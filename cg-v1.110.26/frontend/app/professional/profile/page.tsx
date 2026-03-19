@@ -3,51 +3,38 @@
 import React, { useState, useEffect } from "react";
 import {
   User,
-  Briefcase,
   MapPin,
-  Star,
-  Globe,
-  Edit,
   Save,
   X,
   ShieldCheck,
   CheckCircle2,
-  AlertTriangle,
   Building2,
-  DollarSign,
   Video,
-  ExternalLink,
-  ChevronRight,
-  BookOpen,
-  Award,
-  Clock,
-  Briefcase as CaseIcon,
-  Phone,
-  Mail,
+  Globe,
   Linkedin,
   Twitter,
   Instagram,
   Facebook,
-  Scale,
-  Gavel,
+  GraduationCap,
+  Languages,
+  Eye,
+  Loader2,
+  Camera,
+  FileText,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useProfessionalAuth } from "../layout";
 import { MediaUpload } from "@/components/professional/media-upload";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface EducationItem {
   institution: string;
@@ -71,7 +58,6 @@ interface ProfileFormData {
   headshot_url: string;
   video_url: string;
   languages: string[];
-  hourly_rate: string;
   years_experience: string;
   education: EducationItem[];
   awards: AwardItem[];
@@ -94,6 +80,8 @@ interface FirmFormData {
   works_with_nonprofits: boolean;
   service_location: string;
 }
+
+// ─── Constants ────────────────────────────────────────────────────────────────
 
 const PRACTICE_AREAS = [
   "divorce",
@@ -122,76 +110,16 @@ const FIRM_PRACTICE_AREAS = [
   "Spousal Support",
 ];
 
-const US_STATES = [
-  "AL",
-  "AK",
-  "AZ",
-  "AR",
-  "CA",
-  "CO",
-  "CT",
-  "DE",
-  "FL",
-  "GA",
-  "HI",
-  "ID",
-  "IL",
-  "IN",
-  "IA",
-  "KS",
-  "KY",
-  "LA",
-  "ME",
-  "MD",
-  "MA",
-  "MI",
-  "MN",
-  "MS",
-  "MO",
-  "MT",
-  "NE",
-  "NV",
-  "NH",
-  "NJ",
-  "NM",
-  "NY",
-  "NC",
-  "ND",
-  "OH",
-  "OK",
-  "OR",
-  "PA",
-  "RI",
-  "SC",
-  "SD",
-  "TN",
-  "TX",
-  "UT",
-  "VT",
-  "VA",
-  "WA",
-  "WV",
-  "WI",
-  "WY",
-];
-
-const PROFESSIONAL_TYPES: Record<string, { label: string; color: string }> = {
-  attorney: { label: "Attorney", color: "bg-[#F4F8F7] text-[#1E3A4A] border-2 border-[#1E3A4A]/30" },
-  paralegal: { label: "Paralegal", color: "bg-blue-50 text-blue-900 border-2 border-blue-900/30" },
-  mediator: { label: "Mediator", color: "bg-purple-50 text-purple-900 border-2 border-purple-900/30" },
-  parenting_coordinator: {
-    label: "Parenting Coordinator",
-    color: "bg-emerald-50 text-emerald-900 border-2 border-emerald-900/30",
-  },
-  intake_coordinator: {
-    label: "Intake Coordinator",
-    color: "bg-cyan-50 text-cyan-900 border-2 border-cyan-900/30",
-  },
-  practice_admin: {
-    label: "Practice Admin",
-    color: "bg-slate-50 text-slate-900 border-2 border-slate-900/30",
-  },
+const PROFESSIONAL_TYPES: Record<string, { label: string }> = {
+  attorney: { label: "Attorney" },
+  paralegal: { label: "Paralegal" },
+  mediator: { label: "Mediator" },
+  parenting_coordinator: { label: "Parenting Coordinator" },
+  intake_coordinator: { label: "Intake Coordinator" },
+  practice_admin: { label: "Practice Admin" },
 };
+
+// ─── Helper Components ────────────────────────────────────────────────────────
 
 function ListEditor({
   items,
@@ -209,22 +137,21 @@ function ListEditor({
   const [inputValue, setInputValue] = useState("");
   return (
     <div className="space-y-2">
-      <Label>{label}</Label>
-      <div className="flex flex-wrap gap-2 mb-2">
+      {label && <Label className="text-sm font-medium text-slate-700">{label}</Label>}
+      <div className="flex flex-wrap gap-1.5 mb-2">
         {items.map((item, index) => (
-          <Badge
+          <span
             key={index}
-            variant="secondary"
-            className="flex items-center gap-1 pr-1"
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#F4F8F7] text-[#1E3A4A] text-xs font-medium border border-[#3DAA8A]/20"
           >
             {item}
             <button
               onClick={() => onRemove(index)}
-              className="hover:text-destructive transition-colors"
+              className="hover:text-red-500 transition-colors ml-0.5"
             >
               <X className="h-3 w-3" />
             </button>
-          </Badge>
+          </span>
         ))}
       </div>
       <div className="flex gap-2">
@@ -232,7 +159,8 @@ function ListEditor({
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           placeholder={placeholder}
-          onKeyPress={(e) => {
+          className="h-9 text-sm border-slate-200 focus:border-[#3DAA8A] focus:ring-[#3DAA8A]/20"
+          onKeyDown={(e) => {
             if (e.key === "Enter") {
               e.preventDefault();
               if (inputValue.trim()) {
@@ -246,6 +174,7 @@ function ListEditor({
           type="button"
           size="sm"
           variant="outline"
+          className="h-9 px-4 border-slate-200 hover:bg-[#F4F8F7] hover:border-[#3DAA8A]/30 text-sm"
           onClick={() => {
             if (inputValue.trim()) {
               onAdd(inputValue.trim());
@@ -266,93 +195,77 @@ function ComplexListEditor<T extends Record<string, any>>({
   onRemove,
   fields,
   label,
-  isEditing,
 }: {
   items: T[];
   onAdd: (item: T) => void;
   onRemove: (index: number) => void;
   fields: { key: keyof T; label: string; placeholder: string }[];
   label: string;
-  isEditing: boolean;
+  isEditing?: boolean;
 }) {
   const [newValues, setNewValues] = useState<T>({} as T);
   return (
     <div className="space-y-3">
-      <Label>{label}</Label>
+      <Label className="text-sm font-medium text-slate-700">{label}</Label>
       <div className="space-y-2">
         {items.map((item, index) => (
           <div
             key={index}
-            className="flex items-center justify-between p-3 bg-muted/30 rounded-md border"
+            className="flex items-center justify-between p-3 bg-[#F4F8F7]/50 rounded-xl border border-slate-100"
           >
             <div className="text-sm">
               {fields.map((f, i) => (
                 <span key={String(f.key)}>
-                  {i > 0 && " • "}
-                  <span
-                    className={
-                      i === 0
-                        ? "font-bold text-foreground"
-                        : "text-muted-foreground"
-                    }
-                  >
+                  {i > 0 && " · "}
+                  <span className={i === 0 ? "font-semibold text-slate-900" : "text-slate-500"}>
                     {String(item[f.key])}
                   </span>
                 </span>
               ))}
             </div>
-            {isEditing && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onRemove(index)}
-                className="text-muted-foreground hover:text-destructive"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            )}
+            <button
+              onClick={() => onRemove(index)}
+              className="text-slate-400 hover:text-red-500 transition-colors p-1"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
           </div>
         ))}
-        {items.length === 0 && !isEditing && (
-          <p className="text-sm text-muted-foreground italic pl-1">
-            Not provided
-          </p>
+        {items.length === 0 && (
+          <p className="text-sm text-slate-400 italic py-2">None added yet</p>
         )}
       </div>
-
-      {isEditing && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-2 border p-3 rounded-md bg-muted/10 mt-2">
-          {fields.map((f) => (
-            <div key={String(f.key)} className="space-y-1">
-              <Label className="text-[10px] uppercase text-muted-foreground">
-                {f.label}
-              </Label>
-              <Input
-                value={(newValues[f.key] as string) || ""}
-                onChange={(e) =>
-                  setNewValues((v) => ({ ...v, [f.key]: e.target.value }))
-                }
-                placeholder={f.placeholder}
-                className="h-8 text-xs h-8"
-              />
-            </div>
-          ))}
-          <div className="flex items-end">
-            <Button
-              size="sm"
-              className="w-full h-8"
-              onClick={() => {
-                if (Object.values(newValues).some((v) => v)) {
-                  onAdd(newValues);
-                  setNewValues({} as T);
-                }
-              }}
-            >
-              Add
-            </Button>
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 p-3 rounded-xl bg-slate-50/80 border border-slate-100">
+        {fields.map((f) => (
+          <div key={String(f.key)} className="space-y-1">
+            <label className="text-[10px] uppercase text-slate-400 font-semibold tracking-wider">
+              {f.label}
+            </label>
+            <Input
+              value={(newValues[f.key] as string) || ""}
+              onChange={(e) =>
+                setNewValues((v) => ({ ...v, [f.key]: e.target.value }))
+              }
+              placeholder={f.placeholder}
+              className="h-8 text-xs border-slate-200 focus:border-[#3DAA8A]"
+            />
           </div>
+        ))}
+        <div className="flex items-end">
+          <Button
+            size="sm"
+            className="w-full h-8 bg-[#1E3A4A] hover:bg-[#2D6A8F] text-white text-xs"
+            onClick={() => {
+              if (Object.values(newValues).some((v) => v)) {
+                onAdd(newValues);
+                setNewValues({} as T);
+              }
+            }}
+          >
+            Add
+          </Button>
         </div>
-      )}
+      </div>
     </div>
   );
 }
@@ -366,122 +279,218 @@ function SocialLinksEditor({
 }) {
   const SOCIAL_NETWORKS = [
     { id: "linkedin", label: "LinkedIn", icon: Linkedin },
-    { id: "twitter", label: "Twitter", icon: Twitter },
+    { id: "twitter", label: "Twitter / X", icon: Twitter },
     { id: "instagram", label: "Instagram", icon: Instagram },
     { id: "facebook", label: "Facebook", icon: Facebook },
     { id: "website", label: "Website", icon: Globe },
   ];
 
   return (
-    <div className="space-y-4 p-4 bg-slate-50 rounded-xl border border-slate-100">
-      <Label className="text-slate-600 text-xs font-semibold uppercase tracking-wider">
-        Social Channels
-      </Label>
-      <div className="space-y-3">
-        {SOCIAL_NETWORKS.map((sn) => (
-          <div key={sn.id} className="relative group">
-            <Input
-              value={links[sn.id] || ""}
-              onChange={(e) => onChange({ ...links, [sn.id]: e.target.value })}
-              placeholder={`${sn.label} URL`}
-              className="pl-9 bg-white border-slate-200 transition-all focus:ring-emerald-500"
-            />
-            <sn.icon className="h-4 w-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 group-focus-within:text-emerald-500 transition-colors" />
-          </div>
-        ))}
-      </div>
+    <div className="space-y-3">
+      {SOCIAL_NETWORKS.map((sn) => (
+        <div key={sn.id} className="relative">
+          <sn.icon className="h-4 w-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 z-10" />
+          <Input
+            value={links[sn.id] || ""}
+            onChange={(e) => onChange({ ...links, [sn.id]: e.target.value })}
+            placeholder={`${sn.label} URL`}
+            className="pl-10 h-10 border-slate-200 focus:border-[#3DAA8A] focus:ring-[#3DAA8A]/20 text-sm"
+          />
+        </div>
+      ))}
     </div>
   );
 }
 
-function MobileDirectoryCard({
+// ─── Live Directory Card Preview (mirrors ProfessionalCard.tsx) ──────────────
+
+function DirectoryCardPreview({
+  firmName,
+  firmFormData,
+}: {
+  firmName: string;
+  firmFormData: FirmFormData;
+}) {
+  return (
+    <Card className="overflow-hidden bg-white rounded-3xl border-2 border-slate-100 shadow-md flex flex-col group">
+      {/* Media Header — mirrors ProfessionalCard */}
+      <div className="relative h-44 bg-slate-50 overflow-hidden">
+        {firmFormData.video_url ? (
+          <div className="absolute inset-0">
+            <video
+              src={firmFormData.video_url}
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-black/10 backdrop-blur-[1px] z-10" />
+            <div className="absolute bottom-3 right-3 z-20 w-10 h-10 rounded-full bg-white/30 backdrop-blur-md flex items-center justify-center border border-white/50 shadow-sm">
+              <Video className="w-5 h-5 text-white fill-current" />
+            </div>
+          </div>
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center bg-slate-50 p-6">
+            {firmFormData.logo_url ? (
+              <div className="relative w-full h-full flex items-center justify-center">
+                <img
+                  src={firmFormData.logo_url.startsWith("http") ? firmFormData.logo_url : `${API_BASE}${firmFormData.logo_url}`}
+                  alt={firmName}
+                  className="max-w-full max-h-full object-contain"
+                />
+              </div>
+            ) : (
+              <div className="w-20 h-20 rounded-full bg-slate-200 flex items-center justify-center shadow-inner">
+                <span className="text-4xl font-bold text-slate-400" style={{ fontFamily: "DM Serif Display, serif" }}>
+                  {firmName.charAt(0) || "F"}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Badges */}
+        <div className="absolute top-3 left-3 z-30 flex flex-col gap-2">
+          {firmFormData.safety_vetted && (
+            <Badge className="bg-emerald-500 text-white gap-1 border-0 shadow-sm text-[10px]">
+              <ShieldCheck className="w-3 h-3" />
+              Safety Vetted
+            </Badge>
+          )}
+        </div>
+      </div>
+
+      {/* Content — mirrors ProfessionalCard */}
+      <CardContent className="flex-1 p-5 space-y-3">
+        <div>
+          <h3
+            className="font-bold text-lg leading-tight text-slate-900"
+            style={{ fontFamily: "DM Serif Display, Georgia, serif" }}
+          >
+            {firmName || "Your Firm Name"}
+          </h3>
+          {firmFormData.headline && (
+            <p className="text-[11px] font-bold text-[#3DAA8A] mb-2 mt-1 tracking-wide uppercase">
+              {firmFormData.headline}
+            </p>
+          )}
+          {firmFormData.service_location && (
+            <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium mb-3">
+              <MapPin className="w-3 h-3 text-[#3DAA8A]" />
+              <span>{firmFormData.service_location}</span>
+            </div>
+          )}
+          {firmFormData.description && (
+            <p className="text-sm text-slate-600 line-clamp-3 leading-relaxed">
+              {firmFormData.description}
+            </p>
+          )}
+        </div>
+        {firmFormData.practice_areas.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 pt-1">
+            {firmFormData.practice_areas.slice(0, 3).map((area) => (
+              <span
+                key={area}
+                className="px-2.5 py-0.5 rounded-full bg-[#F4F8F7] text-[#3DAA8A] text-[10px] font-bold border border-[#3DAA8A]/10"
+              >
+                {area}
+              </span>
+            ))}
+            {firmFormData.practice_areas.length > 3 && (
+              <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-500 text-[10px] font-bold">
+                +{firmFormData.practice_areas.length - 3}
+              </span>
+            )}
+          </div>
+        )}
+      </CardContent>
+
+      <CardFooter className="p-5 pt-0 mt-auto">
+        <div className="w-full rounded-full bg-[#3DAA8A] text-white text-center py-2.5 text-sm font-bold opacity-60 cursor-default">
+          View Profile
+        </div>
+      </CardFooter>
+    </Card>
+  );
+}
+
+// ─── Team Member Mini Card ──────────────────────────────────────────────────
+
+function TeamMemberPreview({
   profile,
   formData,
 }: {
   profile: any;
   formData: ProfileFormData;
 }) {
-  const displayName =
-    `${profile?.user_first_name || ""} ${profile?.user_last_name || ""}`.trim();
+  const displayName = `${profile?.user_first_name || ""} ${profile?.user_last_name || ""}`.trim();
   const typeInfo = PROFESSIONAL_TYPES[profile?.professional_type || "attorney"];
 
   return (
-    <Card className="max-w-[320px] mx-auto overflow-hidden shadow-xl border-0 bg-white ring-1 ring-slate-200 group">
-      <div className="relative h-40 bg-slate-100">
+    <div className="flex items-start gap-3 p-3 rounded-xl bg-white border border-slate-100">
+      <div className="w-11 h-11 rounded-full bg-[#F4F8F7] flex items-center justify-center shrink-0 overflow-hidden border border-slate-200">
         {formData.headshot_url ? (
           <img
-            src={
-              formData.headshot_url.startsWith("http")
-                ? formData.headshot_url
-                : `${API_BASE}${formData.headshot_url}`
-            }
+            src={formData.headshot_url.startsWith("http") ? formData.headshot_url : `${API_BASE}${formData.headshot_url}`}
             className="w-full h-full object-cover"
             alt={displayName}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-emerald-50">
-            <User className="h-12 w-12 text-emerald-200" />
-          </div>
+          <User className="h-5 w-5 text-slate-400" />
         )}
-        <div className="absolute top-3 left-3 flex gap-1.5">
-          <Badge className="bg-white/90 backdrop-blur-md text-emerald-600 border-0 shadow-sm text-[9px] font-bold">
-            TOP RATED
-          </Badge>
-          <Badge className="bg-blue-600 text-white border-0 shadow-sm text-[9px] font-bold">
-            VERIFIED
-          </Badge>
-        </div>
       </div>
-      <div className="p-4 space-y-3">
-        <div>
-          <h3 className="font-bold text-slate-900 group-hover:text-emerald-600 transition-colors">
-            {displayName || "Professional Name"}
-          </h3>
-          <p className="text-[10px] text-slate-500 font-medium uppercase tracking-tight mt-0.5">
-            {typeInfo.label} • {formData.years_experience || "0"} Years exp
-          </p>
-        </div>
-        <p className="text-[11px] text-slate-600 line-clamp-2 leading-relaxed italic border-l-2 border-emerald-500 pl-2">
-          {formData.headline ||
-            "Seeking representation? I specialize in complex family transitions."}
-        </p>
-        <div className="flex flex-wrap gap-1 mt-2">
-          {formData.practice_areas.slice(0, 3).map((area) => (
-            <Badge
-              key={area}
-              variant="outline"
-              className="text-[9px] px-1.5 py-0 bg-slate-50 border-slate-100 text-slate-500 capitalize"
-            >
-              {area.replace(/_/g, " ")}
-            </Badge>
-          ))}
-        </div>
-        <div className="flex items-center justify-between pt-3 border-t border-slate-50">
-          <div className="flex items-center gap-1.5">
-            <div className="flex h-4 items-center -space-x-1">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <Star
-                  key={i}
-                  className="h-2.5 w-2.5 fill-amber-400 text-amber-400"
-                />
-              ))}
-            </div>
-            <span className="text-[10px] font-bold text-slate-700">5.0</span>
-          </div>
-          <p className="text-[10px] font-bold text-slate-900">
-            {formData.hourly_rate || "$0"}
-            <span className="font-normal text-slate-400">/hr</span>
-          </p>
-        </div>
+      <div className="min-w-0">
+        <p className="text-sm font-semibold text-slate-900 truncate">{displayName || "Your Name"}</p>
+        <p className="text-[11px] text-slate-500">{typeInfo?.label}</p>
+        {formData.headline && (
+          <p className="text-[11px] text-[#3DAA8A] mt-0.5 truncate">{formData.headline}</p>
+        )}
       </div>
-    </Card>
+    </div>
   );
 }
 
+// ─── Section Wrapper ──────────────────────────────────────────────────────────
+
+function FormSection({
+  icon: Icon,
+  title,
+  description,
+  children,
+}: {
+  icon: React.ElementType;
+  title: string;
+  description?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+      <div className="px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-[#F4F8F7]/60 to-white">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-[#1E3A4A] flex items-center justify-center">
+            <Icon className="h-4 w-4 text-white" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-slate-900 text-[15px]">{title}</h3>
+            {description && (
+              <p className="text-xs text-slate-500 mt-0.5">{description}</p>
+            )}
+          </div>
+        </div>
+      </div>
+      <div className="p-6">{children}</div>
+    </div>
+  );
+}
+
+// ─── Main Page ────────────────────────────────────────────────────────────────
+
 export default function ProfilePage() {
   const { profile, firms, token, refreshProfile } = useProfessionalAuth();
-  const [isEditing, setIsEditing] = useState(false);
+  const [activeTab, setActiveTab] = useState<"profile" | "firm">("profile");
   const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
   const [formData, setFormData] = useState<ProfileFormData>({
     license_number: "",
     license_state: "",
@@ -492,7 +501,6 @@ export default function ProfilePage() {
     headshot_url: "",
     video_url: "",
     languages: [],
-    hourly_rate: "",
     years_experience: "",
     education: [],
     awards: [],
@@ -501,7 +509,6 @@ export default function ProfilePage() {
     service_location: "",
   });
 
-  // Firm editing state
   const [selectedFirmId, setSelectedFirmId] = useState<string | null>(null);
   const [firmFormData, setFirmFormData] = useState<FirmFormData>({
     description: "",
@@ -520,6 +527,7 @@ export default function ProfilePage() {
   const [isSavingFirm, setIsSavingFirm] = useState(false);
   const [firmSaveSuccess, setFirmSaveSuccess] = useState(false);
 
+  // Load profile data
   useEffect(() => {
     if (profile) {
       setFormData({
@@ -532,7 +540,6 @@ export default function ProfilePage() {
         headshot_url: profile.headshot_url || "",
         video_url: profile.video_url || "",
         languages: profile.languages || [],
-        hourly_rate: profile.hourly_rate || "",
         years_experience: profile.years_experience?.toString() || "",
         education: profile.education || [],
         awards: profile.awards || [],
@@ -543,12 +550,14 @@ export default function ProfilePage() {
     }
   }, [profile]);
 
+  // Auto-select first firm
   useEffect(() => {
     if (firms.length > 0 && !selectedFirmId) {
       setSelectedFirmId(firms[0].id);
     }
   }, [firms, selectedFirmId]);
 
+  // Load firm data
   useEffect(() => {
     const loadFirmData = async () => {
       if (selectedFirmId && token) {
@@ -568,8 +577,7 @@ export default function ProfilePage() {
               pricing_structure: firmData.pricing_structure || {},
               safety_vetted: firmData.safety_vetted || false,
               accepted_payment_methods: firmData.accepted_payment_methods || [],
-              payment_plans_available:
-                firmData.payment_plans_available || false,
+              payment_plans_available: firmData.payment_plans_available || false,
               works_with_nonprofits: firmData.works_with_nonprofits || false,
               service_location: firmData.service_location || "",
             });
@@ -580,9 +588,10 @@ export default function ProfilePage() {
       }
     };
     loadFirmData();
-  }, [selectedFirmId]);
+  }, [selectedFirmId, token]);
 
-  const handleSave = async () => {
+  // Save handlers
+  const handleSaveProfile = async () => {
     if (!profile || !token) return;
     setIsSaving(true);
     try {
@@ -597,7 +606,8 @@ export default function ProfilePage() {
           years_experience: parseInt(formData.years_experience) || 0,
         }),
       });
-      setIsEditing(false);
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
       await refreshProfile();
     } catch (error) {
       console.error("Error saving profile:", error);
@@ -607,7 +617,7 @@ export default function ProfilePage() {
   };
 
   const handleSaveFirm = async () => {
-    if (!selectedFirmId) return;
+    if (!selectedFirmId || !token) return;
     setIsSavingFirm(true);
     try {
       const response = await fetch(
@@ -633,127 +643,99 @@ export default function ProfilePage() {
   };
 
   const togglePracticeArea = (area: string) => {
-    setFormData((prev) => {
-      const areas = prev.practice_areas.includes(area)
+    setFormData((prev) => ({
+      ...prev,
+      practice_areas: prev.practice_areas.includes(area)
         ? prev.practice_areas.filter((a) => a !== area)
-        : [...prev.practice_areas, area];
-      return { ...prev, practice_areas: areas };
-    });
+        : [...prev.practice_areas, area],
+    }));
   };
 
   const toggleFirmPracticeArea = (area: string) => {
-    setFirmFormData((prev) => {
-      const areas = prev.practice_areas.includes(area)
+    setFirmFormData((prev) => ({
+      ...prev,
+      practice_areas: prev.practice_areas.includes(area)
         ? prev.practice_areas.filter((a) => a !== area)
-        : [...prev.practice_areas, area];
-      return { ...prev, practice_areas: areas };
-    });
+        : [...prev.practice_areas, area],
+    }));
   };
 
   if (!profile) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-[#3DAA8A]" />
       </div>
     );
   }
 
-  const typeInfo = PROFESSIONAL_TYPES[profile.professional_type];
-  const displayName =
-    `${profile.user_first_name || ""} ${profile.user_last_name || ""}`.trim();
+  const firmName = firms.find((f) => f.id === selectedFirmId)?.name || "Your Firm";
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2">
-      <link
-        href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Outfit:wght@400;500;600;700&display=swap"
-        rel="stylesheet"
-      />
+    <div className="max-w-7xl mx-auto py-2">
+      {/* Page Header */}
+      <div className="mb-8">
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+              Directory Profile
+            </h1>
+            <p className="text-sm text-slate-500 mt-1">
+              Manage how parents find and see you in the CommonGround directory
+            </p>
+          </div>
+          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#F4F8F7] border border-[#3DAA8A]/20">
+            <Eye className="h-3.5 w-3.5 text-[#3DAA8A]" />
+            <span className="text-xs font-medium text-[#1E3A4A]">Live Preview</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Tab Navigation */}
+      <div className="flex gap-1 mb-6 bg-slate-100/80 rounded-xl p-1 w-fit">
+        <button
+          onClick={() => setActiveTab("profile")}
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all ${
+            activeTab === "profile"
+              ? "bg-white text-[#1E3A4A] shadow-sm"
+              : "text-slate-500 hover:text-slate-700"
+          }`}
+        >
+          <User className="h-4 w-4" />
+          Your Profile
+        </button>
+        <button
+          onClick={() => setActiveTab("firm")}
+          className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all ${
+            activeTab === "firm"
+              ? "bg-white text-[#1E3A4A] shadow-sm"
+              : "text-slate-500 hover:text-slate-700"
+          }`}
+        >
+          <Building2 className="h-4 w-4" />
+          Your Firm
+        </button>
+      </div>
+
       <div className="flex flex-col lg:flex-row gap-8">
-        {/* LEFT COLUMN: EDITOR */}
-        <div className="flex-1 space-y-8 min-w-0 pb-20">
-          {/* Header */}
-          <div className="relative overflow-hidden rounded-sm bg-gradient-to-br from-[#1E3A4A] via-[#2D6A8F] to-[#3DAA8A] px-8 py-8 shadow-2xl border-2 border-[#1E3A4A]/40">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#2D6A8F] via-[#D4AF37] to-[#2D6A8F]" />
-            <div className="flex items-start gap-5">
-              <div className="p-4 bg-[#F4F8F7] border-2 border-[#1E3A4A]/20 rounded-sm shadow-xl shrink-0">
-                <Scale className="h-8 w-8 text-[#1E3A4A]" strokeWidth={1.5} />
-              </div>
-              <div>
-                <h1 className="serif text-3xl lg:text-4xl font-bold text-white leading-tight tracking-tight">
-                  Directory Presence Manager
-                </h1>
-                <p className="sans text-sm text-[#E8F4F0] mt-2 max-w-3xl">
-                  Control how parents see you in the professional directory
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              {!isEditing ? (
-                <Button
-                  onClick={() => setIsEditing(true)}
-                  className="bg-[#1E3A4A] hover:bg-[#2D6A8F] text-white shadow-lg border-2 border-[#1E3A4A]/40 sans font-semibold"
-                >
-                  <Edit className="h-4 w-4 mr-2" />
-                  Edit Profile
-                </Button>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsEditing(false)}
-                    className="shadow-sm border-2 border-slate-300 sans"
-                  >
-                    <X className="h-4 w-4 mr-2" />
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={handleSave}
-                    disabled={isSaving}
-                    className="bg-[#1E3A4A] hover:bg-[#2D6A8F] text-white shadow-lg border-2 border-[#1E3A4A]/40 sans font-semibold"
-                  >
-                    <Save className="h-4 w-4 mr-2" />
-                    {isSaving ? "Saving..." : "Save Profile"}
-                  </Button>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
-            {/* Attorney Identity Section */}
-            <div className="bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white rounded-sm shadow-lg border-2 border-[#1E3A4A]/30 overflow-hidden relative">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A4A] via-[#3DAA8A] to-[#1E3A4A]"></div>
-              <div className="border-b-2 border-[#1E3A4A]/10 bg-gradient-to-r from-[#F4F8F7] to-white px-6 py-4 flex items-center justify-between">
-                <div className="flex items-center gap-2 serif font-bold text-slate-900">
-                  <User className="h-5 w-5 text-[#1E3A4A]" strokeWidth={2} />
-                  Individual Attorney Details
-                </div>
-                <Badge className="bg-[#F4F8F7] text-[#1E3A4A] border-2 border-[#1E3A4A]/30 sans">
-                  Private & Public Mix
-                </Badge>
-              </div>
-              <div className="p-6 space-y-6">
+        {/* ═══════════════════════════ LEFT: FORM ═══════════════════════════ */}
+        <div className="flex-1 min-w-0 space-y-6 pb-20">
+          {activeTab === "profile" ? (
+            <>
+              {/* ─── Headshot & Headline ─── */}
+              <FormSection icon={Camera} title="Photo & Headline" description="First impressions matter — this appears on the firm detail page">
                 <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <Label className="text-slate-700 font-semibold">
-                      Professional Headshot
-                    </Label>
+                  <div>
+                    <Label className="text-sm font-medium text-slate-700 mb-2 block">Headshot</Label>
                     <MediaUpload
-                      label=""
                       value={formData.headshot_url}
-                      onChange={(url) =>
-                        setFormData((prev) => ({ ...prev, headshot_url: url }))
-                      }
+                      onChange={(url) => setFormData((prev) => ({ ...prev, headshot_url: url }))}
                       onUpload={async (file: File) => {
-                        const formData = new FormData();
-                        formData.append("file", file);
+                        const fd = new FormData();
+                        fd.append("file", file);
                         const response = await fetch(`${API_BASE}/api/v1/professional/profile/headshot`, {
                           method: "POST",
                           headers: { Authorization: `Bearer ${token}` },
-                          body: formData,
+                          body: fd,
                         });
                         const updated = await response.json();
                         return updated.headshot_url || "";
@@ -762,253 +744,162 @@ export default function ProfilePage() {
                       placeholder="Upload Headshot"
                     />
                   </div>
-                  <div className="space-y-4">
-                    <Label
-                      htmlFor="headline"
-                      className="text-slate-700 font-semibold"
+                  <div className="space-y-5">
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium text-slate-700">Professional Headline</Label>
+                      <Input
+                        value={formData.headline}
+                        onChange={(e) => setFormData((prev) => ({ ...prev, headline: e.target.value }))}
+                        placeholder="e.g. Board Certified Family Law Specialist"
+                        className="border-slate-200 focus:border-[#3DAA8A] focus:ring-[#3DAA8A]/20"
+                        maxLength={150}
+                      />
+                      <p className="text-[11px] text-slate-400">Appears below your name on the team page</p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-slate-700">Years Experience</Label>
+                        <Input
+                          type="number"
+                          value={formData.years_experience}
+                          onChange={(e) => setFormData((prev) => ({ ...prev, years_experience: e.target.value }))}
+                          placeholder="0"
+                          className="border-slate-200 focus:border-[#3DAA8A]"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-slate-700">Location</Label>
+                        <Input
+                          value={formData.service_location}
+                          onChange={(e) => setFormData((prev) => ({ ...prev, service_location: e.target.value }))}
+                          placeholder="e.g. Los Angeles, CA"
+                          className="border-slate-200 focus:border-[#3DAA8A]"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </FormSection>
+
+              {/* ─── Biography ─── */}
+              <FormSection icon={FileText} title="Biography" description="Tell parents about your approach and experience">
+                <Textarea
+                  value={formData.bio}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, bio: e.target.value }))}
+                  placeholder="Tell parents about your approach to family law, your experience with high-conflict cases, and what makes your practice different..."
+                  className="min-h-[140px] border-slate-200 focus:border-[#3DAA8A] focus:ring-[#3DAA8A]/20 text-sm leading-relaxed resize-y"
+                />
+              </FormSection>
+
+              {/* ─── Practice Areas ─── */}
+              <FormSection icon={Sparkles} title="Practice Areas" description="Select all areas you specialize in">
+                <div className="flex flex-wrap gap-2">
+                  {PRACTICE_AREAS.map((area) => (
+                    <button
+                      key={area}
+                      onClick={() => togglePracticeArea(area)}
+                      className={`px-3.5 py-2 rounded-full text-sm font-medium transition-all capitalize ${
+                        formData.practice_areas.includes(area)
+                          ? "bg-[#1E3A4A] text-white shadow-sm"
+                          : "bg-slate-50 text-slate-600 border border-slate-200 hover:border-[#3DAA8A]/40 hover:bg-[#F4F8F7]"
+                      }`}
                     >
-                      Professional Headline
-                    </Label>
-                    <Input
-                      id="headline"
-                      value={formData.headline}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          headline: e.target.value,
-                        }))
-                      }
-                      placeholder="e.g. Board Certified Family Law Specialist"
-                      className="border-slate-300 focus:ring-emerald-500"
-                      maxLength={150}
-                    />
-                    <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">
-                      Visible on search result cards
-                    </p>
-                  </div>
+                      {area.replace(/_/g, " ")}
+                    </button>
+                  ))}
                 </div>
+              </FormSection>
 
-                <div className="space-y-2">
-                  <Label htmlFor="bio" className="text-slate-700 font-semibold">
-                    Short Biography
-                  </Label>
-                  <Textarea
-                    id="bio"
-                    value={formData.bio}
-                    onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, bio: e.target.value }))
-                    }
-                    placeholder="Tell parents about your approach to high-conflict cases..."
-                    className="min-h-[120px] border-slate-300 focus:ring-emerald-500"
-                  />
-                </div>
+              {/* ─── Languages ─── */}
+              <FormSection icon={Languages} title="Languages" description="Languages you can serve clients in">
+                <ListEditor
+                  label=""
+                  items={formData.languages}
+                  onAdd={(l) => setFormData((p) => ({ ...p, languages: [...p.languages, l] }))}
+                  onRemove={(i) => setFormData((p) => ({ ...p, languages: p.languages.filter((_, idx) => idx !== i) }))}
+                  placeholder="e.g. Spanish, Mandarin..."
+                />
+              </FormSection>
 
-                <div className="grid md:grid-cols-3 gap-6 pt-4 border-t border-slate-50">
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="service_location"
-                      className="text-slate-700 font-semibold"
-                    >
-                      Service Location
-                    </Label>
-                    <Input
-                      id="service_location"
-                      value={formData.service_location}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          service_location: e.target.value,
-                        }))
-                      }
-                      placeholder="e.g. San Francisco Area"
-                      className="border-slate-300 focus:ring-emerald-500"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="years_experience"
-                      className="text-slate-700 font-semibold"
-                    >
-                      Years of Experience
-                    </Label>
-                    <Input
-                      id="years_experience"
-                      type="number"
-                      value={formData.years_experience}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          years_experience: e.target.value,
-                        }))
-                      }
-                      className="border-slate-300"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-slate-700 font-semibold">
-                      Languages
-                    </Label>
-                    <ListEditor
-                      label=""
-                      items={formData.languages}
-                      onAdd={(l) =>
-                        setFormData((p) => ({
-                          ...p,
-                          languages: [...p.languages, l],
-                        }))
-                      }
-                      onRemove={(i) =>
-                        setFormData((p) => ({
-                          ...p,
-                          languages: p.languages.filter((_, idx) => idx !== i),
-                        }))
-                      }
-                      placeholder="Add language..."
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Expertise Section */}
-            <div className="bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white rounded-sm shadow-lg border-2 border-[#1E3A4A]/30 overflow-hidden relative">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A4A] via-[#3DAA8A] to-[#1E3A4A]"></div>
-              <div className="border-b-2 border-[#1E3A4A]/10 bg-gradient-to-r from-[#F4F8F7] to-white px-6 py-4">
-                <div className="flex items-center gap-2 serif font-bold text-slate-900">
-                  <Gavel className="h-5 w-5 text-[#1E3A4A]" strokeWidth={2} />
-                  Expertise & Academic Background
-                </div>
-              </div>
-              <div className="p-6 space-y-8">
-                <div className="space-y-3">
-                  <Label className="serif text-slate-900 font-bold">
-                    Practice Areas
-                  </Label>
-                  <div className="flex flex-wrap gap-2">
-                    {PRACTICE_AREAS.map((area) => (
-                      <Button
-                        key={area}
-                        variant={
-                          formData.practice_areas.includes(area)
-                            ? "default"
-                            : "outline"
-                        }
-                        size="sm"
-                        onClick={() => togglePracticeArea(area)}
-                        className={
-                          formData.practice_areas.includes(area)
-                            ? "bg-[#1E3A4A] hover:bg-[#2D6A8F] text-white border-2 border-[#1E3A4A]/40 sans font-semibold"
-                            : "border-2 border-slate-300 sans hover:border-[#1E3A4A]/40 hover:bg-[#F4F8F7]"
-                        }
-                      >
-                        {area.replace(/_/g, " ")}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-8 pt-6 border-t border-slate-50">
+              {/* ─── Education & Awards ─── */}
+              <FormSection icon={GraduationCap} title="Education & Credentials" description="Build trust with your academic background">
+                <div className="space-y-8">
                   <ComplexListEditor
-                    label="Education History"
+                    label="Education"
                     items={formData.education}
                     isEditing={true}
-                    onAdd={(item) =>
-                      setFormData((p) => ({
-                        ...p,
-                        education: [...p.education, item],
-                      }))
-                    }
-                    onRemove={(i) =>
-                      setFormData((p) => ({
-                        ...p,
-                        education: p.education.filter((_, idx) => idx !== i),
-                      }))
-                    }
+                    onAdd={(item) => setFormData((p) => ({ ...p, education: [...p.education, item] }))}
+                    onRemove={(i) => setFormData((p) => ({ ...p, education: p.education.filter((_, idx) => idx !== i) }))}
                     fields={[
-                      {
-                        key: "institution",
-                        label: "Institution",
-                        placeholder: "University Name",
-                      },
-                      {
-                        key: "degree",
-                        label: "Degree",
-                        placeholder: "Juris Doctor",
-                      },
+                      { key: "institution", label: "Institution", placeholder: "University Name" },
+                      { key: "degree", label: "Degree", placeholder: "Juris Doctor" },
                       { key: "year", label: "Year", placeholder: "2010" },
                     ]}
                   />
-                  <ComplexListEditor
-                    label="Awards & Honors"
-                    items={formData.awards}
-                    isEditing={true}
-                    onAdd={(item) =>
-                      setFormData((p) => ({
-                        ...p,
-                        awards: [...p.awards, item],
-                      }))
-                    }
-                    onRemove={(i) =>
-                      setFormData((p) => ({
-                        ...p,
-                        awards: p.awards.filter((_, idx) => idx !== i),
-                      }))
-                    }
-                    fields={[
-                      {
-                        key: "title",
-                        label: "Award Title",
-                        placeholder: "Super Lawyer",
-                      },
-                      {
-                        key: "organization",
-                        label: "Organization",
-                        placeholder: "State Bar",
-                      },
-                      { key: "year", label: "Year", placeholder: "2023" },
-                    ]}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Firm Presence Section */}
-            <div className="bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white rounded-sm shadow-lg border-2 border-[#1E3A4A]/30 overflow-hidden relative">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A4A] via-[#3DAA8A] to-[#1E3A4A]"></div>
-              <div className="border-b-2 border-[#1E3A4A]/10 bg-gradient-to-r from-[#1E3A4A] via-[#2D6A8F] to-[#3DAA8A] px-6 py-4">
-                <div className="flex items-center gap-2 serif font-bold text-white">
-                  <Building2 className="h-5 w-5 text-[#F4F8F7]" strokeWidth={2} />
-                  Firm-Wide Identity
-                </div>
-              </div>
-              <div className="p-6 space-y-8">
-                {firms.length === 0 ? (
-                  <div className="text-center py-10">
-                    <p className="text-slate-500">No firm association found.</p>
+                  <div className="border-t border-slate-100 pt-6">
+                    <ComplexListEditor
+                      label="Awards & Honors"
+                      items={formData.awards}
+                      isEditing={true}
+                      onAdd={(item) => setFormData((p) => ({ ...p, awards: [...p.awards, item] }))}
+                      onRemove={(i) => setFormData((p) => ({ ...p, awards: p.awards.filter((_, idx) => idx !== i) }))}
+                      fields={[
+                        { key: "title", label: "Award", placeholder: "Super Lawyer" },
+                        { key: "organization", label: "Organization", placeholder: "State Bar" },
+                        { key: "year", label: "Year", placeholder: "2023" },
+                      ]}
+                    />
                   </div>
-                ) : (
-                  <>
+                </div>
+              </FormSection>
+
+              {/* Save Button */}
+              <div className="flex items-center gap-3 pt-2">
+                <Button
+                  onClick={handleSaveProfile}
+                  disabled={isSaving}
+                  className="bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white px-8 h-11 rounded-xl shadow-sm font-semibold"
+                >
+                  {isSaving ? (
+                    <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Saving...</>
+                  ) : (
+                    <><Save className="h-4 w-4 mr-2" /> Save Profile</>
+                  )}
+                </Button>
+                {saveSuccess && (
+                  <span className="text-sm font-medium text-[#3DAA8A] flex items-center gap-1.5 animate-in fade-in">
+                    <CheckCircle2 className="h-4 w-4" /> Saved
+                  </span>
+                )}
+              </div>
+            </>
+          ) : (
+            <>
+              {/* ═══════════════════ FIRM TAB ═══════════════════ */}
+
+              {firms.length === 0 ? (
+                <div className="text-center py-16 bg-white rounded-2xl border border-slate-200">
+                  <Building2 className="h-12 w-12 text-slate-300 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-slate-700 mb-2">No Firm Associated</h3>
+                  <p className="text-sm text-slate-500">Contact support to link your professional account to a firm.</p>
+                </div>
+              ) : (
+                <>
+                  {/* ─── Firm Logo & Headline ─── */}
+                  <FormSection icon={Building2} title="Firm Identity" description="Logo and headline shown on your directory card">
                     <div className="grid md:grid-cols-2 gap-6">
-                      <div className="space-y-4">
-                        <Label className="text-slate-700 font-semibold">
-                          Firm Logo
-                        </Label>
+                      <div>
+                        <Label className="text-sm font-medium text-slate-700 mb-2 block">Firm Logo</Label>
                         <MediaUpload
-                          label=""
                           value={firmFormData.logo_url}
-                          onChange={(url) =>
-                            setFirmFormData((prev) => ({
-                              ...prev,
-                              logo_url: url,
-                            }))
-                          }
+                          onChange={(url) => setFirmFormData((prev) => ({ ...prev, logo_url: url }))}
                           onUpload={async (file: File) => {
-                            const formData = new FormData();
-                            formData.append("file", file);
+                            const fd = new FormData();
+                            fd.append("file", file);
                             const response = await fetch(`${API_BASE}/api/v1/professional/firms/${selectedFirmId}/logo`, {
                               method: "POST",
                               headers: { Authorization: `Bearer ${token}` },
-                              body: formData,
+                              body: fd,
                             });
                             const updated = await response.json();
                             return updated.logo_url || "";
@@ -1016,193 +907,168 @@ export default function ProfilePage() {
                           aspectRatio="square"
                         />
                       </div>
-                      <div className="space-y-4">
-                        <Label
-                          htmlFor="firm_headline"
-                          className="text-slate-700 font-semibold"
-                        >
-                          Firm Headline
-                        </Label>
-                        <Input
-                          id="firm_headline"
-                          value={firmFormData.headline}
-                          onChange={(e) =>
-                            setFirmFormData((p) => ({
-                              ...p,
-                              headline: e.target.value,
-                            }))
-                          }
-                          placeholder="e.g. Leading Family Law Firm in California"
-                          className="border-slate-300"
-                        />
-                        <Label
-                          htmlFor="firm_service_location"
-                          className="text-slate-700 font-semibold mt-4"
-                        >
-                          Firm Service Location
-                        </Label>
-                        <Input
-                          id="firm_service_location"
-                          value={firmFormData.service_location}
-                          onChange={(e) =>
-                            setFirmFormData((p) => ({
-                              ...p,
-                              service_location: e.target.value,
-                            }))
-                          }
-                          placeholder="Greater Los Angeles Area"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-4 pt-6 border-t border-slate-50">
-                      <Label className="text-slate-700 font-bold text-lg">
-                        Programs & Financials
-                      </Label>
-                      <div className="grid md:grid-cols-2 gap-4">
-                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                          <Label className="font-bold text-slate-700">
-                            Payment Plans Available
-                          </Label>
-                          <input
-                            type="checkbox"
-                            checked={firmFormData.payment_plans_available}
-                            onChange={(e) =>
-                              setFirmFormData((p) => ({
-                                ...p,
-                                payment_plans_available: e.target.checked,
-                              }))
-                            }
-                            className="h-6 w-6 rounded-lg"
+                      <div className="space-y-5">
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium text-slate-700">Firm Headline</Label>
+                          <Input
+                            value={firmFormData.headline}
+                            onChange={(e) => setFirmFormData((p) => ({ ...p, headline: e.target.value }))}
+                            placeholder="e.g. Leading Family Law Firm in California"
+                            className="border-slate-200 focus:border-[#3DAA8A] focus:ring-[#3DAA8A]/20"
                           />
+                          <p className="text-[11px] text-slate-400">Appears below your firm name on the directory card</p>
                         </div>
-                        <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                          <Label className="font-bold text-slate-700">
-                            Works with Nonprofits
-                          </Label>
-                          <input
-                            type="checkbox"
-                            checked={firmFormData.works_with_nonprofits}
-                            onChange={(e) =>
-                              setFirmFormData((p) => ({
-                                ...p,
-                                works_with_nonprofits: e.target.checked,
-                              }))
-                            }
-                            className="h-6 w-6 rounded-lg"
+                        <div className="space-y-2">
+                          <Label className="text-sm font-medium text-slate-700">Service Location</Label>
+                          <Input
+                            value={firmFormData.service_location}
+                            onChange={(e) => setFirmFormData((p) => ({ ...p, service_location: e.target.value }))}
+                            placeholder="e.g. Greater Los Angeles Area"
+                            className="border-slate-200 focus:border-[#3DAA8A]"
                           />
                         </div>
                       </div>
                     </div>
+                  </FormSection>
 
-                    <div className="flex items-center gap-4 pt-6">
-                      <Button
-                        onClick={handleSaveFirm}
-                        disabled={isSavingFirm}
-                        className="bg-[#1E3A4A] hover:bg-[#2D6A8F] text-white min-w-[200px] shadow-lg border-2 border-[#1E3A4A]/40 sans font-semibold"
-                      >
-                        <Save className="h-4 w-4 mr-2" />
-                        {isSavingFirm
-                          ? "Saving..."
-                          : "Save Firm Profile"}
-                      </Button>
-                      {firmSaveSuccess && (
-                        <span className="sans text-sm font-semibold text-[#1E3A4A] flex items-center gap-1.5 animate-in fade-in">
-                          <CheckCircle2 className="h-4 w-4" /> Published
-                        </span>
+                  {/* ─── Firm Description ─── */}
+                  <FormSection icon={FileText} title="About Your Firm" description="Describe your firm's mission and approach">
+                    <Textarea
+                      value={firmFormData.description}
+                      onChange={(e) => setFirmFormData((p) => ({ ...p, description: e.target.value }))}
+                      placeholder="Describe your firm's approach to family law, specializations, and what sets you apart..."
+                      className="min-h-[120px] border-slate-200 focus:border-[#3DAA8A] focus:ring-[#3DAA8A]/20 text-sm leading-relaxed resize-y"
+                    />
+                  </FormSection>
+
+                  {/* ─── Firm Practice Areas ─── */}
+                  <FormSection icon={Sparkles} title="Firm Practice Areas" description="Areas your firm covers">
+                    <div className="flex flex-wrap gap-2">
+                      {FIRM_PRACTICE_AREAS.map((area) => (
+                        <button
+                          key={area}
+                          onClick={() => toggleFirmPracticeArea(area)}
+                          className={`px-3.5 py-2 rounded-full text-sm font-medium transition-all ${
+                            firmFormData.practice_areas.includes(area)
+                              ? "bg-[#1E3A4A] text-white shadow-sm"
+                              : "bg-slate-50 text-slate-600 border border-slate-200 hover:border-[#3DAA8A]/40 hover:bg-[#F4F8F7]"
+                          }`}
+                        >
+                          {area}
+                        </button>
+                      ))}
+                    </div>
+                  </FormSection>
+
+                  {/* ─── Social Links ─── */}
+                  <FormSection icon={Globe} title="Social & Web Presence" description="Help parents find you online">
+                    <SocialLinksEditor
+                      links={firmFormData.social_links}
+                      onChange={(links) => setFirmFormData((p) => ({ ...p, social_links: links }))}
+                    />
+                  </FormSection>
+
+                  {/* ─── Programs ─── */}
+                  <FormSection icon={ShieldCheck} title="Programs & Trust Signals" description="Build confidence with parents">
+                    <div className="space-y-3">
+                      {[
+                        { key: "payment_plans_available" as const, label: "Payment Plans Available", desc: "Offer flexible payment options" },
+                        { key: "works_with_nonprofits" as const, label: "Works with Nonprofits", desc: "Partner with nonprofit organizations" },
+                      ].map((item) => (
+                        <label
+                          key={item.key}
+                          className="flex items-center justify-between p-4 rounded-xl bg-[#F4F8F7]/50 border border-slate-100 hover:border-[#3DAA8A]/20 transition-colors cursor-pointer"
+                        >
+                          <div>
+                            <p className="text-sm font-semibold text-slate-800">{item.label}</p>
+                            <p className="text-xs text-slate-500 mt-0.5">{item.desc}</p>
+                          </div>
+                          <input
+                            type="checkbox"
+                            checked={firmFormData[item.key] as boolean}
+                            onChange={(e) =>
+                              setFirmFormData((p) => ({ ...p, [item.key]: e.target.checked }))
+                            }
+                            className="h-5 w-5 rounded border-slate-300 text-[#3DAA8A] focus:ring-[#3DAA8A]/20"
+                          />
+                        </label>
+                      ))}
+                    </div>
+                  </FormSection>
+
+                  {/* Save Button */}
+                  <div className="flex items-center gap-3 pt-2">
+                    <Button
+                      onClick={handleSaveFirm}
+                      disabled={isSavingFirm}
+                      className="bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white px-8 h-11 rounded-xl shadow-sm font-semibold"
+                    >
+                      {isSavingFirm ? (
+                        <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Saving...</>
+                      ) : (
+                        <><Save className="h-4 w-4 mr-2" /> Save Firm Profile</>
                       )}
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
+                    </Button>
+                    {firmSaveSuccess && (
+                      <span className="text-sm font-medium text-[#3DAA8A] flex items-center gap-1.5 animate-in fade-in">
+                        <CheckCircle2 className="h-4 w-4" /> Published to directory
+                      </span>
+                    )}
+                  </div>
+                </>
+              )}
+            </>
+          )}
         </div>
 
-        {/* RIGHT COLUMN: PREVIEW (STICKY) */}
-        <div className="hidden lg:block w-[360px] flex-shrink-0">
-          <div className="sticky top-8 space-y-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="serif text-xl font-bold text-slate-900">
-                Live Directory Preview
-              </h3>
-              <Badge className="bg-[#F4F8F7] text-[#1E3A4A] border-2 border-[#1E3A4A]/30 uppercase text-[9px] tracking-widest sans font-bold">
-                Real-time
-              </Badge>
+        {/* ═══════════════════════════ RIGHT: LIVE PREVIEW ═══════════════════════════ */}
+        <div className="hidden lg:block w-[380px] flex-shrink-0">
+          <div className="sticky top-6 space-y-5">
+            {/* Preview Header */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  Live Preview
+                </span>
+              </div>
+              <span className="text-[10px] text-slate-400">Updates as you type</span>
             </div>
 
-            <div className="space-y-8 bg-gradient-to-br from-[#F4F8F7]/30 to-white p-6 rounded-sm border-2 border-dashed border-[#1E3A4A]/20 shadow-inner">
-              <div className="space-y-2">
-                <p className="sans text-[10px] font-bold text-[#1E3A4A]/60 uppercase tracking-widest text-center">
-                  Mobile Search Result Card
-                </p>
-                <MobileDirectoryCard profile={profile} formData={formData} />
-              </div>
-
-              <div className="space-y-4 pt-4 border-t-2 border-[#1E3A4A]/20">
-                <p className="sans text-[10px] font-bold text-[#1E3A4A]/60 uppercase tracking-widest text-center">
-                  Firm Page Overview
-                </p>
-                <Card className="p-4 shadow-lg border-2 border-[#1E3A4A]/30 overflow-hidden relative bg-gradient-to-br from-white via-[#F4F8F7]/20 to-white">
-                  <div className="h-1 bg-gradient-to-r from-[#1E3A4A] via-[#3DAA8A] to-[#1E3A4A] absolute top-0 left-0 right-0" />
-                  <h4 className="serif font-bold text-sm text-slate-900 group">
-                    {firms.find((f) => f.id === selectedFirmId)?.name ||
-                      "Your Firm"}
-                    <Globe className="h-3 w-3 inline ml-2 text-[#1E3A4A]/40" />
-                  </h4>
-                  <p className="sans text-[10px] text-slate-600 mt-0.5 line-clamp-1 italic">
-                    {firmFormData.headline || "Headline placeholder..."}
-                  </p>
-                  <div className="mt-3 flex flex-wrap gap-1">
-                    {firmFormData.practice_areas.slice(0, 3).map((a) => (
-                      <div
-                        key={a}
-                        className="sans text-[9px] px-1.5 py-0.5 bg-[#F4F8F7] border-2 border-[#1E3A4A]/20 rounded-sm text-[#1E3A4A]"
-                      >
-                        {a}
-                      </div>
-                    ))}
-                  </div>
-                </Card>
-              </div>
-
-              <Card className="bg-gradient-to-br from-blue-900 to-blue-800 p-4 border-2 border-blue-900/40 shadow-xl">
-                <div className="flex items-center gap-3 text-white">
-                  <div className="p-2 bg-blue-50 rounded-sm border-2 border-blue-900/20">
-                    <ShieldCheck className="h-5 w-5 text-blue-900" />
-                  </div>
-                  <div>
-                    <p className="serif text-xs font-bold leading-tight">
-                      CommonGround Verified Profile
-                    </p>
-                    <p className="sans text-[10px] opacity-80 mt-1 uppercase tracking-wider font-semibold">
-                      Security Level: High
-                    </p>
-                  </div>
-                </div>
-              </Card>
-            </div>
-
-            <div className="p-4 bg-gradient-to-br from-[#F4F8F7] to-[#E8F4F0] rounded-sm border-2 border-[#1E3A4A]/30 flex gap-3 shadow-sm">
-              <AlertTriangle className="h-4 w-4 text-[#1E3A4A] shrink-0 mt-0.5" />
-              <p className="sans text-[11px] text-[#1E3A4A] leading-relaxed font-medium">
-                The information provided above will be indexed by search engines
-                and visible to all CommonGround users. Review your bio and
-                headline for clarity.
+            {/* Directory Card Preview */}
+            <div>
+              <p className="text-[11px] font-medium text-slate-400 mb-2 uppercase tracking-wide">
+                Directory Card
               </p>
+              <DirectoryCardPreview
+                firmName={firmName}
+                firmFormData={firmFormData}
+              />
+            </div>
+
+            {/* Team Member Preview */}
+            <div>
+              <p className="text-[11px] font-medium text-slate-400 mb-2 uppercase tracking-wide">
+                Your Team Listing
+              </p>
+              <TeamMemberPreview profile={profile} formData={formData} />
+            </div>
+
+            {/* Tip */}
+            <div className="p-4 rounded-xl bg-[#F4F8F7] border border-[#3DAA8A]/10">
+              <div className="flex gap-3">
+                <Sparkles className="h-4 w-4 text-[#3DAA8A] shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-xs font-semibold text-[#1E3A4A]">Profile completeness matters</p>
+                  <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">
+                    Firms with a logo, headline, description, and practice areas get 3x more views from parents.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-
-      <style>{`
-        .serif {
-          font-family: "Crimson Pro", serif;
-        }
-        .sans {
-          font-family: "Outfit", sans-serif;
-        }
-      `}</style>
     </div>
   );
 }
