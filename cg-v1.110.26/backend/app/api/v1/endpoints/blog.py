@@ -367,16 +367,9 @@ async def generate_blog_post(
     Returns generated content (title, body, excerpt, SEO fields)
     without saving to database. Admin can review and then create.
     """
-    import anthropic
+    import json
+    import os
     from app.core.config import settings
-
-    if not settings.ANTHROPIC_API_KEY:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="ANTHROPIC_API_KEY not configured. Set it in Render environment variables.",
-        )
-
-    client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
 
     keywords_text = ""
     if data.keywords:
@@ -402,22 +395,63 @@ async def generate_blog_post(
         '- "seo_title": SEO-optimized title (under 60 chars)\n'
         '- "seo_description": meta description (under 160 chars)\n'
         '- "suggested_slug": URL slug\n'
-        '- "suggested_category": one of: co-parenting, communication, legal, children, wellness, technology\n'
+        '- "suggested_category": one of: Co-Parenting Tips, Communication, Legal Insights, Family Wellness, ARIA & Technology, KidSpace\n'
         '- "suggested_tags": array of 3-5 relevant tags\n\n'
         "Return ONLY valid JSON, no markdown code fences."
     )
 
-    try:
-        response = client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=4096,
-            system=system_prompt,
-            messages=[{"role": "user", "content": user_prompt}],
-        )
+    content_text = ""
 
-        import json
-        content_text = response.content[0].text
-        generated = json.loads(content_text)
+    # Try Anthropic first, fall back to OpenAI
+    try:
+        if settings.ANTHROPIC_API_KEY:
+            import anthropic
+            client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
+            response = client.messages.create(
+                model="claude-sonnet-4-20250514",
+                max_tokens=4096,
+                system=system_prompt,
+                messages=[{"role": "user", "content": user_prompt}],
+            )
+            content_text = response.content[0].text
+            logger.info("Blog generated via Anthropic Claude")
+        else:
+            raise Exception("No Anthropic key, falling back to OpenAI")
+
+    except Exception as anthropic_err:
+        logger.warning(f"Anthropic failed ({anthropic_err}), trying OpenAI fallback")
+
+        openai_key = os.environ.get("OPENAI_API_KEY") or getattr(settings, "OPENAI_API_KEY", None)
+        if not openai_key:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Neither ANTHROPIC_API_KEY nor OPENAI_API_KEY configured.",
+            )
+
+        from openai import OpenAI
+        openai_client = OpenAI(api_key=openai_key)
+        response = openai_client.chat.completions.create(
+            model="gpt-4o",
+            max_tokens=4096,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ],
+        )
+        content_text = response.choices[0].message.content or ""
+        logger.info("Blog generated via OpenAI GPT-4o fallback")
+
+    # Parse JSON response
+    try:
+        # Strip markdown fences if present
+        cleaned = content_text.strip()
+        if cleaned.startswith("```"):
+            cleaned = cleaned.split("\n", 1)[1] if "\n" in cleaned else cleaned[3:]
+            if cleaned.endswith("```"):
+                cleaned = cleaned[:-3]
+            cleaned = cleaned.strip()
+
+        generated = json.loads(cleaned)
 
         return {
             "generated": True,
@@ -432,7 +466,6 @@ async def generate_blog_post(
         }
 
     except json.JSONDecodeError:
-        # If Claude doesn't return valid JSON, return raw text
         return {
             "generated": True,
             "title": "",
@@ -449,5 +482,5 @@ async def generate_blog_post(
         logger.error(f"Blog generation failed: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Blog generation failed. Check API key and try again.",
+            detail=f"Blog generation failed: {str(e)}",
         )
