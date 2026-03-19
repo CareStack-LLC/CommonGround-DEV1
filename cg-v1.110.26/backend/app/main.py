@@ -142,6 +142,10 @@ async def lifespan(app: FastAPI):
                 "ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS terms_version VARCHAR(20)",
                 "ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS privacy_policy_accepted_at TIMESTAMP",
                 "ALTER TABLE agreements ADD COLUMN IF NOT EXISTS is_default BOOLEAN DEFAULT FALSE",
+                # COPPA consent fields on children table
+                "ALTER TABLE children ADD COLUMN IF NOT EXISTS coppa_consent_given BOOLEAN DEFAULT FALSE",
+                "ALTER TABLE children ADD COLUMN IF NOT EXISTS coppa_consent_at TIMESTAMP",
+                "ALTER TABLE children ADD COLUMN IF NOT EXISTS coppa_consent_by VARCHAR(36)",
                 # Blog posts table
                 """CREATE TABLE IF NOT EXISTS blog_posts (
                     id VARCHAR(36) PRIMARY KEY DEFAULT gen_random_uuid()::text,
