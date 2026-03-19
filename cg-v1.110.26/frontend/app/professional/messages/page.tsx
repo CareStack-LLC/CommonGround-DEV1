@@ -399,7 +399,7 @@ export default function MessagesPage() {
         open={showCompose}
         onClose={() => setShowCompose(false)}
         cases={cases}
-        token={token}
+        token={token || ""}
         onSent={() => { setShowCompose(false); fetchMessages(); toast({ title: "Message sent" }); }}
       />
     </div>
