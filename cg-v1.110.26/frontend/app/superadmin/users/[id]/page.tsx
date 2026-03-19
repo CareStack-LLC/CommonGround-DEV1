@@ -295,42 +295,40 @@ export default function UserDetailPage() {
       )}
 
       {/* Messages Tab */}
-      {activeTab === 'messages' && (
-        <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
-          <h3 className="text-sm font-semibold text-zinc-300 mb-4">Message Activity</h3>
-          <div className="grid grid-cols-3 gap-4 mb-4">
-            <div className="bg-zinc-800/40 rounded-lg p-3 text-center">
-              <div className="text-lg font-bold text-white">{user?.stats.messages_sent || 0}</div>
-              <div className="text-[10px] text-zinc-500">Messages Sent</div>
+      {activeTab === 'messages' && user && (() => {
+        const s = user.stats as any;
+        return (
+          <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
+            <h3 className="text-sm font-semibold text-zinc-300 mb-4">Message Activity</h3>
+            <div className="grid grid-cols-3 gap-4 mb-4">
+              <div className="bg-zinc-800/40 rounded-lg p-3 text-center">
+                <div className="text-lg font-bold text-white">{s.messages_sent || 0}</div>
+                <div className="text-[10px] text-zinc-500">Messages Sent</div>
+              </div>
+              <div className="bg-zinc-800/40 rounded-lg p-3 text-center">
+                <div className="text-lg font-bold text-white">{s.messages_received || 0}</div>
+                <div className="text-[10px] text-zinc-500">Messages Received</div>
+              </div>
+              <div className="bg-zinc-800/40 rounded-lg p-3 text-center">
+                <div className="text-sm font-medium text-zinc-300">{s.last_message_at ? formatDate(s.last_message_at) : '—'}</div>
+                <div className="text-[10px] text-zinc-500">Last Message</div>
+              </div>
             </div>
-            <div className="bg-zinc-800/40 rounded-lg p-3 text-center">
-              <div className="text-lg font-bold text-white">{user?.stats.messages_received || 0}</div>
-              <div className="text-[10px] text-zinc-500">Messages Received</div>
-            </div>
-            <div className="bg-zinc-800/40 rounded-lg p-3 text-center">
-              <div className="text-sm font-medium text-zinc-300">{user?.stats.last_message_at ? formatDate(user.stats.last_message_at) : '—'}</div>
-              <div className="text-[10px] text-zinc-500">Last Message</div>
-            </div>
+            <p className="text-[11px] text-zinc-600">Message content is private and not viewable from this portal.</p>
           </div>
-          <p className="text-[11px] text-zinc-600">Message content is private and not viewable from this portal.</p>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Transactions Tab */}
       {activeTab === 'transactions' && (
         <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
           <h3 className="text-sm font-semibold text-zinc-300 mb-4">Payment History</h3>
           {user?.subscription?.stripe_customer_id ? (
-            <div className="space-y-2">
-              <div className="grid grid-cols-4 text-[10px] text-zinc-600 uppercase tracking-wider px-3 py-1">
-                <span>Date</span><span>Amount</span><span>Type</span><span>Status</span>
-              </div>
-              <div className="text-center py-8 text-zinc-600 text-xs">
-                Transaction history loads from Stripe. View in{' '}
-                <a href={`https://dashboard.stripe.com/customers/${user.subscription.stripe_customer_id}`} target="_blank" rel="noopener" className="text-violet-400 hover:underline">
-                  Stripe Dashboard <ExternalLink className="w-3 h-3 inline" />
-                </a>
-              </div>
+            <div className="text-center py-8 text-zinc-600 text-xs">
+              View full transaction history in{' '}
+              <a href={`https://dashboard.stripe.com/customers/${user.subscription.stripe_customer_id}`} target="_blank" rel="noopener" className="text-violet-400 hover:underline">
+                Stripe Dashboard <ExternalLink className="w-3 h-3 inline" />
+              </a>
             </div>
           ) : (
             <div className="text-center py-8 text-zinc-600 text-xs">No Stripe customer linked to this account.</div>
@@ -339,54 +337,60 @@ export default function UserDetailPage() {
       )}
 
       {/* ARIA Tab */}
-      {activeTab === 'aria' && (
-        <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
-          <h3 className="text-sm font-semibold text-zinc-300 mb-4">ARIA Monitoring</h3>
-          <div className="grid grid-cols-3 gap-4 mb-4">
-            <div className="bg-zinc-800/40 rounded-lg p-3 text-center">
-              <div className="text-lg font-bold text-white">{user?.stats.aria_interventions || 0}</div>
-              <div className="text-[10px] text-zinc-500">Total Interventions</div>
-            </div>
-            <div className="bg-zinc-800/40 rounded-lg p-3 text-center">
-              <div className="text-lg font-bold text-emerald-400">
-                {user?.stats.aria_interventions ? `${Math.round((user.stats.aria_accepted || 0) / Math.max(user.stats.aria_interventions, 1) * 100)}%` : '—'}
+      {activeTab === 'aria' && user && (() => {
+        const s = user.stats as any;
+        return (
+          <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
+            <h3 className="text-sm font-semibold text-zinc-300 mb-4">ARIA Monitoring</h3>
+            <div className="grid grid-cols-3 gap-4 mb-4">
+              <div className="bg-zinc-800/40 rounded-lg p-3 text-center">
+                <div className="text-lg font-bold text-white">{s.aria_interventions || 0}</div>
+                <div className="text-[10px] text-zinc-500">Total Interventions</div>
               </div>
-              <div className="text-[10px] text-zinc-500">Acceptance Rate</div>
+              <div className="bg-zinc-800/40 rounded-lg p-3 text-center">
+                <div className="text-lg font-bold text-emerald-400">
+                  {s.aria_interventions ? `${Math.round((s.aria_accepted || 0) / Math.max(s.aria_interventions, 1) * 100)}%` : '—'}
+                </div>
+                <div className="text-[10px] text-zinc-500">Acceptance Rate</div>
+              </div>
+              <div className="bg-zinc-800/40 rounded-lg p-3 text-center">
+                <div className="text-lg font-bold text-amber-400">{s.aria_blocked || 0}</div>
+                <div className="text-[10px] text-zinc-500">Blocked Messages</div>
+              </div>
             </div>
-            <div className="bg-zinc-800/40 rounded-lg p-3 text-center">
-              <div className="text-lg font-bold text-amber-400">{user?.stats.aria_blocked || 0}</div>
-              <div className="text-[10px] text-zinc-500">Blocked Messages</div>
-            </div>
+            <p className="text-[11px] text-zinc-600">ARIA monitors communication tone and flags hostile or inappropriate messages.</p>
           </div>
-          <p className="text-[11px] text-zinc-600">ARIA monitors communication tone and flags hostile or inappropriate messages.</p>
-        </div>
-      )}
+        );
+      })()}
 
       {/* KidSpace Tab */}
-      {activeTab === 'kidspace' && (
-        <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
-          <h3 className="text-sm font-semibold text-zinc-300 mb-4">KidSpace Usage</h3>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
-            <div className="bg-zinc-800/40 rounded-lg p-3 text-center">
-              <div className="text-lg font-bold text-white">{user?.stats.kidspace_sessions || 0}</div>
-              <div className="text-[10px] text-zinc-500">Sessions</div>
+      {activeTab === 'kidspace' && user && (() => {
+        const s = user.stats as any;
+        return (
+          <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
+            <h3 className="text-sm font-semibold text-zinc-300 mb-4">KidSpace Usage</h3>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+              <div className="bg-zinc-800/40 rounded-lg p-3 text-center">
+                <div className="text-lg font-bold text-white">{s.kidspace_sessions || 0}</div>
+                <div className="text-[10px] text-zinc-500">Sessions</div>
+              </div>
+              <div className="bg-zinc-800/40 rounded-lg p-3 text-center">
+                <div className="text-lg font-bold text-white">{s.kidspace_minutes || 0}</div>
+                <div className="text-[10px] text-zinc-500">Minutes</div>
+              </div>
+              <div className="bg-zinc-800/40 rounded-lg p-3 text-center">
+                <div className="text-lg font-bold text-white">{s.kidspace_theater || 0}</div>
+                <div className="text-[10px] text-zinc-500">Theater Views</div>
+              </div>
+              <div className="bg-zinc-800/40 rounded-lg p-3 text-center">
+                <div className="text-lg font-bold text-white">{s.kidspace_stories || 0}</div>
+                <div className="text-[10px] text-zinc-500">Stories Read</div>
+              </div>
             </div>
-            <div className="bg-zinc-800/40 rounded-lg p-3 text-center">
-              <div className="text-lg font-bold text-white">{user?.stats.kidspace_minutes || 0}</div>
-              <div className="text-[10px] text-zinc-500">Minutes</div>
-            </div>
-            <div className="bg-zinc-800/40 rounded-lg p-3 text-center">
-              <div className="text-lg font-bold text-white">{user?.stats.kidspace_theater || 0}</div>
-              <div className="text-[10px] text-zinc-500">Theater Views</div>
-            </div>
-            <div className="bg-zinc-800/40 rounded-lg p-3 text-center">
-              <div className="text-lg font-bold text-white">{user?.stats.kidspace_stories || 0}</div>
-              <div className="text-[10px] text-zinc-500">Stories Read</div>
-            </div>
+            <p className="text-[11px] text-zinc-600">KidSpace connects children with family through supervised video calls, theater, and stories.</p>
           </div>
-          <p className="text-[11px] text-zinc-600">KidSpace connects children with family through supervised video calls, theater, and stories.</p>
-        </div>
-      )}
+        );
+      })()}
 
       {activeTab === 'files' && (
         <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
