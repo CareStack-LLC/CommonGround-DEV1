@@ -135,7 +135,7 @@ export default function KidSpaceAnalyticsPage() {
     );
   }
 
-  const consentPct = data && data.coppa_consent.total_children > 0
+  const consentPct = data?.coppa_consent?.total_children && data.coppa_consent.total_children > 0
     ? Math.round((data.coppa_consent.children_with_consent / data.coppa_consent.total_children) * 100)
     : 0;
 
@@ -278,7 +278,7 @@ export default function KidSpaceAnalyticsPage() {
           <div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs text-zinc-400">
-                {data.coppa_consent.children_with_consent} of {data.coppa_consent.total_children} children have parental consent
+                {data?.coppa_consent?.children_with_consent ?? 0} of {data?.coppa_consent?.total_children ?? 0} children have parental consent
               </span>
               <span className="text-sm font-semibold text-white">{consentPct}%</span>
             </div>
@@ -290,7 +290,7 @@ export default function KidSpaceAnalyticsPage() {
             </div>
             {consentPct < 100 && (
               <p className="text-[11px] text-amber-500/80 mt-2">
-                {data.coppa_consent.total_children - data.coppa_consent.children_with_consent} children pending consent
+                {(data?.coppa_consent?.total_children ?? 0) - (data?.coppa_consent?.children_with_consent ?? 0)} children pending consent
               </p>
             )}
           </div>
