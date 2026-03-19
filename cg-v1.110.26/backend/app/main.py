@@ -142,6 +142,54 @@ async def lifespan(app: FastAPI):
                 "ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS terms_version VARCHAR(20)",
                 "ALTER TABLE user_profiles ADD COLUMN IF NOT EXISTS privacy_policy_accepted_at TIMESTAMP",
                 "ALTER TABLE agreements ADD COLUMN IF NOT EXISTS is_default BOOLEAN DEFAULT FALSE",
+                # Blog posts table
+                """CREATE TABLE IF NOT EXISTS blog_posts (
+                    id VARCHAR(36) PRIMARY KEY DEFAULT gen_random_uuid()::text,
+                    title VARCHAR(500) NOT NULL, slug VARCHAR(500) UNIQUE NOT NULL,
+                    content TEXT NOT NULL, excerpt VARCHAR(1000) NOT NULL,
+                    author VARCHAR(200) DEFAULT 'CommonGround Team', category VARCHAR(100) NOT NULL,
+                    tags JSONB DEFAULT '[]'::jsonb, featured_image_url VARCHAR(2048),
+                    status VARCHAR(20) DEFAULT 'draft', published_at TIMESTAMP,
+                    seo_title VARCHAR(200), seo_description VARCHAR(500),
+                    created_at TIMESTAMP DEFAULT NOW(), updated_at TIMESTAMP DEFAULT NOW()
+                )""",
+                # KidSpace genres (must be before movies/books for FK)
+                """CREATE TABLE IF NOT EXISTS kidspace_genres (
+                    id VARCHAR(36) PRIMARY KEY DEFAULT gen_random_uuid()::text,
+                    name VARCHAR(100) NOT NULL, description VARCHAR(500),
+                    icon_emoji VARCHAR(10), created_at TIMESTAMP DEFAULT NOW()
+                )""",
+                # KidSpace authors (must be before books for FK)
+                """CREATE TABLE IF NOT EXISTS kidspace_authors (
+                    id VARCHAR(36) PRIMARY KEY DEFAULT gen_random_uuid()::text,
+                    name VARCHAR(200) NOT NULL, bio TEXT, photo_url VARCHAR(2048),
+                    is_featured BOOLEAN DEFAULT FALSE, showcase_book_id VARCHAR(36),
+                    created_at TIMESTAMP DEFAULT NOW()
+                )""",
+                # KidSpace movies
+                """CREATE TABLE IF NOT EXISTS kidspace_movies (
+                    id VARCHAR(36) PRIMARY KEY DEFAULT gen_random_uuid()::text,
+                    title VARCHAR(300) NOT NULL, description TEXT,
+                    duration_minutes INTEGER, age_min INTEGER DEFAULT 3, age_max INTEGER DEFAULT 12,
+                    genre_id VARCHAR(36) REFERENCES kidspace_genres(id),
+                    poster_url VARCHAR(2048), video_url VARCHAR(2048), trailer_url VARCHAR(2048),
+                    is_featured BOOLEAN DEFAULT FALSE, is_visible BOOLEAN DEFAULT TRUE,
+                    view_count INTEGER DEFAULT 0, total_minutes_watched INTEGER DEFAULT 0,
+                    created_at TIMESTAMP DEFAULT NOW()
+                )""",
+                # KidSpace books
+                """CREATE TABLE IF NOT EXISTS kidspace_books (
+                    id VARCHAR(36) PRIMARY KEY DEFAULT gen_random_uuid()::text,
+                    title VARCHAR(300) NOT NULL,
+                    author_id VARCHAR(36) REFERENCES kidspace_authors(id),
+                    description TEXT, page_count INTEGER,
+                    age_min INTEGER DEFAULT 3, age_max INTEGER DEFAULT 12,
+                    genre_id VARCHAR(36) REFERENCES kidspace_genres(id),
+                    cover_url VARCHAR(2048), pdf_url VARCHAR(2048),
+                    is_featured BOOLEAN DEFAULT FALSE, is_visible BOOLEAN DEFAULT TRUE,
+                    read_count INTEGER DEFAULT 0, total_pages_turned INTEGER DEFAULT 0,
+                    created_at TIMESTAMP DEFAULT NOW()
+                )""",
             ]
             for sql in migrations:
                 await conn.execute(text(sql))
