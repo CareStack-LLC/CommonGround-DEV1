@@ -1682,6 +1682,10 @@ async def upload_message_attachment(
             detail="Failed to upload file to storage"
         )
 
+    # Virus scan (placeholder — logs upload without scan)
+    from app.services.storage import scan_file_for_viruses
+    scan_result = scan_file_for_viruses(file_content, file.filename or "unnamed")
+
     # Create attachment record
     attachment = MessageAttachment(
         message_id=message_id,
@@ -1693,7 +1697,8 @@ async def upload_message_attachment(
         storage_path=storage_path,
         storage_url=storage_url,
         sha256_hash=sha256_hash,
-        virus_scanned=False,  # TODO: Integrate virus scanning service
+        virus_scanned=scan_result.get("scanned", False),
+        scan_result=scan_result.get("status", "not_scanned"),
         uploaded_by=current_user.id,
         uploaded_at=datetime.utcnow(),
     )

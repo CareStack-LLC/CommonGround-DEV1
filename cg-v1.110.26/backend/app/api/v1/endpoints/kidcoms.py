@@ -183,6 +183,46 @@ async def update_kidcoms_settings(
 # ============================================================
 
 @router.post(
+    "/children/{child_id}/coppa-consent",
+    summary="Grant COPPA parental consent",
+    description="Parent grants consent for their child to use KidSpace features (video calls, theater, arcade). Required by COPPA before any child data collection.",
+)
+async def grant_coppa_consent(
+    child_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Grant COPPA parental consent for a child's KidSpace access."""
+    from datetime import datetime
+
+    # Verify child exists and user is a parent
+    child_result = await db.execute(
+        select(Child).where(Child.id == child_id)
+    )
+    child = child_result.scalar_one_or_none()
+    if not child:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Child not found")
+
+    # Verify the user is a parent on the family file
+    if child.family_file_id:
+        family_file = await get_family_file_with_access(db, child.family_file_id, current_user.id)
+    else:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized")
+
+    child.coppa_consent_given = True
+    child.coppa_consent_at = datetime.utcnow()
+    child.coppa_consent_by = current_user.id
+    await db.commit()
+
+    return {
+        "status": "consent_granted",
+        "child_id": child_id,
+        "consented_at": child.coppa_consent_at.isoformat(),
+        "consented_by": current_user.id,
+    }
+
+
+@router.post(
     "/sessions",
     status_code=status.HTTP_201_CREATED,
     response_model=KidComsSessionResponse,
@@ -229,6 +269,13 @@ async def create_session(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Child not found in this family file"
+        )
+
+    # COPPA: Require parental consent before child can use KidSpace features
+    if not child.coppa_consent_given:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Parental consent is required before your child can use KidSpace. Please provide consent in your child's profile settings."
         )
 
     # Check settings
@@ -2475,3 +2522,54 @@ async def save_media_progress(
 
     await db.commit()
     return {"saved": True, "media_id": media_id}
+
+
+# === COPPA: CHILD DATA DELETION ===
+
+@router.delete(
+    "/children/{child_id}/data",
+    summary="Delete child KidSpace data (COPPA compliance)",
+    description="Removes all KidSpace session data, recordings, and preferences for a child. Preserves the child profile record for custody tracking.",
+)
+async def delete_child_kidspace_data(
+    child_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Delete all KidSpace data for a child while preserving the custody record."""
+    # Verify child exists and user is parent
+    child_result = await db.execute(
+        select(Child).where(Child.id == child_id)
+    )
+    child = child_result.scalar_one_or_none()
+    if not child:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Child not found")
+
+    if child.family_file_id:
+        await get_family_file_with_access(db, child.family_file_id, current_user.id)
+    else:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized")
+
+    # Delete KidComs sessions for this child
+    from app.models.kidcoms import KidComsSession
+    sessions_result = await db.execute(
+        select(KidComsSession).where(KidComsSession.child_id == child_id)
+    )
+    sessions = sessions_result.scalars().all()
+    deleted_count = len(sessions)
+    for session in sessions:
+        await db.delete(session)
+
+    # Reset COPPA consent
+    child.coppa_consent_given = False
+    child.coppa_consent_at = None
+    child.coppa_consent_by = None
+
+    await db.commit()
+
+    return {
+        "status": "deleted",
+        "child_id": child_id,
+        "sessions_deleted": deleted_count,
+        "message": "All KidSpace data has been removed. The child profile is preserved for custody records.",
+    }

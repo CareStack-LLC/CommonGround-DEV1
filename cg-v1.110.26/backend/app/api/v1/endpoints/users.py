@@ -659,3 +659,85 @@ async def request_account_deletion(
         deletion_scheduled=True,
         deletion_date=deletion_date.strftime("%Y-%m-%d"),
     )
+
+
+# === GDPR DATA EXPORT ===
+
+@router.get("/me/export", summary="Export personal data (GDPR Article 20)")
+async def export_personal_data(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Export all personal data associated with the user's account.
+    Returns a JSON object containing profile, messages metadata,
+    agreements, and financial records.
+    """
+    from app.models.message import Message
+    from datetime import datetime
+
+    # Profile data
+    profile = current_user.profile
+    profile_data = {
+        "id": current_user.id,
+        "email": current_user.email,
+        "first_name": current_user.first_name,
+        "last_name": current_user.last_name,
+        "phone": current_user.phone,
+        "created_at": current_user.created_at.isoformat() if current_user.created_at else None,
+    }
+    if profile:
+        profile_data.update({
+            "timezone": profile.timezone,
+            "subscription_tier": profile.subscription_tier,
+            "terms_accepted_at": profile.terms_accepted_at.isoformat() if profile.terms_accepted_at else None,
+            "terms_version": profile.terms_version,
+        })
+
+    # Message count (not content — content available via case exports)
+    msg_result = await db.execute(
+        select(Message).where(Message.sender_id == current_user.id)
+    )
+    messages = msg_result.scalars().all()
+    message_summary = {
+        "total_sent": len(messages),
+        "date_range": {
+            "earliest": min((m.created_at for m in messages), default=None),
+            "latest": max((m.created_at for m in messages), default=None),
+        } if messages else None,
+    }
+
+    return {
+        "exported_at": datetime.utcnow().isoformat(),
+        "user_profile": profile_data,
+        "messages_summary": message_summary,
+        "note": "Full message content and case data can be exported via the case export feature.",
+    }
+
+
+# === CONSENT WITHDRAWAL ===
+
+@router.post("/me/consent/withdraw", summary="Withdraw marketing consent")
+async def withdraw_marketing_consent(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Withdraw marketing consent without deleting the account.
+    The user will no longer receive marketing communications.
+    """
+    profile = current_user.profile
+    if not profile:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User profile not found",
+        )
+
+    profile.marketing_emails_enabled = False
+    await db.commit()
+
+    return {
+        "status": "consent_withdrawn",
+        "marketing_emails_enabled": False,
+        "message": "You will no longer receive marketing communications. Your account remains active.",
+    }

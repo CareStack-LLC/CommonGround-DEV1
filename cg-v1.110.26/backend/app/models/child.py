@@ -90,6 +90,13 @@ class Child(Base, UUIDMixin, TimestampMixin):
     # Photo
     photo_url: Mapped[Optional[str]] = mapped_column(String(2048), nullable=True)  # Supabase signed URLs are ~600+ chars
 
+    # === COPPA COMPLIANCE ===
+    coppa_consent_given: Mapped[bool] = mapped_column(Boolean, default=False)
+    coppa_consent_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    coppa_consent_by: Mapped[Optional[str]] = mapped_column(
+        String(36), ForeignKey("users.id"), nullable=True
+    )
+
     # === SPECIAL NEEDS ===
     has_special_needs: Mapped[bool] = mapped_column(Boolean, default=False)
     special_needs_notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)

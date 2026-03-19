@@ -119,21 +119,27 @@ async def court_login(
     db: AsyncSession = Depends(get_db),
 ):
     """
-    MVP court login with simulated verification.
+    Court login with verification code.
 
-    For demo purposes:
-    - Code "123456" always works
-    - Creates professional if not exists
-    - Returns JWT token for court portal access
+    In non-production environments, code "123456" is accepted for testing.
+    In production, this endpoint is disabled until court authentication is configured.
     """
     from app.core.security import create_access_token
+    from app.core.config import settings
     from datetime import timedelta
 
-    # MVP: Accept code 123456 for demo
+    # Production: court portal authentication not yet configured
+    if settings.is_production:
+        raise HTTPException(
+            status_code=status.HTTP_501_NOT_IMPLEMENTED,
+            detail="Court portal authentication is not yet available.",
+        )
+
+    # Non-production: accept demo code for testing
     if data.access_code != "123456":
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid verification code. Use 123456 for demo.",
+            detail="Invalid verification code.",
         )
 
     service = CourtProfessionalService(db)

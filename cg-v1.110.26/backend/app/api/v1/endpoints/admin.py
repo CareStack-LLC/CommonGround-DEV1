@@ -1861,7 +1861,7 @@ async def send_monthly_reports(
             # Build the report URL for the CTA button
             frontend_url = getattr(
                 email_service, 'frontend_url',
-                'https://common-ground-blue.vercel.app'
+                'https://find-commonground.com'
             )
             report_url = (
                 f"{frontend_url}/reports/monthly"

@@ -1412,7 +1412,7 @@ async def get_my_connected_children(
                 "name": child.display_name or child.first_name,
                 "avatar_url": child.photo_url,
                 "age": age,
-                "is_online": False,  # TODO: Integrate with presence system
+                "is_online": False,  # v1: Online presence requires WebSocket infrastructure — disabled by design
                 "family_file_id": child.family_file_id,
                 "can_video_call": permission.can_video_call,
                 "can_voice_call": permission.can_voice_call,
@@ -1527,7 +1527,8 @@ async def check_child_availability_for_circle(
             "reason": "Calls are only allowed during specific times"
         }
 
-    # TODO: Check if child is actually online via presence system
+    # v1: Real-time presence requires WebSocket infrastructure — not yet available
+    # Calls are allowed if within permitted hours; actual availability determined at call time
     return {
         "available": True,
         "reason": None

@@ -3577,7 +3577,7 @@ async def create_professional_checkout(
     # Create checkout session
     from app.core.config import settings
 
-    frontend_url = settings.FRONTEND_URL or "https://common-ground-blue.vercel.app"
+    frontend_url = settings.FRONTEND_URL or "https://find-commonground.com"
     session = await stripe_service.create_subscription_checkout(
         customer_id=profile.stripe_customer_id,
         price_id=price_id,
@@ -3618,7 +3618,7 @@ async def create_billing_portal(
         )
 
     stripe_service = StripeService()
-    frontend_url = settings.FRONTEND_URL or "https://common-ground-blue.vercel.app"
+    frontend_url = settings.FRONTEND_URL or "https://find-commonground.com"
 
     portal_url = await stripe_service.create_customer_portal_session(
         customer_id=profile.stripe_customer_id,

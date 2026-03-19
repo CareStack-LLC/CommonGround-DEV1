@@ -9,6 +9,8 @@ accordingly. It handles:
 """
 
 import logging
+import threading
+import time
 from fastapi import APIRouter, Request, HTTPException, status, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional, Union
@@ -32,6 +34,29 @@ from app.utils.sentry_helpers import capture_error
 from sqlalchemy.orm import selectinload
 
 logger = logging.getLogger(__name__)
+
+# Webhook event deduplication — prevents double-processing
+_processed_events: dict[str, float] = {}
+_processed_events_lock = threading.Lock()
+_DEDUP_TTL_SECONDS = 86400  # 24 hours
+
+
+def _is_duplicate_event(event_id: str) -> bool:
+    """Check if event was already processed. Returns True if duplicate."""
+    now = time.time()
+    with _processed_events_lock:
+        # Periodic cleanup of expired entries
+        if len(_processed_events) > 1000:
+            cutoff = now - _DEDUP_TTL_SECONDS
+            expired = [k for k, v in _processed_events.items() if v < cutoff]
+            for k in expired:
+                del _processed_events[k]
+
+        if event_id in _processed_events:
+            return True
+        _processed_events[event_id] = now
+        return False
+
 
 router = APIRouter()
 
@@ -66,8 +91,19 @@ async def handle_stripe_webhook(
         # Parse event
         event_data = stripe_service.handle_webhook_event(event)
         event_type = event_data["event_type"]
+        event_id = event.get("id", "") if isinstance(event, dict) else getattr(event, "id", "")
 
-        logger.info(f"Received Stripe webhook: {event_type}")
+        logger.info(f"Received Stripe webhook: {event_type} (id={event_id})")
+
+        # Deduplication: skip already-processed events
+        if event_id and _is_duplicate_event(event_id):
+            logger.info(f"Skipping duplicate webhook event: {event_id}")
+            return WebhookHandlerResponse(
+                success=True,
+                event_type=event_type,
+                message=f"Duplicate event {event_id} — already processed",
+                processed_at=datetime.utcnow(),
+            )
 
         # Route to handler based on event type
         handler = WEBHOOK_HANDLERS.get(event_type)

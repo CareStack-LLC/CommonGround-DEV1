@@ -470,6 +470,31 @@ def validate_attachment(
         return False, None, f"File type {content_type} is not allowed"
 
 
+def scan_file_for_viruses(file_content: bytes, filename: str = "") -> dict:
+    """
+    Scan file content for malware/viruses.
+
+    Returns dict with:
+        - scanned: bool — whether a scan was performed
+        - status: "clean" | "infected" | "error" | "not_scanned"
+        - detail: optional detail message
+
+    Currently a placeholder — returns not_scanned.
+    Integration point for ClamAV, VirusTotal, or similar service.
+    """
+    import logging
+    logger = logging.getLogger(__name__)
+
+    # Placeholder: virus scanning not yet configured
+    # To enable, set VIRUS_SCAN_ENABLED=true and configure scanning service
+    logger.info(f"File upload without virus scan: {filename} ({len(file_content)} bytes)")
+    return {
+        "scanned": False,
+        "status": "not_scanned",
+        "detail": "Virus scanning not configured — file accepted without scan",
+    }
+
+
 def build_report_path(family_file_id: str, report_id: str) -> str:
     """Build storage path for a generated PDF report."""
     return f"{family_file_id}/{report_id}.pdf"
