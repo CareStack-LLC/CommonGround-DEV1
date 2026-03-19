@@ -51,7 +51,7 @@ export default function MoviesPage() {
   const [selectedMovie, setSelectedMovie] = useState<VideoContent | null>(null);
 
   // API + fallback merged video list
-  const [allVideos, setAllVideos] = useState<VideoContent[]>(allVideos);
+  const [allVideos, setAllVideos] = useState<VideoContent[]>(theaterContent.videos);
 
   // Watch Together state
   const [contacts, setContacts] = useState<ChildContact[]>([]);
