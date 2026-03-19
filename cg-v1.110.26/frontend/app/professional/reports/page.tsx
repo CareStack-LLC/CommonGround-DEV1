@@ -87,6 +87,38 @@ const REPORT_TYPES = [
       "Per-parent payment breakdown",
     ],
   },
+  {
+    id: "aria_assessment",
+    title: "ARIA Assessment",
+    description: "AI analysis of communication patterns and good-faith scores",
+    icon: Shield,
+    color: "from-[#3DAA8A] to-[#2D6A8F]",
+    bgColor: "bg-[#E8F4F0]",
+    borderColor: "border-[#3DAA8A]/30",
+    textColor: "text-[#1E3A4A]",
+    includes: [
+      "Good-faith scores per parent",
+      "Communication tone analysis over time",
+      "ARIA intervention summary and outcomes",
+      "Cooperation vs conflict ratio",
+    ],
+  },
+  {
+    id: "monthly_summary",
+    title: "Monthly Summary",
+    description: "Auto-generated rolling 30-day overview for ongoing monitoring",
+    icon: Calendar,
+    color: "from-slate-500 to-slate-700",
+    bgColor: "bg-slate-50",
+    borderColor: "border-slate-200",
+    textColor: "text-slate-700",
+    includes: [
+      "Exchange compliance for the period",
+      "Message volume and ARIA flags",
+      "Financial activity summary",
+      "Key events and timeline highlights",
+    ],
+  },
 ];
 
 interface RecentReport {
