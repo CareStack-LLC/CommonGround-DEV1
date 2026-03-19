@@ -50,7 +50,7 @@ export default function UserDetailPage() {
   const [statusAction, setStatusAction] = useState<'activate' | 'deactivate' | null>(null);
   const [reason, setReason] = useState('');
   const [updating, setUpdating] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'activity' | 'files'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'activity' | 'files' | 'messages' | 'transactions' | 'aria' | 'kidspace'>('overview');
 
   const fetchUser = useCallback(async () => {
     try {
@@ -150,17 +150,25 @@ export default function UserDetailPage() {
 
       {/* Tab Navigation */}
       <div className="flex gap-1 border-b border-zinc-800/60">
-        {(['overview', 'activity', 'files'] as const).map(tab => (
+        {([
+          { key: 'overview', label: 'Overview' },
+          { key: 'activity', label: 'Activity' },
+          { key: 'files', label: 'Family Files' },
+          { key: 'messages', label: 'Messages' },
+          { key: 'transactions', label: 'Transactions' },
+          { key: 'aria', label: 'ARIA' },
+          { key: 'kidspace', label: 'KidSpace' },
+        ] as const).map(tab => (
           <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors capitalize ${
-              activeTab === tab
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === tab.key
                 ? 'border-violet-500 text-violet-400'
                 : 'border-transparent text-zinc-500 hover:text-zinc-300'
             }`}
           >
-            {tab === 'files' ? 'Family Files' : tab}
+            {tab.label}
           </button>
         ))}
       </div>
@@ -283,6 +291,100 @@ export default function UserDetailPage() {
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Messages Tab */}
+      {activeTab === 'messages' && (
+        <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
+          <h3 className="text-sm font-semibold text-zinc-300 mb-4">Message Activity</h3>
+          <div className="grid grid-cols-3 gap-4 mb-4">
+            <div className="bg-zinc-800/40 rounded-lg p-3 text-center">
+              <div className="text-lg font-bold text-white">{user?.stats.messages_sent || 0}</div>
+              <div className="text-[10px] text-zinc-500">Messages Sent</div>
+            </div>
+            <div className="bg-zinc-800/40 rounded-lg p-3 text-center">
+              <div className="text-lg font-bold text-white">{user?.stats.messages_received || 0}</div>
+              <div className="text-[10px] text-zinc-500">Messages Received</div>
+            </div>
+            <div className="bg-zinc-800/40 rounded-lg p-3 text-center">
+              <div className="text-sm font-medium text-zinc-300">{user?.stats.last_message_at ? formatDate(user.stats.last_message_at) : '—'}</div>
+              <div className="text-[10px] text-zinc-500">Last Message</div>
+            </div>
+          </div>
+          <p className="text-[11px] text-zinc-600">Message content is private and not viewable from this portal.</p>
+        </div>
+      )}
+
+      {/* Transactions Tab */}
+      {activeTab === 'transactions' && (
+        <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
+          <h3 className="text-sm font-semibold text-zinc-300 mb-4">Payment History</h3>
+          {user?.subscription?.stripe_customer_id ? (
+            <div className="space-y-2">
+              <div className="grid grid-cols-4 text-[10px] text-zinc-600 uppercase tracking-wider px-3 py-1">
+                <span>Date</span><span>Amount</span><span>Type</span><span>Status</span>
+              </div>
+              <div className="text-center py-8 text-zinc-600 text-xs">
+                Transaction history loads from Stripe. View in{' '}
+                <a href={`https://dashboard.stripe.com/customers/${user.subscription.stripe_customer_id}`} target="_blank" rel="noopener" className="text-violet-400 hover:underline">
+                  Stripe Dashboard <ExternalLink className="w-3 h-3 inline" />
+                </a>
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-8 text-zinc-600 text-xs">No Stripe customer linked to this account.</div>
+          )}
+        </div>
+      )}
+
+      {/* ARIA Tab */}
+      {activeTab === 'aria' && (
+        <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
+          <h3 className="text-sm font-semibold text-zinc-300 mb-4">ARIA Monitoring</h3>
+          <div className="grid grid-cols-3 gap-4 mb-4">
+            <div className="bg-zinc-800/40 rounded-lg p-3 text-center">
+              <div className="text-lg font-bold text-white">{user?.stats.aria_interventions || 0}</div>
+              <div className="text-[10px] text-zinc-500">Total Interventions</div>
+            </div>
+            <div className="bg-zinc-800/40 rounded-lg p-3 text-center">
+              <div className="text-lg font-bold text-emerald-400">
+                {user?.stats.aria_interventions ? `${Math.round((user.stats.aria_accepted || 0) / Math.max(user.stats.aria_interventions, 1) * 100)}%` : '—'}
+              </div>
+              <div className="text-[10px] text-zinc-500">Acceptance Rate</div>
+            </div>
+            <div className="bg-zinc-800/40 rounded-lg p-3 text-center">
+              <div className="text-lg font-bold text-amber-400">{user?.stats.aria_blocked || 0}</div>
+              <div className="text-[10px] text-zinc-500">Blocked Messages</div>
+            </div>
+          </div>
+          <p className="text-[11px] text-zinc-600">ARIA monitors communication tone and flags hostile or inappropriate messages.</p>
+        </div>
+      )}
+
+      {/* KidSpace Tab */}
+      {activeTab === 'kidspace' && (
+        <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
+          <h3 className="text-sm font-semibold text-zinc-300 mb-4">KidSpace Usage</h3>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+            <div className="bg-zinc-800/40 rounded-lg p-3 text-center">
+              <div className="text-lg font-bold text-white">{user?.stats.kidspace_sessions || 0}</div>
+              <div className="text-[10px] text-zinc-500">Sessions</div>
+            </div>
+            <div className="bg-zinc-800/40 rounded-lg p-3 text-center">
+              <div className="text-lg font-bold text-white">{user?.stats.kidspace_minutes || 0}</div>
+              <div className="text-[10px] text-zinc-500">Minutes</div>
+            </div>
+            <div className="bg-zinc-800/40 rounded-lg p-3 text-center">
+              <div className="text-lg font-bold text-white">{user?.stats.kidspace_theater || 0}</div>
+              <div className="text-[10px] text-zinc-500">Theater Views</div>
+            </div>
+            <div className="bg-zinc-800/40 rounded-lg p-3 text-center">
+              <div className="text-lg font-bold text-white">{user?.stats.kidspace_stories || 0}</div>
+              <div className="text-[10px] text-zinc-500">Stories Read</div>
+            </div>
+          </div>
+          <p className="text-[11px] text-zinc-600">KidSpace connects children with family through supervised video calls, theater, and stories.</p>
         </div>
       )}
 

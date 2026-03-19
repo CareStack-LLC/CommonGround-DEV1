@@ -194,6 +194,61 @@ export default function SuperAdminDashboard() {
         )}
       </div>
 
+      {/* KPI Row — LTV, Churn, ARPU */}
+      {!loading && dashboard && (
+        <div className="grid grid-cols-3 gap-3">
+          <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-4">
+            <div className="flex items-center gap-2 mb-1">
+              <TrendingUp className="w-4 h-4 text-emerald-400" />
+              <span className="text-xs text-zinc-500">Est. LTV</span>
+            </div>
+            <div className="text-xl font-bold text-white">
+              {formatCurrency(
+                dashboard.subscriptions.estimated_mrr > 0
+                  ? (dashboard.subscriptions.estimated_mrr * 18) / Math.max(Object.values(dashboard.subscriptions.tier_breakdown).reduce((a, b) => a + b, 0) - (dashboard.subscriptions.tier_breakdown['web_starter'] || 0), 1)
+                  : 0
+              )}
+            </div>
+            <span className="text-[10px] text-zinc-600">18-month avg lifetime</span>
+          </div>
+          <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-4">
+            <div className="flex items-center gap-2 mb-1">
+              <ArrowDownRight className="w-4 h-4 text-amber-400" />
+              <span className="text-xs text-zinc-500">Churn Rate</span>
+            </div>
+            <div className="text-xl font-bold text-white">
+              {(() => {
+                const paying = Object.entries(dashboard.subscriptions.tier_breakdown)
+                  .filter(([k]) => k !== 'web_starter' && k !== 'none')
+                  .reduce((a, [, v]) => a + v, 0);
+                const cancelled = dashboard.subscriptions.past_due_count || 0;
+                return paying + cancelled > 0
+                  ? `${((cancelled / (paying + cancelled)) * 100).toFixed(1)}%`
+                  : '0%';
+              })()}
+            </div>
+            <span className="text-[10px] text-zinc-600">30-day rolling</span>
+          </div>
+          <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-4">
+            <div className="flex items-center gap-2 mb-1">
+              <DollarSign className="w-4 h-4 text-blue-400" />
+              <span className="text-xs text-zinc-500">ARPU</span>
+            </div>
+            <div className="text-xl font-bold text-white">
+              {formatCurrency(
+                (() => {
+                  const paying = Object.entries(dashboard.subscriptions.tier_breakdown)
+                    .filter(([k]) => k !== 'web_starter' && k !== 'none')
+                    .reduce((a, [, v]) => a + v, 0);
+                  return paying > 0 ? dashboard.subscriptions.estimated_mrr / paying : 0;
+                })()
+              )}
+            </div>
+            <span className="text-[10px] text-zinc-600">per paying user/mo</span>
+          </div>
+        </div>
+      )}
+
       {/* Charts & Feeds Row */}
       <div className="grid lg:grid-cols-3 gap-4">
         {/* Sparkline Chart */}

@@ -16,16 +16,46 @@ import {
   X,
   LogOut,
   Bell,
+  Activity,
+  Brain,
+  Gamepad2,
+  PenTool,
+  Film,
 } from 'lucide-react';
 import { adminAPI, type PlatformHealth } from '@/lib/admin-api';
 
-const navItems = [
-  { href: '/superadmin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
-  { href: '/superadmin/users', label: 'Users', icon: Users },
-  { href: '/superadmin/billing', label: 'Billing', icon: CreditCard },
-  { href: '/superadmin/reports', label: 'Reports', icon: FileText },
-  { href: '/superadmin/audit-log', label: 'Audit Log', icon: ScrollText },
-  { href: '/superadmin/growth', label: 'Growth', icon: TrendingUp },
+const navSections = [
+  {
+    label: 'Operations',
+    items: [
+      { href: '/superadmin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
+      { href: '/superadmin/users', label: 'Users', icon: Users },
+      { href: '/superadmin/audit-log', label: 'Audit Log', icon: ScrollText },
+      { href: '/superadmin/platform-audit', label: 'Platform Audit', icon: Activity },
+    ],
+  },
+  {
+    label: 'Analytics',
+    items: [
+      { href: '/superadmin/growth', label: 'Growth', icon: TrendingUp },
+      { href: '/superadmin/aria', label: 'ARIA Insights', icon: Brain },
+      { href: '/superadmin/kidspace', label: 'KidSpace', icon: Gamepad2 },
+    ],
+  },
+  {
+    label: 'Revenue',
+    items: [
+      { href: '/superadmin/billing', label: 'Billing', icon: CreditCard },
+      { href: '/superadmin/reports', label: 'Reports', icon: FileText },
+    ],
+  },
+  {
+    label: 'Content',
+    items: [
+      { href: '/superadmin/blog', label: 'Blog', icon: PenTool },
+      { href: '/superadmin/kidspace/media', label: 'Media Library', icon: Film },
+    ],
+  },
 ];
 
 export default function SuperAdminLayout({ children }: { children: React.ReactNode }) {
@@ -133,32 +163,38 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
           flex flex-col transition-transform duration-200
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}>
-          <nav className="flex-1 py-3 px-2.5 space-y-0.5 overflow-y-auto">
-            {navItems.map((item) => {
-              const active = isActive(item.href, item.exact);
-              return (
-                <a
-                  key={item.href}
-                  href={item.href}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    router.push(item.href);
-                    setSidebarOpen(false);
-                  }}
-                  className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 group ${
-                    active
-                      ? 'bg-violet-500/15 text-violet-300 shadow-sm shadow-violet-500/5'
-                      : 'text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200'
-                  }`}
-                >
-                  <item.icon className={`w-4 h-4 flex-shrink-0 ${active ? 'text-violet-400' : 'text-zinc-500 group-hover:text-zinc-400'}`} />
-                  {item.label}
-                  {item.label === 'Reports' && (
-                    <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded-full bg-violet-500/20 text-violet-400 font-medium">New</span>
-                  )}
-                </a>
-              );
-            })}
+          <nav className="flex-1 py-3 px-2.5 space-y-4 overflow-y-auto">
+            {navSections.map((section) => (
+              <div key={section.label}>
+                <div className="text-[10px] uppercase tracking-wider text-zinc-600 font-semibold px-3 mb-1">
+                  {section.label}
+                </div>
+                <div className="space-y-0.5">
+                  {section.items.map((item) => {
+                    const active = isActive(item.href, item.exact);
+                    return (
+                      <a
+                        key={item.href}
+                        href={item.href}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          router.push(item.href);
+                          setSidebarOpen(false);
+                        }}
+                        className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 group ${
+                          active
+                            ? 'bg-violet-500/15 text-violet-300 shadow-sm shadow-violet-500/5'
+                            : 'text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200'
+                        }`}
+                      >
+                        <item.icon className={`w-4 h-4 flex-shrink-0 ${active ? 'text-violet-400' : 'text-zinc-500 group-hover:text-zinc-400'}`} />
+                        {item.label}
+                      </a>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </nav>
 
           <div className="p-3 border-t border-zinc-800/80">

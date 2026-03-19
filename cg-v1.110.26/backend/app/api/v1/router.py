@@ -58,6 +58,8 @@ from app.api.v1.endpoints import (
     sendgrid_webhooks,
     marketing,
     verify,
+    blog,
+    kidspace_media,
 )
 
 api_router = APIRouter()
@@ -188,6 +190,12 @@ api_router.include_router(marketing.router, prefix="/marketing", tags=["Marketin
 
 # Report Verification - Public endpoint (no auth required)
 api_router.include_router(verify.router, prefix="/verify", tags=["Verification"])
+
+# Blog - Public read + admin CRUD
+api_router.include_router(blog.router, prefix="/blog", tags=["Blog"])
+
+# KidSpace Media - Public read + admin CRUD
+api_router.include_router(kidspace_media.router, prefix="/kidspace", tags=["KidSpace Media"])
 
 # SuperAdmin Portal - Platform administration
 api_router.include_router(admin.router, prefix="/admin", tags=["SuperAdmin Portal"])
