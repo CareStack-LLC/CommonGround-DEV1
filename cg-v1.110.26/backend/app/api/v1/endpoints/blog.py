@@ -370,6 +370,12 @@ async def generate_blog_post(
     import anthropic
     from app.core.config import settings
 
+    if not settings.ANTHROPIC_API_KEY:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="ANTHROPIC_API_KEY not configured. Set it in Render environment variables.",
+        )
+
     client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
 
     keywords_text = ""
