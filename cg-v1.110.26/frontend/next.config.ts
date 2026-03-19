@@ -1,9 +1,5 @@
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
-import path from "path";
-import { fileURLToPath } from "url";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const securityHeaders = [
   {
@@ -81,9 +77,9 @@ const nextConfig: NextConfig = {
     resolveAlias: {
       // Handle PDF.js canvas dependency
       canvas: { browser: '' },
-      // Force React resolution to a single instance to avoid duplicates from pnpm hoisting
-      react: path.resolve(__dirname, '..', '..', 'node_modules', 'react'),
-      'react-dom': path.resolve(__dirname, '..', '..', 'node_modules', 'react-dom'),
+      // Force React resolution to local instance to avoid duplicates from parent directory
+      react: './node_modules/react',
+      'react-dom': './node_modules/react-dom',
     },
   },
   // Keep webpack config for fallback
