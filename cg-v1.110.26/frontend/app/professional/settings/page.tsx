@@ -93,12 +93,12 @@ type TabId = (typeof TABS)[number]["id"];
 // ─── Plan Data ───────────────────────────────────────────────────────────────
 
 const TIER_ORDER = ["starter", "solo", "small_firm", "mid_size", "enterprise"];
-const PLANS: Record<string, { name: string; monthlyPrice: string; annualPrice: string; monthlyPriceId: string | null; annualPriceId: string | null; cases: number | string; team: number | string; featureCount: number; isEnterprise?: boolean }> = {
-  starter: { name: "Starter", monthlyPrice: "Free", annualPrice: "Free", monthlyPriceId: null, annualPriceId: null, cases: 3, team: 0, featureCount: 6 },
-  solo: { name: "Solo", monthlyPrice: "$99/mo", annualPrice: "$79/mo", monthlyPriceId: "price_1T7WgpB3EXvvERPfbXPqXJjK", annualPriceId: "price_1T7WgpB3EXvvERPfaYzRkMnL", cases: 15, team: 0, featureCount: 10 },
-  small_firm: { name: "Small Firm", monthlyPrice: "$299/mo", annualPrice: "$249/mo", monthlyPriceId: "price_1T7WgpB3EXvvERPfcDeFgHiJ", annualPriceId: "price_1T7WgpB3EXvvERPfdKlMnOpQ", cases: 50, team: 5, featureCount: 15 },
-  mid_size: { name: "Mid-Size", monthlyPrice: "$799/mo", annualPrice: "$649/mo", monthlyPriceId: "price_1T7WgpB3EXvvERPfeRsTuVwX", annualPriceId: "price_1T7WgpB3EXvvERPffYzAbCdE", cases: 150, team: 15, featureCount: 18 },
-  enterprise: { name: "Enterprise", monthlyPrice: "Custom", annualPrice: "Custom", monthlyPriceId: null, annualPriceId: null, cases: "\u221E", team: 50, featureCount: 21, isEnterprise: true },
+const PLANS: Record<string, { name: string; monthlyPrice: string; annualPrice: string; cases: number | string; team: number | string; featureCount: number; isEnterprise?: boolean }> = {
+  starter: { name: "Starter", monthlyPrice: "Free", annualPrice: "Free", cases: 3, team: 0, featureCount: 6 },
+  solo: { name: "Solo", monthlyPrice: "$99/mo", annualPrice: "$79/mo", cases: 15, team: 0, featureCount: 10 },
+  small_firm: { name: "Small Firm", monthlyPrice: "$299/mo", annualPrice: "$249/mo", cases: 50, team: 5, featureCount: 15 },
+  mid_size: { name: "Mid-Size", monthlyPrice: "$799/mo", annualPrice: "$649/mo", cases: 150, team: 15, featureCount: 18 },
+  enterprise: { name: "Enterprise", monthlyPrice: "Custom", annualPrice: "Custom", cases: "\u221E", team: 50, featureCount: 21, isEnterprise: true },
 };
 
 const FEATURE_LABELS: Record<string, string> = {
@@ -197,16 +197,21 @@ function SettingsContent() {
     router.replace(`/professional/settings?tab=${tab}`, { scroll: false });
   };
 
-  // Checkout
-  const handleCheckout = async (priceId: string) => {
+  // Checkout — uses the professional subscription endpoint
+  const handleCheckout = async (planCode: string) => {
     if (!token) return;
-    setCheckoutLoading(priceId);
+    setCheckoutLoading(planCode);
     try {
-      const res = await fetch(`${API_BASE}/api/v1/subscriptions/checkout`, {
+      const res = await fetch(`${API_BASE}/api/v1/professional/subscription/checkout`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ price_id: priceId, success_url: window.location.href, cancel_url: window.location.href }),
+        body: JSON.stringify({ plan_code: planCode, billing_period: billingCycle === "annual" ? "annual" : "monthly" }),
       });
+      if (!res.ok) {
+        const err = await res.json().catch(() => null);
+        console.error("Checkout error:", err?.detail || res.status);
+        return;
+      }
       const data = await res.json();
       if (data.checkout_url) window.location.href = data.checkout_url;
     } catch (err) {
@@ -468,7 +473,7 @@ function SubscriptionTab({
   billingCycle: "monthly" | "annual";
   setBillingCycle: (c: "monthly" | "annual") => void;
   checkoutLoading: string | null;
-  handleCheckout: (priceId: string) => void;
+  handleCheckout: (planCode: string) => void;
   profile: any;
 }) {
   if (!usage) return <p className="text-sm text-slate-500 py-8 text-center">Unable to load subscription data.</p>;
@@ -501,8 +506,8 @@ function SubscriptionTab({
             {TIER_ORDER.map((tierKey) => {
               const plan = PLANS[tierKey];
               const isCurrent = tierKey === usage.tier;
-              const priceId = billingCycle === "monthly" ? plan.monthlyPriceId : plan.annualPriceId;
               const price = billingCycle === "monthly" ? plan.monthlyPrice : plan.annualPrice;
+              const canCheckout = tierKey !== "starter" && !plan.isEnterprise;
               return (
                 <div key={tierKey} className={`relative rounded-xl border p-4 flex flex-col ${isCurrent ? "border-[#3DAA8A] bg-[#F4F8F7] ring-1 ring-[#3DAA8A]/20" : "border-slate-200 hover:border-[#3DAA8A]/30"}`}>
                   {isCurrent && <Badge className="absolute -top-2 left-1/2 -translate-x-1/2 bg-[#3DAA8A] text-white border-0 text-[10px] px-2">Current</Badge>}
@@ -520,9 +525,9 @@ function SubscriptionTab({
                       <Button asChild size="sm" className="w-full bg-[#1E3A4A] hover:bg-[#162E3C] text-white text-xs h-8 rounded-lg">
                         <a href="mailto:sales@find-commonground.com?subject=Enterprise%20Inquiry"><Mail className="h-3 w-3 mr-1" />Contact</a>
                       </Button>
-                    ) : priceId ? (
-                      <Button onClick={() => handleCheckout(priceId)} disabled={checkoutLoading === priceId} size="sm" className="w-full bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white text-xs h-8 rounded-lg">
-                        {checkoutLoading === priceId ? <Loader2 className="h-3 w-3 animate-spin" /> : <>Switch</>}
+                    ) : canCheckout ? (
+                      <Button onClick={() => handleCheckout(tierKey)} disabled={checkoutLoading === tierKey} size="sm" className="w-full bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white text-xs h-8 rounded-lg">
+                        {checkoutLoading === tierKey ? <Loader2 className="h-3 w-3 animate-spin" /> : <>Switch</>}
                       </Button>
                     ) : (
                       <Button disabled variant="outline" size="sm" className="w-full text-xs h-8 rounded-lg">Free</Button>
