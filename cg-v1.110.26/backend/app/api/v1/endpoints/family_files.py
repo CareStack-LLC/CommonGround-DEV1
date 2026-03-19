@@ -1163,6 +1163,28 @@ async def invite_firm_from_directory(
             detail="An error occurred while processing your request."
         )
 
+    # Send email notification to firm
+    try:
+        from app.services.email import EmailService
+        email_svc = EmailService()
+        parent_name = f"{current_user.first_name} {current_user.last_name}"
+        # Get firm email from firm record
+        from sqlalchemy import select as sa_select
+        from app.models.professional import Firm
+        firm_result = await db.execute(sa_select(Firm).where(Firm.id == firm_id))
+        firm = firm_result.scalar_one_or_none()
+        if firm and firm.contact_email:
+            await email_svc.send_professional_invitation(
+                to_email=firm.contact_email,
+                to_name=firm.name,
+                inviter_name=parent_name,
+                family_file_number=family_file_id[:8],
+                role="Case Representative",
+                access_description="View messages, exchanges, compliance data, and generate reports",
+            )
+    except Exception as e:
+        logger.warning(f"Failed to send firm invitation email: {e}")
+
     return {
         "id": request.id,
         "family_file_id": request.family_file_id,
@@ -1173,6 +1195,7 @@ async def invite_firm_from_directory(
         "message": request.message,
         "expires_at": request.expires_at,
         "created_at": request.created_at,
+        "consent_notice": "By inviting this professional, you grant them read-only access to your family file data including messages, exchanges, compliance records, and financial information. This access is for evidence gathering and reporting purposes only. The professional cannot modify any data. You may revoke access at any time from your settings.",
         "info": "Invitation sent to firm. Awaiting other parent approval and firm acceptance."
     }
 
