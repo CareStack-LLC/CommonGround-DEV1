@@ -622,23 +622,21 @@ function KidsHubPageContent() {
                   {/* Featured Movie */}
                   {featuredMovie && (
                     <motion.button
-                      whileHover={{ scale: 1.02 }}
+                      whileHover={{ scale: 1.02, y: -2 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => handleFeatureClick('theater')}
-                      className="w-full bg-white/20 backdrop-blur-sm rounded-3xl p-4 flex items-center gap-4 text-left"
+                      className="w-full bg-white/20 backdrop-blur-sm rounded-3xl p-4 flex items-center gap-4 text-left border border-white/10 shadow-lg transition-transform"
                     >
-                      <div className="w-16 h-20 rounded-xl overflow-hidden bg-white/30 flex-shrink-0">
+                      <div className="w-20 h-28 rounded-xl overflow-hidden bg-white/30 flex-shrink-0 shadow-md">
                         {featuredMovie.poster_url ? (
                           <img src={featuredMovie.poster_url} alt={featuredMovie.title} className="w-full h-full object-cover" />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-3xl">🎬</div>
+                          <div className="w-full h-full flex items-center justify-center text-4xl bg-gradient-to-br from-amber-400 to-orange-500">🎬</div>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold text-yellow-200 uppercase tracking-wider">★ Featured</span>
-                        </div>
-                        <h3 className="text-white font-bold text-lg truncate">{featuredMovie.title}</h3>
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-yellow-300 uppercase tracking-wider bg-yellow-500/20 px-2 py-0.5 rounded-full">⭐ Featured Movie</span>
+                        <h3 className="text-white font-bold text-lg truncate mt-1">{featuredMovie.title}</h3>
                         <p className="text-white/70 text-sm">{featuredMovie.genre_name || 'Movie'} • {featuredMovie.duration_minutes || '?'}min</p>
                       </div>
                       <span className="text-3xl">▶️</span>
@@ -648,23 +646,21 @@ function KidsHubPageContent() {
                   {/* Featured Author */}
                   {featuredAuthor && (
                     <motion.button
-                      whileHover={{ scale: 1.02 }}
+                      whileHover={{ scale: 1.02, y: -2 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => handleFeatureClick('stories')}
-                      className="w-full bg-white/20 backdrop-blur-sm rounded-3xl p-4 flex items-center gap-4 text-left"
+                      className="w-full bg-white/20 backdrop-blur-sm rounded-3xl p-4 flex items-center gap-4 text-left border-l-4 border-purple-400 shadow-lg transition-transform"
                     >
-                      <div className="w-14 h-14 rounded-full overflow-hidden bg-white/30 flex-shrink-0">
+                      <div className="w-14 h-14 rounded-full overflow-hidden bg-white/30 flex-shrink-0 shadow-md ring-2 ring-purple-300/50">
                         {featuredAuthor.photo_url ? (
                           <img src={featuredAuthor.photo_url} alt={featuredAuthor.name} className="w-full h-full object-cover" />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-2xl">✍️</div>
+                          <div className="w-full h-full flex items-center justify-center text-2xl bg-gradient-to-br from-purple-400 to-violet-500">✍️</div>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold text-purple-200 uppercase tracking-wider">✨ Author Spotlight</span>
-                        </div>
-                        <h3 className="text-white font-bold truncate">{featuredAuthor.name}</h3>
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-purple-200 uppercase tracking-wider bg-purple-500/20 px-2 py-0.5 rounded-full">✨ Author Spotlight</span>
+                        <h3 className="text-white font-bold truncate mt-1">{featuredAuthor.name}</h3>
                         {featuredAuthor.showcase_book_title && (
                           <p className="text-white/70 text-sm truncate">📖 {featuredAuthor.showcase_book_title}</p>
                         )}
@@ -737,36 +733,24 @@ function KidsHubPageContent() {
         </AnimatePresence>
       </main>
 
-      {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-lg border-t border-white/20 px-6 py-3 z-50">
-        <div className="max-w-lg mx-auto flex items-center justify-around">
-          {[
-            { icon: '🏠', label: 'Home', active: activeSection === 'home', onClick: () => setActiveSection('home') },
-            { icon: '💬', label: 'Chat', active: false, onClick: () => {} },
-            { icon: '🖼️', label: 'Gallery', active: false, onClick: () => {} },
-          ].map((item, i) => (
+      {/* Bottom Navigation — Home only (Chat/Gallery removed as non-functional) */}
+      {activeSection !== 'home' && (
+        <nav className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-lg border-t border-white/20 px-6 py-3 z-50">
+          <div className="max-w-lg mx-auto flex items-center justify-center">
             <motion.button
-              key={item.label}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7 + i * 0.1 }}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              onClick={item.onClick}
-              className={`flex flex-col items-center gap-1 px-6 py-2 rounded-2xl transition-colors ${
-                item.active
-                  ? 'bg-teal-100 text-teal-600'
-                  : 'text-gray-400 hover:text-gray-600'
-              }`}
+              onClick={() => setActiveSection('home')}
+              className="flex flex-col items-center gap-1 px-8 py-2 rounded-2xl bg-teal-100 text-teal-600"
             >
-              <span className="text-2xl">{item.icon}</span>
-              <span className={`text-xs font-medium ${item.active ? 'text-teal-600' : ''}`}>
-                {item.label}
-              </span>
+              <span className="text-2xl">🏠</span>
+              <span className="text-xs font-medium">Home</span>
             </motion.button>
-          ))}
-        </div>
-      </nav>
+          </div>
+        </nav>
+      )}
     </div>
   );
 }

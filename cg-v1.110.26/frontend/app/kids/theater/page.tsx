@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 
@@ -284,7 +284,7 @@ function WatchPartyModal({
   )
 }
 
-// Video player component
+// Video player component — plays real video when video_url exists, falls back to demo
 function VideoPlayer({
   movie,
   watchParty,
@@ -294,16 +294,53 @@ function VideoPlayer({
   watchParty: string[]
   onClose: () => void
 }) {
+  const videoRef = useRef<HTMLVideoElement>(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [progress, setProgress] = useState(0)
+  const [currentTime, setCurrentTime] = useState('0:00')
+  const [totalTime, setTotalTime] = useState(movie.duration || '0:00')
+  const hasVideo = !!movie.video_url
 
-  // Simulate video progress
+  // Real video time tracking
   useEffect(() => {
-    if (isPlaying && progress < 100) {
+    const v = videoRef.current
+    if (!v) return
+    const onTime = () => {
+      if (v.duration) {
+        setProgress((v.currentTime / v.duration) * 100)
+        const m = Math.floor(v.currentTime / 60)
+        const s = Math.floor(v.currentTime % 60)
+        setCurrentTime(`${m}:${s.toString().padStart(2, '0')}`)
+        const tm = Math.floor(v.duration / 60)
+        const ts = Math.floor(v.duration % 60)
+        setTotalTime(`${tm}:${ts.toString().padStart(2, '0')}`)
+      }
+    }
+    v.addEventListener('timeupdate', onTime)
+    return () => v.removeEventListener('timeupdate', onTime)
+  }, [hasVideo])
+
+  // Demo fallback: simulate progress
+  useEffect(() => {
+    if (!hasVideo && isPlaying && progress < 100) {
       const timer = setTimeout(() => setProgress(p => p + 1), 500)
       return () => clearTimeout(timer)
     }
-  }, [isPlaying, progress])
+  }, [hasVideo, isPlaying, progress])
+
+  const togglePlay = () => {
+    if (hasVideo && videoRef.current) {
+      if (isPlaying) videoRef.current.pause()
+      else videoRef.current.play()
+    }
+    setIsPlaying(!isPlaying)
+  }
+
+  const seek = (delta: number) => {
+    if (hasVideo && videoRef.current) {
+      videoRef.current.currentTime = Math.max(0, videoRef.current.currentTime + delta)
+    }
+  }
 
   return (
     <motion.div
@@ -312,98 +349,75 @@ function VideoPlayer({
       exit={{ opacity: 0 }}
       className="fixed inset-0 bg-black z-50"
     >
-      {/* Video area */}
       <div className="w-full h-full flex items-center justify-center relative">
-        {/* Placeholder for video */}
-        <div className="w-full h-full bg-gradient-to-br from-gray-900 to-black flex items-center justify-center">
-          <motion.div
-            animate={{ scale: [1, 1.1, 1] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="text-center"
-          >
-            <span className="text-[150px]">{movie.poster}</span>
-            <h2 className="text-4xl font-black text-white mt-4">{movie.title}</h2>
-            {!isPlaying && (
-              <p className="text-xl text-gray-400 mt-2">Press play to start!</p>
-            )}
-          </motion.div>
-        </div>
+        {/* Real video or emoji fallback */}
+        {hasVideo ? (
+          <video
+            ref={videoRef}
+            src={movie.video_url}
+            poster={movie.poster_url || undefined}
+            className="w-full h-full object-contain bg-black"
+            playsInline
+            onEnded={() => setIsPlaying(false)}
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-gray-900 to-black flex items-center justify-center">
+            <motion.div animate={{ scale: [1, 1.1, 1] }} transition={{ duration: 2, repeat: Infinity }} className="text-center">
+              <span className="text-[150px]">{movie.poster}</span>
+              <h2 className="text-4xl font-black text-white mt-4">{movie.title}</h2>
+              {!isPlaying && <p className="text-xl text-gray-400 mt-2">Press play to start!</p>}
+            </motion.div>
+          </div>
+        )}
 
         {/* Watch party participants */}
         {watchParty.length > 0 && (
           <div className="absolute top-4 right-4 flex gap-2">
             {watchParty.map((id, i) => (
-              <motion.div
-                key={id}
-                initial={{ scale: 0, x: 20 }}
-                animate={{ scale: 1, x: 0 }}
-                transition={{ delay: i * 0.1 }}
-                className="w-14 h-14 rounded-full bg-purple-500 border-3 border-white flex items-center justify-center"
-              >
-                <span className="text-2xl">
-                  {id === '1' ? '👩' : id === '2' ? '👨' : id === '3' ? '👵' : '👴'}
-                </span>
+              <motion.div key={id} initial={{ scale: 0, x: 20 }} animate={{ scale: 1, x: 0 }} transition={{ delay: i * 0.1 }}
+                className="w-14 h-14 rounded-full bg-purple-500 border-3 border-white flex items-center justify-center">
+                <span className="text-2xl">{id === '1' ? '👩' : id === '2' ? '👨' : id === '3' ? '👵' : '👴'}</span>
               </motion.div>
             ))}
             <div className="ml-2 px-4 py-2 bg-green-500/90 rounded-full text-white font-bold flex items-center gap-2">
-              <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
-              Watching Together!
+              <span className="w-2 h-2 bg-white rounded-full animate-pulse" /> Watching Together!
             </div>
           </div>
         )}
 
         {/* Close button */}
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={onClose}
-          className="absolute top-4 left-4 w-12 h-12 rounded-full bg-white/20 text-white flex items-center justify-center backdrop-blur-sm"
-        >
+        <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={onClose}
+          className="absolute top-4 left-4 w-12 h-12 rounded-full bg-white/20 text-white flex items-center justify-center backdrop-blur-sm">
           <span className="text-2xl">✕</span>
         </motion.button>
 
-        {/* Video controls */}
+        {/* Controls */}
         <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/90 to-transparent">
-          {/* Progress bar */}
-          <div className="w-full h-2 bg-white/30 rounded-full mb-4 overflow-hidden">
-            <motion.div
-              className="h-full bg-gradient-to-r from-pink-500 to-purple-500 rounded-full"
-              animate={{ width: `${progress}%` }}
-            />
+          <div className="w-full h-2 bg-white/30 rounded-full mb-4 overflow-hidden cursor-pointer"
+            onClick={(e) => {
+              if (hasVideo && videoRef.current?.duration) {
+                const rect = e.currentTarget.getBoundingClientRect()
+                const pct = (e.clientX - rect.left) / rect.width
+                videoRef.current.currentTime = pct * videoRef.current.duration
+              }
+            }}>
+            <motion.div className="h-full bg-gradient-to-r from-pink-500 to-purple-500 rounded-full" animate={{ width: `${progress}%` }} />
           </div>
-
-          {/* Control buttons */}
           <div className="flex items-center justify-center gap-6">
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              className="w-14 h-14 rounded-full bg-white/20 text-white flex items-center justify-center"
-            >
+            <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => seek(-10)}
+              className="w-14 h-14 rounded-full bg-white/20 text-white flex items-center justify-center">
               <span className="text-2xl">⏪</span>
             </motion.button>
-
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => setIsPlaying(!isPlaying)}
-              className="w-20 h-20 rounded-full bg-white text-black flex items-center justify-center shadow-xl"
-            >
+            <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={togglePlay}
+              className="w-20 h-20 rounded-full bg-white text-black flex items-center justify-center shadow-xl">
               <span className="text-4xl">{isPlaying ? '⏸️' : '▶️'}</span>
             </motion.button>
-
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              className="w-14 h-14 rounded-full bg-white/20 text-white flex items-center justify-center"
-            >
+            <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => seek(10)}
+              className="w-14 h-14 rounded-full bg-white/20 text-white flex items-center justify-center">
               <span className="text-2xl">⏩</span>
             </motion.button>
           </div>
-
-          {/* Time display */}
-          <div className="text-center mt-4 text-white/80">
-            0:{progress.toString().padStart(2, '0')} / {movie.duration}
-          </div>
+          <div className="text-center mt-4 text-white/80">{currentTime} / {totalTime}</div>
         </div>
       </div>
     </motion.div>
@@ -469,8 +483,10 @@ export default function TheaterPage() {
 
   const [movies, setMovies] = useState<Movie[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  // Extract unique genres from loaded movies for category tabs
+  // Extract unique genres from loaded movies, deduplicate against base categories
+  const baseIds = new Set(['all', 'favorites', 'new'])
   const movieGenres = Array.from(new Set(movies.map(m => m.genre).filter(Boolean)))
+    .filter(name => !baseIds.has(name.toLowerCase()))
     .map(name => ({ id: name.toLowerCase(), name, icon_emoji: '🎭' }))
 
   // Fetch real movies from API, fall back to sample data if endpoint not available

@@ -684,12 +684,15 @@ export default function ArcadePage() {
     ))
   }
 
+  const [comingSoonId, setComingSoonId] = useState<string | null>(null)
+
   const handlePlay = (gameId: string) => {
     if (['memory', 'catch', 'color'].includes(gameId)) {
       setActiveGame(gameId)
     } else {
-      // Coming soon games
-      alert('Coming soon! 🎮')
+      // Show "Coming Soon" toast briefly
+      setComingSoonId(gameId)
+      setTimeout(() => setComingSoonId(null), 2000)
     }
   }
 
@@ -749,6 +752,24 @@ export default function ArcadePage() {
             />
           ))}
         </div>
+
+        {/* Coming Soon toast */}
+        <AnimatePresence>
+          {comingSoonId && (
+            <motion.div
+              initial={{ opacity: 0, y: 50, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 50, scale: 0.9 }}
+              className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 bg-white/95 backdrop-blur-sm rounded-2xl px-8 py-4 shadow-2xl flex items-center gap-3"
+            >
+              <span className="text-3xl">🎮</span>
+              <div>
+                <p className="font-bold text-gray-900">Coming Soon!</p>
+                <p className="text-sm text-gray-500">This game is being built</p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Bonus message */}
         <motion.div

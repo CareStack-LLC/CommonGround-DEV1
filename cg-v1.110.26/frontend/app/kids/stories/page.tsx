@@ -131,10 +131,15 @@ function StoryCard({
           />
         </motion.button>
 
-        {/* Book cover */}
-        <div className="w-20 h-24 mx-auto mb-4 bg-white/90 rounded-xl flex items-center justify-center shadow-lg relative">
-          <span className="text-4xl">{story.cover_emoji}</span>
-          {/* Book spine effect */}
+        {/* Book cover — real image or emoji fallback */}
+        <div className="w-20 h-24 mx-auto mb-4 bg-white/90 rounded-xl overflow-hidden shadow-lg relative">
+          {story.cover_url ? (
+            <img src={story.cover_url} alt={story.title} className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <span className="text-4xl">{story.cover_emoji}</span>
+            </div>
+          )}
           <div className="absolute left-0 top-0 bottom-0 w-2 bg-black/10 rounded-l-xl" />
         </div>
 
@@ -153,7 +158,7 @@ function StoryCard({
   );
 }
 
-// Story Reader View
+// Story Reader View — shows real PDF when available, falls back to demo pages
 function StoryReader({
   story,
   onClose
@@ -162,8 +167,9 @@ function StoryReader({
   onClose: () => void;
 }) {
   const [currentPage, setCurrentPage] = useState(0);
+  const hasPdf = !!story.pdf_url;
 
-  // Sample story pages (would come from API)
+  // Demo pages (used when no pdf_url)
   const pages = [
     { text: `Once upon a time, there was ${story.title.toLowerCase().replace('the ', 'a ')}...`, image: story.cover_emoji },
     { text: 'One sunny morning, an amazing adventure began!', image: '🌅' },
@@ -176,6 +182,32 @@ function StoryReader({
 
   const goNext = () => setCurrentPage(p => Math.min(p + 1, pages.length - 1));
   const goPrev = () => setCurrentPage(p => Math.max(p - 1, 0));
+
+  // PDF Reader mode
+  if (hasPdf) {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 bg-gradient-to-b from-purple-900 via-indigo-900 to-blue-900 z-50 flex flex-col"
+      >
+        <header className="relative z-10 p-4 flex items-center justify-between">
+          <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={onClose}
+            className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-white">←</motion.button>
+          <h2 className="text-white font-bold text-lg">{story.title}</h2>
+          <div className="w-12" />
+        </header>
+        <div className="flex-1 p-4 relative z-10">
+          <iframe
+            src={story.pdf_url}
+            className="w-full h-full rounded-2xl bg-white shadow-2xl"
+            title={story.title}
+          />
+        </div>
+      </motion.div>
+    );
+  }
 
   return (
     <motion.div
