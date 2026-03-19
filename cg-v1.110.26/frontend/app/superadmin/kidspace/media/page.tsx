@@ -151,10 +151,10 @@ export default function MediaLibraryPage() {
       const headers = { Authorization: `Bearer ${getToken()}` };
 
       const [moviesRes, booksRes, authorsRes, genresRes] = await Promise.all([
-        fetch(`${API_BASE}/api/v1/admin/kidspace/movies`, { headers }),
-        fetch(`${API_BASE}/api/v1/admin/kidspace/books`, { headers }),
-        fetch(`${API_BASE}/api/v1/admin/kidspace/authors`, { headers }),
-        fetch(`${API_BASE}/api/v1/admin/kidspace/genres`, { headers }),
+        fetch(`${API_BASE}/api/v1/kidspace/admin/movies`, { headers }),
+        fetch(`${API_BASE}/api/v1/kidspace/admin/books`, { headers }),
+        fetch(`${API_BASE}/api/v1/kidspace/admin/authors`, { headers }),
+        fetch(`${API_BASE}/api/v1/kidspace/admin/genres`, { headers }),
       ]);
 
       if (moviesRes.ok) { const d = await moviesRes.json(); setMovies(Array.isArray(d) ? d : d.movies || []); }
@@ -208,8 +208,8 @@ export default function MediaLibraryPage() {
       if (moviePosterFile) formData.append('poster_file', moviePosterFile);
 
       const url = editingMovie
-        ? `${API_BASE}/api/v1/admin/kidspace/movies/${editingMovie.id}`
-        : `${API_BASE}/api/v1/admin/kidspace/movies`;
+        ? `${API_BASE}/api/v1/kidspace/admin/movies/${editingMovie.id}`
+        : `${API_BASE}/api/v1/kidspace/admin/movies`;
 
       const res = await fetch(url, {
         method: editingMovie ? 'PUT' : 'POST',
@@ -230,7 +230,7 @@ export default function MediaLibraryPage() {
   const handleDeleteMovie = async (id: string) => {
     if (!confirm('Delete this movie?')) return;
     try {
-      await fetch(`${API_BASE}/api/v1/admin/kidspace/movies/${id}`, {
+      await fetch(`${API_BASE}/api/v1/kidspace/admin/movies/${id}`, {
         method: 'DELETE', headers: { Authorization: `Bearer ${getToken()}` },
       });
       showSuccess('Movie deleted');
@@ -273,8 +273,8 @@ export default function MediaLibraryPage() {
       if (bookCoverFile) formData.append('cover_file', bookCoverFile);
 
       const url = editingBook
-        ? `${API_BASE}/api/v1/admin/kidspace/books/${editingBook.id}`
-        : `${API_BASE}/api/v1/admin/kidspace/books`;
+        ? `${API_BASE}/api/v1/kidspace/admin/books/${editingBook.id}`
+        : `${API_BASE}/api/v1/kidspace/admin/books`;
 
       const res = await fetch(url, {
         method: editingBook ? 'PUT' : 'POST',
@@ -295,7 +295,7 @@ export default function MediaLibraryPage() {
   const handleDeleteBook = async (id: string) => {
     if (!confirm('Delete this book?')) return;
     try {
-      await fetch(`${API_BASE}/api/v1/admin/kidspace/books/${id}`, {
+      await fetch(`${API_BASE}/api/v1/kidspace/admin/books/${id}`, {
         method: 'DELETE', headers: { Authorization: `Bearer ${getToken()}` },
       });
       showSuccess('Book deleted');
@@ -328,8 +328,8 @@ export default function MediaLibraryPage() {
       if (authorPhotoFile) formData.append('photo_file', authorPhotoFile);
 
       const url = editingAuthor
-        ? `${API_BASE}/api/v1/admin/kidspace/authors/${editingAuthor.id}`
-        : `${API_BASE}/api/v1/admin/kidspace/authors`;
+        ? `${API_BASE}/api/v1/kidspace/admin/authors/${editingAuthor.id}`
+        : `${API_BASE}/api/v1/kidspace/admin/authors`;
 
       const res = await fetch(url, {
         method: editingAuthor ? 'PUT' : 'POST',
@@ -350,7 +350,7 @@ export default function MediaLibraryPage() {
   const handleDeleteAuthor = async (id: string) => {
     if (!confirm('Delete this author?')) return;
     try {
-      await fetch(`${API_BASE}/api/v1/admin/kidspace/authors/${id}`, {
+      await fetch(`${API_BASE}/api/v1/kidspace/admin/authors/${id}`, {
         method: 'DELETE', headers: { Authorization: `Bearer ${getToken()}` },
       });
       showSuccess('Author deleted');
@@ -363,7 +363,7 @@ export default function MediaLibraryPage() {
     if (!newGenreName.trim()) return;
     try {
       setAddingGenre(true);
-      const res = await fetch(`${API_BASE}/api/v1/admin/kidspace/genres`, {
+      const res = await fetch(`${API_BASE}/api/v1/kidspace/admin/genres`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
         body: JSON.stringify({ name: newGenreName, emoji: newGenreEmoji || '🎬', description: newGenreDesc }),
@@ -382,7 +382,7 @@ export default function MediaLibraryPage() {
   const handleDeleteGenre = async (id: string) => {
     if (!confirm('Delete this genre?')) return;
     try {
-      await fetch(`${API_BASE}/api/v1/admin/kidspace/genres/${id}`, {
+      await fetch(`${API_BASE}/api/v1/kidspace/admin/genres/${id}`, {
         method: 'DELETE', headers: { Authorization: `Bearer ${getToken()}` },
       });
       showSuccess('Genre deleted');

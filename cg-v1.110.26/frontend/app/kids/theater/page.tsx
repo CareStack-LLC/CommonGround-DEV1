@@ -44,6 +44,8 @@ function FloatingDecorations() {
   )
 }
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+
 // Movie card component
 interface Movie {
   id: string
@@ -52,6 +54,8 @@ interface Movie {
   duration: string
   rating: string
   genre: string
+  video_url?: string
+  poster_url?: string
   isNew?: boolean
   isFavorite?: boolean
 }
@@ -93,10 +97,14 @@ function MovieCard({
     >
       {/* Movie poster */}
       <div className="relative rounded-3xl overflow-hidden shadow-2xl">
-        {/* Gradient poster placeholder */}
-        <div className={`w-full aspect-[2/3] bg-gradient-to-br ${genreColors[movie.genre] || 'from-gray-400 to-gray-600'} flex items-center justify-center`}>
-          <span className="text-8xl">{movie.poster}</span>
-        </div>
+        {/* Movie poster — real image or gradient fallback */}
+        {movie.poster_url ? (
+          <img src={movie.poster_url} alt={movie.title} className="w-full aspect-[2/3] object-cover" />
+        ) : (
+          <div className={`w-full aspect-[2/3] bg-gradient-to-br ${genreColors[movie.genre] || 'from-gray-400 to-gray-600'} flex items-center justify-center`}>
+            <span className="text-8xl">{movie.poster}</span>
+          </div>
+        )}
 
         {/* Overlay on hover */}
         <motion.div
@@ -453,17 +461,53 @@ export default function TheaterPage() {
   const [watchingMovie, setWatchingMovie] = useState<Movie | null>(null)
   const [watchPartyMembers, setWatchPartyMembers] = useState<string[]>([])
 
-  // Sample movies data
-  const [movies, setMovies] = useState<Movie[]>([
-    { id: '1', title: 'Space Rangers', poster: '🚀', duration: '1:32', rating: '4.8', genre: 'Adventure', isNew: true, isFavorite: false },
-    { id: '2', title: 'Silly Penguins', poster: '🐧', duration: '1:15', rating: '4.9', genre: 'Comedy', isNew: true, isFavorite: true },
-    { id: '3', title: 'Magic Kingdom', poster: '🏰', duration: '1:45', rating: '4.7', genre: 'Fantasy', isNew: false, isFavorite: true },
-    { id: '4', title: 'Ocean Friends', poster: '🐠', duration: '1:28', rating: '4.6', genre: 'Animation', isNew: false, isFavorite: false },
-    { id: '5', title: 'Dino World', poster: '🦕', duration: '1:38', rating: '4.8', genre: 'Adventure', isNew: true, isFavorite: false },
-    { id: '6', title: 'Robot Dance', poster: '🤖', duration: '1:22', rating: '4.5', genre: 'Musical', isNew: false, isFavorite: false },
-    { id: '7', title: 'Puppy Pals', poster: '🐕', duration: '1:18', rating: '4.9', genre: 'Family', isNew: false, isFavorite: true },
-    { id: '8', title: 'Super Kitty', poster: '🐱', duration: '1:25', rating: '4.7', genre: 'Comedy', isNew: false, isFavorite: false },
-  ])
+  const [movies, setMovies] = useState<Movie[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  // Fetch real movies from API, fall back to sample data if endpoint not available
+  useEffect(() => {
+    const fetchMovies = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/v1/kidspace/movies?limit=50`)
+        if (res.ok) {
+          const data = await res.json()
+          const items = data.movies || data || []
+          if (items.length > 0) {
+            const mapped: Movie[] = items.map((m: any) => ({
+              id: m.id,
+              title: m.title,
+              poster: m.poster_url ? '' : '🎬',
+              poster_url: m.poster_url,
+              video_url: m.video_url,
+              duration: m.duration_minutes ? `${Math.floor(m.duration_minutes / 60)}:${(m.duration_minutes % 60).toString().padStart(2, '0')}` : '0:00',
+              rating: '4.8',
+              genre: m.genre_name || 'Family',
+              isNew: new Date(m.created_at) > new Date(Date.now() - 14 * 86400000),
+              isFavorite: false,
+            }))
+            setMovies(mapped)
+            setIsLoading(false)
+            return
+          }
+        }
+      } catch {
+        // API unavailable — use fallback
+      }
+      // Fallback sample data
+      setMovies([
+        { id: '1', title: 'Space Rangers', poster: '🚀', duration: '1:32', rating: '4.8', genre: 'Adventure', isNew: true, isFavorite: false },
+        { id: '2', title: 'Silly Penguins', poster: '🐧', duration: '1:15', rating: '4.9', genre: 'Comedy', isNew: true, isFavorite: true },
+        { id: '3', title: 'Magic Kingdom', poster: '🏰', duration: '1:45', rating: '4.7', genre: 'Fantasy', isNew: false, isFavorite: true },
+        { id: '4', title: 'Ocean Friends', poster: '🐠', duration: '1:28', rating: '4.6', genre: 'Animation', isNew: false, isFavorite: false },
+        { id: '5', title: 'Dino World', poster: '🦕', duration: '1:38', rating: '4.8', genre: 'Adventure', isNew: true, isFavorite: false },
+        { id: '6', title: 'Robot Dance', poster: '🤖', duration: '1:22', rating: '4.5', genre: 'Musical', isNew: false, isFavorite: false },
+        { id: '7', title: 'Puppy Pals', poster: '🐕', duration: '1:18', rating: '4.9', genre: 'Family', isNew: false, isFavorite: true },
+        { id: '8', title: 'Super Kitty', poster: '🐱', duration: '1:25', rating: '4.7', genre: 'Comedy', isNew: false, isFavorite: false },
+      ])
+      setIsLoading(false)
+    }
+    fetchMovies()
+  }, [])
 
   // Filter movies based on category
   const filteredMovies = movies.filter(movie => {

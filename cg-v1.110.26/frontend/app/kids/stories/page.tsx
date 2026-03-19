@@ -16,21 +16,25 @@ import {
 } from 'lucide-react';
 
 /* =============================================================================
-   STORY TIME - AI-Generated Books for Kids
-   Kids can read stories created with ARIA AI
+   STORY TIME - Books for Kids
+   Kids can read stories managed via KidSpace Media Library
    ============================================================================= */
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 interface Story {
   id: string;
   title: string;
   cover_emoji: string;
+  cover_url?: string;
+  pdf_url?: string;
   page_count: number;
   theme: string;
   created_at: string;
   is_favorite: boolean;
 }
 
-// Sample stories (would come from API)
+// Fallback stories when API unavailable
 const sampleStories: Story[] = [
   { id: '1', title: 'The Brave Little Dinosaur', cover_emoji: '🦕', page_count: 8, theme: 'adventure', created_at: '2024-01-10', is_favorite: true },
   { id: '2', title: 'Princess Luna\'s Space Trip', cover_emoji: '🚀', page_count: 10, theme: 'space', created_at: '2024-01-08', is_favorite: false },
@@ -314,6 +318,36 @@ function StoriesPageContent() {
   const [stories, setStories] = useState<Story[]>(sampleStories);
   const [selectedStory, setSelectedStory] = useState<Story | null>(null);
   const [isCreating, setIsCreating] = useState(false);
+
+  // Fetch real books from API
+  useEffect(() => {
+    const fetchBooks = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/v1/kidspace/books?limit=50`);
+        if (res.ok) {
+          const data = await res.json();
+          const items = data.books || data || [];
+          if (items.length > 0) {
+            const mapped: Story[] = items.map((b: any) => ({
+              id: b.id,
+              title: b.title,
+              cover_emoji: '📖',
+              cover_url: b.cover_url,
+              pdf_url: b.pdf_url,
+              page_count: b.page_count || 0,
+              theme: b.genre_name || 'adventure',
+              created_at: b.created_at,
+              is_favorite: false,
+            }));
+            setStories(mapped);
+          }
+        }
+      } catch {
+        // API unavailable — keep fallback sample data
+      }
+    };
+    fetchBooks();
+  }, []);
 
   const toggleFavorite = (id: string) => {
     setStories(stories.map(s =>
