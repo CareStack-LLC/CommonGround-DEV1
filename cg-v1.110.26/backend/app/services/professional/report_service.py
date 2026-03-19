@@ -210,6 +210,40 @@ class ComplianceReportService:
                 end_date=end_date
             )
 
+        elif report_type == "aria_assessment":
+            # ARIA Assessment is an alias for aria_analysis with the same data
+            template = ARIAAnalysisReport(self.db)
+            return await template.generate_data(
+                family_file_id=family_file_id,
+                professional_id=professional_id,
+                start_date=start_date,
+                end_date=end_date
+            )
+
+        elif report_type == "monthly_summary":
+            # Monthly summary combines all 4 report types into one rolling 30-day view
+            from datetime import timedelta
+            if not start_date:
+                end_date = datetime.utcnow()
+                start_date = end_date - timedelta(days=30)
+
+            full = FullComplianceReport(self.db)
+            full_data = await full.generate_data(
+                family_file_id=family_file_id,
+                professional_id=professional_id,
+                start_date=start_date,
+                end_date=end_date
+            )
+
+            return {
+                "report_type": "monthly_summary",
+                "metadata": full_data.get("metadata", {}),
+                "period": {"start": start_date.isoformat(), "end": end_date.isoformat(), "days": 30},
+                "executive_summary": full_data.get("executive_summary", {}),
+                "sections": full_data.get("sections", {}),
+                "recommendations": full_data.get("recommendations", []),
+            }
+
         else:
             raise ValueError(f"Unsupported report type: {report_type}")
 
