@@ -24,7 +24,7 @@ const QUICK_CREATE_ITEMS = [
         href: "/professional/intake/new",
         label: "Send ARIA Intake",
         description: "Email intake link to a client",
-        icon: <Bot className="h-4 w-4 text-amber-600" />,
+        icon: <Bot className="h-4 w-4 text-[#2D6A8F]" />,
     },
     {
         href: "/professional/documents/ocr",

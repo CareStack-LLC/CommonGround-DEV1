@@ -185,25 +185,25 @@ export default function CaseTimelinePage() {
       {/* Back Link */}
       <Link
         href={`/professional/cases/${familyFileId}`}
-        className="inline-flex items-center gap-2 text-sm sans text-amber-900 hover:text-amber-800 font-semibold"
+        className="inline-flex items-center gap-2 text-sm sans text-[#1E3A4A] hover:text-[#2D6A8F] font-semibold"
       >
         <ArrowLeft className="h-4 w-4" />
         Back to Case
       </Link>
 
       {/* Header */}
-      <div className="relative overflow-hidden rounded-sm bg-gradient-to-br from-amber-900 via-amber-800 to-amber-950 px-8 py-8 shadow-2xl border-2 border-amber-900/40">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-600 via-amber-400 to-amber-600" />
+      <div className="relative overflow-hidden rounded-sm bg-gradient-to-br from-[#1E3A4A] via-[#2D6A8F] to-[#1E3A4A] px-8 py-8 shadow-2xl border-2 border-[#1E3A4A]/40">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#2D6A8F] via-[#C8A951] to-[#2D6A8F]" />
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div className="flex items-start gap-5">
-            <div className="p-4 bg-amber-50 border-2 border-amber-900/20 rounded-sm shadow-xl shrink-0">
-              <Clock className="h-8 w-8 text-amber-900" strokeWidth={1.5} />
+            <div className="p-4 bg-[#F4F8F7] border-2 border-[#1E3A4A]/20 rounded-sm shadow-xl shrink-0">
+              <Clock className="h-8 w-8 text-[#1E3A4A]" strokeWidth={1.5} />
             </div>
             <div>
               <h1 className="serif text-3xl lg:text-4xl font-bold text-white leading-tight tracking-tight">
                 Case Timeline
               </h1>
-              <p className="sans text-sm text-amber-100 mt-2">
+              <p className="sans text-sm text-[#E8F4F0] mt-2">
                 Chronological view of all case events
               </p>
             </div>
@@ -264,11 +264,11 @@ export default function CaseTimelinePage() {
       )}
 
       {/* Filters */}
-      <Card className="border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/20 to-white shadow-sm">
+      <Card className="border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/20 to-white shadow-sm">
         <CardContent className="py-3">
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-amber-900" />
+              <Filter className="h-4 w-4 text-[#1E3A4A]" />
               <span className="sans text-sm font-semibold text-slate-900">Filter by type:</span>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -278,7 +278,7 @@ export default function CaseTimelinePage() {
                   variant={selectedTypes.includes(type.value) ? "default" : "outline"}
                   size="sm"
                   onClick={() => toggleEventType(type.value)}
-                  className={selectedTypes.includes(type.value) ? "bg-amber-900 hover:bg-amber-800 text-white border-2 border-amber-900/40 sans font-semibold" : "border-2 border-slate-300 sans hover:border-amber-900/40 hover:bg-amber-50"}
+                  className={selectedTypes.includes(type.value) ? "bg-[#1E3A4A] hover:bg-[#2D6A8F] text-white border-2 border-[#1E3A4A]/40 sans font-semibold" : "border-2 border-slate-300 sans hover:border-[#1E3A4A]/40 hover:bg-[#F4F8F7]"}
                 >
                   <type.icon className="h-3.5 w-3.5 mr-1.5" />
                   {type.label}
@@ -289,7 +289,7 @@ export default function CaseTimelinePage() {
                   variant="ghost"
                   size="sm"
                   onClick={() => setSelectedTypes([])}
-                  className="sans text-slate-600 hover:text-amber-900"
+                  className="sans text-slate-600 hover:text-[#1E3A4A]"
                 >
                   Clear filters
                 </Button>
@@ -308,8 +308,8 @@ export default function CaseTimelinePage() {
         <div className="space-y-6">
           {Object.entries(groupedEvents).map(([date, dateEvents]) => (
             <div key={date}>
-              <div className="sticky top-0 z-10 bg-gradient-to-r from-amber-50 to-white/95 backdrop-blur py-2 mb-3 border-b-2 border-amber-900/20">
-                <h3 className="serif text-sm font-bold text-amber-900">{date}</h3>
+              <div className="sticky top-0 z-10 bg-gradient-to-r from-[#F4F8F7] to-white/95 backdrop-blur py-2 mb-3 border-b-2 border-[#1E3A4A]/20">
+                <h3 className="serif text-sm font-bold text-[#1E3A4A]">{date}</h3>
               </div>
               <div className="space-y-3">
                 {dateEvents.map((event) => (
@@ -320,9 +320,9 @@ export default function CaseTimelinePage() {
           ))}
         </div>
       ) : (
-        <Card className="border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/20 to-white shadow-sm">
+        <Card className="border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/20 to-white shadow-sm">
           <CardContent className="py-12 text-center">
-            <Clock className="h-12 w-12 mx-auto text-amber-900/40 mb-4" />
+            <Clock className="h-12 w-12 mx-auto text-[#1E3A4A]/40 mb-4" />
             <h3 className="serif text-lg font-bold text-slate-900 mb-2">No events found</h3>
             <p className="sans text-slate-600">
               {selectedTypes.length > 0
@@ -364,17 +364,17 @@ function SummaryCard({
       onClick={onClick}
       className={`p-3 rounded-sm border-2 text-left transition-all ${
         active
-          ? "bg-amber-50 border-amber-900/40 ring-2 ring-amber-500/20 shadow-md"
-          : "bg-gradient-to-br from-white via-amber-50/20 to-white border-amber-900/20 hover:border-amber-900/40 hover:shadow-sm"
+          ? "bg-[#F4F8F7] border-[#1E3A4A]/40 ring-2 ring-[#3DAA8A]/20 shadow-md"
+          : "bg-gradient-to-br from-white via-[#F4F8F7]/20 to-white border-[#1E3A4A]/20 hover:border-[#1E3A4A]/40 hover:shadow-sm"
       }`}
     >
       <div className="flex items-center justify-between mb-1">
-        <span className={active ? "text-amber-900" : "text-slate-600"}>
+        <span className={active ? "text-[#1E3A4A]" : "text-slate-600"}>
           {icon}
         </span>
-        <span className={`serif text-xl font-bold ${active ? "text-amber-900" : "text-slate-900"}`}>{value}</span>
+        <span className={`serif text-xl font-bold ${active ? "text-[#1E3A4A]" : "text-slate-900"}`}>{value}</span>
       </div>
-      <p className={`sans text-xs ${active ? "text-amber-900/70" : "text-slate-600"}`}>{label}</p>
+      <p className={`sans text-xs ${active ? "text-[#1E3A4A]/70" : "text-slate-600"}`}>{label}</p>
     </button>
   );
 }
@@ -395,7 +395,7 @@ function TimelineEventCard({ event }: { event: TimelineEvent }) {
   const getEventColorClasses = (type: string) => {
     const colorMap: Record<string, string> = {
       message: "bg-purple-50 text-purple-900 border-2 border-purple-900/20",
-      exchange: "bg-amber-50 text-amber-900 border-2 border-amber-900/20",
+      exchange: "bg-[#F4F8F7] text-[#1E3A4A] border-2 border-[#1E3A4A]/20",
       agreement: "bg-slate-50 text-slate-900 border-2 border-slate-900/20",
       court: "bg-blue-50 text-blue-900 border-2 border-blue-900/20",
       aria: "bg-emerald-50 text-emerald-900 border-2 border-emerald-900/20",
@@ -423,7 +423,7 @@ function TimelineEventCard({ event }: { event: TimelineEvent }) {
   };
 
   return (
-    <Card className="border-2 border-amber-900/30 bg-gradient-to-br from-white via-amber-50/20 to-white hover:shadow-lg transition-shadow">
+    <Card className="border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/20 to-white hover:shadow-lg transition-shadow">
       <CardContent className="py-4">
         <div className="flex items-start gap-4">
           {/* Icon */}
@@ -454,7 +454,7 @@ function TimelineEventCard({ event }: { event: TimelineEvent }) {
             {event.metadata && Object.keys(event.metadata).length > 0 && (
               <div className="mt-2 flex flex-wrap gap-2">
                 {event.metadata.sender && (
-                  <Badge className="sans text-xs bg-amber-50 text-amber-900 border-2 border-amber-900/30">
+                  <Badge className="sans text-xs bg-[#F4F8F7] text-[#1E3A4A] border-2 border-[#1E3A4A]/30">
                     From: {event.metadata.sender}
                   </Badge>
                 )}

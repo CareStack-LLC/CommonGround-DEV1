@@ -2811,7 +2811,29 @@ async def create_intake_session(
         family_file_id=family_file_id,
     )
 
-    # TODO: Send intake link email to client
+    # Send intake link email to client
+    try:
+        from app.services.email import EmailService
+        email_svc = EmailService()
+        professional_name = (
+            f"{profile.user.first_name} {profile.user.last_name}"
+            if profile.user else "Your attorney"
+        )
+        await email_svc.send_generic_notification(
+            to_email=data.client_email,
+            to_name=data.client_name,
+            subject=f"{professional_name} has invited you to complete an intake",
+            message=(
+                f"{professional_name} has invited you to complete an intake questionnaire "
+                f"through CommonGround. Please click the link below to get started. "
+                f"This link will expire in 7 days."
+            ),
+            cta_url=session.intake_link,
+            cta_text="Start Intake",
+            title="You're Invited to Complete an Intake",
+        )
+    except Exception as e:
+        logger.error(f"Failed to send intake link email to {data.client_email}: {e}")
 
     return _intake_session_to_detail(session)
 
@@ -3009,7 +3031,33 @@ async def request_intake_clarification(
             detail="Intake session not found.",
         )
 
-    # TODO: Send notification to client about clarification request
+    # Send notification to client about clarification request
+    try:
+        from app.services.email import EmailService
+        email_svc = EmailService()
+        client_email = getattr(session, 'client_email', None)
+        client_name = getattr(session, 'client_name', None) or "there"
+        professional_name = (
+            f"{profile.user.first_name} {profile.user.last_name}"
+            if profile.user else "Your attorney"
+        )
+        if client_email:
+            await email_svc.send_generic_notification(
+                to_email=client_email,
+                to_name=client_name,
+                subject=f"{professional_name} has a follow-up question about your intake",
+                message=(
+                    f"{professional_name} has reviewed your intake submission and has a "
+                    f"follow-up question. Please click below to view and respond to their request."
+                ),
+                cta_url=session.intake_link,
+                cta_text="View Request",
+                title="Follow-Up Question on Your Intake",
+            )
+        else:
+            logger.warning(f"No client email on intake session {session_id}, skipping clarification notification")
+    except Exception as e:
+        logger.error(f"Failed to send clarification notification for session {session_id}: {e}")
 
     return _intake_session_to_detail(session)
 

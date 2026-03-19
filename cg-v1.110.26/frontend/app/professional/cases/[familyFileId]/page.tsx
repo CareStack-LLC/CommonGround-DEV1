@@ -157,7 +157,7 @@ export default function CaseDetailPage() {
         @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap');
 
         .case-page-wrapper {
-          background: linear-gradient(135deg, #fef9f3 0%, #faf5ed 100%);
+          background: linear-gradient(135deg, #F4F8F7 0%, #E8F4F0 100%);
           min-height: 100vh;
         }
 
@@ -175,7 +175,7 @@ export default function CaseDetailPage() {
           left: 0;
           right: 0;
           height: 3px;
-          background: linear-gradient(90deg, #92400e 0%, #d97706 50%, #92400e 100%);
+          background: linear-gradient(90deg, #1E3A4A 0%, #C8A951 50%, #1E3A4A 100%);
         }
 
         .case-number-seal {
@@ -190,7 +190,7 @@ export default function CaseDetailPage() {
           left: -50%;
           width: 200%;
           height: 200%;
-          background: radial-gradient(circle, rgba(217,119,6,0.1) 0%, transparent 70%);
+          background: radial-gradient(circle, rgba(30,58,74,0.1) 0%, transparent 70%);
           animation: seal-glow 3s ease-in-out infinite;
         }
 
@@ -210,7 +210,7 @@ export default function CaseDetailPage() {
           left: 0;
           right: 0;
           height: 3px;
-          background: #92400e;
+          background: #1E3A4A;
           transform: scaleX(0);
           transition: transform 0.3s ease;
         }
@@ -221,8 +221,8 @@ export default function CaseDetailPage() {
 
         .parchment-texture {
           background-image:
-            radial-gradient(circle at 20% 50%, rgba(217,119,6,0.03) 0%, transparent 50%),
-            radial-gradient(circle at 80% 50%, rgba(153,27,27,0.03) 0%, transparent 50%);
+            radial-gradient(circle at 20% 50%, rgba(30,58,74,0.03) 0%, transparent 50%),
+            radial-gradient(circle at 80% 50%, rgba(61,170,138,0.03) 0%, transparent 50%);
         }
       `}</style>
 
@@ -231,41 +231,41 @@ export default function CaseDetailPage() {
           {/* Elegant Back Link */}
           <Link
             href="/professional/cases"
-            className="inline-flex items-center gap-2 text-sm sans font-medium text-amber-900 hover:text-amber-950 transition-colors mb-8 group"
+            className="inline-flex items-center gap-2 text-sm sans font-medium text-[#1E3A4A] hover:text-[#1E3A4A] transition-colors mb-8 group"
           >
             <ArrowLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-1" />
-            <span className="border-b border-amber-900/20 group-hover:border-amber-900/40">Return to Case List</span>
+            <span className="border-b border-[#1E3A4A]/20 group-hover:border-[#1E3A4A]/40">Return to Case List</span>
           </Link>
 
           {/* Distinguished Case Header */}
           <div className="mb-10 legal-border pt-6">
             <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
               <div className="flex items-start gap-6">
-                <div className="case-number-seal relative p-5 bg-gradient-to-br from-amber-50 to-amber-100 border-2 border-amber-900/20 rounded-sm shrink-0 shadow-lg">
-                  <Briefcase className="h-10 w-10 text-amber-900" strokeWidth={1.5} />
-                  <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-amber-900 rounded-full flex items-center justify-center">
-                    <span className="text-[10px] font-bold text-amber-50 sans">
+                <div className="case-number-seal relative p-5 bg-gradient-to-br from-[#F4F8F7] to-[#E8F4F0] border-2 border-[#1E3A4A]/20 rounded-sm shrink-0 shadow-lg">
+                  <Briefcase className="h-10 w-10 text-[#1E3A4A]" strokeWidth={1.5} />
+                  <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-[#1E3A4A] rounded-full flex items-center justify-center">
+                    <span className="text-[10px] font-bold text-[#F4F8F7] sans">
                       {caseData.status.charAt(0).toUpperCase()}
                     </span>
                   </div>
                 </div>
                 <div>
                   <div className="flex items-baseline gap-3 mb-2">
-                    <span className="text-xs sans font-semibold text-amber-900/60 tracking-widest uppercase">
+                    <span className="text-xs sans font-semibold text-[#1E3A4A]/60 tracking-widest uppercase">
                       Case No.
                     </span>
-                    <div className="h-px w-8 bg-amber-900/20"></div>
+                    <div className="h-px w-8 bg-[#1E3A4A]/20"></div>
                   </div>
                   <h1 className="text-4xl lg:text-5xl serif font-bold text-slate-900 mb-3 leading-tight tracking-tight">
                     {caseData.family_file_number || `${familyFileId.slice(0, 8).toUpperCase()}`}
                   </h1>
                   <div className="flex flex-wrap items-center gap-3">
-                    <Badge className="bg-amber-900 text-amber-50 hover:bg-amber-950 sans font-medium px-3 py-1 text-xs rounded-sm">
+                    <Badge className="bg-[#1E3A4A] text-[#F4F8F7] hover:bg-[#1E3A4A] sans font-medium px-3 py-1 text-xs rounded-sm">
                       {caseData.status.toUpperCase()}
                     </Badge>
                     <div className="h-4 w-px bg-slate-300"></div>
                     <span className="text-sm sans text-slate-600 flex items-center gap-2">
-                      <Users className="h-4 w-4 text-amber-900/60" strokeWidth={1.5} />
+                      <Users className="h-4 w-4 text-[#1E3A4A]/60" strokeWidth={1.5} />
                       {representingLabels[caseData.representing]}
                     </span>
                     <div className="h-4 w-px bg-slate-300"></div>
@@ -289,7 +289,7 @@ export default function CaseDetailPage() {
                   <Button
                     onClick={() => setShowARIAControls(true)}
                     variant="outline"
-                    className="sans font-semibold px-5 h-11 border-2 border-amber-900/30 text-amber-900 hover:bg-amber-50 gap-2"
+                    className="sans font-semibold px-5 h-11 border-2 border-[#1E3A4A]/30 text-[#1E3A4A] hover:bg-[#F4F8F7] gap-2"
                   >
                     <Bot className="h-4 w-4" strokeWidth={2} />
                     ARIA Controls
@@ -305,31 +305,31 @@ export default function CaseDetailPage() {
               <TabsList className="bg-transparent border-none p-0 h-auto w-full justify-start gap-0 overflow-x-auto">
                 <TabsTrigger
                   value="overview"
-                  className="tab-underline data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none border-none pb-4 px-6 sans font-semibold text-slate-500 data-[state=active]:text-amber-900 hover:text-slate-900 transition-colors text-sm tracking-wide"
+                  className="tab-underline data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none border-none pb-4 px-6 sans font-semibold text-slate-500 data-[state=active]:text-[#1E3A4A] hover:text-slate-900 transition-colors text-sm tracking-wide"
                 >
                   AT A GLANCE
                 </TabsTrigger>
                 <TabsTrigger
                   value="timeline"
-                  className="tab-underline data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none border-none pb-4 px-6 sans font-semibold text-slate-500 data-[state=active]:text-amber-900 hover:text-slate-900 transition-colors text-sm tracking-wide"
+                  className="tab-underline data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none border-none pb-4 px-6 sans font-semibold text-slate-500 data-[state=active]:text-[#1E3A4A] hover:text-slate-900 transition-colors text-sm tracking-wide"
                 >
                   CHRONICLE
                 </TabsTrigger>
                 <TabsTrigger
                   value="communications"
-                  className="tab-underline data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none border-none pb-4 px-6 sans font-semibold text-slate-500 data-[state=active]:text-amber-900 hover:text-slate-900 transition-colors text-sm tracking-wide"
+                  className="tab-underline data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none border-none pb-4 px-6 sans font-semibold text-slate-500 data-[state=active]:text-[#1E3A4A] hover:text-slate-900 transition-colors text-sm tracking-wide"
                 >
                   CLIENT CORRESPONDENCE
                 </TabsTrigger>
                 <TabsTrigger
                   value="documents"
-                  className="tab-underline data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none border-none pb-4 px-6 sans font-semibold text-slate-500 data-[state=active]:text-amber-900 hover:text-slate-900 transition-colors text-sm tracking-wide"
+                  className="tab-underline data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none border-none pb-4 px-6 sans font-semibold text-slate-500 data-[state=active]:text-[#1E3A4A] hover:text-slate-900 transition-colors text-sm tracking-wide"
                 >
                   EXHIBITS
                 </TabsTrigger>
                 <TabsTrigger
                   value="compliance"
-                  className="tab-underline data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none border-none pb-4 px-6 sans font-semibold text-slate-500 data-[state=active]:text-amber-900 hover:text-slate-900 transition-colors text-sm tracking-wide"
+                  className="tab-underline data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none border-none pb-4 px-6 sans font-semibold text-slate-500 data-[state=active]:text-[#1E3A4A] hover:text-slate-900 transition-colors text-sm tracking-wide"
                 >
                   PORTALS
                 </TabsTrigger>
@@ -479,7 +479,7 @@ function NavigationCard({
   const colorClasses = {
     burgundy: "bg-red-900 text-red-50 shadow-lg shadow-red-900/30",
     navy: "bg-slate-900 text-slate-50 shadow-lg shadow-slate-900/30",
-    amber: "bg-amber-900 text-amber-50 shadow-lg shadow-amber-900/30",
+    amber: "bg-[#1E3A4A] text-[#F4F8F7] shadow-lg shadow-[#1E3A4A]/30",
     gold: "bg-yellow-700 text-yellow-50 shadow-lg shadow-yellow-700/30",
     slate: "bg-slate-700 text-slate-50 shadow-lg shadow-slate-700/30",
   };
@@ -487,7 +487,7 @@ function NavigationCard({
   const borderClasses = {
     burgundy: "border-red-900/20 hover:border-red-900/40",
     navy: "border-slate-900/20 hover:border-slate-900/40",
-    amber: "border-amber-900/20 hover:border-amber-900/40",
+    amber: "border-[#1E3A4A]/20 hover:border-[#1E3A4A]/40",
     gold: "border-yellow-700/20 hover:border-yellow-700/40",
     slate: "border-slate-700/20 hover:border-slate-700/40",
   };
@@ -500,8 +500,8 @@ function NavigationCard({
             <div className={`p-3.5 rounded-sm ${colorClasses[color]} transition-transform duration-300 group-hover:scale-110`}>
               {icon}
             </div>
-            <div className="h-6 w-6 border-2 border-amber-900/20 rounded-full flex items-center justify-center group-hover:border-amber-900/60 transition-colors">
-              <ChevronRight className="h-3.5 w-3.5 text-amber-900/40 group-hover:text-amber-900 transition-all group-hover:translate-x-0.5" strokeWidth={2.5} />
+            <div className="h-6 w-6 border-2 border-[#1E3A4A]/20 rounded-full flex items-center justify-center group-hover:border-[#1E3A4A]/60 transition-colors">
+              <ChevronRight className="h-3.5 w-3.5 text-[#1E3A4A]/40 group-hover:text-[#1E3A4A] transition-all group-hover:translate-x-0.5" strokeWidth={2.5} />
             </div>
           </div>
           <h3 className="serif font-bold text-slate-900 text-lg leading-tight mb-2">{title}</h3>

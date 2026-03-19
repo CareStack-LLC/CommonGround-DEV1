@@ -52,9 +52,9 @@ const STATUS_CONFIG: Record<
 > = {
     new_lead: {
         label: "New Lead",
-        color: "bg-amber-50 text-amber-700 border-amber-200",
-        dotColor: "bg-amber-400",
-        barColor: "bg-amber-400",
+        color: "bg-[#F4F8F7] text-[#1E3A4A] border-[#3DAA8A]/30",
+        dotColor: "bg-[#3DAA8A]",
+        barColor: "bg-[#3DAA8A]",
         icon: <CircleDot className="h-3.5 w-3.5" />,
     },
     intake: {

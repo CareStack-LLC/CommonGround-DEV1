@@ -188,7 +188,7 @@ export default function CaseSchedulePage() {
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="p-4 bg-amber-100 text-amber-600 rounded-xl">
+          <div className="p-4 bg-[#E8F4F0] text-[#1E3A4A] rounded-xl">
             <Calendar className="h-8 w-8" />
           </div>
           <div>
@@ -392,7 +392,7 @@ function ExchangeCard({
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           {/* Left: Date and Time */}
           <div className="flex items-start gap-4">
-            <div className="flex flex-col items-center justify-center w-14 h-14 bg-amber-100 text-amber-700 rounded-lg">
+            <div className="flex flex-col items-center justify-center w-14 h-14 bg-[#E8F4F0] text-[#1E3A4A] rounded-lg">
               <span className="text-xs font-medium">
                 {new Date(exchange.scheduled_date).toLocaleDateString("en-US", { month: "short" })}
               </span>
