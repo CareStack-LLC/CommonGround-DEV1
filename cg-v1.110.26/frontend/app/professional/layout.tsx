@@ -555,7 +555,7 @@ function ProfessionalNavigation({
                 </Link>
               )}
               <Link
-                href="/professional/settings/subscription"
+                href="/professional/settings"
                 className="p-1.5 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-all"
                 title="Settings"
               >
