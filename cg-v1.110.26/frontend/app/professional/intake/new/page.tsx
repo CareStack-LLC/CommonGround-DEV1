@@ -363,11 +363,11 @@ export default function NewIntakePage() {
 
         {/* Header */}
         <div className="flex items-center gap-4">
-          <div className="p-3 bg-purple-100 text-purple-600 rounded-xl">
-            <Bot className="h-8 w-8" />
+          <div className="p-3 bg-[#F4F8F7] text-[#3DAA8A] rounded-xl border border-[#3DAA8A]/10">
+            <Bot className="h-7 w-7" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">New ARIA Pro Intake</h1>
+            <h1 className="text-2xl font-bold text-slate-900">New ARIA Intake</h1>
             <p className="text-muted-foreground">
               Step 1 of 2 — Choose an intake template
             </p>
@@ -602,13 +602,13 @@ export default function NewIntakePage() {
         </Card>
 
         {/* ARIA Info */}
-        <Card className="bg-purple-50/50 border-purple-200 mt-6">
+        <Card className="bg-[#F4F8F7]/50 border-[#3DAA8A]/20 mt-6 rounded-2xl">
           <CardContent className="pt-4">
             <div className="flex items-start gap-3">
-              <Sparkles className="h-5 w-5 text-purple-600 mt-0.5" />
+              <Sparkles className="h-5 w-5 text-[#3DAA8A] mt-0.5" />
               <div>
-                <h4 className="font-medium text-purple-900">Powered by ARIA Pro</h4>
-                <p className="text-sm text-purple-700 mt-1">
+                <h4 className="font-medium text-[#1E3A4A]">Powered by ARIA</h4>
+                <p className="text-sm text-slate-600 mt-1">
                   Your client will have a guided conversation with ARIA using the{" "}
                   <strong>{selectedTemplate?.name}</strong> template.
                   After completion, you'll receive a comprehensive summary, extracted data,

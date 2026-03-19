@@ -26,12 +26,13 @@ const REPORT_TYPES = [
   {
     id: "full_compliance",
     title: "Full Compliance Report",
-    description: "Comprehensive evidence package for case documentation",
+    description: "Complete overview of parenting plan adherence across all areas",
     icon: FileText,
     color: "from-blue-500 to-indigo-600",
     bgColor: "bg-blue-50",
     borderColor: "border-blue-200",
     textColor: "text-blue-700",
+    roles: ["Attorney", "GAL", "Mediator"],
     includes: [
       "Exchange compliance (on-time rates, GPS verification)",
       "Financial compliance (support payments, arrears)",
@@ -41,29 +42,31 @@ const REPORT_TYPES = [
   },
   {
     id: "aria_analysis",
-    title: "ARIA Communication Analysis",
-    description: "Detailed hostile communication patterns with before/after examples",
+    title: "Communication Analysis",
+    description: "Detailed communication patterns with before/after ARIA intervention examples",
     icon: MessageCircle,
     color: "from-amber-500 to-orange-600",
     bgColor: "bg-amber-50",
     borderColor: "border-amber-200",
     textColor: "text-amber-700",
+    roles: ["Attorney", "GAL", "Parenting Coordinator"],
     includes: [
       "ARIA intervention history with before/after examples",
-      "Sentiment analysis and hostility trends",
+      "Sentiment analysis and tone trends",
       "Communication pattern analysis (time of day, triggers)",
-      "Threat detection and escalations",
+      "Escalation detection and risk flags",
     ],
   },
   {
     id: "exchange_compliance",
     title: "Exchange Compliance Report",
-    description: "Focused analysis of custody exchange patterns",
+    description: "Custody exchange patterns, GPS tracking, and schedule adherence",
     icon: RefreshCw,
     color: "from-emerald-500 to-teal-600",
     bgColor: "bg-emerald-50",
     borderColor: "border-emerald-200",
     textColor: "text-emerald-700",
+    roles: ["Attorney", "GAL"],
     includes: [
       "On-time vs late vs missed exchanges",
       "GPS verification tracking",
@@ -74,12 +77,13 @@ const REPORT_TYPES = [
   {
     id: "financial_compliance",
     title: "Financial Compliance Report",
-    description: "Child support payment tracking and arrears calculation",
+    description: "Support payment history, arrears tracking, and transaction records",
     icon: DollarSign,
     color: "from-purple-500 to-pink-600",
     bgColor: "bg-purple-50",
     borderColor: "border-purple-200",
     textColor: "text-purple-700",
+    roles: ["Attorney", "Mediator"],
     includes: [
       "Payment history (on-time, late, missed)",
       "Arrears calculation",
@@ -90,12 +94,13 @@ const REPORT_TYPES = [
   {
     id: "aria_assessment",
     title: "ARIA Assessment",
-    description: "AI analysis of communication patterns and good-faith scores",
+    description: "AI-powered good-faith scoring and cooperation analysis per parent",
     icon: Shield,
     color: "from-[#3DAA8A] to-[#2D6A8F]",
     bgColor: "bg-[#E8F4F0]",
     borderColor: "border-[#3DAA8A]/30",
     textColor: "text-[#1E3A4A]",
+    roles: ["GAL", "Parenting Coordinator", "Mediator"],
     includes: [
       "Good-faith scores per parent",
       "Communication tone analysis over time",
@@ -106,12 +111,13 @@ const REPORT_TYPES = [
   {
     id: "monthly_summary",
     title: "Monthly Summary",
-    description: "Auto-generated rolling 30-day overview for ongoing monitoring",
+    description: "Rolling 30-day snapshot for ongoing case monitoring",
     icon: Calendar,
     color: "from-slate-500 to-slate-700",
     bgColor: "bg-slate-50",
     borderColor: "border-slate-200",
     textColor: "text-slate-700",
+    roles: ["Attorney", "GAL", "Parenting Coordinator", "Mediator"],
     includes: [
       "Exchange compliance for the period",
       "Message volume and ARIA flags",
@@ -229,6 +235,15 @@ export default function ReportsPage() {
                     <CardDescription className="text-sm mt-1">
                       {reportType.description}
                     </CardDescription>
+                    {reportType.roles && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {reportType.roles.map((role) => (
+                          <span key={role} className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#F4F8F7] text-[#1E3A4A] border border-[#3DAA8A]/15">
+                            {role}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               </CardHeader>
