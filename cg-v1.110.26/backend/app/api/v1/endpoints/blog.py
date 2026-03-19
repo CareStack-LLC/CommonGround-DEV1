@@ -135,6 +135,24 @@ async def list_published_posts(
     }
 
 
+@router.get(
+    "/posts/{slug}",
+    summary="Get a published blog post by slug (public)",
+)
+async def get_published_post_by_slug(
+    slug: str,
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    """Get a single published blog post by its URL slug. No auth required."""
+    result = await db.execute(
+        select(BlogPost).where(BlogPost.slug == slug, BlogPost.status == "published")
+    )
+    post = result.scalar_one_or_none()
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    return _post_to_dict(post)
+
+
 # =============================================================================
 # ADMIN ENDPOINTS
 # =============================================================================
