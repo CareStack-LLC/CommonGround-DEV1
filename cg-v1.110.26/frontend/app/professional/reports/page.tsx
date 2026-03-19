@@ -286,21 +286,22 @@ export default function ReportsPage() {
       {/* Recent Reports Section */}
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="serif text-lg font-bold text-slate-900 flex items-center gap-2">
-            <div className="h-1 w-6 bg-[#1E3A4A] rounded-full" />
+          <h2 className="text-lg font-semibold text-slate-900">
             Recent Reports
           </h2>
-          <Button variant="outline" size="sm" onClick={fetchRecentReports} disabled={isLoading} className="border-2 border-slate-300 sans">
+          <Button variant="outline" size="sm" onClick={fetchRecentReports} disabled={isLoading} className="border-slate-200 hover:bg-[#F4F8F7] rounded-xl h-9">
             <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
           </Button>
         </div>
 
         {recentReports.length === 0 ? (
-          <Card className="border-dashed border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-[#F4F8F7]/30 to-white shadow-sm">
-            <CardContent className="py-12 text-center">
-              <FileText className="h-12 w-12 mx-auto text-[#1E3A4A]/40 mb-3" />
-              <p className="serif text-slate-900 font-bold">No reports generated yet</p>
-              <p className="sans text-sm text-slate-600 mt-1">
+          <Card className="border border-dashed border-slate-200 bg-white rounded-2xl">
+            <CardContent className="py-16 flex flex-col items-center justify-center text-center">
+              <div className="p-4 bg-[#F4F8F7] rounded-2xl mb-5">
+                <FileText className="h-10 w-10 text-[#3DAA8A]" />
+              </div>
+              <p className="text-lg font-semibold text-slate-900 mb-1.5">No reports generated yet</p>
+              <p className="text-sm text-slate-500 max-w-sm">
                 Select a report type above to get started
               </p>
             </CardContent>
@@ -312,20 +313,19 @@ export default function ReportsPage() {
               const Icon = reportTypeInfo.icon;
 
               return (
-                <Card key={report.id} className="border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/20 to-white hover:shadow-lg transition-all relative">
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A4A] via-[#3DAA8A] to-[#1E3A4A]"></div>
+                <Card key={report.id} className="border border-slate-200 bg-white hover:shadow-md transition-all rounded-2xl overflow-hidden">
                   <CardContent className="pt-5">
                     <div className="flex items-start gap-3 mb-3">
-                      <div className={`p-2 bg-gradient-to-br ${reportTypeInfo.color} text-white rounded-sm border-2 border-white/20`}>
+                      <div className={`p-2 bg-gradient-to-br ${reportTypeInfo.color} text-white rounded-xl shadow-sm`}>
                         <Icon className="h-4 w-4" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="serif font-bold text-sm text-slate-900 truncate">
+                        <p className="font-semibold text-sm text-slate-900 truncate">
                           {report.title || reportTypeInfo.title}
                         </p>
                         <div className="flex items-center gap-2 mt-1">
-                          <Calendar className="h-3 w-3 text-[#1E3A4A]" />
-                          <span className="sans text-xs text-slate-600">
+                          <Calendar className="h-3 w-3 text-slate-400" />
+                          <span className="text-xs text-slate-500">
                             {new Date(report.created_at).toLocaleDateString("en-US", {
                               month: "short",
                               day: "numeric",
@@ -338,9 +338,9 @@ export default function ReportsPage() {
 
                     {/* SHA-256 Hash */}
                     {report.sha256_hash && (
-                      <div className="flex items-center gap-1.5 mb-3 px-2 py-1.5 bg-[#F4F8F7] rounded-sm border-2 border-[#1E3A4A]/20">
-                        <Hash className="h-3 w-3 text-[#1E3A4A] shrink-0" />
-                        <span className="text-[10px] font-mono text-slate-600 truncate">
+                      <div className="flex items-center gap-1.5 mb-3 px-2.5 py-1.5 bg-slate-50 rounded-lg border border-slate-100">
+                        <Hash className="h-3 w-3 text-slate-400 shrink-0" />
+                        <span className="text-[10px] font-mono text-slate-500 truncate">
                           {report.sha256_hash.slice(0, 24)}...
                         </span>
                       </div>
@@ -350,14 +350,14 @@ export default function ReportsPage() {
                     <div className="flex items-center gap-2">
                       <Button
                         size="sm"
-                        className="flex-1 sans text-xs bg-[#1E3A4A] hover:bg-[#2D6A8F] text-white border-2 border-[#1E3A4A]/40"
+                        className="flex-1 text-xs bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white rounded-lg shadow-sm"
                         onClick={() => downloadReport(report.id)}
                       >
                         <Download className="h-3.5 w-3.5 mr-1.5" />
                         Download
                       </Button>
                       <Link href={`/professional/reports/${report.id}/verify`}>
-                        <Button size="sm" variant="outline" className="sans text-xs border-2 border-slate-300">
+                        <Button size="sm" variant="outline" className="text-xs border-slate-200 rounded-lg">
                           <Shield className="h-3.5 w-3.5" />
                         </Button>
                       </Link>
@@ -370,22 +370,18 @@ export default function ReportsPage() {
         )}
 
         {/* SHA-256 Info Box */}
-        <Card className="mt-6 bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-900/30 shadow-sm relative">
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-900 via-blue-600 to-blue-900"></div>
-          <CardContent className="py-4 px-4">
-            <div className="flex items-start gap-3">
-              <Shield className="h-5 w-5 text-blue-900 mt-0.5 shrink-0" />
-              <div>
-                <p className="serif text-sm font-bold text-blue-900">SHA-256 Cryptographic Verification</p>
-                <p className="sans text-xs text-blue-800 mt-1 leading-relaxed">
-                  Every report is cryptographically signed with a SHA-256 hash. Any post-export modification
-                  invalidates the hash, ensuring tamper-evident court-ready documents. The hash can be verified
-                  at any time to prove authenticity.
-                </p>
-              </div>
+        <div className="mt-6 p-4 rounded-2xl bg-[#F4F8F7] border border-[#3DAA8A]/10">
+          <div className="flex items-start gap-3">
+            <Shield className="h-5 w-5 text-[#3DAA8A] mt-0.5 shrink-0" />
+            <div>
+              <p className="text-sm font-semibold text-[#1E3A4A]">SHA-256 Verification</p>
+              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
+                Every report is cryptographically signed with a SHA-256 hash. Any modification after export
+                invalidates the hash, ensuring tamper-evident documents that can be verified at any time.
+              </p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
       <style>{`
