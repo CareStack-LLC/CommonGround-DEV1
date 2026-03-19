@@ -84,7 +84,7 @@ export default function LibraryPage() {
         const items = data.books || data || [];
         if (items.length > 0) {
           const catMap: Record<string, BookCategory> = {
-            stories: 'stories', learn: 'learn', fantasy: 'fantasy', adventure: 'adventure',
+            stories: 'fiction', learn: 'educational', fiction: 'fiction', educational: 'educational', fantasy: 'fantasy', adventure: 'adventure',
           };
           const apiBooks: StorybookContent[] = items.map((b: any) => ({
             id: b.id,
@@ -93,7 +93,7 @@ export default function LibraryPage() {
             cover: b.cover_url || '',
             pages: b.page_count || 0,
             author: b.author_name || b.author?.name || '',
-            category: catMap[(b.genre_name || 'stories').toLowerCase()] || 'stories',
+            category: catMap[(b.genre_name || 'fiction').toLowerCase()] || 'fiction',
             ageRange: b.age_min && b.age_max ? `${b.age_min}-${b.age_max}` : '3-12',
           }));
           const apiIds = new Set(apiBooks.map(b => b.id));
