@@ -8,6 +8,8 @@ import { AuthorAvatar } from '@/components/kidcoms/author-avatar';
 import { HorizontalScrollRow } from '@/components/kidcoms/horizontal-scroll-row';
 import { theaterContent, BookCategory, bookCategories } from '@/lib/theater-content';
 import { BookOpen, Search, Trophy, Target, Zap } from 'lucide-react';
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 import { ARIAHelper } from '@/components/kidcoms/aria-helper';
 import { KidSpaceHeader } from '@/components/kidcoms/kidspace-header';
 import { BookDetailModal } from '@/components/kidcoms/book-detail-modal';
@@ -62,10 +64,58 @@ export default function LibraryPage() {
   const [stats, setStats] = useState<ReadingStats>({ booksRead: 0, booksCompleted: 0, pagesRead: 0, streak: 0, lastReadDate: null });
   const [currentlyReading, setCurrentlyReading] = useState<ReadingProgress[]>([]);
   const [progressMap, setProgressMap] = useState<Record<string, ReadingProgress | null>>({});
+  const [allBooks, setAllBooks] = useState<StorybookContent[]>(theaterContent.storybooks);
+  const [apiAuthors, setApiAuthors] = useState<{name: string; avatar: string; bookCount: number}[]>([]);
 
   useEffect(() => {
     validateAndLoadUser();
+    fetchApiContent();
   }, []);
+
+  async function fetchApiContent() {
+    try {
+      const [booksRes, authorsRes] = await Promise.all([
+        fetch(`${API_BASE}/api/v1/kidspace/books?limit=50`).catch(() => null),
+        fetch(`${API_BASE}/api/v1/kidspace/authors/featured`).catch(() => null),
+      ]);
+
+      if (booksRes?.ok) {
+        const data = await booksRes.json();
+        const items = data.books || data || [];
+        if (items.length > 0) {
+          const catMap: Record<string, BookCategory> = {
+            stories: 'stories', learn: 'learn', fantasy: 'fantasy', adventure: 'adventure',
+          };
+          const apiBooks: StorybookContent[] = items.map((b: any) => ({
+            id: b.id,
+            title: b.title,
+            url: b.pdf_url || '',
+            cover: b.cover_url || '',
+            pages: b.page_count || 0,
+            author: b.author_name || b.author?.name || '',
+            category: catMap[(b.genre_name || 'stories').toLowerCase()] || 'stories',
+            ageRange: b.age_min && b.age_max ? `${b.age_min}-${b.age_max}` : '3-12',
+          }));
+          const apiIds = new Set(apiBooks.map(b => b.id));
+          const fallback = theaterContent.storybooks.filter(b => !apiIds.has(b.id));
+          setAllBooks([...apiBooks, ...fallback]);
+        }
+      }
+
+      if (authorsRes?.ok) {
+        const author = await authorsRes.json();
+        if (author?.name) {
+          setApiAuthors([{
+            name: author.name,
+            avatar: author.photo_url || '',
+            bookCount: author.books?.length || 1,
+          }]);
+        }
+      }
+    } catch {
+      // API unavailable — keep hardcoded fallback
+    }
+  }
 
   function validateAndLoadUser() {
     try {
@@ -91,7 +141,7 @@ export default function LibraryPage() {
       setCurrentlyReading(getCurrentlyReading());
 
       const map: Record<string, ReadingProgress | null> = {};
-      theaterContent.storybooks.forEach(b => { map[b.id] = getReadingProgress(b.id); });
+      allBooks.forEach(b => { map[b.id] = getReadingProgress(b.id); });
       setProgressMap(map);
 
       setIsLoading(false);
@@ -102,8 +152,8 @@ export default function LibraryPage() {
     }
   }
 
-  const books = theaterContent.storybooks;
-  const authors = getAuthors(books);
+  const books = allBooks;
+  const authors = apiAuthors.length > 0 ? apiAuthors : getAuthors(allBooks);
 
   const filteredBooks = books.filter(book => {
     if (selectedCategory === 'reading') {

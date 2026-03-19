@@ -30,7 +30,9 @@ import { FeaturedHeroBanner } from '@/components/kidcoms/featured-hero-banner';
 import { ARIAHelper } from '@/components/kidcoms/aria-helper';
 import { MovieDetailModal } from '@/components/kidcoms/movie-detail-modal';
 import { theaterContent } from '@/lib/theater-content';
-import type { VideoContent } from '@/lib/theater-content';
+import type { VideoContent, StorybookContent } from '@/lib/theater-content';
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 import { useKidSpaceTheme } from '@/components/kidcoms/kidspace-theme-provider';
 import {
   circleMessagesAPI,
@@ -134,6 +136,47 @@ export default function ChildDashboardPage() {
   const [upcomingEvents, setUpcomingEvents] = useState<ChildEvent[]>([]);
   const [eventsLoading, setEventsLoading] = useState(true);
 
+  // API-sourced content (merged with hardcoded fallback)
+  const [apiVideos, setApiVideos] = useState<VideoContent[]>(apiVideos);
+  const [apiComingSoon, setApiComingSoon] = useState<{id: string; poster: string}[]>(COMING_SOON);
+
+  // Fetch from KidSpace API
+  useEffect(() => {
+    const fetchApiContent = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/v1/kidspace/movies?limit=20`);
+        if (res.ok) {
+          const data = await res.json();
+          const items = data.movies || data || [];
+          if (items.length > 0) {
+            const mapped: VideoContent[] = items.map((m: any) => ({
+              id: m.id,
+              title: m.title,
+              url: m.video_url || '',
+              thumbnail: m.poster_url || '',
+              duration: m.duration_minutes ? `${m.duration_minutes} min` : undefined,
+              description: m.description || '',
+              category: (m.genre_name || 'comedy').toLowerCase() as any,
+              ageRange: m.age_min && m.age_max ? `${m.age_min}-${m.age_max}` : '3-12',
+            }));
+            const apiIds = new Set(mapped.map(m => m.id));
+            const fallback = apiVideos.filter(v => !apiIds.has(v.id));
+            setApiVideos([...mapped, ...fallback]);
+            // Coming soon = movies with posters
+            const comingSoonFromApi = mapped
+              .filter(m => m.thumbnail)
+              .slice(0, 5)
+              .map(m => ({ id: m.id, poster: m.thumbnail! }));
+            if (comingSoonFromApi.length > 0) setApiComingSoon(comingSoonFromApi);
+          }
+        }
+      } catch {
+        // Keep hardcoded fallback
+      }
+    };
+    fetchApiContent();
+  }, []);
+
   // Add event modal
   const [showAddEvent, setShowAddEvent] = useState(false);
   const [eventStep, setEventStep] = useState<'type' | 'details'>('type');
@@ -174,7 +217,7 @@ export default function ChildDashboardPage() {
       setRecentVideos(getRecentlyWatched());
 
       const vMap: Record<string, WatchProgress | null> = {};
-      theaterContent.videos.forEach(v => { vMap[v.id] = getWatchProgress(v.id); });
+      apiVideos.forEach(v => { vMap[v.id] = getWatchProgress(v.id); });
       setProgressMap(vMap);
 
       const bMap: Record<string, ReadingProgress | null> = {};
@@ -273,7 +316,7 @@ export default function ChildDashboardPage() {
     ...recentVideos.filter(v => v.progress > 0 && v.progress < 90).map(wp => ({
       type: 'video' as const,
       id: wp.videoId,
-      item: theaterContent.videos.find(v => v.id === wp.videoId)!,
+      item: apiVideos.find(v => v.id === wp.videoId)!,
       progress: wp.progress,
       lastAction: wp.lastWatched ? new Date(wp.lastWatched).getTime() : 0,
     })),
@@ -292,12 +335,12 @@ export default function ChildDashboardPage() {
   const [selectedMovie, setSelectedMovie] = useState<VideoContent | null>(null);
   useEffect(() => {
     const interval = setInterval(() => {
-      setFeaturedIndex(i => (i + 1) % theaterContent.videos.length);
+      setFeaturedIndex(i => (i + 1) % apiVideos.length);
     }, 5000);
     return () => clearInterval(interval);
   }, []);
 
-  const featuredVideo = theaterContent.videos[featuredIndex];
+  const featuredVideo = apiVideos[featuredIndex];
 
   const userInitial = userData?.childName?.charAt(0).toUpperCase() || 'K';
   const avatarGradient = AVATAR_COLORS[(userData?.childName?.length || 0) % AVATAR_COLORS.length];
@@ -685,7 +728,7 @@ export default function ChildDashboardPage() {
           </div>
           <div className="overflow-x-auto scrollbar-hide px-4">
             <div className="flex gap-4 min-w-max pb-2">
-              {COMING_SOON.map(item => (
+              {apiComingSoon.map(item => (
                 <div key={item.id} className="relative flex-shrink-0 w-72 rounded-2xl overflow-hidden hover:scale-[1.02] transition-transform duration-200 group" style={{ background: 'var(--portal-surface)', boxShadow: 'var(--portal-shadow-lg)' }}>
                   <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
                     <img src={item.poster} alt="Coming soon" className="absolute inset-0 w-full h-full object-cover" />

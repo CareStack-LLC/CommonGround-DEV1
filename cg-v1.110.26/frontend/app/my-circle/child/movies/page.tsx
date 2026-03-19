@@ -15,6 +15,8 @@ import { theaterContent, VideoCategory, videoCategories } from '@/lib/theater-co
 import type { VideoContent } from '@/lib/theater-content';
 import type { WatchProgress, VideoStats } from '@/lib/watch-progress';
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
 interface ChildUserData {
   userId: string;
   childId: string;
@@ -48,15 +50,55 @@ export default function MoviesPage() {
   // Movie detail modal state
   const [selectedMovie, setSelectedMovie] = useState<VideoContent | null>(null);
 
+  // API + fallback merged video list
+  const [allVideos, setAllVideos] = useState<VideoContent[]>(allVideos);
+
   // Watch Together state
   const [contacts, setContacts] = useState<ChildContact[]>([]);
   const [watchTogetherMovie, setWatchTogetherMovie] = useState<any | null>(null);
   const [isStartingCall, setIsStartingCall] = useState(false);
 
+  // Fetch movies from KidSpace API, merge with hardcoded fallback
+  useEffect(() => {
+    const fetchApiMovies = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/v1/kidspace/movies?limit=50`);
+        if (res.ok) {
+          const data = await res.json();
+          const items = data.movies || data || [];
+          if (items.length > 0) {
+            const genreMap: Record<string, VideoCategory> = {
+              comedy: 'comedy', adventure: 'adventure', educational: 'educational',
+              animation: 'animation', action: 'action', family: 'comedy',
+            };
+            const apiMapped: VideoContent[] = items.map((m: any) => ({
+              id: m.id,
+              title: m.title,
+              url: m.video_url || '',
+              thumbnail: m.poster_url || '',
+              duration: m.duration_minutes ? `${m.duration_minutes} min` : undefined,
+              description: m.description || '',
+              category: genreMap[(m.genre_name || 'comedy').toLowerCase()] || 'comedy',
+              ageRange: m.age_min && m.age_max ? `${m.age_min}-${m.age_max}` : '3-12',
+            }));
+            // Merge: API movies first, then hardcoded ones not in API
+            const apiIds = new Set(apiMapped.map(m => m.id));
+            const fallback = allVideos.filter(v => !apiIds.has(v.id));
+            setAllVideos([...apiMapped, ...fallback]);
+            return;
+          }
+        }
+      } catch {
+        // API unavailable — keep hardcoded fallback
+      }
+    };
+    fetchApiMovies();
+  }, []);
+
   // Auto-rotate featured banner
   useEffect(() => {
     const interval = setInterval(() => {
-      setFeaturedIndex(i => (i + 1) % theaterContent.videos.length);
+      setFeaturedIndex(i => (i + 1) % allVideos.length);
     }, 5000);
     return () => clearInterval(interval);
   }, []);
@@ -95,7 +137,7 @@ export default function MoviesPage() {
       setContinueWatching(getContinueWatching());
 
       const map: Record<string, WatchProgress | null> = {};
-      theaterContent.videos.forEach(v => { map[v.id] = getWatchProgress(v.id); });
+      allVideos.forEach(v => { map[v.id] = getWatchProgress(v.id); });
       setProgressMap(map);
       setFavoritesSet(new Set(getFavorites() as string[]));
 
@@ -107,9 +149,9 @@ export default function MoviesPage() {
     }
   }
 
-  const featuredVideo = theaterContent.videos[featuredIndex];
+  const featuredVideo = allVideos[featuredIndex];
 
-  const filteredVideos = theaterContent.videos.filter(video => {
+  const filteredVideos = allVideos.filter(video => {
     if (selectedCategory === 'favorites') return favoritesSet.has(video.id);
     if (selectedCategory === 'continue') return continueWatching.some(p => p.videoId === video.id);
     if (selectedCategory !== 'all' && video.category !== selectedCategory) return false;
@@ -129,7 +171,7 @@ export default function MoviesPage() {
       animation: [],
       action: [],
     };
-    theaterContent.videos.forEach(v => {
+    allVideos.forEach(v => {
       if (grouped[v.category]) {
         grouped[v.category].push(v);
       }
@@ -350,7 +392,7 @@ export default function MoviesPage() {
           <section className="px-4">
             <HorizontalScrollRow
               title="CommonGround Originals"
-              items={theaterContent.videos}
+              items={allVideos}
               showViewAll={false}
               cardClassName="w-36"
               renderCard={(video) => (
@@ -407,7 +449,7 @@ export default function MoviesPage() {
               onViewAll={() => setSelectedCategory('continue')}
               cardClassName="w-40"
               renderCard={(wp) => {
-                const video = theaterContent.videos.find(v => v.id === wp.videoId);
+                const video = allVideos.find(v => v.id === wp.videoId);
                 if (!video) return null;
                 return (
                   <StreamingMovieCard
@@ -501,8 +543,8 @@ export default function MoviesPage() {
                   <button
                     onClick={() => {
                       // Pick the first video as a default for the Watch Together flow
-                      if (theaterContent.videos.length > 0) {
-                        setWatchTogetherMovie(theaterContent.videos[0]);
+                      if (allVideos.length > 0) {
+                        setWatchTogetherMovie(allVideos[0]);
                       }
                     }}
                     className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
@@ -562,7 +604,7 @@ export default function MoviesPage() {
         onWatchNow={(v) => router.push(`/my-circle/child/movies/${v.id}`)}
         onWatchTogether={(v) => { setSelectedMovie(null); setWatchTogetherMovie(v); }}
         progress={selectedMovie ? progressMap[selectedMovie.id] : null}
-        rating={selectedMovie ? 4.5 - theaterContent.videos.indexOf(selectedMovie) * 0.1 : 4.5}
+        rating={selectedMovie ? 4.5 - allVideos.indexOf(selectedMovie) * 0.1 : 4.5}
       />
 
       {/* ── Watch Together Contact Picker Modal ── */}
