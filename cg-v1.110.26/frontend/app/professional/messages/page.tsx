@@ -267,7 +267,7 @@ export default function MessagesPage() {
                 Correspondence
               </h1>
               <p className="sans text-[#E8F4F0] mt-2 text-sm tracking-wide leading-relaxed">
-                Secure Client Communications & Case Management
+                Secure Client Communications — Not monitored by ARIA
               </p>
             </div>
           </div>
