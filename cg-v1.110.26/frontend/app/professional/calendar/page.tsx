@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import {
   Calendar as CalendarIcon,
@@ -167,6 +167,18 @@ const isSameDay = (date1: Date, date2: Date) => {
   );
 };
 
+const getWeekDates = (date: Date): Date[] => {
+  const start = new Date(date);
+  start.setDate(start.getDate() - start.getDay());
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
+    return d;
+  });
+};
+
+const HOURS = Array.from({ length: 14 }, (_, i) => i + 7); // 7am to 8pm
+
 export default function ProfessionalCalendarPage() {
   const { profile, token } = useProfessionalAuth();
   const [events, setEvents] = useState<ProfessionalEvent[]>([]);
@@ -248,10 +260,24 @@ export default function ProfessionalCalendarPage() {
     });
   };
 
+  const getEventsForDate = (date: Date) => {
+    return events.filter((event) => isSameDay(new Date(event.start_time), date));
+  };
+
   // Navigation
-  const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
-  const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
+  const prevPeriod = () => {
+    if (view === "month") setCurrentDate(new Date(year, month - 1, 1));
+    else if (view === "week") setCurrentDate(new Date(currentDate.getTime() - 7 * 86400000));
+    else setCurrentDate(new Date(currentDate.getTime() - 86400000));
+  };
+  const nextPeriod = () => {
+    if (view === "month") setCurrentDate(new Date(year, month + 1, 1));
+    else if (view === "week") setCurrentDate(new Date(currentDate.getTime() + 7 * 86400000));
+    else setCurrentDate(new Date(currentDate.getTime() + 86400000));
+  };
   const goToToday = () => setCurrentDate(new Date());
+
+  const weekDates = getWeekDates(currentDate);
 
   // Handle event actions
   const handleCancelEvent = async (eventId: string) => {
@@ -402,15 +428,19 @@ export default function ProfessionalCalendarPage() {
       {/* Calendar Navigation */}
       <Card className="border border-slate-200 bg-white shadow-sm rounded-2xl overflow-hidden">
         <CardHeader className="pb-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button variant="outline" size="icon" onClick={prevMonth} className="border-2 border-[#1E3A4A]/20 hover:bg-[#F4F8F7]">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <div className="flex items-center gap-3">
+              <Button variant="outline" size="icon" onClick={prevPeriod} className="border-slate-200 hover:bg-[#F4F8F7] rounded-lg h-9 w-9">
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <h2 className="serif text-xl font-bold text-slate-900">
-                {monthName} {year}
+              <h2 className="text-lg font-semibold text-slate-900 min-w-[160px] text-center">
+                {view === "day"
+                  ? currentDate.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })
+                  : view === "week"
+                    ? `${weekDates[0].toLocaleDateString("en-US", { month: "short", day: "numeric" })} – ${weekDates[6].toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`
+                    : `${monthName} ${year}`}
               </h2>
-              <Button variant="outline" size="icon" onClick={nextMonth} className="border-2 border-[#1E3A4A]/20 hover:bg-[#F4F8F7]">
+              <Button variant="outline" size="icon" onClick={nextPeriod} className="border-slate-200 hover:bg-[#F4F8F7] rounded-lg h-9 w-9">
                 <ChevronRight className="h-4 w-4" />
               </Button>
               <Input
@@ -422,34 +452,34 @@ export default function ProfessionalCalendarPage() {
                     setCurrentDate(new Date(y, m - 1, d));
                   }
                 }}
-                className="w-auto border-2 border-slate-300 sans"
+                className="w-auto border-slate-200 rounded-lg"
               />
-              <Button variant="outline" onClick={goToToday} className="border-2 border-[#1E3A4A]/20 hover:bg-[#F4F8F7] sans">
+              <Button variant="outline" onClick={goToToday} className="border-slate-200 hover:bg-[#F4F8F7] rounded-lg">
                 Today
               </Button>
             </div>
-            <div className="flex gap-2">
+            <div className="flex bg-slate-100/80 rounded-lg p-0.5 gap-0.5">
               <Button
-                variant={view === "month" ? "default" : "outline"}
+                variant="ghost"
                 size="sm"
                 onClick={() => setView("month")}
-                className={view === "month" ? "bg-[#1E3A4A] hover:bg-[#1E3A4A] text-[#F4F8F7] border-2 border-[#1E3A4A]/40 shadow-md sans" : "border-2 border-slate-300 hover:bg-[#F4F8F7] sans"}
+                className={view === "month" ? "bg-white text-[#1E3A4A] shadow-sm rounded-md" : "text-slate-500 hover:text-slate-700 rounded-md"}
               >
                 Month
               </Button>
               <Button
-                variant={view === "week" ? "default" : "outline"}
+                variant="ghost"
                 size="sm"
                 onClick={() => setView("week")}
-                className={view === "week" ? "bg-[#1E3A4A] hover:bg-[#1E3A4A] text-[#F4F8F7] border-2 border-[#1E3A4A]/40 shadow-md sans" : "border-2 border-slate-300 hover:bg-[#F4F8F7] sans"}
+                className={view === "week" ? "bg-white text-[#1E3A4A] shadow-sm rounded-md" : "text-slate-500 hover:text-slate-700 rounded-md"}
               >
                 Week
               </Button>
               <Button
-                variant={view === "day" ? "default" : "outline"}
+                variant="ghost"
                 size="sm"
                 onClick={() => setView("day")}
-                className={view === "day" ? "bg-[#1E3A4A] hover:bg-[#1E3A4A] text-[#F4F8F7] border-2 border-[#1E3A4A]/40 shadow-md sans" : "border-2 border-slate-300 hover:bg-[#F4F8F7] sans"}
+                className={view === "day" ? "bg-white text-[#1E3A4A] shadow-sm rounded-md" : "text-slate-500 hover:text-slate-700 rounded-md"}
               >
                 Day
               </Button>
@@ -460,72 +490,121 @@ export default function ProfessionalCalendarPage() {
         <CardContent>
           {loading ? (
             <div className="flex items-center justify-center h-96">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1E3A4A]" />
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3DAA8A]" />
             </div>
-          ) : (
-            <div className="grid grid-cols-7 gap-px bg-[#1E3A4A]/20 rounded-sm overflow-hidden">
-              {/* Week day headers */}
+          ) : view === "month" ? (
+            /* ── Month View ── */
+            <div className="grid grid-cols-7 gap-px bg-slate-200 rounded-xl overflow-hidden">
               {weekDays.map((day) => (
-                <div
-                  key={day}
-                  className="bg-[#F4F8F7] p-2 text-center sans text-xs font-bold text-[#1E3A4A]/60 tracking-[0.1em] uppercase border-b-2 border-[#1E3A4A]/20"
-                >
+                <div key={day} className="bg-[#F4F8F7] p-2 text-center text-xs font-semibold text-slate-500 uppercase tracking-wide">
                   {day}
                 </div>
               ))}
-
-              {/* Calendar days */}
               {days.map((day, index) => {
                 const dayEvents = getEventsForDay(day);
                 const isToday = day !== null && isSameDay(new Date(year, month, day), today);
-                const isSelected =
-                  day !== null && selectedDate && isSameDay(new Date(year, month, day), selectedDate);
-
+                const isSelected = day !== null && selectedDate && isSameDay(new Date(year, month, day), selectedDate);
                 return (
                   <div
                     key={index}
-                    className={`
-                      min-h-[100px] bg-white p-1 cursor-pointer hover:bg-[#F4F8F7]/50 transition-colors
-                      ${!day ? "bg-[#F4F8F7]/30" : ""}
-                      ${isSelected ? "ring-2 ring-[#1E3A4A] ring-inset" : ""}
-                    `}
+                    className={`min-h-[100px] bg-white p-1.5 cursor-pointer hover:bg-[#F4F8F7]/50 transition-colors ${!day ? "bg-slate-50/50" : ""} ${isSelected ? "ring-2 ring-[#3DAA8A] ring-inset" : ""}`}
                     onClick={() => day && setSelectedDate(new Date(year, month, day))}
                   >
                     {day && (
                       <>
-                        <div
-                          className={`
-                            serif text-sm font-bold p-1 w-7 h-7 flex items-center justify-center rounded-sm
-                            ${isToday ? "bg-[#1E3A4A] text-[#F4F8F7]" : "text-slate-900"}
-                          `}
-                        >
+                        <div className={`text-sm font-semibold w-7 h-7 flex items-center justify-center rounded-full ${isToday ? "bg-[#3DAA8A] text-white" : "text-slate-900"}`}>
                           {day}
                         </div>
                         <div className="space-y-1 mt-1">
                           {dayEvents.slice(0, 3).map((event) => {
                             const config = EVENT_TYPE_CONFIG[event.event_type] || EVENT_TYPE_CONFIG.other;
                             return (
-                              <div
-                                key={event.id}
-                                className="text-xs p-1 rounded truncate cursor-pointer hover:opacity-80"
-                                style={{ backgroundColor: `${event.color || config.color}20`, color: event.color || config.color }}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setSelectedEvent(event);
-                                }}
-                              >
+                              <div key={event.id} className="text-xs p-1 rounded-md truncate cursor-pointer hover:opacity-80" style={{ backgroundColor: `${event.color || config.color}15`, color: event.color || config.color }}
+                                onClick={(e) => { e.stopPropagation(); setSelectedEvent(event); }}>
                                 {event.all_day ? "All day" : formatTime(event.start_time)} {event.title}
                               </div>
                             );
                           })}
-                          {dayEvents.length > 3 && (
-                            <div className="text-xs text-muted-foreground pl-1">
-                              +{dayEvents.length - 3} more
-                            </div>
-                          )}
+                          {dayEvents.length > 3 && <div className="text-xs text-slate-400 pl-1">+{dayEvents.length - 3} more</div>}
                         </div>
                       </>
                     )}
+                  </div>
+                );
+              })}
+            </div>
+          ) : view === "week" ? (
+            /* ── Week View ── */
+            <div className="grid grid-cols-8 gap-px bg-slate-200 rounded-xl overflow-hidden">
+              {/* Time gutter header */}
+              <div className="bg-[#F4F8F7] p-2" />
+              {weekDates.map((d, i) => {
+                const isToday = isSameDay(d, today);
+                return (
+                  <div key={i} className="bg-[#F4F8F7] p-2 text-center">
+                    <div className="text-xs font-semibold text-slate-500 uppercase">{weekDays[i]}</div>
+                    <div className={`text-lg font-bold mt-0.5 ${isToday ? "text-[#3DAA8A]" : "text-slate-900"}`}>{d.getDate()}</div>
+                  </div>
+                );
+              })}
+              {/* Time rows */}
+              {HOURS.map((hour) => (
+                <React.Fragment key={hour}>
+                  <div className="bg-white p-2 text-right text-xs text-slate-400 font-medium border-r border-slate-100">
+                    {hour > 12 ? `${hour - 12}p` : hour === 12 ? "12p" : `${hour}a`}
+                  </div>
+                  {weekDates.map((d, i) => {
+                    const dayEvents = getEventsForDate(d).filter((e) => {
+                      if (e.all_day) return hour === 7;
+                      const h = new Date(e.start_time).getHours();
+                      return h === hour;
+                    });
+                    return (
+                      <div key={i} className="bg-white min-h-[48px] p-0.5 border-b border-slate-50 hover:bg-[#F4F8F7]/30 cursor-pointer"
+                        onClick={() => { setSelectedDate(d); setView("day"); }}>
+                        {dayEvents.map((event) => {
+                          const config = EVENT_TYPE_CONFIG[event.event_type] || EVENT_TYPE_CONFIG.other;
+                          return (
+                            <div key={event.id} className="text-xs p-1.5 rounded-md mb-0.5 truncate cursor-pointer" style={{ backgroundColor: `${event.color || config.color}15`, color: event.color || config.color }}
+                              onClick={(e) => { e.stopPropagation(); setSelectedEvent(event); }}>
+                              {event.all_day ? "All day" : formatTime(event.start_time)} {event.title}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })}
+                </React.Fragment>
+              ))}
+            </div>
+          ) : (
+            /* ── Day View ── */
+            <div className="space-y-0">
+              {HOURS.map((hour) => {
+                const hourEvents = getEventsForDate(currentDate).filter((e) => {
+                  if (e.all_day) return hour === 7;
+                  const h = new Date(e.start_time).getHours();
+                  return h === hour;
+                });
+                return (
+                  <div key={hour} className="flex border-b border-slate-100 min-h-[56px]">
+                    <div className="w-20 shrink-0 p-2 text-right text-xs text-slate-400 font-medium border-r border-slate-100">
+                      {hour > 12 ? `${hour - 12}:00 PM` : hour === 12 ? "12:00 PM" : `${hour}:00 AM`}
+                    </div>
+                    <div className="flex-1 p-1 hover:bg-[#F4F8F7]/30 transition-colors">
+                      {hourEvents.map((event) => {
+                        const config = EVENT_TYPE_CONFIG[event.event_type] || EVENT_TYPE_CONFIG.other;
+                        return (
+                          <div key={event.id} className="p-2 rounded-lg mb-1 cursor-pointer hover:opacity-90 transition-opacity" style={{ backgroundColor: `${event.color || config.color}15`, borderLeft: `3px solid ${event.color || config.color}` }}
+                            onClick={() => setSelectedEvent(event)}>
+                            <p className="text-sm font-semibold" style={{ color: event.color || config.color }}>{event.title}</p>
+                            <p className="text-xs text-slate-500 mt-0.5">
+                              {event.all_day ? "All day" : `${formatTime(event.start_time)} – ${formatTime(event.end_time)}`}
+                            </p>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 );
               })}
