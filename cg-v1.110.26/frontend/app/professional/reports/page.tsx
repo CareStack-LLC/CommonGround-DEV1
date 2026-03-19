@@ -234,14 +234,14 @@ export default function ReportsPage() {
               </CardHeader>
               <CardContent className="space-y-4 pt-4">
                 {/* What's Included */}
-                <div className={`${reportType.bgColor} border-2 ${reportType.borderColor} rounded-sm p-4 shadow-sm`}>
-                  <p className={`sans text-xs font-bold uppercase tracking-wider mb-2 ${reportType.textColor}`}>
+                <div className="bg-slate-50 border border-slate-100 rounded-xl p-4">
+                  <p className="text-xs font-semibold uppercase tracking-wide mb-2 text-slate-500">
                     What's Included
                   </p>
                   <ul className="space-y-1.5">
                     {reportType.includes.map((item, index) => (
-                      <li key={index} className="flex items-start gap-2 sans text-sm text-slate-700">
-                        <CheckCircle2 className={`h-4 w-4 mt-0.5 shrink-0 ${reportType.textColor}`} />
+                      <li key={index} className="flex items-start gap-2 text-sm text-slate-700">
+                        <CheckCircle2 className="h-4 w-4 mt-0.5 shrink-0 text-[#3DAA8A]" />
                         <span>{item}</span>
                       </li>
                     ))}
@@ -256,7 +256,7 @@ export default function ReportsPage() {
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </Link>
-                  <Button variant="outline" size="icon" asChild className="border-2 border-slate-300">
+                  <Button variant="outline" size="icon" asChild className="border border-slate-200 rounded-xl">
                     <Link href={`/professional/reports/examples?type=${reportType.id}`}>
                       <FileText className="h-4 w-4 text-slate-500" />
                     </Link>

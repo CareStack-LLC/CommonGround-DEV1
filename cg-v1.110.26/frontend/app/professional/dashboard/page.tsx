@@ -144,60 +144,56 @@ export default function ProfessionalDashboardPage() {
     <div className="min-h-screen bg-[#F4F8F7]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
-        {/* ===== Section 1: Header Card ===== */}
-        <div className="rounded-xl bg-gradient-to-br from-[#1E3A4A] via-[#2D6A8F] to-[#1E3A4A] p-6 sm:p-8 shadow-lg relative overflow-hidden">
-          {/* Subtle decorative circle */}
-          <div className="absolute -top-10 -right-10 w-40 h-40 rounded-full bg-[#3DAA8A]/10 blur-2xl" />
+        {/* ===== Section 1: Header ===== */}
+        <div className="rounded-2xl bg-white border border-slate-200 p-6 sm:p-8 shadow-sm relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#3DAA8A] via-[#2D6A8F] to-[#3DAA8A] rounded-t-2xl" />
 
           <div className="relative z-10">
-            {/* Greeting and Date */}
             <div className="mb-6">
-              <h1 className="text-2xl sm:text-3xl font-bold text-white">
+              <h1 className="text-2xl sm:text-3xl font-bold text-slate-900">
                 {getGreeting()}, {firstName}
               </h1>
-              <p className="text-sm text-white/60 mt-1">{formatDate()}</p>
+              <p className="text-sm text-slate-500 mt-1">{formatDate()}</p>
             </div>
 
-            {/* Stats Row */}
             <div className="flex flex-wrap gap-6 mb-6">
               <div className="flex items-center gap-2">
-                <span className="text-2xl font-bold text-white">{caseCount}</span>
-                <span className="text-sm text-white/70">Active Cases</span>
+                <span className="text-2xl font-bold text-[#1E3A4A]">{caseCount}</span>
+                <span className="text-sm text-slate-500">Active Cases</span>
               </div>
-              <div className="w-px h-8 bg-white/20 hidden sm:block" />
+              <div className="w-px h-8 bg-slate-200 hidden sm:block" />
               <div className="flex items-center gap-2">
-                <span className="text-2xl font-bold text-white">{courtEventCount}</span>
-                <span className="text-sm text-white/70">Upcoming Court Dates</span>
+                <span className="text-2xl font-bold text-[#1E3A4A]">{courtEventCount}</span>
+                <span className="text-sm text-slate-500">Upcoming Dates</span>
               </div>
-              <div className="w-px h-8 bg-white/20 hidden sm:block" />
+              <div className="w-px h-8 bg-slate-200 hidden sm:block" />
               <div className="flex items-center gap-2">
-                <span className="text-2xl font-bold text-white">{pendingActionCount}</span>
-                <span className="text-sm text-white/70">Pending Actions</span>
+                <span className="text-2xl font-bold text-[#1E3A4A]">{pendingActionCount}</span>
+                <span className="text-sm text-slate-500">Pending Actions</span>
               </div>
             </div>
 
-            {/* Quick Action Buttons */}
             <div className="flex flex-wrap gap-3">
               <Link
                 href="/professional/intake"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm font-medium transition-colors border border-white/20"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white text-sm font-semibold transition-colors shadow-sm"
               >
                 <UserPlus className="h-4 w-4" />
                 New Intake
               </Link>
               <Link
                 href="/professional/reports/generate"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm font-medium transition-colors border border-white/20"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-[#F4F8F7] text-slate-700 text-sm font-semibold transition-colors border border-slate-200"
               >
                 <FileBarChart className="h-4 w-4" />
                 Generate Report
               </Link>
               <Link
                 href="/professional/cases"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-sm font-medium transition-colors border border-white/20"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-[#F4F8F7] text-slate-700 text-sm font-semibold transition-colors border border-slate-200"
               >
                 <Briefcase className="h-4 w-4" />
-                Search Cases
+                View Cases
               </Link>
             </div>
           </div>
@@ -206,7 +202,7 @@ export default function ProfessionalDashboardPage() {
         {/* ===== Section 2: Stats Grid ===== */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Active Cases */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-5 flex items-center gap-4">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex items-center gap-4">
             <div className="w-11 h-11 rounded-full bg-[#3DAA8A]/10 flex items-center justify-center shrink-0">
               <Briefcase className="h-5 w-5 text-[#3DAA8A]" />
             </div>
@@ -217,7 +213,7 @@ export default function ProfessionalDashboardPage() {
           </div>
 
           {/* Pending Intake */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-5 flex items-center gap-4">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex items-center gap-4">
             <div className="w-11 h-11 rounded-full bg-[#2D6A8F]/10 flex items-center justify-center shrink-0">
               <UserPlus className="h-5 w-5 text-[#2D6A8F]" />
             </div>
@@ -228,7 +224,7 @@ export default function ProfessionalDashboardPage() {
           </div>
 
           {/* Unread Messages */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-5 flex items-center gap-4">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex items-center gap-4">
             <div className="w-11 h-11 rounded-full bg-amber-50 flex items-center justify-center shrink-0">
               <MessageSquare className="h-5 w-5 text-amber-600" />
             </div>
@@ -239,7 +235,7 @@ export default function ProfessionalDashboardPage() {
           </div>
 
           {/* Upcoming Deadlines */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-5 flex items-center gap-4">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex items-center gap-4">
             <div className="w-11 h-11 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
               <Calendar className="h-5 w-5 text-slate-600" />
             </div>
@@ -255,7 +251,7 @@ export default function ProfessionalDashboardPage() {
 
           {/* Left Column: Recent Activity (3/5 = ~60%) */}
           <div className="lg:col-span-3">
-            <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
               <div className="flex items-center justify-between mb-5">
                 <h2 className="text-lg font-semibold text-[#1E3A4A] flex items-center gap-2">
                   <Clock className="h-5 w-5 text-[#3DAA8A]" />
@@ -313,7 +309,7 @@ export default function ProfessionalDashboardPage() {
           <div className="lg:col-span-2 space-y-6">
 
             {/* Upcoming Deadlines */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
               <div className="flex items-center justify-between mb-5">
                 <h2 className="text-lg font-semibold text-[#1E3A4A] flex items-center gap-2">
                   <Calendar className="h-5 w-5 text-[#3DAA8A]" />
@@ -362,7 +358,7 @@ export default function ProfessionalDashboardPage() {
             </div>
 
             {/* Pending Actions */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+            <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
               <h2 className="text-lg font-semibold text-[#1E3A4A] flex items-center gap-2 mb-5">
                 <Bell className="h-5 w-5 text-amber-500" />
                 Pending Actions
@@ -446,48 +442,6 @@ export default function ProfessionalDashboardPage() {
               </div>
             </div>
           </div>
-        </div>
-
-        {/* ===== Section 4: Quick Actions Bar ===== */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <Link href="/professional/intake">
-            <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-5 flex items-center gap-4 hover:shadow-md hover:border-[#3DAA8A]/30 transition-all cursor-pointer group">
-              <div className="w-11 h-11 rounded-full bg-[#3DAA8A]/10 flex items-center justify-center shrink-0 group-hover:bg-[#3DAA8A]/20 transition-colors">
-                <UserPlus className="h-5 w-5 text-[#3DAA8A]" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-semibold text-[#1E3A4A]">New Intake</p>
-                <p className="text-xs text-slate-400">Start a new case intake</p>
-              </div>
-              <ArrowRight className="h-4 w-4 text-slate-300 group-hover:text-[#3DAA8A] transition-colors" />
-            </div>
-          </Link>
-
-          <Link href="/professional/reports/generate">
-            <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-5 flex items-center gap-4 hover:shadow-md hover:border-[#2D6A8F]/30 transition-all cursor-pointer group">
-              <div className="w-11 h-11 rounded-full bg-[#2D6A8F]/10 flex items-center justify-center shrink-0 group-hover:bg-[#2D6A8F]/20 transition-colors">
-                <FileBarChart className="h-5 w-5 text-[#2D6A8F]" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-semibold text-[#1E3A4A]">Generate Report</p>
-                <p className="text-xs text-slate-400">Create case reports</p>
-              </div>
-              <ArrowRight className="h-4 w-4 text-slate-300 group-hover:text-[#2D6A8F] transition-colors" />
-            </div>
-          </Link>
-
-          <Link href="/professional/cases">
-            <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-5 flex items-center gap-4 hover:shadow-md hover:border-[#1E3A4A]/30 transition-all cursor-pointer group">
-              <div className="w-11 h-11 rounded-full bg-[#1E3A4A]/10 flex items-center justify-center shrink-0 group-hover:bg-[#1E3A4A]/20 transition-colors">
-                <Briefcase className="h-5 w-5 text-[#1E3A4A]" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-semibold text-[#1E3A4A]">View All Cases</p>
-                <p className="text-xs text-slate-400">Browse your caseload</p>
-              </div>
-              <ArrowRight className="h-4 w-4 text-slate-300 group-hover:text-[#1E3A4A] transition-colors" />
-            </div>
-          </Link>
         </div>
 
       </div>

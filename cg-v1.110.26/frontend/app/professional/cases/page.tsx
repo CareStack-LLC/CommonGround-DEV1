@@ -80,8 +80,8 @@ interface SavedView {
 const SYSTEM_VIEWS: SavedView[] = [
   { id: "my_cases", name: "My Cases", filters: { status: "active" } },
   { id: "urgent", name: "Urgent", filters: { urgency: "urgent" } },
-  { id: "dv_flagged", name: "DV Flagged", filters: { aria_risk: "high" } },
-  { id: "court_week", name: "Court This Week", filters: { court_date: "7" } },
+  { id: "dv_flagged", name: "Flagged", filters: { aria_risk: "high" } },
+  { id: "court_week", name: "This Week", filters: { court_date: "7" } },
 ];
 
 const URGENCY_COLORS: Record<string, string> = {

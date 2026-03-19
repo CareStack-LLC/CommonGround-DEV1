@@ -103,15 +103,15 @@ function NotificationItem({
 
     return (
         <div
-            className={`group flex items-start gap-3 p-4 rounded-sm border-2 transition-all cursor-pointer ${notification.is_read
-                    ? "bg-gradient-to-br from-white via-[#F4F8F7]/20 to-white border-[#1E3A4A]/20 hover:shadow-sm"
-                    : "bg-[#F4F8F7] border-[#1E3A4A]/40 hover:border-[#1E3A4A]/60 shadow-md"
+            className={`group flex items-start gap-3 p-4 rounded-xl border transition-all cursor-pointer ${notification.is_read
+                    ? "bg-white border-slate-200 hover:shadow-sm"
+                    : "bg-[#F4F8F7] border-[#3DAA8A]/20 hover:border-[#3DAA8A]/40 shadow-sm"
                 }`}
             onClick={handleClick}
         >
             {/* Unread dot */}
             <div className="mt-1 shrink-0 relative">
-                <div className="p-2 bg-white border-2 border-[#1E3A4A]/20 rounded-sm shadow-sm">
+                <div className="p-2 bg-white border border-slate-200 rounded-lg shadow-sm">
                     {TYPE_ICONS[notification.type] || TYPE_ICONS.system}
                 </div>
                 {!notification.is_read && (
@@ -248,47 +248,39 @@ export default function NotificationsPage() {
             />
 
             {/* Header */}
-            <div className="relative overflow-hidden rounded-sm bg-gradient-to-br from-[#1E3A4A] via-[#2D6A8F] to-[#3DAA8A] px-8 py-8 shadow-2xl border-2 border-[#1E3A4A]/40">
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#2D6A8F] via-[#D4AF37] to-[#2D6A8F]" />
-                <div className="flex items-center justify-between gap-4">
-                    <div className="flex items-start gap-5">
-                        <div className="p-4 bg-[#F4F8F7] border-2 border-[#1E3A4A]/20 rounded-sm shadow-xl shrink-0">
-                            <Bell className="h-8 w-8 text-[#1E3A4A]" strokeWidth={1.5} />
-                        </div>
-                        <div>
-                            <h1 className="serif text-3xl lg:text-4xl font-bold text-white leading-tight tracking-tight flex items-center gap-3">
-                                Notifications
-                                {unreadCount > 0 && (
-                                    <Badge className="bg-white text-[#1E3A4A] border-2 border-[#1E3A4A]/20 sans text-xs font-bold">{unreadCount} new</Badge>
-                                )}
-                            </h1>
-                            <p className="sans text-sm text-[#E8F4F0] mt-2">Your activity history and alerts</p>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-2">
+                <div>
+                    <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-3">
+                        Notifications
                         {unreadCount > 0 && (
-                            <Button variant="outline" size="sm" onClick={markAllRead} className="gap-1.5 text-xs border-2 border-white/30 text-white hover:bg-white/10 sans">
-                                <CheckCheck className="h-3.5 w-3.5" />
-                                Mark All Read
-                            </Button>
+                            <Badge className="bg-[#3DAA8A]/10 text-[#3DAA8A] border border-[#3DAA8A]/20 text-xs font-semibold">{unreadCount} new</Badge>
                         )}
-                        <Link href="/professional/notifications/preferences">
-                            <Button variant="outline" size="sm" className="gap-1.5 text-xs border-2 border-white/30 text-white hover:bg-white/10 sans">
-                                <Settings className="h-3.5 w-3.5" />
-                                Preferences
-                            </Button>
-                        </Link>
-                    </div>
+                    </h1>
+                    <p className="text-sm text-slate-500 mt-1">Your activity history and alerts</p>
+                </div>
+                <div className="flex items-center gap-2">
+                    {unreadCount > 0 && (
+                        <Button variant="outline" size="sm" onClick={markAllRead} className="gap-1.5 text-xs border-slate-200 text-slate-700 hover:bg-[#F4F8F7] rounded-xl h-9">
+                            <CheckCheck className="h-3.5 w-3.5" />
+                            Mark All Read
+                        </Button>
+                    )}
+                    <Link href="/professional/notifications/preferences">
+                        <Button variant="outline" size="sm" className="gap-1.5 text-xs border-slate-200 text-slate-700 hover:bg-[#F4F8F7] rounded-xl h-9">
+                            <Settings className="h-3.5 w-3.5" />
+                            Preferences
+                        </Button>
+                    </Link>
                 </div>
             </div>
 
             {/* Filters */}
-            <Card className="border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/20 to-white shadow-sm">
+            <Card className="border border-slate-200 bg-white shadow-sm rounded-2xl">
                 <CardContent className="py-3">
                     <div className="flex gap-3 flex-wrap">
                         <Select value={typeFilter} onValueChange={setTypeFilter}>
-                            <SelectTrigger className="w-44 h-8 sans text-xs border-2 border-slate-300">
-                                <Filter className="h-3.5 w-3.5 mr-1.5 text-[#1E3A4A]" />
+                            <SelectTrigger className="w-44 h-8 text-xs border-slate-200 rounded-lg">
+                                <Filter className="h-3.5 w-3.5 mr-1.5 text-slate-500" />
                                 <SelectValue placeholder="All Types" />
                             </SelectTrigger>
                             <SelectContent>
@@ -302,7 +294,7 @@ export default function NotificationsPage() {
                             </SelectContent>
                         </Select>
                         <Select value={readFilter} onValueChange={setReadFilter}>
-                            <SelectTrigger className="w-36 h-8 sans text-xs border-2 border-slate-300">
+                            <SelectTrigger className="w-36 h-8 text-xs border-slate-200 rounded-lg">
                                 <SelectValue placeholder="All" />
                             </SelectTrigger>
                             <SelectContent>
@@ -323,11 +315,11 @@ export default function NotificationsPage() {
                     ))}
                 </div>
             ) : notifications.length === 0 ? (
-                <Card className="border-dashed border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-[#F4F8F7]/30 to-white shadow-sm">
+                <Card className="border border-dashed border-slate-200 bg-white shadow-sm rounded-2xl">
                     <CardContent className="py-16 text-center">
-                        <Bell className="h-12 w-12 mx-auto mb-3 text-[#1E3A4A]/40" />
-                        <p className="serif text-slate-900 font-bold">No notifications</p>
-                        <p className="sans text-xs text-slate-600 mt-1">You're all caught up!</p>
+                        <Bell className="h-12 w-12 mx-auto mb-3 text-slate-300" />
+                        <p className="text-slate-900 font-semibold">No notifications</p>
+                        <p className="text-xs text-slate-500 mt-1">You're all caught up!</p>
                     </CardContent>
                 </Card>
             ) : (

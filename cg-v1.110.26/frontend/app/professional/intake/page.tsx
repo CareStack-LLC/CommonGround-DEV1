@@ -219,7 +219,7 @@ export default function IntakePage() {
             </div>
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-                <TabsList className="grid w-full grid-cols-2 max-w-md bg-[#F4F8F7]/50 border-2 border-[#1E3A4A]/10 p-1">
+                <TabsList className="grid w-full grid-cols-2 max-w-md bg-slate-100/80 rounded-xl p-1">
                     <TabsTrigger
                         value="invitations"
                         className="relative serif data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#1E3A4A]/20 data-[state=active]:text-[#1E3A4A]"
@@ -318,7 +318,7 @@ export default function IntakePage() {
                             </Button>
                             <Button
                                 onClick={() => router.push("/professional/intake/new")}
-                                className="bg-[#1E3A4A] hover:bg-[#1E3A4A] text-[#F4F8F7] border-2 border-[#1E3A4A]/40 shadow-lg"
+                                className="bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm font-semibold"
                             >
                                 <Plus className="h-4 w-4 mr-2" />
                                 New ARIA Intake
