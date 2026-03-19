@@ -347,6 +347,7 @@ function SettingsContent() {
               checkoutLoading={checkoutLoading}
               handleCheckout={handleCheckout}
               profile={profile}
+              token={token}
             />
           )}
           {activeTab === "firm" && (
@@ -467,7 +468,7 @@ function AccountTab({ profile }: { profile: any }) {
 // ─── Subscription Tab ────────────────────────────────────────────────────────
 
 function SubscriptionTab({
-  usage, billingCycle, setBillingCycle, checkoutLoading, handleCheckout, profile,
+  usage, billingCycle, setBillingCycle, checkoutLoading, handleCheckout, profile, token,
 }: {
   usage: TierUsage | null;
   billingCycle: "monthly" | "annual";
@@ -475,6 +476,7 @@ function SubscriptionTab({
   checkoutLoading: string | null;
   handleCheckout: (planCode: string) => void;
   profile: any;
+  token: string | null;
 }) {
   if (!usage) return <p className="text-sm text-slate-500 py-8 text-center">Unable to load subscription data.</p>;
 
