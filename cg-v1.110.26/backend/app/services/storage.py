@@ -111,7 +111,7 @@ class SupabaseStorageService:
 
         # Return the public URL for public buckets (avatars, kidcoms)
         # For private buckets, return a signed URL with limited expiry
-        if bucket in (StorageBucket.AVATARS, StorageBucket.KIDCOMS, StorageBucket.PROFESSIONAL_MEDIA):
+        if bucket in (StorageBucket.AVATARS, StorageBucket.KIDCOMS, StorageBucket.PROFESSIONAL_MEDIA, StorageBucket.KIDSPACE_MEDIA, StorageBucket.EMAIL_ASSETS):
             return self._get_storage_url(bucket, path)
         else:
             # Sensitive buckets get 2-hour expiry; less-sensitive get 24 hours

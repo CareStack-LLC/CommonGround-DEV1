@@ -197,15 +197,15 @@ export default function MediaLibraryPage() {
       const formData = new FormData();
       formData.append('title', movieTitle);
       formData.append('description', movieDesc);
-      formData.append('duration', movieDuration);
-      formData.append('age_range_min', movieAgeMin);
-      formData.append('age_range_max', movieAgeMax);
+      formData.append('duration_minutes', movieDuration);
+      formData.append('age_min', movieAgeMin);
+      formData.append('age_max', movieAgeMax);
       if (movieGenreId) formData.append('genre_id', movieGenreId);
       formData.append('trailer_url', movieTrailerUrl);
       formData.append('is_featured', String(movieFeatured));
       formData.append('is_visible', String(movieVisible));
-      if (movieVideoFile) formData.append('video_file', movieVideoFile);
-      if (moviePosterFile) formData.append('poster_file', moviePosterFile);
+      if (movieVideoFile) formData.append('video', movieVideoFile);
+      if (moviePosterFile) formData.append('poster', moviePosterFile);
 
       const url = editingMovie
         ? `${API_BASE}/api/v1/kidspace/admin/movies/${editingMovie.id}`
@@ -264,13 +264,13 @@ export default function MediaLibraryPage() {
       formData.append('description', bookDesc);
       if (bookAuthorId) formData.append('author_id', bookAuthorId);
       formData.append('page_count', bookPageCount);
-      formData.append('age_range_min', bookAgeMin);
-      formData.append('age_range_max', bookAgeMax);
+      formData.append('age_min', bookAgeMin);
+      formData.append('age_max', bookAgeMax);
       if (bookGenreId) formData.append('genre_id', bookGenreId);
       formData.append('is_featured', String(bookFeatured));
       formData.append('is_visible', String(bookVisible));
-      if (bookPdfFile) formData.append('pdf_file', bookPdfFile);
-      if (bookCoverFile) formData.append('cover_file', bookCoverFile);
+      if (bookPdfFile) formData.append('pdf', bookPdfFile);
+      if (bookCoverFile) formData.append('cover', bookCoverFile);
 
       const url = editingBook
         ? `${API_BASE}/api/v1/kidspace/admin/books/${editingBook.id}`
@@ -325,7 +325,7 @@ export default function MediaLibraryPage() {
       formData.append('bio', authorBio);
       if (authorShowcaseBookId) formData.append('showcase_book_id', authorShowcaseBookId);
       formData.append('is_featured', String(authorFeatured));
-      if (authorPhotoFile) formData.append('photo_file', authorPhotoFile);
+      if (authorPhotoFile) formData.append('photo', authorPhotoFile);
 
       const url = editingAuthor
         ? `${API_BASE}/api/v1/kidspace/admin/authors/${editingAuthor.id}`
