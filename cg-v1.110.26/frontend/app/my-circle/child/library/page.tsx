@@ -64,7 +64,7 @@ export default function LibraryPage() {
   const [stats, setStats] = useState<ReadingStats>({ booksRead: 0, booksCompleted: 0, pagesRead: 0, streak: 0, lastReadDate: null });
   const [currentlyReading, setCurrentlyReading] = useState<ReadingProgress[]>([]);
   const [progressMap, setProgressMap] = useState<Record<string, ReadingProgress | null>>({});
-  const [allBooks, setAllBooks] = useState<StorybookContent[]>(theaterContent.storybooks);
+  const [allBooks, setAllBooks] = useState<StorybookContent[]>([]);
   const [apiAuthors, setApiAuthors] = useState<{name: string; avatar: string; bookCount: number}[]>([]);
 
   useEffect(() => {
@@ -82,24 +82,20 @@ export default function LibraryPage() {
       if (booksRes?.ok) {
         const data = await booksRes.json();
         const items = data.books || data || [];
-        if (items.length > 0) {
-          const catMap: Record<string, BookCategory> = {
-            stories: 'fiction', learn: 'educational', fiction: 'fiction', educational: 'educational', fantasy: 'fantasy', adventure: 'adventure',
-          };
-          const apiBooks: StorybookContent[] = items.map((b: any) => ({
-            id: b.id,
-            title: b.title,
-            url: b.pdf_url || '',
-            cover: b.cover_url || '',
-            pages: b.page_count || 0,
-            author: b.author_name || b.author?.name || '',
-            category: catMap[(b.genre_name || 'fiction').toLowerCase()] || 'fiction',
-            ageRange: b.age_min && b.age_max ? `${b.age_min}-${b.age_max}` : '3-12',
-          }));
-          const apiIds = new Set(apiBooks.map(b => b.id));
-          const fallback = theaterContent.storybooks.filter(b => !apiIds.has(b.id));
-          setAllBooks([...apiBooks, ...fallback]);
-        }
+        const catMap: Record<string, BookCategory> = {
+          stories: 'fiction', learn: 'educational', fiction: 'fiction', educational: 'educational', fantasy: 'fantasy', adventure: 'adventure',
+        };
+        const apiBooks: StorybookContent[] = items.map((b: any) => ({
+          id: b.id,
+          title: b.title,
+          url: b.pdf_url || '',
+          cover: b.cover_url || '',
+          pages: b.page_count || 0,
+          author: b.author_name || b.author?.name || '',
+          category: catMap[(b.genre_name || 'fiction').toLowerCase()] || 'fiction',
+          ageRange: b.age_min && b.age_max ? `${b.age_min}-${b.age_max}` : '3-12',
+        }));
+        setAllBooks(apiBooks);
       }
 
       if (authorsRes?.ok) {
@@ -153,7 +149,7 @@ export default function LibraryPage() {
   }
 
   const books = allBooks;
-  const authors = apiAuthors.length > 0 ? apiAuthors : getAuthors(allBooks);
+  const authors = apiAuthors;
 
   const filteredBooks = books.filter(book => {
     if (selectedCategory === 'reading') {

@@ -50,46 +50,44 @@ export default function MoviesPage() {
   // Movie detail modal state
   const [selectedMovie, setSelectedMovie] = useState<VideoContent | null>(null);
 
-  // API + fallback merged video list
-  const [allVideos, setAllVideos] = useState<VideoContent[]>(theaterContent.videos);
+  // API-only video list (no hardcoded fallback)
+  const [allVideos, setAllVideos] = useState<VideoContent[]>([]);
+  const [isLoadingVideos, setIsLoadingVideos] = useState(true);
 
   // Watch Together state
   const [contacts, setContacts] = useState<ChildContact[]>([]);
   const [watchTogetherMovie, setWatchTogetherMovie] = useState<any | null>(null);
   const [isStartingCall, setIsStartingCall] = useState(false);
 
-  // Fetch movies from KidSpace API, merge with hardcoded fallback
+  // Fetch movies from KidSpace API only — no hardcoded fallback
   useEffect(() => {
     const fetchApiMovies = async () => {
+      setIsLoadingVideos(true);
       try {
         const res = await fetch(`${API_BASE}/api/v1/kidspace/movies?limit=50`);
         if (res.ok) {
           const data = await res.json();
           const items = data.movies || data || [];
-          if (items.length > 0) {
-            const genreMap: Record<string, VideoCategory> = {
-              comedy: 'comedy', adventure: 'adventure', educational: 'educational',
-              animation: 'animation', action: 'action', family: 'comedy',
-            };
-            const apiMapped: VideoContent[] = items.map((m: any) => ({
-              id: m.id,
-              title: m.title,
-              url: m.video_url || '',
-              thumbnail: m.poster_url || '',
-              duration: m.duration_minutes ? `${m.duration_minutes} min` : undefined,
-              description: m.description || '',
-              category: genreMap[(m.genre_name || 'comedy').toLowerCase()] || 'comedy',
-              ageRange: m.age_min && m.age_max ? `${m.age_min}-${m.age_max}` : '3-12',
-            }));
-            // Merge: API movies first, then hardcoded ones not in API
-            const apiIds = new Set(apiMapped.map(m => m.id));
-            const fallback = allVideos.filter(v => !apiIds.has(v.id));
-            setAllVideos([...apiMapped, ...fallback]);
-            return;
-          }
+          const genreMap: Record<string, VideoCategory> = {
+            comedy: 'comedy', adventure: 'adventure', educational: 'educational',
+            animation: 'animation', action: 'action', family: 'comedy',
+          };
+          const apiMapped: VideoContent[] = items.map((m: any) => ({
+            id: m.id,
+            title: m.title,
+            url: m.video_url || '',
+            thumbnail: m.poster_url || '',
+            duration: m.duration_minutes ? `${m.duration_minutes} min` : undefined,
+            description: m.description || '',
+            category: genreMap[(m.genre_name || 'comedy').toLowerCase()] || 'comedy',
+            ageRange: m.age_min && m.age_max ? `${m.age_min}-${m.age_max}` : '3-12',
+          }));
+          setAllVideos(apiMapped);
         }
       } catch {
-        // API unavailable — keep hardcoded fallback
+        // API unavailable — leave empty
+      } finally {
+        setIsLoadingVideos(false);
       }
     };
     fetchApiMovies();
