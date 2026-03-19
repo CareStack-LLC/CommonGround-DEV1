@@ -3,48 +3,22 @@
 import { useState, useEffect } from "react";
 import { useProfessionalAuth } from "../../layout";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import {
-  Users,
-  UserPlus,
-  MoreVertical,
-  Mail,
-  Shield,
-  Clock,
-  AlertTriangle,
-  Check,
-  X,
-  ArrowLeft,
-  RefreshCw,
-  Trash2,
+  Users, UserPlus, MoreVertical, Shield, Clock, ArrowLeft, RefreshCw, Trash2, Loader2,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -60,19 +34,19 @@ const FIRM_ROLES = [
 ];
 
 const ROLE_COLORS: Record<string, string> = {
-  owner: "bg-purple-100 text-purple-800",
-  admin: "bg-blue-100 text-blue-800",
-  attorney: "bg-emerald-100 text-emerald-800",
-  paralegal: "bg-cyan-100 text-cyan-800",
-  intake: "bg-amber-100 text-amber-800",
-  readonly: "bg-gray-100 text-gray-800",
+  owner: "bg-[#3DAA8A]/10 text-[#1E3A4A] border-0",
+  admin: "bg-blue-50 text-blue-700 border-0",
+  attorney: "bg-emerald-50 text-emerald-700 border-0",
+  paralegal: "bg-cyan-50 text-cyan-700 border-0",
+  intake: "bg-amber-50 text-amber-700 border-0",
+  readonly: "bg-slate-100 text-slate-600 border-0",
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  active: "bg-green-100 text-green-800",
-  invited: "bg-yellow-100 text-yellow-800",
-  suspended: "bg-red-100 text-red-800",
-  removed: "bg-gray-100 text-gray-800",
+  active: "bg-green-50 text-green-700 border-0",
+  invited: "bg-blue-50 text-blue-700 border-0",
+  suspended: "bg-red-50 text-red-700 border-0",
+  removed: "bg-slate-100 text-slate-500 border-0",
 };
 
 interface Member {
@@ -91,34 +65,26 @@ interface Member {
 }
 
 export default function TeamManagementPage() {
-  const { token, activeFirm, profile } = useProfessionalAuth();
+  const { token, activeFirm } = useProfessionalAuth();
   const { toast } = useToast();
   const [members, setMembers] = useState<Member[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isInviting, setIsInviting] = useState(false);
   const [showInviteDialog, setShowInviteDialog] = useState(false);
-  const [inviteData, setInviteData] = useState({
-    email: "",
-    role: "attorney",
-  });
+  const [inviteData, setInviteData] = useState({ email: "", role: "attorney" });
 
   useEffect(() => {
-    if (token && activeFirm) {
-      fetchMembers();
-    }
+    if (token && activeFirm) fetchMembers();
   }, [token, activeFirm]);
 
   const fetchMembers = async () => {
     if (!activeFirm) return;
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_BASE}/api/v1/professional/firms/${activeFirm.id}/members`, {
+      const res = await fetch(`${API_BASE}/api/v1/professional/firms/${activeFirm.id}/members`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (response.ok) {
-        const data = await response.json();
-        setMembers(data);
-      }
+      if (res.ok) setMembers(await res.json());
     } catch (err) {
       console.error("Error fetching members:", err);
     } finally {
@@ -130,35 +96,22 @@ export default function TeamManagementPage() {
     if (!activeFirm || !inviteData.email) return;
     setIsInviting(true);
     try {
-      const response = await fetch(
-        `${API_BASE}/api/v1/professional/firms/${activeFirm.id}/members/invite`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(inviteData),
-        }
-      );
-      if (response.ok) {
-        toast({
-          title: "Invitation sent",
-          description: `An invitation has been sent to ${inviteData.email}`,
-        });
+      const res = await fetch(`${API_BASE}/api/v1/professional/firms/${activeFirm.id}/members/invite`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify(inviteData),
+      });
+      if (res.ok) {
+        toast({ title: "Invitation sent", description: `Sent to ${inviteData.email}` });
         setShowInviteDialog(false);
         setInviteData({ email: "", role: "attorney" });
         fetchMembers();
       } else {
-        const error = await response.json();
+        const error = await res.json();
         throw new Error(error.detail || "Failed to invite member");
       }
     } catch (err: any) {
-      toast({
-        title: "Error",
-        description: err.message || "Failed to send invitation.",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: err.message, variant: "destructive" });
     } finally {
       setIsInviting(false);
     }
@@ -167,170 +120,93 @@ export default function TeamManagementPage() {
   const handleUpdateRole = async (memberId: string, newRole: string) => {
     if (!activeFirm) return;
     try {
-      const response = await fetch(
-        `${API_BASE}/api/v1/professional/firms/${activeFirm.id}/members/${memberId}`,
-        {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ role: newRole }),
-        }
-      );
-      if (response.ok) {
-        toast({ title: "Role updated" });
-        fetchMembers();
-      }
-    } catch (err) {
-      toast({
-        title: "Error",
-        description: "Failed to update role.",
-        variant: "destructive",
+      const res = await fetch(`${API_BASE}/api/v1/professional/firms/${activeFirm.id}/members/${memberId}`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ role: newRole }),
       });
-    }
+      if (res.ok) { toast({ title: "Role updated" }); fetchMembers(); }
+    } catch { toast({ title: "Error", description: "Failed to update role.", variant: "destructive" }); }
   };
 
   const handleResendInvite = async (memberId: string) => {
     if (!activeFirm) return;
     try {
-      const response = await fetch(
-        `${API_BASE}/api/v1/professional/firms/${activeFirm.id}/members/${memberId}/resend`,
-        {
-          method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      if (response.ok) {
-        toast({ title: "Invitation resent" });
-      }
-    } catch (err) {
-      toast({
-        title: "Error",
-        description: "Failed to resend invitation.",
-        variant: "destructive",
+      const res = await fetch(`${API_BASE}/api/v1/professional/firms/${activeFirm.id}/members/${memberId}/resend`, {
+        method: "POST", headers: { Authorization: `Bearer ${token}` },
       });
-    }
+      if (res.ok) toast({ title: "Invitation resent" });
+    } catch { toast({ title: "Error", description: "Failed to resend.", variant: "destructive" }); }
   };
 
   const handleRemoveMember = async (memberId: string) => {
-    if (!activeFirm) return;
-    if (!confirm("Are you sure you want to remove this member?")) return;
-
+    if (!activeFirm || !confirm("Are you sure you want to remove this member?")) return;
     try {
-      const response = await fetch(
-        `${API_BASE}/api/v1/professional/firms/${activeFirm.id}/members/${memberId}`,
-        {
-          method: "DELETE",
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      if (response.ok) {
-        toast({ title: "Member removed" });
-        fetchMembers();
-      }
-    } catch (err) {
-      toast({
-        title: "Error",
-        description: "Failed to remove member.",
-        variant: "destructive",
+      const res = await fetch(`${API_BASE}/api/v1/professional/firms/${activeFirm.id}/members/${memberId}`, {
+        method: "DELETE", headers: { Authorization: `Bearer ${token}` },
       });
-    }
+      if (res.ok) { toast({ title: "Member removed" }); fetchMembers(); }
+    } catch { toast({ title: "Error", description: "Failed to remove member.", variant: "destructive" }); }
   };
 
   const getInitials = (name?: string | null, email?: string | null) => {
     if (name) {
       const parts = name.split(" ");
-      if (parts.length >= 2) {
-        return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
-      }
-      return name[0].toUpperCase();
+      return parts.length >= 2 ? `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase() : name[0].toUpperCase();
     }
-    if (email) {
-      return email[0].toUpperCase();
-    }
-    return "?";
+    return email ? email[0].toUpperCase() : "?";
   };
 
-  const formatDate = (dateStr: string | null) => {
-    if (!dateStr) return "—";
-    return new Date(dateStr).toLocaleDateString();
-  };
+  const isOwner = (member: Member) => member.role === "owner";
+  const hasActions = (member: Member) => !isOwner(member);
 
   if (!activeFirm) {
     return (
-      <div className="p-6">
-        <Card>
-          <CardContent className="p-8 text-center">
-            <Users className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-            <h2 className="text-lg font-semibold mb-2">No Firm Selected</h2>
-            <p className="text-gray-500">Select a firm from the header to manage team members.</p>
-          </CardContent>
-        </Card>
+      <div className="max-w-4xl mx-auto py-12 text-center">
+        <Users className="h-10 w-10 mx-auto text-slate-300 mb-3" />
+        <h2 className="text-base font-semibold text-slate-900">No Firm Selected</h2>
+        <p className="text-sm text-slate-500 mt-1">Select a firm from the header to manage team members.</p>
       </div>
     );
   }
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="max-w-4xl mx-auto space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between">
         <div>
-          <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
-            <Link href="/professional/firm" className="hover:text-gray-700 flex items-center gap-1">
-              <ArrowLeft className="h-4 w-4" />
-              Firm Settings
-            </Link>
-          </div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <Users className="h-6 w-6" />
-            Team Members
-          </h1>
-          <p className="text-gray-500 mt-1">
-            Manage who has access to your firm's cases and data
-          </p>
+          <Link href="/professional/firm" className="inline-flex items-center gap-1.5 text-xs text-[#3DAA8A] hover:text-[#2D8A6E] font-medium mb-2">
+            <ArrowLeft className="h-3.5 w-3.5" /> Firm Settings
+          </Link>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Team Members</h1>
+          <p className="text-sm text-slate-500 mt-1">Manage who has access to your firm's cases and data</p>
         </div>
         <Dialog open={showInviteDialog} onOpenChange={setShowInviteDialog}>
           <DialogTrigger asChild>
-            <Button>
-              <UserPlus className="h-4 w-4 mr-2" />
-              Invite Member
+            <Button className="bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm gap-2">
+              <UserPlus className="h-4 w-4" /> Invite Member
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="rounded-2xl">
             <DialogHeader>
               <DialogTitle>Invite Team Member</DialogTitle>
-              <DialogDescription>
-                Send an invitation to join your firm. They will receive an email with instructions.
-              </DialogDescription>
+              <DialogDescription>They'll receive an email with instructions to join your firm.</DialogDescription>
             </DialogHeader>
-            <div className="space-y-4 py-4">
-              <div className="space-y-2">
-                <Label htmlFor="invite-email">Email Address</Label>
-                <Input
-                  id="invite-email"
-                  type="email"
-                  placeholder="colleague@example.com"
-                  value={inviteData.email}
+            <div className="space-y-4 py-2">
+              <div className="space-y-1.5">
+                <Label className="text-xs text-slate-500">Email Address</Label>
+                <Input type="email" placeholder="colleague@example.com" value={inviteData.email}
                   onChange={(e) => setInviteData({ ...inviteData, email: e.target.value })}
-                />
+                  className="border-slate-200 focus:border-[#3DAA8A]" />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="invite-role">Role</Label>
-                <Select
-                  value={inviteData.role}
-                  onValueChange={(value) => setInviteData({ ...inviteData, role: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select role" />
-                  </SelectTrigger>
+              <div className="space-y-1.5">
+                <Label className="text-xs text-slate-500">Role</Label>
+                <Select value={inviteData.role} onValueChange={(v) => setInviteData({ ...inviteData, role: v })}>
+                  <SelectTrigger className="border-slate-200"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {FIRM_ROLES.filter((r) => r.value !== "owner").map((role) => (
                       <SelectItem key={role.value} value={role.value}>
-                        <div className="flex flex-col">
-                          <span>{role.label}</span>
-                          <span className="text-xs text-gray-500">{role.description}</span>
-                        </div>
+                        <div><span className="font-medium">{role.label}</span><span className="text-xs text-slate-500 ml-2">{role.description}</span></div>
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -338,11 +214,10 @@ export default function TeamManagementPage() {
               </div>
             </div>
             <DialogFooter>
-              <Button variant="outline" onClick={() => setShowInviteDialog(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleInvite} disabled={isInviting || !inviteData.email}>
-                {isInviting ? "Sending..." : "Send Invitation"}
+              <Button variant="outline" onClick={() => setShowInviteDialog(false)} className="rounded-lg">Cancel</Button>
+              <Button onClick={handleInvite} disabled={isInviting || !inviteData.email}
+                className="bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white rounded-lg">
+                {isInviting ? <><Loader2 className="h-4 w-4 animate-spin mr-1.5" />Sending...</> : "Send Invitation"}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -351,118 +226,84 @@ export default function TeamManagementPage() {
 
       {/* Members List */}
       {isLoading ? (
-        <Card>
-          <CardContent className="p-6 space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="flex items-center gap-4">
-                <div className="h-10 w-10 rounded-full bg-gray-200 animate-pulse" />
-                <div className="flex-1 space-y-2">
-                  <div className="h-4 w-48 bg-gray-200 animate-pulse rounded" />
-                  <div className="h-3 w-32 bg-gray-200 animate-pulse rounded" />
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-[#3DAA8A]" />
+        </div>
       ) : members.length === 0 ? (
-        <Card>
-          <CardContent className="p-8 text-center">
-            <Users className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-            <h2 className="text-lg font-semibold mb-2">No Team Members Yet</h2>
-            <p className="text-gray-500 mb-4">
-              Invite colleagues to collaborate on cases together.
-            </p>
-            <Button onClick={() => setShowInviteDialog(true)}>
-              <UserPlus className="h-4 w-4 mr-2" />
-              Invite Your First Member
+        <Card className="rounded-2xl border border-slate-200">
+          <CardContent className="py-12 text-center">
+            <Users className="h-10 w-10 mx-auto text-slate-300 mb-3" />
+            <h2 className="text-base font-semibold text-slate-900">No Team Members Yet</h2>
+            <p className="text-sm text-slate-500 mt-1 mb-4">Invite colleagues to collaborate on cases.</p>
+            <Button onClick={() => setShowInviteDialog(true)} className="bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white rounded-xl gap-2">
+              <UserPlus className="h-4 w-4" /> Invite Your First Member
             </Button>
           </CardContent>
         </Card>
       ) : (
-        <Card>
+        <Card className="rounded-2xl border border-slate-200 overflow-hidden">
           <CardContent className="p-0">
-            <div className="divide-y">
+            <div className="divide-y divide-slate-100">
               {members.map((member) => (
-                <div
-                  key={member.id}
-                  className="flex items-center justify-between p-4 hover:bg-gray-50"
-                >
-                  <div className="flex items-center gap-4">
-                    <Avatar className="h-10 w-10">
-                      <AvatarFallback className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white">
-                        {getInitials(member.professional_name, member.professional_email || member.invite_email)}
-                      </AvatarFallback>
-                    </Avatar>
+                <div key={member.id} className="flex items-center justify-between p-4 hover:bg-slate-50/50 transition-colors">
+                  <div className="flex items-center gap-3.5">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#3DAA8A]/20 to-[#2D6A8F]/20 flex items-center justify-center text-sm font-bold text-[#1E3A4A]">
+                      {getInitials(member.professional_name, member.professional_email || member.invite_email)}
+                    </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <p className="font-medium">
+                        <p className="text-sm font-semibold text-slate-900">
                           {member.professional_name || member.invite_email || "Pending Invite"}
                         </p>
                         {member.status === "invited" && (
-                          <Badge variant="outline" className="text-xs">
-                            <Clock className="h-3 w-3 mr-1" />
-                            Pending
+                          <Badge variant="outline" className="text-[10px] border-blue-200 text-blue-600 gap-1">
+                            <Clock className="h-2.5 w-2.5" /> Pending
                           </Badge>
                         )}
                       </div>
-                      <p className="text-sm text-gray-500">
-                        {member.professional_email || member.invite_email}
-                      </p>
+                      <p className="text-xs text-slate-500">{member.professional_email || member.invite_email}</p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3">
-                    <Badge className={ROLE_COLORS[member.role] || "bg-gray-100"}>
+                  <div className="flex items-center gap-2">
+                    <Badge className={`text-[10px] ${ROLE_COLORS[member.role] || "bg-slate-100"}`}>
                       {FIRM_ROLES.find((r) => r.value === member.role)?.label || member.role}
                     </Badge>
-                    <Badge className={STATUS_COLORS[member.status] || "bg-gray-100"}>
+                    <Badge className={`text-[10px] ${STATUS_COLORS[member.status] || "bg-slate-100"}`}>
                       {member.status}
                     </Badge>
 
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        {member.role !== "owner" && (
-                          <>
-                            <DropdownMenuItem disabled>
-                              <Shield className="h-4 w-4 mr-2" />
-                              Change Role
+                    {/* Only show menu for non-owners */}
+                    {hasActions(member) ? (
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg">
+                            <MoreVertical className="h-4 w-4 text-slate-400" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="rounded-xl">
+                          <DropdownMenuItem disabled className="text-xs text-slate-400">
+                            <Shield className="h-3.5 w-3.5 mr-2" /> Change Role
+                          </DropdownMenuItem>
+                          {FIRM_ROLES.filter((r) => r.value !== "owner" && r.value !== member.role).map((role) => (
+                            <DropdownMenuItem key={role.value} onClick={() => handleUpdateRole(member.id, role.value)} className="pl-8 text-xs">
+                              {role.label}
                             </DropdownMenuItem>
-                            {FIRM_ROLES.filter((r) => r.value !== "owner" && r.value !== member.role).map(
-                              (role) => (
-                                <DropdownMenuItem
-                                  key={role.value}
-                                  onClick={() => handleUpdateRole(member.id, role.value)}
-                                  className="pl-8"
-                                >
-                                  {role.label}
-                                </DropdownMenuItem>
-                              )
-                            )}
-                            <DropdownMenuSeparator />
-                          </>
-                        )}
-                        {member.status === "invited" && (
-                          <DropdownMenuItem onClick={() => handleResendInvite(member.id)}>
-                            <RefreshCw className="h-4 w-4 mr-2" />
-                            Resend Invitation
+                          ))}
+                          <DropdownMenuSeparator />
+                          {member.status === "invited" && (
+                            <DropdownMenuItem onClick={() => handleResendInvite(member.id)} className="text-xs">
+                              <RefreshCw className="h-3.5 w-3.5 mr-2" /> Resend Invitation
+                            </DropdownMenuItem>
+                          )}
+                          <DropdownMenuItem onClick={() => handleRemoveMember(member.id)} className="text-red-600 text-xs">
+                            <Trash2 className="h-3.5 w-3.5 mr-2" /> Remove Member
                           </DropdownMenuItem>
-                        )}
-                        {member.role !== "owner" && (
-                          <DropdownMenuItem
-                            onClick={() => handleRemoveMember(member.id)}
-                            className="text-red-600"
-                          >
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Remove Member
-                          </DropdownMenuItem>
-                        )}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    ) : (
+                      <div className="w-8" /> /* Spacer for owner alignment */
+                    )}
                   </div>
                 </div>
               ))}
@@ -472,16 +313,16 @@ export default function TeamManagementPage() {
       )}
 
       {/* Role Legend */}
-      <Card className="mt-6">
-        <CardHeader>
-          <CardTitle className="text-sm font-medium text-gray-700">Role Permissions</CardTitle>
+      <Card className="rounded-2xl border border-slate-200">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-sm font-medium text-slate-700">Role Permissions</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {FIRM_ROLES.map((role) => (
-              <div key={role.value} className="flex items-start gap-3">
-                <Badge className={ROLE_COLORS[role.value]}>{role.label}</Badge>
-                <p className="text-sm text-gray-600">{role.description}</p>
+              <div key={role.value} className="flex items-center gap-2.5">
+                <Badge className={`text-[10px] ${ROLE_COLORS[role.value]}`}>{role.label}</Badge>
+                <p className="text-xs text-slate-500">{role.description}</p>
               </div>
             ))}
           </div>

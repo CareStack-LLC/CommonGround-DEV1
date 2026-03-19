@@ -270,8 +270,8 @@ export default function CaseQueuePage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
                 <Card>
                     <CardContent className="pt-4 flex items-center gap-3">
-                        <div className="p-2 bg-indigo-100 rounded-lg">
-                            <Inbox className="h-5 w-5 text-indigo-600" />
+                        <div className="p-2 bg-[#F4F8F7] rounded-lg">
+                            <Inbox className="h-5 w-5 text-[#3DAA8A]" />
                         </div>
                         <div>
                             <p className="text-xs text-muted-foreground">In Queue</p>
@@ -460,7 +460,7 @@ export default function CaseQueuePage() {
                                                     size="sm"
                                                     onClick={() => handleAssign(item.id)}
                                                     disabled={!selectedMember[item.id] || assigning === item.id}
-                                                    className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                                                    className="bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white"
                                                 >
                                                     {assigning === item.id ? (
                                                         <Loader2 className="h-4 w-4 animate-spin" />

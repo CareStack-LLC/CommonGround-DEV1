@@ -72,7 +72,7 @@ const TEMPLATE_TYPES = [
 ];
 
 const TYPE_COLORS: Record<string, string> = {
-  intake: "bg-purple-100 text-purple-800",
+  intake: "bg-[#3DAA8A]/10 text-[#1E3A4A]",
   agreement: "bg-blue-100 text-blue-800",
   schedule: "bg-green-100 text-green-800",
   financial: "bg-amber-100 text-amber-800",
@@ -445,13 +445,13 @@ export default function FirmTemplatesPage() {
       </div>
 
       {/* Info Banner */}
-      <Card className="mb-6 bg-purple-50 border-purple-200">
+      <Card className="mb-6 bg-[#F4F8F7] border-[#3DAA8A]/10">
         <CardContent className="p-4">
           <div className="flex items-start gap-3">
-            <Sparkles className="h-5 w-5 text-purple-600 mt-0.5" />
+            <Sparkles className="h-5 w-5 text-[#3DAA8A] mt-0.5" />
             <div>
-              <h4 className="font-medium text-purple-900">Template System</h4>
-              <p className="text-sm text-purple-700 mt-1">
+              <h4 className="font-medium text-[#1E3A4A]">Template System</h4>
+              <p className="text-sm text-slate-600 mt-1">
                 Templates customize how ARIA handles intakes and help standardize your firm's
                 documentation. Intake templates define the questions ARIA asks, while agreement
                 templates provide default language for custody agreements.
@@ -569,7 +569,7 @@ export default function FirmTemplatesPage() {
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link href={`/professional/firm/templates/${template.id}/edit`} className="flex items-center cursor-pointer">
-                            <Sparkles className="h-4 w-4 mr-2 text-purple-500" />
+                            <Sparkles className="h-4 w-4 mr-2 text-[#3DAA8A]" />
                             Open Builder
                           </Link>
                         </DropdownMenuItem>
