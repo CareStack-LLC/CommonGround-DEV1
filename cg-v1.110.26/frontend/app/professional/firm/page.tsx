@@ -32,7 +32,6 @@ import {
   BarChart3,
   Inbox,
   Clock,
-  Scale,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -189,159 +188,53 @@ export default function FirmSettingsPage() {
 
   return (
     <div className="space-y-6">
-      <link
-        href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Outfit:wght@400;500;600;700&display=swap"
-        rel="stylesheet"
-      />
-
       {/* Header */}
-      <div className="relative overflow-hidden rounded-sm bg-gradient-to-br from-[#1E3A4A] via-[#2D6A8F] to-[#3DAA8A] px-8 py-8 shadow-2xl border-2 border-[#1E3A4A]/40">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#2D6A8F] via-[#D4AF37] to-[#2D6A8F]" />
-        <div className="flex items-center justify-between">
-          <div className="flex items-start gap-5">
-            <div className="p-4 bg-[#F4F8F7] border-2 border-[#1E3A4A]/20 rounded-sm shadow-xl shrink-0">
-              <Building2 className="h-8 w-8 text-[#1E3A4A]" strokeWidth={1.5} />
-            </div>
-            <div>
-              <h1 className="serif text-3xl lg:text-4xl font-bold text-white leading-tight tracking-tight">
-                Firm Settings
-              </h1>
-              <p className="sans text-sm text-[#E8F4F0] mt-2">
-                Manage your firm profile and preferences
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Badge className="bg-[#F4F8F7] text-[#1E3A4A] border-2 border-[#1E3A4A]/30 sans font-semibold">
-              {firm?.subscription_tier === "professional" ? "Professional" : firm?.subscription_tier}
-            </Badge>
-            <Badge
-              className={firm?.subscription_status === "active" ? "bg-emerald-50 text-emerald-900 border-2 border-emerald-900/30 sans font-semibold" : "bg-slate-50 text-slate-900 border-2 border-slate-900/30 sans"}
-            >
-              {firm?.subscription_status || "trial"}
-            </Badge>
-          </div>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Firm Settings</h1>
+          <p className="text-sm text-slate-500 mt-1">Manage your firm profile and preferences</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Badge className="bg-[#3DAA8A]/10 text-[#1E3A4A] border-0 text-xs font-medium">
+            {firm?.subscription_tier === "professional" ? "Professional" : firm?.subscription_tier}
+          </Badge>
+          <Badge className={`text-xs ${firm?.subscription_status === "active" ? "bg-green-50 text-green-700 border-0" : "bg-slate-100 text-slate-600 border-0"}`}>
+            {firm?.subscription_status || "trial"}
+          </Badge>
         </div>
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Link href="/professional/firm/team">
-          <Card className="border-2 border-[#1E3A4A]/30 hover:shadow-lg transition cursor-pointer bg-gradient-to-br from-white via-[#F4F8F7]/20 to-white">
-            <CardContent className="p-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-50 border-2 border-blue-900/20 rounded-sm">
-                  <Users className="h-5 w-5 text-blue-900" strokeWidth={2} />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {[
+          { href: "/professional/firm/team", icon: Users, label: "Team Members", desc: `${firm?.member_count || 0} members`, color: "text-blue-600 bg-blue-50" },
+          { href: "/professional/firm/templates", icon: FileText, label: "Templates", desc: "Intake & agreement templates", color: "text-purple-600 bg-purple-50" },
+          { href: "/professional/firm/analytics", icon: BarChart3, label: "Analytics", desc: "Firm performance & trends", color: "text-[#3DAA8A] bg-[#F4F8F7]" },
+          { href: "/professional/firm/queue", icon: Inbox, label: "Case Queue", desc: "Assign incoming cases", color: "text-[#1E3A4A] bg-slate-100" },
+        ].map((item) => (
+          <Link key={item.href} href={item.href}>
+            <Card className="border border-slate-200 hover:border-[#3DAA8A]/30 hover:shadow-sm transition-all cursor-pointer rounded-xl">
+              <CardContent className="p-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className={`p-2 rounded-lg ${item.color}`}>
+                    <item.icon className="h-4 w-4" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900">{item.label}</p>
+                    <p className="text-xs text-slate-500">{item.desc}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="serif font-bold text-slate-900">Team Members</p>
-                  <p className="sans text-sm text-slate-600">{firm?.member_count || 0} members</p>
-                </div>
-              </div>
-              <ArrowRight className="h-5 w-5 text-[#1E3A4A]/40" />
-            </CardContent>
-          </Card>
-        </Link>
-        <Link href="/professional/firm/templates">
-          <Card className="border-2 border-[#1E3A4A]/30 hover:shadow-lg transition cursor-pointer bg-gradient-to-br from-white via-[#F4F8F7]/20 to-white">
-            <CardContent className="p-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-purple-50 border-2 border-purple-900/20 rounded-sm">
-                  <FileText className="h-5 w-5 text-purple-900" strokeWidth={2} />
-                </div>
-                <div>
-                  <p className="serif font-bold text-slate-900">Templates</p>
-                  <p className="sans text-sm text-slate-600">Intake & agreement templates</p>
-                </div>
-              </div>
-              <ArrowRight className="h-5 w-5 text-[#1E3A4A]/40" />
-            </CardContent>
-          </Card>
-        </Link>
-        <Link href="/professional/firm/analytics">
-          <Card className="border-2 border-[#1E3A4A]/30 hover:shadow-lg transition cursor-pointer bg-gradient-to-br from-white via-[#F4F8F7]/20 to-white">
-            <CardContent className="p-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-emerald-50 border-2 border-emerald-900/20 rounded-sm">
-                  <BarChart3 className="h-5 w-5 text-emerald-900" strokeWidth={2} />
-                </div>
-                <div>
-                  <p className="serif font-bold text-slate-900">Analytics</p>
-                  <p className="sans text-sm text-slate-600">Firm performance & trends</p>
-                </div>
-              </div>
-              <ArrowRight className="h-5 w-5 text-[#1E3A4A]/40" />
-            </CardContent>
-          </Card>
-        </Link>
-        <Link href="/professional/firm/queue">
-          <Card className="border-2 border-[#1E3A4A]/30 hover:shadow-lg transition cursor-pointer bg-gradient-to-br from-white via-[#F4F8F7]/20 to-white">
-            <CardContent className="p-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-[#F4F8F7] border-2 border-[#1E3A4A]/20 rounded-sm">
-                  <Inbox className="h-5 w-5 text-[#1E3A4A]" strokeWidth={2} />
-                </div>
-                <div>
-                  <p className="serif font-bold text-slate-900">Case Queue</p>
-                  <p className="sans text-sm text-slate-600">Assign incoming cases</p>
-                </div>
-              </div>
-              <ArrowRight className="h-5 w-5 text-[#1E3A4A]/40" />
-            </CardContent>
-          </Card>
-        </Link>
-      </div>
-
-      {/* Integrations (Coming Soon) */}
-      <div className="mb-6">
-        <h2 className="sans text-sm font-bold text-[#1E3A4A]/60 uppercase tracking-widest flex items-center gap-2 mb-4">
-          <div className="h-1 w-8 bg-[#1E3A4A] rounded-full" />
-          External Integrations
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card className="bg-gradient-to-br from-[#F4F8F7]/30 to-white border-dashed border-2 border-[#1E3A4A]/20 opacity-80 overflow-hidden relative group">
-            <div className="absolute top-2 right-2 flex gap-1">
-              <Badge className="bg-[#F4F8F7] text-[#1E3A4A] border-2 border-[#1E3A4A]/30 sans text-[10px]">COMING SOON</Badge>
-            </div>
-            <CardContent className="p-4 flex items-center gap-4">
-              <div className="h-10 w-10 rounded-sm bg-white border-2 border-[#1E3A4A]/20 flex items-center justify-center p-2">
-                <img src="/integrations/mycase.svg" alt="MyCase" className="w-full h-full grayscale opacity-50" onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                  e.currentTarget.parentElement!.innerHTML = '<span className="serif font-bold text-slate-300">MC</span>';
-                }} />
-              </div>
-              <div>
-                <p className="serif font-semibold text-slate-400">MyCase</p>
-                <p className="sans text-xs text-slate-400">Sync cases, calendar, and contacts</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-[#F4F8F7]/30 to-white border-dashed border-2 border-[#1E3A4A]/20 opacity-80 overflow-hidden relative group">
-            <div className="absolute top-2 right-2 flex gap-1">
-              <Badge className="bg-[#F4F8F7] text-[#1E3A4A] border-2 border-[#1E3A4A]/30 sans text-[10px]">COMING SOON</Badge>
-            </div>
-            <CardContent className="p-4 flex items-center gap-4">
-              <div className="h-10 w-10 rounded-sm bg-white border-2 border-[#1E3A4A]/20 flex items-center justify-center p-2">
-                <img src="/integrations/silo.svg" alt="Silo" className="w-full h-full grayscale opacity-50" onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                  e.currentTarget.parentElement!.innerHTML = '<span className="serif font-bold text-slate-300">S</span>';
-                }} />
-              </div>
-              <div>
-                <p className="serif font-semibold text-slate-400">Silo</p>
-                <p className="sans text-xs text-slate-400">Export financial ledgers and compliance reports</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+                <ArrowRight className="h-4 w-4 text-slate-300" />
+              </CardContent>
+            </Card>
+          </Link>
+        ))}
       </div>
 
       {/* Basic Info */}
-      <Card className="mb-6 border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white shadow-lg relative">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A4A] via-[#3DAA8A] to-[#1E3A4A]"></div>
-        <CardHeader className="border-b-2 border-[#1E3A4A]/10">
-          <CardTitle className="serif text-slate-900">Basic Information</CardTitle>
+      <Card className="mb-6 border border-slate-200 rounded-2xl">
+        <CardHeader className="border-b border-slate-100">
+          <CardTitle className="text-slate-900">Basic Information</CardTitle>
           <CardDescription className="sans">Your firm's public profile information</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -419,10 +312,9 @@ export default function FirmSettingsPage() {
       </Card>
 
       {/* Address */}
-      <Card className="mb-6 border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white shadow-lg relative">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A4A] via-[#3DAA8A] to-[#1E3A4A]"></div>
-        <CardHeader className="border-b-2 border-[#1E3A4A]/10">
-          <CardTitle className="serif text-slate-900">
+      <Card className="mb-6 border border-slate-200 rounded-2xl">
+        <CardHeader className="border-b border-slate-100">
+          <CardTitle className="text-slate-900">
             <MapPin className="h-5 w-5 inline mr-2 text-[#1E3A4A]" />
             Address
           </CardTitle>
@@ -480,10 +372,9 @@ export default function FirmSettingsPage() {
       </Card>
 
       {/* Branding & Visibility */}
-      <Card className="mb-6 border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white shadow-lg relative">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A4A] via-[#3DAA8A] to-[#1E3A4A]"></div>
-        <CardHeader className="border-b-2 border-[#1E3A4A]/10">
-          <CardTitle className="serif text-slate-900">
+      <Card className="mb-6 border border-slate-200 rounded-2xl">
+        <CardHeader className="border-b border-slate-100">
+          <CardTitle className="text-slate-900">
             <Palette className="h-5 w-5 inline mr-2 text-[#1E3A4A]" />
             Branding & Visibility
           </CardTitle>
@@ -525,10 +416,9 @@ export default function FirmSettingsPage() {
       </Card>
 
       {/* Activity Log */}
-      <Card className="mb-6 border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white shadow-lg relative">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A4A] via-[#3DAA8A] to-[#1E3A4A]"></div>
-        <CardHeader className="border-b-2 border-[#1E3A4A]/10">
-          <CardTitle className="serif text-slate-900">
+      <Card className="mb-6 border border-slate-200 rounded-2xl">
+        <CardHeader className="border-b border-slate-100">
+          <CardTitle className="text-slate-900">
             <Clock className="h-5 w-5 inline mr-2 text-[#1E3A4A]" />
             Recent Activity
           </CardTitle>
@@ -541,20 +431,11 @@ export default function FirmSettingsPage() {
 
       {/* Save Button */}
       <div className="flex justify-end">
-        <Button onClick={handleSave} disabled={isSaving} className="bg-[#1E3A4A] hover:bg-[#2D6A8F] text-white shadow-lg border-2 border-[#1E3A4A]/40 sans font-semibold">
+        <Button onClick={handleSave} disabled={isSaving} className="bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm font-semibold">
           <Save className="h-4 w-4 mr-2" />
           {isSaving ? "Saving..." : "Save Changes"}
         </Button>
       </div>
-
-      <style>{`
-        .serif {
-          font-family: "Crimson Pro", serif;
-        }
-        .sans {
-          font-family: "Outfit", sans-serif;
-        }
-      `}</style>
     </div>
   );
 }
