@@ -10,14 +10,14 @@ import { useAuth } from '@/lib/auth-context';
  * hero content show immediately for unauthenticated visitors.
  */
 export default function AuthRedirectGuard() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, profile } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      router.replace('/dashboard');
+      router.replace(profile?.is_professional ? '/professional/dashboard' : '/dashboard');
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [isAuthenticated, isLoading, profile, router]);
 
   return null;
 }

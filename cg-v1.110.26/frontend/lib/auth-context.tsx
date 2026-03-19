@@ -10,7 +10,7 @@ interface AuthContextType {
   timezone: string;
   isLoading: boolean;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<{ profile: UserProfile | null }>;
   register: (data: {
     email: string;
     password: string;
@@ -72,12 +72,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(response.user);
 
     // Load profile after login
+    let profileData: UserProfile | null = null;
     try {
-      const profileData = await usersAPI.getProfile();
+      profileData = await usersAPI.getProfile();
       setProfile(profileData);
     } catch (profileError) {
       console.error('Failed to load profile after login:', profileError);
     }
+
+    return { profile: profileData };
   };
 
   const register = async (data: {

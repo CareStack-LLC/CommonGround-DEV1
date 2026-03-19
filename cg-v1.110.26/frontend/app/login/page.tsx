@@ -35,8 +35,10 @@ function LoginContent() {
     setIsLoading(true);
 
     try {
-      await login(email, password);
-      const redirectTo = searchParams.get('redirect') || '/dashboard';
+      const { profile } = await login(email, password);
+      const explicitRedirect = searchParams.get('redirect');
+      // If no explicit redirect, route professionals to their portal
+      const redirectTo = explicitRedirect || (profile?.is_professional ? '/professional/dashboard' : '/dashboard');
       router.push(redirectTo);
     } catch (err) {
       if (err instanceof APIError) {

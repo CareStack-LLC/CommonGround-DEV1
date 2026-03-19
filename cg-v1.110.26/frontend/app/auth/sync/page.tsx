@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { authAPI } from '@/lib/api';
+import { authAPI, usersAPI } from '@/lib/api';
 import { Loader2 } from 'lucide-react';
 
 /**
@@ -71,11 +71,24 @@ function AuthSyncContent() {
                     localStorage.setItem('user', JSON.stringify(response.user));
                 }
 
+                // Determine redirect: professionals go to professional dashboard
+                let destination = next;
+                if (next === '/dashboard') {
+                    try {
+                        const profileData = await usersAPI.getProfile();
+                        if (profileData?.is_professional) {
+                            destination = '/professional/dashboard';
+                        }
+                    } catch {
+                        // Profile fetch failed — use default redirect
+                    }
+                }
+
                 setStatus('Success! Redirecting...');
                 await new Promise(resolve => setTimeout(resolve, 400));
                 // Full page navigation so AuthProvider re-initializes
                 // and picks up the newly-stored tokens from localStorage.
-                window.location.href = next;
+                window.location.href = destination;
 
             } catch (err) {
                 console.error('[auth/sync] error:', err);

@@ -69,8 +69,9 @@ async def run_rolling_generator():
             exchanges_created = await _roll_exchange_instances(db)
             obligations_created = await _roll_obligation_instances(db)
             reports_sent = await _send_anniversary_monthly_reports(db)
+            expired_requests = await _expire_stale_access_requests(db)
             await db.commit()
-            logger.info(f"Done: {exchanges_created} exchanges, {obligations_created} obligations, {reports_sent} monthly reports emailed")
+            logger.info(f"Done: {exchanges_created} exchanges, {obligations_created} obligations, {reports_sent} monthly reports emailed, {expired_requests} access requests expired")
         except Exception as e:
             await db.rollback()
             logger.error(f"Rolling generator failed: {e}", exc_info=True)
@@ -327,6 +328,29 @@ async def _send_anniversary_monthly_reports(db: AsyncSession) -> int:
                 continue
 
     return sent
+
+
+async def _expire_stale_access_requests(db: AsyncSession) -> int:
+    """Transition PENDING access requests past their expires_at to EXPIRED."""
+    from app.models.professional import ProfessionalAccessRequest, AccessRequestStatus
+    from sqlalchemy import update
+
+    now = datetime.utcnow()
+
+    result = await db.execute(
+        update(ProfessionalAccessRequest)
+        .where(
+            ProfessionalAccessRequest.status == AccessRequestStatus.PENDING.value,
+            ProfessionalAccessRequest.expires_at < now,
+        )
+        .values(status=AccessRequestStatus.EXPIRED.value)
+    )
+
+    expired_count = result.rowcount
+    if expired_count:
+        logger.info(f"Expired {expired_count} stale professional access requests")
+
+    return expired_count
 
 
 if __name__ == "__main__":

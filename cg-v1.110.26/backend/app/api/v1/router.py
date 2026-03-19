@@ -2,7 +2,8 @@
 Main API router - combines all endpoint routers.
 """
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from app.core.security import require_parent_user
 
 from app.api.v1.endpoints import (
     admin,
@@ -66,10 +67,10 @@ api_router.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 api_router.include_router(users.router, prefix="/users", tags=["Users"])
 api_router.include_router(cases.router, prefix="/cases", tags=["Cases"])
 api_router.include_router(family_files.router, prefix="/family-files", tags=["Family Files"])
-api_router.include_router(quick_accords.router, prefix="/quick-accords", tags=["QuickAccords"])
-api_router.include_router(agreements.router, prefix="/agreements", tags=["Agreements"])
-api_router.include_router(messages.router, prefix="/messages", tags=["Messages"])
-api_router.include_router(schedule.router, prefix="/schedule", tags=["Schedule"])
+api_router.include_router(quick_accords.router, prefix="/quick-accords", tags=["QuickAccords"], dependencies=[Depends(require_parent_user)])
+api_router.include_router(agreements.router, prefix="/agreements", tags=["Agreements"], dependencies=[Depends(require_parent_user)])
+api_router.include_router(messages.router, prefix="/messages", tags=["Messages"], dependencies=[Depends(require_parent_user)])
+api_router.include_router(schedule.router, prefix="/schedule", tags=["Schedule"], dependencies=[Depends(require_parent_user)])
 api_router.include_router(websocket.router, tags=["WebSocket"])
 
 # Schedule V2.0 endpoints
@@ -77,7 +78,7 @@ api_router.include_router(collections.router, prefix="/collections", tags=["My T
 api_router.include_router(time_blocks.router, prefix="/time-blocks", tags=["Time Blocks"])
 api_router.include_router(events.router, prefix="/events", tags=["Events"])
 api_router.include_router(calendar.router, prefix="/calendar", tags=["Calendar"])
-api_router.include_router(exchanges.router, prefix="/exchanges", tags=["Custody Exchanges"])
+api_router.include_router(exchanges.router, prefix="/exchanges", tags=["Custody Exchanges"], dependencies=[Depends(require_parent_user)])
 
 # Court Access Mode (MediatorMode)
 api_router.include_router(court.router, prefix="/court", tags=["Court Access Mode"])
@@ -89,10 +90,10 @@ api_router.include_router(court_forms.router, prefix="/court/forms", tags=["Cour
 api_router.include_router(cubbie.router, prefix="/cubbie", tags=["KidsCubbie"])
 
 # Child Profiles - Dual-parent approval workflow
-api_router.include_router(children.router, prefix="/children", tags=["Child Profiles"])
+api_router.include_router(children.router, prefix="/children", tags=["Child Profiles"], dependencies=[Depends(require_parent_user)])
 
 # ClearFund - Purpose-Locked Financial Obligations
-api_router.include_router(clearfund.router, prefix="/clearfund", tags=["ClearFund"])
+api_router.include_router(clearfund.router, prefix="/clearfund", tags=["ClearFund"], dependencies=[Depends(require_parent_user)])
 
 # Wallet System - Parent/Child Wallets with Stripe Connect
 api_router.include_router(wallet.router, prefix="/wallets", tags=["Wallets"])

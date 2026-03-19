@@ -475,3 +475,55 @@ async def get_current_participant_user(
             detail=f"Invalid token type for participant: {token_type}",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+
+async def require_parent_user(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> User:
+    """
+    Ensure the current user is a parent, NOT a professional-only account.
+
+    Professionals must use /professional/* endpoints to interact with
+    case data. This dependency blocks professionals from calling parent-
+    facing write endpoints (messages, agreements, schedules, etc.)
+    that they shouldn't directly modify.
+
+    A user who is BOTH a parent (has family files) AND a professional
+    is allowed through — the guard only blocks professional-only accounts
+    accessing parent endpoints they have no ownership of.
+    """
+    from app.models.professional import ProfessionalProfile
+    from app.models.family_file import FamilyFile
+
+    # Check if user has a professional profile
+    prof_result = await db.execute(
+        select(ProfessionalProfile).where(
+            ProfessionalProfile.user_id == str(current_user.id),
+            ProfessionalProfile.is_active == True,
+        )
+    )
+    has_professional_profile = prof_result.scalar_one_or_none() is not None
+
+    if not has_professional_profile:
+        # Regular parent user — allow
+        return current_user
+
+    # User IS a professional. Check if they also own family files as a parent.
+    ff_result = await db.execute(
+        select(FamilyFile.id).where(
+            (FamilyFile.parent_a_id == str(current_user.id)) |
+            (FamilyFile.parent_b_id == str(current_user.id))
+        ).limit(1)
+    )
+    is_also_parent = ff_result.scalar_one_or_none() is not None
+
+    if is_also_parent:
+        # Dual-role user (parent + professional) — allow parent endpoints
+        return current_user
+
+    # Professional-only account trying to use parent endpoints
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="Professional accounts must use the professional portal to access case data.",
+    )
