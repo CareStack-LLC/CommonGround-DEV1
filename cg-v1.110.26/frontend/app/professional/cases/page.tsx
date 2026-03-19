@@ -301,20 +301,20 @@ export default function CasesListPage() {
           )}
 
           {/* Filter Bar */}
-          <Card className="border-2 border-slate-300 bg-white shadow-lg">
-            <CardContent className="py-5">
-              <div className="flex flex-col sm:flex-row gap-3">
+          <Card className="border border-slate-200 bg-white shadow-sm rounded-2xl">
+            <CardContent className="py-4 flex items-center">
+              <div className="flex flex-col sm:flex-row gap-3 w-full">
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" strokeWidth={2} />
                   <Input
                     placeholder="Search by file number, name, or firm..."
                     value={searchQuery}
                     onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }}
-                    className="pl-10 sans border-2 border-slate-300 focus:border-[#1E3A4A]"
+                    className="pl-10 border-slate-200 focus:border-[#3DAA8A] focus:ring-[#3DAA8A]/20"
                   />
                 </div>
                 <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPage(1); }}>
-                  <SelectTrigger className="w-full sm:w-40 sans border-2 border-slate-300 font-medium">
+                  <SelectTrigger className="w-full sm:w-40 border-slate-200 font-medium">
                     <Filter className="h-4 w-4 mr-2 text-slate-500" strokeWidth={2} />
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
@@ -327,7 +327,7 @@ export default function CasesListPage() {
                   </SelectContent>
                 </Select>
                 <Select value={urgencyFilter} onValueChange={(v) => { setUrgencyFilter(v); setPage(1); }}>
-                  <SelectTrigger className="w-full sm:w-40 sans border-2 border-slate-300 font-medium">
+                  <SelectTrigger className="w-full sm:w-40 border-slate-200 font-medium">
                     <Zap className="h-4 w-4 mr-2 text-slate-500" strokeWidth={2} />
                     <SelectValue placeholder="Urgency" />
                   </SelectTrigger>
@@ -340,7 +340,7 @@ export default function CasesListPage() {
                   </SelectContent>
                 </Select>
                 <Select value={roleFilter} onValueChange={(v) => { setRoleFilter(v); setPage(1); }}>
-                  <SelectTrigger className="w-full sm:w-48 sans border-2 border-slate-300 font-medium">
+                  <SelectTrigger className="w-full sm:w-48 border-slate-200 font-medium">
                     <Users className="h-4 w-4 mr-2 text-slate-500" strokeWidth={2} />
                     <SelectValue placeholder="My Role" />
                   </SelectTrigger>
@@ -355,7 +355,7 @@ export default function CasesListPage() {
                 </Select>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm" className="gap-2 sans border-2 border-slate-300 font-medium h-11">
+                    <Button variant="outline" size="sm" className="gap-2 border-slate-200 font-medium h-11">
                       <ArrowUpDown className="h-4 w-4 text-slate-500" strokeWidth={2} />
                       Sort
                     </Button>
@@ -453,13 +453,13 @@ export default function CasesListPage() {
               ))}
             </div>
           ) : (
-            <Card className="border-2 border-dashed border-slate-300 bg-slate-50/50">
-              <CardContent className="py-20 text-center">
-                <div className="p-5 bg-gradient-to-br from-[#E8F4F0] to-[#d4ede5] rounded-sm w-fit mx-auto mb-6 border-2 border-[#1E3A4A]/20">
-                  <Briefcase className="h-12 w-12 text-[#1E3A4A]" strokeWidth={1.5} />
+            <Card className="border border-dashed border-slate-200 bg-white rounded-2xl">
+              <CardContent className="py-24 flex flex-col items-center justify-center text-center">
+                <div className="p-4 bg-[#F4F8F7] rounded-2xl w-fit mb-5">
+                  <Briefcase className="h-10 w-10 text-[#3DAA8A]" strokeWidth={1.5} />
                 </div>
-                <h3 className="serif text-xl font-bold text-slate-900 mb-2">No cases found</h3>
-                <p className="sans text-slate-600 max-w-sm mx-auto">
+                <h3 className="text-lg font-semibold text-slate-900 mb-1.5">No cases found</h3>
+                <p className="text-sm text-slate-500 max-w-sm">
                   {searchQuery || urgencyFilter !== "all" || roleFilter !== "all"
                     ? "Try adjusting your filters to see more results"
                     : "You don't have any assigned cases yet"}
