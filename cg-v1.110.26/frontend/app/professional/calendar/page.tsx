@@ -16,6 +16,9 @@ import {
   Users,
   MoreHorizontal,
   AlertTriangle,
+  Eye,
+  RefreshCw,
+  Bell,
 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -670,116 +673,170 @@ export default function ProfessionalCalendarPage() {
 
       {/* Event Detail Dialog */}
       <Dialog open={!!selectedEvent} onOpenChange={() => setSelectedEvent(null)}>
-        <DialogContent className="max-w-md">
-          {selectedEvent && (
-            <>
-              <DialogHeader>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <DialogTitle className="text-lg">{selectedEvent.title}</DialogTitle>
-                    <DialogDescription>
-                      {EVENT_TYPE_CONFIG[selectedEvent.event_type]?.label || "Event"}
-                    </DialogDescription>
+        <DialogContent className="max-w-lg border border-slate-200 rounded-2xl p-0 overflow-hidden">
+          {selectedEvent && (() => {
+            const config = EVENT_TYPE_CONFIG[selectedEvent.event_type] || EVENT_TYPE_CONFIG.other;
+            return (
+              <>
+                {/* Color bar + header */}
+                <div className="px-6 pt-5 pb-4" style={{ borderTop: `4px solid ${selectedEvent.color || config.color}` }}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-start gap-3 min-w-0">
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: `${selectedEvent.color || config.color}15` }}>
+                        <div style={{ color: selectedEvent.color || config.color }}>{config.icon}</div>
+                      </div>
+                      <div className="min-w-0">
+                        <DialogHeader className="p-0 space-y-0">
+                          <DialogTitle className="text-lg font-semibold text-slate-900 leading-tight">
+                            {selectedEvent.title}
+                          </DialogTitle>
+                        </DialogHeader>
+                        <span className="text-xs font-medium px-2 py-0.5 rounded-full mt-1.5 inline-block" style={{ backgroundColor: `${selectedEvent.color || config.color}15`, color: selectedEvent.color || config.color }}>
+                          {config.label}
+                        </span>
+                      </div>
+                    </div>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="rounded-lg h-8 w-8 shrink-0">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => { setEditingEvent(selectedEvent); setSelectedEvent(null); }}>Edit Event</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleCancelEvent(selectedEvent.id)}>Cancel Event</DropdownMenuItem>
+                        <DropdownMenuItem className="text-destructive" onClick={() => handleDeleteEvent(selectedEvent.id)}>Delete</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => { setEditingEvent(selectedEvent); setSelectedEvent(null); }}>Edit</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleCancelEvent(selectedEvent.id)}>
-                        Cancel Event
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="text-destructive"
-                        onClick={() => handleDeleteEvent(selectedEvent.id)}
-                      >
-                        Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </DialogHeader>
-
-              <div className="space-y-4 py-4">
-                {selectedEvent.is_cancelled && (
-                  <div className="flex items-center gap-2 text-red-600 bg-red-50 p-2 rounded">
-                    <AlertTriangle className="h-4 w-4" />
-                    <span>This event has been cancelled</span>
-                  </div>
-                )}
-
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Clock className="h-4 w-4" />
-                  <span>
-                    {selectedEvent.all_day
-                      ? "All day"
-                      : `${formatTime(selectedEvent.start_time)} - ${formatTime(selectedEvent.end_time)}`}
-                  </span>
                 </div>
 
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <CalendarIcon className="h-4 w-4" />
-                  <span>{formatDate(selectedEvent.start_time)}</span>
-                </div>
+                {/* Content */}
+                <div className="px-6 pb-6 space-y-4">
+                  {selectedEvent.is_cancelled && (
+                    <div className="flex items-center gap-2 text-red-700 bg-red-50 p-3 rounded-xl border border-red-200 text-sm font-medium">
+                      <AlertTriangle className="h-4 w-4 shrink-0" />
+                      This event has been cancelled
+                      {selectedEvent.cancellation_reason && (
+                        <span className="text-red-500 font-normal ml-1">— {selectedEvent.cancellation_reason}</span>
+                      )}
+                    </div>
+                  )}
 
-                {selectedEvent.location && (
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <MapPin className="h-4 w-4" />
-                    <span>{selectedEvent.location}</span>
+                  {/* Date & Time card */}
+                  <div className="bg-[#F4F8F7]/50 rounded-xl p-4 space-y-3 border border-slate-100">
+                    <div className="flex items-center gap-3">
+                      <CalendarIcon className="h-4 w-4 text-[#3DAA8A] shrink-0" />
+                      <div>
+                        <p className="text-sm font-medium text-slate-900">
+                          {new Date(selectedEvent.start_time).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
+                        </p>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          {selectedEvent.all_day
+                            ? "All day event"
+                            : `${formatTime(selectedEvent.start_time)} – ${formatTime(selectedEvent.end_time)}`}
+                        </p>
+                      </div>
+                    </div>
+
+                    {selectedEvent.location && (
+                      <div className="flex items-center gap-3">
+                        <MapPin className="h-4 w-4 text-[#3DAA8A] shrink-0" />
+                        <p className="text-sm text-slate-700">{selectedEvent.location}</p>
+                      </div>
+                    )}
+
+                    {selectedEvent.virtual_meeting_url && (
+                      <div className="flex items-center gap-3">
+                        <Video className="h-4 w-4 text-[#3DAA8A] shrink-0" />
+                        <a href={selectedEvent.virtual_meeting_url} target="_blank" rel="noopener noreferrer"
+                          className="text-sm text-[#3DAA8A] font-medium hover:underline">
+                          Join Video Call →
+                        </a>
+                      </div>
+                    )}
+
+                    {selectedEvent.is_recurring && (
+                      <div className="flex items-center gap-3">
+                        <RefreshCw className="h-4 w-4 text-slate-400 shrink-0" />
+                        <p className="text-xs text-slate-500">Recurring event</p>
+                      </div>
+                    )}
+
+                    {selectedEvent.reminder_minutes != null && selectedEvent.reminder_minutes > 0 && (
+                      <div className="flex items-center gap-3">
+                        <Bell className="h-4 w-4 text-slate-400 shrink-0" />
+                        <p className="text-xs text-slate-500">Reminder {selectedEvent.reminder_minutes} min before</p>
+                      </div>
+                    )}
                   </div>
-                )}
 
-                {selectedEvent.virtual_meeting_url && (
-                  <div className="flex items-center gap-2">
-                    <Video className="h-4 w-4 text-muted-foreground" />
-                    <a
-                      href={selectedEvent.virtual_meeting_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-teal-600 hover:underline"
-                    >
-                      Join Video Call
-                    </a>
-                  </div>
-                )}
-
-                {selectedEvent.family_file_title && (
-                  <div className="flex items-center gap-2">
-                    <Briefcase className="h-4 w-4 text-muted-foreground" />
-                    <Link
-                      href={`/professional/cases/${selectedEvent.family_file_id}`}
-                      className="text-teal-600 hover:underline"
-                    >
-                      {selectedEvent.family_file_title}
+                  {/* Linked Case */}
+                  {selectedEvent.family_file_title && (
+                    <Link href={`/professional/cases/${selectedEvent.family_file_id}`} className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:border-[#3DAA8A]/30 hover:bg-[#F4F8F7]/30 transition-colors group">
+                      <div className="w-8 h-8 rounded-lg bg-[#3DAA8A]/10 flex items-center justify-center shrink-0">
+                        <Briefcase className="h-4 w-4 text-[#3DAA8A]" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs text-slate-500">Linked Case</p>
+                        <p className="text-sm font-medium text-slate-900 truncate group-hover:text-[#3DAA8A] transition-colors">{selectedEvent.family_file_title}</p>
+                      </div>
+                      <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-[#3DAA8A] transition-colors" />
                     </Link>
-                  </div>
-                )}
+                  )}
 
-                {selectedEvent.description && (
-                  <div className="border-t pt-4">
-                    <h4 className="font-medium mb-2">Description</h4>
-                    <p className="text-muted-foreground text-sm">{selectedEvent.description}</p>
-                  </div>
-                )}
+                  {/* Description */}
+                  {selectedEvent.description && (
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Description</p>
+                      <p className="text-sm text-slate-700 leading-relaxed">{selectedEvent.description}</p>
+                    </div>
+                  )}
 
-                {selectedEvent.notes && (
-                  <div className="border-t pt-4">
-                    <h4 className="font-medium mb-2">Notes</h4>
-                    <p className="text-muted-foreground text-sm">{selectedEvent.notes}</p>
-                  </div>
-                )}
-              </div>
+                  {/* Notes */}
+                  {selectedEvent.notes && (
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Notes</p>
+                      <p className="text-sm text-slate-600 leading-relaxed bg-slate-50 rounded-lg p-3 border border-slate-100">{selectedEvent.notes}</p>
+                    </div>
+                  )}
 
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setSelectedEvent(null)}>
-                  Close
-                </Button>
-              </DialogFooter>
-            </>
-          )}
+                  {/* Attendees */}
+                  {selectedEvent.attendee_emails && selectedEvent.attendee_emails.length > 0 && (
+                    <div>
+                      <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Attendees</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {selectedEvent.attendee_emails.map((email, i) => (
+                          <span key={i} className="text-xs px-2.5 py-1 rounded-full bg-[#F4F8F7] text-[#1E3A4A] border border-[#3DAA8A]/15 font-medium">
+                            {email}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Footer actions */}
+                  <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+                    <div className="flex items-center gap-2">
+                      {selectedEvent.parent_visibility === "visible" && (
+                        <span className="text-[10px] font-medium text-slate-400 flex items-center gap-1">
+                          <Eye className="h-3 w-3" /> Visible to parents
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm" className="rounded-lg border-slate-200 text-sm" onClick={() => { setEditingEvent(selectedEvent); setSelectedEvent(null); }}>
+                        Edit
+                      </Button>
+                      <Button variant="outline" size="sm" className="rounded-lg border-slate-200 text-sm" onClick={() => setSelectedEvent(null)}>
+                        Close
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </>
+            );
+          })()}
         </DialogContent>
       </Dialog>
 
