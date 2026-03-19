@@ -64,6 +64,7 @@ interface Message {
   subject?: string;
   content: string;
   is_read: boolean;
+  is_archived?: boolean;
   sent_at?: string;
   created_at: string;
   updated_at?: string;
@@ -166,6 +167,46 @@ export default function MessagesPage() {
       setUnreadCount(prev => Math.max(0, prev - 1));
     } catch (error) {
       console.error("Error marking message as read:", error);
+    }
+  };
+
+  const archiveMessage = async (messageId: string) => {
+    if (!token) return;
+
+    try {
+      await fetch(
+        `${API_BASE}/api/v1/professional/messages/${messageId}/archive`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      setMessages(prev =>
+        prev.map(m => m.id === messageId ? { ...m, is_archived: true } : m)
+      );
+    } catch (error) {
+      console.error("Error archiving message:", error);
+    }
+  };
+
+  const unarchiveMessage = async (messageId: string) => {
+    if (!token) return;
+
+    try {
+      await fetch(
+        `${API_BASE}/api/v1/professional/messages/${messageId}/unarchive`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      setMessages(prev =>
+        prev.map(m => m.id === messageId ? { ...m, is_archived: false } : m)
+      );
+    } catch (error) {
+      console.error("Error unarchiving message:", error);
     }
   };
 
@@ -306,6 +347,8 @@ export default function MessagesPage() {
               key={message.id}
               message={message}
               onMarkRead={() => markAsRead(message.id)}
+              onArchive={() => archiveMessage(message.id)}
+              onUnarchive={() => unarchiveMessage(message.id)}
             />
           ))}
         </div>
@@ -398,9 +441,13 @@ function StatCard({
 function MessageCard({
   message,
   onMarkRead,
+  onArchive,
+  onUnarchive,
 }: {
   message: Message;
   onMarkRead: () => void;
+  onArchive: () => void;
+  onUnarchive: () => void;
 }) {
   const router = useRouter();
 
@@ -547,10 +594,10 @@ function MessageCard({
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={(e) => {
                   e.stopPropagation();
-                  // Archive functionality
+                  message.is_archived ? onUnarchive() : onArchive();
                 }}>
                   <Archive className="h-4 w-4 mr-2" />
-                  Archive
+                  {message.is_archived ? "Unarchive" : "Archive"}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

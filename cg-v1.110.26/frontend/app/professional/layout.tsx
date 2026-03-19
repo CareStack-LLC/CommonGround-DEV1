@@ -65,6 +65,9 @@ interface ProfessionalProfile {
   // Subscription & tier gating
   subscription_tier?: string;
   firm_id?: string;
+  // Onboarding status
+  onboarding_completed?: boolean;
+  is_onboarding_complete?: boolean;
 }
 
 interface Firm {
@@ -147,6 +150,31 @@ export default function ProfessionalPortalLayout({
         const data = await response.json();
         setProfile(data);
 
+        // Set Sentry user context for error tracking
+        if (typeof window !== 'undefined') {
+          try {
+            const Sentry = require('@sentry/nextjs');
+            Sentry.setUser({
+              id: data.user_id,
+              email: data.user_email,
+            });
+            Sentry.setTag('portal', 'professional');
+            Sentry.setTag('professional_type', data.professional_type);
+            if (data.firm_id) {
+              Sentry.setTag('firm_id', data.firm_id);
+            }
+          } catch (e) {
+            // Sentry may not be loaded
+          }
+        }
+
+        // Check if onboarding is complete — redirect if not
+        const onboardingDone = data.onboarding_completed ?? data.is_onboarding_complete ?? true;
+        if (!onboardingDone && !pathname.includes("/onboarding")) {
+          router.push("/professional/onboarding");
+          return;
+        }
+
         // Extract firms from the response
         if (data.firms && Array.isArray(data.firms)) {
           const firmList = data.firms.map((m: any) => ({
@@ -216,6 +244,19 @@ export default function ProfessionalPortalLayout({
   };
 
   const logout = () => {
+    // Clear Sentry user context
+    if (typeof window !== 'undefined') {
+      try {
+        const Sentry = require('@sentry/nextjs');
+        Sentry.setUser(null);
+        Sentry.setTag('portal', undefined);
+        Sentry.setTag('professional_type', undefined);
+        Sentry.setTag('firm_id', undefined);
+      } catch (e) {
+        // Sentry may not be loaded
+      }
+    }
+
     setToken(null);
     setProfile(null);
     setFirms([]);
@@ -407,21 +448,15 @@ function ProfessionalNavigation({
       icon: <MessageSquare className="h-4 w-4" />,
       badge: dashboardData?.unread_messages > 0 ? dashboardData.unread_messages.toString() : undefined,
     },
-  ];
-
-  // Secondary items in overflow menu
-  const moreMenuItems: { href: string; label: string; icon: React.ReactNode; badge?: string; dividerAfter?: boolean }[] = [
     {
       href: "/professional/reports",
       label: "Reports",
       icon: <FileText className="h-4 w-4" />,
     },
-    {
-      href: "/professional/integrations",
-      label: "Integrations",
-      icon: <Puzzle className="h-4 w-4" />,
-      dividerAfter: true,
-    },
+  ];
+
+  // Secondary items in overflow menu
+  const moreMenuItems: { href: string; label: string; icon: React.ReactNode; badge?: string; dividerAfter?: boolean }[] = [
     {
       href: "/professional/profile",
       label: "Profile",

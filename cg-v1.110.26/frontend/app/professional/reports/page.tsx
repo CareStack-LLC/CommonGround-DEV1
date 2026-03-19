@@ -135,10 +135,26 @@ export default function ReportsPage() {
 
   const downloadReport = async (reportId: string) => {
     if (!token) return;
-    window.open(
-      `${API_BASE}/api/v1/professional/reports/${reportId}/download`,
-      "_blank"
-    );
+    try {
+      const res = await fetch(
+        `${API_BASE}/api/v1/professional/reports/${reportId}/download`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      if (!res.ok) throw new Error("Download failed");
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `report-${reportId}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error("Failed to download report:", e);
+    }
   };
 
   return (

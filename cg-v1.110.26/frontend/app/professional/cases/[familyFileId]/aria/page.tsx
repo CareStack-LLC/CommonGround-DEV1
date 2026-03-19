@@ -197,8 +197,27 @@ export default function ARIAControlPage() {
     if (!token || !familyFileId) return;
     setIsAnalyzing(true);
     try {
-      // We call the same endpoint, it triggers fresh AI analysis on backend
-      await fetchAnalysis();
+      const res = await fetch(
+        `${API_BASE}/api/v1/professional/cases/${familyFileId}/aria/analyze`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({}),
+        }
+      );
+      if (res.ok) {
+        const data = await res.json();
+        setAnalysis(data);
+      } else {
+        console.error("Analysis request failed:", res.status);
+        // Fall back to fetching latest analysis
+        await fetchAnalysis();
+      }
+    } catch (error) {
+      console.error("Error running analysis:", error);
     } finally {
       setIsAnalyzing(false);
     }

@@ -174,6 +174,7 @@ export default function ProfessionalCalendarPage() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedEvent, setSelectedEvent] = useState<ProfessionalEvent | null>(null);
   const [showEventForm, setShowEventForm] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<ProfessionalEvent | null>(null);
   const [view, setView] = useState<"month" | "week" | "day">("month");
 
   const year = currentDate.getFullYear();
@@ -290,6 +291,29 @@ export default function ProfessionalCalendarPage() {
 
     setShowEventForm(false);
     fetchEvents();
+  };
+
+  // Update existing event
+  const handleUpdateEvent = async (data: any) => {
+    if (!token || !editingEvent) return;
+    const payload = {
+      ...data,
+      start_time: new Date(data.start_time).toISOString(),
+      end_time: new Date(data.end_time).toISOString(),
+      family_file_id: data.family_file_id || null,
+    };
+
+    try {
+      await professionalFetch(`/professional/events/${editingEvent.id}`, token, {
+        method: "PUT",
+        body: JSON.stringify(payload),
+      });
+      setEditingEvent(null);
+      setSelectedEvent(null);
+      fetchEvents();
+    } catch (error) {
+      console.error("Failed to update event:", error);
+    }
   };
 
   // Check for conflicts
@@ -591,7 +615,7 @@ export default function ProfessionalCalendarPage() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={() => { }}>Edit</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => { setEditingEvent(selectedEvent); setSelectedEvent(null); }}>Edit</DropdownMenuItem>
                       <DropdownMenuItem onClick={() => handleCancelEvent(selectedEvent.id)}>
                         Cancel Event
                       </DropdownMenuItem>
@@ -707,6 +731,39 @@ export default function ProfessionalCalendarPage() {
                 : undefined
             }
           />
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Event Dialog */}
+      <Dialog open={!!editingEvent} onOpenChange={(open) => { if (!open) setEditingEvent(null); }}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Edit Event</DialogTitle>
+            <DialogDescription>Update calendar event details</DialogDescription>
+          </DialogHeader>
+          {editingEvent && (
+            <EventForm
+              onSubmit={handleUpdateEvent}
+              onCancel={() => setEditingEvent(null)}
+              cases={cases}
+              onCheckConflicts={handleCheckConflicts}
+              initialData={{
+                title: editingEvent.title,
+                description: editingEvent.description || "",
+                event_type: editingEvent.event_type,
+                start_time: editingEvent.start_time.slice(0, 16),
+                end_time: editingEvent.end_time.slice(0, 16),
+                all_day: editingEvent.all_day,
+                location: editingEvent.location || "",
+                virtual_meeting_url: editingEvent.virtual_meeting_url || "",
+                family_file_id: editingEvent.family_file_id || "",
+                parent_visibility: editingEvent.parent_visibility,
+                reminder_minutes: editingEvent.reminder_minutes,
+                notes: editingEvent.notes || "",
+                color: editingEvent.color || "",
+              }}
+            />
+          )}
         </DialogContent>
       </Dialog>
     </div>
