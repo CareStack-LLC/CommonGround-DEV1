@@ -473,104 +473,18 @@ function SubscriptionTab({
 }) {
   if (!usage) return <p className="text-sm text-slate-500 py-8 text-center">Unable to load subscription data.</p>;
 
-  const currentTierIndex = TIER_ORDER.indexOf(usage.tier);
   const currentPlan = PLANS[usage.tier] || PLANS.starter;
   const casePercent = usage.cases.max > 0 ? Math.min(100, (usage.cases.active / usage.cases.max) * 100) : 0;
   const isNearLimit = casePercent >= 80;
 
   return (
     <div className="space-y-4">
-      {/* Current Plan */}
-      <Card className="bg-gradient-to-br from-[#F4F8F7] to-[#E0F0EC] border-0 shadow-sm rounded-2xl">
-        <CardContent className="pt-6 pb-5">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-white/80 rounded-xl shadow-sm text-[#3DAA8A]">
-                <Zap className="h-6 w-6" />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="text-xl font-bold text-slate-900">{currentPlan.name}</h2>
-                  <Badge className="bg-[#3DAA8A]/15 text-[#1E3A4A] border-0 text-xs">Current</Badge>
-                </div>
-                <p className="text-lg font-semibold text-slate-700 mt-0.5">
-                  {billingCycle === "monthly" ? currentPlan.monthlyPrice : currentPlan.annualPrice}
-                </p>
-                <div className="flex items-center gap-3 mt-1 text-xs text-slate-600">
-                  <span className="flex items-center gap-1">
-                    <span className={`w-1.5 h-1.5 rounded-full ${usage.subscription_status === "active" ? "bg-green-500" : "bg-amber-500"}`} />
-                    {usage.subscription_status === "active" ? "Active" : "Inactive"}
-                  </span>
-                  {usage.subscription_ends_at && (
-                    <span>Renews {new Date(usage.subscription_ends_at).toLocaleDateString()}</span>
-                  )}
-                </div>
-              </div>
-            </div>
-            {currentTierIndex < TIER_ORDER.length - 1 && (
-              <Button className="bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm gap-2">
-                <ArrowUpRight className="h-4 w-4" /> Upgrade
-              </Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Usage */}
-      <div className="grid sm:grid-cols-2 gap-4">
-        <Card className={`rounded-2xl border ${isNearLimit ? "border-amber-200" : "border-slate-200"}`}>
-          <CardContent className="pt-5 pb-4">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                <FolderOpen className="h-4 w-4 text-slate-400" /> Active Cases
-              </span>
-              <span className="text-sm font-semibold">{usage.cases.active} / {usage.cases.max >= 999999 ? "\u221E" : usage.cases.max}</span>
-            </div>
-            <Progress value={casePercent} className={`h-2 ${isNearLimit ? "[&>div]:bg-amber-500" : ""}`} />
-            <p className="text-xs text-slate-500 mt-2">{usage.cases.remaining >= 999999 ? "Unlimited" : `${usage.cases.remaining} remaining`}</p>
-          </CardContent>
-        </Card>
-        <Card className="rounded-2xl border border-slate-200">
-          <CardContent className="pt-5 pb-4">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-sm font-medium text-slate-700 flex items-center gap-2">
-                <Users className="h-4 w-4 text-slate-400" /> Team Members
-              </span>
-              <span className="text-sm font-semibold">{usage.team_members.max >= 999999 ? "Unlimited" : `Max ${usage.team_members.max}`}</span>
-            </div>
-            <p className="text-xs text-slate-500">
-              {usage.team_members.max === 0 ? "Upgrade to Small Firm or higher for team features." : `You can invite up to ${usage.team_members.max} members.`}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Features */}
-      <Card className="rounded-2xl border border-slate-200">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-slate-700">Features Included</CardTitle>
-          <CardDescription className="text-xs">
-            {Object.values(usage.features).filter(Boolean).length} of {Object.keys(usage.features).length} features
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-1.5">
-            {Object.entries(usage.features).map(([feature, enabled]) => (
-              <div key={feature} className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs ${enabled ? "text-slate-700" : "text-slate-400"}`}>
-                {enabled ? <CheckCircle2 className="h-3.5 w-3.5 text-[#3DAA8A] shrink-0" /> : <XCircle className="h-3.5 w-3.5 text-slate-300 shrink-0" />}
-                {FEATURE_LABELS[feature] || feature.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())}
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Plan Cards */}
+      {/* Plan Cards — moved to top */}
       <Card className="rounded-2xl border border-slate-200">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="text-sm font-medium text-slate-700 flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-[#3DAA8A]" /> All Plans
+              <TrendingUp className="h-4 w-4 text-[#3DAA8A]" /> Choose Your Plan
             </CardTitle>
             <div className="flex items-center gap-1 bg-slate-100 rounded-full p-0.5">
               {(["monthly", "annual"] as const).map((cycle) => (
@@ -618,6 +532,106 @@ function SubscriptionTab({
               );
             })}
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Usage */}
+      <div className="grid sm:grid-cols-2 gap-4">
+        <Card className={`rounded-2xl border ${isNearLimit ? "border-amber-200" : "border-slate-200"}`}>
+          <CardContent className="pt-5 pb-4">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                <FolderOpen className="h-4 w-4 text-slate-400" /> Active Cases
+              </span>
+              <span className="text-sm font-semibold">{usage.cases.active} / {usage.cases.max >= 999999 ? "\u221E" : usage.cases.max}</span>
+            </div>
+            <Progress value={casePercent} className={`h-2 ${isNearLimit ? "[&>div]:bg-amber-500" : ""}`} />
+            <p className="text-xs text-slate-500 mt-2">{usage.cases.remaining >= 999999 ? "Unlimited" : `${usage.cases.remaining} remaining`}</p>
+          </CardContent>
+        </Card>
+        <Card className="rounded-2xl border border-slate-200">
+          <CardContent className="pt-5 pb-4">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                <Users className="h-4 w-4 text-slate-400" /> Team Members
+              </span>
+              <span className="text-sm font-semibold">{usage.team_members.max >= 999999 ? "Unlimited" : `Max ${usage.team_members.max}`}</span>
+            </div>
+            <p className="text-xs text-slate-500">
+              {usage.team_members.max === 0 ? "Upgrade to Small Firm or higher for team features." : `You can invite up to ${usage.team_members.max} members.`}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Features */}
+      <Card className="rounded-2xl border border-slate-200">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium text-slate-700">Features Included</CardTitle>
+          <CardDescription className="text-xs">
+            Your {currentPlan.name} plan includes {Object.values(usage.features).filter(Boolean).length} of {Object.keys(usage.features).length} features
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-1.5">
+            {Object.entries(usage.features).map(([feature, enabled]) => (
+              <div key={feature} className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs ${enabled ? "text-slate-700" : "text-slate-400"}`}>
+                {enabled ? <CheckCircle2 className="h-3.5 w-3.5 text-[#3DAA8A] shrink-0" /> : <XCircle className="h-3.5 w-3.5 text-slate-300 shrink-0" />}
+                {FEATURE_LABELS[feature] || feature.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())}
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Billing History */}
+      <Card className="rounded-2xl border border-slate-200">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-sm font-medium text-slate-700 flex items-center gap-2">
+              <CreditCard className="h-4 w-4 text-slate-400" /> Billing History
+            </CardTitle>
+            <Badge className="bg-slate-100 text-slate-500 border-0 text-[10px]">
+              {usage.subscription_status === "active" ? "Active" : "Free Tier"}
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {usage.tier === "starter" ? (
+            <div className="py-6 text-center">
+              <CreditCard className="h-8 w-8 text-slate-300 mx-auto mb-2" />
+              <p className="text-sm font-medium text-slate-600">No billing history</p>
+              <p className="text-xs text-slate-400 mt-1">Upgrade to a paid plan to see transaction history here.</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {/* Current subscription info */}
+              <div className="flex items-center justify-between p-3 rounded-xl bg-[#F4F8F7]">
+                <div>
+                  <p className="text-sm font-medium text-slate-900">{currentPlan.name} Plan</p>
+                  <p className="text-xs text-slate-500">
+                    {billingCycle === "monthly" ? currentPlan.monthlyPrice : currentPlan.annualPrice}
+                    {" \u00B7 "}
+                    {usage.subscription_status === "active" ? "Active" : "Inactive"}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-slate-500">
+                    {usage.subscription_ends_at
+                      ? `Renews ${new Date(usage.subscription_ends_at).toLocaleDateString()}`
+                      : "No renewal date"}
+                  </p>
+                </div>
+              </div>
+              <p className="text-[11px] text-slate-400 pt-1">
+                For detailed invoices and payment methods, visit your{" "}
+                <a href="https://billing.stripe.com/p/login/test" target="_blank" rel="noopener noreferrer"
+                  className="text-[#3DAA8A] hover:underline font-medium">
+                  Stripe billing portal
+                </a>.
+              </p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
