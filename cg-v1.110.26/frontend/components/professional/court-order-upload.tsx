@@ -144,23 +144,23 @@ export function CourtOrderUpload({
   const getConfidenceBadge = (confidence: number) => {
     if (confidence >= 0.95) {
       return (
-        <Badge className="bg-emerald-50 text-emerald-900 border-emerald-900/30">
+        <Badge className="bg-emerald-50 text-emerald-700 border border-emerald-200">
           <CheckCircle2 className="h-3 w-3 mr-1" />
           High Confidence
         </Badge>
       );
     } else if (confidence >= 0.75) {
       return (
-        <Badge className="bg-amber-50 text-amber-900 border-amber-900/30">
+        <Badge className="bg-amber-50 text-amber-700 border border-amber-200">
           <AlertCircle className="h-3 w-3 mr-1" />
-          Medium - Please Verify
+          Medium — Verify
         </Badge>
       );
     } else {
       return (
-        <Badge className="bg-red-50 text-red-900 border-red-900/30">
+        <Badge className="bg-red-50 text-red-700 border border-red-200">
           <AlertCircle className="h-3 w-3 mr-1" />
-          Low - Manual Review Required
+          Low — Review Required
         </Badge>
       );
     }
@@ -168,14 +168,14 @@ export function CourtOrderUpload({
 
   return (
     <Dialog open={open} onOpenChange={handleReset}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto border-2 border-amber-900/20">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto border border-slate-200 rounded-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-bold text-slate-900">
-            <FileText className="h-6 w-6 text-amber-900" />
-            Upload Court Order
+            <FileText className="h-6 w-6 text-[#3DAA8A]" />
+            Import Document
           </DialogTitle>
           <DialogDescription>
-            Upload a court order (FL-341, FL-311, etc.) to automatically extract
+            Upload a document (court orders, agreements, etc.) to automatically extract
             custody schedule, support obligations, and case details.
           </DialogDescription>
         </DialogHeader>
@@ -183,7 +183,7 @@ export function CourtOrderUpload({
         {step === "upload" && (
           <div className="space-y-4">
             {/* File Upload Area */}
-            <div className="border-2 border-dashed border-slate-300 rounded-lg p-8 text-center hover:border-amber-900 hover:bg-amber-50/30 transition-colors">
+            <div className="border-2 border-dashed border-slate-200 rounded-2xl p-8 text-center hover:border-[#3DAA8A]/40 hover:bg-[#F4F8F7]/30 transition-colors">
               <input
                 type="file"
                 id="court-order-file"
@@ -196,22 +196,22 @@ export function CourtOrderUpload({
                 htmlFor="court-order-file"
                 className="cursor-pointer flex flex-col items-center gap-3"
               >
-                <div className="p-4 bg-amber-100 rounded-full">
-                  <Upload className="h-8 w-8 text-amber-900" />
+                <div className="p-4 bg-[#F4F8F7] rounded-2xl">
+                  <Upload className="h-8 w-8 text-[#3DAA8A]" />
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-slate-900 mb-1">
                     Click to upload or drag and drop
                   </p>
-                  <p className="text-xs text-slate-600">PDF files only (max 10MB)</p>
+                  <p className="text-xs text-slate-500">PDF files only (max 10MB)</p>
                 </div>
               </label>
             </div>
 
             {file && (
-              <Card className="border-2 border-emerald-900/30 bg-emerald-50/30">
+              <Card className="border border-[#3DAA8A]/20 bg-[#F4F8F7]/30 rounded-xl">
                 <CardContent className="py-3 flex items-center gap-3">
-                  <FileText className="h-5 w-5 text-emerald-900" />
+                  <FileText className="h-5 w-5 text-[#3DAA8A]" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-slate-900 truncate">
                       {file.name}
@@ -247,9 +247,9 @@ export function CourtOrderUpload({
             )}
 
             {error && (
-              <div className="p-3 bg-red-50 border border-red-900/30 rounded-lg flex items-start gap-2">
-                <AlertCircle className="h-5 w-5 text-red-900 shrink-0 mt-0.5" />
-                <p className="text-sm text-red-900">{error}</p>
+              <div className="p-3 bg-red-50 border border-red-200 rounded-xl flex items-start gap-2">
+                <AlertCircle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
+                <p className="text-sm text-red-700">{error}</p>
               </div>
             )}
           </div>
@@ -257,8 +257,8 @@ export function CourtOrderUpload({
 
         {step === "review" && extractedData && (
           <div className="space-y-4">
-            <div className="p-3 bg-blue-50 border border-blue-900/30 rounded-lg">
-              <p className="text-sm text-blue-900">
+            <div className="p-3 bg-[#F4F8F7] border border-[#3DAA8A]/20 rounded-xl">
+              <p className="text-sm text-[#1E3A4A]">
                 <strong>Review extracted data:</strong> Green highlights indicate high
                 confidence. Yellow/red require manual verification.
               </p>
@@ -356,17 +356,17 @@ export function CourtOrderUpload({
               )}
 
               {/* Court-Ordered Terms */}
-              <Card className="border-2 border-amber-900/30 bg-amber-50/20">
+              <Card className="border border-[#2D6A8F]/20 bg-[#2D6A8F]/5 rounded-xl">
                 <CardContent className="py-4 space-y-3">
                   <div className="flex items-center gap-2">
-                    <Lock className="h-4 w-4 text-amber-900" />
+                    <Lock className="h-4 w-4 text-[#2D6A8F]" />
                     <h3 className="font-semibold text-sm text-slate-900">
-                      Court-Locked Fields
+                      Protected Fields
                     </h3>
                   </div>
                   <p className="text-xs text-slate-600">
-                    These fields will be locked after creation and can only be changed
-                    by uploading a new court order.
+                    These fields will be locked after creation and can only be updated
+                    by importing a new document.
                   </p>
 
                   {extractedData.custody_split && (
@@ -403,7 +403,7 @@ export function CourtOrderUpload({
             <Button
               onClick={handleUploadAndExtract}
               disabled={!file || uploading || extracting}
-              className="bg-amber-900 hover:bg-amber-950 text-white"
+              className="bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm font-semibold"
             >
               {uploading || extracting ? (
                 <>Processing...</>
@@ -419,7 +419,7 @@ export function CourtOrderUpload({
           {step === "review" && (
             <Button
               onClick={handleConfirm}
-              className="bg-emerald-900 hover:bg-emerald-950 text-white"
+              className="bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm font-semibold"
             >
               <CheckCircle2 className="h-4 w-4 mr-2" />
               Confirm & Create Case
