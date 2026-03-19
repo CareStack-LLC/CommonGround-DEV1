@@ -498,56 +498,14 @@ function ProfessionalNavigation({
                 </NavLink>
               ))}
 
-              {/* More Menu (Dropdown) */}
-              <div className="relative">
-                <button
-                  onClick={() => setMoreMenuOpen(!moreMenuOpen)}
-                  className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium transition-all duration-200 rounded-lg hover:bg-slate-50 ${
-                    moreMenuItems.some((item) => pathname.startsWith(item.href))
-                      ? "text-[var(--portal-primary)] bg-[var(--portal-primary)]/5"
-                      : "text-slate-600 hover:text-slate-900"
-                  }`}
-                >
-                  <MoreHorizontal className="h-4 w-4" />
-                  <span>More</span>
-                  <ChevronDown className={`h-3.5 w-3.5 transition-transform ${moreMenuOpen ? "rotate-180" : ""}`} />
-                </button>
-
-                {moreMenuOpen && (
-                  <>
-                    {/* Backdrop */}
-                    <div
-                      className="fixed inset-0 z-10"
-                      onClick={() => setMoreMenuOpen(false)}
-                    />
-
-                    {/* Dropdown Menu */}
-                    <div className="absolute left-0 top-full mt-1 w-56 bg-white border border-slate-200 rounded-lg shadow-lg z-20 py-1.5">
-                      {moreMenuItems.map((item, index) => (
-                        <div key={item.href}>
-                          <Link
-                            href={item.href}
-                            onClick={() => setMoreMenuOpen(false)}
-                            className={`flex items-center gap-3 px-4 py-2.5 text-sm font-medium transition-all duration-200 ${
-                              pathname.startsWith(item.href)
-                                ? "text-[var(--portal-primary)] bg-[var(--portal-primary)]/5"
-                                : "text-slate-700 hover:bg-slate-50 hover:text-slate-900"
-                            }`}
-                          >
-                            <span className={pathname.startsWith(item.href) ? "text-[var(--portal-primary)]" : "text-slate-400"}>
-                              {item.icon}
-                            </span>
-                            {item.label}
-                          </Link>
-                          {item.dividerAfter && index < moreMenuItems.length - 1 && (
-                            <div className="my-1.5 h-px bg-slate-200" />
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
+              {/* Profile link */}
+              <NavLink
+                href="/professional/profile"
+                current={pathname}
+                icon={<User className="h-4 w-4" />}
+              >
+                Profile
+              </NavLink>
             </div>
 
             {/* Quick Actions */}
@@ -564,6 +522,13 @@ function ProfessionalNavigation({
                   {dashboardData.pending_intakes} pending intake{dashboardData.pending_intakes !== 1 ? "s" : ""}
                 </Badge>
               )}
+              <Link
+                href="/professional/help"
+                className="p-1.5 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-all"
+                title="Help & Support"
+              >
+                <HelpCircle className="h-4 w-4" />
+              </Link>
               <Link
                 href="/professional/notifications"
                 className="relative p-1.5 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-all"
