@@ -108,6 +108,17 @@ function TemplateCard({
             {template.description}
           </p>
 
+          {/* Role badges */}
+          {template.bestFor && template.bestFor.length > 0 && (
+            <div className="flex flex-wrap gap-1 mt-2">
+              {template.bestFor.map((role) => (
+                <span key={role} className="text-[10px] font-medium px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">
+                  {role}
+                </span>
+              ))}
+            </div>
+          )}
+
           <div className="flex items-center gap-3 mt-2">
             <span className="flex items-center gap-1 text-xs text-muted-foreground">
               <Clock className="h-3 w-3" />
@@ -471,11 +482,11 @@ export default function NewIntakePage() {
 
       {/* Header */}
       <div className="flex items-center gap-4">
-        <div className="p-3 bg-purple-100 text-purple-600 rounded-xl">
+        <div className="p-3 bg-[#F4F8F7] text-[#3DAA8A] rounded-xl border border-[#3DAA8A]/10">
           <Bot className="h-8 w-8" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-foreground">New ARIA Pro Intake</h1>
+          <h1 className="text-2xl font-bold text-slate-900">New ARIA Intake</h1>
           <p className="text-muted-foreground">
             Step 2 of 2 — Enter client details
           </p>
@@ -607,7 +618,7 @@ export default function NewIntakePage() {
             <div className="flex items-start gap-3">
               <Sparkles className="h-5 w-5 text-[#3DAA8A] mt-0.5" />
               <div>
-                <h4 className="font-medium text-[#1E3A4A]">Powered by ARIA</h4>
+                <h4 className="font-medium text-[#1E3A4A]">Powered by ARIA Pro</h4>
                 <p className="text-sm text-slate-600 mt-1">
                   Your client will have a guided conversation with ARIA using the{" "}
                   <strong>{selectedTemplate?.name}</strong> template.

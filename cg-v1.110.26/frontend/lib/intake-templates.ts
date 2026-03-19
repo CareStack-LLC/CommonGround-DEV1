@@ -16,7 +16,11 @@ export type IntakeTemplateId =
     | "visitation-only"
     | "domestic-violence-screening"
     | "relocation"
+    | "high-conflict"
+    | "gal-investigation"
     | "initial-consultation";
+
+export type ProfessionalRole = "Attorney" | "Mediator" | "GAL" | "Paralegal" | "Therapist";
 
 export interface IntakeSection {
     id: string;
@@ -33,6 +37,7 @@ export interface IntakeTemplate {
     icon: string;
     estimatedTime: number; // minutes
     tier: "free" | "paid";
+    bestFor: ProfessionalRole[];
     formTargets: string[];
     sections: IntakeSection[];
 }
@@ -44,10 +49,11 @@ export const INTAKE_TEMPLATES: IntakeTemplate[] = [
         id: "comprehensive-custody",
         name: "Comprehensive Custody Agreement",
         description:
-            "Complete 17-section intake covering all aspects of custody, parenting time, support, and co-parenting",
+            "Full 17-section intake covering custody, parenting time, support, and co-parenting. Produces a complete case summary with FL-341/311/312 data extraction.",
         icon: "📋",
         estimatedTime: 45,
         tier: "free",
+        bestFor: ["Attorney", "Mediator"],
         formTargets: ["FL-341", "FL-311", "FL-312", "FL-150", "FL-342"],
         sections: [
             { id: "parent-info", title: "Parent Information", description: "Basic contact information for both parents", questions: ["Your full legal name", "Your address", "Other parent's name & contact"], required: true },
@@ -72,10 +78,11 @@ export const INTAKE_TEMPLATES: IntakeTemplate[] = [
     {
         id: "custody-only",
         name: "Custody & Visitation Only",
-        description: "Focused intake for custody and parenting time (no financial support)",
+        description: "Focused 6-section intake for custody and parenting time without financial components. Ideal for straightforward custody arrangements.",
         icon: "👨‍👩‍👧‍👦",
         estimatedTime: 25,
         tier: "free",
+        bestFor: ["Attorney", "Mediator", "GAL"],
         formTargets: ["FL-341", "FL-311"],
         sections: [
             { id: "parent-info", title: "Parent Information", description: "Basic information", questions: ["Your name & contact", "Other parent's name & contact"], required: true },
@@ -89,10 +96,11 @@ export const INTAKE_TEMPLATES: IntakeTemplate[] = [
     {
         id: "child-support",
         name: "Child Support Only",
-        description: "Financial support calculation and modification",
+        description: "Financial support calculation with income details, expenses, and arrears tracking. Generates FL-150/FL-342 data for guideline calculations.",
         icon: "💰",
         estimatedTime: 20,
         tier: "free",
+        bestFor: ["Attorney", "Paralegal"],
         formTargets: ["FL-150", "FL-342"],
         sections: [
             { id: "parent-info", title: "Parent Information", description: "Contact and basic information", questions: ["Your name & contact", "Other parent's name & contact"], required: true },
@@ -106,12 +114,51 @@ export const INTAKE_TEMPLATES: IntakeTemplate[] = [
         ],
     },
     {
+        id: "initial-consultation",
+        name: "Initial Consultation",
+        description: "Quick 5-section intake for first meetings. Captures the essentials so you can hit the ground running with a new client.",
+        icon: "👋",
+        estimatedTime: 10,
+        tier: "free",
+        bestFor: ["Attorney", "Paralegal", "Mediator"],
+        formTargets: [],
+        sections: [
+            { id: "contact", title: "Contact Information", description: "How to reach you", questions: ["Full name", "Phone", "Email", "Preferred contact method"], required: true },
+            { id: "situation-overview", title: "Your Situation", description: "Quick overview", questions: ["Marital status", "Number of children", "Current court case?"], required: true },
+            { id: "main-issues", title: "Main Issues", description: "What brings you here", questions: ["Main issue", "Custody? Support? Divorce? DV?", "Urgency", "Main goal"], required: true },
+            { id: "timeline", title: "Timeline & Urgency", description: "When you need help", questions: ["When action needed", "Upcoming court dates", "Safety concerns", "Other parent represented?"], required: true },
+            { id: "additional-info", title: "Anything Else", description: "Other important information", questions: ["Anything else attorney should know?", "Specific questions?"], required: false },
+        ],
+    },
+    {
+        id: "high-conflict",
+        name: "High-Conflict Case Intake",
+        description: "Structured intake for contentious cases. Documents communication patterns, boundary violations, and conflict history to build an evidence-based strategy.",
+        icon: "⚠️",
+        estimatedTime: 30,
+        tier: "free",
+        bestFor: ["Attorney", "GAL", "Therapist"],
+        formTargets: ["FL-341", "FL-311"],
+        sections: [
+            { id: "parent-info", title: "Parent Information", description: "Both parents' contact details", questions: ["Your name & contact", "Other parent's name & contact", "Attorneys involved"], required: true },
+            { id: "children", title: "Children", description: "Children involved", questions: ["Names, ages, birthdates", "Special needs", "Therapy or counseling"], required: true },
+            { id: "conflict-history", title: "Conflict History", description: "Pattern of conflict between parents", questions: ["How long has conflict been high?", "Main sources of disagreement", "Prior mediation attempts", "Police involvement?"], required: true },
+            { id: "communication-issues", title: "Communication Breakdown", description: "How parent communication has deteriorated", questions: ["Current communication method", "Blocked or restricted?", "Hostile messages?", "Using children as messengers?"], required: true },
+            { id: "boundary-violations", title: "Boundary Violations", description: "Instances where boundaries were crossed", questions: ["Schedule violations", "Unilateral decisions", "Interference with parenting time", "False allegations"], required: true },
+            { id: "impact-on-children", title: "Impact on Children", description: "How conflict affects the children", questions: ["Behavioral changes", "School performance", "Anxiety or distress", "Children expressing preferences"], required: true },
+            { id: "current-orders", title: "Current Orders & Compliance", description: "Existing court orders and adherence", questions: ["Current custody order", "Compliance by both parties", "Contempt filings", "Modifications pending"], required: true },
+            { id: "safety-concerns", title: "Safety Concerns", description: "Any safety issues", questions: ["DV history", "Substance abuse", "Mental health concerns", "Supervised visitation needed?"], required: false },
+            { id: "goals", title: "Goals & Strategy", description: "What outcome you're seeking", questions: ["Primary goal", "Willing to mediate?", "Open to parallel parenting?", "Timeline expectations"], required: true },
+        ],
+    },
+    {
         id: "modification",
         name: "Modification of Existing Order",
-        description: "Request to change an existing custody or support order",
+        description: "Structured intake for order modifications. Documents changed circumstances and builds the case for why a modification serves the children's best interests.",
         icon: "📝",
         estimatedTime: 20,
         tier: "paid",
+        bestFor: ["Attorney", "Paralegal"],
         formTargets: ["FL-300"],
         sections: [
             { id: "case-info", title: "Existing Case Information", description: "Current court order details", questions: ["Case number", "Court", "Order date", "Copy available?"], required: true },
@@ -124,10 +171,11 @@ export const INTAKE_TEMPLATES: IntakeTemplate[] = [
     {
         id: "visitation-only",
         name: "Visitation Rights",
-        description: "Establish or modify visitation schedule (for non-custodial parent)",
+        description: "Establish or modify visitation for non-custodial parents. Covers current contact, requested schedule, and any barriers to visitation.",
         icon: "🗓️",
         estimatedTime: 15,
         tier: "paid",
+        bestFor: ["Attorney", "GAL"],
         formTargets: ["FL-311"],
         sections: [
             { id: "relationship", title: "Relationship to Child", description: "Basic information", questions: ["Relationship", "Legal parent?", "Paternity established?", "Current visitation?"], required: true },
@@ -138,11 +186,12 @@ export const INTAKE_TEMPLATES: IntakeTemplate[] = [
     },
     {
         id: "domestic-violence-screening",
-        name: "Domestic Violence Case Screening",
-        description: "Sensitive intake for cases involving domestic violence (DV)",
+        name: "Domestic Violence Screening",
+        description: "Trauma-informed intake for DV cases. Includes safety assessment, protective order status, and custody safety planning. Handles sensitive disclosures.",
         icon: "🛡️",
         estimatedTime: 30,
         tier: "paid",
+        bestFor: ["Attorney", "GAL", "Therapist"],
         formTargets: ["DV-100", "DV-110"],
         sections: [
             { id: "safety-first", title: "Safety Assessment", description: "Your immediate safety", questions: ["Safe location?", "Completing privately?", "Safety plan?", "Children safe?"], required: true },
@@ -157,10 +206,11 @@ export const INTAKE_TEMPLATES: IntakeTemplate[] = [
     {
         id: "relocation",
         name: "Move-Away / Relocation",
-        description: "Request to relocate with children to a new area",
+        description: "Builds the case for or against relocation. Covers move-away factors, impact on both parents, and a proposed long-distance parenting plan.",
         icon: "🚚",
         estimatedTime: 25,
         tier: "paid",
+        bestFor: ["Attorney"],
         formTargets: ["FL-300"],
         sections: [
             { id: "move-details", title: "Proposed Move", description: "Where and when", questions: ["Destination", "Distance", "Timeline", "Definite or conditional?", "Job/lease signed?"], required: true },
@@ -172,19 +222,23 @@ export const INTAKE_TEMPLATES: IntakeTemplate[] = [
         ],
     },
     {
-        id: "initial-consultation",
-        name: "Initial Consultation Intake",
-        description: "Quick intake for first meeting with attorney",
-        icon: "👋",
-        estimatedTime: 10,
-        tier: "free",
+        id: "gal-investigation",
+        name: "GAL / Child Advocate Investigation",
+        description: "Comprehensive intake for Guardian ad Litem investigations. Covers both parents' perspectives, child observations, home environment, and professional recommendations.",
+        icon: "⚖️",
+        estimatedTime: 35,
+        tier: "paid",
+        bestFor: ["GAL"],
         formTargets: [],
         sections: [
-            { id: "contact", title: "Contact Information", description: "How to reach you", questions: ["Full name", "Phone", "Email", "Preferred contact method"], required: true },
-            { id: "situation-overview", title: "Your Situation", description: "Quick overview", questions: ["Marital status", "Number of children", "Current court case?"], required: true },
-            { id: "main-issues", title: "Main Issues", description: "What brings you here", questions: ["Main issue", "Custody? Support? Divorce? DV?", "Urgency", "Main goal"], required: true },
-            { id: "timeline", title: "Timeline & Urgency", description: "When you need help", questions: ["When action needed", "Upcoming court dates", "Safety concerns", "Other parent represented?"], required: true },
-            { id: "additional-info", title: "Anything Else", description: "Other important information", questions: ["Anything else attorney should know?", "Specific questions?"], required: false },
+            { id: "case-overview", title: "Case Overview", description: "Court case background", questions: ["Case number", "Appointing judge", "Appointment date", "Scope of investigation"], required: true },
+            { id: "parent-a", title: "Parent A Information", description: "First parent's details and perspective", questions: ["Name & contact", "Employment", "Living situation", "Relationship with children", "Concerns about other parent"], required: true },
+            { id: "parent-b", title: "Parent B Information", description: "Second parent's details and perspective", questions: ["Name & contact", "Employment", "Living situation", "Relationship with children", "Concerns about other parent"], required: true },
+            { id: "children-info", title: "Children's Information", description: "Each child's details", questions: ["Names & ages", "School performance", "Health issues", "Behavioral concerns", "Expressed preferences"], required: true },
+            { id: "home-observations", title: "Home Environment", description: "Living conditions for each household", questions: ["Parent A home", "Parent B home", "Children's rooms", "Safety concerns", "Other residents"], required: true },
+            { id: "collateral-contacts", title: "Collateral Contacts", description: "Third-party sources to interview", questions: ["Teachers", "Therapists", "Pediatrician", "Family members", "Coaches/mentors"], required: true },
+            { id: "allegations", title: "Allegations & Concerns", description: "Issues raised by either party", questions: ["Substance abuse", "DV history", "Mental health", "Parenting capacity", "Alienation concerns"], required: true },
+            { id: "prior-evaluations", title: "Prior Evaluations", description: "Previous professional assessments", questions: ["Custody evaluations", "Psychological evaluations", "Drug tests", "CPS reports"], required: false },
         ],
     },
 ];
