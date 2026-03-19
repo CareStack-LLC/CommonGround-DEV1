@@ -67,7 +67,7 @@ export default function BlogPage() {
   const fetchPosts = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${API_BASE}/api/v1/admin/blog/posts`, {
+      const res = await fetch(`${API_BASE}/api/v1/blog/admin/posts`, {
         headers: { Authorization: `Bearer ${getToken()}` },
       });
       if (!res.ok) throw new Error('Failed to fetch posts');
@@ -117,7 +117,7 @@ export default function BlogPage() {
     if (!aiTopic.trim()) return;
     try {
       setGenerating(true);
-      const res = await fetch(`${API_BASE}/api/v1/admin/blog/generate`, {
+      const res = await fetch(`${API_BASE}/api/v1/blog/admin/generate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -145,14 +145,14 @@ export default function BlogPage() {
       const body = { title, content, excerpt, category, seo_title: seoTitle, seo_description: seoDescription, status: publish ? 'published' : 'draft' };
 
       if (editingPost) {
-        const res = await fetch(`${API_BASE}/api/v1/admin/blog/posts/${editingPost.id}`, {
+        const res = await fetch(`${API_BASE}/api/v1/blog/admin/posts/${editingPost.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
           body: JSON.stringify(body),
         });
         if (!res.ok) throw new Error('Failed to update post');
       } else {
-        const res = await fetch(`${API_BASE}/api/v1/admin/blog/posts`, {
+        const res = await fetch(`${API_BASE}/api/v1/blog/admin/posts`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getToken()}` },
           body: JSON.stringify(body),
@@ -176,7 +176,7 @@ export default function BlogPage() {
     if (!confirm('Are you sure you want to delete this post?')) return;
     try {
       setDeleting(id);
-      const res = await fetch(`${API_BASE}/api/v1/admin/blog/posts/${id}`, {
+      const res = await fetch(`${API_BASE}/api/v1/blog/admin/posts/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${getToken()}` },
       });
@@ -195,7 +195,7 @@ export default function BlogPage() {
     try {
       setToggling(post.id);
       const endpoint = post.status === 'published' ? 'unpublish' : 'publish';
-      const res = await fetch(`${API_BASE}/api/v1/admin/blog/posts/${post.id}/${endpoint}`, {
+      const res = await fetch(`${API_BASE}/api/v1/blog/admin/posts/${post.id}/${endpoint}`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${getToken()}` },
       });
