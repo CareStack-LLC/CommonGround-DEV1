@@ -14,8 +14,9 @@ import {
   Loader2,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { theaterContent } from '@/lib/theater-content';
 import { OriginalsBadge } from '@/components/kidcoms/originals-badge';
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 // Set up PDF.js worker
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
@@ -40,12 +41,35 @@ export default function BookReaderPage() {
   const [scale, setScale] = useState<number>(1.2);
   const [error, setError] = useState<string | null>(null);
 
-  // Find the book
-  const book = theaterContent.storybooks.find((b) => b.id === bookId);
+  // Fetch book from API
+  const [book, setBook] = useState<{ id: string; title: string; url: string; cover: string; pages: number; author: string } | null>(null);
 
   useEffect(() => {
     validateAndLoadUser();
-  }, []);
+    const fetchBook = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/v1/kidspace/books?limit=50`);
+        if (res.ok) {
+          const data = await res.json();
+          const items = data.books || data || [];
+          const found = items.find((b: any) => b.id === bookId);
+          if (found) {
+            setBook({
+              id: found.id,
+              title: found.title,
+              url: found.pdf_url || '',
+              cover: found.cover_url || '',
+              pages: found.page_count || 0,
+              author: found.author_name || found.author?.name || '',
+            });
+          }
+        }
+      } catch {
+        // API unavailable
+      }
+    };
+    fetchBook();
+  }, [bookId]);
 
   function validateAndLoadUser() {
     try {
