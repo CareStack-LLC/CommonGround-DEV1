@@ -7,6 +7,8 @@ from app.core.security import require_parent_user
 
 from app.api.v1.endpoints import (
     admin,
+    admin_leads,
+    admin_inbox,
     auth,
     users,
     partners,
@@ -196,6 +198,12 @@ api_router.include_router(blog.router, prefix="/blog", tags=["Blog"])
 
 # KidSpace Media - Public read + admin CRUD
 api_router.include_router(kidspace_media.router, prefix="/kidspace", tags=["KidSpace Media"])
+
+# Admin Lead Generator - Lead lists, campaigns, SendGrid
+api_router.include_router(admin_leads.router, prefix="/admin/leads", tags=["Admin Lead Generator"])
+
+# Admin Email Monitor - Gmail integration, AI drafts
+api_router.include_router(admin_inbox.router, prefix="/admin/inbox", tags=["Admin Email Monitor"])
 
 # SuperAdmin Portal - Platform administration
 api_router.include_router(admin.router, prefix="/admin", tags=["SuperAdmin Portal"])

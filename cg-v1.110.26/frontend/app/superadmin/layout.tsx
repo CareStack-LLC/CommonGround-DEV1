@@ -21,6 +21,11 @@ import {
   Gamepad2,
   PenTool,
   Film,
+  FileBarChart,
+  Bug,
+  UserPlus,
+  Send,
+  Mail,
 } from 'lucide-react';
 import { adminAPI, type PlatformHealth } from '@/lib/admin-api';
 
@@ -32,6 +37,8 @@ const navSections = [
       { href: '/superadmin/users', label: 'Users', icon: Users },
       { href: '/superadmin/audit-log', label: 'Audit Log', icon: ScrollText },
       { href: '/superadmin/platform-audit', label: 'Platform Audit', icon: Activity },
+      { href: '/superadmin/weekly-report', label: 'Weekly Report', icon: FileBarChart },
+      { href: '/superadmin/bug-triage', label: 'Bug Triage', icon: Bug },
     ],
   },
   {
@@ -47,6 +54,19 @@ const navSections = [
     items: [
       { href: '/superadmin/billing', label: 'Billing', icon: CreditCard },
       { href: '/superadmin/reports', label: 'Reports', icon: FileText },
+    ],
+  },
+  {
+    label: 'Sales',
+    items: [
+      { href: '/superadmin/leads', label: 'Lead Generator', icon: UserPlus },
+      { href: '/superadmin/leads/campaigns', label: 'Campaigns', icon: Send },
+    ],
+  },
+  {
+    label: 'Inbox',
+    items: [
+      { href: '/superadmin/inbox', label: 'Email Monitor', icon: Mail },
     ],
   },
   {

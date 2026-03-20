@@ -2587,3 +2587,166 @@ async def get_funnel_stats(
         "created_first_agreement": created_first_agreement,
         "created_first_agreement_pct": agr_pct,
     }
+
+
+# =============================================================================
+# MODULE 13: Weekly Report
+# =============================================================================
+
+@router.get(
+    "/weekly-report",
+    summary="Generate on-demand weekly report",
+)
+async def get_weekly_report(
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Generate on-demand weekly report with platform metrics and highlights."""
+    from app.services.weekly_report_service import generate_weekly_report
+
+    report = await generate_weekly_report(db)
+    await _log_admin_action(db, admin_user, "weekly_report_generated", "report")
+    await db.commit()
+    return report
+
+
+@router.post(
+    "/weekly-report/send",
+    summary="Generate and email weekly report",
+)
+async def send_weekly_report(
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Generate and email the weekly report to configured recipients."""
+    from app.services.weekly_report_service import generate_weekly_report, send_weekly_report_email
+
+    report = await generate_weekly_report(db)
+    sent = await send_weekly_report_email(report)
+    await _log_admin_action(
+        db, admin_user, "weekly_report_sent", "report", details=f"sent={sent}"
+    )
+    await db.commit()
+    return {"sent": sent, "report": report}
+
+
+# =============================================================================
+# MODULE 14: Bug Triage (Sentry Integration)
+# =============================================================================
+
+@router.get(
+    "/bugs/current",
+    summary="Fetch live Sentry issues",
+)
+async def get_current_bugs(
+    project: Optional[str] = Query(None, description="Sentry project slug"),
+    days: int = Query(7, description="Look-back window in days"),
+) -> dict:
+    """Fetch and categorize current Sentry issues."""
+    from app.services.sentry_triage_service import fetch_sentry_issues, categorize_issues
+
+    issues = await fetch_sentry_issues(project, days)
+    return categorize_issues(issues)
+
+
+@router.post(
+    "/bugs/triage",
+    summary="Run AI triage on Sentry issues",
+)
+async def run_bug_triage(
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+    days: int = Query(7, description="Look-back window in days"),
+) -> dict:
+    """Run AI-powered triage on current Sentry issues to prioritize fixes."""
+    from app.services.sentry_triage_service import fetch_sentry_issues, ai_triage
+
+    issues = await fetch_sentry_issues(days=days)
+    result = await ai_triage(issues)
+    await _log_admin_action(
+        db, admin_user, "bug_triage_run", "bugs", details=f"issues={len(issues)}"
+    )
+    await db.commit()
+    return result
+
+
+@router.post(
+    "/bugs/sprints",
+    summary="Generate and save a sprint plan from AI triage",
+)
+async def create_sprint(
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+    days: int = Query(3, description="Sprint duration in days"),
+) -> dict:
+    """Generate an AI sprint plan from triaged bugs and persist it."""
+    from app.services.sentry_triage_service import (
+        fetch_sentry_issues,
+        ai_triage,
+        generate_sprint_plan,
+        save_sprint,
+    )
+
+    issues = await fetch_sentry_issues()
+    triaged = await ai_triage(issues)
+    sprint_plan = await generate_sprint_plan(triaged, days)
+    sprint_id = await save_sprint(db, sprint_plan, triaged)
+    await _log_admin_action(db, admin_user, "sprint_created", "sprint", sprint_id)
+    await db.commit()
+    return {"sprint_id": sprint_id, "plan": sprint_plan}
+
+
+@router.get(
+    "/bugs/sprints",
+    summary="List past sprint plans",
+)
+async def list_sprints(
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+    limit: int = Query(10, description="Max number of sprints to return"),
+) -> list:
+    """List recent sprint plans ordered by creation date."""
+    from app.models.bug_triage import BugTriageSprint
+
+    result = await db.execute(
+        select(BugTriageSprint)
+        .order_by(BugTriageSprint.created_at.desc())
+        .limit(limit)
+    )
+    return [
+        {
+            "id": s.id,
+            "status": s.status,
+            "period_start": str(s.period_start),
+            "period_end": str(s.period_end),
+            "summary": s.summary_json,
+            "plan": s.sprint_plan_json,
+            "ai_analysis": s.ai_analysis,
+            "created_at": s.created_at.isoformat() if s.created_at else None,
+        }
+        for s in result.scalars().all()
+    ]
+
+
+@router.patch(
+    "/bugs/sprints/{sprint_id}",
+    summary="Update sprint status",
+)
+async def update_sprint_status(
+    sprint_id: str,
+    status: str = Query(..., description="New status: draft, active, or completed"),
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Update the status of a sprint plan (draft/active/completed)."""
+    from app.models.bug_triage import BugTriageSprint
+
+    sprint = await db.get(BugTriageSprint, sprint_id)
+    if not sprint:
+        raise HTTPException(status_code=404, detail="Sprint not found")
+    sprint.status = status
+    await _log_admin_action(
+        db, admin_user, "sprint_updated", "sprint", sprint_id, f"status={status}"
+    )
+    await db.commit()
+    return {"id": sprint.id, "status": sprint.status}

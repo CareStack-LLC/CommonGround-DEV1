@@ -257,6 +257,98 @@ export interface TierConfig {
   tiers: { name: string; price: number; user_count: number; is_paid: boolean }[];
 }
 
+export interface WeeklyReport {
+  generated_at: string;
+  period: { start: string; end: string };
+  users: { total: number; new_this_week: number; growth_pct: number | null; active_30d: number };
+  revenue: { estimated_mrr: number; paying_users: number; tier_breakdown: Record<string, number> };
+  engagement: { messages_this_week: number; message_growth_pct: number | null; aria_flags_this_week: number };
+  platform: { active_family_files: number; total_professionals: number };
+  bugs: { open_sentry_issues: number };
+}
+
+export interface BugCategory {
+  total: number;
+  critical: number;
+  high: number;
+  medium: number;
+  low: number;
+  user_reported: number;
+  frontend: number;
+  backend: number;
+  issues: Record<string, any[]>;
+}
+
+export interface SprintPlan {
+  days: number;
+  plan: Record<string, any[]>;
+  total_items: number;
+  deferred: any[];
+  investigate: any[];
+  summary: string;
+  top_3: string[];
+}
+
+export interface LeadList {
+  id: string;
+  name: string;
+  lead_type: string;
+  description: string | null;
+  sendgrid_list_id: string | null;
+  lead_count: number;
+  created_at: string;
+}
+
+export interface Lead {
+  id: string;
+  email: string;
+  first_name: string | null;
+  last_name: string | null;
+  company: string | null;
+  title: string | null;
+  source: string;
+  status: string;
+}
+
+export interface EmailCampaign {
+  id: string;
+  name: string;
+  lead_list_id: string | null;
+  subject: string;
+  html_content: string | null;
+  status: string;
+  scheduled_at: string | null;
+  sent_at: string | null;
+  stats_json: Record<string, any> | null;
+  created_at: string;
+}
+
+export interface MonitoredEmail {
+  id: string;
+  gmail_message_id: string;
+  from_email: string;
+  from_name: string | null;
+  to_email: string;
+  subject: string;
+  body_preview: string;
+  body_full: string;
+  received_at: string;
+  is_urgent: boolean;
+  urgency_reason: string | null;
+  category: string;
+  ai_summary: string | null;
+  ai_draft_response: string | null;
+  draft_status: string;
+  admin_notes: string | null;
+}
+
+export interface InboxStats {
+  total: number;
+  urgent: number;
+  pending_drafts: number;
+  by_category: Record<string, number>;
+}
+
 // --- API calls ---
 
 export const adminAPI = {
@@ -338,4 +430,71 @@ export const adminAPI = {
 
   // Tier configuration
   getTierConfig: () => adminFetch<TierConfig>('/admin/config/tiers'),
+
+  // Weekly Report
+  getWeeklyReport: () => adminFetch<WeeklyReport>('/admin/weekly-report'),
+  sendWeeklyReport: () => adminFetch<{ sent: boolean; report: WeeklyReport }>('/admin/weekly-report/send', { method: 'POST' }),
+
+  // Bug Triage
+  getCurrentBugs: (days = 7) => adminFetch<BugCategory>(`/admin/bugs/current?days=${days}`),
+  runBugTriage: (days = 7) => adminFetch<any>(`/admin/bugs/triage?days=${days}`, { method: 'POST' }),
+  createSprint: (days = 3) => adminFetch<{ sprint_id: string; plan: SprintPlan }>(`/admin/bugs/sprints?days=${days}`, { method: 'POST' }),
+  listSprints: (limit = 10) => adminFetch<any[]>(`/admin/bugs/sprints?limit=${limit}`),
+  updateSprintStatus: (id: string, status: string) => adminFetch<any>(`/admin/bugs/sprints/${id}?status=${status}`, { method: 'PATCH' }),
+
+  // Leads
+  getLeadLists: () => adminFetch<LeadList[]>('/admin/leads/lists'),
+  createLeadList: (data: { name: string; lead_type: string; description?: string }) =>
+    adminFetch<LeadList>('/admin/leads/lists', { method: 'POST', body: JSON.stringify(data) }),
+  getLeadListDetail: (id: string) => adminFetch<LeadList & { leads: Lead[] }>(`/admin/leads/lists/${id}`),
+  deleteLeadList: (id: string) => adminFetch<void>(`/admin/leads/lists/${id}`, { method: 'DELETE' }),
+  importLeadsCsv: (listId: string, file: File) => {
+    const fd = new FormData();
+    fd.append('file', file);
+    const token = getAuthToken();
+    return fetch(`${API_URL}/admin/leads/lists/${listId}/import-csv`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: fd,
+    }).then(r => r.json());
+  },
+  addLead: (listId: string, data: Partial<Lead>) =>
+    adminFetch<Lead>(`/admin/leads/lists/${listId}/leads`, { method: 'POST', body: JSON.stringify(data) }),
+  getLeads: (listId: string, limit = 50, offset = 0) =>
+    adminFetch<{ leads: Lead[]; total: number }>(`/admin/leads/lists/${listId}/leads?limit=${limit}&offset=${offset}`),
+  syncLeadsToSendGrid: (listId: string) =>
+    adminFetch<any>(`/admin/leads/lists/${listId}/sync-sendgrid`, { method: 'POST' }),
+
+  // Campaigns
+  getCampaigns: () => adminFetch<EmailCampaign[]>('/admin/leads/campaigns'),
+  createCampaign: (data: { name: string; lead_list_id: string; subject: string; html_content?: string }) =>
+    adminFetch<EmailCampaign>('/admin/leads/campaigns', { method: 'POST', body: JSON.stringify(data) }),
+  generateCampaignContent: (campaignId: string, data: { audience: string; product_focus: string; tone: string }) =>
+    adminFetch<{ html_content: string; plain_content: string }>(`/admin/leads/campaigns/${campaignId}/generate-content`, { method: 'POST', body: JSON.stringify(data) }),
+  sendCampaign: (campaignId: string) =>
+    adminFetch<any>(`/admin/leads/campaigns/${campaignId}/send`, { method: 'POST' }),
+  getCampaignStats: (campaignId: string) =>
+    adminFetch<any>(`/admin/leads/campaigns/${campaignId}/stats`),
+
+  // Inbox
+  getOAuthUrl: () => adminFetch<{ url: string }>('/admin/inbox/oauth/url'),
+  exchangeOAuthCode: (code: string) =>
+    adminFetch<{ success: boolean }>(`/admin/inbox/oauth/callback?code=${code}`, { method: 'POST' }),
+  getEmails: (params?: { category?: string; is_urgent?: boolean; draft_status?: string; limit?: number; offset?: number }) => {
+    const sp = new URLSearchParams();
+    if (params?.category) sp.set('category', params.category);
+    if (params?.is_urgent !== undefined) sp.set('is_urgent', String(params.is_urgent));
+    if (params?.draft_status) sp.set('draft_status', params.draft_status);
+    if (params?.limit) sp.set('limit', String(params.limit));
+    if (params?.offset) sp.set('offset', String(params.offset));
+    return adminFetch<{ emails: MonitoredEmail[]; total: number }>(`/admin/inbox/emails?${sp}`);
+  },
+  getEmailDetail: (id: string) => adminFetch<MonitoredEmail>(`/admin/inbox/emails/${id}`),
+  approveDraft: (id: string) => adminFetch<any>(`/admin/inbox/emails/${id}/approve-draft`, { method: 'POST' }),
+  rejectDraft: (id: string) => adminFetch<any>(`/admin/inbox/emails/${id}/reject-draft`, { method: 'POST' }),
+  sendReply: (id: string, body: string) =>
+    adminFetch<any>(`/admin/inbox/emails/${id}/reply`, { method: 'POST', body: JSON.stringify({ response_body: body }) }),
+  syncInbox: () => adminFetch<any>('/admin/inbox/sync', { method: 'POST' }),
+  getDigests: () => adminFetch<any[]>('/admin/inbox/digests'),
+  getInboxStats: () => adminFetch<InboxStats>('/admin/inbox/stats'),
 };

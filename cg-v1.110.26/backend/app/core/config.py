@@ -121,6 +121,16 @@ class Settings(BaseSettings):
     # Monitoring
     SENTRY_DSN: Optional[str] = None
 
+    # Sentry API (for bug triage)
+    SENTRY_AUTH_TOKEN: Optional[str] = None
+    SENTRY_ORG_SLUG: str = "commonground"
+    SENTRY_PROJECT_SLUG: str = "commonground-frontend"
+
+    # Google OAuth (for email monitor)
+    GOOGLE_OAUTH_CLIENT_ID: Optional[str] = None
+    GOOGLE_OAUTH_CLIENT_SECRET: Optional[str] = None
+    GOOGLE_MONITORED_EMAILS: str = "hello@find-commonground.com,support@find-commonground.com"
+
     # Rate Limiting
     RATE_LIMIT_REQUESTS: int = 100
     RATE_LIMIT_PERIOD: int = 60  # seconds
