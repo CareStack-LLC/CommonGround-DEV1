@@ -164,11 +164,13 @@ export default function MoviesPage() {
   // Group videos by genre for the Netflix-style rows
   const videosByGenre = useMemo(() => {
     const grouped: Record<VideoCategory, VideoContent[]> = {
+      commonground_originals: [],
       comedy: [],
       adventure: [],
       educational: [],
       animation: [],
       action: [],
+      family: [],
     };
     allVideos.forEach(v => {
       if (grouped[v.category]) {
