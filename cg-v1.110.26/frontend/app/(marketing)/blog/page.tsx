@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Calendar, Clock, ArrowRight, Loader2 } from 'lucide-react';
 import { NewsletterForm } from '@/components/marketing/newsletter-form';
-import { blogPosts as legacyPosts, formatDate, getCategoryStyles, type BlogPost as LegacyPost } from '@/lib/blog-data';
+import { blogPosts as legacyPosts, formatDate, type BlogPost as LegacyPost } from '@/lib/blog-data';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -32,7 +32,7 @@ interface DisplayPost {
   title: string;
   excerpt: string;
   category: string;
-  categoryColor: string;
+  pillClasses: string;
   author: string;
   date: string;
   readTime: string;
@@ -47,14 +47,21 @@ function estimateReadTime(content: string): string {
   return `${mins} min read`;
 }
 
-function categoryToColor(cat: string): string {
+function categoryToPillClasses(cat: string): string {
   const map: Record<string, string> = {
-    'Co-Parenting Tips': 'sage', 'Communication': 'amber', 'Agreements': 'sage',
-    'High-Conflict': 'red', 'Parenting': 'sage', 'Scheduling': 'amber',
-    'Legal Insights': 'slate', 'Platform Updates': 'amber', 'ARIA & Technology': 'slate',
-    'Family Wellness': 'sage', 'KidSpace': 'amber',
+    'Co-Parenting Tips': 'bg-[#E8F4F0] text-[#3DAA8A]',
+    'Communication': 'bg-[#FEF7ED] text-[#F5A623]',
+    'Agreements': 'bg-[#E8F4F0] text-[#3DAA8A]',
+    'High-Conflict': 'bg-red-100 text-red-700',
+    'Parenting': 'bg-[#E8F4F0] text-[#3DAA8A]',
+    'Scheduling': 'bg-[#FEF7ED] text-[#F5A623]',
+    'Legal Insights': 'bg-gray-100 text-gray-700',
+    'Platform Updates': 'bg-[#FEF7ED] text-[#F5A623]',
+    'ARIA & Technology': 'bg-gray-100 text-gray-700',
+    'Family Wellness': 'bg-[#E8F4F0] text-[#3DAA8A]',
+    'KidSpace': 'bg-[#FEF7ED] text-[#F5A623]',
   };
-  return map[cat] || 'sage';
+  return map[cat] || 'bg-[#E8F4F0] text-[#3DAA8A]';
 }
 
 export default function BlogPage() {
@@ -76,7 +83,7 @@ export default function BlogPage() {
             title: p.title,
             excerpt: p.excerpt,
             category: p.category,
-            categoryColor: categoryToColor(p.category),
+            pillClasses: categoryToPillClasses(p.category),
             author: p.author,
             date: p.published_at || p.created_at || '',
             readTime: estimateReadTime(p.content),
@@ -95,7 +102,7 @@ export default function BlogPage() {
         // Fallback to legacy hardcoded posts
         setPosts(legacyPosts.map(p => ({
           slug: p.slug, title: p.title, excerpt: p.excerpt,
-          category: p.category, categoryColor: p.categoryColor,
+          category: p.category, pillClasses: categoryToPillClasses(p.category),
           author: p.author, date: p.date, readTime: p.readTime,
           featured: p.featured, image: p.image, isApi: false,
         })));
@@ -111,26 +118,26 @@ export default function BlogPage() {
   const recentPosts = filteredPosts.filter(p => !p.featured);
 
   // Placeholder gradient for posts without images
-  const placeholderBg = 'bg-gradient-to-br from-[#3DAA8A]/20 via-[#2D6A8F]/10 to-[#1E3A4A]/20';
+  const placeholderBg = 'bg-gradient-to-br from-[#E8F4F0] via-[#D6EEF5] to-[#E0E8ED]';
 
   return (
     <div className="bg-[#F4F8F7]">
       {/* Hero */}
-      <section className="relative py-20 lg:py-24 bg-white border-b border-gray-200 overflow-hidden">
+      <section className="relative py-16 lg:py-20 bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F] overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-20 right-[10%] w-64 h-64 rounded-full bg-cg-sage/5 blur-3xl" />
-          <div className="absolute bottom-20 left-[5%] w-48 h-48 rounded-full bg-cg-amber/5 blur-3xl" />
+          <div className="absolute top-10 right-[10%] w-64 h-64 rounded-full bg-[#3DAA8A]/10 blur-3xl" />
+          <div className="absolute bottom-10 left-[5%] w-48 h-48 rounded-full bg-[#F5A623]/10 blur-3xl" />
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
-            <h1 className="text-4xl sm:text-5xl font-serif font-semibold text-[#1E3A4A] mb-6">The CommonGround Blog</h1>
-            <p className="text-xl text-gray-600">Expert advice, practical tips, and insights for co-parents navigating the journey of raising children together, apart.</p>
+            <h1 className="text-4xl sm:text-5xl font-serif font-semibold text-white mb-4">The CommonGround Blog</h1>
+            <p className="text-lg text-white/70">Expert advice, practical tips, and insights for co-parents navigating the journey of raising children together, apart.</p>
           </div>
         </div>
       </section>
 
       {/* Category Filter */}
-      <section className="py-6 border-b border-gray-200 sticky top-16 bg-[#F4F8F7]/95 backdrop-blur z-40">
+      <section className="py-4 border-b border-gray-200 sticky top-16 bg-white/95 backdrop-blur z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap gap-2">
             {allCategories.map((category) => (
@@ -139,8 +146,8 @@ export default function BlogPage() {
                 onClick={() => setActiveCategory(category)}
                 className={`px-4 py-2 text-sm rounded-full transition-all duration-300 ${
                   activeCategory === category
-                    ? 'bg-cg-sage text-white'
-                    : 'bg-white border border-gray-200 hover:border-cg-sage/30 text-[#1E3A4A]'
+                    ? 'bg-[#3DAA8A] text-white'
+                    : 'bg-[#F4F8F7] border border-gray-200 hover:border-[#3DAA8A]/30 text-[#1E3A4A]'
                 }`}
               >
                 {category}
@@ -175,10 +182,10 @@ export default function BlogPage() {
                           </div>
                         )}
                       </div>
-                      <div className={`inline-block px-3 py-1 ${getCategoryStyles(featuredPosts[0].categoryColor as any)} text-sm font-medium rounded-full mb-3`}>
+                      <div className={`inline-block px-3 py-1 ${featuredPosts[0].pillClasses} text-sm font-medium rounded-full mb-3`}>
                         {featuredPosts[0].category}
                       </div>
-                      <h3 className="text-2xl font-semibold text-[#1E3A4A] group-hover:text-cg-sage transition-colors mb-3">{featuredPosts[0].title}</h3>
+                      <h3 className="text-2xl font-semibold text-[#1E3A4A] group-hover:text-[#3DAA8A] transition-colors mb-3">{featuredPosts[0].title}</h3>
                       <p className="text-gray-600 mb-4">{featuredPosts[0].excerpt}</p>
                       <div className="flex items-center gap-4 text-sm text-gray-600">
                         <span className="flex items-center gap-1"><Calendar className="w-4 h-4" />{formatDate(featuredPosts[0].date)}</span>
@@ -199,10 +206,10 @@ export default function BlogPage() {
                             </div>
                           )}
                         </div>
-                        <div className={`inline-block px-2 py-0.5 ${getCategoryStyles(post.categoryColor as any)} text-xs font-medium rounded-full mb-2`}>
+                        <div className={`inline-block px-2 py-0.5 ${post.pillClasses} text-xs font-medium rounded-full mb-2`}>
                           {post.category}
                         </div>
-                        <h3 className="font-semibold text-[#1E3A4A] group-hover:text-cg-sage transition-colors mb-2">{post.title}</h3>
+                        <h3 className="font-semibold text-[#1E3A4A] group-hover:text-[#3DAA8A] transition-colors mb-2">{post.title}</h3>
                         <div className="flex items-center gap-3 text-xs text-gray-600">
                           <span>{formatDate(post.date)}</span>
                           <span>{post.readTime}</span>
@@ -235,10 +242,10 @@ export default function BlogPage() {
                         )}
                       </div>
                       <div className="p-6">
-                        <div className={`inline-block px-2 py-0.5 ${getCategoryStyles(post.categoryColor as any)} text-xs font-medium rounded-full mb-3`}>
+                        <div className={`inline-block px-2 py-0.5 ${post.pillClasses} text-xs font-medium rounded-full mb-3`}>
                           {post.category}
                         </div>
-                        <h3 className="font-semibold text-[#1E3A4A] group-hover:text-cg-sage transition-colors mb-2">{post.title}</h3>
+                        <h3 className="font-semibold text-[#1E3A4A] group-hover:text-[#3DAA8A] transition-colors mb-2">{post.title}</h3>
                         <p className="text-sm text-gray-600 mb-4 line-clamp-2">{post.excerpt}</p>
                         <div className="flex items-center gap-3 text-xs text-gray-600">
                           <span>{formatDate(post.date)}</span>
@@ -259,11 +266,11 @@ export default function BlogPage() {
       {/* Newsletter */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-br from-cg-sage-subtle to-cg-amber-subtle rounded-2xl p-8 lg:p-12 text-center">
+          <div className="bg-gradient-to-br from-[#E8F4F0] to-[#FEF7ED] rounded-2xl p-8 lg:p-12 text-center">
             <h2 className="text-2xl sm:text-3xl font-semibold text-[#1E3A4A] mb-4">Get co-parenting tips in your inbox</h2>
             <p className="text-gray-600 mb-8 max-w-xl mx-auto">Join thousands of parents receiving weekly advice on communication, scheduling, and building a better co-parenting relationship.</p>
             <NewsletterForm />
-            <p className="text-xs text-gray-600 mt-4">No spam. Unsubscribe anytime.</p>
+            <p className="text-xs text-gray-500 mt-4">No spam. Unsubscribe anytime.</p>
           </div>
         </div>
       </section>
@@ -273,7 +280,7 @@ export default function BlogPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-2xl font-semibold text-[#1E3A4A] mb-4">Ready to put these tips into practice?</h2>
           <p className="text-gray-600 mb-8 max-w-xl mx-auto">CommonGround gives you the tools to communicate better, track agreements, and co-parent more effectively.</p>
-          <Link href="/register" className="inline-flex items-center justify-center gap-2 bg-cg-sage text-white font-medium px-8 py-3 rounded-full transition-all duration-200 hover:bg-cg-sage-light hover:shadow-lg">
+          <Link href="/register" className="inline-flex items-center justify-center gap-2 bg-[#3DAA8A] text-white font-medium px-8 py-3 rounded-full transition-all duration-200 hover:bg-[#2D8A70] hover:shadow-lg">
             Get Started Free <ArrowRight className="w-5 h-5" />
           </Link>
         </div>
