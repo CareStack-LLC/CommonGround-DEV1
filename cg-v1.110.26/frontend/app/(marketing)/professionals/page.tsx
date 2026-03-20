@@ -1,6 +1,6 @@
-'use client';
-
 import Link from 'next/link';
+import { ImagePlaceholder } from '@/components/marketing/image-placeholder';
+import { JsonLd } from '@/components/marketing/json-ld';
 import {
   Scale,
   Users,
@@ -19,57 +19,79 @@ import {
   ClipboardCheck,
   Brain,
   Globe,
+  Heart,
+  HelpCircle,
 } from 'lucide-react';
 
-/**
- * Professionals Landing Page
- *
- * Unified page for all family law professionals — attorneys, mediators,
- * GALs, custody evaluators, and parenting coordinators.
- *
- * CommonGround is NOT a practice management tool. It's a bridge between
- * parents and professionals — giving professionals a window into verified
- * family data without managing the case themselves.
- */
-
 const whoItsFor = [
-  { role: 'Family Law Attorneys', icon: Scale, description: 'Access verified evidence for custody and support cases' },
-  { role: 'Mediators', icon: Building2, description: 'Review communication patterns before and during sessions' },
-  { role: 'Guardians ad Litem', icon: Shield, description: 'See the full picture of family dynamics and compliance' },
-  { role: 'Custody Evaluators', icon: FileText, description: 'Analyze behavioral data and co-parenting patterns' },
-  { role: 'Parenting Coordinators', icon: Users, description: 'Monitor compliance and track agreement adherence' },
+  {
+    role: 'Family Law Attorneys',
+    icon: Scale,
+    description: 'Access verified evidence for custody and support cases',
+    benefit: 'Court-ready exports in one click',
+  },
+  {
+    role: 'Mediators',
+    icon: Building2,
+    description: 'Review communication patterns before and during sessions',
+    benefit: 'ARIA tone analysis for context',
+  },
+  {
+    role: 'Guardians ad Litem',
+    icon: Shield,
+    description: 'See the full picture of family dynamics and compliance',
+    benefit: 'Compliance metrics dashboard',
+  },
+  {
+    role: 'Custody Evaluators',
+    icon: FileText,
+    description: 'Analyze behavioral data and co-parenting patterns',
+    benefit: 'Custody analytics & time tracking',
+  },
+  {
+    role: 'Parenting Coordinators',
+    icon: Users,
+    description: 'Monitor compliance and track agreement adherence',
+    benefit: 'Real-time agreement tracking',
+  },
 ];
 
 const dataAccess = [
   {
     icon: MessageSquare,
     title: 'Communications',
-    description: 'Verified, timestamped messages between co-parents with tone and sentiment context from ARIA.',
+    description:
+      'Verified, timestamped messages between co-parents with tone and sentiment context from ARIA.',
   },
   {
     icon: Calendar,
     title: 'Custody Exchanges',
-    description: 'Check-in/check-out logs, schedule adherence, and any documented disruptions or modifications.',
+    description:
+      'Check-in/check-out logs, schedule adherence, and any documented disruptions or modifications.',
   },
   {
     icon: BarChart3,
     title: 'Compliance Data',
-    description: 'Agreement adherence tracking, schedule compliance rates, and behavioral pattern analysis.',
+    description:
+      'Agreement adherence tracking, schedule compliance rates, and behavioral pattern analysis.',
   },
   {
     icon: DollarSign,
     title: 'Financial Records',
-    description: 'Shared expense submissions, payment history, and verified financial documentation.',
+    description:
+      'Shared expense submissions, payment history, and verified financial documentation.',
   },
   {
     icon: Brain,
     title: 'ARIA Analysis',
-    description: 'AI-powered insights on communication quality, co-parenting dynamics, and areas of concern.',
+    description:
+      'AI-powered insights on communication quality, co-parenting dynamics, and areas of concern.',
   },
   {
     icon: Download,
     title: 'Court-Ready Exports',
-    description: 'Professional PDF reports with SHA-256 verification, neutral formatting, and complete audit trails.',
+    description:
+      'Professional PDF reports with SHA-256 verification, neutral formatting, and complete audit trails.',
   },
 ];
 
@@ -77,61 +99,118 @@ const steps = [
   {
     step: '01',
     title: 'Get invited or self-enroll',
-    description: 'A parent adds you to their case, or you join through our professional portal.',
+    description:
+      "A parent adds you to their case, or you join through our professional portal.",
   },
   {
     step: '02',
     title: 'Access the family file',
-    description: 'Review the family\'s CommonGround activity — communications, exchanges, finances, and compliance.',
+    description:
+      "Review the family's CommonGround activity — communications, exchanges, finances, and compliance.",
   },
   {
     step: '03',
     title: 'Review and analyze',
-    description: 'Use verified data and ARIA insights to inform your recommendations and decisions.',
+    description:
+      'Use verified data and ARIA insights to inform your recommendations and decisions.',
   },
   {
     step: '04',
     title: 'Export court-ready documentation',
-    description: 'Generate professional, tamper-proof reports ready for court filings or mediation sessions.',
+    description:
+      'Generate professional, tamper-proof reports ready for court filings or mediation sessions.',
+  },
+];
+
+const objections = [
+  {
+    question: 'I already use another co-parenting app with my clients.',
+    answer:
+      'CommonGround offers features no other platform provides — KidSpace for direct parent-child video calls, Silent Handoff for GPS-verified contactless exchanges, and ARIA messaging included free for clients. Your clients get a better experience at no extra cost to you.',
+    icon: HelpCircle,
+  },
+  {
+    question: "My clients won't adopt another app.",
+    answer:
+      "CommonGround's free tier means zero cost barrier for clients. They can sign up in 2 minutes with just an email. No credit card, no trial expiration. When both parents can start for free, adoption is easy.",
+    icon: Users,
+  },
+  {
+    question: 'I need records that hold up in court.',
+    answer:
+      'Every record in CommonGround is timestamped, encrypted, and verified with SHA-256 hashing. Exports are formatted for family law proceedings with complete audit trails. Tamper-proof by design.',
+    icon: Shield,
+  },
+  {
+    question: 'How much does it cost for professionals?',
+    answer:
+      'Professional access is free. Your clients choose and pay for their own plans. You get read access to verified data, exports, and analytics at no cost to you or your firm.',
+    icon: DollarSign,
   },
 ];
 
 export default function ProfessionalsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9]">
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'ProfessionalService',
+          name: 'CommonGround Professional Portal',
+          description:
+            'Verified co-parenting data access for family law professionals. Communications, exchanges, compliance, financials, and court-ready exports.',
+          serviceType: 'Family Law Technology',
+        }}
+      />
+
       {/* Hero */}
       <section className="pt-24 pb-16 sm:pt-32 sm:pb-24">
-        <div className="max-w-5xl mx-auto px-6 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#1E3A4A]/10 rounded-full mb-6">
-            <Eye className="w-4 h-4 text-[#1E3A4A]" />
-            <span className="text-sm font-medium text-[#1E3A4A]">For Family Law Professionals</span>
-          </div>
-          <h1
-            className="text-4xl sm:text-5xl lg:text-6xl text-[#1E3A4A] mb-6 leading-[1.1]"
-            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
-          >
-            The family data your cases need
-            <br />
-            <span className="text-[#3DAA8A]">organized, verified, and ready</span>
-          </h1>
-          <p className="text-lg sm:text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
-            CommonGround gives professionals a window into verified co-parenting activity — messages,
-            custody exchanges, finances, and compliance — without managing the case yourself.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/help/contact?type=demo"
-              className="inline-flex items-center justify-center px-8 py-4 bg-[#1E3A4A] text-white font-semibold rounded-full hover:bg-[#2D6A8F] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 group"
-            >
-              Schedule a Demo
-              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-            </Link>
-            <Link
-              href="/features"
-              className="inline-flex items-center justify-center px-8 py-4 bg-white text-[#1E3A4A] font-semibold rounded-full border-2 border-[#1E3A4A]/20 hover:border-[#1E3A4A]/40 hover:bg-[#1E3A4A]/5 transition-all"
-            >
-              Learn More
-            </Link>
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#1E3A4A]/10 rounded-full mb-6">
+                <Eye className="w-4 h-4 text-[#1E3A4A]" />
+                <span className="text-sm font-medium text-[#1E3A4A]">For Family Law Professionals</span>
+              </div>
+              <h1
+                className="text-4xl sm:text-5xl lg:text-6xl text-[#1E3A4A] mb-6 leading-[1.1]"
+                style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
+              >
+                Access verified family data
+                <br />
+                <span className="text-[#3DAA8A]">in minutes, not months</span>
+              </h1>
+              <p className="text-lg sm:text-xl text-gray-600 mb-6 leading-relaxed">
+                CommonGround gives professionals a window into verified co-parenting activity — messages,
+                custody exchanges, finances, and compliance — without managing the case yourself.
+              </p>
+              <p className="text-base text-[var(--portal-primary)] font-medium mb-8">
+                Free for professionals. Your clients pay for their own plans.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link
+                  href="/help/contact?type=demo"
+                  className="inline-flex items-center justify-center px-8 py-4 bg-[#1E3A4A] text-white font-semibold rounded-full hover:bg-[#2D6A8F] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 group"
+                >
+                  Schedule a Demo
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </Link>
+                <Link
+                  href="/features"
+                  className="inline-flex items-center justify-center px-8 py-4 bg-white text-[#1E3A4A] font-semibold rounded-full border-2 border-[#1E3A4A]/20 hover:border-[#1E3A4A]/40 hover:bg-[#1E3A4A]/5 transition-all"
+                >
+                  See All Features
+                </Link>
+              </div>
+            </div>
+
+            <div>
+              <ImagePlaceholder
+                alt="Professional dashboard showing case overview with timeline and compliance metrics"
+                prompt="Professional portal dashboard mockup showing family case overview with timeline, compliance metrics, and document exports, clean dark UI with teal accents, no text"
+                aspectRatio="4/3"
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -158,14 +237,22 @@ export default function ProfessionalsPage() {
               return (
                 <div
                   key={item.role}
-                  className="flex items-start gap-4 bg-gradient-to-br from-[#F5F9F9] to-white rounded-2xl p-6 border-2 border-[#1E3A4A]/8 hover:border-[#3DAA8A]/30 transition-all hover:shadow-md"
+                  className="flex flex-col bg-gradient-to-br from-[#F5F9F9] to-white rounded-2xl p-6 border-2 border-[#1E3A4A]/8 hover:border-[#3DAA8A]/30 transition-all hover:shadow-md"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-[#3DAA8A]/10 flex items-center justify-center flex-shrink-0">
-                    <Icon className="w-6 h-6 text-[#3DAA8A]" />
+                  <div className="flex items-start gap-4 mb-3">
+                    <div className="w-12 h-12 rounded-xl bg-[#3DAA8A]/10 flex items-center justify-center flex-shrink-0">
+                      <Icon className="w-6 h-6 text-[#3DAA8A]" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-[#1E3A4A] mb-1">{item.role}</h3>
+                      <p className="text-sm text-gray-600">{item.description}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-semibold text-[#1E3A4A] mb-1">{item.role}</h3>
-                    <p className="text-sm text-gray-600">{item.description}</p>
+                  <div className="mt-auto pt-3 border-t border-gray-100">
+                    <p className="text-xs font-medium text-[var(--portal-primary)]">
+                      <Check className="w-3 h-3 inline mr-1" />
+                      {item.benefit}
+                    </p>
                   </div>
                 </div>
               );
@@ -174,13 +261,52 @@ export default function ProfessionalsPage() {
         </div>
       </section>
 
-      {/* What You'll See — Data Access Section */}
+      {/* Questions Professionals Ask — Objection Handling */}
       <section className="py-16 sm:py-24 bg-gradient-to-b from-[#F4F8F7] to-white">
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2
+              className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+              style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
+            >
+              Questions professionals <span className="text-[#3DAA8A]">ask</span>
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Honest answers to the questions we hear most from attorneys, mediators, and evaluators.
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            {objections.map((obj) => {
+              const Icon = obj.icon;
+              return (
+                <div
+                  key={obj.question}
+                  className="bg-white rounded-2xl p-6 border-2 border-gray-100 hover:border-[#3DAA8A]/20 transition-all"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-[#1E3A4A]/8 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Icon className="w-5 h-5 text-[#1E3A4A]" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-[#1E3A4A] mb-2">{obj.question}</h3>
+                      <p className="text-gray-600 leading-relaxed">{obj.answer}</p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Data Access */}
+      <section className="py-16 sm:py-24 bg-white">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#3DAA8A]/10 rounded-full mb-6">
               <ClipboardCheck className="w-4 h-4 text-[#3DAA8A]" />
-              <span className="text-sm font-medium text-[#3DAA8A]">What You'll See</span>
+              <span className="text-sm font-medium text-[#3DAA8A]">What You&apos;ll See</span>
             </div>
             <h2
               className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
@@ -194,7 +320,7 @@ export default function ProfessionalsPage() {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {dataAccess.map((item) => {
               const Icon = item.icon;
               return (
@@ -216,10 +342,65 @@ export default function ProfessionalsPage() {
               );
             })}
           </div>
+
+          <div className="grid md:grid-cols-2 gap-6">
+            <ImagePlaceholder
+              alt="Professional portal communications timeline view"
+              prompt="Professional portal screenshot showing communications timeline with verified message cards, tone analysis badges, timestamps, clean professional UI with teal accents, no text"
+              aspectRatio="16/10"
+            />
+            <ImagePlaceholder
+              alt="Professional portal compliance dashboard"
+              prompt="Professional portal screenshot showing compliance dashboard with schedule adherence chart, exchange metrics, behavioral analysis cards, clean professional UI, no text"
+              aspectRatio="16/10"
+            />
+          </div>
         </div>
       </section>
 
-      {/* Directory Feature — Secondary, not hero */}
+      {/* 4Ever Forward Impact */}
+      <section className="py-16 sm:py-24 bg-gradient-to-b from-[#F4F8F7] to-white">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--portal-primary)]/10 rounded-full mb-6">
+            <Heart className="h-4 w-4 text-[var(--portal-primary)]" />
+            <span className="text-sm font-medium text-[var(--portal-primary)]">Proven Impact</span>
+          </div>
+          <h2
+            className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
+          >
+            Real families, <span className="text-[#3DAA8A]">real results</span>
+          </h2>
+          <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+            Through the 4Ever Forward Foundation grant program, CommonGround helped families in high-conflict situations find cooperation. One mediator called it a breakthrough after two years of conflict.
+          </p>
+
+          <div className="bg-white rounded-2xl p-8 border-2 border-[#F5A623]/10 max-w-2xl mx-auto mb-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-10 w-10 rounded-full bg-[var(--portal-primary)]/10 flex items-center justify-center">
+                <Users className="h-5 w-5 text-[var(--portal-primary)]" />
+              </div>
+              <div className="text-left">
+                <p className="font-semibold text-gray-900">The Rivera Family</p>
+                <p className="text-sm text-[#F5A623]">4Ever Forward Grant Program</p>
+              </div>
+            </div>
+            <p className="text-gray-600 leading-relaxed italic text-left">
+              &ldquo;Both parents were court-ordered to communicate, but every exchange had devolved into arguments for over two years. After three months on CommonGround, their mediator said it was the first time she had seen them cooperate — on anything.&rdquo;
+            </p>
+          </div>
+
+          <Link
+            href="/testimonials"
+            className="inline-flex items-center gap-2 text-[var(--portal-primary)] font-medium hover:underline"
+          >
+            Read all impact stories
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+      </section>
+
+      {/* Directory */}
       <section className="py-16 sm:py-24 bg-white">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -255,15 +436,14 @@ export default function ProfessionalsPage() {
               </ul>
             </div>
 
-            {/* Directory Preview */}
             <div className="bg-[#F4F8F7] rounded-3xl p-6 border-2 border-gray-100 shadow-lg">
               <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200">
                 <Search className="w-5 h-5 text-gray-400" />
                 <span className="text-gray-500">Find a professional near Los Angeles, CA...</span>
               </div>
               {[
-                { name: 'Morrison Family Law', specialty: 'Custody & Co-Parenting', type: 'Attorney' },
-                { name: 'Bay Area Mediation Group', specialty: 'Mediation, Collaborative', type: 'Mediator' },
+                { name: 'Morrison Family Law', specialty: 'Custody & Co-Parenting', type: 'Attorney', highlight: false },
+                { name: 'Bay Area Mediation Group', specialty: 'Mediation, Collaborative', type: 'Mediator', highlight: false },
                 { name: 'Your Practice Here', specialty: 'Your Specialty', type: '', highlight: true },
               ].map((firm, i) => (
                 <div
@@ -281,11 +461,13 @@ export default function ProfessionalsPage() {
                       </p>
                       <p className="text-sm text-gray-500">{firm.specialty}</p>
                     </div>
-                    <div className={`text-xs font-medium px-2 py-1 rounded-full ${
-                      firm.highlight
-                        ? 'bg-[#F5A623]/20 text-[#F5A623]'
-                        : 'bg-[#3DAA8A]/10 text-[#3DAA8A]'
-                    }`}>
+                    <div
+                      className={`text-xs font-medium px-2 py-1 rounded-full ${
+                        firm.highlight
+                          ? 'bg-[#F5A623]/20 text-[#F5A623]'
+                          : 'bg-[#3DAA8A]/10 text-[#3DAA8A]'
+                      }`}
+                    >
                       {firm.highlight ? 'Join today' : firm.type}
                     </div>
                   </div>
@@ -397,12 +579,15 @@ export default function ProfessionalsPage() {
               <ArrowRight className="ml-2 h-6 w-6 group-hover:translate-x-2 transition-transform" />
             </Link>
             <Link
-              href="/features"
+              href="/register"
               className="inline-flex items-center justify-center px-10 py-5 bg-white/10 text-white font-bold text-lg rounded-full hover:bg-white/20 transition-all border-2 border-white/30"
             >
-              Learn More
+              Recommend to a Client
             </Link>
           </div>
+          <p className="text-sm text-white/50 mt-6">
+            Free for professionals. Your clients choose their own plans.
+          </p>
         </div>
       </section>
     </div>

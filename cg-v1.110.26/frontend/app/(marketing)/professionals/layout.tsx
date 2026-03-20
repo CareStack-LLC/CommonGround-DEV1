@@ -1,27 +1,27 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'For Family Law Professionals | CommonGround',
+  title: 'For Family Law Professionals | Free Case Data Access | CommonGround',
   description:
-    'Access verified co-parenting data for your cases. Communications, custody exchanges, financial records, and court-ready exports — all in one secure platform.',
+    'Access verified co-parenting data for custody cases. Communications, exchanges, financial records, compliance metrics, and court-ready SHA-256 verified exports. Free for attorneys, mediators, GALs, and evaluators.',
   keywords: [
-    'family law professionals',
-    'co-parenting data',
-    'court-ready exports',
-    'custody exchange records',
+    'family law software',
+    'custody case management',
+    'guardian ad litem tools',
+    'co-parenting compliance data',
+    'court-ready evidence platform',
     'family law attorney tools',
-    'guardian ad litem',
-    'custody evaluator',
-    'parenting coordinator',
-    'mediator tools',
-    'co-parenting compliance',
-    'family law evidence',
+    'custody evaluator software',
+    'parenting coordinator tools',
+    'mediator co-parenting tools',
+    'co-parenting professional portal',
     'CommonGround professionals',
+    'KidSpace',
   ],
   openGraph: {
-    title: 'For Family Law Professionals | CommonGround',
+    title: 'For Family Law Professionals | Free Case Data Access | CommonGround',
     description:
-      'Access verified co-parenting data for your cases. Communications, custody exchanges, financial records, and court-ready exports — all in one secure platform.',
+      'Access verified co-parenting data for your cases. Free for professionals — communications, custody exchanges, financial records, and SHA-256 verified court-ready exports.',
     type: 'website',
   },
 };

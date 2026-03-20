@@ -24,6 +24,16 @@ const faqItems = [
     answer:
       'KidSpace lets children video call, read stories, and play games with both parents \u2014 a safe space designed around them, not the conflict.',
   },
+  {
+    question: 'How is CommonGround different from other co-parenting apps?',
+    answer:
+      'CommonGround includes ARIA messaging free (most competitors charge for AI features), plus unique features like KidSpace for direct parent-child video calls and Silent Handoff for GPS-verified contactless exchanges. No other co-parenting app offers these.',
+  },
+  {
+    question: 'Can my attorney access my records?',
+    answer:
+      'Yes. You can invite your attorney, mediator, or other family law professional to view your CommonGround data. They get read-only access to verified records at no cost to them.',
+  },
 ];
 
 export default function FAQSection() {

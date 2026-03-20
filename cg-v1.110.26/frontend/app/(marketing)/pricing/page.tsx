@@ -3,98 +3,170 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
-import { Check, Clock, DollarSign, Scale } from 'lucide-react';
+import { Check, Clock, DollarSign, Scale, Minus } from 'lucide-react';
+
+const plans = [
+  {
+    name: 'Web Starter',
+    code: 'web_starter',
+    tagline: 'Everything you need to start',
+    whoFor: 'Parents beginning their co-parenting journey',
+    monthly: 0,
+    annual: 0,
+    features: [
+      'ARIA-assisted messaging',
+      'Shared custody calendar',
+      'ClearFund expense tracking',
+      'Full web access',
+    ],
+    color: 'var(--portal-primary)',
+    cta: 'Start Free',
+  },
+  {
+    name: 'Plus',
+    code: 'plus',
+    tagline: 'Automate the hard parts',
+    whoFor: 'Parents ready to stop coordinating and start co-parenting',
+    monthly: 17.99,
+    annual: 199.99,
+    popular: true,
+    features: [
+      'Everything in Web Starter',
+      'Automated recurring schedules',
+      'Quick Accords (one-time agreements)',
+      'PDF exports',
+      'My Circle: 1 trusted contact',
+      'Mobile apps (coming soon)',
+    ],
+    color: '#F5A623',
+    cta: 'Start 14-Day Trial',
+  },
+  {
+    name: 'Complete',
+    code: 'complete',
+    tagline: 'Peace of mind, documented',
+    whoFor: 'Parents who need verified exchanges and court-ready records',
+    monthly: 34.99,
+    annual: 349.99,
+    features: [
+      'Everything in Plus',
+      'Silent Handoff GPS verification',
+      'Custody analytics & tracking',
+      'KidSpace video calls',
+      'Court-ready evidence packages',
+      'Priority support',
+    ],
+    color: 'var(--portal-primary)',
+    cta: 'Start 14-Day Trial',
+  },
+];
+
+const comparisonCategories = [
+  {
+    name: 'Communication',
+    features: [
+      { name: 'ARIA-assisted messaging', free: true, plus: true, complete: true },
+      { name: 'Message history & search', free: true, plus: true, complete: true },
+      { name: 'Read receipts', free: false, plus: true, complete: true },
+      { name: 'Message tone analysis', free: true, plus: true, complete: true },
+    ],
+  },
+  {
+    name: 'Scheduling',
+    features: [
+      { name: 'Shared custody calendar', free: true, plus: true, complete: true },
+      { name: 'Automated recurring schedules', free: false, plus: true, complete: true },
+      { name: 'Holiday rotation management', free: false, plus: true, complete: true },
+      { name: 'Quick Accords (one-time agreements)', free: false, plus: true, complete: true },
+      { name: 'Automatic reminders', free: false, plus: true, complete: true },
+    ],
+  },
+  {
+    name: 'Finances',
+    features: [
+      { name: 'ClearFund expense tracking', free: true, plus: true, complete: true },
+      { name: 'Receipt uploads', free: true, plus: true, complete: true },
+      { name: 'Auto-split calculations', free: false, plus: true, complete: true },
+      { name: 'Payment tracking', free: false, plus: true, complete: true },
+    ],
+  },
+  {
+    name: 'Children',
+    features: [
+      { name: 'KidSpace video calls', free: false, plus: false, complete: true },
+      { name: 'KidSpace messaging', free: false, plus: false, complete: true },
+      { name: 'KidSpace movie nights & activities', free: false, plus: false, complete: true },
+    ],
+  },
+  {
+    name: 'Exchanges',
+    features: [
+      { name: 'Silent Handoff GPS verification', free: false, plus: false, complete: true },
+      { name: 'QR code check-in confirmation', free: false, plus: false, complete: true },
+      { name: 'Exchange history & logs', free: false, plus: false, complete: true },
+    ],
+  },
+  {
+    name: 'Documentation & Evidence',
+    features: [
+      { name: 'PDF message exports', free: false, plus: true, complete: true },
+      { name: 'Court-ready evidence packages', free: false, plus: false, complete: true },
+      { name: 'SHA-256 tamper verification', free: false, plus: false, complete: true },
+      { name: 'Custody analytics & time tracking', free: false, plus: false, complete: true },
+    ],
+  },
+  {
+    name: 'Support & Access',
+    features: [
+      { name: 'Web access', free: true, plus: true, complete: true },
+      { name: 'Mobile apps', free: false, plus: 'Coming soon', complete: 'Coming soon' },
+      { name: 'My Circle trusted contacts', free: false, plus: '1 contact', complete: '3 contacts' },
+      { name: 'Professional portal access', free: false, plus: false, complete: true },
+      { name: 'Priority support', free: false, plus: false, complete: true },
+    ],
+  },
+];
 
 export default function PricingPage() {
   const router = useRouter();
   const { user } = useAuth();
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly');
 
-  const plans = [
-    {
-      name: 'Web Starter',
-      code: 'web_starter',
-      tagline: 'Everything you need to start',
-      whoFor: 'Parents beginning their co-parenting journey',
-      monthly: 0,
-      annual: 0,
-      features: [
-        'ARIA-assisted messaging',
-        'Shared custody calendar',
-        'ClearFund expense tracking',
-        'Full web access'
-      ],
-      color: 'var(--portal-primary)',
-      cta: 'Start Free'
-    },
-    {
-      name: 'Plus',
-      code: 'plus',
-      tagline: 'Automate the hard parts',
-      whoFor: 'Parents ready to stop coordinating and start co-parenting',
-      monthly: 17.99,
-      annual: 199.99,
-      popular: true,
-      features: [
-        'Everything in Web Starter',
-        'Automated recurring schedules',
-        'Quick Accords (one-time agreements)',
-        'PDF exports',
-        'My Circle: 1 trusted contact',
-        'Mobile apps (coming soon)'
-      ],
-      color: '#F5A623',
-      cta: 'Start Trial'
-    },
-    {
-      name: 'Complete',
-      code: 'complete',
-      tagline: 'Peace of mind, documented',
-      whoFor: 'Parents who need verified exchanges and court-ready records',
-      monthly: 34.99,
-      annual: 349.99,
-      features: [
-        'Everything in Plus',
-        'Silent Handoff GPS verification',
-        'Custody analytics & tracking',
-        'KidSpace video calls',
-        'Court-ready evidence packages',
-        'Priority support'
-      ],
-      color: 'var(--portal-primary)',
-      cta: 'Start Trial'
-    }
-  ];
-
-  const getPrice = (plan: typeof plans[0]) => {
+  const getPrice = (plan: (typeof plans)[0]) => {
     if (plan.monthly === 0) return '$0';
-    if (billingPeriod === 'monthly') {
-      return `$${plan.monthly}`;
-    }
-    const monthlyEquiv = (plan.annual / 12).toFixed(2);
-    return `$${monthlyEquiv}`;
+    if (billingPeriod === 'monthly') return `$${plan.monthly}`;
+    return `$${(plan.annual / 12).toFixed(2)}`;
   };
 
-  const getPeriod = (plan: typeof plans[0]) => {
+  const getPeriod = (plan: (typeof plans)[0]) => {
     if (plan.monthly === 0) return 'forever';
     if (billingPeriod === 'annual') return '/month (billed annually)';
     return '/month';
   };
 
-  const getSavings = (plan: typeof plans[0]) => {
+  const getSavings = (plan: (typeof plans)[0]) => {
     if (plan.monthly === 0 || billingPeriod === 'monthly') return null;
-    const monthlyCost = plan.monthly * 12;
-    const savings = monthlyCost - plan.annual;
+    const savings = plan.monthly * 12 - plan.annual;
     return `Save $${savings.toFixed(0)}/year`;
+  };
+
+  const handleCTA = () => {
+    router.push(user ? '/settings/billing' : '/register');
+  };
+
+  const renderCheckmark = (value: boolean | string) => {
+    if (value === true) return <Check className="w-5 h-5 text-[var(--portal-primary)] mx-auto" />;
+    if (value === false) return <Minus className="w-4 h-4 text-gray-300 mx-auto" />;
+    return <span className="text-xs text-gray-500">{value}</span>;
   };
 
   return (
     <div className="min-h-screen bg-[#F4F8F7]">
-      {/* Hero Section */}
+      {/* Hero */}
       <section className="relative pt-24 pb-16 px-6 overflow-hidden">
         <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-[var(--portal-primary)] rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#F5A623] rounded-full blur-3xl"></div>
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-[var(--portal-primary)] rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#F5A623] rounded-full blur-3xl" />
         </div>
 
         <div className="relative max-w-4xl mx-auto text-center">
@@ -107,11 +179,13 @@ export default function PricingPage() {
             <span className="text-[var(--portal-primary)]">Upgrade when ready.</span>
           </h1>
 
-          <p className="text-xl sm:text-2xl text-gray-600 mb-8 leading-relaxed max-w-2xl mx-auto">
+          <p className="text-xl sm:text-2xl text-gray-600 mb-4 leading-relaxed max-w-2xl mx-auto">
             No credit card. No pressure. Just see if automation works better than coordination.
           </p>
+          <p className="text-base text-gray-500 mb-8 max-w-xl mx-auto">
+            Less than the cost of one missed exchange or one heated text that ends up in court.
+          </p>
 
-          {/* Billing Toggle */}
           <div className="inline-flex items-center gap-4 bg-white/60 backdrop-blur-sm rounded-full p-2">
             <button
               onClick={() => setBillingPeriod('monthly')}
@@ -142,17 +216,12 @@ export default function PricingPage() {
       <section className="py-16 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-3 gap-8">
-            {plans.map((plan, idx) => (
+            {plans.map((plan) => (
               <div
                 key={plan.code}
                 className={`relative bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 ${
                   plan.popular ? 'ring-2 ring-[#F5A623] scale-105' : ''
                 }`}
-                style={{
-                  animationDelay: `${idx * 100}ms`,
-                  animation: 'slideUp 0.6s ease-out forwards',
-                  opacity: 0
-                }}
               >
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2">
@@ -162,7 +231,14 @@ export default function PricingPage() {
                   </div>
                 )}
 
-                {/* Header */}
+                {plan.monthly > 0 && (
+                  <div className="absolute top-4 right-4">
+                    <span className="text-[var(--portal-primary)] bg-[var(--portal-primary)]/10 text-xs font-medium px-2 py-1 rounded-full">
+                      14-day free trial
+                    </span>
+                  </div>
+                )}
+
                 <div className="text-center mb-6">
                   <h2
                     className="text-3xl font-serif text-[#1E3A4A] mb-2"
@@ -173,25 +249,17 @@ export default function PricingPage() {
                   <p className="text-sm text-gray-500 mb-4">{plan.tagline}</p>
 
                   <div className="mb-2">
-                    <span
-                      className="text-5xl font-bold"
-                      style={{ color: plan.color }}
-                    >
+                    <span className="text-5xl font-bold" style={{ color: plan.color }}>
                       {getPrice(plan)}
                     </span>
-                    <span className="text-gray-500 text-sm ml-1">
-                      {getPeriod(plan)}
-                    </span>
+                    <span className="text-gray-500 text-sm ml-1">{getPeriod(plan)}</span>
                   </div>
 
                   {getSavings(plan) && (
-                    <div className="text-sm text-[#F5A623] font-medium">
-                      {getSavings(plan)}
-                    </div>
+                    <div className="text-sm text-[#F5A623] font-medium">{getSavings(plan)}</div>
                   )}
                 </div>
 
-                {/* Who it's for */}
                 <div className="mb-6 p-4 bg-gray-50 rounded-xl">
                   <p className="text-sm text-center">
                     <span className="font-medium text-gray-700">Best for:</span>{' '}
@@ -199,33 +267,22 @@ export default function PricingPage() {
                   </p>
                 </div>
 
-                {/* Features */}
                 <ul className="space-y-3 mb-8">
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-3">
-                      <Check
-                        className="w-5 h-5 flex-shrink-0 mt-0.5"
-                        style={{ color: plan.color }}
-                      />
+                      <Check className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: plan.color }} />
                       <span className="text-gray-700 text-sm">{feature}</span>
                     </li>
                   ))}
                 </ul>
 
-                {/* CTA */}
                 <button
-                  onClick={() => {
-                    if (user) {
-                      router.push('/settings/billing');
-                    } else {
-                      router.push('/signup');
-                    }
-                  }}
+                  onClick={handleCTA}
                   className="w-full py-3 rounded-xl font-medium text-lg transition-all duration-200 shadow-md hover:shadow-xl hover:-translate-y-0.5"
                   style={{
                     backgroundColor: plan.popular ? plan.color : 'white',
                     color: plan.popular ? 'white' : plan.color,
-                    border: plan.popular ? 'none' : `2px solid ${plan.color}`
+                    border: plan.popular ? 'none' : `2px solid ${plan.color}`,
                   }}
                 >
                   {plan.cta}
@@ -235,11 +292,152 @@ export default function PricingPage() {
           </div>
 
           <p className="text-center text-sm text-gray-500 mt-8">
-            All paid plans include a 14-day free trial. Cancel anytime.
+            All paid plans include a 14-day free trial. Cancel anytime. No contracts.
+          </p>
+        </div>
+      </section>
+
+      {/* Full Feature Comparison Table */}
+      <section className="py-16 px-6 bg-white">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2
+              className="text-3xl sm:text-4xl font-serif text-[#1E3A4A] mb-4"
+              style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
+            >
+              Compare every <span className="text-[#3DAA8A]">feature</span>
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              See exactly what&apos;s included in each plan.
+            </p>
+          </div>
+
+          <div className="bg-white rounded-2xl border-2 border-gray-100 overflow-hidden shadow-sm">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-[#1E3A4A] text-white">
+                    <th className="text-left py-4 px-6 font-semibold min-w-[240px]">Feature</th>
+                    <th className="text-center py-4 px-4 font-semibold min-w-[100px]">
+                      <div>Web Starter</div>
+                      <div className="text-xs font-normal text-white/60 mt-0.5">Free</div>
+                    </th>
+                    <th className="text-center py-4 px-4 font-semibold min-w-[100px] bg-[#F5A623]/20">
+                      <div className="text-[#F5A623]">Plus</div>
+                      <div className="text-xs font-normal text-white/60 mt-0.5">$17.99/mo</div>
+                    </th>
+                    <th className="text-center py-4 px-4 font-semibold min-w-[100px]">
+                      <div>Complete</div>
+                      <div className="text-xs font-normal text-white/60 mt-0.5">$34.99/mo</div>
+                    </th>
+                  </tr>
+                </thead>
+                {comparisonCategories.map((category) => (
+                  <tbody key={category.name}>
+                    <tr>
+                      <td
+                        colSpan={4}
+                        className="py-3 px-6 bg-[#F4F8F7] font-semibold text-[#1E3A4A] text-xs uppercase tracking-wide border-t border-gray-200"
+                      >
+                        {category.name}
+                      </td>
+                    </tr>
+                    {category.features.map((feature) => (
+                      <tr
+                        key={feature.name}
+                        className="border-t border-gray-50 hover:bg-gray-50/50 transition-colors"
+                      >
+                        <td className="py-3 px-6 text-gray-700">{feature.name}</td>
+                        <td className="py-3 px-4 text-center">{renderCheckmark(feature.free)}</td>
+                        <td className="py-3 px-4 text-center bg-[#F5A623]/[0.03]">
+                          {renderCheckmark(feature.plus)}
+                        </td>
+                        <td className="py-3 px-4 text-center">{renderCheckmark(feature.complete)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                ))}
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Free Tier Highlight */}
+      <section className="py-16 px-6 bg-gradient-to-br from-[#E8F4F8] to-white">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2
+            className="text-3xl sm:text-4xl font-serif text-[#1E3A4A] mb-4"
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
+          >
+            ARIA messaging. <span className="text-[#3DAA8A]">Included free.</span>
+          </h2>
+          <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+            Most co-parenting apps charge for AI features. CommonGround includes ARIA messaging in the free tier &mdash; no ads, no message limits, no expiring trial.
+          </p>
+          <div className="grid sm:grid-cols-3 gap-6 max-w-3xl mx-auto">
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+              <p className="text-2xl font-bold text-[var(--portal-primary)] mb-1">$0</p>
+              <p className="text-sm text-gray-600">ARIA messaging forever</p>
+            </div>
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+              <p className="text-2xl font-bold text-[var(--portal-primary)] mb-1">No ads</p>
+              <p className="text-sm text-gray-600">Clean, focused experience</p>
+            </div>
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+              <p className="text-2xl font-bold text-[var(--portal-primary)] mb-1">Unlimited</p>
+              <p className="text-sm text-gray-600">No message caps</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Cost Comparison */}
+      <section className="py-16 px-6 bg-white">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2
+            className="text-3xl sm:text-4xl font-serif text-[#1E3A4A] mb-4"
+            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
+          >
+            The cost of <span className="text-[#F5A623]">not</span> having CommonGround
+          </h2>
+          <p className="text-lg text-gray-600 mb-10 max-w-2xl mx-auto">
+            One heated text in court. One missed exchange. One undocumented conversation. The cost adds up fast.
           </p>
 
-          {/* Professional Pricing */}
-          <div className="mt-12 bg-gradient-to-br from-[#1E3A4A]/5 to-white rounded-2xl p-8 border-2 border-[var(--portal-primary)]/10 text-center">
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="bg-[#FEF7ED] rounded-xl p-6 border border-[#F5A623]/10">
+              <div className="h-12 w-12 rounded-xl bg-[#F5A623]/10 flex items-center justify-center mx-auto mb-3">
+                <Scale className="h-6 w-6 text-[#F5A623]" />
+              </div>
+              <p className="text-sm text-gray-500 mb-1">Avg. attorney hour</p>
+              <p className="text-3xl font-bold text-[#1E3A4A]">$300+</p>
+              <p className="text-xs text-gray-500 mt-2">1 hour saved = 8 months of Complete</p>
+            </div>
+            <div className="bg-[#E8F4F8] rounded-xl p-6 border border-[var(--portal-primary)]/10">
+              <div className="h-12 w-12 rounded-xl bg-[var(--portal-primary)]/10 flex items-center justify-center mx-auto mb-3">
+                <DollarSign className="h-6 w-6 text-[var(--portal-primary)]" />
+              </div>
+              <p className="text-sm text-gray-500 mb-1">Avg. mediation session</p>
+              <p className="text-3xl font-bold text-[#1E3A4A]">$200–500</p>
+              <p className="text-xs text-gray-500 mt-2">Calmer messages mean fewer sessions</p>
+            </div>
+            <div className="bg-[#FEF7ED] rounded-xl p-6 border border-[#F5A623]/10">
+              <div className="h-12 w-12 rounded-xl bg-[#F5A623]/10 flex items-center justify-center mx-auto mb-3">
+                <Clock className="h-6 w-6 text-[#F5A623]" />
+              </div>
+              <p className="text-sm text-gray-500 mb-1">Hours spent coordinating</p>
+              <p className="text-3xl font-bold text-[#1E3A4A]">Countless</p>
+              <p className="text-xs text-gray-500 mt-2">Time you could spend with your kids</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Professional Pricing */}
+      <section className="py-12 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="bg-gradient-to-br from-[#1E3A4A]/5 to-white rounded-2xl p-8 border-2 border-[var(--portal-primary)]/10 text-center">
             <h3
               className="text-2xl font-serif text-[#1E3A4A] mb-3"
               style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
@@ -247,7 +445,7 @@ export default function PricingPage() {
               For Family Law Professionals
             </h3>
             <p className="text-gray-600 mb-4 max-w-xl mx-auto">
-              Custom pricing for attorneys, mediators, and law firms. Includes the Professional Portal, court-ready exports, and firm directory listing.
+              Free access for professionals. Your clients choose their own plans. Includes the Professional Portal, court-ready exports, and searchable directory listing.
             </p>
             <button
               onClick={() => router.push('/professionals')}
@@ -259,57 +457,7 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* Value Props */}
-      <section className="py-20 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2
-            className="text-4xl sm:text-5xl font-serif text-[#1E3A4A] mb-6"
-            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
-          >
-            Why upgrade?
-          </h2>
-
-          <div className="grid md:grid-cols-3 gap-6 mt-12">
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="h-14 w-14 rounded-xl bg-[var(--portal-primary)]/10 flex items-center justify-center mx-auto mb-3">
-                <Clock className="h-7 w-7 text-[var(--portal-primary)]" />
-              </div>
-              <h3 className="font-serif text-xl text-[#1E3A4A] mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-                Stop coordinating
-              </h3>
-              <p className="text-gray-600 text-sm">
-                Set schedules once. Get automatic reminders. Never text about pickups again.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="h-14 w-14 rounded-xl bg-[var(--portal-primary)]/10 flex items-center justify-center mx-auto mb-3">
-                <DollarSign className="h-7 w-7 text-[#F5A623]" />
-              </div>
-              <h3 className="font-serif text-xl text-[#1E3A4A] mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-                Keep finances clear
-              </h3>
-              <p className="text-gray-600 text-sm">
-                Track every dollar. Upload receipts. Auto-split costs. Clear records for court.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="h-14 w-14 rounded-xl bg-[var(--portal-primary)]/10 flex items-center justify-center mx-auto mb-3">
-                <Scale className="h-7 w-7 text-[var(--portal-primary)]" />
-              </div>
-              <h3 className="font-serif text-xl text-[#1E3A4A] mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-                Be court-ready
-              </h3>
-              <p className="text-gray-600 text-sm">
-                GPS verification. Custody analytics. Evidence packages. Everything timestamped.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ Section */}
+      {/* FAQ */}
       <section className="py-20 px-6 bg-white">
         <div className="max-w-3xl mx-auto">
           <h2
@@ -321,29 +469,19 @@ export default function PricingPage() {
 
           <div className="space-y-6">
             {[
-              {
-                q: 'Do both parents need to pay?',
-                a: 'No. Each parent manages their own subscription. You can message each other regardless of plan.'
-              },
-              {
-                q: 'Can I cancel anytime?',
-                a: 'Yes. No contracts. No commitments. Cancel with one click from your settings.'
-              },
-              {
-                q: 'What happens to my data if I cancel?',
-                a: 'You keep read-only access for 90 days. Export everything before that if you need it.'
-              },
-              {
-                q: 'Do you offer financial hardship discounts?',
-                a: 'Yes. Every family deserves access to these tools, regardless of finances. Email support@find-commonground.com and we\'ll work with you.'
-              }
+              { q: 'Do both parents need to pay?', a: 'No. Each parent manages their own subscription. You can message each other regardless of plan.' },
+              { q: 'Can I cancel anytime?', a: 'Yes. No contracts. No commitments. Cancel with one click from your settings.' },
+              { q: 'What happens to my data if I cancel?', a: "You keep read-only access for 90 days. Export everything before that if you need it." },
+              { q: 'Do you offer financial hardship discounts?', a: "Yes. Every family deserves access to these tools. Email support@find-commonground.com and we'll work with you." },
+              { q: 'How does CommonGround compare to other co-parenting apps?', a: 'CommonGround includes ARIA messaging free (most competitors charge), plus unique features like KidSpace video calls and Silent Handoff GPS exchanges that no other app offers.' },
+              { q: 'What happens after the 14-day trial?', a: "You'll be charged for your chosen plan. Cancel before the trial ends and you won't be charged. You can always downgrade to the free Web Starter plan." },
+              { q: 'Can I switch plans anytime?', a: 'Yes. Upgrade or downgrade anytime from your settings. Changes take effect on your next billing cycle.' },
+              { q: 'Is there a family or couple discount?', a: 'Each parent has their own account and subscription. We keep pricing simple — the same price for everyone, with financial hardship discounts available.' },
             ].map((faq) => (
               <details key={faq.q} className="group bg-gray-50 rounded-xl p-6">
                 <summary className="cursor-pointer list-none flex items-center justify-between font-medium text-[#1E3A4A]">
                   {faq.q}
-                  <span className="text-gray-400 group-open:rotate-180 transition-transform">
-                    ▼
-                  </span>
+                  <span className="text-gray-400 group-open:rotate-180 transition-transform">▼</span>
                 </summary>
                 <p className="mt-4 text-gray-600">{faq.a}</p>
               </details>
@@ -352,13 +490,12 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* Final CTA */}
       <section className="py-20 px-6 bg-gradient-to-br from-[var(--portal-primary)] to-[#234846] text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#F5A623] rounded-full blur-3xl"></div>
+          <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#F5A623] rounded-full blur-3xl" />
         </div>
-
         <div className="relative max-w-4xl mx-auto text-center">
           <h2
             className="text-4xl sm:text-5xl font-serif mb-6 leading-tight"
@@ -366,37 +503,18 @@ export default function PricingPage() {
           >
             Ready to find common ground?
           </h2>
-
           <p className="text-xl text-white/80 mb-10 max-w-2xl mx-auto">
-            Join the families who've found a calmer way.
+            Join the families who&apos;ve found a calmer way.
           </p>
-
           <button
-            onClick={() => router.push('/signup')}
+            onClick={() => router.push('/register')}
             className="px-8 py-4 bg-white text-[var(--portal-primary)] rounded-xl font-medium text-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5"
           >
             Start Free Today
           </button>
-
-          <p className="mt-6 text-sm text-white/60">
-            No credit card required. Start in 2 minutes.
-          </p>
+          <p className="mt-6 text-sm text-white/60">No credit card required. Start in 2 minutes.</p>
         </div>
       </section>
-
-      {/* CSS Animations */}
-      <style>{`
-        @keyframes slideUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
     </div>
   );
 }
