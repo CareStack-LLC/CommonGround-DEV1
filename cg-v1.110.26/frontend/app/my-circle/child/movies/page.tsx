@@ -147,7 +147,7 @@ export default function MoviesPage() {
     }
   }
 
-  const featuredVideo = allVideos[featuredIndex];
+  const featuredVideo = allVideos.length > 0 ? allVideos[featuredIndex % allVideos.length] : null;
 
   const filteredVideos = allVideos.filter(video => {
     if (selectedCategory === 'favorites') return favoritesSet.has(video.id);
@@ -287,7 +287,7 @@ export default function MoviesPage() {
       <main className="space-y-6 pt-4 pb-6">
 
         {/* ── HERO BANNER ── Large cinematic banner for the featured video */}
-        {isHomeView && (
+        {isHomeView && featuredVideo && (
           <section className="relative px-4">
             <div
               className="relative rounded-2xl overflow-hidden"
@@ -385,8 +385,17 @@ export default function MoviesPage() {
           </section>
         )}
 
+        {/* Empty state when no movies uploaded */}
+        {!isLoadingVideos && allVideos.length === 0 && (
+          <section className="px-4 py-16 text-center">
+            <div className="text-4xl mb-3 opacity-50">🎬</div>
+            <h3 className="text-lg font-semibold text-white/80 mb-1">No Movies Yet</h3>
+            <p className="text-sm text-white/50">Movies will appear here once added by the CommonGround team.</p>
+          </section>
+        )}
+
         {/* ── COMMONGROUND ORIGINALS ROW ── */}
-        {isHomeView && (
+        {isHomeView && allVideos.length > 0 && (
           <section className="px-4">
             <HorizontalScrollRow
               title="CommonGround Originals"
