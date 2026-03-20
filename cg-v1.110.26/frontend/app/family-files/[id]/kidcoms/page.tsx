@@ -192,7 +192,7 @@ export default function KidComsPage() {
         <div className="min-h-screen bg-background pb-20 lg:pb-0">
           <Navigation />
           <div className="flex flex-col items-center justify-center py-32">
-            <div className="w-14 h-14 border-3 border-purple-500/20 border-t-purple-500 rounded-full animate-spin" />
+            <div className="w-14 h-14 border-3 border-[#3DAA8A]/20 border-t-[#3DAA8A] rounded-full animate-spin" />
             <p className="mt-4 text-muted-foreground font-medium">Loading KidSpace...</p>
           </div>
         </div>
@@ -226,8 +226,8 @@ export default function KidComsPage() {
             </button>
             <div className="flex-1">
               <h1 className="text-3xl font-bold text-foreground flex items-center gap-3" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/10 to-purple-600/5 flex items-center justify-center shadow-md">
-                  <Video className="h-6 w-6 text-purple-600" />
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#3DAA8A]/10 to-[#2D6A8F]/5 flex items-center justify-center shadow-md">
+                  <Video className="h-6 w-6 text-[#3DAA8A]" />
                 </div>
                 KidSpace
               </h1>
@@ -271,14 +271,14 @@ export default function KidComsPage() {
                       className={cn(
                         'w-full flex items-center gap-3 p-3 rounded-xl transition-all border-2',
                         selectedChild?.id === child.id
-                          ? 'bg-purple-50 border-purple-300 shadow-sm'
+                          ? 'bg-[#3DAA8A]/10 dark:bg-[#3DAA8A]/20 border-[#3DAA8A]/40 shadow-sm'
                           : 'bg-muted border-border hover:border-border'
                       )}
                     >
                       <div className={cn(
                         "w-10 h-10 rounded-full flex items-center justify-center font-bold",
                         selectedChild?.id === child.id
-                          ? 'bg-purple-500 text-white'
+                          ? 'bg-[#3DAA8A] text-white'
                           : 'bg-muted text-muted-foreground'
                       )}>
                         {(child.preferred_name || child.first_name).charAt(0)}
@@ -287,7 +287,7 @@ export default function KidComsPage() {
                         {child.preferred_name || child.first_name}
                       </span>
                       {selectedChild?.id === child.id && (
-                        <CheckCircle className="h-5 w-5 text-purple-600 ml-auto" />
+                        <CheckCircle className="h-5 w-5 text-[#3DAA8A] ml-auto" />
                       )}
                     </button>
                   ))}
@@ -304,16 +304,16 @@ export default function KidComsPage() {
                   disabled={!selectedChild || isStartingSession}
                   className={cn(
                     'flex flex-col items-center p-4 rounded-xl transition-all border-2',
-                    'bg-purple-50 dark:bg-purple-900/30 border-purple-200 dark:border-purple-700 hover:border-purple-300 dark:hover:border-purple-500 hover:shadow-md active:scale-95',
-                    'disabled:opacity-50 disabled:hover:border-purple-200 disabled:active:scale-100'
+                    'bg-[#3DAA8A]/10 dark:bg-[#3DAA8A]/20 border-[#3DAA8A]/30 dark:border-[#3DAA8A]/40 hover:border-[#3DAA8A]/50 dark:hover:border-[#3DAA8A]/60 hover:shadow-md active:scale-95',
+                    'disabled:opacity-50 disabled:hover:border-[#3DAA8A]/30 disabled:active:scale-100'
                   )}
                 >
                   {isStartingSession ? (
-                    <Loader2 className="h-8 w-8 text-purple-600 dark:text-purple-400 animate-spin" />
+                    <Loader2 className="h-8 w-8 text-[#3DAA8A] dark:text-[#5BC4A0] animate-spin" />
                   ) : (
-                    <Video className="h-8 w-8 text-purple-600 dark:text-purple-400" />
+                    <Video className="h-8 w-8 text-[#3DAA8A] dark:text-[#5BC4A0]" />
                   )}
-                  <span className="mt-2 text-sm font-bold text-purple-700 dark:text-purple-300">Video Call</span>
+                  <span className="mt-2 text-sm font-bold text-[#1E3A4A] dark:text-[#5BC4A0]">Video Call</span>
                 </button>
                 <button
                   onClick={() => startVoiceCall()}
@@ -416,7 +416,7 @@ export default function KidComsPage() {
                           <button
                             onClick={() => startVideoCall(contact.id)}
                             disabled={isStartingSession}
-                            className="p-2 bg-purple-100 hover:bg-purple-200 text-purple-600 rounded-lg transition-colors disabled:opacity-50"
+                            className="p-2 bg-[#3DAA8A]/10 hover:bg-[#3DAA8A]/20 text-[#3DAA8A] rounded-lg transition-colors disabled:opacity-50"
                           >
                             <Phone className="h-4 w-4" />
                           </button>
@@ -459,7 +459,7 @@ export default function KidComsPage() {
                       className={cn(
                         'w-full flex items-center justify-between p-3 rounded-xl transition-all border-2',
                         session.status === 'active' || session.status === 'waiting'
-                          ? 'bg-purple-50 border-purple-200 hover:border-purple-300 cursor-pointer'
+                          ? 'bg-[#3DAA8A]/10 dark:bg-[#3DAA8A]/20 border-[#3DAA8A]/30 hover:border-[#3DAA8A]/50 cursor-pointer'
                           : 'bg-muted border-border cursor-default'
                       )}
                     >
