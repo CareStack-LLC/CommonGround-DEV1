@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { trackEarlyAdopterSignup } from '@/lib/analytics';
 
 interface EarlyAdopterFormProps {
   source: string;
@@ -43,6 +44,7 @@ export function EarlyAdopterForm({ source, className = '' }: EarlyAdopterFormPro
         throw new Error(data.message || 'Failed to sign up');
       }
 
+      trackEarlyAdopterSignup(source);
       setIsSubmitted(true);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Something went wrong. Please try again.';

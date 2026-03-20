@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { Navigation } from '@/components/navigation';
 import { familyFilesAPI, agreementsAPI, quickAccordsAPI, FamilyFileDetail, QuickAccord } from '@/lib/api';
+import { trackAgreementCreated } from '@/lib/analytics';
 import { ProtectedRoute } from '@/components/protected-route';
 import {
   FolderOpen,
@@ -630,6 +631,8 @@ function AgreementsListContent() {
       const newAgreement = await agreementsAPI.createForFamilyFile(selectedFamilyFile.id, {
         title: `${selectedFamilyFile.title} - SharedCare Agreement`,
       });
+
+      trackAgreementCreated();
 
       if (useAria) {
         router.push(`/agreements/${newAgreement.id}/aria`);

@@ -12,6 +12,7 @@ import {
   ArrowLeft,
   Shield,
 } from "lucide-react";
+import { trackProfessionalSignup } from '@/lib/analytics';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -170,6 +171,7 @@ export default function ProfessionalOnboardingPage() {
         });
       }
 
+      trackProfessionalSignup(formData.professional_type);
       setCurrentStep("complete");
     } catch (error) {
       console.error("Error creating profile:", error);

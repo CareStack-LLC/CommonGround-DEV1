@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { subscriptionAPI, grantsAPI, SubscriptionStatus, GrantStatusResponse } from '@/lib/api';
+import { trackPurchase } from '@/lib/analytics';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -156,6 +157,12 @@ export default function BillingSettingsPage() {
           // First sync from Stripe to update the profile
           const syncedData = await subscriptionAPI.syncSubscription();
           setSubscription(syncedData);
+
+          // Track purchase in GA4
+          if (syncedData.tier && syncedData.tier !== 'starter') {
+            const priceMap: Record<string, number> = { plus: 17.99, complete: 34.99 };
+            trackPurchase(syncedData.tier, priceMap[syncedData.tier] || 0);
+          }
 
           // Also refresh grant status
           const grantData = await grantsAPI.getStatus();

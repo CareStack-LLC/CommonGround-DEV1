@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import { messagesAPI, ARIAAnalysisResponse, MessageAttachment, InterventionAction } from '@/lib/api';
 import { ARIARewriteModal, type ARIARewritePayload } from './aria-rewrite-modal';
+import { trackFirstMessage } from '@/lib/analytics';
 import {
   Send,
   Sparkles,
@@ -306,6 +307,7 @@ export function MessageCompose({
         attachments: uploadedAttachments
       };
 
+      trackFirstMessage();
       onMessageSent(finalMessage);
     } catch (err: any) {
       console.error('Failed to send message:', err);

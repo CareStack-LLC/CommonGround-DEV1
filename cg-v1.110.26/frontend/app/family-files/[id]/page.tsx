@@ -84,6 +84,7 @@ import { useFeatureGate } from '@/hooks/use-feature-gate';
 import { TierBadge } from '@/components/tier-badge';
 import { Lock } from 'lucide-react';
 import { Trash2, UserMinus, Pencil, Gavel, Briefcase, Building2, XCircle, CheckCircle2, ExternalLink } from 'lucide-react';
+import { trackInviteCoParent } from '@/lib/analytics';
 
 /* =============================================================================
    Family File Detail Page - "The Sanctuary of Truth"
@@ -214,6 +215,7 @@ function FamilyFileDetailContent() {
       setInviteError(null);
       setInviteSuccess(null);
       await familyFilesAPI.inviteParentB(id, inviteEmail);
+      trackInviteCoParent();
       setInviteSuccess(`Invitation sent to ${inviteEmail}`);
       setInviteEmail('');
       await loadData();

@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/auth-context';
 import { APIError } from '@/lib/api';
 import { signInWithGoogle } from '@/lib/supabase';
 import { Loader2, Mail, Lock, User, ArrowRight, Users, CheckCircle } from 'lucide-react';
+import { trackSignupStarted, trackSignupCompleted, trackBeginCheckout } from '@/lib/analytics';
 
 /* =============================================================================
    REGISTER PAGE
@@ -51,6 +52,7 @@ function RegisterContent() {
     setError('');
     setOauthLoading(true);
     try {
+      trackSignupStarted('google');
       await signInWithGoogle();
       // Redirect happens automatically via Supabase OAuth
     } catch (err) {
@@ -141,6 +143,7 @@ function RegisterContent() {
       return;
     }
 
+    trackSignupStarted('email');
     setStep(2);
   };
 
@@ -162,6 +165,13 @@ function RegisterContent() {
         last_name: formData.last_name,
         subscription_price_id: billingInterval === 'month' ? plan?.priceId.month : plan?.priceId.year
       });
+
+      // Track signup completion
+      const plan = plans.find(p => p.id === selectedPlan);
+      trackSignupCompleted('email');
+      if (plan && plan.price[billingInterval] > 0) {
+        trackBeginCheckout(plan.name, plan.price[billingInterval]);
+      }
 
       // If a checkout URL is returned, redirect to Stripe
       if (response && response.checkout_url) {

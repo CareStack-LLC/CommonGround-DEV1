@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/auth-context';
 import { APIError } from '@/lib/api';
 import { signInWithGoogle } from '@/lib/supabase';
 import { Loader2, Mail, Lock, ArrowRight } from 'lucide-react';
+import { trackLogin } from '@/lib/analytics';
 
 function LoginContent() {
   const router = useRouter();
@@ -22,6 +23,7 @@ function LoginContent() {
     setError('');
     setOauthLoading(true);
     try {
+      trackLogin('google');
       await signInWithGoogle();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to sign in with Google');
@@ -36,6 +38,7 @@ function LoginContent() {
 
     try {
       const { profile } = await login(email, password);
+      trackLogin('email');
       const explicitRedirect = searchParams.get('redirect');
       // If no explicit redirect, route professionals to their portal
       const redirectTo = explicitRedirect || (profile?.is_professional ? '/professional/dashboard' : '/dashboard');

@@ -16,6 +16,7 @@ import {
   HelpCircle,
   Shield,
 } from 'lucide-react';
+import { trackContactForm } from '@/lib/analytics';
 
 /**
  * Contact Page
@@ -101,6 +102,7 @@ function ContactForm() {
         throw new Error(data.detail || 'Failed to send message');
       }
 
+      trackContactForm(selectedType);
       setIsSubmitted(true);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Something went wrong. Please try again.';

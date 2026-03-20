@@ -158,3 +158,50 @@ export function trackCTAClick(ctaName: string, location: string) {
 export function trackSectionView(pageName: string, sectionName: string) {
   gtag('event', 'section_view', { page: pageName, section: sectionName });
 }
+
+/** Professional onboarding signup */
+export function trackProfessionalSignup(role: string) {
+  gtag('event', 'professional_signup', {
+    engagement_type: 'activation',
+    role,
+  });
+}
+
+// ─── Section Tracking Helper ──────────────────────────────────
+
+const trackedSections = new Set<string>();
+
+/**
+ * Set up IntersectionObserver for marketing page sections.
+ * Call once on mount, returns cleanup function.
+ *
+ * Usage:
+ *   useEffect(() => setupSectionTracking('homepage'), []);
+ *
+ * Tracks any element with data-section="sectionName" attribute.
+ */
+export function setupSectionTracking(pageName: string): () => void {
+  if (typeof window === 'undefined') return () => {};
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          const section = (entry.target as HTMLElement).dataset.section;
+          if (section) {
+            const key = `${pageName}:${section}`;
+            if (!trackedSections.has(key)) {
+              trackedSections.add(key);
+              trackSectionView(pageName, section);
+            }
+          }
+        }
+      });
+    },
+    { threshold: 0.3 }
+  );
+
+  document.querySelectorAll('[data-section]').forEach((el) => observer.observe(el));
+
+  return () => observer.disconnect();
+}

@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ProtectedRoute } from '@/components/protected-route';
 import { Navigation } from '@/components/navigation';
+import { trackExpenseSubmitted } from '@/lib/analytics';
 
 const categories: { value: ObligationCategory; label: string; description: string }[] = [
   { value: 'medical', label: 'Medical', description: 'Doctor visits, medications, therapy' },
@@ -239,6 +240,7 @@ function NewExpenseContent() {
       };
 
       const obligation = await clearfundAPI.createObligation(data);
+      trackExpenseSubmitted();
       router.push(`/payments/${obligation.id}`);
     } catch (err: any) {
       setError(err.message || 'Failed to create expense');

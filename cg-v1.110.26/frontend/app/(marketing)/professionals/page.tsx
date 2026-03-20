@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { JsonLd } from '@/components/marketing/json-ld';
 import { ProfessionalInterestForm } from '@/components/marketing/professional-interest-form';
+import { SectionTracker } from '@/components/marketing/analytics-tracker';
 import {
   Scale,
   Users,
@@ -150,6 +151,7 @@ const objections = [
 export default function ProfessionalsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9]">
+      <SectionTracker page="professionals" />
       <JsonLd
         data={{
           '@context': 'https://schema.org',
@@ -162,7 +164,7 @@ export default function ProfessionalsPage() {
       />
 
       {/* Hero */}
-      <section className="pt-24 pb-16 sm:pt-32 sm:pb-24">
+      <section className="pt-24 pb-16 sm:pt-32 sm:pb-24" data-section="hero">
         <div className="max-w-5xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -216,7 +218,7 @@ export default function ProfessionalsPage() {
       </section>
 
       {/* Who It's For */}
-      <section className="py-16 sm:py-24 bg-white">
+      <section className="py-16 sm:py-24 bg-white" data-section="who-its-for">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2
@@ -262,7 +264,7 @@ export default function ProfessionalsPage() {
       </section>
 
       {/* Professional Interest Form — Demo CTA */}
-      <section className="py-16 sm:py-24 bg-gradient-to-b from-[#F4F8F7] to-white" id="demo">
+      <section className="py-16 sm:py-24 bg-gradient-to-b from-[#F4F8F7] to-white" id="demo" data-section="demo-form">
         <div className="max-w-4xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-10 items-start">
             <div>
@@ -305,7 +307,7 @@ export default function ProfessionalsPage() {
       </section>
 
       {/* Data Access */}
-      <section className="py-16 sm:py-24 bg-white">
+      <section className="py-16 sm:py-24 bg-white" data-section="data-access">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#3DAA8A]/10 rounded-full mb-6">
@@ -367,7 +369,7 @@ export default function ProfessionalsPage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 sm:py-24 bg-[#F4F8F7]">
+      <section className="py-16 sm:py-24 bg-[#F4F8F7]" data-section="how-it-works">
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2
@@ -403,7 +405,7 @@ export default function ProfessionalsPage() {
       </section>
 
       {/* Security & Trust */}
-      <section className="py-16 sm:py-24 bg-white">
+      <section className="py-16 sm:py-24 bg-white" data-section="security">
         <div className="max-w-6xl mx-auto px-6">
           <div className="bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F] rounded-3xl p-8 sm:p-12 text-white">
             <div className="grid lg:grid-cols-2 gap-10 items-center">
@@ -446,7 +448,7 @@ export default function ProfessionalsPage() {
       </section>
 
       {/* FAQ — Questions Professionals Ask */}
-      <section className="py-16 sm:py-24 bg-[#F4F8F7]">
+      <section className="py-16 sm:py-24 bg-[#F4F8F7]" data-section="faq">
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2
