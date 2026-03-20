@@ -15,14 +15,17 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
 from sqlalchemy import select, desc
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.core.database import get_db
 from app.core.security import get_current_admin_user
 from app.models.user import User
-from app.models.blog import BlogPost
+from app.models.blog import BlogPost, BlogMarketingContent
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
+
+PLATFORMS = ["facebook", "instagram", "tiktok", "linkedin", "newsletter"]
 
 
 # =============================================================================
@@ -40,6 +43,7 @@ class BlogPostCreate(BaseModel):
     featured_image_url: Optional[str] = None
     seo_title: Optional[str] = None
     seo_description: Optional[str] = None
+    marketing_content: Optional[list[dict]] = None
 
 
 class BlogPostUpdate(BaseModel):
@@ -53,6 +57,14 @@ class BlogPostUpdate(BaseModel):
     featured_image_url: Optional[str] = None
     seo_title: Optional[str] = None
     seo_description: Optional[str] = None
+
+
+class MarketingContentUpdate(BaseModel):
+    headline: Optional[str] = Field(None, max_length=500)
+    body: Optional[str] = None
+    hashtags: Optional[list[str]] = None
+    cta_text: Optional[str] = Field(None, max_length=500)
+    cta_url: Optional[str] = Field(None, max_length=2048)
 
 
 class BlogGenerateRequest(BaseModel):
@@ -69,8 +81,23 @@ def _slugify(text: str) -> str:
     return slug.strip("-")
 
 
-def _post_to_dict(post: BlogPost) -> dict:
+def _marketing_to_dict(mc: BlogMarketingContent) -> dict:
     return {
+        "id": str(mc.id),
+        "blog_post_id": str(mc.blog_post_id),
+        "platform": mc.platform,
+        "headline": mc.headline,
+        "body": mc.body,
+        "hashtags": mc.hashtags or [],
+        "cta_text": mc.cta_text,
+        "cta_url": mc.cta_url,
+        "created_at": mc.created_at.isoformat() if mc.created_at else None,
+        "updated_at": mc.updated_at.isoformat() if mc.updated_at else None,
+    }
+
+
+def _post_to_dict(post: BlogPost, include_marketing: bool = False) -> dict:
+    result = {
         "id": str(post.id),
         "title": post.title,
         "slug": post.slug,
@@ -87,6 +114,14 @@ def _post_to_dict(post: BlogPost) -> dict:
         "created_at": post.created_at.isoformat() if post.created_at else None,
         "updated_at": post.updated_at.isoformat() if post.updated_at else None,
     }
+    if include_marketing:
+        try:
+            result["marketing_content"] = [
+                _marketing_to_dict(mc) for mc in (post.marketing_content or [])
+            ]
+        except Exception:
+            result["marketing_content"] = []
+    return result
 
 
 # =============================================================================
@@ -167,7 +202,7 @@ async def create_blog_post(
     db: AsyncSession = Depends(get_db),
     admin_user: User = Depends(get_current_admin_user),
 ) -> dict:
-    """Create a new blog post (draft by default)."""
+    """Create a new blog post (draft by default). Optionally includes marketing content."""
     slug = data.slug or _slugify(data.title)
 
     # Check slug uniqueness
@@ -191,10 +226,36 @@ async def create_blog_post(
         status="draft",
     )
     db.add(post)
+    await db.flush()
+
+    # Save marketing content if provided
+    if data.marketing_content:
+        blog_url = f"https://find-commonground.com/blog/{slug}"
+        for mc_data in data.marketing_content:
+            platform = mc_data.get("platform", "")
+            if platform not in PLATFORMS:
+                continue
+            mc = BlogMarketingContent(
+                blog_post_id=post.id,
+                platform=platform,
+                headline=mc_data.get("headline", ""),
+                body=mc_data.get("body", ""),
+                hashtags=mc_data.get("hashtags", []),
+                cta_text=mc_data.get("cta_text", ""),
+                cta_url=mc_data.get("cta_url", blog_url),
+            )
+            db.add(mc)
+
     await db.commit()
     await db.refresh(post)
 
-    return _post_to_dict(post)
+    # Reload with marketing content
+    result = await db.execute(
+        select(BlogPost).options(selectinload(BlogPost.marketing_content)).where(BlogPost.id == post.id)
+    )
+    post = result.scalar_one()
+
+    return _post_to_dict(post, include_marketing=True)
 
 
 @router.get(
@@ -209,7 +270,7 @@ async def list_all_posts(
     admin_user: User = Depends(get_current_admin_user),
 ) -> dict:
     """List all blog posts including drafts (admin view)."""
-    query = select(BlogPost)
+    query = select(BlogPost).options(selectinload(BlogPost.marketing_content))
 
     if status_filter:
         query = query.where(BlogPost.status == status_filter)
@@ -217,16 +278,19 @@ async def list_all_posts(
     query = query.order_by(desc(BlogPost.created_at))
 
     from sqlalchemy import func
-    count_query = select(func.count()).select_from(query.subquery())
-    total_result = await db.execute(count_query)
+    count_q = select(func.count()).select_from(
+        select(BlogPost.id).where(BlogPost.status == status_filter).subquery()
+        if status_filter else select(BlogPost.id).subquery()
+    )
+    total_result = await db.execute(count_q)
     total = total_result.scalar() or 0
 
     query = query.offset(offset).limit(limit)
     result = await db.execute(query)
-    posts = result.scalars().all()
+    posts = result.scalars().unique().all()
 
     return {
-        "posts": [_post_to_dict(p) for p in posts],
+        "posts": [_post_to_dict(p, include_marketing=True) for p in posts],
         "total": total,
         "limit": limit,
         "offset": offset,
@@ -242,15 +306,15 @@ async def get_blog_post(
     db: AsyncSession = Depends(get_db),
     admin_user: User = Depends(get_current_admin_user),
 ) -> dict:
-    """Get a single blog post by ID."""
+    """Get a single blog post by ID with marketing content."""
     result = await db.execute(
-        select(BlogPost).where(BlogPost.id == post_id)
+        select(BlogPost).options(selectinload(BlogPost.marketing_content)).where(BlogPost.id == post_id)
     )
     post = result.scalar_one_or_none()
     if not post:
         raise HTTPException(status_code=404, detail="Blog post not found")
 
-    return _post_to_dict(post)
+    return _post_to_dict(post, include_marketing=True)
 
 
 @router.put(
@@ -353,6 +417,66 @@ async def unpublish_blog_post(
     return _post_to_dict(post)
 
 
+# =============================================================================
+# MARKETING CONTENT ENDPOINTS
+# =============================================================================
+
+@router.get(
+    "/admin/posts/{post_id}/marketing",
+    summary="Get marketing content for a blog post (admin)",
+)
+async def get_marketing_content(
+    post_id: str,
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Get all platform marketing content for a blog post."""
+    result = await db.execute(
+        select(BlogMarketingContent).where(BlogMarketingContent.blog_post_id == post_id)
+    )
+    items = result.scalars().all()
+    return {"marketing_content": [_marketing_to_dict(mc) for mc in items]}
+
+
+@router.put(
+    "/admin/posts/{post_id}/marketing/{platform}",
+    summary="Update marketing content for a platform (admin)",
+)
+async def update_marketing_content(
+    post_id: str,
+    platform: str,
+    data: MarketingContentUpdate,
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Update marketing content for a specific platform."""
+    if platform not in PLATFORMS:
+        raise HTTPException(status_code=400, detail=f"Invalid platform. Must be one of: {', '.join(PLATFORMS)}")
+
+    result = await db.execute(
+        select(BlogMarketingContent).where(
+            BlogMarketingContent.blog_post_id == post_id,
+            BlogMarketingContent.platform == platform,
+        )
+    )
+    mc = result.scalar_one_or_none()
+    if not mc:
+        raise HTTPException(status_code=404, detail=f"No marketing content found for platform: {platform}")
+
+    update_data = data.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(mc, field, value)
+
+    await db.commit()
+    await db.refresh(mc)
+
+    return _marketing_to_dict(mc)
+
+
+# =============================================================================
+# AI GENERATION
+# =============================================================================
+
 @router.post(
     "/admin/generate",
     summary="Generate blog post content with AI (admin)",
@@ -362,9 +486,9 @@ async def generate_blog_post(
     admin_user: User = Depends(get_current_admin_user),
 ) -> dict:
     """
-    Generate a blog post using the Anthropic API.
+    Generate a blog post and platform-specific marketing content using AI.
 
-    Returns generated content (title, body, excerpt, SEO fields)
+    Returns generated content (title, body, excerpt, SEO fields, marketing content)
     without saving to database. Admin can review and then create.
     """
     import json
@@ -396,7 +520,13 @@ async def generate_blog_post(
         '- "seo_description": meta description (under 160 chars)\n'
         '- "suggested_slug": URL slug\n'
         '- "suggested_category": one of: Co-Parenting Tips, Communication, Legal Insights, Family Wellness, ARIA & Technology, KidSpace\n'
-        '- "suggested_tags": array of 3-5 relevant tags\n\n'
+        '- "suggested_tags": array of 3-5 relevant tags\n'
+        '- "marketing": object with platform-specific social media content, each keyed by platform name:\n'
+        '  - "facebook": { "headline": short hook for Facebook groups (under 100 chars), "body": community-oriented post (150-300 words, empathetic, shareable, question at end to drive comments), "hashtags": [5-8 hashtags for Facebook reach], "cta_text": CTA text }\n'
+        '  - "instagram": { "headline": attention-grabbing first line (under 80 chars), "body": Instagram caption (150-200 words, emotional hook, line breaks for readability, engagement question), "hashtags": [20-30 mix of branded + discovery hashtags], "cta_text": CTA text }\n'
+        '  - "tiktok": { "headline": hook-first caption (under 80 chars), "body": TikTok description (50-100 words, conversational, trend-aware), "hashtags": [8-12 mix of viral + niche hashtags], "cta_text": CTA text }\n'
+        '  - "linkedin": { "headline": professional thought-leadership hook (under 100 chars), "body": LinkedIn post (200-400 words, professional tone targeting family law attorneys/mediators/GALs, data-driven, industry insight angle), "hashtags": [5-8 professional hashtags], "cta_text": CTA text }\n'
+        '  - "newsletter": { "headline": email subject line (under 60 chars), "body": email body (200-300 words, warm personal tone, value-first, clear CTA to read blog), "hashtags": [], "cta_text": CTA button text }\n\n'
         "Return ONLY valid JSON, no markdown code fences."
     )
 
@@ -409,7 +539,7 @@ async def generate_blog_post(
             client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
             response = client.messages.create(
                 model="claude-sonnet-4-20250514",
-                max_tokens=4096,
+                max_tokens=8192,
                 system=system_prompt,
                 messages=[{"role": "user", "content": user_prompt}],
             )
@@ -432,7 +562,7 @@ async def generate_blog_post(
         openai_client = OpenAI(api_key=openai_key)
         response = openai_client.chat.completions.create(
             model="gpt-4o",
-            max_tokens=4096,
+            max_tokens=8192,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
@@ -466,6 +596,23 @@ async def generate_blog_post(
         except Exception as img_err:
             logger.warning(f"Blog image generation failed (non-blocking): {img_err}")
 
+        # Build marketing content with blog URL
+        slug = generated.get("suggested_slug", _slugify(generated.get("title", data.topic)))
+        blog_url = f"https://find-commonground.com/blog/{slug}"
+        marketing_raw = generated.get("marketing", {})
+        marketing_content = []
+        for platform in PLATFORMS:
+            platform_data = marketing_raw.get(platform, {})
+            if platform_data:
+                marketing_content.append({
+                    "platform": platform,
+                    "headline": platform_data.get("headline", ""),
+                    "body": platform_data.get("body", ""),
+                    "hashtags": platform_data.get("hashtags", []),
+                    "cta_text": platform_data.get("cta_text", "Learn more"),
+                    "cta_url": blog_url,
+                })
+
         return {
             "generated": True,
             "title": generated.get("title", ""),
@@ -473,11 +620,12 @@ async def generate_blog_post(
             "excerpt": generated.get("excerpt", ""),
             "seo_title": generated.get("seo_title", ""),
             "seo_description": generated.get("seo_description", ""),
-            "suggested_slug": generated.get("suggested_slug", ""),
+            "suggested_slug": slug,
             "suggested_category": generated.get("suggested_category", ""),
             "suggested_tags": generated.get("suggested_tags", []),
             "featured_image_url": featured_image_url,
             "featured_image_alt": featured_image_alt,
+            "marketing_content": marketing_content,
         }
 
     except json.JSONDecodeError:
@@ -493,6 +641,7 @@ async def generate_blog_post(
             "suggested_tags": [],
             "featured_image_url": None,
             "featured_image_alt": None,
+            "marketing_content": [],
             "parse_error": "AI response was not valid JSON. Content returned as raw text.",
         }
     except Exception as e:
@@ -518,6 +667,7 @@ async def _generate_blog_image(
     import os
     import httpx
     from openai import OpenAI
+    from app.core.config import settings
     from app.services.storage import storage_service, StorageBucket
 
     openai_key = os.environ.get("OPENAI_API_KEY") or getattr(settings, "OPENAI_API_KEY", None)

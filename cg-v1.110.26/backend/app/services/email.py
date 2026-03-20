@@ -68,6 +68,10 @@ class EmailService:
         context.setdefault('frontend_url', self.frontend_url)
         context.setdefault('current_year', datetime.now().year)
 
+        # UTM tracking for Google Analytics attribution
+        campaign = template_path.replace('/', '_').replace('.html', '')
+        context.setdefault('utm_params', f'utm_source=email&utm_medium=transactional&utm_campaign={campaign}')
+
         template = self.jinja_env.get_template(template_path)
         return template.render(**context)
 

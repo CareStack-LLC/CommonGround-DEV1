@@ -72,7 +72,7 @@
                 {% if unsubscribe_url %}
                 <a href="{{ unsubscribe_url }}" style="color: #3DAA8A; text-decoration: underline;">Manage preferences</a> &middot;
                 {% endif %}
-                <a href="{{ frontend_url }}/support" style="color: #3DAA8A; text-decoration: underline;">Help Center</a>
+                <a href="{{ frontend_url }}/support?{{ utm_params }}" style="color: #3DAA8A; text-decoration: underline;">Help Center</a>
               </p>
               {% endblock %}
             </td>
@@ -88,8 +88,8 @@
                 {% block legal_footer %}
                 CommonGround, Inc. &middot; Los Angeles, CA<br>
                 &copy; {{ current_year | default('2026') }} CommonGround. All rights reserved.<br>
-                <a href="{{ frontend_url }}/privacy" style="color: #8CA0A8; text-decoration: underline;">Privacy Policy</a> &middot;
-                <a href="{{ frontend_url }}/terms" style="color: #8CA0A8; text-decoration: underline;">Terms of Service</a>
+                <a href="{{ frontend_url }}/privacy?{{ utm_params }}" style="color: #8CA0A8; text-decoration: underline;">Privacy Policy</a> &middot;
+                <a href="{{ frontend_url }}/terms?{{ utm_params }}" style="color: #8CA0A8; text-decoration: underline;">Terms of Service</a>
                 {% endblock %}
               </p>
             </td>

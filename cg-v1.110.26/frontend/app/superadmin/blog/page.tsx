@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import {
   PenTool, Plus, Loader2, Trash2, Edit3, Eye, EyeOff,
   Sparkles, X, RefreshCw, CheckCircle, AlertTriangle,
+  ChevronDown, ChevronRight, Copy, Facebook, Instagram, Linkedin, Mail, Video,
 } from 'lucide-react';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -17,18 +18,40 @@ const CATEGORIES = [
   'KidSpace',
 ];
 
+const PLATFORM_META: Record<string, { label: string; icon: any; color: string }> = {
+  facebook: { label: 'Facebook', icon: Facebook, color: 'text-blue-400' },
+  instagram: { label: 'Instagram', icon: Instagram, color: 'text-pink-400' },
+  tiktok: { label: 'TikTok', icon: Video, color: 'text-cyan-400' },
+  linkedin: { label: 'LinkedIn', icon: Linkedin, color: 'text-sky-400' },
+  newsletter: { label: 'Newsletter', icon: Mail, color: 'text-amber-400' },
+};
+
+interface MarketingContent {
+  id: string;
+  platform: string;
+  headline: string;
+  body: string;
+  hashtags: string[];
+  cta_text: string;
+  cta_url: string;
+}
+
 interface BlogPost {
   id: string;
   title: string;
+  slug: string;
   content: string;
   excerpt: string;
   category: string;
+  tags: string[];
+  featured_image_url: string | null;
   status: 'draft' | 'published';
   seo_title: string;
   seo_description: string;
   published_at: string | null;
   created_at: string;
   updated_at: string;
+  marketing_content?: MarketingContent[];
 }
 
 function formatDate(dateStr: string | null): string {
@@ -36,6 +59,124 @@ function formatDate(dateStr: string | null): string {
   return new Date(dateStr).toLocaleDateString('en-US', {
     month: 'short', day: 'numeric', year: 'numeric',
   });
+}
+
+function CopyButton({ text, label }: { text: string; label?: string }) {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = () => {
+    navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+  return (
+    <button
+      onClick={handleCopy}
+      className="inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] bg-zinc-800/60 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-200 transition-colors"
+    >
+      {copied ? <CheckCircle className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+      {label || (copied ? 'Copied!' : 'Copy')}
+    </button>
+  );
+}
+
+function MarketingTabs({ content, imageUrl }: { content: MarketingContent[]; imageUrl?: string | null }) {
+  const [activeTab, setActiveTab] = useState(content[0]?.platform || 'facebook');
+  const active = content.find((c) => c.platform === activeTab);
+
+  if (!content.length) {
+    return (
+      <div className="px-5 py-4 text-sm text-zinc-600 italic">
+        No marketing content generated yet. Edit the post and use AI Generate to create marketing content.
+      </div>
+    );
+  }
+
+  return (
+    <div className="border-t border-zinc-800/40">
+      {/* Tab bar */}
+      <div className="flex gap-0 border-b border-zinc-800/40 overflow-x-auto">
+        {content.map((mc) => {
+          const meta = PLATFORM_META[mc.platform];
+          if (!meta) return null;
+          const Icon = meta.icon;
+          return (
+            <button
+              key={mc.platform}
+              onClick={() => setActiveTab(mc.platform)}
+              className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium transition-colors whitespace-nowrap border-b-2 ${
+                activeTab === mc.platform
+                  ? `${meta.color} border-current`
+                  : 'text-zinc-500 border-transparent hover:text-zinc-300'
+              }`}
+            >
+              <Icon className="w-3.5 h-3.5" />
+              {meta.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Tab content */}
+      {active && (
+        <div className="p-5 space-y-4">
+          {/* Headline */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[11px] text-zinc-500 uppercase tracking-wider font-medium">Headline</span>
+              <CopyButton text={active.headline} />
+            </div>
+            <p className="text-sm text-zinc-200 font-medium">{active.headline}</p>
+          </div>
+
+          {/* Body */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[11px] text-zinc-500 uppercase tracking-wider font-medium">Post Copy</span>
+              <CopyButton text={active.body} />
+            </div>
+            <div className="bg-zinc-800/40 rounded-lg p-3 text-sm text-zinc-300 whitespace-pre-wrap max-h-48 overflow-y-auto">
+              {active.body}
+            </div>
+          </div>
+
+          {/* Hashtags */}
+          {active.hashtags.length > 0 && (
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[11px] text-zinc-500 uppercase tracking-wider font-medium">Hashtags</span>
+                <CopyButton text={active.hashtags.join(' ')} label="Copy All" />
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {active.hashtags.map((tag, i) => (
+                  <span
+                    key={i}
+                    className="px-2 py-0.5 rounded-full bg-zinc-800/60 text-xs text-zinc-400"
+                  >
+                    {tag.startsWith('#') ? tag : `#${tag}`}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* CTA */}
+          <div className="flex items-center gap-3">
+            <span className="text-[11px] text-zinc-500 uppercase tracking-wider font-medium">CTA:</span>
+            <span className="text-sm text-violet-400 font-medium">{active.cta_text}</span>
+            <CopyButton text={active.cta_url} label="Copy Link" />
+          </div>
+
+          {/* Full Copy-All */}
+          <div className="pt-2 border-t border-zinc-800/40">
+            <CopyButton
+              text={`${active.headline}\n\n${active.body}\n\n${active.hashtags.join(' ')}\n\n${active.cta_url}`}
+              label="Copy Full Post"
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function BlogPage() {
@@ -48,6 +189,7 @@ export default function BlogPage() {
   const [deleting, setDeleting] = useState<string | null>(null);
   const [toggling, setToggling] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState('');
+  const [expandedPost, setExpandedPost] = useState<string | null>(null);
 
   // Form state
   const [title, setTitle] = useState('');
@@ -57,6 +199,7 @@ export default function BlogPage() {
   const [seoTitle, setSeoTitle] = useState('');
   const [seoDescription, setSeoDescription] = useState('');
   const [featuredImageUrl, setFeaturedImageUrl] = useState('');
+  const [marketingContent, setMarketingContent] = useState<any[]>([]);
 
   // AI generation state
   const [aiTopic, setAiTopic] = useState('');
@@ -94,6 +237,7 @@ export default function BlogPage() {
     setSeoTitle('');
     setSeoDescription('');
     setFeaturedImageUrl('');
+    setMarketingContent([]);
     setAiTopic('');
     setAiKeywords('');
     setEditingPost(null);
@@ -112,6 +256,8 @@ export default function BlogPage() {
     setCategory(post.category || CATEGORIES[0]);
     setSeoTitle(post.seo_title || '');
     setSeoDescription(post.seo_description || '');
+    setFeaturedImageUrl(post.featured_image_url || '');
+    setMarketingContent(post.marketing_content || []);
     setShowModal(true);
   };
 
@@ -125,7 +271,7 @@ export default function BlogPage() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${getToken()}`,
         },
-        body: JSON.stringify({ topic: aiTopic, keywords: aiKeywords || undefined }),
+        body: JSON.stringify({ topic: aiTopic, keywords: aiKeywords ? aiKeywords.split(',').map(k => k.trim()) : undefined }),
       });
       if (!res.ok) throw new Error('AI generation failed');
       const data = await res.json();
@@ -134,9 +280,9 @@ export default function BlogPage() {
       setExcerpt(data.excerpt || '');
       setSeoTitle(data.seo_title || '');
       setSeoDescription(data.seo_description || '');
-      if (data.featured_image_url) {
-        setFeaturedImageUrl(data.featured_image_url);
-      }
+      if (data.suggested_category) setCategory(data.suggested_category);
+      if (data.featured_image_url) setFeaturedImageUrl(data.featured_image_url);
+      if (data.marketing_content) setMarketingContent(data.marketing_content);
     } catch (err: any) {
       console.error('[Blog] AI generation failed:', err);
       setError(err.message || 'AI generation failed. Please try again.');
@@ -149,7 +295,17 @@ export default function BlogPage() {
   const handleSave = async (publish: boolean) => {
     try {
       setSaving(true);
-      const body = { title, content, excerpt, category, seo_title: seoTitle, seo_description: seoDescription, featured_image_url: featuredImageUrl || undefined, status: publish ? 'published' : 'draft' };
+      const body: any = {
+        title, content, excerpt, category,
+        seo_title: seoTitle,
+        seo_description: seoDescription,
+        featured_image_url: featuredImageUrl || undefined,
+      };
+
+      // Include marketing content on create
+      if (!editingPost && marketingContent.length > 0) {
+        body.marketing_content = marketingContent;
+      }
 
       if (editingPost) {
         const res = await fetch(`${API_BASE}/api/v1/blog/admin/posts/${editingPost.id}`, {
@@ -158,6 +314,14 @@ export default function BlogPage() {
           body: JSON.stringify(body),
         });
         if (!res.ok) throw new Error('Failed to update post');
+
+        // If publishing, do it in a separate call
+        if (publish && editingPost.status !== 'published') {
+          await fetch(`${API_BASE}/api/v1/blog/admin/posts/${editingPost.id}/publish`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${getToken()}` },
+          });
+        }
       } else {
         const res = await fetch(`${API_BASE}/api/v1/blog/admin/posts`, {
           method: 'POST',
@@ -165,11 +329,19 @@ export default function BlogPage() {
           body: JSON.stringify(body),
         });
         if (!res.ok) throw new Error('Failed to create post');
+
+        if (publish) {
+          const created = await res.json();
+          await fetch(`${API_BASE}/api/v1/blog/admin/posts/${created.id}/publish`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${getToken()}` },
+          });
+        }
       }
 
       setShowModal(false);
       resetForm();
-      setSuccessMessage(editingPost ? 'Post updated successfully' : 'Post created successfully');
+      setSuccessMessage(editingPost ? 'Post updated successfully' : 'Post created with marketing content');
       setTimeout(() => setSuccessMessage(''), 4000);
       await fetchPosts();
     } catch (err: any) {
@@ -225,7 +397,7 @@ export default function BlogPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-white">Blog Management</h1>
-          <p className="text-sm text-zinc-500 mt-0.5">Create and manage blog posts</p>
+          <p className="text-sm text-zinc-500 mt-0.5">Create blog posts with auto-generated social media marketing</p>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -245,27 +417,17 @@ export default function BlogPage() {
         </div>
       </div>
 
-      {/* Error Message */}
-      {error && (
-        <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 flex items-center gap-2">
-          <AlertTriangle className="w-4 h-4 text-red-400" />
-          <span className="text-sm text-red-300">{error}</span>
-        </div>
-      )}
-
-      {/* Success Message */}
-      {successMessage && (
-        <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-4 py-3 flex items-center gap-2">
-          <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-          <span className="text-sm text-emerald-300">{successMessage}</span>
-        </div>
-      )}
-
-      {/* Error */}
+      {/* Messages */}
       {error && (
         <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 flex items-center gap-2">
           <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0" />
           <span className="text-sm text-red-300">{error}</span>
+        </div>
+      )}
+      {successMessage && (
+        <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl px-4 py-3 flex items-center gap-2">
+          <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+          <span className="text-sm text-emerald-300">{successMessage}</span>
         </div>
       )}
 
@@ -287,8 +449,9 @@ export default function BlogPage() {
             <div className="bg-violet-500/5 border border-violet-500/20 rounded-lg p-4 space-y-3">
               <div className="flex items-center gap-2 text-sm font-medium text-violet-300">
                 <Sparkles className="w-4 h-4" />
-                Generate with AI
+                Generate Blog + Marketing with AI
               </div>
+              <p className="text-xs text-zinc-500">Generates blog post, featured image, and marketing content for Facebook, Instagram, TikTok, LinkedIn, and Newsletter.</p>
               <div className="flex flex-col sm:flex-row gap-2">
                 <input
                   type="text"
@@ -301,7 +464,7 @@ export default function BlogPage() {
                   type="text"
                   value={aiKeywords}
                   onChange={(e) => setAiKeywords(e.target.value)}
-                  placeholder="Keywords (optional)"
+                  placeholder="Keywords (comma-separated)"
                   className="flex-1 px-3 py-2 bg-zinc-800/60 border border-zinc-700/60 rounded-lg text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-violet-500/50"
                 />
                 <button
@@ -310,7 +473,7 @@ export default function BlogPage() {
                   className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium transition-colors disabled:opacity-50 whitespace-nowrap"
                 >
                   {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                  Generate
+                  {generating ? 'Generating...' : 'Generate'}
                 </button>
               </div>
             </div>
@@ -411,6 +574,18 @@ export default function BlogPage() {
               )}
             </div>
 
+            {/* Marketing Content Preview (in modal after AI generation) */}
+            {marketingContent.length > 0 && (
+              <div>
+                <label className="text-xs text-zinc-500 uppercase tracking-wider font-medium block mb-2">
+                  Generated Marketing Content ({marketingContent.length} platforms)
+                </label>
+                <div className="bg-zinc-800/30 rounded-lg border border-zinc-700/40 overflow-hidden">
+                  <MarketingTabs content={marketingContent} imageUrl={featuredImageUrl} />
+                </div>
+              </div>
+            )}
+
             {/* Action Buttons */}
             <div className="flex justify-end gap-2 pt-2 border-t border-zinc-800/60">
               <button
@@ -440,7 +615,7 @@ export default function BlogPage() {
         </div>
       )}
 
-      {/* Blog Posts Table */}
+      {/* Blog Posts List */}
       <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl overflow-hidden">
         {loading ? (
           <div className="p-4 space-y-3">
@@ -455,39 +630,68 @@ export default function BlogPage() {
             <p className="text-xs text-zinc-600 mt-1">Create your first post to get started</p>
           </div>
         ) : (
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-zinc-800/60">
-                <th className="text-left px-5 py-3 text-[11px] text-zinc-500 uppercase tracking-wider font-medium">Title</th>
-                <th className="text-left px-5 py-3 text-[11px] text-zinc-500 uppercase tracking-wider font-medium hidden sm:table-cell">Category</th>
-                <th className="text-left px-5 py-3 text-[11px] text-zinc-500 uppercase tracking-wider font-medium">Status</th>
-                <th className="text-left px-5 py-3 text-[11px] text-zinc-500 uppercase tracking-wider font-medium hidden md:table-cell">Published</th>
-                <th className="text-right px-5 py-3 text-[11px] text-zinc-500 uppercase tracking-wider font-medium">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-800/40">
-              {posts.map((post) => (
-                <tr key={post.id} className="hover:bg-zinc-800/20 transition-colors">
-                  <td className="px-5 py-3.5">
-                    <span className="text-sm font-medium text-zinc-200 line-clamp-1">{post.title}</span>
-                  </td>
-                  <td className="px-5 py-3.5 hidden sm:table-cell">
-                    <span className="text-xs text-zinc-400">{post.category}</span>
-                  </td>
-                  <td className="px-5 py-3.5">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium ${
-                      post.status === 'published'
-                        ? 'bg-emerald-500/15 text-emerald-400'
-                        : 'bg-zinc-500/15 text-zinc-400'
-                    }`}>
-                      {post.status}
-                    </span>
-                  </td>
-                  <td className="px-5 py-3.5 hidden md:table-cell">
-                    <span className="text-xs text-zinc-500">{formatDate(post.published_at)}</span>
-                  </td>
-                  <td className="px-5 py-3.5">
-                    <div className="flex items-center justify-end gap-1">
+          <div className="divide-y divide-zinc-800/40">
+            {posts.map((post) => {
+              const isExpanded = expandedPost === post.id;
+              const hasMarketing = (post.marketing_content?.length || 0) > 0;
+
+              return (
+                <div key={post.id}>
+                  {/* Post row */}
+                  <div
+                    className={`flex items-center px-5 py-3.5 hover:bg-zinc-800/20 transition-colors ${hasMarketing ? 'cursor-pointer' : ''}`}
+                    onClick={() => hasMarketing && setExpandedPost(isExpanded ? null : post.id)}
+                  >
+                    {/* Expand icon */}
+                    <div className="w-6 flex-shrink-0">
+                      {hasMarketing ? (
+                        isExpanded
+                          ? <ChevronDown className="w-4 h-4 text-zinc-500" />
+                          : <ChevronRight className="w-4 h-4 text-zinc-500" />
+                      ) : (
+                        <span className="w-4 h-4" />
+                      )}
+                    </div>
+
+                    {/* Title */}
+                    <div className="flex-1 min-w-0 mr-4">
+                      <span className="text-sm font-medium text-zinc-200 line-clamp-1">{post.title}</span>
+                      {hasMarketing && (
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          {post.marketing_content!.map((mc) => {
+                            const meta = PLATFORM_META[mc.platform];
+                            if (!meta) return null;
+                            const Icon = meta.icon;
+                            return <Icon key={mc.platform} className={`w-3 h-3 ${meta.color} opacity-60`} />;
+                          })}
+                          <span className="text-[10px] text-zinc-600">{post.marketing_content!.length} platforms</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Category */}
+                    <div className="hidden sm:block w-32 flex-shrink-0">
+                      <span className="text-xs text-zinc-400">{post.category}</span>
+                    </div>
+
+                    {/* Status */}
+                    <div className="w-24 flex-shrink-0">
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium ${
+                        post.status === 'published'
+                          ? 'bg-emerald-500/15 text-emerald-400'
+                          : 'bg-zinc-500/15 text-zinc-400'
+                      }`}>
+                        {post.status}
+                      </span>
+                    </div>
+
+                    {/* Published date */}
+                    <div className="hidden md:block w-28 flex-shrink-0">
+                      <span className="text-xs text-zinc-500">{formatDate(post.published_at)}</span>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-1 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
                       <button
                         onClick={() => handleTogglePublish(post)}
                         disabled={toggling === post.id}
@@ -522,11 +726,18 @@ export default function BlogPage() {
                         )}
                       </button>
                     </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  </div>
+
+                  {/* Expanded marketing content */}
+                  {isExpanded && hasMarketing && (
+                    <div className="bg-zinc-900/80 border-t border-zinc-800/30">
+                      <MarketingTabs content={post.marketing_content!} imageUrl={post.featured_image_url} />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         )}
       </div>
     </div>

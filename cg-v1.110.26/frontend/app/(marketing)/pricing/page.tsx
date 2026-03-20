@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { Check, Clock, DollarSign, Scale, Minus } from 'lucide-react';
 import { InlineNewsletterCta } from '@/components/marketing/inline-newsletter-cta';
+import { trackViewPricing, trackBeginCheckout } from '@/lib/analytics';
 
 const plans = [
   {
@@ -133,6 +134,8 @@ export default function PricingPage() {
   const { user } = useAuth();
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly');
 
+  useEffect(() => { trackViewPricing(); }, []);
+
   const getPrice = (plan: (typeof plans)[0]) => {
     if (plan.monthly === 0) return '$0';
     if (billingPeriod === 'monthly') return `$${plan.monthly}`;
@@ -151,7 +154,8 @@ export default function PricingPage() {
     return `Save $${savings.toFixed(0)}/year`;
   };
 
-  const handleCTA = () => {
+  const handleCTA = (planName?: string, price?: number) => {
+    if (planName) trackBeginCheckout(planName, price);
     router.push(user ? '/settings/billing' : '/register');
   };
 

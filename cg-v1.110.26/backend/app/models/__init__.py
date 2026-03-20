@@ -263,7 +263,7 @@ from app.models.report_request import (
     URGENCY_LEVELS,
 )
 from app.models.generated_report import GeneratedReport
-from app.models.blog import BlogPost
+from app.models.blog import BlogPost, BlogMarketingContent
 from app.models.kidspace_media import (
     KidSpaceGenre,
     KidSpaceAuthor,

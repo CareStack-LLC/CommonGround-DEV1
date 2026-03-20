@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Check, Scale, Building2, Users, Brain, Briefcase } from 'lucide-react';
+import { trackDemoRequest } from '@/lib/analytics';
 
 const roles = [
   { id: 'attorney', label: 'Attorney', icon: Scale },
@@ -63,6 +64,7 @@ export function ProfessionalInterestForm({
       }
 
       setIsSubmitted(true);
+      trackDemoRequest(formState.role, source);
     } catch (err: unknown) {
       const message =
         err instanceof Error ? err.message : 'Something went wrong. Please try again.';

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
+import { trackNewsletterSignup } from '@/lib/analytics';
 
 interface NewsletterFormProps {
   source?: string;
@@ -39,6 +40,7 @@ export function NewsletterForm({ source, className = '' }: NewsletterFormProps) 
       }
 
       setIsSubmitted(true);
+      trackNewsletterSignup(resolvedSource);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Something went wrong. Please try again.';
       setError(message);

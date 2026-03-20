@@ -119,6 +119,19 @@ export default function RootLayout({
       className={`${dmSans.variable} ${dmSerifDisplay.variable} ${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable}`}
     >
       <head>
+        {/* Google Analytics (gtag.js) — G-Y3BC0JNN56 */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3BC0JNN56" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-Y3BC0JNN56');
+            `,
+          }}
+        />
+        {/* Dark mode detection */}
         <script
           dangerouslySetInnerHTML={{
             __html: `

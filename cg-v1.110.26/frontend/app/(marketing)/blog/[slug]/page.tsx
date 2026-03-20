@@ -13,6 +13,7 @@ import {
 } from '@/lib/blog-data';
 import { BlogContent } from '@/components/marketing/blog-content';
 import { InlineNewsletterCta } from '@/components/marketing/inline-newsletter-cta';
+import { trackBlogRead } from '@/lib/analytics';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -73,6 +74,14 @@ export default function BlogPostPage() {
     };
     fetchPost();
   }, [slug]);
+
+  // Track blog read
+  useEffect(() => {
+    if (!isLoading) {
+      const category = apiPost?.category || legacyPost?.category || '';
+      trackBlogRead(slug, category);
+    }
+  }, [isLoading, slug, apiPost, legacyPost]);
 
   // Set page title + OG/Twitter meta tags for SEO
   useEffect(() => {
