@@ -4,8 +4,19 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { ArrowLeft, Play, Pause, Volume2, VolumeX, Maximize } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { theaterContent } from '@/lib/theater-content';
 import { OriginalsBadge } from '@/components/kidcoms/originals-badge';
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
+interface ApiMovie {
+  id: string;
+  title: string;
+  description: string;
+  video_url: string;
+  poster_url: string;
+  duration_minutes: number;
+  is_featured: boolean;
+}
 
 interface ChildUserData {
   userId: string;
@@ -30,12 +41,35 @@ export default function MoviePlayerPage() {
   const [isMuted, setIsMuted] = useState(false);
   const [showControls, setShowControls] = useState(true);
 
-  // Find the video
-  const video = theaterContent.videos.find((v) => v.id === videoId);
+  // Fetch video from API
+  const [video, setVideo] = useState<{ id: string; title: string; url: string; thumbnail: string; description: string } | null>(null);
 
   useEffect(() => {
     validateAndLoadUser();
-  }, []);
+    // Fetch movie from API
+    const fetchMovie = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/v1/kidspace/movies?limit=50`);
+        if (res.ok) {
+          const data = await res.json();
+          const items = data.movies || data || [];
+          const found = items.find((m: any) => m.id === videoId);
+          if (found) {
+            setVideo({
+              id: found.id,
+              title: found.title,
+              url: found.video_url || '',
+              thumbnail: found.poster_url || '',
+              description: found.description || '',
+            });
+          }
+        }
+      } catch {
+        // API unavailable
+      }
+    };
+    fetchMovie();
+  }, [videoId]);
 
   function validateAndLoadUser() {
     try {
