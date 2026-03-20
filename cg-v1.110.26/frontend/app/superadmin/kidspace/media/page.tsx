@@ -200,7 +200,8 @@ export default function MediaLibraryPage() {
       formData.append('duration_minutes', movieDuration);
       formData.append('age_min', movieAgeMin);
       formData.append('age_max', movieAgeMax);
-      if (movieGenreId) formData.append('genre_id', movieGenreId);
+      // Skip genre_id (FK can fail if genres not seeded) — send genre_name instead
+      if (movieGenreId) formData.append('genre_name', movieGenreId);
       formData.append('trailer_url', movieTrailerUrl);
       formData.append('is_featured', String(movieFeatured));
       formData.append('is_visible', String(movieVisible));
@@ -274,7 +275,8 @@ export default function MediaLibraryPage() {
       formData.append('page_count', bookPageCount);
       formData.append('age_min', bookAgeMin);
       formData.append('age_max', bookAgeMax);
-      if (bookGenreId) formData.append('genre_id', bookGenreId);
+      // Skip genre_id FK — send genre_name instead
+      if (bookGenreId) formData.append('genre_name', bookGenreId);
       formData.append('is_featured', String(bookFeatured));
       formData.append('is_visible', String(bookVisible));
       if (bookPdfFile) formData.append('pdf', bookPdfFile);

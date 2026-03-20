@@ -434,7 +434,9 @@ async def create_movie(
     age_min: int = Form(3),
     age_max: int = Form(12),
     genre_id: Optional[str] = Form(None),
+    genre_name: Optional[str] = Form(None),
     is_featured: bool = Form(False),
+    is_visible: bool = Form(True),
     trailer_url: Optional[str] = Form(None),
     video: Optional[UploadFile] = File(None),
     poster: Optional[UploadFile] = File(None),
@@ -442,49 +444,73 @@ async def create_movie(
     admin_user: User = Depends(get_current_admin_user),
 ) -> dict:
     """Create a new KidSpace movie with optional video and poster uploads."""
-    storage = SupabaseStorageService()
     movie_id = str(uuid4())
 
     video_url = None
-    if video and video.filename:
-        file_content = await video.read()
-        ext = video.filename.rsplit(".", 1)[-1] if "." in video.filename else "mp4"
-        path = f"movies/{movie_id}/video.{ext}"
-        video_url = await storage.upload_file(
-            bucket=KIDSPACE_MEDIA_BUCKET,
-            path=path,
-            file_content=file_content,
-            content_type=video.content_type or "video/mp4",
-        )
-
     poster_url = None
-    if poster and poster.filename:
-        file_content = await poster.read()
-        ext = poster.filename.rsplit(".", 1)[-1] if "." in poster.filename else "jpg"
-        path = f"movies/{movie_id}/poster.{ext}"
-        poster_url = await storage.upload_file(
-            bucket=KIDSPACE_MEDIA_BUCKET,
-            path=path,
-            file_content=file_content,
-            content_type=poster.content_type or "image/jpeg",
+
+    try:
+        storage = SupabaseStorageService()
+
+        if video and video.filename:
+            file_content = await video.read()
+            ext = video.filename.rsplit(".", 1)[-1] if "." in video.filename else "mp4"
+            path = f"movies/{movie_id}/video.{ext}"
+            video_url = await storage.upload_file(
+                bucket=KIDSPACE_MEDIA_BUCKET,
+                path=path,
+                file_content=file_content,
+                content_type=video.content_type or "video/mp4",
+            )
+            logger.info(f"Uploaded video for movie {movie_id}: {video_url}")
+
+        if poster and poster.filename:
+            file_content = await poster.read()
+            ext = poster.filename.rsplit(".", 1)[-1] if "." in poster.filename else "jpg"
+            path = f"movies/{movie_id}/poster.{ext}"
+            poster_url = await storage.upload_file(
+                bucket=KIDSPACE_MEDIA_BUCKET,
+                path=path,
+                file_content=file_content,
+                content_type=poster.content_type or "image/jpeg",
+            )
+            logger.info(f"Uploaded poster for movie {movie_id}: {poster_url}")
+
+    except Exception as e:
+        logger.error(f"File upload failed for movie {movie_id}: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"File upload failed: {str(e)}",
         )
 
-    movie = KidSpaceMovie(
-        id=movie_id,
-        title=title,
-        description=description,
-        duration_minutes=duration_minutes,
-        age_min=age_min,
-        age_max=age_max,
-        genre_id=genre_id,
-        poster_url=poster_url,
-        video_url=video_url,
-        trailer_url=trailer_url,
-        is_featured=is_featured,
-    )
-    db.add(movie)
-    await db.commit()
-    await db.refresh(movie)
+    # Don't pass genre_id if it's empty or the genres table doesn't have entries
+    resolved_genre_id = genre_id if genre_id and genre_id.strip() else None
+
+    try:
+        movie = KidSpaceMovie(
+            id=movie_id,
+            title=title,
+            description=description,
+            duration_minutes=duration_minutes,
+            age_min=age_min,
+            age_max=age_max,
+            genre_id=resolved_genre_id,
+            poster_url=poster_url,
+            video_url=video_url,
+            trailer_url=trailer_url,
+            is_featured=is_featured,
+            is_visible=is_visible,
+        )
+        db.add(movie)
+        await db.commit()
+        await db.refresh(movie)
+    except Exception as e:
+        logger.error(f"DB insert failed for movie {movie_id}: {e}")
+        await db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Database error: {str(e)}",
+        )
 
     return _movie_to_dict(movie)
 
@@ -629,54 +655,61 @@ async def create_book(
     age_max: int = Form(12),
     genre_id: Optional[str] = Form(None),
     is_featured: bool = Form(False),
+    is_visible: bool = Form(True),
     pdf: Optional[UploadFile] = File(None),
     cover: Optional[UploadFile] = File(None),
     db: AsyncSession = Depends(get_db),
     admin_user: User = Depends(get_current_admin_user),
 ) -> dict:
     """Create a new KidSpace book with optional PDF and cover uploads."""
-    storage = SupabaseStorageService()
     book_id = str(uuid4())
-
     pdf_url = None
-    if pdf and pdf.filename:
-        file_content = await pdf.read()
-        path = f"books/{book_id}/book.pdf"
-        pdf_url = await storage.upload_file(
-            bucket=KIDSPACE_MEDIA_BUCKET,
-            path=path,
-            file_content=file_content,
-            content_type="application/pdf",
-        )
-
     cover_url = None
-    if cover and cover.filename:
-        file_content = await cover.read()
-        ext = cover.filename.rsplit(".", 1)[-1] if "." in cover.filename else "jpg"
-        path = f"books/{book_id}/cover.{ext}"
-        cover_url = await storage.upload_file(
-            bucket=KIDSPACE_MEDIA_BUCKET,
-            path=path,
-            file_content=file_content,
-            content_type=cover.content_type or "image/jpeg",
-        )
 
-    book = KidSpaceBook(
-        id=book_id,
-        title=title,
-        author_id=author_id,
-        description=description,
-        page_count=page_count,
-        age_min=age_min,
-        age_max=age_max,
-        genre_id=genre_id,
-        cover_url=cover_url,
-        pdf_url=pdf_url,
-        is_featured=is_featured,
-    )
-    db.add(book)
-    await db.commit()
-    await db.refresh(book)
+    try:
+        storage = SupabaseStorageService()
+
+        if pdf and pdf.filename:
+            file_content = await pdf.read()
+            path = f"books/{book_id}/book.pdf"
+            pdf_url = await storage.upload_file(
+                bucket=KIDSPACE_MEDIA_BUCKET, path=path,
+                file_content=file_content, content_type="application/pdf",
+            )
+            logger.info(f"Uploaded PDF for book {book_id}: {pdf_url}")
+
+        if cover and cover.filename:
+            file_content = await cover.read()
+            ext = cover.filename.rsplit(".", 1)[-1] if "." in cover.filename else "jpg"
+            path = f"books/{book_id}/cover.{ext}"
+            cover_url = await storage.upload_file(
+                bucket=KIDSPACE_MEDIA_BUCKET, path=path,
+                file_content=file_content, content_type=cover.content_type or "image/jpeg",
+            )
+            logger.info(f"Uploaded cover for book {book_id}: {cover_url}")
+
+    except Exception as e:
+        logger.error(f"File upload failed for book {book_id}: {e}")
+        raise HTTPException(status_code=500, detail=f"File upload failed: {str(e)}")
+
+    resolved_genre_id = genre_id if genre_id and genre_id.strip() else None
+    resolved_author_id = author_id if author_id and author_id.strip() else None
+
+    try:
+        book = KidSpaceBook(
+            id=book_id, title=title, author_id=resolved_author_id,
+            description=description, page_count=page_count,
+            age_min=age_min, age_max=age_max, genre_id=resolved_genre_id,
+            cover_url=cover_url, pdf_url=pdf_url,
+            is_featured=is_featured, is_visible=is_visible,
+        )
+        db.add(book)
+        await db.commit()
+        await db.refresh(book)
+    except Exception as e:
+        logger.error(f"DB insert failed for book {book_id}: {e}")
+        await db.rollback()
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
     return _book_to_dict(book)
 
