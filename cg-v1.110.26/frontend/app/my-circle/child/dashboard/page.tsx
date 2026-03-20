@@ -136,9 +136,9 @@ export default function ChildDashboardPage() {
   const [upcomingEvents, setUpcomingEvents] = useState<ChildEvent[]>([]);
   const [eventsLoading, setEventsLoading] = useState(true);
 
-  // API-sourced content (merged with hardcoded fallback)
-  const [apiVideos, setApiVideos] = useState<VideoContent[]>(theaterContent.videos);
-  const [apiComingSoon, setApiComingSoon] = useState<{id: string; poster: string}[]>(COMING_SOON);
+  // API-only content (no hardcoded fallback)
+  const [apiVideos, setApiVideos] = useState<VideoContent[]>([]);
+  const [apiComingSoon, setApiComingSoon] = useState<{id: string; poster: string}[]>([]);
 
   // Fetch from KidSpace API
   useEffect(() => {
@@ -148,27 +148,22 @@ export default function ChildDashboardPage() {
         if (res.ok) {
           const data = await res.json();
           const items = data.movies || data || [];
-          if (items.length > 0) {
-            const mapped: VideoContent[] = items.map((m: any) => ({
-              id: m.id,
-              title: m.title,
-              url: m.video_url || '',
-              thumbnail: m.poster_url || '',
-              duration: m.duration_minutes ? `${m.duration_minutes} min` : undefined,
-              description: m.description || '',
-              category: (m.genre_name || 'comedy').toLowerCase() as any,
-              ageRange: m.age_min && m.age_max ? `${m.age_min}-${m.age_max}` : '3-12',
-            }));
-            const apiIds = new Set(mapped.map(m => m.id));
-            const fallback = apiVideos.filter(v => !apiIds.has(v.id));
-            setApiVideos([...mapped, ...fallback]);
-            // Coming soon = movies with posters
-            const comingSoonFromApi = mapped
-              .filter(m => m.thumbnail)
-              .slice(0, 5)
-              .map(m => ({ id: m.id, poster: m.thumbnail! }));
-            if (comingSoonFromApi.length > 0) setApiComingSoon(comingSoonFromApi);
-          }
+          const mapped: VideoContent[] = items.map((m: any) => ({
+            id: m.id,
+            title: m.title,
+            url: m.video_url || '',
+            thumbnail: m.poster_url || '',
+            duration: m.duration_minutes ? `${m.duration_minutes} min` : undefined,
+            description: m.description || '',
+            category: (m.genre_name || 'comedy').toLowerCase() as any,
+            ageRange: m.age_min && m.age_max ? `${m.age_min}-${m.age_max}` : '3-12',
+          }));
+          setApiVideos(mapped);
+          const comingSoonFromApi = mapped
+            .filter(m => m.thumbnail)
+            .slice(0, 5)
+            .map(m => ({ id: m.id, poster: m.thumbnail! }));
+          setApiComingSoon(comingSoonFromApi);
         }
       } catch {
         // Keep hardcoded fallback
@@ -221,7 +216,7 @@ export default function ChildDashboardPage() {
       setProgressMap(vMap);
 
       const bMap: Record<string, ReadingProgress | null> = {};
-      theaterContent.storybooks.forEach(b => { bMap[b.id] = getReadingProgress(b.id); });
+      // Reading progress tracked by localStorage — works with any book IDs
       setBookProgressMap(bMap);
 
       setIsLoading(false);
@@ -320,27 +315,21 @@ export default function ChildDashboardPage() {
       progress: wp.progress,
       lastAction: wp.lastWatched ? new Date(wp.lastWatched).getTime() : 0,
     })),
-    ...Object.entries(bookProgressMap)
-      .filter(([_, p]) => p && p.currentPage > 0 && !p.completed)
-      .map(([id, p]) => ({
-        type: 'book' as const,
-        id,
-        item: theaterContent.storybooks.find(b => b.id === id)!,
-        progress: p!.totalPages > 0 ? (p!.currentPage / p!.totalPages) * 100 : 0,
-        lastAction: p!.lastRead ? new Date(p!.lastRead).getTime() : 0,
-      }))
+    // Book progress — currently empty until API books are loaded with progress tracking
+
   ].filter(e => e.item).sort((a, b) => b.lastAction - a.lastAction);
 
   const [featuredIndex, setFeaturedIndex] = useState(0);
   const [selectedMovie, setSelectedMovie] = useState<VideoContent | null>(null);
   useEffect(() => {
+    if (apiVideos.length === 0) return;
     const interval = setInterval(() => {
       setFeaturedIndex(i => (i + 1) % apiVideos.length);
     }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [apiVideos.length]);
 
-  const featuredVideo = apiVideos[featuredIndex];
+  const featuredVideo = apiVideos.length > 0 ? apiVideos[featuredIndex % apiVideos.length] : null;
 
   const userInitial = userData?.childName?.charAt(0).toUpperCase() || 'K';
   const avatarGradient = AVATAR_COLORS[(userData?.childName?.length || 0) % AVATAR_COLORS.length];
@@ -433,26 +422,35 @@ export default function ChildDashboardPage() {
         </div>
 
         {/* Featured Hero Banner */}
-        <div className="px-4">
-          <FeaturedHeroBanner
-            content={{
-              id: featuredVideo.id,
-              title: featuredVideo.title,
-              cover: featuredVideo.thumbnail,
-              description: featuredVideo.description,
-              duration: featuredVideo.duration ? parseInt(featuredVideo.duration) : undefined,
-              type: 'video',
-              category: featuredVideo.category,
-              rating: 4.5,
-              ratingCount: 2400,
-            }}
-            badge="✨ Featured"
-            onPlay={() => router.push(`/my-circle/child/movies/${featuredVideo.id}`)}
-            onMoreInfo={() => setSelectedMovie(featuredVideo)}
-            onFavorite={() => { }}
-            isFavorite={false}
-          />
-        </div>
+        {featuredVideo ? (
+          <div className="px-4">
+            <FeaturedHeroBanner
+              content={{
+                id: featuredVideo.id,
+                title: featuredVideo.title,
+                cover: featuredVideo.thumbnail,
+                description: featuredVideo.description,
+                duration: featuredVideo.duration ? parseInt(featuredVideo.duration) : undefined,
+                type: 'video',
+                category: featuredVideo.category,
+                rating: 4.5,
+                ratingCount: 2400,
+              }}
+              badge="✨ Featured"
+              onPlay={() => router.push(`/my-circle/child/movies/${featuredVideo.id}`)}
+              onMoreInfo={() => setSelectedMovie(featuredVideo)}
+              onFavorite={() => { }}
+              isFavorite={false}
+            />
+          </div>
+        ) : (
+          <div className="px-4">
+            <div className="rounded-2xl bg-gradient-to-br from-slate-700/50 to-slate-800/50 p-8 text-center">
+              <div className="text-4xl mb-2 opacity-50">🎬</div>
+              <p className="text-sm text-white/60">Featured content coming soon</p>
+            </div>
+          </div>
+        )}
 
         {/* Pick Back Up — real progress only */}
         {pickBackUp.length > 0 && (
@@ -713,8 +711,8 @@ export default function ChildDashboardPage() {
           </div>
         </section>
 
-        {/* Coming Soon */}
-        <section>
+        {/* Coming Soon — only show if there are movies with posters */}
+        {apiComingSoon.length > 0 && <section>
           <div className="px-4 flex items-center justify-between mb-3">
             <h2 className="text-xl font-bold" style={{ fontFamily: 'var(--portal-font-heading)', color: 'var(--portal-text-heading)' }}>
               Coming Soon
@@ -747,7 +745,7 @@ export default function ChildDashboardPage() {
               ))}
             </div>
           </div>
-        </section>
+        </section>}
 
         {/* Featured Author */}
         <section className="px-4">

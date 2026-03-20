@@ -373,9 +373,14 @@ export default function LibraryPage() {
             {filteredBooks.length === 0 ? (
               <div className="text-center py-20">
                 <div className="text-6xl mb-4">📚</div>
-                <p className="font-medium" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>
-                  {searchQuery ? 'No books found' : 'No books in this category'}
+                <p className="font-medium text-lg" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>
+                  {searchQuery ? 'No books found' : allBooks.length === 0 ? 'No Books Yet' : 'No books in this category'}
                 </p>
+                {allBooks.length === 0 && !searchQuery && (
+                  <p className="text-sm mt-2" style={{ color: 'var(--portal-muted)', opacity: 0.6 }}>
+                    Books will appear here once added by the CommonGround team.
+                  </p>
+                )}
               </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
