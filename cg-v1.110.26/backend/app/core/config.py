@@ -113,6 +113,8 @@ class Settings(BaseSettings):
     SENDGRID_EARLY_ADOPTER_LIST_ID: Optional[str] = None  # SendGrid Marketing contact list for early adopters
     SENDGRID_NEWSLETTER_LIST_ID: Optional[str] = None  # SendGrid Marketing contact list for newsletter subscribers
     SENDGRID_LEADS_LIST_ID: Optional[str] = None  # SendGrid Marketing contact list for contact form leads
+    SENDGRID_PROFESSIONAL_LIST_ID: Optional[str] = None  # SendGrid Marketing contact list for professional leads
+    SENDGRID_USERS_LIST_ID: Optional[str] = None  # SendGrid Marketing contact list for registered users
     FROM_EMAIL: str = "noreply@find-commonground.com"
     FROM_NAME: str = "CommonGround"
 

@@ -170,6 +170,25 @@ class AuthService:
             except Exception as e:
                 logger.warning(f"Failed to send welcome email to {user.email}: {e}")
 
+            # Add to SendGrid Marketing Contacts — Registered Users list
+            # Non-blocking: don't fail registration if SendGrid is down
+            try:
+                from app.services.email import email_service as _email_svc
+                user_list_ids = []
+                if settings.SENDGRID_USERS_LIST_ID:
+                    user_list_ids = [settings.SENDGRID_USERS_LIST_ID]
+                await _email_svc.add_marketing_contact(
+                    email=user.email,
+                    first_name=request.first_name or "",
+                    list_ids=user_list_ids if user_list_ids else None,
+                    custom_fields={
+                        "e1_T": "registration",   # signup_source
+                        "e2_T": "parent",          # user_type
+                    },
+                )
+            except Exception as e:
+                logger.warning(f"Failed to add {user.email} to SendGrid Marketing: {e}")
+
             return user, access_token, refresh_token, checkout_url
 
         except HTTPException as e:

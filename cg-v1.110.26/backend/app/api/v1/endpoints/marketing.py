@@ -1,5 +1,6 @@
 """
-Marketing endpoints for newsletter subscriptions and contact form submissions.
+Marketing endpoints for newsletter subscriptions, contact form, early adopter,
+and professional interest lead capture.
 """
 
 import logging
@@ -13,6 +14,8 @@ from app.schemas.marketing import (
     EarlyAdopterResponse,
     ContactFormRequest,
     ContactFormResponse,
+    ProfessionalInterestRequest,
+    ProfessionalInterestResponse,
 )
 from app.services.email import email_service
 from app.core.config import settings
@@ -181,4 +184,67 @@ async def submit_contact_form(request: ContactFormRequest):
         return ContactFormResponse(
             success=False,
             message="We couldn't send your message right now. Please try again later."
+        )
+
+
+@router.post("/professional-interest", response_model=ProfessionalInterestResponse, status_code=status.HTTP_200_OK)
+async def professional_interest_signup(request: ProfessionalInterestRequest):
+    """
+    Capture a professional's interest in CommonGround.
+
+    Adds the contact to the SendGrid Marketing Contacts 'Professional Leads' list
+    and sends a notification to the partnerships team. No authentication required.
+
+    Args:
+        request: Professional interest with email, name, role, and firm
+
+    Returns:
+        ProfessionalInterestResponse with success status
+    """
+    try:
+        # Add to SendGrid Marketing Contacts professional list
+        list_ids = []
+        if settings.SENDGRID_PROFESSIONAL_LIST_ID:
+            list_ids = [settings.SENDGRID_PROFESSIONAL_LIST_ID]
+
+        full_name = " ".join(filter(None, [request.first_name, request.last_name]))
+
+        await email_service.add_marketing_contact(
+            email=request.email,
+            first_name=request.first_name or "",
+            list_ids=list_ids if list_ids else None,
+            custom_fields={
+                "e1_T": f"professional_{request.source}",  # signup_source
+                "e2_T": "professional",                     # user_type
+                "e3_T": request.role,                       # inquiry_type / role
+            },
+        )
+
+        # Notify partnerships team
+        await email_service.send_contact_form_notification(
+            name=full_name or "Professional Lead",
+            email=request.email,
+            inquiry_type="professional",
+            subject=f"Professional Interest: {request.role.title()}" + (f" — {request.firm_name}" if request.firm_name else ""),
+            message=f"Role: {request.role.title()}\nFirm: {request.firm_name or 'Not provided'}\nSource: {request.source}",
+            internal_email="partnerships@find-commonground.com",
+        )
+
+        # Send confirmation to the professional
+        await email_service.send_contact_form_confirmation(
+            to_email=request.email,
+            name=request.first_name or "there",
+        )
+
+        logger.info(f"Professional interest: {request.email} (role: {request.role}, source: {request.source})")
+        return ProfessionalInterestResponse(
+            success=True,
+            message="Thanks for your interest! Our partnerships team will reach out within 24 hours."
+        )
+    except Exception as e:
+        logger.error(f"Professional interest signup failed for {request.email}: {str(e)}")
+        capture_error(e)
+        return ProfessionalInterestResponse(
+            success=False,
+            message="We couldn't process your request right now. Please try again later."
         )

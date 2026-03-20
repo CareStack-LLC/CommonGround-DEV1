@@ -1,5 +1,5 @@
 """
-Marketing schemas for newsletter and contact form endpoints.
+Marketing schemas for newsletter, contact form, early adopter, and professional interest endpoints.
 """
 
 from pydantic import BaseModel, EmailStr, Field
@@ -37,5 +37,22 @@ class ContactFormRequest(BaseModel):
 
 
 class ContactFormResponse(BaseModel):
+    success: bool
+    message: str
+
+
+class ProfessionalInterestRequest(BaseModel):
+    email: EmailStr
+    first_name: Optional[str] = Field(None, max_length=100)
+    last_name: Optional[str] = Field(None, max_length=100)
+    role: str = Field(
+        default="attorney",
+        pattern="^(attorney|mediator|gal|therapist|paralegal|other)$",
+    )
+    firm_name: Optional[str] = Field(None, max_length=200)
+    source: str = Field(default="professionals_page", max_length=50)
+
+
+class ProfessionalInterestResponse(BaseModel):
     success: bool
     message: str

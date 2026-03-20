@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { JsonLd } from '@/components/marketing/json-ld';
+import { ProfessionalInterestForm } from '@/components/marketing/professional-interest-form';
 import {
   Scale,
   Users,
@@ -188,13 +189,13 @@ export default function ProfessionalsPage() {
                 Free for professionals. Your clients pay for their own plans.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link
-                  href="/help/contact?type=demo"
+                <a
+                  href="#demo"
                   className="inline-flex items-center justify-center px-8 py-4 bg-[#1E3A4A] text-white font-semibold rounded-full hover:bg-[#2D6A8F] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 group"
                 >
-                  Schedule a Demo
+                  Request a Demo
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                </Link>
+                </a>
                 <Link
                   href="/features"
                   className="inline-flex items-center justify-center px-8 py-4 bg-white text-[#1E3A4A] font-semibold rounded-full border-2 border-[#1E3A4A]/20 hover:border-[#1E3A4A]/40 hover:bg-[#1E3A4A]/5 transition-all"
@@ -563,37 +564,46 @@ export default function ProfessionalsPage() {
         </div>
       </section>
 
-      {/* Final CTA */}
-      <section className="py-20 sm:py-28 bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F] text-white">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2
-            className="text-4xl sm:text-5xl mb-6"
-            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
-          >
-            Better data makes for better outcomes
-          </h2>
-          <p className="text-xl text-white/80 mb-10 max-w-2xl mx-auto">
-            See how CommonGround gives family law professionals the verified, organized data
-            they need — without adding another tool to manage.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/help/contact?type=demo"
-              className="inline-flex items-center justify-center px-10 py-5 bg-[#F5A623] text-white font-bold text-lg rounded-full hover:bg-[#E09520] transition-all shadow-2xl hover:-translate-y-1 group"
-            >
-              Schedule a Demo
-              <ArrowRight className="ml-2 h-6 w-6 group-hover:translate-x-2 transition-transform" />
-            </Link>
-            <Link
-              href="/register"
-              className="inline-flex items-center justify-center px-10 py-5 bg-white/10 text-white font-bold text-lg rounded-full hover:bg-white/20 transition-all border-2 border-white/30"
-            >
-              Recommend to a Client
-            </Link>
+      {/* Professional Interest Form */}
+      <section className="py-16 sm:py-24 bg-[#F4F8F7]" id="demo">
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="grid lg:grid-cols-2 gap-10 items-start">
+            <div>
+              <h2
+                className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+                style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
+              >
+                Better data makes for <span className="text-[#3DAA8A]">better outcomes</span>
+              </h2>
+              <p className="text-lg text-gray-600 mb-6">
+                See how CommonGround gives family law professionals the verified, organized data
+                they need — without adding another tool to manage.
+              </p>
+              <ul className="space-y-3 mb-8">
+                {[
+                  'Free for all professionals — always',
+                  'Your clients choose their own plans',
+                  'Set up in under 5 minutes',
+                  'No software to install',
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-3 text-gray-700">
+                    <div className="w-5 h-5 rounded-full bg-[#3DAA8A] flex items-center justify-center flex-shrink-0">
+                      <Check className="w-3 h-3 text-white" />
+                    </div>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/register"
+                className="inline-flex items-center gap-2 text-[#3DAA8A] font-medium hover:underline"
+              >
+                Or recommend CommonGround to a client
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <ProfessionalInterestForm source="professionals_page" />
           </div>
-          <p className="text-sm text-white/50 mt-6">
-            Free for professionals. Your clients choose their own plans.
-          </p>
         </div>
       </section>
     </div>
