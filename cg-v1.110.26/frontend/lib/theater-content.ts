@@ -3,7 +3,7 @@
  * Static configuration for available videos and storybooks
  */
 
-export type VideoCategory = 'comedy' | 'adventure' | 'educational' | 'animation' | 'action';
+export type VideoCategory = 'comedy' | 'adventure' | 'educational' | 'animation' | 'action' | 'commonground_originals' | 'family';
 export type BookCategory = 'fiction' | 'educational' | 'fantasy' | 'adventure';
 
 export interface VideoContent {
@@ -65,6 +65,18 @@ export const videoCategories: Record<VideoCategory, CategoryMetadata> = {
     color: 'orange-500',
     emoji: '⚡',
     description: 'Fast-paced and exciting'
+  },
+  commonground_originals: {
+    name: 'CommonGround Originals',
+    color: 'teal-500',
+    emoji: '🌟',
+    description: 'Made exclusively for CommonGround families'
+  },
+  family: {
+    name: 'Family',
+    color: 'pink-500',
+    emoji: '👨‍👩‍👧‍👦',
+    description: 'Great for the whole family'
   }
 };
 

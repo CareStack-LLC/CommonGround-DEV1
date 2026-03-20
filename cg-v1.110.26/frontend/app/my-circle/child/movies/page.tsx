@@ -70,7 +70,8 @@ export default function MoviesPage() {
           const items = data.movies || data || [];
           const genreMap: Record<string, VideoCategory> = {
             comedy: 'comedy', adventure: 'adventure', educational: 'educational',
-            animation: 'animation', action: 'action', family: 'comedy',
+            animation: 'animation', action: 'action', family: 'family',
+            commonground_originals: 'commonground_originals',
           };
           const apiMapped: VideoContent[] = items.map((m: any) => ({
             id: m.id,

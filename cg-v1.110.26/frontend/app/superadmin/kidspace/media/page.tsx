@@ -9,7 +9,25 @@ import {
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
-type Tab = 'movies' | 'books' | 'authors' | 'genres';
+type Tab = 'movies' | 'books' | 'authors';
+
+// Preset genres — no custom creation needed
+const MOVIE_GENRES = [
+  { value: 'commonground_originals', label: '🌟 CommonGround Originals' },
+  { value: 'comedy', label: '😂 Comedy' },
+  { value: 'adventure', label: '🚀 Adventure' },
+  { value: 'educational', label: '🎓 Educational' },
+  { value: 'animation', label: '✨ Animation' },
+  { value: 'action', label: '⚡ Action' },
+  { value: 'family', label: '👨‍👩‍👧‍👦 Family' },
+];
+
+const BOOK_GENRES = [
+  { value: 'fiction', label: '📚 Stories' },
+  { value: 'educational', label: '🔬 Learn' },
+  { value: 'fantasy', label: '🦄 Fantasy' },
+  { value: 'adventure', label: '🗺️ Adventure' },
+];
 
 interface Movie {
   id: string;
@@ -74,7 +92,6 @@ const TABS: { key: Tab; label: string; icon: React.ElementType }[] = [
   { key: 'movies', label: 'Movies', icon: Film },
   { key: 'books', label: 'Books', icon: BookOpen },
   { key: 'authors', label: 'Authors', icon: Users2 },
-  { key: 'genres', label: 'Genres', icon: Tag },
 ];
 
 export default function MediaLibraryPage() {
@@ -717,7 +734,7 @@ export default function MediaLibraryPage() {
                   <label className={labelCls}>Genre</label>
                   <select value={movieGenreId} onChange={e => setMovieGenreId(e.target.value)} className={inputCls}>
                     <option value="">Select genre...</option>
-                    {genres.map(g => <option key={g.id} value={g.id}>{g.emoji} {g.name}</option>)}
+                    {MOVIE_GENRES.map(g => <option key={g.value} value={g.value}>{g.label}</option>)}
                   </select>
                 </div>
                 <div><label className={labelCls}>Trailer URL</label><input value={movieTrailerUrl} onChange={e => setMovieTrailerUrl(e.target.value)} placeholder="https://..." className={inputCls} /></div>
@@ -794,7 +811,7 @@ export default function MediaLibraryPage() {
                 <label className={labelCls}>Genre</label>
                 <select value={bookGenreId} onChange={e => setBookGenreId(e.target.value)} className={inputCls}>
                   <option value="">Select genre...</option>
-                  {genres.map(g => <option key={g.id} value={g.id}>{g.emoji} {g.name}</option>)}
+                  {BOOK_GENRES.map(g => <option key={g.value} value={g.value}>{g.label}</option>)}
                 </select>
               </div>
 
