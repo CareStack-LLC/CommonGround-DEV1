@@ -122,7 +122,7 @@ export default function HomePage() {
                 </Link>
               </div>
 
-              <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-500">
+              <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-600">
                 <span className="flex items-center gap-1.5">
                   <Check className="h-4 w-4 text-[var(--portal-primary)]" />
                   Forever free tier
@@ -471,7 +471,7 @@ export default function HomePage() {
                       <Icon className="h-7 w-7" style={{ color: useCase.color }} />
                     </div>
                     <h3 className="text-xl font-semibold text-[#1E3A4A] mb-2">{useCase.title}</h3>
-                    <p className="text-gray-500 mb-4">{useCase.description}</p>
+                    <p className="text-gray-600 mb-4">{useCase.description}</p>
                     <ul className="space-y-2">
                       {useCase.features.map((feature) => (
                         <li key={feature} className="flex items-start gap-2 text-sm text-gray-600">
@@ -519,9 +519,9 @@ export default function HomePage() {
               ];
 
               const renderOthers = (val: boolean | string) => {
-                if (val === true) return <Check className="h-5 w-5 text-gray-400 mx-auto" />;
+                if (val === true) return <Check className="h-5 w-5 text-gray-600 mx-auto" />;
                 if (val === false) return <span className="text-gray-300">&mdash;</span>;
-                return <span className="text-gray-400 text-xs">{val}</span>;
+                return <span className="text-gray-600 text-xs">{val}</span>;
               };
 
               return (
@@ -577,11 +577,11 @@ export default function HomePage() {
                           </div>
                           <div className="flex items-center gap-2 rounded-lg bg-gray-50 py-2 px-3">
                             {row.others === true ? (
-                              <Check className="h-4 w-4 text-gray-400 shrink-0" />
+                              <Check className="h-4 w-4 text-gray-600 shrink-0" />
                             ) : row.others === false ? (
                               <span className="text-gray-300 text-base shrink-0">&mdash;</span>
                             ) : null}
-                            <span className="text-gray-400">
+                            <span className="text-gray-600">
                               {row.others === true ? 'Others' : row.others === false ? 'Not available' : row.others}
                             </span>
                           </div>

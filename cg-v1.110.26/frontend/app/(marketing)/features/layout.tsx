@@ -6,6 +6,7 @@ export const metadata: Metadata = {
     'Explore CommonGround features: ARIA AI messaging, TimeBridge automated schedules, ClearFund expense tracking, KidSpace video calls, Silent Handoff GPS exchanges, and court-ready evidence exports.',
   keywords:
     'co-parenting features, AI co-parenting messaging, custody schedule app, child video calls co-parenting, GPS custody exchange, court ready evidence app, ARIA messaging, KidSpace, Silent Handoff, TimeBridge, ClearFund',
+  alternates: { canonical: 'https://www.find-commonground.com/features' },
   openGraph: {
     title: 'CommonGround Features — Tools for Calmer Co-Parenting',
     description:

@@ -6,6 +6,7 @@ export const metadata: Metadata = {
     'Feeling pushed out of your kids\' lives? CommonGround detects manipulation, documents patterns for court, and lets you bond with your kids through KidSpace — without needing her phone. Early adopter spots available.',
   keywords:
     'co-parenting app for dads, fathers rights co-parenting, see my kids co-parenting app, co-parent weaponizing kids, parental alienation app, dad co-parenting tool, father custody app',
+  alternates: { canonical: 'https://www.find-commonground.com/for-dads' },
   openGraph: {
     title: 'Being a Good Dad Shouldn\'t Feel Like Walking on Eggshells — CommonGround',
     description:

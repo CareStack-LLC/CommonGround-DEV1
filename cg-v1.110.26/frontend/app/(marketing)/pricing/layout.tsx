@@ -6,6 +6,7 @@ export const metadata: Metadata = {
     'Start co-parenting for free, forever. No credit card required. Upgrade for automated schedules ($17.99/mo), GPS exchanges, KidSpace video calls, and court-ready evidence ($34.99/mo). 14-day free trial on all paid plans.',
   keywords:
     'co-parenting app pricing, free co-parenting app, custody app cost, co-parenting subscription, CommonGround plans, affordable co-parenting, KidSpace video calls pricing',
+  alternates: { canonical: 'https://www.find-commonground.com/pricing' },
   openGraph: {
     title: 'CommonGround Pricing — Free Forever Tier Available',
     description:

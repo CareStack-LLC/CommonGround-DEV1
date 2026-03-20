@@ -157,7 +157,7 @@ export default function PricingPage() {
   const renderCheckmark = (value: boolean | string) => {
     if (value === true) return <Check className="w-5 h-5 text-[var(--portal-primary)] mx-auto" />;
     if (value === false) return <Minus className="w-4 h-4 text-gray-300 mx-auto" />;
-    return <span className="text-xs text-gray-500">{value}</span>;
+    return <span className="text-xs text-gray-600">{value}</span>;
   };
 
   return (
@@ -182,7 +182,7 @@ export default function PricingPage() {
           <p className="text-xl sm:text-2xl text-gray-600 mb-4 leading-relaxed max-w-2xl mx-auto">
             No credit card. No pressure. Just see if automation works better than coordination.
           </p>
-          <p className="text-base text-gray-500 mb-8 max-w-xl mx-auto">
+          <p className="text-base text-gray-600 mb-8 max-w-xl mx-auto">
             Less than the cost of one missed exchange or one heated text that ends up in court.
           </p>
 
@@ -246,13 +246,13 @@ export default function PricingPage() {
                   >
                     {plan.name}
                   </h2>
-                  <p className="text-sm text-gray-500 mb-4">{plan.tagline}</p>
+                  <p className="text-sm text-gray-600 mb-4">{plan.tagline}</p>
 
                   <div className="mb-2">
                     <span className="text-5xl font-bold" style={{ color: plan.color }}>
                       {getPrice(plan)}
                     </span>
-                    <span className="text-gray-500 text-sm ml-1">{getPeriod(plan)}</span>
+                    <span className="text-gray-600 text-sm ml-1">{getPeriod(plan)}</span>
                   </div>
 
                   {getSavings(plan) && (
@@ -291,7 +291,7 @@ export default function PricingPage() {
             ))}
           </div>
 
-          <p className="text-center text-sm text-gray-500 mt-8">
+          <p className="text-center text-sm text-gray-600 mt-8">
             All paid plans include a 14-day free trial. Cancel anytime. No contracts.
           </p>
         </div>
@@ -375,7 +375,7 @@ export default function PricingPage() {
                       <div className="font-medium text-gray-700 text-sm mb-2">{feature.name}</div>
                       <div className="grid grid-cols-3 gap-2 text-xs">
                         <div className="flex flex-col items-center gap-1 rounded-lg bg-gray-50 py-1.5">
-                          <span className="text-gray-400 font-medium">Free</span>
+                          <span className="text-gray-600 font-medium">Free</span>
                           {renderCheckmark(feature.free)}
                         </div>
                         <div className="flex flex-col items-center gap-1 rounded-lg bg-[#F5A623]/5 py-1.5 ring-1 ring-[#F5A623]/20">
@@ -383,7 +383,7 @@ export default function PricingPage() {
                           {renderCheckmark(feature.plus)}
                         </div>
                         <div className="flex flex-col items-center gap-1 rounded-lg bg-gray-50 py-1.5">
-                          <span className="text-gray-400 font-medium">Complete</span>
+                          <span className="text-gray-600 font-medium">Complete</span>
                           {renderCheckmark(feature.complete)}
                         </div>
                       </div>
@@ -443,25 +443,25 @@ export default function PricingPage() {
               <div className="h-12 w-12 rounded-xl bg-[#F5A623]/10 flex items-center justify-center mx-auto mb-3">
                 <Scale className="h-6 w-6 text-[#F5A623]" />
               </div>
-              <p className="text-sm text-gray-500 mb-1">Avg. attorney hour</p>
+              <p className="text-sm text-gray-600 mb-1">Avg. attorney hour</p>
               <p className="text-3xl font-bold text-[#1E3A4A]">$300+</p>
-              <p className="text-xs text-gray-500 mt-2">1 hour saved = 8 months of Complete</p>
+              <p className="text-xs text-gray-600 mt-2">1 hour saved = 8 months of Complete</p>
             </div>
             <div className="bg-[#E8F4F8] rounded-xl p-6 border border-[var(--portal-primary)]/10">
               <div className="h-12 w-12 rounded-xl bg-[var(--portal-primary)]/10 flex items-center justify-center mx-auto mb-3">
                 <DollarSign className="h-6 w-6 text-[var(--portal-primary)]" />
               </div>
-              <p className="text-sm text-gray-500 mb-1">Avg. mediation session</p>
+              <p className="text-sm text-gray-600 mb-1">Avg. mediation session</p>
               <p className="text-3xl font-bold text-[#1E3A4A]">$200–500</p>
-              <p className="text-xs text-gray-500 mt-2">Calmer messages mean fewer sessions</p>
+              <p className="text-xs text-gray-600 mt-2">Calmer messages mean fewer sessions</p>
             </div>
             <div className="bg-[#FEF7ED] rounded-xl p-6 border border-[#F5A623]/10">
               <div className="h-12 w-12 rounded-xl bg-[#F5A623]/10 flex items-center justify-center mx-auto mb-3">
                 <Clock className="h-6 w-6 text-[#F5A623]" />
               </div>
-              <p className="text-sm text-gray-500 mb-1">Hours spent coordinating</p>
+              <p className="text-sm text-gray-600 mb-1">Hours spent coordinating</p>
               <p className="text-3xl font-bold text-[#1E3A4A]">Countless</p>
-              <p className="text-xs text-gray-500 mt-2">Time you could spend with your kids</p>
+              <p className="text-xs text-gray-600 mt-2">Time you could spend with your kids</p>
             </div>
           </div>
         </div>
@@ -514,7 +514,7 @@ export default function PricingPage() {
               <details key={faq.q} className="group bg-gray-50 rounded-xl p-6">
                 <summary className="cursor-pointer list-none flex items-center justify-between font-medium text-[#1E3A4A]">
                   {faq.q}
-                  <span className="text-gray-400 group-open:rotate-180 transition-transform">▼</span>
+                  <span className="text-gray-600 group-open:rotate-180 transition-transform">▼</span>
                 </summary>
                 <p className="mt-4 text-gray-600">{faq.a}</p>
               </details>

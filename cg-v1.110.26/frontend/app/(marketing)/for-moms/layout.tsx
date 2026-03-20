@@ -6,6 +6,7 @@ export const metadata: Metadata = {
     'Tired of unreliable co-parents who forget pickups and go off-topic? CommonGround keeps communication focused, automates reminders he can\'t ignore, and tracks every payment. Early adopter spots available.',
   keywords:
     'co-parenting app for moms, unreliable co-parent app, co-parent doesn\'t show up, co-parenting communication app, co-parent forgets pickup, co-parenting help for mothers, single mom co-parenting tool',
+  alternates: { canonical: 'https://www.find-commonground.com/for-moms' },
   openGraph: {
     title: 'You Shouldn\'t Have to Chase Him to Be a Good Parent — CommonGround',
     description:

@@ -335,11 +335,11 @@ export default function KidComsPage() {
                   onClick={() => router.push(`/family-files/${familyFileId}/my-circle`)}
                   className={cn(
                     'flex flex-col items-center p-4 rounded-xl transition-all border-2',
-                    'bg-teal-50 dark:bg-teal-900/30 border-teal-200 dark:border-teal-700 hover:border-teal-300 dark:hover:border-teal-500 hover:shadow-md active:scale-95'
+                    'bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 border-[#D4AF37]/30 dark:border-[#D4AF37]/40 hover:border-[#D4AF37]/50 dark:hover:border-[#D4AF37]/60 hover:shadow-md active:scale-95'
                   )}
                 >
-                  <Heart className="h-8 w-8 text-teal-600 dark:text-teal-400" />
-                  <span className="mt-2 text-sm font-bold text-teal-700 dark:text-teal-300">My Circle</span>
+                  <Heart className="h-8 w-8 text-[#D4AF37] dark:text-[#E8C84A]" />
+                  <span className="mt-2 text-sm font-bold text-[#8B6914] dark:text-[#E8C84A]">My Circle</span>
                 </button>
                 <button
                   onClick={() => {

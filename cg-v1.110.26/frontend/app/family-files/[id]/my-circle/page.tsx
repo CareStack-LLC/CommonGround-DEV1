@@ -103,6 +103,13 @@ function MyCircleContent({ params }: PageParams) {
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [showPermissionModal, setShowPermissionModal] = useState(false);
   const [showChildSetupModal, setShowChildSetupModal] = useState(false);
+  const [showEditContactModal, setShowEditContactModal] = useState(false);
+  const [editingContact, setEditingContact] = useState<CircleContact | null>(null);
+  const [editContactName, setEditContactName] = useState('');
+  const [editRelationship, setEditRelationship] = useState('');
+  const [editPhotoFile, setEditPhotoFile] = useState<File | null>(null);
+  const [editPhotoPreview, setEditPhotoPreview] = useState<string | null>(null);
+  const [isSavingContact, setIsSavingContact] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Invite form state
@@ -275,6 +282,57 @@ function MyCircleContent({ params }: PageParams) {
       setError(err instanceof Error ? err.message : 'Failed to create child account');
     } finally {
       setIsSettingUpChild(false);
+    }
+  }
+
+  function openEditContactModal(contact: CircleContact) {
+    setEditingContact(contact);
+    setEditContactName(contact.contact_name || '');
+    setEditRelationship(contact.relationship_type || '');
+    setEditPhotoFile(null);
+    setEditPhotoPreview(contact.photo_url || null);
+    setShowEditContactModal(true);
+  }
+
+  async function handleSaveContactEdit() {
+    if (!editingContact || !editContactName.trim()) return;
+    setIsSavingContact(true);
+    try {
+      let photoUrl = editingContact.photo_url;
+
+      // Upload photo if new file selected
+      if (editPhotoFile) {
+        const formData = new FormData();
+        formData.append('file', editPhotoFile);
+        const uploadRes = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/circle/${editingContact.id}/photo`,
+          {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` },
+            body: formData,
+          }
+        );
+        if (uploadRes.ok) {
+          const uploadData = await uploadRes.json();
+          photoUrl = uploadData.photo_url || photoUrl;
+        }
+      }
+
+      await circleAPI.update(editingContact.id, {
+        contact_name: editContactName.trim(),
+        relationship_type: editRelationship || undefined,
+        photo_url: photoUrl,
+      });
+
+      // Refresh contacts
+      await loadData();
+      setShowEditContactModal(false);
+      setEditingContact(null);
+    } catch (err: any) {
+      console.error('Failed to update contact:', err);
+      setError(err.message || 'Failed to update contact');
+    } finally {
+      setIsSavingContact(false);
     }
   }
 
@@ -638,7 +696,16 @@ function MyCircleContent({ params }: PageParams) {
                               <Link2 className="h-4 w-4" />
                             </button>
 
-                            {/* Edit Button */}
+                            {/* Edit Contact Details */}
+                            <button
+                              onClick={() => openEditContactModal(contact)}
+                              className="p-2 text-[#D4AF37] bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 rounded-lg transition-colors"
+                              title="Edit contact name & photo"
+                            >
+                              <Edit2 className="h-4 w-4" />
+                            </button>
+
+                            {/* Edit Permissions */}
                             <button
                               onClick={() => {
                                 // Find real permission for this contact
@@ -671,9 +738,9 @@ function MyCircleContent({ params }: PageParams) {
                                 }
                               }}
                               className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
-                              title="Edit permissions"
+                              title="Edit call permissions"
                             >
-                              <Edit2 className="h-4 w-4" />
+                              <Settings className="h-4 w-4" />
                             </button>
                           </div>
                         </div>
@@ -863,6 +930,95 @@ function MyCircleContent({ params }: PageParams) {
                   </div>
                 </>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* Edit Contact Modal */}
+        {showEditContactModal && editingContact && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+            <div className="bg-card border-2 border-border rounded-2xl shadow-2xl w-full max-w-md p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Edit Contact</h3>
+                <button onClick={() => setShowEditContactModal(false)} className="p-1 hover:bg-muted rounded-lg"><X className="h-5 w-5 text-muted-foreground" /></button>
+              </div>
+
+              {/* Photo Upload */}
+              <div className="flex flex-col items-center mb-6">
+                <label className="cursor-pointer group">
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#3DAA8A]/20 to-[#2D6A8F]/20 flex items-center justify-center overflow-hidden border-2 border-border group-hover:border-[#3DAA8A] transition-colors">
+                    {editPhotoPreview ? (
+                      <img src={editPhotoPreview} alt="Contact" className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-2xl font-bold text-[#3DAA8A]">{editContactName.charAt(0).toUpperCase()}</span>
+                    )}
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setEditPhotoFile(file);
+                        setEditPhotoPreview(URL.createObjectURL(file));
+                      }
+                    }}
+                  />
+                </label>
+                <p className="text-xs text-muted-foreground mt-2">Click to change photo</p>
+              </div>
+
+              {/* Contact Name */}
+              <div className="space-y-1.5 mb-4">
+                <label className="text-sm font-medium text-foreground">Contact Name</label>
+                <input
+                  type="text"
+                  value={editContactName}
+                  onChange={(e) => setEditContactName(e.target.value)}
+                  className="w-full px-4 py-2.5 border border-border rounded-xl bg-background text-foreground focus:ring-2 focus:ring-[#3DAA8A] focus:border-[#3DAA8A] transition-all"
+                  placeholder="Enter name..."
+                />
+              </div>
+
+              {/* Relationship */}
+              <div className="space-y-1.5 mb-6">
+                <label className="text-sm font-medium text-foreground">Relationship</label>
+                <select
+                  value={editRelationship}
+                  onChange={(e) => setEditRelationship(e.target.value)}
+                  className="w-full px-4 py-2.5 border border-border rounded-xl bg-background text-foreground focus:ring-2 focus:ring-[#3DAA8A] focus:border-[#3DAA8A] transition-all"
+                >
+                  <option value="">Select relationship...</option>
+                  <option value="grandparent">Grandparent</option>
+                  <option value="aunt">Aunt</option>
+                  <option value="uncle">Uncle</option>
+                  <option value="sibling">Sibling</option>
+                  <option value="cousin">Cousin</option>
+                  <option value="family_friend">Family Friend</option>
+                  <option value="therapist">Therapist</option>
+                  <option value="tutor">Tutor</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowEditContactModal(false)}
+                  className="flex-1 py-2.5 border border-border rounded-xl font-medium text-foreground hover:bg-muted transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveContactEdit}
+                  disabled={isSavingContact || !editContactName.trim()}
+                  className="flex-1 py-2.5 bg-[#3DAA8A] text-white rounded-xl font-semibold hover:bg-[#2D8A6E] disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
+                >
+                  {isSavingContact ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+                  {isSavingContact ? 'Saving...' : 'Save'}
+                </button>
+              </div>
             </div>
           </div>
         )}

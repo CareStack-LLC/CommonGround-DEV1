@@ -141,8 +141,8 @@ export default function MyCirclePage() {
                 <Image
                   src="/images/Website pictes/mycircle1.png"
                   alt="Grandmother bonding with grandchild through KidSpace video call"
-                  width={1200}
-                  height={800}
+                  width={800}
+                  height={533}
                   className="w-full h-auto object-cover"
                   priority
                   sizes="(max-width: 768px) 100vw, 50vw"
@@ -165,7 +165,7 @@ export default function MyCirclePage() {
             >
               Sound Familiar?
             </h2>
-            <p className="text-gray-500 text-lg">
+            <p className="text-gray-600 text-lg">
               You love this child. You shouldn&apos;t need to fight to be part of their life.
             </p>
           </div>
@@ -178,10 +178,10 @@ export default function MyCirclePage() {
               >
                 <div className="flex flex-col sm:flex-row gap-4 sm:gap-8">
                   <div className="flex-1">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2 block">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-gray-600 mb-2 block">
                       The distance
                     </span>
-                    <p className="text-gray-500 line-through decoration-[#E85D75]/40 decoration-2">
+                    <p className="text-gray-600 line-through decoration-[#E85D75]/40 decoration-2">
                       {point.old}
                     </p>
                   </div>
@@ -224,7 +224,7 @@ export default function MyCirclePage() {
             >
               A Safe Space to Stay Connected
             </h2>
-            <p className="text-gray-500 text-lg max-w-2xl mx-auto">
+            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
               KidSpace isn&apos;t just video calls. It&apos;s a whole world where
               family bonds grow — safely and on the parents&apos; terms.
             </p>
@@ -256,7 +256,7 @@ export default function MyCirclePage() {
                   >
                     {feature.tagline}
                   </h3>
-                  <p className="text-gray-500 leading-relaxed text-[15px]">
+                  <p className="text-gray-600 leading-relaxed text-[15px]">
                     {feature.description}
                   </p>
                 </div>
@@ -284,7 +284,7 @@ export default function MyCirclePage() {
               </div>
               <div>
                 <p className="font-semibold text-[#1E3A4A]">Marcus</p>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-600">
                   4Ever Forward Foundation Grant Program
                 </p>
               </div>
@@ -309,7 +309,7 @@ export default function MyCirclePage() {
             >
               Stay Part of Their Story
             </h2>
-            <p className="text-gray-500 text-lg">
+            <p className="text-gray-600 text-lg">
               Join the first 50 members and lock in 30% off for life.
               No credit card required. Just your email.
             </p>
@@ -335,10 +335,10 @@ export default function MyCirclePage() {
               >
                 <summary className="flex items-center justify-between gap-4 p-6 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
                   <h3 className="font-semibold text-[#1E3A4A] text-left">{faq.q}</h3>
-                  <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0 transition-transform duration-200 group-open:rotate-180" />
+                  <ChevronDown className="w-5 h-5 text-gray-600 flex-shrink-0 transition-transform duration-200 group-open:rotate-180" />
                 </summary>
                 <div className="px-6 pb-6 -mt-1">
-                  <p className="text-gray-500 leading-relaxed">{faq.a}</p>
+                  <p className="text-gray-600 leading-relaxed">{faq.a}</p>
                 </div>
               </details>
             ))}

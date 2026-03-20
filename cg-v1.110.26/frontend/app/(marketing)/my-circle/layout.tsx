@@ -6,6 +6,7 @@ export const metadata: Metadata = {
     'Grandparents, aunts, uncles — stay bonded with your grandchild through KidSpace video calls, shared movies, stories, and games. Safe, parent-controlled, ARIA-monitored. Early adopter spots available.',
   keywords:
     'grandparent video call app, extended family co-parenting, grandparents rights app, family bonding app for kids, grandparent child video call, family connection app, grandchild bonding app',
+  alternates: { canonical: 'https://www.find-commonground.com/my-circle' },
   openGraph: {
     title: 'Family Doesn\'t End at the Front Door — CommonGround KidSpace',
     description:

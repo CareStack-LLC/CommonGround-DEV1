@@ -6,6 +6,7 @@ export const metadata: Metadata = {
     'Recently divorced and want to keep things on track? CommonGround sets up agreements, automates custody schedules and payments, and prevents regression. Early adopter spots available.',
   keywords:
     'divorce co-parenting app, co-parenting after divorce, co-parenting schedule app, newly divorced parenting plan, post-divorce co-parenting, custody schedule automation, co-parenting agreement app',
+  alternates: { canonical: 'https://www.find-commonground.com/fresh-start' },
   openGraph: {
     title: 'The Hard Part Is Over. Don\'t Let Co-Parenting Undo the Progress. — CommonGround',
     description:

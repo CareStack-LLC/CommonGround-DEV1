@@ -1,13 +1,7 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import dynamic from "next/dynamic";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
-import { SubscriptionProvider } from "@/contexts/subscription-context";
-import { NotificationProvider } from "@/contexts/notification-context";
-import { WebSocketProvider } from "@/contexts/websocket-context";
-import { RealtimeProvider } from "@/contexts/realtime-context";
-import { ServiceWorkerRegister } from "@/components/service-worker-register";
-import { PortalWrapper } from "@/components/portal-wrapper";
-import { IncomingCallNotification } from "@/components/incoming-call-notification";
 import {
   DM_Sans,
   DM_Serif_Display,
@@ -15,6 +9,16 @@ import {
   Space_Grotesk,
   JetBrains_Mono,
 } from "next/font/google";
+
+/* ── Lazy-loaded client components ─────────────────────────────────
+ * Heavy providers (WebSocket, Realtime, Notification, Subscription)
+ * and non-critical client components are loaded dynamically so their
+ * JS doesn't block the initial render of marketing pages.
+ * ------------------------------------------------------------------- */
+const AppProviders = dynamic(
+  () => import("@/components/app-providers"),
+  { ssr: true },
+);
 
 /* ── Self-hosted Google Fonts via next/font ────────────────────────────
  * Eliminates render-blocking <link> to fonts.googleapis.com.
@@ -24,55 +28,76 @@ import {
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  style: ["normal", "italic"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
   variable: "--font-dm-sans",
+  preload: true,
 });
 
 const dmSerifDisplay = DM_Serif_Display({
   subsets: ["latin"],
   weight: ["400"],
-  style: ["normal", "italic"],
   display: "swap",
   variable: "--font-dm-serif-display",
+  preload: true,
 });
 
 const inter = Inter({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
   variable: "--font-inter",
+  preload: false,
 });
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
   variable: "--font-space-grotesk",
+  preload: false,
 });
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "500", "600"],
   display: "swap",
   variable: "--font-jetbrains-mono",
+  preload: false,
 });
+
+/* ── Viewport — required for mobile PageSpeed ─────────────────────── */
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#F4F8F7" },
+    { media: "(prefers-color-scheme: dark)", color: "#1E3A4A" },
+  ],
+};
 
 export const metadata: Metadata = {
   title: "CommonGround | The Calm Way to Co-Parent",
   description: "Free co-parenting app with AI-powered messaging, shared custody calendar, expense tracking, and court-ready documentation. Peaceful tools that put your children first.",
   keywords: ["co-parenting", "co-parenting app", "free co-parenting app", "custody calendar", "co-parenting communication", "child custody app", "shared parenting", "court-ready records", "ARIA", "family law", "expense tracking"],
   authors: [{ name: "CommonGround" }],
+  metadataBase: new URL("https://www.find-commonground.com"),
   openGraph: {
     title: "CommonGround | The Calm Way to Co-Parent",
     description: "Free co-parenting tools with AI-powered messaging, shared calendar, and court-ready documentation. Built by parents, for parents.",
     type: "website",
+    siteName: "CommonGround",
   },
   twitter: {
     card: "summary",
     title: "CommonGround | The Calm Way to Co-Parent",
     description: "Peaceful co-parenting tools that put your children first.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true },
   },
 };
 
@@ -103,20 +128,10 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
-        <ServiceWorkerRegister />
         <AuthProvider>
-          <SubscriptionProvider>
-            <WebSocketProvider>
-              <RealtimeProvider>
-                <NotificationProvider>
-                  <IncomingCallNotification />
-                  <PortalWrapper>
-                    {children}
-                  </PortalWrapper>
-                </NotificationProvider>
-              </RealtimeProvider>
-            </WebSocketProvider>
-          </SubscriptionProvider>
+          <AppProviders>
+            {children}
+          </AppProviders>
         </AuthProvider>
       </body>
     </html>

@@ -237,7 +237,7 @@ export default function FeaturesPage() {
                     )}
                   </div>
 
-                  <p className="text-lg text-gray-400 mb-2 line-through decoration-[#F5A623]/30">
+                  <p className="text-lg text-gray-600 mb-2 line-through decoration-[#F5A623]/30">
                     {feature.problem}
                   </p>
 
@@ -341,10 +341,10 @@ export default function FeaturesPage() {
               View Pricing
             </Link>
           </div>
-          <p className="mt-6 text-sm text-gray-500">
+          <p className="mt-6 text-sm text-gray-600">
             Free tier includes ARIA messaging, basic scheduling, and ClearFund tracking. No fees.
           </p>
-          <p className="mt-3 text-sm text-gray-400">
+          <p className="mt-3 text-sm text-gray-600">
             Family law professional?{' '}
             <Link href="/professionals" className="text-[var(--portal-primary)] hover:underline">
               See how professionals use CommonGround
