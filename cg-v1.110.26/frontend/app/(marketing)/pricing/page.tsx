@@ -312,53 +312,86 @@ export default function PricingPage() {
             </p>
           </div>
 
-          <div className="bg-white rounded-2xl border-2 border-gray-100 overflow-hidden shadow-sm">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-[#1E3A4A] text-white">
-                    <th className="text-left py-4 px-6 font-semibold min-w-[240px]">Feature</th>
-                    <th className="text-center py-4 px-4 font-semibold min-w-[100px]">
-                      <div>Web Starter</div>
-                      <div className="text-xs font-normal text-white/60 mt-0.5">Free</div>
-                    </th>
-                    <th className="text-center py-4 px-4 font-semibold min-w-[100px] bg-[#F5A623]/20">
-                      <div className="text-[#F5A623]">Plus</div>
-                      <div className="text-xs font-normal text-white/60 mt-0.5">$17.99/mo</div>
-                    </th>
-                    <th className="text-center py-4 px-4 font-semibold min-w-[100px]">
-                      <div>Complete</div>
-                      <div className="text-xs font-normal text-white/60 mt-0.5">$34.99/mo</div>
-                    </th>
+          {/* Desktop table */}
+          <div className="hidden md:block bg-white rounded-2xl border-2 border-gray-100 overflow-hidden shadow-sm">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-[#1E3A4A] text-white">
+                  <th className="text-left py-4 px-6 font-semibold">Feature</th>
+                  <th className="text-center py-4 px-4 font-semibold w-[110px]">
+                    <div>Web Starter</div>
+                    <div className="text-xs font-normal text-white/60 mt-0.5">Free</div>
+                  </th>
+                  <th className="text-center py-4 px-4 font-semibold w-[110px] bg-[#F5A623]/20">
+                    <div className="text-[#F5A623]">Plus</div>
+                    <div className="text-xs font-normal text-white/60 mt-0.5">$17.99/mo</div>
+                  </th>
+                  <th className="text-center py-4 px-4 font-semibold w-[110px]">
+                    <div>Complete</div>
+                    <div className="text-xs font-normal text-white/60 mt-0.5">$34.99/mo</div>
+                  </th>
+                </tr>
+              </thead>
+              {comparisonCategories.map((category) => (
+                <tbody key={category.name}>
+                  <tr>
+                    <td
+                      colSpan={4}
+                      className="py-3 px-6 bg-[#F4F8F7] font-semibold text-[#1E3A4A] text-xs uppercase tracking-wide border-t border-gray-200"
+                    >
+                      {category.name}
+                    </td>
                   </tr>
-                </thead>
-                {comparisonCategories.map((category) => (
-                  <tbody key={category.name}>
-                    <tr>
-                      <td
-                        colSpan={4}
-                        className="py-3 px-6 bg-[#F4F8F7] font-semibold text-[#1E3A4A] text-xs uppercase tracking-wide border-t border-gray-200"
-                      >
-                        {category.name}
+                  {category.features.map((feature) => (
+                    <tr
+                      key={feature.name}
+                      className="border-t border-gray-50 hover:bg-gray-50/50 transition-colors"
+                    >
+                      <td className="py-3 px-6 text-gray-700">{feature.name}</td>
+                      <td className="py-3 px-4 text-center">{renderCheckmark(feature.free)}</td>
+                      <td className="py-3 px-4 text-center bg-[#F5A623]/[0.03]">
+                        {renderCheckmark(feature.plus)}
                       </td>
+                      <td className="py-3 px-4 text-center">{renderCheckmark(feature.complete)}</td>
                     </tr>
-                    {category.features.map((feature) => (
-                      <tr
-                        key={feature.name}
-                        className="border-t border-gray-50 hover:bg-gray-50/50 transition-colors"
-                      >
-                        <td className="py-3 px-6 text-gray-700">{feature.name}</td>
-                        <td className="py-3 px-4 text-center">{renderCheckmark(feature.free)}</td>
-                        <td className="py-3 px-4 text-center bg-[#F5A623]/[0.03]">
+                  ))}
+                </tbody>
+              ))}
+            </table>
+          </div>
+
+          {/* Mobile cards */}
+          <div className="md:hidden space-y-6">
+            {comparisonCategories.map((category) => (
+              <div key={category.name} className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+                <div className="bg-[#F4F8F7] py-3 px-4 border-b border-gray-200">
+                  <h3 className="font-semibold text-[#1E3A4A] text-xs uppercase tracking-wide">
+                    {category.name}
+                  </h3>
+                </div>
+                <div className="divide-y divide-gray-50">
+                  {category.features.map((feature) => (
+                    <div key={feature.name} className="px-4 py-3">
+                      <div className="font-medium text-gray-700 text-sm mb-2">{feature.name}</div>
+                      <div className="grid grid-cols-3 gap-2 text-xs">
+                        <div className="flex flex-col items-center gap-1 rounded-lg bg-gray-50 py-1.5">
+                          <span className="text-gray-400 font-medium">Free</span>
+                          {renderCheckmark(feature.free)}
+                        </div>
+                        <div className="flex flex-col items-center gap-1 rounded-lg bg-[#F5A623]/5 py-1.5 ring-1 ring-[#F5A623]/20">
+                          <span className="text-[#F5A623] font-medium">Plus</span>
                           {renderCheckmark(feature.plus)}
-                        </td>
-                        <td className="py-3 px-4 text-center">{renderCheckmark(feature.complete)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                ))}
-              </table>
-            </div>
+                        </div>
+                        <div className="flex flex-col items-center gap-1 rounded-lg bg-gray-50 py-1.5">
+                          <span className="text-gray-400 font-medium">Complete</span>
+                          {renderCheckmark(feature.complete)}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>

@@ -32,6 +32,7 @@ const features = [
       alt: 'ARIA messaging interface with AI suggestion',
       prompt:
         'Clean UI mockup of messaging interface showing draft message with AI suggestion overlay, teal and gold UI, dark chat background, mobile app style, no text',
+      src: '/images/marketing/feat1.png',
     },
   },
   {
@@ -48,6 +49,7 @@ const features = [
       alt: 'TimeBridge automated custody calendar',
       prompt:
         'Clean calendar UI mockup showing custody schedule with color-coded parent days in teal and gold, automated reminder notification popup, modern app interface, no text',
+      src: '/images/marketing/feat2.png',
     },
   },
   {
@@ -64,6 +66,7 @@ const features = [
       alt: 'ClearFund expense tracking dashboard',
       prompt:
         'Clean expense tracking UI showing receipt upload, split percentage selector, payment history chart with teal and gold accent colors, modern dashboard style, no text',
+      src: '/images/marketing/feat3.png',
     },
   },
   {
@@ -81,6 +84,7 @@ const features = [
       alt: 'KidSpace parent-child video call',
       prompt:
         'Warm illustration of parent and child on video call, kid-friendly colorful UI with storybook elements, teal accent, movie night feature visible, no text',
+      src: '/images/marketing/feat4.png',
     },
   },
   {
@@ -98,6 +102,7 @@ const features = [
       alt: 'Silent Handoff GPS exchange verification',
       prompt:
         'Map UI showing GPS exchange location with QR code check-in confirmation, timestamp overlay, clean teal UI, mobile app style, no text',
+      src: '/images/marketing/feat5.png',
     },
   },
   {
