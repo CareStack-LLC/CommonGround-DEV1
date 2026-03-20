@@ -184,23 +184,23 @@ export default function KidComsSettingsPage() {
           </div>
 
           {error && (
-            <div className="mb-6 bg-red-50 border-2 border-red-200 rounded-2xl p-4">
+            <div className="mb-6 bg-red-50 dark:bg-red-950/30 border-2 border-red-200 dark:border-red-800/50 rounded-2xl p-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
-                  <XCircle className="h-5 w-5 text-red-600" />
+                <div className="w-10 h-10 rounded-lg bg-red-100 dark:bg-red-900/50 flex items-center justify-center flex-shrink-0">
+                  <XCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
                 </div>
-                <p className="text-red-700 font-medium">{error}</p>
+                <p className="text-red-700 dark:text-red-300 font-medium">{error}</p>
               </div>
             </div>
           )}
 
           {success && (
-            <div className="mb-6 bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4">
+            <div className="mb-6 bg-emerald-50 dark:bg-emerald-950/30 border-2 border-emerald-200 dark:border-emerald-800/50 rounded-2xl p-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-emerald-100 flex items-center justify-center flex-shrink-0">
-                  <CheckCircle className="h-5 w-5 text-emerald-600" />
+                <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center flex-shrink-0">
+                  <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                 </div>
-                <p className="text-emerald-700 font-medium">{success}</p>
+                <p className="text-emerald-700 dark:text-emerald-300 font-medium">{success}</p>
               </div>
             </div>
           )}
@@ -217,7 +217,7 @@ export default function KidComsSettingsPage() {
             </h2>
             <div>
               <p className="text-sm text-muted-foreground mb-4">
-                Control how circle contacts are approved for video calls
+                Choose whether one or both parents need to approve before a contact can communicate with your child
               </p>
               <div className="space-y-3">
                 <label className="flex items-center gap-3 p-3 border border-border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
@@ -260,7 +260,7 @@ export default function KidComsSettingsPage() {
             </h2>
             <div>
               <p className="text-sm text-muted-foreground mb-4">
-                Enable or disable KidSpace features for your family
+                Choose which activities your child can access in KidSpace. Disabled features won't appear in their menu.
               </p>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {[
@@ -301,6 +301,7 @@ export default function KidComsSettingsPage() {
               Session Limits
             </h2>
             <div>
+              <p className="text-sm text-muted-foreground mb-4">Set boundaries on how long and how often your child can use KidSpace each day</p>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
@@ -314,6 +315,7 @@ export default function KidComsSettingsPage() {
                     max={180}
                     className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-cg-sage focus:border-transparent"
                   />
+                  <p className="text-xs text-muted-foreground mt-1">How long each call or session can last</p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
@@ -327,6 +329,7 @@ export default function KidComsSettingsPage() {
                     max={20}
                     className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-cg-sage focus:border-transparent"
                   />
+                  <p className="text-xs text-muted-foreground mt-1">Total calls your child can make per day</p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
@@ -340,6 +343,7 @@ export default function KidComsSettingsPage() {
                     max={10}
                     className="w-full px-3 py-2 bg-background border border-border rounded-lg focus:ring-2 focus:ring-cg-sage focus:border-transparent"
                   />
+                  <p className="text-xs text-muted-foreground mt-1">People who can join a single call</p>
                 </div>
               </div>
             </div>
