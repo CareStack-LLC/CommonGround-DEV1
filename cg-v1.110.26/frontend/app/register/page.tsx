@@ -167,7 +167,6 @@ function RegisterContent() {
       });
 
       // Track signup completion
-      const plan = plans.find(p => p.id === selectedPlan);
       trackSignupCompleted('email');
       if (plan && plan.price[billingInterval] > 0) {
         trackBeginCheckout(plan.name, plan.price[billingInterval]);
