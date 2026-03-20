@@ -504,58 +504,94 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div className="bg-white rounded-2xl border-2 border-gray-100 overflow-hidden shadow-sm">
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="bg-[#1E3A4A] text-white">
-                      <th className="text-left py-4 px-6 font-semibold">Feature</th>
-                      <th className="text-center py-4 px-6 font-semibold text-[#F5A623]">CommonGround</th>
-                      <th className="text-center py-4 px-6 font-semibold text-white/60">Other Apps</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {[
-                      { feature: 'AI messaging assistance', cg: true, others: 'Paid only' },
-                      { feature: 'Free tier with no ads', cg: true, others: 'Ads or limited' },
-                      { feature: 'Automated recurring schedules', cg: true, others: true },
-                      { feature: 'Expense tracking & splitting', cg: true, others: true },
-                      { feature: 'Court-ready exports (SHA-256)', cg: true, others: 'Basic exports' },
-                      { feature: 'Child video calls (KidSpace)', cg: true, others: false, unique: true },
-                      { feature: 'GPS-verified exchanges (Silent Handoff)', cg: true, others: false, unique: true },
-                      { feature: 'QR code check-in confirmation', cg: true, others: false, unique: true },
-                      { feature: 'Professional portal for attorneys', cg: true, others: true },
-                      { feature: 'Grant program for families in need', cg: true, others: 'Varies' },
-                    ].map((row) => (
-                      <tr key={row.feature} className={row.unique ? 'bg-[#F5A623]/5' : ''}>
-                        <td className="py-3 px-6 text-gray-700">
+            {(() => {
+              const comparisonRows = [
+                { feature: 'AI messaging assistance', cg: true, others: 'Paid only' as const },
+                { feature: 'Free tier with no ads', cg: true, others: 'Ads or limited' as const },
+                { feature: 'Automated recurring schedules', cg: true, others: true as const },
+                { feature: 'Expense tracking & splitting', cg: true, others: true as const },
+                { feature: 'Court-ready exports (SHA-256)', cg: true, others: 'Basic exports' as const },
+                { feature: 'Child video calls (KidSpace)', cg: true, others: false as const, unique: true },
+                { feature: 'GPS-verified exchanges (Silent Handoff)', cg: true, others: false as const, unique: true },
+                { feature: 'QR code check-in confirmation', cg: true, others: false as const, unique: true },
+                { feature: 'Professional portal for attorneys', cg: true, others: true as const },
+                { feature: 'Grant program for families in need', cg: true, others: 'Varies' as const },
+              ];
+
+              const renderOthers = (val: boolean | string) => {
+                if (val === true) return <Check className="h-5 w-5 text-gray-400 mx-auto" />;
+                if (val === false) return <span className="text-gray-300">&mdash;</span>;
+                return <span className="text-gray-400 text-xs">{val}</span>;
+              };
+
+              return (
+                <>
+                  {/* Desktop table */}
+                  <div className="hidden md:block bg-white rounded-2xl border-2 border-gray-100 overflow-hidden shadow-sm">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="bg-[#1E3A4A] text-white">
+                          <th className="text-left py-4 px-6 font-semibold">Feature</th>
+                          <th className="text-center py-4 px-6 font-semibold text-[#F5A623]">CommonGround</th>
+                          <th className="text-center py-4 px-6 font-semibold text-white/60">Other Apps</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100">
+                        {comparisonRows.map((row) => (
+                          <tr key={row.feature} className={row.unique ? 'bg-[#F5A623]/5' : ''}>
+                            <td className="py-3 px-6 text-gray-700">
+                              {row.feature}
+                              {row.unique && (
+                                <span className="ml-2 text-xs font-bold text-[#F5A623] uppercase">Unique</span>
+                              )}
+                            </td>
+                            <td className="py-3 px-6 text-center">
+                              <Check className="h-5 w-5 text-[var(--portal-primary)] mx-auto" />
+                            </td>
+                            <td className="py-3 px-6 text-center">
+                              {renderOthers(row.others)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+
+                  {/* Mobile cards */}
+                  <div className="md:hidden space-y-3">
+                    {comparisonRows.map((row) => (
+                      <div
+                        key={row.feature}
+                        className={`rounded-xl border p-4 ${row.unique ? 'border-[#F5A623]/30 bg-[#F5A623]/5' : 'border-gray-100 bg-white'}`}
+                      >
+                        <div className="font-medium text-gray-700 text-sm mb-3">
                           {row.feature}
                           {row.unique && (
                             <span className="ml-2 text-xs font-bold text-[#F5A623] uppercase">Unique</span>
                           )}
-                        </td>
-                        <td className="py-3 px-6 text-center">
-                          {row.cg === true ? (
-                            <Check className="h-5 w-5 text-[var(--portal-primary)] mx-auto" />
-                          ) : (
-                            <span className="text-gray-400">{String(row.cg)}</span>
-                          )}
-                        </td>
-                        <td className="py-3 px-6 text-center">
-                          {row.others === true ? (
-                            <Check className="h-5 w-5 text-gray-400 mx-auto" />
-                          ) : row.others === false ? (
-                            <span className="text-gray-300">&mdash;</span>
-                          ) : (
-                            <span className="text-gray-400 text-xs">{row.others}</span>
-                          )}
-                        </td>
-                      </tr>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3 text-xs">
+                          <div className="flex items-center gap-2 rounded-lg bg-[var(--portal-primary)]/5 py-2 px-3">
+                            <Check className="h-4 w-4 text-[var(--portal-primary)] shrink-0" />
+                            <span className="font-medium text-[var(--portal-primary)]">CommonGround</span>
+                          </div>
+                          <div className="flex items-center gap-2 rounded-lg bg-gray-50 py-2 px-3">
+                            {row.others === true ? (
+                              <Check className="h-4 w-4 text-gray-400 shrink-0" />
+                            ) : row.others === false ? (
+                              <span className="text-gray-300 text-base shrink-0">&mdash;</span>
+                            ) : null}
+                            <span className="text-gray-400">
+                              {row.others === true ? 'Others' : row.others === false ? 'Not available' : row.others}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
                     ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+                  </div>
+                </>
+              );
+            })()}
           </div>
         </section>
 
