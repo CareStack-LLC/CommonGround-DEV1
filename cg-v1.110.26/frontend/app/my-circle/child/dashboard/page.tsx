@@ -139,6 +139,7 @@ export default function ChildDashboardPage() {
   // API-only content (no hardcoded fallback)
   const [apiVideos, setApiVideos] = useState<VideoContent[]>([]);
   const [apiComingSoon, setApiComingSoon] = useState<{id: string; poster: string}[]>([]);
+  const [featuredAuthor, setFeaturedAuthor] = useState<{name: string; bio: string; photo_url: string; books?: any[]} | null>(null);
 
   // Fetch from KidSpace API
   useEffect(() => {
@@ -166,7 +167,17 @@ export default function ChildDashboardPage() {
           setApiComingSoon(comingSoonFromApi);
         }
       } catch {
-        // Keep hardcoded fallback
+        // API unavailable
+      }
+      // Fetch featured author
+      try {
+        const authRes = await fetch(`${API_BASE}/api/v1/kidspace/authors/featured`);
+        if (authRes.ok) {
+          const author = await authRes.json();
+          if (author?.name) setFeaturedAuthor(author);
+        }
+      } catch {
+        // No featured author
       }
     };
     fetchApiContent();
@@ -357,16 +368,6 @@ export default function ChildDashboardPage() {
         userInitial={userInitial}
         avatarGradient={avatarGradient}
         sticky={false}
-        actions={
-          <>
-            <button className="w-9 h-9 rounded-full flex items-center justify-center transition-colors" style={{ background: 'var(--portal-surface)', color: 'var(--portal-muted)' }} aria-label="Search">
-              <Search className="w-4 h-4" />
-            </button>
-            <button className="w-9 h-9 rounded-full flex items-center justify-center transition-colors" style={{ background: 'var(--portal-surface)', color: 'var(--portal-muted)' }} aria-label="Notifications">
-              <Bell className="w-4 h-4" />
-            </button>
-          </>
-        }
       />
 
       <main className="space-y-6 pb-6">
@@ -747,64 +748,47 @@ export default function ChildDashboardPage() {
           </div>
         </section>}
 
-        {/* Featured Author */}
-        <section className="px-4">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-[#4BA8C8] text-xs font-semibold uppercase tracking-widest" style={{ fontFamily: 'var(--portal-font-body)' }}>
-              Featured Author
-            </p>
-            <button onClick={() => router.push('/my-circle/child/library')} className="flex items-center gap-1 text-sm font-semibold text-[#4BA8C8] hover:text-[#5BC4A0] transition-colors">
-              Library <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-          <div className="bg-gradient-to-br from-amber-950/40 to-slate-800/60 rounded-2xl p-4 mb-4 border border-amber-800/30">
-            <div className="flex items-center gap-3">
-              <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-amber-500/30 flex-shrink-0 shadow-lg shadow-amber-500/20">
-                <img src="/kidsComms/posters/authors/ayaanasclark.jpg" alt="Ayanna S Clark" className="w-full h-full object-cover" />
-              </div>
-              <div>
-                <p className="font-bold text-base" style={{ fontFamily: 'var(--portal-font-heading)', color: 'var(--portal-text-heading)' }}>Ayanna S Clark</p>
-                <div className="flex items-center gap-1 mt-0.5">
-                  {[1, 2, 3, 4, 5].map(i => <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />)}
-                  <span className="text-amber-400 text-xs ml-1" style={{ fontFamily: 'var(--portal-font-body)' }}>Top Author</span>
+        {/* Featured Author — from superadmin API */}
+        {featuredAuthor && (
+          <section className="px-4">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-[#4BA8C8] text-xs font-semibold uppercase tracking-widest" style={{ fontFamily: 'var(--portal-font-body)' }}>
+                Featured Author
+              </p>
+              <button onClick={() => router.push('/my-circle/child/library')} className="flex items-center gap-1 text-sm font-semibold text-[#4BA8C8] hover:text-[#5BC4A0] transition-colors">
+                Library <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="bg-gradient-to-br from-amber-950/40 to-slate-800/60 rounded-2xl p-4 mb-4 border border-amber-800/30">
+              <div className="flex items-center gap-3">
+                {featuredAuthor.photo_url ? (
+                  <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-amber-500/30 flex-shrink-0 shadow-lg shadow-amber-500/20">
+                    <img src={featuredAuthor.photo_url} alt={featuredAuthor.name} className="w-full h-full object-cover" />
+                  </div>
+                ) : (
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center flex-shrink-0 border-2 border-amber-500/30">
+                    <span className="text-white text-xl font-bold">{featuredAuthor.name[0]}</span>
+                  </div>
+                )}
+                <div>
+                  <p className="font-bold text-base" style={{ fontFamily: 'var(--portal-font-heading)', color: 'var(--portal-text-heading)' }}>{featuredAuthor.name}</p>
+                  <div className="flex items-center gap-1 mt-0.5">
+                    {[1, 2, 3, 4, 5].map(i => <Star key={i} className="w-3 h-3 fill-amber-400 text-amber-400" />)}
+                    <span className="text-amber-400 text-xs ml-1" style={{ fontFamily: 'var(--portal-font-body)' }}>Featured Author</span>
+                  </div>
+                  {featuredAuthor.bio && (
+                    <p className="text-xs mt-2 leading-relaxed" style={{ fontFamily: 'var(--portal-font-body)', color: 'var(--portal-text)' }}>
+                      {featuredAuthor.bio}
+                    </p>
+                  )}
                 </div>
-                <p className="text-xs mt-2 leading-relaxed" style={{ fontFamily: 'var(--portal-font-body)', color: 'var(--portal-text)' }}>
-                  Ayanna S. Clark is a Compton-born illustrator and author who creates magical stories that inspire confidence, imagination, and empowerment in young readers.
-                </p>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
-        {/* Featured Promo — Luna and Midnight */}
-        <section className="px-4 pb-12">
-          <div className="rounded-3xl overflow-hidden" style={{ background: 'var(--portal-surface)', border: '1px solid var(--portal-border)', boxShadow: 'var(--portal-shadow-xl)' }}>
-            <div className="relative aspect-[16/9] w-full">
-              <img src="/kidsComms/posters/featuredartistpromo.png" alt="Luna and Midnight Promo" className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent" />
-            </div>
-            <div className="p-6">
-              <h3 className="text-2xl font-black mb-4" style={{ fontFamily: 'var(--portal-font-heading)', color: 'var(--portal-text-heading)' }}>
-                Luna has found a glowing key... and it unlocks the stars.
-              </h3>
-              <div className="space-y-4">
-                <p className="text-base leading-relaxed" style={{ fontFamily: 'var(--portal-font-body)', color: 'var(--portal-text)' }}>
-                  When the sky begins to whisper secrets, Luna and her brave cat Midnight step into a magical adventure filled with constellations, courage, and a little bit of mystery.
-                </p>
-                <p className="text-[#4BA8C8] font-bold text-base italic" style={{ fontFamily: 'var(--portal-font-body)' }}>
-                  If you love magic, friendship, and nighttime adventures, this is your next favorite story.
-                </p>
-                <button
-                  onClick={() => router.push('/my-circle/child/library/luna-midnight')}
-                  className="w-full sm:w-auto mt-2 px-8 py-4 bg-gradient-to-r from-[#4BA8C8] to-[#3DAA8A] rounded-2xl text-white font-black text-lg shadow-xl shadow-[#4BA8C8]/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
-                  style={{ fontFamily: 'var(--portal-font-heading)' }}
-                >
-                  READ NOW
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
+        {/* Spacer before nav */}
+        <div className="pb-8" />
       </main>
 
       <KidBottomNav />
