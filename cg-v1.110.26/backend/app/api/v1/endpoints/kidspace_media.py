@@ -303,28 +303,40 @@ async def create_author(
 ) -> dict:
     """Create a new KidSpace author with optional photo upload."""
     photo_url = None
-    if photo and photo.filename:
-        storage = SupabaseStorageService()
-        file_content = await photo.read()
-        ext = photo.filename.rsplit(".", 1)[-1] if "." in photo.filename else "jpg"
-        path = f"authors/{uuid4()}.{ext}"
-        photo_url = await storage.upload_file(
-            bucket=KIDSPACE_MEDIA_BUCKET,
-            path=path,
-            file_content=file_content,
-            content_type=photo.content_type or "image/jpeg",
-        )
+    try:
+        if photo and photo.filename:
+            storage = SupabaseStorageService()
+            file_content = await photo.read()
+            ext = photo.filename.rsplit(".", 1)[-1] if "." in photo.filename else "jpg"
+            path = f"authors/{uuid4()}.{ext}"
+            photo_url = await storage.upload_file(
+                bucket=KIDSPACE_MEDIA_BUCKET,
+                path=path,
+                file_content=file_content,
+                content_type=photo.content_type or "image/jpeg",
+            )
+            logger.info(f"Uploaded author photo: {photo_url}")
+    except Exception as e:
+        logger.error(f"Author photo upload failed: {e}")
+        raise HTTPException(status_code=500, detail=f"Photo upload failed: {str(e)}")
 
-    author = KidSpaceAuthor(
-        name=name,
-        bio=bio,
-        photo_url=photo_url,
-        is_featured=is_featured,
-        showcase_book_id=showcase_book_id,
-    )
-    db.add(author)
-    await db.commit()
-    await db.refresh(author)
+    resolved_book_id = showcase_book_id if showcase_book_id and showcase_book_id.strip() else None
+
+    try:
+        author = KidSpaceAuthor(
+            name=name,
+            bio=bio,
+            photo_url=photo_url,
+            is_featured=is_featured,
+            showcase_book_id=resolved_book_id,
+        )
+        db.add(author)
+        await db.commit()
+        await db.refresh(author)
+    except Exception as e:
+        logger.error(f"Author DB insert failed: {e}")
+        await db.rollback()
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
     return _author_to_dict(author)
 

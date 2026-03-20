@@ -354,12 +354,19 @@ export default function MediaLibraryPage() {
         headers: { Authorization: `Bearer ${getToken()}` },
         body: formData,
       });
-      if (!res.ok) throw new Error('Failed to save author');
+      if (!res.ok) {
+        const errBody = await res.text().catch(() => '');
+        console.error(`[SuperAdmin] Author save failed (${res.status}):`, errBody);
+        throw new Error(`Failed to save author (${res.status}): ${errBody.slice(0, 200)}`);
+      }
+      const saved = await res.json();
+      console.log('[SuperAdmin] Author saved:', { id: saved.id, photo_url: saved.photo_url });
+      if (!saved.photo_url && authorPhotoFile) console.warn('[SuperAdmin] ⚠️ Photo was attached but photo_url is null');
       setShowAuthorModal(false); resetAuthorForm();
       showSuccess(editingAuthor ? 'Author updated' : 'Author added');
       await fetchData();
     } catch (err) {
-      console.error('Save author failed:', err);
+      console.error('[SuperAdmin] Save author failed:', err);
     } finally {
       setSaving(false);
     }
