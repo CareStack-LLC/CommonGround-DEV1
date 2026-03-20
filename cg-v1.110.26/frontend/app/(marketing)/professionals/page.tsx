@@ -13,14 +13,11 @@ import {
   Check,
   BarChart3,
   Download,
-  Search,
   MessageSquare,
   Calendar,
   DollarSign,
   ClipboardCheck,
   Brain,
-  Globe,
-  Heart,
   HelpCircle,
 } from 'lucide-react';
 
@@ -264,41 +261,45 @@ export default function ProfessionalsPage() {
         </div>
       </section>
 
-      {/* Questions Professionals Ask — Objection Handling */}
-      <section className="py-16 sm:py-24 bg-gradient-to-b from-[#F4F8F7] to-white">
+      {/* Professional Interest Form — Demo CTA */}
+      <section className="py-16 sm:py-24 bg-gradient-to-b from-[#F4F8F7] to-white" id="demo">
         <div className="max-w-4xl mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2
-              className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
-              style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
-            >
-              Questions professionals <span className="text-[#3DAA8A]">ask</span>
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Honest answers to the questions we hear most from attorneys, mediators, and evaluators.
-            </p>
-          </div>
-
-          <div className="space-y-6">
-            {objections.map((obj) => {
-              const Icon = obj.icon;
-              return (
-                <div
-                  key={obj.question}
-                  className="bg-white rounded-2xl p-6 border-2 border-gray-100 hover:border-[#3DAA8A]/20 transition-all"
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-[#1E3A4A]/8 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Icon className="w-5 h-5 text-[#1E3A4A]" />
+          <div className="grid lg:grid-cols-2 gap-10 items-start">
+            <div>
+              <h2
+                className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+                style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
+              >
+                Better data makes for <span className="text-[#3DAA8A]">better outcomes</span>
+              </h2>
+              <p className="text-lg text-gray-600 mb-6">
+                See how CommonGround gives family law professionals the verified, organized data
+                they need — without adding another tool to manage.
+              </p>
+              <ul className="space-y-3 mb-8">
+                {[
+                  'Free for all professionals — always',
+                  'Your clients choose their own plans',
+                  'Set up in under 5 minutes',
+                  'No software to install',
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-3 text-gray-700">
+                    <div className="w-5 h-5 rounded-full bg-[#3DAA8A] flex items-center justify-center flex-shrink-0">
+                      <Check className="w-3 h-3 text-white" />
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-[#1E3A4A] mb-2">{obj.question}</h3>
-                      <p className="text-gray-600 leading-relaxed">{obj.answer}</p>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/register"
+                className="inline-flex items-center gap-2 text-[#3DAA8A] font-medium hover:underline"
+              >
+                Or recommend CommonGround to a client
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <ProfessionalInterestForm source="professionals_page" />
           </div>
         </div>
       </section>
@@ -361,126 +362,6 @@ export default function ProfessionalsPage() {
               height={400}
               className="rounded-2xl object-cover w-full"
             />
-          </div>
-        </div>
-      </section>
-
-      {/* 4Ever Forward Impact */}
-      <section className="py-16 sm:py-24 bg-gradient-to-b from-[#F4F8F7] to-white">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--portal-primary)]/10 rounded-full mb-6">
-            <Heart className="h-4 w-4 text-[var(--portal-primary)]" />
-            <span className="text-sm font-medium text-[var(--portal-primary)]">Proven Impact</span>
-          </div>
-          <h2
-            className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
-            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
-          >
-            Real families, <span className="text-[#3DAA8A]">real results</span>
-          </h2>
-          <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-            Through the 4Ever Forward Foundation grant program, CommonGround helped families in high-conflict situations find cooperation. One mediator called it a breakthrough after two years of conflict.
-          </p>
-
-          <div className="bg-white rounded-2xl p-8 border-2 border-[#F5A623]/10 max-w-2xl mx-auto mb-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="h-10 w-10 rounded-full bg-[var(--portal-primary)]/10 flex items-center justify-center">
-                <Users className="h-5 w-5 text-[var(--portal-primary)]" />
-              </div>
-              <div className="text-left">
-                <p className="font-semibold text-gray-900">The Rivera Family</p>
-                <p className="text-sm text-[#F5A623]">4Ever Forward Grant Program</p>
-              </div>
-            </div>
-            <p className="text-gray-600 leading-relaxed italic text-left">
-              &ldquo;Both parents were court-ordered to communicate, but every exchange had devolved into arguments for over two years. After three months on CommonGround, their mediator said it was the first time she had seen them cooperate — on anything.&rdquo;
-            </p>
-          </div>
-
-          <Link
-            href="/testimonials"
-            className="inline-flex items-center gap-2 text-[var(--portal-primary)] font-medium hover:underline"
-          >
-            Read all impact stories
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
-      </section>
-
-      {/* Directory */}
-      <section className="py-16 sm:py-24 bg-white">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#F5A623]/10 rounded-full mb-6">
-                <Globe className="w-4 h-4 text-[#F5A623]" />
-                <span className="text-sm font-medium text-[#F5A623]">Professional Directory</span>
-              </div>
-              <h2
-                className="text-3xl sm:text-4xl text-[#1E3A4A] mb-6"
-                style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
-              >
-                Get discovered by families <span className="text-[#F5A623]">who need you</span>
-              </h2>
-              <p className="text-lg text-gray-600 mb-8">
-                When parents on CommonGround need professional support, they search our directory.
-                Your profile shows up based on location, specialty, and availability.
-              </p>
-              <ul className="space-y-3">
-                {[
-                  'Appear in searches by location and specialty',
-                  'Profile includes credentials and service areas',
-                  'Parents can request consultations directly',
-                  'Easy onboarding — set up your profile in minutes',
-                ].map((item) => (
-                  <li key={item} className="flex items-center gap-3">
-                    <div className="w-5 h-5 rounded-full bg-[#3DAA8A] flex items-center justify-center flex-shrink-0">
-                      <Check className="w-3 h-3 text-white" />
-                    </div>
-                    <span className="text-gray-700">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="bg-[#F4F8F7] rounded-3xl p-6 border-2 border-gray-100 shadow-lg">
-              <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200">
-                <Search className="w-5 h-5 text-gray-400" />
-                <span className="text-gray-500">Find a professional near Los Angeles, CA...</span>
-              </div>
-              {[
-                { name: 'Morrison Family Law', specialty: 'Custody & Co-Parenting', type: 'Attorney', highlight: false },
-                { name: 'Bay Area Mediation Group', specialty: 'Mediation, Collaborative', type: 'Mediator', highlight: false },
-                { name: 'Your Practice Here', specialty: 'Your Specialty', type: '', highlight: true },
-              ].map((firm, i) => (
-                <div
-                  key={i}
-                  className={`p-4 rounded-xl mb-3 transition-all ${
-                    firm.highlight
-                      ? 'bg-[#F5A623]/10 border-2 border-[#F5A623]/30'
-                      : 'bg-white border border-gray-100'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className={`font-semibold ${firm.highlight ? 'text-[#F5A623]' : 'text-[#1E3A4A]'}`}>
-                        {firm.name}
-                      </p>
-                      <p className="text-sm text-gray-500">{firm.specialty}</p>
-                    </div>
-                    <div
-                      className={`text-xs font-medium px-2 py-1 rounded-full ${
-                        firm.highlight
-                          ? 'bg-[#F5A623]/20 text-[#F5A623]'
-                          : 'bg-[#3DAA8A]/10 text-[#3DAA8A]'
-                      }`}
-                    >
-                      {firm.highlight ? 'Join today' : firm.type}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </section>
@@ -564,45 +445,49 @@ export default function ProfessionalsPage() {
         </div>
       </section>
 
-      {/* Professional Interest Form */}
-      <section className="py-16 sm:py-24 bg-[#F4F8F7]" id="demo">
+      {/* FAQ — Questions Professionals Ask */}
+      <section className="py-16 sm:py-24 bg-[#F4F8F7]">
         <div className="max-w-4xl mx-auto px-6">
-          <div className="grid lg:grid-cols-2 gap-10 items-start">
-            <div>
-              <h2
-                className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
-                style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
-              >
-                Better data makes for <span className="text-[#3DAA8A]">better outcomes</span>
-              </h2>
-              <p className="text-lg text-gray-600 mb-6">
-                See how CommonGround gives family law professionals the verified, organized data
-                they need — without adding another tool to manage.
-              </p>
-              <ul className="space-y-3 mb-8">
-                {[
-                  'Free for all professionals — always',
-                  'Your clients choose their own plans',
-                  'Set up in under 5 minutes',
-                  'No software to install',
-                ].map((item) => (
-                  <li key={item} className="flex items-center gap-3 text-gray-700">
-                    <div className="w-5 h-5 rounded-full bg-[#3DAA8A] flex items-center justify-center flex-shrink-0">
-                      <Check className="w-3 h-3 text-white" />
+          <div className="text-center mb-12">
+            <h2
+              className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+              style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
+            >
+              Common <span className="text-[#3DAA8A]">questions</span>
+            </h2>
+          </div>
+
+          <div className="space-y-4">
+            {objections.map((obj) => {
+              const Icon = obj.icon;
+              return (
+                <div
+                  key={obj.question}
+                  className="bg-white rounded-2xl p-6 border border-gray-100"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-[#1E3A4A]/8 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Icon className="w-5 h-5 text-[#1E3A4A]" />
                     </div>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/register"
-                className="inline-flex items-center gap-2 text-[#3DAA8A] font-medium hover:underline"
-              >
-                Or recommend CommonGround to a client
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-            <ProfessionalInterestForm source="professionals_page" />
+                    <div>
+                      <h3 className="font-semibold text-[#1E3A4A] mb-2">{obj.question}</h3>
+                      <p className="text-gray-600 leading-relaxed">{obj.answer}</p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Final CTA */}
+          <div className="text-center mt-12">
+            <a
+              href="#demo"
+              className="inline-flex items-center justify-center px-8 py-4 bg-[#1E3A4A] text-white font-semibold rounded-full hover:bg-[#2D6A8F] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 group"
+            >
+              Request a Demo
+              <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+            </a>
           </div>
         </div>
       </section>

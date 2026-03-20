@@ -1,0 +1,23 @@
+{% extends 'base/_base.html' %}
+{% import 'base/_components.html' as c %}
+
+{% block title %}Growth Alert: {{ event_type }}{% endblock %}
+
+{% block preheader %}{{ event_type }}: {{ name }} ({{ email }}){% endblock %}
+
+{% block content %}
+{{ c.heading('🚀 ' ~ event_type) }}
+{{ c.subheading('A new lead or user event requires attention.') }}
+
+{% call c.info_card() %}
+{{ c.detail_row('Name', name) }}
+{{ c.detail_row('Email', email) }}
+{{ c.detail_row('Event', event_type) }}
+{{ c.detail_row('Time', submitted_at) }}
+{% for key, value in details.items() %}
+{{ c.detail_row(key, value) }}
+{% endfor %}
+{% endcall %}
+
+{{ c.button('mailto:' ~ email, 'Reply to ' ~ (name if name != 'Not provided' else email), '#2D6A8F') }}
+{% endblock %}

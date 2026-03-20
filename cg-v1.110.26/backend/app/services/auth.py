@@ -180,14 +180,47 @@ class AuthService:
                 await _email_svc.add_marketing_contact(
                     email=user.email,
                     first_name=request.first_name or "",
+                    last_name=request.last_name or "",
                     list_ids=user_list_ids if user_list_ids else None,
                     custom_fields={
-                        "e1_T": "registration",   # signup_source
-                        "e2_T": "parent",          # user_type
+                        "e1_T": "registration",        # signup_source
+                        "e2_T": "parent",               # user_type
+                        "e4_T": request.last_name or "",  # last_name
+                        "e6_T": getattr(request, 'referral_source', '') or "organic",  # referral_source
+                        "e7_T": "activated",            # lifecycle_stage
                     },
                 )
             except Exception as e:
                 logger.warning(f"Failed to add {user.email} to SendGrid Marketing: {e}")
+
+            # Notify growth team of new registration
+            try:
+                from app.services.email import email_service as _email_svc
+                await _email_svc.send_growth_notification(
+                    event_type="New User Registration",
+                    email=user.email,
+                    name=f"{request.first_name or ''} {request.last_name or ''}".strip(),
+                    details={
+                        "Plan": request.subscription_price_id or "Free",
+                    },
+                )
+            except Exception as e:
+                logger.warning(f"Failed to send growth notification for {user.email}: {e}")
+
+            # Notify onboarding team of new registration for follow-up
+            try:
+                from app.services.email import email_service as _email_svc2
+                user_full_name = f"{request.first_name or ''} {request.last_name or ''}".strip()
+                await _email_svc2.send_contact_form_notification(
+                    name=user_full_name or "New User",
+                    email=user.email,
+                    inquiry_type="onboarding",
+                    subject=f"New Registration: {user_full_name or user.email}",
+                    message=f"A new user just registered.\n\nName: {user_full_name or 'Not provided'}\nEmail: {user.email}\nPlan: {request.subscription_price_id or 'Free'}",
+                    internal_email="onboarding@find-commonground.com",
+                )
+            except Exception as e:
+                logger.warning(f"Failed to send onboarding notification for {user.email}: {e}")
 
             return user, access_token, refresh_token, checkout_url
 

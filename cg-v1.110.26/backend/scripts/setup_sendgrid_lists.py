@@ -37,9 +37,13 @@ LISTS = [
 
 # ── Custom fields to create ──────────────────────────────────────────────────
 CUSTOM_FIELDS = [
-    {"name": "signup_source", "field_type": "Text"},
-    {"name": "user_type", "field_type": "Text"},       # parent, professional, admin
-    {"name": "inquiry_type", "field_type": "Text"},     # general, support, professional, etc.
+    {"name": "signup_source", "field_type": "Text"},       # e1_T: where they signed up from
+    {"name": "user_type", "field_type": "Text"},           # e2_T: parent, professional, admin
+    {"name": "inquiry_type", "field_type": "Text"},        # e3_T: general, support, professional, role, etc.
+    {"name": "last_name", "field_type": "Text"},           # e4_T: contact last name
+    {"name": "firm_or_org", "field_type": "Text"},         # e5_T: firm/organization name
+    {"name": "referral_source", "field_type": "Text"},     # e6_T: how they found us (invite, organic, landing page)
+    {"name": "lifecycle_stage", "field_type": "Text"},     # e7_T: lead, activated, engaged, churned
 ]
 
 

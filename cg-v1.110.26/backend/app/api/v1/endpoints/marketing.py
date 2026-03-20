@@ -32,6 +32,7 @@ INQUIRY_EMAIL_MAP = {
     "court": "partnerships@find-commonground.com",
     "partnership": "partnerships@find-commonground.com",
     "security": "support@find-commonground.com",
+    "onboarding": "onboarding@find-commonground.com",
     "general": "hello@find-commonground.com",
 }
 DEFAULT_INTERNAL_EMAIL = "hello@find-commonground.com"
@@ -60,7 +61,10 @@ async def subscribe_newsletter(request: NewsletterSubscribeRequest):
             email=request.email,
             first_name=request.first_name or "",
             list_ids=list_ids if list_ids else None,
-            custom_fields={"e1_T": request.source or "website"},  # e1_T = signup_source custom field
+            custom_fields={
+                "e1_T": request.source or "website",  # signup_source
+                "e7_T": "lead",                        # lifecycle_stage
+            },
         )
 
         # Send welcome email
@@ -103,11 +107,27 @@ async def early_adopter_signup(request: EarlyAdopterRequest):
             email=request.email,
             first_name=request.first_name or "",
             list_ids=list_ids if list_ids else None,
+            custom_fields={
+                "e1_T": request.source or "website",  # signup_source
+                "e2_T": "parent",                       # user_type
+                "e7_T": "lead",                         # lifecycle_stage
+            },
         )
 
         # Send welcome email
         display_name = request.first_name or "there"
         await email_service.send_early_adopter_welcome(request.email, display_name)
+
+        # Notify growth team
+        try:
+            await email_service.send_growth_notification(
+                event_type="Early Adopter Signup",
+                email=request.email,
+                name=request.first_name or "",
+                details={"Source": request.source},
+            )
+        except Exception:
+            logger.warning(f"Failed to send growth notification for early adopter {request.email}")
 
         logger.info(f"Early adopter signup: {request.email} (source: {request.source})")
         return EarlyAdopterResponse(
@@ -150,11 +170,26 @@ async def submit_contact_form(request: ContactFormRequest):
         if settings.SENDGRID_LEADS_LIST_ID:
             lead_list_ids = [settings.SENDGRID_LEADS_LIST_ID]
 
+        # Extract first and last name from full name
+        name_parts = request.name.split() if request.name else []
+        contact_first = name_parts[0] if name_parts else ""
+        contact_last = " ".join(name_parts[1:]) if len(name_parts) > 1 else ""
+
+        # Determine user_type from inquiry_type
+        contact_user_type = "professional" if request.inquiry_type in ("professional", "court", "partnership") else "parent"
+
         await email_service.add_marketing_contact(
             email=request.email,
-            first_name=request.name.split()[0] if request.name else "",
+            first_name=contact_first,
+            last_name=contact_last,
             list_ids=lead_list_ids if lead_list_ids else None,
-            custom_fields={"e1_T": f"contact_{request.inquiry_type}"},  # e1_T = signup_source custom field
+            custom_fields={
+                "e1_T": f"contact_{request.inquiry_type}",  # signup_source
+                "e2_T": contact_user_type,                    # user_type
+                "e3_T": request.inquiry_type,                 # inquiry_type
+                "e4_T": contact_last,                         # last_name
+                "e7_T": "lead",                               # lifecycle_stage
+            },
         )
 
         # Send notification to internal team
@@ -212,11 +247,15 @@ async def professional_interest_signup(request: ProfessionalInterestRequest):
         await email_service.add_marketing_contact(
             email=request.email,
             first_name=request.first_name or "",
+            last_name=request.last_name or "",
             list_ids=list_ids if list_ids else None,
             custom_fields={
                 "e1_T": f"professional_{request.source}",  # signup_source
                 "e2_T": "professional",                     # user_type
                 "e3_T": request.role,                       # inquiry_type / role
+                "e4_T": request.last_name or "",            # last_name
+                "e5_T": request.firm_name or "",            # firm_or_org
+                "e7_T": "lead",                             # lifecycle_stage
             },
         )
 

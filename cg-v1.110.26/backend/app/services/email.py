@@ -169,7 +169,24 @@ class EmailService:
             'expiry_days': 7
         })
 
-        return await self._send_email(to_email, subject, html_body)
+        result = await self._send_email(to_email, subject, html_body)
+
+        # Track invitee in SendGrid for pipeline visibility
+        try:
+            await self.add_marketing_contact(
+                email=to_email,
+                first_name=to_name.split()[0] if to_name else "",
+                custom_fields={
+                    "e1_T": "invitation_co_parent",   # signup_source
+                    "e2_T": "parent",                  # user_type
+                    "e6_T": "co_parent_invite",        # referral_source
+                    "e7_T": "invited",                 # lifecycle_stage
+                },
+            )
+        except Exception as e:
+            logger.warning(f"Failed to track co-parent invitee {to_email} in SendGrid: {e}")
+
+        return result
 
     async def send_professional_invitation(
         self,
@@ -211,7 +228,29 @@ class EmailService:
             'expiry_days': 7
         })
 
-        return await self._send_email(to_email, subject, html_body)
+        result = await self._send_email(to_email, subject, html_body)
+
+        # Track professional invitee in SendGrid
+        try:
+            pro_list_ids = []
+            if settings.SENDGRID_PROFESSIONAL_LIST_ID:
+                pro_list_ids = [settings.SENDGRID_PROFESSIONAL_LIST_ID]
+            await self.add_marketing_contact(
+                email=to_email,
+                first_name=to_name.split()[0] if to_name else "",
+                list_ids=pro_list_ids if pro_list_ids else None,
+                custom_fields={
+                    "e1_T": "invitation_professional",  # signup_source
+                    "e2_T": "professional",              # user_type
+                    "e3_T": role,                        # inquiry_type / role
+                    "e6_T": "professional_invite",       # referral_source
+                    "e7_T": "invited",                   # lifecycle_stage
+                },
+            )
+        except Exception as e:
+            logger.warning(f"Failed to track professional invitee {to_email} in SendGrid: {e}")
+
+        return result
 
     async def send_circle_invitation(
         self,
@@ -247,7 +286,24 @@ class EmailService:
             'expiry_days': 7
         })
 
-        return await self._send_email(to_email, subject, html_body)
+        result = await self._send_email(to_email, subject, html_body)
+
+        # Track circle invitee in SendGrid
+        try:
+            await self.add_marketing_contact(
+                email=to_email,
+                first_name=to_name.split()[0] if to_name else "",
+                custom_fields={
+                    "e1_T": "invitation_circle",      # signup_source
+                    "e2_T": "circle_member",           # user_type
+                    "e6_T": "circle_invite",           # referral_source
+                    "e7_T": "invited",                 # lifecycle_stage
+                },
+            )
+        except Exception as e:
+            logger.warning(f"Failed to track circle invitee {to_email} in SendGrid: {e}")
+
+        return result
 
     # ==================== Notification Emails ====================
 
@@ -834,12 +890,30 @@ class EmailService:
             'resend_note': is_resend,
         })
 
-        return await self._send_email(
+        result = await self._send_email(
             to_email,
             subject,
             html_body,
             from_name_override=from_name_override,
         )
+
+        # Track attorney-invited parent in SendGrid
+        try:
+            await self.add_marketing_contact(
+                email=to_email,
+                first_name=to_name.split()[0] if to_name else "",
+                custom_fields={
+                    "e1_T": "invitation_attorney",     # signup_source
+                    "e2_T": "parent",                   # user_type
+                    "e5_T": attorney_firm or "",         # firm_or_org
+                    "e6_T": "attorney_invite",          # referral_source
+                    "e7_T": "invited",                  # lifecycle_stage
+                },
+            )
+        except Exception as e:
+            logger.warning(f"Failed to track attorney invitee {to_email} in SendGrid: {e}")
+
+        return result
 
     # ==================== Auth Emails ====================
 
@@ -952,6 +1026,7 @@ class EmailService:
         self,
         email: str,
         first_name: str = "",
+        last_name: str = "",
         list_ids: Optional[List[str]] = None,
         custom_fields: Optional[Dict[str, Any]] = None,
     ) -> bool:
@@ -964,6 +1039,7 @@ class EmailService:
         Args:
             email: Contact email address
             first_name: Contact first name (optional)
+            last_name: Contact last name (optional)
             list_ids: List of SendGrid list IDs to add the contact to
             custom_fields: Dict of custom field IDs to values
 
@@ -980,6 +1056,8 @@ class EmailService:
             contact_data: Dict[str, Any] = {"email": email}
             if first_name:
                 contact_data["first_name"] = first_name
+            if last_name:
+                contact_data["last_name"] = last_name
             if custom_fields:
                 contact_data["custom_fields"] = custom_fields
 
@@ -1020,6 +1098,32 @@ class EmailService:
             'to_name': to_name,
         })
         return await self._send_email(to_email, subject, html_body)
+
+    async def send_growth_notification(
+        self,
+        event_type: str,
+        email: str,
+        name: str = "",
+        details: Optional[Dict[str, str]] = None,
+    ) -> bool:
+        """
+        Send internal notification to the growth team for key lead/user events.
+
+        Args:
+            event_type: Event label (e.g., "New Registration", "Early Adopter Signup")
+            email: The lead/user's email
+            name: The lead/user's name
+            details: Additional key-value pairs to display (role, source, firm, etc.)
+        """
+        subject = f"Growth Alert: {event_type} — {name or email}"
+        html_body = self._render_template('marketing/growth_notification.html', {
+            'event_type': event_type,
+            'name': name or "Not provided",
+            'email': email,
+            'details': details or {},
+            'submitted_at': datetime.now().strftime('%B %d, %Y at %I:%M %p'),
+        })
+        return await self._send_email("growth@find-commonground.com", subject, html_body)
 
     # ==================== System Notification Emails ====================
 
