@@ -221,7 +221,7 @@ export default function ProfessionalCalendarPage() {
       setEvents(eventsResponse.events || []);
       setSummary(summaryResponse);
     } catch (error) {
-      console.error("Failed to fetch events:", error);
+      console.error("[Calendar] Failed to fetch events:", error);
     } finally {
       setLoading(false);
     }
@@ -243,7 +243,7 @@ export default function ProfessionalCalendarPage() {
           }))
         );
       } catch (error) {
-        console.error("Failed to fetch cases:", error);
+        console.error("[Calendar] Failed to fetch cases:", error);
       }
     };
     fetchCases();
@@ -290,7 +290,7 @@ export default function ProfessionalCalendarPage() {
       fetchEvents();
       setSelectedEvent(null);
     } catch (error) {
-      console.error("Failed to cancel event:", error);
+      console.error("[Calendar] Failed to cancel event:", error);
     }
   };
 
@@ -301,7 +301,7 @@ export default function ProfessionalCalendarPage() {
       fetchEvents();
       setSelectedEvent(null);
     } catch (error) {
-      console.error("Failed to delete event:", error);
+      console.error("[Calendar] Failed to delete event:", error);
     }
   };
 
@@ -344,7 +344,7 @@ export default function ProfessionalCalendarPage() {
       setSelectedEvent(null);
       fetchEvents();
     } catch (error) {
-      console.error("Failed to update event:", error);
+      console.error("[Calendar] Failed to update event:", error);
     }
   };
 
@@ -359,7 +359,7 @@ export default function ProfessionalCalendarPage() {
       );
       return response.conflicts || [];
     } catch (error) {
-      console.error("Failed to check conflicts:", error);
+      console.error("[Calendar] Failed to check conflicts:", error);
       return [];
     }
   };

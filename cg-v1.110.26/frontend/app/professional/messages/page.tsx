@@ -117,7 +117,7 @@ export default function MessagesPage() {
         setMessages(data.items || data || []);
       }
     } catch (error) {
-      console.error("Error fetching messages:", error);
+      console.error("[Messages] Error fetching messages:", error);
     } finally {
       setIsLoading(false);
     }
@@ -133,7 +133,9 @@ export default function MessagesPage() {
         const data = await response.json();
         setCases(data.items || data || []);
       }
-    } catch { /* silent */ }
+    } catch (err) {
+      console.error("[Messages] Error fetching cases:", err);
+    }
   };
 
   const markAsRead = async (messageId: string) => {
@@ -144,7 +146,9 @@ export default function MessagesPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
       setMessages(prev => prev.map(m => m.id === messageId ? { ...m, is_read: true } : m));
-    } catch { /* silent */ }
+    } catch (err) {
+      console.error("[Messages] Mark as read failed:", err);
+    }
   };
 
   const archiveMessage = async (messageId: string) => {
@@ -155,7 +159,9 @@ export default function MessagesPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
       setMessages(prev => prev.map(m => m.id === messageId ? { ...m, is_archived: true } : m));
-    } catch { /* silent */ }
+    } catch (err) {
+      console.error("[Messages] Archive failed:", err);
+    }
   };
 
   const unarchiveMessage = async (messageId: string) => {
@@ -166,7 +172,9 @@ export default function MessagesPage() {
         headers: { Authorization: `Bearer ${token}` },
       });
       setMessages(prev => prev.map(m => m.id === messageId ? { ...m, is_archived: false } : m));
-    } catch { /* silent */ }
+    } catch (err) {
+      console.error("[Messages] Unarchive failed:", err);
+    }
   };
 
   const filteredMessages = messages.filter(

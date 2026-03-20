@@ -108,8 +108,8 @@ export default function LibraryPage() {
           }]);
         }
       }
-    } catch {
-      // API unavailable — keep hardcoded fallback
+    } catch (err) {
+      console.error("[KidSpace Library] API fetch failed:", err);
     }
   }
 

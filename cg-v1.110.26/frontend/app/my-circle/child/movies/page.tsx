@@ -85,8 +85,8 @@ export default function MoviesPage() {
           }));
           setAllVideos(apiMapped);
         }
-      } catch {
-        // API unavailable — leave empty
+      } catch (err) {
+        console.error("[KidSpace Movies] API fetch failed:", err);
       } finally {
         setIsLoadingVideos(false);
       }

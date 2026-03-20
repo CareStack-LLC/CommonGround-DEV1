@@ -132,8 +132,10 @@ export default function BlogPage() {
       setExcerpt(data.excerpt || '');
       setSeoTitle(data.seo_title || '');
       setSeoDescription(data.seo_description || '');
-    } catch (err) {
-      console.error('AI generation failed:', err);
+    } catch (err: any) {
+      console.error('[Blog] AI generation failed:', err);
+      setError(err.message || 'AI generation failed. Please try again.');
+      setTimeout(() => setError(''), 5000);
     } finally {
       setGenerating(false);
     }
@@ -165,8 +167,10 @@ export default function BlogPage() {
       setSuccessMessage(editingPost ? 'Post updated successfully' : 'Post created successfully');
       setTimeout(() => setSuccessMessage(''), 4000);
       await fetchPosts();
-    } catch (err) {
-      console.error('Save failed:', err);
+    } catch (err: any) {
+      console.error('[Blog] Save failed:', err);
+      setError(err.message || 'Failed to save post. Please try again.');
+      setTimeout(() => setError(''), 5000);
     } finally {
       setSaving(false);
     }
@@ -184,8 +188,10 @@ export default function BlogPage() {
       setSuccessMessage('Post deleted');
       setTimeout(() => setSuccessMessage(''), 4000);
       await fetchPosts();
-    } catch (err) {
-      console.error('Delete failed:', err);
+    } catch (err: any) {
+      console.error('[Blog] Delete failed:', err);
+      setError(err.message || 'Failed to delete post.');
+      setTimeout(() => setError(''), 5000);
     } finally {
       setDeleting(null);
     }
@@ -233,6 +239,14 @@ export default function BlogPage() {
           </button>
         </div>
       </div>
+
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 flex items-center gap-2">
+          <AlertTriangle className="w-4 h-4 text-red-400" />
+          <span className="text-sm text-red-300">{error}</span>
+        </div>
+      )}
 
       {/* Success Message */}
       {successMessage && (

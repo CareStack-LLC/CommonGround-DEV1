@@ -147,7 +147,7 @@ export default function CasesListPage() {
       );
       if (response.ok) setCases(await response.json());
     } catch (error) {
-      console.error("Error fetching cases:", error);
+      console.error("[Cases] Error fetching cases:", error);
     } finally {
       setIsLoading(false);
     }
