@@ -120,7 +120,7 @@ export default function KidComsSettingsPage() {
         <div className="min-h-screen bg-background pb-20 lg:pb-0">
           <Navigation />
           <div className="flex flex-col items-center justify-center py-32">
-            <div className="w-14 h-14 border-3 border-purple-500/20 border-t-purple-500 rounded-full animate-spin" />
+            <div className="w-14 h-14 border-3 border-[#3DAA8A]/20 border-t-[#3DAA8A] rounded-full animate-spin" />
             <p className="mt-4 text-muted-foreground font-medium">Loading Settings...</p>
           </div>
         </div>
@@ -157,8 +157,8 @@ export default function KidComsSettingsPage() {
             </button>
             <div className="flex-1">
               <h1 className="text-3xl font-bold text-foreground flex items-center gap-3" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500/10 to-purple-600/5 flex items-center justify-center shadow-md">
-                  <Settings className="h-6 w-6 text-purple-600" />
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#3DAA8A]/10 to-[#2D6A8F]/5 flex items-center justify-center shadow-md">
+                  <Settings className="h-6 w-6 text-[#3DAA8A]" />
                 </div>
                 KidSpace Settings
               </h1>
@@ -253,8 +253,8 @@ export default function KidComsSettingsPage() {
           {/* Features */}
           <div className="bg-card border-2 border-border rounded-2xl shadow-lg p-6">
             <h2 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500/10 to-purple-600/5 flex items-center justify-center">
-                <Video className="h-4 w-4 text-purple-600" />
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#3DAA8A]/10 to-[#2D6A8F]/5 flex items-center justify-center">
+                <Video className="h-4 w-4 text-[#3DAA8A]" />
               </div>
               Allowed Features
             </h2>

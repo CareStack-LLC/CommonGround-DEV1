@@ -48,7 +48,7 @@ const ROOM_COLORS = [
   'bg-teal-100 dark:bg-teal-900/30 border-teal-300 dark:border-teal-700 text-teal-700 dark:text-teal-300',
   'bg-cyan-100 dark:bg-cyan-900/30 border-cyan-300 dark:border-cyan-700 text-cyan-700 dark:text-cyan-300',
   'bg-blue-100 dark:bg-blue-900/30 border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300',
-  'bg-purple-100 dark:bg-purple-900/30 border-purple-300 dark:border-purple-700 text-purple-700 dark:text-purple-300',
+  'bg-amber-100 dark:bg-amber-900/30 border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300',
 ];
 
 const RELATIONSHIP_OPTIONS = [
@@ -431,10 +431,10 @@ function MyCircleContent({ params }: PageParams) {
 
               <button
                 onClick={() => setShowChildSetupModal(true)}
-                className="bg-card border-2 border-border rounded-2xl shadow-lg hover:shadow-xl hover:border-purple-300 transition-all p-6 flex items-center gap-4 group"
+                className="bg-card border-2 border-border rounded-2xl shadow-lg hover:shadow-xl hover:border-[#3DAA8A]/40 transition-all p-6 flex items-center gap-4 group"
               >
-                <div className="p-3 bg-gradient-to-br from-purple-500/10 to-purple-600/5 rounded-xl group-hover:from-purple-500/20 group-hover:to-purple-600/10 transition-all">
-                  <Users className="h-6 w-6 text-purple-600" />
+                <div className="p-3 bg-gradient-to-br from-[#3DAA8A]/10 to-[#2D6A8F]/5 rounded-xl group-hover:from-[#3DAA8A]/20 group-hover:to-[#2D6A8F]/10 transition-all">
+                  <Users className="h-6 w-6 text-[#3DAA8A]" />
                 </div>
                 <div className="text-left">
                   <h3 className="font-bold text-foreground">Setup Child</h3>
@@ -632,7 +632,7 @@ function MyCircleContent({ params }: PageParams) {
                                 navigator.clipboard.writeText(loginUrl);
                                 alert('Login link copied to clipboard!');
                               }}
-                              className="p-2 text-purple-600 bg-purple-100 hover:bg-purple-200 rounded-lg transition-colors"
+                              className="p-2 text-[#3DAA8A] bg-[#3DAA8A]/10 hover:bg-[#3DAA8A]/20 rounded-lg transition-colors"
                               title="Copy login link"
                             >
                               <Link2 className="h-4 w-4" />
@@ -891,7 +891,7 @@ function MyCircleContent({ params }: PageParams) {
                     {[
                       { key: 'can_video_call', icon: Video, label: 'Video Calls', color: 'green' },
                       { key: 'can_voice_call', icon: Phone, label: 'Voice Calls', color: 'blue' },
-                      { key: 'can_chat', icon: MessageCircle, label: 'Chat', color: 'purple' },
+                      { key: 'can_chat', icon: MessageCircle, label: 'Chat', color: 'emerald' },
                       { key: 'can_theater', icon: Film, label: 'Watch Together', color: 'orange' },
                     ].map(({ key, icon: Icon, label, color }) => (
                       <button
@@ -1007,7 +1007,7 @@ function MyCircleContent({ params }: PageParams) {
                   <select
                     value={selectedChildId}
                     onChange={(e) => setSelectedChildId(e.target.value)}
-                    className="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-background text-foreground"
+                    className="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-[#3DAA8A] focus:border-[#3DAA8A] bg-background text-foreground"
                   >
                     <option value="">Select a child...</option>
                     {children.map((child) => (
@@ -1027,7 +1027,7 @@ function MyCircleContent({ params }: PageParams) {
                     value={childSetupName}
                     onChange={(e) => setChildSetupName(e.target.value)}
                     placeholder="e.g., Emma"
-                    className="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-background text-foreground"
+                    className="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-[#3DAA8A] focus:border-[#3DAA8A] bg-background text-foreground"
                   />
                 </div>
 
@@ -1041,7 +1041,7 @@ function MyCircleContent({ params }: PageParams) {
                     value={childSetupPin}
                     onChange={(e) => setChildSetupPin(e.target.value.replace(/\D/g, ''))}
                     placeholder="1234"
-                    className="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-background text-foreground text-center text-2xl tracking-widest"
+                    className="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-[#3DAA8A] focus:border-[#3DAA8A] bg-background text-foreground text-center text-2xl tracking-widest"
                   />
                   <p className="text-xs text-muted-foreground mt-1">Make it easy for your child to remember</p>
                 </div>
@@ -1070,7 +1070,7 @@ function MyCircleContent({ params }: PageParams) {
                         onClick={() => setChildSetupAvatar(avatar.id)}
                         className={`p-2 text-2xl rounded-xl border-2 transition-colors ${
                           childSetupAvatar === avatar.id
-                            ? 'border-purple-500 bg-purple-50'
+                            ? 'border-[#3DAA8A] bg-[#3DAA8A]/10'
                             : 'border-border hover:border-muted-foreground'
                         }`}
                       >
@@ -1091,7 +1091,7 @@ function MyCircleContent({ params }: PageParams) {
                 <button
                   onClick={handleSetupChildUser}
                   disabled={isSettingUpChild}
-                  className="flex-1 py-3 bg-purple-600 text-white rounded-xl font-semibold hover:bg-purple-700 disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
+                  className="flex-1 py-3 bg-[#3DAA8A] text-white rounded-xl font-semibold hover:bg-[#2D8A6E] disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
                 >
                   {isSettingUpChild ? (
                     <>
@@ -1260,7 +1260,7 @@ function MessagesSection({ familyFileId, children: childrenList, contacts }: Mes
           >
             <div className="flex items-center gap-3">
               {/* Avatar */}
-              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-teal-500/10 to-purple-500/10 flex items-center justify-center text-lg flex-shrink-0">
+              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#3DAA8A]/10 to-[#2D6A8F]/10 flex items-center justify-center text-lg flex-shrink-0">
                 {convo.contactRelationship === 'grandparent' ? '👴' :
                  convo.contactRelationship === 'aunt' ? '👩' :
                  convo.contactRelationship === 'uncle' ? '👨' : '💜'}
