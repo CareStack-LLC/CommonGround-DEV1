@@ -56,6 +56,7 @@ export default function BlogPage() {
   const [category, setCategory] = useState(CATEGORIES[0]);
   const [seoTitle, setSeoTitle] = useState('');
   const [seoDescription, setSeoDescription] = useState('');
+  const [featuredImageUrl, setFeaturedImageUrl] = useState('');
 
   // AI generation state
   const [aiTopic, setAiTopic] = useState('');
@@ -92,6 +93,7 @@ export default function BlogPage() {
     setCategory(CATEGORIES[0]);
     setSeoTitle('');
     setSeoDescription('');
+    setFeaturedImageUrl('');
     setAiTopic('');
     setAiKeywords('');
     setEditingPost(null);
@@ -132,6 +134,9 @@ export default function BlogPage() {
       setExcerpt(data.excerpt || '');
       setSeoTitle(data.seo_title || '');
       setSeoDescription(data.seo_description || '');
+      if (data.featured_image_url) {
+        setFeaturedImageUrl(data.featured_image_url);
+      }
     } catch (err: any) {
       console.error('[Blog] AI generation failed:', err);
       setError(err.message || 'AI generation failed. Please try again.');
@@ -144,7 +149,7 @@ export default function BlogPage() {
   const handleSave = async (publish: boolean) => {
     try {
       setSaving(true);
-      const body = { title, content, excerpt, category, seo_title: seoTitle, seo_description: seoDescription, status: publish ? 'published' : 'draft' };
+      const body = { title, content, excerpt, category, seo_title: seoTitle, seo_description: seoDescription, featured_image_url: featuredImageUrl || undefined, status: publish ? 'published' : 'draft' };
 
       if (editingPost) {
         const res = await fetch(`${API_BASE}/api/v1/blog/admin/posts/${editingPost.id}`, {
@@ -380,6 +385,30 @@ export default function BlogPage() {
                   />
                 </div>
               </div>
+            </div>
+
+            {/* Featured Image */}
+            <div>
+              <label className="text-xs text-zinc-500 uppercase tracking-wider font-medium block mb-1.5">Featured Image</label>
+              {featuredImageUrl && (
+                <div className="mb-2 rounded-lg overflow-hidden border border-zinc-700/60">
+                  <img
+                    src={featuredImageUrl}
+                    alt="Featured image preview"
+                    className="w-full h-48 object-cover"
+                  />
+                </div>
+              )}
+              <input
+                type="text"
+                value={featuredImageUrl}
+                onChange={(e) => setFeaturedImageUrl(e.target.value)}
+                placeholder="Image URL (auto-generated with AI, or paste your own)..."
+                className="w-full px-3 py-2 bg-zinc-800/60 border border-zinc-700/60 rounded-lg text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-violet-500/50"
+              />
+              {!featuredImageUrl && (
+                <p className="text-xs text-zinc-600 mt-1">An image will be auto-generated when you use AI generation</p>
+              )}
             </div>
 
             {/* Action Buttons */}

@@ -453,6 +453,19 @@ async def generate_blog_post(
 
         generated = json.loads(cleaned)
 
+        # Generate feature image with DALL-E 3
+        featured_image_url = None
+        featured_image_alt = None
+        try:
+            featured_image_url, featured_image_alt = await _generate_blog_image(
+                title=generated.get("title", data.topic),
+                excerpt=generated.get("excerpt", ""),
+                category=generated.get("suggested_category", ""),
+                slug=generated.get("suggested_slug", _slugify(generated.get("title", data.topic))),
+            )
+        except Exception as img_err:
+            logger.warning(f"Blog image generation failed (non-blocking): {img_err}")
+
         return {
             "generated": True,
             "title": generated.get("title", ""),
@@ -463,6 +476,8 @@ async def generate_blog_post(
             "suggested_slug": generated.get("suggested_slug", ""),
             "suggested_category": generated.get("suggested_category", ""),
             "suggested_tags": generated.get("suggested_tags", []),
+            "featured_image_url": featured_image_url,
+            "featured_image_alt": featured_image_alt,
         }
 
     except json.JSONDecodeError:
@@ -476,6 +491,8 @@ async def generate_blog_post(
             "suggested_slug": "",
             "suggested_category": "",
             "suggested_tags": [],
+            "featured_image_url": None,
+            "featured_image_alt": None,
             "parse_error": "AI response was not valid JSON. Content returned as raw text.",
         }
     except Exception as e:
@@ -484,3 +501,86 @@ async def generate_blog_post(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Blog generation failed: {str(e)}",
         )
+
+
+async def _generate_blog_image(
+    title: str,
+    excerpt: str,
+    category: str,
+    slug: str,
+) -> tuple[Optional[str], Optional[str]]:
+    """
+    Generate a feature image for a blog post using DALL-E 3,
+    upload it to Supabase storage, and return (url, alt_text).
+
+    Returns (None, None) if generation fails.
+    """
+    import os
+    import httpx
+    from openai import OpenAI
+    from app.services.storage import storage_service, StorageBucket
+
+    openai_key = os.environ.get("OPENAI_API_KEY") or getattr(settings, "OPENAI_API_KEY", None)
+    if not openai_key:
+        logger.info("No OPENAI_API_KEY configured — skipping blog image generation")
+        return None, None
+
+    # Build the DALL-E prompt with CommonGround brand style
+    brand_style = (
+        "Warm, organic illustration style with flowing teal (#3DAA8A) blob outlines "
+        "and soft color-pencil texture. Soft white (#F4F8F7) background. "
+        "Small coral-pink (#E85D75) hand-drawn accent icons floating nearby. "
+        "Calm, child-centered, trustworthy mood. "
+        "No text, no words, no letters, no numbers in the image."
+    )
+
+    subject = f"Blog topic: {title}"
+    if excerpt:
+        subject += f". {excerpt}"
+    if category:
+        subject += f" Category: {category}."
+
+    dalle_prompt = (
+        f"{brand_style}\n\n"
+        f"Subject: Create an illustration for a co-parenting blog post. {subject}\n\n"
+        "The image should feel warm and supportive, showing themes of family, "
+        "cooperation, children's wellbeing, or peaceful co-parenting. "
+        "Use diverse, inclusive representation."
+    )
+
+    # Generate image with DALL-E 3
+    openai_client = OpenAI(api_key=openai_key)
+    response = openai_client.images.generate(
+        model="dall-e-3",
+        prompt=dalle_prompt,
+        size="1792x1024",
+        quality="standard",
+        n=1,
+    )
+
+    image_url = response.data[0].url
+    if not image_url:
+        logger.warning("DALL-E 3 returned no image URL")
+        return None, None
+
+    # Download the image from OpenAI's temporary URL
+    async with httpx.AsyncClient(timeout=30.0) as http_client:
+        img_response = await http_client.get(image_url)
+        img_response.raise_for_status()
+        image_bytes = img_response.content
+
+    # Upload to Supabase blog-images bucket
+    storage_path = f"{slug}.png"
+    public_url = await storage_service.upload_file(
+        bucket=StorageBucket.BLOG_IMAGES,
+        path=storage_path,
+        file_content=image_bytes,
+        content_type="image/png",
+        upsert=True,
+    )
+
+    # Generate alt text from title
+    alt_text = f"Illustration for blog post: {title}"
+
+    logger.info(f"Blog image generated and uploaded: {public_url}")
+    return public_url, alt_text

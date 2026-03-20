@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Calendar, Clock, ArrowRight, Loader2 } from 'lucide-react';
 import { NewsletterForm } from '@/components/marketing/newsletter-form';
 import { blogPosts as legacyPosts, formatDate, getCategoryStyles, type BlogPost as LegacyPost } from '@/lib/blog-data';
@@ -167,7 +168,7 @@ export default function BlogPage() {
                     <Link href={`/blog/${featuredPosts[0].slug}`} className="group block">
                       <div className={`aspect-[16/9] rounded-2xl mb-6 overflow-hidden ${!featuredPosts[0].image ? placeholderBg : ''}`}>
                         {featuredPosts[0].image ? (
-                          <img src={featuredPosts[0].image} alt={featuredPosts[0].title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                          <Image src={featuredPosts[0].image} alt={featuredPosts[0].title} width={1792} height={1024} sizes="(max-width: 768px) 100vw, 66vw" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" priority />
                         ) : (
                           <div className={`w-full h-full ${placeholderBg} flex items-center justify-center`}>
                             <span className="text-6xl opacity-30">📝</span>
@@ -191,7 +192,7 @@ export default function BlogPage() {
                       <Link key={post.slug} href={`/blog/${post.slug}`} className="group block">
                         <div className={`aspect-[16/9] rounded-xl mb-4 overflow-hidden ${!post.image ? placeholderBg : ''}`}>
                           {post.image ? (
-                            <img src={post.image} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                            <Image src={post.image} alt={post.title} width={1792} height={1024} sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                           ) : (
                             <div className={`w-full h-full ${placeholderBg} flex items-center justify-center`}>
                               <span className="text-4xl opacity-30">📝</span>
@@ -226,7 +227,7 @@ export default function BlogPage() {
                     <Link key={post.slug} href={`/blog/${post.slug}`} className="group bg-[#F4F8F7] rounded-xl border border-gray-200/50 overflow-hidden hover:shadow-lg transition-shadow">
                       <div className={`aspect-[16/10] overflow-hidden ${!post.image ? placeholderBg : ''}`}>
                         {post.image ? (
-                          <img src={post.image} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                          <Image src={post.image} alt={post.title} width={1792} height={1024} sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                         ) : (
                           <div className={`w-full h-full ${placeholderBg} flex items-center justify-center`}>
                             <span className="text-4xl opacity-30">📝</span>

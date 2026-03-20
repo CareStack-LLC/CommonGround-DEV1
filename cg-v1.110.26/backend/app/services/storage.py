@@ -37,6 +37,7 @@ class StorageBucket:
     REPORTS = "reports"  # Private bucket for generated PDF reports
     ARIA_FRAME_EVIDENCE = "aria-frame-evidence"  # Private bucket for ARIA video frame captures
     KIDSPACE_MEDIA = "kidspace-media"  # Public bucket for KidSpace movies, books, author photos
+    BLOG_IMAGES = "blog-images"  # Public bucket for AI-generated blog feature images
 
 
 class SupabaseStorageService:
@@ -111,7 +112,7 @@ class SupabaseStorageService:
 
         # Return the public URL for public buckets (avatars, kidcoms)
         # For private buckets, return a signed URL with limited expiry
-        if bucket in (StorageBucket.AVATARS, StorageBucket.KIDCOMS, StorageBucket.PROFESSIONAL_MEDIA, StorageBucket.KIDSPACE_MEDIA, "email-assets"):
+        if bucket in (StorageBucket.AVATARS, StorageBucket.KIDCOMS, StorageBucket.PROFESSIONAL_MEDIA, StorageBucket.KIDSPACE_MEDIA, StorageBucket.BLOG_IMAGES, "email-assets"):
             return self._get_storage_url(bucket, path)
         else:
             # Sensitive buckets get 2-hour expiry; less-sensitive get 24 hours

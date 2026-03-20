@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { Calendar, Clock, ArrowLeft, ArrowRight, User, Share2, Loader2, CheckCircle } from 'lucide-react';
 import {
@@ -72,10 +73,46 @@ export default function BlogPostPage() {
     fetchPost();
   }, [slug]);
 
-  // Set page title
+  // Set page title + OG/Twitter meta tags for SEO
   useEffect(() => {
     const title = apiPost?.seo_title || apiPost?.title || legacyPost?.title;
+    const description = apiPost?.seo_description || apiPost?.excerpt || legacyPost?.excerpt || '';
+    const imageUrl = apiPost?.featured_image_url || legacyPost?.image || '';
+
     if (title) document.title = `${title} | CommonGround Blog`;
+
+    // Set OG and Twitter meta tags dynamically
+    const metaTags: Record<string, string> = {
+      'og:title': title || '',
+      'og:description': description,
+      'og:image': imageUrl,
+      'og:image:width': '1792',
+      'og:image:height': '1024',
+      'og:type': 'article',
+      'twitter:card': 'summary_large_image',
+      'twitter:title': title || '',
+      'twitter:description': description,
+      'twitter:image': imageUrl,
+    };
+
+    const cleanupTags: HTMLMetaElement[] = [];
+    for (const [property, content] of Object.entries(metaTags)) {
+      if (!content) continue;
+      const isOg = property.startsWith('og:');
+      const attr = isOg ? 'property' : 'name';
+      let tag = document.querySelector(`meta[${attr}="${property}"]`) as HTMLMetaElement | null;
+      if (!tag) {
+        tag = document.createElement('meta');
+        tag.setAttribute(attr, property);
+        document.head.appendChild(tag);
+        cleanupTags.push(tag);
+      }
+      tag.setAttribute('content', content);
+    }
+
+    return () => {
+      cleanupTags.forEach(tag => tag.remove());
+    };
   }, [apiPost, legacyPost]);
 
   const handleShare = () => {
@@ -141,7 +178,7 @@ export default function BlogPostPage() {
           <section>
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6">
               <div className="aspect-[16/9] rounded-2xl overflow-hidden shadow-lg">
-                <img src={apiPost.featured_image_url} alt={apiPost.title} className="w-full h-full object-cover" />
+                <Image src={apiPost.featured_image_url} alt={apiPost.title} width={1792} height={1024} sizes="(max-width: 1280px) 100vw, 1280px" className="w-full h-full object-cover" priority />
               </div>
             </div>
           </section>
@@ -234,7 +271,7 @@ export default function BlogPostPage() {
           <section>
             <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6">
               <div className="aspect-[16/9] rounded-2xl overflow-hidden shadow-lg">
-                <img src={legacyPost.image} alt={legacyPost.title} className="w-full h-full object-cover" />
+                <Image src={legacyPost.image} alt={legacyPost.title} width={1792} height={1024} sizes="(max-width: 1280px) 100vw, 1280px" className="w-full h-full object-cover" priority />
               </div>
             </div>
           </section>
