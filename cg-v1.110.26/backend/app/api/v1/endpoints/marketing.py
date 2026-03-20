@@ -9,10 +9,13 @@ from fastapi import APIRouter, status
 from app.schemas.marketing import (
     NewsletterSubscribeRequest,
     NewsletterSubscribeResponse,
+    EarlyAdopterRequest,
+    EarlyAdopterResponse,
     ContactFormRequest,
     ContactFormResponse,
 )
 from app.services.email import email_service
+from app.core.config import settings
 from app.utils.sentry_helpers import capture_error
 
 logger = logging.getLogger(__name__)
@@ -56,6 +59,50 @@ async def subscribe_newsletter(request: NewsletterSubscribeRequest):
         return NewsletterSubscribeResponse(
             success=False,
             message="We couldn't process your subscription right now. Please try again later."
+        )
+
+
+@router.post("/early-adopter", response_model=EarlyAdopterResponse, status_code=status.HTTP_200_OK)
+async def early_adopter_signup(request: EarlyAdopterRequest):
+    """
+    Sign up for the CommonGround early adopter list.
+
+    Adds the contact to the SendGrid Marketing Contacts 'Early Adopters' list
+    and sends a welcome email. No authentication required.
+
+    Args:
+        request: Early adopter signup with email, optional first name, and source page
+
+    Returns:
+        EarlyAdopterResponse with success status
+    """
+    try:
+        # Add to SendGrid Marketing Contacts list
+        list_ids = []
+        if settings.SENDGRID_EARLY_ADOPTER_LIST_ID:
+            list_ids = [settings.SENDGRID_EARLY_ADOPTER_LIST_ID]
+
+        await email_service.add_marketing_contact(
+            email=request.email,
+            first_name=request.first_name or "",
+            list_ids=list_ids if list_ids else None,
+        )
+
+        # Send welcome email
+        display_name = request.first_name or "there"
+        await email_service.send_early_adopter_welcome(request.email, display_name)
+
+        logger.info(f"Early adopter signup: {request.email} (source: {request.source})")
+        return EarlyAdopterResponse(
+            success=True,
+            message="You're on the list! We'll reach out soon with your exclusive early adopter offer."
+        )
+    except Exception as e:
+        logger.error(f"Early adopter signup failed for {request.email}: {str(e)}")
+        capture_error(e)
+        return EarlyAdopterResponse(
+            success=False,
+            message="We couldn't process your signup right now. Please try again later."
         )
 
 

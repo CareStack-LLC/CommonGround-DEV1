@@ -110,6 +110,7 @@ class Settings(BaseSettings):
     EMAIL_ENABLED: bool = False
     SENDGRID_API_KEY: Optional[str] = None
     SENDGRID_WEBHOOK_VERIFICATION_KEY: Optional[str] = None  # For verifying webhook signatures
+    SENDGRID_EARLY_ADOPTER_LIST_ID: Optional[str] = None  # SendGrid Marketing contact list for early adopters
     FROM_EMAIL: str = "noreply@find-commonground.com"
     FROM_NAME: str = "CommonGround"
 

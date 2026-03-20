@@ -16,6 +16,17 @@ class NewsletterSubscribeResponse(BaseModel):
     message: str
 
 
+class EarlyAdopterRequest(BaseModel):
+    email: EmailStr
+    first_name: Optional[str] = Field(None, max_length=100)
+    source: str = Field(default="website", max_length=50)
+
+
+class EarlyAdopterResponse(BaseModel):
+    success: bool
+    message: str
+
+
 class ContactFormRequest(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
     email: EmailStr

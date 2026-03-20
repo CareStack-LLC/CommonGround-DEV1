@@ -1,0 +1,29 @@
+{% extends 'base/_base.html' %}
+{% import 'base/_components.html' as c %}
+
+{% block title %}You're on the Early Adopter List!{% endblock %}
+
+{% block preheader %}Welcome, {{ to_name }}! You've secured your spot as a CommonGround early adopter.{% endblock %}
+
+{% block content %}
+{{ c.heading("You're In!") }}
+{{ c.subheading('Hey ' ~ to_name ~ ', you just secured your spot on the CommonGround early adopter list.') }}
+
+<p style="margin: 0 0 24px; font-family: Arial, Helvetica, sans-serif; font-size: 15px; color: #6B8A9A; line-height: 1.6; text-align: center;">
+  As one of our first 50 members, here's what you're getting:
+</p>
+
+{{ c.feature(icons.checkmark, '30% Off for Life', 'Locked in at the early adopter rate for 36 months on any paid plan.') }}
+{{ c.feature(icons.calendar, 'First Access', 'Be the first to experience CommonGround when we launch.') }}
+{{ c.feature(icons.document, 'Shape the Product', 'Your feedback will directly influence what we build.') }}
+
+{{ c.divider() }}
+
+<p style="margin: 0 0 24px; font-family: Arial, Helvetica, sans-serif; font-size: 15px; color: #6B8A9A; line-height: 1.6; text-align: center;">
+  We'll be in touch soon with next steps. In the meantime, learn more about what we're building.
+</p>
+
+{{ c.button(frontend_url, 'Visit CommonGround') }}
+
+{{ c.help_note(frontend_url) }}
+{% endblock %}

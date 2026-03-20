@@ -948,6 +948,79 @@ class EmailService:
         })
         return await self._send_email(to_email, subject, html_body)
 
+    async def add_marketing_contact(
+        self,
+        email: str,
+        first_name: str = "",
+        list_ids: Optional[List[str]] = None,
+        custom_fields: Optional[Dict[str, Any]] = None,
+    ) -> bool:
+        """
+        Add a contact to SendGrid Marketing Contacts.
+
+        Uses the SendGrid v3 Marketing Contacts API to add/upsert a contact,
+        optionally assigning them to a list and setting custom fields.
+
+        Args:
+            email: Contact email address
+            first_name: Contact first name (optional)
+            list_ids: List of SendGrid list IDs to add the contact to
+            custom_fields: Dict of custom field IDs to values
+
+        Returns:
+            True if the contact was added successfully
+        """
+        if not self.enabled or not self.api_key:
+            logger.info(f"[MARKETING DEV MODE] Would add contact: {email} (first_name={first_name})")
+            return True
+
+        try:
+            import httpx
+
+            contact_data: Dict[str, Any] = {"email": email}
+            if first_name:
+                contact_data["first_name"] = first_name
+            if custom_fields:
+                contact_data["custom_fields"] = custom_fields
+
+            payload: Dict[str, Any] = {"contacts": [contact_data]}
+            if list_ids:
+                payload["list_ids"] = list_ids
+
+            async with httpx.AsyncClient() as client:
+                resp = await client.put(
+                    "https://api.sendgrid.com/v3/marketing/contacts",
+                    headers={
+                        "Authorization": f"Bearer {self.api_key}",
+                        "Content-Type": "application/json",
+                    },
+                    json=payload,
+                    timeout=10.0,
+                )
+
+            if resp.status_code in [200, 201, 202]:
+                logger.info(f"Marketing contact added: {email}")
+                return True
+            else:
+                logger.error(f"SendGrid Marketing Contacts returned {resp.status_code}: {resp.text}")
+                return False
+
+        except ImportError:
+            logger.error("httpx not installed. Run: pip install httpx")
+            return False
+        except Exception as e:
+            logger.error(f"Failed to add marketing contact {email}: {str(e)}")
+            capture_error(e)
+            return False
+
+    async def send_early_adopter_welcome(self, to_email: str, to_name: str = "there") -> bool:
+        """Send welcome email to early adopter signup."""
+        subject = "You're on the Early Adopter List! — CommonGround"
+        html_body = self._render_template('marketing/early_adopter_welcome.html', {
+            'to_name': to_name,
+        })
+        return await self._send_email(to_email, subject, html_body)
+
     # ==================== System Notification Emails ====================
 
     async def send_generic_notification(
