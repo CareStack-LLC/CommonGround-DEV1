@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { ImagePlaceholder } from '@/components/marketing/image-placeholder';
 import { JsonLd } from '@/components/marketing/json-ld';
 import {
@@ -113,6 +114,7 @@ const features = [
       alt: 'Court-ready evidence export preview',
       prompt:
         'PDF export preview showing court-ready document with verification seal, organized sections for messages and schedules, professional formatting, no text',
+      src: '/images/marketing/feat6.png',
     },
   },
   {
@@ -129,6 +131,7 @@ const features = [
       alt: 'Custody analytics dashboard',
       prompt:
         'Dashboard showing custody time pie chart, compliance metrics, parenting time bar graph, clean data visualization with teal and gold colors, no text',
+      src: '/images/marketing/feat7.png',
     },
   },
 ];
@@ -260,11 +263,21 @@ export default function FeaturesPage() {
 
                 {/* Image */}
                 <div className={isEven ? 'lg:order-2' : 'lg:order-1'}>
-                  <ImagePlaceholder
-                    alt={feature.image.alt}
-                    prompt={feature.image.prompt}
-                    aspectRatio="4/3"
-                  />
+                  {feature.image.src ? (
+                    <Image
+                      src={feature.image.src}
+                      alt={feature.image.alt}
+                      width={640}
+                      height={480}
+                      className="rounded-2xl object-cover w-full"
+                    />
+                  ) : (
+                    <ImagePlaceholder
+                      alt={feature.image.alt}
+                      prompt={feature.image.prompt}
+                      aspectRatio="4/3"
+                    />
+                  )}
                 </div>
               </div>
             );

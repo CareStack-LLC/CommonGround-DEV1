@@ -1,7 +1,7 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import { MarketingHeader } from '@/components/marketing';
-import { ImagePlaceholder } from '@/components/marketing/image-placeholder';
 import { JsonLd } from '@/components/marketing/json-ld';
 import {
   ArrowRight,
@@ -195,11 +195,7 @@ export default function HomePage() {
                   title: 'Sign up free',
                   description:
                     'Create your account in 2 minutes. Invite your co-parent when you\'re ready — or start on your own.',
-                  image: {
-                    alt: 'Parent signing up on phone',
-                    prompt:
-                      'Simple flat icon illustration of a person signing up on a smartphone, teal and gold accent colors, clean line art style, SaaS onboarding',
-                  },
+                  image: { alt: 'Parent signing up on phone', src: '/images/marketing/home1.png' },
                 },
                 {
                   step: '02',
@@ -207,11 +203,7 @@ export default function HomePage() {
                   title: 'Set it and forget it',
                   description:
                     'ARIA handles messaging tone. TimeBridge automates your schedule. ClearFund tracks expenses. Everything runs itself.',
-                  image: {
-                    alt: 'Automated calendar with checkmarks',
-                    prompt:
-                      'Simple flat icon illustration of an automated calendar with checkmark notifications, teal and gold accent colors, clean line art style',
-                  },
+                  image: { alt: 'Automated calendar with checkmarks', src: '/images/marketing/home2.png' },
                 },
                 {
                   step: '03',
@@ -219,22 +211,19 @@ export default function HomePage() {
                   title: 'Live your life',
                   description:
                     'Spend your energy on your kids, not on coordination. Everything is documented and court-ready if you ever need it.',
-                  image: {
-                    alt: 'Parent relaxing with child',
-                    prompt:
-                      'Simple flat icon illustration of a parent relaxing with a happy child, teal and gold accent colors, clean line art style, warm feeling',
-                  },
+                  image: { alt: 'Parent relaxing with child', src: '/images/marketing/home3.png' },
                 },
               ].map((item) => {
                 const Icon = item.icon;
                 return (
                   <div key={item.step} className="text-center">
-                    <div className="relative mb-6">
-                      <ImagePlaceholder
+                    <div className="relative mb-6 mx-auto max-w-[280px]">
+                      <Image
+                        src={item.image.src}
                         alt={item.image.alt}
-                        prompt={item.image.prompt}
-                        aspectRatio="4/3"
-                        className="mx-auto max-w-[280px]"
+                        width={560}
+                        height={420}
+                        className="rounded-2xl object-cover w-full"
                       />
                       <div className="absolute -top-3 -left-3 w-10 h-10 rounded-full bg-[#1E3A4A] flex items-center justify-center text-white font-bold text-sm">
                         {item.step}

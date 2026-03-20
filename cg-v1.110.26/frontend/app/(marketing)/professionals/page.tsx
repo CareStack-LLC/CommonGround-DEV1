@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ImagePlaceholder } from '@/components/marketing/image-placeholder';
+import Image from 'next/image';
 import { JsonLd } from '@/components/marketing/json-ld';
 import {
   Scale,
@@ -205,10 +205,12 @@ export default function ProfessionalsPage() {
             </div>
 
             <div>
-              <ImagePlaceholder
+              <Image
+                src="/images/marketing/pro1.png"
                 alt="Professional dashboard showing case overview with timeline and compliance metrics"
-                prompt="Professional portal dashboard mockup showing family case overview with timeline, compliance metrics, and document exports, clean dark UI with teal accents, no text"
-                aspectRatio="4/3"
+                width={640}
+                height={480}
+                className="rounded-2xl object-cover w-full"
               />
             </div>
           </div>
@@ -344,15 +346,19 @@ export default function ProfessionalsPage() {
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
-            <ImagePlaceholder
+            <Image
+              src="/images/marketing/pro2.png"
               alt="Professional portal communications timeline view"
-              prompt="Professional portal screenshot showing communications timeline with verified message cards, tone analysis badges, timestamps, clean professional UI with teal accents, no text"
-              aspectRatio="16/10"
+              width={640}
+              height={400}
+              className="rounded-2xl object-cover w-full"
             />
-            <ImagePlaceholder
+            <Image
+              src="/images/marketing/pro3.png"
               alt="Professional portal compliance dashboard"
-              prompt="Professional portal screenshot showing compliance dashboard with schedule adherence chart, exchange metrics, behavioral analysis cards, clean professional UI, no text"
-              aspectRatio="16/10"
+              width={640}
+              height={400}
+              className="rounded-2xl object-cover w-full"
             />
           </div>
         </div>
