@@ -216,7 +216,15 @@ export default function MediaLibraryPage() {
         headers: { Authorization: `Bearer ${getToken()}` },
         body: formData,
       });
-      if (!res.ok) throw new Error('Failed to save movie');
+      if (!res.ok) {
+        const errBody = await res.text().catch(() => '');
+        console.error(`[SuperAdmin] Movie save failed (${res.status}):`, errBody);
+        throw new Error(`Failed to save movie (${res.status}): ${errBody.slice(0, 200)}`);
+      }
+      const saved = await res.json();
+      console.log('[SuperAdmin] Movie saved:', { id: saved.id, video_url: saved.video_url, poster_url: saved.poster_url });
+      if (!saved.video_url && movieVideoFile) console.warn('[SuperAdmin] ⚠️ Video file was attached but video_url is null — upload may have failed');
+      if (!saved.poster_url && moviePosterFile) console.warn('[SuperAdmin] ⚠️ Poster file was attached but poster_url is null — upload may have failed');
       setShowMovieModal(false); resetMovieForm();
       showSuccess(editingMovie ? 'Movie updated' : 'Movie added');
       await fetchData();
@@ -281,12 +289,20 @@ export default function MediaLibraryPage() {
         headers: { Authorization: `Bearer ${getToken()}` },
         body: formData,
       });
-      if (!res.ok) throw new Error('Failed to save book');
+      if (!res.ok) {
+        const errBody = await res.text().catch(() => '');
+        console.error(`[SuperAdmin] Book save failed (${res.status}):`, errBody);
+        throw new Error(`Failed to save book (${res.status}): ${errBody.slice(0, 200)}`);
+      }
+      const saved = await res.json();
+      console.log('[SuperAdmin] Book saved:', { id: saved.id, pdf_url: saved.pdf_url, cover_url: saved.cover_url });
+      if (!saved.pdf_url && bookPdfFile) console.warn('[SuperAdmin] ⚠️ PDF file was attached but pdf_url is null — upload may have failed');
+      if (!saved.cover_url && bookCoverFile) console.warn('[SuperAdmin] ⚠️ Cover file was attached but cover_url is null — upload may have failed');
       setShowBookModal(false); resetBookForm();
       showSuccess(editingBook ? 'Book updated' : 'Book added');
       await fetchData();
     } catch (err) {
-      console.error('Save book failed:', err);
+      console.error('[SuperAdmin] Save book failed:', err);
     } finally {
       setSaving(false);
     }
