@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { Check, Clock, DollarSign, Scale, Minus } from 'lucide-react';
+import { InlineNewsletterCta } from '@/components/marketing/inline-newsletter-cta';
 
 const plans = [
   {
@@ -520,6 +521,17 @@ export default function PricingPage() {
               </details>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Not Ready Yet — Newsletter Capture */}
+      <section className="py-12 px-6">
+        <div className="max-w-2xl mx-auto">
+          <InlineNewsletterCta
+            source="newsletter_pricing"
+            headline="Not ready yet? Stay in the loop."
+            subtext="Get co-parenting tips and be the first to know about new features and special offers."
+          />
         </div>
       </section>
 

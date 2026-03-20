@@ -28,6 +28,7 @@ INQUIRY_EMAIL_MAP = {
     "professional": "partnerships@find-commonground.com",
     "court": "partnerships@find-commonground.com",
     "partnership": "partnerships@find-commonground.com",
+    "security": "support@find-commonground.com",
     "general": "hello@find-commonground.com",
 }
 DEFAULT_INTERNAL_EMAIL = "hello@find-commonground.com"
@@ -47,6 +48,19 @@ async def subscribe_newsletter(request: NewsletterSubscribeRequest):
         NewsletterSubscribeResponse with success status
     """
     try:
+        # Add to SendGrid Marketing Contacts newsletter list
+        list_ids = []
+        if settings.SENDGRID_NEWSLETTER_LIST_ID:
+            list_ids = [settings.SENDGRID_NEWSLETTER_LIST_ID]
+
+        await email_service.add_marketing_contact(
+            email=request.email,
+            first_name=request.first_name or "",
+            list_ids=list_ids if list_ids else None,
+            custom_fields={"e1_T": request.source or "website"},  # e1_T = signup_source custom field
+        )
+
+        # Send welcome email
         await email_service.send_newsletter_welcome(request.email)
         logger.info(f"Newsletter subscription from {request.email} (source: {request.source})")
         return NewsletterSubscribeResponse(
@@ -127,6 +141,18 @@ async def submit_contact_form(request: ContactFormRequest):
     """
     try:
         internal_email = INQUIRY_EMAIL_MAP.get(request.inquiry_type, DEFAULT_INTERNAL_EMAIL)
+
+        # Add to SendGrid Marketing Contacts leads list for CRM tracking
+        lead_list_ids = []
+        if settings.SENDGRID_LEADS_LIST_ID:
+            lead_list_ids = [settings.SENDGRID_LEADS_LIST_ID]
+
+        await email_service.add_marketing_contact(
+            email=request.email,
+            first_name=request.name.split()[0] if request.name else "",
+            list_ids=lead_list_ids if lead_list_ids else None,
+            custom_fields={"e1_T": f"contact_{request.inquiry_type}"},  # e1_T = signup_source custom field
+        )
 
         # Send notification to internal team
         await email_service.send_contact_form_notification(

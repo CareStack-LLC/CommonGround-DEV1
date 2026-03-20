@@ -12,6 +12,7 @@ import {
   getCategoryStyles,
 } from '@/lib/blog-data';
 import { BlogContent } from '@/components/marketing/blog-content';
+import { InlineNewsletterCta } from '@/components/marketing/inline-newsletter-cta';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -227,6 +228,17 @@ export default function BlogPostPage() {
           </div>
         </section>
 
+        {/* Newsletter CTA */}
+        <section className="py-8">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <InlineNewsletterCta
+              source={`newsletter_blog_${slug}`}
+              headline="Enjoy this article? Get more like it."
+              subtext="Co-parenting tips, expert advice, and product updates — straight to your inbox."
+            />
+          </div>
+        </section>
+
         {/* CTA */}
         <section className="py-16">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -292,6 +304,17 @@ export default function BlogPostPage() {
                 </button>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* Newsletter CTA */}
+        <section className="py-8">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <InlineNewsletterCta
+              source={`newsletter_blog_${slug}`}
+              headline="Enjoy this article? Get more like it."
+              subtext="Co-parenting tips, expert advice, and product updates — straight to your inbox."
+            />
           </div>
         </section>
 

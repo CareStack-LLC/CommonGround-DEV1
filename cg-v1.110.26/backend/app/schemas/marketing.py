@@ -8,6 +8,7 @@ from typing import Optional
 
 class NewsletterSubscribeRequest(BaseModel):
     email: EmailStr
+    first_name: Optional[str] = Field(None, max_length=100)
     source: Optional[str] = "website"
 
 
@@ -30,7 +31,7 @@ class EarlyAdopterResponse(BaseModel):
 class ContactFormRequest(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
     email: EmailStr
-    inquiry_type: str = Field(..., pattern="^(general|support|professional|court|partnership)$")
+    inquiry_type: str = Field(..., pattern="^(general|support|professional|court|partnership|security)$")
     subject: Optional[str] = Field(None, max_length=200)
     message: str = Field(..., min_length=10, max_length=5000)
 

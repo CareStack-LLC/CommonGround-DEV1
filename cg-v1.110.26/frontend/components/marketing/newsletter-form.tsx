@@ -1,12 +1,22 @@
 'use client';
 
 import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 
-export function NewsletterForm() {
+interface NewsletterFormProps {
+  source?: string;
+  className?: string;
+}
+
+export function NewsletterForm({ source, className = '' }: NewsletterFormProps) {
+  const pathname = usePathname();
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [error, setError] = useState('');
+
+  // Use explicit source prop, or derive from current page path
+  const resolvedSource = source || `newsletter_${pathname?.replace(/\//g, '_').replace(/^_/, '') || 'footer'}`;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,7 +30,7 @@ export function NewsletterForm() {
       const res = await fetch(`${API_URL}/api/v1/marketing/newsletter`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, source: 'newsletter_form' }),
+        body: JSON.stringify({ email, source: resolvedSource }),
       });
 
       if (!res.ok) {
@@ -39,7 +49,7 @@ export function NewsletterForm() {
 
   if (isSubmitted) {
     return (
-      <div className="text-center">
+      <div className={`text-center ${className}`}>
         <p className="text-cg-sage font-medium">Thanks for subscribing!</p>
         <p className="text-sm text-muted-foreground mt-1">Check your inbox for confirmation.</p>
       </div>
@@ -47,7 +57,7 @@ export function NewsletterForm() {
   }
 
   return (
-    <div>
+    <div className={className}>
       <form className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto" onSubmit={handleSubmit}>
         <input
           type="email"
