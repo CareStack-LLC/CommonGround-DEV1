@@ -282,7 +282,7 @@ export default function PricingPage() {
                 </ul>
 
                 <button
-                  onClick={handleCTA}
+                  onClick={() => handleCTA(plan.name, plan.monthly)}
                   className="w-full py-3 rounded-xl font-medium text-lg transition-all duration-200 shadow-md hover:shadow-xl hover:-translate-y-0.5"
                   style={{
                     backgroundColor: plan.popular ? plan.color : 'white',
