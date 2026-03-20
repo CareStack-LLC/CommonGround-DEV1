@@ -83,6 +83,13 @@ export const metadata: Metadata = {
   keywords: ["co-parenting", "co-parenting app", "free co-parenting app", "custody calendar", "co-parenting communication", "child custody app", "shared parenting", "court-ready records", "ARIA", "family law", "expense tracking"],
   authors: [{ name: "CommonGround" }],
   metadataBase: new URL("https://www.find-commonground.com"),
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    apple: "/apple-icon.png",
+  },
   openGraph: {
     title: "CommonGround | The Calm Way to Co-Parent",
     description: "Free co-parenting tools with AI-powered messaging, shared calendar, and court-ready documentation. Built by parents, for parents.",
