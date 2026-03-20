@@ -661,53 +661,7 @@ export default function MediaLibraryPage() {
             </div>
           )}
 
-          {/* ============ GENRES TAB ============ */}
-          {activeTab === 'genres' && (
-            <div className="space-y-4">
-              {/* Inline add */}
-              <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-4">
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <input value={newGenreEmoji} onChange={e => setNewGenreEmoji(e.target.value)} placeholder="Emoji" className={`${inputCls} w-20`} />
-                  <input value={newGenreName} onChange={e => setNewGenreName(e.target.value)} placeholder="Genre name" className={`${inputCls} flex-1`} />
-                  <input value={newGenreDesc} onChange={e => setNewGenreDesc(e.target.value)} placeholder="Description" className={`${inputCls} flex-1`} />
-                  <button
-                    onClick={handleAddGenre}
-                    disabled={addingGenre || !newGenreName.trim()}
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium transition-colors disabled:opacity-50 whitespace-nowrap"
-                  >
-                    {addingGenre ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-                    Add Genre
-                  </button>
-                </div>
-              </div>
-
-              {genres.length === 0 ? (
-                <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl py-16 text-center">
-                  <Tag className="w-10 h-10 text-zinc-700 mx-auto mb-3" />
-                  <p className="text-sm text-zinc-500">No genres yet</p>
-                </div>
-              ) : (
-                <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl divide-y divide-zinc-800/40">
-                  {genres.map(genre => (
-                    <div key={genre.id} className="flex items-center gap-4 px-5 py-3.5 hover:bg-zinc-800/20 transition-colors">
-                      <span className="text-2xl">{genre.emoji}</span>
-                      <div className="flex-1 min-w-0">
-                        <span className="text-sm font-medium text-zinc-200">{genre.name}</span>
-                        <p className="text-xs text-zinc-500 mt-0.5">{genre.description || 'No description'}</p>
-                      </div>
-                      <div className="flex items-center gap-3 text-[11px] text-zinc-500 flex-shrink-0">
-                        <span>{genre.movie_count} movies</span>
-                        <span>{genre.book_count} books</span>
-                      </div>
-                      <button onClick={() => handleDeleteGenre(genre.id)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-zinc-500 hover:text-red-400 transition-colors flex-shrink-0">
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
+          {/* Genres tab removed — using preset genres */}
         </>
       )}
 
