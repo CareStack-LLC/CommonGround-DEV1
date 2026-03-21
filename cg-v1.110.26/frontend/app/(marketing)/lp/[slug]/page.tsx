@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { trackEvent } from '@/lib/analytics';
+import { trackCTAClick, trackSectionView } from '@/lib/analytics';
 
 const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/api\/v1\/?$/, '');
 
@@ -56,12 +56,7 @@ export default function LandingPage() {
         if (data.og_image_url) { setMeta('og:image', data.og_image_url); setMeta('twitter:image', data.og_image_url); }
 
         // Track GA event
-        trackEvent('landing_page_view', {
-          page_slug: slug,
-          target_audience: data.target_audience,
-          utm_source: data.utm_source,
-          utm_campaign: data.utm_campaign,
-        });
+        trackSectionView(`lp-${slug}`, data.target_audience || 'general');
       } catch {
         setNotFound(true);
       } finally {
@@ -72,11 +67,7 @@ export default function LandingPage() {
 
   const handleCtaClick = () => {
     if (page) {
-      trackEvent('landing_page_cta_click', {
-        page_slug: slug,
-        cta_text: page.cta_text,
-        target_audience: page.target_audience,
-      });
+      trackCTAClick(page.cta_text, `lp-${slug}`);
     }
   };
 
