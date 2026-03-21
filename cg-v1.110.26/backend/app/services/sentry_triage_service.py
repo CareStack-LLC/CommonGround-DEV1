@@ -226,33 +226,66 @@ async def ai_triage(issues: list[dict]) -> dict:
         "}"
     )
 
-    try:
-        import anthropic
+    import json
 
-        client = anthropic.AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY)
-        response = await client.messages.create(
-            model="claude-sonnet-4-5-20250514",
-            max_tokens=4096,
-            messages=[{"role": "user", "content": prompt}],
-        )
-
-        import json
-
-        text = response.content[0].text
-        # Try to parse JSON from the response
+    def _parse_ai_response(text: str) -> dict:
+        """Extract JSON from an AI response that may contain markdown fences."""
         if "```json" in text:
             text = text.split("```json")[1].split("```")[0]
         elif "```" in text:
             text = text.split("```")[1].split("```")[0]
-
         return json.loads(text.strip())
-    except Exception as e:
-        logger.error(f"AI triage failed: {e}")
-        return {
-            "summary": f"AI triage failed: {str(e)}",
-            "recommendations": [],
-            "error": True,
-        }
+
+    # --- Try Claude first ---
+    if settings.ANTHROPIC_API_KEY:
+        try:
+            import anthropic
+
+            client = anthropic.AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY)
+            response = await client.messages.create(
+                model="claude-sonnet-4-5-20250514",
+                max_tokens=4096,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            text = response.content[0].text
+            result = _parse_ai_response(text)
+            result["provider"] = "claude"
+            return result
+        except Exception as e:
+            logger.warning("Claude triage failed, falling back to OpenAI: %s", e)
+
+    # --- Fallback to OpenAI ---
+    if settings.OPENAI_API_KEY:
+        try:
+            from openai import AsyncOpenAI
+
+            oai_client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+            oai_response = await oai_client.chat.completions.create(
+                model="gpt-4o",
+                max_tokens=4096,
+                messages=[
+                    {"role": "system", "content": "You are a senior software engineer. Respond only with valid JSON."},
+                    {"role": "user", "content": prompt},
+                ],
+                response_format={"type": "json_object"},
+            )
+            text = oai_response.choices[0].message.content or "{}"
+            result = json.loads(text)
+            result["provider"] = "openai"
+            return result
+        except Exception as e:
+            logger.error("OpenAI triage also failed: %s", e)
+            return {
+                "summary": f"AI triage failed (both Claude and OpenAI): {str(e)}",
+                "recommendations": [],
+                "error": True,
+            }
+
+    return {
+        "summary": "No AI provider configured. Set ANTHROPIC_API_KEY or OPENAI_API_KEY.",
+        "recommendations": [],
+        "error": True,
+    }
 
 
 async def generate_sprint_plan(triaged_data: dict, days: int = 3) -> dict:
