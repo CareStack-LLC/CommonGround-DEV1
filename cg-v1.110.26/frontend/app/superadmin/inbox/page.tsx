@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
 import {
   Mail, RefreshCw, AlertTriangle, Check, X, Send,
   Filter, Clock, Flame, MessageSquare, ExternalLink,
@@ -57,6 +58,37 @@ export default function InboxPage() {
 
   // OAuth
   const [connectingOAuth, setConnectingOAuth] = useState(false);
+  const searchParams = useSearchParams();
+  const oauthHandled = useRef(false);
+
+  // Handle OAuth callback — exchange code from URL param
+  useEffect(() => {
+    const code = searchParams.get('oauth_code');
+    const oauthError = searchParams.get('oauth_error');
+
+    if (oauthError && !oauthHandled.current) {
+      oauthHandled.current = true;
+      setError(`Google OAuth failed: ${oauthError}`);
+      // Clean URL
+      window.history.replaceState({}, '', '/superadmin/inbox');
+      return;
+    }
+
+    if (code && !oauthHandled.current) {
+      oauthHandled.current = true;
+      (async () => {
+        try {
+          await adminAPI.exchangeOAuthCode(code);
+          setSuccess('Google account connected successfully!');
+          // Clean URL and refresh
+          window.history.replaceState({}, '', '/superadmin/inbox');
+        } catch (err: unknown) {
+          setError(err instanceof Error ? err.message : 'Failed to connect Google account');
+          window.history.replaceState({}, '', '/superadmin/inbox');
+        }
+      })();
+    }
+  }, [searchParams]);
 
   const fetchEmails = useCallback(async () => {
     try {
