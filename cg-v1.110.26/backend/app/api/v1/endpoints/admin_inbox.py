@@ -260,3 +260,101 @@ async def get_inbox_stats(
         # Table may not exist yet (migration not applied)
         logger.warning("Inbox stats query failed (table may not exist): %s", exc)
         return {"total": 0, "by_category": {}, "urgent_pending": 0, "pending_drafts": 0}
+
+
+# =============================================================================
+# AI Inbox Analysis
+# =============================================================================
+
+@router.post(
+    "/analyze",
+    summary="AI analysis of inbox",
+)
+async def analyze_inbox(
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """
+    Run AI analysis on recent emails to produce action items,
+    category summary, and priority recommendations.
+    """
+    from app.services.gmail_monitor_service import get_emails_paginated
+
+    try:
+        result = await get_emails_paginated(db, limit=30, offset=0)
+        emails = result.get("emails", [])
+    except Exception as exc:
+        logger.warning("Cannot fetch emails for analysis: %s", exc)
+        return {"analysis": None, "error": "No emails available for analysis"}
+
+    if not emails:
+        return {"analysis": None, "error": "No emails to analyze"}
+
+    # Build summary for AI
+    email_summaries = []
+    for e in emails[:20]:  # Cap at 20 for token limits
+        email_summaries.append(
+            f"- From: {e.get('from_name', '')} <{e.get('from_email', '')}>\n"
+            f"  Subject: {e.get('subject', '')}\n"
+            f"  Category: {e.get('category', 'unknown')}\n"
+            f"  Urgent: {e.get('is_urgent', False)}\n"
+            f"  Status: {e.get('draft_status', 'none')}"
+        )
+
+    prompt = (
+        "Analyze this inbox for a co-parenting platform admin. "
+        "Return a JSON object with these fields:\n"
+        "- action_items: array of {priority: 'high'|'medium'|'low', action: string, email_subject: string}\n"
+        "- category_breakdown: object mapping category to count\n"
+        "- recommendations: array of strings (2-4 actionable suggestions)\n"
+        "- summary: one paragraph overview of inbox health\n\n"
+        f"Emails:\n{''.join(email_summaries)}"
+    )
+
+    # Try Claude first, fallback to OpenAI
+    analysis = None
+    provider = None
+    try:
+        from anthropic import AsyncAnthropic
+        from app.core.config import settings
+        if settings.ANTHROPIC_API_KEY:
+            client = AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY)
+            resp = await client.messages.create(
+                model="claude-sonnet-4-20250514",
+                max_tokens=1000,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            raw = resp.content[0].text
+            provider = "claude"
+            # Parse JSON from response
+            import json
+            start = raw.find("{")
+            end = raw.rfind("}") + 1
+            if start >= 0 and end > start:
+                analysis = json.loads(raw[start:end])
+    except Exception as exc:
+        logger.warning("Claude inbox analysis failed, trying OpenAI: %s", exc)
+
+    if not analysis:
+        try:
+            from openai import AsyncOpenAI
+            from app.core.config import settings
+            if settings.OPENAI_API_KEY:
+                client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+                resp = await client.chat.completions.create(
+                    model="gpt-4o",
+                    messages=[{"role": "user", "content": prompt}],
+                    response_format={"type": "json_object"},
+                    max_tokens=1000,
+                )
+                import json
+                analysis = json.loads(resp.choices[0].message.content or "{}")
+                provider = "openai"
+        except Exception as exc:
+            logger.warning("OpenAI inbox analysis also failed: %s", exc)
+
+    return {
+        "analysis": analysis,
+        "provider": provider,
+        "email_count": len(emails),
+    }

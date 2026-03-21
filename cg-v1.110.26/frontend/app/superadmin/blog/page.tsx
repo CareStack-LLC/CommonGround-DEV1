@@ -7,7 +7,9 @@ import {
   ChevronDown, ChevronRight, Copy, Facebook, Instagram, Linkedin, Mail, Video,
 } from 'lucide-react';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+// Use the same base URL as admin-api — strip /api/v1 suffix if present
+const _raw = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_BASE = _raw.replace(/\/api\/v1\/?$/, '');
 
 const CATEGORIES = [
   'Co-Parenting Tips',

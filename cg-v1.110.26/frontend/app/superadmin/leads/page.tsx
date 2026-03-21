@@ -261,7 +261,7 @@ export default function LeadsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-800/40">
-                {selectedList.leads.length === 0 ? (
+                {(!selectedList.leads || selectedList.leads.length === 0) ? (
                   <tr><td colSpan={5} className="px-4 py-12 text-center text-zinc-500">No leads yet. Import a CSV or add manually.</td></tr>
                 ) : selectedList.leads.map(lead => (
                   <tr key={lead.id} className="hover:bg-zinc-800/30 transition-colors">

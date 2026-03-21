@@ -4,10 +4,12 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
   Mail, RefreshCw, AlertTriangle, Check, X, Send,
-  Filter, Clock, Flame, MessageSquare, ExternalLink,
-  Link, Inbox,
+  Flame, MessageSquare,
+  Link, Inbox, Sparkles, Brain,
 } from 'lucide-react';
 import { adminAPI, type MonitoredEmail, type InboxStats } from '@/lib/admin-api';
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 function Skeleton({ className = '' }: { className?: string }) {
   return <div className={`animate-pulse bg-zinc-800/60 rounded-lg ${className}`} />;
@@ -55,6 +57,11 @@ export default function InboxPage() {
   const [sendingReply, setSendingReply] = useState(false);
   const [approvingDraft, setApprovingDraft] = useState(false);
   const [rejectingDraft, setRejectingDraft] = useState(false);
+
+  // AI Analysis
+  const [analyzing, setAnalyzing] = useState(false);
+  const [analysis, setAnalysis] = useState<any>(null);
+  const [showAnalysis, setShowAnalysis] = useState(false);
 
   // OAuth
   const [connectingOAuth, setConnectingOAuth] = useState(false);
@@ -188,6 +195,24 @@ export default function InboxPage() {
     }
   };
 
+  const runAnalysis = async () => {
+    try {
+      setAnalyzing(true);
+      setError(null);
+      const result = await adminAPI.analyzeInbox();
+      if (result.analysis) {
+        setAnalysis(result);
+        setShowAnalysis(true);
+      } else {
+        setError(result.error || 'No analysis available');
+      }
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Analysis failed');
+    } finally {
+      setAnalyzing(false);
+    }
+  };
+
   const connectGoogleOAuth = async () => {
     try {
       setConnectingOAuth(true);
@@ -210,6 +235,9 @@ export default function InboxPage() {
           <p className="text-sm text-zinc-500 mt-0.5">{total} emails total</p>
         </div>
         <div className="flex items-center gap-2">
+          <button onClick={runAnalysis} disabled={analyzing} className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-600/80 hover:bg-emerald-600 text-white text-sm font-medium transition-colors disabled:opacity-50">
+            <Brain className={`w-4 h-4 ${analyzing ? 'animate-pulse' : ''}`} /> {analyzing ? 'Analyzing...' : 'AI Analysis'}
+          </button>
           <button onClick={connectGoogleOAuth} disabled={connectingOAuth} className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-zinc-800/60 hover:bg-zinc-800 text-zinc-300 text-sm font-medium transition-colors disabled:opacity-50">
             <Link className="w-4 h-4" /> Connect Google
           </button>
@@ -281,6 +309,56 @@ export default function InboxPage() {
           <option value="sent">Sent</option>
         </select>
       </div>
+
+      {/* AI Analysis Panel */}
+      {showAnalysis && analysis?.analysis && (
+        <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-5 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Brain className="w-5 h-5 text-emerald-400" />
+              <h2 className="text-sm font-semibold text-emerald-300">AI Inbox Analysis</h2>
+              <span className="text-[10px] text-zinc-500">{analysis.email_count} emails analyzed via {analysis.provider}</span>
+            </div>
+            <button onClick={() => setShowAnalysis(false)} className="text-zinc-500 hover:text-zinc-300"><X className="w-4 h-4" /></button>
+          </div>
+          {analysis.analysis.summary && (
+            <p className="text-sm text-zinc-300">{analysis.analysis.summary}</p>
+          )}
+          {analysis.analysis.action_items?.length > 0 && (
+            <div>
+              <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">Action Items</h3>
+              <div className="space-y-1.5">
+                {analysis.analysis.action_items.map((item: any, i: number) => (
+                  <div key={i} className="flex items-start gap-2 text-sm">
+                    <span className={`inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium mt-0.5 ${
+                      item.priority === 'high' ? 'bg-red-500/15 text-red-400' :
+                      item.priority === 'medium' ? 'bg-amber-500/15 text-amber-400' :
+                      'bg-zinc-700/50 text-zinc-400'
+                    }`}>{item.priority}</span>
+                    <div>
+                      <span className="text-zinc-200">{item.action}</span>
+                      {item.email_subject && <span className="text-xs text-zinc-500 ml-2">({item.email_subject})</span>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {analysis.analysis.recommendations?.length > 0 && (
+            <div>
+              <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">Recommendations</h3>
+              <ul className="space-y-1">
+                {analysis.analysis.recommendations.map((r: string, i: number) => (
+                  <li key={i} className="text-sm text-zinc-300 flex items-start gap-2">
+                    <Sparkles className="w-3.5 h-3.5 text-emerald-400 mt-0.5 flex-shrink-0" />
+                    {r}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
 
       {error && (
         <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 flex items-center gap-3">

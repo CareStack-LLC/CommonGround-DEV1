@@ -580,6 +580,7 @@ export const adminAPI = {
   syncInbox: () => adminFetch<any>('/admin/inbox/sync', { method: 'POST' }),
   getDigests: () => adminFetch<any[]>('/admin/inbox/digests'),
   getInboxStats: () => adminFetch<InboxStats>('/admin/inbox/stats'),
+  analyzeInbox: () => adminFetch<{ analysis: any; provider: string | null; email_count: number; error?: string }>('/admin/inbox/analyze', { method: 'POST' }),
 
   // Performance & AI Monitoring
   getPerformanceOverview: (days = 7) => adminFetch<{
