@@ -226,6 +226,14 @@ export interface BillingOverview {
   mrr_by_tier: Record<string, { count: number; price: number; mrr: number }>;
   total_mrr: number;
   stripe_live: StripeLiveData | null;
+  valuation?: Record<string, number>;
+  refunds?: {
+    recent_refunds: { id: string; amount: number; reason: string | null; status: string; created: string }[];
+    total_refunded_30d: number;
+    refund_count_30d: number;
+    disputes: { id: string; amount: number; status: string; reason: string; created: string }[];
+    dispute_count: number;
+  } | null;
   note: string;
 }
 
