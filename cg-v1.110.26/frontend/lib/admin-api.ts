@@ -229,6 +229,15 @@ export interface BillingOverview {
   note: string;
 }
 
+export interface AuditEvent {
+  id: string;
+  timestamp: string;
+  event_type: string;
+  user_email: string;
+  target_id: string | null;
+  metadata: Record<string, unknown> | null;
+}
+
 export interface AuditLogEntry {
   id: string;
   user_id: string;
@@ -456,6 +465,16 @@ export const adminAPI = {
     if (params.limit) searchParams.set('limit', String(params.limit));
     if (params.offset) searchParams.set('offset', String(params.offset));
     return adminFetch<AuditLogResult>(`/admin/audit-log?${searchParams}`);
+  },
+
+  getPlatformAudit: (params: { days?: number; event_type?: string; user_email?: string; limit?: number; offset?: number }) => {
+    const searchParams = new URLSearchParams();
+    if (params.days) searchParams.set('days', String(params.days));
+    if (params.event_type) searchParams.set('event_type', params.event_type);
+    if (params.user_email) searchParams.set('user_email', params.user_email);
+    if (params.limit) searchParams.set('limit', String(params.limit));
+    if (params.offset) searchParams.set('offset', String(params.offset));
+    return adminFetch<{ events: AuditEvent[]; total: number; limit: number; offset: number }>(`/admin/platform-audit?${searchParams}`);
   },
 
   getGrowthStats: (days: number = 30) =>

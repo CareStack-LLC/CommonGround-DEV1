@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Bug, RefreshCw, Brain, Calendar, ChevronDown, ChevronRight,
   AlertTriangle, Clock, History, Zap,
@@ -65,6 +65,10 @@ export default function BugTriagePage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchBugs();
+  }, []);
 
   const runTriage = async () => {
     try {

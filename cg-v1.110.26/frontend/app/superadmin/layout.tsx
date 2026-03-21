@@ -35,9 +35,7 @@ const navSections = [
     items: [
       { href: '/superadmin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
       { href: '/superadmin/users', label: 'Users', icon: Users },
-      { href: '/superadmin/audit-log', label: 'Audit Log', icon: ScrollText },
-      { href: '/superadmin/platform-audit', label: 'Platform Audit', icon: Activity },
-      { href: '/superadmin/weekly-report', label: 'Weekly Report', icon: FileBarChart },
+      { href: '/superadmin/activity-log', label: 'Activity Log', icon: Activity },
       { href: '/superadmin/bug-triage', label: 'Bug Triage', icon: Bug },
     ],
   },
