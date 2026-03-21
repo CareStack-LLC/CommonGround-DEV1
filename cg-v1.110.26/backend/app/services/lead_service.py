@@ -674,7 +674,7 @@ async def match_leads_to_users(db: AsyncSession) -> dict:
 # ---------------------------------------------------------------------------
 
 def _landing_page_to_dict(lp: LandingPage) -> dict:
-    return {
+    d = {
         "id": lp.id,
         "slug": lp.slug,
         "title": lp.title,
@@ -696,6 +696,17 @@ def _landing_page_to_dict(lp: LandingPage) -> dict:
         "created_at": lp.created_at.isoformat() if lp.created_at else None,
         "updated_at": lp.updated_at.isoformat() if lp.updated_at else None,
     }
+    # Parse structured sections from body_html (format_version 2)
+    sections_json = None
+    if lp.body_html and lp.body_html.strip().startswith("{"):
+        try:
+            parsed = json.loads(lp.body_html)
+            if parsed.get("format_version") == 2:
+                sections_json = parsed
+        except (json.JSONDecodeError, TypeError):
+            pass
+    d["sections_json"] = sections_json
+    return d
 
 
 async def get_all_landing_pages(db: AsyncSession) -> list[dict]:
@@ -768,29 +779,81 @@ async def ai_generate_landing_page(
     tone: str = "professional",
     cta_destination: str = "https://www.find-commonground.com/register",
 ) -> dict:
-    """Use Claude to generate a full landing page with SEO and UTM."""
+    """Use Claude to generate a structured landing page with SEO and UTM.
+
+    Returns structured section data (format_version 2) stored in body_html
+    as JSON. The frontend renders this using the same template as /for-dads.
+    """
     slug = re.sub(r"[^a-z0-9]+", "-", target_audience.lower()).strip("-")
 
     prompt = (
         "You are a conversion-focused landing page copywriter for CommonGround, "
-        "an AI-powered co-parenting platform. Brand voice: empathetic, child-first, "
-        "neutral, professional, hopeful. Primary color: #7C3AED (violet).\n\n"
+        "an AI-powered co-parenting platform.\n\n"
+        "Brand voice: empathetic, child-first, neutral, professional, hopeful.\n"
+        "Brand colors: #3DAA8A (sage green, primary), #2D6A8F (navy), "
+        "#F5A623 (gold accent), #E85D75 (pink accent), #1E3A4A (dark text).\n\n"
+        "CommonGround features you can reference:\n"
+        "- ARIA: AI communication monitor that detects manipulation/conflict patterns\n"
+        "- KidSpace: Safe video calls, movies, storytime between parent and child\n"
+        "- KidComs: Monitored messaging for children\n"
+        "- ClearFund: Expense tracking and child support management\n"
+        "- TimeBridge: Custody schedule and exchange management\n"
+        "- Agreement Builder: Custody agreement creation wizard\n"
+        "- Evidence Exports: Court-ready documentation\n"
+        "- Silent Handoff: Contactless custody exchanges with GPS\n\n"
         f"Target audience: {target_audience}\n"
         f"Key message: {key_message}\n"
-        f"Tone: {tone}\n"
-        f"CTA destination: {cta_destination}\n\n"
-        "Generate a landing page with:\n"
-        "1. slug (URL-safe, e.g. 'for-single-moms')\n"
-        "2. title (page title for browser tab)\n"
-        "3. headline (hero section, 8-12 words max)\n"
-        "4. subheadline (1-2 sentences supporting the headline)\n"
-        "5. body_html (responsive HTML with inline CSS, 3-4 sections: benefits, "
-        "features, social proof, final CTA. Use #7C3AED for accent color)\n"
-        "6. cta_text (button text, 3-5 words)\n"
-        "7. seo_title (60 chars max)\n"
-        "8. seo_description (160 chars max)\n"
-        "9. utm_campaign (e.g. 'lp-for-single-moms')\n\n"
-        "Return ONLY valid JSON with these keys."
+        f"Tone: {tone}\n\n"
+        "Generate a STRUCTURED landing page as JSON with these exact keys:\n\n"
+        "{\n"
+        '  "slug": "url-safe-slug",\n'
+        '  "title": "Browser tab title (60 chars max)",\n'
+        '  "headline": "Hero headline, 8-12 words, emotionally compelling",\n'
+        '  "headline_accent": "2-4 word phrase FROM the headline to highlight in green",\n'
+        '  "subheadline": "2-3 sentences supporting the headline",\n'
+        '  "hero_label": "Short uppercase label above headline, e.g. For dads who refuse to disappear",\n'
+        '  "cta_text": "CTA button text, 3-6 words",\n'
+        '  "pain_points_heading": "Section heading, e.g. Sound Familiar?",\n'
+        '  "pain_points_subheading": "One sentence under the heading",\n'
+        '  "pain_points": [\n'
+        '    {"old": "The painful reality they face now", "cg": "How CommonGround fixes it"},\n'
+        '    // exactly 4 items\n'
+        '  ],\n'
+        '  "features_label": "Short label like Your corner",\n'
+        '  "features_heading": "Section heading for features",\n'
+        '  "features_subheading": "One sentence under the heading",\n'
+        '  "features": [\n'
+        '    {\n'
+        '      "icon": "MessageSquare",\n'
+        '      "name": "ARIA",\n'
+        '      "tagline": "Short tagline, 3-5 words",\n'
+        '      "description": "2-3 sentences describing the benefit for this audience",\n'
+        '      "accent": "#F5A623"\n'
+        "    },\n"
+        '    // exactly 3 features. Use real CommonGround feature names.\n'
+        '    // Icon must be one of: MessageSquare, Video, FileText, Calendar, '
+        'DollarSign, Shield, Heart, Users, Scale, MapPin, Clock, Gavel\n'
+        '    // accent must be one of: #F5A623, #3DAA8A, #2D6A8F, #E85D75\n'
+        "  ],\n"
+        '  "testimonial": {\n'
+        '    "quote": "A realistic testimonial quote (2-3 sentences) from this audience type",\n'
+        '    "name": "First name only",\n'
+        '    "title": "Brief context like CommonGround Early Adopter",\n'
+        '    "initial": "First letter of name"\n'
+        "  },\n"
+        '  "early_adopter_label": "Early Adopter Offer",\n'
+        '  "early_adopter_heading": "Emotionally compelling CTA heading",\n'
+        '  "early_adopter_subheading": "One sentence about the offer",\n'
+        '  "faq_heading": "Questions You Might Have",\n'
+        '  "faqs": [\n'
+        '    {"q": "Question relevant to this audience", "a": "Helpful, reassuring answer"},\n'
+        '    // exactly 4 FAQs\n'
+        "  ],\n"
+        '  "seo_title": "SEO title, 60 chars max, include target keywords",\n'
+        '  "seo_description": "Meta description, 160 chars max",\n'
+        '  "utm_campaign": "lp-slug-name"\n'
+        "}\n\n"
+        "Return ONLY valid JSON. No markdown, no code fences."
     )
 
     result = None
@@ -829,18 +892,38 @@ async def ai_generate_landing_page(
 
     # Fill in defaults
     result.setdefault("slug", slug)
-    result.setdefault("cta_url", cta_destination)
+    result.setdefault("cta_text", "Join the Early Adopter List")
     result.setdefault("utm_source", "landing_page")
     result.setdefault("utm_medium", "web")
     result.setdefault("target_audience", target_audience)
 
+    # Build top-level fields for the LandingPage model
+    top_level = {
+        "slug": result.get("slug", slug),
+        "title": result.get("title", f"CommonGround for {target_audience}"),
+        "headline": result.get("headline", ""),
+        "subheadline": result.get("subheadline", ""),
+        "cta_text": result.get("cta_text", "Join the Early Adopter List"),
+        "cta_url": cta_destination,
+        "target_audience": target_audience,
+        "seo_title": result.get("seo_title", ""),
+        "seo_description": result.get("seo_description", ""),
+        "utm_source": result.get("utm_source", "landing_page"),
+        "utm_medium": result.get("utm_medium", "web"),
+        "utm_campaign": result.get("utm_campaign", f"lp-{slug}"),
+    }
+
+    # Store structured sections as JSON in body_html
+    result["format_version"] = 2
+    top_level["body_html"] = json.dumps(result)
+
     # Append UTM params to CTA URL
-    cta = result.get("cta_url", cta_destination)
+    cta = top_level["cta_url"]
     sep = "&" if "?" in cta else "?"
-    result["cta_url"] = (
-        f"{cta}{sep}utm_source={result.get('utm_source', 'landing_page')}"
-        f"&utm_medium={result.get('utm_medium', 'web')}"
-        f"&utm_campaign={result.get('utm_campaign', slug)}"
+    top_level["cta_url"] = (
+        f"{cta}{sep}utm_source={top_level['utm_source']}"
+        f"&utm_medium={top_level['utm_medium']}"
+        f"&utm_campaign={top_level['utm_campaign']}"
     )
 
-    return result
+    return top_level
