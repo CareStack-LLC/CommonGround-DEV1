@@ -462,7 +462,8 @@ async def generate_landing_page(
         await db.commit()
         return result
     except Exception as exc:
-        logger.warning("Failed to save landing page to DB: %s", exc)
+        import traceback
+        logger.error("Failed to save landing page to DB: %s\n%s", exc, traceback.format_exc())
         await db.rollback()
         # Parse sections_json from body_html for the frontend
         sections_json = None
@@ -477,6 +478,7 @@ async def generate_landing_page(
         generated["id"] = "preview"
         generated["status"] = "draft"
         generated["saved"] = False
+        generated["save_error"] = str(exc)
         generated["sections_json"] = sections_json
         return generated
 

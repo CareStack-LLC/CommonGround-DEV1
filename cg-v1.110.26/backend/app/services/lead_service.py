@@ -727,23 +727,35 @@ async def get_landing_page_by_slug(db: AsyncSession, slug: str) -> Optional[dict
 
 
 async def create_landing_page(db: AsyncSession, data: dict) -> dict:
+    # Truncate fields to avoid varchar overflow crashes
+    def trunc(val: Optional[str], limit: int) -> Optional[str]:
+        return val[:limit] if val else val
+
+    slug = trunc(data.get("slug", "untitled"), 200) or "untitled"
+
+    # Handle duplicate slugs by appending a suffix
+    existing = await db.execute(select(LandingPage).where(LandingPage.slug == slug))
+    if existing.scalar_one_or_none():
+        import time
+        slug = f"{slug}-{int(time.time()) % 10000}"
+
     lp = LandingPage(
-        slug=data["slug"],
-        title=data["title"],
-        headline=data["headline"],
+        slug=slug,
+        title=trunc(data.get("title", "Untitled"), 200) or "Untitled",
+        headline=trunc(data.get("headline", ""), 500) or "",
         subheadline=data.get("subheadline"),
         hero_image_url=data.get("hero_image_url"),
-        body_html=data["body_html"],
-        cta_text=data.get("cta_text", "Get Started Free"),
-        cta_url=data.get("cta_url", "https://www.find-commonground.com/register"),
-        target_audience=data.get("target_audience", "general"),
+        body_html=data.get("body_html", ""),
+        cta_text=trunc(data.get("cta_text", "Get Started Free"), 100),
+        cta_url=trunc(data.get("cta_url", "https://www.find-commonground.com/register"), 500),
+        target_audience=trunc(data.get("target_audience", "general"), 100),
         status=data.get("status", "draft"),
-        seo_title=data.get("seo_title"),
-        seo_description=data.get("seo_description"),
+        seo_title=trunc(data.get("seo_title"), 200),
+        seo_description=trunc(data.get("seo_description"), 500),
         og_image_url=data.get("og_image_url"),
-        utm_source=data.get("utm_source"),
-        utm_medium=data.get("utm_medium"),
-        utm_campaign=data.get("utm_campaign"),
+        utm_source=trunc(data.get("utm_source"), 100),
+        utm_medium=trunc(data.get("utm_medium"), 100),
+        utm_campaign=trunc(data.get("utm_campaign"), 200),
     )
     db.add(lp)
     await db.flush()

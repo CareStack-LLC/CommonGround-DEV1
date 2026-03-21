@@ -92,18 +92,18 @@ class LandingPage(Base, UUIDMixin, TimestampMixin):
     __tablename__ = "landing_pages"
 
     slug: Mapped[str] = mapped_column(String(200), unique=True, index=True)
-    title: Mapped[str] = mapped_column(String(300))
-    headline: Mapped[str] = mapped_column(String(500))
-    subheadline: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    title: Mapped[str] = mapped_column(String(200))
+    headline: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    subheadline: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     hero_image_url: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    body_html: Mapped[str] = mapped_column(Text)
-    cta_text: Mapped[str] = mapped_column(String(100), default="Get Started Free")
-    cta_url: Mapped[str] = mapped_column(String(500), default="https://www.find-commonground.com/register")
-    target_audience: Mapped[str] = mapped_column(String(100), default="general")
-    status: Mapped[str] = mapped_column(String(20), default="draft")  # draft, published
+    body_html: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    cta_text: Mapped[Optional[str]] = mapped_column(String(200), nullable=True, default="Get Started")
+    cta_url: Mapped[Optional[str]] = mapped_column(Text, nullable=True, default="https://www.find-commonground.com/register")
+    target_audience: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
+    status: Mapped[Optional[str]] = mapped_column(String(20), nullable=True, default="draft")
     # SEO
-    seo_title: Mapped[Optional[str]] = mapped_column(String(70), nullable=True)
-    seo_description: Mapped[Optional[str]] = mapped_column(String(170), nullable=True)
+    seo_title: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
+    seo_description: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     og_image_url: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     # UTM
     utm_source: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
@@ -111,7 +111,7 @@ class LandingPage(Base, UUIDMixin, TimestampMixin):
     utm_campaign: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
     # Analytics
     ga_events_json: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
-    view_count: Mapped[int] = mapped_column(default=0)
+    view_count: Mapped[Optional[int]] = mapped_column(default=0, nullable=True)
 
     def __repr__(self) -> str:
         return f"<LandingPage /{self.slug} ({self.status})>"
