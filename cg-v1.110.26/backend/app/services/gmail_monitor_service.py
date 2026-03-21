@@ -210,7 +210,7 @@ def _extract_header(headers: list[dict], name: str) -> str:
 
 async def fetch_new_emails(
     db: AsyncSession,
-    since_hours: int = 6,
+    since_hours: int = 72,
 ) -> list[MonitoredEmail]:
     """Fetch recent emails for all monitored accounts and create MonitoredEmail records."""
     monitored_addresses = [
@@ -220,13 +220,16 @@ async def fetch_new_emails(
     ]
     new_emails: list[MonitoredEmail] = []
 
+    logger.info("Syncing emails for monitored addresses: %s", monitored_addresses)
+
     after_epoch = int((datetime.utcnow() - timedelta(hours=since_hours)).timestamp())
 
     for address in monitored_addresses:
         try:
             client, _ = await _get_gmail_client(db, address)
-        except ValueError:
-            logger.warning("No OAuth token for %s — skipping", address)
+            logger.info("Got Gmail client for %s", address)
+        except ValueError as ve:
+            logger.warning("No OAuth token for %s — skipping: %s", address, ve)
             continue
 
         try:
@@ -238,8 +241,12 @@ async def fetch_new_emails(
                     "maxResults": 50,
                 },
             )
-            resp.raise_for_status()
-            message_ids = [m["id"] for m in resp.json().get("messages", [])]
+            if resp.status_code != 200:
+                logger.error("Gmail API error for %s (HTTP %s): %s", address, resp.status_code, resp.text[:500])
+                resp.raise_for_status()
+            gmail_data = resp.json()
+            message_ids = [m["id"] for m in gmail_data.get("messages", [])]
+            logger.info("Gmail returned %d messages for %s (since %d hours ago)", len(message_ids), address, since_hours)
 
             for msg_id in message_ids:
                 # Skip if already stored
@@ -541,14 +548,36 @@ async def get_google_oauth_url() -> str:
 
 
 async def exchange_oauth_code(db: AsyncSession, code: str) -> dict:
-    """Adapter: exchange code for tokens using first monitored email."""
+    """Exchange code for tokens, detecting the actual Google account email."""
     monitored = [
         e.strip()
         for e in settings.GOOGLE_MONITORED_EMAILS.split(",")
         if e.strip()
     ]
-    email = monitored[0] if monitored else "hello@find-commonground.com"
-    token_record = await exchange_code_for_token(db, code, email)
+    fallback_email = monitored[0] if monitored else "teejay@find-commonground.com"
+
+    # Exchange the code first to get the access token
+    token_record = await exchange_code_for_token(db, code, fallback_email)
+
+    # Now use the token to detect the actual authenticated Gmail address
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            profile_resp = await client.get(
+                f"{GMAIL_API_BASE}/users/me/profile",
+                headers={"Authorization": f"Bearer {token_record.access_token}"},
+            )
+            if profile_resp.status_code == 200:
+                actual_email = profile_resp.json().get("emailAddress", "")
+                if actual_email and actual_email != token_record.email:
+                    logger.info(
+                        "OAuth token was for %s, updating record from %s",
+                        actual_email, token_record.email,
+                    )
+                    token_record.email = actual_email
+                    await db.flush()
+    except Exception as exc:
+        logger.warning("Could not detect Gmail profile email: %s", exc)
+
     return {"email": token_record.email, "status": "connected"}
 
 

@@ -129,7 +129,7 @@ class Settings(BaseSettings):
     # Google OAuth (for email monitor)
     GOOGLE_OAUTH_CLIENT_ID: Optional[str] = None
     GOOGLE_OAUTH_CLIENT_SECRET: Optional[str] = None
-    GOOGLE_MONITORED_EMAILS: str = "hello@find-commonground.com,support@find-commonground.com"
+    GOOGLE_MONITORED_EMAILS: str = "teejay@find-commonground.com"
 
     # Rate Limiting
     RATE_LIMIT_REQUESTS: int = 100
