@@ -413,8 +413,13 @@ async def list_landing_pages(
     db: AsyncSession = Depends(get_db),
     admin_user: User = Depends(get_current_admin_user),
 ) -> list:
-    from app.services.lead_service import get_all_landing_pages
-    return await get_all_landing_pages(db)
+    try:
+        from app.services.lead_service import get_all_landing_pages
+        return await get_all_landing_pages(db)
+    except Exception as exc:
+        logger.warning("Landing pages query failed (table may not exist): %s", exc)
+        await db.rollback()
+        return []
 
 
 @router.post(
