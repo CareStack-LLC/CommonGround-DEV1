@@ -19,7 +19,22 @@ const PLATFORM_COLORS: Record<string, string> = {
   backend: 'bg-violet-500/15 text-violet-400',
 };
 
-type Tab = 'live' | 'sprint' | 'history';
+type Tab = 'live' | 'triage' | 'sprint' | 'history';
+
+interface TriageResult {
+  summary: string;
+  top_3?: string[];
+  patterns?: string[];
+  recommendations?: {
+    issue_id?: string;
+    title: string;
+    severity: string;
+    action: string;
+    reason: string;
+    estimated_effort?: string;
+  }[];
+  error?: boolean;
+}
 
 function Skeleton({ className = '' }: { className?: string }) {
   return <div className={`animate-pulse bg-zinc-800/60 rounded-lg ${className}`} />;
@@ -34,6 +49,7 @@ export default function BugTriagePage() {
   const [loading, setLoading] = useState(false);
   const [triaging, setTriaging] = useState(false);
   const [generatingSprint, setGeneratingSprint] = useState(false);
+  const [triageResult, setTriageResult] = useState<TriageResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const fetchBugs = async () => {
@@ -54,8 +70,9 @@ export default function BugTriagePage() {
     try {
       setTriaging(true);
       setError(null);
-      await adminAPI.runBugTriage(7);
-      await fetchBugs();
+      const result = await adminAPI.runBugTriage(7);
+      setTriageResult(result as TriageResult);
+      setActiveTab('triage');
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to run triage');
     } finally {
@@ -102,6 +119,7 @@ export default function BugTriagePage() {
 
   const tabs: { id: Tab; label: string; icon: React.ElementType }[] = [
     { id: 'live', label: 'Live Issues', icon: Bug },
+    { id: 'triage', label: 'AI Analysis', icon: Brain },
     { id: 'sprint', label: 'Sprint Plan', icon: Calendar },
     { id: 'history', label: 'History', icon: History },
   ];
@@ -247,6 +265,123 @@ export default function BugTriagePage() {
             <div className="flex flex-col items-center justify-center py-20">
               <Bug className="w-12 h-12 text-zinc-700 mb-4" />
               <p className="text-zinc-500 text-sm">Click &ldquo;Fetch Issues&rdquo; to load current Sentry issues</p>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* AI Analysis Tab */}
+      {activeTab === 'triage' && (
+        <>
+          {triaging && (
+            <div className="space-y-3">
+              <div className="bg-zinc-900/50 border border-violet-500/20 rounded-xl p-5 flex items-center gap-3">
+                <Brain className="w-5 h-5 text-violet-400 animate-pulse" />
+                <p className="text-sm text-zinc-300">Analyzing issues with Claude AI...</p>
+              </div>
+              {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-20" />)}
+            </div>
+          )}
+          {triageResult && !triaging && (
+            <div className="space-y-4">
+              {/* Summary */}
+              <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
+                <h3 className="text-sm font-semibold text-zinc-300 mb-2 flex items-center gap-2">
+                  <Brain className="w-4 h-4 text-violet-400" /> AI Summary
+                </h3>
+                <p className="text-sm text-zinc-400 leading-relaxed">{triageResult.summary}</p>
+              </div>
+
+              {/* Top 3 Priorities */}
+              {triageResult.top_3 && triageResult.top_3.length > 0 && (
+                <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
+                  <h3 className="text-sm font-semibold text-amber-400 mb-3 flex items-center gap-2">
+                    <Zap className="w-4 h-4" /> Top Priorities
+                  </h3>
+                  <ul className="space-y-2">
+                    {triageResult.top_3.map((item, i) => (
+                      <li key={i} className="flex items-start gap-3 text-sm text-zinc-300">
+                        <span className="flex-shrink-0 w-5 h-5 rounded-full bg-amber-500/15 text-amber-400 text-xs flex items-center justify-center font-bold">{i + 1}</span>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Patterns */}
+              {triageResult.patterns && triageResult.patterns.length > 0 && (
+                <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
+                  <h3 className="text-sm font-semibold text-blue-400 mb-3">Common Patterns</h3>
+                  <ul className="space-y-1.5">
+                    {triageResult.patterns.map((p, i) => (
+                      <li key={i} className="text-sm text-zinc-400 flex items-start gap-2">
+                        <span className="text-blue-400 mt-0.5">•</span> {p}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Recommendations Table */}
+              {triageResult.recommendations && triageResult.recommendations.length > 0 && (
+                <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl overflow-hidden">
+                  <div className="px-5 py-3 border-b border-zinc-800/60">
+                    <h3 className="text-sm font-semibold text-zinc-300">Recommendations ({triageResult.recommendations.length})</h3>
+                  </div>
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-zinc-800/80">
+                        <th className="text-left px-4 py-2.5 text-xs font-medium text-zinc-500 uppercase tracking-wider">Issue</th>
+                        <th className="text-left px-4 py-2.5 text-xs font-medium text-zinc-500 uppercase tracking-wider">Severity</th>
+                        <th className="text-left px-4 py-2.5 text-xs font-medium text-zinc-500 uppercase tracking-wider">Action</th>
+                        <th className="text-left px-4 py-2.5 text-xs font-medium text-zinc-500 uppercase tracking-wider hidden md:table-cell">Effort</th>
+                        <th className="text-left px-4 py-2.5 text-xs font-medium text-zinc-500 uppercase tracking-wider hidden lg:table-cell">Reason</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-zinc-800/40">
+                      {triageResult.recommendations.map((rec, idx) => {
+                        const actionColors: Record<string, string> = {
+                          resolve: 'bg-emerald-500/15 text-emerald-400',
+                          defer: 'bg-zinc-700/50 text-zinc-400',
+                          investigate: 'bg-blue-500/15 text-blue-400',
+                          ignore: 'bg-zinc-800/50 text-zinc-600',
+                        };
+                        return (
+                          <tr key={idx} className="hover:bg-zinc-800/30 transition-colors">
+                            <td className="px-4 py-3">
+                              <div className="text-zinc-200 font-medium truncate max-w-xs">{rec.title}</div>
+                            </td>
+                            <td className="px-4 py-3">
+                              <span className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium capitalize ${SEVERITY_COLORS[rec.severity] || SEVERITY_COLORS.low}`}>
+                                {rec.severity}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3">
+                              <span className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium capitalize ${actionColors[rec.action] || actionColors.defer}`}>
+                                {rec.action}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 hidden md:table-cell">
+                              <span className="text-xs text-zinc-500 flex items-center gap-1">
+                                <Clock className="w-3 h-3" />
+                                {rec.estimated_effort || '—'}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-zinc-500 text-xs hidden lg:table-cell max-w-xs truncate">{rec.reason}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
+          {!triageResult && !triaging && (
+            <div className="flex flex-col items-center justify-center py-20">
+              <Brain className="w-12 h-12 text-zinc-700 mb-4" />
+              <p className="text-zinc-500 text-sm">Click &ldquo;Run AI Triage&rdquo; to analyze issues with Claude</p>
             </div>
           )}
         </>
