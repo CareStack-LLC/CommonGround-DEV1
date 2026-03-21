@@ -23,6 +23,7 @@ import {
   Film,
   FileBarChart,
   Bug,
+  Gauge,
   UserPlus,
   Send,
   Mail,
@@ -37,6 +38,7 @@ const navSections = [
       { href: '/superadmin/users', label: 'Users', icon: Users },
       { href: '/superadmin/activity-log', label: 'Activity Log', icon: Activity },
       { href: '/superadmin/bug-triage', label: 'Bug Triage', icon: Bug },
+      { href: '/superadmin/performance', label: 'Performance', icon: Gauge },
     ],
   },
   {

@@ -325,6 +325,141 @@ async def generate_sprint_plan(triaged_data: dict, days: int = 3) -> dict:
     }
 
 
+async def fetch_performance_data(days: int = 7) -> dict:
+    """Fetch performance metrics from Sentry's Discover API."""
+    if not settings.SENTRY_AUTH_TOKEN:
+        raise ValueError("SENTRY_AUTH_TOKEN not configured")
+
+    org = settings.SENTRY_ORG_SLUG
+    slug = settings.SENTRY_PROJECT_SLUG
+    since = (datetime.utcnow() - timedelta(days=days)).strftime("%Y-%m-%dT%H:%M:%S")
+    until = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S")
+    headers = {"Authorization": f"Bearer {settings.SENTRY_AUTH_TOKEN}"}
+
+    result = {
+        "period_days": days,
+        "transactions": [],
+        "ai_calls": [],
+        "slow_queries": [],
+        "summary": {},
+    }
+
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        # 1. Top transactions by volume and p75 duration
+        try:
+            resp = await client.get(
+                f"{SENTRY_API_BASE}/organizations/{org}/events/",
+                headers=headers,
+                params={
+                    "field": ["transaction", "count()", "p75(transaction.duration)", "p95(transaction.duration)", "failure_rate()"],
+                    "sort": "-count()",
+                    "per_page": 20,
+                    "query": f"event.type:transaction project:{slug}",
+                    "start": since,
+                    "end": until,
+                },
+            )
+            if resp.status_code == 200:
+                data = resp.json().get("data", [])
+                result["transactions"] = [
+                    {
+                        "name": row.get("transaction", ""),
+                        "count": row.get("count()", 0),
+                        "p75_ms": round(row.get("p75(transaction.duration)", 0), 1),
+                        "p95_ms": round(row.get("p95(transaction.duration)", 0), 1),
+                        "failure_rate": round(row.get("failure_rate()", 0) * 100, 1),
+                    }
+                    for row in data
+                ]
+                logger.info("Fetched %d transaction metrics from Sentry", len(data))
+            else:
+                logger.warning("Sentry transactions query failed (HTTP %s): %s", resp.status_code, resp.text[:300])
+        except Exception as exc:
+            logger.warning("Failed to fetch transaction data: %s", exc)
+
+        # 2. AI/LLM calls — look for ai.* span operations
+        try:
+            resp = await client.get(
+                f"{SENTRY_API_BASE}/organizations/{org}/events/",
+                headers=headers,
+                params={
+                    "field": ["description", "count()", "avg(span.duration)", "sum(ai.total_tokens.used)"],
+                    "sort": "-count()",
+                    "per_page": 20,
+                    "query": f"span.op:ai.* project:{slug}",
+                    "dataset": "spansIndexed",
+                    "start": since,
+                    "end": until,
+                },
+            )
+            if resp.status_code == 200:
+                data = resp.json().get("data", [])
+                result["ai_calls"] = [
+                    {
+                        "description": row.get("description", ""),
+                        "count": row.get("count()", 0),
+                        "avg_duration_ms": round(row.get("avg(span.duration)", 0), 1),
+                        "total_tokens": row.get("sum(ai.total_tokens.used)", 0),
+                    }
+                    for row in data
+                ]
+                logger.info("Fetched %d AI call metrics from Sentry", len(data))
+            else:
+                logger.warning("Sentry AI spans query failed (HTTP %s): %s", resp.status_code, resp.text[:300])
+        except Exception as exc:
+            logger.warning("Failed to fetch AI span data: %s", exc)
+
+        # 3. Slow DB queries — look for db span operations
+        try:
+            resp = await client.get(
+                f"{SENTRY_API_BASE}/organizations/{org}/events/",
+                headers=headers,
+                params={
+                    "field": ["description", "count()", "avg(span.duration)", "p95(span.duration)"],
+                    "sort": "-p95(span.duration)",
+                    "per_page": 15,
+                    "query": f"span.op:db project:{slug} span.duration:>100",
+                    "dataset": "spansIndexed",
+                    "start": since,
+                    "end": until,
+                },
+            )
+            if resp.status_code == 200:
+                data = resp.json().get("data", [])
+                result["slow_queries"] = [
+                    {
+                        "query": (row.get("description", "")[:200]),
+                        "count": row.get("count()", 0),
+                        "avg_ms": round(row.get("avg(span.duration)", 0), 1),
+                        "p95_ms": round(row.get("p95(span.duration)", 0), 1),
+                    }
+                    for row in data
+                ]
+                logger.info("Fetched %d slow query metrics from Sentry", len(data))
+            else:
+                logger.warning("Sentry slow queries failed (HTTP %s): %s", resp.status_code, resp.text[:300])
+        except Exception as exc:
+            logger.warning("Failed to fetch slow query data: %s", exc)
+
+        # 4. Summary stats
+        total_tx = sum(t.get("count", 0) for t in result["transactions"])
+        total_ai = sum(a.get("count", 0) for a in result["ai_calls"])
+        total_tokens = sum(a.get("total_tokens", 0) for a in result["ai_calls"])
+        avg_p75 = (
+            sum(t.get("p75_ms", 0) for t in result["transactions"]) / len(result["transactions"])
+            if result["transactions"] else 0
+        )
+        result["summary"] = {
+            "total_requests": total_tx,
+            "total_ai_calls": total_ai,
+            "total_tokens_used": total_tokens,
+            "avg_response_p75_ms": round(avg_p75, 1),
+            "slow_queries_count": len(result["slow_queries"]),
+        }
+
+    return result
+
+
 async def save_sprint(
     db: AsyncSession,
     sprint_plan: dict,

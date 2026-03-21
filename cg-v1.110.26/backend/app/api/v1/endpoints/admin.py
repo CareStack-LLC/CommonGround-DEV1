@@ -2833,3 +2833,30 @@ async def update_sprint_status(
     )
     await db.commit()
     return {"id": sprint.id, "status": sprint.status}
+
+
+# =============================================================================
+# MODULE: Performance & AI Monitoring (Sentry)
+# =============================================================================
+
+@router.get(
+    "/performance/overview",
+    summary="Performance and AI monitoring overview",
+)
+async def get_performance_overview(
+    days: int = Query(7, description="Look-back window"),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Fetch performance metrics and AI call stats from Sentry."""
+    from app.services.sentry_triage_service import fetch_performance_data
+
+    try:
+        return await fetch_performance_data(days)
+    except Exception as exc:
+        logger.warning("Performance data unavailable: %s", exc)
+        return {
+            "transactions": [],
+            "ai_calls": [],
+            "slow_queries": [],
+            "error": str(exc),
+        }

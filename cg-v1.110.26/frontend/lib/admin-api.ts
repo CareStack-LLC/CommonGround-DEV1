@@ -580,4 +580,14 @@ export const adminAPI = {
   syncInbox: () => adminFetch<any>('/admin/inbox/sync', { method: 'POST' }),
   getDigests: () => adminFetch<any[]>('/admin/inbox/digests'),
   getInboxStats: () => adminFetch<InboxStats>('/admin/inbox/stats'),
+
+  // Performance & AI Monitoring
+  getPerformanceOverview: (days = 7) => adminFetch<{
+    period_days: number;
+    transactions: { name: string; count: number; p75_ms: number; p95_ms: number; failure_rate: number }[];
+    ai_calls: { description: string; count: number; avg_duration_ms: number; total_tokens: number }[];
+    slow_queries: { query: string; count: number; avg_ms: number; p95_ms: number }[];
+    summary: { total_requests: number; total_ai_calls: number; total_tokens_used: number; avg_response_p75_ms: number; slow_queries_count: number };
+    error?: string;
+  }>(`/admin/performance/overview?days=${days}`),
 };
