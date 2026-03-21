@@ -151,7 +151,7 @@ export default function AriaInsightsPage() {
         <h2 className="text-sm font-semibold text-zinc-300 mb-4">Daily Interventions (30 days)</h2>
         {loading ? (
           <Skeleton className="h-64" />
-        ) : data && data.daily_interventions.length > 0 ? (
+        ) : data && data.daily_interventions?.length > 0 ? (
           <ResponsiveContainer width="100%" height={260}>
             <LineChart data={data.daily_interventions}>
               <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
@@ -179,7 +179,7 @@ export default function AriaInsightsPage() {
           <h2 className="text-sm font-semibold text-zinc-300 mb-4">Top Flagged Categories</h2>
           {loading ? (
             <Skeleton className="h-64" />
-          ) : data && data.top_categories.length > 0 ? (
+          ) : data && data.top_categories?.length > 0 ? (
             <ResponsiveContainer width="100%" height={260}>
               <BarChart data={data.top_categories} layout="vertical" margin={{ left: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#27272a" horizontal={false} />
@@ -199,7 +199,7 @@ export default function AriaInsightsPage() {
           <h2 className="text-sm font-semibold text-zinc-300 mb-4">Sentiment Distribution</h2>
           {loading ? (
             <Skeleton className="h-64" />
-          ) : data && data.sentiment_distribution.length > 0 ? (
+          ) : data && data.sentiment_distribution?.length > 0 ? (
             <ResponsiveContainer width="100%" height={260}>
               <PieChart>
                 <Pie
@@ -237,7 +237,7 @@ export default function AriaInsightsPage() {
           <div className="space-y-2">
             {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-10" />)}
           </div>
-        ) : data && data.recent_flagged.length > 0 ? (
+        ) : data && data.recent_flagged?.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
