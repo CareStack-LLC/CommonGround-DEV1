@@ -913,6 +913,31 @@ async def ai_generate_landing_page(
         "utm_campaign": result.get("utm_campaign", f"lp-{slug}"),
     }
 
+    # --- Generate hero image with DALL-E ---
+    hero_image_url = None
+    try:
+        hero_image_url = await _generate_landing_page_image(
+            headline=result.get("headline", target_audience),
+            target_audience=target_audience,
+            slug=top_level["slug"],
+        )
+        if hero_image_url:
+            top_level["hero_image_url"] = hero_image_url
+            top_level["og_image_url"] = hero_image_url
+    except Exception as exc:
+        logger.warning("Landing page image generation failed: %s", exc)
+
+    # --- Generate social media posts ---
+    social_posts = await _generate_landing_page_social_posts(
+        headline=result.get("headline", ""),
+        subheadline=result.get("subheadline", ""),
+        target_audience=target_audience,
+        page_url=f"https://www.find-commonground.com/lp/{top_level['slug']}",
+        utm_campaign=top_level["utm_campaign"],
+    )
+    if social_posts:
+        result["social_posts"] = social_posts
+
     # Store structured sections as JSON in body_html
     result["format_version"] = 2
     top_level["body_html"] = json.dumps(result)
@@ -927,3 +952,133 @@ async def ai_generate_landing_page(
     )
 
     return top_level
+
+
+async def _generate_landing_page_image(
+    headline: str,
+    target_audience: str,
+    slug: str,
+) -> Optional[str]:
+    """Generate a hero image for a landing page using DALL-E 3."""
+    import os
+
+    openai_key = os.environ.get("OPENAI_API_KEY") or getattr(settings, "OPENAI_API_KEY", None)
+    if not openai_key:
+        logger.info("No OPENAI_API_KEY — skipping landing page image generation")
+        return None
+
+    brand_style = (
+        "Warm, organic illustration style with flowing teal (#3DAA8A) blob outlines "
+        "and soft color-pencil texture. Soft white (#F4F8F7) background. "
+        "Small coral-pink (#E85D75) hand-drawn accent icons floating nearby. "
+        "Calm, child-centered, trustworthy mood. "
+        "No text, no words, no letters, no numbers in the image."
+    )
+
+    dalle_prompt = (
+        f"{brand_style}\n\n"
+        f"Subject: Create an illustration for a co-parenting landing page "
+        f"targeting {target_audience}. Headline: {headline}\n\n"
+        "The image should feel warm and supportive, showing themes of family, "
+        "cooperation, children's wellbeing, or peaceful co-parenting. "
+        "Use diverse, inclusive representation."
+    )
+
+    from openai import OpenAI
+    client = OpenAI(api_key=openai_key)
+    response = client.images.generate(
+        model="dall-e-3",
+        prompt=dalle_prompt,
+        size="1792x1024",
+        quality="standard",
+        n=1,
+    )
+
+    image_url = response.data[0].url
+    if not image_url:
+        return None
+
+    # Download and upload to Supabase
+    async with httpx.AsyncClient(timeout=30.0) as http_client:
+        img_response = await http_client.get(image_url)
+        img_response.raise_for_status()
+        image_bytes = img_response.content
+
+    try:
+        from app.services.storage import storage_service, StorageBucket
+        storage_path = f"lp-{slug}.png"
+        public_url = await storage_service.upload_file(
+            bucket=StorageBucket.BLOG_IMAGES,
+            path=storage_path,
+            file_content=image_bytes,
+            content_type="image/png",
+            upsert=True,
+        )
+        logger.info("Landing page image uploaded: %s", public_url)
+        return public_url
+    except Exception as exc:
+        logger.warning("Supabase upload failed, using temporary URL: %s", exc)
+        return image_url  # Fallback to OpenAI temp URL
+
+
+async def _generate_landing_page_social_posts(
+    headline: str,
+    subheadline: str,
+    target_audience: str,
+    page_url: str,
+    utm_campaign: str,
+) -> list[dict]:
+    """Generate social media posts for a landing page."""
+    prompt = (
+        "You are a social media marketer for CommonGround, an AI-powered co-parenting platform. "
+        "Write social media posts to promote a landing page.\n\n"
+        f"Landing page headline: {headline}\n"
+        f"Subheadline: {subheadline}\n"
+        f"Target audience: {target_audience}\n"
+        f"Landing page URL: {page_url}?utm_source={{platform}}&utm_medium=social&utm_campaign={utm_campaign}\n\n"
+        "Generate posts for these platforms as a JSON array:\n"
+        "[\n"
+        '  {"platform": "twitter", "headline": "hook under 100 chars", '
+        '"body": "tweet text under 280 chars including URL", '
+        '"hashtags": ["3-5 hashtags"], "cta_text": "short CTA"},\n'
+        '  {"platform": "linkedin", "headline": "professional hook", '
+        '"body": "200-300 word professional post", '
+        '"hashtags": ["5-8 professional hashtags"], "cta_text": "CTA"},\n'
+        '  {"platform": "facebook", "headline": "community hook", '
+        '"body": "150-250 word shareable post", '
+        '"hashtags": ["5-8 hashtags"], "cta_text": "CTA"},\n'
+        '  {"platform": "instagram", "headline": "attention-grabbing first line", '
+        '"body": "Instagram caption with line breaks", '
+        '"hashtags": ["20-30 hashtags"], "cta_text": "CTA"}\n'
+        "]\n\n"
+        "Replace {platform} in the URL with the actual platform name. "
+        "Return ONLY valid JSON array. No markdown."
+    )
+
+    try:
+        if settings.ANTHROPIC_API_KEY:
+            client = anthropic.AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY)
+            response = await client.messages.create(
+                model="claude-sonnet-4-20250514",
+                max_tokens=4096,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            text = response.content[0].text
+            if "```json" in text:
+                text = text.split("```json")[1].split("```")[0]
+            elif "```" in text:
+                text = text.split("```")[1].split("```")[0]
+            posts = json.loads(text.strip())
+            # Add CTA URL to each post
+            for post in posts:
+                platform = post.get("platform", "direct")
+                post["cta_url"] = (
+                    f"{page_url}?utm_source={platform}"
+                    f"&utm_medium=social&utm_campaign={utm_campaign}"
+                )
+            return posts
+    except Exception as exc:
+        logger.warning("Social post generation failed: %s", exc)
+
+    # Fallback: return empty list
+    return []
