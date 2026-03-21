@@ -47,7 +47,7 @@ interface PipelineData {
   funnel: { total: number; contacted: number; responded: number; converted: number };
   by_source: Record<string, number>;
   conversion_rate: number;
-  recent_conversions: { email: string; source: string; converted_at: string }[];
+  recent_conversions: { email: string; source: string; converted_at: string | null; list_id?: string }[];
   top_lists: { id: string; name: string; lead_count: number; converted: number }[];
 }
 
