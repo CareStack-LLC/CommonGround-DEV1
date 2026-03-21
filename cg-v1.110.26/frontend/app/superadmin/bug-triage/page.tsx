@@ -204,8 +204,10 @@ export default function BugTriagePage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-800/40">
-                  {Object.entries(bugs.issues).flatMap(([severity, issues]) =>
-                    issues.map((issue: any, idx: number) => (
+                  {Object.entries(bugs.issues)
+                  .filter(([key]) => Array.isArray(bugs.issues[key as keyof typeof bugs.issues]))
+                  .flatMap(([severity, issues]) =>
+                    (issues as any[]).map((issue: any, idx: number) => (
                       <tr key={`${severity}-${idx}`} className="hover:bg-zinc-800/30 transition-colors">
                         <td className="px-4 py-3">
                           <div className="text-zinc-200 font-medium truncate max-w-md">{issue.title || issue.culprit || 'Untitled issue'}</div>
@@ -232,7 +234,7 @@ export default function BugTriagePage() {
                       </tr>
                     ))
                   )}
-                  {Object.values(bugs.issues).flat().length === 0 && (
+                  {Object.values(bugs.issues).filter(Array.isArray).flat().length === 0 && (
                     <tr>
                       <td colSpan={5} className="px-4 py-12 text-center text-zinc-500">No issues found for this period.</td>
                     </tr>

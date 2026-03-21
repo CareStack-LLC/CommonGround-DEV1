@@ -73,7 +73,15 @@ async def exchange_code_for_token(
                 "grant_type": "authorization_code",
             },
         )
-        resp.raise_for_status()
+        if resp.status_code != 200:
+            error_body = resp.text
+            logger.error(
+                "Google token exchange failed (HTTP %s): %s  |  redirect_uri=%s",
+                resp.status_code,
+                error_body,
+                _redirect_uri(),
+            )
+            resp.raise_for_status()
         token_data = resp.json()
 
     expires_in = token_data.get("expires_in", 3600)
