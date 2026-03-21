@@ -261,7 +261,7 @@ export default function KidSpaceAnalyticsPage() {
                     <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
                     <XAxis dataKey="type" tick={{ fill: '#a1a1aa', fontSize: 11 }} axisLine={false} tickLine={false} />
                     <YAxis tick={{ fill: '#71717a', fontSize: 11 }} axisLine={false} tickLine={false} label={{ value: 'minutes', angle: -90, position: 'insideLeft', style: { fill: '#71717a', fontSize: 10 } }} />
-                    <Tooltip contentStyle={CustomTooltipStyle} formatter={(val: number) => [`${val} min`, 'Avg Duration']} />
+                    <Tooltip contentStyle={CustomTooltipStyle} formatter={(val) => [`${val} min`, 'Avg Duration']} />
                     <Bar dataKey="avg_minutes" name="Avg Minutes" radius={[4, 4, 0, 0]} barSize={30}>
                       {data.session_averages.map((entry, i) => (
                         <Cell key={i} fill={SESSION_COLORS[entry.type] || '#71717a'} />

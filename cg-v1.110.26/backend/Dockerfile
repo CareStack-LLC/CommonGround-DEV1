@@ -31,8 +31,8 @@ RUN echo '#!/bin/bash\n\
 set -e\n\
 echo "Starting CommonGround API..."\n\
 echo "PORT=$PORT"\n\
-echo "Running database migrations..."\n\
-alembic upgrade head 2>&1 && echo "Migrations complete!" || echo "Migration warning (may already be applied)"\n\
+echo "Running database migrations (60s timeout)..."\n\
+timeout 60 alembic upgrade head 2>&1 && echo "Migrations complete!" || echo "Migration warning (skipped or already applied)"\n\
 echo "Starting uvicorn on port ${PORT:-8000}..."\n\
 exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers 1 --log-level info --access-log\n\
 ' > /app/start.sh && chmod +x /app/start.sh
