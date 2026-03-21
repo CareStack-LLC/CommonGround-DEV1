@@ -28,6 +28,7 @@ import {
   Send,
   Mail,
   Globe,
+  BarChart3,
 } from 'lucide-react';
 import { adminAPI, type PlatformHealth } from '@/lib/admin-api';
 
@@ -63,6 +64,7 @@ const navSections = [
       { href: '/superadmin/leads', label: 'Lead Generator', icon: UserPlus },
       { href: '/superadmin/leads/campaigns', label: 'Campaigns', icon: Send },
       { href: '/superadmin/leads/landing-pages', label: 'Landing Pages', icon: Globe },
+      { href: '/superadmin/leads/analytics', label: 'Marketing Analytics', icon: BarChart3 },
     ],
   },
   {
