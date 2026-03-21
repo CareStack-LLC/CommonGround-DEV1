@@ -59,29 +59,31 @@ async def fetch_sentry_issues(
         raw_issues = resp.json()
         logger.info("Sentry returned %d issues", len(raw_issues))
 
-        # Also fetch user feedback (from the "Report a Bug" widget)
-        user_feedback = []
+        # Fetch user feedback — the new Sentry widget creates issues
+        # with category "feedback", queryable via the issues endpoint
+        feedback_issues_raw = []
         try:
             fb_resp = await client.get(
-                f"{SENTRY_API_BASE}/projects/{org}/{slug}/user-feedback/",
+                url,
                 headers={"Authorization": f"Bearer {settings.SENTRY_AUTH_TOKEN}"},
-                params={"start": since, "limit": 50},
+                params={
+                    "query": f"issue.category:feedback lastSeen:>{since}",
+                    "limit": 50,
+                    "sort": "date",
+                },
             )
             if fb_resp.status_code == 200:
-                user_feedback = fb_resp.json()
-                logger.info("Sentry returned %d user feedback reports", len(user_feedback))
+                feedback_issues_raw = fb_resp.json()
+                logger.info("Sentry returned %d user feedback issues", len(feedback_issues_raw))
             else:
-                logger.warning("User feedback fetch failed (HTTP %s)", fb_resp.status_code)
+                logger.warning("User feedback fetch failed (HTTP %s): %s", fb_resp.status_code, fb_resp.text[:300])
         except Exception as exc:
             logger.warning("Failed to fetch user feedback: %s", exc)
 
-    # Build a set of issue IDs that have user feedback
-    feedback_issue_ids = set()
-    for fb in user_feedback:
-        event = fb.get("event", {})
-        issue_id = event.get("issueID") or fb.get("issue", {}).get("id")
-        if issue_id:
-            feedback_issue_ids.add(str(issue_id))
+    # Track which issue IDs came from the feedback query
+    feedback_issue_ids = {str(fb["id"]) for fb in feedback_issues_raw}
+    # Also track IDs already in the main issues list to avoid duplicates
+    existing_ids = {str(issue["id"]) for issue in raw_issues}
 
     for issue in raw_issues:
         issue_id = str(issue["id"])
@@ -107,29 +109,28 @@ async def fetch_sentry_issues(
             }
         )
 
-    # Append standalone user feedback that isn't linked to an existing issue
-    for fb in user_feedback:
-        event = fb.get("event", {})
-        issue_id = event.get("issueID") or fb.get("issue", {}).get("id")
-        if issue_id and str(issue_id) not in {i["id"] for i in issues}:
+    # Append feedback issues that weren't in the main issues query
+    for fb_issue in feedback_issues_raw:
+        fb_id = str(fb_issue["id"])
+        if fb_id not in existing_ids:
             issues.append(
                 {
-                    "id": str(issue_id),
-                    "title": fb.get("name", "") or fb.get("comments", "User feedback"),
-                    "culprit": fb.get("comments", "")[:120],
-                    "level": "warning",
-                    "count": 1,
-                    "user_count": 1,
-                    "first_seen": fb.get("dateCreated"),
-                    "last_seen": fb.get("dateCreated"),
+                    "id": fb_id,
+                    "title": fb_issue.get("title", "User Feedback"),
+                    "culprit": fb_issue.get("culprit", ""),
+                    "level": fb_issue.get("level", "info"),
+                    "count": int(fb_issue.get("count", 1)),
+                    "user_count": int(fb_issue.get("userCount", 1)),
+                    "first_seen": fb_issue.get("firstSeen"),
+                    "last_seen": fb_issue.get("lastSeen"),
                     "is_unhandled": False,
-                    "short_id": "",
-                    "permalink": "",
+                    "short_id": fb_issue.get("shortId", ""),
+                    "permalink": fb_issue.get("permalink", ""),
                     "has_user_feedback": True,
-                    "platform": event.get("platform", ""),
+                    "platform": fb_issue.get("platform", ""),
                     "metadata": {
-                        "type": "user_feedback",
-                        "value": fb.get("comments", ""),
+                        "type": fb_issue.get("metadata", {}).get("type", "user_feedback"),
+                        "value": fb_issue.get("metadata", {}).get("value", ""),
                     },
                 }
             )
