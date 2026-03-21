@@ -390,6 +390,37 @@ export default function BillingPage() {
         </div>
       </div>
 
+      {/* Valuation Metrics (live computed) */}
+      {data?.valuation && Object.keys(data.valuation).length > 0 && (
+        <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <TrendingUp className="w-4 h-4 text-violet-400" />
+            <h2 className="text-sm font-semibold text-zinc-300">Valuation Metrics</h2>
+            <span className="text-[11px] text-emerald-500/70 ml-auto">Live from data</span>
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <ValuationCard label="LTV" value={formatCurrency(data.valuation.ltv || 0)} sub={`${data.valuation.avg_lifetime_months || 0} mo avg lifetime`} />
+            <ValuationCard label="ARPU" value={formatCurrency(data.valuation.arpu || 0)} sub="monthly per user" />
+            <ValuationCard label="Retention" value={`${data.valuation.retention_rate_pct || 0}%`} sub={`${data.valuation.monthly_churn_pct || 0}% monthly churn`} highlight={data.valuation.retention_rate_pct >= 90} />
+            <ValuationCard label="LTV:CAC" value={`${data.valuation.ltv_cac_ratio || 0}x`} sub={data.valuation.ltv_cac_ratio >= 3 ? 'Healthy (>3x target)' : 'Below 3x target'} highlight={data.valuation.ltv_cac_ratio >= 3} />
+          </div>
+          <div className="grid grid-cols-3 gap-3 mt-3">
+            <div className="bg-zinc-800/30 rounded-lg p-3 text-center">
+              <div className="text-lg font-bold text-white">{formatCurrency(data.valuation.arr || 0)}</div>
+              <div className="text-[11px] text-zinc-500">ARR</div>
+            </div>
+            <div className="bg-zinc-800/30 rounded-lg p-3 text-center">
+              <div className="text-lg font-bold text-white">{data.valuation.active_paying || 0}</div>
+              <div className="text-[11px] text-zinc-500">Paying Users</div>
+            </div>
+            <div className="bg-zinc-800/30 rounded-lg p-3 text-center">
+              <div className="text-lg font-bold text-white">{(data.valuation.total_users || 0).toLocaleString()}</div>
+              <div className="text-[11px] text-zinc-500">Total Users</div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Revenue Projections */}
       {data && data.total_mrr > 0 && (
         <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
@@ -399,14 +430,12 @@ export default function BillingPage() {
           </div>
           {(() => {
             const mrr = stripeAvailable && stripeLive?.total_mrr != null ? stripeLive.total_mrr : data.total_mrr;
-            // Assume conservative 5% monthly growth from current paid base
             const monthlyGrowth = 0.05;
             const projections = [
               { label: '1 Year', months: 12 },
               { label: '3 Years', months: 36 },
               { label: '5 Years', months: 60 },
             ].map(({ label, months }) => {
-              // Geometric sum: MRR * sum(1+g)^i for i=0..months-1
               const factor = ((Math.pow(1 + monthlyGrowth, months) - 1) / monthlyGrowth);
               const totalRevenue = mrr * factor;
               const endingMrr = mrr * Math.pow(1 + monthlyGrowth, months);
@@ -430,10 +459,81 @@ export default function BillingPage() {
             );
           })()}
           <p className="text-[11px] text-zinc-600 mt-3">
-            Based on current MRR of {formatCurrency(stripeAvailable && stripeLive?.total_mrr != null ? stripeLive.total_mrr : data.total_mrr)} with 5% assumed monthly growth. Actual results depend on churn, pricing changes, and acquisition.
+            Based on current MRR of {formatCurrency(stripeAvailable && stripeLive?.total_mrr != null ? stripeLive.total_mrr : data.total_mrr)} with 5% assumed monthly growth.
           </p>
         </div>
       )}
+
+      {/* Refunds & Disputes */}
+      {data?.refunds && (
+        <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <AlertTriangle className="w-4 h-4 text-amber-400" />
+            <h2 className="text-sm font-semibold text-zinc-300">Refunds &amp; Disputes</h2>
+          </div>
+          <div className="grid grid-cols-3 gap-3 mb-4">
+            <div className="bg-zinc-800/30 rounded-lg p-3 text-center">
+              <div className={`text-lg font-bold ${data.refunds.refund_count_30d > 0 ? 'text-amber-400' : 'text-white'}`}>
+                {data.refunds.refund_count_30d}
+              </div>
+              <div className="text-[11px] text-zinc-500">Refunds (30d)</div>
+            </div>
+            <div className="bg-zinc-800/30 rounded-lg p-3 text-center">
+              <div className={`text-lg font-bold ${data.refunds.total_refunded_30d > 0 ? 'text-amber-400' : 'text-white'}`}>
+                {formatCurrency(data.refunds.total_refunded_30d)}
+              </div>
+              <div className="text-[11px] text-zinc-500">Refunded Amount</div>
+            </div>
+            <div className="bg-zinc-800/30 rounded-lg p-3 text-center">
+              <div className={`text-lg font-bold ${data.refunds.dispute_count > 0 ? 'text-red-400' : 'text-white'}`}>
+                {data.refunds.dispute_count}
+              </div>
+              <div className="text-[11px] text-zinc-500">Open Disputes</div>
+            </div>
+          </div>
+
+          {data.refunds.recent_refunds?.length > 0 && (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-xs text-zinc-500 border-b border-zinc-800/60">
+                    <th className="text-left pb-2 font-medium">Amount</th>
+                    <th className="text-left pb-2 font-medium">Reason</th>
+                    <th className="text-left pb-2 font-medium">Status</th>
+                    <th className="text-left pb-2 font-medium">Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.refunds.recent_refunds.map((r: { id: string; amount: number; reason: string | null; status: string; created: string }) => (
+                    <tr key={r.id} className="border-b border-zinc-800/30 last:border-0">
+                      <td className="py-2 text-amber-400 font-medium">{formatCurrency(r.amount)}</td>
+                      <td className="py-2 text-xs text-zinc-400 capitalize">{r.reason?.replace('_', ' ') || 'N/A'}</td>
+                      <td className="py-2 text-xs text-zinc-400 capitalize">{r.status}</td>
+                      <td className="py-2 text-xs text-zinc-500">{formatDate(r.created)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {data.refunds.recent_refunds?.length === 0 && data.refunds.dispute_count === 0 && (
+            <p className="text-zinc-600 text-sm text-center py-4">No refunds or disputes. Looking good!</p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ValuationCard({ label, value, sub, highlight }: {
+  label: string; value: string; sub: string; highlight?: boolean;
+}) {
+  return (
+    <div className="bg-zinc-800/30 rounded-lg p-4">
+      <div className="text-[11px] text-zinc-500 uppercase tracking-wider font-medium mb-1">{label}</div>
+      <div className={`text-xl font-bold ${highlight ? 'text-emerald-400' : 'text-white'}`}>{value}</div>
+      <div className="text-[11px] text-zinc-600 mt-0.5">{sub}</div>
     </div>
   );
 }

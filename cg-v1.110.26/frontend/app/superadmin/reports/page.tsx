@@ -405,51 +405,8 @@ export default function ReportsPage() {
             ))}
           </div>
 
-          {/* Valuation KPI Summary */}
-          <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
-            <div className="flex items-center gap-2 mb-4">
-              <Target className="w-4 h-4 text-violet-400" />
-              <h2 className="text-sm font-semibold text-zinc-300">Key Valuation Metrics</h2>
-              <span className="text-[11px] text-zinc-600 ml-auto">Updated with each report generation</span>
-            </div>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-              <div className="bg-zinc-800/30 rounded-lg p-4">
-                <div className="flex items-center gap-1.5 mb-1">
-                  <DollarSign className="w-3.5 h-3.5 text-emerald-400" />
-                  <span className="text-[11px] text-zinc-500 uppercase tracking-wider font-medium">Est. LTV</span>
-                </div>
-                <div className="text-xl font-bold text-white">$215</div>
-                <div className="text-[11px] text-zinc-600 mt-0.5">avg lifetime value per user</div>
-              </div>
-              <div className="bg-zinc-800/30 rounded-lg p-4">
-                <div className="flex items-center gap-1.5 mb-1">
-                  <Users className="w-3.5 h-3.5 text-blue-400" />
-                  <span className="text-[11px] text-zinc-500 uppercase tracking-wider font-medium">CAC</span>
-                </div>
-                <div className="text-xl font-bold text-white">$45</div>
-                <div className="text-[11px] text-zinc-600 mt-0.5">customer acquisition cost</div>
-              </div>
-              <div className="bg-zinc-800/30 rounded-lg p-4">
-                <div className="flex items-center gap-1.5 mb-1">
-                  <TrendingUp className="w-3.5 h-3.5 text-violet-400" />
-                  <span className="text-[11px] text-zinc-500 uppercase tracking-wider font-medium">LTV:CAC</span>
-                </div>
-                <div className="text-xl font-bold text-emerald-400">4.8x</div>
-                <div className="text-[11px] text-zinc-600 mt-0.5">healthy ratio (&gt;3x target)</div>
-              </div>
-              <div className="bg-zinc-800/30 rounded-lg p-4">
-                <div className="flex items-center gap-1.5 mb-1">
-                  <RefreshCw className="w-3.5 h-3.5 text-amber-400" />
-                  <span className="text-[11px] text-zinc-500 uppercase tracking-wider font-medium">Retention</span>
-                </div>
-                <div className="text-xl font-bold text-white">87%</div>
-                <div className="text-[11px] text-zinc-600 mt-0.5">30-day retention rate</div>
-              </div>
-            </div>
-            <p className="text-[11px] text-zinc-600 mt-3">
-              Generate a Valuation Metrics report for live calculated values from your subscription and engagement data.
-            </p>
-          </div>
+          {/* Valuation KPI Summary — live from billing API */}
+          <ValuationKPIs />
 
           {/* Reports List */}
           <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl overflow-hidden">
@@ -665,6 +622,72 @@ export default function ReportsPage() {
           )}
         </>
       )}
+    </div>
+  );
+}
+
+function ValuationKPIs() {
+  const [val, setVal] = useState<Record<string, number> | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await adminAPI.getBillingOverview();
+        if (data?.valuation) setVal(data.valuation);
+      } catch { /* silent — billing might not be connected */ }
+    })();
+  }, []);
+
+  const fmtC = (n: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(n);
+
+  return (
+    <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
+      <div className="flex items-center gap-2 mb-4">
+        <Target className="w-4 h-4 text-violet-400" />
+        <h2 className="text-sm font-semibold text-zinc-300">Key Valuation Metrics</h2>
+        <span className="text-[11px] text-emerald-500/70 ml-auto">{val ? 'Live from data' : 'Loading...'}</span>
+      </div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="bg-zinc-800/30 rounded-lg p-4">
+          <div className="flex items-center gap-1.5 mb-1">
+            <DollarSign className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="text-[11px] text-zinc-500 uppercase tracking-wider font-medium">Est. LTV</span>
+          </div>
+          <div className="text-xl font-bold text-white">{val ? fmtC(val.ltv || 0) : '...'}</div>
+          <div className="text-[11px] text-zinc-600 mt-0.5">{val?.avg_lifetime_months ? `${val.avg_lifetime_months} mo avg lifetime` : 'avg lifetime value per user'}</div>
+        </div>
+        <div className="bg-zinc-800/30 rounded-lg p-4">
+          <div className="flex items-center gap-1.5 mb-1">
+            <DollarSign className="w-3.5 h-3.5 text-blue-400" />
+            <span className="text-[11px] text-zinc-500 uppercase tracking-wider font-medium">ARPU</span>
+          </div>
+          <div className="text-xl font-bold text-white">{val ? fmtC(val.arpu || 0) : '...'}</div>
+          <div className="text-[11px] text-zinc-600 mt-0.5">monthly per paying user</div>
+        </div>
+        <div className="bg-zinc-800/30 rounded-lg p-4">
+          <div className="flex items-center gap-1.5 mb-1">
+            <TrendingUp className="w-3.5 h-3.5 text-violet-400" />
+            <span className="text-[11px] text-zinc-500 uppercase tracking-wider font-medium">LTV:CAC</span>
+          </div>
+          <div className={`text-xl font-bold ${val && val.ltv_cac_ratio >= 3 ? 'text-emerald-400' : 'text-white'}`}>
+            {val ? `${val.ltv_cac_ratio || 0}x` : '...'}
+          </div>
+          <div className="text-[11px] text-zinc-600 mt-0.5">{val && val.ltv_cac_ratio >= 3 ? 'Healthy (>3x target)' : 'target: >3x'}</div>
+        </div>
+        <div className="bg-zinc-800/30 rounded-lg p-4">
+          <div className="flex items-center gap-1.5 mb-1">
+            <RefreshCw className="w-3.5 h-3.5 text-amber-400" />
+            <span className="text-[11px] text-zinc-500 uppercase tracking-wider font-medium">Retention</span>
+          </div>
+          <div className={`text-xl font-bold ${val && val.retention_rate_pct >= 90 ? 'text-emerald-400' : 'text-white'}`}>
+            {val ? `${val.retention_rate_pct || 0}%` : '...'}
+          </div>
+          <div className="text-[11px] text-zinc-600 mt-0.5">{val ? `${val.monthly_churn_pct || 0}% monthly churn` : '30-day retention rate'}</div>
+        </div>
+      </div>
+      <p className="text-[11px] text-zinc-600 mt-3">
+        Computed live from subscription data. Generate a Valuation Metrics report for detailed breakdown.
+      </p>
     </div>
   );
 }

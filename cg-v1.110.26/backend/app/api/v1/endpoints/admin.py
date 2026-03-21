@@ -774,6 +774,100 @@ async def get_billing_overview(
     await _log_admin_action(db, admin_user, "view_billing", "platform")
     await db.commit()
 
+    # --- Phase 4: Computed valuation metrics ---
+    valuation = {}
+    try:
+        # Total active paying users
+        active_paying = sum(
+            t["count"] for t in mrr_by_tier.values() if t["price"] > 0
+        )
+
+        # Churn rate: cancelled in 30d / (active + cancelled)
+        total_base = active_paying + (cancelled_30d or 0)
+        monthly_churn = round((cancelled_30d or 0) / total_base * 100, 1) if total_base > 0 else 0.0
+
+        # ARPU (average revenue per user)
+        arpu = round(total_mrr / active_paying, 2) if active_paying > 0 else 0
+
+        # LTV = ARPU / monthly churn rate (in months)
+        if monthly_churn > 0:
+            avg_lifetime_months = round(100 / monthly_churn, 1)
+            ltv = round(arpu * avg_lifetime_months, 2)
+        else:
+            avg_lifetime_months = 0
+            ltv = 0
+
+        # Retention rate (inverse of churn)
+        retention_rate = round(100 - monthly_churn, 1)
+
+        # Total users for CAC approximation
+        total_users_result = await db.execute(
+            select(func.count()).select_from(User).where(User.is_deleted == False)
+        )
+        total_users = total_users_result.scalar() or 0
+
+        valuation = {
+            "active_paying": active_paying,
+            "monthly_churn_pct": monthly_churn,
+            "retention_rate_pct": retention_rate,
+            "arpu": arpu,
+            "ltv": ltv,
+            "avg_lifetime_months": avg_lifetime_months,
+            "ltv_cac_ratio": round(ltv / 45, 1) if ltv > 0 else 0,  # Placeholder CAC of $45
+            "total_users": total_users,
+            "arr": round(total_mrr * 12, 2),
+        }
+    except Exception as exc:
+        logger.warning("Valuation metrics calculation failed: %s", exc)
+
+    # --- Phase 4: Stripe refunds/disputes (if available) ---
+    refunds_data = None
+    try:
+        if stripe_live and stripe_live.get("stripe_available"):
+            import stripe
+            # Recent refunds
+            refunds = stripe.Refund.list(limit=10)
+            refund_list = [
+                {
+                    "id": r.id,
+                    "amount": r.amount / 100.0,
+                    "status": r.status,
+                    "reason": r.reason,
+                    "created": datetime.fromtimestamp(r.created).isoformat(),
+                }
+                for r in refunds.data
+            ]
+            total_refunded_30d = sum(
+                r.amount / 100.0 for r in refunds.data
+                if datetime.fromtimestamp(r.created) >= thirty_days_ago
+            )
+
+            # Disputes
+            disputes = stripe.Dispute.list(limit=10)
+            dispute_list = [
+                {
+                    "id": d.id,
+                    "amount": d.amount / 100.0,
+                    "status": d.status,
+                    "reason": d.reason,
+                    "created": datetime.fromtimestamp(d.created).isoformat(),
+                }
+                for d in disputes.data
+            ]
+
+            refunds_data = {
+                "recent_refunds": refund_list,
+                "total_refunded_30d": round(total_refunded_30d, 2),
+                "refund_count_30d": len([
+                    r for r in refunds.data
+                    if datetime.fromtimestamp(r.created) >= thirty_days_ago
+                ]),
+                "disputes": dispute_list,
+                "dispute_count": len(dispute_list),
+            }
+    except Exception as exc:
+        logger.warning("Stripe refunds/disputes fetch failed: %s", exc)
+
     return {
         "consumer_subscriptions": breakdown,
         "professional_subscriptions": prof_breakdown,
@@ -784,6 +878,8 @@ async def get_billing_overview(
         "mrr_by_tier": mrr_by_tier,
         "total_mrr": round(total_mrr, 2),
         "stripe_live": stripe_live,
+        "valuation": valuation,
+        "refunds": refunds_data,
         "note": "MRR calculated from database tier counts. See stripe_live for real-time Stripe data.",
     }
 
