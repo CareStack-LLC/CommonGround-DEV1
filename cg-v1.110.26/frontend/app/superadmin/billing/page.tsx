@@ -232,59 +232,74 @@ export default function BillingPage() {
         </div>
       )}
 
-      {/* Consumer Subscriptions Detail */}
+      {/* Subscription Breakdown by Category */}
       <div className="grid lg:grid-cols-2 gap-4">
-        {/* Tier Breakdown */}
+        {/* Grouped Tier Breakdown */}
         <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-zinc-300 mb-4">Consumer Tiers</h2>
+          <h2 className="text-sm font-semibold text-zinc-300 mb-4">Subscriptions by Category</h2>
           {loading ? (
             <div className="space-y-3">{Array.from({ length: 5 }).map((_, i) => <div key={i} className="animate-pulse bg-zinc-800/60 rounded h-12" />)}</div>
-          ) : data && (
-            <div className="space-y-3">
-              {Object.entries(data.consumer_subscriptions)
-                .sort(([, a], [, b]) => b.total - a.total)
-                .map(([tier, info]) => {
-                  const tierPrice = data.mrr_by_tier[tier]?.price ?? 0;
+          ) : data && (() => {
+            const TIER_GROUPS: { label: string; color: string; tiers: string[] }[] = [
+              { label: 'Standard Plans', color: 'text-violet-400', tiers: ['plus', 'complete'] },
+              { label: 'Professional Plans', color: 'text-indigo-400', tiers: ['professional_starter', 'solo', 'small_firm', 'mid_size'] },
+              { label: 'Free / Starter', color: 'text-zinc-500', tiers: ['web_starter'] },
+            ];
+
+            return (
+              <div className="space-y-5">
+                {TIER_GROUPS.map((group) => {
+                  const groupEntries = Object.entries(data.consumer_subscriptions)
+                    .filter(([tier]) => group.tiers.includes(tier))
+                    .sort(([, a], [, b]) => b.total - a.total);
+                  // Also check professional subscriptions for professional tiers
+                  const proEntries = Object.entries(data.professional_subscriptions)
+                    .filter(([tier]) => group.tiers.includes(tier));
+                  const allEntries = [...groupEntries.map(([t, info]) => ({ tier: t, total: info.total, statuses: info.statuses })),
+                    ...proEntries.map(([t, count]) => ({ tier: t, total: count, statuses: {} as Record<string, number> }))];
+                  if (allEntries.length === 0) return null;
+                  const groupTotal = allEntries.reduce((s, e) => s + e.total, 0);
                   return (
-                    <div key={tier} className="bg-zinc-800/30 rounded-lg px-4 py-3">
+                    <div key={group.label}>
                       <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm text-zinc-200 capitalize font-medium">{TIER_LABELS[tier] || tier}</span>
-                          <span className="text-xs text-zinc-600">${tierPrice}/mo</span>
-                        </div>
-                        <span className="text-sm font-semibold text-zinc-300">{info.total}</span>
+                        <span className={`text-[11px] uppercase tracking-wider font-semibold ${group.color}`}>{group.label}</span>
+                        <span className="text-xs text-zinc-500">{groupTotal} total</span>
                       </div>
-                      <div className="flex flex-wrap gap-2">
-                        {Object.entries(info.statuses).map(([status, count]) => (
-                          <span key={status} className={`text-[11px] ${STATUS_COLORS[status] || 'text-zinc-500'}`}>
-                            {count} {status}
-                          </span>
-                        ))}
+                      <div className="space-y-2">
+                        {allEntries.map(({ tier, total, statuses }) => {
+                          const tierPrice = data.mrr_by_tier[tier]?.price ?? 0;
+                          return (
+                            <div key={tier} className="bg-zinc-800/30 rounded-lg px-4 py-3">
+                              <div className="flex items-center justify-between mb-1">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm text-zinc-200 font-medium">{TIER_LABELS[tier] || tier}</span>
+                                  {tierPrice > 0 && <span className="text-xs text-zinc-600">${tierPrice}/mo</span>}
+                                </div>
+                                <span className="text-sm font-semibold text-zinc-300">{total}</span>
+                              </div>
+                              {Object.keys(statuses).length > 0 && (
+                                <div className="flex flex-wrap gap-2">
+                                  {Object.entries(statuses).map(([status, count]) => (
+                                    <span key={status} className={`text-[11px] ${STATUS_COLORS[status] || 'text-zinc-500'}`}>
+                                      {count} {status}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   );
                 })}
-            </div>
-          )}
+              </div>
+            );
+          })()}
         </div>
 
-        {/* Professional Subscriptions & Actions */}
+        {/* Key Metrics & Actions */}
         <div className="space-y-4">
-          <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
-            <h2 className="text-sm font-semibold text-zinc-300 mb-4">Professional Tiers</h2>
-            {loading ? (
-              <div className="space-y-3">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="animate-pulse bg-zinc-800/60 rounded h-10" />)}</div>
-            ) : data && (
-              <div className="space-y-2">
-                {Object.entries(data.professional_subscriptions).map(([tier, count]) => (
-                  <div key={tier} className="flex items-center justify-between px-4 py-2.5 bg-zinc-800/30 rounded-lg">
-                    <span className="text-sm text-zinc-300 capitalize">{TIER_LABELS[tier] || tier}</span>
-                    <span className="text-sm font-semibold text-zinc-200">{count}</span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
 
           {/* Key Metrics */}
           <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
@@ -374,6 +389,51 @@ export default function BillingPage() {
           )}
         </div>
       </div>
+
+      {/* Revenue Projections */}
+      {data && data.total_mrr > 0 && (
+        <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <TrendingUp className="w-4 h-4 text-emerald-400" />
+            <h2 className="text-sm font-semibold text-zinc-300">Revenue Projections</h2>
+          </div>
+          {(() => {
+            const mrr = stripeAvailable && stripeLive?.total_mrr != null ? stripeLive.total_mrr : data.total_mrr;
+            // Assume conservative 5% monthly growth from current paid base
+            const monthlyGrowth = 0.05;
+            const projections = [
+              { label: '1 Year', months: 12 },
+              { label: '3 Years', months: 36 },
+              { label: '5 Years', months: 60 },
+            ].map(({ label, months }) => {
+              // Geometric sum: MRR * sum(1+g)^i for i=0..months-1
+              const factor = ((Math.pow(1 + monthlyGrowth, months) - 1) / monthlyGrowth);
+              const totalRevenue = mrr * factor;
+              const endingMrr = mrr * Math.pow(1 + monthlyGrowth, months);
+              return { label, totalRevenue, endingMrr, arr: endingMrr * 12 };
+            });
+
+            return (
+              <div className="grid grid-cols-3 gap-3">
+                {projections.map((p) => (
+                  <div key={p.label} className="bg-zinc-800/30 rounded-lg p-4 text-center">
+                    <div className="text-[11px] uppercase tracking-wider text-zinc-500 font-semibold mb-2">{p.label}</div>
+                    <div className="text-lg font-bold text-white mb-1">{formatCurrency(p.totalRevenue)}</div>
+                    <div className="text-xs text-zinc-500">cumulative revenue</div>
+                    <div className="mt-2 pt-2 border-t border-zinc-700/40">
+                      <div className="text-sm font-semibold text-emerald-400">{formatCurrency(p.arr)}</div>
+                      <div className="text-[11px] text-zinc-600">projected ARR</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
+          <p className="text-[11px] text-zinc-600 mt-3">
+            Based on current MRR of {formatCurrency(stripeAvailable && stripeLive?.total_mrr != null ? stripeLive.total_mrr : data.total_mrr)} with 5% assumed monthly growth. Actual results depend on churn, pricing changes, and acquisition.
+          </p>
+        </div>
+      )}
     </div>
   );
 }

@@ -42,7 +42,8 @@ interface KidSpaceStats {
   };
 }
 
-function formatNumber(n: number): string {
+function formatNumber(n: number | null | undefined): string {
+  if (n == null || isNaN(n)) return '0';
   if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`;
   if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
   return n.toLocaleString();
@@ -184,8 +185,8 @@ export default function KidSpaceAnalyticsPage() {
                     <div className="text-sm text-zinc-300 truncate">{item.title}</div>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <div className="text-xs text-zinc-300 font-medium">{item.view_count.toLocaleString()} views</div>
-                    <div className="text-[11px] text-zinc-600">{item.minutes_watched.toLocaleString()} min</div>
+                    <div className="text-xs text-zinc-300 font-medium">{(item.view_count ?? 0).toLocaleString()} views</div>
+                    <div className="text-[11px] text-zinc-600">{(item.minutes_watched ?? 0).toLocaleString()} min</div>
                   </div>
                 </div>
               ))}
@@ -220,8 +221,8 @@ export default function KidSpaceAnalyticsPage() {
                     <div className="text-sm text-zinc-300 truncate">{item.title}</div>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <div className="text-xs text-zinc-300 font-medium">{item.read_count.toLocaleString()} reads</div>
-                    <div className="text-[11px] text-zinc-600">{item.pages_turned.toLocaleString()} pages</div>
+                    <div className="text-xs text-zinc-300 font-medium">{(item.read_count ?? 0).toLocaleString()} reads</div>
+                    <div className="text-[11px] text-zinc-600">{(item.pages_turned ?? 0).toLocaleString()} pages</div>
                   </div>
                 </div>
               ))}

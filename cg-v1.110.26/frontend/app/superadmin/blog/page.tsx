@@ -214,12 +214,20 @@ export default function BlogPage() {
       const res = await fetch(`${API_BASE}/api/v1/blog/admin/posts`, {
         headers: { Authorization: `Bearer ${getToken()}` },
       });
+      if (res.status === 503) {
+        setError('Blog service is temporarily unavailable. Please try again in a few minutes.');
+        return;
+      }
       if (!res.ok) throw new Error('Failed to fetch posts');
       const data = await res.json();
       setPosts(Array.isArray(data) ? data : data.posts || []);
     } catch (err) {
-      console.error('Failed to load blog posts:', err);
-      setError('Failed to load blog posts');
+      console.error('[Blog] Load failed:', err);
+      if (err instanceof TypeError && err.message === 'Failed to fetch') {
+        setError('Unable to reach the blog service. This may be a temporary connectivity issue — please retry.');
+      } else {
+        setError('Failed to load blog posts');
+      }
     } finally {
       setLoading(false);
     }
@@ -346,8 +354,12 @@ export default function BlogPage() {
       await fetchPosts();
     } catch (err: any) {
       console.error('[Blog] Save failed:', err);
-      setError(err.message || 'Failed to save post. Please try again.');
-      setTimeout(() => setError(''), 5000);
+      if (err instanceof TypeError && err.message === 'Failed to fetch') {
+        setError('Unable to reach the blog service. Your changes were not saved — please retry when the service is back.');
+      } else {
+        setError(err.message || 'Failed to save post. Please try again.');
+      }
+      setTimeout(() => setError(''), 8000);
     } finally {
       setSaving(false);
     }

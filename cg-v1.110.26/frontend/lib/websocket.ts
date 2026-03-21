@@ -425,7 +425,7 @@ class WebSocketClient {
   private ws: WebSocket | null = null;
   private token: string | null = null;
   private reconnectAttempts = 0;
-  private maxReconnectAttempts = 5;
+  private maxReconnectAttempts = 10;
   private reconnectDelay = 1000; // Start with 1 second
   private pingInterval: NodeJS.Timeout | null = null;
   private reconnectTimeout: NodeJS.Timeout | null = null;
@@ -433,6 +433,7 @@ class WebSocketClient {
   private subscribedCases: Set<string> = new Set();
   private isConnecting = false;
   private connectionPromise: Promise<void> | null = null;
+  private visibilityHandler: (() => void) | null = null;
 
   /**
    * Get WebSocket URL based on environment.
@@ -472,6 +473,8 @@ class WebSocketClient {
           this.reconnectAttempts = 0;
           this.reconnectDelay = 1000;
           this.startPingInterval();
+          this.setupVisibilityHandler();
+          this.emitConnectionStatus('connected');
 
           // Resubscribe to previously subscribed cases
           this.subscribedCases.forEach((caseId) => {
@@ -485,9 +488,15 @@ class WebSocketClient {
           console.log('[WebSocket] Disconnected', event.code, event.reason);
           this.isConnecting = false;
           this.stopPingInterval();
+          this.emitConnectionStatus('disconnected');
 
-          // Attempt reconnect if not a normal close
-          if (event.code !== 1000) {
+          // Code 1012 = service restart: reset attempts and reconnect immediately
+          if (event.code === 1012) {
+            console.log('[WebSocket] Server restarting — reconnecting immediately');
+            this.reconnectAttempts = 0;
+            this.scheduleReconnect();
+          } else if (event.code !== 1000) {
+            // Any non-normal close: attempt reconnect with backoff
             this.scheduleReconnect();
           }
         };
@@ -520,6 +529,7 @@ class WebSocketClient {
    */
   disconnect(): void {
     this.stopPingInterval();
+    this.removeVisibilityHandler();
 
     if (this.reconnectTimeout) {
       clearTimeout(this.reconnectTimeout);
@@ -535,6 +545,7 @@ class WebSocketClient {
     this.subscribedCases.clear();
     this.isConnecting = false;
     this.connectionPromise = null;
+    this.emitConnectionStatus('disconnected');
   }
 
   /**
@@ -663,7 +674,8 @@ class WebSocketClient {
    */
   private scheduleReconnect(): void {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-      console.log('[WebSocket] Max reconnect attempts reached');
+      console.log('[WebSocket] Max reconnect attempts reached — waiting for visibility change to retry');
+      this.emitConnectionStatus('failed');
       return;
     }
 
@@ -684,6 +696,57 @@ class WebSocketClient {
         });
       }
     }, delay);
+  }
+
+  /**
+   * Reset reconnect attempts and try again. Called when page regains focus.
+   */
+  resetAndReconnect(): void {
+    if (this.ws?.readyState === WebSocket.OPEN) return;
+    if (!this.token) return;
+
+    console.log('[WebSocket] Resetting reconnection on page focus');
+    this.reconnectAttempts = 0;
+    this.reconnectDelay = 1000;
+
+    if (this.reconnectTimeout) {
+      clearTimeout(this.reconnectTimeout);
+      this.reconnectTimeout = null;
+    }
+
+    this.connect(this.token).catch((error) => {
+      console.error('[WebSocket] Reconnect on focus failed:', error);
+    });
+  }
+
+  /**
+   * Setup visibility change handler to reconnect when tab becomes visible.
+   */
+  private setupVisibilityHandler(): void {
+    this.removeVisibilityHandler();
+    this.visibilityHandler = () => {
+      if (document.visibilityState === 'visible' && this.ws?.readyState !== WebSocket.OPEN) {
+        this.resetAndReconnect();
+      }
+    };
+    document.addEventListener('visibilitychange', this.visibilityHandler);
+  }
+
+  /**
+   * Remove visibility change handler.
+   */
+  private removeVisibilityHandler(): void {
+    if (this.visibilityHandler) {
+      document.removeEventListener('visibilitychange', this.visibilityHandler);
+      this.visibilityHandler = null;
+    }
+  }
+
+  /**
+   * Emit connection status to listeners so UI can show connectivity state.
+   */
+  private emitConnectionStatus(status: 'connected' | 'disconnected' | 'failed'): void {
+    this.handleMessage({ type: 'connection_status', status });
   }
 }
 

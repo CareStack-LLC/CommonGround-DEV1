@@ -2,37 +2,101 @@
  * SuperAdmin API Client
  *
  * All calls require an admin JWT token (user.is_admin === true).
+ * Includes Sentry breadcrumbs and automatic retry for transient failures.
  */
+
+import * as Sentry from '@sentry/nextjs';
 
 let apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
 if (apiUrl.endsWith('/')) apiUrl = apiUrl.slice(0, -1);
 if (!apiUrl.endsWith('/api/v1')) apiUrl += '/api/v1';
 const API_URL = apiUrl;
 
+/** HTTP status codes that are safe to retry automatically. */
+const RETRYABLE_STATUSES = new Set([502, 503, 504]);
+
 function getAuthToken(): string | null {
   if (typeof window === 'undefined') return null;
   return localStorage.getItem('access_token');
 }
 
-async function adminFetch<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+async function adminFetch<T>(
+  endpoint: string,
+  options: RequestInit = {},
+  retries = 1,
+): Promise<T> {
   const token = getAuthToken();
   if (!token) throw new Error('Not authenticated');
 
-  const res = await fetch(`${API_URL}${endpoint}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-      ...options.headers,
-    },
+  const method = options.method || 'GET';
+
+  Sentry.addBreadcrumb({
+    category: 'admin-api',
+    message: `${method} ${endpoint}`,
+    level: 'info',
   });
 
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: res.statusText }));
-    throw new Error(err.detail || `Admin API error ${res.status}`);
+  let lastError: Error | null = null;
+
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const res = await fetch(`${API_URL}${endpoint}`, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+          ...options.headers,
+        },
+      });
+
+      if (!res.ok) {
+        // Retry on transient server errors (only for GET requests)
+        if (RETRYABLE_STATUSES.has(res.status) && method === 'GET' && attempt < retries) {
+          await new Promise((r) => setTimeout(r, 1000 * (attempt + 1)));
+          continue;
+        }
+
+        const err = await res.json().catch(() => ({ detail: res.statusText }));
+        const errorMsg = err.detail || `Admin API error ${res.status}`;
+
+        Sentry.addBreadcrumb({
+          category: 'admin-api',
+          message: `${method} ${endpoint} → ${res.status}`,
+          level: 'error',
+          data: { status: res.status, detail: err.detail },
+        });
+
+        throw new Error(errorMsg);
+      }
+
+      return res.json();
+    } catch (err) {
+      lastError = err instanceof Error ? err : new Error(String(err));
+
+      // Retry on network failures (Failed to fetch) for GET requests
+      if (
+        err instanceof TypeError &&
+        err.message === 'Failed to fetch' &&
+        method === 'GET' &&
+        attempt < retries
+      ) {
+        await new Promise((r) => setTimeout(r, 1000 * (attempt + 1)));
+        continue;
+      }
+
+      // If not retryable, throw immediately
+      if (attempt >= retries) {
+        Sentry.addBreadcrumb({
+          category: 'admin-api',
+          message: `${method} ${endpoint} failed: ${lastError.message}`,
+          level: 'error',
+        });
+        throw lastError;
+      }
+    }
   }
 
-  return res.json();
+  throw lastError || new Error(`Admin API call failed: ${endpoint}`);
 }
 
 async function adminFetchBlob(endpoint: string): Promise<Blob> {

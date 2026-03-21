@@ -26,7 +26,7 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi.responses import StreamingResponse
-from sqlalchemy import func, select, or_, and_, case as sql_case, cast, Date
+from sqlalchemy import func, select, or_, and_, case as sql_case, cast, Date, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -990,7 +990,7 @@ async def list_report_requests(
     summary="Request a new admin report",
 )
 async def create_report_request(
-    report_type: str = Query(..., description="Report type: user_export, billing_summary, engagement, compliance, growth"),
+    report_type: str = Query(..., description="Report type: user_export, billing_summary, engagement, compliance, growth, operational_efficiency, valuation_metrics"),
     date_range_days: int = Query(30, ge=1, le=365),
     notes: Optional[str] = Query(None, description="Additional notes"),
     db: AsyncSession = Depends(get_db),
@@ -1005,8 +1005,10 @@ async def create_report_request(
     - engagement: Platform usage and ARIA metrics
     - compliance: Audit trail summary
     - growth: Detailed growth analytics
+    - operational_efficiency: Resolution rates, response times, uptime
+    - valuation_metrics: LTV, CAC, retention, churn, unit economics
     """
-    valid_types = ["user_export", "billing_summary", "engagement", "compliance", "growth"]
+    valid_types = ["user_export", "billing_summary", "engagement", "compliance", "growth", "operational_efficiency", "valuation_metrics"]
     if report_type not in valid_types:
         raise HTTPException(
             status_code=400,
@@ -2242,16 +2244,20 @@ async def get_platform_audit(
 
     since = datetime.utcnow() - timedelta(days=days)
     events = []
+    warnings = []
 
     # Helper to resolve user email from ID
     async def _get_email(user_id: str) -> str:
         if not user_id:
             return "unknown"
-        result = await db.execute(
-            select(User.email).where(User.id == user_id)
-        )
-        email = result.scalar_one_or_none()
-        return email or "unknown"
+        try:
+            result = await db.execute(
+                select(User.email).where(User.id == user_id)
+            )
+            email = result.scalar_one_or_none()
+            return email or "unknown"
+        except Exception:
+            return "unknown"
 
     # Filter function
     def _matches(evt_type: str, email: str) -> bool:
@@ -2263,112 +2269,147 @@ async def get_platform_audit(
 
     # 1. Messages
     if not event_type or event_type == "message_sent":
-        msg_result = await db.execute(
-            select(Message.created_at, Message.sender_id)
-            .where(Message.created_at >= since)
-            .order_by(desc(Message.created_at))
-            .limit(limit)
-        )
-        for row in msg_result.all():
-            email = await _get_email(row.sender_id)
-            if _matches("message_sent", email):
-                events.append({
-                    "timestamp": row.created_at.isoformat(),
-                    "event_type": "message_sent",
-                    "user_email": email,
-                })
+        try:
+            msg_result = await db.execute(
+                select(Message.created_at, Message.sender_id)
+                .where(Message.created_at >= since)
+                .order_by(desc(Message.created_at))
+                .limit(limit)
+            )
+            for row in msg_result.all():
+                email = await _get_email(row.sender_id)
+                if _matches("message_sent", email):
+                    events.append({
+                        "timestamp": row.created_at.isoformat(),
+                        "event_type": "message_sent",
+                        "user_email": email,
+                    })
+        except Exception as exc:
+            logger.exception("Platform audit: messages query failed")
+            capture_error(exc)
+            warnings.append("messages")
 
     # 2. Custody exchanges
     if not event_type or event_type == "exchange_created":
-        ex_result = await db.execute(
-            select(CustodyExchange.created_at, CustodyExchange.family_file_id)
-            .where(CustodyExchange.created_at >= since)
-            .order_by(desc(CustodyExchange.created_at))
-            .limit(limit)
-        )
-        for row in ex_result.all():
-            events.append({
-                "timestamp": row.created_at.isoformat(),
-                "event_type": "exchange_created",
-                "user_email": f"family:{row.family_file_id[:8]}",
-            })
+        try:
+            ex_result = await db.execute(
+                select(CustodyExchange.created_at, CustodyExchange.family_file_id)
+                .where(CustodyExchange.created_at >= since)
+                .order_by(desc(CustodyExchange.created_at))
+                .limit(limit)
+            )
+            for row in ex_result.all():
+                events.append({
+                    "timestamp": row.created_at.isoformat(),
+                    "event_type": "exchange_created",
+                    "user_email": f"family:{row.family_file_id[:8]}",
+                })
+        except Exception as exc:
+            logger.exception("Platform audit: exchanges query failed")
+            capture_error(exc)
+            warnings.append("exchanges")
 
     # 3. Generated reports
     if not event_type or event_type == "report_generated":
-        rep_result = await db.execute(
-            select(GeneratedReport.created_at, GeneratedReport.family_file_id)
-            .where(GeneratedReport.created_at >= since)
-            .order_by(desc(GeneratedReport.created_at))
-            .limit(limit)
-        )
-        for row in rep_result.all():
-            events.append({
-                "timestamp": row.created_at.isoformat(),
-                "event_type": "report_generated",
-                "user_email": f"family:{row.family_file_id[:8] if row.family_file_id else 'n/a'}",
-            })
+        try:
+            rep_result = await db.execute(
+                select(GeneratedReport.created_at, GeneratedReport.family_file_id)
+                .where(GeneratedReport.created_at >= since)
+                .order_by(desc(GeneratedReport.created_at))
+                .limit(limit)
+            )
+            for row in rep_result.all():
+                events.append({
+                    "timestamp": row.created_at.isoformat(),
+                    "event_type": "report_generated",
+                    "user_email": f"family:{row.family_file_id[:8] if row.family_file_id else 'n/a'}",
+                })
+        except Exception as exc:
+            logger.exception("Platform audit: reports query failed")
+            capture_error(exc)
+            warnings.append("reports")
 
     # 4. Agreements
     if not event_type or event_type == "agreement_signed":
-        agr_result = await db.execute(
-            select(Agreement.created_at, Agreement.family_file_id)
-            .where(Agreement.created_at >= since)
-            .order_by(desc(Agreement.created_at))
-            .limit(limit)
-        )
-        for row in agr_result.all():
-            events.append({
-                "timestamp": row.created_at.isoformat(),
-                "event_type": "agreement_signed",
-                "user_email": f"family:{row.family_file_id[:8] if row.family_file_id else 'n/a'}",
-            })
+        try:
+            agr_result = await db.execute(
+                select(Agreement.created_at, Agreement.family_file_id)
+                .where(Agreement.created_at >= since)
+                .order_by(desc(Agreement.created_at))
+                .limit(limit)
+            )
+            for row in agr_result.all():
+                events.append({
+                    "timestamp": row.created_at.isoformat(),
+                    "event_type": "agreement_signed",
+                    "user_email": f"family:{row.family_file_id[:8] if row.family_file_id else 'n/a'}",
+                })
+        except Exception as exc:
+            logger.exception("Platform audit: agreements query failed")
+            capture_error(exc)
+            warnings.append("agreements")
 
     # 5. Payments
     if not event_type or event_type == "payment_made":
-        pay_result = await db.execute(
-            select(Payment.created_at, Payment.payer_id)
-            .where(Payment.created_at >= since)
-            .order_by(desc(Payment.created_at))
-            .limit(limit)
-        )
-        for row in pay_result.all():
-            email = await _get_email(row.payer_id)
-            if _matches("payment_made", email):
-                events.append({
-                    "timestamp": row.created_at.isoformat(),
-                    "event_type": "payment_made",
-                    "user_email": email,
-                })
+        try:
+            pay_result = await db.execute(
+                select(Payment.created_at, Payment.payer_id)
+                .where(Payment.created_at >= since)
+                .order_by(desc(Payment.created_at))
+                .limit(limit)
+            )
+            for row in pay_result.all():
+                email = await _get_email(row.payer_id)
+                if _matches("payment_made", email):
+                    events.append({
+                        "timestamp": row.created_at.isoformat(),
+                        "event_type": "payment_made",
+                        "user_email": email,
+                    })
+        except Exception as exc:
+            logger.exception("Platform audit: payments query failed")
+            capture_error(exc)
+            warnings.append("payments")
 
     # 6. KidComs sessions
     if not event_type or event_type == "call_started":
-        kc_result = await db.execute(
-            select(KidComsSession.created_at, KidComsSession.initiated_by_id)
-            .where(KidComsSession.created_at >= since)
-            .order_by(desc(KidComsSession.created_at))
-            .limit(limit)
-        )
-        for row in kc_result.all():
-            events.append({
-                "timestamp": row.created_at.isoformat(),
-                "event_type": "call_started",
-                "user_email": row.initiated_by_id[:8] if row.initiated_by_id else "unknown",
-            })
+        try:
+            kc_result = await db.execute(
+                select(KidComsSession.created_at, KidComsSession.initiated_by_id)
+                .where(KidComsSession.created_at >= since)
+                .order_by(desc(KidComsSession.created_at))
+                .limit(limit)
+            )
+            for row in kc_result.all():
+                events.append({
+                    "timestamp": row.created_at.isoformat(),
+                    "event_type": "call_started",
+                    "user_email": row.initiated_by_id[:8] if row.initiated_by_id else "unknown",
+                })
+        except Exception as exc:
+            logger.exception("Platform audit: kidcoms query failed")
+            capture_error(exc)
+            warnings.append("kidcoms")
 
     # 7. ARIA interventions
     if not event_type or event_type == "aria_intervention":
-        aria_result = await db.execute(
-            select(MessageFlag.created_at, MessageFlag.message_id)
-            .where(MessageFlag.created_at >= since)
-            .order_by(desc(MessageFlag.created_at))
-            .limit(limit)
-        )
-        for row in aria_result.all():
-            events.append({
-                "timestamp": row.created_at.isoformat(),
-                "event_type": "aria_intervention",
-                "user_email": "system",
-            })
+        try:
+            aria_result = await db.execute(
+                select(MessageFlag.created_at, MessageFlag.message_id)
+                .where(MessageFlag.created_at >= since)
+                .order_by(desc(MessageFlag.created_at))
+                .limit(limit)
+            )
+            for row in aria_result.all():
+                events.append({
+                    "timestamp": row.created_at.isoformat(),
+                    "event_type": "aria_intervention",
+                    "user_email": "system",
+                })
+        except Exception as exc:
+            logger.exception("Platform audit: aria query failed")
+            capture_error(exc)
+            warnings.append("aria")
 
     # Sort all events by timestamp descending
     events.sort(key=lambda e: e["timestamp"], reverse=True)
@@ -2376,10 +2417,14 @@ async def get_platform_audit(
     total_count = len(events)
     paged_events = events[offset : offset + limit]
 
-    return {
+    result = {
         "events": paged_events,
         "total_count": total_count,
     }
+    if warnings:
+        result["warnings"] = warnings
+        result["partial"] = True
+    return result
 
 
 # =============================================================================
