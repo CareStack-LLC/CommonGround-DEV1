@@ -377,39 +377,108 @@ async def fetch_performance_data(days: int = 7) -> dict:
         except Exception as exc:
             logger.warning("Failed to fetch transaction data: %s", exc)
 
-        # 2. AI/LLM calls — look for ai.* span operations
+        # 2. AI/LLM calls — query ai.pipeline spans (matches Sentry AI Insights)
         try:
-            resp = await client.get(
-                f"{SENTRY_API_BASE}/organizations/{org}/events/",
-                headers=headers,
-                params={
-                    "field": ["description", "count()", "avg(span.duration)", "sum(ai.total_tokens.used)"],
-                    "sort": "-count()",
-                    "per_page": 20,
-                    "query": f"span.op:ai.* project:{slug}",
-                    "dataset": "spansIndexed",
-                    "start": since,
-                    "end": until,
-                },
-            )
-            if resp.status_code == 200:
-                data = resp.json().get("data", [])
-                result["ai_calls"] = [
-                    {
-                        "description": row.get("description", ""),
-                        "count": row.get("count()", 0),
-                        "avg_duration_ms": round(row.get("avg(span.duration)", 0), 1),
-                        "total_tokens": row.get("sum(ai.total_tokens.used)", 0),
-                    }
-                    for row in data
-                ]
-                logger.info("Fetched %d AI call metrics from Sentry", len(data))
-            else:
-                logger.warning("Sentry AI spans query failed (HTTP %s): %s", resp.status_code, resp.text[:300])
+            # Strategy A: Query ai.pipeline and ai.chat_completions spans
+            for span_op in ["ai.chat_completions.create.v2", "ai.chat_completions", "ai.pipeline", "ai.*"]:
+                resp = await client.get(
+                    f"{SENTRY_API_BASE}/organizations/{org}/events/",
+                    headers=headers,
+                    params={
+                        "field": [
+                            "span.description",
+                            "count()",
+                            "avg(span.duration)",
+                            "sum(ai.total_tokens.used)",
+                        ],
+                        "sort": "-count()",
+                        "per_page": 20,
+                        "query": f"span.op:{span_op} project:{slug}",
+                        "dataset": "spansIndexed",
+                        "start": since,
+                        "end": until,
+                    },
+                )
+                if resp.status_code == 200:
+                    data = resp.json().get("data", [])
+                    if data:
+                        result["ai_calls"] = [
+                            {
+                                "description": row.get("span.description", row.get("description", "")),
+                                "count": row.get("count()", 0),
+                                "avg_duration_ms": round(row.get("avg(span.duration)", 0), 1),
+                                "total_tokens": row.get("sum(ai.total_tokens.used)", 0) or 0,
+                            }
+                            for row in data
+                        ]
+                        result["ai_source"] = "spans"
+                        logger.info("Fetched %d AI calls from Sentry spans (op=%s)", len(data), span_op)
+                        break
+                else:
+                    logger.debug("Sentry AI span query (op=%s) failed HTTP %s", span_op, resp.status_code)
+
+            # Strategy B: Try the simpler field names
+            if not result["ai_calls"]:
+                resp = await client.get(
+                    f"{SENTRY_API_BASE}/organizations/{org}/events/",
+                    headers=headers,
+                    params={
+                        "field": ["description", "count()", "avg(span.duration)"],
+                        "sort": "-count()",
+                        "per_page": 20,
+                        "query": f"span.op:ai.* project:{slug}",
+                        "dataset": "spansIndexed",
+                        "start": since,
+                        "end": until,
+                    },
+                )
+                if resp.status_code == 200:
+                    data = resp.json().get("data", [])
+                    if data:
+                        result["ai_calls"] = [
+                            {
+                                "description": row.get("description", ""),
+                                "count": row.get("count()", 0),
+                                "avg_duration_ms": round(row.get("avg(span.duration)", 0), 1),
+                                "total_tokens": 0,
+                            }
+                            for row in data
+                        ]
+                        result["ai_source"] = "spans_basic"
+                        logger.info("Fetched %d AI calls (basic fields)", len(data))
+
+            # Strategy C: Fall back to AI-related transactions
+            if not result["ai_calls"]:
+                resp2 = await client.get(
+                    f"{SENTRY_API_BASE}/organizations/{org}/events/",
+                    headers=headers,
+                    params={
+                        "field": ["transaction", "count()", "p75(transaction.duration)", "failure_rate()"],
+                        "sort": "-count()",
+                        "per_page": 20,
+                        "query": f"event.type:transaction project:{slug} (transaction:*aria* OR transaction:*analyze* OR transaction:*triage*)",
+                        "start": since,
+                        "end": until,
+                    },
+                )
+                if resp2.status_code == 200:
+                    data2 = resp2.json().get("data", [])
+                    result["ai_calls"] = [
+                        {
+                            "description": row.get("transaction", ""),
+                            "count": row.get("count()", 0),
+                            "avg_duration_ms": round(row.get("p75(transaction.duration)", 0), 1),
+                            "total_tokens": 0,
+                        }
+                        for row in data2
+                    ]
+                    if data2:
+                        logger.info("Fetched %d AI transactions (fallback)", len(data2))
+                    result["ai_source"] = "transactions"
         except Exception as exc:
             logger.warning("Failed to fetch AI span data: %s", exc)
 
-        # 3. Slow DB queries — look for db span operations
+        # 3. Slow DB queries — try spans, fall back to slow transactions
         try:
             resp = await client.get(
                 f"{SENTRY_API_BASE}/organizations/{org}/events/",
@@ -418,7 +487,7 @@ async def fetch_performance_data(days: int = 7) -> dict:
                     "field": ["description", "count()", "avg(span.duration)", "p95(span.duration)"],
                     "sort": "-p95(span.duration)",
                     "per_page": 15,
-                    "query": f"span.op:db project:{slug} span.duration:>100",
+                    "query": f"span.op:db project:{slug} span.duration:>50",
                     "dataset": "spansIndexed",
                     "start": since,
                     "end": until,
@@ -426,18 +495,48 @@ async def fetch_performance_data(days: int = 7) -> dict:
             )
             if resp.status_code == 200:
                 data = resp.json().get("data", [])
-                result["slow_queries"] = [
-                    {
-                        "query": (row.get("description", "")[:200]),
-                        "count": row.get("count()", 0),
-                        "avg_ms": round(row.get("avg(span.duration)", 0), 1),
-                        "p95_ms": round(row.get("p95(span.duration)", 0), 1),
-                    }
-                    for row in data
-                ]
-                logger.info("Fetched %d slow query metrics from Sentry", len(data))
-            else:
-                logger.warning("Sentry slow queries failed (HTTP %s): %s", resp.status_code, resp.text[:300])
+                if data:
+                    result["slow_queries"] = [
+                        {
+                            "query": (row.get("description", "")[:200]),
+                            "count": row.get("count()", 0),
+                            "avg_ms": round(row.get("avg(span.duration)", 0), 1),
+                            "p95_ms": round(row.get("p95(span.duration)", 0), 1),
+                        }
+                        for row in data
+                    ]
+                    logger.info("Fetched %d slow query metrics from Sentry spans", len(data))
+
+            # Fallback: show slowest transactions overall (p95 > 1s)
+            if not result["slow_queries"]:
+                resp2 = await client.get(
+                    f"{SENTRY_API_BASE}/organizations/{org}/events/",
+                    headers=headers,
+                    params={
+                        "field": ["transaction", "count()", "p75(transaction.duration)", "p95(transaction.duration)"],
+                        "sort": "-p95(transaction.duration)",
+                        "per_page": 15,
+                        "query": f"event.type:transaction project:{slug} p95(transaction.duration):>1000",
+                        "start": since,
+                        "end": until,
+                    },
+                )
+                if resp2.status_code == 200:
+                    data2 = resp2.json().get("data", [])
+                    result["slow_queries"] = [
+                        {
+                            "query": row.get("transaction", "")[:200],
+                            "count": row.get("count()", 0),
+                            "avg_ms": round(row.get("p75(transaction.duration)", 0), 1),
+                            "p95_ms": round(row.get("p95(transaction.duration)", 0), 1),
+                        }
+                        for row in data2
+                    ]
+                    if data2:
+                        logger.info("Fetched %d slow transactions (fallback)", len(data2))
+                    result["db_source"] = "transactions"
+                else:
+                    logger.warning("Sentry slow tx fallback failed (HTTP %s): %s", resp2.status_code, resp2.text[:200])
         except Exception as exc:
             logger.warning("Failed to fetch slow query data: %s", exc)
 

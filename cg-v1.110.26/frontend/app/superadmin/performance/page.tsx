@@ -256,8 +256,12 @@ export default function PerformancePage() {
             </table>
           </div>
         ) : (
-          <div className="px-5 py-10 text-center text-zinc-500 text-sm">
-            No AI usage data available for this period
+          <div className="px-5 py-10 text-center text-sm">
+            <p className="text-zinc-500">No AI usage data available for this period</p>
+            <p className="text-zinc-600 text-xs mt-2">
+              AI spans are captured automatically when the backend processes ARIA, triage, or lead qualification requests.
+              Data appears after users trigger AI features.
+            </p>
           </div>
         )}
       </section>
@@ -304,8 +308,12 @@ export default function PerformancePage() {
             </table>
           </div>
         ) : (
-          <div className="px-5 py-10 text-center text-zinc-500 text-sm">
-            No slow queries detected for this period
+          <div className="px-5 py-10 text-center text-sm">
+            <p className="text-zinc-500">No slow queries detected for this period</p>
+            <p className="text-zinc-600 text-xs mt-2">
+              Queries taking &gt;50ms are tracked automatically via Sentry&apos;s SQLAlchemy integration.
+              No slow queries is good — your database is performing well.
+            </p>
           </div>
         )}
       </section>
