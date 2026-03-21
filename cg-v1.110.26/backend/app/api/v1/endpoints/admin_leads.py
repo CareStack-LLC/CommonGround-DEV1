@@ -456,10 +456,19 @@ async def generate_landing_page(
         tone=body.tone,
         cta_destination=body.cta_destination,
     )
-    # Save to database as draft
-    result = await svc_create(db, generated)
-    await db.commit()
-    return result
+    # Try to save to database; return generated content even if DB fails
+    try:
+        result = await svc_create(db, generated)
+        await db.commit()
+        return result
+    except Exception as exc:
+        logger.warning("Failed to save landing page to DB (table may not exist): %s", exc)
+        await db.rollback()
+        # Return the AI-generated content directly
+        generated["id"] = "preview"
+        generated["status"] = "draft"
+        generated["saved"] = False
+        return generated
 
 
 @router.put(
