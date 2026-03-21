@@ -514,7 +514,7 @@ export default function LeadsPage() {
                               </span>
                             </td>
                             <td className="px-4 py-3 text-zinc-500 text-xs">
-                              {new Date(c.converted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' })}
+                              {c.converted_at ? new Date(c.converted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' }) : '—'}
                             </td>
                           </tr>
                         ))}
