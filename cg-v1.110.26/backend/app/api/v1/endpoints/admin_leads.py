@@ -147,6 +147,7 @@ async def delete_lead_list(
 async def import_csv(
     list_id: str,
     file: UploadFile = File(...),
+    source: str = Query("import", description="Lead source: import, newsletter, blog, event, etc."),
     db: AsyncSession = Depends(get_db),
     admin_user: User = Depends(get_current_admin_user),
 ) -> dict:
@@ -157,7 +158,7 @@ async def import_csv(
         raise HTTPException(status_code=400, detail="File must be a .csv")
 
     contents = await file.read()
-    result = await import_csv_to_list(db, list_id, contents)
+    result = await import_csv_to_list(db, list_id, contents, source=source)
     await db.commit()
     return result
 
@@ -337,5 +338,197 @@ async def create_template(
     from app.services.lead_service import create_template as svc_create_template
 
     result = await svc_create_template(db, body.model_dump())
+    await db.commit()
+    return result
+
+
+# =============================================================================
+# Pipeline & Conversion Tracking
+# =============================================================================
+
+@router.get(
+    "/pipeline",
+    summary="Lead pipeline overview",
+)
+async def get_pipeline(
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Funnel counts, source breakdown, conversion rate, recent conversions."""
+    from app.services.lead_service import get_lead_pipeline
+
+    return await get_lead_pipeline(db)
+
+
+@router.post(
+    "/match-users",
+    summary="Match leads to existing users",
+)
+async def match_users(
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Match lead emails to User accounts, marking converted leads."""
+    from app.services.lead_service import match_leads_to_users
+
+    result = await match_leads_to_users(db)
+    await db.commit()
+    return result
+
+
+# =============================================================================
+# Landing Pages
+# =============================================================================
+
+class LandingPageCreate(BaseModel):
+    slug: str
+    title: str
+    headline: str
+    subheadline: Optional[str] = None
+    hero_image_url: Optional[str] = None
+    body_html: str
+    cta_text: str = "Get Started Free"
+    cta_url: str = "https://www.find-commonground.com/register"
+    target_audience: str = "general"
+    status: str = "draft"
+    seo_title: Optional[str] = None
+    seo_description: Optional[str] = None
+    utm_source: Optional[str] = None
+    utm_medium: Optional[str] = None
+    utm_campaign: Optional[str] = None
+
+
+class LandingPageGenerate(BaseModel):
+    target_audience: str
+    key_message: str
+    tone: str = "professional"
+    cta_destination: str = "https://www.find-commonground.com/register"
+
+
+@router.get(
+    "/landing-pages",
+    summary="List all landing pages",
+)
+async def list_landing_pages(
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> list:
+    from app.services.lead_service import get_all_landing_pages
+    return await get_all_landing_pages(db)
+
+
+@router.post(
+    "/landing-pages",
+    summary="Create a landing page",
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_landing_page(
+    body: LandingPageCreate,
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    from app.services.lead_service import create_landing_page as svc_create
+    result = await svc_create(db, body.model_dump())
+    await db.commit()
+    return result
+
+
+@router.post(
+    "/landing-pages/generate",
+    summary="AI-generate a landing page",
+)
+async def generate_landing_page(
+    body: LandingPageGenerate,
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Generate a full landing page using AI (Claude/OpenAI) with SEO + UTM."""
+    from app.services.lead_service import ai_generate_landing_page, create_landing_page as svc_create
+
+    generated = await ai_generate_landing_page(
+        target_audience=body.target_audience,
+        key_message=body.key_message,
+        tone=body.tone,
+        cta_destination=body.cta_destination,
+    )
+    # Save to database as draft
+    result = await svc_create(db, generated)
+    await db.commit()
+    return result
+
+
+@router.put(
+    "/landing-pages/{page_id}",
+    summary="Update a landing page",
+)
+async def update_landing_page_endpoint(
+    page_id: str,
+    body: LandingPageCreate,
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    from app.services.lead_service import update_landing_page
+    result = await update_landing_page(db, page_id, body.model_dump())
+    if not result:
+        raise HTTPException(status_code=404, detail="Landing page not found")
+    await db.commit()
+    return result
+
+
+@router.post(
+    "/landing-pages/{page_id}/publish",
+    summary="Publish a landing page",
+)
+async def publish_landing_page(
+    page_id: str,
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    from app.services.lead_service import update_landing_page
+    result = await update_landing_page(db, page_id, {"status": "published"})
+    if not result:
+        raise HTTPException(status_code=404, detail="Landing page not found")
+    await db.commit()
+    return result
+
+
+@router.delete(
+    "/landing-pages/{page_id}",
+    summary="Delete a landing page",
+)
+async def delete_landing_page_endpoint(
+    page_id: str,
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    from app.services.lead_service import delete_landing_page
+    deleted = await delete_landing_page(db, page_id)
+    if not deleted:
+        raise HTTPException(status_code=404, detail="Landing page not found")
+    await db.commit()
+    return {"deleted": True}
+
+
+# =============================================================================
+# Public Landing Page API (no auth required — used by frontend)
+# =============================================================================
+
+public_router = APIRouter()
+
+
+@public_router.get(
+    "/lp/{slug}",
+    summary="Get published landing page by slug",
+)
+async def get_public_landing_page(
+    slug: str,
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    """Public endpoint — returns a published landing page by slug."""
+    from app.services.lead_service import get_landing_page_by_slug
+
+    result = await get_landing_page_by_slug(db, slug)
+    if not result or result.get("status") != "published":
+        raise HTTPException(status_code=404, detail="Page not found")
     await db.commit()
     return result

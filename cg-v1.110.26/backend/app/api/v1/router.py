@@ -202,6 +202,10 @@ api_router.include_router(kidspace_media.router, prefix="/kidspace", tags=["KidS
 # Admin Lead Generator - Lead lists, campaigns, SendGrid
 api_router.include_router(admin_leads.router, prefix="/admin/leads", tags=["Admin Lead Generator"])
 
+# Public Landing Pages (no auth)
+from app.api.v1.endpoints.admin_leads import public_router as landing_page_public_router
+api_router.include_router(landing_page_public_router, tags=["Landing Pages"])
+
 # Admin Email Monitor - Gmail integration, AI drafts
 api_router.include_router(admin_inbox.router, prefix="/admin/inbox", tags=["Admin Email Monitor"])
 

@@ -14,7 +14,8 @@ from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import Settings
-from app.models.lead import LeadList, Lead, EmailCampaign, CampaignTemplate
+from app.models.lead import LeadList, Lead, EmailCampaign, CampaignTemplate, LandingPage
+from app.models.user import User
 
 logger = logging.getLogger(__name__)
 settings = Settings()
@@ -50,6 +51,7 @@ async def import_leads_csv(
     db: AsyncSession,
     file_content: bytes,
     lead_list_id: str,
+    source: str = "import",
 ) -> dict:
     """Parse a CSV file and create Lead records.
 
@@ -88,7 +90,7 @@ async def import_leads_csv(
             last_name=(row.get("last_name") or "").strip() or None,
             company=(row.get("company") or "").strip() or None,
             title=(row.get("title") or "").strip() or None,
-            source="import",
+            source=source,
         )
         db.add(lead)
         imported += 1
@@ -114,6 +116,7 @@ async def add_lead_manually(
     last_name: Optional[str] = None,
     company: Optional[str] = None,
     title: Optional[str] = None,
+    source: str = "manual",
 ) -> Lead:
     """Add a single lead to a list."""
     email = email.strip().lower()
@@ -127,7 +130,7 @@ async def add_lead_manually(
         last_name=last_name,
         company=company,
         title=title,
-        source="manual",
+        source=source,
     )
     db.add(lead)
 
@@ -393,6 +396,11 @@ def _lead_to_dict(lead: Lead) -> dict:
         "title": lead.title,
         "source": lead.source,
         "status": lead.status,
+        "utm_source": getattr(lead, "utm_source", None),
+        "utm_medium": getattr(lead, "utm_medium", None),
+        "utm_campaign": getattr(lead, "utm_campaign", None),
+        "converted_user_id": getattr(lead, "converted_user_id", None),
+        "converted_at": lead.converted_at.isoformat() if getattr(lead, "converted_at", None) else None,
         "created_at": lead.created_at.isoformat() if lead.created_at else None,
     }
 
@@ -451,8 +459,8 @@ async def delete_list(db: AsyncSession, list_id: str) -> bool:
     return True
 
 
-async def import_csv_to_list(db: AsyncSession, list_id: str, contents: bytes) -> dict:
-    return await import_leads_csv(db, contents, list_id)
+async def import_csv_to_list(db: AsyncSession, list_id: str, contents: bytes, source: str = "import") -> dict:
+    return await import_leads_csv(db, contents, list_id, source=source)
 
 
 async def add_lead_to_list(db: AsyncSession, list_id: str, data: dict) -> dict:
@@ -463,6 +471,7 @@ async def add_lead_to_list(db: AsyncSession, list_id: str, data: dict) -> dict:
         last_name=data.get("last_name"),
         company=data.get("company"),
         title=data.get("title"),
+        source=data.get("source", "manual"),
     )
     return _lead_to_dict(lead)
 
@@ -543,3 +552,295 @@ async def create_template(db: AsyncSession, data: dict) -> dict:
     db.add(t)
     await db.flush()
     return {"id": t.id, "name": t.name, "target_audience": t.target_audience}
+
+
+# ---------------------------------------------------------------------------
+# Pipeline & conversion tracking
+# ---------------------------------------------------------------------------
+
+async def get_lead_pipeline(db: AsyncSession) -> dict:
+    """Return funnel counts, source breakdown, and recent conversions."""
+    try:
+        # Funnel counts
+        total = (await db.execute(select(func.count(Lead.id)))).scalar() or 0
+        contacted = (await db.execute(
+            select(func.count(Lead.id)).where(Lead.status == "contacted")
+        )).scalar() or 0
+        responded = (await db.execute(
+            select(func.count(Lead.id)).where(Lead.status == "responded")
+        )).scalar() or 0
+        converted = (await db.execute(
+            select(func.count(Lead.id)).where(Lead.status == "converted")
+        )).scalar() or 0
+
+        # Source breakdown
+        source_result = await db.execute(
+            select(Lead.source, func.count(Lead.id)).group_by(Lead.source)
+        )
+        by_source = {row[0]: row[1] for row in source_result}
+
+        # Conversion rate
+        conversion_rate = round(converted / total * 100, 1) if total > 0 else 0.0
+
+        # Recent conversions (leads with converted_user_id set)
+        recent_result = await db.execute(
+            select(Lead)
+            .where(Lead.converted_user_id.isnot(None))
+            .order_by(Lead.converted_at.desc())
+            .limit(10)
+        )
+        recent = [
+            {
+                "email": l.email,
+                "source": l.source,
+                "converted_at": l.converted_at.isoformat() if l.converted_at else None,
+                "list_id": l.lead_list_id,
+            }
+            for l in recent_result.scalars().all()
+        ]
+
+        # Top lists by lead count
+        list_result = await db.execute(
+            select(LeadList).order_by(LeadList.lead_count.desc()).limit(5)
+        )
+        top_lists = []
+        for ll in list_result.scalars().all():
+            conv_count = (await db.execute(
+                select(func.count(Lead.id)).where(
+                    Lead.lead_list_id == ll.id,
+                    Lead.status == "converted",
+                )
+            )).scalar() or 0
+            top_lists.append({
+                "id": ll.id,
+                "name": ll.name,
+                "lead_count": ll.lead_count,
+                "converted": conv_count,
+            })
+
+        return {
+            "funnel": {"total": total, "contacted": contacted, "responded": responded, "converted": converted},
+            "by_source": by_source,
+            "conversion_rate": conversion_rate,
+            "recent_conversions": recent,
+            "top_lists": top_lists,
+        }
+    except Exception as exc:
+        logger.warning("Pipeline query failed (tables may not exist): %s", exc)
+        return {
+            "funnel": {"total": 0, "contacted": 0, "responded": 0, "converted": 0},
+            "by_source": {},
+            "conversion_rate": 0,
+            "recent_conversions": [],
+            "top_lists": [],
+        }
+
+
+async def match_leads_to_users(db: AsyncSession) -> dict:
+    """Match lead emails to User accounts, updating conversion tracking."""
+    try:
+        # Get all leads without a converted_user_id
+        unmatched = await db.execute(
+            select(Lead).where(Lead.converted_user_id.is_(None))
+        )
+        leads = unmatched.scalars().all()
+        if not leads:
+            return {"matched": 0, "total_unmatched": 0}
+
+        matched = 0
+        for lead in leads:
+            user_result = await db.execute(
+                select(User).where(func.lower(User.email) == lead.email.lower()).limit(1)
+            )
+            user = user_result.scalar_one_or_none()
+            if user:
+                lead.converted_user_id = user.id
+                lead.converted_at = user.created_at or datetime.utcnow()
+                lead.status = "converted"
+                matched += 1
+
+        if matched > 0:
+            await db.flush()
+
+        logger.info("Matched %d leads to users", matched)
+        return {"matched": matched, "total_unmatched": len(leads) - matched}
+    except Exception as exc:
+        logger.warning("Lead-user matching failed: %s", exc)
+        return {"matched": 0, "error": str(exc)}
+
+
+# ---------------------------------------------------------------------------
+# Landing page management
+# ---------------------------------------------------------------------------
+
+def _landing_page_to_dict(lp: LandingPage) -> dict:
+    return {
+        "id": lp.id,
+        "slug": lp.slug,
+        "title": lp.title,
+        "headline": lp.headline,
+        "subheadline": lp.subheadline,
+        "hero_image_url": lp.hero_image_url,
+        "body_html": lp.body_html,
+        "cta_text": lp.cta_text,
+        "cta_url": lp.cta_url,
+        "target_audience": lp.target_audience,
+        "status": lp.status,
+        "seo_title": lp.seo_title,
+        "seo_description": lp.seo_description,
+        "og_image_url": lp.og_image_url,
+        "utm_source": lp.utm_source,
+        "utm_medium": lp.utm_medium,
+        "utm_campaign": lp.utm_campaign,
+        "view_count": lp.view_count,
+        "created_at": lp.created_at.isoformat() if lp.created_at else None,
+        "updated_at": lp.updated_at.isoformat() if lp.updated_at else None,
+    }
+
+
+async def get_all_landing_pages(db: AsyncSession) -> list[dict]:
+    result = await db.execute(select(LandingPage).order_by(LandingPage.created_at.desc()))
+    return [_landing_page_to_dict(lp) for lp in result.scalars().all()]
+
+
+async def get_landing_page_by_slug(db: AsyncSession, slug: str) -> Optional[dict]:
+    result = await db.execute(select(LandingPage).where(LandingPage.slug == slug))
+    lp = result.scalar_one_or_none()
+    if not lp:
+        return None
+    # Increment view count for published pages
+    if lp.status == "published":
+        lp.view_count = (lp.view_count or 0) + 1
+        await db.flush()
+    return _landing_page_to_dict(lp)
+
+
+async def create_landing_page(db: AsyncSession, data: dict) -> dict:
+    lp = LandingPage(
+        slug=data["slug"],
+        title=data["title"],
+        headline=data["headline"],
+        subheadline=data.get("subheadline"),
+        hero_image_url=data.get("hero_image_url"),
+        body_html=data["body_html"],
+        cta_text=data.get("cta_text", "Get Started Free"),
+        cta_url=data.get("cta_url", "https://www.find-commonground.com/register"),
+        target_audience=data.get("target_audience", "general"),
+        status=data.get("status", "draft"),
+        seo_title=data.get("seo_title"),
+        seo_description=data.get("seo_description"),
+        og_image_url=data.get("og_image_url"),
+        utm_source=data.get("utm_source"),
+        utm_medium=data.get("utm_medium"),
+        utm_campaign=data.get("utm_campaign"),
+    )
+    db.add(lp)
+    await db.flush()
+    return _landing_page_to_dict(lp)
+
+
+async def update_landing_page(db: AsyncSession, page_id: str, data: dict) -> Optional[dict]:
+    lp = await db.get(LandingPage, page_id)
+    if not lp:
+        return None
+    for key in ["slug", "title", "headline", "subheadline", "hero_image_url",
+                "body_html", "cta_text", "cta_url", "target_audience", "status",
+                "seo_title", "seo_description", "og_image_url",
+                "utm_source", "utm_medium", "utm_campaign"]:
+        if key in data:
+            setattr(lp, key, data[key])
+    await db.flush()
+    return _landing_page_to_dict(lp)
+
+
+async def delete_landing_page(db: AsyncSession, page_id: str) -> bool:
+    lp = await db.get(LandingPage, page_id)
+    if not lp:
+        return False
+    await db.delete(lp)
+    await db.flush()
+    return True
+
+
+async def ai_generate_landing_page(
+    target_audience: str,
+    key_message: str,
+    tone: str = "professional",
+    cta_destination: str = "https://www.find-commonground.com/register",
+) -> dict:
+    """Use Claude to generate a full landing page with SEO and UTM."""
+    slug = re.sub(r"[^a-z0-9]+", "-", target_audience.lower()).strip("-")
+
+    prompt = (
+        "You are a conversion-focused landing page copywriter for CommonGround, "
+        "an AI-powered co-parenting platform. Brand voice: empathetic, child-first, "
+        "neutral, professional, hopeful. Primary color: #7C3AED (violet).\n\n"
+        f"Target audience: {target_audience}\n"
+        f"Key message: {key_message}\n"
+        f"Tone: {tone}\n"
+        f"CTA destination: {cta_destination}\n\n"
+        "Generate a landing page with:\n"
+        "1. slug (URL-safe, e.g. 'for-single-moms')\n"
+        "2. title (page title for browser tab)\n"
+        "3. headline (hero section, 8-12 words max)\n"
+        "4. subheadline (1-2 sentences supporting the headline)\n"
+        "5. body_html (responsive HTML with inline CSS, 3-4 sections: benefits, "
+        "features, social proof, final CTA. Use #7C3AED for accent color)\n"
+        "6. cta_text (button text, 3-5 words)\n"
+        "7. seo_title (60 chars max)\n"
+        "8. seo_description (160 chars max)\n"
+        "9. utm_campaign (e.g. 'lp-for-single-moms')\n\n"
+        "Return ONLY valid JSON with these keys."
+    )
+
+    result = None
+    try:
+        if settings.ANTHROPIC_API_KEY:
+            client = anthropic.AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY)
+            response = await client.messages.create(
+                model="claude-sonnet-4-20250514",
+                max_tokens=4096,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            text = response.content[0].text
+            if "```json" in text:
+                text = text.split("```json")[1].split("```")[0]
+            elif "```" in text:
+                text = text.split("```")[1].split("```")[0]
+            result = json.loads(text.strip())
+    except Exception as e:
+        logger.warning("Claude landing page generation failed: %s", e)
+
+    if not result:
+        try:
+            from openai import AsyncOpenAI
+            if settings.OPENAI_API_KEY:
+                client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+                resp = await client.chat.completions.create(
+                    model="gpt-4o",
+                    messages=[{"role": "user", "content": prompt}],
+                    response_format={"type": "json_object"},
+                    max_tokens=4096,
+                )
+                result = json.loads(resp.choices[0].message.content or "{}")
+        except Exception as e:
+            logger.warning("OpenAI landing page generation also failed: %s", e)
+            raise ValueError("Both AI providers failed to generate landing page")
+
+    # Fill in defaults
+    result.setdefault("slug", slug)
+    result.setdefault("cta_url", cta_destination)
+    result.setdefault("utm_source", "landing_page")
+    result.setdefault("utm_medium", "web")
+    result.setdefault("target_audience", target_audience)
+
+    # Append UTM params to CTA URL
+    cta = result.get("cta_url", cta_destination)
+    sep = "&" if "?" in cta else "?"
+    result["cta_url"] = (
+        f"{cta}{sep}utm_source={result.get('utm_source', 'landing_page')}"
+        f"&utm_medium={result.get('utm_medium', 'web')}"
+        f"&utm_campaign={result.get('utm_campaign', slug)}"
+    )
+
+    return result

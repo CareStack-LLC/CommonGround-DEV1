@@ -42,9 +42,21 @@ class Lead(Base, UUIDMixin, TimestampMixin):
     last_name: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     company: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
     title: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
-    source: Mapped[str] = mapped_column(String(20), default="manual")  # manual, import
-    status: Mapped[str] = mapped_column(String(20), default="new")  # new, contacted, responded, converted, unsubscribed
+    source: Mapped[str] = mapped_column(String(50), default="manual")
+    # Sources: manual, import, newsletter, blog, contact_form, early_adopter,
+    #          referral, landing_page, social, event, paid, organic
+    status: Mapped[str] = mapped_column(String(20), default="new")
+    # Statuses: new, contacted, responded, converted, unsubscribed
     metadata_json: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+
+    # Attribution tracking
+    utm_source: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    utm_medium: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    utm_campaign: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
+
+    # Conversion tracking — links lead to the User account they created
+    converted_user_id: Mapped[Optional[str]] = mapped_column(String(36), nullable=True, index=True)
+    converted_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
     lead_list: Mapped["LeadList"] = relationship("LeadList", back_populates="leads")
 
@@ -72,6 +84,37 @@ class EmailCampaign(Base, UUIDMixin, TimestampMixin):
 
     def __repr__(self) -> str:
         return f"<EmailCampaign {self.name} ({self.status})>"
+
+
+class LandingPage(Base, UUIDMixin, TimestampMixin):
+    """AI-generated landing page for targeted marketing."""
+
+    __tablename__ = "landing_pages"
+
+    slug: Mapped[str] = mapped_column(String(200), unique=True, index=True)
+    title: Mapped[str] = mapped_column(String(300))
+    headline: Mapped[str] = mapped_column(String(500))
+    subheadline: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    hero_image_url: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    body_html: Mapped[str] = mapped_column(Text)
+    cta_text: Mapped[str] = mapped_column(String(100), default="Get Started Free")
+    cta_url: Mapped[str] = mapped_column(String(500), default="https://www.find-commonground.com/register")
+    target_audience: Mapped[str] = mapped_column(String(100), default="general")
+    status: Mapped[str] = mapped_column(String(20), default="draft")  # draft, published
+    # SEO
+    seo_title: Mapped[Optional[str]] = mapped_column(String(70), nullable=True)
+    seo_description: Mapped[Optional[str]] = mapped_column(String(170), nullable=True)
+    og_image_url: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    # UTM
+    utm_source: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    utm_medium: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    utm_campaign: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
+    # Analytics
+    ga_events_json: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    view_count: Mapped[int] = mapped_column(default=0)
+
+    def __repr__(self) -> str:
+        return f"<LandingPage /{self.slug} ({self.status})>"
 
 
 class CampaignTemplate(Base, UUIDMixin, TimestampMixin):
