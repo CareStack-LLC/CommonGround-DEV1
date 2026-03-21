@@ -367,6 +367,64 @@ async def search_users(
     )
     await db.commit()
 
+    # --- Phase 3: Summary stats (only on first page) ---
+    summary = None
+    if offset == 0:
+        # Total counts
+        total_active = await db.scalar(
+            select(func.count()).select_from(User).where(User.is_active == True, User.is_deleted == False)
+        ) or 0
+        total_inactive = await db.scalar(
+            select(func.count()).select_from(User).where(User.is_active == False, User.is_deleted == False)
+        ) or 0
+
+        # Tier breakdown
+        tier_result = await db.execute(
+            select(
+                UserProfile.subscription_tier,
+                func.count().label("count"),
+            )
+            .join(User, User.id == UserProfile.user_id)
+            .where(User.is_deleted == False)
+            .group_by(UserProfile.subscription_tier)
+            .order_by(func.count().desc())
+        )
+        tier_breakdown = {row.subscription_tier or "none": row.count for row in tier_result.all()}
+
+        # Professional users (have professional profile)
+        try:
+            from app.models.professional import ProfessionalProfile
+            pro_count = await db.scalar(
+                select(func.count()).select_from(ProfessionalProfile)
+            ) or 0
+        except Exception:
+            pro_count = 0
+
+        # New users last 7 days
+        seven_days = datetime.utcnow() - timedelta(days=7)
+        new_7d = await db.scalar(
+            select(func.count()).select_from(User).where(
+                User.created_at >= seven_days, User.is_deleted == False
+            )
+        ) or 0
+
+        # New users last 30 days
+        thirty_days = datetime.utcnow() - timedelta(days=30)
+        new_30d = await db.scalar(
+            select(func.count()).select_from(User).where(
+                User.created_at >= thirty_days, User.is_deleted == False
+            )
+        ) or 0
+
+        summary = {
+            "total_active": total_active,
+            "total_inactive": total_inactive,
+            "professionals": pro_count,
+            "new_7d": new_7d,
+            "new_30d": new_30d,
+            "tier_breakdown": tier_breakdown,
+        }
+
     return {
         "users": [
             {
@@ -387,6 +445,7 @@ async def search_users(
         "total": total,
         "limit": limit,
         "offset": offset,
+        "summary": summary,
     }
 
 
@@ -2056,14 +2115,87 @@ async def get_aria_insights(
     )
     sentiment_dist["positive"] = total_msgs_result.scalar() or 0
 
+    # --- Phase 3 enhancements ---
+
+    # User action breakdown (accepted, modified, rejected, sent_anyway, cancelled)
+    action_result = await db.execute(
+        select(
+            MessageFlag.user_action,
+            func.count().label("count"),
+        )
+        .where(MessageFlag.user_action.isnot(None))
+        .group_by(MessageFlag.user_action)
+        .order_by(func.count().desc())
+    )
+    action_breakdown = {row.user_action: row.count for row in action_result.all()}
+
+    sent_anyway_count = action_breakdown.get("sent_anyway", 0)
+    rejected_count = action_breakdown.get("rejected", 0)
+
+    # Avg messages per day (last 30 days)
+    from app.models.message import Message
+    msg_count_30d = await db.execute(
+        select(func.count()).select_from(Message).where(
+            Message.created_at >= thirty_days_ago
+        )
+    )
+    total_msgs_30d = msg_count_30d.scalar() or 0
+    avg_messages_per_day = round(total_msgs_30d / 30, 1)
+
+    # Intervention rate (flagged / total messages in last 30d)
+    intervention_rate = (
+        round(last_30d / total_msgs_30d * 100, 1)
+        if total_msgs_30d > 0 else 0.0
+    )
+
+    # Category breakdown from JSON array (explode categories)
+    cat_detail_result = await db.execute(
+        select(MessageFlag.categories, func.count().label("cnt"))
+        .where(MessageFlag.created_at >= thirty_days_ago)
+        .group_by(MessageFlag.categories)
+    )
+    category_counts: dict[str, int] = {}
+    for row in cat_detail_result.all():
+        cats = row.categories if isinstance(row.categories, list) else []
+        for c in cats:
+            category_counts[c] = category_counts.get(c, 0) + row.cnt
+    detailed_categories = sorted(
+        [{"category": k, "count": v} for k, v in category_counts.items()],
+        key=lambda x: x["count"],
+        reverse=True,
+    )
+
+    # Intervention level distribution
+    level_result = await db.execute(
+        select(
+            MessageFlag.intervention_level,
+            func.count().label("count"),
+        )
+        .group_by(MessageFlag.intervention_level)
+        .order_by(MessageFlag.intervention_level)
+    )
+    level_labels = {1: "Gentle Nudge", 2: "Firm Suggestion", 3: "Strong Warning", 4: "Blocked"}
+    intervention_levels = [
+        {"level": row.intervention_level, "label": level_labels.get(row.intervention_level, f"Level {row.intervention_level}"), "count": row.count}
+        for row in level_result.all()
+    ]
+
     return {
         "total_interventions": total_interventions,
         "last_7d": last_7d,
         "last_30d": last_30d,
         "daily_interventions": daily_interventions,
         "top_categories": top_categories,
+        "detailed_categories": detailed_categories,
         "blocked_count": blocked_count,
         "acceptance_rate": acceptance_rate,
+        "sent_anyway_count": sent_anyway_count,
+        "rejected_count": rejected_count,
+        "action_breakdown": action_breakdown,
+        "intervention_levels": intervention_levels,
+        "intervention_rate": intervention_rate,
+        "avg_messages_per_day": avg_messages_per_day,
+        "total_messages_30d": total_msgs_30d,
         "sentiment_distribution": sentiment_dist,
     }
 
@@ -2198,18 +2330,112 @@ async def get_kidspace_stats(
         for row in daily_result.all()
     ]
 
+    # --- Phase 3 enhancements ---
+
+    # Total children
+    total_children_result = await db.execute(
+        select(func.count()).select_from(Child)
+    )
+    total_children = total_children_result.scalar() or 0
+
+    # Total minutes watched across all session types
+    total_watch_result = await db.execute(
+        select(func.sum(KidComsSession.duration_seconds)).where(
+            KidComsSession.session_type.in_([
+                SessionType.THEATER.value,
+                SessionType.WHITEBOARD.value,
+            ]),
+            KidComsSession.status == SessionStatus.COMPLETED.value,
+        )
+    )
+    total_watch_seconds = total_watch_result.scalar() or 0
+    total_minutes_watched = total_watch_seconds // 60
+
+    # Avg session duration by type
+    avg_duration_result = await db.execute(
+        select(
+            KidComsSession.session_type,
+            func.avg(KidComsSession.duration_seconds).label("avg_secs"),
+            func.count().label("count"),
+        )
+        .where(KidComsSession.status == SessionStatus.COMPLETED.value)
+        .group_by(KidComsSession.session_type)
+    )
+    session_averages = [
+        {
+            "type": row.session_type,
+            "avg_minutes": round((row.avg_secs or 0) / 60, 1),
+            "total_sessions": row.count,
+        }
+        for row in avg_duration_result.all()
+    ]
+
+    # Most played — top theater sessions by views (using total_messages as proxy for views)
+    most_played_result = await db.execute(
+        select(
+            KidComsSession.room_name,
+            func.count().label("view_count"),
+            func.sum(KidComsSession.duration_seconds).label("total_secs"),
+        )
+        .where(KidComsSession.session_type == SessionType.THEATER.value)
+        .group_by(KidComsSession.room_name)
+        .order_by(func.count().desc())
+        .limit(10)
+    )
+    most_played = [
+        {
+            "rank": i + 1,
+            "title": row.room_name or f"Session {i+1}",
+            "view_count": row.view_count,
+            "minutes_watched": (row.total_secs or 0) // 60,
+        }
+        for i, row in enumerate(most_played_result.all())
+    ]
+
+    # Most read — top whiteboard/stories sessions
+    most_read_result = await db.execute(
+        select(
+            KidComsSession.room_name,
+            func.count().label("read_count"),
+            func.sum(KidComsSession.total_messages).label("pages"),
+        )
+        .where(KidComsSession.session_type == SessionType.WHITEBOARD.value)
+        .group_by(KidComsSession.room_name)
+        .order_by(func.count().desc())
+        .limit(10)
+    )
+    most_read = [
+        {
+            "rank": i + 1,
+            "title": row.room_name or f"Story {i+1}",
+            "read_count": row.read_count,
+            "pages_turned": row.pages or 0,
+        }
+        for i, row in enumerate(most_read_result.all())
+    ]
+
     return {
         "active_families": active_families,
+        "total_children": total_children,
         "total_call_minutes": total_call_minutes,
         "call_minutes_30d": call_minutes_30d,
+        "total_minutes_watched": total_minutes_watched,
         "theater_sessions": theater_sessions,
         "theater_minutes": theater_minutes,
         "arcade_sessions": arcade_sessions,
         "arcade_minutes": arcade_minutes,
         "stories_sessions": stories_sessions,
+        "stories_read": stories_sessions,
         "pages_turned": pages_turned,
         "coppa_consented_children": coppa_consented_children,
+        "session_averages": session_averages,
+        "most_played": most_played,
+        "most_read": most_read,
         "daily_usage": daily_usage,
+        "coppa_consent": {
+            "children_with_consent": coppa_consented_children,
+            "total_children": total_children,
+        },
     }
 
 

@@ -4,8 +4,10 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Users, Search, ChevronLeft, ChevronRight, Shield,
-  Filter, ArrowUpDown, UserCheck, UserX, Eye,
+  ArrowUpDown, Eye, UserPlus, UserCheck, UserX, Briefcase,
+  TrendingUp, PieChart as PieChartIcon,
 } from 'lucide-react';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { adminAPI, type AdminUser, type UserSearchResult } from '@/lib/admin-api';
 
 const TIERS = [
@@ -27,9 +29,25 @@ const TIER_COLORS: Record<string, string> = {
   solo: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20',
   small_firm: 'bg-amber-500/15 text-amber-400 border border-amber-500/20',
   mid_size: 'bg-rose-500/15 text-rose-400 border border-rose-500/20',
+  none: 'bg-zinc-800 text-zinc-500',
 };
 
+const PIE_COLORS = ['#8b5cf6', '#3b82f6', '#10b981', '#14b8a6', '#f59e0b', '#ec4899', '#ef4444', '#71717a'];
+
 const PAGE_SIZE = 25;
+
+interface UserSummary {
+  total_active: number;
+  total_inactive: number;
+  professionals: number;
+  new_7d: number;
+  new_30d: number;
+  tier_breakdown: Record<string, number>;
+}
+
+interface ExtendedSearchResult extends UserSearchResult {
+  summary?: UserSummary | null;
+}
 
 function timeAgo(dateStr: string | null): string {
   if (!dateStr) return 'Never';
@@ -44,9 +62,17 @@ function timeAgo(dateStr: string | null): string {
   return `${Math.floor(days / 30)}mo`;
 }
 
+const CustomTooltipStyle = {
+  backgroundColor: '#18181b',
+  border: '1px solid rgba(63,63,70,0.6)',
+  borderRadius: '8px',
+  color: '#e4e4e7',
+  fontSize: '12px',
+};
+
 export default function UsersPage() {
   const router = useRouter();
-  const [data, setData] = useState<UserSearchResult | null>(null);
+  const [data, setData] = useState<ExtendedSearchResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState('');
   const [tier, setTier] = useState('');
@@ -67,7 +93,7 @@ export default function UsersPage() {
         sort_by: sortBy,
         sort_order: sortOrder,
       });
-      setData(result);
+      setData(result as ExtendedSearchResult);
     } catch (err) {
       console.error('Failed to load users:', err);
     } finally {
@@ -83,6 +109,7 @@ export default function UsersPage() {
   useEffect(() => { setPage(0); }, [query, tier, statusFilter, sortBy, sortOrder]);
 
   const totalPages = data ? Math.ceil(data.total / PAGE_SIZE) : 0;
+  const summary = data?.summary;
 
   const toggleSort = (field: string) => {
     if (sortBy === field) {
@@ -93,12 +120,68 @@ export default function UsersPage() {
     }
   };
 
+  const tierPieData = summary?.tier_breakdown
+    ? Object.entries(summary.tier_breakdown)
+        .filter(([, v]) => v > 0)
+        .map(([tier, count]) => ({
+          name: tier.replace(/_/g, ' '),
+          value: count,
+        }))
+    : [];
+
   return (
     <div className="space-y-5">
       <div>
         <h1 className="text-xl font-bold text-white">User Management</h1>
         <p className="text-sm text-zinc-500 mt-0.5">{data ? `${(data.total ?? 0).toLocaleString()} total users` : 'Loading...'}</p>
       </div>
+
+      {/* Summary Cards */}
+      {summary && (
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+          <SummaryCard icon={UserCheck} label="Active Users" value={summary.total_active.toLocaleString()} color="emerald" />
+          <SummaryCard icon={UserX} label="Inactive" value={summary.total_inactive.toLocaleString()} color="red" />
+          <SummaryCard icon={Briefcase} label="Professionals" value={summary.professionals.toLocaleString()} color="violet" />
+          <SummaryCard icon={UserPlus} label="New (7d)" value={summary.new_7d.toLocaleString()} color="blue" />
+          <SummaryCard icon={TrendingUp} label="New (30d)" value={summary.new_30d.toLocaleString()} color="teal" />
+        </div>
+      )}
+
+      {/* Tier Breakdown Chart */}
+      {tierPieData.length > 0 && (
+        <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <PieChartIcon className="w-4 h-4 text-violet-400" />
+            <h2 className="text-sm font-semibold text-zinc-300">Subscription Tier Distribution</h2>
+          </div>
+          <ResponsiveContainer width="100%" height={220}>
+            <PieChart>
+              <Pie
+                data={tierPieData}
+                cx="50%"
+                cy="50%"
+                innerRadius={50}
+                outerRadius={85}
+                paddingAngle={3}
+                dataKey="value"
+                nameKey="name"
+                stroke="none"
+              >
+                {tierPieData.map((_, i) => (
+                  <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip contentStyle={CustomTooltipStyle} />
+              <Legend
+                verticalAlign="middle"
+                align="right"
+                layout="vertical"
+                formatter={(value: string) => <span className="text-zinc-400 text-xs capitalize">{value}</span>}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      )}
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
@@ -191,20 +274,18 @@ export default function UsersPage() {
                   </td>
                   <td className="px-4 py-3">
                     <span className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium capitalize ${TIER_COLORS[user.subscription_tier || ''] || 'bg-zinc-800 text-zinc-500'}`}>
-                      {(user.subscription_tier || 'unknown').replace('_', ' ')}
+                      {(user.subscription_tier || 'free').replace('_', ' ')}
                     </span>
                   </td>
                   <td className="px-4 py-3 hidden lg:table-cell text-zinc-500 text-xs">
-                    {user.created_at ? new Date(user.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' }) : '—'}
+                    {user.created_at ? new Date(user.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' }) : '\u2014'}
                   </td>
                   <td className="px-4 py-3 hidden md:table-cell text-zinc-500 text-xs">
                     {timeAgo(user.last_active)}
                   </td>
                   <td className="px-4 py-3">
                     <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${
-                      user.is_active
-                        ? 'bg-emerald-500/15 text-emerald-400'
-                        : 'bg-red-500/15 text-red-400'
+                      user.is_active ? 'bg-emerald-500/15 text-emerald-400' : 'bg-red-500/15 text-red-400'
                     }`}>
                       <span className={`w-1.5 h-1.5 rounded-full ${user.is_active ? 'bg-emerald-400' : 'bg-red-400'}`} />
                       {user.is_active ? 'Active' : 'Inactive'}
@@ -223,28 +304,43 @@ export default function UsersPage() {
         {data && data.total > PAGE_SIZE && (
           <div className="flex items-center justify-between px-4 py-3 border-t border-zinc-800/60">
             <span className="text-xs text-zinc-500">
-              Showing {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, data.total)} of {data.total}
+              Showing {page * PAGE_SIZE + 1}\u2013{Math.min((page + 1) * PAGE_SIZE, data.total)} of {data.total}
             </span>
             <div className="flex items-center gap-1">
-              <button
-                disabled={page === 0}
-                onClick={() => setPage(page - 1)}
-                className="p-1.5 rounded-lg hover:bg-zinc-800/60 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-              >
+              <button disabled={page === 0} onClick={() => setPage(page - 1)} className="p-1.5 rounded-lg hover:bg-zinc-800/60 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
                 <ChevronLeft className="w-4 h-4" />
               </button>
               <span className="text-xs text-zinc-400 px-2">{page + 1} / {totalPages}</span>
-              <button
-                disabled={page >= totalPages - 1}
-                onClick={() => setPage(page + 1)}
-                className="p-1.5 rounded-lg hover:bg-zinc-800/60 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-              >
+              <button disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)} className="p-1.5 rounded-lg hover:bg-zinc-800/60 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+function SummaryCard({ icon: Icon, label, value, color }: {
+  icon: React.ElementType; label: string; value: string; color: string;
+}) {
+  const colorMap: Record<string, string> = {
+    emerald: 'from-emerald-600/20 to-emerald-600/5 border-emerald-500/20',
+    red: 'from-red-600/20 to-red-600/5 border-red-500/20',
+    violet: 'from-violet-600/20 to-violet-600/5 border-violet-500/20',
+    blue: 'from-blue-600/20 to-blue-600/5 border-blue-500/20',
+    teal: 'from-teal-600/20 to-teal-600/5 border-teal-500/20',
+  };
+  const iconColorMap: Record<string, string> = {
+    emerald: 'text-emerald-400', red: 'text-red-400',
+    violet: 'text-violet-400', blue: 'text-blue-400', teal: 'text-teal-400',
+  };
+  return (
+    <div className={`bg-gradient-to-b ${colorMap[color]} border rounded-xl p-4`}>
+      <Icon className={`w-4 h-4 ${iconColorMap[color]} mb-1.5`} />
+      <div className="text-xl font-bold text-white tracking-tight">{value}</div>
+      <span className="text-[11px] text-zinc-500">{label}</span>
     </div>
   );
 }
