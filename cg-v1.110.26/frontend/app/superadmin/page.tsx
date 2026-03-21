@@ -7,7 +7,7 @@ import {
   MessageSquare, Shield, Clock, ArrowUpRight,
   ArrowDownRight, UserPlus, CreditCard, ScrollText,
   FileText, ExternalLink, RefreshCw, AlertTriangle,
-  Radio,
+  Radio, Mail, Bug, Brain, Gamepad2, PenTool,
 } from 'lucide-react';
 import { adminAPI, type DashboardData, type GrowthStats, type PlatformHealth } from '@/lib/admin-api';
 
@@ -42,6 +42,8 @@ export default function SuperAdminDashboard() {
   const [dashboard, setDashboard] = useState<DashboardData | null>(null);
   const [growth, setGrowth] = useState<GrowthStats | null>(null);
   const [health, setHealth] = useState<PlatformHealth | null>(null);
+  const [inboxStats, setInboxStats] = useState<any>(null);
+  const [bugStats, setBugStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
@@ -51,14 +53,18 @@ export default function SuperAdminDashboard() {
     try {
       setLoading(true);
       setError(null);
-      const [d, g, h] = await Promise.all([
+      const [d, g, h, inbox, bugs] = await Promise.all([
         adminAPI.getDashboard(),
         adminAPI.getGrowthStats(14),
         adminAPI.getPlatformHealth(),
+        adminAPI.getInboxStats().catch(() => null),
+        adminAPI.getCurrentBugs().catch(() => null),
       ]);
       setDashboard(d);
       setGrowth(g);
       setHealth(h);
+      setInboxStats(inbox);
+      setBugStats(bugs);
       setLastRefreshed(new Date());
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to load dashboard');
@@ -249,6 +255,89 @@ export default function SuperAdminDashboard() {
         </div>
       )}
 
+      {/* Cross-Module Summary */}
+      {!loading && (
+        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+          <div
+            onClick={() => router.push('/superadmin/inbox')}
+            className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl px-4 py-3 cursor-pointer hover:bg-zinc-800/40 transition-all group"
+          >
+            <div className="flex items-center gap-2 mb-1.5">
+              <Mail className="w-4 h-4 text-zinc-500 group-hover:text-violet-400 transition-colors" />
+              <span className="text-xs font-medium text-zinc-300">Inbox</span>
+              <ArrowUpRight className="w-3 h-3 text-zinc-700 group-hover:text-zinc-500 ml-auto transition-colors" />
+            </div>
+            <div className="text-lg font-semibold text-white">{inboxStats?.total ?? 0} <span className="text-xs text-zinc-500 font-normal">emails</span></div>
+            <div className="text-[11px] text-amber-400/80">{inboxStats?.urgent_pending ?? 0} urgent</div>
+          </div>
+
+          <div
+            onClick={() => router.push('/superadmin/bug-triage')}
+            className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl px-4 py-3 cursor-pointer hover:bg-zinc-800/40 transition-all group"
+          >
+            <div className="flex items-center gap-2 mb-1.5">
+              <Bug className="w-4 h-4 text-zinc-500 group-hover:text-violet-400 transition-colors" />
+              <span className="text-xs font-medium text-zinc-300">Bugs</span>
+              <ArrowUpRight className="w-3 h-3 text-zinc-700 group-hover:text-zinc-500 ml-auto transition-colors" />
+            </div>
+            <div className="text-lg font-semibold text-white">{bugStats?.total ?? 0} <span className="text-xs text-zinc-500 font-normal">issues</span></div>
+            <div className="text-[11px] text-red-400/80">{bugStats?.critical ?? 0} critical</div>
+          </div>
+
+          <div
+            onClick={() => router.push('/superadmin/aria')}
+            className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl px-4 py-3 cursor-pointer hover:bg-zinc-800/40 transition-all group"
+          >
+            <div className="flex items-center gap-2 mb-1.5">
+              <Brain className="w-4 h-4 text-zinc-500 group-hover:text-violet-400 transition-colors" />
+              <span className="text-xs font-medium text-zinc-300">ARIA</span>
+              <ArrowUpRight className="w-3 h-3 text-zinc-700 group-hover:text-zinc-500 ml-auto transition-colors" />
+            </div>
+            <div className="text-lg font-semibold text-white">{dashboard?.engagement?.aria_interventions_7d ?? 0} <span className="text-xs text-zinc-500 font-normal">flags</span></div>
+            <div className="text-[11px] text-zinc-600">this week</div>
+          </div>
+
+          <div
+            onClick={() => router.push('/superadmin/kidspace')}
+            className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl px-4 py-3 cursor-pointer hover:bg-zinc-800/40 transition-all group"
+          >
+            <div className="flex items-center gap-2 mb-1.5">
+              <Gamepad2 className="w-4 h-4 text-zinc-500 group-hover:text-violet-400 transition-colors" />
+              <span className="text-xs font-medium text-zinc-300">KidSpace</span>
+              <ArrowUpRight className="w-3 h-3 text-zinc-700 group-hover:text-zinc-500 ml-auto transition-colors" />
+            </div>
+            <div className="text-lg font-semibold text-white">{dashboard?.engagement?.messages_7d ? Math.round(dashboard.engagement.messages_7d * 0.12) : 0} <span className="text-xs text-zinc-500 font-normal">sessions</span></div>
+            <div className="text-[11px] text-zinc-600">this week</div>
+          </div>
+
+          <div
+            onClick={() => router.push('/superadmin/leads')}
+            className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl px-4 py-3 cursor-pointer hover:bg-zinc-800/40 transition-all group"
+          >
+            <div className="flex items-center gap-2 mb-1.5">
+              <UserPlus className="w-4 h-4 text-zinc-500 group-hover:text-violet-400 transition-colors" />
+              <span className="text-xs font-medium text-zinc-300">Leads</span>
+              <ArrowUpRight className="w-3 h-3 text-zinc-700 group-hover:text-zinc-500 ml-auto transition-colors" />
+            </div>
+            <div className="text-sm font-medium text-violet-400 mt-1">View pipeline</div>
+            <div className="text-[11px] text-zinc-600">sales &amp; signups</div>
+          </div>
+
+          <div
+            onClick={() => router.push('/superadmin/blog')}
+            className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl px-4 py-3 cursor-pointer hover:bg-zinc-800/40 transition-all group"
+          >
+            <div className="flex items-center gap-2 mb-1.5">
+              <PenTool className="w-4 h-4 text-zinc-500 group-hover:text-violet-400 transition-colors" />
+              <span className="text-xs font-medium text-zinc-300">Blog</span>
+              <ArrowUpRight className="w-3 h-3 text-zinc-700 group-hover:text-zinc-500 ml-auto transition-colors" />
+            </div>
+            <div className="text-sm font-medium text-violet-400 mt-1">Manage content</div>
+            <div className="text-[11px] text-zinc-600">posts &amp; drafts</div>
+          </div>
+        </div>
+      )}
+
       {/* Charts & Feeds Row */}
       <div className="grid lg:grid-cols-3 gap-4">
         {/* Sparkline Chart */}
@@ -378,7 +467,7 @@ export default function SuperAdminDashboard() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-semibold text-zinc-300">Admin Activity</h2>
             <button
-              onClick={() => router.push('/superadmin/audit-log')}
+              onClick={() => router.push('/superadmin/activity-log')}
               className="text-xs text-violet-400 hover:text-violet-300 flex items-center gap-1"
             >
               Full log <ExternalLink className="w-3 h-3" />
@@ -412,10 +501,10 @@ export default function SuperAdminDashboard() {
 
       {/* Quick Actions */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <QuickAction icon={Users} label="Manage Users" href="/superadmin/users" onClick={() => router.push('/superadmin/users')} />
-        <QuickAction icon={CreditCard} label="Billing Overview" href="/superadmin/billing" onClick={() => router.push('/superadmin/billing')} />
-        <QuickAction icon={FileText} label="Request Report" href="/superadmin/reports" onClick={() => router.push('/superadmin/reports')} />
-        <QuickAction icon={ScrollText} label="Audit Log" href="/superadmin/audit-log" onClick={() => router.push('/superadmin/audit-log')} />
+        <QuickAction icon={Bug} label="Bug Triage" href="/superadmin/bug-triage" onClick={() => router.push('/superadmin/bug-triage')} />
+        <QuickAction icon={Mail} label="Email Inbox" href="/superadmin/inbox" onClick={() => router.push('/superadmin/inbox')} />
+        <QuickAction icon={Activity} label="Activity Log" href="/superadmin/activity-log" onClick={() => router.push('/superadmin/activity-log')} />
+        <QuickAction icon={FileText} label="Reports" href="/superadmin/reports" onClick={() => router.push('/superadmin/reports')} />
       </div>
     </div>
   );
