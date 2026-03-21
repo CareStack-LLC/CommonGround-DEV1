@@ -113,7 +113,16 @@ export default function LandingPagesPage() {
     setTimeout(() => setCopiedField(null), 2000);
   };
 
-  const sections = selected?.sections_json;
+  // Try sections_json first, then parse body_html as fallback
+  let sections = selected?.sections_json;
+  if (!sections && selected?.body_html) {
+    try {
+      const parsed = typeof selected.body_html === 'string' && selected.body_html.trim().startsWith('{')
+        ? JSON.parse(selected.body_html)
+        : null;
+      if (parsed?.format_version === 2) sections = parsed;
+    } catch { /* legacy HTML */ }
+  }
   const socialPosts: any[] = sections?.social_posts || [];
   const pageUrl = selected ? `https://www.find-commonground.com/lp/${selected.slug}` : '';
 

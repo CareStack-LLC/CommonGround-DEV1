@@ -462,12 +462,22 @@ async def generate_landing_page(
         await db.commit()
         return result
     except Exception as exc:
-        logger.warning("Failed to save landing page to DB (table may not exist): %s", exc)
+        logger.warning("Failed to save landing page to DB: %s", exc)
         await db.rollback()
-        # Return the AI-generated content directly
+        # Parse sections_json from body_html for the frontend
+        sections_json = None
+        if generated.get("body_html", "").strip().startswith("{"):
+            try:
+                import json as _json
+                parsed = _json.loads(generated["body_html"])
+                if parsed.get("format_version") == 2:
+                    sections_json = parsed
+            except Exception:
+                pass
         generated["id"] = "preview"
         generated["status"] = "draft"
         generated["saved"] = False
+        generated["sections_json"] = sections_json
         return generated
 
 
