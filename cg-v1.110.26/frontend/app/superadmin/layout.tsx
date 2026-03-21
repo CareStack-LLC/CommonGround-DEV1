@@ -27,6 +27,7 @@ import {
   UserPlus,
   Send,
   Mail,
+  Globe,
 } from 'lucide-react';
 import { adminAPI, type PlatformHealth } from '@/lib/admin-api';
 
@@ -61,6 +62,7 @@ const navSections = [
     items: [
       { href: '/superadmin/leads', label: 'Lead Generator', icon: UserPlus },
       { href: '/superadmin/leads/campaigns', label: 'Campaigns', icon: Send },
+      { href: '/superadmin/leads/landing-pages', label: 'Landing Pages', icon: Globe },
     ],
   },
   {

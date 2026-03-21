@@ -539,17 +539,17 @@ export const adminAPI = {
     adminFetch<LeadList>('/admin/leads/lists', { method: 'POST', body: JSON.stringify(data) }),
   getLeadListDetail: (id: string) => adminFetch<LeadList & { leads: Lead[] }>(`/admin/leads/lists/${id}`),
   deleteLeadList: (id: string) => adminFetch<void>(`/admin/leads/lists/${id}`, { method: 'DELETE' }),
-  importLeadsCsv: (listId: string, file: File) => {
+  importLeadsCsv: (listId: string, file: File, source = 'import') => {
     const fd = new FormData();
     fd.append('file', file);
     const token = getAuthToken();
-    return fetch(`${API_URL}/admin/leads/lists/${listId}/import-csv`, {
+    return fetch(`${API_URL}/admin/leads/lists/${listId}/import-csv?source=${encodeURIComponent(source)}`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
       body: fd,
     }).then(r => r.json());
   },
-  addLead: (listId: string, data: Partial<Lead>) =>
+  addLead: (listId: string, data: Partial<Lead> & { source?: string }) =>
     adminFetch<Lead>(`/admin/leads/lists/${listId}/leads`, { method: 'POST', body: JSON.stringify(data) }),
   getLeads: (listId: string, limit = 50, offset = 0) =>
     adminFetch<{ leads: Lead[]; total: number }>(`/admin/leads/lists/${listId}/leads?limit=${limit}&offset=${offset}`),
@@ -566,6 +566,29 @@ export const adminAPI = {
     adminFetch<any>(`/admin/leads/campaigns/${campaignId}/send`, { method: 'POST' }),
   getCampaignStats: (campaignId: string) =>
     adminFetch<any>(`/admin/leads/campaigns/${campaignId}/stats`),
+
+  // Pipeline & Attribution
+  getLeadPipeline: () => adminFetch<{
+    funnel: { total: number; contacted: number; responded: number; converted: number };
+    by_source: Record<string, number>;
+    conversion_rate: number;
+    recent_conversions: { email: string; source: string; converted_at: string | null; list_id: string }[];
+    top_lists: { id: string; name: string; lead_count: number; converted: number }[];
+  }>('/admin/leads/pipeline'),
+  matchLeadUsers: () => adminFetch<{ matched: number; total_unmatched: number }>('/admin/leads/match-users', { method: 'POST' }),
+
+  // Landing Pages
+  getLandingPages: () => adminFetch<any[]>('/admin/leads/landing-pages'),
+  createLandingPage: (data: any) =>
+    adminFetch<any>('/admin/leads/landing-pages', { method: 'POST', body: JSON.stringify(data) }),
+  generateLandingPage: (data: { target_audience: string; key_message: string; tone?: string; cta_destination?: string }) =>
+    adminFetch<any>('/admin/leads/landing-pages/generate', { method: 'POST', body: JSON.stringify(data) }),
+  updateLandingPage: (id: string, data: any) =>
+    adminFetch<any>(`/admin/leads/landing-pages/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  publishLandingPage: (id: string) =>
+    adminFetch<any>(`/admin/leads/landing-pages/${id}/publish`, { method: 'POST' }),
+  deleteLandingPage: (id: string) =>
+    adminFetch<any>(`/admin/leads/landing-pages/${id}`, { method: 'DELETE' }),
 
   // Inbox
   getOAuthUrl: () => adminFetch<{ url: string }>('/admin/inbox/oauth/url'),
