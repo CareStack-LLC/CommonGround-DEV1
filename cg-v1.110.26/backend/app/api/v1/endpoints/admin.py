@@ -2107,78 +2107,97 @@ async def get_aria_insights(
             sentiment_dist["negative"] += cat["count"]
 
     # Count messages that passed without flags as positive
-    from app.models.message import Message
-    total_msgs_result = await db.execute(
-        select(func.count()).select_from(Message).where(
-            Message.was_flagged == False
+    try:
+        from app.models.message import Message
+        total_msgs_result = await db.execute(
+            select(func.count()).select_from(Message)
         )
-    )
-    sentiment_dist["positive"] = total_msgs_result.scalar() or 0
+        total_msg_count = total_msgs_result.scalar() or 0
+        sentiment_dist["positive"] = max(0, total_msg_count - total_interventions)
+    except Exception:
+        sentiment_dist["positive"] = 0
 
-    # --- Phase 3 enhancements ---
+    # --- Phase 3 enhancements (wrapped in try/except for resilience) ---
+    action_breakdown: dict = {}
+    sent_anyway_count = 0
+    rejected_count = 0
+    avg_messages_per_day = 0.0
+    total_msgs_30d = 0
+    intervention_rate = 0.0
+    detailed_categories: list = []
+    intervention_levels: list = []
 
-    # User action breakdown (accepted, modified, rejected, sent_anyway, cancelled)
-    action_result = await db.execute(
-        select(
-            MessageFlag.user_action,
-            func.count().label("count"),
+    try:
+        # User action breakdown
+        action_result = await db.execute(
+            select(
+                MessageFlag.user_action,
+                func.count().label("count"),
+            )
+            .where(MessageFlag.user_action.isnot(None))
+            .group_by(MessageFlag.user_action)
+            .order_by(func.count().desc())
         )
-        .where(MessageFlag.user_action.isnot(None))
-        .group_by(MessageFlag.user_action)
-        .order_by(func.count().desc())
-    )
-    action_breakdown = {row.user_action: row.count for row in action_result.all()}
+        action_breakdown = {row.user_action: row.count for row in action_result.all()}
+        sent_anyway_count = action_breakdown.get("sent_anyway", 0)
+        rejected_count = action_breakdown.get("rejected", 0)
+    except Exception as exc:
+        logger.warning("ARIA action breakdown query failed: %s", exc)
 
-    sent_anyway_count = action_breakdown.get("sent_anyway", 0)
-    rejected_count = action_breakdown.get("rejected", 0)
-
-    # Avg messages per day (last 30 days)
-    from app.models.message import Message
-    msg_count_30d = await db.execute(
-        select(func.count()).select_from(Message).where(
-            Message.created_at >= thirty_days_ago
+    try:
+        # Avg messages per day (last 30 days)
+        from app.models.message import Message
+        msg_count_30d = await db.execute(
+            select(func.count()).select_from(Message).where(
+                Message.created_at >= thirty_days_ago
+            )
         )
-    )
-    total_msgs_30d = msg_count_30d.scalar() or 0
-    avg_messages_per_day = round(total_msgs_30d / 30, 1)
-
-    # Intervention rate (flagged / total messages in last 30d)
-    intervention_rate = (
-        round(last_30d / total_msgs_30d * 100, 1)
-        if total_msgs_30d > 0 else 0.0
-    )
-
-    # Category breakdown from JSON array (explode categories)
-    cat_detail_result = await db.execute(
-        select(MessageFlag.categories, func.count().label("cnt"))
-        .where(MessageFlag.created_at >= thirty_days_ago)
-        .group_by(MessageFlag.categories)
-    )
-    category_counts: dict[str, int] = {}
-    for row in cat_detail_result.all():
-        cats = row.categories if isinstance(row.categories, list) else []
-        for c in cats:
-            category_counts[c] = category_counts.get(c, 0) + row.cnt
-    detailed_categories = sorted(
-        [{"category": k, "count": v} for k, v in category_counts.items()],
-        key=lambda x: x["count"],
-        reverse=True,
-    )
-
-    # Intervention level distribution
-    level_result = await db.execute(
-        select(
-            MessageFlag.intervention_level,
-            func.count().label("count"),
+        total_msgs_30d = msg_count_30d.scalar() or 0
+        avg_messages_per_day = round(total_msgs_30d / 30, 1)
+        intervention_rate = (
+            round(last_30d / total_msgs_30d * 100, 1)
+            if total_msgs_30d > 0 else 0.0
         )
-        .group_by(MessageFlag.intervention_level)
-        .order_by(MessageFlag.intervention_level)
-    )
-    level_labels = {1: "Gentle Nudge", 2: "Firm Suggestion", 3: "Strong Warning", 4: "Blocked"}
-    intervention_levels = [
-        {"level": row.intervention_level, "label": level_labels.get(row.intervention_level, f"Level {row.intervention_level}"), "count": row.count}
-        for row in level_result.all()
-    ]
+    except Exception as exc:
+        logger.warning("ARIA message count query failed: %s", exc)
+
+    try:
+        # Category breakdown from JSON array
+        cat_detail_result = await db.execute(
+            select(MessageFlag.categories, func.count().label("cnt"))
+            .where(MessageFlag.created_at >= thirty_days_ago)
+            .group_by(MessageFlag.categories)
+        )
+        category_counts: dict[str, int] = {}
+        for row in cat_detail_result.all():
+            cats = row.categories if isinstance(row.categories, list) else []
+            for c in cats:
+                category_counts[c] = category_counts.get(c, 0) + row.cnt
+        detailed_categories = sorted(
+            [{"category": k, "count": v} for k, v in category_counts.items()],
+            key=lambda x: x["count"],
+            reverse=True,
+        )
+    except Exception as exc:
+        logger.warning("ARIA category detail query failed: %s", exc)
+
+    try:
+        # Intervention level distribution
+        level_result = await db.execute(
+            select(
+                MessageFlag.intervention_level,
+                func.count().label("count"),
+            )
+            .group_by(MessageFlag.intervention_level)
+            .order_by(MessageFlag.intervention_level)
+        )
+        level_labels = {1: "Gentle Nudge", 2: "Firm Suggestion", 3: "Strong Warning", 4: "Blocked"}
+        intervention_levels = [
+            {"level": row.intervention_level, "label": level_labels.get(row.intervention_level, f"Level {row.intervention_level}"), "count": row.count}
+            for row in level_result.all()
+        ]
+    except Exception as exc:
+        logger.warning("ARIA intervention levels query failed: %s", exc)
 
     return {
         "total_interventions": total_interventions,
@@ -2330,89 +2349,104 @@ async def get_kidspace_stats(
         for row in daily_result.all()
     ]
 
-    # --- Phase 3 enhancements ---
+    # --- Phase 3 enhancements (wrapped for resilience) ---
+    total_children = 0
+    total_minutes_watched = 0
+    session_averages: list = []
+    most_played: list = []
+    most_read: list = []
 
-    # Total children
-    total_children_result = await db.execute(
-        select(func.count()).select_from(Child)
-    )
-    total_children = total_children_result.scalar() or 0
-
-    # Total minutes watched across all session types
-    total_watch_result = await db.execute(
-        select(func.sum(KidComsSession.duration_seconds)).where(
-            KidComsSession.session_type.in_([
-                SessionType.THEATER.value,
-                SessionType.WHITEBOARD.value,
-            ]),
-            KidComsSession.status == SessionStatus.COMPLETED.value,
+    try:
+        total_children_result = await db.execute(
+            select(func.count()).select_from(Child)
         )
-    )
-    total_watch_seconds = total_watch_result.scalar() or 0
-    total_minutes_watched = total_watch_seconds // 60
+        total_children = total_children_result.scalar() or 0
+    except Exception as exc:
+        logger.warning("KidSpace total_children query failed: %s", exc)
 
-    # Avg session duration by type
-    avg_duration_result = await db.execute(
-        select(
-            KidComsSession.session_type,
-            func.avg(KidComsSession.duration_seconds).label("avg_secs"),
-            func.count().label("count"),
+    try:
+        total_watch_result = await db.execute(
+            select(func.sum(KidComsSession.duration_seconds)).where(
+                KidComsSession.session_type.in_([
+                    SessionType.THEATER.value,
+                    SessionType.WHITEBOARD.value,
+                ]),
+                KidComsSession.status == SessionStatus.COMPLETED.value,
+            )
         )
-        .where(KidComsSession.status == SessionStatus.COMPLETED.value)
-        .group_by(KidComsSession.session_type)
-    )
-    session_averages = [
-        {
-            "type": row.session_type,
-            "avg_minutes": round((row.avg_secs or 0) / 60, 1),
-            "total_sessions": row.count,
-        }
-        for row in avg_duration_result.all()
-    ]
+        total_watch_seconds = total_watch_result.scalar() or 0
+        total_minutes_watched = total_watch_seconds // 60
+    except Exception as exc:
+        logger.warning("KidSpace total_minutes_watched query failed: %s", exc)
 
-    # Most played — top theater sessions by views (using total_messages as proxy for views)
-    most_played_result = await db.execute(
-        select(
-            KidComsSession.room_name,
-            func.count().label("view_count"),
-            func.sum(KidComsSession.duration_seconds).label("total_secs"),
+    try:
+        avg_duration_result = await db.execute(
+            select(
+                KidComsSession.session_type,
+                func.avg(KidComsSession.duration_seconds).label("avg_secs"),
+                func.count().label("count"),
+            )
+            .where(KidComsSession.status == SessionStatus.COMPLETED.value)
+            .group_by(KidComsSession.session_type)
         )
-        .where(KidComsSession.session_type == SessionType.THEATER.value)
-        .group_by(KidComsSession.room_name)
-        .order_by(func.count().desc())
-        .limit(10)
-    )
-    most_played = [
-        {
-            "rank": i + 1,
-            "title": row.room_name or f"Session {i+1}",
-            "view_count": row.view_count,
-            "minutes_watched": (row.total_secs or 0) // 60,
-        }
-        for i, row in enumerate(most_played_result.all())
-    ]
+        session_averages = [
+            {
+                "type": row.session_type,
+                "avg_minutes": round((row.avg_secs or 0) / 60, 1),
+                "total_sessions": row.count,
+            }
+            for row in avg_duration_result.all()
+        ]
+    except Exception as exc:
+        logger.warning("KidSpace session_averages query failed: %s", exc)
 
-    # Most read — top whiteboard/stories sessions
-    most_read_result = await db.execute(
-        select(
-            KidComsSession.room_name,
-            func.count().label("read_count"),
-            func.sum(KidComsSession.total_messages).label("pages"),
+    try:
+        most_played_result = await db.execute(
+            select(
+                KidComsSession.room_name,
+                func.count().label("view_count"),
+                func.sum(KidComsSession.duration_seconds).label("total_secs"),
+            )
+            .where(KidComsSession.session_type == SessionType.THEATER.value)
+            .group_by(KidComsSession.room_name)
+            .order_by(func.count().desc())
+            .limit(10)
         )
-        .where(KidComsSession.session_type == SessionType.WHITEBOARD.value)
-        .group_by(KidComsSession.room_name)
-        .order_by(func.count().desc())
-        .limit(10)
-    )
-    most_read = [
-        {
-            "rank": i + 1,
-            "title": row.room_name or f"Story {i+1}",
-            "read_count": row.read_count,
-            "pages_turned": row.pages or 0,
-        }
-        for i, row in enumerate(most_read_result.all())
-    ]
+        most_played = [
+            {
+                "rank": i + 1,
+                "title": row.room_name or f"Session {i+1}",
+                "view_count": row.view_count,
+                "minutes_watched": (row.total_secs or 0) // 60,
+            }
+            for i, row in enumerate(most_played_result.all())
+        ]
+    except Exception as exc:
+        logger.warning("KidSpace most_played query failed: %s", exc)
+
+    try:
+        most_read_result = await db.execute(
+            select(
+                KidComsSession.room_name,
+                func.count().label("read_count"),
+                func.sum(KidComsSession.total_messages).label("pages"),
+            )
+            .where(KidComsSession.session_type == SessionType.WHITEBOARD.value)
+            .group_by(KidComsSession.room_name)
+            .order_by(func.count().desc())
+            .limit(10)
+        )
+        most_read = [
+            {
+                "rank": i + 1,
+                "title": row.room_name or f"Story {i+1}",
+                "read_count": row.read_count,
+                "pages_turned": row.pages or 0,
+            }
+            for i, row in enumerate(most_read_result.all())
+        ]
+    except Exception as exc:
+        logger.warning("KidSpace most_read query failed: %s", exc)
 
     return {
         "active_families": active_families,
