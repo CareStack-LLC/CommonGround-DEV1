@@ -26,37 +26,79 @@ async def fetch_sentry_issues(
         raise ValueError("SENTRY_AUTH_TOKEN not configured")
 
     slug = project_slug or settings.SENTRY_PROJECT_SLUG
-    since = (datetime.utcnow() - timedelta(days=days)).isoformat()
+    org = settings.SENTRY_ORG_SLUG
+
+    # Fetch ALL unresolved issues active in the last N days (not just first-seen)
+    since = (datetime.utcnow() - timedelta(days=days)).strftime("%Y-%m-%d")
+
+    url = f"{SENTRY_API_BASE}/projects/{org}/{slug}/issues/"
+    logger.info(
+        "Fetching Sentry issues: org=%s project=%s since=%s url=%s",
+        org, slug, since, url,
+    )
 
     issues = []
     async with httpx.AsyncClient(timeout=30.0) as client:
+        # Primary fetch: all unresolved issues with activity in the window
         resp = await client.get(
-            f"{SENTRY_API_BASE}/projects/{settings.SENTRY_ORG_SLUG}/{slug}/issues/",
+            url,
             headers={"Authorization": f"Bearer {settings.SENTRY_AUTH_TOKEN}"},
             params={
-                "query": f"is:unresolved firstSeen:>{since[:10]}",
+                "query": f"is:unresolved lastSeen:>{since}",
                 "limit": limit,
                 "sort": "freq",
             },
         )
-        resp.raise_for_status()
+
+        if resp.status_code != 200:
+            logger.error(
+                "Sentry API error (HTTP %s): %s", resp.status_code, resp.text[:500]
+            )
+            resp.raise_for_status()
+
         raw_issues = resp.json()
+        logger.info("Sentry returned %d issues", len(raw_issues))
+
+        # Also fetch user feedback (from the "Report a Bug" widget)
+        user_feedback = []
+        try:
+            fb_resp = await client.get(
+                f"{SENTRY_API_BASE}/projects/{org}/{slug}/user-feedback/",
+                headers={"Authorization": f"Bearer {settings.SENTRY_AUTH_TOKEN}"},
+                params={"start": since, "limit": 50},
+            )
+            if fb_resp.status_code == 200:
+                user_feedback = fb_resp.json()
+                logger.info("Sentry returned %d user feedback reports", len(user_feedback))
+            else:
+                logger.warning("User feedback fetch failed (HTTP %s)", fb_resp.status_code)
+        except Exception as exc:
+            logger.warning("Failed to fetch user feedback: %s", exc)
+
+    # Build a set of issue IDs that have user feedback
+    feedback_issue_ids = set()
+    for fb in user_feedback:
+        event = fb.get("event", {})
+        issue_id = event.get("issueID") or fb.get("issue", {}).get("id")
+        if issue_id:
+            feedback_issue_ids.add(str(issue_id))
 
     for issue in raw_issues:
+        issue_id = str(issue["id"])
         issues.append(
             {
-                "id": issue["id"],
+                "id": issue_id,
                 "title": issue["title"],
                 "culprit": issue.get("culprit", ""),
                 "level": issue.get("level", "error"),
-                "count": issue.get("count", 0),
-                "user_count": issue.get("userCount", 0),
+                "count": int(issue.get("count", 0)),
+                "user_count": int(issue.get("userCount", 0)),
                 "first_seen": issue.get("firstSeen"),
                 "last_seen": issue.get("lastSeen"),
                 "is_unhandled": issue.get("isUnhandled", False),
                 "short_id": issue.get("shortId", ""),
                 "permalink": issue.get("permalink", ""),
-                "has_user_feedback": issue.get("hasSeen", False),
+                "has_user_feedback": issue_id in feedback_issue_ids,
                 "platform": issue.get("platform", ""),
                 "metadata": {
                     "type": issue.get("metadata", {}).get("type", ""),
@@ -65,6 +107,34 @@ async def fetch_sentry_issues(
             }
         )
 
+    # Append standalone user feedback that isn't linked to an existing issue
+    for fb in user_feedback:
+        event = fb.get("event", {})
+        issue_id = event.get("issueID") or fb.get("issue", {}).get("id")
+        if issue_id and str(issue_id) not in {i["id"] for i in issues}:
+            issues.append(
+                {
+                    "id": str(issue_id),
+                    "title": fb.get("name", "") or fb.get("comments", "User feedback"),
+                    "culprit": fb.get("comments", "")[:120],
+                    "level": "warning",
+                    "count": 1,
+                    "user_count": 1,
+                    "first_seen": fb.get("dateCreated"),
+                    "last_seen": fb.get("dateCreated"),
+                    "is_unhandled": False,
+                    "short_id": "",
+                    "permalink": "",
+                    "has_user_feedback": True,
+                    "platform": event.get("platform", ""),
+                    "metadata": {
+                        "type": "user_feedback",
+                        "value": fb.get("comments", ""),
+                    },
+                }
+            )
+
+    logger.info("Total issues after merging feedback: %d", len(issues))
     return issues
 
 
@@ -90,7 +160,7 @@ def categorize_issues(issues: list[dict]) -> dict:
         else:
             categories["low"].append(issue)
 
-        # User-reported
+        # User-reported (from widget feedback or has affected users)
         if issue["has_user_feedback"] or issue["user_count"] > 0:
             categories["user_reported"].append(issue)
 
@@ -127,6 +197,7 @@ async def ai_triage(issues: list[dict]) -> dict:
             f"   Occurrences: {issue['count']}, Users affected: {issue['user_count']}\n"
             f"   First seen: {issue['first_seen']}, Last seen: {issue['last_seen']}\n"
             f"   Unhandled: {issue['is_unhandled']}"
+            f"{'  [USER REPORTED]' if issue.get('has_user_feedback') else ''}"
         )
 
     prompt = (
