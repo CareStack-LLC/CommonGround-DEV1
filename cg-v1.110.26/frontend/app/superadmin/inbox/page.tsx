@@ -65,6 +65,8 @@ export default function InboxPage() {
   const [categoryFilter, setCategoryFilter] = useState('');
   const [urgentOnly, setUrgentOnly] = useState(false);
   const [draftStatusFilter, setDraftStatusFilter] = useState('');
+  const [recipientFilter, setRecipientFilter] = useState('');
+  const [sortBy, setSortBy] = useState<'date' | 'priority'>('date');
 
   // Reply
   const [customReply, setCustomReply] = useState('');
@@ -240,6 +242,23 @@ export default function InboxPage() {
     }
   };
 
+  // Client-side filtering and sorting
+  const displayEmails = (() => {
+    const PRIORITY_ORDER: Record<string, number> = { high: 0, medium: 1, low: 2 };
+    let filtered = emails;
+    if (recipientFilter) {
+      filtered = filtered.filter(e => e.to_email === recipientFilter);
+    }
+    if (sortBy === 'priority') {
+      filtered = [...filtered].sort((a, b) => {
+        const aPri = parseAdminNotes(a.admin_notes ?? null).priority || 'low';
+        const bPri = parseAdminNotes(b.admin_notes ?? null).priority || 'low';
+        return (PRIORITY_ORDER[aPri] ?? 3) - (PRIORITY_ORDER[bPri] ?? 3);
+      });
+    }
+    return filtered;
+  })();
+
   return (
     <div className="space-y-4">
       {/* Header */}
@@ -299,15 +318,24 @@ export default function InboxPage() {
       )}
 
       {/* Filters */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 flex-wrap">
+        <select value={recipientFilter} onChange={e => setRecipientFilter(e.target.value)} className="px-3 py-2 bg-zinc-900/80 border border-zinc-800/80 rounded-lg text-sm text-zinc-300 focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer">
+          <option value="">All Inboxes</option>
+          <option value="hello@find-commonground.com">hello@ (General)</option>
+          <option value="support@find-commonground.com">support@ (Support)</option>
+          <option value="teejay@find-commonground.com">teejay@ (CEO)</option>
+        </select>
         <select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)} className="px-3 py-2 bg-zinc-900/80 border border-zinc-800/80 rounded-lg text-sm text-zinc-300 focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer">
           <option value="">All Categories</option>
           <option value="support">Support</option>
           <option value="billing">Billing</option>
-          <option value="feedback">Feedback</option>
           <option value="sales">Sales</option>
-          <option value="legal">Legal</option>
+          <option value="onboarding">Onboarding</option>
+          <option value="feedback">Feedback</option>
           <option value="partnership">Partnership</option>
+          <option value="legal">Legal</option>
+          <option value="notification">Notification</option>
+          <option value="personal">Personal</option>
           <option value="spam">Spam</option>
           <option value="other">Other</option>
         </select>
@@ -321,6 +349,10 @@ export default function InboxPage() {
           <option value="approved">Approved</option>
           <option value="rejected">Rejected</option>
           <option value="sent">Sent</option>
+        </select>
+        <select value={sortBy} onChange={e => setSortBy(e.target.value as 'date' | 'priority')} className="px-3 py-2 bg-zinc-900/80 border border-zinc-800/80 rounded-lg text-sm text-zinc-300 focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer">
+          <option value="date">Sort: Newest</option>
+          <option value="priority">Sort: Priority</option>
         </select>
       </div>
 
@@ -395,12 +427,12 @@ export default function InboxPage() {
               <div className="p-3 space-y-2">
                 {Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} className="h-16" />)}
               </div>
-            ) : emails.length === 0 ? (
+            ) : displayEmails.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 px-4">
                 <Inbox className="w-10 h-10 text-zinc-700 mb-3" />
                 <p className="text-sm text-zinc-500">No emails found</p>
               </div>
-            ) : emails.map(email => (
+            ) : displayEmails.map(email => (
               <button
                 key={email.id}
                 onClick={() => viewEmail(email.id)}
@@ -425,6 +457,11 @@ export default function InboxPage() {
                     </div>
                     <div className="text-xs text-zinc-400 truncate mt-0.5">{email.subject}</div>
                     <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                      {email.to_email && (
+                        <span className="inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium bg-zinc-800/80 text-zinc-500">
+                          {email.to_email.split('@')[0]}@
+                        </span>
+                      )}
                       <span className={`inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium ${CATEGORY_COLORS[email.category] || CATEGORY_COLORS.other}`}>
                         {email.category}
                       </span>
