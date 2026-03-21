@@ -319,6 +319,10 @@ async def analyze_email(db: AsyncSession, email_id: str) -> dict:
         "You are the executive assistant for CommonGround, an AI-powered co-parenting "
         "platform (https://www.find-commonground.com). Analyze the following inbound email "
         "and provide a JSON response.\n\n"
+        "CommonGround email addresses and their purposes:\n"
+        "- hello@find-commonground.com — General inquiries\n"
+        "- support@find-commonground.com — Customer support\n"
+        "- teejay@find-commonground.com — CEO/founder direct\n\n"
         f"From: {email_record.from_name or ''} <{email_record.from_email}>\n"
         f"To: {email_record.to_email}\n"
         f"Subject: {email_record.subject}\n"
@@ -326,9 +330,27 @@ async def analyze_email(db: AsyncSession, email_id: str) -> dict:
         "Return ONLY valid JSON with these keys:\n"
         "- is_urgent (bool): true if requires response within 24h\n"
         "- urgency_reason (string or null): why it's urgent\n"
-        "- category (string): one of support, sales, partnership, spam, personal, other\n"
-        "- summary (string): 1-2 sentence summary\n"
-        "- draft_response (string): professional, empathetic draft reply (CommonGround brand voice)"
+        "- priority (string): one of 'high', 'medium', 'low'\n"
+        "  high = needs response today, medium = within 2-3 days, low = informational/no rush\n"
+        "- category (string): one of:\n"
+        "  support (bug reports, feature issues, account problems),\n"
+        "  sales (pricing questions, demos, enterprise inquiries),\n"
+        "  onboarding (new user questions, setup help, getting started),\n"
+        "  billing (payment issues, refunds, subscription changes),\n"
+        "  partnership (business partnerships, integrations, legal professionals),\n"
+        "  legal (legal notices, compliance, attorney communications),\n"
+        "  feedback (product feedback, feature requests, reviews),\n"
+        "  notification (automated notifications, system alerts, newsletters),\n"
+        "  spam (unsolicited marketing, scams),\n"
+        "  personal (personal messages to team members),\n"
+        "  other (doesn't fit any category)\n"
+        "- suggested_label (string): a short label for organizing, e.g. 'Bug Report', "
+        "'Pricing Question', 'New User Help', 'Payment Failed'\n"
+        "- summary (string): 1-2 sentence summary of the email\n"
+        "- action_needed (string): specific action to take, e.g. 'Reply with pricing info', "
+        "'Escalate to engineering', 'No action needed'\n"
+        "- draft_response (string): professional, empathetic draft reply in CommonGround brand voice. "
+        "Sign as 'The CommonGround Team' unless it's a personal email to teejay."
     )
 
     try:
@@ -352,6 +374,16 @@ async def analyze_email(db: AsyncSession, email_id: str) -> dict:
         email_record.category = analysis.get("category", "other")
         email_record.ai_summary = analysis.get("summary")
         email_record.ai_draft_response = analysis.get("draft_response")
+        # Store extra analysis fields in admin_notes as JSON if present
+        extra = {}
+        if analysis.get("priority"):
+            extra["priority"] = analysis["priority"]
+        if analysis.get("suggested_label"):
+            extra["suggested_label"] = analysis["suggested_label"]
+        if analysis.get("action_needed"):
+            extra["action_needed"] = analysis["action_needed"]
+        if extra:
+            email_record.admin_notes = json.dumps(extra)
         email_record.processed_at = datetime.utcnow()
 
         await db.flush()
