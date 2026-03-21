@@ -66,10 +66,26 @@ async def oauth_callback(
 ) -> dict:
     """Exchange an OAuth authorization code for access and refresh tokens."""
     from app.services.gmail_monitor_service import exchange_oauth_code
+    from app.core.config import Settings
 
-    result = await exchange_oauth_code(db, code)
-    await db.commit()
-    return result
+    _settings = Settings()
+    if not _settings.GOOGLE_OAUTH_CLIENT_SECRET:
+        raise HTTPException(
+            status_code=503,
+            detail="Google OAuth client secret is not configured. Set GOOGLE_OAUTH_CLIENT_SECRET in environment.",
+        )
+
+    try:
+        result = await exchange_oauth_code(db, code)
+        await db.commit()
+        return result
+    except Exception as exc:
+        logger.error("OAuth code exchange failed: %s", exc)
+        await db.rollback()
+        raise HTTPException(
+            status_code=502,
+            detail=f"Failed to exchange OAuth code with Google: {type(exc).__name__}. Check that the database migration has been applied and GOOGLE_OAUTH_CLIENT_SECRET is correct.",
+        )
 
 
 # =============================================================================
