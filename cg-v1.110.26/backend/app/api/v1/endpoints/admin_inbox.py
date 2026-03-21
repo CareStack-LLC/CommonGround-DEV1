@@ -44,8 +44,15 @@ async def get_oauth_url(
     """Generate a Google OAuth consent URL for Gmail API access."""
     from app.services.gmail_monitor_service import get_google_oauth_url
 
-    url = await get_google_oauth_url()
-    return {"url": url}
+    try:
+        url = await get_google_oauth_url()
+        return {"url": url}
+    except Exception as exc:
+        logger.warning("OAuth URL generation failed: %s", exc)
+        raise HTTPException(
+            status_code=503,
+            detail="Google OAuth is not configured. Set GOOGLE_OAUTH_CLIENT_SECRET in environment.",
+        )
 
 
 @router.post(
@@ -85,14 +92,19 @@ async def list_emails(
     """List monitored emails with optional filters and pagination."""
     from app.services.gmail_monitor_service import get_emails_paginated
 
-    return await get_emails_paginated(
-        db,
-        category=category,
-        is_urgent=is_urgent,
-        draft_status=draft_status,
-        page=page,
-        page_size=page_size,
-    )
+    try:
+        return await get_emails_paginated(
+            db,
+            category=category,
+            is_urgent=is_urgent,
+            draft_status=draft_status,
+            page=page,
+            page_size=page_size,
+        )
+    except Exception as exc:
+        # Table may not exist yet (migration not applied)
+        logger.warning("Inbox emails query failed (table may not exist): %s", exc)
+        return {"emails": [], "total": 0, "page": page, "page_size": page_size}
 
 
 @router.get(
@@ -180,9 +192,16 @@ async def trigger_sync(
     """Manually trigger an email sync from Gmail."""
     from app.services.gmail_monitor_service import sync_emails
 
-    result = await sync_emails(db)
-    await db.commit()
-    return result
+    try:
+        result = await sync_emails(db)
+        await db.commit()
+        return result
+    except Exception as exc:
+        logger.warning("Inbox sync failed: %s", exc)
+        raise HTTPException(
+            status_code=503,
+            detail="Email sync is not available. Google OAuth may not be configured, or the database migration has not been applied.",
+        )
 
 
 @router.get(
@@ -197,7 +216,11 @@ async def list_digests(
     """Return recent email digest summaries."""
     from app.services.gmail_monitor_service import get_digests
 
-    return await get_digests(db, limit)
+    try:
+        return await get_digests(db, limit)
+    except Exception as exc:
+        logger.warning("Digests query failed (table may not exist): %s", exc)
+        return []
 
 
 # =============================================================================
@@ -215,4 +238,9 @@ async def get_inbox_stats(
     """Get inbox stats: counts by category, urgent count, pending drafts."""
     from app.services.gmail_monitor_service import get_inbox_stats as svc_get_inbox_stats
 
-    return await svc_get_inbox_stats(db)
+    try:
+        return await svc_get_inbox_stats(db)
+    except Exception as exc:
+        # Table may not exist yet (migration not applied)
+        logger.warning("Inbox stats query failed (table may not exist): %s", exc)
+        return {"total": 0, "by_category": {}, "urgent_pending": 0, "pending_drafts": 0}
