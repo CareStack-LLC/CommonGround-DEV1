@@ -123,7 +123,15 @@ export default function LandingPagesPage() {
       if (parsed?.format_version === 2) sections = parsed;
     } catch { /* legacy HTML */ }
   }
-  const socialPosts: any[] = sections?.social_posts || [];
+  // Marketing content from AI — stored under 'marketing' key (same as blog system)
+  const marketingRaw = sections?.marketing || {};
+  const socialPosts: any[] = sections?.social_posts || Object.entries(marketingRaw).map(([platform, data]: [string, any]) => ({
+    platform,
+    headline: data?.headline || '',
+    body: data?.body || '',
+    hashtags: data?.hashtags || [],
+    cta_text: data?.cta_text || '',
+  }));
   const pageUrl = selected ? `https://www.find-commonground.com/lp/${selected.slug}` : '';
 
   return (
