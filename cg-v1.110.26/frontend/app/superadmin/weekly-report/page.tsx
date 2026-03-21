@@ -196,7 +196,7 @@ export default function WeeklyReportPage() {
               <div className="border border-zinc-800/60 rounded-lg p-4">
                 <div className="text-xs text-zinc-500 mb-1">Revenue Breakdown</div>
                 <div className="space-y-1.5 mt-2">
-                  {Object.entries(report.revenue.tier_breakdown).map(([tier, count]) => (
+                  {Object.entries(report.revenue?.tier_breakdown || {}).map(([tier, count]) => (
                     <div key={tier} className="flex justify-between text-xs">
                       <span className="text-zinc-400 capitalize">{tier.replace('_', ' ')}</span>
                       <span className="text-zinc-300 font-medium">{count}</span>

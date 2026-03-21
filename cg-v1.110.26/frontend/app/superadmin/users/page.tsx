@@ -97,7 +97,7 @@ export default function UsersPage() {
     <div className="space-y-5">
       <div>
         <h1 className="text-xl font-bold text-white">User Management</h1>
-        <p className="text-sm text-zinc-500 mt-0.5">{data ? `${data.total.toLocaleString()} total users` : 'Loading...'}</p>
+        <p className="text-sm text-zinc-500 mt-0.5">{data ? `${(data.total ?? 0).toLocaleString()} total users` : 'Loading...'}</p>
       </div>
 
       {/* Filters */}
@@ -165,11 +165,11 @@ export default function UsersPage() {
                     <td colSpan={6} className="px-4 py-3"><div className="animate-pulse bg-zinc-800/60 rounded h-8" /></td>
                   </tr>
                 ))
-              ) : data?.users.length === 0 ? (
+              ) : data?.users?.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-4 py-12 text-center text-zinc-500">No users found matching your criteria.</td>
                 </tr>
-              ) : data?.users.map((user) => (
+              ) : data?.users?.map((user) => (
                 <tr
                   key={user.id}
                   onClick={() => router.push(`/superadmin/users/${user.id}`)}

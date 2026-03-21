@@ -246,7 +246,7 @@ export default function InboxPage() {
           <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl px-4 py-3">
             <div className="text-[11px] text-zinc-500 mb-1">By Category</div>
             <div className="flex flex-wrap gap-1">
-              {Object.entries(stats.by_category).map(([cat, count]) => (
+              {Object.entries(stats.by_category || {}).map(([cat, count]) => (
                 <span key={cat} className={`inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium ${CATEGORY_COLORS[cat] || CATEGORY_COLORS.other}`}>
                   {cat}: {count}
                 </span>

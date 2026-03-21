@@ -38,8 +38,8 @@ export default function GrowthPage() {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  const calcTrend = (data: { date: string; count: number }[]) => {
-    if (data.length < 8) return 0;
+  const calcTrend = (data?: { date: string; count: number }[]) => {
+    if (!data || data.length < 8) return 0;
     const recent = data.slice(-7).reduce((a, b) => a + b.count, 0);
     const prev = data.slice(-14, -7).reduce((a, b) => a + b.count, 0);
     return prev === 0 ? 0 : Math.round(((recent - prev) / prev) * 100);
@@ -47,7 +47,7 @@ export default function GrowthPage() {
 
   const userTrend = growth ? calcTrend(growth.daily_registrations) : 0;
   const msgTrend = engagement ? calcTrend(engagement.daily_messages) : 0;
-  const avgPerDay = growth && growth.daily_registrations.length > 0
+  const avgPerDay = growth && growth.daily_registrations?.length > 0
     ? (growth.total_new_users / growth.daily_registrations.length).toFixed(1) : '0';
 
   const chartData = activeChart === 'users'
@@ -95,9 +95,9 @@ export default function GrowthPage() {
           <>
             <SummaryCard icon={Users} label="New Users" value={growth?.total_new_users || 0} trend={userTrend} color="violet" />
             <SummaryCard icon={BarChart3} label="Avg / Day" value={avgPerDay} color="blue" isText />
-            <SummaryCard icon={MessageSquare} label="Messages" value={engagement?.totals.messages || 0} trend={msgTrend} color="emerald" />
-            <SummaryCard icon={Zap} label="ARIA Flags" value={engagement?.totals.aria_interventions || 0} color="amber" />
-            <SummaryCard icon={CheckCircle} label="ARIA Accept" value={`${engagement?.totals.aria_acceptance_rate || 0}%`} color="indigo" isText />
+            <SummaryCard icon={MessageSquare} label="Messages" value={engagement?.totals?.messages || 0} trend={msgTrend} color="emerald" />
+            <SummaryCard icon={Zap} label="ARIA Flags" value={engagement?.totals?.aria_interventions || 0} color="amber" />
+            <SummaryCard icon={CheckCircle} label="ARIA Accept" value={`${engagement?.totals?.aria_acceptance_rate || 0}%`} color="indigo" isText />
           </>
         )}
       </div>
@@ -170,16 +170,16 @@ export default function GrowthPage() {
           <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
             <h3 className="text-sm font-semibold text-zinc-300 mb-4">Feature Adoption ({days}d)</h3>
             <div className="space-y-3">
-              <FeatureRow label="New Family Files" value={engagement.totals.new_family_files} icon={FileText} />
-              <FeatureRow label="New Agreements" value={engagement.totals.new_agreements} icon={CheckCircle} />
-              <FeatureRow label="ARIA Acceptance Rate" value={`${engagement.totals.aria_acceptance_rate}%`} icon={Zap} />
+              <FeatureRow label="New Family Files" value={engagement.totals?.new_family_files ?? 0} icon={FileText} />
+              <FeatureRow label="New Agreements" value={engagement.totals?.new_agreements ?? 0} icon={CheckCircle} />
+              <FeatureRow label="ARIA Acceptance Rate" value={`${engagement.totals?.aria_acceptance_rate ?? 0}%`} icon={Zap} />
             </div>
           </div>
 
           <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
             <h3 className="text-sm font-semibold text-zinc-300 mb-4">Daily Breakdown</h3>
             <div className="max-h-64 overflow-y-auto space-y-0">
-              {growth && [...growth.daily_registrations].reverse().slice(0, 14).map((d) => (
+              {growth && [...(growth.daily_registrations || [])].reverse().slice(0, 14).map((d) => (
                 <div key={d.date} className="flex items-center justify-between py-2 border-b border-zinc-800/30 last:border-0">
                   <span className="text-xs text-zinc-500">
                     {new Date(d.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}

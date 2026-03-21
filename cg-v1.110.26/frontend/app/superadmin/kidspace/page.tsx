@@ -170,9 +170,9 @@ export default function KidSpaceAnalyticsPage() {
             <div className="space-y-2">
               {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-10" />)}
             </div>
-          ) : data && data.most_played.length > 0 ? (
+          ) : data && data.most_played?.length > 0 ? (
             <div className="space-y-0">
-              {data.most_played.slice(0, 10).map((item, i) => (
+              {data.most_played?.slice(0, 10).map((item, i) => (
                 <div key={i} className="flex items-center gap-3 py-2.5 border-b border-zinc-800/30 last:border-0 hover:bg-zinc-800/20 transition-colors px-2 rounded">
                   <span className={`w-6 text-center text-xs font-bold ${i === 0 ? 'text-amber-400' : 'text-zinc-600'}`}>
                     {i === 0 ? (
@@ -206,9 +206,9 @@ export default function KidSpaceAnalyticsPage() {
             <div className="space-y-2">
               {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-10" />)}
             </div>
-          ) : data && data.most_read.length > 0 ? (
+          ) : data && data.most_read?.length > 0 ? (
             <div className="space-y-0">
-              {data.most_read.slice(0, 10).map((item, i) => (
+              {data.most_read?.slice(0, 10).map((item, i) => (
                 <div key={i} className="flex items-center gap-3 py-2.5 border-b border-zinc-800/30 last:border-0 hover:bg-zinc-800/20 transition-colors px-2 rounded">
                   <span className={`w-6 text-center text-xs font-bold ${i === 0 ? 'text-amber-400' : 'text-zinc-600'}`}>
                     {i === 0 ? (
@@ -238,7 +238,7 @@ export default function KidSpaceAnalyticsPage() {
         <h2 className="text-sm font-semibold text-zinc-300 mb-4">Daily Usage Trends</h2>
         {loading ? (
           <Skeleton className="h-64" />
-        ) : data && data.daily_usage.length > 0 ? (
+        ) : data && data.daily_usage?.length > 0 ? (
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={data.daily_usage}>
               <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />

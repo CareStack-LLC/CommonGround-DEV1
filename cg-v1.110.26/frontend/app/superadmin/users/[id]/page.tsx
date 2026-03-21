@@ -268,7 +268,7 @@ export default function UserDetailPage() {
       {activeTab === 'activity' && (
         <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
           <h3 className="text-sm font-semibold text-zinc-300 mb-4">Recent Activity</h3>
-          {user.recent_activity.length === 0 ? (
+          {!user.recent_activity?.length ? (
             <p className="text-sm text-zinc-500 py-8 text-center">No recent activity recorded.</p>
           ) : (
             <div className="space-y-0">
@@ -276,7 +276,7 @@ export default function UserDetailPage() {
                 <div key={event.id} className="flex gap-3 py-3 border-b border-zinc-800/40 last:border-b-0">
                   <div className="flex flex-col items-center">
                     <div className={`w-2 h-2 rounded-full mt-1.5 ${event.status === 'success' ? 'bg-emerald-500' : event.status === 'error' ? 'bg-red-500' : 'bg-zinc-600'}`} />
-                    {i < user.recent_activity.length - 1 && <div className="w-px flex-1 bg-zinc-800/60 mt-1" />}
+                    {i < (user.recent_activity?.length ?? 0) - 1 && <div className="w-px flex-1 bg-zinc-800/60 mt-1" />}
                   </div>
                   <div className="flex-1 min-w-0 pb-1">
                     <div className="text-sm text-zinc-300 capitalize">
@@ -399,7 +399,7 @@ export default function UserDetailPage() {
       {activeTab === 'files' && (
         <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
           <h3 className="text-sm font-semibold text-zinc-300 mb-4">Family Files</h3>
-          {user.family_files.length === 0 ? (
+          {!user.family_files?.length ? (
             <p className="text-sm text-zinc-500 py-8 text-center">No family files associated with this user.</p>
           ) : (
             <div className="space-y-2">

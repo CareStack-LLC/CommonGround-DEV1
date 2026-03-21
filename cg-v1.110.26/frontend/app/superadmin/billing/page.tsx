@@ -79,8 +79,8 @@ export default function BillingPage() {
   }
 
   // Calculate totals from MRR data (uses correct prices from API)
-  const totalConsumers = data ? Object.values(data.consumer_subscriptions).reduce((a, b) => a + b.total, 0) : 0;
-  const paidConsumers = data ? Object.entries(data.mrr_by_tier)
+  const totalConsumers = data ? Object.values(data.consumer_subscriptions || {}).reduce((a, b) => a + b.total, 0) : 0;
+  const paidConsumers = data ? Object.entries(data.mrr_by_tier || {})
     .filter(([, v]) => v.price > 0)
     .reduce((a, [, v]) => a + v.count, 0) : 0;
 
@@ -162,7 +162,7 @@ export default function BillingPage() {
         <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
           <h2 className="text-sm font-semibold text-zinc-300 mb-4">Revenue by Tier</h2>
           <div className="space-y-3">
-            {Object.entries(data.mrr_by_tier)
+            {Object.entries(data.mrr_by_tier || {})
               .filter(([, v]) => v.price > 0)
               .sort(([, a], [, b]) => b.mrr - a.mrr)
               .map(([tier, info]) => {
@@ -249,11 +249,11 @@ export default function BillingPage() {
             return (
               <div className="space-y-5">
                 {TIER_GROUPS.map((group) => {
-                  const groupEntries = Object.entries(data.consumer_subscriptions)
+                  const groupEntries = Object.entries(data.consumer_subscriptions || {})
                     .filter(([tier]) => group.tiers.includes(tier))
                     .sort(([, a], [, b]) => b.total - a.total);
                   // Also check professional subscriptions for professional tiers
-                  const proEntries = Object.entries(data.professional_subscriptions)
+                  const proEntries = Object.entries(data.professional_subscriptions || {})
                     .filter(([tier]) => group.tiers.includes(tier));
                   const allEntries = [...groupEntries.map(([t, info]) => ({ tier: t, total: info.total, statuses: info.statuses })),
                     ...proEntries.map(([t, count]) => ({ tier: t, total: count, statuses: {} as Record<string, number> }))];

@@ -93,13 +93,13 @@ export default function SuperAdminDashboard() {
   // Growth trend calc
   const growthTrend = growth ? (() => {
     const data = growth.daily_registrations;
-    if (data.length < 8) return 0;
+    if (!data || data.length < 8) return 0;
     const recent = data.slice(-7).reduce((a, b) => a + b.count, 0);
     const prev = data.slice(-14, -7).reduce((a, b) => a + b.count, 0);
     return prev === 0 ? 0 : Math.round(((recent - prev) / prev) * 100);
   })() : 0;
 
-  const sparklineMax = growth ? Math.max(...growth.daily_registrations.map(d => d.count), 1) : 1;
+  const sparklineMax = growth ? Math.max(...(growth.daily_registrations || []).map(d => d.count), 1) : 1;
 
   return (
     <div className="space-y-6">
@@ -205,7 +205,7 @@ export default function SuperAdminDashboard() {
             <div className="text-xl font-bold text-white">
               {formatCurrency(
                 dashboard.subscriptions.estimated_mrr > 0
-                  ? (dashboard.subscriptions.estimated_mrr * 18) / Math.max(Object.values(dashboard.subscriptions.tier_breakdown).reduce((a, b) => a + b, 0) - (dashboard.subscriptions.tier_breakdown['web_starter'] || 0), 1)
+                  ? (dashboard.subscriptions.estimated_mrr * 18) / Math.max(Object.values(dashboard.subscriptions?.tier_breakdown || {}).reduce((a, b) => a + b, 0) - (dashboard.subscriptions?.tier_breakdown['web_starter'] || 0), 1)
                   : 0
               )}
             </div>
@@ -218,7 +218,7 @@ export default function SuperAdminDashboard() {
             </div>
             <div className="text-xl font-bold text-white">
               {(() => {
-                const paying = Object.entries(dashboard.subscriptions.tier_breakdown)
+                const paying = Object.entries(dashboard.subscriptions?.tier_breakdown || {})
                   .filter(([k]) => k !== 'web_starter' && k !== 'none')
                   .reduce((a, [, v]) => a + v, 0);
                 const cancelled = dashboard.subscriptions.past_due_count || 0;
@@ -237,7 +237,7 @@ export default function SuperAdminDashboard() {
             <div className="text-xl font-bold text-white">
               {formatCurrency(
                 (() => {
-                  const paying = Object.entries(dashboard.subscriptions.tier_breakdown)
+                  const paying = Object.entries(dashboard.subscriptions?.tier_breakdown || {})
                     .filter(([k]) => k !== 'web_starter' && k !== 'none')
                     .reduce((a, [, v]) => a + v, 0);
                   return paying > 0 ? dashboard.subscriptions.estimated_mrr / paying : 0;
@@ -266,7 +266,7 @@ export default function SuperAdminDashboard() {
             <Skeleton className="h-36" />
           ) : growth && (
             <div className="flex items-end gap-1 h-36">
-              {growth.daily_registrations.map((d, i) => {
+              {(growth.daily_registrations || []).map((d, i) => {
                 const height = Math.max((d.count / sparklineMax) * 100, 4);
                 const isWeekend = [0, 6].includes(new Date(d.date).getDay());
                 return (
@@ -285,7 +285,7 @@ export default function SuperAdminDashboard() {
               })}
             </div>
           )}
-          {growth && growth.daily_registrations.length > 0 && (
+          {growth && growth.daily_registrations?.length > 0 && (
             <div className="flex justify-between mt-2 text-[10px] text-zinc-600">
               <span>{new Date(growth.daily_registrations[0].date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
               <span>{new Date(growth.daily_registrations[growth.daily_registrations.length - 1].date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
@@ -310,7 +310,7 @@ export default function SuperAdminDashboard() {
             </div>
           ) : dashboard && (
             <div className="space-y-2.5">
-              {Object.entries(dashboard.subscriptions.tier_breakdown)
+              {Object.entries(dashboard.subscriptions?.tier_breakdown || {})
                 .sort(([, a], [, b]) => b - a)
                 .map(([tier, count]) => {
                   const total = dashboard.users.total || 1;
@@ -354,7 +354,7 @@ export default function SuperAdminDashboard() {
             </div>
           ) : dashboard && (
             <div className="space-y-1">
-              {dashboard.recent_signups.map((s) => (
+              {(dashboard.recent_signups || []).map((s) => (
                 <div
                   key={s.id}
                   onClick={() => router.push(`/superadmin/users/${s.id}`)}
@@ -390,7 +390,7 @@ export default function SuperAdminDashboard() {
             </div>
           ) : dashboard && (
             <div className="space-y-1">
-              {dashboard.recent_admin_actions.map((a) => (
+              {(dashboard.recent_admin_actions || []).map((a) => (
                 <div key={a.id} className="flex items-start gap-3 px-3 py-2 rounded-lg hover:bg-zinc-800/40 transition-colors">
                   <div className="w-1.5 h-1.5 rounded-full bg-violet-500/60 mt-2 flex-shrink-0" />
                   <div className="flex-1 min-w-0">

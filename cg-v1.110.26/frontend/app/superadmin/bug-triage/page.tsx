@@ -222,8 +222,8 @@ export default function BugTriagePage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-800/40">
-                  {Object.entries(bugs.issues)
-                  .filter(([key]) => Array.isArray(bugs.issues[key as keyof typeof bugs.issues]))
+                  {Object.entries(bugs.issues || {})
+                  .filter(([key]) => Array.isArray((bugs.issues || {})[key as keyof typeof bugs.issues]))
                   .flatMap(([severity, issues]) =>
                     (issues as any[]).map((issue: any, idx: number) => (
                       <tr key={`${severity}-${idx}`} className="hover:bg-zinc-800/30 transition-colors">
@@ -252,7 +252,7 @@ export default function BugTriagePage() {
                       </tr>
                     ))
                   )}
-                  {Object.values(bugs.issues).filter(Array.isArray).flat().length === 0 && (
+                  {Object.values(bugs.issues || {}).filter(Array.isArray).flat().length === 0 && (
                     <tr>
                       <td colSpan={5} className="px-4 py-12 text-center text-zinc-500">No issues found for this period.</td>
                     </tr>
@@ -420,7 +420,7 @@ export default function BugTriagePage() {
               </div>
 
               {/* Day-by-Day Breakdown */}
-              {Object.entries(sprint.plan.plan).map(([day, items]) => (
+              {Object.entries(sprint.plan.plan || {}).map(([day, items]) => (
                 <div key={day} className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
                   <h3 className="text-sm font-semibold text-zinc-300 mb-3 capitalize">{day}</h3>
                   <div className="space-y-2">
