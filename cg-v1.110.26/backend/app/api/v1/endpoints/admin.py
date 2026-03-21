@@ -2690,8 +2690,28 @@ async def get_current_bugs(
     """Fetch and categorize current Sentry issues."""
     from app.services.sentry_triage_service import fetch_sentry_issues, categorize_issues
 
-    issues = await fetch_sentry_issues(project, days)
-    return categorize_issues(issues)
+    try:
+        issues = await fetch_sentry_issues(project, days)
+        return categorize_issues(issues)
+    except ValueError as exc:
+        # SENTRY_AUTH_TOKEN not configured
+        logger.warning("Bug triage unavailable: %s", exc)
+        return {
+            "total": 0, "critical": 0, "high": 0, "medium": 0, "low": 0,
+            "user_reported": 0, "frontend": 0, "backend": 0,
+            "issues": {"critical": [], "high": [], "medium": [], "low": [], "user_reported": [], "by_platform": {"frontend": [], "backend": []}},
+            "setup_required": True,
+            "message": str(exc),
+        }
+    except Exception as exc:
+        logger.error("Bug triage fetch failed: %s", exc)
+        capture_error(exc)
+        return {
+            "total": 0, "critical": 0, "high": 0, "medium": 0, "low": 0,
+            "user_reported": 0, "frontend": 0, "backend": 0,
+            "issues": {"critical": [], "high": [], "medium": [], "low": [], "user_reported": [], "by_platform": {"frontend": [], "backend": []}},
+            "error": str(exc),
+        }
 
 
 @router.post(
@@ -2706,13 +2726,20 @@ async def run_bug_triage(
     """Run AI-powered triage on current Sentry issues to prioritize fixes."""
     from app.services.sentry_triage_service import fetch_sentry_issues, ai_triage
 
-    issues = await fetch_sentry_issues(days=days)
-    result = await ai_triage(issues)
-    await _log_admin_action(
-        db, admin_user, "bug_triage_run", "bugs", details=f"issues={len(issues)}"
-    )
-    await db.commit()
-    return result
+    try:
+        issues = await fetch_sentry_issues(days=days)
+        result = await ai_triage(issues)
+        await _log_admin_action(
+            db, admin_user, "bug_triage_run", "bugs", details=f"issues={len(issues)}"
+        )
+        await db.commit()
+        return result
+    except ValueError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    except Exception as exc:
+        logger.error("Bug triage failed: %s", exc)
+        capture_error(exc)
+        raise HTTPException(status_code=502, detail=f"Bug triage failed: {type(exc).__name__}")
 
 
 @router.post(
@@ -2732,13 +2759,20 @@ async def create_sprint(
         save_sprint,
     )
 
-    issues = await fetch_sentry_issues()
-    triaged = await ai_triage(issues)
-    sprint_plan = await generate_sprint_plan(triaged, days)
-    sprint_id = await save_sprint(db, sprint_plan, triaged)
-    await _log_admin_action(db, admin_user, "sprint_created", "sprint", sprint_id)
-    await db.commit()
-    return {"sprint_id": sprint_id, "plan": sprint_plan}
+    try:
+        issues = await fetch_sentry_issues()
+        triaged = await ai_triage(issues)
+        sprint_plan = await generate_sprint_plan(triaged, days)
+        sprint_id = await save_sprint(db, sprint_plan, triaged)
+        await _log_admin_action(db, admin_user, "sprint_created", "sprint", sprint_id)
+        await db.commit()
+        return {"sprint_id": sprint_id, "plan": sprint_plan}
+    except ValueError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    except Exception as exc:
+        logger.error("Sprint creation failed: %s", exc)
+        capture_error(exc)
+        raise HTTPException(status_code=502, detail=f"Sprint creation failed: {type(exc).__name__}")
 
 
 @router.get(
@@ -2753,24 +2787,28 @@ async def list_sprints(
     """List recent sprint plans ordered by creation date."""
     from app.models.bug_triage import BugTriageSprint
 
-    result = await db.execute(
-        select(BugTriageSprint)
-        .order_by(BugTriageSprint.created_at.desc())
-        .limit(limit)
-    )
-    return [
-        {
-            "id": s.id,
-            "status": s.status,
-            "period_start": str(s.period_start),
-            "period_end": str(s.period_end),
-            "summary": s.summary_json,
-            "plan": s.sprint_plan_json,
-            "ai_analysis": s.ai_analysis,
-            "created_at": s.created_at.isoformat() if s.created_at else None,
-        }
-        for s in result.scalars().all()
-    ]
+    try:
+        result = await db.execute(
+            select(BugTriageSprint)
+            .order_by(BugTriageSprint.created_at.desc())
+            .limit(limit)
+        )
+        return [
+            {
+                "id": s.id,
+                "status": s.status,
+                "period_start": str(s.period_start),
+                "period_end": str(s.period_end),
+                "summary": s.summary_json,
+                "plan": s.sprint_plan_json,
+                "ai_analysis": s.ai_analysis,
+                "created_at": s.created_at.isoformat() if s.created_at else None,
+            }
+            for s in result.scalars().all()
+        ]
+    except Exception as exc:
+        logger.warning("Sprint listing failed (table may not exist): %s", exc)
+        return []
 
 
 @router.patch(
