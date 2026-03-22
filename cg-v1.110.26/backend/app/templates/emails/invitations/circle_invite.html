@@ -5,16 +5,6 @@
 
 {% block preheader %}{{ inviter_name }} has invited you to join {{ child_name }}'s My Circle on CommonGround.{% endblock %}
 
-{% block header %}
-<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
-  <tr>
-    <td align="center" style="padding: 28px 32px; background-color: #8B5CF6;">
-      <img src="{{ icons.logo }}" alt="CommonGround" width="180" height="40" style="display: block; margin: 0 auto; max-width: 180px; height: auto;">
-    </td>
-  </tr>
-</table>
-{% endblock %}
-
 {% block content %}
 {{ c.heading("Stay Connected with " ~ child_name) }}
 {{ c.subheading(inviter_name ~ " has invited you to join " ~ child_name ~ "'s My Circle on CommonGround — a safe space to keep important family bonds strong.") }}

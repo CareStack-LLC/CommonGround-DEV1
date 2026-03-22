@@ -446,7 +446,7 @@ class ChatbotService:
     async def _send_transcript_email(
         self, session: ChatbotSession, is_escalation: bool = False
     ) -> None:
-        """Format and send a transcript email to the support team."""
+        """Format and send a transcript email to the support team using branded template."""
         visitor = session.visitor
         visitor_name = visitor.name or "Anonymous"
         visitor_email = visitor.email or "Not provided"
@@ -455,56 +455,31 @@ class ChatbotService:
         subject_prefix = "[Chatbot Escalation]" if is_escalation else "[Chatbot Transcript]"
         subject = f"{subject_prefix} {visitor_name} — {session.started_at.strftime('%b %d, %Y %I:%M %p')}"
 
-        # Build message rows
-        message_rows = ""
-        for msg in session.messages:
-            role_label = "Visitor" if msg.role == "user" else "Aria"
-            bg_color = "#f0fdf4" if msg.role == "assistant" else "#f8fafc"
-            ts = msg.created_at.strftime("%I:%M %p") if msg.created_at else ""
-            message_rows += f"""
-            <tr>
-                <td style="padding:8px 12px; background:{bg_color}; border-bottom:1px solid #e2e8f0;">
-                    <strong>{role_label}</strong> <span style="color:#94a3b8; font-size:12px;">{ts}</span><br/>
-                    {msg.content}
-                </td>
-            </tr>"""
-
-        escalation_section = ""
-        if is_escalation and session.escalation_reason:
-            escalation_section = f"""
-            <tr>
-                <td style="padding:12px; background:#fef2f2; border:1px solid #fecaca;">
-                    <strong>Escalation Reason:</strong> {session.escalation_reason}
-                </td>
-            </tr>"""
-
-        html_body = f"""
-        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width:600px; margin:0 auto;">
-            <div style="background:#3DAA8A; color:white; padding:16px 20px; border-radius:8px 8px 0 0;">
-                <h2 style="margin:0; font-size:18px;">{subject_prefix} Chat Transcript</h2>
-            </div>
-            <div style="padding:16px 20px; background:#ffffff; border:1px solid #e2e8f0;">
-                <table style="width:100%; margin-bottom:16px;">
-                    <tr><td><strong>Visitor:</strong> {visitor_name}</td></tr>
-                    <tr><td><strong>Email:</strong> {visitor_email}</td></tr>
-                    <tr><td><strong>Phone:</strong> {visitor_phone}</td></tr>
-                    <tr><td><strong>Source Page:</strong> {visitor.source_page or "N/A"}</td></tr>
-                    <tr><td><strong>Session Started:</strong> {session.started_at.strftime("%b %d, %Y %I:%M %p UTC")}</td></tr>
-                    <tr><td><strong>Messages:</strong> {session.message_count}</td></tr>
-                </table>
-                {escalation_section}
-                <h3 style="margin:16px 0 8px; font-size:14px; color:#64748b;">Conversation</h3>
-                <table style="width:100%; border-collapse:collapse;">
-                    {message_rows}
-                </table>
-            </div>
-            <div style="padding:12px 20px; background:#f8fafc; border-radius:0 0 8px 8px; border:1px solid #e2e8f0; border-top:0;">
-                <p style="margin:0; font-size:12px; color:#94a3b8;">Sent by CommonGround Aria Chatbot</p>
-            </div>
-        </div>
-        """
+        # Build message list for template
+        template_messages = []
+        for msg in sorted(session.messages, key=lambda m: m.created_at):
+            template_messages.append({
+                "role": msg.role,
+                "content": msg.content,
+                "timestamp": msg.created_at.strftime("%I:%M %p") if msg.created_at else "",
+            })
 
         try:
+            html_body = email_service._render_template(
+                'notifications/chatbot_transcript.html',
+                {
+                    'subject_prefix': subject_prefix,
+                    'is_escalation': is_escalation,
+                    'visitor_name': visitor_name,
+                    'visitor_email': visitor_email,
+                    'visitor_phone': visitor_phone,
+                    'source_page': visitor.source_page or "N/A",
+                    'session_date': session.started_at.strftime("%b %d, %Y %I:%M %p UTC"),
+                    'message_count': session.message_count or 0,
+                    'escalation_reason': session.escalation_reason if is_escalation else None,
+                    'messages': template_messages,
+                },
+            )
             await email_service._send_email(
                 to_email=ESCALATION_EMAIL,
                 subject=subject,

@@ -137,7 +137,7 @@
 {{ c.notice('Need help getting started? Our support team is here to walk you through every step.') }}
 
 <p style="margin: 8px 0 0; font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #6B8A9A; text-align: center; line-height: 1.5;">
-  <a href="{{ support_url | default(frontend_url ~ '/support') }}" style="color: #3DAA8A; text-decoration: underline; font-family: Arial, Helvetica, sans-serif;">Contact Support</a>
+  <a href="{{ support_url | default(frontend_url ~ '/help/contact') }}" style="color: #3DAA8A; text-decoration: underline; font-family: Arial, Helvetica, sans-serif;">Contact Support</a>
 </p>
 
 {{ c.help_note(frontend_url) }}
