@@ -41,6 +41,7 @@ const navSections = [
       { href: '/superadmin/activity-log', label: 'Activity Log', icon: Activity },
       { href: '/superadmin/bug-triage', label: 'Bug Triage', icon: Bug },
       { href: '/superadmin/performance', label: 'Performance', icon: Gauge },
+      { href: '/superadmin/status', label: 'System Status', icon: Activity },
     ],
   },
   {

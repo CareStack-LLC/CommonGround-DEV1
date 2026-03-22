@@ -643,4 +643,28 @@ export const adminAPI = {
     summary: { total_requests: number; total_ai_calls: number; total_tokens_used: number; avg_response_p75_ms: number; slow_queries_count: number };
     error?: string;
   }>(`/admin/performance/overview?days=${days}`),
+
+  // System Status
+  getSystemStatus: () => adminFetch<SystemStatusResponse>('/admin/system-status'),
 };
+
+// System Status types
+export interface ServiceStatus {
+  name: string;
+  slug: string;
+  category: string;
+  status: 'operational' | 'degraded' | 'down';
+  latency_ms: number;
+  detail: string;
+  checked_at: string;
+}
+
+export interface SystemStatusResponse {
+  overall: 'operational' | 'degraded' | 'down';
+  checked_at: string;
+  services: ServiceStatus[];
+  total: number;
+  operational: number;
+  degraded: number;
+  down: number;
+}

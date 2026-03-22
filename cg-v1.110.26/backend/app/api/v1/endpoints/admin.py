@@ -3216,3 +3216,224 @@ async def get_performance_overview(
             "slow_queries": [],
             "error": str(exc),
         }
+
+
+# =============================================================================
+# MODULE: System Status — Live Service Health Checks
+# =============================================================================
+
+import asyncio
+import time as _time
+import httpx
+
+
+async def _check_service(name: str, slug: str, category: str, check_fn) -> dict:
+    """Run a single service health check with timeout and error handling."""
+    start = _time.monotonic()
+    try:
+        detail = await asyncio.wait_for(check_fn(), timeout=5.0)
+        latency = round((_time.monotonic() - start) * 1000)
+        return {
+            "name": name,
+            "slug": slug,
+            "category": category,
+            "status": "operational",
+            "latency_ms": latency,
+            "detail": detail or "Healthy",
+            "checked_at": datetime.utcnow().isoformat(),
+        }
+    except asyncio.TimeoutError:
+        return {
+            "name": name, "slug": slug, "category": category,
+            "status": "down", "latency_ms": 5000,
+            "detail": "Health check timed out (5s)",
+            "checked_at": datetime.utcnow().isoformat(),
+        }
+    except Exception as exc:
+        latency = round((_time.monotonic() - start) * 1000)
+        return {
+            "name": name, "slug": slug, "category": category,
+            "status": "down", "latency_ms": latency,
+            "detail": str(exc)[:200],
+            "checked_at": datetime.utcnow().isoformat(),
+        }
+
+
+@router.get("/system-status", summary="Live system health status")
+async def get_system_status(
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Check health of all platform services concurrently."""
+    from app.core.config import Settings
+    cfg = Settings()
+
+    # Define all health checks
+    async def check_database():
+        result = await db.execute(select(func.count()).select_from(User))
+        count = result.scalar() or 0
+        return f"{count} users in database"
+
+    async def check_supabase_auth():
+        if not cfg.SUPABASE_URL:
+            raise ValueError("SUPABASE_URL not configured")
+        async with httpx.AsyncClient(timeout=4.0) as client:
+            resp = await client.get(f"{cfg.SUPABASE_URL}/auth/v1/settings", headers={
+                "apikey": cfg.SUPABASE_ANON_KEY or "",
+            })
+            if resp.status_code < 400:
+                return "Auth service responding"
+            raise ValueError(f"Auth returned {resp.status_code}")
+
+    async def check_claude():
+        if not cfg.ANTHROPIC_API_KEY:
+            raise ValueError("ANTHROPIC_API_KEY not set")
+        import anthropic
+        client = anthropic.AsyncAnthropic(api_key=cfg.ANTHROPIC_API_KEY)
+        # Lightweight check — list models
+        resp = await client.models.list(limit=1)
+        return f"Claude API connected"
+
+    async def check_openai():
+        if not cfg.OPENAI_API_KEY:
+            raise ValueError("OPENAI_API_KEY not set")
+        return "API key configured"
+
+    async def check_stripe():
+        if not cfg.STRIPE_SECRET_KEY:
+            raise ValueError("STRIPE_SECRET_KEY not set")
+        import stripe
+        stripe.api_key = cfg.STRIPE_SECRET_KEY
+        acct = stripe.Account.retrieve()
+        return f"Account: {acct.get('business_profile', {}).get('name', acct.id)}"
+
+    async def check_daily():
+        if not cfg.DAILY_API_KEY:
+            raise ValueError("DAILY_API_KEY not set")
+        async with httpx.AsyncClient(timeout=4.0) as client:
+            resp = await client.get("https://api.daily.co/v1/rooms?limit=1", headers={
+                "Authorization": f"Bearer {cfg.DAILY_API_KEY}",
+            })
+            if resp.status_code == 200:
+                data = resp.json()
+                count = data.get("total_count", len(data.get("data", [])))
+                return f"{count} rooms available"
+            raise ValueError(f"Daily.co returned {resp.status_code}")
+
+    async def check_sendgrid():
+        if not cfg.SENDGRID_API_KEY:
+            raise ValueError("SENDGRID_API_KEY not set")
+        if not cfg.EMAIL_ENABLED:
+            return "API key set but EMAIL_ENABLED=False"
+        async with httpx.AsyncClient(timeout=4.0) as client:
+            resp = await client.get("https://api.sendgrid.com/v3/user/profile", headers={
+                "Authorization": f"Bearer {cfg.SENDGRID_API_KEY}",
+            })
+            if resp.status_code == 200:
+                return "SendGrid connected"
+            raise ValueError(f"SendGrid returned {resp.status_code}")
+
+    async def check_mapbox():
+        if not cfg.MAPBOX_API_KEY:
+            raise ValueError("MAPBOX_API_KEY not set")
+        return "API key configured"
+
+    async def check_sentry():
+        if not cfg.SENTRY_AUTH_TOKEN:
+            raise ValueError("SENTRY_AUTH_TOKEN not set")
+        org = getattr(cfg, 'SENTRY_ORG_SLUG', 'commonground-s0')
+        async with httpx.AsyncClient(timeout=4.0) as client:
+            resp = await client.get(f"https://sentry.io/api/0/organizations/{org}/", headers={
+                "Authorization": f"Bearer {cfg.SENTRY_AUTH_TOKEN}",
+            })
+            if resp.status_code == 200:
+                return f"Sentry org: {org}"
+            raise ValueError(f"Sentry returned {resp.status_code}")
+
+    async def check_gmail():
+        try:
+            from app.models.inbox import GoogleOAuthToken
+            result = await db.execute(
+                select(func.count()).select_from(GoogleOAuthToken)
+            )
+            count = result.scalar() or 0
+            if count > 0:
+                return f"{count} OAuth token(s) stored"
+            raise ValueError("No OAuth tokens — Gmail not connected")
+        except Exception as exc:
+            if "GoogleOAuthToken" in str(exc) or "google_oauth_tokens" in str(exc):
+                raise ValueError("google_oauth_tokens table not found")
+            raise
+
+    async def check_websocket():
+        try:
+            from app.core.websocket import manager
+            active = len(manager.active_connections) if hasattr(manager, 'active_connections') else 0
+            return f"{active} active connection(s)"
+        except Exception:
+            return "WebSocket manager available"
+
+    async def check_blog():
+        try:
+            from app.models.blog import BlogPost
+            result = await db.execute(
+                select(func.count()).select_from(BlogPost)
+            )
+            count = result.scalar() or 0
+            return f"{count} blog posts"
+        except Exception:
+            raise ValueError("Blog system unavailable")
+
+    async def check_landing_pages():
+        try:
+            from app.models.lead import LandingPage
+            result = await db.execute(
+                select(func.count()).select_from(LandingPage)
+            )
+            count = result.scalar() or 0
+            return f"{count} landing pages"
+        except Exception:
+            raise ValueError("Landing pages table unavailable")
+
+    # Run all checks concurrently
+    checks = [
+        _check_service("Database (PostgreSQL)", "database", "infrastructure", check_database),
+        _check_service("Authentication (Supabase)", "supabase_auth", "infrastructure", check_supabase_auth),
+        _check_service("ARIA — Claude API", "claude", "ai", check_claude),
+        _check_service("ARIA Fallback — OpenAI", "openai", "ai", check_openai),
+        _check_service("Payment Processing (Stripe)", "stripe", "infrastructure", check_stripe),
+        _check_service("KidComs Video (Daily.co)", "daily", "communication", check_daily),
+        _check_service("Email Notifications (SendGrid)", "sendgrid", "communication", check_sendgrid),
+        _check_service("Geolocation (Mapbox)", "mapbox", "infrastructure", check_mapbox),
+        _check_service("Bug Tracking (Sentry)", "sentry", "ai", check_sentry),
+        _check_service("Gmail Monitor", "gmail", "communication", check_gmail),
+        _check_service("Real-time Messaging", "websocket", "communication", check_websocket),
+        _check_service("Blog System", "blog", "content", check_blog),
+        _check_service("Landing Pages", "landing_pages", "content", check_landing_pages),
+    ]
+
+    services = await asyncio.gather(*checks)
+
+    # Determine overall status
+    statuses = [s["status"] for s in services]
+    critical_slugs = {"database", "supabase_auth", "claude"}
+    critical_down = any(
+        s["status"] == "down" and s["slug"] in critical_slugs for s in services
+    )
+
+    if critical_down:
+        overall = "down"
+    elif "down" in statuses:
+        overall = "degraded"
+    else:
+        overall = "operational"
+
+    return {
+        "overall": overall,
+        "checked_at": datetime.utcnow().isoformat(),
+        "services": services,
+        "total": len(services),
+        "operational": statuses.count("operational"),
+        "degraded": statuses.count("degraded"),
+        "down": statuses.count("down"),
+    }
