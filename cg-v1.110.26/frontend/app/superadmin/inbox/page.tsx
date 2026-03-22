@@ -151,6 +151,14 @@ export default function InboxPage() {
 
   useEffect(() => { fetchEmails(); }, [fetchEmails]);
 
+  // Auto-poll every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchEmails();
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [fetchEmails]);
+
   const syncInbox = async () => {
     try {
       setSyncing(true);
@@ -343,7 +351,7 @@ export default function InboxPage() {
           {selectedIds.size > 0 && (
             <>
               <button onClick={analyzeSelectedEmails} disabled={analyzingSelected} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#4BA8C8]/20 hover:bg-[#4BA8C8]/30 text-[#4BA8C8] text-xs font-medium transition-colors disabled:opacity-50">
-                <Sparkles className={`w-3.5 h-3.5 ${analyzingSelected ? 'animate-pulse' : ''}`} /> Analyze ({selectedIds.size})
+                <Sparkles className={`w-3.5 h-3.5 ${analyzingSelected ? 'animate-pulse' : ''}`} /> {analyzingSelected ? 'Analyzing...' : `Analyze (${selectedIds.size})`}
               </button>
               <button onClick={() => setSelectedIds(new Set())} className="px-2.5 py-1.5 rounded-lg text-[#6B8A9A] hover:text-white text-xs transition-colors">
                 Clear
@@ -351,13 +359,6 @@ export default function InboxPage() {
               <div className="w-px h-5 bg-[#2D6A8F]/30" />
             </>
           )}
-          <button onClick={() => setShowDashboard(v => !v)} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${showDashboard ? 'bg-[#3DAA8A]/15 text-[#3DAA8A]' : 'bg-[#2D6A8F]/20 hover:bg-[#2D6A8F]/30 text-[#8AACBC]'}`}>
-            <Activity className="w-3.5 h-3.5" /> KPIs
-          </button>
-          <button onClick={runAnalysis} disabled={analyzing} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#3DAA8A]/15 hover:bg-[#3DAA8A]/25 text-[#3DAA8A] text-xs font-medium transition-colors disabled:opacity-50">
-            <Brain className={`w-3.5 h-3.5 ${analyzing ? 'animate-pulse' : ''}`} /> {analyzing ? 'Analyzing...' : 'AI Analysis'}
-          </button>
-          <div className="w-px h-5 bg-[#2D6A8F]/30" />
           <button onClick={connectGoogleOAuth} disabled={connectingOAuth} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#2D6A8F]/20 hover:bg-[#2D6A8F]/30 text-[#8AACBC] text-xs font-medium transition-colors disabled:opacity-50">
             <Link className="w-3.5 h-3.5" /> Connect
           </button>
@@ -367,36 +368,57 @@ export default function InboxPage() {
         </div>
       </div>
 
-      {/* Quick Stats Strip */}
+      {/* Inbox Alias Breakdown */}
       {stats && (
-        <div className="flex items-center gap-4 bg-[#1A3648]/40 border border-[#2D6A8F]/15 rounded-xl px-5 py-3">
-          <div className="flex items-center gap-2">
-            <Mail className="w-4 h-4 text-[#6B8A9A]" />
-            <span className="text-sm font-semibold text-white">{stats.total}</span>
-            <span className="text-xs text-[#6B8A9A]">total</span>
-          </div>
-          <div className="w-px h-5 bg-[#2D6A8F]/30" />
+        <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+          {[
+            { alias: 'hello@', full: 'hello@find-commonground.com', icon: '📬' },
+            { alias: 'support@', full: 'support@find-commonground.com', icon: '🛟' },
+            { alias: 'info@', full: 'info@find-commonground.com', icon: 'ℹ️' },
+            { alias: 'sales@', full: 'sales@find-commonground.com', icon: '💼' },
+            { alias: 'onboarding@', full: 'onboarding@find-commonground.com', icon: '🚀' },
+            { alias: 'partnerships@', full: 'partnerships@find-commonground.com', icon: '🤝' },
+            { alias: 'teejay@', full: 'teejay@find-commonground.com', icon: '👤' },
+          ].map(({ alias, full, icon }) => {
+            const count = emails.filter(e => e.to_email === full).length;
+            const isActive = recipientFilter === full;
+            return (
+              <button
+                key={alias}
+                onClick={() => setRecipientFilter(isActive ? '' : full)}
+                className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-left transition-all ${
+                  isActive
+                    ? 'bg-[#3DAA8A]/15 border-[#3DAA8A]/30 ring-1 ring-[#3DAA8A]/20'
+                    : 'bg-[#1A3648]/40 border-[#2D6A8F]/15 hover:border-[#2D6A8F]/30'
+                }`}
+              >
+                <span className="text-sm">{icon}</span>
+                <div className="min-w-0">
+                  <div className={`text-xs font-medium truncate ${isActive ? 'text-[#5BC4A0]' : 'text-[#8AACBC]'}`}>{alias}</div>
+                  <div className={`text-lg font-bold ${isActive ? 'text-white' : count > 0 ? 'text-white' : 'text-[#4A6E7F]'}`}>{count}</div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Alert Badges */}
+      {stats && (stats.urgent > 0 || stats.pending_drafts > 0) && (
+        <div className="flex items-center gap-3">
           {stats.urgent > 0 && (
-            <>
-              <div className="flex items-center gap-2">
-                <Flame className="w-3.5 h-3.5 text-red-400" />
-                <span className="text-sm font-semibold text-red-400">{stats.urgent}</span>
-                <span className="text-xs text-[#6B8A9A]">urgent</span>
-              </div>
-              <div className="w-px h-5 bg-[#2D6A8F]/30" />
-            </>
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20">
+              <Flame className="w-3.5 h-3.5 text-red-400" />
+              <span className="text-xs font-medium text-red-400">{stats.urgent} urgent</span>
+            </div>
           )}
           {stats.pending_drafts > 0 && (
-            <>
-              <div className="flex items-center gap-2">
-                <MessageSquare className="w-3.5 h-3.5 text-[#F5A623]" />
-                <span className="text-sm font-semibold text-[#F5A623]">{stats.pending_drafts}</span>
-                <span className="text-xs text-[#6B8A9A]">drafts pending</span>
-              </div>
-              <div className="w-px h-5 bg-[#2D6A8F]/30" />
-            </>
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#F5A623]/10 border border-[#F5A623]/20">
+              <MessageSquare className="w-3.5 h-3.5 text-[#F5A623]" />
+              <span className="text-xs font-medium text-[#F5A623]">{stats.pending_drafts} drafts pending</span>
+            </div>
           )}
-          <div className="flex items-center gap-1.5 flex-wrap">
+          <div className="flex items-center gap-1.5 flex-wrap ml-auto">
             {Object.entries(stats.by_category || {})
               .sort(([,a], [,b]) => Number(b) - Number(a))
               .slice(0, 5)
@@ -556,73 +578,7 @@ export default function InboxPage() {
         </div>
       )}
 
-      {/* KPI Dashboard */}
-      {showDashboard && kpis && (
-        <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5 space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Activity className="w-4 h-4 text-[#3DAA8A]" />
-              <h2 className="text-sm font-semibold text-[#D0E4EC]">Email KPIs</h2>
-            </div>
-            <button onClick={() => setShowDashboard(false)} className="text-[#6B8A9A] hover:text-[#D0E4EC]"><X className="w-4 h-4" /></button>
-          </div>
-
-          {/* Inbox Breakdown */}
-          <div>
-            <h3 className="text-xs font-semibold text-[#6B8A9A] uppercase tracking-wider mb-2">By Inbox</h3>
-            <div className="space-y-1.5">
-              {Object.entries(kpis.by_recipient || {}).sort(([,a], [,b]) => Number(b) - Number(a)).map(([email, count]) => {
-                const countNum = Number(count);
-                const maxCount = Math.max(...Object.values(kpis.by_recipient || {}).map(Number));
-                const pct = maxCount > 0 ? (countNum / maxCount) * 100 : 0;
-                return (
-                  <div key={email} className="flex items-center gap-3">
-                    <span className="text-xs text-[#8AACBC] w-32 truncate">{email.split('@')[0]}@</span>
-                    <div className="flex-1 h-4 bg-[#2D6A8F]/20 rounded-full overflow-hidden">
-                      <div className="h-full bg-[#3DAA8A]/40 rounded-full" style={{ width: `${pct}%` }} />
-                    </div>
-                    <span className="text-xs text-[#8AACBC] w-8 text-right">{countNum}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Volume Trend */}
-          {kpis.volume_trend?.length > 0 && (
-            <div>
-              <h3 className="text-xs font-semibold text-[#6B8A9A] uppercase tracking-wider mb-2">Daily Volume (30d)</h3>
-              <div className="flex items-end gap-px h-16">
-                {kpis.volume_trend.map((d: { date: string; count: number }, i: number) => {
-                  const maxVol = Math.max(...kpis.volume_trend.map((v: { count: number }) => v.count));
-                  const pct = maxVol > 0 ? (d.count / maxVol) * 100 : 0;
-                  return (
-                    <div key={i} className="flex-1 flex flex-col items-center justify-end" title={`${d.date}: ${d.count}`}>
-                      <div className="w-full bg-emerald-500/40 rounded-t-sm" style={{ height: `${Math.max(pct, 4)}%` }} />
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Metrics row */}
-          <div className="grid grid-cols-3 gap-3">
-            <div className="bg-[#2D6A8F]/10 rounded-lg p-3 text-center">
-              <div className="text-lg font-bold text-white">{kpis.draft_approval_rate || 0}%</div>
-              <div className="text-[11px] text-[#6B8A9A]">Draft Approval Rate</div>
-            </div>
-            <div className="bg-[#2D6A8F]/10 rounded-lg p-3 text-center">
-              <div className="text-lg font-bold text-white">{kpis.total || 0}</div>
-              <div className="text-[11px] text-[#6B8A9A]">Total Emails</div>
-            </div>
-            <div className="bg-[#2D6A8F]/10 rounded-lg p-3 text-center">
-              <div className="text-lg font-bold text-red-400">{kpis.urgent || 0}</div>
-              <div className="text-[11px] text-[#6B8A9A]">Urgent</div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* KPI panel removed — alias cards above serve this purpose */}
 
       {/* Split Pane */}
       <div className="flex gap-4 min-h-[600px]">

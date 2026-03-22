@@ -88,7 +88,7 @@ export function EarlyAdopterForm({ source, className = '' }: EarlyAdopterFormPro
           value={firstName}
           onChange={(e) => setFirstName(e.target.value)}
           placeholder="First name (optional)"
-          className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#F5A623]/50 focus:border-transparent"
+          className="w-full px-4 py-3 rounded-lg border border-[#3DAA8A]/20 bg-white text-[#1E3A4A] placeholder:text-[#6B8A9A] focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/40 focus:border-transparent"
         />
         <input
           type="email"
@@ -96,7 +96,7 @@ export function EarlyAdopterForm({ source, className = '' }: EarlyAdopterFormPro
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Your email address"
           required
-          className="w-full px-4 py-3 rounded-lg border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[#F5A623]/50 focus:border-transparent"
+          className="w-full px-4 py-3 rounded-lg border border-[#3DAA8A]/20 bg-white text-[#1E3A4A] placeholder:text-[#6B8A9A] focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/40 focus:border-transparent"
         />
         <button
           type="submit"
