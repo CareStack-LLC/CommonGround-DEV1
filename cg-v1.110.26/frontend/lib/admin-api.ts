@@ -613,6 +613,27 @@ export const adminAPI = {
   getInboxStats: () => adminFetch<InboxStats>('/admin/inbox/stats'),
   analyzeInbox: () => adminFetch<{ analysis: any; provider: string | null; email_count: number; error?: string }>('/admin/inbox/analyze', { method: 'POST' }),
 
+  analyzeSelected: (emailIds: string[]) =>
+    adminFetch<{ analysis: any; provider: string | null; email_count: number }>('/admin/inbox/analyze-selected', {
+      method: 'POST',
+      body: JSON.stringify({ email_ids: emailIds }),
+    }),
+
+  generateReply: (id: string, instructions?: string) =>
+    adminFetch<{ draft_response: string; provider: string | null; thread_length: number }>(`/admin/inbox/emails/${id}/generate-reply`, {
+      method: 'POST',
+      body: JSON.stringify({ instructions: instructions || '' }),
+    }),
+
+  getInboxKPIs: () => adminFetch<{
+    by_recipient: Record<string, number>;
+    volume_trend: { date: string; count: number }[];
+    draft_approval_rate: number;
+    by_category: Record<string, number>;
+    total: number;
+    urgent: number;
+  }>('/admin/inbox/kpis'),
+
   // Performance & AI Monitoring
   getPerformanceOverview: (days = 7) => adminFetch<{
     period_days: number;

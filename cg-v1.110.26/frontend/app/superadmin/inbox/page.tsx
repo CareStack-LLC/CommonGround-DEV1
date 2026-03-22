@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
   Mail, RefreshCw, AlertTriangle, Check, X, Send,
-  Flame, MessageSquare,
+  Flame, MessageSquare, Activity, BarChart3,
   Link, Inbox, Sparkles, Brain,
 } from 'lucide-react';
 import { adminAPI, type MonitoredEmail, type InboxStats } from '@/lib/admin-api';
@@ -78,6 +78,19 @@ export default function InboxPage() {
   const [analyzing, setAnalyzing] = useState(false);
   const [analysis, setAnalysis] = useState<any>(null);
   const [showAnalysis, setShowAnalysis] = useState(false);
+
+  // Multi-select
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [analyzingSelected, setAnalyzingSelected] = useState(false);
+
+  // AI Reply Generation
+  const [generatingReply, setGeneratingReply] = useState(false);
+  const [replyInstructions, setReplyInstructions] = useState('');
+
+  // KPIs
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [kpis, setKpis] = useState<any>(null);
+  const [showDashboard, setShowDashboard] = useState(false);
 
   // OAuth
   const [connectingOAuth, setConnectingOAuth] = useState(false);
@@ -229,6 +242,63 @@ export default function InboxPage() {
     }
   };
 
+  const analyzeSelectedEmails = async () => {
+    try {
+      setAnalyzingSelected(true);
+      setError(null);
+      const result = await adminAPI.analyzeSelected(Array.from(selectedIds));
+      if (result.analysis) {
+        setAnalysis(result);
+        setShowAnalysis(true);
+      } else {
+        setError('No patterns found in selected emails');
+      }
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Selected analysis failed');
+    } finally {
+      setAnalyzingSelected(false);
+    }
+  };
+
+  const generateAIReply = async () => {
+    if (!selectedEmail) return;
+    try {
+      setGeneratingReply(true);
+      setError(null);
+      const result = await adminAPI.generateReply(selectedEmail.id, replyInstructions);
+      setCustomReply(result.draft_response);
+      setReplyInstructions('');
+      setSuccess(`AI reply generated (${result.thread_length} messages in thread, via ${result.provider})`);
+      setTimeout(() => setSuccess(''), 4000);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to generate reply');
+    } finally {
+      setGeneratingReply(false);
+    }
+  };
+
+  const toggleSelectEmail = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === displayEmails.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(displayEmails.map(e => e.id)));
+    }
+  };
+
+  // Fetch KPIs on mount
+  useEffect(() => {
+    adminAPI.getInboxKPIs().then(setKpis).catch(() => {});
+  }, []);
+
   const connectGoogleOAuth = async () => {
     try {
       setConnectingOAuth(true);
@@ -268,6 +338,19 @@ export default function InboxPage() {
           <p className="text-sm text-zinc-500 mt-0.5">{total} emails total</p>
         </div>
         <div className="flex items-center gap-2">
+          {selectedIds.size > 0 && (
+            <button onClick={analyzeSelectedEmails} disabled={analyzingSelected} className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-blue-600/80 hover:bg-blue-600 text-white text-sm font-medium transition-colors disabled:opacity-50">
+              <Sparkles className={`w-4 h-4 ${analyzingSelected ? 'animate-pulse' : ''}`} /> {analyzingSelected ? 'Analyzing...' : `Analyze Selected (${selectedIds.size})`}
+            </button>
+          )}
+          {selectedIds.size > 0 && (
+            <button onClick={() => setSelectedIds(new Set())} className="px-3 py-2 rounded-lg bg-zinc-800/60 hover:bg-zinc-800 text-zinc-400 text-sm transition-colors">
+              Clear
+            </button>
+          )}
+          <button onClick={() => setShowDashboard(v => !v)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-zinc-800/60 hover:bg-zinc-800 text-zinc-300 text-sm font-medium transition-colors">
+            <Activity className="w-4 h-4" /> KPIs
+          </button>
           <button onClick={runAnalysis} disabled={analyzing} className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-600/80 hover:bg-emerald-600 text-white text-sm font-medium transition-colors disabled:opacity-50">
             <Brain className={`w-4 h-4 ${analyzing ? 'animate-pulse' : ''}`} /> {analyzing ? 'Analyzing...' : 'AI Analysis'}
           </button>
@@ -322,7 +405,11 @@ export default function InboxPage() {
         <select value={recipientFilter} onChange={e => setRecipientFilter(e.target.value)} className="px-3 py-2 bg-zinc-900/80 border border-zinc-800/80 rounded-lg text-sm text-zinc-300 focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer">
           <option value="">All Inboxes</option>
           <option value="hello@find-commonground.com">hello@ (General)</option>
+          <option value="info@find-commonground.com">info@ (Info)</option>
           <option value="support@find-commonground.com">support@ (Support)</option>
+          <option value="sales@find-commonground.com">sales@ (Sales)</option>
+          <option value="onboarding@find-commonground.com">onboarding@ (Onboarding)</option>
+          <option value="partnerships@find-commonground.com">partnerships@ (Partnerships)</option>
           <option value="teejay@find-commonground.com">teejay@ (CEO)</option>
         </select>
         <select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)} className="px-3 py-2 bg-zinc-900/80 border border-zinc-800/80 rounded-lg text-sm text-zinc-300 focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer">
@@ -403,6 +490,48 @@ export default function InboxPage() {
               </ul>
             </div>
           )}
+          {/* Multi-select pattern analysis results */}
+          {analysis.analysis.patterns?.length > 0 && (
+            <div>
+              <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">Patterns Detected</h3>
+              <div className="space-y-2">
+                {analysis.analysis.patterns.map((p: any, i: number) => (
+                  <div key={i} className="bg-zinc-800/30 rounded-lg px-3 py-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-zinc-200">{p.pattern}</span>
+                      <span className="text-[10px] text-zinc-500">{p.frequency} · {p.emails_affected} emails</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {analysis.analysis.faq_recommendations?.length > 0 && (
+            <div>
+              <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">FAQ Recommendations</h3>
+              <div className="space-y-3">
+                {analysis.analysis.faq_recommendations.map((faq: any, i: number) => (
+                  <div key={i} className="bg-zinc-800/30 rounded-lg px-4 py-3">
+                    <p className="text-sm font-medium text-zinc-200 mb-1">Q: {faq.question}</p>
+                    <p className="text-xs text-zinc-400">A: {faq.suggested_answer}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {analysis.analysis.insights?.length > 0 && (
+            <div>
+              <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">Business Insights</h3>
+              <ul className="space-y-1">
+                {analysis.analysis.insights.map((insight: string, i: number) => (
+                  <li key={i} className="text-sm text-zinc-300 flex items-start gap-2">
+                    <BarChart3 className="w-3.5 h-3.5 text-blue-400 mt-0.5 flex-shrink-0" />
+                    {insight}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       )}
 
@@ -418,10 +547,91 @@ export default function InboxPage() {
         </div>
       )}
 
+      {/* KPI Dashboard */}
+      {showDashboard && kpis && (
+        <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Activity className="w-4 h-4 text-violet-400" />
+              <h2 className="text-sm font-semibold text-zinc-300">Email KPIs</h2>
+            </div>
+            <button onClick={() => setShowDashboard(false)} className="text-zinc-500 hover:text-zinc-300"><X className="w-4 h-4" /></button>
+          </div>
+
+          {/* Inbox Breakdown */}
+          <div>
+            <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">By Inbox</h3>
+            <div className="space-y-1.5">
+              {Object.entries(kpis.by_recipient || {}).sort(([,a]: [string, number], [,b]: [string, number]) => b - a).map(([email, count]: [string, number]) => {
+                const maxCount = Math.max(...Object.values(kpis.by_recipient || {}).map(Number));
+                const pct = maxCount > 0 ? (count / maxCount) * 100 : 0;
+                return (
+                  <div key={email} className="flex items-center gap-3">
+                    <span className="text-xs text-zinc-400 w-32 truncate">{email.split('@')[0]}@</span>
+                    <div className="flex-1 h-4 bg-zinc-800/60 rounded-full overflow-hidden">
+                      <div className="h-full bg-violet-500/40 rounded-full" style={{ width: `${pct}%` }} />
+                    </div>
+                    <span className="text-xs text-zinc-400 w-8 text-right">{count}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Volume Trend */}
+          {kpis.volume_trend?.length > 0 && (
+            <div>
+              <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">Daily Volume (30d)</h3>
+              <div className="flex items-end gap-px h-16">
+                {kpis.volume_trend.map((d: { date: string; count: number }, i: number) => {
+                  const maxVol = Math.max(...kpis.volume_trend.map((v: { count: number }) => v.count));
+                  const pct = maxVol > 0 ? (d.count / maxVol) * 100 : 0;
+                  return (
+                    <div key={i} className="flex-1 flex flex-col items-center justify-end" title={`${d.date}: ${d.count}`}>
+                      <div className="w-full bg-emerald-500/40 rounded-t-sm" style={{ height: `${Math.max(pct, 4)}%` }} />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Metrics row */}
+          <div className="grid grid-cols-3 gap-3">
+            <div className="bg-zinc-800/30 rounded-lg p-3 text-center">
+              <div className="text-lg font-bold text-white">{kpis.draft_approval_rate || 0}%</div>
+              <div className="text-[11px] text-zinc-500">Draft Approval Rate</div>
+            </div>
+            <div className="bg-zinc-800/30 rounded-lg p-3 text-center">
+              <div className="text-lg font-bold text-white">{kpis.total || 0}</div>
+              <div className="text-[11px] text-zinc-500">Total Emails</div>
+            </div>
+            <div className="bg-zinc-800/30 rounded-lg p-3 text-center">
+              <div className="text-lg font-bold text-red-400">{kpis.urgent || 0}</div>
+              <div className="text-[11px] text-zinc-500">Urgent</div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Split Pane */}
       <div className="flex gap-4 min-h-[600px]">
         {/* Email List (1/3) */}
         <div className="w-1/3 bg-zinc-900/50 border border-zinc-800/60 rounded-xl overflow-hidden flex flex-col">
+          {/* Select All / Count header */}
+          {!loading && displayEmails.length > 0 && (
+            <div className="flex items-center gap-2 px-4 py-2 border-b border-zinc-800/40">
+              <input
+                type="checkbox"
+                checked={selectedIds.size === displayEmails.length && displayEmails.length > 0}
+                onChange={toggleSelectAll}
+                className="rounded border-zinc-700 bg-zinc-900 text-violet-500 focus:ring-violet-500/30"
+              />
+              <span className="text-[11px] text-zinc-500">
+                {selectedIds.size > 0 ? `${selectedIds.size} selected` : `${displayEmails.length} emails`}
+              </span>
+            </div>
+          )}
           <div className="flex-1 overflow-y-auto">
             {loading ? (
               <div className="p-3 space-y-2">
@@ -433,13 +643,22 @@ export default function InboxPage() {
                 <p className="text-sm text-zinc-500">No emails found</p>
               </div>
             ) : displayEmails.map(email => (
-              <button
+              <div
                 key={email.id}
-                onClick={() => viewEmail(email.id)}
-                className={`w-full text-left px-4 py-3 border-b border-zinc-800/40 hover:bg-zinc-800/30 transition-colors ${
+                className={`w-full text-left px-4 py-3 border-b border-zinc-800/40 hover:bg-zinc-800/30 transition-colors flex items-start gap-2 ${
                   selectedEmail?.id === email.id ? 'bg-zinc-800/50' : ''
                 }`}
               >
+                <input
+                  type="checkbox"
+                  checked={selectedIds.has(email.id)}
+                  onChange={() => toggleSelectEmail(email.id)}
+                  className="mt-1 rounded border-zinc-700 bg-zinc-900 text-violet-500 focus:ring-violet-500/30 flex-shrink-0"
+                />
+                <button
+                  onClick={() => viewEmail(email.id)}
+                  className="flex-1 text-left min-w-0"
+                >
                 <div className="flex items-start gap-2">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
@@ -482,6 +701,7 @@ export default function InboxPage() {
                   </div>
                 </div>
               </button>
+              </div>
             ))}
           </div>
         </div>
@@ -596,13 +816,31 @@ export default function InboxPage() {
                 </div>
               )}
 
-              {/* Custom Reply */}
+              {/* Custom Reply with AI Generation */}
               <div className="border border-zinc-800/60 rounded-xl p-4">
-                <span className="text-xs font-semibold text-zinc-400 mb-2 block">Send Custom Reply</span>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-semibold text-zinc-400">Reply</span>
+                  <button
+                    onClick={generateAIReply}
+                    disabled={generatingReply}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 text-xs font-medium transition-colors disabled:opacity-50"
+                  >
+                    <Sparkles className={`w-3.5 h-3.5 ${generatingReply ? 'animate-pulse' : ''}`} />
+                    {generatingReply ? 'Generating...' : 'Generate AI Reply'}
+                  </button>
+                </div>
+                {/* Optional instructions for AI */}
+                <input
+                  type="text"
+                  value={replyInstructions}
+                  onChange={e => setReplyInstructions(e.target.value)}
+                  placeholder="AI instructions (optional): e.g., be apologetic about delay, mention refund policy..."
+                  className="w-full px-3 py-1.5 mb-2 bg-zinc-900/60 border border-zinc-800/60 rounded-lg text-xs text-zinc-300 placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/30"
+                />
                 <textarea
                   value={customReply}
                   onChange={e => setCustomReply(e.target.value)}
-                  placeholder="Type your reply..."
+                  placeholder="Type your reply or generate one with AI..."
                   rows={4}
                   className="w-full px-3 py-2.5 bg-zinc-900/80 border border-zinc-800/80 rounded-lg text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-violet-500/50 resize-none"
                 />

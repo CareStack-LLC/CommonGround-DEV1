@@ -321,8 +321,13 @@ async def analyze_email(db: AsyncSession, email_id: str) -> dict:
         "and provide a JSON response.\n\n"
         "CommonGround email addresses and their purposes:\n"
         "- hello@find-commonground.com — General inquiries\n"
+        "- info@find-commonground.com — General information requests\n"
         "- support@find-commonground.com — Customer support\n"
-        "- teejay@find-commonground.com — CEO/founder direct\n\n"
+        "- sales@find-commonground.com — Sales inquiries, pricing, demos\n"
+        "- onboarding@find-commonground.com — New user onboarding help\n"
+        "- partnerships@find-commonground.com — Business partnerships, integrations\n"
+        "- teejay@find-commonground.com — CEO/founder direct\n"
+        "All are aliases for the same account.\n\n"
         f"From: {email_record.from_name or ''} <{email_record.from_email}>\n"
         f"To: {email_record.to_email}\n"
         f"Subject: {email_record.subject}\n"
@@ -728,3 +733,184 @@ async def get_digests(db: AsyncSession, limit: int = 20) -> list[dict]:
         }
         for d in digests
     ]
+
+
+async def generate_thread_reply(
+    db: AsyncSession,
+    email_id: str,
+    instructions: str = "",
+) -> dict:
+    """Generate an AI reply with full thread context."""
+    email_record = await db.get(MonitoredEmail, email_id)
+    if not email_record:
+        raise ValueError("Email not found")
+
+    # Load thread context
+    thread_emails = [email_record]
+    if email_record.thread_id:
+        result = await db.execute(
+            select(MonitoredEmail)
+            .where(MonitoredEmail.thread_id == email_record.thread_id)
+            .order_by(MonitoredEmail.received_at.asc())
+        )
+        thread_emails = list(result.scalars().all())
+
+    # Build thread context (cap at 10k chars)
+    thread_text = ""
+    for i, msg in enumerate(thread_emails):
+        entry = (
+            f"--- Message {i + 1} ---\n"
+            f"From: {msg.from_name or msg.from_email} <{msg.from_email}>\n"
+            f"To: {msg.to_email}\n"
+            f"Date: {msg.received_at.isoformat() if msg.received_at else 'unknown'}\n"
+            f"Subject: {msg.subject}\n\n"
+            f"{msg.body_full[:2000]}\n\n"
+        )
+        if len(thread_text) + len(entry) > 10000:
+            thread_text += f"\n[{len(thread_emails) - i} earlier messages truncated]\n"
+            break
+        thread_text += entry
+
+    instruction_line = ""
+    if instructions:
+        instruction_line = f"\nSpecial instructions: {instructions}\n"
+
+    prompt = (
+        "You are the executive assistant for CommonGround, an AI-powered co-parenting "
+        "platform (https://www.find-commonground.com). Generate a professional, "
+        "empathetic reply to the latest email in this thread.\n\n"
+        "Guidelines:\n"
+        "- Reference earlier messages in the thread where relevant\n"
+        "- Be helpful and solution-oriented\n"
+        "- Match the formality level of the sender\n"
+        "- Sign as 'The CommonGround Team' unless it's a personal email to teejay\n"
+        f"{instruction_line}\n"
+        f"Email Thread ({len(thread_emails)} messages):\n\n{thread_text}\n\n"
+        "Generate a reply to the LATEST message. Return ONLY the reply text, no JSON."
+    )
+
+    draft = None
+    provider = None
+
+    try:
+        if settings.ANTHROPIC_API_KEY:
+            client = anthropic.AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY)
+            response = await client.messages.create(
+                model="claude-sonnet-4-5-20250514",
+                max_tokens=1500,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            draft = response.content[0].text.strip()
+            provider = "claude"
+    except Exception as e:
+        logger.warning("Claude thread reply failed: %s", e)
+
+    if not draft:
+        try:
+            from openai import AsyncOpenAI
+            if settings.OPENAI_API_KEY:
+                oai = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+                resp = await oai.chat.completions.create(
+                    model="gpt-4o",
+                    messages=[{"role": "user", "content": prompt}],
+                    max_tokens=1500,
+                )
+                draft = (resp.choices[0].message.content or "").strip()
+                provider = "openai"
+        except Exception as e:
+            logger.warning("OpenAI thread reply also failed: %s", e)
+
+    if not draft:
+        draft = "Unable to generate a reply at this time. Please compose manually."
+        provider = None
+
+    return {
+        "draft_response": draft,
+        "provider": provider,
+        "thread_length": len(thread_emails),
+    }
+
+
+async def get_inbox_kpis(db: AsyncSession) -> dict:
+    """Compute inbox KPIs: volume trends, recipient breakdown, approval rates."""
+    kpis: dict = {}
+
+    try:
+        # By recipient
+        result = await db.execute(
+            select(MonitoredEmail.to_email, func.count(MonitoredEmail.id))
+            .group_by(MonitoredEmail.to_email)
+        )
+        kpis["by_recipient"] = {row[0]: row[1] for row in result}
+    except Exception as e:
+        logger.warning("KPI by_recipient failed: %s", e)
+        kpis["by_recipient"] = {}
+
+    try:
+        # Volume trend: daily counts for last 30 days
+        from sqlalchemy import cast, Date
+        thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+        result = await db.execute(
+            select(
+                cast(MonitoredEmail.received_at, Date).label("day"),
+                func.count(MonitoredEmail.id),
+            )
+            .where(MonitoredEmail.received_at >= thirty_days_ago)
+            .group_by("day")
+            .order_by("day")
+        )
+        kpis["volume_trend"] = [
+            {"date": row[0].isoformat() if row[0] else None, "count": row[1]}
+            for row in result
+        ]
+    except Exception as e:
+        logger.warning("KPI volume_trend failed: %s", e)
+        kpis["volume_trend"] = []
+
+    try:
+        # Draft approval rate
+        total_with_drafts = await db.scalar(
+            select(func.count(MonitoredEmail.id))
+            .where(MonitoredEmail.ai_draft_response.isnot(None))
+        ) or 0
+        approved_or_sent = await db.scalar(
+            select(func.count(MonitoredEmail.id))
+            .where(
+                MonitoredEmail.ai_draft_response.isnot(None),
+                MonitoredEmail.draft_status.in_(["approved", "sent"]),
+            )
+        ) or 0
+        kpis["draft_approval_rate"] = (
+            round(approved_or_sent / total_with_drafts * 100, 1)
+            if total_with_drafts > 0 else 0
+        )
+        kpis["total_with_drafts"] = total_with_drafts
+        kpis["approved_or_sent"] = approved_or_sent
+    except Exception as e:
+        logger.warning("KPI approval rate failed: %s", e)
+        kpis["draft_approval_rate"] = 0
+
+    try:
+        # Category distribution
+        result = await db.execute(
+            select(MonitoredEmail.category, func.count(MonitoredEmail.id))
+            .group_by(MonitoredEmail.category)
+        )
+        kpis["by_category"] = {row[0]: row[1] for row in result}
+    except Exception as e:
+        logger.warning("KPI by_category failed: %s", e)
+        kpis["by_category"] = {}
+
+    try:
+        # Total and urgent
+        kpis["total"] = await db.scalar(select(func.count(MonitoredEmail.id))) or 0
+        kpis["urgent"] = await db.scalar(
+            select(func.count(MonitoredEmail.id))
+            .where(MonitoredEmail.is_urgent == True)
+        ) or 0
+    except Exception as e:
+        logger.warning("KPI totals failed: %s", e)
+        kpis.setdefault("total", 0)
+        kpis.setdefault("urgent", 0)
+
+    return kpis

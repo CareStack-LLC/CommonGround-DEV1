@@ -358,3 +358,170 @@ async def analyze_inbox(
         "provider": provider,
         "email_count": len(emails),
     }
+
+
+# =============================================================================
+# Multi-Select Analysis
+# =============================================================================
+
+class AnalyzeSelectedBody(BaseModel):
+    email_ids: list[str]
+
+
+@router.post(
+    "/analyze-selected",
+    summary="Analyze selected emails for patterns",
+)
+async def analyze_selected_emails(
+    body: AnalyzeSelectedBody,
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Analyze a selected set of emails to find patterns, FAQ opportunities, and insights."""
+    from app.models.inbox import MonitoredEmail
+
+    if not body.email_ids:
+        return {"analysis": None, "provider": None, "email_count": 0}
+
+    # Load selected emails (cap at 30)
+    ids = body.email_ids[:30]
+    result = await db.execute(
+        select(MonitoredEmail).where(MonitoredEmail.id.in_(ids))
+    )
+    emails = list(result.scalars().all())
+
+    if not emails:
+        return {"analysis": None, "provider": None, "email_count": 0}
+
+    # Build email summaries
+    email_summaries = []
+    for e in emails:
+        email_summaries.append(
+            f"---\nFrom: {e.from_name or e.from_email}\n"
+            f"To: {e.to_email}\nSubject: {e.subject}\n"
+            f"Category: {e.category}\nPriority: {(e.admin_notes or '{}')}\n"
+            f"Body: {(e.body_full or '')[:500]}\n"
+        )
+
+    prompt = (
+        "You are a customer success analyst for CommonGround, an AI-powered co-parenting platform. "
+        f"Analyze these {len(emails)} selected emails and find patterns.\n\n"
+        "Return ONLY valid JSON with these fields:\n"
+        "- patterns: array of {pattern: string, frequency: string, emails_affected: number}\n"
+        "- faq_recommendations: array of {question: string, suggested_answer: string} — "
+        "generate FAQ entries from recurring questions\n"
+        "- action_items: array of {priority: 'high'|'medium'|'low', action: string}\n"
+        "- insights: array of strings — business insights and improvement suggestions\n"
+        "- summary: one paragraph overview of what these emails reveal\n\n"
+        f"Emails:\n{''.join(email_summaries)}"
+    )
+
+    analysis = None
+    provider = None
+
+    try:
+        import anthropic
+        from app.core.config import Settings
+        s = Settings()
+        if s.ANTHROPIC_API_KEY:
+            client = anthropic.AsyncAnthropic(api_key=s.ANTHROPIC_API_KEY)
+            response = await client.messages.create(
+                model="claude-sonnet-4-20250514",
+                max_tokens=2000,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            text = response.content[0].text
+            if "```json" in text:
+                text = text.split("```json")[1].split("```")[0]
+            elif "```" in text:
+                text = text.split("```")[1].split("```")[0]
+            import json
+            analysis = json.loads(text.strip())
+            provider = "claude"
+    except Exception as exc:
+        logger.warning("Claude multi-select analysis failed: %s", exc)
+
+    if not analysis:
+        try:
+            from openai import AsyncOpenAI
+            from app.core.config import Settings
+            s = Settings()
+            if s.OPENAI_API_KEY:
+                oai = AsyncOpenAI(api_key=s.OPENAI_API_KEY)
+                resp = await oai.chat.completions.create(
+                    model="gpt-4o",
+                    messages=[{"role": "user", "content": prompt}],
+                    response_format={"type": "json_object"},
+                    max_tokens=2000,
+                )
+                import json
+                analysis = json.loads(resp.choices[0].message.content or "{}")
+                provider = "openai"
+        except Exception as exc:
+            logger.warning("OpenAI multi-select analysis also failed: %s", exc)
+
+    return {
+        "analysis": analysis,
+        "provider": provider,
+        "email_count": len(emails),
+    }
+
+
+# =============================================================================
+# Thread-Aware AI Reply Generation
+# =============================================================================
+
+class GenerateReplyBody(BaseModel):
+    instructions: str = ""
+
+
+@router.post(
+    "/emails/{email_id}/generate-reply",
+    summary="Generate AI reply with thread context",
+)
+async def generate_reply(
+    email_id: str,
+    body: GenerateReplyBody = GenerateReplyBody(),
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Generate a contextual AI reply using full email thread history."""
+    try:
+        from app.services import gmail_monitor_service
+        result = await gmail_monitor_service.generate_thread_reply(
+            db, email_id, body.instructions
+        )
+        return result
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        logger.error("Generate reply failed: %s", e)
+        raise HTTPException(status_code=502, detail="Failed to generate reply")
+
+
+# =============================================================================
+# Email KPIs
+# =============================================================================
+
+@router.get(
+    "/kpis",
+    summary="Inbox KPI dashboard metrics",
+)
+async def get_inbox_kpis(
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Detailed inbox KPIs: recipient breakdown, volume trends, approval rates."""
+    try:
+        from app.services import gmail_monitor_service
+        return await gmail_monitor_service.get_inbox_kpis(db)
+    except Exception as e:
+        logger.error("KPIs fetch failed: %s", e)
+        return {
+            "by_recipient": {},
+            "volume_trend": [],
+            "draft_approval_rate": 0,
+            "by_category": {},
+            "total": 0,
+            "urgent": 0,
+        }
