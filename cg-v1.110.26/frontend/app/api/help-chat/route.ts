@@ -177,14 +177,19 @@ export async function POST(request: NextRequest) {
 
     const openai = new OpenAI({ apiKey: openaiKey });
 
+    const openaiMessages: OpenAI.ChatCompletionMessageParam[] = [
+      { role: 'system' as const, content: SYSTEM_PROMPT },
+      ...sanitizedMessages.map((m: { role: string; content: string }) => ({
+        role: m.role as 'user' | 'assistant',
+        content: m.content,
+      })),
+    ];
+
     const openaiStream = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       max_tokens: 600,
       stream: true,
-      messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
-        ...sanitizedMessages,
-      ],
+      messages: openaiMessages,
     });
 
     const encoder = new TextEncoder();
