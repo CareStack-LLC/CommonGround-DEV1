@@ -582,6 +582,25 @@ export const adminAPI = {
       ...(body ? { body: JSON.stringify(body) } : {}),
     }),
 
+  // Reddit
+  getRedditStatus: () => adminFetch<any>('/admin/reddit/status'),
+  getRedditConfig: () => adminFetch<any>('/admin/reddit/config'),
+  saveRedditConfig: (config: { client_id: string; client_secret: string; username: string; password: string }) =>
+    adminFetch<any>('/admin/reddit/config', { method: 'POST', body: JSON.stringify(config) }),
+  getRedditPosts: (subreddit: string, sort = 'hot', limit = 25) =>
+    adminFetch<any>(`/admin/reddit/subreddit/${subreddit}/posts?sort=${sort}&limit=${limit}`),
+  searchReddit: (subreddit: string, query: string) =>
+    adminFetch<any>(`/admin/reddit/subreddit/${subreddit}/search?q=${encodeURIComponent(query)}`),
+  getRedditComments: (postId: string, subreddit: string) =>
+    adminFetch<any>(`/admin/reddit/post/${postId}/comments?subreddit=${subreddit}`),
+  postRedditComment: (parentId: string, text: string) =>
+    adminFetch<any>('/admin/reddit/comment', { method: 'POST', body: JSON.stringify({ parent_id: parentId, text }) }),
+  createRedditPost: (subreddit: string, title: string, text: string) =>
+    adminFetch<any>('/admin/reddit/post', { method: 'POST', body: JSON.stringify({ subreddit, title, text }) }),
+  getTrackedSubreddits: () => adminFetch<{ subreddits: string[] }>('/admin/reddit/tracked-subreddits'),
+  updateTrackedSubreddits: (subreddits: string[]) =>
+    adminFetch<any>('/admin/reddit/tracked-subreddits', { method: 'POST', body: JSON.stringify({ subreddits }) }),
+
   // Leads
   getLeadLists: () => adminFetch<LeadList[]>('/admin/leads/lists'),
   createLeadList: (data: { name: string; lead_type: string; description?: string }) =>

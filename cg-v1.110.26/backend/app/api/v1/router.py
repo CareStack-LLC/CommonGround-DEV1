@@ -213,5 +213,9 @@ api_router.include_router(admin_inbox.router, prefix="/admin/inbox", tags=["Admi
 # Chatbot - Public Aria Customer Success
 api_router.include_router(chatbot.router, prefix="/chatbot", tags=["Chatbot"])
 
+# Admin Reddit Integration
+from app.api.v1.endpoints import admin_reddit
+api_router.include_router(admin_reddit.router, prefix="/admin/reddit", tags=["Admin Reddit"])
+
 # SuperAdmin Portal - Platform administration
 api_router.include_router(admin.router, prefix="/admin", tags=["SuperAdmin Portal"])
