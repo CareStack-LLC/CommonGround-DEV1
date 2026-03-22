@@ -562,16 +562,17 @@ export default function InboxPage() {
           <div>
             <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">By Inbox</h3>
             <div className="space-y-1.5">
-              {Object.entries(kpis.by_recipient || {}).sort(([,a]: [string, number], [,b]: [string, number]) => b - a).map(([email, count]: [string, number]) => {
+              {Object.entries(kpis.by_recipient || {}).sort(([,a], [,b]) => Number(b) - Number(a)).map(([email, count]) => {
+                const countNum = Number(count);
                 const maxCount = Math.max(...Object.values(kpis.by_recipient || {}).map(Number));
-                const pct = maxCount > 0 ? (count / maxCount) * 100 : 0;
+                const pct = maxCount > 0 ? (countNum / maxCount) * 100 : 0;
                 return (
                   <div key={email} className="flex items-center gap-3">
                     <span className="text-xs text-zinc-400 w-32 truncate">{email.split('@')[0]}@</span>
                     <div className="flex-1 h-4 bg-zinc-800/60 rounded-full overflow-hidden">
                       <div className="h-full bg-violet-500/40 rounded-full" style={{ width: `${pct}%` }} />
                     </div>
-                    <span className="text-xs text-zinc-400 w-8 text-right">{count}</span>
+                    <span className="text-xs text-zinc-400 w-8 text-right">{countNum}</span>
                   </div>
                 );
               })}
