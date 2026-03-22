@@ -267,8 +267,13 @@ async def admin_get_config(
     admin_user: User = Depends(get_current_admin_user),
 ):
     """Get a chatbot config value. Requires admin auth."""
-    value = await chatbot_service.get_config(db, key)
-    return {"key": key, "value": value}
+    try:
+        value = await chatbot_service.get_config(db, key)
+        return {"key": key, "value": value}
+    except Exception as e:
+        logger.error(f"Failed to get chatbot config '{key}': {e}")
+        # Table may not exist yet — return null gracefully
+        return {"key": key, "value": None}
 
 
 @router.put("/admin/config/{key}")
@@ -297,7 +302,15 @@ async def admin_update_config(
             detail="Value must be a string.",
         )
 
-    await chatbot_service.update_config(
-        db, key, value, updated_by=admin_user.email or str(admin_user.id)
-    )
-    return {"success": True, "key": key}
+    try:
+        await chatbot_service.update_config(
+            db, key, value, updated_by=admin_user.email or str(admin_user.id)
+        )
+        return {"success": True, "key": key}
+    except Exception as e:
+        logger.error(f"Failed to update chatbot config '{key}': {e}")
+        capture_error(e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to save config. The chatbot_config table may need to be created. Please contact support.",
+        )
