@@ -77,7 +77,7 @@ class ChatbotService:
         if not api_key:
             logger.warning("ANTHROPIC_API_KEY not set — chatbot will use fallback responses")
         self.client = anthropic.AsyncAnthropic(api_key=api_key or "missing")
-        self.model = "claude-sonnet-4-5-20250514"
+        self.model = "claude-3-5-sonnet-20241022"
 
     _config_table_exists: Optional[bool] = None  # Cache table existence check
 
