@@ -334,85 +334,94 @@ export default function InboxPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-white">Email Monitor</h1>
-          <p className="text-sm text-[#6B8A9A] mt-0.5">{total} emails total</p>
+          <h1 className="text-xl font-bold text-white">Inbox</h1>
+          <p className="text-sm text-[#6B8A9A] mt-0.5">
+            {total} emails{stats?.urgent ? ` · ${stats.urgent} urgent` : ''}{stats?.pending_drafts ? ` · ${stats.pending_drafts} drafts pending` : ''}
+          </p>
         </div>
         <div className="flex items-center gap-2">
           {selectedIds.size > 0 && (
-            <button onClick={analyzeSelectedEmails} disabled={analyzingSelected} className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-blue-600/80 hover:bg-blue-600 text-white text-sm font-medium transition-colors disabled:opacity-50">
-              <Sparkles className={`w-4 h-4 ${analyzingSelected ? 'animate-pulse' : ''}`} /> {analyzingSelected ? 'Analyzing...' : `Analyze Selected (${selectedIds.size})`}
-            </button>
+            <>
+              <button onClick={analyzeSelectedEmails} disabled={analyzingSelected} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#4BA8C8]/20 hover:bg-[#4BA8C8]/30 text-[#4BA8C8] text-xs font-medium transition-colors disabled:opacity-50">
+                <Sparkles className={`w-3.5 h-3.5 ${analyzingSelected ? 'animate-pulse' : ''}`} /> Analyze ({selectedIds.size})
+              </button>
+              <button onClick={() => setSelectedIds(new Set())} className="px-2.5 py-1.5 rounded-lg text-[#6B8A9A] hover:text-white text-xs transition-colors">
+                Clear
+              </button>
+              <div className="w-px h-5 bg-[#2D6A8F]/30" />
+            </>
           )}
-          {selectedIds.size > 0 && (
-            <button onClick={() => setSelectedIds(new Set())} className="px-3 py-2 rounded-lg bg-[#2D6A8F]/20 hover:bg-[#2D6A8F]/30 text-[#8AACBC] text-sm transition-colors">
-              Clear
-            </button>
-          )}
-          <button onClick={() => setShowDashboard(v => !v)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#2D6A8F]/20 hover:bg-[#2D6A8F]/30 text-[#D0E4EC] text-sm font-medium transition-colors">
-            <Activity className="w-4 h-4" /> KPIs
+          <button onClick={() => setShowDashboard(v => !v)} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${showDashboard ? 'bg-[#3DAA8A]/15 text-[#3DAA8A]' : 'bg-[#2D6A8F]/20 hover:bg-[#2D6A8F]/30 text-[#8AACBC]'}`}>
+            <Activity className="w-3.5 h-3.5" /> KPIs
           </button>
-          <button onClick={runAnalysis} disabled={analyzing} className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-600/80 hover:bg-emerald-600 text-white text-sm font-medium transition-colors disabled:opacity-50">
-            <Brain className={`w-4 h-4 ${analyzing ? 'animate-pulse' : ''}`} /> {analyzing ? 'Analyzing...' : 'AI Analysis'}
+          <button onClick={runAnalysis} disabled={analyzing} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#3DAA8A]/15 hover:bg-[#3DAA8A]/25 text-[#3DAA8A] text-xs font-medium transition-colors disabled:opacity-50">
+            <Brain className={`w-3.5 h-3.5 ${analyzing ? 'animate-pulse' : ''}`} /> {analyzing ? 'Analyzing...' : 'AI Analysis'}
           </button>
-          <button onClick={connectGoogleOAuth} disabled={connectingOAuth} className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#2D6A8F]/20 hover:bg-[#2D6A8F]/30 text-[#D0E4EC] text-sm font-medium transition-colors disabled:opacity-50">
-            <Link className="w-4 h-4" /> Connect Google
+          <div className="w-px h-5 bg-[#2D6A8F]/30" />
+          <button onClick={connectGoogleOAuth} disabled={connectingOAuth} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#2D6A8F]/20 hover:bg-[#2D6A8F]/30 text-[#8AACBC] text-xs font-medium transition-colors disabled:opacity-50">
+            <Link className="w-3.5 h-3.5" /> Connect
           </button>
-          <button onClick={syncInbox} disabled={syncing} className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors disabled:opacity-50">
-            <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} /> Sync
+          <button onClick={syncInbox} disabled={syncing} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-xs font-medium transition-colors disabled:opacity-50">
+            <RefreshCw className={`w-3.5 h-3.5 ${syncing ? 'animate-spin' : ''}`} /> Sync
           </button>
         </div>
       </div>
 
-      {/* Stats Bar */}
+      {/* Quick Stats Strip */}
       {stats && (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl px-4 py-3 flex items-center gap-3">
+        <div className="flex items-center gap-4 bg-[#1A3648]/40 border border-[#2D6A8F]/15 rounded-xl px-5 py-3">
+          <div className="flex items-center gap-2">
             <Mail className="w-4 h-4 text-[#6B8A9A]" />
-            <div>
-              <div className="text-lg font-semibold text-white">{stats.total}</div>
-              <div className="text-[11px] text-[#6B8A9A]">Total Emails</div>
-            </div>
+            <span className="text-sm font-semibold text-white">{stats.total}</span>
+            <span className="text-xs text-[#6B8A9A]">total</span>
           </div>
-          <div className="bg-[#1A3648]/60 border border-red-500/20 rounded-xl px-4 py-3 flex items-center gap-3">
-            <Flame className="w-4 h-4 text-red-400" />
-            <div>
-              <div className="text-lg font-semibold text-red-400">{stats.urgent}</div>
-              <div className="text-[11px] text-[#6B8A9A]">Urgent</div>
-            </div>
-          </div>
-          <div className="bg-[#1A3648]/60 border border-[#F5A623]/20 rounded-xl px-4 py-3 flex items-center gap-3">
-            <MessageSquare className="w-4 h-4 text-amber-400" />
-            <div>
-              <div className="text-lg font-semibold text-amber-400">{stats.pending_drafts}</div>
-              <div className="text-[11px] text-[#6B8A9A]">Pending Drafts</div>
-            </div>
-          </div>
-          <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl px-4 py-3">
-            <div className="text-[11px] text-[#6B8A9A] mb-1">By Category</div>
-            <div className="flex flex-wrap gap-1">
-              {Object.entries(stats.by_category || {}).map(([cat, count]) => (
-                <span key={cat} className={`inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium ${CATEGORY_COLORS[cat] || CATEGORY_COLORS.other}`}>
-                  {cat}: {count}
-                </span>
-              ))}
-            </div>
+          <div className="w-px h-5 bg-[#2D6A8F]/30" />
+          {stats.urgent > 0 && (
+            <>
+              <div className="flex items-center gap-2">
+                <Flame className="w-3.5 h-3.5 text-red-400" />
+                <span className="text-sm font-semibold text-red-400">{stats.urgent}</span>
+                <span className="text-xs text-[#6B8A9A]">urgent</span>
+              </div>
+              <div className="w-px h-5 bg-[#2D6A8F]/30" />
+            </>
+          )}
+          {stats.pending_drafts > 0 && (
+            <>
+              <div className="flex items-center gap-2">
+                <MessageSquare className="w-3.5 h-3.5 text-[#F5A623]" />
+                <span className="text-sm font-semibold text-[#F5A623]">{stats.pending_drafts}</span>
+                <span className="text-xs text-[#6B8A9A]">drafts pending</span>
+              </div>
+              <div className="w-px h-5 bg-[#2D6A8F]/30" />
+            </>
+          )}
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {Object.entries(stats.by_category || {})
+              .sort(([,a], [,b]) => Number(b) - Number(a))
+              .slice(0, 5)
+              .map(([cat, count]) => (
+              <span key={cat} className={`inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium ${CATEGORY_COLORS[cat] || CATEGORY_COLORS.other}`}>
+                {cat} {count}
+              </span>
+            ))}
           </div>
         </div>
       )}
 
       {/* Filters */}
-      <div className="flex items-center gap-3 flex-wrap">
-        <select value={recipientFilter} onChange={e => setRecipientFilter(e.target.value)} className="px-3 py-2 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-[#D0E4EC] focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer">
+      <div className="flex items-center gap-2 flex-wrap">
+        <select value={recipientFilter} onChange={e => setRecipientFilter(e.target.value)} className="px-3 py-1.5 bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-lg text-xs text-[#D0E4EC] focus:outline-none focus:border-[#3DAA8A]/50 appearance-none cursor-pointer">
           <option value="">All Inboxes</option>
-          <option value="hello@find-commonground.com">hello@ (General)</option>
-          <option value="info@find-commonground.com">info@ (Info)</option>
-          <option value="support@find-commonground.com">support@ (Support)</option>
-          <option value="sales@find-commonground.com">sales@ (Sales)</option>
-          <option value="onboarding@find-commonground.com">onboarding@ (Onboarding)</option>
-          <option value="partnerships@find-commonground.com">partnerships@ (Partnerships)</option>
-          <option value="teejay@find-commonground.com">teejay@ (CEO)</option>
+          <option value="hello@find-commonground.com">hello@</option>
+          <option value="info@find-commonground.com">info@</option>
+          <option value="support@find-commonground.com">support@</option>
+          <option value="sales@find-commonground.com">sales@</option>
+          <option value="onboarding@find-commonground.com">onboarding@</option>
+          <option value="partnerships@find-commonground.com">partnerships@</option>
+          <option value="teejay@find-commonground.com">teejay@</option>
         </select>
-        <select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)} className="px-3 py-2 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-[#D0E4EC] focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer">
+        <select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)} className="px-3 py-1.5 bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-lg text-xs text-[#D0E4EC] focus:outline-none focus:border-[#3DAA8A]/50 appearance-none cursor-pointer">
           <option value="">All Categories</option>
           <option value="support">Support</option>
           <option value="billing">Billing</option>
@@ -426,20 +435,20 @@ export default function InboxPage() {
           <option value="spam">Spam</option>
           <option value="other">Other</option>
         </select>
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input type="checkbox" checked={urgentOnly} onChange={e => setUrgentOnly(e.target.checked)} className="rounded border-zinc-700 bg-zinc-900 text-violet-500 focus:ring-violet-500/30" />
-          <span className="text-sm text-[#8AACBC]">Urgent only</span>
+        <label className="flex items-center gap-1.5 cursor-pointer px-3 py-1.5 rounded-lg bg-[#1A3648]/60 border border-[#2D6A8F]/20">
+          <input type="checkbox" checked={urgentOnly} onChange={e => setUrgentOnly(e.target.checked)} className="rounded border-[#2D6A8F] bg-[#1A3648] text-[#3DAA8A] focus:ring-[#3DAA8A]/30 w-3.5 h-3.5" />
+          <span className="text-xs text-[#8AACBC]">Urgent only</span>
         </label>
-        <select value={draftStatusFilter} onChange={e => setDraftStatusFilter(e.target.value)} className="px-3 py-2 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-[#D0E4EC] focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer">
+        <select value={draftStatusFilter} onChange={e => setDraftStatusFilter(e.target.value)} className="px-3 py-1.5 bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-lg text-xs text-[#D0E4EC] focus:outline-none focus:border-[#3DAA8A]/50 appearance-none cursor-pointer">
           <option value="">All Drafts</option>
           <option value="pending">Pending</option>
           <option value="approved">Approved</option>
           <option value="rejected">Rejected</option>
           <option value="sent">Sent</option>
         </select>
-        <select value={sortBy} onChange={e => setSortBy(e.target.value as 'date' | 'priority')} className="px-3 py-2 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-[#D0E4EC] focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer">
-          <option value="date">Sort: Newest</option>
-          <option value="priority">Sort: Priority</option>
+        <select value={sortBy} onChange={e => setSortBy(e.target.value as 'date' | 'priority')} className="px-3 py-1.5 bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-lg text-xs text-[#D0E4EC] focus:outline-none focus:border-[#3DAA8A]/50 appearance-none cursor-pointer">
+          <option value="date">Newest first</option>
+          <option value="priority">Priority first</option>
         </select>
       </div>
 
@@ -570,7 +579,7 @@ export default function InboxPage() {
                   <div key={email} className="flex items-center gap-3">
                     <span className="text-xs text-[#8AACBC] w-32 truncate">{email.split('@')[0]}@</span>
                     <div className="flex-1 h-4 bg-[#2D6A8F]/20 rounded-full overflow-hidden">
-                      <div className="h-full bg-violet-500/40 rounded-full" style={{ width: `${pct}%` }} />
+                      <div className="h-full bg-[#3DAA8A]/40 rounded-full" style={{ width: `${pct}%` }} />
                     </div>
                     <span className="text-xs text-[#8AACBC] w-8 text-right">{countNum}</span>
                   </div>
@@ -626,7 +635,7 @@ export default function InboxPage() {
                 type="checkbox"
                 checked={selectedIds.size === displayEmails.length && displayEmails.length > 0}
                 onChange={toggleSelectAll}
-                className="rounded border-zinc-700 bg-zinc-900 text-violet-500 focus:ring-violet-500/30"
+                className="rounded border-[#2D6A8F] bg-[#1A3648] text-[#3DAA8A] focus:ring-[#3DAA8A]/30"
               />
               <span className="text-[11px] text-[#6B8A9A]">
                 {selectedIds.size > 0 ? `${selectedIds.size} selected` : `${displayEmails.length} emails`}
@@ -654,7 +663,7 @@ export default function InboxPage() {
                   type="checkbox"
                   checked={selectedIds.has(email.id)}
                   onChange={() => toggleSelectEmail(email.id)}
-                  className="mt-1 rounded border-zinc-700 bg-zinc-900 text-violet-500 focus:ring-violet-500/30 flex-shrink-0"
+                  className="mt-1 rounded border-[#2D6A8F] bg-[#1A3648] text-[#3DAA8A] focus:ring-[#3DAA8A]/30 flex-shrink-0"
                 />
                 <button
                   onClick={() => viewEmail(email.id)}
@@ -678,7 +687,7 @@ export default function InboxPage() {
                     <div className="text-xs text-[#8AACBC] truncate mt-0.5">{email.subject}</div>
                     <div className="flex items-center gap-1.5 mt-1 flex-wrap">
                       {email.to_email && (
-                        <span className="inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium bg-zinc-800/80 text-[#6B8A9A]">
+                        <span className="inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#2D6A8F]/20 text-[#6B8A9A]">
                           {email.to_email.split('@')[0]}@
                         </span>
                       )}
@@ -758,7 +767,7 @@ export default function InboxPage() {
                 {(() => {
                   const extra = parseAdminNotes(selectedEmail.admin_notes ?? null);
                   return extra.action_needed ? (
-                    <div className="mt-2 text-xs text-[#5BC4A0]/80 bg-violet-500/10 border border-[#3DAA8A]/20 rounded-lg px-3 py-2">
+                    <div className="mt-2 text-xs text-[#5BC4A0]/80 bg-[#3DAA8A]/10 border border-[#3DAA8A]/20 rounded-lg px-3 py-2">
                       <span className="font-medium">Action: </span>{extra.action_needed}
                     </div>
                   ) : null;
@@ -779,7 +788,7 @@ export default function InboxPage() {
               {selectedEmail.ai_summary && (
                 <div className="bg-violet-500/5 border border-[#3DAA8A]/20 rounded-xl p-4">
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="w-5 h-5 rounded bg-violet-500/20 flex items-center justify-center">
+                    <div className="w-5 h-5 rounded bg-[#3DAA8A]/20 flex items-center justify-center">
                       <span className="text-[10px] font-bold text-[#3DAA8A]">AI</span>
                     </div>
                     <span className="text-xs font-semibold text-[#5BC4A0]">AI Summary</span>
@@ -817,42 +826,46 @@ export default function InboxPage() {
                 </div>
               )}
 
-              {/* Custom Reply with AI Generation */}
-              <div className="border border-[#2D6A8F]/20 rounded-xl p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-semibold text-[#8AACBC]">Reply</span>
+              {/* Reply Composer */}
+              <div className="border border-[#2D6A8F]/20 rounded-xl overflow-hidden">
+                <div className="flex items-center justify-between px-4 py-2.5 bg-[#1A3648]/40 border-b border-[#2D6A8F]/15">
+                  <span className="text-xs font-semibold text-[#D0E4EC]">Compose Reply</span>
                   <button
                     onClick={generateAIReply}
                     disabled={generatingReply}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 text-xs font-medium transition-colors disabled:opacity-50"
+                    className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#3DAA8A]/15 hover:bg-[#3DAA8A]/25 text-[#3DAA8A] text-xs font-medium transition-colors disabled:opacity-50"
                   >
                     <Sparkles className={`w-3.5 h-3.5 ${generatingReply ? 'animate-pulse' : ''}`} />
-                    {generatingReply ? 'Generating...' : 'Generate AI Reply'}
+                    {generatingReply ? 'Generating...' : 'AI Generate'}
                   </button>
                 </div>
-                {/* Optional instructions for AI */}
-                <input
-                  type="text"
-                  value={replyInstructions}
-                  onChange={e => setReplyInstructions(e.target.value)}
-                  placeholder="AI instructions (optional): e.g., be apologetic about delay, mention refund policy..."
-                  className="w-full px-3 py-1.5 mb-2 bg-zinc-900/60 border border-[#2D6A8F]/20 rounded-lg text-xs text-[#D0E4EC] placeholder:text-[#4A6E7F] focus:outline-none focus:border-emerald-500/30"
-                />
-                <textarea
-                  value={customReply}
-                  onChange={e => setCustomReply(e.target.value)}
-                  placeholder="Type your reply or generate one with AI..."
-                  rows={4}
-                  className="w-full px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50 resize-none"
-                />
-                <button
-                  onClick={sendReply}
-                  disabled={sendingReply || !customReply.trim()}
-                  className="mt-2 flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors disabled:opacity-50"
-                >
-                  <Send className={`w-4 h-4 ${sendingReply ? 'animate-pulse' : ''}`} />
-                  {sendingReply ? 'Sending...' : 'Send Reply'}
-                </button>
+                <div className="p-4 space-y-2">
+                  <input
+                    type="text"
+                    value={replyInstructions}
+                    onChange={e => setReplyInstructions(e.target.value)}
+                    placeholder="AI instructions (optional): e.g., be apologetic, mention refund policy..."
+                    className="w-full px-3 py-1.5 bg-[#1A3648]/60 border border-[#2D6A8F]/15 rounded-lg text-xs text-[#D0E4EC] placeholder:text-[#4A6E7F] focus:outline-none focus:border-[#3DAA8A]/30"
+                  />
+                  <textarea
+                    value={customReply}
+                    onChange={e => setCustomReply(e.target.value)}
+                    placeholder="Type your reply or generate one with AI..."
+                    rows={5}
+                    className="w-full px-3 py-2.5 bg-[#162D3A] border border-[#2D6A8F]/15 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-[#3DAA8A]/40 resize-none"
+                  />
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] text-[#4A6E7F]">CommonGround branded signature will be added automatically</span>
+                    <button
+                      onClick={sendReply}
+                      disabled={sendingReply || !customReply.trim()}
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors disabled:opacity-50"
+                    >
+                      <Send className={`w-4 h-4 ${sendingReply ? 'animate-pulse' : ''}`} />
+                      {sendingReply ? 'Sending...' : 'Send Reply'}
+                    </button>
+                  </div>
+                </div>
               </div>
 
               {/* Admin Notes */}
