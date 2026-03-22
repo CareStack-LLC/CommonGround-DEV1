@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { HelpChat } from '@/components/marketing/help-chat';
 import {
   ArrowRight,
   BookOpen,
@@ -324,6 +325,9 @@ export default function HelpCenterPage() {
           </div>
         </div>
       </section>
+
+      {/* ARIA Help Chat — floating assistant */}
+      <HelpChat />
     </div>
   );
 }
