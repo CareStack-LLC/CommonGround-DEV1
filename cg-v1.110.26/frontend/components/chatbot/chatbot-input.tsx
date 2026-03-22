@@ -40,7 +40,7 @@ export function ChatbotInput({ onSend, disabled }: ChatbotInputProps) {
   };
 
   return (
-    <div className="flex items-end gap-2 border-t bg-background px-3 py-2.5">
+    <div className="flex items-end gap-2 border-t border-gray-200 bg-white px-3 py-2.5">
       <textarea
         ref={textareaRef}
         value={value}
@@ -50,7 +50,7 @@ export function ChatbotInput({ onSend, disabled }: ChatbotInputProps) {
         placeholder="Type a message..."
         disabled={disabled}
         rows={1}
-        className="flex-1 resize-none border-0 bg-transparent text-sm outline-none placeholder:text-muted-foreground disabled:opacity-50 max-h-[100px]"
+        className="flex-1 resize-none border-0 bg-transparent text-sm text-gray-800 outline-none placeholder:text-gray-400 disabled:opacity-50 max-h-[100px]"
       />
       <Button
         size="icon"

@@ -30,7 +30,7 @@ export function ChatbotWindow({
   onEscalate,
 }: ChatbotWindowProps) {
   return (
-    <div className="fixed bottom-24 left-5 z-[40] flex flex-col w-[380px] h-[520px] sm:rounded-2xl rounded-none inset-0 sm:inset-auto sm:bottom-24 sm:left-5 sm:w-[380px] sm:h-[520px] w-full h-full bg-background border shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300" style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+    <div className="fixed bottom-24 left-5 z-[40] flex flex-col w-[380px] h-[520px] sm:rounded-2xl rounded-none inset-0 sm:inset-auto sm:bottom-24 sm:left-5 sm:w-[380px] sm:h-[520px] w-full h-full bg-white border border-gray-200 shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300" style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
       {/* Header */}
       <div className="flex items-center justify-between bg-gradient-to-r from-[#3DAA8A] to-[#2D6A8F] px-4 py-3 max-sm:py-4 text-white shrink-0">
         <div>
@@ -68,8 +68,8 @@ export function ChatbotWindow({
 
       {/* Input */}
       {sessionEnded ? (
-        <div className="border-t px-4 py-3 text-center">
-          <p className="text-xs text-muted-foreground">
+        <div className="border-t border-gray-200 px-4 py-3 text-center bg-white">
+          <p className="text-xs text-gray-500">
             This chat has been sent to our team. They&apos;ll follow up via email.
           </p>
         </div>

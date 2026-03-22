@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
 interface ChatbotVisitorFormProps {
   onSubmit: (info: { name: string; email: string; phone?: string }) => void;
@@ -21,32 +20,32 @@ export function ChatbotVisitorForm({ onSubmit, onSkip }: ChatbotVisitorFormProps
   };
 
   return (
-    <div className="mx-4 my-2 rounded-xl border bg-card p-3.5">
-      <p className="text-xs text-muted-foreground mb-2.5">
+    <div className="mx-4 my-2 rounded-xl border border-gray-200 bg-gray-50 p-3.5">
+      <p className="text-xs text-gray-500 mb-2.5">
         Share your info so our team can follow up if needed
       </p>
       <form onSubmit={handleSubmit} className="flex flex-col gap-2">
-        <Input
+        <input
           placeholder="Your name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="h-8 text-sm"
+          className="h-8 text-sm px-3 rounded-md border border-gray-300 bg-white text-gray-800 placeholder:text-gray-400 outline-none focus:border-[#3DAA8A] focus:ring-1 focus:ring-[#3DAA8A]/30"
           required
         />
-        <Input
+        <input
           type="email"
           placeholder="Email address"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="h-8 text-sm"
+          className="h-8 text-sm px-3 rounded-md border border-gray-300 bg-white text-gray-800 placeholder:text-gray-400 outline-none focus:border-[#3DAA8A] focus:ring-1 focus:ring-[#3DAA8A]/30"
           required
         />
-        <Input
+        <input
           type="tel"
           placeholder="Phone (optional)"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          className="h-8 text-sm"
+          className="h-8 text-sm px-3 rounded-md border border-gray-300 bg-white text-gray-800 placeholder:text-gray-400 outline-none focus:border-[#3DAA8A] focus:ring-1 focus:ring-[#3DAA8A]/30"
         />
         <div className="flex gap-2 mt-1">
           <Button
@@ -61,7 +60,7 @@ export function ChatbotVisitorForm({ onSubmit, onSkip }: ChatbotVisitorFormProps
             variant="ghost"
             size="sm"
             onClick={onSkip}
-            className="h-8 text-xs text-muted-foreground"
+            className="h-8 text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-100"
           >
             Skip
           </Button>
