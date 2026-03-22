@@ -45,7 +45,7 @@ export default function ChatbotWidget() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasCollectedInfo, setHasCollectedInfo] = useState(false);
-  const [showVisitorForm, setShowVisitorForm] = useState(false);
+  const [showVisitorForm, setShowVisitorForm] = useState(true); // Show form first
   const [sessionEnded, setSessionEnded] = useState(false);
   const [assistantMsgCount, setAssistantMsgCount] = useState(0);
 
@@ -59,6 +59,8 @@ export default function ChatbotWidget() {
     const saved = sessionStorage.getItem(SESSION_KEY);
     if (saved) {
       setSessionId(saved);
+      setHasCollectedInfo(true);
+      setShowVisitorForm(false);
       // Restore greeting so chat isn't empty on reopen
       if (messages.length === 0) {
         setMessages([
@@ -97,10 +99,11 @@ export default function ChatbotWidget() {
 
   const handleOpen = useCallback(() => {
     setIsOpen(true);
-    if (!sessionId && messages.length === 0) {
+    // Don't start session yet — wait for visitor info first
+    if (hasCollectedInfo && !sessionId && messages.length === 0) {
       initSession();
     }
-  }, [sessionId, messages.length, initSession]);
+  }, [sessionId, messages.length, initSession, hasCollectedInfo]);
 
   const handleClose = useCallback(() => {
     setIsOpen(false);
@@ -152,11 +155,6 @@ export default function ChatbotWidget() {
           ...prev,
           { id: message_id, role: "assistant", content: reply },
         ]);
-
-        // Show visitor form after 2nd assistant response if info not collected
-        if (newCount >= 2 && !hasCollectedInfo) {
-          setShowVisitorForm(true);
-        }
       } catch (err: any) {
         setMessages((prev) => [
           ...prev,
@@ -172,35 +170,49 @@ export default function ChatbotWidget() {
         setIsLoading(false);
       }
     },
-    [sessionId, isLoading, assistantMsgCount, hasCollectedInfo]
+    [sessionId, isLoading, assistantMsgCount]
   );
 
   const handleVisitorSubmit = useCallback(
     async (info: { name: string; email: string; phone?: string }) => {
-      if (!sessionId) return;
       setShowVisitorForm(false);
       setHasCollectedInfo(true);
+
+      // Start session and send visitor info
       try {
-        await updateChatVisitor(sessionId, info);
-        setMessages((prev) => [
-          ...prev,
+        const { session_id, greeting } = await startChatSession(
+          window.location.pathname
+        );
+        setSessionId(session_id);
+        sessionStorage.setItem(SESSION_KEY, session_id);
+        setMessages([
+          { id: "greeting", role: "assistant", content: greeting || DEFAULT_GREETING },
           {
             id: `system-${Date.now()}`,
             role: "system",
-            content: `Thanks, ${info.name}! Our team can now follow up if needed.`,
+            content: `Welcome, ${info.name}! How can I help you today?`,
           },
         ]);
+        setAssistantMsgCount(1);
+
+        // Send visitor info to backend
+        await updateChatVisitor(session_id, info);
       } catch {
-        // Silently fail — visitor info is nice-to-have
+        setMessages([
+          { id: "greeting", role: "assistant", content: DEFAULT_GREETING },
+        ]);
+        setAssistantMsgCount(1);
       }
     },
-    [sessionId]
+    []
   );
 
-  const handleVisitorSkip = useCallback(() => {
+  const handleVisitorSkip = useCallback(async () => {
     setShowVisitorForm(false);
     setHasCollectedInfo(true);
-  }, []);
+    // Start session without visitor info
+    await initSession();
+  }, [initSession]);
 
   const handleEscalate = useCallback(async () => {
     if (!sessionId || sessionEnded) return;

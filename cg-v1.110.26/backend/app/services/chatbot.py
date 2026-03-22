@@ -14,7 +14,7 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple
 
-import anthropic
+import openai
 from sqlalchemy import select, func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -72,7 +72,7 @@ GREETING_MESSAGE = (
 class ChatbotService:
     """Service for the public-facing Aria customer success chatbot."""
 
-    MODEL = "claude-3-5-sonnet-20241022"
+    MODEL = "gpt-4o-mini"
 
     _config_table_exists: Optional[bool] = None  # Cache table existence check
 
@@ -215,20 +215,20 @@ class ChatbotService:
         db.add(user_msg)
         await db.flush()
 
-        # Call Claude — create client inline (same pattern as ARIA service)
+        # Call OpenAI
         try:
-            client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
-            response = client.messages.create(
+            client = openai.OpenAI(api_key=settings.OPENAI_API_KEY)
+            oai_messages = [{"role": "system", "content": system_prompt}] + messages
+            response = client.chat.completions.create(
                 model=self.MODEL,
                 max_tokens=250,
-                system=system_prompt,
-                messages=messages,
+                messages=oai_messages,
             )
-            reply_text = response.content[0].text
-            token_count = response.usage.input_tokens + response.usage.output_tokens
+            reply_text = response.choices[0].message.content
+            token_count = (response.usage.prompt_tokens + response.usage.completion_tokens) if response.usage else None
         except Exception as e:
-            logger.error(f"Claude API error in chatbot: {type(e).__name__}: {e}")
-            logger.error(f"Claude API key present: {bool(settings.ANTHROPIC_API_KEY)}, model: {self.MODEL}, messages count: {len(messages)}")
+            logger.error(f"OpenAI API error in chatbot: {type(e).__name__}: {e}")
+            logger.error(f"OpenAI API key present: {bool(settings.OPENAI_API_KEY)}, model: {self.MODEL}, messages count: {len(messages)}")
             capture_error(e)
             reply_text = (
                 "I'm sorry, I'm having a little trouble right now. "

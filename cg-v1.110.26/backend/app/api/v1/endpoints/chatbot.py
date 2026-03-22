@@ -42,21 +42,20 @@ router = APIRouter()
 @router.get("/debug-test")
 async def debug_test():
     """Temporary debug endpoint — REMOVE AFTER TESTING."""
-    import anthropic as _anthropic
+    import openai as _openai
     from app.core.config import settings as _s
     result = {
-        "key_present": bool(_s.ANTHROPIC_API_KEY),
-        "key_prefix": (_s.ANTHROPIC_API_KEY or "")[:12] + "..." if _s.ANTHROPIC_API_KEY else None,
-        "anthropic_version": _anthropic.__version__,
+        "openai_key_present": bool(_s.OPENAI_API_KEY),
+        "openai_key_prefix": (_s.OPENAI_API_KEY or "")[:8] + "..." if _s.OPENAI_API_KEY else None,
     }
     try:
-        client = _anthropic.AsyncAnthropic(api_key=_s.ANTHROPIC_API_KEY)
-        resp = await client.messages.create(
-            model="claude-3-5-sonnet-20241022",
+        client = _openai.OpenAI(api_key=_s.OPENAI_API_KEY)
+        resp = client.chat.completions.create(
+            model="gpt-4o-mini",
             max_tokens=20,
             messages=[{"role": "user", "content": "Say hi in one word"}],
         )
-        result["claude_response"] = resp.content[0].text
+        result["response"] = resp.choices[0].message.content
         result["status"] = "SUCCESS"
     except Exception as e:
         result["error_type"] = type(e).__name__
