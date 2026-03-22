@@ -30,7 +30,7 @@ export function ChatbotWindow({
   onEscalate,
 }: ChatbotWindowProps) {
   return (
-    <div className="fixed bottom-24 right-5 z-[40] flex flex-col w-[380px] h-[520px] max-sm:inset-0 max-sm:bottom-0 max-sm:right-0 max-sm:w-full max-sm:h-full max-sm:rounded-none rounded-2xl bg-background border shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
+    <div className="fixed bottom-24 left-5 z-[40] flex flex-col w-[380px] h-[520px] max-sm:inset-0 max-sm:bottom-0 max-sm:left-0 max-sm:w-full max-sm:h-full max-sm:rounded-none rounded-2xl bg-background border shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
       {/* Header */}
       <div className="flex items-center justify-between bg-gradient-to-r from-[#3DAA8A] to-[#2D6A8F] px-4 py-3 text-white shrink-0">
         <div>

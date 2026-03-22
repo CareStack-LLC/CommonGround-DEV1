@@ -34,6 +34,11 @@ const HIDDEN_PATH_PREFIXES = [
 
 const SESSION_KEY = "cg_chatbot_session_id";
 
+const DEFAULT_GREETING =
+  "Hi there! I'm Aria, CommonGround's customer success assistant. " +
+  "I can help you learn about our co-parenting platform, answer questions about features and pricing, " +
+  "or connect you with our support team. How can I help you today?";
+
 export default function ChatbotWidget() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
@@ -60,27 +65,35 @@ export default function ChatbotWidget() {
 
   const initSession = useCallback(async () => {
     if (sessionId) return;
+    // Show greeting immediately so the chat isn't empty
+    setMessages([
+      { id: "greeting", role: "assistant", content: DEFAULT_GREETING },
+    ]);
+    setAssistantMsgCount(1);
     try {
       const { session_id, greeting } = await startChatSession(
         window.location.pathname
       );
       setSessionId(session_id);
       sessionStorage.setItem(SESSION_KEY, session_id);
-      setMessages([
-        { id: "greeting", role: "assistant", content: greeting },
-      ]);
-      setAssistantMsgCount(1);
+      // Update with server greeting if different
+      if (greeting && greeting !== DEFAULT_GREETING) {
+        setMessages([
+          { id: "greeting", role: "assistant", content: greeting },
+        ]);
+      }
     } catch (err) {
       console.error("Failed to start chat session:", err);
+      // Session failed but greeting is already showing — user can still see it
     }
   }, [sessionId]);
 
   const handleOpen = useCallback(() => {
     setIsOpen(true);
-    if (!sessionId) {
+    if (!sessionId && messages.length === 0) {
       initSession();
     }
-  }, [sessionId, initSession]);
+  }, [sessionId, messages.length, initSession]);
 
   const handleClose = useCallback(() => {
     setIsOpen(false);
@@ -88,7 +101,7 @@ export default function ChatbotWidget() {
 
   const handleSend = useCallback(
     async (content: string) => {
-      if (!sessionId || isLoading) return;
+      if (isLoading) return;
 
       const userMsg: ChatMessage = {
         id: `user-${Date.now()}`,
@@ -98,8 +111,34 @@ export default function ChatbotWidget() {
       setMessages((prev) => [...prev, userMsg]);
       setIsLoading(true);
 
+      // If no session yet, try to create one first
+      let currentSessionId = sessionId;
+      if (!currentSessionId) {
+        try {
+          const { session_id } = await startChatSession(
+            window.location.pathname
+          );
+          currentSessionId = session_id;
+          setSessionId(session_id);
+          sessionStorage.setItem(SESSION_KEY, session_id);
+        } catch {
+          // Still no session — show fallback
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `error-${Date.now()}`,
+              role: "assistant",
+              content:
+                "I'm having trouble connecting right now. Please reach out to our team at hello@find-commonground.com and they'll be happy to help!",
+            },
+          ]);
+          setIsLoading(false);
+          return;
+        }
+      }
+
       try {
-        const { message_id, reply } = await sendChatMessage(sessionId, content);
+        const { message_id, reply } = await sendChatMessage(currentSessionId, content);
         const newCount = assistantMsgCount + 1;
         setAssistantMsgCount(newCount);
         setMessages((prev) => [
