@@ -417,8 +417,13 @@ async def send_reply(
     client, _ = await _get_gmail_client(db, email_record.to_email)
 
     try:
-        # Build the reply MIME message
-        mime_msg = MIMEText(response_body, "plain")
+        # Build the reply MIME message (HTML to support formatting)
+        # Convert plain newlines to <br> if the body doesn't contain HTML tags
+        if "<" not in response_body or "<br" not in response_body.lower():
+            html_body = response_body.replace("\n", "<br>")
+        else:
+            html_body = response_body
+        mime_msg = MIMEText(html_body, "html")
         mime_msg["To"] = email_record.from_email
         mime_msg["From"] = email_record.to_email
         mime_msg["Subject"] = f"Re: {email_record.subject}"

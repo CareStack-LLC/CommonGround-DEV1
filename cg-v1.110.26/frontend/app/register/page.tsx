@@ -251,9 +251,9 @@ function RegisterContent() {
       </div>
 
       {/* Header */}
-      <header className="relative z-10 p-6">
+      <header className="relative z-10 p-6 flex justify-center sm:justify-start">
         <Link href="/" className="inline-flex items-center gap-2 text-foreground hover:text-cg-sage transition-colors">
-          <svg width="40" height="40" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg className="w-[52px] h-[52px] sm:w-[40px] sm:h-[40px]" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <linearGradient id="reg-bg" x1="0" y1="0" x2="1" y2="1">
                 <stop offset="0%" stopColor="#E8F4F8" />

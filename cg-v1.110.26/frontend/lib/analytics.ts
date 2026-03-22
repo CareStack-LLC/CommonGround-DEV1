@@ -134,11 +134,23 @@ export function trackExpenseSubmitted() {
 // ─── Content Engagement ────────────────────────────────────────
 
 /** User read a blog post */
-export function trackBlogRead(slug: string, category: string) {
+export function trackBlogRead(slug: string, category: string, source?: string, medium?: string, campaign?: string) {
   gtag('event', 'view_item', {
     content_type: 'blog_post',
     item_id: slug,
     item_category: category,
+    ...(source && { traffic_source: source }),
+    ...(medium && { traffic_medium: medium }),
+    ...(campaign && { traffic_campaign: campaign }),
+  });
+}
+
+/** Track blog page view with full attribution */
+export function trackBlogPageView(slug: string) {
+  gtag('event', 'page_view', {
+    page_title: `Blog: ${slug}`,
+    page_location: window.location.href,
+    content_group: 'blog',
   });
 }
 

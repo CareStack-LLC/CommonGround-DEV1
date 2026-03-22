@@ -13,7 +13,7 @@ import {
 } from '@/lib/blog-data';
 import { BlogContent } from '@/components/marketing/blog-content';
 import { InlineNewsletterCta } from '@/components/marketing/inline-newsletter-cta';
-import { trackBlogRead } from '@/lib/analytics';
+import { trackBlogRead, trackBlogPageView, setupSectionTracking } from '@/lib/analytics';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -75,13 +75,23 @@ export default function BlogPostPage() {
     fetchPost();
   }, [slug]);
 
-  // Track blog read
+  // Track blog read with source attribution (UTM params)
   useEffect(() => {
     if (!isLoading) {
       const category = apiPost?.category || legacyPost?.category || '';
-      trackBlogRead(slug, category);
+      const params = new URLSearchParams(window.location.search);
+      const source = params.get('utm_source') || undefined;
+      const medium = params.get('utm_medium') || undefined;
+      const campaign = params.get('utm_campaign') || undefined;
+      trackBlogRead(slug, category, source, medium, campaign);
+      trackBlogPageView(slug);
     }
   }, [isLoading, slug, apiPost, legacyPost]);
+
+  // Section tracking (same pattern as landing pages)
+  useEffect(() => {
+    return setupSectionTracking(`blog-${slug}`);
+  }, [slug]);
 
   // Set page title + OG/Twitter meta tags for SEO
   useEffect(() => {

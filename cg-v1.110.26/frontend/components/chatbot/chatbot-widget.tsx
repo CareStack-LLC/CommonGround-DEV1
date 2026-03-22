@@ -14,6 +14,8 @@ import {
 
 /** Paths where the chatbot should NOT appear */
 const HIDDEN_PATH_PREFIXES = [
+  "/login",
+  "/register",
   "/dashboard",
   "/superadmin",
   "/professional",
