@@ -263,12 +263,14 @@ export default function AboutPage() {
           </div>
 
           <div className="grid md:grid-cols-[auto_1fr] gap-10 items-start max-w-4xl mx-auto">
-            {/* Photo placeholder */}
+            {/* Founder photo */}
             <div className="flex flex-col items-center gap-3 md:sticky md:top-8">
-              <div className="h-32 w-32 rounded-full bg-gradient-to-br from-[#F5A623] to-[#E8960E] flex items-center justify-center shadow-xl border-4 border-white/20">
-                <span className="text-4xl font-bold text-white" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-                  TW
-                </span>
+              <div className="h-40 w-40 rounded-full overflow-hidden shadow-xl border-4 border-white/20">
+                <img
+                  src="/images/Website pictes/father1.png"
+                  alt="Thomas Wilform with his children"
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="text-center">
                 <p className="text-white font-semibold text-lg">Thomas Wilform</p>
