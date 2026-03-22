@@ -79,13 +79,20 @@ class ChatbotService:
         self.client = anthropic.AsyncAnthropic(api_key=api_key or "missing")
         self.model = "claude-sonnet-4-5-20250514"
 
+    _config_table_exists: Optional[bool] = None  # Cache table existence check
+
     async def _get_system_prompt(self, db: AsyncSession) -> str:
         """Load system prompt from DB config, falling back to default."""
+        # Skip DB query entirely if we already know the table doesn't exist
+        if ChatbotService._config_table_exists is False:
+            return SYSTEM_PROMPT
+
         try:
             result = await db.execute(
                 select(ChatbotConfig).where(ChatbotConfig.key == "system_prompt")
             )
             config = result.scalar_one_or_none()
+            ChatbotService._config_table_exists = True
             if config and config.value.strip():
                 # Append any active promotions
                 promo_result = await db.execute(
@@ -97,7 +104,13 @@ class ChatbotService:
                     prompt += f"\n\nCURRENT PROMOTIONS/DEALS (mention when relevant):\n{promo.value}"
                 return prompt
         except Exception as e:
-            logger.debug(f"Could not load chatbot config from DB, using default: {e}")
+            logger.warning(f"chatbot_config table not available, using default prompt: {e}")
+            ChatbotService._config_table_exists = False
+            # Rollback so the DB session is usable for subsequent operations
+            try:
+                await db.rollback()
+            except Exception:
+                pass
         return SYSTEM_PROMPT
 
     async def update_config(
@@ -174,6 +187,10 @@ class ChatbotService:
             raise ValueError("Please wait a moment before sending another message.")
         _rate_limits[session_id] = (count + 1, now)
 
+        # Load system prompt FIRST — if chatbot_config table is missing,
+        # this may rollback, so do it before loading any other data
+        system_prompt = await self._get_system_prompt(db)
+
         # Load session
         result = await db.execute(
             select(ChatbotSession)
@@ -202,9 +219,6 @@ class ChatbotService:
         )
         db.add(user_msg)
         await db.flush()
-
-        # Load system prompt from DB (with fallback)
-        system_prompt = await self._get_system_prompt(db)
 
         # Call Claude
         try:
