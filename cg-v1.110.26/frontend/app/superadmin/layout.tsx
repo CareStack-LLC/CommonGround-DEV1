@@ -18,6 +18,7 @@ import {
   PenTool,
   Film,
   Bug,
+  Shield,
   UserPlus,
   Send,
   Mail,
