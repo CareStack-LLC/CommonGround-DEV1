@@ -267,7 +267,7 @@ export default function AboutPage() {
             <div className="flex flex-col items-center gap-3 md:sticky md:top-8">
               <div className="h-40 w-40 rounded-full overflow-hidden shadow-xl border-4 border-white/20">
                 <img
-                  src="/images/Website pictes/father1.png"
+                  src="/images/Website pictes/thomasimage.PNG"
                   alt="Thomas Wilform with his children"
                   className="w-full h-full object-cover"
                 />
