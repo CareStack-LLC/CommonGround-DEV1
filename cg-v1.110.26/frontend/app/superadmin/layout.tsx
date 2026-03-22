@@ -57,7 +57,7 @@ const navSections = [
       { href: '/superadmin/leads', label: 'Leads', icon: UserPlus },
       { href: '/superadmin/leads/campaigns', label: 'Campaigns', icon: Send },
       { href: '/superadmin/leads/landing-pages', label: 'Landing Pages', icon: Globe },
-      { href: '/superadmin/reddit', label: 'Reddit', icon: MessageCircle },
+      { href: '/superadmin/reddit', label: 'GTM Playbook', icon: TrendingUp },
       { href: '/superadmin/inbox', label: 'Inbox', icon: Mail },
     ],
   },
