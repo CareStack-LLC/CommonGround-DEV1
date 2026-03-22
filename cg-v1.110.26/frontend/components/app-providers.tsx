@@ -19,6 +19,12 @@ import { RealtimeProvider } from '@/contexts/realtime-context';
 import { ServiceWorkerRegister } from '@/components/service-worker-register';
 import { PortalWrapper } from '@/components/portal-wrapper';
 import { IncomingCallNotification } from '@/components/incoming-call-notification';
+import dynamic from 'next/dynamic';
+
+const ChatbotWidget = dynamic(
+  () => import('@/components/chatbot/chatbot-widget'),
+  { ssr: false },
+);
 
 export default function AppProviders({ children }: { children: React.ReactNode }) {
   return (
@@ -28,6 +34,7 @@ export default function AppProviders({ children }: { children: React.ReactNode }
           <NotificationProvider>
             <ServiceWorkerRegister />
             <IncomingCallNotification />
+            <ChatbotWidget />
             <PortalWrapper>
               {children}
             </PortalWrapper>
