@@ -30,30 +30,30 @@ export function ChatbotWindow({
   onEscalate,
 }: ChatbotWindowProps) {
   return (
-    <div className="fixed bottom-24 left-5 z-[40] flex flex-col w-[380px] h-[520px] sm:rounded-2xl rounded-none inset-0 sm:inset-auto sm:bottom-24 sm:left-5 sm:w-[380px] sm:h-[520px] w-full h-full bg-white border border-gray-200 shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300" style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+    <div className="fixed z-[40] flex flex-col bottom-24 left-3 right-3 h-[70vh] max-h-[520px] sm:right-auto sm:left-5 sm:w-[380px] sm:h-[520px] rounded-2xl bg-white border border-gray-200 shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
       {/* Header */}
-      <div className="flex items-center justify-between bg-gradient-to-r from-[#3DAA8A] to-[#2D6A8F] px-4 py-3 max-sm:py-4 text-white shrink-0">
+      <div className="flex items-center justify-between bg-gradient-to-r from-[#3DAA8A] to-[#2D6A8F] px-4 py-3 text-white shrink-0 rounded-t-2xl">
         <div>
           <h3 className="font-semibold text-sm">Aria</h3>
           <p className="text-xs text-white/80">CommonGround Assistant</p>
         </div>
-        <div className="flex items-center gap-1 max-sm:gap-2">
+        <div className="flex items-center gap-1">
           <Button
             variant="ghost"
             size="icon"
             onClick={onEscalate}
-            className="h-8 w-8 max-sm:h-10 max-sm:w-10 text-white/80 hover:text-white hover:bg-white/20"
+            className="h-8 w-8 text-white/80 hover:text-white hover:bg-white/20"
             title="Talk to a human"
           >
-            <Mail className="h-4 w-4 max-sm:h-5 max-sm:w-5" />
+            <Mail className="h-4 w-4" />
           </Button>
           <Button
             variant="ghost"
             size="icon"
             onClick={onClose}
-            className="h-8 w-8 max-sm:h-10 max-sm:w-10 text-white hover:text-white hover:bg-white/20 max-sm:bg-white/20 max-sm:rounded-full"
+            className="h-8 w-8 text-white hover:text-white hover:bg-white/20"
           >
-            <X className="h-4 w-4 max-sm:h-5 max-sm:w-5" />
+            <X className="h-4 w-4" />
           </Button>
         </div>
       </div>
