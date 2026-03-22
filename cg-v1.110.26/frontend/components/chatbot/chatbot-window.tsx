@@ -32,28 +32,28 @@ export function ChatbotWindow({
   return (
     <div className="fixed bottom-24 left-5 z-[40] flex flex-col w-[380px] h-[520px] max-sm:inset-0 max-sm:bottom-0 max-sm:left-0 max-sm:w-full max-sm:h-full max-sm:rounded-none rounded-2xl bg-background border shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
       {/* Header */}
-      <div className="flex items-center justify-between bg-gradient-to-r from-[#3DAA8A] to-[#2D6A8F] px-4 py-3 text-white shrink-0">
+      <div className="flex items-center justify-between bg-gradient-to-r from-[#3DAA8A] to-[#2D6A8F] px-4 py-3 max-sm:py-4 text-white shrink-0">
         <div>
           <h3 className="font-semibold text-sm">Aria</h3>
           <p className="text-xs text-white/80">CommonGround Assistant</p>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 max-sm:gap-2">
           <Button
             variant="ghost"
             size="icon"
             onClick={onEscalate}
-            className="h-8 w-8 text-white/80 hover:text-white hover:bg-white/20"
+            className="h-8 w-8 max-sm:h-10 max-sm:w-10 text-white/80 hover:text-white hover:bg-white/20"
             title="Talk to a human"
           >
-            <Mail className="h-4 w-4" />
+            <Mail className="h-4 w-4 max-sm:h-5 max-sm:w-5" />
           </Button>
           <Button
             variant="ghost"
             size="icon"
             onClick={onClose}
-            className="h-8 w-8 text-white/80 hover:text-white hover:bg-white/20"
+            className="h-8 w-8 max-sm:h-10 max-sm:w-10 text-white hover:text-white hover:bg-white/20 max-sm:bg-white/20 max-sm:rounded-full"
           >
-            <X className="h-4 w-4" />
+            <X className="h-4 w-4 max-sm:h-5 max-sm:w-5" />
           </Button>
         </div>
       </div>

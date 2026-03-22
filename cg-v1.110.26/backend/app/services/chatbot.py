@@ -64,9 +64,8 @@ RULES:
 """
 
 GREETING_MESSAGE = (
-    "Hi there! I'm Aria, CommonGround's customer success assistant. "
-    "I can help you learn about our co-parenting platform, answer questions about features and pricing, "
-    "or connect you with our support team. How can I help you today?"
+    "Hi! I'm Aria from CommonGround. "
+    "Ask me anything about our co-parenting platform — features, pricing, or getting started. How can I help?"
 )
 
 
@@ -140,6 +139,14 @@ class ChatbotService:
         if session.status != "active":
             raise ValueError("This chat session has ended.")
 
+        # Build conversation history for Claude BEFORE adding new message
+        messages = []
+        for msg in sorted(session.messages, key=lambda m: m.created_at):
+            if msg.role in ("user", "assistant"):
+                messages.append({"role": msg.role, "content": msg.content})
+        # Add current user message
+        messages.append({"role": "user", "content": user_content[:2000]})
+
         # Store user message
         user_msg = ChatbotMessage(
             session_id=session.id,
@@ -148,14 +155,6 @@ class ChatbotService:
         )
         db.add(user_msg)
         await db.flush()
-
-        # Build conversation history for Claude
-        messages = []
-        for msg in session.messages:
-            if msg.role in ("user", "assistant"):
-                messages.append({"role": msg.role, "content": msg.content})
-        # Add current user message
-        messages.append({"role": "user", "content": user_content[:2000]})
 
         # Call Claude
         try:
