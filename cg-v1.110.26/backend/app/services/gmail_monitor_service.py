@@ -404,6 +404,27 @@ async def analyze_email(db: AsyncSession, email_id: str) -> dict:
 # Reply via Gmail
 # ---------------------------------------------------------------------------
 
+_EMAIL_SIGNATURE = """
+<br><br>
+<table cellpadding="0" cellspacing="0" style="border-top: 2px solid #3DAA8A; padding-top: 16px; margin-top: 24px; font-family: 'DM Sans', Helvetica, Arial, sans-serif;">
+  <tr>
+    <td style="padding-right: 16px; vertical-align: top;">
+      <img src="https://find-commonground.com/logo-email.png" alt="CommonGround" width="48" height="48" style="border-radius: 12px;" />
+    </td>
+    <td style="vertical-align: top;">
+      <div style="font-size: 14px; font-weight: 600; color: #1E3A4A;">CommonGround Team</div>
+      <div style="font-size: 12px; color: #6B8A9A; margin-top: 2px;">The calm way to co-parent</div>
+      <div style="margin-top: 8px;">
+        <a href="https://find-commonground.com" style="font-size: 12px; color: #3DAA8A; text-decoration: none;">find-commonground.com</a>
+        <span style="color: #D0E4EC; margin: 0 6px;">|</span>
+        <a href="mailto:hello@find-commonground.com" style="font-size: 12px; color: #3DAA8A; text-decoration: none;">hello@find-commonground.com</a>
+      </div>
+    </td>
+  </tr>
+</table>
+"""
+
+
 async def send_reply(
     db: AsyncSession,
     email_id: str,
@@ -423,6 +444,8 @@ async def send_reply(
             html_body = response_body.replace("\n", "<br>")
         else:
             html_body = response_body
+        # Append branded signature
+        html_body += _EMAIL_SIGNATURE
         mime_msg = MIMEText(html_body, "html")
         mime_msg["To"] = email_record.from_email
         mime_msg["From"] = email_record.to_email
