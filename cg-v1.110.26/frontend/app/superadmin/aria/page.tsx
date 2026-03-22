@@ -49,7 +49,7 @@ function formatNumber(n: number | null | undefined): string {
 }
 
 function Skeleton({ className = '' }: { className?: string }) {
-  return <div className={`animate-pulse bg-zinc-800/60 rounded-lg ${className}`} />;
+  return <div className={`animate-pulse bg-[#2D6A8F]/20 rounded-lg ${className}`} />;
 }
 
 const SENTIMENT_COLORS: Record<string, string> = {
@@ -126,8 +126,8 @@ export default function AriaInsightsPage() {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <AlertTriangle className="w-10 h-10 text-amber-500 mb-3" />
-        <p className="text-zinc-400 mb-4">{error}</p>
-        <button onClick={fetchData} className="px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium transition-colors">Retry</button>
+        <p className="text-[#8AACBC] mb-4">{error}</p>
+        <button onClick={fetchData} className="px-4 py-2 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors">Retry</button>
       </div>
     );
   }
@@ -136,10 +136,10 @@ export default function AriaInsightsPage() {
     return (
       <div className="space-y-6">
         <Header loading={false} onRefresh={fetchData} />
-        <div className="flex flex-col items-center justify-center py-20 bg-zinc-900/50 border border-zinc-800/60 rounded-xl">
-          <Brain className="w-12 h-12 text-zinc-600 mb-4" />
-          <p className="text-zinc-400 text-lg font-medium">No ARIA data available yet</p>
-          <p className="text-zinc-600 text-sm mt-1">ARIA insights will appear once the system processes interactions.</p>
+        <div className="flex flex-col items-center justify-center py-20 bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl">
+          <Brain className="w-12 h-12 text-[#4A6E7F] mb-4" />
+          <p className="text-[#8AACBC] text-lg font-medium">No ARIA data available yet</p>
+          <p className="text-[#4A6E7F] text-sm mt-1">ARIA insights will appear once the system processes interactions.</p>
         </div>
       </div>
     );
@@ -185,15 +185,15 @@ export default function AriaInsightsPage() {
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex gap-1 bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-1">
+      <div className="flex gap-1 bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-1">
         {tabs.map((t) => (
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
             className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-medium transition-colors ${
               tab === t.key
-                ? 'bg-violet-500/20 text-violet-300 border border-violet-500/30'
-                : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'
+                ? 'bg-violet-500/20 text-[#5BC4A0] border border-violet-500/30'
+                : 'text-[#6B8A9A] hover:text-[#D0E4EC] hover:bg-[#2D6A8F]/20'
             }`}
           >
             <t.icon className="w-3.5 h-3.5" />
@@ -206,8 +206,8 @@ export default function AriaInsightsPage() {
       {tab === 'overview' && (
         <div className="space-y-4">
           {/* Daily Interventions Chart */}
-          <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
-            <h2 className="text-sm font-semibold text-zinc-300 mb-4">Daily Interventions (30 days)</h2>
+          <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+            <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">Daily Interventions (30 days)</h2>
             {data?.daily_interventions?.length ? (
               <ResponsiveContainer width="100%" height={260}>
                 <LineChart data={data.daily_interventions}>
@@ -218,13 +218,13 @@ export default function AriaInsightsPage() {
                   <Line type="monotone" dataKey="count" name="Interventions" stroke="#14b8a6" strokeWidth={2} dot={false} activeDot={{ r: 4, fill: '#14b8a6' }} />
                 </LineChart>
               </ResponsiveContainer>
-            ) : <p className="text-zinc-600 text-sm text-center py-10">No intervention data</p>}
+            ) : <p className="text-[#4A6E7F] text-sm text-center py-10">No intervention data</p>}
           </div>
 
           {/* Sentiment + Intervention Levels */}
           <div className="grid lg:grid-cols-2 gap-4">
-            <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
-              <h2 className="text-sm font-semibold text-zinc-300 mb-4">Sentiment Distribution</h2>
+            <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+              <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">Sentiment Distribution</h2>
               {sentimentData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={260}>
                   <PieChart>
@@ -234,14 +234,14 @@ export default function AriaInsightsPage() {
                       ))}
                     </Pie>
                     <Tooltip contentStyle={CustomTooltipStyle} />
-                    <Legend verticalAlign="bottom" formatter={(value: string) => <span className="text-zinc-400 text-xs capitalize">{value}</span>} />
+                    <Legend verticalAlign="bottom" formatter={(value: string) => <span className="text-[#8AACBC] text-xs capitalize">{value}</span>} />
                   </PieChart>
                 </ResponsiveContainer>
-              ) : <p className="text-zinc-600 text-sm text-center py-10">No sentiment data</p>}
+              ) : <p className="text-[#4A6E7F] text-sm text-center py-10">No sentiment data</p>}
             </div>
 
-            <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
-              <h2 className="text-sm font-semibold text-zinc-300 mb-4">Intervention Levels</h2>
+            <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+              <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">Intervention Levels</h2>
               {data?.intervention_levels?.length ? (
                 <div className="space-y-3">
                   {data.intervention_levels.map((lvl, i) => {
@@ -250,8 +250,8 @@ export default function AriaInsightsPage() {
                     return (
                       <div key={lvl.level}>
                         <div className="flex justify-between text-xs mb-1">
-                          <span className="text-zinc-400">{lvl.label}</span>
-                          <span className="text-zinc-300 font-medium">{formatNumber(lvl.count)}</span>
+                          <span className="text-[#8AACBC]">{lvl.label}</span>
+                          <span className="text-[#D0E4EC] font-medium">{formatNumber(lvl.count)}</span>
                         </div>
                         <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
                           <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: LEVEL_COLORS[i] || '#71717a' }} />
@@ -260,7 +260,7 @@ export default function AriaInsightsPage() {
                     );
                   })}
                 </div>
-              ) : <p className="text-zinc-600 text-sm text-center py-10">No level data</p>}
+              ) : <p className="text-[#4A6E7F] text-sm text-center py-10">No level data</p>}
             </div>
           </div>
         </div>
@@ -268,8 +268,8 @@ export default function AriaInsightsPage() {
 
       {tab === 'categories' && (
         <div className="grid lg:grid-cols-2 gap-4">
-          <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
-            <h2 className="text-sm font-semibold text-zinc-300 mb-4">By Severity</h2>
+          <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+            <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">By Severity</h2>
             {data?.top_categories?.length ? (
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={data.top_categories} layout="vertical" margin={{ left: 20 }}>
@@ -280,11 +280,11 @@ export default function AriaInsightsPage() {
                   <Bar dataKey="count" name="Flags" fill="#14b8a6" radius={[0, 4, 4, 0]} barSize={18} />
                 </BarChart>
               </ResponsiveContainer>
-            ) : <p className="text-zinc-600 text-sm text-center py-10">No severity data</p>}
+            ) : <p className="text-[#4A6E7F] text-sm text-center py-10">No severity data</p>}
           </div>
 
-          <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
-            <h2 className="text-sm font-semibold text-zinc-300 mb-4">Detected Categories (30d)</h2>
+          <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+            <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">Detected Categories (30d)</h2>
             {data?.detailed_categories?.length ? (
               <div className="space-y-2">
                 {data.detailed_categories.map((cat) => {
@@ -293,8 +293,8 @@ export default function AriaInsightsPage() {
                   return (
                     <div key={cat.category}>
                       <div className="flex justify-between text-xs mb-1">
-                        <span className="text-zinc-400 capitalize">{cat.category.replace(/_/g, ' ')}</span>
-                        <span className="text-zinc-300 font-medium">{cat.count}</span>
+                        <span className="text-[#8AACBC] capitalize">{cat.category.replace(/_/g, ' ')}</span>
+                        <span className="text-[#D0E4EC] font-medium">{cat.count}</span>
                       </div>
                       <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
                         <div className="h-full rounded-full bg-teal-500 transition-all" style={{ width: `${pct}%` }} />
@@ -303,15 +303,15 @@ export default function AriaInsightsPage() {
                   );
                 })}
               </div>
-            ) : <p className="text-zinc-600 text-sm text-center py-10">No category data</p>}
+            ) : <p className="text-[#4A6E7F] text-sm text-center py-10">No category data</p>}
           </div>
         </div>
       )}
 
       {tab === 'actions' && (
         <div className="grid lg:grid-cols-2 gap-4">
-          <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
-            <h2 className="text-sm font-semibold text-zinc-300 mb-4">User Response Actions</h2>
+          <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+            <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">User Response Actions</h2>
             {actionData.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={actionData} layout="vertical" margin={{ left: 30 }}>
@@ -326,24 +326,24 @@ export default function AriaInsightsPage() {
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
-            ) : <p className="text-zinc-600 text-sm text-center py-10">No action data</p>}
+            ) : <p className="text-[#4A6E7F] text-sm text-center py-10">No action data</p>}
           </div>
 
-          <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
-            <h2 className="text-sm font-semibold text-zinc-300 mb-4">Action Summary</h2>
+          <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+            <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">Action Summary</h2>
             <div className="space-y-4">
               {[
                 { label: 'Accepted Suggestion', key: 'accepted', icon: Activity, color: 'text-emerald-400', desc: 'User used ARIA rewrite' },
                 { label: 'Modified Suggestion', key: 'modified', icon: MessageSquare, color: 'text-blue-400', desc: 'User edited the rewrite' },
                 { label: 'Rejected Suggestion', key: 'rejected', icon: XCircle, color: 'text-amber-400', desc: 'User dismissed the suggestion' },
                 { label: 'Sent Anyway', key: 'sent_anyway', icon: Send, color: 'text-red-400', desc: 'User overrode ARIA and sent original' },
-                { label: 'Cancelled', key: 'cancelled', icon: PhoneOff, color: 'text-zinc-500', desc: 'User cancelled the message entirely' },
+                { label: 'Cancelled', key: 'cancelled', icon: PhoneOff, color: 'text-[#6B8A9A]', desc: 'User cancelled the message entirely' },
               ].map(({ label, key, icon: Icon, color, desc }) => (
-                <div key={key} className="flex items-center gap-3 p-3 rounded-lg bg-zinc-800/30">
+                <div key={key} className="flex items-center gap-3 p-3 rounded-lg bg-[#2D6A8F]/10">
                   <Icon className={`w-5 h-5 ${color} flex-shrink-0`} />
                   <div className="flex-1">
-                    <div className="text-sm text-zinc-200 font-medium">{label}</div>
-                    <div className="text-xs text-zinc-500">{desc}</div>
+                    <div className="text-sm text-white font-medium">{label}</div>
+                    <div className="text-xs text-[#6B8A9A]">{desc}</div>
                   </div>
                   <div className="text-lg font-bold text-zinc-100">
                     {formatNumber(data?.action_breakdown?.[key] ?? 0)}
@@ -356,40 +356,40 @@ export default function AriaInsightsPage() {
       )}
 
       {tab === 'messages' && (
-        <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-zinc-300 mb-4">Recent Flagged Messages</h2>
-          <p className="text-xs text-zinc-600 mb-4">No message content is shown — only metadata for privacy compliance.</p>
+        <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+          <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">Recent Flagged Messages</h2>
+          <p className="text-xs text-[#4A6E7F] mb-4">No message content is shown — only metadata for privacy compliance.</p>
           {data?.recent_flagged?.length ? (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-zinc-800/60">
-                    <th className="text-left text-xs text-zinc-500 font-medium pb-3 pr-4">Timestamp</th>
-                    <th className="text-left text-xs text-zinc-500 font-medium pb-3 pr-4">Sender</th>
-                    <th className="text-left text-xs text-zinc-500 font-medium pb-3 pr-4">Category</th>
-                    <th className="text-left text-xs text-zinc-500 font-medium pb-3">Preview</th>
+                  <tr className="border-b border-[#2D6A8F]/20">
+                    <th className="text-left text-xs text-[#6B8A9A] font-medium pb-3 pr-4">Timestamp</th>
+                    <th className="text-left text-xs text-[#6B8A9A] font-medium pb-3 pr-4">Sender</th>
+                    <th className="text-left text-xs text-[#6B8A9A] font-medium pb-3 pr-4">Category</th>
+                    <th className="text-left text-xs text-[#6B8A9A] font-medium pb-3">Preview</th>
                   </tr>
                 </thead>
                 <tbody>
                   {data.recent_flagged.map((msg, i) => (
-                    <tr key={i} className="border-b border-zinc-800/30 last:border-0 hover:bg-zinc-800/20 transition-colors">
-                      <td className="py-2.5 pr-4 text-xs text-zinc-500 whitespace-nowrap">
+                    <tr key={i} className="border-b border-[#2D6A8F]/10 last:border-0 hover:bg-[#2D6A8F]/10 transition-colors">
+                      <td className="py-2.5 pr-4 text-xs text-[#6B8A9A] whitespace-nowrap">
                         {new Date(msg.timestamp).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                       </td>
-                      <td className="py-2.5 pr-4 text-xs text-zinc-300 font-mono">{msg.sender_email}</td>
+                      <td className="py-2.5 pr-4 text-xs text-[#D0E4EC] font-mono">{msg.sender_email}</td>
                       <td className="py-2.5 pr-4">
                         <span className="inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium bg-red-500/15 text-red-400 border border-red-500/20">
                           {msg.category}
                         </span>
                       </td>
-                      <td className="py-2.5 text-xs text-zinc-400 truncate max-w-xs">{msg.message_preview}</td>
+                      <td className="py-2.5 text-xs text-[#8AACBC] truncate max-w-xs">{msg.message_preview}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
           ) : (
-            <p className="text-zinc-600 text-sm text-center py-6">No flagged messages</p>
+            <p className="text-[#4A6E7F] text-sm text-center py-6">No flagged messages</p>
           )}
         </div>
       )}
@@ -402,12 +402,12 @@ function Header({ loading, onRefresh }: { loading: boolean; onRefresh: () => voi
     <div className="flex items-center justify-between">
       <div>
         <h1 className="text-xl font-bold text-white">ARIA Insights</h1>
-        <p className="text-sm text-zinc-500 mt-0.5">AI moderation analytics — interactions, blocks, overrides &amp; categories</p>
+        <p className="text-sm text-[#6B8A9A] mt-0.5">AI moderation analytics — interactions, blocks, overrides &amp; categories</p>
       </div>
       <button
         onClick={onRefresh}
         disabled={loading}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800/60 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 text-xs font-medium transition-colors disabled:opacity-50"
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#2D6A8F]/20 hover:bg-[#2D6A8F]/30 text-[#8AACBC] hover:text-white text-xs font-medium transition-colors disabled:opacity-50"
       >
         <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
         Refresh
@@ -421,22 +421,22 @@ function MetricCard({ icon: Icon, label, value, color }: {
 }) {
   const colorMap: Record<string, string> = {
     teal: 'from-teal-600/20 to-teal-600/5 border-teal-500/20',
-    emerald: 'from-emerald-600/20 to-emerald-600/5 border-emerald-500/20',
+    emerald: 'from-[#3DAA8A]/20 to-[#3DAA8A]/5 border-[#3DAA8A]/20',
     red: 'from-red-600/20 to-red-600/5 border-red-500/20',
-    violet: 'from-violet-600/20 to-violet-600/5 border-violet-500/20',
-    amber: 'from-amber-600/20 to-amber-600/5 border-amber-500/20',
-    blue: 'from-blue-600/20 to-blue-600/5 border-blue-500/20',
+    violet: 'from-[#3DAA8A]/20 to-[#3DAA8A]/5 border-[#3DAA8A]/20',
+    amber: 'from-[#F5A623]/20 to-[#F5A623]/5 border-[#F5A623]/20',
+    blue: 'from-[#2D6A8F]/20 to-[#2D6A8F]/5 border-[#2D6A8F]/20',
   };
   const iconColorMap: Record<string, string> = {
     teal: 'text-teal-400', emerald: 'text-emerald-400',
-    red: 'text-red-400', violet: 'text-violet-400',
+    red: 'text-red-400', violet: 'text-[#3DAA8A]',
     amber: 'text-amber-400', blue: 'text-blue-400',
   };
   return (
     <div className={`bg-gradient-to-b ${colorMap[color]} border rounded-xl p-4`}>
       <Icon className={`w-4 h-4 ${iconColorMap[color]} mb-1.5`} />
       <div className="text-xl font-bold text-white tracking-tight">{value}</div>
-      <span className="text-[11px] text-zinc-500">{label}</span>
+      <span className="text-[11px] text-[#6B8A9A]">{label}</span>
     </div>
   );
 }

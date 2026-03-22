@@ -153,26 +153,26 @@ function DashboardInner() {
                 <MetricCard
                   icon={Users} label="Total Users" value={formatNumber(dashboard.users.total)}
                   sub={`${dashboard.users.new_24h} new today`}
-                  trend={growthTrend} color="violet"
+                  trend={growthTrend} color="sage"
                   tooltip="Total registered users across all plans"
                   sparklineData={sparklineData}
                 />
                 <MetricCard
                   icon={DollarSign} label="Est. MRR" value={formatCurrency(dashboard.subscriptions.estimated_mrr)}
                   sub={`${dashboard.subscriptions.past_due_count} past due`}
-                  color="blue" alert={dashboard.subscriptions.past_due_count > 0}
+                  color="ocean" alert={dashboard.subscriptions.past_due_count > 0}
                   tooltip="Monthly recurring revenue from all active paid subscriptions"
                 />
                 <MetricCard
                   icon={Activity} label="Active (30d)" value={formatNumber(dashboard.users.active_30d)}
                   sub={`${dashboard.users.active_today} online now`}
-                  color="emerald"
+                  color="sky"
                   tooltip="Users who logged in at least once in the past 30 days"
                 />
                 <MetricCard
                   icon={MessageSquare} label="Messages (7d)" value={formatNumber(dashboard.engagement.messages_7d)}
                   sub={`${dashboard.engagement.aria_interventions_7d} ARIA flags`}
-                  color="amber"
+                  color="gold"
                   tooltip="Total co-parent messages sent in the past 7 days"
                 />
               </>
@@ -199,13 +199,13 @@ function DashboardInner() {
           {/* Charts Row */}
           <div className="grid lg:grid-cols-3 gap-4">
             {/* User Growth Chart */}
-            <div className="lg:col-span-2 bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
+            <div className="lg:col-span-2 bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-sm font-semibold text-zinc-300">
+                <h2 className="text-sm font-semibold text-[#D0E4EC]">
                   User Growth (14 days)
                   <InfoTooltip text="Daily new user registrations. Weekend days are shown lighter." />
                 </h2>
-                <button onClick={() => router.push('/superadmin/growth')} className="text-xs text-violet-400 hover:text-violet-300 flex items-center gap-1">
+                <button onClick={() => router.push('/superadmin/growth')} className="text-xs text-[#3DAA8A] hover:text-[#5BC4A0] flex items-center gap-1">
                   View details <ExternalLink className="w-3 h-3" />
                 </button>
               </div>
@@ -219,10 +219,10 @@ function DashboardInner() {
                       return (
                         <div key={i} className="flex-1 group relative">
                           <div
-                            className={`w-full rounded-t transition-all ${isWeekend ? 'bg-violet-500/25' : 'bg-violet-500/60 group-hover:bg-violet-400/80'}`}
+                            className={`w-full rounded-t transition-all ${isWeekend ? 'bg-[#3DAA8A]/25' : 'bg-[#3DAA8A]/60 group-hover:bg-[#5BC4A0]/80'}`}
                             style={{ height: `${height}%` }}
                           />
-                          <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-zinc-800 text-zinc-200 text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10 shadow-lg">
+                          <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[#1E3A4A] text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10 shadow-lg">
                             {d.count} users • {new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                           </div>
                         </div>
@@ -230,7 +230,7 @@ function DashboardInner() {
                     })}
                   </div>
                   {growth.daily_registrations?.length > 0 && (
-                    <div className="flex justify-between mt-2 text-[10px] text-zinc-600">
+                    <div className="flex justify-between mt-2 text-[10px] text-[#4A6E7F]">
                       <span>{new Date(growth.daily_registrations[0].date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                       <span>{new Date(growth.daily_registrations[growth.daily_registrations.length - 1].date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                     </div>
@@ -240,13 +240,13 @@ function DashboardInner() {
             </div>
 
             {/* Revenue Split */}
-            <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
+            <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-sm font-semibold text-zinc-300">
+                <h2 className="text-sm font-semibold text-[#D0E4EC]">
                   Revenue Split
                   <InfoTooltip text="Subscription breakdown by tier as percentage of total users" />
                 </h2>
-                <button onClick={() => router.push('/superadmin/billing')} className="text-xs text-violet-400 hover:text-violet-300 flex items-center gap-1">
+                <button onClick={() => router.push('/superadmin/billing')} className="text-xs text-[#3DAA8A] hover:text-[#5BC4A0] flex items-center gap-1">
                   Details <ExternalLink className="w-3 h-3" />
                 </button>
               </div>
@@ -262,11 +262,11 @@ function DashboardInner() {
                       return (
                         <div key={tier}>
                           <div className="flex justify-between text-xs mb-1">
-                            <span className="text-zinc-400 capitalize">{tier.replace('_', ' ')}</span>
-                            <span className="text-zinc-500">{count} ({pct}%)</span>
+                            <span className="text-[#8AACBC] capitalize">{tier.replace('_', ' ')}</span>
+                            <span className="text-[#6B8A9A]">{count} ({pct}%)</span>
                           </div>
-                          <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                            <div className="h-full rounded-full bg-gradient-to-r from-violet-600 to-violet-400 transition-all duration-500" style={{ width: `${pct}%` }} />
+                          <div className="h-1.5 bg-[#1E3A4A] rounded-full overflow-hidden">
+                            <div className="h-full rounded-full bg-gradient-to-r from-[#3DAA8A] to-[#5BC4A0] transition-all duration-500" style={{ width: `${pct}%` }} />
                           </div>
                         </div>
                       );
@@ -279,10 +279,10 @@ function DashboardInner() {
           {/* Activity Feeds */}
           <div className="grid lg:grid-cols-2 gap-4">
             {/* Recent Signups */}
-            <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
+            <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-sm font-semibold text-zinc-300">Recent Signups</h2>
-                <button onClick={() => router.push('/superadmin/users')} className="text-xs text-violet-400 hover:text-violet-300 flex items-center gap-1">
+                <h2 className="text-sm font-semibold text-[#D0E4EC]">Recent Signups</h2>
+                <button onClick={() => router.push('/superadmin/users')} className="text-xs text-[#3DAA8A] hover:text-[#5BC4A0] flex items-center gap-1">
                   All users <ExternalLink className="w-3 h-3" />
                 </button>
               </div>
@@ -291,14 +291,14 @@ function DashboardInner() {
               ) : (
                 <div className="space-y-1">
                   {(dashboard?.recent_signups || []).map((s) => (
-                    <div key={s.id} onClick={() => router.push(`/superadmin/users/${s.id}`)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-zinc-800/40 cursor-pointer transition-colors">
-                      <div className="w-7 h-7 rounded-full bg-gradient-to-br from-violet-600/40 to-indigo-600/40 flex items-center justify-center text-xs font-medium text-violet-300">
+                    <div key={s.id} onClick={() => router.push(`/superadmin/users/${s.id}`)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#2D6A8F]/15 cursor-pointer transition-colors">
+                      <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#3DAA8A]/40 to-[#2D6A8F]/40 flex items-center justify-center text-xs font-medium text-[#5BC4A0]">
                         {s.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm text-zinc-300 truncate">{s.name}</div>
+                        <div className="text-sm text-[#D0E4EC] truncate">{s.name}</div>
                       </div>
-                      <span className="text-[11px] text-zinc-600 whitespace-nowrap">{timeAgo(s.created_at)}</span>
+                      <span className="text-[11px] text-[#4A6E7F] whitespace-nowrap">{timeAgo(s.created_at)}</span>
                     </div>
                   ))}
                 </div>
@@ -306,10 +306,10 @@ function DashboardInner() {
             </div>
 
             {/* Admin Activity */}
-            <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
+            <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-sm font-semibold text-zinc-300">Admin Activity</h2>
-                <button onClick={() => router.push('/superadmin/users?tab=activity')} className="text-xs text-violet-400 hover:text-violet-300 flex items-center gap-1">
+                <h2 className="text-sm font-semibold text-[#D0E4EC]">Admin Activity</h2>
+                <button onClick={() => router.push('/superadmin/users?tab=activity')} className="text-xs text-[#3DAA8A] hover:text-[#5BC4A0] flex items-center gap-1">
                   Full log <ExternalLink className="w-3 h-3" />
                 </button>
               </div>
@@ -318,16 +318,16 @@ function DashboardInner() {
               ) : (
                 <div className="space-y-1">
                   {(dashboard?.recent_admin_actions || []).map((a) => (
-                    <div key={a.id} className="flex items-start gap-3 px-3 py-2 rounded-lg hover:bg-zinc-800/40 transition-colors">
-                      <div className="w-1.5 h-1.5 rounded-full bg-violet-500/60 mt-2 flex-shrink-0" />
+                    <div key={a.id} className="flex items-start gap-3 px-3 py-2 rounded-lg hover:bg-[#2D6A8F]/15 transition-colors">
+                      <div className="w-1.5 h-1.5 rounded-full bg-[#3DAA8A]/60 mt-2 flex-shrink-0" />
                       <div className="flex-1 min-w-0">
-                        <div className="text-xs text-zinc-400">
-                          <span className="text-zinc-300 font-medium">{a.action.replace('admin:', '').replace(/_/g, ' ')}</span>
-                          {a.user_email && <span className="text-zinc-600 ml-1">by {a.user_email.split('@')[0]}</span>}
+                        <div className="text-xs text-[#8AACBC]">
+                          <span className="text-[#D0E4EC] font-medium">{a.action.replace('admin:', '').replace(/_/g, ' ')}</span>
+                          {a.user_email && <span className="text-[#4A6E7F] ml-1">by {a.user_email.split('@')[0]}</span>}
                         </div>
-                        {a.description && <div className="text-[11px] text-zinc-600 mt-0.5 truncate">{a.description}</div>}
+                        {a.description && <div className="text-[11px] text-[#4A6E7F] mt-0.5 truncate">{a.description}</div>}
                       </div>
-                      <span className="text-[11px] text-zinc-600 whitespace-nowrap flex-shrink-0">{timeAgo(a.created_at)}</span>
+                      <span className="text-[11px] text-[#4A6E7F] whitespace-nowrap flex-shrink-0">{timeAgo(a.created_at)}</span>
                     </div>
                   ))}
                 </div>
@@ -354,24 +354,24 @@ function DashboardInner() {
               <>
                 <MetricCard
                   icon={Gauge} label="API Latency (p75)" value={`${perfData.summary?.avg_response_p75_ms || 0}ms`}
-                  color={perfData.summary?.avg_response_p75_ms > 500 ? 'amber' : 'emerald'}
+                  color={perfData.summary?.avg_response_p75_ms > 500 ? 'gold' : 'sky'}
                   tooltip="75th percentile API response time — most users experience this speed or faster"
                 />
                 <MetricCard
                   icon={AlertTriangle} label="Error Rate"
                   value={`${((perfData.transactions || []).reduce((a: number, t: any) => a + (t.failure_rate || 0), 0) / Math.max((perfData.transactions || []).length, 1) * 100).toFixed(1)}%`}
-                  color="red"
+                  color="coral"
                   tooltip="Average failure rate across all API endpoints"
                 />
                 <MetricCard
                   icon={Server} label="Uptime"
                   value={systemStatus ? `${Math.round((systemStatus.services?.filter((s: any) => s.status === 'operational').length / Math.max(systemStatus.services?.length, 1)) * 100)}%` : '—'}
-                  color="emerald"
+                  color="sky"
                   tooltip="Percentage of services currently operational"
                 />
                 <MetricCard
                   icon={Brain} label="AI Tokens Used" value={formatNumber(perfData.summary?.total_tokens_used || 0)}
-                  color="violet"
+                  color="sage"
                   tooltip="Total AI tokens consumed across Claude and OpenAI calls"
                 />
               </>
@@ -380,20 +380,20 @@ function DashboardInner() {
 
           {/* Service Health Grid */}
           {systemStatus?.services && (
-            <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
-              <h2 className="text-sm font-semibold text-zinc-300 mb-4">
+            <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+              <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">
                 Service Health
                 <InfoTooltip text="Real-time status of all backend services and integrations" />
               </h2>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
                 {systemStatus.services.map((s: any) => (
-                  <div key={s.name} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-zinc-800/30 border border-zinc-800/40">
+                  <div key={s.name} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#2D6A8F]/10 border border-[#2D6A8F]/15">
                     <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
                       s.status === 'operational' ? 'bg-emerald-400 animate-pulse' :
                       s.status === 'degraded' ? 'bg-amber-400' : 'bg-red-400'
                     }`} />
-                    <span className="text-xs text-zinc-400 truncate">{s.name}</span>
-                    {s.latency_ms && <span className="text-[10px] text-zinc-600 ml-auto">{s.latency_ms}ms</span>}
+                    <span className="text-xs text-[#8AACBC] truncate">{s.name}</span>
+                    {s.latency_ms && <span className="text-[10px] text-[#4A6E7F] ml-auto">{s.latency_ms}ms</span>}
                   </div>
                 ))}
               </div>
@@ -402,15 +402,15 @@ function DashboardInner() {
 
           {/* API Endpoints Table */}
           {perfData?.transactions && (
-            <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
-              <h2 className="text-sm font-semibold text-zinc-300 mb-4">
+            <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+              <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">
                 Top API Endpoints
                 <InfoTooltip text="Busiest endpoints by request volume with latency and failure metrics" />
               </h2>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="text-xs text-zinc-500 border-b border-zinc-800/60">
+                    <tr className="text-xs text-[#6B8A9A] border-b border-[#2D6A8F]/20">
                       <th className="text-left py-2 font-medium">Endpoint</th>
                       <th className="text-right py-2 font-medium">Requests</th>
                       <th className="text-right py-2 font-medium">p75</th>
@@ -420,12 +420,12 @@ function DashboardInner() {
                   </thead>
                   <tbody>
                     {perfData.transactions.slice(0, 10).map((t: any, i: number) => (
-                      <tr key={i} className="border-b border-zinc-800/30 hover:bg-zinc-800/20">
-                        <td className="py-2 text-zinc-300 font-mono text-xs truncate max-w-xs">{t.transaction}</td>
-                        <td className="py-2 text-right text-zinc-400">{t.count}</td>
-                        <td className="py-2 text-right text-zinc-400">{t.p75_ms}ms</td>
-                        <td className={`py-2 text-right ${t.p95_ms > 1000 ? 'text-amber-400' : 'text-zinc-400'}`}>{t.p95_ms}ms</td>
-                        <td className={`py-2 text-right ${t.failure_rate > 5 ? 'text-red-400' : 'text-zinc-400'}`}>{(t.failure_rate || 0).toFixed(1)}%</td>
+                      <tr key={i} className="border-b border-[#2D6A8F]/10 hover:bg-[#2D6A8F]/10">
+                        <td className="py-2 text-[#D0E4EC] font-mono text-xs truncate max-w-xs">{t.transaction}</td>
+                        <td className="py-2 text-right text-[#8AACBC]">{t.count}</td>
+                        <td className="py-2 text-right text-[#8AACBC]">{t.p75_ms}ms</td>
+                        <td className={`py-2 text-right ${t.p95_ms > 1000 ? 'text-amber-400' : 'text-[#8AACBC]'}`}>{t.p95_ms}ms</td>
+                        <td className={`py-2 text-right ${t.failure_rate > 5 ? 'text-red-400' : 'text-[#8AACBC]'}`}>{(t.failure_rate || 0).toFixed(1)}%</td>
                       </tr>
                     ))}
                   </tbody>
@@ -443,54 +443,54 @@ function DashboardInner() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             <MetricCard
               icon={MessageCircle} label="Active Chats" value={chatbotStats?.active_today ?? '—'}
-              color="emerald"
+              color="sky"
               tooltip="Chatbot conversations currently active today"
             />
             <MetricCard
               icon={AlertTriangle} label="Escalated" value={chatbotStats?.escalated_count ?? '—'}
-              color={chatbotStats?.escalated_count > 0 ? 'red' : 'slate'}
+              color={chatbotStats?.escalated_count > 0 ? 'coral' : 'neutral'}
               tooltip="Conversations escalated to human support"
             />
             <MetricCard
               icon={Brain} label="ARIA Flags (7d)" value={dashboard?.engagement?.aria_interventions_7d ?? '—'}
-              color="amber"
+              color="gold"
               tooltip="Messages flagged by ARIA for hostile or inappropriate language"
             />
             <MetricCard
               icon={Mail} label="Unread Emails" value={inboxStats?.urgent_pending ?? '—'}
-              color={inboxStats?.urgent_pending > 0 ? 'amber' : 'slate'}
+              color={inboxStats?.urgent_pending > 0 ? 'gold' : 'neutral'}
               tooltip="Urgent emails awaiting response in the inbox"
             />
           </div>
 
           {/* Chatbot + Inbox Summary */}
           <div className="grid lg:grid-cols-2 gap-4">
-            <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
+            <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-sm font-semibold text-zinc-300">Chatbot Overview</h2>
-                <button onClick={() => router.push('/superadmin/chatbot')} className="text-xs text-violet-400 hover:text-violet-300 flex items-center gap-1">
+                <h2 className="text-sm font-semibold text-[#D0E4EC]">Chatbot Overview</h2>
+                <button onClick={() => router.push('/superadmin/chatbot')} className="text-xs text-[#3DAA8A] hover:text-[#5BC4A0] flex items-center gap-1">
                   Manage <ExternalLink className="w-3 h-3" />
                 </button>
               </div>
               {chatbotStats ? (
                 <div className="space-y-3">
                   <div className="flex justify-between text-sm">
-                    <span className="text-zinc-500">Total Sessions</span>
-                    <span className="text-zinc-300">{chatbotStats.total_sessions ?? 0}</span>
+                    <span className="text-[#6B8A9A]">Total Sessions</span>
+                    <span className="text-[#D0E4EC]">{chatbotStats.total_sessions ?? 0}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-zinc-500">Avg Messages/Session</span>
-                    <span className="text-zinc-300">{chatbotStats.avg_messages ?? '—'}</span>
+                    <span className="text-[#6B8A9A]">Avg Messages/Session</span>
+                    <span className="text-[#D0E4EC]">{chatbotStats.avg_messages ?? '—'}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-zinc-500">Escalation Rate</span>
-                    <span className={`${chatbotStats.escalation_rate > 20 ? 'text-amber-400' : 'text-zinc-300'}`}>
+                    <span className="text-[#6B8A9A]">Escalation Rate</span>
+                    <span className={`${chatbotStats.escalation_rate > 20 ? 'text-amber-400' : 'text-[#D0E4EC]'}`}>
                       {chatbotStats.escalation_rate ?? 0}%
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-zinc-500">Unique Visitors</span>
-                    <span className="text-zinc-300">{chatbotStats.unique_visitors ?? 0}</span>
+                    <span className="text-[#6B8A9A]">Unique Visitors</span>
+                    <span className="text-[#D0E4EC]">{chatbotStats.unique_visitors ?? 0}</span>
                   </div>
                 </div>
               ) : (
@@ -498,32 +498,32 @@ function DashboardInner() {
               )}
             </div>
 
-            <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
+            <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-sm font-semibold text-zinc-300">Inbox Summary</h2>
-                <button onClick={() => router.push('/superadmin/inbox')} className="text-xs text-violet-400 hover:text-violet-300 flex items-center gap-1">
+                <h2 className="text-sm font-semibold text-[#D0E4EC]">Inbox Summary</h2>
+                <button onClick={() => router.push('/superadmin/inbox')} className="text-xs text-[#3DAA8A] hover:text-[#5BC4A0] flex items-center gap-1">
                   Open inbox <ExternalLink className="w-3 h-3" />
                 </button>
               </div>
               {inboxStats ? (
                 <div className="space-y-3">
                   <div className="flex justify-between text-sm">
-                    <span className="text-zinc-500">Total Emails</span>
-                    <span className="text-zinc-300">{inboxStats.total ?? 0}</span>
+                    <span className="text-[#6B8A9A]">Total Emails</span>
+                    <span className="text-[#D0E4EC]">{inboxStats.total ?? 0}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-zinc-500">Urgent</span>
-                    <span className={`${inboxStats.urgent_pending > 0 ? 'text-amber-400 font-medium' : 'text-zinc-300'}`}>
+                    <span className="text-[#6B8A9A]">Urgent</span>
+                    <span className={`${inboxStats.urgent_pending > 0 ? 'text-amber-400 font-medium' : 'text-[#D0E4EC]'}`}>
                       {inboxStats.urgent_pending ?? 0}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-zinc-500">Support</span>
-                    <span className="text-zinc-300">{inboxStats.by_category?.support ?? 0}</span>
+                    <span className="text-[#6B8A9A]">Support</span>
+                    <span className="text-[#D0E4EC]">{inboxStats.by_category?.support ?? 0}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-zinc-500">Sales</span>
-                    <span className="text-zinc-300">{inboxStats.by_category?.sales ?? 0}</span>
+                    <span className="text-[#6B8A9A]">Sales</span>
+                    <span className="text-[#D0E4EC]">{inboxStats.by_category?.sales ?? 0}</span>
                   </div>
                 </div>
               ) : (
@@ -549,13 +549,13 @@ function QuickLink({ icon: Icon, label, badge, badgeColor, onClick }: {
   icon: React.ElementType; label: string; badge?: number; badgeColor?: string; onClick: () => void;
 }) {
   return (
-    <button onClick={onClick} className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl px-4 py-3 flex items-center gap-3 hover:bg-zinc-800/40 hover:border-zinc-700/60 transition-all text-left group">
-      <Icon className="w-4 h-4 text-zinc-500 group-hover:text-violet-400 transition-colors" />
-      <span className="text-sm text-zinc-400 group-hover:text-zinc-200 transition-colors">{label}</span>
+    <button onClick={onClick} className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl px-4 py-3 flex items-center gap-3 hover:bg-[#2D6A8F]/15 hover:border-zinc-700/60 transition-all text-left group">
+      <Icon className="w-4 h-4 text-[#6B8A9A] group-hover:text-[#3DAA8A] transition-colors" />
+      <span className="text-sm text-[#8AACBC] group-hover:text-white transition-colors">{label}</span>
       {badge !== undefined && badge > 0 && (
-        <span className={`text-xs font-medium ml-auto ${badgeColor || 'text-zinc-400'}`}>{badge}</span>
+        <span className={`text-xs font-medium ml-auto ${badgeColor || 'text-[#8AACBC]'}`}>{badge}</span>
       )}
-      <ArrowUpRight className="w-3.5 h-3.5 text-zinc-700 group-hover:text-zinc-500 ml-auto transition-colors" />
+      <ArrowUpRight className="w-3.5 h-3.5 text-[#3A5A6A] group-hover:text-[#6B8A9A] ml-auto transition-colors" />
     </button>
   );
 }

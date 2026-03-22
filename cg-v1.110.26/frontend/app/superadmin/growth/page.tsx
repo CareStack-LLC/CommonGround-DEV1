@@ -25,7 +25,7 @@ export default function GrowthAndEngagementPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-xl font-bold text-white">Growth & Engagement</h1>
-        <p className="text-sm text-zinc-500 mt-0.5">User growth trends and KidSpace engagement analytics</p>
+        <p className="text-sm text-[#6B8A9A] mt-0.5">User growth trends and KidSpace engagement analytics</p>
       </div>
 
       <TabBar tabs={TABS} activeTab={tab} onTabChange={handleTabChange} />

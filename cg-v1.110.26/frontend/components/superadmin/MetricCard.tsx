@@ -9,19 +9,19 @@ interface MetricCardProps {
   value: string | number;
   sub?: string;
   trend?: number;
-  color?: "violet" | "emerald" | "blue" | "amber" | "red" | "slate";
+  color?: "sage" | "ocean" | "gold" | "sky" | "coral" | "neutral";
   alert?: boolean;
   tooltip?: string;
   sparklineData?: number[];
 }
 
 const COLOR_MAP = {
-  violet: { icon: "text-violet-400", bg: "bg-violet-500/10", border: "border-violet-500/20" },
-  emerald: { icon: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20" },
-  blue: { icon: "text-blue-400", bg: "bg-blue-500/10", border: "border-blue-500/20" },
-  amber: { icon: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/20" },
-  red: { icon: "text-red-400", bg: "bg-red-500/10", border: "border-red-500/20" },
-  slate: { icon: "text-zinc-400", bg: "bg-zinc-500/10", border: "border-zinc-500/20" },
+  sage: { icon: "text-[#3DAA8A]", bg: "bg-[#3DAA8A]/10", border: "border-[#3DAA8A]/20" },
+  ocean: { icon: "text-[#2D6A8F]", bg: "bg-[#2D6A8F]/10", border: "border-[#2D6A8F]/20" },
+  gold: { icon: "text-[#F5A623]", bg: "bg-[#F5A623]/10", border: "border-[#F5A623]/20" },
+  sky: { icon: "text-[#4BA8C8]", bg: "bg-[#4BA8C8]/10", border: "border-[#4BA8C8]/20" },
+  coral: { icon: "text-[#C53030]", bg: "bg-[#C53030]/10", border: "border-[#C53030]/20" },
+  neutral: { icon: "text-[#8AACBC]", bg: "bg-[#8AACBC]/10", border: "border-[#8AACBC]/20" },
 };
 
 function MiniSparkline({ data }: { data: number[] }) {
@@ -54,7 +54,7 @@ export function MetricCard({
   value,
   sub,
   trend,
-  color = "slate",
+  color = "neutral",
   alert,
   tooltip,
   sparklineData,
@@ -64,7 +64,7 @@ export function MetricCard({
   return (
     <div
       className={`rounded-xl border p-4 transition-colors ${c.bg} ${c.border} ${
-        alert ? "ring-1 ring-amber-500/40" : ""
+        alert ? "ring-1 ring-[#F5A623]/40" : ""
       }`}
     >
       <div className="flex items-start justify-between">
@@ -72,7 +72,7 @@ export function MetricCard({
           <div className={`p-1.5 rounded-lg ${c.bg}`}>
             <Icon className={`w-4 h-4 ${c.icon}`} />
           </div>
-          <span className="text-xs text-zinc-500 font-medium">
+          <span className="text-xs text-[#8AACBC] font-medium">
             {label}
             {tooltip && <InfoTooltip text={tooltip} />}
           </span>
@@ -85,11 +85,11 @@ export function MetricCard({
       </div>
       <div className="text-2xl font-bold text-white">{value}</div>
       <div className="flex items-center gap-2 mt-1">
-        {sub && <span className="text-[11px] text-zinc-500">{sub}</span>}
+        {sub && <span className="text-[11px] text-[#6B8A9A]">{sub}</span>}
         {trend !== undefined && trend !== 0 && (
           <span
             className={`flex items-center gap-0.5 text-[11px] font-medium ${
-              trend > 0 ? "text-emerald-400" : "text-red-400"
+              trend > 0 ? "text-[#3DAA8A]" : "text-[#C53030]"
             }`}
           >
             {trend > 0 ? (
@@ -120,10 +120,10 @@ export function SmallMetric({
   tooltip?: string;
 }) {
   return (
-    <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-3 flex items-center gap-3">
-      <Icon className="w-4 h-4 text-zinc-500 flex-shrink-0" />
+    <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-3 flex items-center gap-3">
+      <Icon className="w-4 h-4 text-[#6B8A9A] flex-shrink-0" />
       <div>
-        <div className="text-[11px] text-zinc-500">
+        <div className="text-[11px] text-[#6B8A9A]">
           {label}
           {tooltip && <InfoTooltip text={tooltip} />}
         </div>

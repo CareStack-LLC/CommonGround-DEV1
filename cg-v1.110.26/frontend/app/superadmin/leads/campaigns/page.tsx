@@ -8,13 +8,13 @@ import {
 import { adminAPI, type EmailCampaign, type LeadList } from '@/lib/admin-api';
 
 function Skeleton({ className = '' }: { className?: string }) {
-  return <div className={`animate-pulse bg-zinc-800/60 rounded-lg ${className}`} />;
+  return <div className={`animate-pulse bg-[#2D6A8F]/20 rounded-lg ${className}`} />;
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  draft: 'bg-zinc-700/50 text-zinc-400',
-  scheduled: 'bg-blue-500/15 text-blue-400 border border-blue-500/20',
-  sent: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20',
+  draft: 'bg-zinc-700/50 text-[#8AACBC]',
+  scheduled: 'bg-blue-500/15 text-blue-400 border border-[#2D6A8F]/20',
+  sent: 'bg-emerald-500/15 text-emerald-400 border border-[#3DAA8A]/20',
   failed: 'bg-red-500/15 text-red-400 border border-red-500/20',
 };
 
@@ -133,13 +133,13 @@ export default function CampaignsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-white">Campaign Manager</h1>
-          <p className="text-sm text-zinc-500 mt-0.5">{campaigns.length} campaigns</p>
+          <p className="text-sm text-[#6B8A9A] mt-0.5">{campaigns.length} campaigns</p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={fetchData} disabled={loading} className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-zinc-800/60 hover:bg-zinc-800 text-zinc-300 text-sm font-medium transition-colors disabled:opacity-50">
+          <button onClick={fetchData} disabled={loading} className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#2D6A8F]/20 hover:bg-[#2D6A8F]/30 text-[#D0E4EC] text-sm font-medium transition-colors disabled:opacity-50">
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
-          <button onClick={() => setShowCreate(true)} className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium transition-colors">
+          <button onClick={() => setShowCreate(true)} className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors">
             <Plus className="w-4 h-4" /> New Campaign
           </button>
         </div>
@@ -159,19 +159,19 @@ export default function CampaignsPage() {
 
       {/* Create Campaign Form */}
       {showCreate && (
-        <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
+        <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-zinc-300">Create Campaign</h3>
-            <button onClick={() => setShowCreate(false)} className="text-zinc-500 hover:text-zinc-300"><X className="w-4 h-4" /></button>
+            <h3 className="text-sm font-semibold text-[#D0E4EC]">Create Campaign</h3>
+            <button onClick={() => setShowCreate(false)} className="text-[#6B8A9A] hover:text-[#D0E4EC]"><X className="w-4 h-4" /></button>
           </div>
           <div className="space-y-3">
-            <input value={createName} onChange={e => setCreateName(e.target.value)} placeholder="Campaign name *" className="w-full px-3 py-2.5 bg-zinc-900/80 border border-zinc-800/80 rounded-lg text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-violet-500/50" />
-            <input value={createSubject} onChange={e => setCreateSubject(e.target.value)} placeholder="Email subject *" className="w-full px-3 py-2.5 bg-zinc-900/80 border border-zinc-800/80 rounded-lg text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-violet-500/50" />
-            <select value={createListId} onChange={e => setCreateListId(e.target.value)} className="w-full px-3 py-2.5 bg-zinc-900/80 border border-zinc-800/80 rounded-lg text-sm text-zinc-300 focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer">
+            <input value={createName} onChange={e => setCreateName(e.target.value)} placeholder="Campaign name *" className="w-full px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50" />
+            <input value={createSubject} onChange={e => setCreateSubject(e.target.value)} placeholder="Email subject *" className="w-full px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50" />
+            <select value={createListId} onChange={e => setCreateListId(e.target.value)} className="w-full px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-[#D0E4EC] focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer">
               <option value="">Select lead list *</option>
               {lists.map(l => <option key={l.id} value={l.id}>{l.name} ({l.lead_count} leads)</option>)}
             </select>
-            <button onClick={createCampaign} disabled={creating || !createName.trim() || !createSubject.trim() || !createListId} className="px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium transition-colors disabled:opacity-50">
+            <button onClick={createCampaign} disabled={creating || !createName.trim() || !createSubject.trim() || !createListId} className="px-4 py-2 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors disabled:opacity-50">
               {creating ? 'Creating...' : 'Create Campaign'}
             </button>
           </div>
@@ -180,17 +180,17 @@ export default function CampaignsPage() {
 
       {/* AI Content Generator */}
       {aiCampaignId && (
-        <div className="bg-zinc-900/50 border border-violet-500/20 rounded-xl p-5">
+        <div className="bg-[#1A3648]/60 border border-[#3DAA8A]/20 rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-violet-300 flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-[#5BC4A0] flex items-center gap-2">
               <Wand2 className="w-4 h-4" /> AI Content Generator
             </h3>
-            <button onClick={() => setAiCampaignId(null)} className="text-zinc-500 hover:text-zinc-300"><X className="w-4 h-4" /></button>
+            <button onClick={() => setAiCampaignId(null)} className="text-[#6B8A9A] hover:text-[#D0E4EC]"><X className="w-4 h-4" /></button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
-              <label className="text-xs text-zinc-500 mb-1 block">Audience</label>
-              <select value={aiAudience} onChange={e => setAiAudience(e.target.value)} className="w-full px-3 py-2.5 bg-zinc-900/80 border border-zinc-800/80 rounded-lg text-sm text-zinc-300 focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer">
+              <label className="text-xs text-[#6B8A9A] mb-1 block">Audience</label>
+              <select value={aiAudience} onChange={e => setAiAudience(e.target.value)} className="w-full px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-[#D0E4EC] focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer">
                 <option value="co-parents">Co-Parents</option>
                 <option value="family-lawyers">Family Lawyers</option>
                 <option value="mediators">Mediators</option>
@@ -199,8 +199,8 @@ export default function CampaignsPage() {
               </select>
             </div>
             <div>
-              <label className="text-xs text-zinc-500 mb-1 block">Product Focus</label>
-              <select value={aiProductFocus} onChange={e => setAiProductFocus(e.target.value)} className="w-full px-3 py-2.5 bg-zinc-900/80 border border-zinc-800/80 rounded-lg text-sm text-zinc-300 focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer">
+              <label className="text-xs text-[#6B8A9A] mb-1 block">Product Focus</label>
+              <select value={aiProductFocus} onChange={e => setAiProductFocus(e.target.value)} className="w-full px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-[#D0E4EC] focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer">
                 <option value="platform">Full Platform</option>
                 <option value="aria">ARIA AI</option>
                 <option value="kidcoms">KidComs</option>
@@ -209,8 +209,8 @@ export default function CampaignsPage() {
               </select>
             </div>
             <div>
-              <label className="text-xs text-zinc-500 mb-1 block">Tone</label>
-              <select value={aiTone} onChange={e => setAiTone(e.target.value)} className="w-full px-3 py-2.5 bg-zinc-900/80 border border-zinc-800/80 rounded-lg text-sm text-zinc-300 focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer">
+              <label className="text-xs text-[#6B8A9A] mb-1 block">Tone</label>
+              <select value={aiTone} onChange={e => setAiTone(e.target.value)} className="w-full px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-[#D0E4EC] focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer">
                 <option value="professional">Professional</option>
                 <option value="friendly">Friendly</option>
                 <option value="empathetic">Empathetic</option>
@@ -218,7 +218,7 @@ export default function CampaignsPage() {
               </select>
             </div>
           </div>
-          <button onClick={generateContent} disabled={generating} className="mt-3 flex items-center gap-1.5 px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium transition-colors disabled:opacity-50">
+          <button onClick={generateContent} disabled={generating} className="mt-3 flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors disabled:opacity-50">
             <Wand2 className={`w-4 h-4 ${generating ? 'animate-spin' : ''}`} />
             {generating ? 'Generating...' : 'Generate Content'}
           </button>
@@ -227,19 +227,19 @@ export default function CampaignsPage() {
 
       {/* Email Preview */}
       {previewHtml && (
-        <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
+        <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-zinc-300 flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-[#D0E4EC] flex items-center gap-2">
               <Eye className="w-4 h-4" /> Email Preview
             </h3>
-            <button onClick={() => { setPreviewHtml(null); setPreviewCampaignId(null); }} className="text-zinc-500 hover:text-zinc-300"><X className="w-4 h-4" /></button>
+            <button onClick={() => { setPreviewHtml(null); setPreviewCampaignId(null); }} className="text-[#6B8A9A] hover:text-[#D0E4EC]"><X className="w-4 h-4" /></button>
           </div>
           <div className="bg-white rounded-lg p-4 max-h-96 overflow-y-auto">
             <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
           </div>
           {previewCampaignId && (
             <div className="mt-3 flex gap-2">
-              <button onClick={() => setAiCampaignId(previewCampaignId)} className="px-3 py-2 rounded-lg bg-zinc-800/60 hover:bg-zinc-800 text-zinc-300 text-sm font-medium transition-colors">
+              <button onClick={() => setAiCampaignId(previewCampaignId)} className="px-3 py-2 rounded-lg bg-[#2D6A8F]/20 hover:bg-[#2D6A8F]/30 text-[#D0E4EC] text-sm font-medium transition-colors">
                 Regenerate
               </button>
             </div>
@@ -258,7 +258,7 @@ export default function CampaignsPage() {
           <button onClick={() => sendCampaign(confirmSend)} disabled={sendingId === confirmSend} className="px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-sm font-medium transition-colors disabled:opacity-50">
             {sendingId === confirmSend ? 'Sending...' : 'Confirm Send'}
           </button>
-          <button onClick={() => setConfirmSend(null)} className="px-3 py-2 rounded-lg text-zinc-400 hover:text-zinc-200 text-sm transition-colors">
+          <button onClick={() => setConfirmSend(null)} className="px-3 py-2 rounded-lg text-[#8AACBC] hover:text-white text-sm transition-colors">
             Cancel
           </button>
         </div>
@@ -271,53 +271,53 @@ export default function CampaignsPage() {
         </div>
       ) : campaigns.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20">
-          <Mail className="w-12 h-12 text-zinc-700 mb-4" />
-          <p className="text-zinc-500 text-sm">No campaigns yet. Create one to get started.</p>
+          <Mail className="w-12 h-12 text-[#3A5A6A] mb-4" />
+          <p className="text-[#6B8A9A] text-sm">No campaigns yet. Create one to get started.</p>
         </div>
       ) : (
-        <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl overflow-hidden">
+        <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-zinc-800/80">
-                <th className="text-left px-4 py-3 text-xs font-medium text-zinc-500 uppercase tracking-wider">Campaign</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-zinc-500 uppercase tracking-wider">Status</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-zinc-500 uppercase tracking-wider hidden md:table-cell">List</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-zinc-500 uppercase tracking-wider hidden lg:table-cell">Sent</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-zinc-500 uppercase tracking-wider hidden lg:table-cell">Open Rate</th>
-                <th className="text-right px-4 py-3 text-xs font-medium text-zinc-500 uppercase tracking-wider w-48">Actions</th>
+              <tr className="border-b border-[#2D6A8F]/20">
+                <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Campaign</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Status</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider hidden md:table-cell">List</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider hidden lg:table-cell">Sent</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider hidden lg:table-cell">Open Rate</th>
+                <th className="text-right px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider w-48">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-800/40">
               {campaigns.map(c => (
-                <tr key={c.id} className="hover:bg-zinc-800/30 transition-colors">
+                <tr key={c.id} className="hover:bg-[#2D6A8F]/10 transition-colors">
                   <td className="px-4 py-3">
-                    <div className="text-zinc-200 font-medium">{c.name}</div>
-                    <div className="text-xs text-zinc-600 truncate">{c.subject}</div>
+                    <div className="text-white font-medium">{c.name}</div>
+                    <div className="text-xs text-[#4A6E7F] truncate">{c.subject}</div>
                   </td>
                   <td className="px-4 py-3">
                     <span className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium capitalize ${STATUS_COLORS[c.status] || STATUS_COLORS.draft}`}>
                       {c.status}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-zinc-400 text-xs hidden md:table-cell">{getListName(c.lead_list_id)}</td>
-                  <td className="px-4 py-3 text-zinc-500 text-xs hidden lg:table-cell">
+                  <td className="px-4 py-3 text-[#8AACBC] text-xs hidden md:table-cell">{getListName(c.lead_list_id)}</td>
+                  <td className="px-4 py-3 text-[#6B8A9A] text-xs hidden lg:table-cell">
                     {c.sent_at ? new Date(c.sent_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '—'}
                   </td>
-                  <td className="px-4 py-3 text-zinc-400 text-xs hidden lg:table-cell">
+                  <td className="px-4 py-3 text-[#8AACBC] text-xs hidden lg:table-cell">
                     {c.stats_json?.open_rate ? `${(c.stats_json.open_rate * 100).toFixed(1)}%` : '—'}
                   </td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex items-center justify-end gap-1">
                       {c.html_content && (
-                        <button onClick={() => { setPreviewHtml(c.html_content!); setPreviewCampaignId(c.id); }} className="p-1.5 rounded-lg hover:bg-zinc-800/60 text-zinc-500 hover:text-zinc-300 transition-colors" title="Preview">
+                        <button onClick={() => { setPreviewHtml(c.html_content!); setPreviewCampaignId(c.id); }} className="p-1.5 rounded-lg hover:bg-[#2D6A8F]/20 text-[#6B8A9A] hover:text-[#D0E4EC] transition-colors" title="Preview">
                           <Eye className="w-4 h-4" />
                         </button>
                       )}
-                      <button onClick={() => setAiCampaignId(c.id)} className="p-1.5 rounded-lg hover:bg-zinc-800/60 text-zinc-500 hover:text-violet-400 transition-colors" title="Generate content">
+                      <button onClick={() => setAiCampaignId(c.id)} className="p-1.5 rounded-lg hover:bg-[#2D6A8F]/20 text-[#6B8A9A] hover:text-[#3DAA8A] transition-colors" title="Generate content">
                         <Wand2 className="w-4 h-4" />
                       </button>
                       {c.stats_json && (
-                        <button className="p-1.5 rounded-lg hover:bg-zinc-800/60 text-zinc-500 hover:text-zinc-300 transition-colors" title="Stats">
+                        <button className="p-1.5 rounded-lg hover:bg-[#2D6A8F]/20 text-[#6B8A9A] hover:text-[#D0E4EC] transition-colors" title="Stats">
                           <BarChart3 className="w-4 h-4" />
                         </button>
                       )}

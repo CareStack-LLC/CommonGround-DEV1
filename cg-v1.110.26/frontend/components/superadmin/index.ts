@@ -1,3 +1,4 @@
+export { AdminLogo } from "./Logo";
 export { MetricCard, SmallMetric } from "./MetricCard";
 export { Skeleton, SkeletonRows, SkeletonCards } from "./Skeleton";
 export { TabBar, useTabState } from "./TabBar";

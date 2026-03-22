@@ -27,12 +27,12 @@ export function PageHeader({
       <div>
         <h1 className="text-xl font-bold text-white">{title}</h1>
         {subtitle && (
-          <p className="text-sm text-zinc-500 mt-0.5">{subtitle}</p>
+          <p className="text-sm text-[#8AACBC] mt-0.5">{subtitle}</p>
         )}
       </div>
       <div className="flex items-center gap-3">
         {showLiveIndicator && (
-          <span className="flex items-center gap-1.5 text-[11px] text-emerald-400/80">
+          <span className="flex items-center gap-1.5 text-[11px] text-[#5BC4A0]/80">
             <Radio className="w-3 h-3 animate-pulse" />
             Live — auto-refresh {liveInterval}
           </span>
@@ -42,7 +42,7 @@ export function PageHeader({
           <button
             onClick={onRefresh}
             disabled={loading}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800/60 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 text-xs font-medium transition-colors disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#2D6A8F]/20 hover:bg-[#2D6A8F]/30 text-[#8AACBC] hover:text-white text-xs font-medium transition-colors disabled:opacity-50"
           >
             <RefreshCw
               className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`}

@@ -12,7 +12,7 @@ import { adminAPI, type MonitoredEmail, type InboxStats } from '@/lib/admin-api'
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 function Skeleton({ className = '' }: { className?: string }) {
-  return <div className={`animate-pulse bg-zinc-800/60 rounded-lg ${className}`} />;
+  return <div className={`animate-pulse bg-[#2D6A8F]/20 rounded-lg ${className}`} />;
 }
 
 function timeAgo(dateStr: string): string {
@@ -30,20 +30,20 @@ const CATEGORY_COLORS: Record<string, string> = {
   support: 'bg-blue-500/15 text-blue-400',
   billing: 'bg-amber-500/15 text-amber-400',
   feedback: 'bg-emerald-500/15 text-emerald-400',
-  sales: 'bg-violet-500/15 text-violet-400',
+  sales: 'bg-[#3DAA8A]/15 text-[#3DAA8A]',
   legal: 'bg-red-500/15 text-red-400',
   partnership: 'bg-teal-500/15 text-teal-400',
   onboarding: 'bg-cyan-500/15 text-cyan-400',
   notification: 'bg-indigo-500/15 text-indigo-400',
   personal: 'bg-pink-500/15 text-pink-400',
-  spam: 'bg-zinc-700/50 text-zinc-500',
-  other: 'bg-zinc-700/50 text-zinc-400',
+  spam: 'bg-zinc-700/50 text-[#6B8A9A]',
+  other: 'bg-zinc-700/50 text-[#8AACBC]',
 };
 
 const PRIORITY_COLORS: Record<string, { bg: string; text: string; label: string }> = {
   high: { bg: 'bg-red-500/15', text: 'text-red-400', label: 'High' },
   medium: { bg: 'bg-amber-500/15', text: 'text-amber-400', label: 'Medium' },
-  low: { bg: 'bg-zinc-700/40', text: 'text-zinc-500', label: 'Low' },
+  low: { bg: 'bg-zinc-700/40', text: 'text-[#6B8A9A]', label: 'Low' },
 };
 
 function parseAdminNotes(notes: string | null): { priority?: string; suggested_label?: string; action_needed?: string } {
@@ -335,7 +335,7 @@ export default function InboxPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-white">Email Monitor</h1>
-          <p className="text-sm text-zinc-500 mt-0.5">{total} emails total</p>
+          <p className="text-sm text-[#6B8A9A] mt-0.5">{total} emails total</p>
         </div>
         <div className="flex items-center gap-2">
           {selectedIds.size > 0 && (
@@ -344,20 +344,20 @@ export default function InboxPage() {
             </button>
           )}
           {selectedIds.size > 0 && (
-            <button onClick={() => setSelectedIds(new Set())} className="px-3 py-2 rounded-lg bg-zinc-800/60 hover:bg-zinc-800 text-zinc-400 text-sm transition-colors">
+            <button onClick={() => setSelectedIds(new Set())} className="px-3 py-2 rounded-lg bg-[#2D6A8F]/20 hover:bg-[#2D6A8F]/30 text-[#8AACBC] text-sm transition-colors">
               Clear
             </button>
           )}
-          <button onClick={() => setShowDashboard(v => !v)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-zinc-800/60 hover:bg-zinc-800 text-zinc-300 text-sm font-medium transition-colors">
+          <button onClick={() => setShowDashboard(v => !v)} className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#2D6A8F]/20 hover:bg-[#2D6A8F]/30 text-[#D0E4EC] text-sm font-medium transition-colors">
             <Activity className="w-4 h-4" /> KPIs
           </button>
           <button onClick={runAnalysis} disabled={analyzing} className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-600/80 hover:bg-emerald-600 text-white text-sm font-medium transition-colors disabled:opacity-50">
             <Brain className={`w-4 h-4 ${analyzing ? 'animate-pulse' : ''}`} /> {analyzing ? 'Analyzing...' : 'AI Analysis'}
           </button>
-          <button onClick={connectGoogleOAuth} disabled={connectingOAuth} className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-zinc-800/60 hover:bg-zinc-800 text-zinc-300 text-sm font-medium transition-colors disabled:opacity-50">
+          <button onClick={connectGoogleOAuth} disabled={connectingOAuth} className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#2D6A8F]/20 hover:bg-[#2D6A8F]/30 text-[#D0E4EC] text-sm font-medium transition-colors disabled:opacity-50">
             <Link className="w-4 h-4" /> Connect Google
           </button>
-          <button onClick={syncInbox} disabled={syncing} className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium transition-colors disabled:opacity-50">
+          <button onClick={syncInbox} disabled={syncing} className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors disabled:opacity-50">
             <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} /> Sync
           </button>
         </div>
@@ -366,29 +366,29 @@ export default function InboxPage() {
       {/* Stats Bar */}
       {stats && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl px-4 py-3 flex items-center gap-3">
-            <Mail className="w-4 h-4 text-zinc-500" />
+          <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl px-4 py-3 flex items-center gap-3">
+            <Mail className="w-4 h-4 text-[#6B8A9A]" />
             <div>
               <div className="text-lg font-semibold text-white">{stats.total}</div>
-              <div className="text-[11px] text-zinc-500">Total Emails</div>
+              <div className="text-[11px] text-[#6B8A9A]">Total Emails</div>
             </div>
           </div>
-          <div className="bg-zinc-900/50 border border-red-500/20 rounded-xl px-4 py-3 flex items-center gap-3">
+          <div className="bg-[#1A3648]/60 border border-red-500/20 rounded-xl px-4 py-3 flex items-center gap-3">
             <Flame className="w-4 h-4 text-red-400" />
             <div>
               <div className="text-lg font-semibold text-red-400">{stats.urgent}</div>
-              <div className="text-[11px] text-zinc-500">Urgent</div>
+              <div className="text-[11px] text-[#6B8A9A]">Urgent</div>
             </div>
           </div>
-          <div className="bg-zinc-900/50 border border-amber-500/20 rounded-xl px-4 py-3 flex items-center gap-3">
+          <div className="bg-[#1A3648]/60 border border-[#F5A623]/20 rounded-xl px-4 py-3 flex items-center gap-3">
             <MessageSquare className="w-4 h-4 text-amber-400" />
             <div>
               <div className="text-lg font-semibold text-amber-400">{stats.pending_drafts}</div>
-              <div className="text-[11px] text-zinc-500">Pending Drafts</div>
+              <div className="text-[11px] text-[#6B8A9A]">Pending Drafts</div>
             </div>
           </div>
-          <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl px-4 py-3">
-            <div className="text-[11px] text-zinc-500 mb-1">By Category</div>
+          <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl px-4 py-3">
+            <div className="text-[11px] text-[#6B8A9A] mb-1">By Category</div>
             <div className="flex flex-wrap gap-1">
               {Object.entries(stats.by_category || {}).map(([cat, count]) => (
                 <span key={cat} className={`inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium ${CATEGORY_COLORS[cat] || CATEGORY_COLORS.other}`}>
@@ -402,7 +402,7 @@ export default function InboxPage() {
 
       {/* Filters */}
       <div className="flex items-center gap-3 flex-wrap">
-        <select value={recipientFilter} onChange={e => setRecipientFilter(e.target.value)} className="px-3 py-2 bg-zinc-900/80 border border-zinc-800/80 rounded-lg text-sm text-zinc-300 focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer">
+        <select value={recipientFilter} onChange={e => setRecipientFilter(e.target.value)} className="px-3 py-2 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-[#D0E4EC] focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer">
           <option value="">All Inboxes</option>
           <option value="hello@find-commonground.com">hello@ (General)</option>
           <option value="info@find-commonground.com">info@ (Info)</option>
@@ -412,7 +412,7 @@ export default function InboxPage() {
           <option value="partnerships@find-commonground.com">partnerships@ (Partnerships)</option>
           <option value="teejay@find-commonground.com">teejay@ (CEO)</option>
         </select>
-        <select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)} className="px-3 py-2 bg-zinc-900/80 border border-zinc-800/80 rounded-lg text-sm text-zinc-300 focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer">
+        <select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)} className="px-3 py-2 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-[#D0E4EC] focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer">
           <option value="">All Categories</option>
           <option value="support">Support</option>
           <option value="billing">Billing</option>
@@ -428,16 +428,16 @@ export default function InboxPage() {
         </select>
         <label className="flex items-center gap-2 cursor-pointer">
           <input type="checkbox" checked={urgentOnly} onChange={e => setUrgentOnly(e.target.checked)} className="rounded border-zinc-700 bg-zinc-900 text-violet-500 focus:ring-violet-500/30" />
-          <span className="text-sm text-zinc-400">Urgent only</span>
+          <span className="text-sm text-[#8AACBC]">Urgent only</span>
         </label>
-        <select value={draftStatusFilter} onChange={e => setDraftStatusFilter(e.target.value)} className="px-3 py-2 bg-zinc-900/80 border border-zinc-800/80 rounded-lg text-sm text-zinc-300 focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer">
+        <select value={draftStatusFilter} onChange={e => setDraftStatusFilter(e.target.value)} className="px-3 py-2 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-[#D0E4EC] focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer">
           <option value="">All Drafts</option>
           <option value="pending">Pending</option>
           <option value="approved">Approved</option>
           <option value="rejected">Rejected</option>
           <option value="sent">Sent</option>
         </select>
-        <select value={sortBy} onChange={e => setSortBy(e.target.value as 'date' | 'priority')} className="px-3 py-2 bg-zinc-900/80 border border-zinc-800/80 rounded-lg text-sm text-zinc-300 focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer">
+        <select value={sortBy} onChange={e => setSortBy(e.target.value as 'date' | 'priority')} className="px-3 py-2 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-[#D0E4EC] focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer">
           <option value="date">Sort: Newest</option>
           <option value="priority">Sort: Priority</option>
         </select>
@@ -445,32 +445,32 @@ export default function InboxPage() {
 
       {/* AI Analysis Panel */}
       {showAnalysis && analysis?.analysis && (
-        <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-5 space-y-4">
+        <div className="bg-emerald-500/5 border border-[#3DAA8A]/20 rounded-xl p-5 space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Brain className="w-5 h-5 text-emerald-400" />
               <h2 className="text-sm font-semibold text-emerald-300">AI Inbox Analysis</h2>
-              <span className="text-[10px] text-zinc-500">{analysis.email_count} emails analyzed via {analysis.provider}</span>
+              <span className="text-[10px] text-[#6B8A9A]">{analysis.email_count} emails analyzed via {analysis.provider}</span>
             </div>
-            <button onClick={() => setShowAnalysis(false)} className="text-zinc-500 hover:text-zinc-300"><X className="w-4 h-4" /></button>
+            <button onClick={() => setShowAnalysis(false)} className="text-[#6B8A9A] hover:text-[#D0E4EC]"><X className="w-4 h-4" /></button>
           </div>
           {analysis.analysis.summary && (
-            <p className="text-sm text-zinc-300">{analysis.analysis.summary}</p>
+            <p className="text-sm text-[#D0E4EC]">{analysis.analysis.summary}</p>
           )}
           {analysis.analysis.action_items?.length > 0 && (
             <div>
-              <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">Action Items</h3>
+              <h3 className="text-xs font-semibold text-[#8AACBC] uppercase tracking-wider mb-2">Action Items</h3>
               <div className="space-y-1.5">
                 {analysis.analysis.action_items.map((item: any, i: number) => (
                   <div key={i} className="flex items-start gap-2 text-sm">
                     <span className={`inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium mt-0.5 ${
                       item.priority === 'high' ? 'bg-red-500/15 text-red-400' :
                       item.priority === 'medium' ? 'bg-amber-500/15 text-amber-400' :
-                      'bg-zinc-700/50 text-zinc-400'
+                      'bg-zinc-700/50 text-[#8AACBC]'
                     }`}>{item.priority}</span>
                     <div>
-                      <span className="text-zinc-200">{item.action}</span>
-                      {item.email_subject && <span className="text-xs text-zinc-500 ml-2">({item.email_subject})</span>}
+                      <span className="text-white">{item.action}</span>
+                      {item.email_subject && <span className="text-xs text-[#6B8A9A] ml-2">({item.email_subject})</span>}
                     </div>
                   </div>
                 ))}
@@ -479,10 +479,10 @@ export default function InboxPage() {
           )}
           {analysis.analysis.recommendations?.length > 0 && (
             <div>
-              <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">Recommendations</h3>
+              <h3 className="text-xs font-semibold text-[#8AACBC] uppercase tracking-wider mb-2">Recommendations</h3>
               <ul className="space-y-1">
                 {analysis.analysis.recommendations.map((r: string, i: number) => (
-                  <li key={i} className="text-sm text-zinc-300 flex items-start gap-2">
+                  <li key={i} className="text-sm text-[#D0E4EC] flex items-start gap-2">
                     <Sparkles className="w-3.5 h-3.5 text-emerald-400 mt-0.5 flex-shrink-0" />
                     {r}
                   </li>
@@ -493,13 +493,13 @@ export default function InboxPage() {
           {/* Multi-select pattern analysis results */}
           {analysis.analysis.patterns?.length > 0 && (
             <div>
-              <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">Patterns Detected</h3>
+              <h3 className="text-xs font-semibold text-[#8AACBC] uppercase tracking-wider mb-2">Patterns Detected</h3>
               <div className="space-y-2">
                 {analysis.analysis.patterns.map((p: any, i: number) => (
-                  <div key={i} className="bg-zinc-800/30 rounded-lg px-3 py-2">
+                  <div key={i} className="bg-[#2D6A8F]/10 rounded-lg px-3 py-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-zinc-200">{p.pattern}</span>
-                      <span className="text-[10px] text-zinc-500">{p.frequency} · {p.emails_affected} emails</span>
+                      <span className="text-sm text-white">{p.pattern}</span>
+                      <span className="text-[10px] text-[#6B8A9A]">{p.frequency} · {p.emails_affected} emails</span>
                     </div>
                   </div>
                 ))}
@@ -508,12 +508,12 @@ export default function InboxPage() {
           )}
           {analysis.analysis.faq_recommendations?.length > 0 && (
             <div>
-              <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">FAQ Recommendations</h3>
+              <h3 className="text-xs font-semibold text-[#8AACBC] uppercase tracking-wider mb-2">FAQ Recommendations</h3>
               <div className="space-y-3">
                 {analysis.analysis.faq_recommendations.map((faq: any, i: number) => (
-                  <div key={i} className="bg-zinc-800/30 rounded-lg px-4 py-3">
-                    <p className="text-sm font-medium text-zinc-200 mb-1">Q: {faq.question}</p>
-                    <p className="text-xs text-zinc-400">A: {faq.suggested_answer}</p>
+                  <div key={i} className="bg-[#2D6A8F]/10 rounded-lg px-4 py-3">
+                    <p className="text-sm font-medium text-white mb-1">Q: {faq.question}</p>
+                    <p className="text-xs text-[#8AACBC]">A: {faq.suggested_answer}</p>
                   </div>
                 ))}
               </div>
@@ -521,10 +521,10 @@ export default function InboxPage() {
           )}
           {analysis.analysis.insights?.length > 0 && (
             <div>
-              <h3 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">Business Insights</h3>
+              <h3 className="text-xs font-semibold text-[#8AACBC] uppercase tracking-wider mb-2">Business Insights</h3>
               <ul className="space-y-1">
                 {analysis.analysis.insights.map((insight: string, i: number) => (
-                  <li key={i} className="text-sm text-zinc-300 flex items-start gap-2">
+                  <li key={i} className="text-sm text-[#D0E4EC] flex items-start gap-2">
                     <BarChart3 className="w-3.5 h-3.5 text-blue-400 mt-0.5 flex-shrink-0" />
                     {insight}
                   </li>
@@ -549,18 +549,18 @@ export default function InboxPage() {
 
       {/* KPI Dashboard */}
       {showDashboard && kpis && (
-        <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5 space-y-4">
+        <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5 space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Activity className="w-4 h-4 text-violet-400" />
-              <h2 className="text-sm font-semibold text-zinc-300">Email KPIs</h2>
+              <Activity className="w-4 h-4 text-[#3DAA8A]" />
+              <h2 className="text-sm font-semibold text-[#D0E4EC]">Email KPIs</h2>
             </div>
-            <button onClick={() => setShowDashboard(false)} className="text-zinc-500 hover:text-zinc-300"><X className="w-4 h-4" /></button>
+            <button onClick={() => setShowDashboard(false)} className="text-[#6B8A9A] hover:text-[#D0E4EC]"><X className="w-4 h-4" /></button>
           </div>
 
           {/* Inbox Breakdown */}
           <div>
-            <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">By Inbox</h3>
+            <h3 className="text-xs font-semibold text-[#6B8A9A] uppercase tracking-wider mb-2">By Inbox</h3>
             <div className="space-y-1.5">
               {Object.entries(kpis.by_recipient || {}).sort(([,a], [,b]) => Number(b) - Number(a)).map(([email, count]) => {
                 const countNum = Number(count);
@@ -568,11 +568,11 @@ export default function InboxPage() {
                 const pct = maxCount > 0 ? (countNum / maxCount) * 100 : 0;
                 return (
                   <div key={email} className="flex items-center gap-3">
-                    <span className="text-xs text-zinc-400 w-32 truncate">{email.split('@')[0]}@</span>
-                    <div className="flex-1 h-4 bg-zinc-800/60 rounded-full overflow-hidden">
+                    <span className="text-xs text-[#8AACBC] w-32 truncate">{email.split('@')[0]}@</span>
+                    <div className="flex-1 h-4 bg-[#2D6A8F]/20 rounded-full overflow-hidden">
                       <div className="h-full bg-violet-500/40 rounded-full" style={{ width: `${pct}%` }} />
                     </div>
-                    <span className="text-xs text-zinc-400 w-8 text-right">{countNum}</span>
+                    <span className="text-xs text-[#8AACBC] w-8 text-right">{countNum}</span>
                   </div>
                 );
               })}
@@ -582,7 +582,7 @@ export default function InboxPage() {
           {/* Volume Trend */}
           {kpis.volume_trend?.length > 0 && (
             <div>
-              <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">Daily Volume (30d)</h3>
+              <h3 className="text-xs font-semibold text-[#6B8A9A] uppercase tracking-wider mb-2">Daily Volume (30d)</h3>
               <div className="flex items-end gap-px h-16">
                 {kpis.volume_trend.map((d: { date: string; count: number }, i: number) => {
                   const maxVol = Math.max(...kpis.volume_trend.map((v: { count: number }) => v.count));
@@ -599,17 +599,17 @@ export default function InboxPage() {
 
           {/* Metrics row */}
           <div className="grid grid-cols-3 gap-3">
-            <div className="bg-zinc-800/30 rounded-lg p-3 text-center">
+            <div className="bg-[#2D6A8F]/10 rounded-lg p-3 text-center">
               <div className="text-lg font-bold text-white">{kpis.draft_approval_rate || 0}%</div>
-              <div className="text-[11px] text-zinc-500">Draft Approval Rate</div>
+              <div className="text-[11px] text-[#6B8A9A]">Draft Approval Rate</div>
             </div>
-            <div className="bg-zinc-800/30 rounded-lg p-3 text-center">
+            <div className="bg-[#2D6A8F]/10 rounded-lg p-3 text-center">
               <div className="text-lg font-bold text-white">{kpis.total || 0}</div>
-              <div className="text-[11px] text-zinc-500">Total Emails</div>
+              <div className="text-[11px] text-[#6B8A9A]">Total Emails</div>
             </div>
-            <div className="bg-zinc-800/30 rounded-lg p-3 text-center">
+            <div className="bg-[#2D6A8F]/10 rounded-lg p-3 text-center">
               <div className="text-lg font-bold text-red-400">{kpis.urgent || 0}</div>
-              <div className="text-[11px] text-zinc-500">Urgent</div>
+              <div className="text-[11px] text-[#6B8A9A]">Urgent</div>
             </div>
           </div>
         </div>
@@ -618,17 +618,17 @@ export default function InboxPage() {
       {/* Split Pane */}
       <div className="flex gap-4 min-h-[600px]">
         {/* Email List (1/3) */}
-        <div className="w-1/3 bg-zinc-900/50 border border-zinc-800/60 rounded-xl overflow-hidden flex flex-col">
+        <div className="w-1/3 bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl overflow-hidden flex flex-col">
           {/* Select All / Count header */}
           {!loading && displayEmails.length > 0 && (
-            <div className="flex items-center gap-2 px-4 py-2 border-b border-zinc-800/40">
+            <div className="flex items-center gap-2 px-4 py-2 border-b border-[#2D6A8F]/15">
               <input
                 type="checkbox"
                 checked={selectedIds.size === displayEmails.length && displayEmails.length > 0}
                 onChange={toggleSelectAll}
                 className="rounded border-zinc-700 bg-zinc-900 text-violet-500 focus:ring-violet-500/30"
               />
-              <span className="text-[11px] text-zinc-500">
+              <span className="text-[11px] text-[#6B8A9A]">
                 {selectedIds.size > 0 ? `${selectedIds.size} selected` : `${displayEmails.length} emails`}
               </span>
             </div>
@@ -640,14 +640,14 @@ export default function InboxPage() {
               </div>
             ) : displayEmails.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 px-4">
-                <Inbox className="w-10 h-10 text-zinc-700 mb-3" />
-                <p className="text-sm text-zinc-500">No emails found</p>
+                <Inbox className="w-10 h-10 text-[#3A5A6A] mb-3" />
+                <p className="text-sm text-[#6B8A9A]">No emails found</p>
               </div>
             ) : displayEmails.map(email => (
               <div
                 key={email.id}
-                className={`w-full text-left px-4 py-3 border-b border-zinc-800/40 hover:bg-zinc-800/30 transition-colors flex items-start gap-2 ${
-                  selectedEmail?.id === email.id ? 'bg-zinc-800/50' : ''
+                className={`w-full text-left px-4 py-3 border-b border-[#2D6A8F]/15 hover:bg-[#2D6A8F]/10 transition-colors flex items-start gap-2 ${
+                  selectedEmail?.id === email.id ? 'bg-[#2D6A8F]/20' : ''
                 }`}
               >
                 <input
@@ -672,13 +672,13 @@ export default function InboxPage() {
                           <Flame className="w-3 h-3 text-red-400 flex-shrink-0" />
                         ) : null;
                       })()}
-                      <span className="text-sm text-zinc-200 font-medium truncate">{email.from_name || email.from_email}</span>
-                      <span className="text-[10px] text-zinc-600 ml-auto flex-shrink-0">{timeAgo(email.received_at)}</span>
+                      <span className="text-sm text-white font-medium truncate">{email.from_name || email.from_email}</span>
+                      <span className="text-[10px] text-[#4A6E7F] ml-auto flex-shrink-0">{timeAgo(email.received_at)}</span>
                     </div>
-                    <div className="text-xs text-zinc-400 truncate mt-0.5">{email.subject}</div>
+                    <div className="text-xs text-[#8AACBC] truncate mt-0.5">{email.subject}</div>
                     <div className="flex items-center gap-1.5 mt-1 flex-wrap">
                       {email.to_email && (
-                        <span className="inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium bg-zinc-800/80 text-zinc-500">
+                        <span className="inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium bg-zinc-800/80 text-[#6B8A9A]">
                           {email.to_email.split('@')[0]}@
                         </span>
                       )}
@@ -688,13 +688,13 @@ export default function InboxPage() {
                       {(() => {
                         const extra = parseAdminNotes(email.admin_notes ?? null);
                         return extra.suggested_label ? (
-                          <span className="inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium bg-zinc-700/40 text-zinc-400">
+                          <span className="inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium bg-zinc-700/40 text-[#8AACBC]">
                             {extra.suggested_label}
                           </span>
                         ) : null;
                       })()}
                       {email.to_email && (
-                        <span className="text-[10px] text-zinc-600 truncate">
+                        <span className="text-[10px] text-[#4A6E7F] truncate">
                           → {email.to_email.split('@')[0]}
                         </span>
                       )}
@@ -708,7 +708,7 @@ export default function InboxPage() {
         </div>
 
         {/* Email Detail (2/3) */}
-        <div className="w-2/3 bg-zinc-900/50 border border-zinc-800/60 rounded-xl overflow-hidden flex flex-col">
+        <div className="w-2/3 bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl overflow-hidden flex flex-col">
           {selectedEmail ? (
             <div className="flex-1 overflow-y-auto p-5 space-y-4">
               {/* Header */}
@@ -733,7 +733,7 @@ export default function InboxPage() {
                   {(() => {
                     const extra = parseAdminNotes(selectedEmail.admin_notes ?? null);
                     return extra.suggested_label ? (
-                      <span className="inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium bg-zinc-700/50 text-zinc-300">
+                      <span className="inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium bg-zinc-700/50 text-[#D0E4EC]">
                         {extra.suggested_label}
                       </span>
                     ) : null;
@@ -742,23 +742,23 @@ export default function InboxPage() {
                     selectedEmail.draft_status === 'pending' ? 'bg-amber-500/15 text-amber-400' :
                     selectedEmail.draft_status === 'approved' ? 'bg-emerald-500/15 text-emerald-400' :
                     selectedEmail.draft_status === 'sent' ? 'bg-blue-500/15 text-blue-400' :
-                    'bg-zinc-700/50 text-zinc-400'
+                    'bg-zinc-700/50 text-[#8AACBC]'
                   }`}>
                     Draft: {selectedEmail.draft_status}
                   </span>
                 </div>
                 <h2 className="text-lg font-semibold text-white">{selectedEmail.subject}</h2>
-                <div className="flex items-center gap-2 mt-1 text-xs text-zinc-500">
-                  <span>From: <span className="text-zinc-300">{selectedEmail.from_name ? `${selectedEmail.from_name} <${selectedEmail.from_email}>` : selectedEmail.from_email}</span></span>
+                <div className="flex items-center gap-2 mt-1 text-xs text-[#6B8A9A]">
+                  <span>From: <span className="text-[#D0E4EC]">{selectedEmail.from_name ? `${selectedEmail.from_name} <${selectedEmail.from_email}>` : selectedEmail.from_email}</span></span>
                   <span>|</span>
-                  <span>To: <span className="text-zinc-300">{selectedEmail.to_email}</span></span>
+                  <span>To: <span className="text-[#D0E4EC]">{selectedEmail.to_email}</span></span>
                   <span>|</span>
                   <span>{new Date(selectedEmail.received_at).toLocaleString()}</span>
                 </div>
                 {(() => {
                   const extra = parseAdminNotes(selectedEmail.admin_notes ?? null);
                   return extra.action_needed ? (
-                    <div className="mt-2 text-xs text-violet-300/80 bg-violet-500/10 border border-violet-500/20 rounded-lg px-3 py-2">
+                    <div className="mt-2 text-xs text-[#5BC4A0]/80 bg-violet-500/10 border border-[#3DAA8A]/20 rounded-lg px-3 py-2">
                       <span className="font-medium">Action: </span>{extra.action_needed}
                     </div>
                   ) : null;
@@ -771,33 +771,33 @@ export default function InboxPage() {
               </div>
 
               {/* Body */}
-              <div className="bg-zinc-800/30 rounded-xl p-4">
-                <div className="text-sm text-zinc-300 whitespace-pre-wrap leading-relaxed">{selectedEmail.body_full}</div>
+              <div className="bg-[#2D6A8F]/10 rounded-xl p-4">
+                <div className="text-sm text-[#D0E4EC] whitespace-pre-wrap leading-relaxed">{selectedEmail.body_full}</div>
               </div>
 
               {/* AI Summary */}
               {selectedEmail.ai_summary && (
-                <div className="bg-violet-500/5 border border-violet-500/20 rounded-xl p-4">
+                <div className="bg-violet-500/5 border border-[#3DAA8A]/20 rounded-xl p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-5 h-5 rounded bg-violet-500/20 flex items-center justify-center">
-                      <span className="text-[10px] font-bold text-violet-400">AI</span>
+                      <span className="text-[10px] font-bold text-[#3DAA8A]">AI</span>
                     </div>
-                    <span className="text-xs font-semibold text-violet-300">AI Summary</span>
+                    <span className="text-xs font-semibold text-[#5BC4A0]">AI Summary</span>
                   </div>
-                  <p className="text-sm text-zinc-300">{selectedEmail.ai_summary}</p>
+                  <p className="text-sm text-[#D0E4EC]">{selectedEmail.ai_summary}</p>
                 </div>
               )}
 
               {/* AI Draft Response */}
               {selectedEmail.ai_draft_response && (
-                <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-xl p-4">
+                <div className="bg-emerald-500/5 border border-[#3DAA8A]/20 rounded-xl p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-5 h-5 rounded bg-emerald-500/20 flex items-center justify-center">
                       <span className="text-[10px] font-bold text-emerald-400">AI</span>
                     </div>
                     <span className="text-xs font-semibold text-emerald-300">AI Draft Response</span>
                   </div>
-                  <p className="text-sm text-zinc-300 whitespace-pre-wrap">{selectedEmail.ai_draft_response}</p>
+                  <p className="text-sm text-[#D0E4EC] whitespace-pre-wrap">{selectedEmail.ai_draft_response}</p>
                   <div className="flex items-center gap-2 mt-3">
                     <button
                       onClick={approveDraft}
@@ -818,9 +818,9 @@ export default function InboxPage() {
               )}
 
               {/* Custom Reply with AI Generation */}
-              <div className="border border-zinc-800/60 rounded-xl p-4">
+              <div className="border border-[#2D6A8F]/20 rounded-xl p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-semibold text-zinc-400">Reply</span>
+                  <span className="text-xs font-semibold text-[#8AACBC]">Reply</span>
                   <button
                     onClick={generateAIReply}
                     disabled={generatingReply}
@@ -836,19 +836,19 @@ export default function InboxPage() {
                   value={replyInstructions}
                   onChange={e => setReplyInstructions(e.target.value)}
                   placeholder="AI instructions (optional): e.g., be apologetic about delay, mention refund policy..."
-                  className="w-full px-3 py-1.5 mb-2 bg-zinc-900/60 border border-zinc-800/60 rounded-lg text-xs text-zinc-300 placeholder:text-zinc-600 focus:outline-none focus:border-emerald-500/30"
+                  className="w-full px-3 py-1.5 mb-2 bg-zinc-900/60 border border-[#2D6A8F]/20 rounded-lg text-xs text-[#D0E4EC] placeholder:text-[#4A6E7F] focus:outline-none focus:border-emerald-500/30"
                 />
                 <textarea
                   value={customReply}
                   onChange={e => setCustomReply(e.target.value)}
                   placeholder="Type your reply or generate one with AI..."
                   rows={4}
-                  className="w-full px-3 py-2.5 bg-zinc-900/80 border border-zinc-800/80 rounded-lg text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-violet-500/50 resize-none"
+                  className="w-full px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50 resize-none"
                 />
                 <button
                   onClick={sendReply}
                   disabled={sendingReply || !customReply.trim()}
-                  className="mt-2 flex items-center gap-1.5 px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium transition-colors disabled:opacity-50"
+                  className="mt-2 flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors disabled:opacity-50"
                 >
                   <Send className={`w-4 h-4 ${sendingReply ? 'animate-pulse' : ''}`} />
                   {sendingReply ? 'Sending...' : 'Send Reply'}
@@ -857,16 +857,16 @@ export default function InboxPage() {
 
               {/* Admin Notes */}
               {selectedEmail.admin_notes && (
-                <div className="bg-zinc-800/30 rounded-lg px-3 py-2">
-                  <span className="text-[10px] text-zinc-500 uppercase tracking-wider">Admin Notes</span>
-                  <p className="text-xs text-zinc-400 mt-1">{selectedEmail.admin_notes}</p>
+                <div className="bg-[#2D6A8F]/10 rounded-lg px-3 py-2">
+                  <span className="text-[10px] text-[#6B8A9A] uppercase tracking-wider">Admin Notes</span>
+                  <p className="text-xs text-[#8AACBC] mt-1">{selectedEmail.admin_notes}</p>
                 </div>
               )}
             </div>
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center">
-              <Mail className="w-12 h-12 text-zinc-700 mb-4" />
-              <p className="text-zinc-500 text-sm">Select an email to view details</p>
+              <Mail className="w-12 h-12 text-[#3A5A6A] mb-4" />
+              <p className="text-[#6B8A9A] text-sm">Select an email to view details</p>
             </div>
           )}
         </div>

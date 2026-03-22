@@ -58,7 +58,7 @@ function formatNumber(n: number): string {
 }
 
 function Skeleton({ className = '' }: { className?: string }) {
-  return <div className={`animate-pulse bg-zinc-800/60 rounded-lg ${className}`} />;
+  return <div className={`animate-pulse bg-[#2D6A8F]/20 rounded-lg ${className}`} />;
 }
 
 export default function PerformanceContent() {
@@ -97,20 +97,20 @@ export default function PerformanceContent() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-zinc-100">Performance &amp; AI Monitoring</h1>
-          <p className="text-sm text-zinc-500 mt-1">
+          <p className="text-sm text-[#6B8A9A] mt-1">
             API performance, database queries, and AI usage from Sentry
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex items-center bg-zinc-900/50 border border-zinc-800 rounded-lg p-0.5">
+          <div className="flex items-center bg-[#1A3648]/60 border border-zinc-800 rounded-lg p-0.5">
             {periodButtons.map((btn) => (
               <button
                 key={btn.value}
                 onClick={() => setDays(btn.value)}
                 className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
                   days === btn.value
-                    ? 'bg-violet-500/20 text-violet-300 border border-violet-500/30'
-                    : 'text-zinc-400 hover:text-zinc-200'
+                    ? 'bg-violet-500/20 text-[#5BC4A0] border border-violet-500/30'
+                    : 'text-[#8AACBC] hover:text-white'
                 }`}
               >
                 {btn.label}
@@ -120,7 +120,7 @@ export default function PerformanceContent() {
           <button
             onClick={() => fetchData(days)}
             disabled={loading}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-300 hover:bg-zinc-700 transition-colors disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-zinc-800 border border-zinc-700 text-[#D0E4EC] hover:bg-zinc-700 transition-colors disabled:opacity-50"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
             Refresh
@@ -130,7 +130,7 @@ export default function PerformanceContent() {
 
       {/* Error / Warning Banner */}
       {(error || data?.error) && (
-        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
+        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-amber-500/10 border border-[#F5A623]/20">
           <AlertTriangle className="w-5 h-5 text-amber-400 flex-shrink-0" />
           <p className="text-sm text-amber-300">{error || data?.error}</p>
         </div>
@@ -169,10 +169,10 @@ export default function PerformanceContent() {
       ) : null}
 
       {/* Top API Endpoints */}
-      <section className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden">
+      <section className="bg-[#1A3648]/60 border border-zinc-800 rounded-xl overflow-hidden">
         <div className="px-5 py-4 border-b border-zinc-800 flex items-center gap-2">
-          <Globe className="w-4 h-4 text-violet-400" />
-          <h2 className="text-sm font-semibold text-zinc-200">Top API Endpoints</h2>
+          <Globe className="w-4 h-4 text-[#3DAA8A]" />
+          <h2 className="text-sm font-semibold text-white">Top API Endpoints</h2>
         </div>
         {loading && !data ? (
           <div className="p-5 space-y-3">
@@ -184,7 +184,7 @@ export default function PerformanceContent() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-zinc-800 text-zinc-500 text-xs">
+                <tr className="border-b border-zinc-800 text-[#6B8A9A] text-xs">
                   <th className="text-left px-5 py-3 font-medium">Endpoint</th>
                   <th className="text-right px-5 py-3 font-medium">Requests</th>
                   <th className="text-right px-5 py-3 font-medium">p75 (ms)</th>
@@ -194,17 +194,17 @@ export default function PerformanceContent() {
               </thead>
               <tbody>
                 {data.transactions.map((t, i) => (
-                  <tr key={i} className="border-b border-zinc-800/50 hover:bg-zinc-800/30 transition-colors">
-                    <td className="px-5 py-3 text-zinc-200 font-mono text-xs">{t?.name}</td>
-                    <td className="px-5 py-3 text-right text-zinc-300">{formatNumber(t?.count ?? 0)}</td>
-                    <td className="px-5 py-3 text-right text-zinc-300">{t?.p75_ms?.toFixed(0)}</td>
+                  <tr key={i} className="border-b border-zinc-800/50 hover:bg-[#2D6A8F]/10 transition-colors">
+                    <td className="px-5 py-3 text-white font-mono text-xs">{t?.name}</td>
+                    <td className="px-5 py-3 text-right text-[#D0E4EC]">{formatNumber(t?.count ?? 0)}</td>
+                    <td className="px-5 py-3 text-right text-[#D0E4EC]">{t?.p75_ms?.toFixed(0)}</td>
                     <td className={`px-5 py-3 text-right font-medium ${
-                      (t?.p95_ms ?? 0) > 2000 ? 'text-red-400' : (t?.p95_ms ?? 0) > 500 ? 'text-amber-400' : 'text-zinc-300'
+                      (t?.p95_ms ?? 0) > 2000 ? 'text-red-400' : (t?.p95_ms ?? 0) > 500 ? 'text-amber-400' : 'text-[#D0E4EC]'
                     }`}>
                       {t?.p95_ms?.toFixed(0)}
                     </td>
                     <td className={`px-5 py-3 text-right font-medium ${
-                      (t?.failure_rate ?? 0) > 5 ? 'text-red-400' : (t?.failure_rate ?? 0) > 1 ? 'text-amber-400' : 'text-zinc-300'
+                      (t?.failure_rate ?? 0) > 5 ? 'text-red-400' : (t?.failure_rate ?? 0) > 1 ? 'text-amber-400' : 'text-[#D0E4EC]'
                     }`}>
                       {t?.failure_rate?.toFixed(1)}%
                     </td>
@@ -214,17 +214,17 @@ export default function PerformanceContent() {
             </table>
           </div>
         ) : (
-          <div className="px-5 py-10 text-center text-zinc-500 text-sm">
+          <div className="px-5 py-10 text-center text-[#6B8A9A] text-sm">
             No performance data available for this period
           </div>
         )}
       </section>
 
       {/* AI Usage */}
-      <section className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden">
+      <section className="bg-[#1A3648]/60 border border-zinc-800 rounded-xl overflow-hidden">
         <div className="px-5 py-4 border-b border-zinc-800 flex items-center gap-2">
-          <Brain className="w-4 h-4 text-violet-400" />
-          <h2 className="text-sm font-semibold text-zinc-200">AI Usage</h2>
+          <Brain className="w-4 h-4 text-[#3DAA8A]" />
+          <h2 className="text-sm font-semibold text-white">AI Usage</h2>
         </div>
         {loading && !data ? (
           <div className="p-5 space-y-3">
@@ -236,7 +236,7 @@ export default function PerformanceContent() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-zinc-800 text-zinc-500 text-xs">
+                <tr className="border-b border-zinc-800 text-[#6B8A9A] text-xs">
                   <th className="text-left px-5 py-3 font-medium">Model / Description</th>
                   <th className="text-right px-5 py-3 font-medium">Calls</th>
                   <th className="text-right px-5 py-3 font-medium">Avg Duration</th>
@@ -245,11 +245,11 @@ export default function PerformanceContent() {
               </thead>
               <tbody>
                 {data.ai_calls.map((a, i) => (
-                  <tr key={i} className="border-b border-zinc-800/50 hover:bg-zinc-800/30 transition-colors">
-                    <td className="px-5 py-3 text-zinc-200">{a?.description}</td>
-                    <td className="px-5 py-3 text-right text-zinc-300">{formatNumber(a?.count ?? 0)}</td>
-                    <td className="px-5 py-3 text-right text-zinc-300">{a?.avg_duration_ms?.toFixed(0)} ms</td>
-                    <td className="px-5 py-3 text-right text-zinc-300">{formatTokens(a?.total_tokens ?? 0)}</td>
+                  <tr key={i} className="border-b border-zinc-800/50 hover:bg-[#2D6A8F]/10 transition-colors">
+                    <td className="px-5 py-3 text-white">{a?.description}</td>
+                    <td className="px-5 py-3 text-right text-[#D0E4EC]">{formatNumber(a?.count ?? 0)}</td>
+                    <td className="px-5 py-3 text-right text-[#D0E4EC]">{a?.avg_duration_ms?.toFixed(0)} ms</td>
+                    <td className="px-5 py-3 text-right text-[#D0E4EC]">{formatTokens(a?.total_tokens ?? 0)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -257,8 +257,8 @@ export default function PerformanceContent() {
           </div>
         ) : (
           <div className="px-5 py-10 text-center text-sm">
-            <p className="text-zinc-500">No AI usage data available for this period</p>
-            <p className="text-zinc-600 text-xs mt-2">
+            <p className="text-[#6B8A9A]">No AI usage data available for this period</p>
+            <p className="text-[#4A6E7F] text-xs mt-2">
               AI spans are captured automatically when the backend processes ARIA, triage, or lead qualification requests.
               Data appears after users trigger AI features.
             </p>
@@ -267,10 +267,10 @@ export default function PerformanceContent() {
       </section>
 
       {/* Slow Database Queries */}
-      <section className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden">
+      <section className="bg-[#1A3648]/60 border border-zinc-800 rounded-xl overflow-hidden">
         <div className="px-5 py-4 border-b border-zinc-800 flex items-center gap-2">
-          <Database className="w-4 h-4 text-violet-400" />
-          <h2 className="text-sm font-semibold text-zinc-200">Slow Database Queries</h2>
+          <Database className="w-4 h-4 text-[#3DAA8A]" />
+          <h2 className="text-sm font-semibold text-white">Slow Database Queries</h2>
         </div>
         {loading && !data ? (
           <div className="p-5 space-y-3">
@@ -282,7 +282,7 @@ export default function PerformanceContent() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-zinc-800 text-zinc-500 text-xs">
+                <tr className="border-b border-zinc-800 text-[#6B8A9A] text-xs">
                   <th className="text-left px-5 py-3 font-medium">Query</th>
                   <th className="text-right px-5 py-3 font-medium">Executions</th>
                   <th className="text-right px-5 py-3 font-medium">Avg (ms)</th>
@@ -291,14 +291,14 @@ export default function PerformanceContent() {
               </thead>
               <tbody>
                 {data.slow_queries.map((q, i) => (
-                  <tr key={i} className="border-b border-zinc-800/50 hover:bg-zinc-800/30 transition-colors">
-                    <td className="px-5 py-3 text-zinc-200 font-mono text-xs max-w-md" title={q?.query}>
+                  <tr key={i} className="border-b border-zinc-800/50 hover:bg-[#2D6A8F]/10 transition-colors">
+                    <td className="px-5 py-3 text-white font-mono text-xs max-w-md" title={q?.query}>
                       {q?.query?.length > 120 ? `${q.query.slice(0, 120)}...` : q?.query}
                     </td>
-                    <td className="px-5 py-3 text-right text-zinc-300">{formatNumber(q?.count ?? 0)}</td>
-                    <td className="px-5 py-3 text-right text-zinc-300">{q?.avg_ms?.toFixed(0)}</td>
+                    <td className="px-5 py-3 text-right text-[#D0E4EC]">{formatNumber(q?.count ?? 0)}</td>
+                    <td className="px-5 py-3 text-right text-[#D0E4EC]">{q?.avg_ms?.toFixed(0)}</td>
                     <td className={`px-5 py-3 text-right font-medium ${
-                      (q?.p95_ms ?? 0) > 1000 ? 'text-red-400' : (q?.p95_ms ?? 0) > 500 ? 'text-amber-400' : 'text-zinc-300'
+                      (q?.p95_ms ?? 0) > 1000 ? 'text-red-400' : (q?.p95_ms ?? 0) > 500 ? 'text-amber-400' : 'text-[#D0E4EC]'
                     }`}>
                       {q?.p95_ms?.toFixed(0)}
                     </td>
@@ -309,8 +309,8 @@ export default function PerformanceContent() {
           </div>
         ) : (
           <div className="px-5 py-10 text-center text-sm">
-            <p className="text-zinc-500">No slow queries detected for this period</p>
-            <p className="text-zinc-600 text-xs mt-2">
+            <p className="text-[#6B8A9A]">No slow queries detected for this period</p>
+            <p className="text-[#4A6E7F] text-xs mt-2">
               Queries taking &gt;50ms are tracked automatically via Sentry&apos;s SQLAlchemy integration.
               No slow queries is good — your database is performing well.
             </p>
@@ -331,10 +331,10 @@ function SummaryCard({
   value: string;
 }) {
   return (
-    <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl px-5 py-4">
+    <div className="bg-[#1A3648]/60 border border-zinc-800 rounded-xl px-5 py-4">
       <div className="flex items-center gap-2 mb-2">
-        <Icon className="w-4 h-4 text-violet-400" />
-        <span className="text-xs text-zinc-500 font-medium">{label}</span>
+        <Icon className="w-4 h-4 text-[#3DAA8A]" />
+        <span className="text-xs text-[#6B8A9A] font-medium">{label}</span>
       </div>
       <div className="text-xl font-bold text-zinc-100">{value}</div>
     </div>

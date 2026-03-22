@@ -18,7 +18,7 @@ const TIER_LABELS: Record<string, string> = {
 const STATUS_COLORS: Record<string, string> = {
   active: 'text-emerald-400', trial: 'text-blue-400',
   past_due: 'text-amber-400', cancelled: 'text-red-400',
-  none: 'text-zinc-500',
+  none: 'text-[#6B8A9A]',
 };
 
 function formatCurrency(n: number): string {
@@ -72,8 +72,8 @@ export default function BillingContent() {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <AlertTriangle className="w-10 h-10 text-amber-500 mb-3" />
-        <p className="text-zinc-400 mb-4">{error}</p>
-        <button onClick={fetchData} className="px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium">Retry</button>
+        <p className="text-[#8AACBC] mb-4">{error}</p>
+        <button onClick={fetchData} className="px-4 py-2 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium">Retry</button>
       </div>
     );
   }
@@ -92,17 +92,17 @@ export default function BillingContent() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-white">Billing & Revenue</h1>
-          <p className="text-sm text-zinc-500 mt-0.5">Subscription metrics and revenue analysis</p>
+          <p className="text-sm text-[#6B8A9A] mt-0.5">Subscription metrics and revenue analysis</p>
         </div>
         <div className="flex items-center gap-2">
           {stripeAvailable && (
-            <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[11px] text-emerald-400 font-medium">
+            <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-emerald-500/10 border border-[#3DAA8A]/20 text-[11px] text-emerald-400 font-medium">
               <Zap className="w-3 h-3" />
               Live from Stripe
             </span>
           )}
           {stripeLive && !stripeAvailable && (
-            <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-400 font-medium">
+            <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-amber-500/10 border border-[#F5A623]/20 text-[11px] text-amber-400 font-medium">
               <AlertTriangle className="w-3 h-3" />
               Stripe Unavailable
             </span>
@@ -110,7 +110,7 @@ export default function BillingContent() {
           <button
             onClick={fetchData}
             disabled={loading}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800/60 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 text-xs font-medium transition-colors disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#2D6A8F]/20 hover:bg-[#2D6A8F]/30 text-[#8AACBC] hover:text-white text-xs font-medium transition-colors disabled:opacity-50"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
             Refresh
@@ -121,37 +121,37 @@ export default function BillingContent() {
       {/* Top Metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
         {loading ? (
-          Array.from({ length: 5 }).map((_, i) => <div key={i} className="animate-pulse bg-zinc-800/60 rounded-xl h-24" />)
+          Array.from({ length: 5 }).map((_, i) => <div key={i} className="animate-pulse bg-[#2D6A8F]/20 rounded-xl h-24" />)
         ) : data && (
           <>
-            <div className="bg-gradient-to-b from-violet-600/20 to-violet-600/5 border border-violet-500/20 rounded-xl p-4">
-              <DollarSign className="w-5 h-5 text-violet-400 mb-2" />
+            <div className="bg-gradient-to-b from-[#3DAA8A]/20 to-[#3DAA8A]/5 border border-[#3DAA8A]/20 rounded-xl p-4">
+              <DollarSign className="w-5 h-5 text-[#3DAA8A] mb-2" />
               <div className="text-2xl font-bold text-white">
                 {stripeAvailable && stripeLive?.total_mrr != null
                   ? formatCurrency(stripeLive.total_mrr)
                   : formatCurrency(data.total_mrr)}
               </div>
-              <div className="text-xs text-zinc-500">{stripeAvailable ? 'Live MRR' : 'Est. MRR'}</div>
+              <div className="text-xs text-[#6B8A9A]">{stripeAvailable ? 'Live MRR' : 'Est. MRR'}</div>
             </div>
-            <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-4">
+            <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-4">
               <Users className="w-5 h-5 text-blue-400 mb-2" />
               <div className="text-2xl font-bold text-white">{totalConsumers.toLocaleString()}</div>
-              <div className="text-xs text-zinc-500">Total Subscribers</div>
+              <div className="text-xs text-[#6B8A9A]">Total Subscribers</div>
             </div>
-            <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-4">
+            <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-4">
               <UserPlus className="w-5 h-5 text-emerald-400 mb-2" />
               <div className="text-2xl font-bold text-white">{data.new_paid_30d}</div>
-              <div className="text-xs text-zinc-500">New Paid (30d)</div>
+              <div className="text-xs text-[#6B8A9A]">New Paid (30d)</div>
             </div>
-            <div className={`bg-zinc-900/50 border rounded-xl p-4 ${data.past_due_count > 0 ? 'border-amber-500/30' : 'border-zinc-800/60'}`}>
-              <AlertTriangle className={`w-5 h-5 mb-2 ${data.past_due_count > 0 ? 'text-amber-400' : 'text-zinc-500'}`} />
+            <div className={`bg-[#1A3648]/60 border rounded-xl p-4 ${data.past_due_count > 0 ? 'border-amber-500/30' : 'border-[#2D6A8F]/20'}`}>
+              <AlertTriangle className={`w-5 h-5 mb-2 ${data.past_due_count > 0 ? 'text-amber-400' : 'text-[#6B8A9A]'}`} />
               <div className={`text-2xl font-bold ${data.past_due_count > 0 ? 'text-amber-400' : 'text-white'}`}>{data.past_due_count}</div>
-              <div className="text-xs text-zinc-500">Past Due</div>
+              <div className="text-xs text-[#6B8A9A]">Past Due</div>
             </div>
-            <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-4">
+            <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-4">
               <UserMinus className="w-5 h-5 text-red-400 mb-2" />
               <div className="text-2xl font-bold text-white">{data.cancelled_30d}</div>
-              <div className="text-xs text-zinc-500">Cancelled (30d)</div>
+              <div className="text-xs text-[#6B8A9A]">Cancelled (30d)</div>
             </div>
           </>
         )}
@@ -159,8 +159,8 @@ export default function BillingContent() {
 
       {/* MRR by Tier */}
       {data && (
-        <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-zinc-300 mb-4">Revenue by Tier</h2>
+        <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+          <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">Revenue by Tier</h2>
           <div className="space-y-3">
             {Object.entries(data.mrr_by_tier || {})
               .filter(([, v]) => v.price > 0)
@@ -171,17 +171,17 @@ export default function BillingContent() {
                   <div key={tier}>
                     <div className="flex items-center justify-between mb-1.5">
                       <div className="flex items-center gap-3">
-                        <span className="text-sm text-zinc-300 font-medium capitalize w-28">{TIER_LABELS[tier] || tier}</span>
-                        <span className="text-xs text-zinc-500">${info.price}/mo x {info.count} active</span>
+                        <span className="text-sm text-[#D0E4EC] font-medium capitalize w-28">{TIER_LABELS[tier] || tier}</span>
+                        <span className="text-xs text-[#6B8A9A]">${info.price}/mo x {info.count} active</span>
                       </div>
                       <div className="flex items-center gap-4">
                         <span className="text-sm font-semibold text-white">{formatCurrency(info.mrr)}</span>
-                        <span className="text-xs text-zinc-500 w-12 text-right">{pctOfMrr}%</span>
+                        <span className="text-xs text-[#6B8A9A] w-12 text-right">{pctOfMrr}%</span>
                       </div>
                     </div>
                     <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
                       <div
-                        className="h-full rounded-full bg-gradient-to-r from-violet-600 to-violet-400 transition-all duration-500"
+                        className="h-full rounded-full bg-gradient-to-r from-[#3DAA8A] to-[#5BC4A0] transition-all duration-500"
                         style={{ width: `${Math.max(pctOfMrr, 2)}%` }}
                       />
                     </div>
@@ -189,8 +189,8 @@ export default function BillingContent() {
                 );
               })}
           </div>
-          <div className="flex items-center justify-between mt-4 pt-4 border-t border-zinc-800/60">
-            <span className="text-sm text-zinc-400 font-medium">Total MRR</span>
+          <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#2D6A8F]/20">
+            <span className="text-sm text-[#8AACBC] font-medium">Total MRR</span>
             <span className="text-lg font-bold text-white">{formatCurrency(data.total_mrr)}</span>
           </div>
         </div>
@@ -198,12 +198,12 @@ export default function BillingContent() {
 
       {/* Recent Payments from Stripe */}
       {stripeAvailable && stripeLive?.recent_payments && stripeLive.recent_payments.length > 0 && (
-        <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-zinc-300 mb-4">Recent Payments (Stripe)</h2>
+        <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+          <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">Recent Payments (Stripe)</h2>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="text-xs text-zinc-500 border-b border-zinc-800/60">
+                <tr className="text-xs text-[#6B8A9A] border-b border-[#2D6A8F]/20">
                   <th className="text-left pb-2 font-medium">Customer</th>
                   <th className="text-left pb-2 font-medium">Amount</th>
                   <th className="text-left pb-2 font-medium hidden sm:table-cell">Description</th>
@@ -213,11 +213,11 @@ export default function BillingContent() {
               </thead>
               <tbody>
                 {stripeLive.recent_payments.map((payment) => (
-                  <tr key={payment.id} className="border-b border-zinc-800/30 last:border-0">
-                    <td className="py-2.5 text-sm text-zinc-300">{payment.customer_email || payment.customer}</td>
-                    <td className="py-2.5 text-sm text-zinc-200 font-medium">{formatCurrency(payment.amount)}</td>
-                    <td className="py-2.5 text-xs text-zinc-500 hidden sm:table-cell max-w-48 truncate">{payment.description || '—'}</td>
-                    <td className="py-2.5 text-xs text-zinc-500">{formatDate(payment.created)}</td>
+                  <tr key={payment.id} className="border-b border-[#2D6A8F]/10 last:border-0">
+                    <td className="py-2.5 text-sm text-[#D0E4EC]">{payment.customer_email || payment.customer}</td>
+                    <td className="py-2.5 text-sm text-white font-medium">{formatCurrency(payment.amount)}</td>
+                    <td className="py-2.5 text-xs text-[#6B8A9A] hidden sm:table-cell max-w-48 truncate">{payment.description || '—'}</td>
+                    <td className="py-2.5 text-xs text-[#6B8A9A]">{formatDate(payment.created)}</td>
                     <td className="py-2.5">
                       <span className="flex items-center gap-1 text-xs text-emerald-400">
                         <CheckCircle className="w-3 h-3" />
@@ -235,15 +235,15 @@ export default function BillingContent() {
       {/* Subscription Breakdown by Category */}
       <div className="grid lg:grid-cols-2 gap-4">
         {/* Grouped Tier Breakdown */}
-        <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-zinc-300 mb-4">Subscriptions by Category</h2>
+        <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+          <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">Subscriptions by Category</h2>
           {loading ? (
-            <div className="space-y-3">{Array.from({ length: 5 }).map((_, i) => <div key={i} className="animate-pulse bg-zinc-800/60 rounded h-12" />)}</div>
+            <div className="space-y-3">{Array.from({ length: 5 }).map((_, i) => <div key={i} className="animate-pulse bg-[#2D6A8F]/20 rounded h-12" />)}</div>
           ) : data && (() => {
             const TIER_GROUPS: { label: string; color: string; tiers: string[] }[] = [
-              { label: 'Standard Plans', color: 'text-violet-400', tiers: ['plus', 'complete'] },
+              { label: 'Standard Plans', color: 'text-[#3DAA8A]', tiers: ['plus', 'complete'] },
               { label: 'Professional Plans', color: 'text-indigo-400', tiers: ['professional_starter', 'solo', 'small_firm', 'mid_size'] },
-              { label: 'Free / Starter', color: 'text-zinc-500', tiers: ['web_starter'] },
+              { label: 'Free / Starter', color: 'text-[#6B8A9A]', tiers: ['web_starter'] },
             ];
 
             return (
@@ -263,24 +263,24 @@ export default function BillingContent() {
                     <div key={group.label}>
                       <div className="flex items-center justify-between mb-2">
                         <span className={`text-[11px] uppercase tracking-wider font-semibold ${group.color}`}>{group.label}</span>
-                        <span className="text-xs text-zinc-500">{groupTotal} total</span>
+                        <span className="text-xs text-[#6B8A9A]">{groupTotal} total</span>
                       </div>
                       <div className="space-y-2">
                         {allEntries.map(({ tier, total, statuses }) => {
                           const tierPrice = data.mrr_by_tier[tier]?.price ?? 0;
                           return (
-                            <div key={tier} className="bg-zinc-800/30 rounded-lg px-4 py-3">
+                            <div key={tier} className="bg-[#2D6A8F]/10 rounded-lg px-4 py-3">
                               <div className="flex items-center justify-between mb-1">
                                 <div className="flex items-center gap-2">
-                                  <span className="text-sm text-zinc-200 font-medium">{TIER_LABELS[tier] || tier}</span>
-                                  {tierPrice > 0 && <span className="text-xs text-zinc-600">${tierPrice}/mo</span>}
+                                  <span className="text-sm text-white font-medium">{TIER_LABELS[tier] || tier}</span>
+                                  {tierPrice > 0 && <span className="text-xs text-[#4A6E7F]">${tierPrice}/mo</span>}
                                 </div>
-                                <span className="text-sm font-semibold text-zinc-300">{total}</span>
+                                <span className="text-sm font-semibold text-[#D0E4EC]">{total}</span>
                               </div>
                               {Object.keys(statuses).length > 0 && (
                                 <div className="flex flex-wrap gap-2">
                                   {Object.entries(statuses).map(([status, count]) => (
-                                    <span key={status} className={`text-[11px] ${STATUS_COLORS[status] || 'text-zinc-500'}`}>
+                                    <span key={status} className={`text-[11px] ${STATUS_COLORS[status] || 'text-[#6B8A9A]'}`}>
                                       {count} {status}
                                     </span>
                                   ))}
@@ -302,20 +302,20 @@ export default function BillingContent() {
         <div className="space-y-4">
 
           {/* Key Metrics */}
-          <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
-            <h2 className="text-sm font-semibold text-zinc-300 mb-4">Key Metrics</h2>
+          <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+            <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">Key Metrics</h2>
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Clock className="w-3.5 h-3.5 text-blue-400" />
-                  <span className="text-xs text-zinc-400">Trial Users</span>
+                  <span className="text-xs text-[#8AACBC]">Trial Users</span>
                 </div>
                 <span className="text-sm font-medium text-blue-400">{data?.trial_count || 0}</span>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Percent className="w-3.5 h-3.5 text-emerald-400" />
-                  <span className="text-xs text-zinc-400">Paid Conversion</span>
+                  <span className="text-xs text-[#8AACBC]">Paid Conversion</span>
                 </div>
                 <span className="text-sm font-medium text-emerald-400">
                   {totalConsumers > 0 ? Math.round((paidConsumers / totalConsumers) * 100) : 0}%
@@ -323,10 +323,10 @@ export default function BillingContent() {
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <DollarSign className="w-3.5 h-3.5 text-violet-400" />
-                  <span className="text-xs text-zinc-400">ARPU (paid)</span>
+                  <DollarSign className="w-3.5 h-3.5 text-[#3DAA8A]" />
+                  <span className="text-xs text-[#8AACBC]">ARPU (paid)</span>
                 </div>
-                <span className="text-sm font-medium text-violet-400">
+                <span className="text-sm font-medium text-[#3DAA8A]">
                   {paidConsumers > 0 ? formatCurrency(data ? data.total_mrr / paidConsumers : 0) : '—'}
                 </span>
               </div>
@@ -334,7 +334,7 @@ export default function BillingContent() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <CreditCard className="w-3.5 h-3.5 text-indigo-400" />
-                    <span className="text-xs text-zinc-400">Stripe Customers</span>
+                    <span className="text-xs text-[#8AACBC]">Stripe Customers</span>
                   </div>
                   <span className="text-sm font-medium text-indigo-400">{stripeLive.total_customers}</span>
                 </div>
@@ -347,7 +347,7 @@ export default function BillingContent() {
             <button
               onClick={() => handleSync('customers')}
               disabled={syncing !== null}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-zinc-900/50 border border-zinc-800/60 rounded-xl text-sm text-zinc-400 hover:text-zinc-200 hover:border-violet-500/30 transition-all disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl text-sm text-[#8AACBC] hover:text-white hover:border-violet-500/30 transition-all disabled:opacity-50"
             >
               <ArrowUpDown className={`w-4 h-4 ${syncing === 'customers' ? 'animate-spin' : ''}`} />
               {syncing === 'customers' ? 'Syncing Customers...' : 'Sync Stripe Customers'}
@@ -355,7 +355,7 @@ export default function BillingContent() {
             <button
               onClick={() => handleSync('subscriptions')}
               disabled={syncing !== null}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-zinc-900/50 border border-zinc-800/60 rounded-xl text-sm text-zinc-400 hover:text-zinc-200 hover:border-violet-500/30 transition-all disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl text-sm text-[#8AACBC] hover:text-white hover:border-violet-500/30 transition-all disabled:opacity-50"
             >
               <ArrowUpDown className={`w-4 h-4 ${syncing === 'subscriptions' ? 'animate-spin' : ''}`} />
               {syncing === 'subscriptions' ? 'Syncing Subscriptions...' : 'Sync Stripe Subscriptions'}
@@ -364,9 +364,9 @@ export default function BillingContent() {
               href="https://dashboard.stripe.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 px-4 py-3 bg-zinc-900/50 border border-zinc-800/60 rounded-xl text-sm text-zinc-400 hover:text-zinc-200 hover:border-zinc-700/60 transition-all group"
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl text-sm text-[#8AACBC] hover:text-white hover:border-zinc-700/60 transition-all group"
             >
-              <CreditCard className="w-4 h-4 group-hover:text-violet-400 transition-colors" />
+              <CreditCard className="w-4 h-4 group-hover:text-[#3DAA8A] transition-colors" />
               Open Stripe Dashboard
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
@@ -374,12 +374,12 @@ export default function BillingContent() {
 
           {/* Sync Result */}
           {syncResult && (
-            <div className="bg-zinc-800/40 border border-zinc-700/40 rounded-xl p-4">
+            <div className="bg-[#2D6A8F]/15 border border-zinc-700/40 rounded-xl p-4">
               <div className="flex items-center gap-2 mb-2">
                 <CheckCircle className="w-4 h-4 text-emerald-400" />
-                <span className="text-sm text-zinc-300 font-medium">Sync Complete</span>
+                <span className="text-sm text-[#D0E4EC] font-medium">Sync Complete</span>
               </div>
-              <div className="text-xs text-zinc-400 space-y-1">
+              <div className="text-xs text-[#8AACBC] space-y-1">
                 {syncResult.synced != null && <div>Synced: <span className="text-emerald-400">{syncResult.synced}</span></div>}
                 {syncResult.updated != null && <div>Updated: <span className="text-blue-400">{syncResult.updated}</span></div>}
                 {syncResult.failed > 0 && <div>Failed: <span className="text-red-400">{syncResult.failed}</span></div>}
@@ -392,10 +392,10 @@ export default function BillingContent() {
 
       {/* Valuation Metrics (live computed) */}
       {data?.valuation && Object.keys(data.valuation).length > 0 && (
-        <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
+        <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
           <div className="flex items-center gap-2 mb-4">
-            <TrendingUp className="w-4 h-4 text-violet-400" />
-            <h2 className="text-sm font-semibold text-zinc-300">Valuation Metrics</h2>
+            <TrendingUp className="w-4 h-4 text-[#3DAA8A]" />
+            <h2 className="text-sm font-semibold text-[#D0E4EC]">Valuation Metrics</h2>
             <span className="text-[11px] text-emerald-500/70 ml-auto">Live from data</span>
           </div>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -405,17 +405,17 @@ export default function BillingContent() {
             <ValuationCard label="LTV:CAC" value={`${data.valuation.ltv_cac_ratio || 0}x`} sub={data.valuation.ltv_cac_ratio >= 3 ? 'Healthy (>3x target)' : 'Below 3x target'} highlight={data.valuation.ltv_cac_ratio >= 3} />
           </div>
           <div className="grid grid-cols-3 gap-3 mt-3">
-            <div className="bg-zinc-800/30 rounded-lg p-3 text-center">
+            <div className="bg-[#2D6A8F]/10 rounded-lg p-3 text-center">
               <div className="text-lg font-bold text-white">{formatCurrency(data.valuation.arr || 0)}</div>
-              <div className="text-[11px] text-zinc-500">ARR</div>
+              <div className="text-[11px] text-[#6B8A9A]">ARR</div>
             </div>
-            <div className="bg-zinc-800/30 rounded-lg p-3 text-center">
+            <div className="bg-[#2D6A8F]/10 rounded-lg p-3 text-center">
               <div className="text-lg font-bold text-white">{data.valuation.active_paying || 0}</div>
-              <div className="text-[11px] text-zinc-500">Paying Users</div>
+              <div className="text-[11px] text-[#6B8A9A]">Paying Users</div>
             </div>
-            <div className="bg-zinc-800/30 rounded-lg p-3 text-center">
+            <div className="bg-[#2D6A8F]/10 rounded-lg p-3 text-center">
               <div className="text-lg font-bold text-white">{(data.valuation.total_users || 0).toLocaleString()}</div>
-              <div className="text-[11px] text-zinc-500">Total Users</div>
+              <div className="text-[11px] text-[#6B8A9A]">Total Users</div>
             </div>
           </div>
         </div>
@@ -423,10 +423,10 @@ export default function BillingContent() {
 
       {/* Revenue Projections */}
       {data && data.total_mrr > 0 && (
-        <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
+        <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
           <div className="flex items-center gap-2 mb-4">
             <TrendingUp className="w-4 h-4 text-emerald-400" />
-            <h2 className="text-sm font-semibold text-zinc-300">Revenue Projections</h2>
+            <h2 className="text-sm font-semibold text-[#D0E4EC]">Revenue Projections</h2>
           </div>
           {(() => {
             const mrr = stripeAvailable && stripeLive?.total_mrr != null ? stripeLive.total_mrr : data.total_mrr;
@@ -445,20 +445,20 @@ export default function BillingContent() {
             return (
               <div className="grid grid-cols-3 gap-3">
                 {projections.map((p) => (
-                  <div key={p.label} className="bg-zinc-800/30 rounded-lg p-4 text-center">
-                    <div className="text-[11px] uppercase tracking-wider text-zinc-500 font-semibold mb-2">{p.label}</div>
+                  <div key={p.label} className="bg-[#2D6A8F]/10 rounded-lg p-4 text-center">
+                    <div className="text-[11px] uppercase tracking-wider text-[#6B8A9A] font-semibold mb-2">{p.label}</div>
                     <div className="text-lg font-bold text-white mb-1">{formatCurrency(p.totalRevenue)}</div>
-                    <div className="text-xs text-zinc-500">cumulative revenue</div>
+                    <div className="text-xs text-[#6B8A9A]">cumulative revenue</div>
                     <div className="mt-2 pt-2 border-t border-zinc-700/40">
                       <div className="text-sm font-semibold text-emerald-400">{formatCurrency(p.arr)}</div>
-                      <div className="text-[11px] text-zinc-600">projected ARR</div>
+                      <div className="text-[11px] text-[#4A6E7F]">projected ARR</div>
                     </div>
                   </div>
                 ))}
               </div>
             );
           })()}
-          <p className="text-[11px] text-zinc-600 mt-3">
+          <p className="text-[11px] text-[#4A6E7F] mt-3">
             Based on current MRR of {formatCurrency(stripeAvailable && stripeLive?.total_mrr != null ? stripeLive.total_mrr : data.total_mrr)} with 5% assumed monthly growth.
           </p>
         </div>
@@ -466,29 +466,29 @@ export default function BillingContent() {
 
       {/* Refunds & Disputes */}
       {data?.refunds && (
-        <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
+        <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
           <div className="flex items-center gap-2 mb-4">
             <AlertTriangle className="w-4 h-4 text-amber-400" />
-            <h2 className="text-sm font-semibold text-zinc-300">Refunds &amp; Disputes</h2>
+            <h2 className="text-sm font-semibold text-[#D0E4EC]">Refunds &amp; Disputes</h2>
           </div>
           <div className="grid grid-cols-3 gap-3 mb-4">
-            <div className="bg-zinc-800/30 rounded-lg p-3 text-center">
+            <div className="bg-[#2D6A8F]/10 rounded-lg p-3 text-center">
               <div className={`text-lg font-bold ${data.refunds.refund_count_30d > 0 ? 'text-amber-400' : 'text-white'}`}>
                 {data.refunds.refund_count_30d}
               </div>
-              <div className="text-[11px] text-zinc-500">Refunds (30d)</div>
+              <div className="text-[11px] text-[#6B8A9A]">Refunds (30d)</div>
             </div>
-            <div className="bg-zinc-800/30 rounded-lg p-3 text-center">
+            <div className="bg-[#2D6A8F]/10 rounded-lg p-3 text-center">
               <div className={`text-lg font-bold ${data.refunds.total_refunded_30d > 0 ? 'text-amber-400' : 'text-white'}`}>
                 {formatCurrency(data.refunds.total_refunded_30d)}
               </div>
-              <div className="text-[11px] text-zinc-500">Refunded Amount</div>
+              <div className="text-[11px] text-[#6B8A9A]">Refunded Amount</div>
             </div>
-            <div className="bg-zinc-800/30 rounded-lg p-3 text-center">
+            <div className="bg-[#2D6A8F]/10 rounded-lg p-3 text-center">
               <div className={`text-lg font-bold ${data.refunds.dispute_count > 0 ? 'text-red-400' : 'text-white'}`}>
                 {data.refunds.dispute_count}
               </div>
-              <div className="text-[11px] text-zinc-500">Open Disputes</div>
+              <div className="text-[11px] text-[#6B8A9A]">Open Disputes</div>
             </div>
           </div>
 
@@ -496,7 +496,7 @@ export default function BillingContent() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-xs text-zinc-500 border-b border-zinc-800/60">
+                  <tr className="text-xs text-[#6B8A9A] border-b border-[#2D6A8F]/20">
                     <th className="text-left pb-2 font-medium">Amount</th>
                     <th className="text-left pb-2 font-medium">Reason</th>
                     <th className="text-left pb-2 font-medium">Status</th>
@@ -505,11 +505,11 @@ export default function BillingContent() {
                 </thead>
                 <tbody>
                   {data.refunds.recent_refunds.map((r: { id: string; amount: number; reason: string | null; status: string; created: string }) => (
-                    <tr key={r.id} className="border-b border-zinc-800/30 last:border-0">
+                    <tr key={r.id} className="border-b border-[#2D6A8F]/10 last:border-0">
                       <td className="py-2 text-amber-400 font-medium">{formatCurrency(r.amount)}</td>
-                      <td className="py-2 text-xs text-zinc-400 capitalize">{r.reason?.replace('_', ' ') || 'N/A'}</td>
-                      <td className="py-2 text-xs text-zinc-400 capitalize">{r.status}</td>
-                      <td className="py-2 text-xs text-zinc-500">{formatDate(r.created)}</td>
+                      <td className="py-2 text-xs text-[#8AACBC] capitalize">{r.reason?.replace('_', ' ') || 'N/A'}</td>
+                      <td className="py-2 text-xs text-[#8AACBC] capitalize">{r.status}</td>
+                      <td className="py-2 text-xs text-[#6B8A9A]">{formatDate(r.created)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -518,7 +518,7 @@ export default function BillingContent() {
           )}
 
           {data.refunds.recent_refunds?.length === 0 && data.refunds.dispute_count === 0 && (
-            <p className="text-zinc-600 text-sm text-center py-4">No refunds or disputes. Looking good!</p>
+            <p className="text-[#4A6E7F] text-sm text-center py-4">No refunds or disputes. Looking good!</p>
           )}
         </div>
       )}
@@ -530,10 +530,10 @@ function ValuationCard({ label, value, sub, highlight }: {
   label: string; value: string; sub: string; highlight?: boolean;
 }) {
   return (
-    <div className="bg-zinc-800/30 rounded-lg p-4">
-      <div className="text-[11px] text-zinc-500 uppercase tracking-wider font-medium mb-1">{label}</div>
+    <div className="bg-[#2D6A8F]/10 rounded-lg p-4">
+      <div className="text-[11px] text-[#6B8A9A] uppercase tracking-wider font-medium mb-1">{label}</div>
       <div className={`text-xl font-bold ${highlight ? 'text-emerald-400' : 'text-white'}`}>{value}</div>
-      <div className="text-[11px] text-zinc-600 mt-0.5">{sub}</div>
+      <div className="text-[11px] text-[#4A6E7F] mt-0.5">{sub}</div>
     </div>
   );
 }

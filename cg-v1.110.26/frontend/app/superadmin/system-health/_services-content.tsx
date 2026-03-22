@@ -9,7 +9,7 @@ import {
 import { adminAPI, type SystemStatusResponse, type ServiceStatus } from '@/lib/admin-api';
 
 const CATEGORY_CONFIG: Record<string, { label: string; icon: React.ElementType; color: string }> = {
-  ai: { label: 'AI & Intelligence', icon: Brain, color: 'text-violet-400' },
+  ai: { label: 'AI & Intelligence', icon: Brain, color: 'text-[#3DAA8A]' },
   communication: { label: 'Communication', icon: MessageSquare, color: 'text-blue-400' },
   infrastructure: { label: 'Infrastructure', icon: Database, color: 'text-emerald-400' },
   content: { label: 'Content', icon: FileText, color: 'text-amber-400' },
@@ -32,8 +32,8 @@ const SLUG_ICONS: Record<string, React.ElementType> = {
 };
 
 const STATUS_CONFIG = {
-  operational: { icon: CheckCircle, color: 'text-emerald-400', bg: 'bg-emerald-500/15', border: 'border-emerald-500/20', label: 'Operational' },
-  degraded: { icon: AlertTriangle, color: 'text-amber-400', bg: 'bg-amber-500/15', border: 'border-amber-500/20', label: 'Degraded' },
+  operational: { icon: CheckCircle, color: 'text-emerald-400', bg: 'bg-emerald-500/15', border: 'border-[#3DAA8A]/20', label: 'Operational' },
+  degraded: { icon: AlertTriangle, color: 'text-amber-400', bg: 'bg-amber-500/15', border: 'border-[#F5A623]/20', label: 'Degraded' },
   down: { icon: XCircle, color: 'text-red-400', bg: 'bg-red-500/15', border: 'border-red-500/20', label: 'Down' },
 };
 
@@ -59,11 +59,11 @@ function ServiceCard({ service }: { service: ServiceStatus }) {
   const ServiceIcon = SLUG_ICONS[service.slug] || Activity;
 
   return (
-    <div className={`bg-zinc-900/50 border ${cfg.border} rounded-xl p-4 transition-all hover:bg-zinc-900/70`}>
+    <div className={`bg-[#1A3648]/60 border ${cfg.border} rounded-xl p-4 transition-all hover:bg-zinc-900/70`}>
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2.5">
-          <ServiceIcon className="w-4 h-4 text-zinc-400" />
-          <span className="text-sm font-medium text-zinc-200">{service.name}</span>
+          <ServiceIcon className="w-4 h-4 text-[#8AACBC]" />
+          <span className="text-sm font-medium text-white">{service.name}</span>
         </div>
         <StatusDot status={service.status} />
       </div>
@@ -71,10 +71,10 @@ function ServiceCard({ service }: { service: ServiceStatus }) {
         <StatusIcon className={`w-3.5 h-3.5 ${cfg.color}`} />
         <span className={`text-xs font-medium ${cfg.color}`}>{cfg.label}</span>
         {service.latency_ms > 0 && (
-          <span className="text-[11px] text-zinc-600 ml-auto">{service.latency_ms}ms</span>
+          <span className="text-[11px] text-[#4A6E7F] ml-auto">{service.latency_ms}ms</span>
         )}
       </div>
-      <p className="text-[11px] text-zinc-500 leading-relaxed truncate" title={service.detail}>
+      <p className="text-[11px] text-[#6B8A9A] leading-relaxed truncate" title={service.detail}>
         {service.detail}
       </p>
     </div>
@@ -128,10 +128,10 @@ export default function ServicesContent() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-white flex items-center gap-2">
-            <Activity className="w-5 h-5 text-violet-400" />
+            <Activity className="w-5 h-5 text-[#3DAA8A]" />
             System Status
           </h1>
-          <p className="text-sm text-zinc-500 mt-0.5">
+          <p className="text-sm text-[#6B8A9A] mt-0.5">
             {lastRefresh
               ? `Last checked ${lastRefresh.toLocaleTimeString()} \u00b7 Auto-refreshes every 60s`
               : 'Checking services...'}
@@ -140,7 +140,7 @@ export default function ServicesContent() {
         <button
           onClick={fetchStatus}
           disabled={loading}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-zinc-800/60 hover:bg-zinc-800 text-zinc-400 hover:text-zinc-200 transition-colors disabled:opacity-50 text-sm"
+          className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#2D6A8F]/20 hover:bg-[#2D6A8F]/30 text-[#8AACBC] hover:text-white transition-colors disabled:opacity-50 text-sm"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           Refresh
@@ -169,7 +169,7 @@ export default function ServicesContent() {
                     ? 'Some Systems Degraded'
                     : 'Critical Systems Down'}
                 </h2>
-                <p className="text-xs text-zinc-500 mt-0.5">
+                <p className="text-xs text-[#6B8A9A] mt-0.5">
                   {data.operational} of {data.total} services operational
                   {data.down > 0 && ` \u00b7 ${data.down} down`}
                   {data.degraded > 0 && ` \u00b7 ${data.degraded} degraded`}
@@ -179,18 +179,18 @@ export default function ServicesContent() {
             <div className="flex items-center gap-4">
               <div className="text-center">
                 <div className="text-2xl font-bold text-emerald-400">{data.operational}</div>
-                <div className="text-[10px] uppercase tracking-wider text-zinc-500">Up</div>
+                <div className="text-[10px] uppercase tracking-wider text-[#6B8A9A]">Up</div>
               </div>
               {data.degraded > 0 && (
                 <div className="text-center">
                   <div className="text-2xl font-bold text-amber-400">{data.degraded}</div>
-                  <div className="text-[10px] uppercase tracking-wider text-zinc-500">Degraded</div>
+                  <div className="text-[10px] uppercase tracking-wider text-[#6B8A9A]">Degraded</div>
                 </div>
               )}
               {data.down > 0 && (
                 <div className="text-center">
                   <div className="text-2xl font-bold text-red-400">{data.down}</div>
-                  <div className="text-[10px] uppercase tracking-wider text-zinc-500">Down</div>
+                  <div className="text-[10px] uppercase tracking-wider text-[#6B8A9A]">Down</div>
                 </div>
               )}
             </div>
@@ -201,10 +201,10 @@ export default function ServicesContent() {
       {/* Loading Skeleton */}
       {loading && !data && (
         <div className="space-y-4">
-          <div className="animate-pulse bg-zinc-800/40 rounded-xl h-24" />
+          <div className="animate-pulse bg-[#2D6A8F]/15 rounded-xl h-24" />
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
             {Array.from({ length: 9 }).map((_, i) => (
-              <div key={i} className="animate-pulse bg-zinc-800/40 rounded-xl h-28" />
+              <div key={i} className="animate-pulse bg-[#2D6A8F]/15 rounded-xl h-28" />
             ))}
           </div>
         </div>
@@ -214,15 +214,15 @@ export default function ServicesContent() {
       {data && categoryOrder.map(cat => {
         const services = grouped[cat];
         if (!services || services.length === 0) return null;
-        const catCfg = CATEGORY_CONFIG[cat] || { label: cat, icon: Activity, color: 'text-zinc-400' };
+        const catCfg = CATEGORY_CONFIG[cat] || { label: cat, icon: Activity, color: 'text-[#8AACBC]' };
         const CatIcon = catCfg.icon;
 
         return (
           <div key={cat}>
             <div className="flex items-center gap-2 mb-3">
               <CatIcon className={`w-4 h-4 ${catCfg.color}`} />
-              <h3 className="text-sm font-semibold text-zinc-300">{catCfg.label}</h3>
-              <span className="text-[11px] text-zinc-600">
+              <h3 className="text-sm font-semibold text-[#D0E4EC]">{catCfg.label}</h3>
+              <span className="text-[11px] text-[#4A6E7F]">
                 {services.filter(s => s.status === 'operational').length}/{services.length} operational
               </span>
             </div>

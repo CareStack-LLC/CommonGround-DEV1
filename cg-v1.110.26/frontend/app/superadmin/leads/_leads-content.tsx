@@ -12,7 +12,7 @@ import {
 import { adminAPI, type LeadList, type Lead } from '@/lib/admin-api';
 
 function Skeleton({ className = '' }: { className?: string }) {
-  return <div className={`animate-pulse bg-zinc-800/60 rounded-lg ${className}`} />;
+  return <div className={`animate-pulse bg-[#2D6A8F]/20 rounded-lg ${className}`} />;
 }
 
 type Tab = 'pipeline' | 'lists' | 'import';
@@ -22,14 +22,14 @@ const SOURCE_OPTIONS = [
 ] as const;
 
 const SOURCE_COLORS: Record<string, string> = {
-  newsletter: 'bg-violet-500/20 text-violet-300 border-violet-500/30',
+  newsletter: 'bg-violet-500/20 text-[#5BC4A0] border-violet-500/30',
   blog: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
   contact_form: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
   event: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
   social: 'bg-pink-500/20 text-pink-300 border-pink-500/30',
   paid: 'bg-orange-500/20 text-orange-300 border-orange-500/30',
   referral: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
-  other: 'bg-zinc-500/20 text-zinc-300 border-zinc-500/30',
+  other: 'bg-zinc-500/20 text-[#D0E4EC] border-zinc-500/30',
 };
 
 const SOURCE_ICONS: Record<string, React.ReactNode> = {
@@ -251,16 +251,16 @@ export default function LeadsContent() {
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <button onClick={() => setSelectedList(null)} className="p-1.5 rounded-lg hover:bg-zinc-800/60 transition-colors">
-            <ChevronLeft className="w-5 h-5 text-zinc-400" />
+          <button onClick={() => setSelectedList(null)} className="p-1.5 rounded-lg hover:bg-[#2D6A8F]/20 transition-colors">
+            <ChevronLeft className="w-5 h-5 text-[#8AACBC]" />
           </button>
           <div className="flex-1">
             <h1 className="text-xl font-bold text-white">{selectedList.name}</h1>
-            <p className="text-sm text-zinc-500 mt-0.5">{selectedList.lead_count} leads | {selectedList.lead_type}</p>
+            <p className="text-sm text-[#6B8A9A] mt-0.5">{selectedList.lead_count} leads | {selectedList.lead_type}</p>
           </div>
           <button
             onClick={() => { setImportListId(selectedList.id); setShowAddLead(true); }}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium transition-colors"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors"
           >
             <Plus className="w-4 h-4" /> Add Lead
           </button>
@@ -287,19 +287,19 @@ export default function LeadsContent() {
 
         {/* Inline Add Lead Form */}
         {showAddLead && (
-          <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
+          <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-zinc-300">Add Lead</h3>
-              <button onClick={() => setShowAddLead(false)} className="text-zinc-500 hover:text-zinc-300"><X className="w-4 h-4" /></button>
+              <h3 className="text-sm font-semibold text-[#D0E4EC]">Add Lead</h3>
+              <button onClick={() => setShowAddLead(false)} className="text-[#6B8A9A] hover:text-[#D0E4EC]"><X className="w-4 h-4" /></button>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <input value={newLead.email} onChange={e => setNewLead({ ...newLead, email: e.target.value })} placeholder="Email *" className="col-span-2 px-3 py-2.5 bg-zinc-900/80 border border-zinc-800/80 rounded-lg text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-violet-500/50" />
-              <input value={newLead.first_name} onChange={e => setNewLead({ ...newLead, first_name: e.target.value })} placeholder="First name" className="px-3 py-2.5 bg-zinc-900/80 border border-zinc-800/80 rounded-lg text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-violet-500/50" />
-              <input value={newLead.last_name} onChange={e => setNewLead({ ...newLead, last_name: e.target.value })} placeholder="Last name" className="px-3 py-2.5 bg-zinc-900/80 border border-zinc-800/80 rounded-lg text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-violet-500/50" />
-              <input value={newLead.company} onChange={e => setNewLead({ ...newLead, company: e.target.value })} placeholder="Company" className="px-3 py-2.5 bg-zinc-900/80 border border-zinc-800/80 rounded-lg text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-violet-500/50" />
-              <input value={newLead.title} onChange={e => setNewLead({ ...newLead, title: e.target.value })} placeholder="Title" className="px-3 py-2.5 bg-zinc-900/80 border border-zinc-800/80 rounded-lg text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-violet-500/50" />
+              <input value={newLead.email} onChange={e => setNewLead({ ...newLead, email: e.target.value })} placeholder="Email *" className="col-span-2 px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50" />
+              <input value={newLead.first_name} onChange={e => setNewLead({ ...newLead, first_name: e.target.value })} placeholder="First name" className="px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50" />
+              <input value={newLead.last_name} onChange={e => setNewLead({ ...newLead, last_name: e.target.value })} placeholder="Last name" className="px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50" />
+              <input value={newLead.company} onChange={e => setNewLead({ ...newLead, company: e.target.value })} placeholder="Company" className="px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50" />
+              <input value={newLead.title} onChange={e => setNewLead({ ...newLead, title: e.target.value })} placeholder="Title" className="px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50" />
             </div>
-            <button onClick={addLead} disabled={addingLead || !newLead.email} className="mt-3 px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium transition-colors disabled:opacity-50">
+            <button onClick={addLead} disabled={addingLead || !newLead.email} className="mt-3 px-4 py-2 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors disabled:opacity-50">
               {addingLead ? 'Adding...' : 'Add Lead'}
             </button>
           </div>
@@ -311,25 +311,25 @@ export default function LeadsContent() {
             {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-10" />)}
           </div>
         ) : (
-          <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl overflow-hidden">
+          <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl overflow-hidden">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-zinc-800/80">
-                  <th className="text-left px-4 py-3 text-xs font-medium text-zinc-500 uppercase tracking-wider">Email</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-zinc-500 uppercase tracking-wider hidden md:table-cell">Name</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-zinc-500 uppercase tracking-wider hidden lg:table-cell">Company</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-zinc-500 uppercase tracking-wider">Source</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-zinc-500 uppercase tracking-wider">Status</th>
+                <tr className="border-b border-[#2D6A8F]/20">
+                  <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Email</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider hidden md:table-cell">Name</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider hidden lg:table-cell">Company</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Source</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-800/40">
                 {(!selectedList?.leads || selectedList.leads.length === 0) ? (
-                  <tr><td colSpan={5} className="px-4 py-12 text-center text-zinc-500">No leads yet. Import a CSV or add manually.</td></tr>
+                  <tr><td colSpan={5} className="px-4 py-12 text-center text-[#6B8A9A]">No leads yet. Import a CSV or add manually.</td></tr>
                 ) : selectedList.leads.map(lead => (
-                  <tr key={lead.id} className="hover:bg-zinc-800/30 transition-colors">
-                    <td className="px-4 py-3 text-zinc-200">{lead.email}</td>
-                    <td className="px-4 py-3 text-zinc-400 hidden md:table-cell">{[lead.first_name, lead.last_name].filter(Boolean).join(' ') || '\u2014'}</td>
-                    <td className="px-4 py-3 text-zinc-400 hidden lg:table-cell">{lead.company || '\u2014'}</td>
+                  <tr key={lead.id} className="hover:bg-[#2D6A8F]/10 transition-colors">
+                    <td className="px-4 py-3 text-white">{lead.email}</td>
+                    <td className="px-4 py-3 text-[#8AACBC] hidden md:table-cell">{[lead.first_name, lead.last_name].filter(Boolean).join(' ') || '\u2014'}</td>
+                    <td className="px-4 py-3 text-[#8AACBC] hidden lg:table-cell">{lead.company || '\u2014'}</td>
                     <td className="px-4 py-3">
                       <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium border ${SOURCE_COLORS[lead.source] || SOURCE_COLORS.other}`}>
                         {lead.source}
@@ -339,7 +339,7 @@ export default function LeadsContent() {
                       <span className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium ${
                         lead.status === 'active' ? 'bg-emerald-500/15 text-emerald-400' :
                         lead.status === 'bounced' ? 'bg-red-500/15 text-red-400' :
-                        'bg-zinc-700/50 text-zinc-400'
+                        'bg-zinc-700/50 text-[#8AACBC]'
                       }`}>{lead.status}</span>
                     </td>
                   </tr>
@@ -365,20 +365,20 @@ export default function LeadsContent() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-white">Lead Generator</h1>
-          <p className="text-sm text-zinc-500 mt-0.5">{lists.length} lead lists</p>
+          <p className="text-sm text-[#6B8A9A] mt-0.5">{lists.length} lead lists</p>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex bg-zinc-900/80 border border-zinc-800/80 rounded-lg p-0.5">
+      <div className="flex bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg p-0.5">
         {tabs.map(tab => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
               activeTab === tab.key
-                ? 'bg-violet-600 text-white'
-                : 'text-zinc-400 hover:text-zinc-200'
+                ? 'bg-[#3DAA8A] text-white'
+                : 'text-[#8AACBC] hover:text-white'
             }`}
           >
             {tab.icon}
@@ -417,7 +417,7 @@ export default function LeadsContent() {
             <>
               {/* Funnel Visualization */}
               <div>
-                <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-3">Conversion Funnel</h2>
+                <h2 className="text-sm font-semibold text-[#8AACBC] uppercase tracking-wider mb-3">Conversion Funnel</h2>
                 <div className="flex items-center gap-2">
                   {[
                     { label: 'Total', value: pipeline?.funnel?.total ?? 0, color: 'from-violet-500/20 to-violet-600/10 border-violet-500/30' },
@@ -428,10 +428,10 @@ export default function LeadsContent() {
                     <div key={step.label} className="flex items-center gap-2 flex-1">
                       <div className={`flex-1 bg-gradient-to-br ${step.color} border rounded-xl p-4 text-center`}>
                         <div className="text-2xl font-bold text-white">{step.value.toLocaleString()}</div>
-                        <div className="text-xs font-medium text-zinc-400 mt-1">{step.label}</div>
+                        <div className="text-xs font-medium text-[#8AACBC] mt-1">{step.label}</div>
                       </div>
                       {idx < arr.length - 1 && (
-                        <ArrowRight className="w-5 h-5 text-zinc-600 flex-shrink-0" />
+                        <ArrowRight className="w-5 h-5 text-[#4A6E7F] flex-shrink-0" />
                       )}
                     </div>
                   ))}
@@ -439,7 +439,7 @@ export default function LeadsContent() {
                 {pipeline?.conversion_rate != null && (
                   <div className="mt-3 flex items-center gap-2">
                     <TrendingUp className="w-4 h-4 text-emerald-400" />
-                    <span className="text-sm text-zinc-400">Conversion rate:</span>
+                    <span className="text-sm text-[#8AACBC]">Conversion rate:</span>
                     <span className="text-sm font-semibold text-emerald-400">{pipeline.conversion_rate.toFixed(1)}%</span>
                   </div>
                 )}
@@ -447,7 +447,7 @@ export default function LeadsContent() {
 
               {/* Source Breakdown */}
               <div>
-                <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-3">By Source</h2>
+                <h2 className="text-sm font-semibold text-[#8AACBC] uppercase tracking-wider mb-3">By Source</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                   {Object.entries(pipeline?.by_source ?? {}).map(([source, count]) => (
                     <div
@@ -467,16 +467,16 @@ export default function LeadsContent() {
               </div>
 
               {/* Match Users */}
-              <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
+              <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="text-sm font-semibold text-zinc-300">Match Leads to Users</h2>
-                    <p className="text-xs text-zinc-500 mt-1">Link lead records with existing platform users by email</p>
+                    <h2 className="text-sm font-semibold text-[#D0E4EC]">Match Leads to Users</h2>
+                    <p className="text-xs text-[#6B8A9A] mt-1">Link lead records with existing platform users by email</p>
                   </div>
                   <button
                     onClick={handleMatchUsers}
                     disabled={matching}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium transition-colors disabled:opacity-50"
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors disabled:opacity-50"
                   >
                     <Zap className={`w-4 h-4 ${matching ? 'animate-pulse' : ''}`} />
                     {matching ? 'Matching...' : 'Match Users'}
@@ -485,8 +485,8 @@ export default function LeadsContent() {
                 {matchResult && (
                   <div className="mt-3 flex items-center gap-4 text-sm">
                     <span className="text-emerald-400 font-medium">{matchResult.matched} matched</span>
-                    <span className="text-zinc-500">|</span>
-                    <span className="text-zinc-400">{matchResult.total_unmatched} unmatched</span>
+                    <span className="text-[#6B8A9A]">|</span>
+                    <span className="text-[#8AACBC]">{matchResult.total_unmatched} unmatched</span>
                   </div>
                 )}
               </div>
@@ -494,26 +494,26 @@ export default function LeadsContent() {
               {/* Recent Conversions */}
               {(pipeline?.recent_conversions?.length ?? 0) > 0 && (
                 <div>
-                  <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-3">Recent Conversions</h2>
-                  <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl overflow-hidden">
+                  <h2 className="text-sm font-semibold text-[#8AACBC] uppercase tracking-wider mb-3">Recent Conversions</h2>
+                  <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl overflow-hidden">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="border-b border-zinc-800/80">
-                          <th className="text-left px-4 py-3 text-xs font-medium text-zinc-500 uppercase tracking-wider">Email</th>
-                          <th className="text-left px-4 py-3 text-xs font-medium text-zinc-500 uppercase tracking-wider">Source</th>
-                          <th className="text-left px-4 py-3 text-xs font-medium text-zinc-500 uppercase tracking-wider">Date</th>
+                        <tr className="border-b border-[#2D6A8F]/20">
+                          <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Email</th>
+                          <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Source</th>
+                          <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Date</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-zinc-800/40">
                         {pipeline?.recent_conversions?.map((c, i) => (
-                          <tr key={i} className="hover:bg-zinc-800/30 transition-colors">
-                            <td className="px-4 py-3 text-zinc-200">{c.email}</td>
+                          <tr key={i} className="hover:bg-[#2D6A8F]/10 transition-colors">
+                            <td className="px-4 py-3 text-white">{c.email}</td>
                             <td className="px-4 py-3">
                               <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium border ${SOURCE_COLORS[c.source] || SOURCE_COLORS.other}`}>
                                 {c.source}
                               </span>
                             </td>
-                            <td className="px-4 py-3 text-zinc-500 text-xs">
+                            <td className="px-4 py-3 text-[#6B8A9A] text-xs">
                               {c.converted_at ? new Date(c.converted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' }) : '—'}
                             </td>
                           </tr>
@@ -527,21 +527,21 @@ export default function LeadsContent() {
               {/* Top Lists */}
               {(pipeline?.top_lists?.length ?? 0) > 0 && (
                 <div>
-                  <h2 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-3">Top Lists</h2>
-                  <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl overflow-hidden">
+                  <h2 className="text-sm font-semibold text-[#8AACBC] uppercase tracking-wider mb-3">Top Lists</h2>
+                  <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl overflow-hidden">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="border-b border-zinc-800/80">
-                          <th className="text-left px-4 py-3 text-xs font-medium text-zinc-500 uppercase tracking-wider">Name</th>
-                          <th className="text-right px-4 py-3 text-xs font-medium text-zinc-500 uppercase tracking-wider">Leads</th>
-                          <th className="text-right px-4 py-3 text-xs font-medium text-zinc-500 uppercase tracking-wider">Converted</th>
+                        <tr className="border-b border-[#2D6A8F]/20">
+                          <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Name</th>
+                          <th className="text-right px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Leads</th>
+                          <th className="text-right px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Converted</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-zinc-800/40">
                         {pipeline?.top_lists?.map(list => (
-                          <tr key={list.id} className="hover:bg-zinc-800/30 transition-colors">
-                            <td className="px-4 py-3 text-zinc-200 font-medium">{list.name}</td>
-                            <td className="px-4 py-3 text-right text-zinc-300">{list.lead_count}</td>
+                          <tr key={list.id} className="hover:bg-[#2D6A8F]/10 transition-colors">
+                            <td className="px-4 py-3 text-white font-medium">{list.name}</td>
+                            <td className="px-4 py-3 text-right text-[#D0E4EC]">{list.lead_count}</td>
                             <td className="px-4 py-3 text-right text-emerald-400 font-medium">{list.converted}</td>
                           </tr>
                         ))}
@@ -561,7 +561,7 @@ export default function LeadsContent() {
           <div className="flex items-center justify-end">
             <button
               onClick={() => setShowCreate(true)}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium transition-colors"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors"
             >
               <Plus className="w-4 h-4" /> Create List
             </button>
@@ -569,21 +569,21 @@ export default function LeadsContent() {
 
           {/* Create List Modal */}
           {showCreate && (
-            <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
+            <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-semibold text-zinc-300">Create Lead List</h3>
-                <button onClick={() => setShowCreate(false)} className="text-zinc-500 hover:text-zinc-300"><X className="w-4 h-4" /></button>
+                <h3 className="text-sm font-semibold text-[#D0E4EC]">Create Lead List</h3>
+                <button onClick={() => setShowCreate(false)} className="text-[#6B8A9A] hover:text-[#D0E4EC]"><X className="w-4 h-4" /></button>
               </div>
               <div className="space-y-3">
-                <input value={createName} onChange={e => setCreateName(e.target.value)} placeholder="List name *" className="w-full px-3 py-2.5 bg-zinc-900/80 border border-zinc-800/80 rounded-lg text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-violet-500/50" />
-                <select value={createType} onChange={e => setCreateType(e.target.value)} className="w-full px-3 py-2.5 bg-zinc-900/80 border border-zinc-800/80 rounded-lg text-sm text-zinc-300 focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer">
+                <input value={createName} onChange={e => setCreateName(e.target.value)} placeholder="List name *" className="w-full px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50" />
+                <select value={createType} onChange={e => setCreateType(e.target.value)} className="w-full px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-[#D0E4EC] focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer">
                   <option value="prospect">Prospect</option>
                   <option value="customer">Customer</option>
                   <option value="partner">Partner</option>
                   <option value="other">Other</option>
                 </select>
-                <input value={createDesc} onChange={e => setCreateDesc(e.target.value)} placeholder="Description (optional)" className="w-full px-3 py-2.5 bg-zinc-900/80 border border-zinc-800/80 rounded-lg text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-violet-500/50" />
-                <button onClick={createList} disabled={creating || !createName.trim()} className="px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium transition-colors disabled:opacity-50">
+                <input value={createDesc} onChange={e => setCreateDesc(e.target.value)} placeholder="Description (optional)" className="w-full px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50" />
+                <button onClick={createList} disabled={creating || !createName.trim()} className="px-4 py-2 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors disabled:opacity-50">
                   {creating ? 'Creating...' : 'Create List'}
                 </button>
               </div>
@@ -597,51 +597,51 @@ export default function LeadsContent() {
             </div>
           ) : lists.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20">
-              <UserPlus className="w-12 h-12 text-zinc-700 mb-4" />
-              <p className="text-zinc-500 text-sm">No lead lists yet. Create one to get started.</p>
+              <UserPlus className="w-12 h-12 text-[#3A5A6A] mb-4" />
+              <p className="text-[#6B8A9A] text-sm">No lead lists yet. Create one to get started.</p>
             </div>
           ) : (
-            <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl overflow-hidden">
+            <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-zinc-800/80">
-                    <th className="text-left px-4 py-3 text-xs font-medium text-zinc-500 uppercase tracking-wider">Name</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-zinc-500 uppercase tracking-wider">Type</th>
-                    <th className="text-right px-4 py-3 text-xs font-medium text-zinc-500 uppercase tracking-wider">Leads</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-zinc-500 uppercase tracking-wider hidden md:table-cell">SendGrid</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-zinc-500 uppercase tracking-wider hidden lg:table-cell">Created</th>
-                    <th className="text-right px-4 py-3 text-xs font-medium text-zinc-500 uppercase tracking-wider w-40">Actions</th>
+                  <tr className="border-b border-[#2D6A8F]/20">
+                    <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Name</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Type</th>
+                    <th className="text-right px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Leads</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider hidden md:table-cell">SendGrid</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider hidden lg:table-cell">Created</th>
+                    <th className="text-right px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider w-40">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-800/40">
                   {lists.map(list => (
-                    <tr key={list.id} className="hover:bg-zinc-800/30 transition-colors">
+                    <tr key={list.id} className="hover:bg-[#2D6A8F]/10 transition-colors">
                       <td className="px-4 py-3">
-                        <button onClick={() => viewList(list.id)} className="text-zinc-200 font-medium hover:text-violet-300 transition-colors flex items-center gap-1.5">
-                          {list.name} <ExternalLink className="w-3 h-3 text-zinc-600" />
+                        <button onClick={() => viewList(list.id)} className="text-white font-medium hover:text-[#5BC4A0] transition-colors flex items-center gap-1.5">
+                          {list.name} <ExternalLink className="w-3 h-3 text-[#4A6E7F]" />
                         </button>
-                        {list.description && <div className="text-xs text-zinc-600 truncate max-w-xs">{list.description}</div>}
+                        {list.description && <div className="text-xs text-[#4A6E7F] truncate max-w-xs">{list.description}</div>}
                       </td>
                       <td className="px-4 py-3">
-                        <span className="inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium bg-zinc-700/50 text-zinc-400 capitalize">{list.lead_type}</span>
+                        <span className="inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium bg-zinc-700/50 text-[#8AACBC] capitalize">{list.lead_type}</span>
                       </td>
-                      <td className="px-4 py-3 text-right text-zinc-300 font-medium">{list.lead_count}</td>
+                      <td className="px-4 py-3 text-right text-[#D0E4EC] font-medium">{list.lead_count}</td>
                       <td className="px-4 py-3 hidden md:table-cell">
                         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${
-                          list.sendgrid_list_id ? 'bg-emerald-500/15 text-emerald-400' : 'bg-zinc-700/50 text-zinc-500'
+                          list.sendgrid_list_id ? 'bg-emerald-500/15 text-emerald-400' : 'bg-zinc-700/50 text-[#6B8A9A]'
                         }`}>
                           <span className={`w-1.5 h-1.5 rounded-full ${list.sendgrid_list_id ? 'bg-emerald-400' : 'bg-zinc-600'}`} />
                           {list.sendgrid_list_id ? 'Synced' : 'Not synced'}
                         </span>
                       </td>
-                      <td className="px-4 py-3 hidden lg:table-cell text-zinc-500 text-xs">
+                      <td className="px-4 py-3 hidden lg:table-cell text-[#6B8A9A] text-xs">
                         {new Date(list.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' })}
                       </td>
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center justify-end gap-1">
                           <button
                             onClick={() => viewList(list.id)}
-                            className="p-1.5 rounded-lg hover:bg-zinc-800/60 text-zinc-500 hover:text-zinc-300 transition-colors"
+                            className="p-1.5 rounded-lg hover:bg-[#2D6A8F]/20 text-[#6B8A9A] hover:text-[#D0E4EC] transition-colors"
                             title="View leads"
                           >
                             <ExternalLink className="w-4 h-4" />
@@ -649,14 +649,14 @@ export default function LeadsContent() {
                           <button
                             onClick={() => syncToSendGrid(list.id)}
                             disabled={syncing === list.id}
-                            className="p-1.5 rounded-lg hover:bg-zinc-800/60 text-zinc-500 hover:text-emerald-400 transition-colors disabled:opacity-50"
+                            className="p-1.5 rounded-lg hover:bg-[#2D6A8F]/20 text-[#6B8A9A] hover:text-emerald-400 transition-colors disabled:opacity-50"
                             title="Sync to SendGrid"
                           >
                             <CloudUpload className={`w-4 h-4 ${syncing === list.id ? 'animate-pulse' : ''}`} />
                           </button>
                           <button
                             onClick={() => deleteList(list.id)}
-                            className="p-1.5 rounded-lg hover:bg-zinc-800/60 text-zinc-500 hover:text-red-400 transition-colors"
+                            className="p-1.5 rounded-lg hover:bg-[#2D6A8F]/20 text-[#6B8A9A] hover:text-red-400 transition-colors"
                             title="Delete list"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -676,15 +676,15 @@ export default function LeadsContent() {
       {activeTab === 'import' && (
         <div className="space-y-6">
           {/* List Selection */}
-          <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
-            <h2 className="text-sm font-semibold text-zinc-300 mb-3">Target List</h2>
-            <p className="text-xs text-zinc-500 mb-3">Select a list before importing leads via CSV or manual entry.</p>
+          <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+            <h2 className="text-sm font-semibold text-[#D0E4EC] mb-3">Target List</h2>
+            <p className="text-xs text-[#6B8A9A] mb-3">Select a list before importing leads via CSV or manual entry.</p>
             {listsLoading ? (
               <Skeleton className="h-10 w-full" />
             ) : lists.length === 0 ? (
-              <div className="text-sm text-zinc-500">
+              <div className="text-sm text-[#6B8A9A]">
                 No lists available.{' '}
-                <button onClick={() => setActiveTab('lists')} className="text-violet-400 hover:text-violet-300 underline">
+                <button onClick={() => setActiveTab('lists')} className="text-[#3DAA8A] hover:text-[#5BC4A0] underline">
                   Create one first
                 </button>
               </div>
@@ -692,7 +692,7 @@ export default function LeadsContent() {
               <select
                 value={importListId}
                 onChange={e => setImportListId(e.target.value)}
-                className="w-full px-3 py-2.5 bg-zinc-900/80 border border-zinc-800/80 rounded-lg text-sm text-zinc-300 focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer"
+                className="w-full px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-[#D0E4EC] focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer"
               >
                 <option value="">Select a list...</option>
                 {lists.map(l => (
@@ -703,12 +703,12 @@ export default function LeadsContent() {
           </div>
 
           {/* Source Selection */}
-          <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
-            <h2 className="text-sm font-semibold text-zinc-300 mb-3">Source</h2>
+          <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+            <h2 className="text-sm font-semibold text-[#D0E4EC] mb-3">Source</h2>
             <select
               value={importSource}
               onChange={e => setImportSource(e.target.value)}
-              className="w-full px-3 py-2.5 bg-zinc-900/80 border border-zinc-800/80 rounded-lg text-sm text-zinc-300 focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer"
+              className="w-full px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-[#D0E4EC] focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer"
             >
               {SOURCE_OPTIONS.map(s => (
                 <option key={s} value={s}>{s.replace('_', ' ')}</option>
@@ -717,18 +717,18 @@ export default function LeadsContent() {
           </div>
 
           {/* CSV Upload */}
-          <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
-            <h2 className="text-sm font-semibold text-zinc-300 mb-3">CSV Import</h2>
+          <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+            <h2 className="text-sm font-semibold text-[#D0E4EC] mb-3">CSV Import</h2>
             <div
               onDragOver={e => { e.preventDefault(); setDragOver(true); }}
               onDragLeave={() => setDragOver(false)}
               onDrop={handleDrop}
               className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors ${
-                dragOver ? 'border-violet-500/50 bg-violet-500/5' : 'border-zinc-800/60'
+                dragOver ? 'border-violet-500/50 bg-violet-500/5' : 'border-[#2D6A8F]/20'
               } ${!importListId ? 'opacity-50 pointer-events-none' : ''}`}
             >
-              <Upload className="w-8 h-8 text-zinc-600 mx-auto mb-3" />
-              <p className="text-sm text-zinc-400 mb-2">
+              <Upload className="w-8 h-8 text-[#4A6E7F] mx-auto mb-3" />
+              <p className="text-sm text-[#8AACBC] mb-2">
                 {importListId
                   ? 'Drag and drop a CSV file here, or click to browse'
                   : 'Select a list above before uploading'}
@@ -743,7 +743,7 @@ export default function LeadsContent() {
               <button
                 onClick={() => fileRef.current?.click()}
                 disabled={importing || !importListId}
-                className="px-4 py-2 rounded-lg bg-zinc-800/60 hover:bg-zinc-800 text-zinc-300 text-sm font-medium transition-colors disabled:opacity-50"
+                className="px-4 py-2 rounded-lg bg-[#2D6A8F]/20 hover:bg-[#2D6A8F]/30 text-[#D0E4EC] text-sm font-medium transition-colors disabled:opacity-50"
               >
                 {importing ? 'Importing...' : 'Choose File'}
               </button>
@@ -751,17 +751,17 @@ export default function LeadsContent() {
           </div>
 
           {/* Manual Add */}
-          <div className="bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-5">
+          <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h2 className="text-sm font-semibold text-zinc-300">Manual Add</h2>
-                <p className="text-xs text-zinc-500 mt-1">Add a single lead manually</p>
+                <h2 className="text-sm font-semibold text-[#D0E4EC]">Manual Add</h2>
+                <p className="text-xs text-[#6B8A9A] mt-1">Add a single lead manually</p>
               </div>
               {!showAddLead && (
                 <button
                   onClick={() => setShowAddLead(true)}
                   disabled={!importListId}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium transition-colors disabled:opacity-50"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors disabled:opacity-50"
                 >
                   <Plus className="w-4 h-4" /> Add Lead
                 </button>
@@ -778,36 +778,36 @@ export default function LeadsContent() {
                     value={newLead.email}
                     onChange={e => setNewLead({ ...newLead, email: e.target.value })}
                     placeholder="Email *"
-                    className="col-span-2 px-3 py-2.5 bg-zinc-900/80 border border-zinc-800/80 rounded-lg text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-violet-500/50"
+                    className="col-span-2 px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50"
                   />
                   <input
                     value={newLead.first_name}
                     onChange={e => setNewLead({ ...newLead, first_name: e.target.value })}
                     placeholder="First name"
-                    className="px-3 py-2.5 bg-zinc-900/80 border border-zinc-800/80 rounded-lg text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-violet-500/50"
+                    className="px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50"
                   />
                   <input
                     value={newLead.last_name}
                     onChange={e => setNewLead({ ...newLead, last_name: e.target.value })}
                     placeholder="Last name"
-                    className="px-3 py-2.5 bg-zinc-900/80 border border-zinc-800/80 rounded-lg text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-violet-500/50"
+                    className="px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50"
                   />
                   <input
                     value={newLead.company}
                     onChange={e => setNewLead({ ...newLead, company: e.target.value })}
                     placeholder="Company"
-                    className="px-3 py-2.5 bg-zinc-900/80 border border-zinc-800/80 rounded-lg text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-violet-500/50"
+                    className="px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50"
                   />
                   <input
                     value={newLead.title}
                     onChange={e => setNewLead({ ...newLead, title: e.target.value })}
                     placeholder="Title"
-                    className="px-3 py-2.5 bg-zinc-900/80 border border-zinc-800/80 rounded-lg text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-violet-500/50"
+                    className="px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50"
                   />
                   <select
                     value={newLead.source}
                     onChange={e => setNewLead({ ...newLead, source: e.target.value })}
-                    className="col-span-2 px-3 py-2.5 bg-zinc-900/80 border border-zinc-800/80 rounded-lg text-sm text-zinc-300 focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer"
+                    className="col-span-2 px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-[#D0E4EC] focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer"
                   >
                     {SOURCE_OPTIONS.map(s => (
                       <option key={s} value={s}>{s.replace('_', ' ')}</option>
@@ -818,13 +818,13 @@ export default function LeadsContent() {
                   <button
                     onClick={addLead}
                     disabled={addingLead || !newLead.email || !importListId}
-                    className="px-4 py-2 rounded-lg bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium transition-colors disabled:opacity-50"
+                    className="px-4 py-2 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors disabled:opacity-50"
                   >
                     {addingLead ? 'Adding...' : 'Add Lead'}
                   </button>
                   <button
                     onClick={() => setShowAddLead(false)}
-                    className="px-4 py-2 rounded-lg text-zinc-500 hover:text-zinc-300 text-sm transition-colors"
+                    className="px-4 py-2 rounded-lg text-[#6B8A9A] hover:text-[#D0E4EC] text-sm transition-colors"
                   >
                     Cancel
                   </button>

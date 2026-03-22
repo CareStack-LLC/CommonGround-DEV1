@@ -21,7 +21,7 @@ export function TabBar({ tabs, activeTab, onTabChange, size = "md" }: TabBarProp
   const sizeClass = size === "sm" ? "text-xs px-3 py-1.5" : "text-sm px-4 py-2";
 
   return (
-    <div className="flex items-center gap-1 bg-zinc-900/50 border border-zinc-800/60 rounded-xl p-1">
+    <div className="flex items-center gap-1 bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-1">
       {tabs.map((tab) => {
         const isActive = tab.key === activeTab;
         const Icon = tab.icon;
@@ -31,8 +31,8 @@ export function TabBar({ tabs, activeTab, onTabChange, size = "md" }: TabBarProp
             onClick={() => onTabChange(tab.key)}
             className={`flex items-center gap-1.5 rounded-lg font-medium transition-all ${sizeClass} ${
               isActive
-                ? "bg-violet-500/15 text-violet-300 shadow-sm"
-                : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50"
+                ? "bg-[#3DAA8A]/15 text-[#5BC4A0] shadow-sm"
+                : "text-[#6B8A9A] hover:text-white hover:bg-[#2D6A8F]/15"
             }`}
           >
             {Icon && <Icon className="w-3.5 h-3.5" />}

@@ -8,7 +8,6 @@ import {
   Users,
   CreditCard,
   TrendingUp,
-  FileText,
   ChevronLeft,
   Menu,
   X,
@@ -18,16 +17,15 @@ import {
   PenTool,
   Film,
   Bug,
-  Shield,
   UserPlus,
   Send,
   Mail,
   Globe,
   MessageCircle,
   Server,
-  Megaphone,
 } from 'lucide-react';
 import { adminAPI, type PlatformHealth } from '@/lib/admin-api';
+import { AdminLogo } from '@/components/superadmin';
 
 const navSections = [
   {
@@ -96,10 +94,10 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#0f1117] flex items-center justify-center">
+      <div className="min-h-screen bg-[#162D3A] flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-2 border-violet-500/30 border-t-violet-500 rounded-full animate-spin" />
-          <p className="text-zinc-500 text-sm">Loading admin portal...</p>
+          <div className="w-10 h-10 border-2 border-[#3DAA8A]/30 border-t-[#3DAA8A] rounded-full animate-spin" />
+          <p className="text-[#6B8A9A] text-sm">Loading admin portal...</p>
         </div>
       </div>
     );
@@ -110,34 +108,34 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
   const isActive = (href: string, exact?: boolean) =>
     exact ? pathname === href : pathname.startsWith(href);
 
-  const healthColor = health?.status === 'healthy' ? 'bg-emerald-500' :
-    health?.status === 'degraded' ? 'bg-amber-500' : health?.status === 'critical' ? 'bg-red-500' : 'bg-zinc-600';
+  const healthColor = health?.status === 'healthy' ? 'bg-[#3DAA8A]' :
+    health?.status === 'degraded' ? 'bg-[#F5A623]' : health?.status === 'critical' ? 'bg-red-500' : 'bg-[#4A6E7F]';
 
   return (
-    <div className="min-h-screen bg-[#0f1117] text-zinc-100">
-      <header className="sticky top-0 z-50 h-14 border-b border-zinc-800/80 bg-[#0f1117]/95 backdrop-blur-md flex items-center px-4 lg:px-6">
+    <div className="min-h-screen bg-[#162D3A] text-[#D0E4EC]">
+      <header className="sticky top-0 z-50 h-14 border-b border-[#2D6A8F]/20 bg-[#162D3A]/95 backdrop-blur-md flex items-center px-4 lg:px-6">
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="lg:hidden mr-3 p-1.5 rounded-lg hover:bg-zinc-800/60 transition-colors"
+          className="lg:hidden mr-3 p-1.5 rounded-lg hover:bg-[#2D6A8F]/20 transition-colors"
         >
           {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
 
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-600 to-indigo-600 flex items-center justify-center">
-              <Shield className="w-4 h-4 text-white" />
-            </div>
-            <span className="font-semibold text-sm tracking-tight hidden sm:block">CommonGround</span>
+            <AdminLogo size={28} />
+            <span className="hidden sm:block text-sm" style={{ fontFamily: "var(--font-dm-serif-display), Georgia, serif" }}>
+              <span className="font-bold text-white">Common</span><span className="font-normal text-[#3DAA8A]">Ground</span>
+            </span>
           </div>
-          <span className="text-[10px] font-bold tracking-widest px-2 py-0.5 rounded-full bg-violet-500/15 text-violet-400 border border-violet-500/20 uppercase">
+          <span className="text-[10px] font-bold tracking-widest px-2 py-0.5 rounded-full bg-[#3DAA8A]/15 text-[#3DAA8A] border border-[#3DAA8A]/20 uppercase">
             Admin
           </span>
         </div>
 
         <div className="ml-4 hidden md:flex items-center gap-2">
           <div className={`w-2 h-2 rounded-full ${healthColor} ${health?.status === 'healthy' ? 'animate-pulse' : ''}`} />
-          <span className="text-xs text-zinc-500">
+          <span className="text-xs text-[#6B8A9A]">
             {health ? `${health.active_sessions} active` : '—'}
           </span>
         </div>
@@ -146,18 +144,18 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
 
         <div className="flex items-center gap-3">
           {health && health.errors_24h > 0 && (
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20">
-              <Bell className="w-3.5 h-3.5 text-amber-400" />
-              <span className="text-xs text-amber-400 font-medium">{health.errors_24h}</span>
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#F5A623]/10 border border-[#F5A623]/20">
+              <Bell className="w-3.5 h-3.5 text-[#F5A623]" />
+              <span className="text-xs text-[#F5A623] font-medium">{health.errors_24h}</span>
             </div>
           )}
           <div className="hidden sm:block text-right">
-            <div className="text-xs font-medium text-zinc-300">{user.first_name} {user.last_name}</div>
-            <div className="text-[11px] text-zinc-500">{user.email}</div>
+            <div className="text-xs font-medium text-[#D0E4EC]">{user.first_name} {user.last_name}</div>
+            <div className="text-[11px] text-[#6B8A9A]">{user.email}</div>
           </div>
           <button
             onClick={() => logout()}
-            className="p-2 rounded-lg hover:bg-zinc-800/60 transition-colors text-zinc-400 hover:text-zinc-200"
+            className="p-2 rounded-lg hover:bg-[#2D6A8F]/20 transition-colors text-[#8AACBC] hover:text-white"
             title="Sign out"
           >
             <LogOut className="w-4 h-4" />
@@ -172,14 +170,14 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
 
         <aside className={`
           fixed lg:sticky top-14 z-40 h-[calc(100vh-3.5rem)]
-          w-56 bg-[#0f1117] border-r border-zinc-800/80
+          w-56 bg-[#1E3A4A] border-r border-[#2D6A8F]/20
           flex flex-col transition-transform duration-200
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}>
           <nav className="flex-1 py-3 px-2.5 space-y-4 overflow-y-auto">
             {navSections.map((section) => (
               <div key={section.label}>
-                <div className="text-[10px] uppercase tracking-wider text-zinc-600 font-semibold px-3 mb-1">
+                <div className="text-[10px] uppercase tracking-wider text-[#5BC4A0]/60 font-semibold px-3 mb-1">
                   {section.label}
                 </div>
                 <div className="space-y-0.5">
@@ -196,11 +194,11 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
                         }}
                         className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 group ${
                           active
-                            ? 'bg-violet-500/15 text-violet-300 shadow-sm shadow-violet-500/5'
-                            : 'text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200'
+                            ? 'bg-[#3DAA8A]/15 text-[#5BC4A0] shadow-sm shadow-[#3DAA8A]/5'
+                            : 'text-[#8AACBC] hover:bg-[#2D6A8F]/20 hover:text-white'
                         }`}
                       >
-                        <item.icon className={`w-4 h-4 flex-shrink-0 ${active ? 'text-violet-400' : 'text-zinc-500 group-hover:text-zinc-400'}`} />
+                        <item.icon className={`w-4 h-4 flex-shrink-0 ${active ? 'text-[#3DAA8A]' : 'text-[#6B8A9A] group-hover:text-[#8AACBC]'}`} />
                         {item.label}
                       </a>
                     );
@@ -210,11 +208,11 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
             ))}
           </nav>
 
-          <div className="p-3 border-t border-zinc-800/80">
+          <div className="p-3 border-t border-[#2D6A8F]/20">
             <a
               href="/dashboard"
               onClick={(e) => { e.preventDefault(); router.push('/dashboard'); }}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50 transition-colors"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-[#6B8A9A] hover:text-white hover:bg-[#2D6A8F]/20 transition-colors"
             >
               <ChevronLeft className="w-3.5 h-3.5" />
               Back to App

@@ -15,12 +15,11 @@ export function Skeleton({ className = "", variant }: SkeletonProps) {
 
   return (
     <div
-      className={`animate-pulse bg-zinc-800/60 rounded-lg ${variantClass} ${className}`}
+      className={`animate-pulse bg-[#2D6A8F]/20 rounded-lg ${variantClass} ${className}`}
     />
   );
 }
 
-/** Render N skeleton rows for a table */
 export function SkeletonRows({ count = 5 }: { count?: number }) {
   return (
     <>
@@ -31,7 +30,6 @@ export function SkeletonRows({ count = 5 }: { count?: number }) {
   );
 }
 
-/** Render N skeleton cards in a grid */
 export function SkeletonCards({ count = 4 }: { count?: number }) {
   return (
     <>

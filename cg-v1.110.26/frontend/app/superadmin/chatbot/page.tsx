@@ -16,13 +16,13 @@ function StatCard({ label, value, icon: Icon, color }: {
   label: string; value: string | number; icon: any; color: string;
 }) {
   return (
-    <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-4">
+    <div className="bg-[#1A3648]/60 border border-zinc-800 rounded-xl p-4">
       <div className="flex items-center gap-3">
         <div className={`p-2 rounded-lg ${color}`}>
           <Icon className="h-4 w-4" />
         </div>
         <div>
-          <p className="text-zinc-400 text-xs">{label}</p>
+          <p className="text-[#8AACBC] text-xs">{label}</p>
           <p className="text-zinc-100 text-xl font-semibold">{value}</p>
         </div>
       </div>
@@ -32,9 +32,9 @@ function StatCard({ label, value, icon: Icon, color }: {
 
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
-    active: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-    closed: 'bg-zinc-500/10 text-zinc-400 border-zinc-500/20',
-    escalated: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+    active: 'bg-emerald-500/10 text-emerald-400 border-[#3DAA8A]/20',
+    closed: 'bg-zinc-500/10 text-[#8AACBC] border-zinc-500/20',
+    escalated: 'bg-amber-500/10 text-amber-400 border-[#F5A623]/20',
   };
   return (
     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${styles[status] || styles.closed}`}>
@@ -179,13 +179,13 @@ export default function ChatbotAdminPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-zinc-100">Chatbot Management</h1>
-          <p className="text-zinc-400 text-sm mt-1">Aria customer success chatbot</p>
+          <p className="text-[#8AACBC] text-sm mt-1">Aria customer success chatbot</p>
         </div>
         <div className="flex items-center gap-2">
           {activeTab === 'conversations' && (
             <button
               onClick={fetchData}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm transition-colors"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-[#D0E4EC] text-sm transition-colors"
             >
               <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
               Refresh
@@ -195,13 +195,13 @@ export default function ChatbotAdminPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-zinc-900/50 border border-zinc-800 rounded-lg p-1 w-fit">
+      <div className="flex gap-1 bg-[#1A3648]/60 border border-zinc-800 rounded-lg p-1 w-fit">
         <button
           onClick={() => setActiveTab('conversations')}
           className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm transition-colors ${
             activeTab === 'conversations'
               ? 'bg-zinc-700 text-zinc-100'
-              : 'text-zinc-400 hover:text-zinc-200'
+              : 'text-[#8AACBC] hover:text-white'
           }`}
         >
           <MessageCircle className="h-4 w-4" />
@@ -212,7 +212,7 @@ export default function ChatbotAdminPage() {
           className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm transition-colors ${
             activeTab === 'settings'
               ? 'bg-zinc-700 text-zinc-100'
-              : 'text-zinc-400 hover:text-zinc-200'
+              : 'text-[#8AACBC] hover:text-white'
           }`}
         >
           <Settings className="h-4 w-4" />
@@ -229,10 +229,10 @@ export default function ChatbotAdminPage() {
       {/* ── Settings Tab ── */}
       {activeTab === 'settings' && (
         <div className="space-y-6">
-          <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6 space-y-6">
+          <div className="bg-[#1A3648]/60 border border-zinc-800 rounded-xl p-6 space-y-6">
             <div>
               <h3 className="text-zinc-100 font-semibold text-lg mb-1">System Prompt</h3>
-              <p className="text-zinc-500 text-sm mb-3">
+              <p className="text-[#6B8A9A] text-sm mb-3">
                 This controls how Aria responds. Edit to change personality, knowledge, and rules.
                 Leave empty to use the default built-in prompt.
               </p>
@@ -241,13 +241,13 @@ export default function ChatbotAdminPage() {
                 onChange={(e) => setSystemPrompt(e.target.value)}
                 placeholder="Leave empty to use default system prompt..."
                 rows={12}
-                className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-zinc-200 text-sm font-mono placeholder:text-zinc-600 outline-none focus:border-zinc-600 resize-y"
+                className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-white text-sm font-mono placeholder:text-[#4A6E7F] outline-none focus:border-zinc-600 resize-y"
               />
             </div>
 
             <div>
               <h3 className="text-zinc-100 font-semibold text-lg mb-1">Active Promotions & Deals</h3>
-              <p className="text-zinc-500 text-sm mb-3">
+              <p className="text-[#6B8A9A] text-sm mb-3">
                 Add current promotions, discounts, or special offers. Aria will mention these when relevant.
                 One per line works best.
               </p>
@@ -256,7 +256,7 @@ export default function ChatbotAdminPage() {
                 onChange={(e) => setActivePromotions(e.target.value)}
                 placeholder={"Example:\n- 30-day free trial of Plus plan for new signups\n- 20% off annual billing through March 2026\n- Free onboarding call for Professional plans"}
                 rows={6}
-                className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-zinc-200 text-sm placeholder:text-zinc-600 outline-none focus:border-zinc-600 resize-y"
+                className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-white text-sm placeholder:text-[#4A6E7F] outline-none focus:border-zinc-600 resize-y"
               />
             </div>
 
@@ -284,26 +284,26 @@ export default function ChatbotAdminPage() {
           <StatCard label="Active Today" value={stats.active_today} icon={TrendingUp} color="bg-blue-500/10 text-blue-400" />
           <StatCard label="Avg Messages" value={stats.avg_messages_per_session} icon={MessageCircle} color="bg-purple-500/10 text-purple-400" />
           <StatCard label="Escalation Rate" value={`${stats.escalation_rate}%`} icon={AlertTriangle} color="bg-amber-500/10 text-amber-400" />
-          <StatCard label="Unique Visitors" value={stats.total_visitors} icon={Users} color="bg-zinc-500/10 text-zinc-400" />
+          <StatCard label="Unique Visitors" value={stats.total_visitors} icon={Users} color="bg-zinc-500/10 text-[#8AACBC]" />
         </div>
       )}
 
       {/* Filters */}
       {activeTab === 'conversations' && <div className="flex flex-wrap gap-3 items-center">
         <div className="relative flex-1 min-w-[200px] max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#6B8A9A]" />
           <input
             type="text"
             placeholder="Search by name or email..."
             value={searchQuery}
             onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }}
-            className="w-full pl-9 pr-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-zinc-200 text-sm placeholder:text-zinc-600 outline-none focus:border-zinc-600"
+            className="w-full pl-9 pr-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-white text-sm placeholder:text-[#4A6E7F] outline-none focus:border-zinc-600"
           />
         </div>
         <select
           value={statusFilter}
           onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
-          className="px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-zinc-200 text-sm outline-none focus:border-zinc-600"
+          className="px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-white text-sm outline-none focus:border-zinc-600"
         >
           <option value="">All statuses</option>
           <option value="active">Active</option>
@@ -314,11 +314,11 @@ export default function ChatbotAdminPage() {
 
       {/* Sessions Table */}
       {activeTab === 'conversations' && <>
-      <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden">
+      <div className="bg-[#1A3648]/60 border border-zinc-800 rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-zinc-800 text-zinc-400">
+              <tr className="border-b border-zinc-800 text-[#8AACBC]">
                 <th className="text-left px-4 py-3 font-medium">Visitor</th>
                 <th className="text-left px-4 py-3 font-medium">Email</th>
                 <th className="text-left px-4 py-3 font-medium">Status</th>
@@ -331,13 +331,13 @@ export default function ChatbotAdminPage() {
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i} className="border-b border-zinc-800/50">
                     <td colSpan={5} className="px-4 py-3">
-                      <div className="h-4 bg-zinc-800/60 rounded animate-pulse" />
+                      <div className="h-4 bg-[#2D6A8F]/20 rounded animate-pulse" />
                     </td>
                   </tr>
                 ))
               ) : sessions.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-zinc-500">
+                  <td colSpan={5} className="px-4 py-8 text-center text-[#6B8A9A]">
                     No chatbot conversations yet.
                   </td>
                 </tr>
@@ -346,13 +346,13 @@ export default function ChatbotAdminPage() {
                   <tr
                     key={s.id}
                     onClick={() => openDetail(s.id)}
-                    className="border-b border-zinc-800/50 hover:bg-zinc-800/30 cursor-pointer transition-colors"
+                    className="border-b border-zinc-800/50 hover:bg-[#2D6A8F]/10 cursor-pointer transition-colors"
                   >
-                    <td className="px-4 py-3 text-zinc-200">{s.visitor_name || 'Anonymous'}</td>
-                    <td className="px-4 py-3 text-zinc-400">{s.visitor_email || '—'}</td>
+                    <td className="px-4 py-3 text-white">{s.visitor_name || 'Anonymous'}</td>
+                    <td className="px-4 py-3 text-[#8AACBC]">{s.visitor_email || '—'}</td>
                     <td className="px-4 py-3"><StatusBadge status={s.status} /></td>
-                    <td className="px-4 py-3 text-zinc-300">{s.message_count}</td>
-                    <td className="px-4 py-3 text-zinc-400">{formatDate(s.started_at)}</td>
+                    <td className="px-4 py-3 text-[#D0E4EC]">{s.message_count}</td>
+                    <td className="px-4 py-3 text-[#8AACBC]">{formatDate(s.started_at)}</td>
                   </tr>
                 ))
               )}
@@ -363,20 +363,20 @@ export default function ChatbotAdminPage() {
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex items-center justify-between px-4 py-3 border-t border-zinc-800">
-            <p className="text-zinc-500 text-xs">{total} total sessions</p>
+            <p className="text-[#6B8A9A] text-xs">{total} total sessions</p>
             <div className="flex gap-2">
               <button
                 disabled={page <= 1}
                 onClick={() => setPage(page - 1)}
-                className="px-3 py-1 rounded bg-zinc-800 text-zinc-300 text-xs disabled:opacity-40 hover:bg-zinc-700"
+                className="px-3 py-1 rounded bg-zinc-800 text-[#D0E4EC] text-xs disabled:opacity-40 hover:bg-zinc-700"
               >
                 Previous
               </button>
-              <span className="text-zinc-500 text-xs flex items-center">{page} / {totalPages}</span>
+              <span className="text-[#6B8A9A] text-xs flex items-center">{page} / {totalPages}</span>
               <button
                 disabled={page >= totalPages}
                 onClick={() => setPage(page + 1)}
-                className="px-3 py-1 rounded bg-zinc-800 text-zinc-300 text-xs disabled:opacity-40 hover:bg-zinc-700"
+                className="px-3 py-1 rounded bg-zinc-800 text-[#D0E4EC] text-xs disabled:opacity-40 hover:bg-zinc-700"
               >
                 Next
               </button>
@@ -398,7 +398,7 @@ export default function ChatbotAdminPage() {
             {detailLoading ? (
               <div className="p-6 space-y-4">
                 {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="h-8 bg-zinc-800/60 rounded animate-pulse" />
+                  <div key={i} className="h-8 bg-[#2D6A8F]/20 rounded animate-pulse" />
                 ))}
               </div>
             ) : selectedSession ? (
@@ -409,13 +409,13 @@ export default function ChatbotAdminPage() {
                     <h2 className="text-zinc-100 font-semibold text-lg">
                       {selectedSession.visitor.name || 'Anonymous'}
                     </h2>
-                    <p className="text-zinc-400 text-xs mt-0.5">
+                    <p className="text-[#8AACBC] text-xs mt-0.5">
                       {selectedSession.visitor.email || 'No email'} &middot; <StatusBadge status={selectedSession.status} />
                     </p>
                   </div>
                   <button
                     onClick={() => setSelectedSession(null)}
-                    className="p-2 rounded-lg hover:bg-zinc-800 text-zinc-400"
+                    className="p-2 rounded-lg hover:bg-[#2D6A8F]/30 text-[#8AACBC]"
                   >
                     <X className="h-5 w-5" />
                   </button>
@@ -424,25 +424,25 @@ export default function ChatbotAdminPage() {
                 {/* Visitor Info */}
                 <div className="px-5 py-4 border-b border-zinc-800 space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-zinc-500">Phone</span>
-                    <span className="text-zinc-300">{selectedSession.visitor.phone || '—'}</span>
+                    <span className="text-[#6B8A9A]">Phone</span>
+                    <span className="text-[#D0E4EC]">{selectedSession.visitor.phone || '—'}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-zinc-500">Source Page</span>
-                    <span className="text-zinc-300 text-right truncate max-w-[200px]">{selectedSession.visitor.source_page || '—'}</span>
+                    <span className="text-[#6B8A9A]">Source Page</span>
+                    <span className="text-[#D0E4EC] text-right truncate max-w-[200px]">{selectedSession.visitor.source_page || '—'}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-zinc-500">Started</span>
-                    <span className="text-zinc-300">{formatDate(selectedSession.started_at)} {formatTime(selectedSession.started_at)}</span>
+                    <span className="text-[#6B8A9A]">Started</span>
+                    <span className="text-[#D0E4EC]">{formatDate(selectedSession.started_at)} {formatTime(selectedSession.started_at)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-zinc-500">Messages</span>
-                    <span className="text-zinc-300">{selectedSession.message_count}</span>
+                    <span className="text-[#6B8A9A]">Messages</span>
+                    <span className="text-[#D0E4EC]">{selectedSession.message_count}</span>
                   </div>
                   {selectedSession.escalation_reason && (
-                    <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-3 mt-2">
+                    <div className="bg-amber-500/10 border border-[#F5A623]/20 rounded-lg p-3 mt-2">
                       <p className="text-amber-400 text-xs font-medium">Escalation Reason</p>
-                      <p className="text-zinc-300 text-sm mt-1">{selectedSession.escalation_reason}</p>
+                      <p className="text-[#D0E4EC] text-sm mt-1">{selectedSession.escalation_reason}</p>
                     </div>
                   )}
                 </div>
@@ -461,7 +461,7 @@ export default function ChatbotAdminPage() {
 
                 {/* Messages */}
                 <div className="px-5 py-4 space-y-3">
-                  <h3 className="text-zinc-400 text-xs font-medium uppercase tracking-wider">Conversation</h3>
+                  <h3 className="text-[#8AACBC] text-xs font-medium uppercase tracking-wider">Conversation</h3>
                   {selectedSession.messages.map((msg) => (
                     <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                       <div
@@ -469,12 +469,12 @@ export default function ChatbotAdminPage() {
                           msg.role === 'user'
                             ? 'bg-emerald-600/20 text-emerald-200'
                             : msg.role === 'system'
-                            ? 'bg-zinc-800/50 text-zinc-500 text-xs text-center w-full'
-                            : 'bg-zinc-800 text-zinc-300'
+                            ? 'bg-[#2D6A8F]/20 text-[#6B8A9A] text-xs text-center w-full'
+                            : 'bg-zinc-800 text-[#D0E4EC]'
                         }`}
                       >
                         <p>{msg.content}</p>
-                        <p className="text-zinc-600 text-[10px] mt-1">{formatTime(msg.created_at)}</p>
+                        <p className="text-[#4A6E7F] text-[10px] mt-1">{formatTime(msg.created_at)}</p>
                       </div>
                     </div>
                   ))}

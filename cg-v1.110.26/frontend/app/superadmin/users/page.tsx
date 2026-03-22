@@ -25,7 +25,7 @@ export default function UsersAndActivityPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-xl font-bold text-white">Users & Activity</h1>
-        <p className="text-sm text-zinc-500 mt-0.5">Manage users and track platform activity</p>
+        <p className="text-sm text-[#6B8A9A] mt-0.5">Manage users and track platform activity</p>
       </div>
 
       <TabBar tabs={TABS} activeTab={tab} onTabChange={handleTabChange} />
