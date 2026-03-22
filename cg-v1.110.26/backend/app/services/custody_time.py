@@ -354,6 +354,17 @@ class CustodyTimeService:
             parent_b_percentage = 0
             unknown_percentage = 0
 
+        # Determination method breakdown for court evidence
+        determination_methods: Dict[str, int] = {}
+        confidence_scores: list = []
+        for r in records:
+            method = r.determination_method or "unknown"
+            determination_methods[method] = determination_methods.get(method, 0) + 1
+            if r.confidence_score is not None:
+                confidence_scores.append(r.confidence_score)
+
+        avg_confidence = round(sum(confidence_scores) / len(confidence_scores), 1) if confidence_scores else 0
+
         return {
             "total_days": total_days,
             "recorded_days": recorded_days,
@@ -369,6 +380,8 @@ class CustodyTimeService:
                 "days": parent_b_days,
                 "percentage": parent_b_percentage,
             },
+            "determination_methods": determination_methods,
+            "avg_confidence_score": avg_confidence,
         }
 
     @staticmethod
@@ -408,7 +421,47 @@ class CustodyTimeService:
         data = section.structured_data
         schedule_pattern = data.get("schedule_pattern", "custom")
 
-        # Get percentages from mapping
+        # Check for explicit percentages in agreement first (custom or court-ordered)
+        explicit_a = data.get("parent_a_percentage")
+        explicit_b = data.get("parent_b_percentage")
+        if explicit_a is not None and explicit_b is not None:
+            try:
+                pct_a = int(explicit_a)
+                pct_b = int(explicit_b)
+                if 0 <= pct_a <= 100 and 0 <= pct_b <= 100:
+                    return schedule_pattern, pct_a, pct_b
+            except (ValueError, TypeError):
+                pass  # Fall through to pattern lookup
+
+        # Also check physical_custody section for explicit percentages
+        phys_result = await db.execute(
+            select(AgreementSection)
+            .join(Agreement)
+            .where(
+                and_(
+                    Agreement.family_file_id == family_file_id,
+                    Agreement.status == "active",
+                    AgreementSection.section_type == "physical_custody"
+                )
+            )
+            .order_by(Agreement.created_at.desc())
+            .limit(1)
+        )
+        phys_section = phys_result.scalar_one_or_none()
+        if phys_section and phys_section.structured_data:
+            phys_data = phys_section.structured_data
+            phys_a = phys_data.get("parent_a_percentage")
+            phys_b = phys_data.get("parent_b_percentage")
+            if phys_a is not None and phys_b is not None:
+                try:
+                    pct_a = int(phys_a)
+                    pct_b = int(phys_b)
+                    if 0 <= pct_a <= 100 and 0 <= pct_b <= 100:
+                        return schedule_pattern, pct_a, pct_b
+                except (ValueError, TypeError):
+                    pass
+
+        # Fall back to schedule pattern lookup
         percentages = SCHEDULE_PATTERN_PERCENTAGES.get(schedule_pattern, (50, 50))
 
         return schedule_pattern, percentages[0], percentages[1]

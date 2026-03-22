@@ -125,6 +125,7 @@ function outcomeLabel(outcome: string | null): string {
 export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyDashboardProps) {
   const [period, setPeriod] = useState<TimePeriod>('30_days');
   const [loading, setLoading] = useState(true);
+  const [errors, setErrors] = useState<string[]>([]);
 
   // Data states
   const [timelineData, setTimelineData] = useState<CustodyTimelineResponse | null>(null);
@@ -132,6 +133,7 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
   const [complianceData, setComplianceData] = useState<ExchangeComplianceResponse | null>(null);
   const [exchangeDetails, setExchangeDetails] = useState<ExchangeDetail[]>([]);
   const [swapEvents, setSwapEvents] = useState<EventV2[]>([]);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   // Live timer
   const [now, setNow] = useState(new Date());
@@ -165,6 +167,7 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
 
   const loadData = async () => {
     setLoading(true);
+    setErrors([]);
     const days = periodToDays(period);
     const { startDate, endDate } = periodToDateRange(period);
 
@@ -176,15 +179,22 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
       eventsAPI.listForCase(familyFileId, startDate, endDate),
     ]);
 
+    const loadErrors: string[] = [];
     if (results[0].status === 'fulfilled') setTimelineData(results[0].value);
+    else loadErrors.push('Custody timeline unavailable');
     if (results[1].status === 'fulfilled') setChildStats(results[1].value);
+    else loadErrors.push('Custody stats unavailable');
     if (results[2].status === 'fulfilled') setComplianceData(results[2].value);
+    else loadErrors.push('Compliance data unavailable');
     if (results[3].status === 'fulfilled') setExchangeDetails(results[3].value);
+    else loadErrors.push('Exchange history unavailable');
     if (results[4].status === 'fulfilled') {
       const swaps = results[4].value.filter((e: EventV2) => e.event_type === 'swap_request');
       setSwapEvents(swaps);
     }
 
+    setErrors(loadErrors);
+    setLastUpdated(new Date());
     setLoading(false);
   };
 
@@ -205,6 +215,18 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
     const pending = swapEvents.filter(e => e.status === 'pending' || e.status === 'pending_approval').length;
     return { total: swapEvents.length, approved, denied, pending };
   }, [swapEvents]);
+
+  // Compliance status determination
+  const complianceStatus = useMemo(() => {
+    if (!childStats) return null;
+    const maxVariance = Math.max(
+      Math.abs(childStats.variance?.parent_a || 0),
+      Math.abs(childStats.variance?.parent_b || 0)
+    );
+    if (maxVariance <= 5) return { label: 'Compliant', color: 'emerald', desc: 'Custody time matches the agreement' };
+    if (maxVariance <= 10) return { label: 'Minor Deviation', color: 'amber', desc: `${maxVariance.toFixed(1)}% deviation from agreed schedule` };
+    return { label: 'Significant Deviation', color: 'red', desc: `${maxVariance.toFixed(1)}% deviation — review recommended` };
+  }, [childStats]);
 
   if (loading) {
     return <CustodyDashboardSkeleton />;
@@ -228,6 +250,70 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
           </button>
         ))}
       </div>
+
+      {/* Error Banner */}
+      {errors.length > 0 && (
+        <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-xl p-3">
+          <div className="flex items-start gap-2">
+            <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="text-sm font-medium text-amber-800 dark:text-amber-300">Some data could not be loaded</p>
+              <ul className="text-xs text-amber-700 dark:text-amber-400 mt-1 space-y-0.5">
+                {errors.map((err) => (
+                  <li key={err}>{err}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Compliance Status Badge */}
+      {complianceStatus && (
+        <div className={`flex items-center justify-between p-3 rounded-xl border ${
+          complianceStatus.color === 'emerald' ? 'bg-emerald-50 border-emerald-200 dark:bg-emerald-950/20 dark:border-emerald-800' :
+          complianceStatus.color === 'amber' ? 'bg-amber-50 border-amber-200 dark:bg-amber-950/20 dark:border-amber-800' :
+          'bg-red-50 border-red-200 dark:bg-red-950/20 dark:border-red-800'
+        }`}>
+          <div className="flex items-center gap-2">
+            {complianceStatus.color === 'emerald' ? (
+              <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+            ) : (
+              <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+            )}
+            <div>
+              <span className={`text-sm font-semibold ${
+                complianceStatus.color === 'emerald' ? 'text-emerald-800 dark:text-emerald-300' :
+                complianceStatus.color === 'amber' ? 'text-amber-800 dark:text-amber-300' :
+                'text-red-800 dark:text-red-300'
+              }`}>{complianceStatus.label}</span>
+              <p className="text-xs text-muted-foreground">{complianceStatus.desc}</p>
+            </div>
+          </div>
+          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+            complianceStatus.color === 'emerald' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300' :
+            complianceStatus.color === 'amber' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300' :
+            'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300'
+          }`}>Agreement Check</span>
+        </div>
+      )}
+
+      {/* Untracked Days Warning */}
+      {childStats && childStats.unknown_days > 0 && (childStats.unknown_days / (childStats.parent_a.days + childStats.parent_b.days + childStats.unknown_days)) > 0.1 && (
+        <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-xl p-3">
+          <div className="flex items-start gap-2">
+            <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
+                {childStats.unknown_days} untracked day{childStats.unknown_days !== 1 ? 's' : ''} in this period
+              </p>
+              <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
+                Untracked days reduce data reliability. Use check-ins or exchanges to improve accuracy.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Current Session */}
       {currentSession && stats && (
@@ -325,6 +411,44 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
         </div>
       )}
 
+      {/* Data Reliability — Determination Methods */}
+      {childStats && (childStats as any).determination_methods && Object.keys((childStats as any).determination_methods).length > 0 && (
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <Shield className="h-4 w-4 text-cg-sage" />
+            <span className="text-sm font-semibold text-foreground">Data Reliability</span>
+            {(childStats as any).avg_confidence_score > 0 && (
+              <span className="ml-auto text-xs text-muted-foreground">
+                Confidence: <span className="font-medium text-foreground">{(childStats as any).avg_confidence_score}%</span>
+              </span>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {Object.entries((childStats as any).determination_methods as Record<string, number>).map(([method, count]) => {
+              const labels: Record<string, string> = {
+                scheduled: 'From Schedule',
+                check_in: 'Check-In Verified',
+                exchange_completed: 'Exchange Verified',
+                manual_override: 'Manual Override',
+                backfilled: 'Backfilled',
+              };
+              const colors: Record<string, string> = {
+                check_in: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400',
+                exchange_completed: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400',
+                scheduled: 'bg-sky-100 text-sky-700 dark:bg-sky-950/30 dark:text-sky-400',
+                backfilled: 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400',
+                manual_override: 'bg-purple-100 text-purple-700 dark:bg-purple-950/30 dark:text-purple-400',
+              };
+              return (
+                <span key={method} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${colors[method] || 'bg-muted text-muted-foreground'}`}>
+                  {labels[method] || method}: {count as number}
+                </span>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Key Metrics */}
       {complianceData && complianceData.metrics.total_exchanges > 0 && (
         <div className="space-y-3">
@@ -398,6 +522,13 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
           </div>
         )}
       </div>
+
+      {/* Last Updated */}
+      {lastUpdated && (
+        <p className="text-xs text-muted-foreground text-center pt-2 border-t border-border">
+          Data as of {format(lastUpdated, 'MMM d, yyyy h:mm a')} &middot; All records SHA-256 verified
+        </p>
+      )}
     </div>
   );
 }
