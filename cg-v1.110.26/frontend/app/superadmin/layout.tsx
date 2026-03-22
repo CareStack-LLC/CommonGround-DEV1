@@ -21,6 +21,7 @@ import {
   Gamepad2,
   PenTool,
   Film,
+  MessageCircle,
 } from 'lucide-react';
 import { adminAPI, type PlatformHealth } from '@/lib/admin-api';
 
@@ -32,6 +33,7 @@ const navSections = [
       { href: '/superadmin/users', label: 'Users', icon: Users },
       { href: '/superadmin/audit-log', label: 'Audit Log', icon: ScrollText },
       { href: '/superadmin/platform-audit', label: 'Platform Audit', icon: Activity },
+      { href: '/superadmin/chatbot', label: 'Chatbot', icon: MessageCircle },
     ],
   },
   {

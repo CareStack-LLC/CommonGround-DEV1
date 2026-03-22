@@ -60,6 +60,7 @@ from app.api.v1.endpoints import (
     verify,
     blog,
     kidspace_media,
+    chatbot,
 )
 
 api_router = APIRouter()
@@ -196,6 +197,9 @@ api_router.include_router(blog.router, prefix="/blog", tags=["Blog"])
 
 # KidSpace Media - Public read + admin CRUD
 api_router.include_router(kidspace_media.router, prefix="/kidspace", tags=["KidSpace Media"])
+
+# Chatbot - Public Aria Customer Success
+api_router.include_router(chatbot.router, prefix="/chatbot", tags=["Chatbot"])
 
 # SuperAdmin Portal - Platform administration
 api_router.include_router(admin.router, prefix="/admin", tags=["SuperAdmin Portal"])

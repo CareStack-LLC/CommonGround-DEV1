@@ -264,6 +264,7 @@ from app.models.report_request import (
 )
 from app.models.generated_report import GeneratedReport
 from app.models.blog import BlogPost, BlogMarketingContent
+from app.models.chatbot import ChatbotVisitor, ChatbotSession, ChatbotMessage
 from app.models.kidspace_media import (
     KidSpaceGenre,
     KidSpaceAuthor,
@@ -532,4 +533,8 @@ __all__ = [
     "KidSpaceAuthor",
     "KidSpaceMovie",
     "KidSpaceBook",
+    # Chatbot (Public Aria Customer Success)
+    "ChatbotVisitor",
+    "ChatbotSession",
+    "ChatbotMessage",
 ]
