@@ -39,6 +39,32 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
+@router.get("/debug-test")
+async def debug_test():
+    """Temporary debug endpoint — REMOVE AFTER TESTING."""
+    import anthropic as _anthropic
+    from app.core.config import settings as _s
+    result = {
+        "key_present": bool(_s.ANTHROPIC_API_KEY),
+        "key_prefix": (_s.ANTHROPIC_API_KEY or "")[:12] + "..." if _s.ANTHROPIC_API_KEY else None,
+        "anthropic_version": _anthropic.__version__,
+    }
+    try:
+        client = _anthropic.AsyncAnthropic(api_key=_s.ANTHROPIC_API_KEY)
+        resp = await client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=20,
+            messages=[{"role": "user", "content": "Say hi in one word"}],
+        )
+        result["claude_response"] = resp.content[0].text
+        result["status"] = "SUCCESS"
+    except Exception as e:
+        result["error_type"] = type(e).__name__
+        result["error"] = str(e)[:500]
+        result["status"] = "FAILED"
+    return result
+
+
 # ── Public Endpoints (no auth) ───────────────────────────────────────
 
 @router.post("/sessions", response_model=ChatbotStartSessionResponse, status_code=status.HTTP_201_CREATED)
