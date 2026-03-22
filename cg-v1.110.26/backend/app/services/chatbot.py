@@ -76,8 +76,8 @@ class ChatbotService:
         api_key = settings.ANTHROPIC_API_KEY
         if not api_key:
             logger.warning("ANTHROPIC_API_KEY not set — chatbot will use fallback responses")
-        self.client = anthropic.Anthropic(api_key=api_key or "missing")
-        self.model = "claude-sonnet-4-20250514"
+        self.client = anthropic.AsyncAnthropic(api_key=api_key or "missing")
+        self.model = "claude-sonnet-4-5-20250514"
 
     async def _get_system_prompt(self, db: AsyncSession) -> str:
         """Load system prompt from DB config, falling back to default."""
@@ -208,7 +208,7 @@ class ChatbotService:
 
         # Call Claude
         try:
-            response = self.client.messages.create(
+            response = await self.client.messages.create(
                 model=self.model,
                 max_tokens=250,
                 system=system_prompt,
