@@ -20,6 +20,7 @@ class BugTriageSprint(Base, UUIDMixin, TimestampMixin):
     summary_json: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
     sprint_plan_json: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
     ai_analysis: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    resolution_notes_json: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)  # per-item fix notes on close
 
     def __repr__(self) -> str:
         return f"<BugTriageSprint {self.period_start} - {self.period_end} ({self.status})>"

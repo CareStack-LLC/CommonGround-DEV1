@@ -3158,6 +3158,7 @@ async def list_sprints(
                 "summary": s.summary_json,
                 "plan": s.sprint_plan_json,
                 "ai_analysis": s.ai_analysis,
+                "resolution_notes": getattr(s, "resolution_notes_json", None),
                 "created_at": s.created_at.isoformat() if s.created_at else None,
             }
             for s in result.scalars().all()
@@ -3174,16 +3175,46 @@ async def list_sprints(
 async def update_sprint_status(
     sprint_id: str,
     status: str = Query(..., description="New status: draft, active, or completed"),
+    request: Request = None,
     db: AsyncSession = Depends(get_db),
     admin_user: User = Depends(get_current_admin_user),
 ) -> dict:
-    """Update the status of a sprint plan (draft/active/completed)."""
+    """Update the status of a sprint plan (draft/active/completed).
+
+    When closing a sprint (status=completed), you may also send a JSON body
+    with ``resolution_notes`` — a dict mapping item keys (e.g. "day_1-0") to
+    fix descriptions so the history view shows what was done for each item.
+
+    Body (optional):
+        {
+          "resolution_notes": {
+            "day_1-0": "Fixed by adding null check in auth middleware",
+            "day_2-1": "Root cause was stale DB connections — added pre-ping"
+          },
+          "completed_items": ["day_1-0", "day_1-1", "day_2-0"]
+        }
+    """
     from app.models.bug_triage import BugTriageSprint
 
     sprint = await db.get(BugTriageSprint, sprint_id)
     if not sprint:
         raise HTTPException(status_code=404, detail="Sprint not found")
     sprint.status = status
+
+    # Persist resolution notes and completed-item list when closing
+    if status == "completed":
+        try:
+            body = await request.json()
+        except Exception:
+            body = {}
+        resolution_notes = body.get("resolution_notes", {})
+        completed_items = body.get("completed_items", [])
+        if resolution_notes or completed_items:
+            sprint.resolution_notes_json = {
+                "notes": resolution_notes,
+                "completed_items": completed_items,
+            }
+
     await _log_admin_action(
         db, admin_user, "sprint_updated", "sprint", sprint_id, f"status={status}"
     )

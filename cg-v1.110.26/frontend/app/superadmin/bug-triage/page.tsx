@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Bug, RefreshCw, Brain, Calendar, ChevronDown, ChevronRight,
   AlertTriangle, Clock, History, Zap, Clipboard, Check,
@@ -58,6 +58,7 @@ export default function BugTriagePage() {
   const [copiedPromptIdx, setCopiedPromptIdx] = useState<number | null>(null);
   const [showCloseConfirm, setShowCloseConfirm] = useState(false);
   const [closingSprint, setClosingSprint] = useState(false);
+  const [resolutionNotes, setResolutionNotes] = useState<Record<string, string>>({});
 
   const fetchBugs = useCallback(async (isPolling = false) => {
     try {
@@ -170,8 +171,18 @@ export default function BugTriagePage() {
     if (!sprint) return;
     try {
       setClosingSprint(true);
-      await adminAPI.updateSprintStatus(sprint.sprint_id, 'completed');
+      // Filter out empty notes and send completed items + resolution notes
+      const notes: Record<string, string> = {};
+      Object.entries(resolutionNotes).forEach(([key, val]) => {
+        if (val.trim()) notes[key] = val.trim();
+      });
+      const completedItems = Array.from(checkedSprintItems);
+      await adminAPI.updateSprintStatus(sprint.sprint_id, 'completed', {
+        resolution_notes: notes,
+        completed_items: completedItems,
+      });
       setShowCloseConfirm(false);
+      setResolutionNotes({});
       // Refresh history if loaded
       if (sprints) {
         const data = await adminAPI.listSprints(10);
@@ -611,8 +622,8 @@ export default function BugTriagePage() {
                       const itemKey = `${day}-${idx}`;
                       const isChecked = checkedSprintItems.has(itemKey);
                       return (
+                        <React.Fragment key={idx}>
                         <div
-                          key={idx}
                           className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
                             isChecked ? 'bg-zinc-800/15 opacity-60' : 'bg-[#2D6A8F]/10'
                           }`}
@@ -641,6 +652,21 @@ export default function BugTriagePage() {
                             </span>
                           )}
                         </div>
+                        {/* Resolution note input — shown for checked items when closing */}
+                        {showCloseConfirm && isChecked && (
+                          <div className="ml-8 mt-1 mb-2">
+                            <input
+                              type="text"
+                              placeholder="How was this resolved? (optional)"
+                              value={resolutionNotes[itemKey] || ''}
+                              onChange={(e) =>
+                                setResolutionNotes((prev) => ({ ...prev, [itemKey]: e.target.value }))
+                              }
+                              className="w-full px-3 py-1.5 rounded-lg bg-[#2D6A8F]/15 border border-[#2D6A8F]/30 text-sm text-[#D0E4EC] placeholder-[#6B8A9A] focus:outline-none focus:border-[#3DAA8A]/50"
+                            />
+                          </div>
+                        )}
+                      </React.Fragment>
                       );
                     })}
                   </div>
@@ -740,7 +766,7 @@ export default function BugTriagePage() {
                     )}
                   </button>
                   {expandedSprints.has(s.id || s.sprint_id) && s.plan && (
-                    <div className="border-t border-[#2D6A8F]/20 px-5 py-4 space-y-2">
+                    <div className="border-t border-[#2D6A8F]/20 px-5 py-4 space-y-4">
                       <p className="text-sm text-[#8AACBC]">{s.plan.summary}</p>
                       {s.plan.top_3 && (
                         <ul className="space-y-1 mt-2">
@@ -751,6 +777,40 @@ export default function BugTriagePage() {
                           ))}
                         </ul>
                       )}
+
+                      {/* Sprint Items with Resolution Notes */}
+                      {s.plan.plan && Object.entries(s.plan.plan).map(([day, dayItems]) => (
+                        <div key={day} className="mt-3">
+                          <h4 className="text-xs font-semibold text-[#6B8A9A] uppercase tracking-wider mb-2">{day.replace('_', ' ')}</h4>
+                          <div className="space-y-1.5">
+                            {(dayItems as any[])?.map((item: any, idx: number) => {
+                              const itemKey = `${day}-${idx}`;
+                              const notes = s.resolution_notes?.notes || {};
+                              const completedItems: string[] = s.resolution_notes?.completed_items || [];
+                              const wasCompleted = completedItems.includes(itemKey);
+                              const fixNote = notes[itemKey];
+                              return (
+                                <div key={idx} className="pl-2">
+                                  <div className="flex items-center gap-2">
+                                    <span className={`w-2 h-2 rounded-full flex-shrink-0 ${wasCompleted ? 'bg-emerald-500' : 'bg-[#6B8A9A]/40'}`} />
+                                    <span className={`inline-flex px-1.5 py-0.5 rounded-full text-[10px] font-medium capitalize ${SEVERITY_COLORS[item.severity] || SEVERITY_COLORS.low}`}>
+                                      {item.severity || 'med'}
+                                    </span>
+                                    <span className={`text-sm ${wasCompleted ? 'text-[#8AACBC]' : 'text-[#6B8A9A]'}`}>
+                                      {item.title || item.description || 'Task'}
+                                    </span>
+                                  </div>
+                                  {fixNote && (
+                                    <div className="ml-6 mt-1 text-xs text-[#5BC4A0] bg-[#3DAA8A]/10 rounded px-2.5 py-1.5 border-l-2 border-[#3DAA8A]/30">
+                                      <span className="font-medium">Fix:</span> {fixNote}
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>

@@ -576,7 +576,11 @@ export const adminAPI = {
   runBugTriage: (days = 7) => adminFetch<any>(`/admin/bugs/triage?days=${days}`, { method: 'POST' }),
   createSprint: (days = 3) => adminFetch<{ sprint_id: string; plan: SprintPlan }>(`/admin/bugs/sprints?days=${days}`, { method: 'POST' }),
   listSprints: (limit = 10) => adminFetch<any[]>(`/admin/bugs/sprints?limit=${limit}`),
-  updateSprintStatus: (id: string, status: string) => adminFetch<any>(`/admin/bugs/sprints/${id}?status=${status}`, { method: 'PATCH' }),
+  updateSprintStatus: (id: string, status: string, body?: { resolution_notes?: Record<string, string>; completed_items?: string[] }) =>
+    adminFetch<any>(`/admin/bugs/sprints/${id}?status=${status}`, {
+      method: 'PATCH',
+      ...(body ? { body: JSON.stringify(body) } : {}),
+    }),
 
   // Leads
   getLeadLists: () => adminFetch<LeadList[]>('/admin/leads/lists'),
