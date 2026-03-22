@@ -281,25 +281,21 @@ export default function AboutPage() {
             {/* Story content */}
             <div className="space-y-5 text-white/85 leading-relaxed">
               <p>
-                CommonGround wasn't born in a boardroom. It started in the real, everyday experience of
-                co-parenting. Thomas Wilform — a Black man from Compton, California with over 15 years in
-                business and technology — built CommonGround because he lived the problem firsthand. When he
-                went looking for tools to help him co-parent, all he found were glorified ledgers. Apps that
-                tracked things but didn't actually <em>help</em>. Most didn't even have a way for a parent
-                to connect directly with their child.
+                CommonGround didn&apos;t come from some boardroom. I built this out of real life. I&apos;m from
+                Compton with 15+ years in business and tech, and when I went looking for co-parenting tools,
+                everything out there was basically a fancy spreadsheet. Nothing actually helped. Most didn&apos;t
+                even let you connect with your kid. Like, what&apos;s the point?
               </p>
               <p>
-                He wanted something different: technology that auto-schedules exchanges, automates payments,
-                keeps agreements at your fingertips, and genuinely makes co-parenting easier — not just
-                documented. He built KidSpace so he could watch movies with his son even when they weren't in
-                the same room. That blend of fun and function, of heart and practicality, runs through every
-                part of the platform.
+                I wanted tech that auto-schedules exchanges, handles payments, keeps agreements accessible,
+                and actually makes co-parenting easier. I built KidSpace so I could watch movies with my son
+                even when we weren&apos;t in the same room. That&apos;s the whole vibe. Fun meets function,
+                heart meets practicality.
               </p>
               <p>
-                Thomas also runs the 4Ever Forward Foundation, a nonprofit dedicated to helping other
-                nonprofits with IT infrastructure — the same belief that technology should serve people, not
-                the other way around. His philosophy is simple: tech should aide co-parenting, not take it
-                over. CommonGround was made to help parents, parent better.
+                I also run the Forever Forward Foundation, helping nonprofits get the IT infrastructure they
+                need. Same energy. Technology should work for people, not the other way around. CommonGround
+                was built to help parents actually parent better.
               </p>
             </div>
           </div>
