@@ -52,14 +52,8 @@ async def run_rolling_generator():
         print("DATABASE_URL not set. Cannot run rolling generator.")
         return
 
-    if database_url.startswith("postgresql://"):
-        database_url = database_url.replace("postgresql://", "postgresql+asyncpg://")
-
-    engine = create_async_engine(
-        database_url,
-        echo=False,
-        connect_args={"statement_cache_size": 0}
-    )
+    from app.core.database import create_app_engine
+    engine = create_app_engine(database_url, app_name="commonground_rolling_generator")
     async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
     logger.info(f"Rolling Generator started at {datetime.utcnow().isoformat()}")

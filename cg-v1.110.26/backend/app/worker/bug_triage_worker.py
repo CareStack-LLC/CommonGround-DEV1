@@ -50,14 +50,8 @@ async def run_bug_triage():
         logger.error("DATABASE_URL not set. Cannot run bug triage worker.")
         return
 
-    if database_url.startswith("postgresql://"):
-        database_url = database_url.replace("postgresql://", "postgresql+asyncpg://")
-
-    engine = create_async_engine(
-        database_url,
-        echo=False,
-        connect_args={"statement_cache_size": 0}
-    )
+    from app.core.database import create_app_engine
+    engine = create_app_engine(database_url, app_name="commonground_bug_triage")
     async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
     logger.info(f"Bug Triage worker started at {datetime.utcnow().isoformat()}")

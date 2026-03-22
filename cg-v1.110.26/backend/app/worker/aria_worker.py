@@ -9,7 +9,6 @@ import asyncio
 import json
 import time
 from datetime import datetime
-from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy import text
 
 # Add project root to path
@@ -48,15 +47,8 @@ async def run_worker():
         print("❌ DATABASE_URL missing. Worker cannot start.")
         return
 
-    if database_url.startswith("postgresql://"):
-        database_url = database_url.replace("postgresql://", "postgresql+asyncpg://")
-
-    # Connect with prepared statements disabled for Supabase
-    engine = create_async_engine(
-        database_url, 
-        echo=False, 
-        connect_args={"statement_cache_size": 0}
-    )
+    from app.core.database import create_app_engine
+    engine = create_app_engine(database_url, app_name="commonground_aria_worker")
 
     print("🚀 ARIA Worker Started. Polling for jobs...")
 

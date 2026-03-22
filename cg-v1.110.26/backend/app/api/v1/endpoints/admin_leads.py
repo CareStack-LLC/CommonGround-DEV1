@@ -13,6 +13,7 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File, status
 from pydantic import BaseModel
+from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
@@ -432,10 +433,15 @@ async def create_landing_page(
     db: AsyncSession = Depends(get_db),
     admin_user: User = Depends(get_current_admin_user),
 ) -> dict:
-    from app.services.lead_service import create_landing_page as svc_create
-    result = await svc_create(db, body.model_dump())
-    await db.commit()
-    return result
+    try:
+        from app.services.lead_service import create_landing_page as svc_create
+        result = await svc_create(db, body.model_dump())
+        await db.commit()
+        return result
+    except ProgrammingError as exc:
+        logger.warning("landing_pages table missing: %s", exc)
+        await db.rollback()
+        raise HTTPException(status_code=503, detail="Landing pages table not yet created. Run the database migration.")
 
 
 @router.post(
@@ -493,12 +499,17 @@ async def update_landing_page_endpoint(
     db: AsyncSession = Depends(get_db),
     admin_user: User = Depends(get_current_admin_user),
 ) -> dict:
-    from app.services.lead_service import update_landing_page
-    result = await update_landing_page(db, page_id, body.model_dump())
-    if not result:
-        raise HTTPException(status_code=404, detail="Landing page not found")
-    await db.commit()
-    return result
+    try:
+        from app.services.lead_service import update_landing_page
+        result = await update_landing_page(db, page_id, body.model_dump())
+        if not result:
+            raise HTTPException(status_code=404, detail="Landing page not found")
+        await db.commit()
+        return result
+    except ProgrammingError as exc:
+        logger.warning("landing_pages table missing: %s", exc)
+        await db.rollback()
+        raise HTTPException(status_code=503, detail="Landing pages table not yet created. Run the database migration.")
 
 
 @router.post(
@@ -510,12 +521,17 @@ async def publish_landing_page(
     db: AsyncSession = Depends(get_db),
     admin_user: User = Depends(get_current_admin_user),
 ) -> dict:
-    from app.services.lead_service import update_landing_page
-    result = await update_landing_page(db, page_id, {"status": "published"})
-    if not result:
-        raise HTTPException(status_code=404, detail="Landing page not found")
-    await db.commit()
-    return result
+    try:
+        from app.services.lead_service import update_landing_page
+        result = await update_landing_page(db, page_id, {"status": "published"})
+        if not result:
+            raise HTTPException(status_code=404, detail="Landing page not found")
+        await db.commit()
+        return result
+    except ProgrammingError as exc:
+        logger.warning("landing_pages table missing: %s", exc)
+        await db.rollback()
+        raise HTTPException(status_code=503, detail="Landing pages table not yet created. Run the database migration.")
 
 
 @router.delete(
@@ -527,12 +543,17 @@ async def delete_landing_page_endpoint(
     db: AsyncSession = Depends(get_db),
     admin_user: User = Depends(get_current_admin_user),
 ) -> dict:
-    from app.services.lead_service import delete_landing_page
-    deleted = await delete_landing_page(db, page_id)
-    if not deleted:
-        raise HTTPException(status_code=404, detail="Landing page not found")
-    await db.commit()
-    return {"deleted": True}
+    try:
+        from app.services.lead_service import delete_landing_page
+        deleted = await delete_landing_page(db, page_id)
+        if not deleted:
+            raise HTTPException(status_code=404, detail="Landing page not found")
+        await db.commit()
+        return {"deleted": True}
+    except ProgrammingError as exc:
+        logger.warning("landing_pages table missing: %s", exc)
+        await db.rollback()
+        raise HTTPException(status_code=503, detail="Landing pages table not yet created. Run the database migration.")
 
 
 # =============================================================================

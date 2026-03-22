@@ -49,14 +49,8 @@ async def run_weekly_report():
         logger.error("DATABASE_URL not set. Cannot run weekly report worker.")
         return
 
-    if database_url.startswith("postgresql://"):
-        database_url = database_url.replace("postgresql://", "postgresql+asyncpg://")
-
-    engine = create_async_engine(
-        database_url,
-        echo=False,
-        connect_args={"statement_cache_size": 0}
-    )
+    from app.core.database import create_app_engine
+    engine = create_app_engine(database_url, app_name="commonground_weekly_report")
     async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
     logger.info(f"Weekly Report worker started at {datetime.utcnow().isoformat()}")

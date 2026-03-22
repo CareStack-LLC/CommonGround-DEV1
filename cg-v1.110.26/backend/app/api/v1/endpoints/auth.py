@@ -6,6 +6,7 @@ import logging
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status, Body
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from sqlalchemy.exc import IntegrityError, OperationalError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger(__name__)
@@ -101,9 +102,19 @@ async def login(
         from app.utils.sentry_helpers import metric_increment
         metric_increment("auth.login.failure")
         raise
+    except OperationalError as e:
+        logger.error(f"Login DB connection error: {e}")
+        from app.utils.sentry_helpers import capture_error
+        capture_error(e)
+        raise HTTPException(status_code=503, detail="Database temporarily unavailable. Please try again.")
+    except IntegrityError as e:
+        logger.warning(f"Login integrity error (likely race condition): {e}")
+        raise HTTPException(status_code=409, detail="Account sync in progress. Please try again.")
     except Exception as e:
         import traceback
         logger.error(f"Login error: {traceback.format_exc()}")
+        from app.utils.sentry_helpers import capture_error
+        capture_error(e)
         if settings.ENVIRONMENT == "production":
             raise HTTPException(status_code=500, detail="Login failed. Please try again later.")
         raise HTTPException(status_code=500, detail=f"Login failed: {type(e).__name__}: {str(e)}")

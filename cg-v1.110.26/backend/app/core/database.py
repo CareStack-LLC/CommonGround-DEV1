@@ -2,41 +2,63 @@
 Database connection and session management.
 """
 
+import logging
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.pool import NullPool
 
 from app.core.config import settings
 from app.models.base import Base
 
+_logger = logging.getLogger("commonground.db")
 
-# Create async engine
-# Note: For Supabase connection pooler (Supavisor/PgBouncer):
-# - statement_cache_size=0: Required because pooler doesn't support prepared statements in transaction mode
-# - NullPool: Required so SQLAlchemy doesn't maintain its own pool (conflicts with Supavisor)
-# - command_timeout=60: Prevents connections from hanging indefinitely
-# - server_settings: Ensure proper session configuration
-connect_args = {}
-if "sqlite" not in settings.async_database_url:
-    connect_args["statement_cache_size"] = 0
-    connect_args["command_timeout"] = 60  # 60 second timeout for long queries
-    # Supabase Supavisor requires these settings for stability
-    connect_args["server_settings"] = {
-        "application_name": "commonground_backend",
-        "jit": "off",  # Disable JIT for connection pooler compatibility
-    }
 
-engine = create_async_engine(
+def create_app_engine(
+    database_url: str,
+    echo: bool = False,
+    app_name: str = "commonground_backend",
+) -> AsyncEngine:
+    """
+    Create a standardised async engine for Supabase Supavisor compatibility.
+
+    Use this everywhere — main app AND workers — so all processes share
+    identical connection settings (NullPool, statement_cache_size=0,
+    command_timeout, jit=off).
+    """
+    # Normalise driver prefix
+    url = database_url.strip()
+    if url.startswith("postgres://"):
+        url = url.replace("postgres://", "postgresql+asyncpg://", 1)
+    elif url.startswith("postgresql://") and "+asyncpg" not in url:
+        url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+
+    connect_args: dict = {}
+    if "sqlite" not in url:
+        connect_args["statement_cache_size"] = 0
+        connect_args["command_timeout"] = 60
+        connect_args["server_settings"] = {
+            "application_name": app_name,
+            "jit": "off",
+        }
+
+    return create_async_engine(
+        url,
+        echo=echo,
+        future=True,
+        poolclass=NullPool,
+        connect_args=connect_args,
+    )
+
+
+# Main application engine & session factory
+engine = create_app_engine(
     settings.async_database_url,
     echo=settings.DATABASE_ECHO,
-    future=True,
-    poolclass=NullPool,  # Always use NullPool for Supabase Supavisor compatibility
-    connect_args=connect_args,
 )
 
-# Create async session factory
 AsyncSessionLocal = async_sessionmaker(
     engine,
     class_=AsyncSession,
@@ -50,20 +72,36 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """
     Dependency for getting async database sessions.
 
-    Usage in FastAPI:
-        @app.get("/users")
-        async def get_users(db: AsyncSession = Depends(get_db)):
-            ...
+    Includes a lightweight pre-ping (SELECT 1) to detect stale / dropped
+    connections *before* the request handler runs.  If the pre-ping fails
+    the engine is disposed (clearing any cached raw connections) and a
+    fresh session is created — effectively a single automatic retry.
     """
-    async with AsyncSessionLocal() as session:
+    for attempt in range(2):
+        session = AsyncSessionLocal()
         try:
+            # Manual pre-ping — NullPool doesn't support pool_pre_ping
+            await session.execute(text("SELECT 1"))
             yield session
             await session.commit()
-        except Exception:
+            return
+        except Exception as exc:
             await session.rollback()
+            if attempt == 0 and _is_connection_error(exc):
+                _logger.warning("DB pre-ping failed, disposing engine and retrying: %s", exc)
+                await engine.dispose()
+                await session.close()
+                continue
             raise
         finally:
             await session.close()
+
+
+def _is_connection_error(exc: Exception) -> bool:
+    """Return True for errors that indicate a broken / closed connection."""
+    msg = str(exc).lower()
+    keywords = ("closed", "connection", "reset", "terminated", "broken pipe", "eof")
+    return any(kw in msg for kw in keywords)
 
 
 # Slow query detection — log queries taking more than 1 second
