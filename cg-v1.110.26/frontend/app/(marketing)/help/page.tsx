@@ -86,7 +86,7 @@ const popularQuestions = [
 export default function HelpCenterPage() {
   return (
     <div className="min-h-screen bg-[#F4F8F7]">
-      {/* Hero */}
+      {/* Hero + ARIA Chat */}
       <section className="pt-16 pb-12 lg:pt-24 lg:pb-16">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h1
@@ -98,6 +98,9 @@ export default function HelpCenterPage() {
           <p className="text-lg text-gray-600 mb-8 max-w-lg mx-auto">
             Guides, answers, and resources for everything CommonGround.
           </p>
+
+          {/* Inline ARIA Chat */}
+          <HelpChat />
         </div>
       </section>
 
@@ -326,8 +329,6 @@ export default function HelpCenterPage() {
         </div>
       </section>
 
-      {/* ARIA Help Chat — floating assistant */}
-      <HelpChat />
     </div>
   );
 }

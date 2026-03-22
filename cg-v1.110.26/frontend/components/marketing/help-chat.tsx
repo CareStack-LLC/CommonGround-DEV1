@@ -2,14 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import Link from 'next/link';
-import {
-  MessageCircle,
-  Send,
-  X,
-  RotateCcw,
-  Sparkles,
-  Loader2,
-} from 'lucide-react';
+import { Send, Sparkles, Loader2, RotateCcw } from 'lucide-react';
 import { trackCTAClick } from '@/lib/analytics';
 
 interface Message {
@@ -19,10 +12,10 @@ interface Message {
 
 const MAX_MESSAGES = 20;
 const GREETING =
-  "Hi! I'm ARIA, your help center assistant. Ask me anything about CommonGround — features, pricing, how to get started, or troubleshooting. I'll point you to the right guide!";
+  "Hi! I'm ARIA. Ask me anything about CommonGround — features, pricing, how to get started, or troubleshooting. I'll point you to the right guide!";
 
 /**
- * Renders message content, converting markdown-style links [text](/url) to clickable links.
+ * Renders message content, converting markdown links and bold text.
  */
 function MessageContent({ content }: { content: string }) {
   const parts = content.split(/(\[[^\]]+\]\([^)]+\))/g);
@@ -42,7 +35,6 @@ function MessageContent({ content }: { content: string }) {
             </Link>
           );
         }
-        // Handle **bold** text
         const boldParts = part.split(/(\*\*[^*]+\*\*)/g);
         return boldParts.map((bp, j) => {
           const boldMatch = bp.match(/^\*\*([^*]+)\*\*$/);
@@ -61,14 +53,12 @@ function MessageContent({ content }: { content: string }) {
 }
 
 export function HelpChat() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', content: GREETING },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [hasStarted, setHasStarted] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -78,25 +68,22 @@ export function HelpChat() {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
-  useEffect(() => {
-    if (isOpen && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [isOpen]);
-
-  const handleOpen = () => {
-    setIsOpen(true);
-    trackCTAClick('help_chat_opened', 'help_center');
-  };
-
-  const handleClose = () => {
-    setIsOpen(false);
+  // Auto-resize textarea
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value);
+    const el = e.target;
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
   };
 
   const handleReset = () => {
-    setMessages([{ role: 'assistant', content: GREETING }]);
+    setMessages([]);
     setInput('');
     setIsLoading(false);
+    setHasStarted(false);
+    if (inputRef.current) {
+      inputRef.current.style.height = 'auto';
+    }
   };
 
   const handleSend = async () => {
@@ -109,10 +96,15 @@ export function HelpChat() {
         {
           role: 'assistant',
           content:
-            "We've reached the conversation limit. Please click the reset button to start a new conversation, or visit our [Contact page](/help/contact) for more help.",
+            "We've reached the conversation limit. Please click reset to start a new conversation, or visit our [Contact page](/help/contact) for more help.",
         },
       ]);
       return;
+    }
+
+    if (!hasStarted) {
+      setHasStarted(true);
+      trackCTAClick('help_chat_used', 'help_center');
     }
 
     const userMessage: Message = { role: 'user', content: trimmed };
@@ -121,11 +113,15 @@ export function HelpChat() {
     setInput('');
     setIsLoading(true);
 
+    if (inputRef.current) {
+      inputRef.current.style.height = 'auto';
+    }
+
     try {
-      // Only send user/assistant messages (skip the greeting for API context)
-      const apiMessages = updatedMessages
-        .filter((m) => m.content !== GREETING)
-        .map((m) => ({ role: m.role, content: m.content }));
+      const apiMessages = updatedMessages.map((m) => ({
+        role: m.role,
+        content: m.content,
+      }));
 
       const res = await fetch('/api/help-chat', {
         method: 'POST',
@@ -140,14 +136,12 @@ export function HelpChat() {
         );
       }
 
-      // Stream the response
       const reader = res.body?.getReader();
       if (!reader) throw new Error('No response stream');
 
       const decoder = new TextDecoder();
       let assistantContent = '';
 
-      // Add empty assistant message
       setMessages((prev) => [...prev, { role: 'assistant', content: '' }]);
 
       while (true) {
@@ -157,7 +151,6 @@ export function HelpChat() {
         const chunk = decoder.decode(value, { stream: true });
         assistantContent += chunk;
 
-        // Update the last assistant message with accumulated content
         setMessages((prev) => {
           const updated = [...prev];
           updated[updated.length - 1] = {
@@ -191,124 +184,96 @@ export function HelpChat() {
     }
   };
 
-  // Floating button (collapsed state)
-  if (!isOpen) {
-    return (
-      <button
-        onClick={handleOpen}
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 bg-[#3DAA8A] text-white pl-5 pr-6 py-3.5 rounded-full shadow-xl hover:bg-[#34967a] hover:shadow-2xl transition-all duration-300 hover:-translate-y-0.5 group"
-        aria-label="Open ARIA help chat"
-      >
-        <Sparkles className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-        <span className="font-medium">Ask ARIA</span>
-      </button>
-    );
-  }
-
-  // Chat panel (expanded state)
   return (
-    <div className="fixed bottom-0 right-0 sm:bottom-6 sm:right-6 z-50 w-full sm:w-[420px] h-[100dvh] sm:h-[600px] sm:max-h-[80vh] flex flex-col bg-white sm:rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
-      {/* Header */}
-      <div className="flex items-center justify-between px-5 py-3.5 bg-gradient-to-r from-[#3DAA8A] to-[#2D8A70] text-white flex-shrink-0">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
-            <Sparkles className="w-4 h-4" />
-          </div>
-          <div>
-            <h3 className="font-semibold text-sm">ARIA Help Assistant</h3>
-            <p className="text-white/70 text-xs">
-              Ask anything about CommonGround
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-1">
-          <button
-            onClick={handleReset}
-            className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-            title="Start new conversation"
-          >
-            <RotateCcw className="w-4 h-4" />
-          </button>
-          <button
-            onClick={handleClose}
-            className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-            title="Close chat"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
-
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 bg-[#F4F8F7]">
-        {messages.map((msg, i) => (
-          <div
-            key={i}
-            className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-          >
-            <div
-              className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
-                msg.role === 'user'
-                  ? 'bg-[#3DAA8A] text-white rounded-br-md'
-                  : 'bg-white text-[#1E3A4A] border border-gray-100 rounded-bl-md shadow-sm'
-              }`}
+    <div className="max-w-2xl mx-auto w-full">
+      {/* Input area — always visible */}
+      <div className="relative">
+        <div className="flex items-center gap-2 mb-2">
+          <Sparkles className="w-4 h-4 text-[#3DAA8A]" />
+          <span className="text-sm font-medium text-[#1E3A4A]">
+            Ask ARIA
+          </span>
+          {hasStarted && (
+            <button
+              onClick={handleReset}
+              className="ml-auto flex items-center gap-1 text-xs text-gray-400 hover:text-[#3DAA8A] transition-colors"
+              title="Start new conversation"
             >
-              {msg.role === 'assistant' ? (
-                <div className="whitespace-pre-wrap">
-                  <MessageContent content={msg.content} />
-                </div>
-              ) : (
-                msg.content
-              )}
-            </div>
-          </div>
-        ))}
-
-        {isLoading && messages[messages.length - 1]?.role === 'user' && (
-          <div className="flex justify-start">
-            <div className="bg-white text-[#1E3A4A] border border-gray-100 rounded-2xl rounded-bl-md px-4 py-3 shadow-sm">
-              <div className="flex items-center gap-2 text-sm text-gray-400">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                ARIA is thinking...
-              </div>
-            </div>
-          </div>
-        )}
-
-        <div ref={messagesEndRef} />
-      </div>
-
-      {/* Input */}
-      <div className="px-4 py-3 bg-white border-t border-gray-100 flex-shrink-0">
-        <div className="flex items-center gap-2">
-          <input
+              <RotateCcw className="w-3 h-3" />
+              Reset
+            </button>
+          )}
+        </div>
+        <div className="flex gap-2">
+          <textarea
             ref={inputRef}
-            type="text"
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            placeholder="Ask a question..."
+            placeholder="How do I invite my co-parent? What is KidSpace? How do I export for court?"
             disabled={isLoading}
-            className="flex-1 px-4 py-2.5 bg-[#F4F8F7] rounded-xl border border-gray-200 text-sm text-[#1E3A4A] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/30 focus:border-transparent disabled:opacity-50"
+            rows={1}
+            className="flex-1 px-4 py-3 bg-white rounded-xl border-2 border-gray-200 text-[15px] text-[#1E3A4A] placeholder:text-gray-400 focus:outline-none focus:border-[#3DAA8A] focus:ring-2 focus:ring-[#3DAA8A]/20 transition-all disabled:opacity-50 resize-none shadow-sm"
             maxLength={2000}
           />
           <button
             onClick={handleSend}
             disabled={isLoading || !input.trim()}
-            className="flex items-center justify-center w-10 h-10 bg-[#3DAA8A] text-white rounded-xl hover:bg-[#34967a] transition-colors disabled:opacity-40 disabled:hover:bg-[#3DAA8A] flex-shrink-0"
+            className="flex items-center justify-center w-11 h-11 bg-[#3DAA8A] text-white rounded-xl hover:bg-[#34967a] transition-colors disabled:opacity-40 disabled:hover:bg-[#3DAA8A] flex-shrink-0 self-end shadow-sm"
             aria-label="Send message"
           >
-            <Send className="w-4 h-4" />
+            {isLoading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Send className="w-4 h-4" />
+            )}
           </button>
         </div>
-        <p className="text-xs text-gray-400 mt-2 text-center">
-          ARIA uses AI to answer your questions. For complex issues,{' '}
-          <Link href="/help/contact" className="text-[#3DAA8A] hover:underline">
-            contact support
-          </Link>
-          .
-        </p>
       </div>
+
+      {/* Conversation — appears after first message */}
+      {hasStarted && messages.length > 0 && (
+        <div className="mt-5 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="max-h-[400px] overflow-y-auto px-5 py-4 space-y-4">
+            {messages.map((msg, i) => (
+              <div
+                key={i}
+                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                <div
+                  className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+                    msg.role === 'user'
+                      ? 'bg-[#3DAA8A] text-white rounded-br-md'
+                      : 'bg-[#F4F8F7] text-[#1E3A4A] rounded-bl-md'
+                  }`}
+                >
+                  {msg.role === 'assistant' ? (
+                    <div className="whitespace-pre-wrap">
+                      <MessageContent content={msg.content} />
+                    </div>
+                  ) : (
+                    msg.content
+                  )}
+                </div>
+              </div>
+            ))}
+
+            {isLoading &&
+              messages[messages.length - 1]?.role === 'user' && (
+                <div className="flex justify-start">
+                  <div className="bg-[#F4F8F7] text-[#1E3A4A] rounded-2xl rounded-bl-md px-4 py-3">
+                    <div className="flex items-center gap-2 text-sm text-gray-400">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      ARIA is thinking...
+                    </div>
+                  </div>
+                </div>
+              )}
+
+            <div ref={messagesEndRef} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
