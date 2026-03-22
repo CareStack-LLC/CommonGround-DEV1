@@ -172,7 +172,6 @@ export default function GTMCommandCenter() {
   const [contactNotes, setContactNotes] = useState('');
 
   // Metrics
-  const [blogCount, setBlogCount] = useState(0);
   const [campaignCount, setCampaignCount] = useState(0);
   const [lpCount, setLpCount] = useState(0);
 
@@ -199,15 +198,11 @@ export default function GTMCommandCenter() {
   useEffect(() => {
     (async () => {
       try {
-        const blogs = await adminAPI.getBlogPosts?.();
-        if (Array.isArray(blogs)) setBlogCount(blogs.length);
-      } catch {}
-      try {
-        const campaigns = await adminAPI.getCampaigns?.();
+        const campaigns = await adminAPI.getCampaigns();
         if (Array.isArray(campaigns)) setCampaignCount(campaigns.length);
       } catch {}
       try {
-        const lps = await adminAPI.getLandingPages?.();
+        const lps = await adminAPI.getLandingPages();
         if (Array.isArray(lps)) setLpCount(lps.length);
       } catch {}
     })();
@@ -345,7 +340,7 @@ export default function GTMCommandCenter() {
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
             {[
               { label: 'Reddit', icon: MessageCircle, color: '#FF4500', stat: `${draftCounts.reddit || 0} drafts, ${postedCounts.reddit || 0} posted`, link: 'studio' },
-              { label: 'Blog', icon: FileText, color: '#3DAA8A', stat: `${blogCount} posts`, link: '/superadmin/blog' },
+              { label: 'Blog', icon: FileText, color: '#3DAA8A', stat: 'View posts', link: '/superadmin/blog' },
               { label: 'Email Campaigns', icon: Mail, color: '#F5A623', stat: `${campaignCount} campaigns`, link: '/superadmin/leads/campaigns' },
               { label: 'Landing Pages', icon: Globe, color: '#2D6A8F', stat: `${lpCount} pages`, link: '/superadmin/leads/landing-pages' },
               { label: 'LinkedIn', icon: Linkedin, color: '#0A66C2', stat: `${draftCounts.linkedin || 0} drafts, ${postedCounts.linkedin || 0} posted`, link: 'studio' },
@@ -650,7 +645,7 @@ export default function GTMCommandCenter() {
             {[
               { label: 'Playbook Progress', value: `${progressPct}%`, sub: `${completedCount}/${totalTasks} tasks`, icon: Target, color: '#3DAA8A' },
               { label: 'Content Created', value: drafts.length.toString(), sub: `${drafts.filter(d => d.status === 'posted').length} posted`, icon: Pencil, color: '#F5A623' },
-              { label: 'Blog Posts', value: blogCount.toString(), sub: 'published', icon: FileText, color: '#5BC4A0' },
+              { label: 'Campaigns', value: campaignCount.toString(), sub: 'total', icon: Mail, color: '#5BC4A0' },
               { label: 'Contacts', value: contacts.length.toString(), sub: `${contacts.filter(c => c.status === 'active_partner').length} partners`, icon: Briefcase, color: '#2D6A8F' },
             ].map(card => (
               <div key={card.label} className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-4">
