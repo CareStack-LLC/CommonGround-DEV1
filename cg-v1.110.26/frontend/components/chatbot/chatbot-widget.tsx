@@ -56,22 +56,11 @@ export default function ChatbotWidget() {
     pathname.startsWith(prefix)
   );
 
-  // Restore session from sessionStorage
+  // On mount, clear any stale session so the chatbot always starts fresh
+  // with the visitor form. This prevents "session closed" errors from
+  // restored sessions that expired on the backend.
   useEffect(() => {
-    const saved = sessionStorage.getItem(SESSION_KEY);
-    if (saved) {
-      setSessionId(saved);
-      setHasCollectedInfo(true);
-      setShowVisitorForm(false);
-      // Restore greeting so chat isn't empty on reopen
-      if (messages.length === 0) {
-        setMessages([
-          { id: "greeting", role: "assistant", content: DEFAULT_GREETING },
-        ]);
-        setAssistantMsgCount(1);
-      }
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    sessionStorage.removeItem(SESSION_KEY);
   }, []);
 
   const initSession = useCallback(async () => {
@@ -158,16 +147,32 @@ export default function ChatbotWidget() {
           { id: message_id, role: "assistant", content: reply },
         ]);
       } catch (err: any) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: `error-${Date.now()}`,
-            role: "assistant",
-            content:
-              err.message ||
-              "Sorry, something went wrong. Please try again or email hello@find-commonground.com.",
-          },
-        ]);
+        const errorMsg = err.message || "";
+        // If the session has ended or is invalid, clear it and start fresh
+        if (
+          errorMsg.includes("session has ended") ||
+          errorMsg.includes("Session not found") ||
+          errorMsg.includes("Message limit")
+        ) {
+          sessionStorage.removeItem(SESSION_KEY);
+          setSessionId(null);
+          setSessionEnded(false);
+          setMessages([]);
+          setAssistantMsgCount(0);
+          setShowVisitorForm(true);
+          setHasCollectedInfo(false);
+        } else {
+          setMessages((prev) => [
+            ...prev,
+            {
+              id: `error-${Date.now()}`,
+              role: "assistant",
+              content:
+                errorMsg ||
+                "Sorry, something went wrong. Please try again or email hello@find-commonground.com.",
+            },
+          ]);
+        }
       } finally {
         setIsLoading(false);
       }
