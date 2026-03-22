@@ -15,15 +15,26 @@ function Skeleton({ className = '' }: { className?: string }) {
   return <div className={`animate-pulse bg-[#2D6A8F]/20 rounded-lg ${className}`} />;
 }
 
-function timeAgo(dateStr: string): string {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return 'now';
-  if (mins < 60) return `${mins}m`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h`;
-  const days = Math.floor(hrs / 24);
-  return `${days}d`;
+function formatEmailTime(dateStr: string): string {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffDays === 0) {
+    // Today — show time like "11:57 PM"
+    return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+  }
+  if (diffDays === 1) {
+    return 'Yesterday';
+  }
+  if (diffDays < 7) {
+    // This week — show day name + time
+    return date.toLocaleDateString('en-US', { weekday: 'short' }) + ' ' +
+      date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+  }
+  // Older — show date
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
@@ -638,7 +649,7 @@ export default function InboxPage() {
                         ) : null;
                       })()}
                       <span className="text-sm text-white font-medium truncate">{email.from_name || email.from_email}</span>
-                      <span className="text-[10px] text-[#4A6E7F] ml-auto flex-shrink-0">{timeAgo(email.received_at)}</span>
+                      <span className="text-[10px] text-[#4A6E7F] ml-auto flex-shrink-0">{formatEmailTime(email.received_at)}</span>
                     </div>
                     <div className="text-xs text-[#8AACBC] truncate mt-0.5">{email.subject}</div>
                     <div className="flex items-center gap-1.5 mt-1 flex-wrap">
@@ -718,7 +729,7 @@ export default function InboxPage() {
                   <span>|</span>
                   <span>To: <span className="text-[#D0E4EC]">{selectedEmail.to_email}</span></span>
                   <span>|</span>
-                  <span>{new Date(selectedEmail.received_at).toLocaleString()}</span>
+                  <span>{new Date(selectedEmail.received_at).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })} at {new Date(selectedEmail.received_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}</span>
                 </div>
                 {(() => {
                   const extra = parseAdminNotes(selectedEmail.admin_notes ?? null);

@@ -409,7 +409,7 @@ _EMAIL_SIGNATURE = """
 <table cellpadding="0" cellspacing="0" style="border-top: 2px solid #3DAA8A; padding-top: 16px; margin-top: 24px; font-family: 'DM Sans', Helvetica, Arial, sans-serif;">
   <tr>
     <td style="padding-right: 16px; vertical-align: top;">
-      <img src="https://find-commonground.com/logo-email.png" alt="CommonGround" width="48" height="48" style="border-radius: 12px;" />
+      <img src="https://find-commonground.com/images/logo-email.png" alt="CommonGround" width="48" height="48" style="border-radius: 12px;" />
     </td>
     <td style="vertical-align: top;">
       <div style="font-size: 14px; font-weight: 600; color: #1E3A4A;">CommonGround Team</div>
