@@ -117,7 +117,7 @@ export default function ARIAPage() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/register"
+              href="/early-access"
               className="inline-flex items-center justify-center gap-2 bg-[#3DAA8A] text-white font-medium px-8 py-4 rounded-full text-lg transition-all duration-200 hover:bg-[#34967a] hover:shadow-xl hover:-translate-y-0.5"
             >
               Try ARIA Free
@@ -472,7 +472,7 @@ export default function ARIAPage() {
             communicating differently today.
           </p>
           <Link
-            href="/register"
+            href="/early-access"
             className="inline-flex items-center justify-center gap-2 bg-[#F5A623] text-white font-semibold text-lg px-10 py-5 rounded-full shadow-xl transition-all duration-300 hover:bg-[#E09520] hover:-translate-y-1 hover:shadow-2xl"
           >
             Get Started Free

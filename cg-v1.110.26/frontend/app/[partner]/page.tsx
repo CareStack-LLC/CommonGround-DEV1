@@ -119,7 +119,7 @@ export default function PartnerLandingPage() {
                 setCodeValid(true);
                 // Redirect to register with grant code
                 setTimeout(() => {
-                    router.push(`/register?grant_code=${encodeURIComponent(grantCode.toUpperCase())}&partner=${partnerSlug}`);
+                    router.push(`/early-access?grant_code=${encodeURIComponent(grantCode.toUpperCase())}&partner=${partnerSlug}`);
                 }, 1000);
             } else {
                 setCodeError(data.message || 'Invalid code');

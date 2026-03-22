@@ -280,7 +280,7 @@ export default function BlogPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-2xl font-semibold text-[#1E3A4A] mb-4">Ready to put these tips into practice?</h2>
           <p className="text-gray-600 mb-8 max-w-xl mx-auto">CommonGround gives you the tools to communicate better, track agreements, and co-parent more effectively.</p>
-          <Link href="/register" className="inline-flex items-center justify-center gap-2 bg-[#3DAA8A] text-white font-medium px-8 py-3 rounded-full transition-all duration-200 hover:bg-[#2D8A70] hover:shadow-lg">
+          <Link href="/early-access" className="inline-flex items-center justify-center gap-2 bg-[#3DAA8A] text-white font-medium px-8 py-3 rounded-full transition-all duration-200 hover:bg-[#2D8A70] hover:shadow-lg">
             Get Started Free <ArrowRight className="w-5 h-5" />
           </Link>
         </div>

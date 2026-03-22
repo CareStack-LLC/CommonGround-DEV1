@@ -159,7 +159,7 @@ export function MarketingHeader() {
                   Sign In
                 </Link>
                 <Link
-                  href="/register"
+                  href="/early-access"
                   className="bg-cg-sage text-white font-medium px-5 py-2 rounded-full text-sm transition-all duration-200 hover:bg-cg-sage-light hover:shadow-lg"
                 >
                   Get Started Free
@@ -232,7 +232,7 @@ export function MarketingHeader() {
                     Sign In
                   </Link>
                   <Link
-                    href="/register"
+                    href="/early-access"
                     className="block w-full text-center bg-cg-sage text-white font-medium px-5 py-3 rounded-full"
                     onClick={() => setMobileMenuOpen(false)}
                   >

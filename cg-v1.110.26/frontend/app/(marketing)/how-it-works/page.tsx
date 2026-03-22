@@ -166,7 +166,7 @@ export default function HowItWorksPage() {
             Join thousands of families who found a better way forward.
           </p>
           <Link
-            href="/register"
+            href="/early-access"
             className="inline-flex items-center justify-center px-10 py-5 bg-[#F5A623] text-white font-bold text-lg rounded-full hover:bg-[#E0951A] transition-all shadow-2xl hover:-translate-y-1 group"
           >
             Start Free Today

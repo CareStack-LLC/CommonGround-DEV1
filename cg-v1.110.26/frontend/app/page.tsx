@@ -108,7 +108,7 @@ export default function HomePage() {
 
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
                 <Link
-                  href="/register"
+                  href="/early-access"
                   className="inline-flex items-center justify-center px-8 py-4 bg-[var(--portal-primary)] text-white font-semibold rounded-full hover:bg-[#2D8A70] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 group"
                 >
                   Start Free &mdash; Parents
@@ -740,7 +740,7 @@ export default function HomePage() {
               Join families who&apos;ve found a calmer way to co-parent &mdash; one that puts children first.
             </p>
             <Link
-              href="/register"
+              href="/early-access"
               className="inline-flex items-center justify-center px-10 py-5 bg-[#F5A623] text-white font-bold text-lg rounded-full hover:bg-[#E09520] transition-all shadow-2xl hover:shadow-3xl hover:-translate-y-1 group"
             >
               Start Free Today

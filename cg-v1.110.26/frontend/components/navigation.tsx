@@ -337,7 +337,7 @@ export function Navigation() {
                     Sign In
                   </Link>
                   <Link
-                    href="/register"
+                    href="/early-access"
                     className="bg-white text-[var(--portal-primary)] font-medium px-5 py-2 rounded-full text-sm transition-all duration-200 hover:bg-white/90 hover:shadow-lg"
                   >
                     Get Started Free
@@ -396,7 +396,7 @@ export function Navigation() {
                     Sign In
                   </Link>
                   <Link
-                    href="/register"
+                    href="/early-access"
                     onClick={() => setMobileMenuOpen(false)}
                     className="block w-full text-center bg-white text-[var(--portal-primary)] font-medium py-2.5 rounded-xl hover:bg-white/90 transition-colors"
                   >

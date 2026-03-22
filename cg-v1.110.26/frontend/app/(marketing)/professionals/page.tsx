@@ -294,7 +294,7 @@ export default function ProfessionalsPage() {
                 ))}
               </ul>
               <Link
-                href="/register"
+                href="/early-access"
                 className="inline-flex items-center gap-2 text-[#3DAA8A] font-medium hover:underline"
               >
                 Or recommend CommonGround to a client

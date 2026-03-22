@@ -156,7 +156,7 @@ export default function PricingPage() {
 
   const handleCTA = (planName?: string, price?: number) => {
     if (planName) trackBeginCheckout(planName, price);
-    router.push(user ? '/settings/billing' : '/register');
+    router.push(user ? '/settings/billing' : '/early-access');
   };
 
   const renderCheckmark = (value: boolean | string) => {
@@ -556,7 +556,7 @@ export default function PricingPage() {
             Join the families who&apos;ve found a calmer way.
           </p>
           <button
-            onClick={() => router.push('/register')}
+            onClick={() => router.push('/early-access')}
             className="px-8 py-4 bg-white text-[var(--portal-primary)] rounded-xl font-medium text-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5"
           >
             Start Free Today

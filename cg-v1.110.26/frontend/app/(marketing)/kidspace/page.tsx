@@ -64,7 +64,7 @@ export default function KidSpacePage() {
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                         <Link
-                            href="/register?plan=plus"
+                            href="/early-access"
                             className="inline-flex items-center justify-center px-8 py-4 bg-[#3DAA8A] text-white font-semibold rounded-full hover:bg-[#2D8A6A] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 group text-lg"
                         >
                             Try KidSpace Free
@@ -196,7 +196,7 @@ export default function KidSpacePage() {
                                 A grandparent might pay for KidSpace just to have movie nights with their grandchild. An aunt might gift it so she can read bedtime stories from across the country. KidSpace keeps families together when life pulls them apart.
                             </p>
                             <Link
-                                href="/register?plan=plus"
+                                href="/early-access"
                                 className="inline-flex items-center text-[#F5A623] font-semibold hover:text-[#D4910F] transition-colors group"
                             >
                                 Gift KidSpace
@@ -279,7 +279,7 @@ export default function KidSpacePage() {
                         KidSpace turns tough transitions into bonding moments. Start your free trial and see what a calmer week looks like.
                     </p>
                     <Link
-                        href="/register?plan=plus"
+                        href="/early-access"
                         className="inline-flex items-center justify-center px-10 py-5 bg-[#3DAA8A] text-white font-bold text-lg rounded-full hover:bg-[#2D8A6A] transition-all shadow-xl hover:-translate-y-1 group"
                     >
                         Start Free Trial

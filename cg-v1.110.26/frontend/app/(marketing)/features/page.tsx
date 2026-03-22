@@ -328,7 +328,7 @@ export default function FeaturesPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/register"
+              href="/early-access"
               className="inline-flex items-center justify-center px-8 py-4 bg-[var(--portal-primary)] text-white rounded-xl font-medium text-lg hover:bg-[#2D6A8F] transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5 group"
             >
               Start Free

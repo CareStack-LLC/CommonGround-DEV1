@@ -265,7 +265,7 @@ export default function BlogPostPage() {
               <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#3DAA8A] via-[#D4AF37] to-[#3DAA8A]" />
               <h2 className="text-xl font-semibold text-white mb-3">Ready to improve your co-parenting journey?</h2>
               <p className="text-[#C8E6DC] mb-8 max-w-lg mx-auto">CommonGround gives you the tools to communicate better, track agreements, and co-parent more effectively.</p>
-              <Link href="/register" className="inline-flex items-center justify-center gap-2 bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white font-semibold px-8 py-3.5 rounded-full transition-all duration-200 shadow-lg hover:shadow-xl">
+              <Link href="/early-access" className="inline-flex items-center justify-center gap-2 bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white font-semibold px-8 py-3.5 rounded-full transition-all duration-200 shadow-lg hover:shadow-xl">
                 Get Started Free <ArrowRight className="w-5 h-5" />
               </Link>
             </div>

@@ -267,7 +267,7 @@ function LoginContent() {
 
             {/* Register Link */}
             <Link
-              href="/register"
+              href="/early-access"
               className="block w-full py-4 px-6 rounded-xl border-2 border-[var(--portal-primary)] text-[var(--portal-primary)] hover:bg-[var(--portal-primary)] hover:text-white font-semibold transition-all text-center"
             >
               Create an Account

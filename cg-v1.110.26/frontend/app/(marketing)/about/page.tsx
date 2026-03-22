@@ -377,7 +377,7 @@ export default function AboutPage() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              href="/register"
+              href="/early-access"
               className="inline-flex items-center justify-center px-8 py-4 bg-[var(--portal-primary)] text-white font-semibold rounded-full hover:bg-[#2D8A70] transition-colors shadow-lg hover:shadow-xl group"
             >
               Start Your Free Trial
