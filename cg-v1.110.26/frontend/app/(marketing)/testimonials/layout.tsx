@@ -1,12 +1,12 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Impact Stories | How CommonGround Helps Families | CommonGround',
-  description: 'Through the 4Ever Forward Foundation grant program, CommonGround helped real families in high-conflict situations find calmer communication, stronger bonds, and peace of mind.',
-  keywords: 'co-parenting impact, family stories, 4Ever Forward Foundation, grant program, co-parenting success, ARIA messaging, KidSpace',
+  title: 'Stories | Families Finding Peace Through CommonGround',
+  description: 'Real stories from families who found calmer co-parenting through CommonGround and the community organizations that support them. From hostile texts to movie nights — transformation is possible.',
+  keywords: 'co-parenting stories, family transformation, co-parenting success, community partnerships, nonprofit co-parenting, Left Right 4 U, Forever Forward Foundation, ARIA messaging, KidSpace',
   openGraph: {
-    title: 'Impact Stories | How CommonGround Helps Families',
-    description: 'Real families. Real impact. See how the 4Ever Forward Foundation grant program helped parents find calmer communication and stronger bonds with their children.',
+    title: 'Stories | Families Finding Peace Through CommonGround',
+    description: 'Real stories from families who found calmer co-parenting through CommonGround and the community organizations that support them.',
     type: 'website',
   },
 };
