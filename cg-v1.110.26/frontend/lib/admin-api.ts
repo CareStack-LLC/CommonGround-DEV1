@@ -338,6 +338,51 @@ export interface TierConfig {
   tiers: { name: string; price: number; user_count: number; is_paid: boolean }[];
 }
 
+// Chatbot admin types
+export interface ChatbotSessionListItem {
+  id: string;
+  visitor_name: string | null;
+  visitor_email: string | null;
+  status: string;
+  message_count: number;
+  started_at: string;
+  ended_at: string | null;
+}
+
+export interface ChatbotSessionsListResponse {
+  sessions: ChatbotSessionListItem[];
+  total: number;
+  page: number;
+  per_page: number;
+}
+
+export interface ChatbotMessageItem {
+  id: string;
+  role: string;
+  content: string;
+  created_at: string;
+}
+
+export interface ChatbotSessionDetail {
+  id: string;
+  visitor: { name: string | null; email: string | null; phone: string | null; source_page: string | null };
+  status: string;
+  message_count: number;
+  started_at: string;
+  ended_at: string | null;
+  escalation_reason: string | null;
+  transcript_emailed: boolean;
+  messages: ChatbotMessageItem[];
+}
+
+export interface ChatbotAdminStats {
+  total_sessions: number;
+  active_today: number;
+  avg_messages_per_session: number;
+  escalation_rate: number;
+  total_visitors: number;
+}
+
 export interface WeeklyReport {
   generated_at: string;
   period: { start: string; end: string };
@@ -646,6 +691,36 @@ export const adminAPI = {
 
   // System Status
   getSystemStatus: () => adminFetch<SystemStatusResponse>('/admin/system-status'),
+
+  // ── Chatbot Admin ─────────────────────────────────────────────────
+  getChatbotSessions: (params: {
+    status?: string;
+    search?: string;
+    date_from?: string;
+    date_to?: string;
+    page?: number;
+    per_page?: number;
+  } = {}) => {
+    const sp = new URLSearchParams();
+    if (params.status) sp.set('status', params.status);
+    if (params.search) sp.set('search', params.search);
+    if (params.date_from) sp.set('date_from', params.date_from);
+    if (params.date_to) sp.set('date_to', params.date_to);
+    if (params.page) sp.set('page', String(params.page));
+    if (params.per_page) sp.set('per_page', String(params.per_page));
+    return adminFetch<ChatbotSessionsListResponse>(`/chatbot/admin/sessions?${sp}`);
+  },
+
+  getChatbotSession: (sessionId: string) =>
+    adminFetch<ChatbotSessionDetail>(`/chatbot/admin/sessions/${sessionId}`),
+
+  emailChatbotTranscript: (sessionId: string) =>
+    adminFetch<{ success: boolean; message: string }>(
+      `/chatbot/admin/sessions/${sessionId}/email-transcript`,
+      { method: 'POST' }
+    ),
+
+  getChatbotStats: () => adminFetch<ChatbotAdminStats>('/chatbot/admin/stats'),
 };
 
 // System Status types

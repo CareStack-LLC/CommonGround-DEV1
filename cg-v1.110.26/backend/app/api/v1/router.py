@@ -62,6 +62,7 @@ from app.api.v1.endpoints import (
     verify,
     blog,
     kidspace_media,
+    chatbot,
 )
 
 api_router = APIRouter()
@@ -208,6 +209,9 @@ api_router.include_router(landing_page_public_router, tags=["Landing Pages"])
 
 # Admin Email Monitor - Gmail integration, AI drafts
 api_router.include_router(admin_inbox.router, prefix="/admin/inbox", tags=["Admin Email Monitor"])
+
+# Chatbot - Public Aria Customer Success
+api_router.include_router(chatbot.router, prefix="/chatbot", tags=["Chatbot"])
 
 # SuperAdmin Portal - Platform administration
 api_router.include_router(admin.router, prefix="/admin", tags=["SuperAdmin Portal"])

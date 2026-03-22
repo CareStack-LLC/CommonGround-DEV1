@@ -29,6 +29,7 @@ import {
   Mail,
   Globe,
   BarChart3,
+  MessageCircle,
 } from 'lucide-react';
 import { adminAPI, type PlatformHealth } from '@/lib/admin-api';
 
@@ -42,6 +43,7 @@ const navSections = [
       { href: '/superadmin/bug-triage', label: 'Bug Triage', icon: Bug },
       { href: '/superadmin/performance', label: 'Performance', icon: Gauge },
       { href: '/superadmin/status', label: 'System Status', icon: Activity },
+      { href: '/superadmin/chatbot', label: 'Chatbot', icon: MessageCircle },
     ],
   },
   {

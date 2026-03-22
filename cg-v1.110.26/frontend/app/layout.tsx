@@ -20,6 +20,11 @@ const AppProviders = dynamic(
   { ssr: true },
 );
 
+const ChatbotWidget = dynamic(
+  () => import("@/components/chatbot/chatbot-widget"),
+  { ssr: false },
+);
+
 /* ── Self-hosted Google Fonts via next/font ────────────────────────────
  * Eliminates render-blocking <link> to fonts.googleapis.com.
  * Each font is subset to latin, loaded with font-display:swap,
@@ -152,6 +157,7 @@ export default function RootLayout({
           <AppProviders>
             {children}
           </AppProviders>
+          <ChatbotWidget />
         </AuthProvider>
       </body>
     </html>
