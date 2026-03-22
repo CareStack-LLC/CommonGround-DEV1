@@ -259,13 +259,13 @@ export default function LeftRight4ULanding({ partnerSlug }: LeftRight4ULandingPr
                     </div>
 
                     {/* Logic Box */}
-                    <div className="bg-[#2D3436] border border-gray-800 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-[#FFE66D]/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2" />
+                    <div className="bg-white border border-gray-200 rounded-3xl p-8 shadow-xl relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-[#FF6B6B]/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2" />
 
-                        <h3 className="text-2xl font-bold text-white mb-6 relative z-10">Activate Access</h3>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-6 relative z-10">Activate Access</h3>
 
                         <div className="space-y-5 relative z-10">
-                            <label className="block text-sm font-medium text-[#4ECDC4] uppercase tracking-wider">
+                            <label className="block text-sm font-medium text-[#FF6B6B] uppercase tracking-wider">
                                 Enter 8-Digit Grant Code
                             </label>
                             <div className="flex gap-3">
@@ -278,13 +278,13 @@ export default function LeftRight4ULanding({ partnerSlug }: LeftRight4ULandingPr
                                         setCodeError(null);
                                         setCodeValid(false);
                                     }}
-                                    className="bg-gray-800/50 border-gray-700 text-white placeholder:text-gray-500 h-14 text-lg font-mono focus:border-[#4ECDC4] transition-colors rounded-xl"
+                                    className="bg-gray-50 border-gray-300 text-gray-900 placeholder:text-gray-400 h-14 text-lg font-mono focus:border-[#FF6B6B] transition-colors rounded-xl"
                                     disabled={validating || codeValid}
                                 />
                                 <Button
                                     onClick={handleValidateCode}
                                     disabled={validating || codeValid}
-                                    className="bg-[#4ECDC4] hover:bg-[#3dbdb4] text-gray-900 font-bold h-14 px-6 rounded-xl shadow-lg shadow-[#4ECDC4]/20 transition-transform hover:-translate-y-0.5"
+                                    className="bg-[#FF6B6B] hover:bg-[#e55a5a] text-white font-bold h-14 px-6 rounded-xl shadow-lg shadow-[#FF6B6B]/20 transition-transform hover:-translate-y-0.5"
                                 >
                                     {validating ? <Loader2 className="animate-spin" /> : <ArrowRight />}
                                 </Button>
@@ -303,7 +303,7 @@ export default function LeftRight4ULanding({ partnerSlug }: LeftRight4ULandingPr
                                 </p>
                             )}
 
-                            <p className="text-xs text-gray-400 mt-4 leading-relaxed">
+                            <p className="text-xs text-gray-500 mt-4 leading-relaxed">
                                 This code provides uncompromising digital privacy and unlocks 6 months of CommonGround Complete.
                             </p>
                         </div>

@@ -194,17 +194,6 @@ export default function PartnersDirectoryPage() {
                         logoUrl="/assets/marketing/forever-forward-hero.png"
                     />
 
-                    {/* Jenesse Center Card */}
-                    <PartnerCard
-                        slug="jenesse-center"
-                        name="Jenesse Center"
-                        description="Jenesse Center Inc. is the oldest domestic violence intervention program in South Los Angeles. Jenesse takes a holistic, comprehensive, and culturally responsive approach to domestic violence intervention and prevention."
-                        website="jenesse.org"
-                        contact="info@jenesse.org"
-                        location="Los Angeles, CA"
-                        logoUrl="/assets/marketing/empowering_father_son.png"
-                    />
-
                     {/* Left Right 4 U Foundation Card */}
                     <PartnerCard
                         slug="leftright4u"
@@ -214,17 +203,6 @@ export default function PartnersDirectoryPage() {
                         contact="info@leftright4u.org"
                         location="San Bernardino, CA"
                         logoUrl="/assets/marketing/lr4u_hero_nano_banana_1772567466304.png"
-                    />
-
-                    {/* Interval House Long Beach Card */}
-                    <PartnerCard
-                        slug="interval-house-lb"
-                        name="Interval House"
-                        description="Interval House provides comprehensive support services to battered women and children, including emergency shelter, transitional housing, legal advocacy, and counseling."
-                        website="intervalhouse.org"
-                        contact="admin@intervalhouse.org"
-                        location="Long Beach, CA"
-                        logoUrl="/assets/marketing/empowering_father_son.png"
                     />
 
                     {/* Call to Action for new partners */}
