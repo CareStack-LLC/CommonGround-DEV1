@@ -1,360 +1,758 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import Link from "next/link";
-import { Check, Star, BarChart3, Users, Shield, TrendingUp, Handshake, FileText, Calendar, DollarSign, BrainCircuit } from "lucide-react";
+import Image from 'next/image';
+import Link from 'next/link';
+import {
+  ArrowRight,
+  BarChart3,
+  BrainCircuit,
+  Calendar,
+  Check,
+  DollarSign,
+  FileText,
+  Handshake,
+  Heart,
+  Quote,
+  Shield,
+  Star,
+  TrendingUp,
+  Users,
+} from 'lucide-react';
+import { PartnershipInquiryForm } from '@/components/marketing/partnership-inquiry-form';
+import { SectionTracker } from '@/components/marketing/analytics-tracker';
 
 export const metadata = {
-    title: "Grant Partnership Program | CommonGround",
-    description: "Empower the families you serve with AI-powered co-parenting tools—at zero cost to your organization.",
+  title: 'Partner With Us | Bring CommonGround to Families You Serve',
+  description:
+    'Give the families you serve AI-powered co-parenting tools at zero cost. 25 free accounts, real-time outcomes dashboards, and grant-ready impact reports for your organization.',
 };
 
 export default function GrantPartnershipPage() {
-    return (
-        <div className="font-sans text-[#1E3A4A] bg-[#F4F8F7]">
-            {/* Hero Section */}
-            <section className="relative overflow-hidden pt-24 pb-32 lg:pt-32 lg:pb-40">
-                {/* Background Blobs - matching Pricing page */}
-                <div className="absolute inset-0 opacity-10 pointer-events-none">
-                    <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#3DAA8A] rounded-full blur-3xl"></div>
-                    <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#F5A623] rounded-full blur-3xl"></div>
-                </div>
+  return (
+    <div className="font-sans text-[#1E3A4A] bg-[#F4F8F7]">
+      <SectionTracker page="grant-partnership" />
 
-                <div className="container relative mx-auto px-4 text-center z-10">
-                    <h1 className="mx-auto mb-6 max-w-4xl font-serif text-5xl font-bold leading-tight md:text-6xl animate-in fade-in slide-in-from-bottom-4 duration-700 text-[#1E3A4A]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-                        Grant Partnership Program
-                    </h1>
-                    <p className="mx-auto mb-10 max-w-2xl text-xl text-gray-600 md:text-2xl animate-in fade-in slide-in-from-bottom-8 duration-700 delay-150 leading-relaxed">
-                        Extend your impact beyond your walls. Empower the families you serve with AI-powered co-parenting tools—at zero cost to your organization.
+      {/* ── Hero ─────────────────────────────────────────────────── */}
+      <section
+        className="relative overflow-hidden pt-16 pb-24 lg:pt-24 lg:pb-32"
+        data-section="hero"
+      >
+        <div className="absolute top-10 left-1/4 w-72 h-72 bg-[#3DAA8A]/8 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#F5A623]/6 rounded-full blur-3xl" />
+
+        <div className="relative max-w-4xl mx-auto px-6 text-center">
+          <p className="text-[#F5A623] font-medium mb-5 tracking-widest uppercase text-xs flex items-center justify-center gap-3">
+            <span className="w-8 h-px bg-[#F5A623]/40" />
+            Community Partnership
+            <span className="w-8 h-px bg-[#F5A623]/40" />
+          </p>
+
+          <h1
+            className="text-4xl sm:text-5xl lg:text-[3.5rem] text-[#1E3A4A] mb-6 leading-[1.15]"
+            style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
+          >
+            The families you serve deserve{' '}
+            <span className="text-[#3DAA8A]">calmer co-parenting.</span>
+          </h1>
+
+          <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed mb-10">
+            You already do the hard work of supporting families through
+            separation, divorce, and custody. CommonGround gives them a tool
+            that keeps working long after they leave your office — at zero cost
+            to your organization.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="#apply"
+              className="inline-flex items-center justify-center gap-2 bg-[#3DAA8A] text-white font-medium px-8 py-4 rounded-full text-lg transition-all duration-200 hover:bg-[#34967a] hover:shadow-xl hover:-translate-y-0.5"
+            >
+              Become a Partner
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+            <Link
+              href="#how-it-works"
+              className="inline-flex items-center justify-center gap-2 border-2 border-[#3DAA8A] text-[#3DAA8A] font-medium px-8 py-4 rounded-full text-lg transition-all duration-200 hover:bg-[#3DAA8A] hover:text-white"
+            >
+              See How It Works
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Stats Bar ────────────────────────────────────────────── */}
+      <div className="relative z-20 -mt-12 px-6" data-section="stats">
+        <div className="max-w-5xl mx-auto">
+          <div className="grid grid-cols-2 gap-6 rounded-2xl bg-white p-8 shadow-xl lg:grid-cols-4 border border-gray-100">
+            {[
+              { value: '25', label: 'Free Accounts Per Partner' },
+              { value: '180', label: 'Days of Full Access' },
+              { value: '24/7', label: 'AI-Powered Support' },
+              { value: '$0', label: 'Cost to Your Organization' },
+            ].map((stat) => (
+              <div key={stat.label} className="text-center">
+                <div
+                  className="mb-1 text-4xl font-bold text-[#3DAA8A]"
+                  style={{
+                    fontFamily: "'DM Serif Display', Georgia, serif",
+                  }}
+                >
+                  {stat.value}
+                </div>
+                <div className="text-sm font-medium text-gray-500 uppercase tracking-wide">
+                  {stat.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* ── The Problem You Know ─────────────────────────────────── */}
+      <section className="py-20 lg:py-28" data-section="problem">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="text-center mb-14">
+            <h2
+              className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+              style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
+            >
+              You&rsquo;ve seen what happens{' '}
+              <span className="text-[#3DAA8A]">after families leave</span>
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto text-lg leading-relaxed">
+              The families you work with make progress in your programs. But the
+              co-parenting conflict follows them home — hostile texts, missed
+              handoffs, children caught in the middle. CommonGround keeps the
+              progress going.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              {
+                before: 'Families relapse into conflict after leaving your program',
+                after: 'ARIA coaches every message, keeping communication constructive 24/7',
+                icon: BrainCircuit,
+              },
+              {
+                before: 'No way to measure long-term outcomes for grant reporting',
+                after: 'Real-time dashboard tracks engagement, communication quality, and retention',
+                icon: BarChart3,
+              },
+              {
+                before: 'Limited staff bandwidth to provide ongoing support',
+                after: 'AI handles the daily mediation — your team focuses on the families who need you most',
+                icon: Users,
+              },
+            ].map((item) => {
+              const Icon = item.icon;
+              return (
+                <div
+                  key={item.before}
+                  className="bg-white rounded-2xl p-7 border border-gray-100 shadow-sm"
+                >
+                  <div className="w-12 h-12 rounded-xl bg-[#3DAA8A]/10 flex items-center justify-center mb-5">
+                    <Icon className="w-6 h-6 text-[#3DAA8A]" />
+                  </div>
+                  <p className="text-gray-400 text-sm line-through mb-3">
+                    {item.before}
+                  </p>
+                  <p className="text-[#1E3A4A] font-medium leading-relaxed">
+                    {item.after}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Social Proof: Partners Already Doing This ────────────── */}
+      <section className="py-16 lg:py-20 bg-white" data-section="social-proof">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2
+              className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+              style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
+            >
+              Organizations already{' '}
+              <span className="text-[#3DAA8A]">making it happen</span>
+            </h2>
+            <p className="text-gray-600 max-w-xl mx-auto">
+              Community partners across Southern California are bringing
+              CommonGround to the families they serve.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {[
+              {
+                name: '4Ever Forward Foundation',
+                tagline: 'Strong fathers. Safer families.',
+                quote:
+                  'CommonGround gave us a way to support fathers beyond our program walls. The families we serve now have tools that work 24/7 — not just during office hours.',
+                image: '/assets/marketing/forever-forward-hero.png',
+                href: '/foreverforward',
+              },
+              {
+                name: 'Left Right 4 U',
+                tagline: 'Recover. Refresh. Restore.',
+                quote:
+                  'Our mothers are dealing with cancer treatment, domestic violence, and co-parenting — all at once. CommonGround takes the communication conflict off their plate so they can focus on healing.',
+                image: '/assets/marketing/lr4u_hero_nano_banana_1772567466304.png',
+                href: '/leftright4u',
+              },
+            ].map((partner) => (
+              <Link
+                key={partner.name}
+                href={partner.href}
+                className="group block bg-[#F4F8F7] rounded-2xl overflow-hidden border border-gray-200 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+              >
+                <div className="relative h-44 overflow-hidden">
+                  <Image
+                    src={partner.image}
+                    alt={partner.name}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                </div>
+                <div className="p-6">
+                  <h3
+                    className="text-lg text-[#1E3A4A] mb-0.5"
+                    style={{
+                      fontFamily: "'DM Serif Display', Georgia, serif",
+                    }}
+                  >
+                    {partner.name}
+                  </h3>
+                  <p className="text-sm text-[#3DAA8A] font-medium mb-3">
+                    {partner.tagline}
+                  </p>
+                  <div className="flex gap-2">
+                    <Quote className="w-4 h-4 text-[#3DAA8A]/40 flex-shrink-0 mt-0.5" />
+                    <p className="text-gray-600 text-sm italic leading-relaxed">
+                      {partner.quote}
                     </p>
-                    <div className="flex flex-col items-center justify-center gap-4 sm:flex-row animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
-                        <Link
-                            href="#apply"
-                            className="px-8 py-4 bg-[#3DAA8A] text-white rounded-full font-medium text-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5"
-                        >
-                            Become a Partner
-                        </Link>
-                        <Link
-                            href="#how-it-works"
-                            className="px-8 py-4 bg-white text-[#3DAA8A] border-2 border-[#3DAA8A] rounded-full font-medium text-lg hover:shadow-lg transition-all duration-200 hover:-translate-y-0.5"
-                        >
-                            Learn More
-                        </Link>
-                    </div>
+                  </div>
+                  <p className="mt-4 text-[#3DAA8A] text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
+                    See their story
+                    <ArrowRight className="w-4 h-4" />
+                  </p>
                 </div>
-            </section>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
 
-            {/* Stats Bar */}
-            <div className="relative z-20 -mt-20 px-4">
-                <div className="container mx-auto">
-                    <div className="grid grid-cols-1 gap-8 rounded-2xl bg-white p-8 shadow-xl md:grid-cols-2 lg:grid-cols-4 border border-gray-100">
-                        <div className="text-center">
-                            <div className="mb-2 font-serif text-4xl font-bold text-[#3DAA8A]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>25</div>
-                            <div className="text-sm font-medium text-gray-500 uppercase tracking-wide">Free Codes Per Partner</div>
-                        </div>
-                        <div className="text-center">
-                            <div className="mb-2 font-serif text-4xl font-bold text-[#3DAA8A]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>180</div>
-                            <div className="text-sm font-medium text-gray-500 uppercase tracking-wide">Days of Full Access</div>
-                        </div>
-                        <div className="text-center">
-                            <div className="mb-2 font-serif text-4xl font-bold text-[#3DAA8A]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>24/7</div>
-                            <div className="text-sm font-medium text-gray-500 uppercase tracking-wide">AI-Assisted Support</div>
-                        </div>
-                        <div className="text-center">
-                            <div className="mb-2 font-serif text-4xl font-bold text-[#3DAA8A]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Zero</div>
-                            <div className="text-sm font-medium text-gray-500 uppercase tracking-wide">Cost to Your Organization</div>
-                        </div>
-                    </div>
+      {/* ── What Your Families Get ───────────────────────────────── */}
+      <section className="py-20 lg:py-24" data-section="features">
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="text-center mb-14">
+            <h2
+              className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+              style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
+            >
+              What your families{' '}
+              <span className="text-[#3DAA8A]">get access to</span>
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto text-lg">
+              Every family receives our Complete tier — the same tools used by
+              attorneys, mediators, and court systems. Six months, fully funded.
+            </p>
+          </div>
+
+          <div className="grid gap-x-8 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              {
+                icon: BrainCircuit,
+                title: 'ARIA AI Coaching',
+                desc: 'Every message gets real-time coaching to keep conversations constructive and child-focused',
+              },
+              {
+                icon: Users,
+                title: 'Secure Messaging',
+                desc: 'Court-documented, threaded conversations that replace hostile texts',
+              },
+              {
+                icon: Calendar,
+                title: 'Custody Calendar',
+                desc: 'Shared schedules, exchange coordination, and GPS handoff verification',
+              },
+              {
+                icon: DollarSign,
+                title: 'Expense Tracking',
+                desc: 'Split child-related costs with receipts, approvals, and zero-fee payments',
+              },
+              {
+                icon: FileText,
+                title: 'Agreement Builder',
+                desc: 'Digital parenting plans that both parents can build and approve together',
+              },
+              {
+                icon: Shield,
+                title: 'Court-Ready Records',
+                desc: 'SHA-256 verified documentation accepted in all 50 states',
+              },
+              {
+                icon: Heart,
+                title: 'KidSpace',
+                desc: 'Age-appropriate messaging that keeps children connected but out of adult conflict',
+              },
+              {
+                icon: BarChart3,
+                title: 'Analytics Dashboard',
+                desc: 'Track communication patterns, compliance, and conflict trends over time',
+              },
+            ].map((item) => {
+              const Icon = item.icon;
+              return (
+                <div key={item.title} className="flex gap-4">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white shadow-sm text-[#3DAA8A] border border-gray-100">
+                    <Icon className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h4
+                      className="mb-1.5 text-lg font-semibold text-[#1E3A4A]"
+                      style={{
+                        fontFamily: "'DM Serif Display', Georgia, serif",
+                      }}
+                    >
+                      {item.title}
+                    </h4>
+                    <p className="text-sm leading-relaxed text-gray-600">
+                      {item.desc}
+                    </p>
+                  </div>
                 </div>
+              );
+            })}
+          </div>
+
+          {/* Value callout */}
+          <div className="mt-14 bg-gradient-to-r from-[#F5A623] to-[#E09520] rounded-2xl p-8 lg:p-10 text-center text-white shadow-lg">
+            <p className="text-white/80 text-sm font-medium uppercase tracking-wider mb-2">
+              Total Partnership Value
+            </p>
+            <div
+              className="text-5xl lg:text-6xl font-bold mb-3"
+              style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
+            >
+              $5,249
+            </div>
+            <p className="text-white/90 max-w-lg mx-auto">
+              Complete tier ($34.99/mo &times; 6 months) &times; 25 families —
+              provided free to your organization.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── What You Get (Org Benefits) ──────────────────────────── */}
+      <section
+        className="py-20 lg:py-24 bg-white"
+        data-section="org-benefits"
+      >
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="text-center mb-14">
+            <h2
+              className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+              style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
+            >
+              What your organization{' '}
+              <span className="text-[#3DAA8A]">gets</span>
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto text-lg">
+              This isn&rsquo;t just a tool for families. It&rsquo;s
+              infrastructure for proving and scaling your impact.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              {
+                icon: Handshake,
+                title: 'Co-Branded Experience',
+                desc: 'Families access CommonGround through a custom landing page with your logo, colors, and mission. It feels like your program — because it is.',
+              },
+              {
+                icon: BarChart3,
+                title: 'Grant-Ready Reports',
+                desc: 'One-click impact reports showing activation rates, communication improvement, retention, and satisfaction — the numbers funders want to see.',
+              },
+              {
+                icon: TrendingUp,
+                title: 'Scalable Impact',
+                desc: 'Serve 10x more families without adding staff. Our AI handles the daily coaching while your team focuses on the work only humans can do.',
+              },
+              {
+                icon: Star,
+                title: '24/7 Ongoing Support',
+                desc: 'Your families get help at 2am on a Sunday — when a hostile text comes in and there\u2019s nobody to call. ARIA is always there.',
+              },
+              {
+                icon: Shield,
+                title: 'Privacy Protected',
+                desc: 'All family data is anonymized before your organization sees it. We handle the security so you can focus on outcomes.',
+              },
+              {
+                icon: Users,
+                title: 'Training & Onboarding',
+                desc: 'We train your staff, provide orientation materials for families, and give you a dedicated point of contact throughout the partnership.',
+              },
+            ].map((item) => {
+              const Icon = item.icon;
+              return (
+                <div
+                  key={item.title}
+                  className="group bg-[#F4F8F7] rounded-2xl p-8 border border-gray-100 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:bg-white"
+                >
+                  <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-[#3DAA8A]/10 text-[#3DAA8A] group-hover:bg-[#3DAA8A] group-hover:text-white transition-all duration-300">
+                    <Icon className="h-7 w-7" />
+                  </div>
+                  <h3
+                    className="mb-3 text-xl text-[#1E3A4A]"
+                    style={{
+                      fontFamily: "'DM Serif Display', Georgia, serif",
+                    }}
+                  >
+                    {item.title}
+                  </h3>
+                  <p className="text-gray-600 leading-relaxed text-sm">
+                    {item.desc}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Measurable Outcomes ───────────────────────────────────── */}
+      <section
+        className="py-20 lg:py-24 bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F] text-white relative overflow-hidden"
+        data-section="outcomes"
+      >
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#F5A623]/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+
+        <div className="relative max-w-5xl mx-auto px-6">
+          <div className="text-center mb-14">
+            <h2
+              className="text-3xl sm:text-4xl text-white mb-4"
+              style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
+            >
+              The numbers your funders want to see
+            </h2>
+            <p className="text-white/70 max-w-2xl mx-auto text-lg">
+              Every metric is tracked automatically. No surveys. No manual
+              reporting. Just real data from real families.
+            </p>
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              {
+                title: 'Activation Rate',
+                desc: 'How many families activated their codes and started using the platform — proving engagement from day one.',
+              },
+              {
+                title: 'Communication Quality',
+                desc: 'Percentage increase in constructive messaging over time — behavioral change you can point to.',
+              },
+              {
+                title: 'Sustained Engagement',
+                desc: '30-day and 90-day retention showing families continue benefiting long after your program ends.',
+              },
+              {
+                title: 'Legal Fee Savings',
+                desc: 'Estimated legal costs prevented through better communication and documentation.',
+              },
+              {
+                title: 'Feature Utilization',
+                desc: 'Which tools families use most — schedules, expenses, agreements — showing comprehensive adoption.',
+              },
+              {
+                title: 'Family Satisfaction',
+                desc: 'Net Promoter Scores and anonymized feedback demonstrating quality of life improvement.',
+              },
+            ].map((item) => (
+              <div
+                key={item.title}
+                className="rounded-2xl border border-white/10 bg-white/5 p-7 backdrop-blur-sm transition-all hover:bg-white/10"
+              >
+                <h4
+                  className="mb-2 text-xl text-[#F5A623]"
+                  style={{
+                    fontFamily: "'DM Serif Display', Georgia, serif",
+                  }}
+                >
+                  {item.title}
+                </h4>
+                <p className="leading-relaxed text-white/75 text-sm">
+                  {item.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── How It Works ─────────────────────────────────────────── */}
+      <section
+        id="how-it-works"
+        className="py-20 lg:py-24 bg-white"
+        data-section="process"
+      >
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="text-center mb-14">
+            <h2
+              className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+              style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
+            >
+              From inquiry to{' '}
+              <span className="text-[#3DAA8A]">active partnership</span>
+            </h2>
+            <p className="text-gray-600 max-w-xl mx-auto text-lg">
+              Most partners are live within 3 weeks.
+            </p>
+          </div>
+
+          <div className="relative grid gap-8 md:grid-cols-5">
+            {/* Connecting line */}
+            <div className="absolute left-0 top-10 hidden h-0.5 w-full bg-gray-100 md:block" />
+
+            {[
+              {
+                num: '1',
+                title: 'Inquiry',
+                desc: 'Fill out the form below. Tell us about your organization and the families you serve.',
+              },
+              {
+                num: '2',
+                title: 'Discovery Call',
+                desc: '30-minute conversation to ensure mutual fit and answer your questions.',
+              },
+              {
+                num: '3',
+                title: 'Custom Setup',
+                desc: 'We build your co-branded landing page and generate your grant codes.',
+              },
+              {
+                num: '4',
+                title: 'Staff Training',
+                desc: '45-minute training session plus materials for orienting your families.',
+              },
+              {
+                num: '5',
+                title: 'Launch',
+                desc: 'Start distributing codes. Watch your dashboard light up with impact.',
+              },
+            ].map((step) => (
+              <div
+                key={step.num}
+                className="relative z-10 text-center bg-white md:bg-transparent p-6 md:p-0 rounded-xl border md:border-0 border-gray-100 shadow-sm md:shadow-none"
+              >
+                <div
+                  className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#3DAA8A] to-[#2C5F5D] text-2xl font-bold text-white shadow-lg shadow-[#3DAA8A]/20"
+                  style={{
+                    fontFamily: "'DM Serif Display', Georgia, serif",
+                  }}
+                >
+                  {step.num}
+                </div>
+                <h4
+                  className="mb-2 text-lg font-semibold text-[#3DAA8A]"
+                  style={{
+                    fontFamily: "'DM Serif Display', Georgia, serif",
+                  }}
+                >
+                  {step.title}
+                </h4>
+                <p className="text-sm text-gray-500 leading-relaxed">
+                  {step.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Partnership Requirements ─────────────────────────────── */}
+      <section className="py-16 lg:py-20" data-section="requirements">
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* What we ask */}
+            <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
+              <h3
+                className="mb-6 pb-4 border-b-2 border-[#3DAA8A]/20 text-2xl text-[#1E3A4A]"
+                style={{
+                  fontFamily: "'DM Serif Display', Georgia, serif",
+                }}
+              >
+                What we ask of you
+              </h3>
+              <ul className="space-y-4">
+                {[
+                  'Distribute grant codes to families in your program',
+                  'Run a 15-minute orientation for new families',
+                  'Include CommonGround in your program materials',
+                  'Share anonymized success stories (optional)',
+                  'Provide feedback so we can keep improving',
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-3">
+                    <div className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#3DAA8A]/10 text-[#3DAA8A]">
+                      <Check className="h-3.5 w-3.5" />
+                    </div>
+                    <span className="text-gray-700">{item}</span>
+                  </li>
+                ))}
+              </ul>
             </div>
 
-            {/* Value Proposition Section */}
-            <section className="py-24">
-                <div className="container mx-auto px-4">
-                    <div className="mb-16 text-center">
-                        <h2 className="mb-4 font-serif text-4xl font-bold text-[#1E3A4A]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Why Partner with CommonGround?</h2>
-                        <p className="mx-auto max-w-2xl text-lg text-gray-600">
-                            We help nonprofits create lasting impact for families navigating divorce and co-parenting challenges.
-                        </p>
+            {/* What you get */}
+            <div className="bg-gradient-to-br from-[#3DAA8A] to-[#2C5F5D] rounded-2xl p-8 text-white shadow-lg relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-bl-full" />
+              <h3
+                className="relative mb-6 pb-4 border-b-2 border-white/20 text-2xl"
+                style={{
+                  fontFamily: "'DM Serif Display', Georgia, serif",
+                }}
+              >
+                What you get
+              </h3>
+              <ul className="relative space-y-4">
+                {[
+                  '25 Complete tier accounts (6 months each)',
+                  'Co-branded landing page with your identity',
+                  'Real-time outcomes dashboard',
+                  'One-click grant-ready impact reports',
+                  'Staff training and ongoing support',
+                  'Priority customer support for your families',
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-3">
+                    <div className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white/20 text-white">
+                      <Check className="h-3.5 w-3.5" />
                     </div>
-
-                    <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-                        {[
-                            {
-                                icon: Star,
-                                title: "Ongoing Support",
-                                desc: "Your clients receive 24/7 AI-powered support long after they complete your program, ensuring lasting impact.",
-                            },
-                            {
-                                icon: BarChart3,
-                                title: "Automated Outcomes",
-                                desc: "Access real-time, anonymized metrics that prove your impact. Generate grant-ready reports with one click.",
-                            },
-                            {
-                                icon: Handshake,
-                                title: "Co-Branded Experience",
-                                desc: "Your clients access CommonGround through a custom landing page featuring your logo, colors, and mission.",
-                            },
-                            {
-                                icon: Users,
-                                title: "Legal Network Connection",
-                                desc: "Connect your clients to vetted family law attorneys in our network, adding value to your services.",
-                            },
-                            {
-                                icon: TrendingUp,
-                                title: "Scalable Impact",
-                                desc: "Serve 10x more families without adding staff. Our AI handles the ongoing mediation and support work.",
-                            },
-                            {
-                                icon: Shield,
-                                title: "Privacy Protected",
-                                desc: "All client data is anonymized before partners see it. We handle HIPAA-level security so you can focus on outcomes.",
-                            },
-                        ].map((item, i) => (
-                            <div key={i} className="group bg-white rounded-2xl p-8 border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                                <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-[#3DAA8A]/10 to-[#F5A623]/20 text-[#3DAA8A] group-hover:from-[#3DAA8A] group-hover:to-[#F5A623] group-hover:text-white transition-all duration-300">
-                                    <item.icon className="h-7 w-7" />
-                                </div>
-                                <h3 className="mb-3 font-serif text-2xl font-bold text-[#1E3A4A]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{item.title}</h3>
-                                <p className="text-gray-600 leading-relaxed">{item.desc}</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* Partnership Model Section */}
-            <section className="bg-white py-24">
-                <div className="container mx-auto px-4">
-                    <div className="mb-16 text-center">
-                        <h2 className="mb-4 font-serif text-4xl font-bold text-[#1E3A4A]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>How the Partnership Works</h2>
-                        <p className="mx-auto max-w-2xl text-lg text-gray-600">
-                            A true partnership where we both contribute to family success.
-                        </p>
-                    </div>
-
-                    <div className="grid gap-8 lg:grid-cols-2">
-                        {/* Your Organization Provides */}
-                        <div className="rounded-2xl bg-[#F4F8F7] p-8 md:p-10 border border-gray-100 shadow-sm">
-                            <h3 className="mb-6 border-b-2 border-[#3DAA8A]/20 pb-4 font-serif text-3xl font-bold text-[#3DAA8A]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Your Organization Provides</h3>
-                            <ul className="space-y-4">
-                                {[
-                                    "Distribute grant codes to eligible families",
-                                    "Conduct 15-minute orientation session",
-                                    "Include CommonGround in program materials",
-                                    "Share anonymized success stories (optional)",
-                                    "Provide feedback for continuous improvement",
-                                ].map((item, i) => (
-                                    <li key={i} className="flex items-start gap-3">
-                                        <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#3DAA8A]/10 text-[#3DAA8A]">
-                                            <Check className="h-4 w-4" />
-                                        </div>
-                                        <span className="text-lg text-gray-700">{item}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-
-                        {/* CommonGround Provides */}
-                        <div className="rounded-2xl bg-white p-8 md:p-10 border border-gray-200 shadow-xl relative overflow-hidden">
-                            <div className="absolute top-0 right-0 w-32 h-32 bg-[#3DAA8A]/5 rounded-bl-full pointer-events-none"></div>
-                            <h3 className="mb-6 border-b-2 border-[#3DAA8A]/20 pb-4 font-serif text-3xl font-bold text-[#3DAA8A]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>CommonGround Provides</h3>
-                            <ul className="space-y-4">
-                                {[
-                                    "Free Complete tier for 180 days ($210 value per family)",
-                                    "Co-branded landing page with your logo and mission",
-                                    "Real-time outcomes dashboard",
-                                    "Grant-ready impact reports",
-                                    "Marketing and training support",
-                                    "Priority customer support for your clients",
-                                ].map((item, i) => (
-                                    <li key={i} className="flex items-start gap-3">
-                                        <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#3DAA8A] text-white">
-                                            <Check className="h-4 w-4" />
-                                        </div>
-                                        <span className="text-lg text-gray-700">{item}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    </div>
-
-                    {/* Grant Value Box */}
-                    <div className="mt-12 overflow-hidden rounded-2xl bg-gradient-to-br from-[#F5A623] to-[#c99943] text-white shadow-xl relative">
-                        <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent hover:opacity-50 transition-opacity"></div>
-                        <div className="p-8 text-center md:p-12 relative z-10">
-                            <h3 className="mb-2 font-serif text-3xl font-bold text-white/90" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Total Partnership Value</h3>
-                            <div className="my-6 font-serif text-6xl md:text-7xl font-bold text-white drop-shadow-sm" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>$5,249</div>
-                            <div className="mx-auto max-w-3xl bg-white/10 rounded-xl p-4 backdrop-blur-sm border border-white/20">
-                                <p className="text-lg text-white font-medium">
-                                    Complete tier ($34.99/month × 6 months) × 25 families = <span className="font-bold underline md:no-underline">$5,248.50</span> in professional tools provided free.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Features Showcase */}
-            <section className="py-24 bg-[#F4F8F7]">
-                <div className="container mx-auto px-4">
-                    <div className="mb-16 text-center">
-                        <h2 className="mb-4 font-serif text-4xl font-bold text-[#1E3A4A]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Complete Tier Features</h2>
-                        <p className="mx-auto max-w-2xl text-lg text-gray-600">
-                            Your clients receive our most comprehensive plan with all premium features included.
-                        </p>
-                    </div>
-
-                    <div className="grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
-                        {[
-                            {
-                                icon: BrainCircuit,
-                                title: "ARIA AI Mediation",
-                                desc: "Real-time message coaching helps keep conversations constructive and child-focused",
-                            },
-                            {
-                                icon: Users,
-                                title: "Organized Communication",
-                                desc: "Secure messaging platform with threaded conversations and search",
-                            },
-                            {
-                                icon: Calendar,
-                                title: "Custody Calendar",
-                                desc: "Shared schedules, exchange coordination, and GPS handoff verification",
-                            },
-                            {
-                                icon: DollarSign,
-                                title: "ClearFund Expenses",
-                                desc: "Track child-related expenses with receipts, splits, and zero-fee payments",
-                            },
-                            {
-                                icon: FileText,
-                                title: "Quick Accords",
-                                desc: "Digital agreement builder for parenting plans and modifications",
-                            },
-                            {
-                                icon: Shield,
-                                title: "Court-Ready Records",
-                                desc: "SHA-256 hashed, timestamped documentation accepted in all 50 states",
-                            },
-                            {
-                                icon: Users,
-                                title: "KidSpace Protection",
-                                desc: "Age-appropriate messaging that keeps children out of adult conflict",
-                            },
-                            {
-                                icon: BarChart3,
-                                title: "Custody Analytics",
-                                desc: "Track time-sharing, response rates, and conflict trends over time",
-                            },
-                        ].map((item, i) => (
-                            <div key={i} className="flex gap-4 p-4 rounded-xl hover:bg-white/50 transition-colors">
-                                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white shadow-sm text-[#3DAA8A] border border-gray-100">
-                                    <item.icon className="h-6 w-6" />
-                                </div>
-                                <div>
-                                    <h4 className="mb-2 font-serif text-xl font-bold text-[#3DAA8A]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{item.title}</h4>
-                                    <p className="text-sm leading-relaxed text-gray-600">{item.desc}</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* Outcomes Section */}
-            <section className="bg-[#3DAA8A] text-white py-24 relative overflow-hidden">
-                {/* Background blobs for visual interest */}
-                <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-                <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#F5A623] rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 opacity-50"></div>
-
-                <div className="container relative mx-auto px-4 z-10">
-                    <div className="mb-16 text-center">
-                        <h2 className="mb-4 font-serif text-4xl font-bold text-white" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Measurable Impact for Grant Reports</h2>
-                        <p className="mx-auto max-w-2xl text-lg text-white/80">
-                            Prove your program's effectiveness with concrete, trackable outcomes.
-                        </p>
-                    </div>
-
-                    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                        {[
-                            { title: "Activation Rate", desc: "Track how many families activated their grant codes and began using the platform—demonstrating engagement." },
-                            { title: "Communication Improvement", desc: "Measure the percentage increase in constructive communication over time, showing tangible behavioral change." },
-                            { title: "Sustained Engagement", desc: "Monitor 30-day and 90-day retention rates to prove families continue benefiting long after your program ends." },
-                            { title: "Legal Fee Savings", desc: "Calculate estimated legal costs prevented through improved communication and better documentation." },
-                            { title: "Feature Utilization", desc: "See how families use schedules, expense tracking, and agreements—proving comprehensive support." },
-                            { title: "Client Satisfaction", desc: "Access Net Promoter Scores and anonymized testimonials demonstrating service quality." },
-                        ].map((item, i) => (
-                            <div key={i} className="rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-sm transition-all hover:bg-white/10 hover:-translate-y-1">
-                                <h4 className="mb-3 font-serif text-2xl font-bold text-[#F5A623]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{item.title}</h4>
-                                <p className="leading-relaxed text-blue-50/90">{item.desc}</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* Process Section */}
-            <section id="how-it-works" className="py-24 bg-white">
-                <div className="container mx-auto px-4">
-                    <div className="mb-16 text-center">
-                        <h2 className="mb-4 font-serif text-4xl font-bold text-[#1E3A4A]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Partnership Process</h2>
-                        <p className="mx-auto max-w-2xl text-lg text-gray-600">
-                            From application to active partnership in 3-4 weeks.
-                        </p>
-                    </div>
-
-                    <div className="relative grid gap-8 md:grid-cols-5">
-                        {/* Connecting Line (Desktop) */}
-                        <div className="absolute left-0 top-10 hidden h-0.5 w-full bg-gray-100 md:block" />
-
-                        {[
-                            { num: "1", title: "Apply", desc: "Complete our partnership application with information about your organization." },
-                            { num: "2", title: "Discovery Call", desc: "30-minute conversation to ensure program fit and answer any questions." },
-                            { num: "3", title: "Setup", desc: "We create your co-branded landing page and generate grant codes." },
-                            { num: "4", title: "Training", desc: "45-minute staff training session plus materials for orienting your clients." },
-                            { num: "5", title: "Launch", desc: "Begin distributing codes. Access your dashboard to track real-time engagement." },
-                        ].map((item, i) => (
-                            <div key={i} className="relative z-10 text-center bg-white md:bg-transparent md:p-0 p-6 rounded-xl border md:border-0 border-gray-100 shadow-sm md:shadow-none">
-                                <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-[#3DAA8A] to-[#2C5F5D] text-3xl font-bold text-white shadow-xl shadow-[#3DAA8A]/20 font-serif" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-                                    {item.num}
-                                </div>
-                                <h4 className="mb-3 font-serif text-xl font-bold text-[#3DAA8A]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{item.title}</h4>
-                                <p className="text-sm text-gray-500">{item.desc}</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* CTA Section */}
-            <section id="apply" className="py-24 text-center bg-gradient-to-br from-[#3DAA8A] to-[#234846] text-white relative overflow-hidden">
-                {/* Abstract shapes matching pricing page */}
-                <div className="absolute inset-0 opacity-10 pointer-events-none">
-                    <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
-                    <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#F5A623] rounded-full blur-3xl"></div>
-                </div>
-
-                <div className="container mx-auto px-4 relative z-10">
-                    <h2 className="mb-6 font-serif text-4xl font-bold md:text-5xl text-white" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Ready to Amplify Your Impact?</h2>
-                    <p className="mx-auto mb-10 max-w-3xl text-xl text-white/80 leading-relaxed">
-                        Join nonprofits across Southern California who are transforming how they support families through divorce and co-parenting challenges.
-                    </p>
-                    <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-                        <Link
-                            href="mailto:partnerships@find-commonground.com?subject=Grant Partnership Application"
-                            className="px-8 py-4 bg-white text-[#3DAA8A] rounded-full font-medium text-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5"
-                        >
-                            Apply for Partnership
-                        </Link>
-                        <Link
-                            href="mailto:partnerships@find-commonground.com?subject=Grant Partnership Questions"
-                            className="px-8 py-4 bg-transparent border-2 border-white/30 hover:bg-white/10 text-white rounded-full font-medium text-lg transition-all duration-200"
-                        >
-                            Schedule Discovery Call
-                        </Link>
-                    </div>
-                </div>
-            </section>
+                    <span className="text-white/90">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
-    );
+      </section>
+
+      {/* ── CTA: Partnership Inquiry Form ────────────────────────── */}
+      <section
+        id="apply"
+        className="py-20 lg:py-24 bg-white"
+        data-section="apply"
+      >
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
+            {/* Left: Copy */}
+            <div className="lg:sticky lg:top-24">
+              <p className="text-[#F5A623] font-medium mb-4 tracking-widest uppercase text-xs flex items-center gap-3">
+                <span className="w-8 h-px bg-[#F5A623]/40" />
+                Get Started
+              </p>
+              <h2
+                className="text-3xl sm:text-4xl text-[#1E3A4A] mb-5 leading-tight"
+                style={{
+                  fontFamily: "'DM Serif Display', Georgia, serif",
+                }}
+              >
+                Start the conversation.{' '}
+                <span className="text-[#3DAA8A]">No commitment required.</span>
+              </h2>
+              <p className="text-gray-600 text-lg leading-relaxed mb-8">
+                Tell us about your organization and the families you serve.
+                We&rsquo;ll schedule a discovery call to explore whether the
+                partnership is a fit — and show you exactly what your families
+                would experience.
+              </p>
+
+              <div className="space-y-6">
+                <div className="flex gap-4">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#3DAA8A]/10">
+                    <Check className="h-5 w-5 text-[#3DAA8A]" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-[#1E3A4A]">
+                      Zero cost, zero risk
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      The entire partnership is funded. Your organization pays
+                      nothing.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#3DAA8A]/10">
+                    <Check className="h-5 w-5 text-[#3DAA8A]" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-[#1E3A4A]">
+                      Live in 3 weeks
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      From first call to families using the platform — most
+                      partners launch in under a month.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#3DAA8A]/10">
+                    <Check className="h-5 w-5 text-[#3DAA8A]" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-[#1E3A4A]">
+                      Impact you can prove
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Grant-ready reports generated automatically. No surveys,
+                      no manual tracking.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <p className="mt-8 text-sm text-gray-400">
+                Prefer email?{' '}
+                <a
+                  href="mailto:partnerships@find-commonground.com"
+                  className="text-[#3DAA8A] underline"
+                >
+                  partnerships@find-commonground.com
+                </a>
+              </p>
+            </div>
+
+            {/* Right: Form */}
+            <div className="rounded-2xl border-2 border-[#3DAA8A]/20 bg-gradient-to-b from-[#3DAA8A]/[0.03] to-transparent p-6 sm:p-8">
+              <PartnershipInquiryForm source="grant_partnership_page" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Final Nudge ──────────────────────────────────────────── */}
+      <section className="py-16 border-t border-gray-200" data-section="final-cta">
+        <div className="max-w-3xl mx-auto px-6 text-center">
+          <p className="text-gray-500 text-lg leading-relaxed">
+            Every family your organization connects with CommonGround is a
+            family with calmer conversations, fewer court appearances, and
+            children who are no longer caught in the middle.
+          </p>
+          <Link
+            href="#apply"
+            className="inline-flex items-center gap-2 text-[#3DAA8A] font-medium mt-4 hover:underline"
+          >
+            Become a partner
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+      </section>
+    </div>
+  );
 }

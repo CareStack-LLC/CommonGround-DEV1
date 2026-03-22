@@ -104,6 +104,17 @@ export function trackContactForm(inquiryType: string) {
   });
 }
 
+/** Partnership inquiry from grant-partnership page */
+export function trackPartnershipInquiry(orgType: string, source: string) {
+  gtag('event', 'generate_lead', {
+    currency: 'USD',
+    value: 50,
+    lead_type: 'partnership_inquiry',
+    org_type: orgType,
+    source,
+  });
+}
+
 // ─── Feature Engagement (shows product stickiness) ─────────────
 
 /** User invited co-parent */
