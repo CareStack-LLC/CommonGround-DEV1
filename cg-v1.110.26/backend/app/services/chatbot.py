@@ -72,12 +72,7 @@ GREETING_MESSAGE = (
 class ChatbotService:
     """Service for the public-facing Aria customer success chatbot."""
 
-    def __init__(self):
-        api_key = settings.ANTHROPIC_API_KEY
-        if not api_key:
-            logger.warning("ANTHROPIC_API_KEY not set — chatbot will use fallback responses")
-        self.client = anthropic.AsyncAnthropic(api_key=api_key or "missing")
-        self.model = "claude-3-5-sonnet-20241022"
+    MODEL = "claude-3-5-sonnet-20241022"
 
     _config_table_exists: Optional[bool] = None  # Cache table existence check
 
@@ -220,10 +215,11 @@ class ChatbotService:
         db.add(user_msg)
         await db.flush()
 
-        # Call Claude
+        # Call Claude — create client inline (same pattern as ARIA service)
         try:
-            response = await self.client.messages.create(
-                model=self.model,
+            client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
+            response = client.messages.create(
+                model=self.MODEL,
                 max_tokens=250,
                 system=system_prompt,
                 messages=messages,
@@ -232,7 +228,7 @@ class ChatbotService:
             token_count = response.usage.input_tokens + response.usage.output_tokens
         except Exception as e:
             logger.error(f"Claude API error in chatbot: {type(e).__name__}: {e}")
-            logger.error(f"Claude API key present: {bool(settings.ANTHROPIC_API_KEY)}, model: {self.model}, messages count: {len(messages)}")
+            logger.error(f"Claude API key present: {bool(settings.ANTHROPIC_API_KEY)}, model: {self.MODEL}, messages count: {len(messages)}")
             capture_error(e)
             reply_text = (
                 "I'm sorry, I'm having a little trouble right now. "
