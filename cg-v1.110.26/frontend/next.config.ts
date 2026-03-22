@@ -42,6 +42,17 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      { source: '/superadmin/activity-log', destination: '/superadmin/users?tab=activity', permanent: true },
+      { source: '/superadmin/performance', destination: '/superadmin/system-health?tab=api', permanent: true },
+      { source: '/superadmin/status', destination: '/superadmin/system-health', permanent: true },
+      { source: '/superadmin/kidspace', destination: '/superadmin/growth?tab=kidspace', permanent: true },
+      { source: '/superadmin/kidspace/media', destination: '/superadmin/media-library', permanent: true },
+      { source: '/superadmin/reports', destination: '/superadmin/billing?tab=reports', permanent: true },
+      { source: '/superadmin/leads/analytics', destination: '/superadmin/leads?tab=analytics', permanent: true },
+    ];
+  },
   async headers() {
     return [
       {

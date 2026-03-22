@@ -7,80 +7,65 @@ import {
   LayoutDashboard,
   Users,
   CreditCard,
-  ScrollText,
   TrendingUp,
   FileText,
-  Shield,
   ChevronLeft,
   Menu,
   X,
   LogOut,
   Bell,
-  Activity,
   Brain,
-  Gamepad2,
   PenTool,
   Film,
-  FileBarChart,
   Bug,
-  Gauge,
   UserPlus,
   Send,
   Mail,
   Globe,
-  BarChart3,
   MessageCircle,
+  Server,
+  Megaphone,
 } from 'lucide-react';
 import { adminAPI, type PlatformHealth } from '@/lib/admin-api';
 
 const navSections = [
   {
-    label: 'Operations',
+    label: 'Overview',
     items: [
       { href: '/superadmin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
-      { href: '/superadmin/users', label: 'Users', icon: Users },
-      { href: '/superadmin/activity-log', label: 'Activity Log', icon: Activity },
+      { href: '/superadmin/users', label: 'Users & Activity', icon: Users },
+    ],
+  },
+  {
+    label: 'Platform',
+    items: [
+      { href: '/superadmin/system-health', label: 'System Health', icon: Server },
       { href: '/superadmin/bug-triage', label: 'Bug Triage', icon: Bug },
-      { href: '/superadmin/performance', label: 'Performance', icon: Gauge },
-      { href: '/superadmin/status', label: 'System Status', icon: Activity },
-      { href: '/superadmin/chatbot', label: 'Chatbot', icon: MessageCircle },
-    ],
-  },
-  {
-    label: 'Analytics',
-    items: [
-      { href: '/superadmin/growth', label: 'Growth', icon: TrendingUp },
       { href: '/superadmin/aria', label: 'ARIA Insights', icon: Brain },
-      { href: '/superadmin/kidspace', label: 'KidSpace', icon: Gamepad2 },
+      { href: '/superadmin/chatbot', label: 'Chatbot (Aria)', icon: MessageCircle },
     ],
   },
   {
-    label: 'Revenue',
+    label: 'Analytics & Revenue',
     items: [
-      { href: '/superadmin/billing', label: 'Billing', icon: CreditCard },
-      { href: '/superadmin/reports', label: 'Reports', icon: FileText },
+      { href: '/superadmin/growth', label: 'Growth & Engagement', icon: TrendingUp },
+      { href: '/superadmin/billing', label: 'Billing & Reports', icon: CreditCard },
     ],
   },
   {
-    label: 'Sales',
+    label: 'Marketing',
     items: [
-      { href: '/superadmin/leads', label: 'Lead Generator', icon: UserPlus },
+      { href: '/superadmin/leads', label: 'Leads', icon: UserPlus },
       { href: '/superadmin/leads/campaigns', label: 'Campaigns', icon: Send },
       { href: '/superadmin/leads/landing-pages', label: 'Landing Pages', icon: Globe },
-      { href: '/superadmin/leads/analytics', label: 'Marketing Analytics', icon: BarChart3 },
-    ],
-  },
-  {
-    label: 'Inbox',
-    items: [
-      { href: '/superadmin/inbox', label: 'Email Monitor', icon: Mail },
+      { href: '/superadmin/inbox', label: 'Inbox', icon: Mail },
     ],
   },
   {
     label: 'Content',
     items: [
       { href: '/superadmin/blog', label: 'Blog', icon: PenTool },
-      { href: '/superadmin/kidspace/media', label: 'Media Library', icon: Film },
+      { href: '/superadmin/media-library', label: 'Media Library', icon: Film },
     ],
   },
 ];
