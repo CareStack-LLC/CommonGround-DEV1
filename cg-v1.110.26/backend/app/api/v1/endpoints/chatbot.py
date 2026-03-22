@@ -256,3 +256,48 @@ async def admin_get_stats(
     """Get aggregate chatbot statistics. Requires admin auth."""
     stats = await chatbot_service.get_stats(db)
     return ChatbotAdminStats(**stats)
+
+
+# ── Admin Config Endpoints (editable system prompt / promotions) ──
+
+@router.get("/admin/config/{key}")
+async def admin_get_config(
+    key: str,
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+):
+    """Get a chatbot config value. Requires admin auth."""
+    value = await chatbot_service.get_config(db, key)
+    return {"key": key, "value": value}
+
+
+@router.put("/admin/config/{key}")
+async def admin_update_config(
+    key: str,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+):
+    """Update a chatbot config value. Requires admin auth.
+
+    Valid keys: system_prompt, active_promotions, greeting_message
+    """
+    ALLOWED_KEYS = {"system_prompt", "active_promotions", "greeting_message"}
+    if key not in ALLOWED_KEYS:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid config key. Allowed: {', '.join(ALLOWED_KEYS)}",
+        )
+
+    body = await request.json()
+    value = body.get("value", "")
+    if not isinstance(value, str):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Value must be a string.",
+        )
+
+    await chatbot_service.update_config(
+        db, key, value, updated_by=admin_user.email or str(admin_user.id)
+    )
+    return {"success": True, "key": key}

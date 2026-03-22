@@ -35,9 +35,8 @@ const HIDDEN_PATH_PREFIXES = [
 const SESSION_KEY = "cg_chatbot_session_id";
 
 const DEFAULT_GREETING =
-  "Hi there! I'm Aria, CommonGround's customer success assistant. " +
-  "I can help you learn about our co-parenting platform, answer questions about features and pricing, " +
-  "or connect you with our support team. How can I help you today?";
+  "Hi! I'm Aria from CommonGround. " +
+  "Ask me anything about our co-parenting platform — features, pricing, or getting started. How can I help?";
 
 export default function ChatbotWidget() {
   const pathname = usePathname();
@@ -60,7 +59,15 @@ export default function ChatbotWidget() {
     const saved = sessionStorage.getItem(SESSION_KEY);
     if (saved) {
       setSessionId(saved);
+      // Restore greeting so chat isn't empty on reopen
+      if (messages.length === 0) {
+        setMessages([
+          { id: "greeting", role: "assistant", content: DEFAULT_GREETING },
+        ]);
+        setAssistantMsgCount(1);
+      }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const initSession = useCallback(async () => {

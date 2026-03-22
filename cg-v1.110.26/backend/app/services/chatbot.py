@@ -20,7 +20,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.core.config import settings
-from app.models.chatbot import ChatbotVisitor, ChatbotSession, ChatbotMessage
+from app.models.chatbot import ChatbotVisitor, ChatbotSession, ChatbotMessage, ChatbotConfig
 from app.services.email import email_service
 from app.utils.sentry_helpers import capture_error
 
@@ -73,8 +73,55 @@ class ChatbotService:
     """Service for the public-facing Aria customer success chatbot."""
 
     def __init__(self):
-        self.client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
+        api_key = settings.ANTHROPIC_API_KEY
+        if not api_key:
+            logger.warning("ANTHROPIC_API_KEY not set — chatbot will use fallback responses")
+        self.client = anthropic.Anthropic(api_key=api_key or "missing")
         self.model = "claude-sonnet-4-20250514"
+
+    async def _get_system_prompt(self, db: AsyncSession) -> str:
+        """Load system prompt from DB config, falling back to default."""
+        try:
+            result = await db.execute(
+                select(ChatbotConfig).where(ChatbotConfig.key == "system_prompt")
+            )
+            config = result.scalar_one_or_none()
+            if config and config.value.strip():
+                # Append any active promotions
+                promo_result = await db.execute(
+                    select(ChatbotConfig).where(ChatbotConfig.key == "active_promotions")
+                )
+                promo = promo_result.scalar_one_or_none()
+                prompt = config.value
+                if promo and promo.value.strip():
+                    prompt += f"\n\nCURRENT PROMOTIONS/DEALS (mention when relevant):\n{promo.value}"
+                return prompt
+        except Exception as e:
+            logger.debug(f"Could not load chatbot config from DB, using default: {e}")
+        return SYSTEM_PROMPT
+
+    async def update_config(
+        self, db: AsyncSession, key: str, value: str, updated_by: str = ""
+    ) -> None:
+        """Update a chatbot config value (upsert)."""
+        result = await db.execute(
+            select(ChatbotConfig).where(ChatbotConfig.key == key)
+        )
+        config = result.scalar_one_or_none()
+        if config:
+            config.value = value
+            config.updated_by = updated_by
+        else:
+            config = ChatbotConfig(key=key, value=value, updated_by=updated_by)
+            db.add(config)
+
+    async def get_config(self, db: AsyncSession, key: str) -> Optional[str]:
+        """Get a chatbot config value."""
+        result = await db.execute(
+            select(ChatbotConfig).where(ChatbotConfig.key == key)
+        )
+        config = result.scalar_one_or_none()
+        return config.value if config else None
 
     async def create_session(
         self,
@@ -156,18 +203,22 @@ class ChatbotService:
         db.add(user_msg)
         await db.flush()
 
+        # Load system prompt from DB (with fallback)
+        system_prompt = await self._get_system_prompt(db)
+
         # Call Claude
         try:
             response = self.client.messages.create(
                 model=self.model,
                 max_tokens=250,
-                system=SYSTEM_PROMPT,
+                system=system_prompt,
                 messages=messages,
             )
             reply_text = response.content[0].text
             token_count = response.usage.input_tokens + response.usage.output_tokens
         except Exception as e:
-            logger.error(f"Claude API error in chatbot: {e}")
+            logger.error(f"Claude API error in chatbot: {type(e).__name__}: {e}")
+            logger.error(f"Claude API key present: {bool(settings.ANTHROPIC_API_KEY)}, model: {self.model}, messages count: {len(messages)}")
             capture_error(e)
             reply_text = (
                 "I'm sorry, I'm having a little trouble right now. "

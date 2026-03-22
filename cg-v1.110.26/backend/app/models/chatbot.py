@@ -89,3 +89,17 @@ class ChatbotMessage(Base, UUIDMixin, TimestampMixin):
     __table_args__ = (
         Index("ix_chatbot_messages_session_id", "session_id"),
     )
+
+
+class ChatbotConfig(Base, UUIDMixin, TimestampMixin):
+    """Admin-editable chatbot configuration (system prompt, promotions, etc.)."""
+
+    __tablename__ = "chatbot_config"
+
+    key: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
+    value: Mapped[str] = mapped_column(Text, nullable=False)
+    updated_by: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+
+    __table_args__ = (
+        Index("ix_chatbot_config_key", "key", unique=True),
+    )

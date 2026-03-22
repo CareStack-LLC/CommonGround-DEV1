@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import {
   MessageCircle, Users, TrendingUp, AlertTriangle,
-  Mail, Search, ChevronLeft, RefreshCw, X,
+  Mail, Search, ChevronLeft, RefreshCw, X, Settings, Save,
 } from 'lucide-react';
 import {
   adminAPI,
@@ -44,12 +44,19 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 export default function ChatbotAdminPage() {
+  const [activeTab, setActiveTab] = useState<'conversations' | 'settings'>('conversations');
   const [stats, setStats] = useState<ChatbotAdminStats | null>(null);
   const [sessions, setSessions] = useState<ChatbotSessionListItem[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Settings
+  const [systemPrompt, setSystemPrompt] = useState('');
+  const [activePromotions, setActivePromotions] = useState('');
+  const [settingsLoading, setSettingsLoading] = useState(false);
+  const [settingsSaved, setSettingsSaved] = useState(false);
 
   // Filters
   const [statusFilter, setStatusFilter] = useState('');
@@ -90,6 +97,44 @@ export default function ChatbotAdminPage() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  // Load settings when settings tab is opened
+  const loadSettings = useCallback(async () => {
+    try {
+      setSettingsLoading(true);
+      const [promptRes, promoRes] = await Promise.all([
+        adminAPI.getChatbotConfig('system_prompt'),
+        adminAPI.getChatbotConfig('active_promotions'),
+      ]);
+      setSystemPrompt(promptRes.value || '');
+      setActivePromotions(promoRes.value || '');
+    } catch {
+      // Config may not exist yet — that's fine
+    } finally {
+      setSettingsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (activeTab === 'settings') loadSettings();
+  }, [activeTab, loadSettings]);
+
+  const saveSettings = async () => {
+    try {
+      setSettingsLoading(true);
+      setSettingsSaved(false);
+      await Promise.all([
+        adminAPI.updateChatbotConfig('system_prompt', systemPrompt),
+        adminAPI.updateChatbotConfig('active_promotions', activePromotions),
+      ]);
+      setSettingsSaved(true);
+      setTimeout(() => setSettingsSaved(false), 3000);
+    } catch (err: any) {
+      setError(err.message || 'Failed to save settings');
+    } finally {
+      setSettingsLoading(false);
+    }
+  };
 
   const openDetail = async (sessionId: string) => {
     try {
@@ -133,15 +178,45 @@ export default function ChatbotAdminPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-100">Chatbot Conversations</h1>
-          <p className="text-zinc-400 text-sm mt-1">Aria customer success chatbot transcripts</p>
+          <h1 className="text-2xl font-bold text-zinc-100">Chatbot Management</h1>
+          <p className="text-zinc-400 text-sm mt-1">Aria customer success chatbot</p>
         </div>
+        <div className="flex items-center gap-2">
+          {activeTab === 'conversations' && (
+            <button
+              onClick={fetchData}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm transition-colors"
+            >
+              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+              Refresh
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-1 bg-zinc-900/50 border border-zinc-800 rounded-lg p-1 w-fit">
         <button
-          onClick={fetchData}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm transition-colors"
+          onClick={() => setActiveTab('conversations')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm transition-colors ${
+            activeTab === 'conversations'
+              ? 'bg-zinc-700 text-zinc-100'
+              : 'text-zinc-400 hover:text-zinc-200'
+          }`}
         >
-          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-          Refresh
+          <MessageCircle className="h-4 w-4" />
+          Conversations
+        </button>
+        <button
+          onClick={() => setActiveTab('settings')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm transition-colors ${
+            activeTab === 'settings'
+              ? 'bg-zinc-700 text-zinc-100'
+              : 'text-zinc-400 hover:text-zinc-200'
+          }`}
+        >
+          <Settings className="h-4 w-4" />
+          Settings
         </button>
       </div>
 
@@ -151,8 +226,59 @@ export default function ChatbotAdminPage() {
         </div>
       )}
 
-      {/* Stats */}
-      {stats && (
+      {/* ── Settings Tab ── */}
+      {activeTab === 'settings' && (
+        <div className="space-y-6">
+          <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-6 space-y-6">
+            <div>
+              <h3 className="text-zinc-100 font-semibold text-lg mb-1">System Prompt</h3>
+              <p className="text-zinc-500 text-sm mb-3">
+                This controls how Aria responds. Edit to change personality, knowledge, and rules.
+                Leave empty to use the default built-in prompt.
+              </p>
+              <textarea
+                value={systemPrompt}
+                onChange={(e) => setSystemPrompt(e.target.value)}
+                placeholder="Leave empty to use default system prompt..."
+                rows={12}
+                className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-zinc-200 text-sm font-mono placeholder:text-zinc-600 outline-none focus:border-zinc-600 resize-y"
+              />
+            </div>
+
+            <div>
+              <h3 className="text-zinc-100 font-semibold text-lg mb-1">Active Promotions & Deals</h3>
+              <p className="text-zinc-500 text-sm mb-3">
+                Add current promotions, discounts, or special offers. Aria will mention these when relevant.
+                One per line works best.
+              </p>
+              <textarea
+                value={activePromotions}
+                onChange={(e) => setActivePromotions(e.target.value)}
+                placeholder={"Example:\n- 30-day free trial of Plus plan for new signups\n- 20% off annual billing through March 2026\n- Free onboarding call for Professional plans"}
+                rows={6}
+                className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-zinc-200 text-sm placeholder:text-zinc-600 outline-none focus:border-zinc-600 resize-y"
+              />
+            </div>
+
+            <div className="flex items-center gap-3">
+              <button
+                onClick={saveSettings}
+                disabled={settingsLoading}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm disabled:opacity-50 transition-colors"
+              >
+                <Save className="h-4 w-4" />
+                {settingsLoading ? 'Saving...' : 'Save Settings'}
+              </button>
+              {settingsSaved && (
+                <span className="text-emerald-400 text-sm">Saved successfully!</span>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Conversations Tab ── */}
+      {activeTab === 'conversations' && stats && (
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <StatCard label="Total Sessions" value={stats.total_sessions} icon={MessageCircle} color="bg-emerald-500/10 text-emerald-400" />
           <StatCard label="Active Today" value={stats.active_today} icon={TrendingUp} color="bg-blue-500/10 text-blue-400" />
@@ -163,7 +289,7 @@ export default function ChatbotAdminPage() {
       )}
 
       {/* Filters */}
-      <div className="flex flex-wrap gap-3 items-center">
+      {activeTab === 'conversations' && <div className="flex flex-wrap gap-3 items-center">
         <div className="relative flex-1 min-w-[200px] max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
           <input
@@ -184,9 +310,10 @@ export default function ChatbotAdminPage() {
           <option value="closed">Closed</option>
           <option value="escalated">Escalated</option>
         </select>
-      </div>
+      </div>}
 
       {/* Sessions Table */}
+      {activeTab === 'conversations' && <>
       <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -357,6 +484,7 @@ export default function ChatbotAdminPage() {
           </div>
         </div>
       )}
+      </>}
     </div>
   );
 }

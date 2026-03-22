@@ -721,6 +721,15 @@ export const adminAPI = {
     ),
 
   getChatbotStats: () => adminFetch<ChatbotAdminStats>('/chatbot/admin/stats'),
+
+  getChatbotConfig: (key: string) =>
+    adminFetch<{ key: string; value: string | null }>(`/chatbot/admin/config/${key}`),
+
+  updateChatbotConfig: (key: string, value: string) =>
+    adminFetch<{ success: boolean; key: string }>(
+      `/chatbot/admin/config/${key}`,
+      { method: 'PUT', body: JSON.stringify({ value }) }
+    ),
 };
 
 // System Status types
