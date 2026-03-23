@@ -21,6 +21,8 @@ from app.models.user import User, UserProfile
 from app.models.family_file import FamilyFile, generate_family_file_number
 from app.models.child import Child
 
+from datetime import date
+
 logger = logging.getLogger(__name__)
 
 # ── Test data pools ──────────────────────────────────────────────────
@@ -266,7 +268,7 @@ async def generate_seed_families(
                 family_file_id=ff_id,
                 first_name=child_name,
                 last_name=a_last,
-                date_of_birth=datetime(2020 - c, 6, 15),
+                date_of_birth=date(2020 - c, 6, 15),
                 status="active",
                 created_by=pa_id,
                 approved_by_a=pa_id,
@@ -285,33 +287,27 @@ async def generate_seed_families(
                 created_by=pa_id,
                 title=f"Weekly Pickup - {a_last} Family",
                 exchange_type="pickup",
-                location_name="Main Street Park",
-                location_address="123 Main St, Los Angeles, CA 90001",
+                location="Main Street Park, 123 Main St, Los Angeles, CA 90001",
                 location_lat=34.0522,
                 location_lng=-118.2437,
-                day_of_week="friday",
-                time="17:00",
+                scheduled_time=datetime.utcnow(),
+                is_recurring=True,
                 recurrence_pattern="weekly",
                 status="active",
             )
             db.add(exchange)
 
         if cohort.target_feature in ("messaging", "general"):
-            from app.models.message import Message, MessageThread
-            thread = MessageThread(
-                id=str(uuid4()),
-                family_file_id=ff_id,
-                created_by=pa_id,
-            )
-            db.add(thread)
+            import hashlib
+            from app.models.message import Message
+            msg_content = f"Hi {b_first}, let's coordinate the schedule for this week."
             msg = Message(
                 id=str(uuid4()),
                 family_file_id=ff_id,
-                thread_id=thread.id,
                 sender_id=pa_id,
                 recipient_id=pb_id,
-                content=f"Hi {b_first}, let's coordinate the schedule for this week.",
-                is_read=False,
+                content=msg_content,
+                content_hash=hashlib.sha256(msg_content.encode()).hexdigest(),
             )
             db.add(msg)
 
@@ -320,7 +316,6 @@ async def generate_seed_families(
             agreement = Agreement(
                 id=str(uuid4()),
                 family_file_id=ff_id,
-                created_by=pa_id,
                 agreement_type="shared_care",
                 agreement_version="v2_standard",
                 title=f"{a_last}-{b_last} SharedCare Agreement",
