@@ -6,6 +6,7 @@ No authentication required. Access controlled via unique tokens.
 
 import logging
 from datetime import datetime
+from json import JSONDecodeError
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -14,6 +15,10 @@ from app.core.database import get_db
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
+
+VALID_SEVERITIES = {"critical", "high", "medium", "low"}
+VALID_CATEGORIES = {"ux", "performance", "functionality", "documentation", "other"}
+VALID_NOTE_TYPES = {"observation", "blocker", "question", "resolution"}
 
 
 async def _get_tester(token: str, db: AsyncSession):
@@ -35,6 +40,25 @@ async def _get_tester(token: str, db: AsyncSession):
     tester.last_accessed_at = now
 
     return tester
+
+
+async def _parse_body(request: Request, required_fields: list[str]) -> dict:
+    """Parse JSON body and validate required fields."""
+    try:
+        body = await request.json()
+    except (JSONDecodeError, Exception):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Invalid or missing JSON body",
+        )
+
+    missing = [f for f in required_fields if not body.get(f)]
+    if missing:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Missing required fields: {', '.join(missing)}",
+        )
+    return body
 
 
 @router.get(
@@ -92,14 +116,18 @@ async def submit_bug_report(
     from app.services.bug_hunt_service import tester_add_bug_report
 
     tester = await _get_tester(token, db)
-    body = await request.json()
+    body = await _parse_body(request, ["title", "description"])
+
+    severity = body.get("severity", "medium")
+    if severity not in VALID_SEVERITIES:
+        severity = "medium"
 
     report = await tester_add_bug_report(
         db, tester,
-        title=body["title"],
-        description=body["description"],
-        severity=body.get("severity", "medium"),
-        steps_to_reproduce=body.get("steps_to_reproduce"),
+        title=body["title"][:500],
+        description=body["description"][:5000],
+        severity=severity,
+        steps_to_reproduce=body.get("steps_to_reproduce", "")[:5000] or None,
     )
     await db.commit()
     return {
@@ -122,14 +150,25 @@ async def submit_feedback(
     from app.services.bug_hunt_service import tester_add_feedback
 
     tester = await _get_tester(token, db)
-    body = await request.json()
+    body = await _parse_body(request, ["content"])
+
+    category = body.get("category", "other")
+    if category not in VALID_CATEGORIES:
+        category = "other"
+
+    rating = body.get("rating")
+    if rating is not None:
+        try:
+            rating = max(1, min(5, int(rating)))
+        except (ValueError, TypeError):
+            rating = None
 
     fb = await tester_add_feedback(
         db, tester,
-        content=body["content"],
-        category=body.get("category", "other"),
-        rating=body.get("rating"),
-        feature_area=body.get("feature_area"),
+        content=body["content"][:5000],
+        category=category,
+        rating=rating,
+        feature_area=body.get("feature_area", "")[:100] or None,
     )
     await db.commit()
     return {
@@ -152,12 +191,16 @@ async def add_note(
     from app.services.bug_hunt_service import tester_add_note
 
     tester = await _get_tester(token, db)
-    body = await request.json()
+    body = await _parse_body(request, ["content"])
+
+    note_type = body.get("note_type", "observation")
+    if note_type not in VALID_NOTE_TYPES:
+        note_type = "observation"
 
     note = await tester_add_note(
         db, tester,
-        content=body["content"],
-        note_type=body.get("note_type", "observation"),
+        content=body["content"][:5000],
+        note_type=note_type,
     )
     await db.commit()
     return {

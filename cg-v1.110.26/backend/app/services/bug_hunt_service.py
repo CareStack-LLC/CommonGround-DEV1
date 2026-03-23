@@ -664,6 +664,8 @@ async def update_bug_status(
     bug = await db.get(BugHuntBugReport, bug_id)
     if not bug:
         raise ValueError(f"Bug report {bug_id} not found")
+    if status not in VALID_BUG_STATUSES:
+        raise ValueError(f"Invalid bug status: {status}")
     bug.status = status
     await db.flush()
     return bug
@@ -702,6 +704,8 @@ async def complete_cohort(
     cohort = await db.get(BugHuntCohort, cohort_id)
     if not cohort:
         raise ValueError(f"Cohort {cohort_id} not found")
+    if cohort.status not in ("active", "seeding"):
+        raise ValueError(f"Cannot complete a cohort in '{cohort.status}' status")
 
     # Gather stats for summary
     dashboard = await get_cohort_dashboard(db, cohort_id)
@@ -728,16 +732,25 @@ async def complete_cohort(
     return cohort
 
 
+VALID_TEST_STATUSES = {"pending", "in_progress", "completed", "blocked"}
+VALID_BUG_STATUSES = {"open", "confirmed", "fixed", "wont_fix"}
+
+
 async def update_family_status(
     db: AsyncSession,
     family_id: str,
     test_status: str,
     tester_notes: Optional[str] = None,
+    cohort_id: Optional[str] = None,
 ) -> BugHuntFamily:
     """Update a family's test status and notes."""
     family = await db.get(BugHuntFamily, family_id)
     if not family:
         raise ValueError(f"Family {family_id} not found")
+    if cohort_id and family.cohort_id != cohort_id:
+        raise ValueError("Family does not belong to this cohort")
+    if test_status not in VALID_TEST_STATUSES:
+        raise ValueError(f"Invalid status: {test_status}")
     family.test_status = test_status
     if tester_notes is not None:
         family.tester_notes = tester_notes

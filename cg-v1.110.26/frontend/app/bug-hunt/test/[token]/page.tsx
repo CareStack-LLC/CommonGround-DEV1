@@ -7,7 +7,10 @@ import {
   ChevronDown, ChevronRight, Plus, Loader2, AlertCircle,
 } from 'lucide-react';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+let _apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+if (_apiUrl.endsWith('/')) _apiUrl = _apiUrl.slice(0, -1);
+if (!_apiUrl.endsWith('/api/v1')) _apiUrl += '/api/v1';
+const API_URL = _apiUrl;
 
 interface TesterDashboard {
   tester: { id: string; tester_name: string; tester_email: string; status: string };
@@ -30,9 +33,15 @@ const SEVERITY_COLORS: Record<string, string> = {
 
 function CopyBtn({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch { /* non-HTTPS or clipboard unavailable */ }
+  };
   return (
-    <button onClick={() => { navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 1500); }}
-      className="p-1 rounded hover:bg-gray-100 transition-colors">
+    <button onClick={handleCopy} className="p-1 rounded hover:bg-gray-100 transition-colors">
       {copied ? <Check className="w-3.5 h-3.5 text-teal-600" /> : <Copy className="w-3.5 h-3.5 text-gray-400" />}
     </button>
   );
@@ -79,18 +88,25 @@ export default function TesterPage() {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
+  const [actionError, setActionError] = useState<string | null>(null);
+
   const postAction = async (path: string, body?: Record<string, any>) => {
     setSubmitting(true);
+    setActionError(null);
     try {
       const res = await fetch(`${apiBase}${path}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: body ? JSON.stringify(body) : undefined,
       });
-      if (!res.ok) throw new Error('Action failed');
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ detail: 'Action failed' }));
+        throw new Error(err.detail || `Error ${res.status}`);
+      }
       await fetchData();
       return true;
-    } catch {
+    } catch (err) {
+      setActionError(err instanceof Error ? err.message : 'Something went wrong');
       return false;
     } finally {
       setSubmitting(false);
@@ -202,6 +218,14 @@ export default function TesterPage() {
           ))}
         </div>
 
+        {/* Error banner */}
+        {actionError && (
+          <div className="bg-red-50 border border-red-200 rounded-xl p-3 flex items-center justify-between">
+            <span className="text-sm text-red-600">{actionError}</span>
+            <button onClick={() => setActionError(null)} className="text-xs text-red-400 underline">dismiss</button>
+          </div>
+        )}
+
         {/* ═══ CHECKLIST ═══ */}
         {tab === 'checklist' && (
           <div className="space-y-2">
@@ -215,8 +239,8 @@ export default function TesterPage() {
               </div>
             </div>
             {checklist.map(item => (
-              <button key={item.id} onClick={() => postAction(`/checklist/${item.id}`)}
-                className="w-full flex items-start gap-3 bg-white rounded-xl border border-gray-100 p-4 shadow-sm text-left">
+              <button key={item.id} onClick={() => postAction(`/checklist/${item.id}`)} disabled={submitting}
+                className="w-full flex items-start gap-3 bg-white rounded-xl border border-gray-100 p-4 shadow-sm text-left disabled:opacity-60">
                 <div className={`mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all ${
                   item.is_completed ? 'bg-teal-500 border-teal-500 text-white' : 'border-gray-300'
                 }`}>

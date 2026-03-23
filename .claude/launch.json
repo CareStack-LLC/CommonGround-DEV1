@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "frontend",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--dir", "cg-v1.110.26/frontend", "dev"],
+      "port": 3000
+    }
+  ]
+}

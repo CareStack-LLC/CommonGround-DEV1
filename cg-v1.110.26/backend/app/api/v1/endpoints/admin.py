@@ -4263,6 +4263,8 @@ async def assign_bug_hunt_tester(
         from app.models.bug_hunt import BugHuntCohort, BugHuntFamily
         cohort = await db.get(BugHuntCohort, cohort_id)
         family = await db.get(BugHuntFamily, family_id)
+        if not cohort or not family:
+            raise HTTPException(status_code=404, detail="Cohort or family not found")
 
         # Send assignment email
         email_sent = await email_service.send_bug_hunt_tester_assignment(
@@ -4348,6 +4350,8 @@ async def resend_bug_hunt_tester_invite(
         from app.models.bug_hunt import BugHuntCohort, BugHuntFamily
         cohort = await db.get(BugHuntCohort, cohort_id)
         family = await db.get(BugHuntFamily, tester.family_id)
+        if not cohort or not family:
+            raise HTTPException(status_code=404, detail="Cohort or family not found")
 
         email_sent = await email_service.send_bug_hunt_tester_assignment(
             to_email=tester.tester_email,

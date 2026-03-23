@@ -68,12 +68,16 @@ function MetricCard({ label, value, icon: Icon }: { label: string; value: string
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
+  const handleCopy = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch { /* non-HTTPS */ }
+  };
   return (
-    <button
-      onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 1500); }}
-      className="p-1 rounded hover:bg-[#2D6A8F]/20 transition-colors"
-      title="Copy"
-    >
+    <button onClick={handleCopy} className="p-1 rounded hover:bg-[#2D6A8F]/20 transition-colors" title="Copy">
       {copied ? <Check className="w-3 h-3 text-[#3DAA8A]" /> : <Copy className="w-3 h-3 text-[#6B8A9A]" />}
     </button>
   );
@@ -142,24 +146,28 @@ export default function BugHuntDetailPage() {
     }
   };
 
-  const handleToggleChecklist = async (itemId: string) => {
-    await adminAPI.toggleBugHuntChecklistItem(cohortId, itemId);
-    await fetchData();
+  const safeAction = async (fn: () => Promise<void>, failMsg = 'Action failed') => {
+    try { await fn(); } catch (err) { setError(err instanceof Error ? err.message : failMsg); }
   };
 
-  const handleAddCheckItem = async () => {
+  const handleToggleChecklist = (itemId: string) => safeAction(async () => {
+    await adminAPI.toggleBugHuntChecklistItem(cohortId, itemId);
+    await fetchData();
+  });
+
+  const handleAddCheckItem = () => safeAction(async () => {
     if (!newCheckItem.trim()) return;
     await adminAPI.addBugHuntChecklistItem(cohortId, { title: newCheckItem.trim() });
     setNewCheckItem('');
     await fetchData();
-  };
+  });
 
-  const handleDeleteCheckItem = async (itemId: string) => {
+  const handleDeleteCheckItem = (itemId: string) => safeAction(async () => {
     await adminAPI.deleteBugHuntChecklistItem(cohortId, itemId);
     await fetchData();
-  };
+  });
 
-  const handleSubmitBug = async () => {
+  const handleSubmitBug = () => safeAction(async () => {
     if (!bugForm.title.trim() || !bugForm.description.trim()) return;
     await adminAPI.addBugHuntBug(cohortId, {
       title: bugForm.title, description: bugForm.description,
@@ -169,14 +177,14 @@ export default function BugHuntDetailPage() {
     setBugForm({ title: '', description: '', severity: 'medium', steps_to_reproduce: '', family_id: '' });
     setShowBugForm(false);
     await fetchData();
-  };
+  });
 
-  const handleUpdateBugStatus = async (bugId: string, newStatus: string) => {
+  const handleUpdateBugStatus = (bugId: string, newStatus: string) => safeAction(async () => {
     await adminAPI.updateBugHuntBug(cohortId, bugId, { status: newStatus });
     await fetchData();
-  };
+  });
 
-  const handleSubmitFeedback = async () => {
+  const handleSubmitFeedback = () => safeAction(async () => {
     if (!feedbackForm.content.trim()) return;
     await adminAPI.addBugHuntFeedback(cohortId, {
       content: feedbackForm.content, category: feedbackForm.category,
@@ -186,9 +194,9 @@ export default function BugHuntDetailPage() {
     setFeedbackForm({ content: '', category: 'other', rating: 0, feature_area: '' });
     setShowFeedbackForm(false);
     await fetchData();
-  };
+  });
 
-  const handleSubmitNote = async () => {
+  const handleSubmitNote = () => safeAction(async () => {
     if (!noteForm.content.trim()) return;
     await adminAPI.addBugHuntNote(cohortId, {
       content: noteForm.content, note_type: noteForm.note_type,
@@ -197,34 +205,30 @@ export default function BugHuntDetailPage() {
     setNoteForm({ content: '', note_type: 'observation', family_id: '' });
     setShowNoteForm(false);
     await fetchData();
-  };
+  });
 
-  const handleFamilyStatus = async (familyId: string, newStatus: string) => {
+  const handleFamilyStatus = (familyId: string, newStatus: string) => safeAction(async () => {
     await adminAPI.updateBugHuntFamilyStatus(cohortId, familyId, { test_status: newStatus });
     await fetchData();
-  };
+  });
 
-  const handleAssignTester = async (familyId: string) => {
+  const handleAssignTester = (familyId: string) => safeAction(async () => {
     if (!assignForm.tester_name.trim() || !assignForm.tester_email.trim()) return;
-    try {
-      await adminAPI.assignBugHuntTester(cohortId, familyId, assignForm);
-      setAssigningFamily(null);
-      setAssignForm({ tester_name: '', tester_email: '' });
-      await fetchData();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to assign tester');
-    }
-  };
+    await adminAPI.assignBugHuntTester(cohortId, familyId, assignForm);
+    setAssigningFamily(null);
+    setAssignForm({ tester_name: '', tester_email: '' });
+    await fetchData();
+  }, 'Failed to assign tester');
 
-  const handleRevokeTester = async (testerId: string) => {
+  const handleRevokeTester = (testerId: string) => safeAction(async () => {
     await adminAPI.revokeBugHuntTester(cohortId, testerId);
     await fetchData();
-  };
+  });
 
-  const handleResendTester = async (testerId: string) => {
+  const handleResendTester = (testerId: string) => safeAction(async () => {
     await adminAPI.resendBugHuntTesterInvite(cohortId, testerId);
     await fetchData();
-  };
+  });
 
   if (loading && !data) {
     return (
@@ -405,7 +409,7 @@ export default function BugHuntDetailPage() {
                   {families.map(f => (
                     <tr key={f.id} className="border-b border-[#2D6A8F]/10 hover:bg-[#1E3A4A]/30">
                       <td className="py-3 px-3">
-                        <div className="text-white font-medium">{f.parent_a_name.split(' ')[1]} & {f.parent_b_name.split(' ')[1]}</div>
+                        <div className="text-white font-medium">{f.parent_a_name.split(' ').slice(1).join(' ') || f.parent_a_name} & {f.parent_b_name.split(' ').slice(1).join(' ') || f.parent_b_name}</div>
                         <div className="text-[10px] text-[#6B8A9A] mt-0.5">{(f.children_names || []).join(', ')}</div>
                       </td>
                       <td className="py-3 px-3">

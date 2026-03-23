@@ -41,6 +41,7 @@ export default function NewBugHuntPage() {
       router.push(`/superadmin/bug-hunts/${cohort.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create');
+    } finally {
       setCreating(false);
     }
   };
