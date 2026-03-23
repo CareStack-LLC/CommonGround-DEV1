@@ -220,6 +220,7 @@ async def generate_seed_families(
         )
         db.add(parent_a)
         db.add(parent_b)
+        await db.flush()  # Users must exist before FamilyFile FKs
 
         # Create UserProfile records
         pa_profile = UserProfile(
@@ -254,6 +255,7 @@ async def generate_seed_families(
             state="CA",
         )
         db.add(family_file)
+        await db.flush()  # FamilyFile must exist before Children/Exchanges/BugHuntFamily FKs
 
         # Create 1-2 children
         num_children = 1 + (i % 2)  # alternating 1 and 2 children
