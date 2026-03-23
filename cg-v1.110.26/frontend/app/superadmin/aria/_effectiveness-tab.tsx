@@ -90,9 +90,9 @@ export default function EffectivenessTab({ data }: { data: AriaInsights }) {
               />
               <Tooltip
                 contentStyle={CustomTooltipStyle}
-                formatter={(value: number, name: string) => {
-                  if (name === 'acceptance_rate') return [`${value}%`, 'Acceptance Rate'];
-                  return [value, name];
+                formatter={(value?: number, name?: string) => {
+                  if (name === 'acceptance_rate') return [`${value ?? 0}%`, 'Acceptance Rate'];
+                  return [value ?? 0, name ?? ''];
                 }}
               />
               <Line
@@ -134,7 +134,7 @@ export default function EffectivenessTab({ data }: { data: AriaInsights }) {
               />
               <Tooltip
                 contentStyle={CustomTooltipStyle}
-                formatter={(value: number) => [value.toFixed(3), 'Avg Toxicity']}
+                formatter={(value?: number) => [(value ?? 0).toFixed(3), 'Avg Toxicity']}
               />
               <Line
                 type="monotone"
