@@ -39,29 +39,29 @@ SUBSCRIPTION_PRODUCTS = {
         "name": "Web Starter",
         "description": "Free web-only access with basic co-parenting features",
         "metadata": {"tier": "web_starter", "platform": "commonground"},
-        "product_id": "prod_U5i6vWb4ktGrTN",
+        "product_id": "prod_UCPQdxPYuteQUA",
         "prices": {
-            "monthly": {"amount": Decimal("0.00"), "id": "price_1T7WgnB3EXvvERPfyu40gtfE"},
+            "monthly": {"amount": Decimal("0.00"), "id": "price_1TE0bXBJIivbOFX7luV9H7OZ"},
         },
     },
     "plus": {
         "name": "Plus",
         "description": "Structure & stability with mobile apps and automation",
         "metadata": {"tier": "plus", "platform": "commonground"},
-        "product_id": "prod_U5i6Efw49ipfb3",
+        "product_id": "prod_UCPQBUvNRmZ4Cs",
         "prices": {
-            "monthly": {"amount": Decimal("17.99"), "id": "price_1T7WgnB3EXvvERPfcpZeMSSH"},
-            "annual": {"amount": Decimal("199.99"), "id": "price_1T7WgnB3EXvvERPfe7NNFlru"},
+            "monthly": {"amount": Decimal("17.99"), "id": "price_1TE0bXBJIivbOFX70Ysv656Q"},
+            "annual": {"amount": Decimal("199.99"), "id": "price_1TE0bYBJIivbOFX7atup1qAE"},
         },
     },
     "complete": {
         "name": "Complete",
         "description": "High-conflict/court-ready with full feature set including Silent Handoff and KidsCom",
         "metadata": {"tier": "complete", "platform": "commonground"},
-        "product_id": "prod_U5i6lsgC2mOHxn",
+        "product_id": "prod_UCPQxC2eRt7g6K",
         "prices": {
-            "monthly": {"amount": Decimal("34.99"), "id": "price_1T7WgoB3EXvvERPfDm7qKpBN"},
-            "annual": {"amount": Decimal("349.99"), "id": "price_1T7WgoB3EXvvERPfmDy9KtDh"},
+            "monthly": {"amount": Decimal("34.99"), "id": "price_1TE0bYBJIivbOFX7VqmtQH23"},
+            "annual": {"amount": Decimal("349.99"), "id": "price_1TE0bZBJIivbOFX77f2QUPc6"},
         },
     },
     # Professional Tiers
@@ -69,36 +69,36 @@ SUBSCRIPTION_PRODUCTS = {
         "name": "Professional - Starter",
         "description": "For professionals getting started with CommonGround",
         "metadata": {"tier": "professional_starter", "type": "professional"},
-        "product_id": "prod_U5i6Vfe7E6vHtZ",
+        "product_id": "prod_UCPQevbVaWJDfT",
         "prices": {
-            "monthly": {"amount": Decimal("49.99"), "id": "price_1T7WgoB3EXvvERPfTe6d3Ccx"},
+            "monthly": {"amount": Decimal("49.00"), "id": "price_1TE0bZBJIivbOFX7kmvDAoqr"},
         },
     },
     "professional_solo": {
         "name": "Professional - Solo",
         "description": "For solo practitioners",
         "metadata": {"tier": "professional_solo", "type": "professional"},
-        "product_id": "prod_U5i6WdwYSiC9wc",
+        "product_id": "prod_UCPQVLqjYyuiRF",
         "prices": {
-            "monthly": {"amount": Decimal("99.00"), "id": "price_1T7WgpB3EXvvERPfjThfJqeO"},
+            "monthly": {"amount": Decimal("99.00"), "id": "price_1TE0baBJIivbOFX7dqc7W1Dp"},
         },
     },
     "professional_small_firm": {
         "name": "Professional - Small Firm",
         "description": "For small firms and teams",
         "metadata": {"tier": "professional_small_firm", "type": "professional"},
-        "product_id": "prod_U5i6tXPi3LbW5h",
+        "product_id": "prod_UCPQOK9Qpuw1hB",
         "prices": {
-            "monthly": {"amount": Decimal("299.00"), "id": "price_1T7WgpB3EXvvERPf4wDi0fjN"},
+            "monthly": {"amount": Decimal("299.00"), "id": "price_1TE0baBJIivbOFX7smGjiSyj"},
         },
     },
     "professional_mid_size": {
         "name": "Professional - Mid-Size",
         "description": "For mid-size firms with expanded case and team limits",
         "metadata": {"tier": "professional_mid_size", "type": "professional"},
-        "product_id": "prod_U5i6Pvkzonm0fe",
+        "product_id": "prod_UCPQQwcr2VaCXs",
         "prices": {
-            "monthly": {"amount": Decimal("799.00"), "id": "price_1T7WgqB3EXvvERPftbsE7Y2f"},
+            "monthly": {"amount": Decimal("799.00"), "id": "price_1TE0bbBJIivbOFX78k6VF4wC"},
         },
     },
     # Reports (One-time payments, but tracked here for sync)
@@ -106,45 +106,45 @@ SUBSCRIPTION_PRODUCTS = {
         "name": "Financial Compliance Report",
         "description": "Detailed audit of all expense reimbursements and obligation payments",
         "metadata": {"type": "report", "report_type": "financial_compliance"},
-        "product_id": "prod_U5i6uitcZE1ykf",
+        "product_id": "prod_UCPQwdLQurLuJL",
         "prices": {
-            "one_time": {"amount": Decimal("79.00"), "id": "price_1T7WgrB3EXvvERPfR1NuSnre"},
+            "one_time": {"amount": Decimal("79.00"), "id": "price_1TE0bdBJIivbOFX7NIrWMiSg"},
         },
     },
     "report_communication": {
         "name": "Communication Analysis Report",
         "description": "Deep dive into message patterns, toxicity levels, and ARIA interventions",
         "metadata": {"type": "report", "report_type": "communication_analysis"},
-        "product_id": "prod_U5i6T4xMbbYmrh",
+        "product_id": "prod_UCPQI4zziqm3mM",
         "prices": {
-            "one_time": {"amount": Decimal("79.00"), "id": "price_1T7WgrB3EXvvERPfgGIUwJwa"},
+            "one_time": {"amount": Decimal("79.00"), "id": "price_1TE0bcBJIivbOFX7d92QMhVJ"},
         },
     },
     "report_court": {
         "name": "Court Investigation Package",
         "description": "Comprehensive analysis of communication, schedule, and custody exchanges",
         "metadata": {"type": "report", "report_type": "court_investigation"},
-        "product_id": "prod_U5i6ZMoAoSQBEH",
+        "product_id": "prod_UCPQOlUDOkaF3u",
         "prices": {
-            "one_time": {"amount": Decimal("149.00"), "id": "price_1T7WgqB3EXvvERPfdLfdqwwC"},
+            "one_time": {"amount": Decimal("149.00"), "id": "price_1TE0bbBJIivbOFX7FwW5R7E9"},
         },
     },
     "rush_delivery": {
         "name": "Rush Report Delivery",
         "description": "48 hour turnaround for reports",
         "metadata": {"type": "addon", "addon_type": "rush"},
-        "product_id": "prod_U5i7U0VOUv5SSz",
+        "product_id": "prod_UCPQTRgWRvrgc6",
         "prices": {
-            "one_time": {"amount": Decimal("50.00"), "id": "price_1T7WgsB3EXvvERPfzQwnJ8yq"},
+            "one_time": {"amount": Decimal("50.00"), "id": "price_1TE0bdBJIivbOFX758bn5Kto"},
         },
     },
     "urgent_delivery": {
         "name": "Urgent Report Delivery",
         "description": "24 hour turnaround for reports",
         "metadata": {"type": "addon", "addon_type": "urgent"},
-        "product_id": "prod_U5i7ekUzdGW0sX",
+        "product_id": "prod_UCPQ5vVhbWJRRE",
         "prices": {
-            "one_time": {"amount": Decimal("100.00"), "id": "price_1T7WgsB3EXvvERPfSV4M1DmI"},
+            "one_time": {"amount": Decimal("100.00"), "id": "price_1TE0beBJIivbOFX7o1Cxoczu"},
         },
     },
 }

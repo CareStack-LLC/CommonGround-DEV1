@@ -110,21 +110,21 @@ function RegisterContent() {
       name: 'Web Starter',
       price: { month: 0, year: 0 },
       features: ['Basic Messaging', 'Case Management', 'Standard Reports'],
-      priceId: { month: 'price_1T7WgnB3EXvvERPfyu40gtfE', year: 'price_1T7WgnB3EXvvERPfyu40gtfE' }
+      priceId: { month: 'price_1TE0bXBJIivbOFX7luV9H7OZ', year: 'price_1TE0bXBJIivbOFX7luV9H7OZ' }
     },
     {
       id: 'plus',
       name: 'Plus',
       price: { month: 17.99, year: 199.99 },
       features: ['Priority Support', 'Advanced Analytics', 'Unlimited Storage'],
-      priceId: { month: 'price_1T7WgnB3EXvvERPfcpZeMSSH', year: 'price_1T7WgnB3EXvvERPfe7NNFlru' }
+      priceId: { month: 'price_1TE0bXBJIivbOFX70Ysv656Q', year: 'price_1TE0bYBJIivbOFX7atup1qAE' }
     },
     {
       id: 'complete',
       name: 'Complete',
       price: { month: 34.99, year: 349.99 },
       features: ['All Plus Features', 'Legal Assistance', 'Expert Consultation'],
-      priceId: { month: 'price_1T7WgoB3EXvvERPfDm7qKpBN', year: 'price_1T7WgoB3EXvvERPfmDy9KtDh' }
+      priceId: { month: 'price_1TE0bYBJIivbOFX7VqmtQH23', year: 'price_1TE0bZBJIivbOFX77f2QUPc6' }
     }
   ];
 

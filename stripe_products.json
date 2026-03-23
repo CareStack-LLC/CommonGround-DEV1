@@ -1,0 +1,142 @@
+{
+  "Web Starter": {
+    "product_id": "prod_UCPQdxPYuteQUA",
+    "prices": [
+      {
+        "label": "monthly (free)",
+        "price_id": "price_1TE0bXBJIivbOFX7luV9H7OZ",
+        "amount": 0.0
+      }
+    ]
+  },
+  "Plus": {
+    "product_id": "prod_UCPQBUvNRmZ4Cs",
+    "prices": [
+      {
+        "label": "monthly",
+        "price_id": "price_1TE0bXBJIivbOFX70Ysv656Q",
+        "amount": 17.99
+      },
+      {
+        "label": "annual",
+        "price_id": "price_1TE0bYBJIivbOFX7atup1qAE",
+        "amount": 199.99
+      }
+    ]
+  },
+  "Complete": {
+    "product_id": "prod_UCPQxC2eRt7g6K",
+    "prices": [
+      {
+        "label": "monthly",
+        "price_id": "price_1TE0bYBJIivbOFX7VqmtQH23",
+        "amount": 34.99
+      },
+      {
+        "label": "annual",
+        "price_id": "price_1TE0bZBJIivbOFX77f2QUPc6",
+        "amount": 349.99
+      }
+    ]
+  },
+  "Professional Starter": {
+    "product_id": "prod_UCPQevbVaWJDfT",
+    "prices": [
+      {
+        "label": "monthly",
+        "price_id": "price_1TE0bZBJIivbOFX7kmvDAoqr",
+        "amount": 49.0
+      }
+    ]
+  },
+  "Professional Solo": {
+    "product_id": "prod_UCPQVLqjYyuiRF",
+    "prices": [
+      {
+        "label": "monthly",
+        "price_id": "price_1TE0baBJIivbOFX7dqc7W1Dp",
+        "amount": 99.0
+      }
+    ]
+  },
+  "Professional Small Firm": {
+    "product_id": "prod_UCPQOK9Qpuw1hB",
+    "prices": [
+      {
+        "label": "monthly",
+        "price_id": "price_1TE0baBJIivbOFX7smGjiSyj",
+        "amount": 299.0
+      }
+    ]
+  },
+  "Professional Mid-Size": {
+    "product_id": "prod_UCPQQwcr2VaCXs",
+    "prices": [
+      {
+        "label": "monthly",
+        "price_id": "price_1TE0bbBJIivbOFX78k6VF4wC",
+        "amount": 799.0
+      }
+    ]
+  },
+  "Court Investigation Package": {
+    "product_id": "prod_UCPQOlUDOkaF3u",
+    "prices": [
+      {
+        "label": "one-time",
+        "price_id": "price_1TE0bbBJIivbOFX7FwW5R7E9",
+        "amount": 149.0
+      }
+    ]
+  },
+  "Custody Compliance Report": {
+    "product_id": "prod_UCPQNVYgbcZ3Am",
+    "prices": [
+      {
+        "label": "one-time",
+        "price_id": "price_1TE0bcBJIivbOFX7gMG8gSwq",
+        "amount": 99.0
+      }
+    ]
+  },
+  "Communication Analysis Report": {
+    "product_id": "prod_UCPQI4zziqm3mM",
+    "prices": [
+      {
+        "label": "one-time",
+        "price_id": "price_1TE0bcBJIivbOFX7d92QMhVJ",
+        "amount": 79.0
+      }
+    ]
+  },
+  "Financial Compliance Report": {
+    "product_id": "prod_UCPQwdLQurLuJL",
+    "prices": [
+      {
+        "label": "one-time",
+        "price_id": "price_1TE0bdBJIivbOFX7NIrWMiSg",
+        "amount": 79.0
+      }
+    ]
+  },
+  "Rush Report Delivery": {
+    "product_id": "prod_UCPQTRgWRvrgc6",
+    "prices": [
+      {
+        "label": "one-time",
+        "price_id": "price_1TE0bdBJIivbOFX758bn5Kto",
+        "amount": 50.0
+      }
+    ]
+  },
+  "Urgent Report Delivery": {
+    "product_id": "prod_UCPQ5vVhbWJRRE",
+    "prices": [
+      {
+        "label": "one-time",
+        "price_id": "price_1TE0beBJIivbOFX7o1Cxoczu",
+        "amount": 100.0
+      }
+    ]
+  }
+}
