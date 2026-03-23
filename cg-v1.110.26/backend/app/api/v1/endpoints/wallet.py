@@ -3,10 +3,16 @@ Wallet API endpoints - Parent and child wallet management with Stripe Connect.
 
 Endpoints for managing wallets, deposits, obligation payments, payouts,
 and child wallet contributions.
+
+IMPORTANT: Route ordering matters in FastAPI. Static paths (e.g. /payouts,
+/pay-obligation, /child/{id}) MUST be defined before parameterized paths
+(e.g. /{wallet_id}) to avoid the parameterized route matching first.
 """
 
 import logging
 from typing import Optional
+
+import stripe
 
 logger = logging.getLogger(__name__)
 from fastapi import APIRouter, Depends, Query, HTTPException, status
@@ -47,7 +53,7 @@ router = APIRouter()
 
 
 # ============================================================================
-# Parent Wallet Endpoints
+# Parent Wallet Endpoints (static paths first)
 # ============================================================================
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
@@ -140,327 +146,56 @@ async def get_my_wallet(
     )
 
 
-@router.get("/{wallet_id}")
-async def get_wallet(
-    wallet_id: str,
+# ============================================================================
+# Payouts (static path - must be before /{wallet_id})
+# ============================================================================
+
+@router.get("/payouts")
+async def list_payouts(
+    status_filter: Optional[str] = Query(None, alias="status"),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
-) -> WalletResponse:
-    """Get wallet by ID."""
-    wallet = await wallet_service.get_wallet_by_id(db, wallet_id)
-
-    if not wallet:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Wallet not found"
-        )
-
-    # Check access - user must own the wallet
-    if wallet.owner_id != str(current_user.id):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Access denied"
-        )
-
-    balances = await wallet_service.calculate_balance(db, wallet.id)
-
-    return WalletResponse(
-        id=wallet.id,
-        owner_type=wallet.owner_type,
-        owner_id=wallet.owner_id,
-        wallet_type=wallet.wallet_type,
-        display_name=wallet.display_name,
-        stripe_account_status=wallet.stripe_account_status,
-        bank_last_four=wallet.bank_last_four,
-        bank_name=wallet.bank_name,
-        onboarding_completed=wallet.onboarding_completed,
-        charges_enabled=wallet.charges_enabled,
-        payouts_enabled=wallet.payouts_enabled,
-        is_active=wallet.is_active,
-        is_ready_for_payments=wallet.is_ready_for_payments,
-        is_ready_for_payouts=wallet.is_ready_for_payouts,
-        current_balance=balances["current_balance"],
-        available_balance=balances["available_balance"],
-        created_at=wallet.created_at,
-        updated_at=wallet.updated_at,
+) -> PayoutListResponse:
+    """Get payouts for current user."""
+    payouts, total = await wallet_service.get_user_payouts(
+        db=db,
+        user_id=str(current_user.id),
+        status=status_filter,
+        page=page,
+        page_size=page_size,
     )
 
-
-@router.get("/{wallet_id}/balance")
-async def get_wallet_balance(
-    wallet_id: str,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
-) -> WalletBalanceResponse:
-    """Get detailed wallet balance breakdown."""
-    wallet = await wallet_service.get_wallet_by_id(db, wallet_id)
-
-    if not wallet:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Wallet not found")
-
-    if wallet.owner_id != str(current_user.id):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
-
-    balances = await wallet_service.calculate_balance(db, wallet_id)
-
-    return WalletBalanceResponse(
-        wallet_id=wallet_id,
-        current_balance=balances["current_balance"],
-        available_balance=balances["available_balance"],
-        pending_balance=balances["pending_balance"],
-        held_balance=balances["held_balance"],
+    return PayoutListResponse(
+        items=[
+            PayoutResponse(
+                id=p.id,
+                obligation_id=p.obligation_id,
+                recipient_wallet_id=p.recipient_wallet_id,
+                recipient_user_id=p.recipient_user_id,
+                gross_amount=p.gross_amount,
+                fee_amount=p.fee_amount,
+                net_amount=p.net_amount,
+                status=p.status,
+                requires_approval=p.requires_approval,
+                approved_at=p.approved_at,
+                approved_by=p.approved_by,
+                stripe_transfer_id=p.stripe_transfer_id,
+                initiated_at=p.initiated_at,
+                completed_at=p.completed_at,
+                estimated_arrival=p.estimated_arrival,
+            )
+            for p in payouts
+        ],
+        total=total,
+        page=page,
+        page_size=page_size,
     )
 
 
 # ============================================================================
-# Stripe Connect Onboarding
-# ============================================================================
-
-@router.post("/{wallet_id}/onboarding")
-async def start_onboarding(
-    wallet_id: str,
-    data: WalletOnboardingRequest = WalletOnboardingRequest(),
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
-) -> WalletOnboardingResponse:
-    """
-    Start or resume Stripe Connect onboarding.
-
-    Returns a URL for the user to complete account setup.
-    The URL expires in 5 minutes.
-    """
-    wallet = await wallet_service.get_wallet_by_id(db, wallet_id)
-
-    if not wallet:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Wallet not found")
-
-    if wallet.owner_id != str(current_user.id):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
-
-    if wallet.onboarding_completed:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Onboarding already completed"
-        )
-
-    try:
-        url, expires_at = await wallet_service.start_stripe_onboarding(
-            db=db,
-            wallet=wallet,
-            email=current_user.email,
-            refresh_url=data.refresh_url,
-            return_url=data.return_url,
-        )
-        await db.commit()
-
-        return WalletOnboardingResponse(
-            wallet_id=wallet_id,
-            onboarding_url=url,
-            expires_in_minutes=5,
-        )
-    except Exception as e:
-        await db.rollback()
-        logger.exception(f"Failed to start onboarding: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to start onboarding."
-        )
-
-
-@router.post("/{wallet_id}/sync")
-async def sync_wallet(
-    wallet_id: str,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
-):
-    """
-    Sync wallet with Stripe account status.
-
-    Call this after returning from onboarding to update status.
-    """
-    wallet = await wallet_service.get_wallet_by_id(db, wallet_id)
-
-    if not wallet:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Wallet not found")
-
-    if wallet.owner_id != str(current_user.id):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
-
-    if not wallet.stripe_account_id:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="No Stripe account. Start onboarding first."
-        )
-
-    try:
-        result = await wallet_service.sync_stripe_account(db, wallet)
-        await db.commit()
-        return result
-    except Exception as e:
-        await db.rollback()
-        logger.exception(f"Failed to sync wallet: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to sync wallet."
-        )
-
-
-# ============================================================================
-# Deposits (Fund Wallet)
-# ============================================================================
-
-@router.post("/{wallet_id}/deposit")
-async def deposit_funds(
-    wallet_id: str,
-    data: DepositCreate,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
-) -> DepositResponse:
-    """
-    Deposit funds to wallet via card or ACH.
-
-    Amount will be added to wallet balance after payment succeeds.
-    Stripe fees are deducted from the deposit amount.
-    """
-    wallet = await wallet_service.get_wallet_by_id(db, wallet_id)
-
-    if not wallet:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Wallet not found")
-
-    if wallet.owner_id != str(current_user.id):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
-
-    try:
-        transaction = await wallet_service.deposit_funds(
-            db=db,
-            wallet=wallet,
-            amount=data.amount,
-            payment_method=data.payment_method,
-            payment_method_id=data.payment_method_id,
-            idempotency_key=data.idempotency_key,
-        )
-        await db.commit()
-
-        # Check if 3D Secure or additional action required
-        requires_action = transaction.extra_data.get("requires_action", False) if transaction.extra_data else False
-        client_secret = transaction.extra_data.get("client_secret") if transaction.extra_data else None
-
-        return DepositResponse(
-            transaction_id=transaction.id,
-            wallet_id=wallet_id,
-            amount=transaction.amount,
-            fee_amount=transaction.fee_amount,
-            net_amount=transaction.net_amount,
-            payment_method=data.payment_method,
-            status=transaction.status,
-            stripe_payment_intent_id=transaction.stripe_payment_intent_id,
-            client_secret=client_secret,
-            requires_action=requires_action,
-            created_at=transaction.created_at,
-        )
-    except ValueError as e:
-        await db.rollback()
-        logger.error(f"Deposit validation failed: {e}")
-        capture_error(e)
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="An error occurred while processing your request.")
-    except Exception as e:
-        await db.rollback()
-        logger.exception(f"Deposit failed: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Deposit failed."
-        )
-
-
-@router.post("/{wallet_id}/deposit/{transaction_id}/confirm")
-async def confirm_deposit(
-    wallet_id: str,
-    transaction_id: str,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
-) -> DepositResponse:
-    """
-    Confirm a deposit after 3D Secure authentication.
-
-    Call this after stripe.confirmCardPayment() succeeds on the frontend.
-    This checks the payment status with Stripe and updates the transaction.
-    """
-    wallet = await wallet_service.get_wallet_by_id(db, wallet_id)
-
-    if not wallet:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Wallet not found")
-
-    if wallet.owner_id != str(current_user.id):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
-
-    try:
-        # Get the transaction
-        from sqlalchemy import select
-        from app.models.wallet import WalletTransaction
-
-        result = await db.execute(
-            select(WalletTransaction).where(WalletTransaction.id == transaction_id)
-        )
-        transaction = result.scalar_one_or_none()
-
-        if not transaction:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transaction not found")
-
-        if transaction.wallet_id != wallet_id:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Transaction does not belong to this wallet")
-
-        # If already completed, just return current state
-        if transaction.status == "completed":
-            return DepositResponse(
-                transaction_id=transaction.id,
-                wallet_id=wallet_id,
-                amount=transaction.amount,
-                fee_amount=transaction.fee_amount,
-                net_amount=transaction.net_amount,
-                payment_method="card",
-                status=transaction.status,
-                stripe_payment_intent_id=transaction.stripe_payment_intent_id,
-                client_secret=None,
-                requires_action=False,
-                created_at=transaction.created_at,
-            )
-
-        # Check with Stripe and complete if successful
-        if transaction.stripe_payment_intent_id:
-            transaction = await wallet_service.complete_deposit(
-                db, transaction_id, transaction.stripe_payment_intent_id
-            )
-            await db.commit()
-
-        return DepositResponse(
-            transaction_id=transaction.id,
-            wallet_id=wallet_id,
-            amount=transaction.amount,
-            fee_amount=transaction.fee_amount,
-            net_amount=transaction.net_amount,
-            payment_method="card",
-            status=transaction.status,
-            stripe_payment_intent_id=transaction.stripe_payment_intent_id,
-            client_secret=None,
-            requires_action=False,
-            created_at=transaction.created_at,
-        )
-    except ValueError as e:
-        await db.rollback()
-        logger.error(f"Payment confirmation validation failed: {e}")
-        capture_error(e)
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="An error occurred while processing your request.")
-    except Exception as e:
-        await db.rollback()
-        logger.exception(f"Payment confirmation failed: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Confirmation failed."
-        )
-
-
-# ============================================================================
-# Obligation Payments
+# Obligation Payments (static paths - must be before /{wallet_id})
 # ============================================================================
 
 @router.post("/pay-obligation")
@@ -602,114 +337,7 @@ async def get_obligation_funding_status(
 
 
 # ============================================================================
-# Transactions History
-# ============================================================================
-
-@router.get("/{wallet_id}/transactions")
-async def get_transactions(
-    wallet_id: str,
-    transaction_type: Optional[str] = Query(None, description="Filter by type"),
-    transaction_status: Optional[str] = Query(None, alias="status", description="Filter by status"),
-    page: int = Query(1, ge=1),
-    page_size: int = Query(20, ge=1, le=100),
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
-) -> TransactionListResponse:
-    """Get paginated transaction history for a wallet."""
-    wallet = await wallet_service.get_wallet_by_id(db, wallet_id)
-
-    if not wallet:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Wallet not found")
-
-    if wallet.owner_id != str(current_user.id):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
-
-    transactions, total = await wallet_service.get_transactions(
-        db=db,
-        wallet_id=wallet_id,
-        transaction_type=transaction_type,
-        status=transaction_status,
-        page=page,
-        page_size=page_size,
-    )
-
-    return TransactionListResponse(
-        items=[
-            TransactionResponse(
-                id=t.id,
-                wallet_id=t.wallet_id,
-                transaction_type=t.transaction_type,
-                amount=t.amount,
-                currency=t.currency,
-                description=t.description,
-                status=t.status,
-                fee_amount=t.fee_amount,
-                net_amount=t.net_amount,
-                balance_after=t.balance_after,
-                obligation_id=t.obligation_id,
-                payout_id=t.payout_id,
-                stripe_payment_intent_id=t.stripe_payment_intent_id,
-                created_at=t.created_at,
-                completed_at=t.completed_at,
-            )
-            for t in transactions
-        ],
-        total=total,
-        page=page,
-        page_size=page_size,
-    )
-
-
-# ============================================================================
-# Payouts
-# ============================================================================
-
-@router.get("/payouts")
-async def list_payouts(
-    status_filter: Optional[str] = Query(None, alias="status"),
-    page: int = Query(1, ge=1),
-    page_size: int = Query(20, ge=1, le=100),
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
-) -> PayoutListResponse:
-    """Get payouts for current user."""
-    payouts, total = await wallet_service.get_user_payouts(
-        db=db,
-        user_id=str(current_user.id),
-        status=status_filter,
-        page=page,
-        page_size=page_size,
-    )
-
-    return PayoutListResponse(
-        items=[
-            PayoutResponse(
-                id=p.id,
-                obligation_id=p.obligation_id,
-                recipient_wallet_id=p.recipient_wallet_id,
-                recipient_user_id=p.recipient_user_id,
-                gross_amount=p.gross_amount,
-                fee_amount=p.fee_amount,
-                net_amount=p.net_amount,
-                status=p.status,
-                requires_approval=p.requires_approval,
-                approved_at=p.approved_at,
-                approved_by=p.approved_by,
-                stripe_transfer_id=p.stripe_transfer_id,
-                initiated_at=p.initiated_at,
-                completed_at=p.completed_at,
-                estimated_arrival=p.estimated_arrival,
-            )
-            for p in payouts
-        ],
-        total=total,
-        page=page,
-        page_size=page_size,
-    )
-
-
-# ============================================================================
-# Child Wallet Endpoints
+# Child Wallet Endpoints (static paths - must be before /{wallet_id})
 # ============================================================================
 
 @router.post("/child/{child_id}")
@@ -953,31 +581,7 @@ async def list_child_contributions(
 
 
 # ============================================================================
-# Analytics
-# ============================================================================
-
-@router.get("/{wallet_id}/analytics")
-async def get_wallet_analytics(
-    wallet_id: str,
-    current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
-) -> WalletAnalytics:
-    """Get wallet analytics for dashboard."""
-    wallet = await wallet_service.get_wallet_by_id(db, wallet_id)
-
-    if not wallet:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Wallet not found")
-
-    if wallet.owner_id != str(current_user.id):
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
-
-    analytics = await wallet_service.get_wallet_analytics(db, wallet_id)
-
-    return WalletAnalytics(**analytics)
-
-
-# ============================================================================
-# Family Wallets
+# Family Wallets (static path - must be before /{wallet_id})
 # ============================================================================
 
 @router.get("/family/{family_file_id}")
@@ -1014,3 +618,418 @@ async def get_family_wallets(
         ))
 
     return WalletListResponse(items=items, total=len(items))
+
+
+# ============================================================================
+# Parameterized wallet routes (/{wallet_id}/...) - MUST be after static paths
+# ============================================================================
+
+@router.get("/{wallet_id}")
+async def get_wallet(
+    wallet_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+) -> WalletResponse:
+    """Get wallet by ID."""
+    wallet = await wallet_service.get_wallet_by_id(db, wallet_id)
+
+    if not wallet:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Wallet not found"
+        )
+
+    # Check access - user must own the wallet
+    if wallet.owner_id != str(current_user.id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied"
+        )
+
+    balances = await wallet_service.calculate_balance(db, wallet.id)
+
+    return WalletResponse(
+        id=wallet.id,
+        owner_type=wallet.owner_type,
+        owner_id=wallet.owner_id,
+        wallet_type=wallet.wallet_type,
+        display_name=wallet.display_name,
+        stripe_account_status=wallet.stripe_account_status,
+        bank_last_four=wallet.bank_last_four,
+        bank_name=wallet.bank_name,
+        onboarding_completed=wallet.onboarding_completed,
+        charges_enabled=wallet.charges_enabled,
+        payouts_enabled=wallet.payouts_enabled,
+        is_active=wallet.is_active,
+        is_ready_for_payments=wallet.is_ready_for_payments,
+        is_ready_for_payouts=wallet.is_ready_for_payouts,
+        current_balance=balances["current_balance"],
+        available_balance=balances["available_balance"],
+        created_at=wallet.created_at,
+        updated_at=wallet.updated_at,
+    )
+
+
+@router.get("/{wallet_id}/balance")
+async def get_wallet_balance(
+    wallet_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+) -> WalletBalanceResponse:
+    """Get detailed wallet balance breakdown."""
+    wallet = await wallet_service.get_wallet_by_id(db, wallet_id)
+
+    if not wallet:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Wallet not found")
+
+    if wallet.owner_id != str(current_user.id):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
+    balances = await wallet_service.calculate_balance(db, wallet_id)
+
+    return WalletBalanceResponse(
+        wallet_id=wallet_id,
+        current_balance=balances["current_balance"],
+        available_balance=balances["available_balance"],
+        pending_balance=balances["pending_balance"],
+        held_balance=balances["held_balance"],
+    )
+
+
+# ============================================================================
+# Stripe Connect Onboarding
+# ============================================================================
+
+@router.post("/{wallet_id}/onboarding")
+async def start_onboarding(
+    wallet_id: str,
+    data: WalletOnboardingRequest = WalletOnboardingRequest(),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+) -> WalletOnboardingResponse:
+    """
+    Start or resume Stripe Connect onboarding.
+
+    Returns a URL for the user to complete account setup.
+    The URL expires in 5 minutes.
+    """
+    wallet = await wallet_service.get_wallet_by_id(db, wallet_id)
+
+    if not wallet:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Wallet not found")
+
+    if wallet.owner_id != str(current_user.id):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
+    if wallet.onboarding_completed:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Onboarding already completed"
+        )
+
+    try:
+        url, expires_at = await wallet_service.start_stripe_onboarding(
+            db=db,
+            wallet=wallet,
+            email=current_user.email,
+            refresh_url=data.refresh_url,
+            return_url=data.return_url,
+        )
+        await db.commit()
+
+        return WalletOnboardingResponse(
+            wallet_id=wallet_id,
+            onboarding_url=url,
+            expires_in_minutes=5,
+        )
+    except stripe.error.StripeError as e:
+        await db.rollback()
+        logger.exception(f"Stripe error during onboarding: {e}")
+        capture_error(e)
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="Unable to connect to payment provider. Please try again later."
+        )
+    except Exception as e:
+        await db.rollback()
+        logger.exception(f"Failed to start onboarding: {e}")
+        capture_error(e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to start onboarding."
+        )
+
+
+@router.post("/{wallet_id}/sync")
+async def sync_wallet(
+    wallet_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Sync wallet with Stripe account status.
+
+    Call this after returning from onboarding to update status.
+    """
+    wallet = await wallet_service.get_wallet_by_id(db, wallet_id)
+
+    if not wallet:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Wallet not found")
+
+    if wallet.owner_id != str(current_user.id):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
+    if not wallet.stripe_account_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No Stripe account. Start onboarding first."
+        )
+
+    try:
+        result = await wallet_service.sync_stripe_account(db, wallet)
+        await db.commit()
+        return result
+    except Exception as e:
+        await db.rollback()
+        logger.exception(f"Failed to sync wallet: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to sync wallet."
+        )
+
+
+# ============================================================================
+# Deposits (Fund Wallet)
+# ============================================================================
+
+@router.post("/{wallet_id}/deposit")
+async def deposit_funds(
+    wallet_id: str,
+    data: DepositCreate,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+) -> DepositResponse:
+    """
+    Deposit funds to wallet via card or ACH.
+
+    Amount will be added to wallet balance after payment succeeds.
+    Stripe fees are deducted from the deposit amount.
+    """
+    wallet = await wallet_service.get_wallet_by_id(db, wallet_id)
+
+    if not wallet:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Wallet not found")
+
+    if wallet.owner_id != str(current_user.id):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
+    try:
+        transaction = await wallet_service.deposit_funds(
+            db=db,
+            wallet=wallet,
+            amount=data.amount,
+            payment_method=data.payment_method,
+            payment_method_id=data.payment_method_id,
+            idempotency_key=data.idempotency_key,
+        )
+        await db.commit()
+
+        # Check if 3D Secure or additional action required
+        requires_action = transaction.extra_data.get("requires_action", False) if transaction.extra_data else False
+        client_secret = transaction.extra_data.get("client_secret") if transaction.extra_data else None
+
+        return DepositResponse(
+            transaction_id=transaction.id,
+            wallet_id=wallet_id,
+            amount=transaction.amount,
+            fee_amount=transaction.fee_amount,
+            net_amount=transaction.net_amount,
+            payment_method=data.payment_method,
+            status=transaction.status,
+            stripe_payment_intent_id=transaction.stripe_payment_intent_id,
+            client_secret=client_secret,
+            requires_action=requires_action,
+            created_at=transaction.created_at,
+        )
+    except ValueError as e:
+        await db.rollback()
+        logger.error(f"Deposit validation failed: {e}")
+        capture_error(e)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="An error occurred while processing your request.")
+    except Exception as e:
+        await db.rollback()
+        logger.exception(f"Deposit failed: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Deposit failed."
+        )
+
+
+@router.post("/{wallet_id}/deposit/{transaction_id}/confirm")
+async def confirm_deposit(
+    wallet_id: str,
+    transaction_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+) -> DepositResponse:
+    """
+    Confirm a deposit after 3D Secure authentication.
+
+    Call this after stripe.confirmCardPayment() succeeds on the frontend.
+    This checks the payment status with Stripe and updates the transaction.
+    """
+    wallet = await wallet_service.get_wallet_by_id(db, wallet_id)
+
+    if not wallet:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Wallet not found")
+
+    if wallet.owner_id != str(current_user.id):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
+    try:
+        # Get the transaction
+        from sqlalchemy import select
+        from app.models.wallet import WalletTransaction
+
+        result = await db.execute(
+            select(WalletTransaction).where(WalletTransaction.id == transaction_id)
+        )
+        transaction = result.scalar_one_or_none()
+
+        if not transaction:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Transaction not found")
+
+        if transaction.wallet_id != wallet_id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Transaction does not belong to this wallet")
+
+        # If already completed, just return current state
+        if transaction.status == "completed":
+            return DepositResponse(
+                transaction_id=transaction.id,
+                wallet_id=wallet_id,
+                amount=transaction.amount,
+                fee_amount=transaction.fee_amount,
+                net_amount=transaction.net_amount,
+                payment_method="card",
+                status=transaction.status,
+                stripe_payment_intent_id=transaction.stripe_payment_intent_id,
+                client_secret=None,
+                requires_action=False,
+                created_at=transaction.created_at,
+            )
+
+        # Check with Stripe and complete if successful
+        if transaction.stripe_payment_intent_id:
+            transaction = await wallet_service.complete_deposit(
+                db, transaction_id, transaction.stripe_payment_intent_id
+            )
+            await db.commit()
+
+        return DepositResponse(
+            transaction_id=transaction.id,
+            wallet_id=wallet_id,
+            amount=transaction.amount,
+            fee_amount=transaction.fee_amount,
+            net_amount=transaction.net_amount,
+            payment_method="card",
+            status=transaction.status,
+            stripe_payment_intent_id=transaction.stripe_payment_intent_id,
+            client_secret=None,
+            requires_action=False,
+            created_at=transaction.created_at,
+        )
+    except ValueError as e:
+        await db.rollback()
+        logger.error(f"Payment confirmation validation failed: {e}")
+        capture_error(e)
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="An error occurred while processing your request.")
+    except Exception as e:
+        await db.rollback()
+        logger.exception(f"Payment confirmation failed: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Confirmation failed."
+        )
+
+
+# ============================================================================
+# Transactions History
+# ============================================================================
+
+@router.get("/{wallet_id}/transactions")
+async def get_transactions(
+    wallet_id: str,
+    transaction_type: Optional[str] = Query(None, description="Filter by type"),
+    transaction_status: Optional[str] = Query(None, alias="status", description="Filter by status"),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+) -> TransactionListResponse:
+    """Get paginated transaction history for a wallet."""
+    wallet = await wallet_service.get_wallet_by_id(db, wallet_id)
+
+    if not wallet:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Wallet not found")
+
+    if wallet.owner_id != str(current_user.id):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
+    transactions, total = await wallet_service.get_transactions(
+        db=db,
+        wallet_id=wallet_id,
+        transaction_type=transaction_type,
+        status=transaction_status,
+        page=page,
+        page_size=page_size,
+    )
+
+    return TransactionListResponse(
+        items=[
+            TransactionResponse(
+                id=t.id,
+                wallet_id=t.wallet_id,
+                transaction_type=t.transaction_type,
+                amount=t.amount,
+                currency=t.currency,
+                description=t.description,
+                status=t.status,
+                fee_amount=t.fee_amount,
+                net_amount=t.net_amount,
+                balance_after=t.balance_after,
+                obligation_id=t.obligation_id,
+                payout_id=t.payout_id,
+                stripe_payment_intent_id=t.stripe_payment_intent_id,
+                created_at=t.created_at,
+                completed_at=t.completed_at,
+            )
+            for t in transactions
+        ],
+        total=total,
+        page=page,
+        page_size=page_size,
+    )
+
+
+# ============================================================================
+# Analytics
+# ============================================================================
+
+@router.get("/{wallet_id}/analytics")
+async def get_wallet_analytics(
+    wallet_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+) -> WalletAnalytics:
+    """Get wallet analytics for dashboard."""
+    wallet = await wallet_service.get_wallet_by_id(db, wallet_id)
+
+    if not wallet:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Wallet not found")
+
+    if wallet.owner_id != str(current_user.id):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
+    analytics = await wallet_service.get_wallet_analytics(db, wallet_id)
+
+    return WalletAnalytics(**analytics)

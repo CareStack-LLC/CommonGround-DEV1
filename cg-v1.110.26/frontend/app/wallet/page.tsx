@@ -166,15 +166,25 @@ function WalletContent() {
       // Create wallet if doesn't exist
       let currentWallet = wallet;
       if (!currentWallet) {
-        const createdWallet = await walletAPI.createWallet();
-        // Add default balance to convert Wallet to WalletWithBalance
-        currentWallet = {
-          ...createdWallet,
-          current_balance: '0.00',
-          available_balance: '0.00',
-          is_ready_for_payments: false,
-          is_ready_for_payouts: false,
-        } as WalletWithBalance;
+        try {
+          const createdWallet = await walletAPI.createWallet();
+          // Add default balance to convert Wallet to WalletWithBalance
+          currentWallet = {
+            ...createdWallet,
+            current_balance: '0.00',
+            available_balance: '0.00',
+            is_ready_for_payments: false,
+            is_ready_for_payouts: false,
+          } as WalletWithBalance;
+        } catch (createErr: any) {
+          // Wallet may already exist (e.g. from a previous attempt) - try fetching it
+          const existingWallet = await walletAPI.getMyWallet();
+          if (existingWallet?.id) {
+            currentWallet = existingWallet;
+          } else {
+            throw createErr;
+          }
+        }
         setWallet(currentWallet);
       }
 
