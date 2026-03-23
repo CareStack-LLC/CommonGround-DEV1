@@ -216,6 +216,21 @@ export interface StripeLiveData {
   error?: string;
 }
 
+export interface StripeHealthData {
+  total_profiles: number;
+  with_stripe_customer: number;
+  with_stripe_subscription: number;
+  paid_no_stripe_sub: number;
+  products_expected: string[];
+  products_verified: {
+    id: string;
+    tier: string;
+    name: string | null;
+    active: boolean;
+    found: boolean;
+  }[];
+}
+
 export interface BillingOverview {
   consumer_subscriptions: Record<string, { total: number; statuses: Record<string, number> }>;
   professional_subscriptions: Record<string, number>;
@@ -225,7 +240,10 @@ export interface BillingOverview {
   new_paid_30d: number;
   mrr_by_tier: Record<string, { count: number; price: number; mrr: number }>;
   total_mrr: number;
+  estimated_mrr: number;
+  verified_mrr: number | null;
   stripe_live: StripeLiveData | null;
+  stripe_health: StripeHealthData | null;
   valuation?: Record<string, number>;
   refunds?: {
     recent_refunds: { id: string; amount: number; reason: string | null; status: string; created: string }[];

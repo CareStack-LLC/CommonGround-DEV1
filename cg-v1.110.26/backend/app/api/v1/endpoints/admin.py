@@ -48,7 +48,7 @@ router = APIRouter()
 _DEFAULT_TIER_PRICES = {
     "web_starter": 0,
     "plus": 17.99, "complete": 34.99,
-    "professional_starter": 49.99,
+    "professional_starter": 49.00,
     "solo": 99.00, "small_firm": 299.00, "mid_size": 799.00,
 }
 
@@ -76,6 +76,9 @@ STRIPE_PRODUCT_TO_TIER: dict[str, str] = {
     "prod_UCPQOK9Qpuw1hB": "small_firm",
     "prod_UCPQQwcr2VaCXs": "mid_size",
 }
+
+
+_DEFAULT_CAC = 45.0  # Customer acquisition cost estimate — update when real marketing spend data is available
 
 
 async def _get_tier_prices(db: AsyncSession) -> dict[str, float]:
@@ -723,6 +726,49 @@ async def get_billing_overview(
         )
     )
 
+    # --- Stripe Health: DB integration stats ---
+    stripe_health = {}
+    try:
+        paid_tiers = ["plus", "complete", "professional_starter", "solo", "small_firm", "mid_size"]
+
+        total_profiles = await db.scalar(select(func.count(UserProfile.id))) or 0
+
+        users_with_stripe_customer = await db.scalar(
+            select(func.count(UserProfile.id)).where(
+                UserProfile.stripe_customer_id != None,
+                UserProfile.stripe_customer_id != "",
+            )
+        ) or 0
+
+        users_with_stripe_sub = await db.scalar(
+            select(func.count(UserProfile.id)).where(
+                UserProfile.stripe_subscription_id != None,
+                UserProfile.stripe_subscription_id != "",
+            )
+        ) or 0
+
+        mismatch_count = await db.scalar(
+            select(func.count(UserProfile.id)).where(
+                UserProfile.subscription_tier.in_(paid_tiers),
+                UserProfile.subscription_status == "active",
+                or_(
+                    UserProfile.stripe_subscription_id == None,
+                    UserProfile.stripe_subscription_id == "",
+                ),
+            )
+        ) or 0
+
+        stripe_health = {
+            "total_profiles": total_profiles,
+            "with_stripe_customer": users_with_stripe_customer,
+            "with_stripe_subscription": users_with_stripe_sub,
+            "paid_no_stripe_sub": mismatch_count,
+            "products_expected": list(STRIPE_PRODUCT_TO_TIER.keys()),
+            "products_verified": [],
+        }
+    except Exception as exc:
+        logger.warning("Stripe health DB queries failed: %s", exc)
+
     # --- Live Stripe data (graceful fallback) ---
     stripe_live = None
     try:
@@ -731,12 +777,21 @@ async def get_billing_overview(
         if app_settings.STRIPE_SECRET_KEY:
             stripe.api_key = app_settings.STRIPE_SECRET_KEY
 
-            # Active subscriptions from Stripe
+            # Active subscriptions from Stripe (paginated)
+            all_subs = []
             subs = stripe.Subscription.list(status="active", limit=100)
-            stripe_active_count = len(subs.data)
+            all_subs.extend(subs.data)
+            while subs.has_more:
+                subs = stripe.Subscription.list(
+                    status="active", limit=100,
+                    starting_after=subs.data[-1].id,
+                )
+                all_subs.extend(subs.data)
+
+            stripe_active_count = len(all_subs)
             stripe_mrr_cents = sum(
                 sub.plan.amount * sub.quantity
-                for sub in subs.data
+                for sub in all_subs
                 if sub.plan and sub.plan.amount
             )
 
@@ -767,6 +822,28 @@ async def get_billing_overview(
                 "total_customers": total_customers,
                 "recent_payments": recent_payments,
             }
+
+            # Verify expected products exist in Stripe
+            products_verified = []
+            for prod_id, tier_code in STRIPE_PRODUCT_TO_TIER.items():
+                try:
+                    prod = stripe.Product.retrieve(prod_id)
+                    products_verified.append({
+                        "id": prod_id,
+                        "tier": tier_code,
+                        "name": prod.name,
+                        "active": prod.active,
+                        "found": True,
+                    })
+                except stripe.error.InvalidRequestError:
+                    products_verified.append({
+                        "id": prod_id,
+                        "tier": tier_code,
+                        "name": None,
+                        "active": False,
+                        "found": False,
+                    })
+            stripe_health["products_verified"] = products_verified
     except Exception as e:
         logger.warning(f"Stripe API unavailable for billing overview: {e}")
         stripe_live = {"stripe_available": False, "error": "Stripe API unavailable."}
@@ -813,7 +890,8 @@ async def get_billing_overview(
             "arpu": arpu,
             "ltv": ltv,
             "avg_lifetime_months": avg_lifetime_months,
-            "ltv_cac_ratio": round(ltv / 45, 1) if ltv > 0 else 0,  # Placeholder CAC of $45
+            "cac": _DEFAULT_CAC,
+            "ltv_cac_ratio": round(ltv / _DEFAULT_CAC, 1) if ltv > 0 else 0,
             "total_users": total_users,
             "arr": round(total_mrr * 12, 2),
         }
@@ -868,6 +946,8 @@ async def get_billing_overview(
     except Exception as exc:
         logger.warning("Stripe refunds/disputes fetch failed: %s", exc)
 
+    verified_mrr = stripe_live.get("total_mrr") if stripe_live and stripe_live.get("stripe_available") else None
+
     return {
         "consumer_subscriptions": breakdown,
         "professional_subscriptions": prof_breakdown,
@@ -877,10 +957,13 @@ async def get_billing_overview(
         "new_paid_30d": new_paid_30d,
         "mrr_by_tier": mrr_by_tier,
         "total_mrr": round(total_mrr, 2),
+        "estimated_mrr": round(total_mrr, 2),
+        "verified_mrr": verified_mrr,
         "stripe_live": stripe_live,
+        "stripe_health": stripe_health,
         "valuation": valuation,
         "refunds": refunds_data,
-        "note": "MRR calculated from database tier counts. See stripe_live for real-time Stripe data.",
+        "note": "estimated_mrr from DB tier counts. verified_mrr from Stripe API (when available).",
     }
 
 

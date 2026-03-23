@@ -127,16 +127,29 @@ export default function BillingContent() {
             <div className="bg-gradient-to-b from-[#3DAA8A]/20 to-[#3DAA8A]/5 border border-[#3DAA8A]/20 rounded-xl p-4">
               <DollarSign className="w-5 h-5 text-[#3DAA8A] mb-2" />
               <div className="text-2xl font-bold text-white">
-                {stripeAvailable && stripeLive?.total_mrr != null
-                  ? formatCurrency(stripeLive.total_mrr)
-                  : formatCurrency(data.total_mrr)}
+                {data.verified_mrr != null
+                  ? formatCurrency(data.verified_mrr)
+                  : formatCurrency(data.estimated_mrr ?? data.total_mrr)}
               </div>
-              <div className="text-xs text-[#6B8A9A]">{stripeAvailable ? 'Live MRR' : 'Est. MRR'}</div>
+              <div className="text-xs text-[#6B8A9A]">
+                {data.verified_mrr != null ? 'Verified MRR (Stripe)' : 'Estimated MRR (DB)'}
+              </div>
+              {data.verified_mrr != null && data.estimated_mrr != null && Math.abs(data.verified_mrr - data.estimated_mrr) > 0.01 && (
+                <div className="text-[10px] text-amber-400/70 mt-1">
+                  DB estimate: {formatCurrency(data.estimated_mrr)}
+                </div>
+              )}
             </div>
             <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-4">
               <Users className="w-5 h-5 text-blue-400 mb-2" />
-              <div className="text-2xl font-bold text-white">{totalConsumers.toLocaleString()}</div>
-              <div className="text-xs text-[#6B8A9A]">Total Subscribers</div>
+              <div className="text-2xl font-bold text-white">
+                {stripeAvailable && stripeLive?.active_subscriptions != null
+                  ? stripeLive.active_subscriptions
+                  : totalConsumers.toLocaleString()}
+              </div>
+              <div className="text-xs text-[#6B8A9A]">
+                {stripeAvailable && stripeLive?.active_subscriptions != null ? 'Verified Subscribers' : 'DB Subscribers'}
+              </div>
             </div>
             <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-4">
               <UserPlus className="w-5 h-5 text-emerald-400 mb-2" />
@@ -193,6 +206,81 @@ export default function BillingContent() {
             <span className="text-sm text-[#8AACBC] font-medium">Total MRR</span>
             <span className="text-lg font-bold text-white">{formatCurrency(data.total_mrr)}</span>
           </div>
+          {data.stripe_health && data.stripe_health.paid_no_stripe_sub > 0 && (
+            <div className="mt-3 text-[11px] text-amber-400/70">
+              Note: {data.stripe_health.paid_no_stripe_sub} subscribers are DB-assigned only (no Stripe subscription). Their MRR is estimated.
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Stripe Health */}
+      {data?.stripe_health && (
+        <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Zap className="w-4 h-4 text-indigo-400" />
+            <h2 className="text-sm font-semibold text-[#D0E4EC]">Stripe Integration Health</h2>
+          </div>
+
+          {/* Integration Stats */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+            <div className="bg-[#2D6A8F]/10 rounded-lg p-3 text-center">
+              <div className="text-lg font-bold text-white">{data.stripe_health.with_stripe_customer}</div>
+              <div className="text-[11px] text-[#6B8A9A]">Stripe Customers</div>
+              <div className="text-[10px] text-[#4A6E7F]">of {data.stripe_health.total_profiles} users</div>
+            </div>
+            <div className="bg-[#2D6A8F]/10 rounded-lg p-3 text-center">
+              <div className="text-lg font-bold text-white">{data.stripe_health.with_stripe_subscription}</div>
+              <div className="text-[11px] text-[#6B8A9A]">Stripe Subscriptions</div>
+            </div>
+            <div className={`rounded-lg p-3 text-center ${data.stripe_health.paid_no_stripe_sub > 0 ? 'bg-amber-500/10 border border-amber-500/20' : 'bg-[#2D6A8F]/10'}`}>
+              <div className={`text-lg font-bold ${data.stripe_health.paid_no_stripe_sub > 0 ? 'text-amber-400' : 'text-white'}`}>
+                {data.stripe_health.paid_no_stripe_sub}
+              </div>
+              <div className="text-[11px] text-[#6B8A9A]">Paid, No Stripe Sub</div>
+            </div>
+            <div className="bg-[#2D6A8F]/10 rounded-lg p-3 text-center">
+              <div className="text-lg font-bold text-white">
+                {data.stripe_health.products_verified?.filter(p => p.found).length ?? 0}/{data.stripe_health.products_expected?.length ?? 0}
+              </div>
+              <div className="text-[11px] text-[#6B8A9A]">Products Verified</div>
+            </div>
+          </div>
+
+          {/* Product Catalog */}
+          {data.stripe_health.products_verified && data.stripe_health.products_verified.length > 0 && (
+            <div>
+              <h3 className="text-xs font-medium text-[#8AACBC] mb-2">Product Catalog</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                {data.stripe_health.products_verified.map((prod) => (
+                  <div key={prod.id} className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#2D6A8F]/10">
+                    {prod.found
+                      ? <CheckCircle className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+                      : <XCircle className="w-3.5 h-3.5 text-red-400 flex-shrink-0" />}
+                    <span className="text-xs text-[#D0E4EC]">{TIER_LABELS[prod.tier] || prod.tier}</span>
+                    {prod.found && !prod.active && (
+                      <span className="text-[10px] text-amber-400 ml-auto">inactive</span>
+                    )}
+                    {prod.found && prod.active && (
+                      <span className="text-[10px] text-emerald-400/60 ml-auto">active</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Mismatch Warning */}
+          {data.stripe_health.paid_no_stripe_sub > 0 && (
+            <div className="mt-4 flex items-start gap-2 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+              <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0 mt-0.5" />
+              <span className="text-xs text-amber-300/80">
+                {data.stripe_health.paid_no_stripe_sub} user{data.stripe_health.paid_no_stripe_sub !== 1 ? 's' : ''} have
+                a paid tier in the database but no Stripe subscription. Use &ldquo;Sync Stripe Subscriptions&rdquo; to reconcile,
+                or these may be grant/manual assignments.
+              </span>
+            </div>
+          )}
         </div>
       )}
 
@@ -380,10 +468,30 @@ export default function BillingContent() {
                 <span className="text-sm text-[#D0E4EC] font-medium">Sync Complete</span>
               </div>
               <div className="text-xs text-[#8AACBC] space-y-1">
-                {syncResult.synced != null && <div>Synced: <span className="text-emerald-400">{syncResult.synced}</span></div>}
-                {syncResult.updated != null && <div>Updated: <span className="text-blue-400">{syncResult.updated}</span></div>}
-                {syncResult.failed > 0 && <div>Failed: <span className="text-red-400">{syncResult.failed}</span></div>}
-                {syncResult.already_synced != null && syncResult.already_synced > 0 && <div>Already synced: {syncResult.already_synced}</div>}
+                {syncResult.synced != null && syncResult.synced > 0 && (
+                  <div>New synced: <span className="text-emerald-400 font-medium">{syncResult.synced}</span></div>
+                )}
+                {syncResult.updated != null && syncResult.updated > 0 && (
+                  <div>Updated: <span className="text-blue-400 font-medium">{syncResult.updated}</span></div>
+                )}
+                {syncResult.already_synced != null && syncResult.already_synced > 0 && (
+                  <div>Already in sync: <span className="text-[#6B8A9A]">{syncResult.already_synced}</span></div>
+                )}
+                {(syncResult.checked ?? syncResult.total_checked) != null && (
+                  <div>Total checked: {syncResult.checked ?? syncResult.total_checked}</div>
+                )}
+                {syncResult.failed > 0 && (
+                  <div className="mt-2 p-2 bg-red-500/10 border border-red-500/20 rounded">
+                    <div>Failed: <span className="text-red-400 font-medium">{syncResult.failed}</span></div>
+                    {syncResult.errors && syncResult.errors.length > 0 && (
+                      <ul className="mt-1 space-y-0.5">
+                        {syncResult.errors.slice(0, 5).map((e, i) => (
+                          <li key={i} className="text-[11px] text-red-300">{e.email || e.user_id}: {e.error}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -402,7 +510,7 @@ export default function BillingContent() {
             <ValuationCard label="LTV" value={formatCurrency(data.valuation.ltv || 0)} sub={`${data.valuation.avg_lifetime_months || 0} mo avg lifetime`} />
             <ValuationCard label="ARPU" value={formatCurrency(data.valuation.arpu || 0)} sub="monthly per user" />
             <ValuationCard label="Retention" value={`${data.valuation.retention_rate_pct || 0}%`} sub={`${data.valuation.monthly_churn_pct || 0}% monthly churn`} highlight={data.valuation.retention_rate_pct >= 90} />
-            <ValuationCard label="LTV:CAC" value={`${data.valuation.ltv_cac_ratio || 0}x`} sub={data.valuation.ltv_cac_ratio >= 3 ? 'Healthy (>3x target)' : 'Below 3x target'} highlight={data.valuation.ltv_cac_ratio >= 3} />
+            <ValuationCard label="LTV:CAC" value={`${data.valuation.ltv_cac_ratio || 0}x`} sub={`CAC: $${data.valuation.cac || 45} (est.) · ${data.valuation.ltv_cac_ratio >= 3 ? '>3x target' : 'Below 3x'}`} highlight={data.valuation.ltv_cac_ratio >= 3} />
           </div>
           <div className="grid grid-cols-3 gap-3 mt-3">
             <div className="bg-[#2D6A8F]/10 rounded-lg p-3 text-center">
