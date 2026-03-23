@@ -90,9 +90,9 @@ function getTransactionColor(type: string): { bg: string; text: string } {
     case 'fee':
       return { bg: 'bg-cg-error-subtle', text: 'text-cg-error' };
     case 'gift_received':
-      return { bg: 'bg-purple-100', text: 'text-purple-600' };
+      return { bg: 'bg-purple-100 dark:bg-purple-900/30', text: 'text-purple-600 dark:text-purple-400' };
     case 'refund':
-      return { bg: 'bg-blue-100', text: 'text-blue-600' };
+      return { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-600 dark:text-blue-400' };
     default:
       return { bg: 'bg-muted', text: 'text-muted-foreground' };
   }
@@ -122,8 +122,8 @@ export default function TransactionList({
   if (transactions.length === 0) {
     return (
       <div className="text-center py-12">
-        <div className="w-14 h-14 bg-gradient-to-br from-slate-100 to-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md">
-          <Receipt className="h-7 w-7 text-slate-500" />
+        <div className="w-14 h-14 bg-gradient-to-br from-muted to-muted/50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md">
+          <Receipt className="h-7 w-7 text-muted-foreground" />
         </div>
         <p className="text-muted-foreground font-medium">{emptyMessage}</p>
       </div>
@@ -156,7 +156,7 @@ export default function TransactionList({
               return (
                 <div
                   key={tx.id}
-                  className="p-4 bg-white rounded-xl border-2 border-slate-200 hover:border-[var(--portal-primary)]/30 hover:shadow-lg transition-all duration-300"
+                  className="p-4 bg-card rounded-xl border-2 border-border hover:border-[var(--portal-primary)]/30 hover:shadow-lg transition-all duration-300"
                 >
                   <div className="flex items-center gap-4">
                     {/* Icon */}

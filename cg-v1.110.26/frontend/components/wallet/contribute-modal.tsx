@@ -138,11 +138,11 @@ export default function ContributeModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 overflow-y-auto">
       <div className="bg-card rounded-2xl shadow-xl max-w-md w-full overflow-hidden my-8">
         {/* Header */}
-        <div className="p-6 border-b border-border bg-purple-50">
+        <div className="p-6 border-b border-border bg-purple-50 dark:bg-purple-950/30">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center">
-                <Gift className="h-5 w-5 text-purple-600" />
+              <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                <Gift className="h-5 w-5 text-purple-600 dark:text-purple-400" />
               </div>
               <div>
                 <h2 className="font-semibold text-foreground">Send Money</h2>
@@ -153,7 +153,7 @@ export default function ContributeModal({
             </div>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-purple-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-lg transition-colors"
             >
               <X className="h-5 w-5 text-muted-foreground" />
             </button>

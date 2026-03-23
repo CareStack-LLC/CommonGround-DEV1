@@ -38,7 +38,7 @@ export default function WalletBalanceCard({
 }: WalletBalanceCardProps) {
   if (isLoading) {
     return (
-      <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg p-6">
+      <div className="bg-card rounded-2xl border-2 border-border shadow-lg p-6">
         <div className="flex flex-col items-center justify-center py-8">
           <div className="w-14 h-14 border-3 border-[var(--portal-primary)]/20 border-t-[var(--portal-primary)] rounded-full animate-spin" />
           <p className="mt-4 text-muted-foreground font-medium">Loading wallet...</p>
@@ -50,7 +50,7 @@ export default function WalletBalanceCard({
   // No wallet yet - show setup prompt
   if (!wallet) {
     return (
-      <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg overflow-hidden">
+      <div className="bg-card rounded-2xl border-2 border-border shadow-lg overflow-hidden">
         <div className="p-6">
           <div className="flex items-start gap-4">
             <div className="w-14 h-14 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md">
@@ -80,10 +80,10 @@ export default function WalletBalanceCard({
   // Wallet exists but onboarding not complete
   if (!wallet.onboarding_completed) {
     return (
-      <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg overflow-hidden">
+      <div className="bg-card rounded-2xl border-2 border-border shadow-lg overflow-hidden">
         <div className="p-6">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 bg-gradient-to-br from-amber-100 to-amber-50 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md">
+            <div className="w-14 h-14 bg-gradient-to-br from-amber-100 to-amber-50 dark:from-amber-900/30 dark:to-amber-950/20 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md">
               <Clock className="h-6 w-6 text-amber-600" />
             </div>
             <div className="flex-1">
@@ -103,7 +103,7 @@ export default function WalletBalanceCard({
             </div>
           </div>
         </div>
-        <div className="border-t-2 border-amber-200 bg-amber-50 px-6 py-3">
+        <div className="border-t-2 border-amber-200 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800 px-6 py-3">
           <p className="text-xs text-amber-700 flex items-center gap-2 font-bold">
             <AlertCircle className="h-4 w-4" />
             Bank verification pending
@@ -119,12 +119,12 @@ export default function WalletBalanceCard({
   const pendingBalance = currentBalance - availableBalance;
 
   return (
-    <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg overflow-hidden">
+    <div className="bg-card rounded-2xl border-2 border-border shadow-lg overflow-hidden">
       {/* Main Balance Section */}
       <div className="p-6">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-2xl flex items-center justify-center shadow-md">
+            <div className="w-14 h-14 bg-gradient-to-br from-emerald-100 to-emerald-50 dark:from-emerald-900/30 dark:to-emerald-950/20 rounded-2xl flex items-center justify-center shadow-md">
               <Wallet className="h-6 w-6 text-emerald-600" />
             </div>
             <div>
@@ -136,7 +136,7 @@ export default function WalletBalanceCard({
           </div>
           <div className="flex items-center gap-2">
             {wallet.charges_enabled && wallet.payouts_enabled && (
-              <span className="flex items-center gap-1 text-xs text-emerald-700 bg-emerald-50 border-2 border-emerald-200 px-2.5 py-1 rounded-full font-bold">
+              <span className="flex items-center gap-1 text-xs text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 border-2 border-emerald-200 dark:border-emerald-800 px-2.5 py-1 rounded-full font-bold">
                 <CheckCircle className="h-3 w-3" />
                 Active
               </span>
@@ -158,7 +158,7 @@ export default function WalletBalanceCard({
           {onViewTransactions && (
             <button
               onClick={onViewTransactions}
-              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-white border-2 border-slate-200 text-foreground rounded-xl font-bold hover:border-[var(--portal-primary)]/30 hover:shadow-lg transition-all duration-300"
+              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-card border-2 border-border text-foreground rounded-xl font-bold hover:border-[var(--portal-primary)]/30 hover:shadow-lg transition-all duration-300"
             >
               View History
             </button>
@@ -167,7 +167,7 @@ export default function WalletBalanceCard({
       </div>
 
       {/* Balance Breakdown */}
-      <div className="border-t-2 border-slate-200 bg-slate-50 px-6 py-4">
+      <div className="border-t-2 border-border bg-muted px-6 py-4">
         <div className="grid grid-cols-2 gap-4">
           <div>
             <p className="text-xs text-muted-foreground mb-1 font-medium">Pending</p>
@@ -178,7 +178,7 @@ export default function WalletBalanceCard({
           <div>
             <p className="text-xs text-muted-foreground mb-1 font-medium">Bank Account</p>
             <div className="flex items-center gap-2">
-              <Building2 className="h-4 w-4 text-slate-500" />
+              <Building2 className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm font-medium">
                 {wallet.bank_name ? `${wallet.bank_name} ` : ''}
                 {wallet.bank_last_four ? `****${wallet.bank_last_four}` : 'Connected'}

@@ -31,8 +31,8 @@ export default function ChildWalletCard({
       <div className="p-5">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center">
-              <PiggyBank className="h-6 w-6 text-purple-600" />
+            <div className="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+              <PiggyBank className="h-6 w-6 text-purple-600 dark:text-purple-400" />
             </div>
             <div>
               <h3 className="font-semibold text-foreground">{childWallet.child_name}'s Savings</h3>
@@ -42,9 +42,9 @@ export default function ChildWalletCard({
         </div>
 
         {/* Balance */}
-        <div className="mt-4 p-4 bg-purple-50 rounded-xl">
-          <p className="text-sm text-purple-600 mb-1">Current Balance</p>
-          <p className="text-2xl font-bold text-purple-700 font-mono tabular-nums">
+        <div className="mt-4 p-4 bg-purple-50 dark:bg-purple-950/30 rounded-xl">
+          <p className="text-sm text-purple-600 dark:text-purple-400 mb-1">Current Balance</p>
+          <p className="text-2xl font-bold text-purple-700 dark:text-purple-300 font-mono tabular-nums">
             {formatCurrency(balance)}
           </p>
         </div>

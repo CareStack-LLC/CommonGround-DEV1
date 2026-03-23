@@ -223,7 +223,7 @@ function WalletContent() {
 
       {/* Onboarding Success Banner */}
       {showOnboardingSuccess && (
-        <div className="bg-emerald-50 border-b-2 border-emerald-200">
+        <div className="bg-emerald-50 dark:bg-emerald-950/30 border-b-2 border-emerald-200 dark:border-emerald-800">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -273,11 +273,11 @@ function WalletContent() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {/* Error Alert */}
         {error && (
-          <div className="flex items-center gap-3 p-4 bg-red-50 border-2 border-red-200 rounded-2xl shadow-lg">
-            <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
-            <p className="text-sm text-red-700 flex-1 font-medium">{error}</p>
-            <button onClick={() => setError(null)} className="hover:bg-red-100 p-1 rounded-lg transition-colors">
-              <X className="h-4 w-4 text-red-600" />
+          <div className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-950/30 border-2 border-red-200 dark:border-red-800 rounded-2xl shadow-lg">
+            <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0" />
+            <p className="text-sm text-red-700 dark:text-red-300 flex-1 font-medium">{error}</p>
+            <button onClick={() => setError(null)} className="hover:bg-red-100 dark:hover:bg-red-900/30 p-1 rounded-lg transition-colors">
+              <X className="h-4 w-4 text-red-600 dark:text-red-400" />
             </button>
           </div>
         )}
