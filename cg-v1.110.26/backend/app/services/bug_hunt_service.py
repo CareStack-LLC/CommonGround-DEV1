@@ -226,12 +226,16 @@ async def generate_seed_families(
         pa_profile = UserProfile(
             id=str(uuid4()),
             user_id=pa_id,
+            first_name=a_first,
+            last_name=a_last,
             subscription_tier="complete",
             subscription_status="active",
         )
         pb_profile = UserProfile(
             id=str(uuid4()),
             user_id=pb_id,
+            first_name=b_first,
+            last_name=b_last,
             subscription_tier="complete",
             subscription_status="active",
         )
