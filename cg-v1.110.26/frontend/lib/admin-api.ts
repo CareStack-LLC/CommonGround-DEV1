@@ -433,6 +433,112 @@ export interface SprintPlan {
   top_3: string[];
 }
 
+// ── Bug Hunt Cohort Types ───────────────────────────────────────────
+
+export interface BugHuntCohort {
+  id: string;
+  name: string;
+  description: string | null;
+  target_feature: string;
+  status: string;
+  family_count: number;
+  test_instructions: string | null;
+  created_by: string;
+  started_at: string | null;
+  completed_at: string | null;
+  seed_config: Record<string, any> | null;
+  summary_json: Record<string, any> | null;
+  created_at: string;
+  updated_at: string;
+  families_count?: number;
+  bugs_count?: number;
+  checklist_progress?: number;
+}
+
+export interface BugHuntFamily {
+  id: string;
+  cohort_id: string;
+  family_file_id: string | null;
+  parent_a_email: string;
+  parent_a_password: string;
+  parent_b_email: string;
+  parent_b_password: string;
+  parent_a_name: string;
+  parent_b_name: string;
+  children_names: string[];
+  test_status: string;
+  tester_notes: string | null;
+  created_at: string;
+}
+
+export interface BugHuntChecklistItem {
+  id: string;
+  cohort_id: string;
+  title: string;
+  description: string | null;
+  display_order: number;
+  is_completed: boolean;
+  completed_by: string | null;
+  completed_at: string | null;
+  created_at: string;
+}
+
+export interface BugHuntNote {
+  id: string;
+  cohort_id: string;
+  family_id: string | null;
+  author_id: string;
+  content: string;
+  note_type: string;
+  created_at: string;
+}
+
+export interface BugHuntBugReport {
+  id: string;
+  cohort_id: string;
+  family_id: string | null;
+  reported_by: string;
+  title: string;
+  description: string;
+  severity: string;
+  status: string;
+  sentry_issue_id: string | null;
+  steps_to_reproduce: string | null;
+  screenshot_urls: string[];
+  created_at: string;
+}
+
+export interface BugHuntFeedback {
+  id: string;
+  cohort_id: string;
+  family_id: string | null;
+  submitted_by: string;
+  rating: number | null;
+  category: string;
+  content: string;
+  feature_area: string | null;
+  created_at: string;
+}
+
+export interface BugHuntDashboard {
+  cohort: BugHuntCohort;
+  families: BugHuntFamily[];
+  checklist: BugHuntChecklistItem[];
+  bug_reports: BugHuntBugReport[];
+  feedback: BugHuntFeedback[];
+  notes: BugHuntNote[];
+  stats: {
+    families_total: number;
+    families_completed: number;
+    checklist_total: number;
+    checklist_completed: number;
+    bugs_total: number;
+    bugs_by_severity: Record<string, number>;
+    feedback_total: number;
+    avg_rating: number | null;
+  };
+}
+
 export interface LeadList {
   id: string;
   name: string;
@@ -599,6 +705,64 @@ export const adminAPI = {
       method: 'PATCH',
       ...(body ? { body: JSON.stringify(body) } : {}),
     }),
+
+  // ── Bug Hunt Cohorts ──────────────────────────────────────────────
+  listBugHunts: (status?: string, limit = 50) => {
+    const sp = new URLSearchParams();
+    if (status) sp.set('status', status);
+    sp.set('limit', String(limit));
+    return adminFetch<BugHuntCohort[]>(`/admin/bug-hunts?${sp}`);
+  },
+
+  createBugHunt: (data: {
+    name: string;
+    description?: string;
+    target_feature: string;
+    family_count: number;
+    test_instructions?: string;
+  }) => adminFetch<BugHuntCohort>('/admin/bug-hunts', { method: 'POST', body: JSON.stringify(data) }),
+
+  getBugHunt: (id: string) => adminFetch<BugHuntDashboard>(`/admin/bug-hunts/${id}`),
+
+  generateBugHuntData: (id: string) =>
+    adminFetch<{ status: string; families_created: number }>(`/admin/bug-hunts/${id}/generate`, { method: 'POST' }),
+
+  updateBugHunt: (id: string, data: Partial<{ name: string; description: string; status: string; test_instructions: string }>) =>
+    adminFetch<BugHuntCohort>(`/admin/bug-hunts/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+
+  addBugHuntChecklistItem: (id: string, data: { title: string; description?: string }) =>
+    adminFetch<BugHuntChecklistItem>(`/admin/bug-hunts/${id}/checklist`, { method: 'POST', body: JSON.stringify(data) }),
+
+  toggleBugHuntChecklistItem: (id: string, itemId: string) =>
+    adminFetch<BugHuntChecklistItem>(`/admin/bug-hunts/${id}/checklist/${itemId}`, { method: 'PATCH' }),
+
+  deleteBugHuntChecklistItem: (id: string, itemId: string) =>
+    adminFetch<void>(`/admin/bug-hunts/${id}/checklist/${itemId}`, { method: 'DELETE' }),
+
+  addBugHuntNote: (id: string, data: { content: string; note_type?: string; family_id?: string }) =>
+    adminFetch<BugHuntNote>(`/admin/bug-hunts/${id}/notes`, { method: 'POST', body: JSON.stringify(data) }),
+
+  addBugHuntBug: (id: string, data: {
+    title: string; description: string; severity: string;
+    family_id?: string; steps_to_reproduce?: string;
+  }) => adminFetch<BugHuntBugReport>(`/admin/bug-hunts/${id}/bugs`, { method: 'POST', body: JSON.stringify(data) }),
+
+  updateBugHuntBug: (id: string, bugId: string, data: { status: string }) =>
+    adminFetch<BugHuntBugReport>(`/admin/bug-hunts/${id}/bugs/${bugId}`, { method: 'PATCH', body: JSON.stringify(data) }),
+
+  addBugHuntFeedback: (id: string, data: {
+    content: string; category: string; rating?: number;
+    family_id?: string; feature_area?: string;
+  }) => adminFetch<BugHuntFeedback>(`/admin/bug-hunts/${id}/feedback`, { method: 'POST', body: JSON.stringify(data) }),
+
+  completeBugHunt: (id: string) =>
+    adminFetch<BugHuntCohort>(`/admin/bug-hunts/${id}/complete`, { method: 'POST' }),
+
+  deleteBugHunt: (id: string) =>
+    adminFetch<{ deleted: boolean }>(`/admin/bug-hunts/${id}`, { method: 'DELETE' }),
+
+  updateBugHuntFamilyStatus: (id: string, familyId: string, data: { test_status: string; tester_notes?: string }) =>
+    adminFetch<BugHuntFamily>(`/admin/bug-hunts/${id}/families/${familyId}`, { method: 'PATCH', body: JSON.stringify(data) }),
 
   // Reddit
   getRedditStatus: () => adminFetch<any>('/admin/reddit/status'),

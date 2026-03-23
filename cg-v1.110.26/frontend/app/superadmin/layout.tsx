@@ -17,6 +17,7 @@ import {
   PenTool,
   Film,
   Bug,
+  FlaskConical,
   UserPlus,
   Send,
   Mail,
@@ -40,6 +41,7 @@ const navSections = [
     items: [
       { href: '/superadmin/system-health', label: 'System Health', icon: Server },
       { href: '/superadmin/bug-triage', label: 'Bug Triage', icon: Bug },
+      { href: '/superadmin/bug-hunts', label: 'Bug Hunts', icon: FlaskConical },
       { href: '/superadmin/aria', label: 'ARIA Insights', icon: Brain },
       { href: '/superadmin/chatbot', label: 'Chatbot (Aria)', icon: MessageCircle },
     ],

@@ -271,6 +271,14 @@ from app.models.kidspace_media import (
     KidSpaceMovie,
     KidSpaceBook,
 )
+from app.models.bug_hunt import (
+    BugHuntCohort,
+    BugHuntFamily,
+    BugHuntChecklistItem,
+    BugHuntNote,
+    BugHuntBugReport,
+    BugHuntFeedback,
+)
 
 __all__ = [
     "Base",
@@ -537,4 +545,11 @@ __all__ = [
     "ChatbotVisitor",
     "ChatbotSession",
     "ChatbotMessage",
+    # Bug Hunt Cohorts (QA Testing)
+    "BugHuntCohort",
+    "BugHuntFamily",
+    "BugHuntChecklistItem",
+    "BugHuntNote",
+    "BugHuntBugReport",
+    "BugHuntFeedback",
 ]

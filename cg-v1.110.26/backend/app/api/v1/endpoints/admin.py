@@ -3833,3 +3833,398 @@ async def get_system_status(
         "degraded": statuses.count("degraded"),
         "down": statuses.count("down"),
     }
+
+
+# =============================================================================
+# MODULE 15: Bug Hunt Cohorts (Organized QA Testing)
+# =============================================================================
+
+@router.post(
+    "/bug-hunts",
+    summary="Create a new bug hunt cohort",
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_bug_hunt(
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Create a new bug hunt cohort for organized QA testing."""
+    from app.services.bug_hunt_service import create_cohort
+
+    body = await request.json()
+    cohort = await create_cohort(
+        db,
+        admin_user,
+        name=body["name"],
+        description=body.get("description"),
+        target_feature=body.get("target_feature", "general"),
+        family_count=body.get("family_count", 3),
+        test_instructions=body.get("test_instructions"),
+    )
+    await _log_admin_action(db, admin_user, "bug_hunt_create", "bug_hunt", target_id=cohort.id, details=cohort.name)
+    await db.commit()
+    return {
+        "id": cohort.id, "name": cohort.name, "description": cohort.description,
+        "target_feature": cohort.target_feature, "status": cohort.status,
+        "family_count": cohort.family_count, "test_instructions": cohort.test_instructions,
+        "created_by": cohort.created_by, "started_at": None, "completed_at": None,
+        "seed_config": None, "summary_json": None,
+        "created_at": cohort.created_at.isoformat(), "updated_at": cohort.updated_at.isoformat(),
+    }
+
+
+@router.get(
+    "/bug-hunts",
+    summary="List bug hunt cohorts",
+)
+async def list_bug_hunts(
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+    status_filter: Optional[str] = Query(None, alias="status"),
+    limit: int = Query(50),
+    offset: int = Query(0),
+) -> list:
+    """List all bug hunt cohorts with summary counts."""
+    from app.services.bug_hunt_service import list_cohorts
+    return await list_cohorts(db, status_filter=status_filter, limit=limit, offset=offset)
+
+
+@router.get(
+    "/bug-hunts/{cohort_id}",
+    summary="Get bug hunt cohort dashboard",
+)
+async def get_bug_hunt(
+    cohort_id: str,
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Get full dashboard data for a bug hunt cohort."""
+    from app.services.bug_hunt_service import get_cohort_dashboard
+
+    try:
+        return await get_cohort_dashboard(db, cohort_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+
+
+@router.post(
+    "/bug-hunts/{cohort_id}/generate",
+    summary="Generate seed data for bug hunt",
+)
+async def generate_bug_hunt_data(
+    cohort_id: str,
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Generate seed test families with accounts for the bug hunt."""
+    from app.services.bug_hunt_service import generate_seed_families
+
+    try:
+        families = await generate_seed_families(db, cohort_id)
+        await _log_admin_action(db, admin_user, "bug_hunt_generate", "bug_hunt", target_id=cohort_id, details=f"{len(families)} families")
+        await db.commit()
+        return {"status": "active", "families_created": len(families)}
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    except Exception as exc:
+        logger.error("Bug hunt data generation failed: %s", exc)
+        capture_error(exc)
+        raise HTTPException(status_code=502, detail=f"Generation failed: {type(exc).__name__}: {exc}")
+
+
+@router.patch(
+    "/bug-hunts/{cohort_id}",
+    summary="Update bug hunt cohort",
+)
+async def update_bug_hunt(
+    cohort_id: str,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Update a bug hunt cohort's details."""
+    from app.models.bug_hunt import BugHuntCohort
+
+    cohort = await db.get(BugHuntCohort, cohort_id)
+    if not cohort:
+        raise HTTPException(status_code=404, detail="Cohort not found")
+
+    body = await request.json()
+    for field in ("name", "description", "test_instructions", "status"):
+        if field in body:
+            setattr(cohort, field, body[field])
+
+    await _log_admin_action(db, admin_user, "bug_hunt_update", "bug_hunt", target_id=cohort_id)
+    await db.commit()
+    return {"id": cohort.id, "name": cohort.name, "status": cohort.status, "updated": True}
+
+
+@router.post(
+    "/bug-hunts/{cohort_id}/checklist",
+    summary="Add checklist item",
+    status_code=status.HTTP_201_CREATED,
+)
+async def add_bug_hunt_checklist_item(
+    cohort_id: str,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Add a new checklist item to the bug hunt."""
+    from app.services.bug_hunt_service import add_checklist_item
+
+    body = await request.json()
+    item = await add_checklist_item(db, cohort_id, title=body["title"], description=body.get("description"))
+    await db.commit()
+    return {
+        "id": item.id, "cohort_id": item.cohort_id, "title": item.title,
+        "description": item.description, "display_order": item.display_order,
+        "is_completed": item.is_completed, "completed_by": None, "completed_at": None,
+        "created_at": item.created_at.isoformat(),
+    }
+
+
+@router.patch(
+    "/bug-hunts/{cohort_id}/checklist/{item_id}",
+    summary="Toggle checklist item",
+)
+async def toggle_bug_hunt_checklist_item(
+    cohort_id: str,
+    item_id: str,
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Toggle a checklist item's completion status."""
+    from app.services.bug_hunt_service import toggle_checklist_item
+
+    try:
+        item = await toggle_checklist_item(db, item_id, admin_user)
+        await db.commit()
+        return {
+            "id": item.id, "cohort_id": item.cohort_id, "title": item.title,
+            "description": item.description, "display_order": item.display_order,
+            "is_completed": item.is_completed, "completed_by": item.completed_by,
+            "completed_at": item.completed_at.isoformat() if item.completed_at else None,
+            "created_at": item.created_at.isoformat(),
+        }
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+
+
+@router.delete(
+    "/bug-hunts/{cohort_id}/checklist/{item_id}",
+    summary="Delete checklist item",
+)
+async def delete_bug_hunt_checklist_item(
+    cohort_id: str,
+    item_id: str,
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Delete a checklist item."""
+    from app.models.bug_hunt import BugHuntChecklistItem
+
+    item = await db.get(BugHuntChecklistItem, item_id)
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    await db.delete(item)
+    await db.commit()
+    return {"deleted": True}
+
+
+@router.post(
+    "/bug-hunts/{cohort_id}/notes",
+    summary="Add note to bug hunt",
+    status_code=status.HTTP_201_CREATED,
+)
+async def add_bug_hunt_note(
+    cohort_id: str,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Add a tester note to the bug hunt."""
+    from app.services.bug_hunt_service import add_note
+
+    body = await request.json()
+    note = await add_note(
+        db, cohort_id, author_id=str(admin_user.id),
+        content=body["content"], note_type=body.get("note_type", "observation"),
+        family_id=body.get("family_id"),
+    )
+    await db.commit()
+    return {
+        "id": note.id, "cohort_id": note.cohort_id, "family_id": note.family_id,
+        "author_id": note.author_id, "content": note.content, "note_type": note.note_type,
+        "created_at": note.created_at.isoformat(),
+    }
+
+
+@router.post(
+    "/bug-hunts/{cohort_id}/bugs",
+    summary="Report a bug during bug hunt",
+    status_code=status.HTTP_201_CREATED,
+)
+async def add_bug_hunt_bug_report(
+    cohort_id: str,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Report a bug found during the bug hunt."""
+    from app.services.bug_hunt_service import add_bug_report
+
+    body = await request.json()
+    report = await add_bug_report(
+        db, cohort_id, reported_by=str(admin_user.id),
+        title=body["title"], description=body["description"],
+        severity=body.get("severity", "medium"),
+        family_id=body.get("family_id"),
+        steps_to_reproduce=body.get("steps_to_reproduce"),
+    )
+    await _log_admin_action(db, admin_user, "bug_hunt_bug_report", "bug_hunt", target_id=cohort_id, details=report.title)
+    await db.commit()
+    return {
+        "id": report.id, "cohort_id": report.cohort_id, "family_id": report.family_id,
+        "reported_by": report.reported_by, "title": report.title, "description": report.description,
+        "severity": report.severity, "status": report.status,
+        "sentry_issue_id": report.sentry_issue_id,
+        "steps_to_reproduce": report.steps_to_reproduce,
+        "screenshot_urls": report.screenshot_urls or [],
+        "created_at": report.created_at.isoformat(),
+    }
+
+
+@router.patch(
+    "/bug-hunts/{cohort_id}/bugs/{bug_id}",
+    summary="Update bug report status",
+)
+async def update_bug_hunt_bug(
+    cohort_id: str,
+    bug_id: str,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Update a bug report's status."""
+    from app.services.bug_hunt_service import update_bug_status
+
+    body = await request.json()
+    try:
+        bug = await update_bug_status(db, bug_id, status=body["status"])
+        await db.commit()
+        return {
+            "id": bug.id, "cohort_id": bug.cohort_id, "title": bug.title,
+            "severity": bug.severity, "status": bug.status,
+            "created_at": bug.created_at.isoformat(),
+        }
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+
+
+@router.post(
+    "/bug-hunts/{cohort_id}/feedback",
+    summary="Add feedback to bug hunt",
+    status_code=status.HTTP_201_CREATED,
+)
+async def add_bug_hunt_feedback(
+    cohort_id: str,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Add tester feedback to the bug hunt."""
+    from app.services.bug_hunt_service import add_feedback
+
+    body = await request.json()
+    fb = await add_feedback(
+        db, cohort_id, submitted_by=str(admin_user.id),
+        content=body["content"], category=body.get("category", "other"),
+        rating=body.get("rating"), family_id=body.get("family_id"),
+        feature_area=body.get("feature_area"),
+    )
+    await db.commit()
+    return {
+        "id": fb.id, "cohort_id": fb.cohort_id, "family_id": fb.family_id,
+        "submitted_by": fb.submitted_by, "rating": fb.rating,
+        "category": fb.category, "content": fb.content,
+        "feature_area": fb.feature_area, "created_at": fb.created_at.isoformat(),
+    }
+
+
+@router.post(
+    "/bug-hunts/{cohort_id}/complete",
+    summary="Complete bug hunt cohort",
+)
+async def complete_bug_hunt(
+    cohort_id: str,
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Complete a bug hunt and generate summary."""
+    from app.services.bug_hunt_service import complete_cohort as _complete
+
+    try:
+        cohort = await _complete(db, cohort_id)
+        await _log_admin_action(db, admin_user, "bug_hunt_complete", "bug_hunt", target_id=cohort_id)
+        await db.commit()
+        return {
+            "id": cohort.id, "name": cohort.name, "status": cohort.status,
+            "completed_at": cohort.completed_at.isoformat() if cohort.completed_at else None,
+            "summary_json": cohort.summary_json,
+        }
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+
+@router.patch(
+    "/bug-hunts/{cohort_id}/families/{family_id}",
+    summary="Update family test status",
+)
+async def update_bug_hunt_family(
+    cohort_id: str,
+    family_id: str,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Update a test family's status and notes."""
+    from app.services.bug_hunt_service import update_family_status
+
+    body = await request.json()
+    try:
+        family = await update_family_status(
+            db, family_id,
+            test_status=body["test_status"],
+            tester_notes=body.get("tester_notes"),
+        )
+        await db.commit()
+        return {
+            "id": family.id, "cohort_id": family.cohort_id,
+            "test_status": family.test_status, "tester_notes": family.tester_notes,
+            "parent_a_name": family.parent_a_name, "parent_b_name": family.parent_b_name,
+        }
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+
+
+@router.delete(
+    "/bug-hunts/{cohort_id}",
+    summary="Delete bug hunt cohort",
+)
+async def delete_bug_hunt(
+    cohort_id: str,
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Delete a bug hunt cohort and clean up generated data."""
+    from app.services.bug_hunt_service import delete_cohort
+
+    try:
+        await delete_cohort(db, cohort_id)
+        await _log_admin_action(db, admin_user, "bug_hunt_delete", "bug_hunt", target_id=cohort_id)
+        await db.commit()
+        return {"deleted": True}
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
