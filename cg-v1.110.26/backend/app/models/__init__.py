@@ -278,6 +278,7 @@ from app.models.bug_hunt import (
     BugHuntNote,
     BugHuntBugReport,
     BugHuntFeedback,
+    BugHuntTester,
 )
 
 __all__ = [
@@ -552,4 +553,5 @@ __all__ = [
     "BugHuntNote",
     "BugHuntBugReport",
     "BugHuntFeedback",
+    "BugHuntTester",
 ]

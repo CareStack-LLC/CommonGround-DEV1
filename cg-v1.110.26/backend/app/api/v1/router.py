@@ -213,6 +213,10 @@ api_router.include_router(admin_inbox.router, prefix="/admin/inbox", tags=["Admi
 # Chatbot - Public Aria Customer Success
 api_router.include_router(chatbot.router, prefix="/chatbot", tags=["Chatbot"])
 
+# Bug Hunt Tester - Public testing portal (no auth)
+from app.api.v1.endpoints import bug_hunt_tester
+api_router.include_router(bug_hunt_tester.router, prefix="/bug-hunt", tags=["Bug Hunt Tester"])
+
 # Admin Reddit Integration
 from app.api.v1.endpoints import admin_reddit
 api_router.include_router(admin_reddit.router, prefix="/admin/reddit", tags=["Admin Reddit"])

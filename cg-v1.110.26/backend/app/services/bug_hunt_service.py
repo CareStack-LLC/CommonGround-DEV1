@@ -1,7 +1,7 @@
 """Bug Hunt Cohort service - manages organized QA testing sessions."""
 
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional
 from uuid import uuid4
 
@@ -16,6 +16,7 @@ from app.models.bug_hunt import (
     BugHuntNote,
     BugHuntBugReport,
     BugHuntFeedback,
+    BugHuntTester,
 )
 from app.models.user import User, UserProfile
 from app.models.family_file import FamilyFile, generate_family_file_number
@@ -391,6 +392,13 @@ async def get_cohort_dashboard(db: AsyncSession, cohort_id: str) -> dict:
     )
     notes = notes_q.scalars().all()
 
+    testers_q = await db.execute(
+        select(BugHuntTester).where(BugHuntTester.cohort_id == cohort_id)
+    )
+    testers = testers_q.scalars().all()
+    tester_map = {t.id: t for t in testers}
+    tester_by_family = {t.family_id: t for t in testers}
+
     # Compute stats
     completed_families = sum(1 for f in families if f.test_status == "completed")
     completed_checklist = sum(1 for c in checklist if c.is_completed)
@@ -412,7 +420,19 @@ async def get_cohort_dashboard(db: AsyncSession, cohort_id: str) -> dict:
             "created_at": c.created_at.isoformat(), "updated_at": c.updated_at.isoformat(),
         }
 
+    def _serialize_tester(t: BugHuntTester) -> dict:
+        return {
+            "id": t.id, "cohort_id": t.cohort_id, "family_id": t.family_id,
+            "tester_name": t.tester_name, "tester_email": t.tester_email,
+            "status": t.status,
+            "first_accessed_at": t.first_accessed_at.isoformat() if t.first_accessed_at else None,
+            "last_accessed_at": t.last_accessed_at.isoformat() if t.last_accessed_at else None,
+            "email_sent_at": t.email_sent_at.isoformat() if t.email_sent_at else None,
+            "created_at": t.created_at.isoformat(),
+        }
+
     def _serialize_family(f: BugHuntFamily) -> dict:
+        t = tester_by_family.get(f.id)
         return {
             "id": f.id, "cohort_id": f.cohort_id, "family_file_id": f.family_file_id,
             "parent_a_email": f.parent_a_email, "parent_a_password": f.parent_a_password,
@@ -420,6 +440,7 @@ async def get_cohort_dashboard(db: AsyncSession, cohort_id: str) -> dict:
             "parent_a_name": f.parent_a_name, "parent_b_name": f.parent_b_name,
             "children_names": f.children_names or [], "test_status": f.test_status,
             "tester_notes": f.tester_notes, "created_at": f.created_at.isoformat(),
+            "tester": _serialize_tester(t) if t else None,
         }
 
     def _serialize_checklist(c: BugHuntChecklistItem) -> dict:
@@ -432,28 +453,39 @@ async def get_cohort_dashboard(db: AsyncSession, cohort_id: str) -> dict:
         }
 
     def _serialize_bug(b: BugHuntBugReport) -> dict:
+        t = tester_map.get(b.tester_id) if b.tester_id else None
         return {
             "id": b.id, "cohort_id": b.cohort_id, "family_id": b.family_id,
-            "reported_by": b.reported_by, "title": b.title, "description": b.description,
+            "reported_by": b.reported_by, "tester_id": b.tester_id,
+            "tester_name": t.tester_name if t else None,
+            "title": b.title, "description": b.description,
             "severity": b.severity, "status": b.status,
             "sentry_issue_id": b.sentry_issue_id, "steps_to_reproduce": b.steps_to_reproduce,
             "screenshot_urls": b.screenshot_urls or [], "created_at": b.created_at.isoformat(),
         }
 
     def _serialize_feedback(f: BugHuntFeedback) -> dict:
+        t = tester_map.get(f.tester_id) if f.tester_id else None
         return {
             "id": f.id, "cohort_id": f.cohort_id, "family_id": f.family_id,
-            "submitted_by": f.submitted_by, "rating": f.rating, "category": f.category,
+            "submitted_by": f.submitted_by, "tester_id": f.tester_id,
+            "tester_name": t.tester_name if t else None,
+            "rating": f.rating, "category": f.category,
             "content": f.content, "feature_area": f.feature_area,
             "created_at": f.created_at.isoformat(),
         }
 
     def _serialize_note(n: BugHuntNote) -> dict:
+        t = tester_map.get(n.tester_id) if n.tester_id else None
         return {
             "id": n.id, "cohort_id": n.cohort_id, "family_id": n.family_id,
-            "author_id": n.author_id, "content": n.content, "note_type": n.note_type,
+            "author_id": n.author_id, "tester_id": n.tester_id,
+            "tester_name": t.tester_name if t else None,
+            "content": n.content, "note_type": n.note_type,
             "created_at": n.created_at.isoformat(),
         }
+
+    testers_active = sum(1 for t in testers if t.status == "active")
 
     return {
         "cohort": _serialize_cohort(cohort),
@@ -462,6 +494,7 @@ async def get_cohort_dashboard(db: AsyncSession, cohort_id: str) -> dict:
         "bug_reports": [_serialize_bug(b) for b in bug_reports],
         "feedback": [_serialize_feedback(f) for f in feedback_items],
         "notes": [_serialize_note(n) for n in notes],
+        "testers": [_serialize_tester(t) for t in testers],
         "stats": {
             "families_total": len(families),
             "families_completed": completed_families,
@@ -471,6 +504,8 @@ async def get_cohort_dashboard(db: AsyncSession, cohort_id: str) -> dict:
             "bugs_by_severity": bugs_by_severity,
             "feedback_total": len(feedback_items),
             "avg_rating": round(avg_rating, 1) if avg_rating else None,
+            "testers_total": len(testers),
+            "testers_active": testers_active,
         },
     }
 
@@ -708,6 +743,259 @@ async def update_family_status(
         family.tester_notes = tester_notes
     await db.flush()
     return family
+
+
+# ── Tester Assignment Functions ──────────────────────────────────────
+
+
+async def assign_tester(
+    db: AsyncSession,
+    cohort_id: str,
+    family_id: str,
+    tester_name: str,
+    tester_email: str,
+    expiry_days: int = 7,
+) -> BugHuntTester:
+    """Assign a real-world tester to a bug hunt family."""
+    import secrets
+
+    # Check family exists and belongs to cohort
+    family = await db.get(BugHuntFamily, family_id)
+    if not family or family.cohort_id != cohort_id:
+        raise ValueError("Family not found in this cohort")
+
+    # Check if family already has a tester
+    existing_q = await db.execute(
+        select(BugHuntTester).where(
+            BugHuntTester.family_id == family_id,
+            BugHuntTester.status != "revoked",
+        )
+    )
+    if existing_q.scalar_one_or_none():
+        raise ValueError("Family already has an active tester assigned")
+
+    tester = BugHuntTester(
+        id=str(uuid4()),
+        cohort_id=cohort_id,
+        family_id=family_id,
+        tester_name=tester_name,
+        tester_email=tester_email,
+        access_token=secrets.token_urlsafe(48),
+        token_expires_at=datetime.utcnow() + timedelta(days=expiry_days),
+        status="invited",
+    )
+    db.add(tester)
+    await db.flush()
+    return tester
+
+
+async def get_tester_by_token(db: AsyncSession, token: str) -> Optional[BugHuntTester]:
+    """Look up a tester by access token, validating expiry and status."""
+    result = await db.execute(
+        select(BugHuntTester).where(BugHuntTester.access_token == token)
+    )
+    tester = result.scalar_one_or_none()
+    if not tester:
+        return None
+    if tester.status == "revoked":
+        return None
+    if tester.token_expires_at < datetime.utcnow():
+        return None
+    return tester
+
+
+async def get_tester_dashboard(db: AsyncSession, tester: BugHuntTester) -> dict:
+    """Get dashboard data for a public tester page."""
+    cohort = await db.get(BugHuntCohort, tester.cohort_id)
+    family = await db.get(BugHuntFamily, tester.family_id)
+
+    # Get checklist for the cohort
+    checklist_q = await db.execute(
+        select(BugHuntChecklistItem).where(
+            BugHuntChecklistItem.cohort_id == tester.cohort_id
+        ).order_by(BugHuntChecklistItem.display_order)
+    )
+    checklist = checklist_q.scalars().all()
+
+    # Get bugs for this family
+    bugs_q = await db.execute(
+        select(BugHuntBugReport).where(
+            BugHuntBugReport.cohort_id == tester.cohort_id,
+            BugHuntBugReport.family_id == tester.family_id,
+        ).order_by(desc(BugHuntBugReport.created_at))
+    )
+    bugs = bugs_q.scalars().all()
+
+    # Get feedback for this family
+    feedback_q = await db.execute(
+        select(BugHuntFeedback).where(
+            BugHuntFeedback.cohort_id == tester.cohort_id,
+            BugHuntFeedback.family_id == tester.family_id,
+        ).order_by(desc(BugHuntFeedback.created_at))
+    )
+    feedback_items = feedback_q.scalars().all()
+
+    # Get notes for this family
+    notes_q = await db.execute(
+        select(BugHuntNote).where(
+            BugHuntNote.cohort_id == tester.cohort_id,
+            BugHuntNote.family_id == tester.family_id,
+        ).order_by(desc(BugHuntNote.created_at))
+    )
+    notes = notes_q.scalars().all()
+
+    return {
+        "tester": {
+            "id": tester.id, "tester_name": tester.tester_name,
+            "tester_email": tester.tester_email, "status": tester.status,
+        },
+        "cohort": {
+            "id": cohort.id, "name": cohort.name, "description": cohort.description,
+            "target_feature": cohort.target_feature, "status": cohort.status,
+            "test_instructions": cohort.test_instructions,
+        },
+        "family": {
+            "id": family.id, "parent_a_email": family.parent_a_email,
+            "parent_a_password": family.parent_a_password,
+            "parent_b_email": family.parent_b_email,
+            "parent_b_password": family.parent_b_password,
+            "parent_a_name": family.parent_a_name,
+            "parent_b_name": family.parent_b_name,
+            "children_names": family.children_names or [],
+        },
+        "checklist": [{
+            "id": c.id, "title": c.title, "description": c.description,
+            "display_order": c.display_order, "is_completed": c.is_completed,
+            "completed_at": c.completed_at.isoformat() if c.completed_at else None,
+        } for c in checklist],
+        "bug_reports": [{
+            "id": b.id, "title": b.title, "description": b.description,
+            "severity": b.severity, "status": b.status,
+            "steps_to_reproduce": b.steps_to_reproduce,
+            "created_at": b.created_at.isoformat(),
+        } for b in bugs],
+        "feedback": [{
+            "id": f.id, "rating": f.rating, "category": f.category,
+            "content": f.content, "feature_area": f.feature_area,
+            "created_at": f.created_at.isoformat(),
+        } for f in feedback_items],
+        "notes": [{
+            "id": n.id, "content": n.content, "note_type": n.note_type,
+            "created_at": n.created_at.isoformat(),
+        } for n in notes],
+    }
+
+
+async def tester_toggle_checklist(
+    db: AsyncSession, tester: BugHuntTester, item_id: str,
+) -> BugHuntChecklistItem:
+    """Toggle a checklist item as a tester."""
+    item = await db.get(BugHuntChecklistItem, item_id)
+    if not item or item.cohort_id != tester.cohort_id:
+        raise ValueError("Checklist item not found")
+
+    item.is_completed = not item.is_completed
+    if item.is_completed:
+        item.tester_id = tester.id
+        item.completed_at = datetime.utcnow()
+    else:
+        item.tester_id = None
+        item.completed_by = None
+        item.completed_at = None
+
+    await db.flush()
+    return item
+
+
+async def tester_add_bug_report(
+    db: AsyncSession,
+    tester: BugHuntTester,
+    title: str,
+    description: str,
+    severity: str = "medium",
+    steps_to_reproduce: Optional[str] = None,
+) -> BugHuntBugReport:
+    """Submit a bug report as a tester."""
+    report = BugHuntBugReport(
+        id=str(uuid4()),
+        cohort_id=tester.cohort_id,
+        family_id=tester.family_id,
+        tester_id=tester.id,
+        title=title,
+        description=description,
+        severity=severity,
+        steps_to_reproduce=steps_to_reproduce,
+    )
+    db.add(report)
+    await db.flush()
+    return report
+
+
+async def tester_add_feedback(
+    db: AsyncSession,
+    tester: BugHuntTester,
+    content: str,
+    category: str = "other",
+    rating: Optional[int] = None,
+    feature_area: Optional[str] = None,
+) -> BugHuntFeedback:
+    """Submit feedback as a tester."""
+    fb = BugHuntFeedback(
+        id=str(uuid4()),
+        cohort_id=tester.cohort_id,
+        family_id=tester.family_id,
+        tester_id=tester.id,
+        rating=rating,
+        category=category,
+        content=content,
+        feature_area=feature_area,
+    )
+    db.add(fb)
+    await db.flush()
+    return fb
+
+
+async def tester_add_note(
+    db: AsyncSession,
+    tester: BugHuntTester,
+    content: str,
+    note_type: str = "observation",
+) -> BugHuntNote:
+    """Add a note as a tester."""
+    note = BugHuntNote(
+        id=str(uuid4()),
+        cohort_id=tester.cohort_id,
+        family_id=tester.family_id,
+        tester_id=tester.id,
+        content=content,
+        note_type=note_type,
+    )
+    db.add(note)
+    await db.flush()
+    return note
+
+
+async def revoke_tester(db: AsyncSession, tester_id: str) -> BugHuntTester:
+    """Revoke a tester's access."""
+    tester = await db.get(BugHuntTester, tester_id)
+    if not tester:
+        raise ValueError(f"Tester {tester_id} not found")
+    tester.status = "revoked"
+    await db.flush()
+    return tester
+
+
+async def resend_tester_invite(db: AsyncSession, tester_id: str, expiry_days: int = 7) -> BugHuntTester:
+    """Regenerate token and mark for resend."""
+    import secrets
+    tester = await db.get(BugHuntTester, tester_id)
+    if not tester:
+        raise ValueError(f"Tester {tester_id} not found")
+    tester.access_token = secrets.token_urlsafe(48)
+    tester.token_expires_at = datetime.utcnow() + timedelta(days=expiry_days)
+    tester.status = "invited"
+    await db.flush()
+    return tester
 
 
 async def delete_cohort(db: AsyncSession, cohort_id: str) -> bool:

@@ -1391,5 +1391,66 @@ class EmailService:
             return None
 
 
+    # ==================== Bug Hunt Tester Emails ====================
+
+    async def send_bug_hunt_tester_assignment(
+        self,
+        to_email: str,
+        tester_name: str,
+        cohort_name: str,
+        cohort_description: Optional[str],
+        test_instructions: Optional[str],
+        family_name: str,
+        parent_a_email: str,
+        parent_a_password: str,
+        parent_a_name: str,
+        parent_b_email: str,
+        parent_b_password: str,
+        parent_b_name: str,
+        children_names: List[str],
+        magic_link: str,
+        expiry_days: int = 7,
+    ) -> bool:
+        """
+        Send bug hunt tester assignment email with credentials and magic link.
+
+        Args:
+            to_email: Tester's email address
+            tester_name: Tester's name
+            cohort_name: Bug hunt cohort name
+            cohort_description: Bug hunt description
+            test_instructions: Testing instructions
+            family_name: Test family display name
+            parent_a_email/password/name: Parent A credentials
+            parent_b_email/password/name: Parent B credentials
+            children_names: List of child names
+            magic_link: URL to the public tester page
+            expiry_days: Token expiry in days
+
+        Returns:
+            Success status
+        """
+        subject = f"Bug Hunt Assignment: {cohort_name}"
+
+        html_body = self._render_template('bug_hunt/tester_assignment.html', {
+            'tester_name': tester_name,
+            'cohort_name': cohort_name,
+            'cohort_description': cohort_description,
+            'test_instructions': test_instructions,
+            'family_name': family_name,
+            'parent_a_email': parent_a_email,
+            'parent_a_password': parent_a_password,
+            'parent_a_name': parent_a_name,
+            'parent_b_email': parent_b_email,
+            'parent_b_password': parent_b_password,
+            'parent_b_name': parent_b_name,
+            'children_names': children_names,
+            'magic_link': magic_link,
+            'expiry_days': expiry_days,
+        })
+
+        return await self._send_email(to_email, subject, html_body)
+
+
 # Create a singleton instance
 email_service = EmailService()

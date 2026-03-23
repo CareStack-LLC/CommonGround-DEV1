@@ -15,7 +15,9 @@ import {
   type BugHuntBugReport,
   type BugHuntFeedback,
   type BugHuntNote,
+  type BugHuntTester,
 } from '@/lib/admin-api';
+import { UserPlus, Mail, XCircle } from 'lucide-react';
 
 const SEVERITY_COLORS: Record<string, string> = {
   critical: 'bg-red-500/15 text-red-400 border border-red-500/20',
@@ -98,6 +100,8 @@ export default function BugHuntDetailPage() {
   const [showNoteForm, setShowNoteForm] = useState(false);
   const [noteForm, setNoteForm] = useState({ content: '', note_type: 'observation', family_id: '' });
   const [expandedBugs, setExpandedBugs] = useState<Set<string>>(new Set());
+  const [assigningFamily, setAssigningFamily] = useState<string | null>(null);
+  const [assignForm, setAssignForm] = useState({ tester_name: '', tester_email: '' });
 
   const fetchData = useCallback(async () => {
     try {
@@ -197,6 +201,28 @@ export default function BugHuntDetailPage() {
 
   const handleFamilyStatus = async (familyId: string, newStatus: string) => {
     await adminAPI.updateBugHuntFamilyStatus(cohortId, familyId, { test_status: newStatus });
+    await fetchData();
+  };
+
+  const handleAssignTester = async (familyId: string) => {
+    if (!assignForm.tester_name.trim() || !assignForm.tester_email.trim()) return;
+    try {
+      await adminAPI.assignBugHuntTester(cohortId, familyId, assignForm);
+      setAssigningFamily(null);
+      setAssignForm({ tester_name: '', tester_email: '' });
+      await fetchData();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to assign tester');
+    }
+  };
+
+  const handleRevokeTester = async (testerId: string) => {
+    await adminAPI.revokeBugHuntTester(cohortId, testerId);
+    await fetchData();
+  };
+
+  const handleResendTester = async (testerId: string) => {
+    await adminAPI.resendBugHuntTesterInvite(cohortId, testerId);
     await fetchData();
   };
 
@@ -371,7 +397,7 @@ export default function BugHuntDetailPage() {
                     <th className="text-left py-3 px-3 text-[#6B8A9A] font-medium text-xs uppercase">Family</th>
                     <th className="text-left py-3 px-3 text-[#6B8A9A] font-medium text-xs uppercase">Parent A</th>
                     <th className="text-left py-3 px-3 text-[#6B8A9A] font-medium text-xs uppercase">Parent B</th>
-                    <th className="text-left py-3 px-3 text-[#6B8A9A] font-medium text-xs uppercase">Children</th>
+                    <th className="text-left py-3 px-3 text-[#6B8A9A] font-medium text-xs uppercase">Tester</th>
                     <th className="text-left py-3 px-3 text-[#6B8A9A] font-medium text-xs uppercase">Status</th>
                   </tr>
                 </thead>
@@ -380,6 +406,7 @@ export default function BugHuntDetailPage() {
                     <tr key={f.id} className="border-b border-[#2D6A8F]/10 hover:bg-[#1E3A4A]/30">
                       <td className="py-3 px-3">
                         <div className="text-white font-medium">{f.parent_a_name.split(' ')[1]} & {f.parent_b_name.split(' ')[1]}</div>
+                        <div className="text-[10px] text-[#6B8A9A] mt-0.5">{(f.children_names || []).join(', ')}</div>
                       </td>
                       <td className="py-3 px-3">
                         <div className="flex items-center gap-1">
@@ -401,8 +428,42 @@ export default function BugHuntDetailPage() {
                           <CopyButton text={f.parent_b_password} />
                         </div>
                       </td>
-                      <td className="py-3 px-3 text-[#8AACBC] text-xs">
-                        {(f.children_names || []).join(', ') || '—'}
+                      <td className="py-3 px-3">
+                        {f.tester ? (
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-white text-xs font-medium">{f.tester.tester_name}</span>
+                              <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded-full ${
+                                f.tester.status === 'active' ? 'bg-[#3DAA8A]/15 text-[#3DAA8A]' :
+                                f.tester.status === 'invited' ? 'bg-yellow-500/15 text-yellow-400' :
+                                f.tester.status === 'revoked' ? 'bg-red-500/15 text-red-400' :
+                                'bg-purple-500/15 text-purple-400'
+                              }`}>{f.tester.status}</span>
+                            </div>
+                            <div className="text-[10px] text-[#6B8A9A] mt-0.5">{f.tester.tester_email}</div>
+                            <div className="flex gap-1 mt-1">
+                              <button onClick={() => handleResendTester(f.tester!.id)} className="text-[10px] text-blue-400 hover:underline flex items-center gap-0.5"><Mail className="w-3 h-3" />Resend</button>
+                              {f.tester.status !== 'revoked' && (
+                                <button onClick={() => handleRevokeTester(f.tester!.id)} className="text-[10px] text-red-400 hover:underline flex items-center gap-0.5 ml-2"><XCircle className="w-3 h-3" />Revoke</button>
+                              )}
+                            </div>
+                          </div>
+                        ) : assigningFamily === f.id ? (
+                          <div className="space-y-1">
+                            <input type="text" placeholder="Name" value={assignForm.tester_name} onChange={e => setAssignForm({...assignForm, tester_name: e.target.value})}
+                              className="w-full px-2 py-1 bg-[#162D3A] border border-[#2D6A8F]/30 rounded text-xs text-white placeholder-[#4A6E7F]" />
+                            <input type="email" placeholder="Email" value={assignForm.tester_email} onChange={e => setAssignForm({...assignForm, tester_email: e.target.value})}
+                              className="w-full px-2 py-1 bg-[#162D3A] border border-[#2D6A8F]/30 rounded text-xs text-white placeholder-[#4A6E7F]" />
+                            <div className="flex gap-1">
+                              <button onClick={() => handleAssignTester(f.id)} className="px-2 py-0.5 bg-[#3DAA8A] text-white rounded text-[10px]">Assign</button>
+                              <button onClick={() => { setAssigningFamily(null); setAssignForm({ tester_name: '', tester_email: '' }); }} className="px-2 py-0.5 text-[#6B8A9A] text-[10px]">Cancel</button>
+                            </div>
+                          </div>
+                        ) : (
+                          <button onClick={() => setAssigningFamily(f.id)} className="flex items-center gap-1 text-xs text-[#3DAA8A] hover:text-[#5BC4A0]">
+                            <UserPlus className="w-3.5 h-3.5" />Assign
+                          </button>
+                        )}
                       </td>
                       <td className="py-3 px-3">
                         <select
@@ -586,6 +647,7 @@ export default function BugHuntDetailPage() {
                     {expandedBugs.has(bug.id) ? <ChevronDown className="w-4 h-4 text-[#6B8A9A]" /> : <ChevronRight className="w-4 h-4 text-[#6B8A9A]" />}
                     <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${SEVERITY_COLORS[bug.severity]}`}>{bug.severity}</span>
                     <span className="text-sm text-white flex-1 truncate">{bug.title}</span>
+                    {bug.tester_name && <span className="text-[10px] text-[#3DAA8A] bg-[#3DAA8A]/10 px-1.5 py-0.5 rounded">by {bug.tester_name}</span>}
                     <select
                       value={bug.status}
                       onChange={e => { e.stopPropagation(); handleUpdateBugStatus(bug.id, e.target.value); }}

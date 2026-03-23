@@ -469,6 +469,20 @@ export interface BugHuntFamily {
   test_status: string;
   tester_notes: string | null;
   created_at: string;
+  tester?: BugHuntTester | null;
+}
+
+export interface BugHuntTester {
+  id: string;
+  cohort_id: string;
+  family_id: string;
+  tester_name: string;
+  tester_email: string;
+  status: string;
+  first_accessed_at: string | null;
+  last_accessed_at: string | null;
+  email_sent_at: string | null;
+  created_at: string;
 }
 
 export interface BugHuntChecklistItem {
@@ -487,7 +501,9 @@ export interface BugHuntNote {
   id: string;
   cohort_id: string;
   family_id: string | null;
-  author_id: string;
+  author_id: string | null;
+  tester_id: string | null;
+  tester_name: string | null;
   content: string;
   note_type: string;
   created_at: string;
@@ -497,7 +513,9 @@ export interface BugHuntBugReport {
   id: string;
   cohort_id: string;
   family_id: string | null;
-  reported_by: string;
+  reported_by: string | null;
+  tester_id: string | null;
+  tester_name: string | null;
   title: string;
   description: string;
   severity: string;
@@ -512,7 +530,9 @@ export interface BugHuntFeedback {
   id: string;
   cohort_id: string;
   family_id: string | null;
-  submitted_by: string;
+  submitted_by: string | null;
+  tester_id: string | null;
+  tester_name: string | null;
   rating: number | null;
   category: string;
   content: string;
@@ -527,6 +547,7 @@ export interface BugHuntDashboard {
   bug_reports: BugHuntBugReport[];
   feedback: BugHuntFeedback[];
   notes: BugHuntNote[];
+  testers: BugHuntTester[];
   stats: {
     families_total: number;
     families_completed: number;
@@ -536,6 +557,8 @@ export interface BugHuntDashboard {
     bugs_by_severity: Record<string, number>;
     feedback_total: number;
     avg_rating: number | null;
+    testers_total: number;
+    testers_active: number;
   };
 }
 
@@ -763,6 +786,15 @@ export const adminAPI = {
 
   updateBugHuntFamilyStatus: (id: string, familyId: string, data: { test_status: string; tester_notes?: string }) =>
     adminFetch<BugHuntFamily>(`/admin/bug-hunts/${id}/families/${familyId}`, { method: 'PATCH', body: JSON.stringify(data) }),
+
+  assignBugHuntTester: (cohortId: string, familyId: string, data: { tester_name: string; tester_email: string }) =>
+    adminFetch<BugHuntTester>(`/admin/bug-hunts/${cohortId}/families/${familyId}/assign-tester`, { method: 'POST', body: JSON.stringify(data) }),
+
+  revokeBugHuntTester: (cohortId: string, testerId: string) =>
+    adminFetch<{ id: string; status: string; revoked: boolean }>(`/admin/bug-hunts/${cohortId}/testers/${testerId}/revoke`, { method: 'POST' }),
+
+  resendBugHuntTesterInvite: (cohortId: string, testerId: string) =>
+    adminFetch<{ id: string; status: string; resent: boolean }>(`/admin/bug-hunts/${cohortId}/testers/${testerId}/resend`, { method: 'POST' }),
 
   // Reddit
   getRedditStatus: () => adminFetch<any>('/admin/reddit/status'),

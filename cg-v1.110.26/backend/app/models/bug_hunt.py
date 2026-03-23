@@ -32,6 +32,7 @@ class BugHuntCohort(Base, UUIDMixin, TimestampMixin):
     notes = relationship("BugHuntNote", back_populates="cohort", cascade="all, delete-orphan")
     bug_reports = relationship("BugHuntBugReport", back_populates="cohort", cascade="all, delete-orphan")
     feedback = relationship("BugHuntFeedback", back_populates="cohort", cascade="all, delete-orphan")
+    testers = relationship("BugHuntTester", back_populates="cohort", cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
         return f"<BugHuntCohort {self.name} ({self.status})>"
@@ -56,6 +57,7 @@ class BugHuntFamily(Base, UUIDMixin, TimestampMixin):
 
     # Relationships
     cohort = relationship("BugHuntCohort", back_populates="families")
+    tester = relationship("BugHuntTester", back_populates="family", uselist=False, cascade="all, delete-orphan")
 
     def __repr__(self) -> str:
         return f"<BugHuntFamily {self.parent_a_name} & {self.parent_b_name} ({self.test_status})>"
@@ -73,6 +75,7 @@ class BugHuntChecklistItem(Base, UUIDMixin, TimestampMixin):
     is_completed: Mapped[bool] = mapped_column(Boolean, default=False)
     completed_by: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("users.id"), nullable=True)
     completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    tester_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("bug_hunt_testers.id", ondelete="SET NULL"), nullable=True)
 
     # Relationships
     cohort = relationship("BugHuntCohort", back_populates="checklist_items")
@@ -88,7 +91,8 @@ class BugHuntNote(Base, UUIDMixin, TimestampMixin):
 
     cohort_id: Mapped[str] = mapped_column(String(36), ForeignKey("bug_hunt_cohorts.id"), index=True)
     family_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("bug_hunt_families.id"), nullable=True)
-    author_id: Mapped[str] = mapped_column(String(36), ForeignKey("users.id"))
+    author_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("users.id"), nullable=True)
+    tester_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("bug_hunt_testers.id", ondelete="SET NULL"), nullable=True)
     content: Mapped[str] = mapped_column(Text)
     note_type: Mapped[str] = mapped_column(String(20), default="observation")
 
@@ -96,7 +100,7 @@ class BugHuntNote(Base, UUIDMixin, TimestampMixin):
     cohort = relationship("BugHuntCohort", back_populates="notes")
 
     def __repr__(self) -> str:
-        return f"<BugHuntNote {self.note_type} by {self.author_id[:8]}>"
+        return f"<BugHuntNote {self.note_type}>"
 
 
 class BugHuntBugReport(Base, UUIDMixin, TimestampMixin):
@@ -106,7 +110,8 @@ class BugHuntBugReport(Base, UUIDMixin, TimestampMixin):
 
     cohort_id: Mapped[str] = mapped_column(String(36), ForeignKey("bug_hunt_cohorts.id"), index=True)
     family_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("bug_hunt_families.id"), nullable=True)
-    reported_by: Mapped[str] = mapped_column(String(36), ForeignKey("users.id"))
+    reported_by: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("users.id"), nullable=True)
+    tester_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("bug_hunt_testers.id", ondelete="SET NULL"), nullable=True)
     title: Mapped[str] = mapped_column(String(500))
     description: Mapped[str] = mapped_column(Text)
     severity: Mapped[str] = mapped_column(String(20), default="medium")
@@ -129,7 +134,8 @@ class BugHuntFeedback(Base, UUIDMixin, TimestampMixin):
 
     cohort_id: Mapped[str] = mapped_column(String(36), ForeignKey("bug_hunt_cohorts.id"), index=True)
     family_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("bug_hunt_families.id"), nullable=True)
-    submitted_by: Mapped[str] = mapped_column(String(36), ForeignKey("users.id"))
+    submitted_by: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("users.id"), nullable=True)
+    tester_id: Mapped[Optional[str]] = mapped_column(String(36), ForeignKey("bug_hunt_testers.id", ondelete="SET NULL"), nullable=True)
     rating: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     category: Mapped[str] = mapped_column(String(50), default="other")
     content: Mapped[str] = mapped_column(Text)
@@ -140,3 +146,27 @@ class BugHuntFeedback(Base, UUIDMixin, TimestampMixin):
 
     def __repr__(self) -> str:
         return f"<BugHuntFeedback [{self.category}] rating={self.rating}>"
+
+
+class BugHuntTester(Base, UUIDMixin, TimestampMixin):
+    """A real-world tester assigned to a bug hunt test family."""
+
+    __tablename__ = "bug_hunt_testers"
+
+    cohort_id: Mapped[str] = mapped_column(String(36), ForeignKey("bug_hunt_cohorts.id"), index=True)
+    family_id: Mapped[str] = mapped_column(String(36), ForeignKey("bug_hunt_families.id"), index=True)
+    tester_name: Mapped[str] = mapped_column(String(200))
+    tester_email: Mapped[str] = mapped_column(String(255))
+    access_token: Mapped[str] = mapped_column(String(100), unique=True, index=True)
+    token_expires_at: Mapped[datetime] = mapped_column(DateTime)
+    status: Mapped[str] = mapped_column(String(20), default="invited")
+    first_accessed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    last_accessed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    email_sent_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+    # Relationships
+    cohort = relationship("BugHuntCohort", back_populates="testers")
+    family = relationship("BugHuntFamily", back_populates="tester")
+
+    def __repr__(self) -> str:
+        return f"<BugHuntTester {self.tester_name} ({self.status})>"

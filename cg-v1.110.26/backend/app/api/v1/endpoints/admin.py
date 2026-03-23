@@ -4228,3 +4228,149 @@ async def delete_bug_hunt(
         return {"deleted": True}
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc))
+
+
+@router.post(
+    "/bug-hunts/{cohort_id}/families/{family_id}/assign-tester",
+    summary="Assign a tester to a bug hunt family",
+    status_code=status.HTTP_201_CREATED,
+)
+async def assign_bug_hunt_tester(
+    cohort_id: str,
+    family_id: str,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Assign an external tester to a test family and send them an email."""
+    from app.services.bug_hunt_service import assign_tester
+    from app.services.email import email_service
+    from app.core.config import settings
+
+    body = await request.json()
+    try:
+        tester = await assign_tester(
+            db, cohort_id, family_id,
+            tester_name=body["tester_name"],
+            tester_email=body["tester_email"],
+        )
+
+        # Build magic link
+        frontend_url = getattr(settings, 'FRONTEND_URL', 'https://www.find-commonground.com')
+        magic_link = f"{frontend_url}/bug-hunt/test/{tester.access_token}"
+
+        # Get cohort and family info for the email
+        from app.models.bug_hunt import BugHuntCohort, BugHuntFamily
+        cohort = await db.get(BugHuntCohort, cohort_id)
+        family = await db.get(BugHuntFamily, family_id)
+
+        # Send assignment email
+        email_sent = await email_service.send_bug_hunt_tester_assignment(
+            to_email=tester.tester_email,
+            tester_name=tester.tester_name,
+            cohort_name=cohort.name,
+            cohort_description=cohort.description,
+            test_instructions=cohort.test_instructions,
+            family_name=f"{family.parent_a_name.split(' ')[-1]} & {family.parent_b_name.split(' ')[-1]}",
+            parent_a_email=family.parent_a_email,
+            parent_a_password=family.parent_a_password,
+            parent_a_name=family.parent_a_name,
+            parent_b_email=family.parent_b_email,
+            parent_b_password=family.parent_b_password,
+            parent_b_name=family.parent_b_name,
+            children_names=family.children_names or [],
+            magic_link=magic_link,
+        )
+
+        if email_sent:
+            tester.email_sent_at = datetime.utcnow()
+
+        await _log_admin_action(
+            db, admin_user, "bug_hunt_assign_tester", "bug_hunt",
+            target_id=cohort_id, details=f"{tester.tester_name} ({tester.tester_email})"
+        )
+        await db.commit()
+
+        return {
+            "id": tester.id, "cohort_id": tester.cohort_id,
+            "family_id": tester.family_id, "tester_name": tester.tester_name,
+            "tester_email": tester.tester_email, "status": tester.status,
+            "email_sent_at": tester.email_sent_at.isoformat() if tester.email_sent_at else None,
+            "created_at": tester.created_at.isoformat(),
+        }
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+
+@router.post(
+    "/bug-hunts/{cohort_id}/testers/{tester_id}/revoke",
+    summary="Revoke tester access",
+)
+async def revoke_bug_hunt_tester(
+    cohort_id: str,
+    tester_id: str,
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Revoke a tester's access to the bug hunt."""
+    from app.services.bug_hunt_service import revoke_tester
+
+    try:
+        tester = await revoke_tester(db, tester_id)
+        await _log_admin_action(db, admin_user, "bug_hunt_revoke_tester", "bug_hunt", target_id=tester_id)
+        await db.commit()
+        return {"id": tester.id, "status": tester.status, "revoked": True}
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+
+
+@router.post(
+    "/bug-hunts/{cohort_id}/testers/{tester_id}/resend",
+    summary="Resend tester invitation",
+)
+async def resend_bug_hunt_tester_invite(
+    cohort_id: str,
+    tester_id: str,
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Regenerate token and resend invitation email to tester."""
+    from app.services.bug_hunt_service import resend_tester_invite
+    from app.services.email import email_service
+    from app.core.config import settings
+
+    try:
+        tester = await resend_tester_invite(db, tester_id)
+
+        frontend_url = getattr(settings, 'FRONTEND_URL', 'https://www.find-commonground.com')
+        magic_link = f"{frontend_url}/bug-hunt/test/{tester.access_token}"
+
+        from app.models.bug_hunt import BugHuntCohort, BugHuntFamily
+        cohort = await db.get(BugHuntCohort, cohort_id)
+        family = await db.get(BugHuntFamily, tester.family_id)
+
+        email_sent = await email_service.send_bug_hunt_tester_assignment(
+            to_email=tester.tester_email,
+            tester_name=tester.tester_name,
+            cohort_name=cohort.name,
+            cohort_description=cohort.description,
+            test_instructions=cohort.test_instructions,
+            family_name=f"{family.parent_a_name.split(' ')[-1]} & {family.parent_b_name.split(' ')[-1]}",
+            parent_a_email=family.parent_a_email,
+            parent_a_password=family.parent_a_password,
+            parent_a_name=family.parent_a_name,
+            parent_b_email=family.parent_b_email,
+            parent_b_password=family.parent_b_password,
+            parent_b_name=family.parent_b_name,
+            children_names=family.children_names or [],
+            magic_link=magic_link,
+        )
+
+        if email_sent:
+            tester.email_sent_at = datetime.utcnow()
+
+        await _log_admin_action(db, admin_user, "bug_hunt_resend_tester", "bug_hunt", target_id=tester_id)
+        await db.commit()
+        return {"id": tester.id, "status": tester.status, "resent": True}
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
