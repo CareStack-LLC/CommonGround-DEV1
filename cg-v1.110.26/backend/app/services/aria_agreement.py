@@ -10,8 +10,13 @@ from datetime import datetime
 from typing import Optional, Dict, Any, List
 import json
 
+import logging
+
+import anthropic
 from openai import OpenAI
 from fastapi import HTTPException, status
+
+logger = logging.getLogger(__name__)
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm.attributes import flag_modified
@@ -47,7 +52,69 @@ class AriaAgreementService:
 
     def __init__(self, db: AsyncSession):
         self.db = db
-        self.client = OpenAI(api_key=settings.OPENAI_API_KEY)
+        # Initialize AI clients - prefer Claude, fallback to OpenAI
+        self._anthropic_client = None
+        self._openai_client = None
+        if settings.ANTHROPIC_API_KEY:
+            self._anthropic_client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
+        if getattr(settings, 'OPENAI_API_KEY', None):
+            self._openai_client = OpenAI(api_key=settings.OPENAI_API_KEY)
+        # Legacy attribute for any direct references
+        self.client = self._openai_client
+
+    def _chat_completion(self, messages: list, max_tokens: int = 2000, model: str = None) -> str:
+        """
+        Make a chat completion call, trying Claude first then OpenAI.
+
+        Args:
+            messages: OpenAI-format messages (list of {role, content} dicts)
+            max_tokens: Maximum tokens in response
+            model: Optional model override
+
+        Returns:
+            The assistant's response text
+        """
+        # Try Claude first
+        if self._anthropic_client:
+            try:
+                # Convert OpenAI message format to Anthropic format
+                system_msg = None
+                anthropic_messages = []
+                for msg in messages:
+                    if msg["role"] == "system":
+                        system_msg = (system_msg + "\n\n" + msg["content"]) if system_msg else msg["content"]
+                    else:
+                        anthropic_messages.append({
+                            "role": msg["role"],
+                            "content": msg["content"],
+                        })
+
+                kwargs = {
+                    "model": "claude-sonnet-4-20250514",
+                    "max_tokens": max_tokens,
+                    "messages": anthropic_messages,
+                }
+                if system_msg:
+                    kwargs["system"] = system_msg
+
+                response = self._anthropic_client.messages.create(**kwargs)
+                return response.content[0].text
+            except Exception as e:
+                logger.warning(f"Claude API failed, falling back to OpenAI: {e}")
+
+        # Fallback to OpenAI
+        if self._openai_client:
+            response = self._openai_client.chat.completions.create(
+                model=model or "gpt-4-turbo",
+                max_tokens=max_tokens,
+                messages=messages,
+            )
+            return response.choices[0].message.content
+
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="No AI provider available. Configure ANTHROPIC_API_KEY or OPENAI_API_KEY."
+        )
 
     async def _get_children_names(self, family_file_id: str) -> list:
         """Get children names for this family file."""
@@ -239,13 +306,7 @@ Start by warmly greeting the parent and letting them know they'll fill in names 
                 for msg in conversation.messages
             ]
 
-            response = self.client.chat.completions.create(
-                model="gpt-4-turbo",
-                max_tokens=2000,
-                messages=openai_messages
-            )
-
-            assistant_message = response.choices[0].message.content
+            assistant_message = self._chat_completion(openai_messages, max_tokens=2000)
 
             # Add assistant response to conversation
             conversation.messages.append({
@@ -372,13 +433,7 @@ Start by warmly greeting the parent and letting them know they'll fill in names 
                 for msg in conversation.messages
             ]
 
-            response = self.client.chat.completions.create(
-                model="gpt-4-turbo",
-                max_tokens=3000,  # Allow longer response for document analysis
-                messages=openai_messages,
-            )
-
-            assistant_message = response.choices[0].message.content
+            assistant_message = self._chat_completion(openai_messages, max_tokens=3000)
 
             # Add assistant response to conversation
             conversation.messages.append(
@@ -485,13 +540,7 @@ Use simple, clear language that both parents can understand."""
                 for msg in messages
             ]
 
-            response = self.client.chat.completions.create(
-                model="gpt-4-turbo",
-                max_tokens=3000,
-                messages=openai_messages
-            )
-
-            summary = response.choices[0].message.content
+            summary = self._chat_completion(openai_messages, max_tokens=3000)
 
             # Save summary
             conversation.summary = summary
@@ -594,13 +643,7 @@ Use simple, clear language. Keep it practical - holiday details and travel plans
                 for msg in messages
             ]
 
-            response = self.client.chat.completions.create(
-                model="gpt-4-turbo",
-                max_tokens=2000,
-                messages=openai_messages
-            )
-
-            summary = response.choices[0].message.content
+            summary = self._chat_completion(openai_messages, max_tokens=2000)
 
             # Save summary
             conversation.summary = summary
@@ -652,19 +695,14 @@ Use simple, clear language. Keep it practical - holiday details and travel plans
         )
 
         try:
-            # Use OpenAI to extract structured data
-            response = self.client.chat.completions.create(
-                model="gpt-4-turbo",
-                max_tokens=4096,  # Maximum for GPT-4-turbo
-                temperature=0.1,  # Low temperature for consistent extraction
-                messages=[
+            # Use AI to extract structured data
+            json_text = self._chat_completion(
+                [
                     {"role": "system", "content": extraction_system},
                     {"role": "user", "content": extraction_prompt}
-                ]
+                ],
+                max_tokens=4096,
             )
-
-            # Extract JSON from response
-            json_text = response.choices[0].message.content
 
             # Try to parse JSON
             try:
@@ -1057,13 +1095,7 @@ Start warmly and explain you'll help them build a simple, clear agreement."""
                 for msg in conversation.messages
             ]
 
-            response = self.client.chat.completions.create(
-                model="gpt-4-turbo",
-                max_tokens=1500,  # Shorter for v2
-                messages=openai_messages
-            )
-
-            assistant_message = response.choices[0].message.content
+            assistant_message = self._chat_completion(openai_messages, max_tokens=1500)
 
             # Add assistant response
             conversation.messages.append({
@@ -1138,17 +1170,13 @@ Start warmly and explain you'll help them build a simple, clear agreement."""
         )
 
         try:
-            response = self.client.chat.completions.create(
-                model="gpt-4-turbo",
-                max_tokens=3000,
-                temperature=0.1,
-                messages=[
+            json_text = self._chat_completion(
+                [
                     {"role": "system", "content": extraction_system},
                     {"role": "user", "content": extraction_prompt}
-                ]
+                ],
+                max_tokens=3000,
             )
-
-            json_text = response.choices[0].message.content
 
             try:
                 extracted_data = json.loads(json_text)
