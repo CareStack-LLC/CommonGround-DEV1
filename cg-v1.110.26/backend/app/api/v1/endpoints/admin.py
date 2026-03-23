@@ -2189,20 +2189,25 @@ async def send_monthly_reports(
     summary="ARIA intervention analytics",
 )
 async def get_aria_insights(
+    days: int = Query(30, ge=7, le=365, description="Time range in days"),
+    offset: int = Query(0, ge=0, description="Offset for flagged messages pagination"),
+    limit: int = Query(50, ge=1, le=200, description="Limit for flagged messages pagination"),
     db: AsyncSession = Depends(get_db),
     admin_user: User = Depends(get_current_admin_user),
 ) -> dict:
     """
-    Get ARIA intervention statistics: totals, daily counts, categories,
-    blocked count, acceptance rate, and sentiment distribution.
+    Comprehensive ARIA intervention analytics: totals, daily counts, categories,
+    blocked count, acceptance rate, sentiment distribution, processing time,
+    weekly trends, circle message data, call intervention data, and top cases.
     """
-    from app.models.message import MessageFlag
+    import json as json_mod
+    from app.models.message import Message, MessageFlag
 
     now = datetime.utcnow()
+    since = now - timedelta(days=days)
     seven_days_ago = now - timedelta(days=7)
-    thirty_days_ago = now - timedelta(days=30)
 
-    # Total interventions (all time)
+    # ── Total interventions (all time) ──
     total_result = await db.execute(
         select(func.count()).select_from(MessageFlag)
     )
@@ -2216,21 +2221,21 @@ async def get_aria_insights(
     )
     last_7d = result_7d.scalar() or 0
 
-    # Last 30 days
-    result_30d = await db.execute(
+    # Last N days (selected range)
+    result_range = await db.execute(
         select(func.count()).select_from(MessageFlag).where(
-            MessageFlag.created_at >= thirty_days_ago
+            MessageFlag.created_at >= since
         )
     )
-    last_30d = result_30d.scalar() or 0
+    last_range = result_range.scalar() or 0
 
-    # Daily interventions (last 30 days)
+    # ── Daily interventions ──
     daily_result = await db.execute(
         select(
             cast(MessageFlag.created_at, Date).label("date"),
             func.count().label("count"),
         )
-        .where(MessageFlag.created_at >= thirty_days_ago)
+        .where(MessageFlag.created_at >= since)
         .group_by(cast(MessageFlag.created_at, Date))
         .order_by(cast(MessageFlag.created_at, Date))
     )
@@ -2239,13 +2244,14 @@ async def get_aria_insights(
         for row in daily_result.all()
     ]
 
-    # Top categories - MessageFlag.categories is JSON array, count occurrences
-    # We group by severity as a proxy for category since categories is a JSON array
+    # ── Severity breakdown (top_categories) ──
     cat_result = await db.execute(
         select(
             MessageFlag.severity,
             func.count().label("count"),
         )
+        .where(MessageFlag.created_at >= since)
+        .where(MessageFlag.severity.isnot(None))
         .group_by(MessageFlag.severity)
         .order_by(func.count().desc())
     )
@@ -2254,66 +2260,59 @@ async def get_aria_insights(
         for row in cat_result.all()
     ]
 
-    # Blocked count (intervention_level 4 = block)
+    # ── Blocked count (intervention_level 4) ──
     blocked_result = await db.execute(
         select(func.count()).select_from(MessageFlag).where(
-            MessageFlag.intervention_level == 4
+            MessageFlag.intervention_level == 4,
+            MessageFlag.created_at >= since,
         )
     )
     blocked_count = blocked_result.scalar() or 0
 
-    # Acceptance rate
+    # ── Acceptance rate (within range) ──
     accepted_result = await db.execute(
         select(func.count()).select_from(MessageFlag).where(
-            MessageFlag.user_action.in_(["accepted", "modified"])
+            MessageFlag.user_action.in_(["accepted", "modified"]),
+            MessageFlag.created_at >= since,
         )
     )
     accepted_count = accepted_result.scalar() or 0
     acceptance_rate = (
-        round(accepted_count / total_interventions * 100, 1)
-        if total_interventions > 0
+        round(accepted_count / last_range * 100, 1)
+        if last_range > 0
         else 0.0
     )
 
-    # Sentiment distribution based on severity
+    # ── Sentiment distribution ──
     sentiment_dist = {"positive": 0, "neutral": 0, "negative": 0}
     for cat in top_categories:
-        if cat["category"] in ("low",):
-            sentiment_dist["neutral"] += cat["count"]
-        elif cat["category"] in ("medium",):
+        if cat["category"] in ("low", "medium"):
             sentiment_dist["neutral"] += cat["count"]
         elif cat["category"] in ("high", "severe"):
             sentiment_dist["negative"] += cat["count"]
-
-    # Count messages that passed without flags as positive
     try:
-        from app.models.message import Message
         total_msgs_result = await db.execute(
-            select(func.count()).select_from(Message)
+            select(func.count()).select_from(Message).where(
+                Message.created_at >= since
+            )
         )
         total_msg_count = total_msgs_result.scalar() or 0
-        sentiment_dist["positive"] = max(0, total_msg_count - total_interventions)
+        sentiment_dist["positive"] = max(0, total_msg_count - last_range)
     except Exception:
         sentiment_dist["positive"] = 0
 
-    # --- Phase 3 enhancements (wrapped in try/except for resilience) ---
+    # ── User action breakdown ──
     action_breakdown: dict = {}
     sent_anyway_count = 0
     rejected_count = 0
-    avg_messages_per_day = 0.0
-    total_msgs_30d = 0
-    intervention_rate = 0.0
-    detailed_categories: list = []
-    intervention_levels: list = []
-
     try:
-        # User action breakdown
         action_result = await db.execute(
             select(
                 MessageFlag.user_action,
                 func.count().label("count"),
             )
             .where(MessageFlag.user_action.isnot(None))
+            .where(MessageFlag.created_at >= since)
             .group_by(MessageFlag.user_action)
             .order_by(func.count().desc())
         )
@@ -2323,35 +2322,46 @@ async def get_aria_insights(
     except Exception as exc:
         logger.warning("ARIA action breakdown query failed: %s", exc)
 
+    # ── Avg messages per day & intervention rate ──
+    avg_messages_per_day = 0.0
+    total_msgs_30d = 0
+    intervention_rate = 0.0
     try:
-        # Avg messages per day (last 30 days)
-        from app.models.message import Message
-        msg_count_30d = await db.execute(
+        msg_count_range = await db.execute(
             select(func.count()).select_from(Message).where(
-                Message.created_at >= thirty_days_ago
+                Message.created_at >= since
             )
         )
-        total_msgs_30d = msg_count_30d.scalar() or 0
-        avg_messages_per_day = round(total_msgs_30d / 30, 1)
+        total_msgs_30d = msg_count_range.scalar() or 0
+        avg_messages_per_day = round(total_msgs_30d / days, 1)
         intervention_rate = (
-            round(last_30d / total_msgs_30d * 100, 1)
+            round(last_range / total_msgs_30d * 100, 1)
             if total_msgs_30d > 0 else 0.0
         )
     except Exception as exc:
         logger.warning("ARIA message count query failed: %s", exc)
 
+    # ── Detailed categories from JSON array (FIX: JSON string fallback) ──
+    detailed_categories: list = []
     try:
-        # Category breakdown from JSON array
         cat_detail_result = await db.execute(
             select(MessageFlag.categories, func.count().label("cnt"))
-            .where(MessageFlag.created_at >= thirty_days_ago)
+            .where(MessageFlag.created_at >= since)
             .group_by(MessageFlag.categories)
         )
         category_counts: dict[str, int] = {}
         for row in cat_detail_result.all():
-            cats = row.categories if isinstance(row.categories, list) else []
+            cats = row.categories
+            if isinstance(cats, str):
+                try:
+                    cats = json_mod.loads(cats)
+                except (json_mod.JSONDecodeError, TypeError):
+                    cats = []
+            if not isinstance(cats, list):
+                cats = []
             for c in cats:
-                category_counts[c] = category_counts.get(c, 0) + row.cnt
+                if isinstance(c, str) and c:
+                    category_counts[c] = category_counts.get(c, 0) + row.cnt
         detailed_categories = sorted(
             [{"category": k, "count": v} for k, v in category_counts.items()],
             key=lambda x: x["count"],
@@ -2360,28 +2370,294 @@ async def get_aria_insights(
     except Exception as exc:
         logger.warning("ARIA category detail query failed: %s", exc)
 
+    # ── Intervention levels (FIX: filter out nulls) ──
+    intervention_levels: list = []
     try:
-        # Intervention level distribution
         level_result = await db.execute(
             select(
                 MessageFlag.intervention_level,
                 func.count().label("count"),
             )
+            .where(MessageFlag.intervention_level.isnot(None))
             .group_by(MessageFlag.intervention_level)
             .order_by(MessageFlag.intervention_level)
         )
         level_labels = {1: "Gentle Nudge", 2: "Firm Suggestion", 3: "Strong Warning", 4: "Blocked"}
         intervention_levels = [
-            {"level": row.intervention_level, "label": level_labels.get(row.intervention_level, f"Level {row.intervention_level}"), "count": row.count}
+            {
+                "level": row.intervention_level,
+                "label": level_labels.get(row.intervention_level, f"Level {row.intervention_level}"),
+                "count": row.count,
+            }
             for row in level_result.all()
+            if row.intervention_level is not None
         ]
     except Exception as exc:
         logger.warning("ARIA intervention levels query failed: %s", exc)
 
+    # ── Recent flagged messages (FIX: actually populate) ──
+    recent_flagged: list = []
+    try:
+        flagged_result = await db.execute(
+            select(
+                MessageFlag.created_at,
+                MessageFlag.severity,
+                MessageFlag.categories,
+                MessageFlag.toxicity_score,
+                MessageFlag.user_action,
+                MessageFlag.intervention_level,
+                MessageFlag.processing_time_ms,
+                Message.sender_id,
+            )
+            .join(Message, MessageFlag.message_id == Message.id)
+            .where(MessageFlag.created_at >= since)
+            .order_by(MessageFlag.created_at.desc())
+            .offset(offset)
+            .limit(limit)
+        )
+        for row in flagged_result.all():
+            cats = row.categories
+            if isinstance(cats, str):
+                try:
+                    cats = json_mod.loads(cats)
+                except (json_mod.JSONDecodeError, TypeError):
+                    cats = []
+            if not isinstance(cats, list):
+                cats = []
+            sender_short = str(row.sender_id)[:8] if row.sender_id else "unknown"
+            recent_flagged.append({
+                "timestamp": row.created_at.isoformat() if row.created_at else None,
+                "severity": row.severity,
+                "categories": cats,
+                "toxicity_score": round(row.toxicity_score, 3) if row.toxicity_score else 0,
+                "user_action": row.user_action,
+                "intervention_level": row.intervention_level,
+                "processing_time_ms": row.processing_time_ms,
+                "sender_id": sender_short,
+            })
+    except Exception as exc:
+        logger.warning("ARIA recent flagged query failed: %s", exc)
+
+    # ── Processing time statistics ──
+    processing_time: dict = {"avg_ms": 0, "min_ms": 0, "max_ms": 0}
+    try:
+        pt_result = await db.execute(
+            select(
+                func.avg(MessageFlag.processing_time_ms).label("avg"),
+                func.min(MessageFlag.processing_time_ms).label("min"),
+                func.max(MessageFlag.processing_time_ms).label("max"),
+            )
+            .where(MessageFlag.processing_time_ms.isnot(None))
+            .where(MessageFlag.created_at >= since)
+        )
+        pt_row = pt_result.one_or_none()
+        if pt_row and pt_row.avg is not None:
+            processing_time = {
+                "avg_ms": round(float(pt_row.avg), 1),
+                "min_ms": int(pt_row.min) if pt_row.min else 0,
+                "max_ms": int(pt_row.max) if pt_row.max else 0,
+            }
+    except Exception as exc:
+        logger.warning("ARIA processing time query failed: %s", exc)
+
+    # ── Weekly effectiveness trends ──
+    weekly_trends: list = []
+    try:
+        weekly_result = await db.execute(
+            select(
+                func.date_trunc("week", MessageFlag.created_at).label("week"),
+                func.count().label("total"),
+                func.sum(
+                    sql_case(
+                        (MessageFlag.user_action.in_(["accepted", "modified"]), 1),
+                        else_=0,
+                    )
+                ).label("accepted"),
+                func.avg(MessageFlag.toxicity_score).label("avg_toxicity"),
+            )
+            .where(MessageFlag.created_at >= since)
+            .group_by(func.date_trunc("week", MessageFlag.created_at))
+            .order_by(func.date_trunc("week", MessageFlag.created_at))
+        )
+        for row in weekly_result.all():
+            total = row.total or 0
+            acc = row.accepted or 0
+            weekly_trends.append({
+                "week": row.week.isoformat() if row.week else None,
+                "total": total,
+                "accepted": acc,
+                "acceptance_rate": round(acc / total * 100, 1) if total > 0 else 0.0,
+                "avg_toxicity": round(float(row.avg_toxicity), 3) if row.avg_toxicity else 0,
+            })
+    except Exception as exc:
+        logger.warning("ARIA weekly trends query failed: %s", exc)
+
+    # ── Circle message ARIA data ──
+    circle_data: dict = {
+        "total_analyzed": 0,
+        "total_flagged": 0,
+        "intervention_rate": 0.0,
+        "action_breakdown": {},
+        "categories": [],
+        "avg_response_time_ms": 0,
+    }
+    try:
+        from app.models.circle_message import CircleMessage
+
+        # Total analyzed
+        ca_result = await db.execute(
+            select(func.count()).select_from(CircleMessage).where(
+                CircleMessage.aria_analyzed == True,
+                CircleMessage.sent_at >= since,
+            )
+        )
+        circle_analyzed = ca_result.scalar() or 0
+
+        # Total flagged
+        cf_result = await db.execute(
+            select(func.count()).select_from(CircleMessage).where(
+                CircleMessage.aria_flagged == True,
+                CircleMessage.sent_at >= since,
+            )
+        )
+        circle_flagged = cf_result.scalar() or 0
+
+        # Action breakdown
+        ca_action_result = await db.execute(
+            select(
+                CircleMessage.user_action,
+                func.count().label("count"),
+            )
+            .where(CircleMessage.aria_flagged == True)
+            .where(CircleMessage.user_action.isnot(None))
+            .where(CircleMessage.sent_at >= since)
+            .group_by(CircleMessage.user_action)
+        )
+        circle_actions = {row.user_action: row.count for row in ca_action_result.all()}
+
+        # Categories from aria_all_categories (JSON string)
+        cc_result = await db.execute(
+            select(CircleMessage.aria_all_categories)
+            .where(CircleMessage.aria_flagged == True)
+            .where(CircleMessage.aria_all_categories.isnot(None))
+            .where(CircleMessage.sent_at >= since)
+        )
+        circle_cat_counts: dict[str, int] = {}
+        for row in cc_result.all():
+            raw = row[0]
+            cats = raw
+            if isinstance(cats, str):
+                try:
+                    cats = json_mod.loads(cats)
+                except (json_mod.JSONDecodeError, TypeError):
+                    cats = []
+            if not isinstance(cats, list):
+                cats = []
+            for c in cats:
+                if isinstance(c, str) and c:
+                    circle_cat_counts[c] = circle_cat_counts.get(c, 0) + 1
+        circle_categories = sorted(
+            [{"category": k, "count": v} for k, v in circle_cat_counts.items()],
+            key=lambda x: x["count"],
+            reverse=True,
+        )
+
+        # Avg response time
+        crt_result = await db.execute(
+            select(func.avg(CircleMessage.aria_response_time_ms))
+            .where(CircleMessage.aria_response_time_ms.isnot(None))
+            .where(CircleMessage.sent_at >= since)
+        )
+        avg_rt = crt_result.scalar()
+
+        circle_data = {
+            "total_analyzed": circle_analyzed,
+            "total_flagged": circle_flagged,
+            "intervention_rate": round(circle_flagged / circle_analyzed * 100, 1) if circle_analyzed > 0 else 0.0,
+            "action_breakdown": circle_actions,
+            "categories": circle_categories,
+            "avg_response_time_ms": round(float(avg_rt), 1) if avg_rt else 0,
+        }
+    except Exception as exc:
+        logger.warning("ARIA circle message query failed: %s", exc)
+
+    # ── Call intervention data ──
+    call_data: dict = {
+        "total_sessions": 0,
+        "total_interventions": 0,
+        "terminated_count": 0,
+        "avg_safety_score": 0,
+        "flag_severity": [],
+    }
+    try:
+        from app.models.circle_call import CircleCallSession, CircleCallFlag
+
+        cs_result = await db.execute(
+            select(
+                func.count().label("total"),
+                func.coalesce(func.sum(CircleCallSession.aria_intervention_count), 0).label("interventions"),
+                func.sum(
+                    sql_case(
+                        (CircleCallSession.aria_terminated_call == True, 1),
+                        else_=0,
+                    )
+                ).label("terminated"),
+                func.avg(CircleCallSession.overall_safety_score).label("avg_safety"),
+            )
+            .where(CircleCallSession.created_at >= since)
+        )
+        cs_row = cs_result.one_or_none()
+        if cs_row:
+            call_data["total_sessions"] = cs_row.total or 0
+            call_data["total_interventions"] = int(cs_row.interventions) if cs_row.interventions else 0
+            call_data["terminated_count"] = int(cs_row.terminated) if cs_row.terminated else 0
+            call_data["avg_safety_score"] = round(float(cs_row.avg_safety), 2) if cs_row.avg_safety else 0
+
+        # Call flag severity
+        cfs_result = await db.execute(
+            select(
+                CircleCallFlag.severity,
+                func.count().label("count"),
+            )
+            .where(CircleCallFlag.flagged_at >= since)
+            .where(CircleCallFlag.severity.isnot(None))
+            .group_by(CircleCallFlag.severity)
+            .order_by(func.count().desc())
+        )
+        call_data["flag_severity"] = [
+            {"severity": row.severity, "count": row.count}
+            for row in cfs_result.all()
+        ]
+    except Exception as exc:
+        logger.warning("ARIA call data query failed: %s", exc)
+
+    # ── Top cases by intervention count ──
+    top_cases: list = []
+    try:
+        tc_result = await db.execute(
+            select(
+                Message.family_file_id,
+                func.count().label("count"),
+            )
+            .join(MessageFlag, MessageFlag.message_id == Message.id)
+            .where(Message.family_file_id.isnot(None))
+            .where(MessageFlag.created_at >= since)
+            .group_by(Message.family_file_id)
+            .order_by(func.count().desc())
+            .limit(10)
+        )
+        top_cases = [
+            {"family_file_id": row.family_file_id, "count": row.count}
+            for row in tc_result.all()
+        ]
+    except Exception as exc:
+        logger.warning("ARIA top cases query failed: %s", exc)
+
     return {
         "total_interventions": total_interventions,
         "last_7d": last_7d,
-        "last_30d": last_30d,
+        "last_range": last_range,
+        "days": days,
         "daily_interventions": daily_interventions,
         "top_categories": top_categories,
         "detailed_categories": detailed_categories,
@@ -2393,8 +2669,14 @@ async def get_aria_insights(
         "intervention_levels": intervention_levels,
         "intervention_rate": intervention_rate,
         "avg_messages_per_day": avg_messages_per_day,
-        "total_messages_30d": total_msgs_30d,
+        "total_messages_period": total_msgs_30d,
         "sentiment_distribution": sentiment_dist,
+        "recent_flagged": recent_flagged,
+        "processing_time": processing_time,
+        "weekly_trends": weekly_trends,
+        "circle_data": circle_data,
+        "call_data": call_data,
+        "top_cases": top_cases,
     }
 
 
