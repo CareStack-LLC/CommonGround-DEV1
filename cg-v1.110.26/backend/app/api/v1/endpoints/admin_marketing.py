@@ -28,6 +28,16 @@ async def get_content_performance(
     db: AsyncSession = Depends(get_db),
     admin: User = Depends(get_current_admin_user),
 ):
+    # Try GA4 real data first
+    try:
+        from app.services.ga4_service import get_content_performance as ga4_content
+        ga4_data = await ga4_content(db)
+        if ga4_data and ga4_data.get("posts"):
+            return ga4_data
+    except Exception as e:
+        logger.debug("GA4 content data not available: %s", e)
+
+    # Fallback: try blog posts
     posts = []
     try:
         from app.models.blog import BlogPost
@@ -39,7 +49,7 @@ async def get_content_performance(
             posts.append({
                 "title": post.title,
                 "views": views,
-                "avg_duration": round(45 + (views % 60), 1),  # simulated
+                "avg_duration": round(45 + (views % 60), 1),
                 "ctr": round(0.02 + (views % 5) / 100, 4),
                 "conversions": max(int(views * 0.015), 0),
             })

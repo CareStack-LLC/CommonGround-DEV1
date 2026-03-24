@@ -131,6 +131,11 @@ class Settings(BaseSettings):
     GOOGLE_OAUTH_CLIENT_SECRET: Optional[str] = None
     GOOGLE_MONITORED_EMAILS: str = "teejay@find-commonground.com"
 
+    # Google Analytics 4
+    GA4_CLIENT_ID: Optional[str] = None
+    GA4_CLIENT_SECRET: Optional[str] = None
+    GA4_PROPERTY_ID: Optional[str] = None
+
     # Rate Limiting
     RATE_LIMIT_REQUESTS: int = 100
     RATE_LIMIT_PERIOD: int = 60  # seconds

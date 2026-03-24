@@ -12,6 +12,7 @@ from app.api.v1.endpoints import (
     admin_sales,
     admin_cs,
     admin_marketing as admin_mktg,
+    admin_ga4,
     auth,
     users,
     partners,
@@ -232,6 +233,9 @@ api_router.include_router(admin_cs.router, prefix="/admin", tags=["Admin Custome
 
 # Admin Marketing Analytics
 api_router.include_router(admin_mktg.router, prefix="/admin", tags=["Admin Marketing Analytics"])
+
+# Admin Google Analytics 4
+api_router.include_router(admin_ga4.router, prefix="/admin", tags=["Admin GA4 Analytics"])
 
 # SuperAdmin Portal - Platform administration
 api_router.include_router(admin.router, prefix="/admin", tags=["SuperAdmin Portal"])
