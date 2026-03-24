@@ -84,7 +84,7 @@ export default function BillingContent() {
       ]);
       if (result.status === 'fulfilled') setData(result.value);
       else throw new Error(result.reason?.message || 'Failed to load billing data');
-      if (summaryResult.status === 'fulfilled') setAISummary(summaryResult.value?.summary || summaryResult.value?.bullets || null);
+      if (summaryResult.status === 'fulfilled') setAISummary((summaryResult.value as any)?.summary || null);
       if (segResult.status === 'fulfilled') setSegments(segResult.value);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to load billing data');
