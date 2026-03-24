@@ -478,6 +478,7 @@ export interface BugHuntTester {
   family_id: string;
   tester_name: string;
   tester_email: string;
+  access_token?: string;
   status: string;
   first_accessed_at: string | null;
   last_accessed_at: string | null;
@@ -800,6 +801,12 @@ export const adminAPI = {
 
   resendBugHuntTesterInvite: (cohortId: string, testerId: string) =>
     adminFetch<{ id: string; status: string; resent: boolean }>(`/admin/bug-hunts/${cohortId}/testers/${testerId}/resend`, { method: 'POST' }),
+
+  sendBugHuntReminder: (cohortId: string, testerId: string) =>
+    adminFetch<{ id: string; reminded: boolean }>(`/admin/bug-hunts/${cohortId}/testers/${testerId}/remind`, { method: 'POST' }),
+
+  sendAllBugHuntInvitations: (cohortId: string) =>
+    adminFetch<{ sent: number; failed: number; skipped: number }>(`/admin/bug-hunts/${cohortId}/send-all-invitations`, { method: 'POST' }),
 
   // Reddit
   getRedditStatus: () => adminFetch<any>('/admin/reddit/status'),

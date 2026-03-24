@@ -91,6 +91,7 @@ export default function BugHuntDetailPage() {
   const [data, setData] = useState<BugHuntDashboard | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [tab, setTab] = useState<Tab>('overview');
   const [generating, setGenerating] = useState(false);
   const [completing, setCompleting] = useState(false);
@@ -313,6 +314,13 @@ export default function BugHuntDetailPage() {
         </button>
       </div>
 
+      {success && (
+        <div className="bg-[#3DAA8A]/10 border border-[#3DAA8A]/20 rounded-lg p-3 text-[#3DAA8A] text-sm flex items-center gap-2">
+          <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+          {success}
+          <button onClick={() => setSuccess(null)} className="ml-auto underline text-xs">dismiss</button>
+        </div>
+      )}
       {error && (
         <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 text-red-400 text-sm">
           {error}
@@ -507,6 +515,37 @@ export default function BugHuntDetailPage() {
       {/* ═══ TEST ACCOUNTS TAB ═══ */}
       {tab === 'accounts' && (
         <div className="space-y-4">
+          {/* Bulk actions bar */}
+          {families.length > 0 && testers.length > 0 && (
+            <div className="flex items-center gap-3 bg-[#1E3A4A]/30 rounded-xl px-4 py-3">
+              <span className="text-xs text-[#8AACBC]">
+                {testers.filter(t => t.first_accessed_at).length}/{testers.length} testers active
+                {testers.filter(t => !t.first_accessed_at && t.email_sent_at).length > 0 && (
+                  <span className="text-yellow-400/70 ml-2">
+                    · {testers.filter(t => !t.first_accessed_at && t.email_sent_at).length} haven&apos;t opened
+                  </span>
+                )}
+              </span>
+              <div className="ml-auto flex gap-2">
+                <button
+                  onClick={async () => {
+                    try {
+                      setError(null);
+                      const result = await adminAPI.sendAllBugHuntInvitations(cohortId);
+                      setSuccess(`Sent ${result.sent} invitations (${result.skipped} skipped, ${result.failed} failed)`);
+                      setTimeout(() => setSuccess(null), 5000);
+                      fetchData();
+                    } catch (err: unknown) {
+                      setError(err instanceof Error ? err.message : 'Failed to send invitations');
+                    }
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-xs font-medium transition-colors"
+                >
+                  <Mail className="w-3.5 h-3.5" /> Send All Invitations
+                </button>
+              </div>
+            </div>
+          )}
           {families.length === 0 ? (
             <div className="text-center py-12 text-[#6B8A9A]">
               No test accounts generated yet. Generate test data from the Overview tab.
@@ -563,10 +602,26 @@ export default function BugHuntDetailPage() {
                               }`}>{f.tester.status}</span>
                             </div>
                             <div className="text-[10px] text-[#6B8A9A] mt-0.5">{f.tester.tester_email}</div>
-                            <div className="flex gap-1 mt-1">
+                            {/* Activity info */}
+                            {f.tester.first_accessed_at ? (
+                              <div className="text-[10px] text-[#3DAA8A] mt-0.5">
+                                Last active: {new Date(f.tester.last_accessed_at || f.tester.first_accessed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
+                              </div>
+                            ) : f.tester.email_sent_at ? (
+                              <div className="text-[10px] text-yellow-400/70 mt-0.5">
+                                Invite sent {new Date(f.tester.email_sent_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} — not opened yet
+                              </div>
+                            ) : null}
+                            <div className="flex gap-1 mt-1 flex-wrap">
+                              {f.tester.access_token && (
+                                <CopyButton text={`${window.location.origin}/bug-hunt/test/${f.tester.access_token}`} />
+                              )}
                               <button onClick={() => handleResendTester(f.tester!.id)} className="text-[10px] text-blue-400 hover:underline flex items-center gap-0.5"><Mail className="w-3 h-3" />Resend</button>
+                              {f.tester.status === 'invited' && !f.tester.first_accessed_at && (
+                                <button onClick={async () => { try { await adminAPI.sendBugHuntReminder(cohortId, f.tester!.id); setSuccess('Reminder sent'); fetchData(); } catch { setError('Failed to send reminder'); } }} className="text-[10px] text-amber-400 hover:underline flex items-center gap-0.5 ml-1">⏰ Remind</button>
+                              )}
                               {f.tester.status !== 'revoked' && (
-                                <button onClick={() => handleRevokeTester(f.tester!.id)} className="text-[10px] text-red-400 hover:underline flex items-center gap-0.5 ml-2"><XCircle className="w-3 h-3" />Revoke</button>
+                                <button onClick={() => handleRevokeTester(f.tester!.id)} className="text-[10px] text-red-400 hover:underline flex items-center gap-0.5 ml-1"><XCircle className="w-3 h-3" />Revoke</button>
                               )}
                             </div>
                           </div>

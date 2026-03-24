@@ -163,6 +163,7 @@ async def generate_seed_families(
     short_id = cohort.id[:8]
     admin_client = get_supabase_admin_client()
     created_families: list[BugHuntFamily] = []
+    synthetic_id_families: list[int] = []  # track families with failed Supabase auth
 
     for i in range(cohort.family_count):
         idx = i % len(PARENT_A_NAMES)
@@ -174,6 +175,7 @@ async def generate_seed_families(
         pa_password = f"BugHunt#{i+1}!2026"
         pb_password = f"BugHunt#{i+1}!2026b"
 
+        supabase_created = True
         try:
             # Create Supabase auth users
             pa_auth = admin_client.auth.admin.create_user({
@@ -193,9 +195,14 @@ async def generate_seed_families(
             pb_supabase_id = pb_auth.user.id
 
         except Exception as e:
-            logger.warning("Supabase user creation failed for family %d: %s. Using synthetic IDs.", i + 1, e)
+            logger.error(
+                "Supabase user creation FAILED for family %d: %s. "
+                "Using synthetic IDs — these accounts will NOT work for actual login.",
+                i + 1, e,
+            )
             pa_supabase_id = str(uuid4())
             pb_supabase_id = str(uuid4())
+            supabase_created = False
 
         # Create local User records
         pa_id = str(uuid4())
@@ -346,6 +353,15 @@ async def generate_seed_families(
         )
         db.add(bh_family)
         created_families.append(bh_family)
+        if not supabase_created:
+            synthetic_id_families.append(i + 1)
+
+    if synthetic_id_families:
+        logger.error(
+            "Cohort %s: %d/%d families have synthetic Supabase IDs (families: %s). "
+            "These accounts cannot be used for actual login.",
+            cohort_id, len(synthetic_id_families), len(created_families), synthetic_id_families,
+        )
 
     # Update cohort status
     cohort.status = "active"
@@ -354,6 +370,7 @@ async def generate_seed_families(
         "target_feature": cohort.target_feature,
         "family_count": cohort.family_count,
         "generated_at": datetime.utcnow().isoformat(),
+        "synthetic_id_families": synthetic_id_families,
     }
 
     await db.flush()
@@ -930,6 +947,7 @@ async def tester_add_bug_report(
     description: str,
     severity: str = "medium",
     steps_to_reproduce: Optional[str] = None,
+    screenshot_urls: Optional[list] = None,
 ) -> BugHuntBugReport:
     """Submit a bug report as a tester."""
     report = BugHuntBugReport(
@@ -941,6 +959,7 @@ async def tester_add_bug_report(
         description=description,
         severity=severity,
         steps_to_reproduce=steps_to_reproduce,
+        screenshot_urls=screenshot_urls,
     )
     db.add(report)
     await db.flush()

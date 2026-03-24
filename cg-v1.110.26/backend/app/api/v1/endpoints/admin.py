@@ -3924,7 +3924,20 @@ async def generate_bug_hunt_data(
         families = await generate_seed_families(db, cohort_id)
         await _log_admin_action(db, admin_user, "bug_hunt_generate", "bug_hunt", target_id=cohort_id, details=f"{len(families)} families")
         await db.commit()
-        return {"status": "active", "families_created": len(families)}
+
+        # Check seed_config for synthetic ID warnings
+        from app.models.bug_hunt import BugHuntCohort
+        cohort = await db.get(BugHuntCohort, cohort_id)
+        synthetic_families = (cohort.seed_config or {}).get("synthetic_id_families", [])
+
+        result = {"status": "active", "families_created": len(families)}
+        if synthetic_families:
+            result["warning"] = (
+                f"{len(synthetic_families)} families have synthetic Supabase IDs "
+                f"and will NOT work for actual login. Family numbers: {synthetic_families}"
+            )
+            result["synthetic_id_families"] = synthetic_families
+        return result
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
     except Exception as exc:
@@ -4352,6 +4365,87 @@ async def revoke_bug_hunt_tester(
 
 
 @router.post(
+    "/bug-hunts/{cohort_id}/send-all-invitations",
+    summary="Send invitations to all unsent testers",
+)
+async def send_all_bug_hunt_invitations(
+    cohort_id: str,
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Send invitation emails to all testers that haven't received one yet."""
+    from app.models.bug_hunt import BugHuntCohort, BugHuntFamily, BugHuntTester
+    from app.services.email import email_service
+    from app.core.config import settings
+    from sqlalchemy import or_
+
+    cohort = await db.get(BugHuntCohort, cohort_id)
+    if not cohort:
+        raise HTTPException(status_code=404, detail="Cohort not found")
+
+    # Find testers that haven't been emailed or are still in "invited" status
+    result = await db.execute(
+        select(BugHuntTester).where(
+            BugHuntTester.cohort_id == cohort_id,
+            or_(
+                BugHuntTester.email_sent_at.is_(None),
+                BugHuntTester.status == "invited",
+            ),
+        )
+    )
+    testers = result.scalars().all()
+
+    if not testers:
+        return {"sent": 0, "failed": 0, "message": "No pending invitations to send"}
+
+    frontend_url = getattr(settings, 'FRONTEND_URL', 'https://www.find-commonground.com')
+    sent = 0
+    failed = 0
+
+    for tester in testers:
+        try:
+            family = await db.get(BugHuntFamily, tester.family_id)
+            if not family:
+                logger.warning("Family %s not found for tester %s, skipping", tester.family_id, tester.id)
+                failed += 1
+                continue
+
+            magic_link = f"{frontend_url}/bug-hunt/test/{tester.access_token}"
+            email_sent = await email_service.send_bug_hunt_tester_assignment(
+                to_email=tester.tester_email,
+                tester_name=tester.tester_name,
+                cohort_name=cohort.name,
+                cohort_description=cohort.description,
+                test_instructions=cohort.test_instructions,
+                family_name=f"{family.parent_a_name.split(' ')[-1]} & {family.parent_b_name.split(' ')[-1]}",
+                parent_a_email=family.parent_a_email,
+                parent_a_password=family.parent_a_password,
+                parent_a_name=family.parent_a_name,
+                parent_b_email=family.parent_b_email,
+                parent_b_password=family.parent_b_password,
+                parent_b_name=family.parent_b_name,
+                children_names=family.children_names or [],
+                magic_link=magic_link,
+            )
+
+            if email_sent:
+                tester.email_sent_at = datetime.utcnow()
+                sent += 1
+            else:
+                failed += 1
+        except Exception as exc:
+            logger.error("Failed to send invitation to %s: %s", tester.tester_email, exc)
+            failed += 1
+
+    await _log_admin_action(
+        db, admin_user, "bug_hunt_bulk_invite", "bug_hunt",
+        target_id=cohort_id, details=f"sent={sent}, failed={failed}",
+    )
+    await db.commit()
+    return {"sent": sent, "failed": failed, "total": len(testers)}
+
+
+@router.post(
     "/bug-hunts/{cohort_id}/testers/{tester_id}/resend",
     summary="Resend tester invitation",
 )
@@ -4403,3 +4497,49 @@ async def resend_bug_hunt_tester_invite(
         return {"id": tester.id, "status": tester.status, "resent": True}
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc))
+
+
+@router.post(
+    "/bug-hunts/{cohort_id}/testers/{tester_id}/remind",
+    summary="Send reminder to tester",
+)
+async def send_bug_hunt_tester_reminder(
+    cohort_id: str,
+    tester_id: str,
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Send a reminder email to a bug hunt tester."""
+    from app.models.bug_hunt import BugHuntCohort, BugHuntTester
+    from app.services.email import email_service
+    from app.core.config import settings
+
+    cohort = await db.get(BugHuntCohort, cohort_id)
+    if not cohort:
+        raise HTTPException(status_code=404, detail="Cohort not found")
+
+    tester = await db.get(BugHuntTester, tester_id)
+    if not tester or tester.cohort_id != cohort_id:
+        raise HTTPException(status_code=404, detail="Tester not found in this cohort")
+
+    if tester.status == "revoked":
+        raise HTTPException(status_code=400, detail="Cannot remind a revoked tester")
+
+    if tester.token_expires_at < datetime.utcnow():
+        raise HTTPException(status_code=400, detail="Tester token has expired. Use resend to generate a new token.")
+
+    frontend_url = getattr(settings, 'FRONTEND_URL', 'https://www.find-commonground.com')
+    magic_link = f"{frontend_url}/bug-hunt/test/{tester.access_token}"
+    days_remaining = max(0, (tester.token_expires_at - datetime.utcnow()).days)
+
+    email_sent = await email_service.send_bug_hunt_reminder(
+        to_email=tester.tester_email,
+        tester_name=tester.tester_name,
+        cohort_name=cohort.name,
+        magic_link=magic_link,
+        days_remaining=days_remaining,
+    )
+
+    await _log_admin_action(db, admin_user, "bug_hunt_remind_tester", "bug_hunt", target_id=tester_id)
+    await db.commit()
+    return {"id": tester.id, "reminder_sent": email_sent, "days_remaining": days_remaining}

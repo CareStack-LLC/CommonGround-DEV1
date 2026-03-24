@@ -1451,6 +1451,38 @@ class EmailService:
 
         return await self._send_email(to_email, subject, html_body)
 
+    async def send_bug_hunt_reminder(
+        self,
+        to_email: str,
+        tester_name: str,
+        cohort_name: str,
+        magic_link: str,
+        days_remaining: int,
+    ) -> bool:
+        """
+        Send a reminder email to a bug hunt tester.
+
+        Args:
+            to_email: Tester's email address
+            tester_name: Tester's name
+            cohort_name: Bug hunt cohort name
+            magic_link: URL to the public tester page
+            days_remaining: Days until token expires
+
+        Returns:
+            Success status
+        """
+        subject = f"Reminder: Your Bug Hunt session for {cohort_name} is waiting"
+
+        html_body = self._render_template('bug_hunt/reminder.html', {
+            'tester_name': tester_name,
+            'cohort_name': cohort_name,
+            'magic_link': magic_link,
+            'days_remaining': days_remaining,
+        })
+
+        return await self._send_email(to_email, subject, html_body)
+
 
 # Create a singleton instance
 email_service = EmailService()

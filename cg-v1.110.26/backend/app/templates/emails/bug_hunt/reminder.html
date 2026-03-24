@@ -1,0 +1,30 @@
+{% extends 'base/_base.html' %}
+{% import 'base/_components.html' as c %}
+
+{% block title %}Bug Hunt Reminder{% endblock %}
+
+{% block preheader %}Your Bug Hunt session for "{{ cohort_name }}" is waiting for you — {{ days_remaining }} days left!{% endblock %}
+
+{% block content %}
+{{ c.heading("Hey " ~ tester_name ~ "!") }}
+{{ c.subheading("Just a friendly reminder that your Bug Hunt session for \"" ~ cohort_name ~ "\" is waiting for you.") }}
+
+{% call c.info_card() %}
+<p style="margin: 0 0 4px; font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #3DAA8A; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.3;">Time Remaining</p>
+<p style="margin: 0; font-family: Arial, Helvetica, sans-serif; font-size: 17px; font-weight: 600; color: #1E3A4A; line-height: 1.4;">{{ days_remaining }} day{{ 's' if days_remaining != 1 else '' }} left before your testing link expires</p>
+{% endcall %}
+
+{{ c.divider() }}
+
+<p style="margin: 0 0 16px; font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #5A7A8A; line-height: 1.6;">
+  We'd love your feedback! Click the button below to jump back into your testing dashboard and share any bugs, observations, or ideas you have about CommonGround.
+</p>
+
+{{ c.button(magic_link, "Continue Testing") }}
+
+{{ c.notice("Your testing link expires in " ~ days_remaining ~ " day" ~ ('s' if days_remaining != 1 else '') ~ ". No login required for the testing dashboard — just click the button above.") }}
+
+<p style="margin: 20px 0 0; font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #8CA0A8; text-align: center; line-height: 1.6;">
+  <strong>Need help?</strong> Reply to this email or reach out to <a href="mailto:support@find-commonground.com" style="color: #3DAA8A;">support@find-commonground.com</a>
+</p>
+{% endblock %}

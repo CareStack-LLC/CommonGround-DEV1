@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import {
   FlaskConical, ClipboardList, Bug, Star, StickyNote, Check, Copy,
-  ChevronDown, ChevronRight, Plus, Loader2, AlertCircle,
+  ChevronDown, ChevronRight, Plus, Loader2, AlertCircle, Camera, X, Image,
 } from 'lucide-react';
 
 let _apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -61,6 +61,7 @@ export default function TesterPage() {
   // Form states
   const [showBugForm, setShowBugForm] = useState(false);
   const [bugForm, setBugForm] = useState({ title: '', description: '', severity: 'medium', steps_to_reproduce: '' });
+  const [screenshots, setScreenshots] = useState<string[]>([]);
   const [showFeedbackForm, setShowFeedbackForm] = useState(false);
   const [feedbackForm, setFeedbackForm] = useState({ content: '', category: 'other', rating: 0 });
   const [showNoteForm, setShowNoteForm] = useState(false);
@@ -277,9 +278,58 @@ export default function TesterPage() {
                 </select>
                 <textarea placeholder="Steps to reproduce (optional)" value={bugForm.steps_to_reproduce} onChange={e => setBugForm({...bugForm, steps_to_reproduce: e.target.value})} rows={2}
                   className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-teal-400 resize-none font-mono" />
+                {/* Screenshot upload */}
+                <div>
+                  <label className="flex items-center gap-2 text-xs text-gray-500 mb-2">
+                    <Camera className="w-3.5 h-3.5" /> Screenshots (optional, max 3)
+                  </label>
+                  {screenshots.length < 3 && (
+                    <label className="flex items-center justify-center gap-2 py-3 border-2 border-dashed border-gray-200 rounded-lg cursor-pointer hover:border-teal-400 hover:bg-teal-50/50 transition-colors">
+                      <Image className="w-4 h-4 text-gray-400" />
+                      <span className="text-xs text-gray-500">Click to add screenshot</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          if (file.size > 5 * 1024 * 1024) { setActionError('Screenshot must be under 5MB'); return; }
+                          const reader = new FileReader();
+                          reader.onload = () => {
+                            if (typeof reader.result === 'string') {
+                              setScreenshots(prev => [...prev.slice(0, 2), reader.result as string]);
+                            }
+                          };
+                          reader.readAsDataURL(file);
+                          e.target.value = '';
+                        }}
+                      />
+                    </label>
+                  )}
+                  {screenshots.length > 0 && (
+                    <div className="flex gap-2 mt-2">
+                      {screenshots.map((src, i) => (
+                        <div key={i} className="relative w-20 h-20 rounded-lg overflow-hidden border border-gray-200">
+                          <img src={src} alt={`Screenshot ${i + 1}`} className="w-full h-full object-cover" />
+                          <button
+                            onClick={() => setScreenshots(prev => prev.filter((_, idx) => idx !== i))}
+                            className="absolute top-0.5 right-0.5 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 <div className="flex gap-2">
                   <button disabled={submitting || !bugForm.title || !bugForm.description}
-                    onClick={async () => { const ok = await postAction('/bugs', bugForm); if (ok) { setBugForm({ title: '', description: '', severity: 'medium', steps_to_reproduce: '' }); setShowBugForm(false); } }}
+                    onClick={async () => {
+                      const payload = { ...bugForm, screenshot_urls: screenshots.length > 0 ? screenshots : undefined };
+                      const ok = await postAction('/bugs', payload);
+                      if (ok) { setBugForm({ title: '', description: '', severity: 'medium', steps_to_reproduce: '' }); setScreenshots([]); setShowBugForm(false); }
+                    }}
                     className="flex-1 py-2.5 bg-teal-600 text-white rounded-lg text-sm font-medium disabled:opacity-50 min-h-[44px]">Submit</button>
                   <button onClick={() => setShowBugForm(false)} className="px-4 py-2.5 text-gray-500 text-sm min-h-[44px]">Cancel</button>
                 </div>

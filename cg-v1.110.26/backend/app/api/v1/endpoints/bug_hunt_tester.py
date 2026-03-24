@@ -4,11 +4,13 @@ Public Bug Hunt Tester API - Token-based access for external testers.
 No authentication required. Access controlled via unique tokens.
 """
 
+import base64
 import logging
 from datetime import datetime
 from json import JSONDecodeError
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile, status
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
@@ -20,16 +22,36 @@ VALID_SEVERITIES = {"critical", "high", "medium", "low"}
 VALID_CATEGORIES = {"ux", "performance", "functionality", "documentation", "other"}
 VALID_NOTE_TYPES = {"observation", "blocker", "question", "resolution"}
 
+MAX_SCREENSHOTS_PER_BUG = 3
+MAX_SCREENSHOT_SIZE_BYTES = 5 * 1024 * 1024  # 5MB
+ALLOWED_IMAGE_TYPES = {"image/png", "image/jpeg", "image/gif", "image/webp"}
+
 
 async def _get_tester(token: str, db: AsyncSession):
-    """Validate token and return tester, updating access timestamps."""
-    from app.services.bug_hunt_service import get_tester_by_token
+    """Validate token and return tester, differentiating expired vs invalid tokens."""
+    from app.models.bug_hunt import BugHuntTester
 
-    tester = await get_tester_by_token(db, token)
+    result = await db.execute(
+        select(BugHuntTester).where(BugHuntTester.access_token == token)
+    )
+    tester = result.scalar_one_or_none()
+
     if not tester:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Invalid or expired testing link",
+            detail="Invalid testing link. Please check your email for the correct URL.",
+        )
+
+    if tester.status == "revoked":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="This testing link has been revoked. Please contact the administrator.",
+        )
+
+    if tester.token_expires_at < datetime.utcnow():
+        raise HTTPException(
+            status_code=status.HTTP_410_GONE,
+            detail="This testing link has expired. Please contact the administrator for a new invitation.",
         )
 
     # Update access timestamps
@@ -122,12 +144,26 @@ async def submit_bug_report(
     if severity not in VALID_SEVERITIES:
         severity = "medium"
 
+    # Handle screenshot_urls (base64 data URLs, max 3, max 5MB each)
+    screenshot_urls = body.get("screenshot_urls", [])
+    if isinstance(screenshot_urls, list):
+        screenshot_urls = screenshot_urls[:3]  # Max 3 screenshots
+        # Validate each is a data URL and not too large
+        valid_screenshots = []
+        for url in screenshot_urls:
+            if isinstance(url, str) and url.startswith("data:image/") and len(url) < 7 * 1024 * 1024:
+                valid_screenshots.append(url)
+        screenshot_urls = valid_screenshots
+    else:
+        screenshot_urls = []
+
     report = await tester_add_bug_report(
         db, tester,
         title=body["title"][:500],
         description=body["description"][:5000],
         severity=severity,
         steps_to_reproduce=body.get("steps_to_reproduce", "")[:5000] or None,
+        screenshot_urls=screenshot_urls or None,
     )
     await db.commit()
     return {
@@ -206,4 +242,65 @@ async def add_note(
     return {
         "id": note.id, "note_type": note.note_type,
         "created_at": note.created_at.isoformat(),
+    }
+
+
+@router.post(
+    "/test/{token}/bugs/{bug_id}/screenshots",
+    summary="Upload screenshot for a bug report",
+    status_code=status.HTTP_201_CREATED,
+)
+async def upload_bug_screenshot(
+    token: str,
+    bug_id: str,
+    file: UploadFile = File(...),
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    """Upload a screenshot image for an existing bug report (max 3 screenshots, 5MB each)."""
+    from app.models.bug_hunt import BugHuntBugReport
+
+    tester = await _get_tester(token, db)
+
+    # Validate file type
+    if file.content_type not in ALLOWED_IMAGE_TYPES:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Invalid file type '{file.content_type}'. Allowed: {', '.join(ALLOWED_IMAGE_TYPES)}",
+        )
+
+    # Read and validate file size
+    contents = await file.read()
+    if len(contents) > MAX_SCREENSHOT_SIZE_BYTES:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail=f"File too large ({len(contents)} bytes). Maximum size is {MAX_SCREENSHOT_SIZE_BYTES // (1024*1024)}MB.",
+        )
+
+    # Find the bug report and verify ownership
+    report = await db.get(BugHuntBugReport, bug_id)
+    if not report:
+        raise HTTPException(status_code=404, detail="Bug report not found")
+    if report.family_id != tester.family_id or report.cohort_id != tester.cohort_id:
+        raise HTTPException(status_code=403, detail="You can only add screenshots to your own bug reports")
+
+    # Check screenshot count limit
+    existing_urls = report.screenshot_urls or []
+    if len(existing_urls) >= MAX_SCREENSHOTS_PER_BUG:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Maximum of {MAX_SCREENSHOTS_PER_BUG} screenshots per bug report reached.",
+        )
+
+    # Store as base64 data URL
+    b64_data = base64.b64encode(contents).decode("utf-8")
+    data_url = f"data:{file.content_type};base64,{b64_data}"
+
+    updated_urls = list(existing_urls) + [data_url]
+    report.screenshot_urls = updated_urls
+
+    await db.commit()
+    return {
+        "bug_id": bug_id,
+        "screenshot_count": len(updated_urls),
+        "message": "Screenshot uploaded successfully",
     }
