@@ -8,7 +8,7 @@ import {
   ArrowUp, ArrowDown, Shield, Activity, BarChart3,
   ChevronDown, ChevronUp,
 } from 'lucide-react';
-import { adminAPI, type BillingOverview, type SyncResult } from '@/lib/admin-api';
+import { adminAPI, type BillingOverview, type SyncResult, type UserSegments } from '@/lib/admin-api';
 
 /* ── Constants ─────────────────────────────────────────── */
 
@@ -63,6 +63,8 @@ export default function BillingContent() {
   const [error, setError] = useState<string | null>(null);
   const [syncing, setSyncing] = useState<string | null>(null);
   const [syncResult, setSyncResult] = useState<SyncResult | null>(null);
+  const [aiSummary, setAISummary] = useState<string[] | null>(null);
+  const [segments, setSegments] = useState<UserSegments | null>(null);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     stripe: false,
     payments: true,
@@ -75,8 +77,15 @@ export default function BillingContent() {
     try {
       setLoading(true);
       setError(null);
-      const result = await adminAPI.getBillingOverview();
-      setData(result);
+      const [result, summaryResult, segResult] = await Promise.allSettled([
+        adminAPI.getBillingOverview(),
+        adminAPI.getAISummary(),
+        adminAPI.getUserSegments(),
+      ]);
+      if (result.status === 'fulfilled') setData(result.value);
+      else throw new Error(result.reason?.message || 'Failed to load billing data');
+      if (summaryResult.status === 'fulfilled') setAISummary(summaryResult.value?.summary || summaryResult.value?.bullets || null);
+      if (segResult.status === 'fulfilled') setSegments(segResult.value);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to load billing data');
     } finally {
@@ -165,6 +174,50 @@ export default function BillingContent() {
           </button>
         </div>
       </div>
+
+      {/* ═══ AI EXECUTIVE SNAPSHOT ═══ */}
+      {aiSummary && aiSummary.length > 0 && (
+        <div className="rounded-2xl border border-[#3DAA8A]/15 bg-gradient-to-r from-[#3DAA8A]/5 via-transparent to-transparent p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <Zap className="w-4 h-4 text-[#3DAA8A]" />
+            <h2 className="text-sm font-bold text-[#3DAA8A] tracking-tight">AI Executive Snapshot</h2>
+          </div>
+          <ul className="space-y-1.5">
+            {aiSummary.map((bullet, i) => (
+              <li key={i} className="text-sm text-[#D0E4EC] flex items-start gap-2">
+                <span className="text-[#3DAA8A] mt-1">•</span>
+                <span>{bullet}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* ═══ USER SEGMENTS ═══ */}
+      {segments && (
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+          <div className="rounded-xl bg-white/[0.02] border border-white/[0.04] p-3 text-center">
+            <div className="text-lg font-bold text-white">{segments.total}</div>
+            <div className="text-[10px] text-[#4A6E7F] font-medium">Total Users</div>
+          </div>
+          <div className="rounded-xl bg-white/[0.02] border border-white/[0.04] p-3 text-center">
+            <div className="text-lg font-bold text-sky-400">{segments.parents}</div>
+            <div className="text-[10px] text-[#4A6E7F] font-medium">Parents</div>
+          </div>
+          <div className="rounded-xl bg-white/[0.02] border border-white/[0.04] p-3 text-center">
+            <div className="text-lg font-bold text-violet-400">{segments.professionals}</div>
+            <div className="text-[10px] text-[#4A6E7F] font-medium">Professionals</div>
+          </div>
+          <div className="rounded-xl bg-white/[0.02] border border-white/[0.04] p-3 text-center">
+            <div className="text-lg font-bold text-amber-400">{segments.admins}</div>
+            <div className="text-[10px] text-[#4A6E7F] font-medium">Admins</div>
+          </div>
+          <div className="rounded-xl bg-white/[0.02] border border-white/[0.04] p-3 text-center">
+            <div className="text-lg font-bold text-[#6B8A9A]">{segments.partner_staff}</div>
+            <div className="text-[10px] text-[#4A6E7F] font-medium">Partner Staff</div>
+          </div>
+        </div>
+      )}
 
       {/* ═══ HERO KPI ROW ═══ */}
       {loading ? (
@@ -264,6 +317,25 @@ export default function BillingContent() {
               </div>
               {data.stripe_health && data.stripe_health.paid_no_stripe_sub > 0 && (
                 <p className="text-[10px] text-amber-400/60 mt-2">{data.stripe_health.paid_no_stripe_sub} subscriber(s) are DB-assigned only. MRR estimated.</p>
+              )}
+
+              {/* Revenue by Segment */}
+              {data.mrr_by_segment && Object.keys(data.mrr_by_segment).length > 0 && (
+                <div className="mt-6 pt-4 border-t border-white/5">
+                  <h3 className="text-xs font-semibold text-[#8AACBC] uppercase tracking-wider mb-3">Revenue by Segment</h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="rounded-xl bg-sky-400/5 border border-sky-400/10 p-4">
+                      <div className="text-[10px] text-sky-400/60 uppercase tracking-widest font-bold mb-1">Consumer</div>
+                      <div className="text-xl font-bold text-sky-400 tabular-nums">{fmtExact(data.mrr_by_segment.consumer || 0)}</div>
+                      <div className="text-[10px] text-[#4A6E7F] mt-0.5">Parents on Plus/Complete</div>
+                    </div>
+                    <div className="rounded-xl bg-violet-400/5 border border-violet-400/10 p-4">
+                      <div className="text-[10px] text-violet-400/60 uppercase tracking-widest font-bold mb-1">Professional</div>
+                      <div className="text-xl font-bold text-violet-400 tabular-nums">{fmtExact(data.mrr_by_segment.professional || 0)}</div>
+                      <div className="text-[10px] text-[#4A6E7F] mt-0.5">Attorneys/Mediators</div>
+                    </div>
+                  </div>
+                </div>
               )}
             </Section>
           </div>

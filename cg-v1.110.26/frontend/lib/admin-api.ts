@@ -242,6 +242,8 @@ export interface BillingOverview {
   total_mrr: number;
   estimated_mrr: number;
   verified_mrr: number | null;
+  mrr_by_segment?: Record<string, number>;
+  mrr_source?: string;
   stripe_live: StripeLiveData | null;
   stripe_health: StripeHealthData | null;
   valuation?: Record<string, number>;
@@ -253,6 +255,16 @@ export interface BillingOverview {
     dispute_count: number;
   } | null;
   note: string;
+}
+
+export interface UserSegments {
+  admins: number;
+  parents: number;
+  professionals: number;
+  partner_staff: number;
+  total: number;
+  paying_parents: number;
+  paying_professionals: number;
 }
 
 export interface AuditEvent {
@@ -706,6 +718,8 @@ export const adminAPI = {
     adminFetchBlob(`/admin/reports/${reportId}/download?format=${format}`),
 
   getPlatformHealth: () => adminFetch<PlatformHealth>('/admin/health'),
+
+  getUserSegments: () => adminFetch<UserSegments>('/admin/analytics/user-segments'),
 
   // Stripe sync operations
   syncStripeCustomers: () =>

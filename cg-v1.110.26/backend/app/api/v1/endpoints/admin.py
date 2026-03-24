@@ -36,6 +36,14 @@ from app.models.user import User, UserProfile
 from app.models.audit import AuditLog
 
 from app.utils.sentry_helpers import capture_error
+from app.services.stripe_revenue import (
+    fetch_stripe_revenue, fetch_stripe_payments, fetch_stripe_customers_count,
+    fetch_stripe_refunds_disputes, compute_unit_economics,
+    STRIPE_PRICE_TO_TIER as _SVC_STRIPE_PRICE_TO_TIER,
+    STRIPE_PRODUCT_TO_TIER as _SVC_STRIPE_PRODUCT_TO_TIER,
+    DEFAULT_TIER_PRICES, DEFAULT_CAC,
+    CONSUMER_TIERS, PROFESSIONAL_TIERS, FREE_TIERS,
+)
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
@@ -44,45 +52,17 @@ router = APIRouter()
 # Shared tier pricing helper
 # =============================================================================
 
-# Correct prices matching actual Stripe plans (from Stripe test export March 2026)
-_DEFAULT_TIER_PRICES = {
-    "web_starter": 0,
-    "plus": 17.99, "complete": 34.99,
-    "professional_starter": 49.00,
-    "solo": 99.00, "small_firm": 299.00, "mid_size": 799.00,
-}
+# Re-export canonical mappings from centralised service (kept for backward compat)
+STRIPE_PRICE_TO_TIER = _SVC_STRIPE_PRICE_TO_TIER
+STRIPE_PRODUCT_TO_TIER = _SVC_STRIPE_PRODUCT_TO_TIER
 
-# Canonical mapping of Stripe Price IDs → tier codes
-STRIPE_PRICE_TO_TIER: dict[str, str] = {
-    # Consumer tiers
-    "price_1TE0bXBJIivbOFX7luV9H7OZ": "web_starter",      # $0/mo
-    "price_1TE0bXBJIivbOFX70Ysv656Q": "plus",              # $17.99/mo
-    "price_1TE0bYBJIivbOFX7atup1qAE": "plus",              # $199.99/yr
-    "price_1TE0bYBJIivbOFX7VqmtQH23": "complete",          # $34.99/mo
-    "price_1TE0bZBJIivbOFX77f2QUPc6": "complete",          # $349.99/yr
-    # Professional tiers
-    "price_1TE0bZBJIivbOFX7kmvDAoqr": "professional_starter",  # $49/mo
-    "price_1TE0baBJIivbOFX7dqc7W1Dp": "solo",              # $99/mo
-    "price_1TE0baBJIivbOFX7smGjiSyj": "small_firm",        # $299/mo
-    "price_1TE0bbBJIivbOFX78k6VF4wC": "mid_size",          # $799/mo
-}
-
-STRIPE_PRODUCT_TO_TIER: dict[str, str] = {
-    "prod_UCPQdxPYuteQUA": "web_starter",
-    "prod_UCPQBUvNRmZ4Cs": "plus",
-    "prod_UCPQxC2eRt7g6K": "complete",
-    "prod_UCPQevbVaWJDfT": "professional_starter",
-    "prod_UCPQVLqjYyuiRF": "solo",
-    "prod_UCPQOK9Qpuw1hB": "small_firm",
-    "prod_UCPQQwcr2VaCXs": "mid_size",
-}
-
-
-_DEFAULT_CAC = 45.0  # Customer acquisition cost estimate — update when real marketing spend data is available
+# Legacy aliases — prefer the service-module names in new code
+_DEFAULT_TIER_PRICES = DEFAULT_TIER_PRICES
+_DEFAULT_CAC = DEFAULT_CAC
 
 
 async def _get_tier_prices(db: AsyncSession) -> dict[str, float]:
-    """Get tier prices, falling back to defaults."""
+    """Get tier prices, falling back to DEFAULT_TIER_PRICES from the service module."""
     try:
         from app.models.subscription import SubscriptionPlan
         result = await db.execute(select(SubscriptionPlan))
@@ -93,10 +73,10 @@ async def _get_tier_prices(db: AsyncSession) -> dict[str, float]:
                 code = plan.plan_code if hasattr(plan, "plan_code") else (plan.name or "").lower().replace(" ", "_")
                 price = float(plan.price_monthly) if hasattr(plan, "price_monthly") and plan.price_monthly else 0
                 prices[code] = price
-            return {**_DEFAULT_TIER_PRICES, **prices}
+            return {**DEFAULT_TIER_PRICES, **prices}
     except Exception:
         pass
-    return _DEFAULT_TIER_PRICES.copy()
+    return DEFAULT_TIER_PRICES.copy()
 
 
 # =============================================================================
@@ -201,6 +181,19 @@ async def get_admin_dashboard(
         for tier, count in tier_counts.items()
     )
 
+    # Stripe-verified MRR (best-effort, falls back gracefully)
+    stripe_snapshot = fetch_stripe_revenue()
+    stripe_mrr = stripe_snapshot.total_mrr if stripe_snapshot.stripe_available else None
+
+    # User type counts
+    admin_count = await db.scalar(
+        select(func.count(User.id)).where(User.is_admin == True, User.is_deleted == False)
+    ) or 0
+    total_profiles = await db.scalar(
+        select(func.count(UserProfile.id))
+    ) or 0
+    parent_count = total_profiles - (total_professionals or 0)
+
     # Messages sent in last 7 days
     from app.models.message import Message
     messages_7d = await db.scalar(
@@ -276,6 +269,9 @@ async def get_admin_dashboard(
             "active_today": active_today,
             "new_7d": new_users_7d,
             "new_24h": new_users_24h,
+            "admins": admin_count,
+            "parents": max(parent_count, 0),
+            "professionals": total_professionals,
         },
         "family_files": {
             "active": total_family_files,
@@ -286,6 +282,8 @@ async def get_admin_dashboard(
         "subscriptions": {
             "tier_breakdown": tier_counts,
             "estimated_mrr": round(estimated_mrr, 2),
+            "mrr": stripe_mrr if stripe_mrr is not None else round(estimated_mrr, 2),
+            "mrr_source": "stripe" if stripe_mrr is not None else "db_estimate",
             "past_due_count": past_due_count,
         },
         "engagement": {
@@ -769,230 +767,89 @@ async def get_billing_overview(
     except Exception as exc:
         logger.warning("Stripe health DB queries failed: %s", exc)
 
-    # --- Live Stripe data (graceful fallback) ---
-    stripe_live = None
+    # --- Live Stripe data via centralised service ---
+    snapshot = fetch_stripe_revenue()
+    stripe_live = {
+        "stripe_available": snapshot.stripe_available,
+        "active_subscriptions": snapshot.active_count,
+        "total_mrr": snapshot.total_mrr,
+        "total_customers": fetch_stripe_customers_count(),
+        "recent_payments": fetch_stripe_payments(20),
+    }
+    if not snapshot.stripe_available:
+        stripe_live["error"] = snapshot.error or "Stripe API unavailable."
+
+    # Verify expected products exist in Stripe (best-effort)
     try:
-        import stripe
-        from app.core.config import settings as app_settings
-        if app_settings.STRIPE_SECRET_KEY:
-            stripe.api_key = app_settings.STRIPE_SECRET_KEY
-
-            # Active subscriptions from Stripe (paginated)
-            # Fetch both active AND trialing to capture all paying/will-pay subs
-            all_subs = []
-            for sub_status in ("active", "trialing"):
-                subs = stripe.Subscription.list(status=sub_status, limit=100)
-                all_subs.extend(subs.data)
-                while subs.has_more:
-                    subs = stripe.Subscription.list(
-                        status=sub_status, limit=100,
-                        starting_after=subs.data[-1].id,
-                    )
-                    all_subs.extend(subs.data)
-
-            stripe_active_count = len(all_subs)
-            logger.info(f"Stripe billing: found {stripe_active_count} active/trialing subscriptions")
-
-            # Calculate MRR from subscriptions — try multiple approaches
-            stripe_mrr_cents = 0
-            for sub in all_subs:
-                try:
-                    sub_amount = 0
-                    quantity = getattr(sub, "quantity", 1) or 1
-
-                    # Approach 1: Modern items.data[].price.unit_amount
-                    sub_items = getattr(sub, "items", None)
-                    items_data = getattr(sub_items, "data", []) if sub_items else []
-                    if items_data and len(items_data) > 0:
-                        for item in items_data:
-                            price_obj = getattr(item, "price", None)
-                            if price_obj:
-                                unit_amount = getattr(price_obj, "unit_amount", 0) or 0
-                                item_qty = getattr(item, "quantity", 1) or 1
-                                recurring = getattr(price_obj, "recurring", None)
-                                interval = getattr(recurring, "interval", "month") if recurring else "month"
-                                if interval == "year":
-                                    sub_amount += (unit_amount * item_qty) / 12
-                                else:
-                                    sub_amount += unit_amount * item_qty
-
-                    # Approach 2: Legacy sub.plan.amount (used by many test subscriptions)
-                    if sub_amount == 0:
-                        plan = getattr(sub, "plan", None)
-                        if plan:
-                            plan_amount = getattr(plan, "amount", 0) or 0
-                            if plan_amount > 0:
-                                plan_interval = getattr(plan, "interval", "month")
-                                if plan_interval == "year":
-                                    sub_amount = (plan_amount * quantity) / 12
-                                else:
-                                    sub_amount = plan_amount * quantity
-
-                    stripe_mrr_cents += sub_amount
-                except Exception as sub_err:
-                    logger.warning(f"Error processing subscription {getattr(sub, 'id', '?')}: {sub_err}")
-
-            logger.info(f"Stripe billing: calculated MRR = ${stripe_mrr_cents / 100:.2f} from {stripe_active_count} subs")
-
-            # Recent invoices (paid)
-            invoices = stripe.Invoice.list(limit=20, status="paid")
-            recent_payments = []
-            for inv in invoices.data:
-                desc = None
-                try:
-                    if inv.lines and inv.lines.data:
-                        desc = inv.lines.data[0].description
-                except Exception:
-                    pass
-                recent_payments.append({
-                    "id": inv.id,
-                    "customer": inv.customer,
-                    "customer_email": inv.customer_email,
-                    "amount": inv.amount_paid / 100.0,
-                    "currency": inv.currency,
-                    "status": inv.status,
-                    "created": datetime.fromtimestamp(inv.created).isoformat(),
-                    "description": desc,
-                })
-
-            # Total customers — count via pagination
-            total_customers = 0
-            cust_page = stripe.Customer.list(limit=100)
-            total_customers += len(cust_page.data)
-            while cust_page.has_more:
-                cust_page = stripe.Customer.list(limit=100, starting_after=cust_page.data[-1].id)
-                total_customers += len(cust_page.data)
-
-            stripe_live = {
-                "stripe_available": True,
-                "active_subscriptions": stripe_active_count,
-                "total_mrr": round(stripe_mrr_cents / 100.0, 2),
-                "total_customers": total_customers,
-                "recent_payments": recent_payments,
-            }
-
-            # Verify expected products exist in Stripe
+        if snapshot.stripe_available:
+            import stripe as _stripe_mod
             products_verified = []
             for prod_id, tier_code in STRIPE_PRODUCT_TO_TIER.items():
                 try:
-                    prod = stripe.Product.retrieve(prod_id)
+                    prod = _stripe_mod.Product.retrieve(prod_id)
                     products_verified.append({
-                        "id": prod_id,
-                        "tier": tier_code,
-                        "name": prod.name,
-                        "active": prod.active,
-                        "found": True,
+                        "id": prod_id, "tier": tier_code,
+                        "name": prod.name, "active": prod.active, "found": True,
                     })
-                except stripe.error.InvalidRequestError:
+                except _stripe_mod.error.InvalidRequestError:
                     products_verified.append({
-                        "id": prod_id,
-                        "tier": tier_code,
-                        "name": None,
-                        "active": False,
-                        "found": False,
+                        "id": prod_id, "tier": tier_code,
+                        "name": None, "active": False, "found": False,
                     })
             stripe_health["products_verified"] = products_verified
     except Exception as e:
-        logger.warning(f"Stripe API unavailable for billing overview: {e}")
-        stripe_live = {"stripe_available": False, "error": "Stripe API unavailable."}
+        logger.warning("Stripe product verification failed: %s", e)
 
     await _log_admin_action(db, admin_user, "view_billing", "platform")
     await db.commit()
 
-    # --- Phase 4: Computed valuation metrics ---
+    # --- Phase 4: Computed valuation metrics (via service) ---
     valuation = {}
     try:
-        # Total active paying users
         active_paying = sum(
             t["count"] for t in mrr_by_tier.values() if t["price"] > 0
         )
+        # Use Stripe MRR when available, else DB estimate
+        valuation_mrr = snapshot.total_mrr if snapshot.stripe_available else total_mrr
 
-        # Churn rate: cancelled in 30d / (active + cancelled)
-        total_base = active_paying + (cancelled_30d or 0)
-        monthly_churn = round((cancelled_30d or 0) / total_base * 100, 1) if total_base > 0 else 0.0
+        econ = compute_unit_economics(
+            mrr=valuation_mrr,
+            paying_users=active_paying,
+            cancelled_30d=cancelled_30d or 0,
+        )
 
-        # ARPU (average revenue per user)
-        arpu = round(total_mrr / active_paying, 2) if active_paying > 0 else 0
-
-        # LTV = ARPU / monthly churn rate (in months)
-        if monthly_churn > 0:
-            avg_lifetime_months = round(100 / monthly_churn, 1)
-            ltv = round(arpu * avg_lifetime_months, 2)
-        else:
-            avg_lifetime_months = 0
-            ltv = 0
-
-        # Retention rate (inverse of churn)
-        retention_rate = round(100 - monthly_churn, 1)
-
-        # Total users for CAC approximation
         total_users_result = await db.execute(
             select(func.count()).select_from(User).where(User.is_deleted == False)
         )
-        total_users = total_users_result.scalar() or 0
+        total_users_val = total_users_result.scalar() or 0
 
         valuation = {
             "active_paying": active_paying,
-            "monthly_churn_pct": monthly_churn,
-            "retention_rate_pct": retention_rate,
-            "arpu": arpu,
-            "ltv": ltv,
-            "avg_lifetime_months": avg_lifetime_months,
-            "cac": _DEFAULT_CAC,
-            "ltv_cac_ratio": round(ltv / _DEFAULT_CAC, 1) if ltv > 0 else 0,
-            "total_users": total_users,
-            "arr": round(total_mrr * 12, 2),
+            "monthly_churn_pct": round(econ["monthly_churn"] * 100, 1),
+            "retention_rate_pct": round(econ["retention"] * 100, 1),
+            "arpu": econ["arpu"],
+            "ltv": econ["ltv"],
+            "avg_lifetime_months": round(1 / econ["monthly_churn"], 1) if econ["monthly_churn"] > 0 else 0,
+            "cac": econ["cac"],
+            "ltv_cac_ratio": econ["ltv_cac_ratio"],
+            "total_users": total_users_val,
+            "arr": round(valuation_mrr * 12, 2),
         }
     except Exception as exc:
         logger.warning("Valuation metrics calculation failed: %s", exc)
 
-    # --- Phase 4: Stripe refunds/disputes (if available) ---
+    # --- Phase 4: Stripe refunds/disputes (via service) ---
     refunds_data = None
-    try:
-        if stripe_live and stripe_live.get("stripe_available"):
-            import stripe
-            # Recent refunds
-            refunds = stripe.Refund.list(limit=10)
-            refund_list = [
-                {
-                    "id": r.id,
-                    "amount": r.amount / 100.0,
-                    "status": r.status,
-                    "reason": r.reason,
-                    "created": datetime.fromtimestamp(r.created).isoformat(),
-                }
-                for r in refunds.data
-            ]
-            total_refunded_30d = sum(
-                r.amount / 100.0 for r in refunds.data
-                if datetime.fromtimestamp(r.created) >= thirty_days_ago
-            )
-
-            # Disputes
-            disputes = stripe.Dispute.list(limit=10)
-            dispute_list = [
-                {
-                    "id": d.id,
-                    "amount": d.amount / 100.0,
-                    "status": d.status,
-                    "reason": d.reason,
-                    "created": datetime.fromtimestamp(d.created).isoformat(),
-                }
-                for d in disputes.data
-            ]
-
+    if snapshot.stripe_available:
+        rd = fetch_stripe_refunds_disputes(days=30)
+        if rd:
             refunds_data = {
-                "recent_refunds": refund_list,
-                "total_refunded_30d": round(total_refunded_30d, 2),
-                "refund_count_30d": len([
-                    r for r in refunds.data
-                    if datetime.fromtimestamp(r.created) >= thirty_days_ago
-                ]),
-                "disputes": dispute_list,
-                "dispute_count": len(dispute_list),
+                "recent_refunds": rd["refunds"],
+                "total_refunded_30d": rd["total_refund_amount"],
+                "refund_count_30d": len(rd["refunds"]),
+                "disputes": rd["disputes"],
+                "dispute_count": len(rd["disputes"]),
             }
-    except Exception as exc:
-        logger.warning("Stripe refunds/disputes fetch failed: %s", exc)
 
     verified_mrr = stripe_live.get("total_mrr") if stripe_live and stripe_live.get("stripe_available") else None
 
@@ -1004,6 +861,7 @@ async def get_billing_overview(
         "cancelled_30d": cancelled_30d,
         "new_paid_30d": new_paid_30d,
         "mrr_by_tier": mrr_by_tier,
+        "mrr_by_segment": snapshot.mrr_by_segment if snapshot.stripe_available else None,
         "total_mrr": round(total_mrr, 2),
         "estimated_mrr": round(total_mrr, 2),
         "verified_mrr": verified_mrr,
@@ -4860,59 +4718,9 @@ async def get_revenue_metrics(
         breakdown[tier_name] = {"count": count, "revenue": revenue}
         db_mrr += revenue
 
-    # Try Stripe for verified MRR
-    stripe_mrr: Optional[float] = None
-    try:
-        import stripe as _stripe
-        from app.core.config import settings as app_settings
-        if app_settings.STRIPE_SECRET_KEY:
-            _stripe.api_key = app_settings.STRIPE_SECRET_KEY
-            all_subs = []
-            for sub_status in ("active", "trialing"):
-                subs = _stripe.Subscription.list(status=sub_status, limit=100)
-                all_subs.extend(subs.data)
-                while subs.has_more:
-                    subs = _stripe.Subscription.list(
-                        status=sub_status, limit=100,
-                        starting_after=subs.data[-1].id,
-                    )
-                    all_subs.extend(subs.data)
-
-            mrr_cents = 0
-            for sub in all_subs:
-                try:
-                    sub_amount = 0
-                    sub_items = getattr(sub, "items", None)
-                    items_data = getattr(sub_items, "data", []) if sub_items else []
-                    if items_data and len(items_data) > 0:
-                        for item in items_data:
-                            price_obj = getattr(item, "price", None)
-                            if price_obj:
-                                unit_amount = getattr(price_obj, "unit_amount", 0) or 0
-                                item_qty = getattr(item, "quantity", 1) or 1
-                                recurring = getattr(price_obj, "recurring", None)
-                                interval = getattr(recurring, "interval", "month") if recurring else "month"
-                                if interval == "year":
-                                    sub_amount += (unit_amount * item_qty) / 12
-                                else:
-                                    sub_amount += unit_amount * item_qty
-                    if sub_amount == 0:
-                        plan = getattr(sub, "plan", None)
-                        if plan:
-                            plan_amount = getattr(plan, "amount", 0) or 0
-                            if plan_amount > 0:
-                                plan_interval = getattr(plan, "interval", "month")
-                                quantity = getattr(sub, "quantity", 1) or 1
-                                if plan_interval == "year":
-                                    sub_amount = (plan_amount * quantity) / 12
-                                else:
-                                    sub_amount = plan_amount * quantity
-                    mrr_cents += sub_amount
-                except Exception:
-                    pass
-            stripe_mrr = round(mrr_cents / 100.0, 2)
-    except Exception as exc:
-        logger.warning("Stripe unavailable for revenue-metrics: %s", exc)
+    # Stripe-verified MRR via centralised service
+    snapshot = fetch_stripe_revenue()
+    stripe_mrr = snapshot.total_mrr if snapshot.stripe_available else None
 
     mrr = stripe_mrr if stripe_mrr is not None else round(db_mrr, 2)
     arr = round(mrr * 12, 2)
@@ -4949,27 +4757,40 @@ async def get_revenue_metrics(
         at_risk_mrr += count * tier_prices.get(tier or "unknown", 0)
     at_risk_mrr = round(at_risk_mrr, 2)
 
-    # MRR trend: daily estimates for last 30 days
+    # MRR trend: daily estimates for last 30 days (single grouped query)
+    trend_result = await db.execute(
+        select(
+            cast(UserProfile.created_at, Date).label("created_date"),
+            UserProfile.subscription_tier,
+            func.count(UserProfile.id),
+        )
+        .where(
+            UserProfile.subscription_status.in_(["active", "past_due"]),
+            UserProfile.created_at <= now,
+        )
+        .group_by(cast(UserProfile.created_at, Date), UserProfile.subscription_tier)
+        .order_by(cast(UserProfile.created_at, Date))
+    )
+    # Build cumulative MRR per day from subscription creation dates
+    daily_additions: dict[str, float] = {}
+    for created_date, tier, count in trend_result:
+        date_str = created_date.isoformat() if hasattr(created_date, "isoformat") else str(created_date)
+        tier_name = tier or "unknown"
+        daily_additions[date_str] = daily_additions.get(date_str, 0) + count * tier_prices.get(tier_name, 0)
+
+    # Accumulate into a running total for each of the last 31 days
     mrr_trend = []
+    cumulative = 0.0
+    all_dates = sorted(daily_additions.keys())
+    date_idx = 0
     for day_offset in range(30, -1, -1):
         day = now - timedelta(days=day_offset)
         day_str = day.strftime("%Y-%m-%d")
-        # Count active subs that existed by that day
-        active_by_day = await db.execute(
-            select(
-                UserProfile.subscription_tier,
-                func.count(UserProfile.id),
-            )
-            .where(
-                UserProfile.subscription_status.in_(["active", "past_due"]),
-                UserProfile.created_at <= day,
-            )
-            .group_by(UserProfile.subscription_tier)
-        )
-        day_mrr = 0.0
-        for tier, count in active_by_day:
-            day_mrr += count * tier_prices.get(tier or "unknown", 0)
-        mrr_trend.append({"date": day_str, "mrr": round(day_mrr, 2)})
+        # Add any subscriptions created on or before this day
+        while date_idx < len(all_dates) and all_dates[date_idx] <= day_str:
+            cumulative += daily_additions[all_dates[date_idx]]
+            date_idx += 1
+        mrr_trend.append({"date": day_str, "mrr": round(cumulative, 2)})
 
     await _log_admin_action(db, admin_user, "view_revenue_metrics", "analytics")
     await db.commit()
@@ -4994,13 +4815,14 @@ async def get_unit_economics(
 ) -> dict:
     """
     Unit economics: ARPU, MRR, ARR, churn, LTV, CAC, LTV/CAC ratio, payback months.
+    Uses centralised stripe_revenue service.
     """
     now = datetime.utcnow()
     thirty_days_ago = now - timedelta(days=30)
 
     tier_prices = await _get_tier_prices(db)
 
-    # Active tier counts
+    # Active tier counts (still needed for DB-side breakdown)
     tier_result = await db.execute(
         select(
             UserProfile.subscription_tier,
@@ -5010,59 +4832,20 @@ async def get_unit_economics(
         .group_by(UserProfile.subscription_tier)
     )
     tier_breakdown: dict = {}
-    total_mrr = 0.0
+    db_mrr = 0.0
     paying_users = 0
     for tier, count in tier_result:
         tier_name = tier or "unknown"
         price = tier_prices.get(tier_name, 0)
         revenue = round(count * price, 2)
         tier_breakdown[tier_name] = {"count": count, "price": price, "revenue": revenue}
-        total_mrr += revenue
+        db_mrr += revenue
         if price > 0:
             paying_users += count
 
-    # Try Stripe for verified MRR
-    try:
-        import stripe as _stripe
-        from app.core.config import settings as app_settings
-        if app_settings.STRIPE_SECRET_KEY:
-            _stripe.api_key = app_settings.STRIPE_SECRET_KEY
-            all_subs = []
-            for sub_status in ("active", "trialing"):
-                subs = _stripe.Subscription.list(status=sub_status, limit=100)
-                all_subs.extend(subs.data)
-                while subs.has_more:
-                    subs = _stripe.Subscription.list(
-                        status=sub_status, limit=100,
-                        starting_after=subs.data[-1].id,
-                    )
-                    all_subs.extend(subs.data)
-            mrr_cents = 0
-            for sub in all_subs:
-                try:
-                    sub_amount = 0
-                    plan = getattr(sub, "plan", None)
-                    if plan:
-                        plan_amount = getattr(plan, "amount", 0) or 0
-                        if plan_amount > 0:
-                            plan_interval = getattr(plan, "interval", "month")
-                            quantity = getattr(sub, "quantity", 1) or 1
-                            if plan_interval == "year":
-                                sub_amount = (plan_amount * quantity) / 12
-                            else:
-                                sub_amount = plan_amount * quantity
-                    mrr_cents += sub_amount
-                except Exception:
-                    pass
-            stripe_mrr = round(mrr_cents / 100.0, 2)
-            if stripe_mrr > 0:
-                total_mrr = stripe_mrr
-    except Exception as exc:
-        logger.warning("Stripe unavailable for unit-economics: %s", exc)
-
-    mrr = round(total_mrr, 2)
-    arr = round(mrr * 12, 2)
-    arpu = round(mrr / paying_users, 2) if paying_users > 0 else 0.0
+    # Stripe-verified MRR via service
+    snapshot = fetch_stripe_revenue()
+    total_mrr = snapshot.total_mrr if snapshot.stripe_available and snapshot.total_mrr > 0 else db_mrr
 
     # Churn rate: cancelled in 30d / (active paying + cancelled)
     cancelled_30d = await db.scalar(
@@ -5071,28 +4854,26 @@ async def get_unit_economics(
             UserProfile.updated_at >= thirty_days_ago,
         )
     ) or 0
-    total_base = paying_users + cancelled_30d
-    monthly_churn_rate = round(cancelled_30d / total_base, 4) if total_base > 0 else 0.0
 
-    # LTV, CAC, ratios
-    cac = _DEFAULT_CAC
-    ltv = round(arpu / monthly_churn_rate, 2) if monthly_churn_rate > 0 else 0.0
-    ltv_cac_ratio = round(ltv / cac, 2) if cac > 0 else 0.0
-    payback_months = round(cac / arpu, 1) if arpu > 0 else 0.0
+    econ = compute_unit_economics(
+        mrr=total_mrr,
+        paying_users=paying_users,
+        cancelled_30d=cancelled_30d,
+    )
 
     await _log_admin_action(db, admin_user, "view_unit_economics", "analytics")
     await db.commit()
 
     return {
-        "arpu": arpu,
-        "mrr": mrr,
-        "arr": arr,
+        "arpu": econ["arpu"],
+        "mrr": econ["mrr"],
+        "arr": round(total_mrr * 12, 2),
         "paying_users": paying_users,
-        "monthly_churn_rate": monthly_churn_rate,
-        "ltv": ltv,
-        "cac": cac,
-        "ltv_cac_ratio": ltv_cac_ratio,
-        "payback_months": payback_months,
+        "monthly_churn_rate": econ["monthly_churn"],
+        "ltv": econ["ltv"],
+        "cac": econ["cac"],
+        "ltv_cac_ratio": econ["ltv_cac_ratio"],
+        "payback_months": econ["payback_months"],
         "tier_breakdown": tier_breakdown,
     }
 
@@ -5313,6 +5094,11 @@ async def get_executive_summary(
         )
     ) or 0
 
+    # Revenue from centralised Stripe service
+    snapshot = fetch_stripe_revenue()
+    mrr = snapshot.total_mrr if snapshot.stripe_available else 0.0
+    arr = round(mrr * 12, 2)
+
     await _log_admin_action(db, admin_user, "view_executive_summary", "analytics")
     await db.commit()
 
@@ -5325,6 +5111,8 @@ async def get_executive_summary(
         "paying_conversion": paying_conversion,
         "paying_users": paying_users,
         "new_users_7d": new_users_7d,
+        "mrr": mrr,
+        "arr": arr,
     }
 
 
@@ -5370,25 +5158,35 @@ async def get_ai_summary(
         select(func.count(User.id)).where(User.created_at >= seven_days_ago)
     ) or 0
 
-    # MRR calculation
-    tier_result = await db.execute(
-        select(
-            UserProfile.subscription_tier,
-            func.count(UserProfile.id),
+    # MRR from centralised Stripe service (with DB fallback)
+    snapshot = fetch_stripe_revenue()
+    if snapshot.stripe_available:
+        mrr = snapshot.total_mrr
+    else:
+        # DB fallback
+        tier_result = await db.execute(
+            select(
+                UserProfile.subscription_tier,
+                func.count(UserProfile.id),
+            )
+            .where(UserProfile.subscription_status == "active")
+            .group_by(UserProfile.subscription_tier)
         )
-        .where(UserProfile.subscription_status == "active")
-        .group_by(UserProfile.subscription_tier)
-    )
-    mrr = 0.0
-    paying_users = 0
-    free_tiers = ["essential", "starter", "web_starter", "unknown"]
-    for tier, count in tier_result:
-        tier_name = tier or "unknown"
-        price = tier_prices.get(tier_name, 0)
-        mrr += count * price
-        if tier_name not in free_tiers and price > 0:
-            paying_users += count
-    mrr = round(mrr, 2)
+        mrr = 0.0
+        for tier, count in tier_result:
+            tier_name = tier or "unknown"
+            price = tier_prices.get(tier_name, 0)
+            mrr += count * price
+        mrr = round(mrr, 2)
+
+    # Paying users count (always from DB)
+    free_tiers_list = list(FREE_TIERS)
+    paying_users = await db.scalar(
+        select(func.count(UserProfile.id)).where(
+            UserProfile.subscription_status == "active",
+            UserProfile.subscription_tier.notin_(free_tiers_list),
+        )
+    ) or 0
 
     # Churn
     cancelled_30d = await db.scalar(
@@ -5445,4 +5243,100 @@ async def get_ai_summary(
         "generated": True,
         "metrics": metrics,
         "generated_at": now.isoformat(),
+    }
+
+
+# =============================================================================
+# User Segments Analytics
+# =============================================================================
+
+@router.get(
+    "/analytics/user-segments",
+    summary="User segment breakdown with revenue attribution",
+)
+async def get_user_segments(
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """
+    Count of admins, parents, professionals, and partner_staff.
+    Includes paying count and MRR per segment from Stripe.
+    """
+    from app.models.professional import ProfessionalProfile
+
+    # Admin count
+    admin_count = await db.scalar(
+        select(func.count(User.id)).where(User.is_admin == True, User.is_deleted == False)
+    ) or 0
+
+    # Professional count
+    professional_count = await db.scalar(
+        select(func.count(ProfessionalProfile.id))
+    ) or 0
+
+    # Total profiles
+    total_profiles = await db.scalar(
+        select(func.count(UserProfile.id))
+    ) or 0
+
+    # Parent count (profiles minus professionals)
+    parent_count = max(total_profiles - professional_count, 0)
+
+    # Partner staff (users linked to a professional but not the professional themselves)
+    partner_staff_count = 0
+    try:
+        partner_staff_count = await db.scalar(
+            select(func.count(User.id)).where(
+                User.is_deleted == False,
+                User.is_admin == False,
+                User.id.notin_(
+                    select(ProfessionalProfile.user_id).where(ProfessionalProfile.user_id != None)
+                ),
+                UserProfile.subscription_tier.in_(list(PROFESSIONAL_TIERS)),
+            ).join(UserProfile, UserProfile.user_id == User.id)
+        ) or 0
+    except Exception:
+        pass
+
+    # Paying users per segment from DB
+    free_tiers_list = list(FREE_TIERS)
+    paying_parents = await db.scalar(
+        select(func.count(UserProfile.id)).where(
+            UserProfile.subscription_status == "active",
+            UserProfile.subscription_tier.notin_(free_tiers_list),
+            UserProfile.subscription_tier.in_(list(CONSUMER_TIERS)),
+        )
+    ) or 0
+    paying_professionals = await db.scalar(
+        select(func.count(UserProfile.id)).where(
+            UserProfile.subscription_status == "active",
+            UserProfile.subscription_tier.in_(list(PROFESSIONAL_TIERS)),
+        )
+    ) or 0
+
+    # Revenue from Stripe service
+    snapshot = fetch_stripe_revenue()
+    mrr_by_segment = snapshot.mrr_by_segment if snapshot.stripe_available else {}
+
+    await _log_admin_action(db, admin_user, "view_user_segments", "analytics")
+    await db.commit()
+
+    return {
+        "segments": {
+            "admins": {"count": admin_count},
+            "parents": {
+                "count": parent_count,
+                "paying": paying_parents,
+                "mrr": mrr_by_segment.get("consumer", 0.0),
+            },
+            "professionals": {
+                "count": professional_count,
+                "paying": paying_professionals,
+                "mrr": mrr_by_segment.get("professional", 0.0),
+            },
+            "partner_staff": {"count": partner_staff_count},
+        },
+        "total_profiles": total_profiles,
+        "stripe_available": snapshot.stripe_available,
+        "generated_at": datetime.utcnow().isoformat(),
     }
