@@ -714,6 +714,12 @@ export const adminAPI = {
   syncStripeSubscriptions: () =>
     adminFetch<SyncResult>('/admin/stripe/sync-subscriptions', { method: 'POST' }),
 
+  fullStripeSync: () =>
+    adminFetch<any>('/admin/stripe/full-sync', { method: 'POST' }),
+
+  stripeDiagnostic: () =>
+    adminFetch<any>('/admin/stripe/diagnostic'),
+
   // Tier configuration
   getTierConfig: () => adminFetch<TierConfig>('/admin/config/tiers'),
 

@@ -86,13 +86,18 @@ export default function BillingContent() {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  const handleSync = async (type: 'customers' | 'subscriptions') => {
+  const handleSync = async (type: 'customers' | 'subscriptions' | 'full') => {
     try {
       setSyncing(type);
       setSyncResult(null);
-      const result = type === 'customers'
-        ? await adminAPI.syncStripeCustomers()
-        : await adminAPI.syncStripeSubscriptions();
+      let result;
+      if (type === 'full') {
+        result = await adminAPI.fullStripeSync();
+      } else if (type === 'customers') {
+        result = await adminAPI.syncStripeCustomers();
+      } else {
+        result = await adminAPI.syncStripeSubscriptions();
+      }
       setSyncResult(result);
       await fetchData();
     } catch (err: unknown) {
@@ -277,16 +282,23 @@ export default function BillingContent() {
             </Section>
 
             <div className="space-y-2.5">
-              <button onClick={() => handleSync('customers')} disabled={syncing !== null}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/[0.03] border border-white/[0.06] text-sm text-[#8AACBC] hover:text-white hover:bg-white/[0.06] hover:border-violet-500/20 transition-all disabled:opacity-40">
-                <ArrowUpDown className={`w-4 h-4 ${syncing === 'customers' ? 'animate-spin' : ''}`} />
-                {syncing === 'customers' ? 'Syncing...' : 'Sync Stripe Customers'}
+              <button onClick={() => handleSync('full')} disabled={syncing !== null}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#3DAA8A]/10 border border-[#3DAA8A]/20 text-sm text-[#3DAA8A] hover:text-white hover:bg-[#3DAA8A]/20 font-semibold transition-all disabled:opacity-40">
+                <RefreshCw className={`w-4 h-4 ${syncing === 'full' ? 'animate-spin' : ''}`} />
+                {syncing === 'full' ? 'Full Sync Running...' : 'Full Stripe Sync'}
               </button>
-              <button onClick={() => handleSync('subscriptions')} disabled={syncing !== null}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white/[0.03] border border-white/[0.06] text-sm text-[#8AACBC] hover:text-white hover:bg-white/[0.06] hover:border-violet-500/20 transition-all disabled:opacity-40">
-                <ArrowUpDown className={`w-4 h-4 ${syncing === 'subscriptions' ? 'animate-spin' : ''}`} />
-                {syncing === 'subscriptions' ? 'Syncing...' : 'Sync Subscriptions'}
-              </button>
+              <div className="grid grid-cols-2 gap-2">
+                <button onClick={() => handleSync('customers')} disabled={syncing !== null}
+                  className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-xs text-[#6B8A9A] hover:text-white hover:bg-white/[0.06] transition-all disabled:opacity-40">
+                  <ArrowUpDown className={`w-3.5 h-3.5 ${syncing === 'customers' ? 'animate-spin' : ''}`} />
+                  {syncing === 'customers' ? 'Syncing...' : 'Customers'}
+                </button>
+                <button onClick={() => handleSync('subscriptions')} disabled={syncing !== null}
+                  className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-xs text-[#6B8A9A] hover:text-white hover:bg-white/[0.06] transition-all disabled:opacity-40">
+                  <ArrowUpDown className={`w-3.5 h-3.5 ${syncing === 'subscriptions' ? 'animate-spin' : ''}`} />
+                  {syncing === 'subscriptions' ? 'Syncing...' : 'Subscriptions'}
+                </button>
+              </div>
               <a href="https://dashboard.stripe.com" target="_blank" rel="noopener noreferrer"
                 className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#635BFF]/10 border border-[#635BFF]/20 text-sm text-[#A5A0FF] hover:text-white hover:bg-[#635BFF]/15 transition-all">
                 <CreditCard className="w-4 h-4" /> Stripe Dashboard <ExternalLink className="w-3 h-3" />

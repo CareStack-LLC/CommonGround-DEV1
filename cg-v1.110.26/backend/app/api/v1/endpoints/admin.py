@@ -1661,6 +1661,233 @@ async def sync_stripe_subscriptions(
 
 
 # =============================================================================
+# Stripe Diagnostic & Full Sync
+# =============================================================================
+
+@router.get(
+    "/stripe/diagnostic",
+    summary="Diagnose Stripe connection and data visibility",
+)
+async def stripe_diagnostic(
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Raw Stripe API diagnostic — shows exactly what Stripe returns."""
+    import stripe
+    from app.core.config import settings as app_settings
+
+    if not app_settings.STRIPE_SECRET_KEY:
+        return {"error": "STRIPE_SECRET_KEY not configured"}
+
+    stripe.api_key = app_settings.STRIPE_SECRET_KEY
+    results: dict = {
+        "key_prefix": app_settings.STRIPE_SECRET_KEY[:12] + "...",
+        "key_is_test": app_settings.STRIPE_SECRET_KEY.startswith("sk_test_"),
+    }
+
+    # 1. List customers
+    try:
+        customers = stripe.Customer.list(limit=3)
+        results["customers"] = {
+            "count_in_page": len(customers.data),
+            "has_more": customers.has_more,
+            "first_3": [{"id": c.id, "email": c.email, "name": c.name} for c in customers.data[:3]],
+        }
+    except Exception as e:
+        results["customers_error"] = str(e)
+
+    # 2. List ALL subscriptions (no status filter)
+    try:
+        all_subs = stripe.Subscription.list(limit=10)
+        results["subscriptions_all"] = {
+            "count_in_page": len(all_subs.data),
+            "has_more": all_subs.has_more,
+            "items": [
+                {
+                    "id": s.id,
+                    "status": s.status,
+                    "customer": s.customer,
+                    "items_count": len(getattr(getattr(s, "items", None), "data", []) or []),
+                    "plan_amount": getattr(getattr(s, "plan", None), "amount", None),
+                    "created": s.created,
+                }
+                for s in all_subs.data[:5]
+            ],
+        }
+    except Exception as e:
+        results["subscriptions_error"] = str(e)
+
+    # 3. List active subscriptions specifically
+    try:
+        active_subs = stripe.Subscription.list(status="active", limit=5)
+        results["subscriptions_active"] = {
+            "count_in_page": len(active_subs.data),
+            "has_more": active_subs.has_more,
+        }
+    except Exception as e:
+        results["subscriptions_active_error"] = str(e)
+
+    # 4. List invoices
+    try:
+        invoices = stripe.Invoice.list(limit=3, status="paid")
+        results["invoices_paid"] = {
+            "count_in_page": len(invoices.data),
+            "has_more": invoices.has_more,
+            "first_3": [{"id": inv.id, "amount_paid": inv.amount_paid, "customer_email": inv.customer_email} for inv in invoices.data[:3]],
+        }
+    except Exception as e:
+        results["invoices_error"] = str(e)
+
+    # 5. Check a specific customer's subscriptions
+    try:
+        customers = stripe.Customer.list(limit=1)
+        if customers.data:
+            cust = customers.data[0]
+            cust_subs = stripe.Subscription.list(customer=cust.id, limit=5)
+            results["first_customer_subs"] = {
+                "customer_id": cust.id,
+                "customer_email": cust.email,
+                "subscription_count": len(cust_subs.data),
+                "subs": [{"id": s.id, "status": s.status} for s in cust_subs.data[:5]],
+            }
+    except Exception as e:
+        results["first_customer_subs_error"] = str(e)
+
+    return results
+
+
+@router.post(
+    "/stripe/full-sync",
+    summary="Full Stripe data sync — customers, subscriptions, and MRR",
+)
+async def full_stripe_sync(
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """
+    Comprehensive sync: for each Stripe customer, find their subscription
+    and update the local DB with tier, status, and subscription ID.
+    """
+    import stripe
+    from app.core.config import settings as app_settings
+
+    if not app_settings.STRIPE_SECRET_KEY:
+        raise HTTPException(status_code=500, detail="Stripe not configured")
+
+    stripe.api_key = app_settings.STRIPE_SECRET_KEY
+
+    # Step 1: Get all Stripe customers with their subscriptions
+    all_customers = []
+    cust_page = stripe.Customer.list(limit=100, expand=["data.subscriptions"])
+    all_customers.extend(cust_page.data)
+    while cust_page.has_more:
+        cust_page = stripe.Customer.list(
+            limit=100, starting_after=cust_page.data[-1].id,
+            expand=["data.subscriptions"],
+        )
+        all_customers.extend(cust_page.data)
+
+    synced = 0
+    created_customers = 0
+    updated_subs = 0
+    errors = []
+
+    for cust in all_customers:
+        try:
+            # Find profile by email
+            email = cust.email
+            if not email:
+                continue
+
+            user_result = await db.execute(
+                select(User).where(func.lower(User.email) == email.lower())
+            )
+            user = user_result.scalar_one_or_none()
+            if not user:
+                continue
+
+            profile_result = await db.execute(
+                select(UserProfile).where(UserProfile.user_id == user.id)
+            )
+            profile = profile_result.scalar_one_or_none()
+            if not profile:
+                continue
+
+            changed = False
+
+            # Sync Stripe customer ID
+            if profile.stripe_customer_id != cust.id:
+                profile.stripe_customer_id = cust.id
+                created_customers += 1
+                changed = True
+
+            # Sync subscription
+            subs_data = getattr(getattr(cust, "subscriptions", None), "data", []) or []
+            if subs_data:
+                sub = subs_data[0]  # Take the first/most recent
+                sub_id = sub.id
+                sub_status = sub.status
+
+                # Map Stripe status
+                status_map = {
+                    "active": "active", "trialing": "trial",
+                    "past_due": "past_due", "canceled": "cancelled",
+                    "incomplete": "incomplete", "unpaid": "past_due",
+                }
+                new_status = status_map.get(sub_status, sub_status)
+
+                # Get tier from price
+                items_data = getattr(getattr(sub, "items", None), "data", []) or []
+                new_tier = None
+                if items_data:
+                    price_obj = getattr(items_data[0], "price", None)
+                    price_id = getattr(price_obj, "id", None) if price_obj else None
+                    if price_id and price_id in STRIPE_PRICE_TO_TIER:
+                        new_tier = STRIPE_PRICE_TO_TIER[price_id]
+
+                if new_tier and profile.subscription_tier != new_tier:
+                    profile.subscription_tier = new_tier
+                    changed = True
+                if profile.subscription_status != new_status:
+                    profile.subscription_status = new_status
+                    changed = True
+                if profile.stripe_subscription_id != sub_id:
+                    profile.stripe_subscription_id = sub_id
+                    changed = True
+
+                # Period dates
+                period_start = getattr(sub, "current_period_start", None)
+                period_end = getattr(sub, "current_period_end", None)
+                if period_start:
+                    profile.subscription_period_start = datetime.fromtimestamp(period_start)
+                if period_end:
+                    profile.subscription_period_end = datetime.fromtimestamp(period_end)
+                    profile.subscription_ends_at = datetime.fromtimestamp(period_end)
+
+                if changed:
+                    updated_subs += 1
+
+            synced += 1
+
+        except Exception as e:
+            errors.append({"email": getattr(cust, "email", "?"), "error": str(e)})
+            logger.error(f"Full sync error for {getattr(cust, 'email', '?')}: {e}")
+
+    await _log_admin_action(
+        db, admin_user, "stripe_full_sync", "platform",
+        details=f"Synced {synced} customers, {updated_subs} subs updated, {created_customers} customer IDs linked",
+    )
+    await db.commit()
+
+    return {
+        "total_stripe_customers": len(all_customers),
+        "matched_to_db": synced,
+        "customer_ids_linked": created_customers,
+        "subscriptions_updated": updated_subs,
+        "errors": errors[:10],
+    }
+
+
+# =============================================================================
 # MODULE 10: Tier Configuration
 # =============================================================================
 
