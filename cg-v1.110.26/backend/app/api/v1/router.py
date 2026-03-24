@@ -9,6 +9,9 @@ from app.api.v1.endpoints import (
     admin,
     admin_leads,
     admin_inbox,
+    admin_sales,
+    admin_cs,
+    admin_marketing as admin_mktg,
     auth,
     users,
     partners,
@@ -220,6 +223,15 @@ api_router.include_router(bug_hunt_tester.router, prefix="/bug-hunt", tags=["Bug
 # Admin Reddit Integration
 from app.api.v1.endpoints import admin_reddit
 api_router.include_router(admin_reddit.router, prefix="/admin/reddit", tags=["Admin Reddit"])
+
+# Admin Sales Intelligence
+api_router.include_router(admin_sales.router, prefix="/admin", tags=["Admin Sales Intelligence"])
+
+# Admin Customer Success
+api_router.include_router(admin_cs.router, prefix="/admin", tags=["Admin Customer Success"])
+
+# Admin Marketing Analytics
+api_router.include_router(admin_mktg.router, prefix="/admin", tags=["Admin Marketing Analytics"])
 
 # SuperAdmin Portal - Platform administration
 api_router.include_router(admin.router, prefix="/admin", tags=["SuperAdmin Portal"])
