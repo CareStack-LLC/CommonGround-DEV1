@@ -268,7 +268,7 @@ export default function BugHuntDetailPage() {
     );
   }
 
-  const { cohort, families, checklist, bug_reports, feedback, notes, stats } = data;
+  const { cohort, families, checklist, bug_reports, feedback, notes, testers, stats } = data;
   const checklistProgress = stats.checklist_total > 0
     ? Math.round((stats.checklist_completed / stats.checklist_total) * 100)
     : 0;
