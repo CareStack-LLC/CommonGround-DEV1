@@ -103,7 +103,7 @@ export default function BugTriagePage() {
     try {
       setGeneratingSprint(true);
       setError(null);
-      const result = await adminAPI.createSprint(3);
+      const result = await adminAPI.createBugSprint(3);
       setSprint(result);
       setActiveTab('sprint');
     } catch (err: unknown) {
