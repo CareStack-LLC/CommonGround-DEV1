@@ -778,37 +778,51 @@ async def get_billing_overview(
             stripe.api_key = app_settings.STRIPE_SECRET_KEY
 
             # Active subscriptions from Stripe (paginated)
+            # Fetch both active AND trialing to capture all paying/will-pay subs
             all_subs = []
-            subs = stripe.Subscription.list(status="active", limit=100)
-            all_subs.extend(subs.data)
-            while subs.has_more:
-                subs = stripe.Subscription.list(
-                    status="active", limit=100,
-                    starting_after=subs.data[-1].id,
-                )
+            for sub_status in ("active", "trialing"):
+                subs = stripe.Subscription.list(status=sub_status, limit=100)
                 all_subs.extend(subs.data)
+                while subs.has_more:
+                    subs = stripe.Subscription.list(
+                        status=sub_status, limit=100,
+                        starting_after=subs.data[-1].id,
+                    )
+                    all_subs.extend(subs.data)
 
             stripe_active_count = len(all_subs)
+            logger.info(f"Stripe billing: found {stripe_active_count} active/trialing subscriptions")
 
-            # Calculate MRR from subscription items (modern Stripe API)
+            # Calculate MRR from subscription items
             stripe_mrr_cents = 0
             for sub in all_subs:
-                # Modern format: sub.items.data[0].price.unit_amount
-                items = sub.get("items", {}).get("data", []) if isinstance(sub, dict) else getattr(sub, "items", {}).get("data", [])
-                if items:
-                    for item in items:
-                        price = item.get("price", {}) if isinstance(item, dict) else getattr(item, "price", {})
-                        unit_amount = price.get("unit_amount", 0) if isinstance(price, dict) else getattr(price, "unit_amount", 0)
-                        quantity = item.get("quantity", 1) if isinstance(item, dict) else getattr(item, "quantity", 1)
-                        interval = (price.get("recurring", {}) or {}).get("interval", "month") if isinstance(price, dict) else getattr(getattr(price, "recurring", None) or {}, "interval", "month")
-                        # Normalize yearly to monthly
-                        if interval == "year":
-                            stripe_mrr_cents += (unit_amount * quantity) / 12
-                        else:
-                            stripe_mrr_cents += unit_amount * quantity
-                elif hasattr(sub, "plan") and sub.plan and getattr(sub.plan, "amount", None):
-                    # Legacy fallback
-                    stripe_mrr_cents += sub.plan.amount * sub.quantity
+                try:
+                    # Stripe Python SDK returns StripeObject — use attribute access
+                    sub_items = getattr(sub, "items", None)
+                    items_data = getattr(sub_items, "data", []) if sub_items else []
+
+                    if items_data:
+                        for item in items_data:
+                            price_obj = getattr(item, "price", None)
+                            if not price_obj:
+                                continue
+                            unit_amount = getattr(price_obj, "unit_amount", 0) or 0
+                            quantity = getattr(item, "quantity", 1) or 1
+                            recurring = getattr(price_obj, "recurring", None)
+                            interval = getattr(recurring, "interval", "month") if recurring else "month"
+
+                            # Normalize yearly to monthly
+                            if interval == "year":
+                                stripe_mrr_cents += (unit_amount * quantity) / 12
+                            else:
+                                stripe_mrr_cents += unit_amount * quantity
+                    elif hasattr(sub, "plan") and sub.plan and getattr(sub.plan, "amount", None):
+                        # Legacy fallback for older subscriptions
+                        stripe_mrr_cents += sub.plan.amount * (sub.quantity or 1)
+                except Exception as sub_err:
+                    logger.warning(f"Error processing subscription {getattr(sub, 'id', '?')}: {sub_err}")
+
+            logger.info(f"Stripe billing: calculated MRR = ${stripe_mrr_cents / 100:.2f} from {stripe_active_count} subs")
 
             # Recent invoices (paid)
             invoices = stripe.Invoice.list(limit=20, status="paid")
