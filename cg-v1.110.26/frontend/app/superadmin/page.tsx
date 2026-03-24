@@ -193,10 +193,10 @@ function DashboardInner() {
                   sparklineData={sparklineData}
                 />
                 <MetricCard
-                  icon={DollarSign} label="Est. MRR" value={formatCurrency(dashboard.subscriptions.estimated_mrr)}
+                  icon={DollarSign} label={dashboard.subscriptions.mrr_source === 'stripe' ? 'MRR' : 'Est. MRR'} value={formatCurrency(dashboard.subscriptions.mrr ?? dashboard.subscriptions.estimated_mrr)}
                   sub={`${dashboard.subscriptions.past_due_count} past due`}
                   color="ocean" alert={dashboard.subscriptions.past_due_count > 0}
-                  tooltip="Monthly recurring revenue from all active paid subscriptions"
+                  tooltip={dashboard.subscriptions.mrr_source === 'stripe' ? 'Verified MRR from Stripe' : 'Estimated MRR from database'}
                 />
                 <MetricCard
                   icon={Activity} label="Active (30d)" value={formatNumber(dashboard.users.active_30d)}
@@ -289,16 +289,18 @@ function DashboardInner() {
                 <div className="space-y-3">{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-6" />)}</div>
               ) : dashboard && (
                 <div className="space-y-2.5">
-                  {Object.entries(dashboard.subscriptions?.tier_breakdown || {})
+                  {Object.keys(dashboard.subscriptions?.tier_breakdown || {}).length === 0 ? (
+                    <p className="text-xs text-[#4A6E7F] text-center py-4">No active subscriptions</p>
+                  ) : Object.entries(dashboard.subscriptions?.tier_breakdown || {})
                     .sort(([, a], [, b]) => b - a)
                     .map(([tier, count]) => {
-                      const total = dashboard.users.total || 1;
-                      const pct = Math.round((count / total) * 100);
+                      const total = Object.values(dashboard.subscriptions?.tier_breakdown || {}).reduce((s: number, c: number) => s + c, 0) || 1;
+                      const pct = Math.round(((count as number) / total) * 100);
                       return (
                         <div key={tier}>
                           <div className="flex justify-between text-xs mb-1">
                             <span className="text-[#8AACBC] capitalize">{tier.replace('_', ' ')}</span>
-                            <span className="text-[#6B8A9A]">{count} ({pct}%)</span>
+                            <span className="text-[#6B8A9A]">{count as number} ({pct}%)</span>
                           </div>
                           <div className="h-1.5 bg-[#1E3A4A] rounded-full overflow-hidden">
                             <div className="h-full rounded-full bg-gradient-to-r from-[#3DAA8A] to-[#5BC4A0] transition-all duration-500" style={{ width: `${pct}%` }} />

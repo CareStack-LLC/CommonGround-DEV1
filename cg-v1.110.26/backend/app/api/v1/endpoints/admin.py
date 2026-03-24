@@ -162,19 +162,35 @@ async def get_admin_dashboard(
         select(func.count(ProfessionalProfile.id))
     )
 
-    # Subscription tier breakdown
+    # User type counts (needed for filtering)
+    admin_count = await db.scalar(
+        select(func.count(User.id)).where(User.is_admin == True, User.is_deleted == False)
+    ) or 0
+    admin_ids_result = await db.execute(
+        select(User.id).where(User.is_admin == True, User.is_deleted == False)
+    )
+    dash_admin_ids = [str(r[0]) for r in admin_ids_result.all()]
+    dash_non_admin = UserProfile.user_id.notin_(dash_admin_ids) if dash_admin_ids else True
+
+    total_profiles = await db.scalar(
+        select(func.count(UserProfile.id)).where(dash_non_admin)
+    ) or 0
+    parent_count = total_profiles - (total_professionals or 0)
+
+    # Subscription tier breakdown (excludes admins)
     tier_counts = {}
     tier_result = await db.execute(
         select(
             UserProfile.subscription_tier,
             func.count(UserProfile.id),
         )
+        .where(dash_non_admin)
         .group_by(UserProfile.subscription_tier)
     )
     for tier, count in tier_result:
         tier_counts[tier or "unknown"] = count
 
-    # MRR estimate using correct tier prices
+    # MRR estimate using correct tier prices (DB fallback)
     tier_prices = await _get_tier_prices(db)
     estimated_mrr = sum(
         tier_prices.get(tier, 0) * count
@@ -185,14 +201,12 @@ async def get_admin_dashboard(
     stripe_snapshot = fetch_stripe_revenue()
     stripe_mrr = stripe_snapshot.total_mrr if stripe_snapshot.stripe_available else None
 
-    # User type counts
-    admin_count = await db.scalar(
-        select(func.count(User.id)).where(User.is_admin == True, User.is_deleted == False)
-    ) or 0
-    total_profiles = await db.scalar(
-        select(func.count(UserProfile.id))
-    ) or 0
-    parent_count = total_profiles - (total_professionals or 0)
+    # Override tier_breakdown with Stripe data when available
+    if stripe_snapshot.stripe_available:
+        tier_counts = {}
+        for tier_name, tier_info in stripe_snapshot.mrr_by_tier.items():
+            if tier_info["count"] > 0:
+                tier_counts[tier_name] = tier_info["count"]
 
     # Messages sent in last 7 days
     from app.models.message import Message
@@ -284,7 +298,10 @@ async def get_admin_dashboard(
             "estimated_mrr": round(estimated_mrr, 2),
             "mrr": stripe_mrr if stripe_mrr is not None else round(estimated_mrr, 2),
             "mrr_source": "stripe" if stripe_mrr is not None else "db_estimate",
+            "mrr_by_tier": {k: v for k, v in stripe_snapshot.mrr_by_tier.items() if v["count"] > 0} if stripe_snapshot.stripe_available else {},
+            "mrr_by_segment": stripe_snapshot.mrr_by_segment if stripe_snapshot.stripe_available else {},
             "past_due_count": past_due_count,
+            "active_subscriptions": stripe_snapshot.active_count if stripe_snapshot.stripe_available else sum(tier_counts.values()),
         },
         "engagement": {
             "messages_7d": messages_7d,
