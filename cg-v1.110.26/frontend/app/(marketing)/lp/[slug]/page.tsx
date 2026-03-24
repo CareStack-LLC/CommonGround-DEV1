@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { LandingPageTemplate } from '@/components/marketing/landing-page-template';
 import { LpAnalytics } from '@/components/marketing/lp-analytics';
 import { JsonLd } from '@/components/marketing/json-ld';
+import { sanitizeHtml } from '@/lib/sanitize';
 
 const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/api\/v1\/?$/, '');
 
@@ -187,7 +188,7 @@ export default async function DynamicLandingPage({ params }: Props) {
       <section className="max-w-4xl mx-auto px-4 py-16">
         <div
           className="prose prose-lg max-w-none prose-headings:text-[#1E3A4A] prose-p:text-gray-600"
-          dangerouslySetInnerHTML={{ __html: data.body_html }}
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(data.body_html) }}
         />
       </section>
 

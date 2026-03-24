@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useProfessionalAuth } from "../layout";
+import { sanitizeHtml } from "@/lib/sanitize";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -235,7 +236,7 @@ export default function HelpCenterPage() {
                     <CardContent className="pt-6">
                         <div
                             className="prose prose-slate max-w-none text-sm leading-relaxed"
-                            dangerouslySetInnerHTML={{ __html: renderMarkdown(selectedArticle.content) }}
+                            dangerouslySetInnerHTML={{ __html: sanitizeHtml(renderMarkdown(selectedArticle.content)) }}
                         />
                     </CardContent>
                 </Card>

@@ -6,7 +6,7 @@ const securityHeaders = [
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.daily.co https://unpkg.com https://cdnjs.cloudflare.com https://www.youtube.com https://s.ytimg.com https://js.stripe.com https://www.googletagmanager.com blob:",  // Next.js + Daily.co SDK + PDF.js + YouTube + Stripe + GA
+      "script-src 'self' 'unsafe-inline' https://*.daily.co https://unpkg.com https://cdnjs.cloudflare.com https://www.youtube.com https://s.ytimg.com https://js.stripe.com https://www.googletagmanager.com blob:",  // Next.js + Daily.co SDK + PDF.js + YouTube + Stripe + GA (unsafe-eval removed)
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",  // Tailwind + Google Fonts
       "img-src 'self' data: https: blob:",
       "font-src 'self' https://fonts.gstatic.com",  // Google Fonts
@@ -34,6 +34,10 @@ const securityHeaders = [
   {
     key: 'Referrer-Policy',
     value: 'strict-origin-when-cross-origin'
+  },
+  {
+    key: 'Strict-Transport-Security',
+    value: 'max-age=63072000; includeSubDomains; preload'
   },
   {
     key: 'Permissions-Policy',

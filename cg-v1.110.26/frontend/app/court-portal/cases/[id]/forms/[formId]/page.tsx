@@ -32,6 +32,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Textarea } from "@/components/ui/textarea";
+import { sanitizeHtml } from "@/lib/sanitize";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { getCourtAuthToken } from "@/lib/court-api";
@@ -1579,7 +1580,7 @@ function FormDataDisplay({ data, formType }: { data: Record<string, any>; formTy
         <div className="prose prose-sm max-w-none text-indigo-800">
           {summary.split('\n\n').map((paragraph, idx) => (
             <p key={idx} className="mb-2 last:mb-0" dangerouslySetInnerHTML={{
-              __html: paragraph.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+              __html: sanitizeHtml(paragraph.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'))
             }} />
           ))}
         </div>

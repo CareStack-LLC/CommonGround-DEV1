@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { Calendar, Clock, ArrowLeft, ArrowRight, User, Share2, Loader2, CheckCircle } from 'lucide-react';
+import { sanitizeHtml } from '@/lib/sanitize';
 import {
   getPostBySlug,
   getRelatedPosts,
@@ -228,7 +229,7 @@ export default function BlogPostPage() {
             `}</style>
             <div
               className="blog-content"
-              dangerouslySetInnerHTML={{ __html: apiPost.content }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHtml(apiPost.content) }}
             />
 
             {/* Share & Tags */}

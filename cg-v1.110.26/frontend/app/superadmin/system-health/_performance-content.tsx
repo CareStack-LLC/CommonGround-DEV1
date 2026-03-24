@@ -197,16 +197,16 @@ export default function PerformanceContent() {
                   <tr key={i} className="border-b border-zinc-800/50 hover:bg-[#2D6A8F]/10 transition-colors">
                     <td className="px-5 py-3 text-white font-mono text-xs">{t?.name}</td>
                     <td className="px-5 py-3 text-right text-[#D0E4EC]">{formatNumber(t?.count ?? 0)}</td>
-                    <td className="px-5 py-3 text-right text-[#D0E4EC]">{t?.p75_ms?.toFixed(0)}</td>
+                    <td className="px-5 py-3 text-right text-[#D0E4EC]">{(t?.p75_ms ?? 0).toFixed(0)}</td>
                     <td className={`px-5 py-3 text-right font-medium ${
                       (t?.p95_ms ?? 0) > 2000 ? 'text-red-400' : (t?.p95_ms ?? 0) > 500 ? 'text-amber-400' : 'text-[#D0E4EC]'
                     }`}>
-                      {t?.p95_ms?.toFixed(0)}
+                      {(t?.p95_ms ?? 0).toFixed(0)}
                     </td>
                     <td className={`px-5 py-3 text-right font-medium ${
                       (t?.failure_rate ?? 0) > 5 ? 'text-red-400' : (t?.failure_rate ?? 0) > 1 ? 'text-amber-400' : 'text-[#D0E4EC]'
                     }`}>
-                      {t?.failure_rate?.toFixed(1)}%
+                      {(t?.failure_rate ?? 0).toFixed(1)}%
                     </td>
                   </tr>
                 ))}
@@ -248,7 +248,7 @@ export default function PerformanceContent() {
                   <tr key={i} className="border-b border-zinc-800/50 hover:bg-[#2D6A8F]/10 transition-colors">
                     <td className="px-5 py-3 text-white">{a?.description}</td>
                     <td className="px-5 py-3 text-right text-[#D0E4EC]">{formatNumber(a?.count ?? 0)}</td>
-                    <td className="px-5 py-3 text-right text-[#D0E4EC]">{a?.avg_duration_ms?.toFixed(0)} ms</td>
+                    <td className="px-5 py-3 text-right text-[#D0E4EC]">{(a?.avg_duration_ms ?? 0).toFixed(0)} ms</td>
                     <td className="px-5 py-3 text-right text-[#D0E4EC]">{formatTokens(a?.total_tokens ?? 0)}</td>
                   </tr>
                 ))}
@@ -296,11 +296,11 @@ export default function PerformanceContent() {
                       {q?.query?.length > 120 ? `${q.query.slice(0, 120)}...` : q?.query}
                     </td>
                     <td className="px-5 py-3 text-right text-[#D0E4EC]">{formatNumber(q?.count ?? 0)}</td>
-                    <td className="px-5 py-3 text-right text-[#D0E4EC]">{q?.avg_ms?.toFixed(0)}</td>
+                    <td className="px-5 py-3 text-right text-[#D0E4EC]">{(q?.avg_ms ?? 0).toFixed(0)}</td>
                     <td className={`px-5 py-3 text-right font-medium ${
                       (q?.p95_ms ?? 0) > 1000 ? 'text-red-400' : (q?.p95_ms ?? 0) > 500 ? 'text-amber-400' : 'text-[#D0E4EC]'
                     }`}>
-                      {q?.p95_ms?.toFixed(0)}
+                      {(q?.p95_ms ?? 0).toFixed(0)}
                     </td>
                   </tr>
                 ))}

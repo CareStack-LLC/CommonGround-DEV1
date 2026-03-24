@@ -408,7 +408,7 @@ def build_recording_path(family_file_id: str, session_id: str, filename: str) ->
 
 
 # File validation constants
-MAX_ATTACHMENT_SIZE = 150 * 1024 * 1024  # 150 MB
+MAX_ATTACHMENT_SIZE = 50 * 1024 * 1024  # 50 MB
 ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"}
 ALLOWED_DOCUMENT_TYPES = {
     "application/pdf",
@@ -489,7 +489,7 @@ def scan_file_for_viruses(file_content: bytes, filename: str = "") -> dict:
 
     # Placeholder: virus scanning not yet configured
     # To enable, set VIRUS_SCAN_ENABLED=true and configure scanning service
-    logger.info(f"File upload without virus scan: {filename} ({len(file_content)} bytes)")
+    logger.warning(f"File upload accepted without virus scan: {filename} ({len(file_content)} bytes)")
     return {
         "scanned": False,
         "status": "not_scanned",

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { sanitizeHtml } from '@/lib/sanitize';
 import { Card, CardContent } from '@/components/ui/card';
 import {
     Clock,
@@ -126,7 +127,7 @@ export default function GenericPartnerLanding({ partner }: GenericPartnerLanding
                         </div>
                     </div>
 
-                    <h1 className="text-5xl md:text-6xl font-black text-white mb-6 leading-[1.1] tracking-tight" dangerouslySetInnerHTML={{ __html: heroTitle }} />
+                    <h1 className="text-5xl md:text-6xl font-black text-white mb-6 leading-[1.1] tracking-tight" dangerouslySetInnerHTML={{ __html: sanitizeHtml(heroTitle) }} />
 
                     <p className="text-xl text-gray-400 mb-8 max-w-lg leading-relaxed">
                         {heroSubtitle}

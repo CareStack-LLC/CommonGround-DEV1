@@ -8,6 +8,7 @@ import {
   TrendingUp, Inbox, MousePointerClick,
 } from 'lucide-react';
 import { adminAPI, type EmailCampaign, type LeadList } from '@/lib/admin-api';
+import { sanitizeHtml } from '@/lib/sanitize';
 
 // ══════════════════════════════════════════════════════════════
 // HELPERS
@@ -373,7 +374,7 @@ export default function CampaignsPage() {
             </div>
           </div>
           <div className="bg-white rounded-b-xl p-6 max-h-[500px] overflow-y-auto">
-            <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
+            <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(previewHtml) }} />
           </div>
         </div>
       )}

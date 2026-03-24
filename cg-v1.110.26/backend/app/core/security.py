@@ -2,8 +2,11 @@
 Security utilities for authentication and authorization.
 """
 
+import logging
 from datetime import datetime, timedelta
 from typing import Optional
+
+logger = logging.getLogger(__name__)
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -164,8 +167,15 @@ async def get_current_user(
             )
     except HTTPException:
         raise
-    except Exception:
-        pass  # Redis unavailable — allow token (fail-open for availability)
+    except Exception as e:
+        # SECURITY TRADEOFF: Fail-open for availability — if Redis is down, we allow
+        # the token through rather than blocking all authenticated requests. This means
+        # revoked tokens may be accepted while Redis is unavailable. We log this as an
+        # error so it can be monitored and addressed quickly.
+        logger.error(
+            "SECURITY: Redis unavailable during token blacklist check — "
+            "revoked tokens may be accepted. Error: %s", str(e)
+        )
 
     # Decode token
     payload = decode_token(token)
