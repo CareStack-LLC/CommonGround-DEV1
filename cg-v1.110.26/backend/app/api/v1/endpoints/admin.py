@@ -131,23 +131,26 @@ async def get_admin_dashboard(
     seven_days_ago = now - timedelta(days=7)
     yesterday = now - timedelta(days=1)
 
-    # User counts
+    # User counts (exclude admins — admins are operators, not customers)
+    _non_admin = (User.is_deleted == False, User.is_admin == False)
     total_users = await db.scalar(
-        select(func.count(User.id)).where(User.is_deleted == False)
+        select(func.count(User.id)).where(*_non_admin)
     )
     active_users_30d = await db.scalar(
         select(func.count(User.id)).where(
-            User.is_deleted == False,
+            *_non_admin,
             User.last_active >= thirty_days_ago,
         )
     )
     new_users_7d = await db.scalar(
         select(func.count(User.id)).where(
+            *_non_admin,
             User.created_at >= seven_days_ago,
         )
     )
     new_users_24h = await db.scalar(
         select(func.count(User.id)).where(
+            *_non_admin,
             User.created_at >= yesterday,
         )
     )
@@ -224,11 +227,12 @@ async def get_admin_dashboard(
         )
     )
 
-    # Active users today (last 24 hours)
+    # Active users today (last 24 hours, exclude admins)
     active_today = await db.scalar(
         select(func.count(User.id)).where(
             User.last_active >= yesterday,
             User.is_deleted == False,
+            User.is_admin == False,
         )
     )
 
@@ -239,10 +243,10 @@ async def get_admin_dashboard(
         )
     )
 
-    # Recent signups (last 10 for feed)
+    # Recent signups (last 10 for feed, exclude admins)
     recent_signups_result = await db.execute(
         select(User.id, User.first_name, User.last_name, User.created_at)
-        .where(User.is_deleted == False)
+        .where(User.is_deleted == False, User.is_admin == False)
         .order_by(User.created_at.desc())
         .limit(10)
     )
@@ -418,19 +422,19 @@ async def search_users(
         except Exception:
             pro_count = 0
 
-        # New users last 7 days
+        # New users last 7 days (exclude admins)
         seven_days = datetime.utcnow() - timedelta(days=7)
         new_7d = await db.scalar(
             select(func.count()).select_from(User).where(
-                User.created_at >= seven_days, User.is_deleted == False
+                User.created_at >= seven_days, User.is_deleted == False, User.is_admin == False
             )
         ) or 0
 
-        # New users last 30 days
+        # New users last 30 days (exclude admins)
         thirty_days = datetime.utcnow() - timedelta(days=30)
         new_30d = await db.scalar(
             select(func.count()).select_from(User).where(
-                User.created_at >= thirty_days, User.is_deleted == False
+                User.created_at >= thirty_days, User.is_deleted == False, User.is_admin == False
             )
         ) or 0
 
@@ -873,7 +877,7 @@ async def get_billing_overview(
         )
 
         total_users_result = await db.execute(
-            select(func.count()).select_from(User).where(User.is_deleted == False)
+            select(func.count()).select_from(User).where(User.is_deleted == False, User.is_admin == False)
         )
         total_users_val = total_users_result.scalar() or 0
 
@@ -1014,7 +1018,7 @@ async def get_growth_stats(
             func.date(User.created_at).label("date"),
             func.count(User.id).label("count"),
         )
-        .where(User.created_at >= start_date)
+        .where(User.created_at >= start_date, User.is_admin == False)
         .group_by(func.date(User.created_at))
         .order_by(func.date(User.created_at))
     )
@@ -5098,23 +5102,23 @@ async def get_executive_summary(
     seven_days_ago = now - timedelta(days=7)
     thirty_days_ago = now - timedelta(days=30)
 
-    # Total users (non-deleted)
+    # Total users (non-deleted, non-admin)
     total_users = await db.scalar(
-        select(func.count(User.id)).where(User.is_deleted == False)
+        select(func.count(User.id)).where(User.is_deleted == False, User.is_admin == False)
     ) or 0
 
-    # DAU: active in last 24h
+    # DAU: active in last 24h (non-admin)
     dau = await db.scalar(
         select(func.count(User.id)).where(
-            User.is_deleted == False,
+            User.is_deleted == False, User.is_admin == False,
             User.last_active >= yesterday,
         )
     ) or 0
 
-    # MAU: active in last 30 days
+    # MAU: active in last 30 days (non-admin)
     mau = await db.scalar(
         select(func.count(User.id)).where(
-            User.is_deleted == False,
+            User.is_deleted == False, User.is_admin == False,
             User.last_active >= thirty_days_ago,
         )
     ) or 0
@@ -5190,27 +5194,29 @@ async def get_ai_summary(
 
     tier_prices = await _get_tier_prices(db)
 
-    # Core metrics
+    # Core metrics (exclude admins)
     total_users = await db.scalar(
-        select(func.count(User.id)).where(User.is_deleted == False)
+        select(func.count(User.id)).where(User.is_deleted == False, User.is_admin == False)
     ) or 0
 
     dau = await db.scalar(
         select(func.count(User.id)).where(
-            User.is_deleted == False,
+            User.is_deleted == False, User.is_admin == False,
             User.last_active >= yesterday,
         )
     ) or 0
 
     mau = await db.scalar(
         select(func.count(User.id)).where(
-            User.is_deleted == False,
+            User.is_deleted == False, User.is_admin == False,
             User.last_active >= thirty_days_ago,
         )
     ) or 0
 
     new_users_7d = await db.scalar(
-        select(func.count(User.id)).where(User.created_at >= seven_days_ago)
+        select(func.count(User.id)).where(
+            User.created_at >= seven_days_ago, User.is_deleted == False, User.is_admin == False
+        )
     ) or 0
 
     # MRR from centralised Stripe service (with DB fallback)
