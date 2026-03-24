@@ -168,11 +168,115 @@ function KPICard({ label, value, icon: Icon, trend, color = 'text-white' }: {
   );
 }
 
+// ── HTML Email Detection ─────────────────────────────────────────────────
+
+function isHtmlContent(body: string): boolean {
+  if (!body) return false;
+  return /<\s*(html|head|body|div|table|p|br|span|img|a|style)\b/i.test(body);
+}
+
+function stripHtmlForPreview(html: string): string {
+  return html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 150);
+}
+
+// ── HTML Email Renderer (sandboxed iframe) ───────────────────────────────
+
+function HtmlEmailBody({ html }: { html: string }) {
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [height, setHeight] = useState(300);
+
+  useEffect(() => {
+    const iframe = iframeRef.current;
+    if (!iframe) return;
+
+    const doc = iframe.contentDocument;
+    if (!doc) return;
+
+    // Wrap email HTML with styling reset
+    const wrappedHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+          * { margin: 0; padding: 0; box-sizing: border-box; }
+          body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #D0E4EC;
+            background: transparent;
+            padding: 8px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+          }
+          a { color: #3DAA8A; }
+          img { max-width: 100%; height: auto; border-radius: 4px; }
+          table { max-width: 100% !important; }
+          blockquote {
+            border-left: 3px solid #2D6A8F;
+            padding-left: 12px;
+            margin: 8px 0;
+            color: #8AACBC;
+          }
+          pre, code {
+            background: #162D3A;
+            border-radius: 4px;
+            padding: 2px 4px;
+            font-size: 13px;
+          }
+          hr { border: none; border-top: 1px solid #2D6A8F30; margin: 12px 0; }
+        </style>
+      </head>
+      <body>${html}</body>
+      </html>
+    `;
+
+    doc.open();
+    doc.write(wrappedHtml);
+    doc.close();
+
+    // Auto-resize iframe to content height
+    const resize = () => {
+      try {
+        const h = doc.documentElement?.scrollHeight || doc.body?.scrollHeight || 300;
+        setHeight(Math.min(Math.max(h + 16, 100), 800));
+      } catch { /* cross-origin safety */ }
+    };
+
+    // Resize after images load
+    const images = doc.querySelectorAll('img');
+    if (images.length > 0) {
+      let loaded = 0;
+      images.forEach(img => {
+        img.addEventListener('load', () => { loaded++; if (loaded >= images.length) resize(); });
+        img.addEventListener('error', () => { loaded++; if (loaded >= images.length) resize(); });
+      });
+    }
+
+    // Initial resize after a tick
+    setTimeout(resize, 100);
+    setTimeout(resize, 500);
+  }, [html]);
+
+  return (
+    <iframe
+      ref={iframeRef}
+      sandbox="allow-same-origin"
+      className="w-full border-0 rounded-lg bg-transparent"
+      style={{ height: `${height}px`, minHeight: '100px' }}
+      title="Email content"
+    />
+  );
+}
+
 // ── Thread Message Bubble ────────────────────────────────────────────────
 
 function ThreadMessage({ email, isLatest }: { email: MonitoredEmail; isLatest: boolean }) {
   const [expanded, setExpanded] = useState(isLatest);
   const isOutbound = email.from_email.endsWith('@find-commonground.com');
+  const bodyIsHtml = isHtmlContent(email.body_full || '');
 
   return (
     <div className={`rounded-xl border transition-all ${
@@ -198,10 +302,18 @@ function ThreadMessage({ email, isLatest }: { email: MonitoredEmail; isLatest: b
             {isOutbound && (
               <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#3DAA8A]/10 text-[#3DAA8A] font-medium">Sent</span>
             )}
+            {bodyIsHtml && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 font-medium">HTML</span>
+            )}
             <span className="text-[10px] text-[#4A6E7F] ml-auto">{formatFullDate(email.received_at)}</span>
           </div>
           {!expanded && (
-            <p className="text-xs text-[#6B8A9A] truncate mt-0.5">{email.body_preview || email.body_full?.slice(0, 120)}</p>
+            <p className="text-xs text-[#6B8A9A] truncate mt-0.5">
+              {bodyIsHtml
+                ? stripHtmlForPreview(email.body_full || '')
+                : (email.body_preview || email.body_full?.slice(0, 120))
+              }
+            </p>
           )}
         </div>
 
@@ -211,11 +323,23 @@ function ThreadMessage({ email, isLatest }: { email: MonitoredEmail; isLatest: b
       {/* Message Body */}
       {expanded && (
         <div className="px-4 pb-4 pt-0">
-          <div className="text-xs text-[#6B8A9A] mb-2">
-            To: {email.to_email}
+          <div className="flex items-center gap-3 text-xs text-[#6B8A9A] mb-3">
+            <span>From: <span className="text-[#8AACBC]">{email.from_name ? `${email.from_name} <${email.from_email}>` : email.from_email}</span></span>
+            <span>→</span>
+            <span>To: <span className="text-[#8AACBC]">{email.to_email}</span></span>
           </div>
-          <div className="text-sm text-[#D0E4EC] whitespace-pre-wrap leading-relaxed pl-11">
-            {email.body_full}
+
+          {/* Render HTML or plain text */}
+          <div className="ml-11">
+            {bodyIsHtml ? (
+              <div className="bg-[#0F2533]/60 rounded-lg border border-[#2D6A8F]/15 overflow-hidden">
+                <HtmlEmailBody html={email.body_full || ''} />
+              </div>
+            ) : (
+              <div className="text-sm text-[#D0E4EC] whitespace-pre-wrap leading-relaxed">
+                {email.body_full}
+              </div>
+            )}
           </div>
 
           {/* AI Summary inline */}
