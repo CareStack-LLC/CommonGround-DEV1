@@ -444,10 +444,13 @@ async def get_cohort_dashboard(db: AsyncSession, cohort_id: str) -> dict:
         }
 
     def _serialize_checklist(c: BugHuntChecklistItem) -> dict:
+        t = tester_map.get(c.tester_id) if c.tester_id else None
         return {
             "id": c.id, "cohort_id": c.cohort_id, "title": c.title,
             "description": c.description, "display_order": c.display_order,
             "is_completed": c.is_completed, "completed_by": c.completed_by,
+            "tester_id": c.tester_id,
+            "tester_name": t.tester_name if t else None,
             "completed_at": c.completed_at.isoformat() if c.completed_at else None,
             "created_at": c.created_at.isoformat(),
         }
@@ -1009,6 +1012,125 @@ async def resend_tester_invite(db: AsyncSession, tester_id: str, expiry_days: in
     tester.status = "invited"
     await db.flush()
     return tester
+
+
+async def generate_ai_overview(db: AsyncSession, cohort_id: str) -> dict:
+    """Generate an AI-powered analysis of a bug hunt cohort using Claude."""
+    import json as json_mod
+
+    dashboard = await get_cohort_dashboard(db, cohort_id)
+    cohort_data = dashboard["cohort"]
+    stats = dashboard["stats"]
+
+    # Build context for the AI
+    checklist_summary = []
+    for item in dashboard["checklist"]:
+        status = "completed" if item["is_completed"] else "incomplete"
+        by = item.get("tester_name") or ("Admin" if item.get("completed_by") else "nobody")
+        checklist_summary.append(f"- [{status}] {item['title']} (by {by})")
+
+    bug_summary = []
+    for bug in dashboard["bug_reports"]:
+        by = bug.get("tester_name") or "Admin"
+        bug_summary.append(f"- [{bug['severity'].upper()}] [{bug['status']}] {bug['title']}: {bug['description'][:200]} (reported by {by})")
+
+    feedback_summary = []
+    for fb in dashboard["feedback"]:
+        rating = f"Rating: {fb['rating']}/5" if fb.get("rating") else "No rating"
+        by = fb.get("tester_name") or "Admin"
+        feedback_summary.append(f"- [{fb['category']}] {rating} — {fb['content'][:200]} (by {by})")
+
+    notes_summary = []
+    for note in dashboard["notes"]:
+        by = note.get("tester_name") or "Admin"
+        notes_summary.append(f"- [{note['note_type']}] {note['content'][:200]} (by {by})")
+
+    tester_summary = []
+    for t in dashboard.get("testers", []):
+        tester_summary.append(f"- {t['tester_name']} ({t['tester_email']}): status={t['status']}, first_access={t.get('first_accessed_at') or 'never'}")
+
+    prompt = f"""Analyze this Bug Hunt QA testing session and provide a structured overview.
+
+BUG HUNT: {cohort_data['name']}
+Description: {cohort_data.get('description') or 'N/A'}
+Target Feature: {cohort_data['target_feature']}
+Status: {cohort_data['status']}
+
+STATS:
+- Families: {stats['families_total']} total, {stats['families_completed']} completed
+- Checklist: {stats['checklist_completed']}/{stats['checklist_total']} items done
+- Bugs Found: {stats['bugs_total']} (by severity: {stats['bugs_by_severity']})
+- Feedback: {stats['feedback_total']} entries, avg rating: {stats.get('avg_rating') or 'N/A'}
+- Testers: {stats.get('testers_total', 0)} assigned, {stats.get('testers_active', 0)} active
+
+CHECKLIST ITEMS:
+{chr(10).join(checklist_summary) if checklist_summary else 'No checklist items'}
+
+BUG REPORTS:
+{chr(10).join(bug_summary) if bug_summary else 'No bugs reported'}
+
+FEEDBACK:
+{chr(10).join(feedback_summary) if feedback_summary else 'No feedback'}
+
+TESTER NOTES:
+{chr(10).join(notes_summary) if notes_summary else 'No notes'}
+
+TESTERS:
+{chr(10).join(tester_summary) if tester_summary else 'No testers assigned'}
+
+Respond with a JSON object (no markdown, just raw JSON) with these fields:
+{{
+  "executive_summary": "2-3 sentence overview of the testing session results",
+  "key_findings": ["finding 1", "finding 2", ...],
+  "bug_patterns": ["pattern 1", "pattern 2", ...],
+  "ux_themes": ["theme 1", "theme 2", ...],
+  "action_items": [
+    {{"priority": "high|medium|low", "action": "description", "category": "bug_fix|ux_improvement|investigation|documentation"}},
+    ...
+  ],
+  "tester_engagement": "assessment of tester participation and coverage",
+  "overall_health": "healthy|needs_attention|critical"
+}}"""
+
+    try:
+        import anthropic
+        from app.core.config import settings
+
+        client = anthropic.AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY)
+        response = await client.messages.create(
+            model="claude-sonnet-4-5-20250514",
+            max_tokens=4096,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        text = response.content[0].text.strip()
+
+        # Parse JSON from response (handle markdown code blocks)
+        if text.startswith("```"):
+            text = text.split("\n", 1)[1].rsplit("```", 1)[0].strip()
+        analysis = json_mod.loads(text)
+    except Exception as e:
+        logger.error("AI overview generation failed: %s", e)
+        analysis = {
+            "executive_summary": f"AI analysis unavailable: {type(e).__name__}",
+            "key_findings": [],
+            "bug_patterns": [],
+            "ux_themes": [],
+            "action_items": [],
+            "tester_engagement": "Unable to assess",
+            "overall_health": "needs_attention",
+            "error": str(e),
+        }
+
+    # Store in cohort summary_json
+    cohort = await db.get(BugHuntCohort, cohort_id)
+    if cohort:
+        existing = cohort.summary_json or {}
+        existing["ai_overview"] = analysis
+        existing["ai_generated_at"] = datetime.utcnow().isoformat()
+        cohort.summary_json = existing
+        await db.flush()
+
+    return analysis
 
 
 async def delete_cohort(db: AsyncSession, cohort_id: str) -> bool:

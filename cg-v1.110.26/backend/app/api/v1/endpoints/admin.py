@@ -4178,6 +4178,31 @@ async def complete_bug_hunt(
         raise HTTPException(status_code=400, detail=str(exc))
 
 
+@router.post(
+    "/bug-hunts/{cohort_id}/ai-overview",
+    summary="Generate AI overview of bug hunt",
+)
+async def generate_bug_hunt_ai_overview(
+    cohort_id: str,
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Use Claude to analyze all bugs, feedback, notes, and checklist data."""
+    from app.services.bug_hunt_service import generate_ai_overview
+
+    try:
+        analysis = await generate_ai_overview(db, cohort_id)
+        await _log_admin_action(db, admin_user, "bug_hunt_ai_overview", "bug_hunt", target_id=cohort_id)
+        await db.commit()
+        return analysis
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+    except Exception as exc:
+        logger.error("AI overview failed: %s", exc)
+        capture_error(exc)
+        raise HTTPException(status_code=502, detail=f"AI analysis failed: {type(exc).__name__}")
+
+
 @router.patch(
     "/bug-hunts/{cohort_id}/families/{family_id}",
     summary="Update family test status",

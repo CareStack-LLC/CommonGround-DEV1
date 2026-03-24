@@ -5,7 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import {
   FlaskConical, ArrowLeft, RefreshCw, Loader2, CheckCircle2, Copy, Check,
   Plus, Bug, MessageSquare, StickyNote, Users, ClipboardList, Star,
-  AlertTriangle, ChevronDown, ChevronRight, Trash2, ExternalLink,
+  AlertTriangle, ChevronDown, ChevronRight, Trash2, ExternalLink, Brain,
 } from 'lucide-react';
 import {
   adminAPI,
@@ -94,6 +94,8 @@ export default function BugHuntDetailPage() {
   const [tab, setTab] = useState<Tab>('overview');
   const [generating, setGenerating] = useState(false);
   const [completing, setCompleting] = useState(false);
+  const [generatingAI, setGeneratingAI] = useState(false);
+  const [aiOverview, setAIOverview] = useState<Record<string, any> | null>(null);
 
   // Form states
   const [newCheckItem, setNewCheckItem] = useState('');
@@ -131,6 +133,25 @@ export default function BugHuntDetailPage() {
       setError(err instanceof Error ? err.message : 'Generation failed');
     } finally {
       setGenerating(false);
+    }
+  };
+
+  // Load cached AI overview from summary_json
+  useEffect(() => {
+    if (data?.cohort?.summary_json?.ai_overview) {
+      setAIOverview(data.cohort.summary_json.ai_overview);
+    }
+  }, [data]);
+
+  const handleGenerateAI = async () => {
+    try {
+      setGeneratingAI(true);
+      const analysis = await adminAPI.generateBugHuntAIOverview(cohortId);
+      setAIOverview(analysis);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'AI analysis failed');
+    } finally {
+      setGeneratingAI(false);
     }
   };
 
@@ -383,6 +404,103 @@ export default function BugHuntDetailPage() {
               <pre className="text-sm text-[#D0E4EC] whitespace-pre-wrap font-mono">{cohort.test_instructions}</pre>
             </div>
           )}
+
+          {/* AI Overview */}
+          <div className="bg-[#1E3A4A]/50 border border-[#2D6A8F]/20 rounded-xl p-5">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-medium text-[#8AACBC] uppercase tracking-wider flex items-center gap-2">
+                <Brain className="w-4 h-4 text-[#3DAA8A]" />
+                AI Analysis
+              </h3>
+              <button
+                onClick={handleGenerateAI}
+                disabled={generatingAI || stats.bugs_total + stats.feedback_total + stats.checklist_completed === 0}
+                className="flex items-center gap-2 px-3 py-1.5 bg-[#3DAA8A]/20 text-[#3DAA8A] rounded-lg hover:bg-[#3DAA8A]/30 transition-colors text-xs font-medium disabled:opacity-50"
+              >
+                {generatingAI ? <><Loader2 className="w-3 h-3 animate-spin" /> Analyzing...</> : <><Brain className="w-3 h-3" /> {aiOverview ? 'Regenerate' : 'Generate Analysis'}</>}
+              </button>
+            </div>
+
+            {!aiOverview && !generatingAI && (
+              <p className="text-sm text-[#6B8A9A] text-center py-4">Click &quot;Generate Analysis&quot; to get an AI-powered overview of this bug hunt.</p>
+            )}
+
+            {aiOverview && !aiOverview.error && (
+              <div className="space-y-4">
+                {/* Health indicator */}
+                <div className="flex items-center gap-2">
+                  <div className={`w-2.5 h-2.5 rounded-full ${aiOverview.overall_health === 'healthy' ? 'bg-[#3DAA8A]' : aiOverview.overall_health === 'critical' ? 'bg-red-500' : 'bg-yellow-500'}`} />
+                  <span className="text-xs uppercase tracking-wider text-[#8AACBC]">{aiOverview.overall_health}</span>
+                </div>
+
+                {/* Executive Summary */}
+                <p className="text-sm text-[#D0E4EC] leading-relaxed">{aiOverview.executive_summary}</p>
+
+                {/* Key Findings */}
+                {aiOverview.key_findings?.length > 0 && (
+                  <div>
+                    <h4 className="text-xs font-medium text-[#8AACBC] uppercase tracking-wider mb-2">Key Findings</h4>
+                    <ul className="space-y-1">
+                      {aiOverview.key_findings.map((f: string, i: number) => (
+                        <li key={i} className="text-sm text-[#D0E4EC] flex items-start gap-2">
+                          <span className="text-[#3DAA8A] mt-1">&#x2022;</span> {f}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Bug Patterns */}
+                {aiOverview.bug_patterns?.length > 0 && (
+                  <div>
+                    <h4 className="text-xs font-medium text-[#8AACBC] uppercase tracking-wider mb-2">Bug Patterns</h4>
+                    <ul className="space-y-1">
+                      {aiOverview.bug_patterns.map((p: string, i: number) => (
+                        <li key={i} className="text-sm text-[#D0E4EC] flex items-start gap-2">
+                          <Bug className="w-3.5 h-3.5 text-orange-400 mt-0.5 flex-shrink-0" /> {p}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Action Items */}
+                {aiOverview.action_items?.length > 0 && (
+                  <div>
+                    <h4 className="text-xs font-medium text-[#8AACBC] uppercase tracking-wider mb-2">Action Items</h4>
+                    <div className="space-y-2">
+                      {aiOverview.action_items.map((a: { priority: string; action: string; category: string }, i: number) => (
+                        <div key={i} className="flex items-start gap-2 bg-[#162D3A]/50 rounded-lg p-3">
+                          <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded-full mt-0.5 flex-shrink-0 ${
+                            a.priority === 'high' ? 'bg-red-500/15 text-red-400' :
+                            a.priority === 'medium' ? 'bg-yellow-500/15 text-yellow-400' :
+                            'bg-zinc-700/50 text-[#8AACBC]'
+                          }`}>{a.priority}</span>
+                          <span className="text-sm text-[#D0E4EC]">{a.action}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Tester Engagement */}
+                {aiOverview.tester_engagement && (
+                  <div>
+                    <h4 className="text-xs font-medium text-[#8AACBC] uppercase tracking-wider mb-2">Tester Engagement</h4>
+                    <p className="text-sm text-[#D0E4EC]">{aiOverview.tester_engagement}</p>
+                  </div>
+                )}
+
+                {cohort.summary_json?.ai_generated_at && (
+                  <p className="text-[10px] text-[#4A6E7F] mt-2">Generated {new Date(cohort.summary_json.ai_generated_at).toLocaleString()}</p>
+                )}
+              </div>
+            )}
+
+            {aiOverview?.error && (
+              <p className="text-sm text-red-400">{aiOverview.executive_summary}</p>
+            )}
+          </div>
         </div>
       )}
 
@@ -531,6 +649,11 @@ export default function BugHuntDetailPage() {
                   {item.completed_at && (
                     <div className="text-[10px] text-[#4A6E7F] mt-1">
                       Completed {new Date(item.completed_at).toLocaleString()}
+                      {item.tester_name ? (
+                        <span className="ml-1 text-[#3DAA8A]">by {item.tester_name}</span>
+                      ) : item.completed_by ? (
+                        <span className="ml-1 text-[#8AACBC]">by Admin</span>
+                      ) : null}
                     </div>
                   )}
                 </div>

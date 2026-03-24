@@ -493,6 +493,8 @@ export interface BugHuntChecklistItem {
   display_order: number;
   is_completed: boolean;
   completed_by: string | null;
+  tester_id: string | null;
+  tester_name: string | null;
   completed_at: string | null;
   created_at: string;
 }
@@ -780,6 +782,9 @@ export const adminAPI = {
 
   completeBugHunt: (id: string) =>
     adminFetch<BugHuntCohort>(`/admin/bug-hunts/${id}/complete`, { method: 'POST' }),
+
+  generateBugHuntAIOverview: (id: string) =>
+    adminFetch<Record<string, any>>(`/admin/bug-hunts/${id}/ai-overview`, { method: 'POST' }),
 
   deleteBugHunt: (id: string) =>
     adminFetch<{ deleted: boolean }>(`/admin/bug-hunts/${id}`, { method: 'DELETE' }),
