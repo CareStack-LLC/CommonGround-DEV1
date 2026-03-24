@@ -90,7 +90,7 @@ export default function OverviewTab({ data }: { data: AriaInsights }) {
                 <Tooltip contentStyle={CustomTooltipStyle} />
                 <Legend
                   verticalAlign="bottom"
-                  formatter={(value: string) => (
+                  formatter={(value: any) => (
                     <span className="text-[#8AACBC] text-xs capitalize">{value}</span>
                   )}
                 />

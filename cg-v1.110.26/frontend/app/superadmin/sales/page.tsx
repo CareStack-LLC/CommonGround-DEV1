@@ -389,7 +389,7 @@ function ForecastTab() {
               />
               <Tooltip
                 contentStyle={RECHARTS_TOOLTIP}
-                formatter={(value: number) => [formatCurrency(value), '']}
+                formatter={(value: any) => [formatCurrency(Number(value ?? 0)), '']}
               />
               {/* Confidence band (high) */}
               <Area
@@ -585,7 +585,7 @@ function UnitEconomicsTab() {
                   tickLine={false}
                   width={90}
                 />
-                <Tooltip contentStyle={RECHARTS_TOOLTIP} formatter={(v: number) => [formatCurrency(v), 'CAC']} />
+                <Tooltip contentStyle={RECHARTS_TOOLTIP} formatter={(v: any) => [formatCurrency(Number(v ?? 0)), 'CAC']} />
                 <Bar dataKey="cac" name="CAC" fill="#4BA8C8" radius={[0, 4, 4, 0]} barSize={18} />
               </BarChart>
             </ResponsiveContainer>
@@ -621,7 +621,7 @@ function UnitEconomicsTab() {
                   tickLine={false}
                   width={90}
                 />
-                <Tooltip contentStyle={RECHARTS_TOOLTIP} formatter={(v: number) => [formatCurrency(v), 'LTV']} />
+                <Tooltip contentStyle={RECHARTS_TOOLTIP} formatter={(v: any) => [formatCurrency(Number(v ?? 0)), 'LTV']} />
                 <Bar dataKey="ltv" name="LTV" fill="#3DAA8A" radius={[0, 4, 4, 0]} barSize={18} />
               </BarChart>
             </ResponsiveContainer>

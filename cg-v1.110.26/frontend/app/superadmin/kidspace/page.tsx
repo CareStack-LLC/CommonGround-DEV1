@@ -213,7 +213,7 @@ export default function KidSpaceAnalyticsPage() {
                   <XAxis dataKey="date" tick={{ fill: '#71717a', fontSize: 11 }} tickFormatter={(v) => new Date(v).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} axisLine={{ stroke: '#3f3f46' }} tickLine={false} />
                   <YAxis tick={{ fill: '#71717a', fontSize: 11 }} axisLine={false} tickLine={false} />
                   <Tooltip contentStyle={CustomTooltipStyle} labelFormatter={(v) => new Date(v).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} />
-                  <Legend verticalAlign="top" height={36} formatter={(value: string) => <span className="text-zinc-400 text-xs capitalize">{value}</span>} />
+                  <Legend verticalAlign="top" height={36} formatter={(value: any) => <span className="text-zinc-400 text-xs capitalize">{value}</span>} />
                   <Line type="monotone" dataKey="calls" name="Calls" stroke="#3b82f6" strokeWidth={2} dot={false} />
                   <Line type="monotone" dataKey="theater" name="Theater" stroke="#10b981" strokeWidth={2} dot={false} />
                   <Line type="monotone" dataKey="arcade" name="Arcade" stroke="#f59e0b" strokeWidth={2} dot={false} />

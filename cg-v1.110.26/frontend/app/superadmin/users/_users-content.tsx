@@ -176,7 +176,7 @@ export default function UsersContent() {
                 verticalAlign="middle"
                 align="right"
                 layout="vertical"
-                formatter={(value: string) => <span className="text-[#8AACBC] text-xs capitalize">{value}</span>}
+                formatter={(value: any) => <span className="text-[#8AACBC] text-xs capitalize">{value}</span>}
               />
             </PieChart>
           </ResponsiveContainer>
