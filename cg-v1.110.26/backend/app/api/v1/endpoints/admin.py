@@ -779,6 +779,18 @@ async def get_billing_overview(
     if not snapshot.stripe_available:
         stripe_live["error"] = snapshot.error or "Stripe API unavailable."
 
+    # Override DB-calculated revenue with Stripe data when available
+    if snapshot.stripe_available:
+        # Use Stripe as source of truth for MRR
+        total_mrr = snapshot.total_mrr
+        mrr_by_tier = {}
+        for tier_name, tier_info in snapshot.mrr_by_tier.items():
+            mrr_by_tier[tier_name] = {
+                "count": tier_info["count"],
+                "price": tier_info["price"],
+                "mrr": tier_info["mrr"],
+            }
+
     # Verify expected products exist in Stripe (best-effort)
     try:
         if snapshot.stripe_available:
@@ -806,11 +818,11 @@ async def get_billing_overview(
     # --- Phase 4: Computed valuation metrics (via service) ---
     valuation = {}
     try:
-        active_paying = sum(
+        # Use Stripe subscription count when available
+        active_paying = snapshot.active_count if snapshot.stripe_available else sum(
             t["count"] for t in mrr_by_tier.values() if t["price"] > 0
         )
-        # Use Stripe MRR when available, else DB estimate
-        valuation_mrr = snapshot.total_mrr if snapshot.stripe_available else total_mrr
+        valuation_mrr = total_mrr  # Already overridden with Stripe data above
 
         econ = compute_unit_economics(
             mrr=valuation_mrr,
@@ -862,8 +874,9 @@ async def get_billing_overview(
         "new_paid_30d": new_paid_30d,
         "mrr_by_tier": mrr_by_tier,
         "mrr_by_segment": snapshot.mrr_by_segment if snapshot.stripe_available else None,
+        "mrr_source": "stripe" if snapshot.stripe_available else "db_estimate",
         "total_mrr": round(total_mrr, 2),
-        "estimated_mrr": round(total_mrr, 2),
+        "estimated_mrr": round(total_mrr, 2) if not snapshot.stripe_available else round(total_mrr, 2),
         "verified_mrr": verified_mrr,
         "stripe_live": stripe_live,
         "stripe_health": stripe_health,
