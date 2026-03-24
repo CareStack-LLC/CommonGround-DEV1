@@ -10,7 +10,7 @@ interface AuthContextType {
   timezone: string;
   isLoading: boolean;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<{ profile: UserProfile | null }>;
+  login: (email: string, password: string) => Promise<{ user: User; profile: UserProfile | null }>;
   register: (data: {
     email: string;
     password: string;
@@ -80,7 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error('Failed to load profile after login:', profileError);
     }
 
-    return { profile: profileData };
+    return { user: response.user, profile: profileData };
   };
 
   const register = async (data: {

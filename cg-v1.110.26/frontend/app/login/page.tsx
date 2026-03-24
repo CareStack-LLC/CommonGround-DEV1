@@ -37,11 +37,15 @@ function LoginContent() {
     setIsLoading(true);
 
     try {
-      const { profile } = await login(email, password);
+      const { user: loggedInUser, profile } = await login(email, password);
       trackLogin('email');
       const explicitRedirect = searchParams.get('redirect');
-      // If no explicit redirect, route professionals to their portal
-      const redirectTo = explicitRedirect || (profile?.is_professional ? '/professional/dashboard' : '/dashboard');
+      // If no explicit redirect, route by user type: admin → superadmin, professional → pro portal, else → dashboard
+      const redirectTo = explicitRedirect || (
+        loggedInUser?.is_admin ? '/superadmin' :
+        profile?.is_professional ? '/professional/dashboard' :
+        '/dashboard'
+      );
       router.push(redirectTo);
     } catch (err) {
       if (err instanceof APIError) {

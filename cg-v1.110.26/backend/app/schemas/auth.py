@@ -86,6 +86,7 @@ class UserResponse(BaseModel):
     email_verified: bool
     first_name: str
     last_name: str
+    is_admin: bool = False
 
     class Config:
         from_attributes = True

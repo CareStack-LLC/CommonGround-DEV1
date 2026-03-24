@@ -334,6 +334,7 @@ export interface User {
   last_name: string;
   phone?: string;
   is_active: boolean;
+  is_admin?: boolean;
   created_at: string;
   updated_at: string;
 }
