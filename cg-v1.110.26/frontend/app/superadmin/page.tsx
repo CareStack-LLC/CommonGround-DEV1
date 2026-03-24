@@ -443,7 +443,7 @@ function DashboardInner() {
                 <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">Revenue by Tier <InfoTooltip text="Monthly revenue contribution by subscription tier" /></h2>
                 <ResponsiveContainer width="100%" height={200}>
                   <PieChart>
-                    <Pie data={Object.entries(revenueData.breakdown).map(([tier, data]: [string, any]) => ({ name: tier.replace('_', ' '), value: data.revenue }))} cx="50%" cy="50%" innerRadius={50} outerRadius={80} dataKey="value" label={({ name, percent }: { name: string; percent?: number }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}>
+                    <Pie data={Object.entries(revenueData.breakdown).map(([tier, data]: [string, any]) => ({ name: tier.replace('_', ' '), value: data.revenue }))} cx="50%" cy="50%" innerRadius={50} outerRadius={80} dataKey="value" label={(props: any) => `${props.name ?? ''} ${((props.percent ?? 0) * 100).toFixed(0)}%`}>
                       {Object.keys(revenueData.breakdown).map((_, i) => (
                         <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
                       ))}
