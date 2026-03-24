@@ -3,59 +3,176 @@
 
 {% block title %}Bug Hunt Testing Assignment{% endblock %}
 
-{% block preheader %}You've been assigned to test "{{ cohort_name }}" on CommonGround.{% endblock %}
+{% block preheader %}You've been assigned to test "{{ cohort_name }}" on CommonGround — here's everything you need to get started.{% endblock %}
 
 {% block content %}
-{{ c.heading("You're Invited to Test") }}
-{{ c.subheading("Hi " ~ tester_name ~ ", you've been assigned to a Bug Hunt testing session for CommonGround.") }}
+{{ c.heading("Welcome to the Bug Hunt!") }}
+{{ c.subheading("Hi " ~ tester_name ~ ", thank you for helping us improve CommonGround! You've been selected for a testing session and we need your sharp eyes to help us catch bugs and improve the experience.") }}
 
 {% call c.info_card() %}
-<p style="margin: 0 0 4px; font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #3DAA8A; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.3;">Bug Hunt</p>
+<p style="margin: 0 0 4px; font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #3DAA8A; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.3;">Bug Hunt Session</p>
 <p style="margin: 0; font-family: Arial, Helvetica, sans-serif; font-size: 17px; font-weight: 600; color: #1E3A4A; line-height: 1.4;">{{ cohort_name }}</p>
 {% if cohort_description %}
-<p style="margin: 8px 0 0; font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #5A7A8A; line-height: 1.4;">{{ cohort_description }}</p>
+<p style="margin: 8px 0 0; font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #5A7A8A; line-height: 1.5;">{{ cohort_description }}</p>
 {% endif %}
 {% endcall %}
 
 {{ c.divider() }}
 
-<p style="margin: 0 0 16px; font-family: Arial, Helvetica, sans-serif; font-size: 16px; font-weight: 600; color: #1E3A4A; line-height: 1.3; text-align: center;">Your Test Family: {{ family_name }}</p>
+<!-- What is CommonGround -->
+<p style="margin: 0 0 8px; font-family: Arial, Helvetica, sans-serif; font-size: 15px; font-weight: 600; color: #1E3A4A; line-height: 1.3;">What is CommonGround?</p>
+<p style="margin: 0 0 16px; font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #5A7A8A; line-height: 1.6;">
+  CommonGround is an AI-powered co-parenting platform designed to help separated and divorced parents communicate, schedule, share documents, and manage their co-parenting responsibilities in one secure place. Think of it as the calm, organized hub where co-parents can collaborate without conflict.
+</p>
 
-<table style="width: 100%; border-collapse: collapse; margin: 0 0 16px;">
+{{ c.divider() }}
+
+<!-- How Testing Works -->
+<p style="margin: 0 0 12px; font-family: Arial, Helvetica, sans-serif; font-size: 15px; font-weight: 600; color: #1E3A4A; line-height: 1.3;">How This Works</p>
+<table style="width: 100%; border-collapse: collapse; margin: 0 0 20px;">
 <tr>
-<td style="padding: 12px; background: #F0F7F4; border-radius: 8px 8px 0 0; font-family: Arial, Helvetica, sans-serif;">
-<p style="margin: 0 0 4px; font-size: 11px; color: #3DAA8A; text-transform: uppercase; letter-spacing: 0.5px;">Parent A — {{ parent_a_name }}</p>
-<p style="margin: 0; font-size: 14px; color: #1E3A4A;"><strong>Email:</strong> {{ parent_a_email }}</p>
-<p style="margin: 4px 0 0; font-size: 14px; color: #1E3A4A;"><strong>Password:</strong> {{ parent_a_password }}</p>
+<td style="padding: 10px 12px; font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #1E3A4A; line-height: 1.5; border-bottom: 1px solid #E8F0F3;">
+  <strong style="color: #3DAA8A;">Step 1:</strong> Click the "Start Testing" button below to open your testing dashboard
 </td>
 </tr>
 <tr>
-<td style="padding: 12px; background: #F5F9FB; border-radius: 0 0 8px 8px; font-family: Arial, Helvetica, sans-serif;">
-<p style="margin: 0 0 4px; font-size: 11px; color: #3DAA8A; text-transform: uppercase; letter-spacing: 0.5px;">Parent B — {{ parent_b_name }}</p>
-<p style="margin: 0; font-size: 14px; color: #1E3A4A;"><strong>Email:</strong> {{ parent_b_email }}</p>
-<p style="margin: 4px 0 0; font-size: 14px; color: #1E3A4A;"><strong>Password:</strong> {{ parent_b_password }}</p>
+<td style="padding: 10px 12px; font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #1E3A4A; line-height: 1.5; border-bottom: 1px solid #E8F0F3;">
+  <strong style="color: #3DAA8A;">Step 2:</strong> Log in to CommonGround using the test account credentials below (use a desktop or mobile browser at <a href="https://www.find-commonground.com" style="color: #3DAA8A;">find-commonground.com</a>)
+</td>
+</tr>
+<tr>
+<td style="padding: 10px 12px; font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #1E3A4A; line-height: 1.5; border-bottom: 1px solid #E8F0F3;">
+  <strong style="color: #3DAA8A;">Step 3:</strong> Explore the app — try messaging, scheduling, creating agreements, uploading documents, and anything else you can find
+</td>
+</tr>
+<tr>
+<td style="padding: 10px 12px; font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #1E3A4A; line-height: 1.5; border-bottom: 1px solid #E8F0F3;">
+  <strong style="color: #3DAA8A;">Step 4:</strong> When you find something that doesn't work right, looks wrong, or feels confusing — report it from your testing dashboard
+</td>
+</tr>
+<tr>
+<td style="padding: 10px 12px; font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #1E3A4A; line-height: 1.5;">
+  <strong style="color: #3DAA8A;">Step 5:</strong> Share your overall feedback and experience — we want to hear everything!
+</td>
+</tr>
+</table>
+
+{{ c.divider() }}
+
+<!-- Test Accounts -->
+<p style="margin: 0 0 12px; font-family: Arial, Helvetica, sans-serif; font-size: 16px; font-weight: 600; color: #1E3A4A; line-height: 1.3; text-align: center;">Your Test Family: {{ family_name }}</p>
+<p style="margin: 0 0 16px; font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #8CA0A8; text-align: center; line-height: 1.5;">
+  You have two parent accounts to test with. Try logging in as both Parent A and Parent B (use different browsers or incognito mode) to see both sides of the co-parenting experience.
+</p>
+
+<table style="width: 100%; border-collapse: collapse; margin: 0 0 16px;">
+<tr>
+<td style="padding: 16px; background: #F0F7F4; border-radius: 8px 8px 0 0; font-family: Arial, Helvetica, sans-serif;">
+<p style="margin: 0 0 6px; font-size: 11px; color: #3DAA8A; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Parent A — {{ parent_a_name }}</p>
+<p style="margin: 0; font-size: 14px; color: #1E3A4A;"><strong>Email:</strong> <span style="background: #E8F5F0; padding: 2px 8px; border-radius: 4px; font-family: monospace;">{{ parent_a_email }}</span></p>
+<p style="margin: 6px 0 0; font-size: 14px; color: #1E3A4A;"><strong>Password:</strong> <span style="background: #E8F5F0; padding: 2px 8px; border-radius: 4px; font-family: monospace;">{{ parent_a_password }}</span></p>
+</td>
+</tr>
+<tr>
+<td style="padding: 16px; background: #F5F9FB; border-radius: 0 0 8px 8px; font-family: Arial, Helvetica, sans-serif; border-top: 2px solid #E0EDF2;">
+<p style="margin: 0 0 6px; font-size: 11px; color: #3DAA8A; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">Parent B — {{ parent_b_name }}</p>
+<p style="margin: 0; font-size: 14px; color: #1E3A4A;"><strong>Email:</strong> <span style="background: #EBF2F7; padding: 2px 8px; border-radius: 4px; font-family: monospace;">{{ parent_b_email }}</span></p>
+<p style="margin: 6px 0 0; font-size: 14px; color: #1E3A4A;"><strong>Password:</strong> <span style="background: #EBF2F7; padding: 2px 8px; border-radius: 4px; font-family: monospace;">{{ parent_b_password }}</span></p>
 </td>
 </tr>
 {% if children_names %}
 <tr>
-<td style="padding: 8px 12px; font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #5A7A8A;">
-<strong>Children:</strong> {{ children_names | join(', ') }}
+<td style="padding: 10px 16px; font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #5A7A8A; background: #FAFCFD; border-radius: 0 0 8px 8px;">
+<strong>Children in this family:</strong> {{ children_names | join(', ') }}
 </td>
 </tr>
 {% endif %}
 </table>
 
+{{ c.divider() }}
+
+<!-- Test Payment Card -->
+<table style="width: 100%; border-collapse: collapse; margin: 0 0 20px;">
+<tr>
+<td style="padding: 20px; background: linear-gradient(135deg, #1E3A4A 0%, #2D5F6F 100%); border-radius: 12px; font-family: Arial, Helvetica, sans-serif; text-align: center;">
+<p style="margin: 0 0 4px; font-size: 11px; color: #3DAA8A; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Test Credit Card (No Real Charges)</p>
+<p style="margin: 0 0 12px; font-size: 13px; color: #8CA0A8; line-height: 1.4;">Use this card to test payments, add money to wallets, and test subscription upgrades. This is a Stripe test card — no real money will be charged.</p>
+
+<table style="margin: 0 auto; border-collapse: collapse;">
+<tr>
+<td style="padding: 8px 16px; background: rgba(61, 170, 138, 0.15); border-radius: 8px; font-family: monospace, Arial; text-align: center;">
+<p style="margin: 0 0 4px; font-size: 22px; letter-spacing: 3px; color: #FFFFFF; font-weight: 600;">4242 4242 4242 4242</p>
+<table style="margin: 0 auto; border-collapse: collapse;">
+<tr>
+<td style="padding: 4px 12px; font-size: 13px; color: #B0C8D0;">
+<strong style="color: #3DAA8A;">Exp:</strong> 07/30
+</td>
+<td style="padding: 4px 12px; font-size: 13px; color: #B0C8D0;">
+<strong style="color: #3DAA8A;">CVC:</strong> 243
+</td>
+<td style="padding: 4px 12px; font-size: 13px; color: #B0C8D0;">
+<strong style="color: #3DAA8A;">ZIP:</strong> 42424
+</td>
+</tr>
+</table>
+</p>
+</td>
+</tr>
+</table>
+
+<p style="margin: 12px 0 0; font-size: 12px; color: #6B8A9A; line-height: 1.4;">
+  Use this card anywhere you see a payment form — wallet top-ups, subscription upgrades, ClearFund payments, etc.
+</p>
+</td>
+</tr>
+</table>
+
+{{ c.divider() }}
+
+<!-- What to Test -->
+<p style="margin: 0 0 12px; font-family: Arial, Helvetica, sans-serif; font-size: 15px; font-weight: 600; color: #1E3A4A; line-height: 1.3;">What to Look For</p>
+<table style="width: 100%; border-collapse: collapse; margin: 0 0 16px;">
+<tr>
+<td style="padding: 8px 12px; font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #1E3A4A; line-height: 1.5; border-bottom: 1px solid #E8F0F3;">
+  🐛 <strong>Bugs:</strong> Buttons that don't work, pages that crash, errors that pop up, features that behave unexpectedly
+</td>
+</tr>
+<tr>
+<td style="padding: 8px 12px; font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #1E3A4A; line-height: 1.5; border-bottom: 1px solid #E8F0F3;">
+  🎨 <strong>Design Issues:</strong> Text that's hard to read, buttons that look off, layout problems on mobile vs desktop
+</td>
+</tr>
+<tr>
+<td style="padding: 8px 12px; font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #1E3A4A; line-height: 1.5; border-bottom: 1px solid #E8F0F3;">
+  😕 <strong>Confusion:</strong> Anything that's not intuitive — if you have to think about how something works, that's valuable feedback
+</td>
+</tr>
+<tr>
+<td style="padding: 8px 12px; font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #1E3A4A; line-height: 1.5; border-bottom: 1px solid #E8F0F3;">
+  📱 <strong>Mobile Experience:</strong> Try the app on your phone — does everything work smoothly?
+</td>
+</tr>
+<tr>
+<td style="padding: 8px 12px; font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #1E3A4A; line-height: 1.5;">
+  💡 <strong>Ideas:</strong> Features you wish existed, things that could be better — we want to hear all of it
+</td>
+</tr>
+</table>
+
 {% if test_instructions %}
 {{ c.divider() }}
-<p style="margin: 0 0 8px; font-family: Arial, Helvetica, sans-serif; font-size: 14px; font-weight: 600; color: #1E3A4A;">Test Instructions:</p>
-<div style="padding: 12px; background: #F5F9FB; border-radius: 8px; font-family: monospace, Arial; font-size: 13px; color: #1E3A4A; line-height: 1.5; white-space: pre-wrap;">{{ test_instructions }}</div>
+<p style="margin: 0 0 8px; font-family: Arial, Helvetica, sans-serif; font-size: 15px; font-weight: 600; color: #1E3A4A;">Specific Test Instructions:</p>
+<div style="padding: 16px; background: #F5F9FB; border-radius: 8px; border-left: 3px solid #3DAA8A; font-family: Arial, Helvetica, sans-serif; font-size: 14px; color: #1E3A4A; line-height: 1.6; white-space: pre-wrap;">{{ test_instructions }}</div>
 {% endif %}
 
-{{ c.button(magic_link, "Start Testing") }}
+{{ c.divider() }}
 
-{{ c.notice("This testing link expires in " ~ expiry_days ~ " days. No login required — just click the button above to start.") }}
+{{ c.button(magic_link, "Start Testing Now") }}
 
-<p style="margin: 16px 0 0; font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #8CA0A8; text-align: center; line-height: 1.5;">
-  You can submit bug reports, feedback, and notes directly from the testing page. Your submissions will be tracked and linked to your name.
+{{ c.notice("This testing link expires in " ~ expiry_days ~ " days. No login required for the testing dashboard — just click the button above. You'll need the credentials above to log into the actual CommonGround app to test it.") }}
+
+<p style="margin: 20px 0 0; font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #8CA0A8; text-align: center; line-height: 1.6;">
+  <strong>Need help?</strong> Reply to this email or reach out to <a href="mailto:support@find-commonground.com" style="color: #3DAA8A;">support@find-commonground.com</a><br>
+  All your bug reports, feedback, and notes are tracked automatically from the testing dashboard.
 </p>
 {% endblock %}
