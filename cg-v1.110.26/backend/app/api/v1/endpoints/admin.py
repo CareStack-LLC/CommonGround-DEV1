@@ -793,32 +793,42 @@ async def get_billing_overview(
             stripe_active_count = len(all_subs)
             logger.info(f"Stripe billing: found {stripe_active_count} active/trialing subscriptions")
 
-            # Calculate MRR from subscription items
+            # Calculate MRR from subscriptions — try multiple approaches
             stripe_mrr_cents = 0
             for sub in all_subs:
                 try:
-                    # Stripe Python SDK returns StripeObject — use attribute access
+                    sub_amount = 0
+                    quantity = getattr(sub, "quantity", 1) or 1
+
+                    # Approach 1: Modern items.data[].price.unit_amount
                     sub_items = getattr(sub, "items", None)
                     items_data = getattr(sub_items, "data", []) if sub_items else []
-
-                    if items_data:
+                    if items_data and len(items_data) > 0:
                         for item in items_data:
                             price_obj = getattr(item, "price", None)
-                            if not price_obj:
-                                continue
-                            unit_amount = getattr(price_obj, "unit_amount", 0) or 0
-                            quantity = getattr(item, "quantity", 1) or 1
-                            recurring = getattr(price_obj, "recurring", None)
-                            interval = getattr(recurring, "interval", "month") if recurring else "month"
+                            if price_obj:
+                                unit_amount = getattr(price_obj, "unit_amount", 0) or 0
+                                item_qty = getattr(item, "quantity", 1) or 1
+                                recurring = getattr(price_obj, "recurring", None)
+                                interval = getattr(recurring, "interval", "month") if recurring else "month"
+                                if interval == "year":
+                                    sub_amount += (unit_amount * item_qty) / 12
+                                else:
+                                    sub_amount += unit_amount * item_qty
 
-                            # Normalize yearly to monthly
-                            if interval == "year":
-                                stripe_mrr_cents += (unit_amount * quantity) / 12
-                            else:
-                                stripe_mrr_cents += unit_amount * quantity
-                    elif hasattr(sub, "plan") and sub.plan and getattr(sub.plan, "amount", None):
-                        # Legacy fallback for older subscriptions
-                        stripe_mrr_cents += sub.plan.amount * (sub.quantity or 1)
+                    # Approach 2: Legacy sub.plan.amount (used by many test subscriptions)
+                    if sub_amount == 0:
+                        plan = getattr(sub, "plan", None)
+                        if plan:
+                            plan_amount = getattr(plan, "amount", 0) or 0
+                            if plan_amount > 0:
+                                plan_interval = getattr(plan, "interval", "month")
+                                if plan_interval == "year":
+                                    sub_amount = (plan_amount * quantity) / 12
+                                else:
+                                    sub_amount = plan_amount * quantity
+
+                    stripe_mrr_cents += sub_amount
                 except Exception as sub_err:
                     logger.warning(f"Error processing subscription {getattr(sub, 'id', '?')}: {sub_err}")
 
