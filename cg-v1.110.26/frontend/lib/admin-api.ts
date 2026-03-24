@@ -118,10 +118,10 @@ async function adminFetchBlob(endpoint: string): Promise<Blob> {
 // --- Types ---
 
 export interface DashboardData {
-  users: { total: number; active_30d: number; active_today: number; new_7d: number; new_24h: number };
+  users: { total: number; active_30d: number; active_today: number; new_7d: number; new_24h: number; admins?: number; parents?: number; professionals?: number };
   family_files: { active: number };
   professionals: { total: number };
-  subscriptions: { tier_breakdown: Record<string, number>; estimated_mrr: number; past_due_count: number };
+  subscriptions: { tier_breakdown: Record<string, number>; estimated_mrr: number; mrr?: number; mrr_source?: string; mrr_by_tier?: Record<string, { count: number; price: number; mrr: number }>; mrr_by_segment?: Record<string, number>; past_due_count: number; active_subscriptions?: number };
   engagement: { messages_7d: number; aria_interventions_7d: number };
   recent_signups: { id: string; name: string; created_at: string | null }[];
   recent_admin_actions: { id: string; action: string; user_email: string; description: string | null; created_at: string | null }[];
