@@ -844,12 +844,36 @@ export default function BugHuntDetailPage() {
                     <span className="text-xs text-[#6B8A9A]">{new Date(bug.created_at).toLocaleDateString()}</span>
                   </button>
                   {expandedBugs.has(bug.id) && (
-                    <div className="px-11 pb-3 space-y-2">
+                    <div className="px-11 pb-3 space-y-3">
                       <p className="text-sm text-[#D0E4EC]">{bug.description}</p>
                       {bug.steps_to_reproduce && (
                         <div>
                           <span className="text-xs text-[#6B8A9A] font-medium">Steps to Reproduce:</span>
                           <pre className="text-xs text-[#8AACBC] mt-1 whitespace-pre-wrap font-mono">{bug.steps_to_reproduce}</pre>
+                        </div>
+                      )}
+                      {bug.screenshot_urls && bug.screenshot_urls.length > 0 && (
+                        <div>
+                          <span className="text-xs text-[#6B8A9A] font-medium">Screenshots ({bug.screenshot_urls.length}):</span>
+                          <div className="flex flex-wrap gap-2 mt-2">
+                            {bug.screenshot_urls.map((url, idx) => (
+                              <a
+                                key={idx}
+                                href={url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="block rounded-lg overflow-hidden border border-[#2D6A8F]/30 hover:border-[#3DAA8A]/50 transition-colors"
+                              >
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                  src={url}
+                                  alt={`Screenshot ${idx + 1} for ${bug.title}`}
+                                  className="w-40 h-28 object-cover bg-[#0D1F2D]"
+                                  loading="lazy"
+                                />
+                              </a>
+                            ))}
+                          </div>
                         </div>
                       )}
                     </div>
