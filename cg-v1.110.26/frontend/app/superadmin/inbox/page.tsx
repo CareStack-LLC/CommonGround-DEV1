@@ -271,7 +271,7 @@ export default function InboxPage() {
   const [connectingOAuth, setConnectingOAuth] = useState(false);
   const searchParams = useSearchParams();
   const oauthHandled = useRef(false);
-  const successTimeout = useRef<NodeJS.Timeout>();
+  const successTimeout = useRef<NodeJS.Timeout>(undefined);
 
   // Handle OAuth callback
   useEffect(() => {
