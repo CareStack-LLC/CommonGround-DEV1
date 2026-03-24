@@ -789,16 +789,38 @@ async def get_billing_overview(
                 all_subs.extend(subs.data)
 
             stripe_active_count = len(all_subs)
-            stripe_mrr_cents = sum(
-                sub.plan.amount * sub.quantity
-                for sub in all_subs
-                if sub.plan and sub.plan.amount
-            )
 
-            # Recent invoices
+            # Calculate MRR from subscription items (modern Stripe API)
+            stripe_mrr_cents = 0
+            for sub in all_subs:
+                # Modern format: sub.items.data[0].price.unit_amount
+                items = sub.get("items", {}).get("data", []) if isinstance(sub, dict) else getattr(sub, "items", {}).get("data", [])
+                if items:
+                    for item in items:
+                        price = item.get("price", {}) if isinstance(item, dict) else getattr(item, "price", {})
+                        unit_amount = price.get("unit_amount", 0) if isinstance(price, dict) else getattr(price, "unit_amount", 0)
+                        quantity = item.get("quantity", 1) if isinstance(item, dict) else getattr(item, "quantity", 1)
+                        interval = (price.get("recurring", {}) or {}).get("interval", "month") if isinstance(price, dict) else getattr(getattr(price, "recurring", None) or {}, "interval", "month")
+                        # Normalize yearly to monthly
+                        if interval == "year":
+                            stripe_mrr_cents += (unit_amount * quantity) / 12
+                        else:
+                            stripe_mrr_cents += unit_amount * quantity
+                elif hasattr(sub, "plan") and sub.plan and getattr(sub.plan, "amount", None):
+                    # Legacy fallback
+                    stripe_mrr_cents += sub.plan.amount * sub.quantity
+
+            # Recent invoices (paid)
             invoices = stripe.Invoice.list(limit=20, status="paid")
-            recent_payments = [
-                {
+            recent_payments = []
+            for inv in invoices.data:
+                desc = None
+                try:
+                    if inv.lines and inv.lines.data:
+                        desc = inv.lines.data[0].description
+                except Exception:
+                    pass
+                recent_payments.append({
                     "id": inv.id,
                     "customer": inv.customer,
                     "customer_email": inv.customer_email,
@@ -806,14 +828,16 @@ async def get_billing_overview(
                     "currency": inv.currency,
                     "status": inv.status,
                     "created": datetime.fromtimestamp(inv.created).isoformat(),
-                    "description": inv.lines.data[0].description if inv.lines and inv.lines.data else None,
-                }
-                for inv in invoices.data
-            ]
+                    "description": desc,
+                })
 
-            # Total customers
-            customers = stripe.Customer.list(limit=1)
-            total_customers = customers.total_count if hasattr(customers, "total_count") else len(customers.data)
+            # Total customers — count via pagination
+            total_customers = 0
+            cust_page = stripe.Customer.list(limit=100)
+            total_customers += len(cust_page.data)
+            while cust_page.has_more:
+                cust_page = stripe.Customer.list(limit=100, starting_after=cust_page.data[-1].id)
+                total_customers += len(cust_page.data)
 
             stripe_live = {
                 "stripe_available": True,
