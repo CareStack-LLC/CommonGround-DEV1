@@ -10,21 +10,27 @@ import {
   Radio, Mail, Bug, Brain, PenTool, Server,
   MessageCircle, Gauge,
 } from 'lucide-react';
-import { adminAPI, type DashboardData, type GrowthStats, type PlatformHealth } from '@/lib/admin-api';
+import { adminAPI, type DashboardData, type GrowthStats, type PlatformHealth, type RevenueMetrics, type ExecutiveSummary } from '@/lib/admin-api';
 import {
   MetricCard, SmallMetric, PageHeader, ErrorState,
   Skeleton, SkeletonCards, TabBar,
   formatNumber, formatCurrency, timeAgo, calcTrend,
-  InfoTooltip,
+  InfoTooltip, CohortHeatmap, FunnelChart, WaterfallChart,
 } from '@/components/superadmin';
+import { AreaChart, Area, LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 
 /* ── Dashboard Tab Views ────────────────────────────────────────────── */
 
 const TABS = [
   { key: 'glance', label: 'At a Glance' },
+  { key: 'revenue', label: 'Revenue' },
+  { key: 'growth', label: 'Growth' },
   { key: 'performance', label: 'Performance' },
   { key: 'support', label: 'Support' },
 ];
+
+const CHART_COLORS = ['#3DAA8A', '#4BA8C8', '#2D6A8F', '#F5A623', '#E8834A', '#C53030'];
+const RECHARTS_TOOLTIP = { backgroundColor: '#1E3A4A', border: '1px solid #2D6A8F', borderRadius: 8, color: '#D0E4EC', fontSize: 12 };
 
 function DashboardInner() {
   const router = useRouter();
@@ -39,6 +45,12 @@ function DashboardInner() {
   const [perfData, setPerfData] = useState<any>(null);
   const [systemStatus, setSystemStatus] = useState<any>(null);
   const [chatbotStats, setChatbotStats] = useState<any>(null);
+  const [revenueData, setRevenueData] = useState<RevenueMetrics | null>(null);
+  const [execSummary, setExecSummary] = useState<ExecutiveSummary | null>(null);
+  const [cohortData, setCohortData] = useState<any>(null);
+  const [retentionCurve, setRetentionCurve] = useState<any>(null);
+  const [aiSummary, setAISummary] = useState<any>(null);
+  const [unitEcon, setUnitEcon] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const refreshRef = useRef<NodeJS.Timeout | null>(null);
@@ -100,7 +112,30 @@ function DashboardInner() {
     if (!loading && activeTab === 'support' && !chatbotStats) {
       adminAPI.getChatbotStats().catch(() => null).then(setChatbotStats);
     }
-  }, [activeTab, loading, perfData, chatbotStats]);
+    if (!loading && activeTab === 'revenue' && !revenueData) {
+      Promise.all([
+        adminAPI.getRevenueMetrics().catch(() => null),
+        adminAPI.getUnitEconomics().catch(() => null),
+      ]).then(([rev, econ]) => {
+        setRevenueData(rev);
+        setUnitEcon(econ);
+      });
+    }
+    if (!loading && activeTab === 'growth' && !cohortData) {
+      Promise.all([
+        adminAPI.getExecutiveSummary().catch(() => null),
+        adminAPI.getCohortAnalysis(6).catch(() => null),
+        adminAPI.getRetentionCurve(90).catch(() => null),
+      ]).then(([exec, cohorts, retention]) => {
+        setExecSummary(exec);
+        setCohortData(cohorts);
+        setRetentionCurve(retention);
+      });
+    }
+    if (!loading && activeTab === 'glance' && !aiSummary) {
+      adminAPI.getAISummary().catch(() => null).then(setAISummary);
+    }
+  }, [activeTab, loading, perfData, chatbotStats, revenueData, cohortData, aiSummary]);
 
   const setTab = useCallback((tab: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -335,13 +370,163 @@ function DashboardInner() {
             </div>
           </div>
 
+          {/* AI Executive Pulse */}
+          {aiSummary?.summary && aiSummary.generated && (
+            <div className="bg-gradient-to-r from-[#3DAA8A]/10 to-[#2D6A8F]/10 border border-[#3DAA8A]/20 rounded-xl p-5">
+              <div className="flex items-center gap-2 mb-3">
+                <Brain className="w-4 h-4 text-[#3DAA8A]" />
+                <h2 className="text-sm font-semibold text-[#D0E4EC]">Executive Pulse</h2>
+                <span className="text-[10px] text-[#4A6E7F] ml-auto">AI-generated</span>
+              </div>
+              <ul className="space-y-2">
+                {aiSummary.summary.map((bullet: string, i: number) => (
+                  <li key={i} className="flex gap-2 text-xs text-[#8AACBC]">
+                    <span className="text-[#3DAA8A] mt-0.5">•</span>
+                    <span>{bullet}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           {/* Quick Links */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            <QuickLink icon={Bug} label="Bug Triage" badge={bugStats?.critical} badgeColor="text-red-400" onClick={() => router.push('/superadmin/bug-triage')} />
-            <QuickLink icon={MessageCircle} label="Chatbot" onClick={() => router.push('/superadmin/chatbot')} />
-            <QuickLink icon={Mail} label="Inbox" badge={inboxStats?.urgent_pending} badgeColor="text-amber-400" onClick={() => router.push('/superadmin/inbox')} />
-            <QuickLink icon={FileText} label="Reports" onClick={() => router.push('/superadmin/billing?tab=reports')} />
+            <QuickLink icon={Bug} label="DevOps Hub" badge={bugStats?.critical} badgeColor="text-red-400" onClick={() => router.push('/superadmin/bug-triage')} />
+            <QuickLink icon={Users} label="Customer Success" onClick={() => router.push('/superadmin/customer-success')} />
+            <QuickLink icon={DollarSign} label="Sales Intelligence" onClick={() => router.push('/superadmin/sales')} />
+            <QuickLink icon={TrendingUp} label="Marketing Analytics" onClick={() => router.push('/superadmin/marketing-analytics')} />
           </div>
+        </div>
+      )}
+
+      {/* ── Revenue View ── */}
+      {activeTab === 'revenue' && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            {!revenueData ? <SkeletonCards count={4} /> : (
+              <>
+                <MetricCard icon={DollarSign} label="MRR" value={formatCurrency(revenueData.mrr)} sub={`${revenueData.mrr_growth_rate > 0 ? '+' : ''}${revenueData.mrr_growth_rate}% growth`} trend={revenueData.mrr_growth_rate} color="sage" tooltip="Monthly recurring revenue from all active subscriptions" />
+                <MetricCard icon={TrendingUp} label="ARR" value={formatCurrency(revenueData.arr)} color="ocean" tooltip="Annual run rate (MRR × 12)" />
+                <MetricCard icon={Activity} label="LTV:CAC" value={unitEcon?.ltv_cac_ratio ? `${unitEcon.ltv_cac_ratio}x` : '—'} color={unitEcon?.ltv_cac_ratio >= 3 ? 'sage' : 'gold'} tooltip="Customer lifetime value to acquisition cost ratio. 3x+ is healthy." />
+                <MetricCard icon={AlertTriangle} label="At-Risk MRR" value={formatCurrency(revenueData.at_risk_mrr)} color={revenueData.at_risk_mrr > 0 ? 'coral' : 'neutral'} tooltip="Revenue from past-due subscriptions" />
+              </>
+            )}
+          </div>
+
+          {/* MRR Trend Chart */}
+          {revenueData?.mrr_trend && revenueData.mrr_trend.length > 0 && (
+            <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+              <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">MRR Trend <InfoTooltip text="Monthly recurring revenue over time" /></h2>
+              <ResponsiveContainer width="100%" height={200}>
+                <AreaChart data={revenueData.mrr_trend}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#2D6A8F" opacity={0.2} />
+                  <XAxis dataKey="date" stroke="#4A6E7F" tick={{ fill: '#6B8A9A', fontSize: 10 }} tickFormatter={(v) => new Date(v).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} />
+                  <YAxis stroke="#4A6E7F" tick={{ fill: '#6B8A9A', fontSize: 10 }} tickFormatter={(v) => `$${v}`} />
+                  <Tooltip contentStyle={RECHARTS_TOOLTIP} formatter={(v: number) => [`$${v.toFixed(2)}`, 'MRR']} />
+                  <defs>
+                    <linearGradient id="mrrGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#3DAA8A" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#3DAA8A" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <Area type="monotone" dataKey="mrr" stroke="#3DAA8A" fill="url(#mrrGrad)" strokeWidth={2} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+
+          {/* Revenue Breakdown + Waterfall */}
+          <div className="grid lg:grid-cols-2 gap-4">
+            {/* Revenue by Tier */}
+            {revenueData?.breakdown && (
+              <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+                <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">Revenue by Tier <InfoTooltip text="Monthly revenue contribution by subscription tier" /></h2>
+                <ResponsiveContainer width="100%" height={200}>
+                  <PieChart>
+                    <Pie data={Object.entries(revenueData.breakdown).map(([tier, data]: [string, any]) => ({ name: tier.replace('_', ' '), value: data.revenue }))} cx="50%" cy="50%" innerRadius={50} outerRadius={80} dataKey="value" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
+                      {Object.keys(revenueData.breakdown).map((_, i) => (
+                        <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <Tooltip contentStyle={RECHARTS_TOOLTIP} formatter={(v: number) => [`$${v.toFixed(2)}`, 'Revenue']} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+
+            {/* Unit Economics Summary */}
+            {unitEcon && (
+              <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+                <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">Unit Economics <InfoTooltip text="Key SaaS metrics for financial health" /></h2>
+                <div className="space-y-3">
+                  {[
+                    { label: 'ARPU', value: formatCurrency(unitEcon.arpu), desc: 'Avg revenue per paying user' },
+                    { label: 'LTV', value: formatCurrency(unitEcon.ltv), desc: 'Customer lifetime value' },
+                    { label: 'CAC', value: unitEcon.cac > 0 ? formatCurrency(unitEcon.cac) : 'N/A', desc: 'Customer acquisition cost' },
+                    { label: 'Churn Rate', value: `${unitEcon.monthly_churn_rate}%`, desc: 'Monthly churn rate' },
+                    { label: 'Payback Period', value: unitEcon.payback_months > 0 ? `${unitEcon.payback_months} mo` : 'N/A', desc: 'Months to recover CAC' },
+                  ].map((item) => (
+                    <div key={item.label} className="flex items-center justify-between">
+                      <div>
+                        <span className="text-xs text-[#8AACBC]">{item.label}</span>
+                        <span className="text-[10px] text-[#4A6E7F] ml-2">{item.desc}</span>
+                      </div>
+                      <span className="text-sm font-medium text-[#D0E4EC]">{item.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── Growth View ── */}
+      {activeTab === 'growth' && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            {!execSummary ? <SkeletonCards count={4} /> : (
+              <>
+                <MetricCard icon={Activity} label="DAU/MAU Ratio" value={`${execSummary.dau_mau_ratio}%`} color={execSummary.dau_mau_ratio >= 20 ? 'sage' : 'gold'} tooltip="Daily to monthly active user ratio. 20%+ is considered healthy for SaaS." />
+                <MetricCard icon={Zap} label="Activation Rate" value={`${execSummary.activation_rate}%`} color="sky" tooltip="% of new users who create a family file within 7 days" />
+                <MetricCard icon={CreditCard} label="Paying Conversion" value={`${execSummary.paying_conversion}%`} color="ocean" tooltip="% of all users on a paid subscription" />
+                <MetricCard icon={UserPlus} label="New Users (7d)" value={formatNumber(execSummary.new_users_7d)} color="sage" tooltip="New user registrations in the last 7 days" />
+              </>
+            )}
+          </div>
+
+          {/* User Funnel */}
+          {execSummary && (
+            <FunnelChart
+              title="User Funnel"
+              tooltip="Conversion from registration through to paid subscription"
+              stages={[
+                { name: 'Registered', count: execSummary.total_users },
+                { name: 'Active (30d)', count: execSummary.mau },
+                { name: 'Activated', count: Math.round(execSummary.total_users * (execSummary.activation_rate / 100)) },
+                { name: 'Paying', count: execSummary.paying_users },
+              ]}
+            />
+          )}
+
+          {/* Retention Curve */}
+          {retentionCurve?.curve && retentionCurve.curve.length > 0 && (
+            <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+              <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">Retention Curve <InfoTooltip text="Percentage of users retained over days since signup" /></h2>
+              <ResponsiveContainer width="100%" height={200}>
+                <LineChart data={retentionCurve.curve.filter((_: any, i: number) => i % 3 === 0 || i <= 7)}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#2D6A8F" opacity={0.2} />
+                  <XAxis dataKey="day" stroke="#4A6E7F" tick={{ fill: '#6B8A9A', fontSize: 10 }} label={{ value: 'Days', position: 'insideBottom', offset: -5, fill: '#6B8A9A', fontSize: 10 }} />
+                  <YAxis stroke="#4A6E7F" tick={{ fill: '#6B8A9A', fontSize: 10 }} domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
+                  <Tooltip contentStyle={RECHARTS_TOOLTIP} formatter={(v: number) => [`${v}%`, 'Retained']} />
+                  <Line type="monotone" dataKey="pct" stroke="#3DAA8A" strokeWidth={2} dot={{ r: 2, fill: '#3DAA8A' }} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+
+          {/* Cohort Heatmap */}
+          {cohortData?.cohorts && <CohortHeatmap cohorts={cohortData.cohorts} />}
         </div>
       )}
 

@@ -6,6 +6,11 @@ from fastapi import APIRouter
 
 from app.api.v1.endpoints import (
     admin,
+    admin_analytics,
+    admin_devops,
+    admin_customer_success,
+    admin_sales,
+    admin_marketing,
     auth,
     users,
     cases,
@@ -110,3 +115,10 @@ api_router.include_router(professional.router, prefix="/professional", tags=["Pr
 
 # SuperAdmin Portal
 api_router.include_router(admin.router, prefix="/admin", tags=["SuperAdmin Portal"])
+
+# BizOps Portal - Analytics, DevOps, Customer Success, Sales, Marketing
+api_router.include_router(admin_analytics.router, prefix="/admin", tags=["BizOps Analytics"])
+api_router.include_router(admin_devops.router, prefix="/admin", tags=["BizOps DevOps"])
+api_router.include_router(admin_customer_success.router, prefix="/admin", tags=["BizOps Customer Success"])
+api_router.include_router(admin_sales.router, prefix="/admin", tags=["BizOps Sales"])
+api_router.include_router(admin_marketing.router, prefix="/admin", tags=["BizOps Marketing"])

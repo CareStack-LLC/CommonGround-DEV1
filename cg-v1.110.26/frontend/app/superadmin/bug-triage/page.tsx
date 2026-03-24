@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import {
   Bug, RefreshCw, Brain, Calendar, ChevronDown, ChevronRight,
   AlertTriangle, Clock, History, Zap, Clipboard, Check,
-  AlertCircle, MessageSquare,
+  AlertCircle, MessageSquare, Rocket, GitBranch, Shield, TrendingUp,
 } from 'lucide-react';
 import { adminAPI, type BugCategory, type SprintPlan } from '@/lib/admin-api';
+import { VelocityContent, DeploymentsContent, QualityContent, SprintsKanbanContent } from './_devops-content';
 
 const SEVERITY_COLORS: Record<string, string> = {
   critical: 'bg-red-500/15 text-red-400 border border-red-500/20',
@@ -20,7 +21,7 @@ const PLATFORM_COLORS: Record<string, string> = {
   backend: 'bg-[#3DAA8A]/15 text-[#3DAA8A]',
 };
 
-type Tab = 'live' | 'triage' | 'sprint' | 'history';
+type Tab = 'live' | 'triage' | 'sprint' | 'history' | 'kanban' | 'velocity' | 'deployments' | 'quality';
 type IssueSubTab = 'system' | 'user';
 
 interface TriageResult {
@@ -206,6 +207,10 @@ export default function BugTriagePage() {
     { id: 'live', label: 'Live Issues', icon: Bug },
     { id: 'triage', label: 'AI Analysis', icon: Brain },
     { id: 'sprint', label: 'Sprint Plan', icon: Calendar },
+    { id: 'kanban', label: 'Sprints', icon: Clipboard },
+    { id: 'velocity', label: 'Velocity', icon: TrendingUp },
+    { id: 'deployments', label: 'Deployments', icon: Rocket },
+    { id: 'quality', label: 'Quality', icon: Shield },
     { id: 'history', label: 'History', icon: History },
   ];
 
@@ -215,7 +220,7 @@ export default function BugTriagePage() {
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-bold text-white">Sentry Bug Triage</h1>
+            <h1 className="text-xl font-bold text-white">DevOps Hub</h1>
             <span className="flex items-center gap-1.5 text-[11px] text-[#6B8A9A]">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
@@ -831,6 +836,18 @@ export default function BugTriagePage() {
           )}
         </>
       )}
+
+      {/* ── DevOps: Kanban Sprints ── */}
+      {activeTab === 'kanban' && <SprintsKanbanContent />}
+
+      {/* ── DevOps: Velocity ── */}
+      {activeTab === 'velocity' && <VelocityContent />}
+
+      {/* ── DevOps: Deployments ── */}
+      {activeTab === 'deployments' && <DeploymentsContent />}
+
+      {/* ── DevOps: Code Quality ── */}
+      {activeTab === 'quality' && <QualityContent />}
     </div>
   );
 }

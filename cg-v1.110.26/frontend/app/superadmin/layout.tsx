@@ -23,41 +23,58 @@ import {
   Globe,
   MessageCircle,
   Server,
+  Heart,
+  DollarSign,
+  BarChart3,
+  Search,
 } from 'lucide-react';
 import { adminAPI, type PlatformHealth } from '@/lib/admin-api';
 import { AdminLogo } from '@/components/superadmin';
 
 const navSections = [
   {
-    label: 'Overview',
+    label: 'Command Center',
     items: [
       { href: '/superadmin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
       { href: '/superadmin/users', label: 'Users & Activity', icon: Users },
     ],
   },
   {
-    label: 'Platform',
+    label: 'Operations',
     items: [
+      { href: '/superadmin/bug-triage', label: 'DevOps Hub', icon: Bug },
+      { href: '/superadmin/customer-success', label: 'Customer Success', icon: Heart },
       { href: '/superadmin/system-health', label: 'System Health', icon: Server },
-      { href: '/superadmin/bug-triage', label: 'Bug Triage', icon: Bug },
-      { href: '/superadmin/aria', label: 'ARIA Insights', icon: Brain },
-      { href: '/superadmin/chatbot', label: 'Chatbot (Aria)', icon: MessageCircle },
     ],
   },
   {
-    label: 'Analytics & Revenue',
+    label: 'Revenue',
+    items: [
+      { href: '/superadmin/sales', label: 'Sales Intelligence', icon: DollarSign },
+      { href: '/superadmin/billing', label: 'Billing & Reports', icon: CreditCard },
+    ],
+  },
+  {
+    label: 'Analytics',
     items: [
       { href: '/superadmin/growth', label: 'Growth & Engagement', icon: TrendingUp },
-      { href: '/superadmin/billing', label: 'Billing & Reports', icon: CreditCard },
+      { href: '/superadmin/marketing-analytics', label: 'Marketing Analytics', icon: BarChart3 },
     ],
   },
   {
     label: 'Marketing',
     items: [
-      { href: '/superadmin/leads', label: 'Leads', icon: UserPlus },
+      { href: '/superadmin/leads', label: 'Leads & Pipeline', icon: UserPlus },
       { href: '/superadmin/leads/campaigns', label: 'Campaigns', icon: Send },
       { href: '/superadmin/leads/landing-pages', label: 'Landing Pages', icon: Globe },
       { href: '/superadmin/reddit', label: 'GTM Playbook', icon: TrendingUp },
+    ],
+  },
+  {
+    label: 'Communication',
+    items: [
+      { href: '/superadmin/aria', label: 'ARIA Insights', icon: Brain },
+      { href: '/superadmin/chatbot', label: 'Chatbot (Aria)', icon: MessageCircle },
       { href: '/superadmin/inbox', label: 'Inbox', icon: Mail },
     ],
   },

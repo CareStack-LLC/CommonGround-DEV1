@@ -753,7 +753,261 @@ export const adminAPI = {
       `/chatbot/admin/config/${key}`,
       { method: 'PUT', body: JSON.stringify({ value }) }
     ),
+
+  // ── BizOps Analytics ────────────────────────────────────────────────
+  getCohortAnalysis: (months = 6) =>
+    adminFetch<{ cohorts: CohortData[]; months: number }>(`/admin/analytics/cohorts?months=${months}`),
+
+  getUnitEconomics: () =>
+    adminFetch<UnitEconomics>('/admin/analytics/unit-economics'),
+
+  getRetentionCurve: (days = 90) =>
+    adminFetch<{ curve: { day: number; pct: number; count: number }[]; total_cohort_size: number }>(
+      `/admin/analytics/retention-curve?days=${days}`
+    ),
+
+  getRevenueMetrics: () =>
+    adminFetch<RevenueMetrics>('/admin/analytics/revenue-metrics'),
+
+  getExecutiveSummary: () =>
+    adminFetch<ExecutiveSummary>('/admin/analytics/executive-summary'),
+
+  getAISummary: () =>
+    adminFetch<{ summary: string[]; generated: boolean; metrics: Record<string, any>; generated_at: string }>(
+      '/admin/analytics/ai-summary'
+    ),
+
+  // ── DevOps Hub ──────────────────────────────────────────────────────
+  getDevOpsVelocity: (sprints = 5) =>
+    adminFetch<any>(`/admin/devops/velocity?sprints=${sprints}`),
+
+  getRepairTrends: (days = 30) =>
+    adminFetch<any>(`/admin/devops/repair-trends?days=${days}`),
+
+  getCodeQuality: () =>
+    adminFetch<any>('/admin/devops/code-quality'),
+
+  postAITriage: (bugs: any[]) =>
+    adminFetch<any>('/admin/devops/ai-triage', { method: 'POST', body: JSON.stringify({ bugs }) }),
+
+  getDeployments: (limit = 20) =>
+    adminFetch<{ deployments: DeploymentData[] }>(`/admin/devops/deployments?limit=${limit}`),
+
+  getSprints: () =>
+    adminFetch<{ sprints: SprintData[] }>('/admin/devops/sprints'),
+
+  createSprint: (data: { name: string; goal?: string; start_date?: string; end_date?: string }) =>
+    adminFetch<SprintData>('/admin/devops/sprints', { method: 'POST', body: JSON.stringify(data) }),
+
+  addSprintItem: (sprintId: string, data: any) =>
+    adminFetch<any>(`/admin/devops/sprints/${sprintId}/items`, { method: 'POST', body: JSON.stringify(data) }),
+
+  updateSprintItem: (sprintId: string, itemId: string, data: any) =>
+    adminFetch<any>(`/admin/devops/sprints/${sprintId}/items/${itemId}`, { method: 'PATCH', body: JSON.stringify(data) }),
+
+  recordDeployment: (data: any) =>
+    adminFetch<any>('/admin/devops/deployments', { method: 'POST', body: JSON.stringify(data) }),
+
+  // ── Customer Success ────────────────────────────────────────────────
+  getCSOverview: () =>
+    adminFetch<CSOverview>('/admin/cs/overview'),
+
+  getHealthScores: (params?: { risk?: string; limit?: number; offset?: number }) => {
+    const sp = new URLSearchParams();
+    if (params?.risk) sp.set('risk', params.risk);
+    if (params?.limit) sp.set('limit', String(params.limit));
+    if (params?.offset) sp.set('offset', String(params.offset));
+    return adminFetch<{ scores: HealthScoreEntry[]; total: number }>(`/admin/cs/health-scores?${sp}`);
+  },
+
+  calculateHealthScores: (userId?: string) =>
+    adminFetch<any>('/admin/cs/health-scores/calculate', {
+      method: 'POST',
+      body: JSON.stringify(userId ? { user_id: userId } : {}),
+    }),
+
+  getChurnRisk: (threshold = 0.7) =>
+    adminFetch<{ at_risk: HealthScoreEntry[] }>(`/admin/cs/churn-risk?threshold=${threshold}`),
+
+  getSatisfaction: () =>
+    adminFetch<SatisfactionData>('/admin/cs/satisfaction'),
+
+  postCSAgent: (data: { user_id?: string; issue_description: string; context?: string }) =>
+    adminFetch<any>('/admin/cs/ai-agent', { method: 'POST', body: JSON.stringify(data) }),
+
+  getAccountHealth: (userId: string) =>
+    adminFetch<any>(`/admin/cs/accounts/${userId}/health`),
+
+  createIntervention: (data: { user_id: string; type: string; channel?: string; notes?: string; follow_up_date?: string }) =>
+    adminFetch<any>('/admin/cs/interventions', { method: 'POST', body: JSON.stringify(data) }),
+
+  getInterventions: (params?: { user_id?: string; type?: string; outcome?: string; limit?: number; offset?: number }) => {
+    const sp = new URLSearchParams();
+    if (params?.user_id) sp.set('user_id', params.user_id);
+    if (params?.type) sp.set('type', params.type);
+    if (params?.outcome) sp.set('outcome', params.outcome);
+    if (params?.limit) sp.set('limit', String(params.limit));
+    if (params?.offset) sp.set('offset', String(params.offset));
+    return adminFetch<{ interventions: any[]; total: number }>(`/admin/cs/interventions?${sp}`);
+  },
+
+  updateIntervention: (id: string, data: any) =>
+    adminFetch<any>(`/admin/cs/interventions/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+
+  // ── Sales Intelligence ──────────────────────────────────────────────
+  getSalesPipeline: () =>
+    adminFetch<{ stages: PipelineStage[]; total_pipeline_value: number }>('/admin/sales/pipeline'),
+
+  getSalesConversions: (days = 30) =>
+    adminFetch<any>(`/admin/sales/conversions?days=${days}`),
+
+  getSalesForecast: (months = 3) =>
+    adminFetch<any>(`/admin/sales/forecast?months=${months}`),
+
+  getSalesCAC: (days = 90) =>
+    adminFetch<any>(`/admin/sales/cac?period=${days}`),
+
+  getSalesLTV: () =>
+    adminFetch<any>('/admin/sales/ltv'),
+
+  getSalesWinLoss: (days = 90) =>
+    adminFetch<any>(`/admin/sales/win-loss?days=${days}`),
+
+  postSalesAISuggestions: () =>
+    adminFetch<any>('/admin/sales/ai-suggestions', { method: 'POST' }),
+
+  // ── Marketing Analytics ─────────────────────────────────────────────
+  getContentPerformance: () =>
+    adminFetch<any>('/admin/marketing/content-performance'),
+
+  getSEOInsights: () =>
+    adminFetch<any>('/admin/marketing/seo-insights'),
+
+  getCampaignAnalytics: (days = 90) =>
+    adminFetch<any>(`/admin/marketing/campaign-analytics?days=${days}`),
+
+  postMarketingAISuggestions: () =>
+    adminFetch<any>('/admin/marketing/ai-suggestions', { method: 'POST' }),
+
+  getSocialTracking: () =>
+    adminFetch<any>('/admin/marketing/social-tracking'),
+
+  getAttribution: () =>
+    adminFetch<any>('/admin/marketing/attribution'),
 };
+
+// ── BizOps Types ──────────────────────────────────────────────────────
+
+export interface CohortData {
+  month: string;
+  size: number;
+  retention: number[];
+}
+
+export interface UnitEconomics {
+  arpu: number;
+  mrr: number;
+  arr: number;
+  paying_users: number;
+  monthly_churn_rate: number;
+  ltv: number;
+  cac: number;
+  ltv_cac_ratio: number;
+  payback_months: number;
+  tier_breakdown: Record<string, { count: number; price: number; revenue: number }>;
+}
+
+export interface RevenueMetrics {
+  mrr: number;
+  arr: number;
+  mrr_growth_rate: number;
+  at_risk_mrr: number;
+  breakdown: Record<string, { count: number; revenue: number }>;
+  mrr_trend: { date: string; mrr: number }[];
+}
+
+export interface ExecutiveSummary {
+  total_users: number;
+  dau: number;
+  mau: number;
+  dau_mau_ratio: number;
+  activation_rate: number;
+  paying_conversion: number;
+  paying_users: number;
+  new_users_7d: number;
+}
+
+export interface DeploymentData {
+  id: string;
+  environment: string;
+  status: string;
+  commit_sha?: string;
+  commit_message?: string;
+  branch?: string;
+  deployed_by?: string;
+  deployed_at: string;
+  duration_seconds?: number;
+}
+
+export interface SprintData {
+  id: string;
+  name: string;
+  goal?: string;
+  status: string;
+  start_date?: string;
+  end_date?: string;
+  planned_points: number;
+  completed_points: number;
+  items: SprintItemData[];
+}
+
+export interface SprintItemData {
+  id: string;
+  title: string;
+  description?: string;
+  severity?: string;
+  platform?: string;
+  status: string;
+  assigned_to?: string;
+  estimated_hours?: number;
+  actual_hours?: number;
+  story_points?: number;
+}
+
+export interface CSOverview {
+  total_accounts: number;
+  at_risk_count: number;
+  avg_health_score: number;
+  estimated_nps: number;
+  active_interventions: number;
+}
+
+export interface HealthScoreEntry {
+  user_id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  overall_score: number;
+  risk_level: string;
+  last_active?: string;
+  subscription_tier?: string;
+  factors?: Record<string, number>;
+}
+
+export interface SatisfactionData {
+  estimated_nps: number;
+  promoters: number;
+  passives: number;
+  detractors: number;
+  response_count: number;
+}
+
+export interface PipelineStage {
+  name: string;
+  count: number;
+  value: number;
+  conversion_from_prev_pct: number;
+}
 
 // System Status types
 export interface ServiceStatus {
