@@ -15,3 +15,13 @@ export {
   formatDateTime,
   calcTrend,
 } from "./helpers";
+
+// BizOps Portal Components
+export { CohortHeatmap } from "./CohortHeatmap";
+export { FunnelChart } from "./FunnelChart";
+export { WaterfallChart } from "./WaterfallChart";
+export { ProgressRing } from "./ProgressRing";
+export { KanbanBoard } from "./KanbanBoard";
+export { DeploymentTimeline } from "./DeploymentTimeline";
+export { HealthScoreBadge } from "./HealthScoreBadge";
+export { CSAgentChat } from "./CSAgentChat";

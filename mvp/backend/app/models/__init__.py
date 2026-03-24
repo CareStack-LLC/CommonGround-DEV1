@@ -172,6 +172,21 @@ from app.models.subscription import (
     GRANT_STATUSES,
     FEE_STATUSES,
 )
+from app.models.bizops import (
+    DailyMetricsSnapshot,
+    MarketingSpend,
+    Deployment,
+    CodeQualitySnapshot,
+    Sprint,
+    SprintItem,
+    CustomerHealthScore,
+    CSIntervention,
+    NPSResponse,
+    SalesEvent,
+    PageView,
+    SocialMetric,
+    SEOSnapshot,
+)
 from app.models.professional import (
     ProfessionalProfile,
     Firm,
@@ -379,4 +394,18 @@ __all__ = [
     "TemplateType",
     "generate_firm_slug",
     "generate_invite_token",
+    # BizOps Portal
+    "DailyMetricsSnapshot",
+    "MarketingSpend",
+    "Deployment",
+    "CodeQualitySnapshot",
+    "Sprint",
+    "SprintItem",
+    "CustomerHealthScore",
+    "CSIntervention",
+    "NPSResponse",
+    "SalesEvent",
+    "PageView",
+    "SocialMetric",
+    "SEOSnapshot",
 ]
