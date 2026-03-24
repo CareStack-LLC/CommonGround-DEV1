@@ -4818,3 +4818,631 @@ async def send_bug_hunt_tester_reminder(
     await _log_admin_action(db, admin_user, "bug_hunt_remind_tester", "bug_hunt", target_id=tester_id)
     await db.commit()
     return {"id": tester.id, "reminder_sent": email_sent, "days_remaining": days_remaining}
+
+
+# =============================================================================
+# ANALYTICS ENDPOINTS — Revenue, Unit Economics, Cohorts, Retention, Summary
+# =============================================================================
+
+
+@router.get(
+    "/analytics/revenue-metrics",
+    summary="Revenue metrics with MRR/ARR and Stripe integration",
+)
+async def get_revenue_metrics(
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """
+    Revenue metrics: MRR, ARR, growth rate, at-risk MRR, tier breakdown, and trend.
+    Uses Stripe API with DB fallback.
+    """
+    now = datetime.utcnow()
+    thirty_days_ago = now - timedelta(days=30)
+
+    tier_prices = await _get_tier_prices(db)
+
+    # Tier breakdown from DB
+    tier_result = await db.execute(
+        select(
+            UserProfile.subscription_tier,
+            func.count(UserProfile.id),
+        )
+        .where(UserProfile.subscription_status == "active")
+        .group_by(UserProfile.subscription_tier)
+    )
+    breakdown: dict = {}
+    db_mrr = 0.0
+    for tier, count in tier_result:
+        tier_name = tier or "unknown"
+        price = tier_prices.get(tier_name, 0)
+        revenue = round(count * price, 2)
+        breakdown[tier_name] = {"count": count, "revenue": revenue}
+        db_mrr += revenue
+
+    # Try Stripe for verified MRR
+    stripe_mrr: Optional[float] = None
+    try:
+        import stripe as _stripe
+        from app.core.config import settings as app_settings
+        if app_settings.STRIPE_SECRET_KEY:
+            _stripe.api_key = app_settings.STRIPE_SECRET_KEY
+            all_subs = []
+            for sub_status in ("active", "trialing"):
+                subs = _stripe.Subscription.list(status=sub_status, limit=100)
+                all_subs.extend(subs.data)
+                while subs.has_more:
+                    subs = _stripe.Subscription.list(
+                        status=sub_status, limit=100,
+                        starting_after=subs.data[-1].id,
+                    )
+                    all_subs.extend(subs.data)
+
+            mrr_cents = 0
+            for sub in all_subs:
+                try:
+                    sub_amount = 0
+                    sub_items = getattr(sub, "items", None)
+                    items_data = getattr(sub_items, "data", []) if sub_items else []
+                    if items_data and len(items_data) > 0:
+                        for item in items_data:
+                            price_obj = getattr(item, "price", None)
+                            if price_obj:
+                                unit_amount = getattr(price_obj, "unit_amount", 0) or 0
+                                item_qty = getattr(item, "quantity", 1) or 1
+                                recurring = getattr(price_obj, "recurring", None)
+                                interval = getattr(recurring, "interval", "month") if recurring else "month"
+                                if interval == "year":
+                                    sub_amount += (unit_amount * item_qty) / 12
+                                else:
+                                    sub_amount += unit_amount * item_qty
+                    if sub_amount == 0:
+                        plan = getattr(sub, "plan", None)
+                        if plan:
+                            plan_amount = getattr(plan, "amount", 0) or 0
+                            if plan_amount > 0:
+                                plan_interval = getattr(plan, "interval", "month")
+                                quantity = getattr(sub, "quantity", 1) or 1
+                                if plan_interval == "year":
+                                    sub_amount = (plan_amount * quantity) / 12
+                                else:
+                                    sub_amount = plan_amount * quantity
+                    mrr_cents += sub_amount
+                except Exception:
+                    pass
+            stripe_mrr = round(mrr_cents / 100.0, 2)
+    except Exception as exc:
+        logger.warning("Stripe unavailable for revenue-metrics: %s", exc)
+
+    mrr = stripe_mrr if stripe_mrr is not None else round(db_mrr, 2)
+    arr = round(mrr * 12, 2)
+
+    # MRR growth rate: compare vs 30 days ago using DB subscription data
+    # Count active paid subs created before 30 days ago
+    old_tier_result = await db.execute(
+        select(
+            UserProfile.subscription_tier,
+            func.count(UserProfile.id),
+        )
+        .where(
+            UserProfile.subscription_status == "active",
+            UserProfile.created_at < thirty_days_ago,
+        )
+        .group_by(UserProfile.subscription_tier)
+    )
+    old_mrr = 0.0
+    for tier, count in old_tier_result:
+        old_mrr += count * tier_prices.get(tier or "unknown", 0)
+    mrr_growth_rate = round(((mrr - old_mrr) / old_mrr * 100) if old_mrr > 0 else 0, 2)
+
+    # At-risk MRR: revenue from past_due subscriptions
+    past_due_result = await db.execute(
+        select(
+            UserProfile.subscription_tier,
+            func.count(UserProfile.id),
+        )
+        .where(UserProfile.subscription_status == "past_due")
+        .group_by(UserProfile.subscription_tier)
+    )
+    at_risk_mrr = 0.0
+    for tier, count in past_due_result:
+        at_risk_mrr += count * tier_prices.get(tier or "unknown", 0)
+    at_risk_mrr = round(at_risk_mrr, 2)
+
+    # MRR trend: daily estimates for last 30 days
+    mrr_trend = []
+    for day_offset in range(30, -1, -1):
+        day = now - timedelta(days=day_offset)
+        day_str = day.strftime("%Y-%m-%d")
+        # Count active subs that existed by that day
+        active_by_day = await db.execute(
+            select(
+                UserProfile.subscription_tier,
+                func.count(UserProfile.id),
+            )
+            .where(
+                UserProfile.subscription_status.in_(["active", "past_due"]),
+                UserProfile.created_at <= day,
+            )
+            .group_by(UserProfile.subscription_tier)
+        )
+        day_mrr = 0.0
+        for tier, count in active_by_day:
+            day_mrr += count * tier_prices.get(tier or "unknown", 0)
+        mrr_trend.append({"date": day_str, "mrr": round(day_mrr, 2)})
+
+    await _log_admin_action(db, admin_user, "view_revenue_metrics", "analytics")
+    await db.commit()
+
+    return {
+        "mrr": mrr,
+        "arr": arr,
+        "mrr_growth_rate": mrr_growth_rate,
+        "at_risk_mrr": at_risk_mrr,
+        "breakdown": breakdown,
+        "mrr_trend": mrr_trend,
+    }
+
+
+@router.get(
+    "/analytics/unit-economics",
+    summary="Unit economics: ARPU, LTV, CAC, churn",
+)
+async def get_unit_economics(
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """
+    Unit economics: ARPU, MRR, ARR, churn, LTV, CAC, LTV/CAC ratio, payback months.
+    """
+    now = datetime.utcnow()
+    thirty_days_ago = now - timedelta(days=30)
+
+    tier_prices = await _get_tier_prices(db)
+
+    # Active tier counts
+    tier_result = await db.execute(
+        select(
+            UserProfile.subscription_tier,
+            func.count(UserProfile.id),
+        )
+        .where(UserProfile.subscription_status == "active")
+        .group_by(UserProfile.subscription_tier)
+    )
+    tier_breakdown: dict = {}
+    total_mrr = 0.0
+    paying_users = 0
+    for tier, count in tier_result:
+        tier_name = tier or "unknown"
+        price = tier_prices.get(tier_name, 0)
+        revenue = round(count * price, 2)
+        tier_breakdown[tier_name] = {"count": count, "price": price, "revenue": revenue}
+        total_mrr += revenue
+        if price > 0:
+            paying_users += count
+
+    # Try Stripe for verified MRR
+    try:
+        import stripe as _stripe
+        from app.core.config import settings as app_settings
+        if app_settings.STRIPE_SECRET_KEY:
+            _stripe.api_key = app_settings.STRIPE_SECRET_KEY
+            all_subs = []
+            for sub_status in ("active", "trialing"):
+                subs = _stripe.Subscription.list(status=sub_status, limit=100)
+                all_subs.extend(subs.data)
+                while subs.has_more:
+                    subs = _stripe.Subscription.list(
+                        status=sub_status, limit=100,
+                        starting_after=subs.data[-1].id,
+                    )
+                    all_subs.extend(subs.data)
+            mrr_cents = 0
+            for sub in all_subs:
+                try:
+                    sub_amount = 0
+                    plan = getattr(sub, "plan", None)
+                    if plan:
+                        plan_amount = getattr(plan, "amount", 0) or 0
+                        if plan_amount > 0:
+                            plan_interval = getattr(plan, "interval", "month")
+                            quantity = getattr(sub, "quantity", 1) or 1
+                            if plan_interval == "year":
+                                sub_amount = (plan_amount * quantity) / 12
+                            else:
+                                sub_amount = plan_amount * quantity
+                    mrr_cents += sub_amount
+                except Exception:
+                    pass
+            stripe_mrr = round(mrr_cents / 100.0, 2)
+            if stripe_mrr > 0:
+                total_mrr = stripe_mrr
+    except Exception as exc:
+        logger.warning("Stripe unavailable for unit-economics: %s", exc)
+
+    mrr = round(total_mrr, 2)
+    arr = round(mrr * 12, 2)
+    arpu = round(mrr / paying_users, 2) if paying_users > 0 else 0.0
+
+    # Churn rate: cancelled in 30d / (active paying + cancelled)
+    cancelled_30d = await db.scalar(
+        select(func.count(UserProfile.id)).where(
+            UserProfile.subscription_status == "cancelled",
+            UserProfile.updated_at >= thirty_days_ago,
+        )
+    ) or 0
+    total_base = paying_users + cancelled_30d
+    monthly_churn_rate = round(cancelled_30d / total_base, 4) if total_base > 0 else 0.0
+
+    # LTV, CAC, ratios
+    cac = _DEFAULT_CAC
+    ltv = round(arpu / monthly_churn_rate, 2) if monthly_churn_rate > 0 else 0.0
+    ltv_cac_ratio = round(ltv / cac, 2) if cac > 0 else 0.0
+    payback_months = round(cac / arpu, 1) if arpu > 0 else 0.0
+
+    await _log_admin_action(db, admin_user, "view_unit_economics", "analytics")
+    await db.commit()
+
+    return {
+        "arpu": arpu,
+        "mrr": mrr,
+        "arr": arr,
+        "paying_users": paying_users,
+        "monthly_churn_rate": monthly_churn_rate,
+        "ltv": ltv,
+        "cac": cac,
+        "ltv_cac_ratio": ltv_cac_ratio,
+        "payback_months": payback_months,
+        "tier_breakdown": tier_breakdown,
+    }
+
+
+@router.get(
+    "/analytics/cohorts",
+    summary="User cohort retention analysis",
+)
+async def get_cohort_analysis(
+    months: int = Query(6, ge=1, le=24, description="Number of months to analyze"),
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """
+    Cohort retention analysis: group users by signup month and track retention.
+    """
+    now = datetime.utcnow()
+    cohorts = []
+
+    for m in range(months - 1, -1, -1):
+        # Cohort month start/end
+        cohort_start = (now.replace(day=1) - timedelta(days=m * 30)).replace(day=1)
+        if cohort_start.month == 12:
+            cohort_end = cohort_start.replace(year=cohort_start.year + 1, month=1)
+        else:
+            cohort_end = cohort_start.replace(month=cohort_start.month + 1)
+
+        # Users created in this month
+        cohort_size = await db.scalar(
+            select(func.count(User.id)).where(
+                User.is_deleted == False,
+                User.created_at >= cohort_start,
+                User.created_at < cohort_end,
+            )
+        ) or 0
+
+        if cohort_size == 0:
+            cohorts.append({
+                "month": cohort_start.strftime("%Y-%m"),
+                "size": 0,
+                "retention": [],
+            })
+            continue
+
+        # Calculate retention for each subsequent month
+        retention = []
+        months_since = 0
+        check_month = cohort_start
+        while check_month < now.replace(day=1):
+            if check_month.month == 12:
+                next_month = check_month.replace(year=check_month.year + 1, month=1)
+            else:
+                next_month = check_month.replace(month=check_month.month + 1)
+
+            # Count users from this cohort who were active in the check_month
+            active_in_month = await db.scalar(
+                select(func.count(User.id)).where(
+                    User.is_deleted == False,
+                    User.created_at >= cohort_start,
+                    User.created_at < cohort_end,
+                    User.last_active >= check_month,
+                    User.last_active < next_month,
+                )
+            ) or 0
+
+            pct = round(active_in_month / cohort_size * 100, 1) if cohort_size > 0 else 0
+            retention.append(pct)
+            check_month = next_month
+            months_since += 1
+
+        cohorts.append({
+            "month": cohort_start.strftime("%Y-%m"),
+            "size": cohort_size,
+            "retention": retention,
+        })
+
+    await _log_admin_action(db, admin_user, "view_cohorts", "analytics")
+    await db.commit()
+
+    return {
+        "cohorts": cohorts,
+        "months": months,
+    }
+
+
+@router.get(
+    "/analytics/retention-curve",
+    summary="Retention curve over time",
+)
+async def get_retention_curve(
+    days: int = Query(90, ge=7, le=365, description="Lookback period in days"),
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """
+    Retention curve: for users created in the last N days, what % are still active
+    at day 1, 7, 14, 30, 60, 90.
+    """
+    now = datetime.utcnow()
+    cutoff = now - timedelta(days=days)
+
+    # Total cohort: all users created in the period
+    total_cohort_size = await db.scalar(
+        select(func.count(User.id)).where(
+            User.is_deleted == False,
+            User.created_at >= cutoff,
+        )
+    ) or 0
+
+    checkpoints = [1, 7, 14, 30, 60, 90]
+    curve = []
+
+    for day_n in checkpoints:
+        if day_n > days:
+            break
+
+        # Users who were created at least day_n days ago AND had last_active >= day_n days after signup
+        # We need users where (last_active - created_at) >= day_n days
+        eligible_cutoff = now - timedelta(days=day_n)
+        eligible_count = await db.scalar(
+            select(func.count(User.id)).where(
+                User.is_deleted == False,
+                User.created_at >= cutoff,
+                User.created_at <= eligible_cutoff,
+            )
+        ) or 0
+
+        if eligible_count == 0:
+            curve.append({"day": day_n, "pct": 0.0, "count": 0})
+            continue
+
+        # Count users from the eligible set whose last_active is at least day_n days after created_at
+        retained = await db.scalar(
+            select(func.count(User.id)).where(
+                User.is_deleted == False,
+                User.created_at >= cutoff,
+                User.created_at <= eligible_cutoff,
+                User.last_active >= User.created_at + timedelta(days=day_n),
+            )
+        ) or 0
+
+        pct = round(retained / eligible_count * 100, 1)
+        curve.append({"day": day_n, "pct": pct, "count": retained})
+
+    await _log_admin_action(db, admin_user, "view_retention_curve", "analytics")
+    await db.commit()
+
+    return {
+        "curve": curve,
+        "total_cohort_size": total_cohort_size,
+    }
+
+
+@router.get(
+    "/analytics/executive-summary",
+    summary="Executive summary of key platform metrics",
+)
+async def get_executive_summary(
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """
+    Executive summary: total users, DAU, MAU, activation rate, paying conversion.
+    """
+    now = datetime.utcnow()
+    yesterday = now - timedelta(days=1)
+    seven_days_ago = now - timedelta(days=7)
+    thirty_days_ago = now - timedelta(days=30)
+
+    # Total users (non-deleted)
+    total_users = await db.scalar(
+        select(func.count(User.id)).where(User.is_deleted == False)
+    ) or 0
+
+    # DAU: active in last 24h
+    dau = await db.scalar(
+        select(func.count(User.id)).where(
+            User.is_deleted == False,
+            User.last_active >= yesterday,
+        )
+    ) or 0
+
+    # MAU: active in last 30 days
+    mau = await db.scalar(
+        select(func.count(User.id)).where(
+            User.is_deleted == False,
+            User.last_active >= thirty_days_ago,
+        )
+    ) or 0
+
+    dau_mau_ratio = round(dau / mau, 4) if mau > 0 else 0.0
+
+    # Activation rate: users who have a profile with a non-default subscription OR
+    # have created a family file (proxy for completing onboarding)
+    from app.models.family_file import FamilyFile
+    activated_users = await db.scalar(
+        select(func.count(func.distinct(FamilyFile.created_by_user_id))).where(
+            FamilyFile.status == "active",
+        )
+    ) or 0
+    activation_rate = round(activated_users / total_users, 4) if total_users > 0 else 0.0
+
+    # Paying users: active paid subscription (non-free tiers)
+    free_tiers = ["essential", "starter", "web_starter", "unknown"]
+    paying_users = await db.scalar(
+        select(func.count(UserProfile.id)).where(
+            UserProfile.subscription_status == "active",
+            UserProfile.subscription_tier.notin_(free_tiers),
+        )
+    ) or 0
+
+    paying_conversion = round(paying_users / total_users, 4) if total_users > 0 else 0.0
+
+    # New users in last 7 days
+    new_users_7d = await db.scalar(
+        select(func.count(User.id)).where(
+            User.created_at >= seven_days_ago,
+        )
+    ) or 0
+
+    await _log_admin_action(db, admin_user, "view_executive_summary", "analytics")
+    await db.commit()
+
+    return {
+        "total_users": total_users,
+        "dau": dau,
+        "mau": mau,
+        "dau_mau_ratio": dau_mau_ratio,
+        "activation_rate": activation_rate,
+        "paying_conversion": paying_conversion,
+        "paying_users": paying_users,
+        "new_users_7d": new_users_7d,
+    }
+
+
+@router.get(
+    "/analytics/ai-summary",
+    summary="AI-generated platform summary (rule-based)",
+)
+async def get_ai_summary(
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """
+    Generate a bullet-point summary of key platform metrics.
+    No actual AI — uses rule-based formatting of real data.
+    """
+    now = datetime.utcnow()
+    yesterday = now - timedelta(days=1)
+    seven_days_ago = now - timedelta(days=7)
+    thirty_days_ago = now - timedelta(days=30)
+
+    tier_prices = await _get_tier_prices(db)
+
+    # Core metrics
+    total_users = await db.scalar(
+        select(func.count(User.id)).where(User.is_deleted == False)
+    ) or 0
+
+    dau = await db.scalar(
+        select(func.count(User.id)).where(
+            User.is_deleted == False,
+            User.last_active >= yesterday,
+        )
+    ) or 0
+
+    mau = await db.scalar(
+        select(func.count(User.id)).where(
+            User.is_deleted == False,
+            User.last_active >= thirty_days_ago,
+        )
+    ) or 0
+
+    new_users_7d = await db.scalar(
+        select(func.count(User.id)).where(User.created_at >= seven_days_ago)
+    ) or 0
+
+    # MRR calculation
+    tier_result = await db.execute(
+        select(
+            UserProfile.subscription_tier,
+            func.count(UserProfile.id),
+        )
+        .where(UserProfile.subscription_status == "active")
+        .group_by(UserProfile.subscription_tier)
+    )
+    mrr = 0.0
+    paying_users = 0
+    free_tiers = ["essential", "starter", "web_starter", "unknown"]
+    for tier, count in tier_result:
+        tier_name = tier or "unknown"
+        price = tier_prices.get(tier_name, 0)
+        mrr += count * price
+        if tier_name not in free_tiers and price > 0:
+            paying_users += count
+    mrr = round(mrr, 2)
+
+    # Churn
+    cancelled_30d = await db.scalar(
+        select(func.count(UserProfile.id)).where(
+            UserProfile.subscription_status == "cancelled",
+            UserProfile.updated_at >= thirty_days_ago,
+        )
+    ) or 0
+    churn_base = paying_users + cancelled_30d
+    monthly_churn_pct = round(cancelled_30d / churn_base * 100, 1) if churn_base > 0 else 0.0
+
+    # Build summary bullets
+    summary = []
+    summary.append(
+        f"Platform has {total_users:,} total users with {dau:,} daily active "
+        f"and {mau:,} monthly active users (DAU/MAU ratio: {round(dau / mau * 100, 1) if mau > 0 else 0}%)."
+    )
+    summary.append(
+        f"MRR is ${mrr:,.2f} (ARR ${mrr * 12:,.2f}) from {paying_users} paying subscribers."
+    )
+    if new_users_7d > 0:
+        summary.append(
+            f"{new_users_7d} new users signed up in the last 7 days."
+        )
+    if monthly_churn_pct > 0:
+        summary.append(
+            f"Monthly churn rate is {monthly_churn_pct}% ({cancelled_30d} cancellations in the last 30 days)."
+        )
+    else:
+        summary.append("No cancellations recorded in the last 30 days — churn rate is 0%.")
+
+    paying_conversion = round(paying_users / total_users * 100, 1) if total_users > 0 else 0
+    summary.append(
+        f"Paying user conversion rate is {paying_conversion}% ({paying_users} of {total_users:,} users)."
+    )
+
+    metrics = {
+        "total_users": total_users,
+        "dau": dau,
+        "mau": mau,
+        "mrr": mrr,
+        "arr": round(mrr * 12, 2),
+        "paying_users": paying_users,
+        "new_users_7d": new_users_7d,
+        "monthly_churn_pct": monthly_churn_pct,
+        "paying_conversion_pct": paying_conversion,
+    }
+
+    await _log_admin_action(db, admin_user, "view_ai_summary", "analytics")
+    await db.commit()
+
+    return {
+        "summary": summary,
+        "generated": True,
+        "metrics": metrics,
+        "generated_at": now.isoformat(),
+    }
