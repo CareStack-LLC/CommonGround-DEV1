@@ -645,13 +645,22 @@ async def get_billing_overview(
     Shows tier breakdown, revenue estimates, and payment status.
     For detailed Stripe data, use Stripe Dashboard directly.
     """
-    # Subscription tier breakdown
+    # ── Exclude admin users from all subscription queries ──
+    admin_ids_result = await db.execute(
+        select(User.id).where(User.is_admin == True, User.is_deleted == False)
+    )
+    admin_user_ids = [str(r[0]) for r in admin_ids_result.all()]
+
+    non_admin_filter = UserProfile.user_id.notin_(admin_user_ids) if admin_user_ids else True
+
+    # Subscription tier breakdown (excludes admins)
     tier_result = await db.execute(
         select(
             UserProfile.subscription_tier,
             UserProfile.subscription_status,
             func.count(UserProfile.id),
         )
+        .where(non_admin_filter)
         .group_by(UserProfile.subscription_tier, UserProfile.subscription_status)
     )
 
@@ -676,33 +685,36 @@ async def get_billing_overview(
     for tier, count in prof_result:
         prof_breakdown[tier or "starter"] = count
 
-    # Past-due count (needs attention)
+    # Past-due count (excludes admins)
     past_due_count = await db.scalar(
         select(func.count(UserProfile.id)).where(
-            UserProfile.subscription_status == "past_due"
+            UserProfile.subscription_status == "past_due",
+            non_admin_filter,
         )
     )
 
-    # Trial users count
+    # Trial users count (excludes admins)
     trial_count = await db.scalar(
         select(func.count(UserProfile.id)).where(
-            UserProfile.subscription_status == "trial"
+            UserProfile.subscription_status == "trial",
+            non_admin_filter,
         )
     )
 
-    # Cancelled in last 30 days
+    # Cancelled in last 30 days (excludes admins)
     thirty_days_ago = datetime.utcnow() - timedelta(days=30)
     cancelled_30d = await db.scalar(
         select(func.count(UserProfile.id)).where(
             UserProfile.subscription_status == "cancelled",
             UserProfile.updated_at >= thirty_days_ago,
+            non_admin_filter,
         )
     )
 
     # Tier prices from config/DB (correct prices)
     tier_prices = await _get_tier_prices(db)
 
-    # Calculate MRR by tier
+    # Calculate MRR by tier (DB estimate — overridden by Stripe below when available)
     mrr_by_tier = {}
     for tier_name, data in breakdown.items():
         active_count = data["statuses"].get("active", 0)
@@ -715,12 +727,13 @@ async def get_billing_overview(
 
     total_mrr = sum(t["mrr"] for t in mrr_by_tier.values())
 
-    # Subscription growth: new paid subscriptions last 30 days
+    # Subscription growth: new paid subscriptions last 30 days (excludes admins)
     new_paid_30d = await db.scalar(
         select(func.count(UserProfile.id)).where(
             UserProfile.subscription_status == "active",
             UserProfile.subscription_tier.notin_(["essential", "starter", "web_starter", "unknown"]),
             UserProfile.created_at >= thirty_days_ago,
+            non_admin_filter,
         )
     )
 
@@ -781,7 +794,7 @@ async def get_billing_overview(
 
     # Override DB-calculated revenue with Stripe data when available
     if snapshot.stripe_available:
-        # Use Stripe as source of truth for MRR
+        # Use Stripe as source of truth for MRR and subscription counts
         total_mrr = snapshot.total_mrr
         mrr_by_tier = {}
         for tier_name, tier_info in snapshot.mrr_by_tier.items():
@@ -790,6 +803,18 @@ async def get_billing_overview(
                 "price": tier_info["price"],
                 "mrr": tier_info["mrr"],
             }
+        # Also override subscription breakdown to match Stripe reality
+        # Build breakdown from Stripe subscriptions instead of DB
+        stripe_breakdown = {}
+        for tier_name, tier_info in snapshot.mrr_by_tier.items():
+            if tier_info["count"] > 0:
+                stripe_breakdown[tier_name] = {
+                    "total": tier_info["count"],
+                    "statuses": {"active": tier_info["count"]},
+                }
+        breakdown = stripe_breakdown
+        # Override new_paid_30d: use Stripe active count (no DB inflation)
+        new_paid_30d = snapshot.active_count
 
     # Verify expected products exist in Stripe (best-effort)
     try:
