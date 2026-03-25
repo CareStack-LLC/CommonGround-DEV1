@@ -9,6 +9,7 @@ import {
   Space_Grotesk,
   JetBrains_Mono,
 } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 
 /* ── Lazy-loaded client components ─────────────────────────────────
  * Heavy providers (WebSocket, Realtime, Notification, Subscription)
@@ -153,6 +154,7 @@ export default function RootLayout({
             {children}
           </AppProviders>
         </AuthProvider>
+        <Analytics />
       </body>
     </html>
   );
