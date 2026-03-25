@@ -23,27 +23,27 @@ logger = logging.getLogger(__name__)
 # ─────────────────────────────────────────────────────────────────────
 
 STRIPE_PRICE_TO_TIER: dict[str, str] = {
-    # Consumer tiers
-    "price_1TE0bXBJIivbOFX7luV9H7OZ": "web_starter",      # $0/mo
-    "price_1TE0bXBJIivbOFX70Ysv656Q": "plus",              # $17.99/mo
-    "price_1TE0bYBJIivbOFX7atup1qAE": "plus",              # $199.99/yr
-    "price_1TE0bYBJIivbOFX7VqmtQH23": "complete",          # $34.99/mo
-    "price_1TE0bZBJIivbOFX77f2QUPc6": "complete",          # $349.99/yr
+    # Consumer tiers (B3EXvvERPf account)
+    "price_1T7WgnB3EXvvERPfyu40gtfE": "web_starter",       # $0/mo (custom)
+    "price_1T7WgnB3EXvvERPfcpZeMSSH": "plus",              # $17.99/mo
+    "price_1T7WgnB3EXvvERPfe7NNFlru": "plus",              # $199.99/yr
+    "price_1T7WgoB3EXvvERPfDm7qKpBN": "complete",          # $34.99/mo
+    "price_1T7WgoB3EXvvERPfmDy9KtDh": "complete",          # $349.99/yr
     # Professional tiers
-    "price_1TE0bZBJIivbOFX7kmvDAoqr": "professional_starter",
-    "price_1TE0baBJIivbOFX7dqc7W1Dp": "solo",
-    "price_1TE0baBJIivbOFX7smGjiSyj": "small_firm",
-    "price_1TE0bbBJIivbOFX78k6VF4wC": "mid_size",
+    "price_1T7WgoB3EXvvERPfTe6d3Ccx": "professional_starter",  # $49.99/mo
+    "price_1T7WgpB3EXvvERPfjThfJqeO": "solo",                  # $99/mo
+    "price_1T7WgpB3EXvvERPf4wDi0fjN": "small_firm",            # $299/mo
+    "price_1T7WgqB3EXvvERPftbsE7Y2f": "mid_size",              # $799/mo
 }
 
 STRIPE_PRODUCT_TO_TIER: dict[str, str] = {
-    "prod_UCPQdxPYuteQUA": "web_starter",
-    "prod_UCPQBUvNRmZ4Cs": "plus",
-    "prod_UCPQxC2eRt7g6K": "complete",
-    "prod_UCPQevbVaWJDfT": "professional_starter",
-    "prod_UCPQVLqjYyuiRF": "solo",
-    "prod_UCPQOK9Qpuw1hB": "small_firm",
-    "prod_UCPQQwcr2VaCXs": "mid_size",
+    "prod_U5i6vWb4ktGrTN": "web_starter",
+    "prod_U5i6Efw49ipfb3": "plus",
+    "prod_U5i6lsgC2mOHxn": "complete",
+    "prod_U5i6Vfe7E6vHtZ": "professional_starter",
+    "prod_U5i6WdwYSiC9wc": "solo",
+    "prod_U5i6tXPi3LbW5h": "small_firm",
+    "prod_U5i6Pvkzonm0fe": "mid_size",
 }
 
 DEFAULT_TIER_PRICES: dict[str, float] = {
@@ -61,8 +61,8 @@ DEFAULT_CAC: float = 45.0
 
 # Yearly price IDs (interval == "year") — used for MRR normalisation
 _YEARLY_PRICE_IDS: set[str] = {
-    "price_1TE0bYBJIivbOFX7atup1qAE",  # plus yearly
-    "price_1TE0bZBJIivbOFX77f2QUPc6",  # complete yearly
+    "price_1T7WgnB3EXvvERPfe7NNFlru",  # plus yearly
+    "price_1T7WgoB3EXvvERPfmDy9KtDh",  # complete yearly
 }
 
 # ─────────────────────────────────────────────────────────────────────
@@ -77,7 +77,7 @@ class StripeRevenueResult:
     total_mrr: float = 0.0
     total_arr: float = 0.0
     active_count: int = 0
-    mrr_by_tier: dict[str, float] = field(default_factory=dict)
+    mrr_by_tier: dict[str, dict] = field(default_factory=dict)  # {tier: {"count": N, "mrr": X}}
     mrr_by_segment: dict[str, float] = field(default_factory=lambda: {
         "consumer": 0.0,
         "professional": 0.0,
@@ -218,7 +218,7 @@ def fetch_stripe_revenue(*, force: bool = False) -> StripeRevenueResult:
     try:
         total_mrr = 0.0
         active_count = 0
-        mrr_by_tier: dict[str, float] = {}
+        mrr_by_tier: dict[str, dict] = {}  # {tier: {"count": N, "mrr": X}}
         mrr_by_segment: dict[str, float] = {"consumer": 0.0, "professional": 0.0}
 
         # Fetch both active and trialing subscriptions
@@ -238,7 +238,10 @@ def fetch_stripe_revenue(*, force: bool = False) -> StripeRevenueResult:
 
                     total_mrr += mrr
                     active_count += 1
-                    mrr_by_tier[tier] = mrr_by_tier.get(tier, 0.0) + mrr
+                    if tier not in mrr_by_tier:
+                        mrr_by_tier[tier] = {"count": 0, "mrr": 0.0, "price": DEFAULT_TIER_PRICES.get(tier, 0)}
+                    mrr_by_tier[tier]["count"] += 1
+                    mrr_by_tier[tier]["mrr"] += mrr
 
                     if tier in CONSUMER_TIERS:
                         mrr_by_segment["consumer"] += mrr
@@ -253,7 +256,7 @@ def fetch_stripe_revenue(*, force: bool = False) -> StripeRevenueResult:
             total_mrr=round(total_mrr, 2),
             total_arr=round(total_mrr * 12, 2),
             active_count=active_count,
-            mrr_by_tier={k: round(v, 2) for k, v in mrr_by_tier.items()},
+            mrr_by_tier={k: {"count": v["count"], "mrr": round(v["mrr"], 2), "price": v["price"]} for k, v in mrr_by_tier.items()},
             mrr_by_segment={k: round(v, 2) for k, v in mrr_by_segment.items()},
             stripe_available=True,
             fetched_at=datetime.utcnow().isoformat(),
