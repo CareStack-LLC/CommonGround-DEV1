@@ -15,7 +15,7 @@ const API_URL = _apiUrl;
 interface TesterDashboard {
   tester: { id: string; tester_name: string; tester_email: string; status: string };
   cohort: { id: string; name: string; description: string | null; target_feature: string; status: string; test_instructions: string | null };
-  family: { id: string; parent_a_email: string; parent_a_password: string; parent_b_email: string; parent_b_password: string; parent_a_name: string; parent_b_name: string; children_names: string[] };
+  family: { id: string; parent_a_email: string; parent_a_password: string; parent_b_email: string; parent_b_password: string; parent_a_name: string; parent_b_name: string; children_names: string[]; agreement_version?: string | null; subscription_tier?: string | null };
   checklist: { id: string; title: string; description: string | null; display_order: number; is_completed: boolean; completed_at: string | null }[];
   bug_reports: { id: string; title: string; description: string; severity: string; status: string; steps_to_reproduce: string | null; created_at: string }[];
   feedback: { id: string; rating: number | null; category: string; content: string; feature_area: string | null; created_at: string }[];
@@ -184,6 +184,30 @@ export default function TesterPage() {
               </div>
               {family.children_names.length > 0 && (
                 <div className="text-xs text-gray-500"><span className="font-medium">Children:</span> {family.children_names.join(', ')}</div>
+              )}
+              {(family.agreement_version || family.subscription_tier) && (
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {family.agreement_version && (
+                    <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
+                      family.agreement_version === 'good_faith' ? 'bg-emerald-50 text-emerald-700' :
+                      family.agreement_version === 'co-operative' ? 'bg-blue-50 text-blue-700' :
+                      family.agreement_version === 'comprehensive' ? 'bg-purple-50 text-purple-700' :
+                      'bg-gray-100 text-gray-600'
+                    }`}>
+                      {family.agreement_version.replace(/_/g, ' ')}
+                    </span>
+                  )}
+                  {family.subscription_tier && (
+                    <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
+                      family.subscription_tier === 'web_starter' ? 'bg-gray-100 text-gray-600' :
+                      family.subscription_tier === 'plus' ? 'bg-amber-50 text-amber-700' :
+                      family.subscription_tier === 'complete' ? 'bg-rose-50 text-rose-700' :
+                      'bg-gray-100 text-gray-600'
+                    }`}>
+                      {family.subscription_tier.replace(/_/g, ' ')}
+                    </span>
+                  )}
+                </div>
               )}
             </div>
           )}
