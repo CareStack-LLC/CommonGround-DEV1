@@ -732,7 +732,7 @@ class ARIAService:
             AI analysis result with detailed feedback
         """
         try:
-            client = OpenAI(api_key=settings.OPENAI_API_KEY)
+            client = OpenAI(api_key=settings.OPENAI_API_KEY, timeout=30.0)
 
             # Build context
             context_info = ""
@@ -1067,7 +1067,7 @@ Respond in JSON format:
             The rewritten message string, or None if rewrite fails
         """
         try:
-            client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
+            client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY, timeout=30.0)
 
             thread_context = ""
             if thread_history:
@@ -1083,21 +1083,13 @@ Respond in JSON format:
                 else "Use a warm, collaborative tone."
             )
 
-            prompt = f"""You are ARIA, a co-parenting communication assistant for CommonGround.
-
-THREAD CONTEXT — recent messages:
-{thread_context}
-
-The parent just tried to send this message:
-"{flagged_message}"
-
-This message was flagged for: {flag_reason}
+            system_prompt = f"""You are ARIA, a co-parenting communication assistant for CommonGround.
 
 YOUR TASK:
-Rewrite this message to be calm, child-focused, and productive.
+Rewrite flagged messages to be calm, child-focused, and productive.
 
 STRICT RULES:
-1. Stay on the EXACT topic of the thread above — do not change the subject.
+1. Stay on the EXACT topic of the thread — do not change the subject.
 2. Do NOT translate insults or anger. Redirect to the co-parenting task instead.
 3. Keep it brief (1–3 sentences).
 4. {tone_instruction}
@@ -1107,10 +1099,19 @@ STRICT RULES:
 If the original message had zero constructive content (pure abuse), suggest:
 "I need a moment to collect my thoughts. Let's continue this conversation later."
 """
+            user_prompt = f"""THREAD CONTEXT — recent messages:
+{thread_context}
+
+The parent just tried to send this message:
+"{flagged_message}"
+
+This message was flagged for: {flag_reason}
+"""
             response = client.messages.create(
                 model="claude-3-5-sonnet-20241022",
                 max_tokens=256,
-                messages=[{"role": "user", "content": prompt}]
+                system=[{"type": "text", "text": system_prompt, "cache_control": {"type": "ephemeral"}}],
+                messages=[{"role": "user", "content": user_prompt}]
             )
 
             rewrite = response.content[0].text.strip()
@@ -1123,8 +1124,8 @@ If the original message had zero constructive content (pure abuse), suggest:
             # Fallback to OpenAI if Anthropic fails
             try:
                 logger.info("[ARIA v2] Attempting OpenAI fallback for contextual rewrite...")
-                openai_client = OpenAI(api_key=settings.OPENAI_API_KEY)
-                
+                openai_client = OpenAI(api_key=settings.OPENAI_API_KEY, timeout=30.0)
+
                 # Use a similar prompt for OpenAI
                 response = openai_client.chat.completions.create(
                     model="gpt-4o",
@@ -1169,7 +1170,7 @@ If the original message had zero constructive content (pure abuse), suggest:
             return []
 
         try:
-            client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
+            client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY, timeout=30.0)
 
             thread_context = ""
             if thread_history:
@@ -1184,13 +1185,7 @@ If the original message had zero constructive content (pure abuse), suggest:
                 else "Replies should be friendly and collaborative."
             )
 
-            prompt = f"""You are ARIA, a co-parenting communication assistant for CommonGround.
-
-THREAD CONTEXT — recent messages:
-{thread_context}
-
-An incoming message was just received:
-"{incoming_message}"
+            system_prompt = f"""You are ARIA, a co-parenting communication assistant for CommonGround.
 
 YOUR TASK:
 Write 1–2 concise, civil reply options the recipient could use.
@@ -1205,10 +1200,17 @@ STRICT RULES:
 Respond in valid JSON only:
 {{"suggestions": ["reply one", "reply two"]}}
 """
+            user_prompt = f"""THREAD CONTEXT — recent messages:
+{thread_context}
+
+An incoming message was just received:
+"{incoming_message}"
+"""
             response = client.messages.create(
                 model="claude-3-5-sonnet-20241022",
                 max_tokens=200,
-                messages=[{"role": "user", "content": prompt}]
+                system=[{"type": "text", "text": system_prompt, "cache_control": {"type": "ephemeral"}}],
+                messages=[{"role": "user", "content": user_prompt}]
             )
 
             import json as _json
@@ -1223,8 +1225,8 @@ Respond in valid JSON only:
             # Fallback to OpenAI if Anthropic fails
             try:
                 logger.info("[ARIA v2] Attempting OpenAI fallback for reply suggestions...")
-                openai_client = OpenAI(api_key=settings.OPENAI_API_KEY)
-                
+                openai_client = OpenAI(api_key=settings.OPENAI_API_KEY, timeout=30.0)
+
                 response = openai_client.chat.completions.create(
                     model="gpt-4o",
                     messages=[

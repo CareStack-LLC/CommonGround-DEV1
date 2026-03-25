@@ -359,7 +359,7 @@ async def analyze_email(db: AsyncSession, email_id: str) -> dict:
     )
 
     try:
-        client = anthropic.AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY)
+        client = anthropic.AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY, timeout=30.0)
         response = await client.messages.create(
             model="claude-sonnet-4-5-20250514",
             max_tokens=2048,
@@ -822,7 +822,7 @@ async def generate_thread_reply(
 
     try:
         if settings.ANTHROPIC_API_KEY:
-            client = anthropic.AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY)
+            client = anthropic.AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY, timeout=30.0)
             response = await client.messages.create(
                 model="claude-sonnet-4-5-20250514",
                 max_tokens=1500,
@@ -837,7 +837,7 @@ async def generate_thread_reply(
         try:
             from openai import AsyncOpenAI
             if settings.OPENAI_API_KEY:
-                oai = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+                oai = AsyncOpenAI(api_key=settings.OPENAI_API_KEY, timeout=30.0)
                 resp = await oai.chat.completions.create(
                     model="gpt-4o",
                     messages=[{"role": "user", "content": prompt}],

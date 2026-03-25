@@ -242,7 +242,7 @@ async def ai_triage(issues: list[dict]) -> dict:
         try:
             import anthropic
 
-            client = anthropic.AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY)
+            client = anthropic.AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY, timeout=30.0)
             response = await client.messages.create(
                 model="claude-sonnet-4-5-20250514",
                 max_tokens=4096,
@@ -260,7 +260,7 @@ async def ai_triage(issues: list[dict]) -> dict:
         try:
             from openai import AsyncOpenAI
 
-            oai_client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+            oai_client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY, timeout=30.0)
             oai_response = await oai_client.chat.completions.create(
                 model="gpt-4o",
                 max_tokens=4096,

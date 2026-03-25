@@ -146,7 +146,7 @@ class AriaQuickAccordService:
         if settings.ARIA_DEFAULT_PROVIDER == "claude" and settings.ANTHROPIC_API_KEY:
             self.provider = "claude"
             try:
-                self.anthropic = Anthropic(api_key=settings.ANTHROPIC_API_KEY)
+                self.anthropic = Anthropic(api_key=settings.ANTHROPIC_API_KEY, timeout=30.0)
             except Exception:
                 self.provider = "openai"
         else:
@@ -155,7 +155,7 @@ class AriaQuickAccordService:
         # Always initialize OpenAI as fallback
         if settings.OPENAI_API_KEY:
             try:
-                self.openai = OpenAI(api_key=settings.OPENAI_API_KEY)
+                self.openai = OpenAI(api_key=settings.OPENAI_API_KEY, timeout=30.0)
             except Exception:
                 pass
 

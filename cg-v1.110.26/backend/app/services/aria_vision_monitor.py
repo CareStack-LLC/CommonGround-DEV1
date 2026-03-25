@@ -113,10 +113,13 @@ Child safety threshold is LOWER - flag anything that would be concerning for a c
     def __init__(self):
         """Initialize with Claude API client."""
         self.client = anthropic.AsyncAnthropic(
-            api_key=settings.ANTHROPIC_API_KEY
+            api_key=settings.ANTHROPIC_API_KEY,
+            timeout=30.0
         ) if settings.ANTHROPIC_API_KEY else None
         # Track last frame hashes per participant for similarity detection
         self._last_frame_hashes: Dict[str, str] = {}
+        # Cache previous analysis result per participant to return on skip
+        self._last_results: Dict[str, FrameAnalysisResult] = {}
 
     def _compute_frame_hash(self, frame_b64: str) -> str:
         """Compute SHA-256 hash of the frame data."""
@@ -170,8 +173,12 @@ Child safety threshold is LOWER - flag anything that would be concerning for a c
             logger.warning("Anthropic API key not configured - skipping vision analysis")
             return FrameAnalysisResult(is_flagged=False)
 
-        # Skip if frame is similar to last analyzed frame
+        # Skip if frame is similar to last analyzed frame — return cached result
         if self.is_frame_similar(participant_id, frame_b64):
+            cached = self._last_results.get(participant_id)
+            if cached:
+                logger.debug(f"Frame similar to previous for participant {participant_id[:8]}... - returning cached result")
+                return cached
             logger.debug(f"Frame similar to previous for participant {participant_id[:8]}... - skipping")
             return FrameAnalysisResult(is_flagged=False)
 
@@ -184,6 +191,7 @@ Child safety threshold is LOWER - flag anything that would be concerning for a c
             response = await self.client.messages.create(
                 model="claude-sonnet-4-5-20250514",
                 max_tokens=300,
+                system=[{"type": "text", "text": prompt, "cache_control": {"type": "ephemeral"}}],
                 messages=[
                     {
                         "role": "user",
@@ -198,7 +206,7 @@ Child safety threshold is LOWER - flag anything that would be concerning for a c
                             },
                             {
                                 "type": "text",
-                                "text": prompt,
+                                "text": "Analyze this video frame for safety violations.",
                             },
                         ],
                     }
@@ -245,6 +253,9 @@ Child safety threshold is LOWER - flag anything that would be concerning for a c
                     f"type={result.violation_type} score={score:.2f} "
                     f"desc={result.violation_description}"
                 )
+
+            # Cache result for this participant so duplicate frames reuse it
+            self._last_results[participant_id] = result
 
             return result
 

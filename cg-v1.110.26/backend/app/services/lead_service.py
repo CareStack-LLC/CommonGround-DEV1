@@ -247,7 +247,7 @@ async def generate_campaign_content(
     )
 
     try:
-        client = anthropic.AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY)
+        client = anthropic.AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY, timeout=30.0)
         response = await client.messages.create(
             model="claude-sonnet-4-5-20250514",
             max_tokens=4096,

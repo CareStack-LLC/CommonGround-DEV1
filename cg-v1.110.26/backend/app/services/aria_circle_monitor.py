@@ -189,11 +189,7 @@ class ARIACircleMonitor:
                 "reason": "Safety monitoring unavailable - API key not configured",
             }
 
-        prompt = f"""You are ARIA, a child safety AI assistant monitoring a video call between a circle contact (grandparent, aunt, family friend, etc.) and a child.
-
-Analyze the following spoken text from the {speaker_type} for child safety concerns:
-
-"{text}"
+        system_prompt = """You are ARIA, a child safety AI assistant monitoring a video call between a circle contact (grandparent, aunt, family friend, etc.) and a child.
 
 Evaluate for these child safety categories:
 1. inappropriate_content - Profanity, sexual references, adult content
@@ -203,13 +199,13 @@ Evaluate for these child safety categories:
 5. distress_signals - Child expressing fear, discomfort, crying
 
 Provide analysis in JSON format:
-{{
+{
   "toxicity_score": 0.0-1.0 (0 = completely safe, 1 = severe danger),
   "severity": "safe" | "low" | "medium" | "high" | "severe",
   "categories": ["category1", "category2"],
   "reason": "Brief explanation of concern",
   "triggers": ["specific phrase 1", "specific phrase 2"]
-}}
+}
 
 IMPORTANT child safety thresholds:
 - 0.0-0.2: Safe, appropriate conversation
@@ -219,17 +215,23 @@ IMPORTANT child safety thresholds:
 
 Be very sensitive to child safety but avoid false positives on normal family conversation."""
 
+        user_prompt = f"""Analyze the following spoken text from the {speaker_type} for child safety concerns:
+
+"{text}"
+"""
+
         try:
             import anthropic
 
-            client = anthropic.Anthropic(api_key=self.anthropic_api_key)
+            client = anthropic.Anthropic(api_key=self.anthropic_api_key, timeout=30.0)
 
             from app.utils.sentry_helpers import ai_span
             with ai_span("child_safety_analysis", "claude-sonnet-4-5-20250514") as span:
                 response = client.messages.create(
                     model="claude-sonnet-4-5-20250514",
                     max_tokens=500,
-                    messages=[{"role": "user", "content": prompt}],
+                    system=[{"type": "text", "text": system_prompt, "cache_control": {"type": "ephemeral"}}],
+                    messages=[{"role": "user", "content": user_prompt}],
                 )
                 if hasattr(response, 'usage'):
                     span.set_data("input_tokens", response.usage.input_tokens)

@@ -41,8 +41,8 @@ class AriaParalegalService:
 
     def __init__(self, db: AsyncSession):
         self.db = db
-        self.anthropic_client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
-        self.openai_client = OpenAI(api_key=settings.OPENAI_API_KEY)
+        self.anthropic_client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY, timeout=30.0)
+        self.openai_client = OpenAI(api_key=settings.OPENAI_API_KEY, timeout=30.0)
 
     def _get_system_prompt(
         self,
@@ -416,7 +416,7 @@ Ready to begin? First, could you tell me a little about yourself and your situat
         response = self.anthropic_client.messages.create(
             model="claude-3-5-sonnet-20240620",
             max_tokens=1500,
-            system=system_prompt,
+            system=[{"type": "text", "text": system_prompt, "cache_control": {"type": "ephemeral"}}],
             messages=claude_messages
         )
 

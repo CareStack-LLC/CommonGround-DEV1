@@ -89,13 +89,18 @@ class AriaAgreementService:
                             "content": msg["content"],
                         })
 
+                # Keep only the last 15 conversation messages to avoid
+                # excessive token usage on long agreement conversations
+                if len(anthropic_messages) > 15:
+                    anthropic_messages = anthropic_messages[-15:]
+
                 kwargs = {
                     "model": "claude-sonnet-4-20250514",
                     "max_tokens": max_tokens,
                     "messages": anthropic_messages,
                 }
                 if system_msg:
-                    kwargs["system"] = system_msg
+                    kwargs["system"] = [{"type": "text", "text": system_msg, "cache_control": {"type": "ephemeral"}}]
 
                 response = self._anthropic_client.messages.create(**kwargs)
                 return response.content[0].text
@@ -104,6 +109,10 @@ class AriaAgreementService:
 
         # Fallback to OpenAI
         if self._openai_client:
+            # Keep system message + last 15 conversation messages
+            if len(messages) > 16:
+                messages = [messages[0]] + messages[-15:]
+
             response = self._openai_client.chat.completions.create(
                 model=model or "gpt-4-turbo",
                 max_tokens=max_tokens,
