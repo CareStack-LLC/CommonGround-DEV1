@@ -138,6 +138,20 @@ export default function NewBugHuntPage() {
           <p className="text-xs text-[#6B8A9A] mt-1">
             Each family gets 2 parent accounts + 1-2 children with test credentials
           </p>
+          <div className="mt-2 p-2.5 bg-[#2D6A8F]/10 border border-[#2D6A8F]/20 rounded-lg">
+            <p className="text-xs text-[#8AACBC]">
+              Families auto-rotate through agreement types and subscription tiers:
+            </p>
+            <div className="flex flex-wrap gap-1.5 mt-1.5">
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400">Good Faith</span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/15 text-blue-400">Co-operative</span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/15 text-purple-400">Comprehensive</span>
+              <span className="text-[10px] text-[#6B8A9A] self-center mx-1">&times;</span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-600/30 text-zinc-400">Web Starter</span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-400">Plus</span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-rose-500/15 text-rose-400">Complete</span>
+            </div>
+          </div>
         </div>
 
         {/* Test Instructions */}

@@ -52,6 +52,18 @@ const FEATURE_LABELS: Record<string, string> = {
   custody_tracking: 'Custody Tracking', clearfund: 'ClearFund', general: 'General',
 };
 
+const AGREEMENT_BADGE: Record<string, string> = {
+  good_faith: 'bg-emerald-500/15 text-emerald-400',
+  'co-operative': 'bg-blue-500/15 text-blue-400',
+  comprehensive: 'bg-purple-500/15 text-purple-400',
+};
+
+const TIER_BADGE: Record<string, string> = {
+  web_starter: 'bg-zinc-600/30 text-zinc-400',
+  plus: 'bg-amber-500/15 text-amber-400',
+  complete: 'bg-rose-500/15 text-rose-400',
+};
+
 type Tab = 'overview' | 'accounts' | 'checklist' | 'bugs' | 'feedback' | 'notes';
 
 function MetricCard({ label, value, icon: Icon }: { label: string; value: string | number; icon: React.ElementType }) {
@@ -556,6 +568,7 @@ export default function BugHuntDetailPage() {
                 <thead>
                   <tr className="border-b border-[#2D6A8F]/20">
                     <th className="text-left py-3 px-3 text-[#6B8A9A] font-medium text-xs uppercase">Family</th>
+                    <th className="text-left py-3 px-3 text-[#6B8A9A] font-medium text-xs uppercase">Config</th>
                     <th className="text-left py-3 px-3 text-[#6B8A9A] font-medium text-xs uppercase">Parent A</th>
                     <th className="text-left py-3 px-3 text-[#6B8A9A] font-medium text-xs uppercase">Parent B</th>
                     <th className="text-left py-3 px-3 text-[#6B8A9A] font-medium text-xs uppercase">Tester</th>
@@ -568,6 +581,16 @@ export default function BugHuntDetailPage() {
                       <td className="py-3 px-3">
                         <div className="text-white font-medium">{f.parent_a_name.split(' ').slice(1).join(' ') || f.parent_a_name} & {f.parent_b_name.split(' ').slice(1).join(' ') || f.parent_b_name}</div>
                         <div className="text-[10px] text-[#6B8A9A] mt-0.5">{(f.children_names || []).join(', ')}</div>
+                      </td>
+                      <td className="py-3 px-3">
+                        <div className="flex flex-col gap-1">
+                          <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded w-fit ${AGREEMENT_BADGE[f.agreement_version || ''] || 'bg-zinc-700/50 text-zinc-500'}`}>
+                            {f.agreement_version?.replace(/_/g, ' ') || 'N/A'}
+                          </span>
+                          <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded w-fit ${TIER_BADGE[f.subscription_tier || ''] || 'bg-zinc-700/50 text-zinc-500'}`}>
+                            {f.subscription_tier?.replace(/_/g, ' ') || 'N/A'}
+                          </span>
+                        </div>
                       </td>
                       <td className="py-3 px-3">
                         <div className="flex items-center gap-1">

@@ -482,6 +482,8 @@ export interface BugHuntFamily {
   tester_notes: string | null;
   created_at: string;
   tester?: BugHuntTester | null;
+  agreement_version?: string | null;
+  subscription_tier?: string | null;
 }
 
 export interface BugHuntTester {

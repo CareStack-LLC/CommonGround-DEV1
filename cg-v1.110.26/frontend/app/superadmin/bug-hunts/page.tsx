@@ -34,6 +34,18 @@ const FEATURE_LABELS: Record<string, string> = {
   general: 'General',
 };
 
+const AGREEMENT_BADGE: Record<string, string> = {
+  good_faith: 'bg-emerald-500/15 text-emerald-400',
+  'co-operative': 'bg-blue-500/15 text-blue-400',
+  comprehensive: 'bg-purple-500/15 text-purple-400',
+};
+
+function getDistinctVersions(cohort: BugHuntCohort): string[] {
+  const families = cohort.seed_config?.families as { agreement_version?: string }[] | undefined;
+  if (!families) return [];
+  return [...new Set(families.map(f => f.agreement_version).filter(Boolean))] as string[];
+}
+
 type FilterTab = 'active' | 'completed' | 'all';
 
 export default function BugHuntsPage() {
@@ -164,6 +176,11 @@ export default function BugHuntsPage() {
                     <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${FEATURE_COLORS[cohort.target_feature] || FEATURE_COLORS.general}`}>
                       {FEATURE_LABELS[cohort.target_feature] || cohort.target_feature}
                     </span>
+                    {getDistinctVersions(cohort).map(v => (
+                      <span key={v} className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${AGREEMENT_BADGE[v] || 'bg-zinc-700/50 text-zinc-400'}`}>
+                        {v.replace(/_/g, ' ')}
+                      </span>
+                    ))}
                   </div>
                   {cohort.description && (
                     <p className="text-sm text-[#6B8A9A] truncate mb-2">{cohort.description}</p>
