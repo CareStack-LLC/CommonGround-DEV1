@@ -148,8 +148,35 @@ async def generate_seed_families(
     db: AsyncSession,
     cohort_id: str,
 ) -> list[BugHuntFamily]:
-    """Generate seed families with Supabase auth accounts and linked data."""
+    """Generate seed families with Supabase auth accounts and full parent lifecycle.
+
+    Creates complete family setups including:
+    - Supabase auth users (Parent A + Parent B)
+    - Local User + UserProfile records with Stripe customers/subscriptions
+    - FamilyFile with both parents and active children
+    - v1 Agreement with all 18 sections, structured data, and activation side effects
+    - Feature-specific data (exchanges, messages) based on cohort target
+    """
+    import stripe
+    from app.core.config import settings
     from app.core.supabase import get_supabase_admin_client
+    from app.models.agreement import Agreement, AgreementSection
+    from app.schemas.agreement import SECTION_TEMPLATES
+
+    # ── Variety data pools ───────────────────────────────────────────
+    EXCHANGE_LOCATIONS = [
+        "Sunnydale Elementary, 123 Oak Ave, Los Angeles, CA 90001",
+        "Central Park Community Center, 456 Elm St, Los Angeles, CA 90002",
+        "Riverside Public Library, 789 Pine Rd, Los Angeles, CA 90003",
+    ]
+
+    ACTIVITIES = [
+        [{"name": "Soccer", "annual_cost": 1200}, {"name": "Piano", "annual_cost": 2400}],
+        [{"name": "Swimming", "annual_cost": 1800}, {"name": "Art Class", "annual_cost": 960}],
+        [{"name": "Basketball", "annual_cost": 1500}, {"name": "Dance", "annual_cost": 2100}],
+    ]
+
+    CHILD_SUPPORT_AMOUNTS = [500, 650, 400, 750, 550]
 
     cohort = await db.get(BugHuntCohort, cohort_id)
     if not cohort:
@@ -250,6 +277,33 @@ async def generate_seed_families(
         db.add(pa_profile)
         db.add(pb_profile)
 
+        # ── Stripe Customer + Subscription for EACH parent ───────────
+        if settings.STRIPE_SECRET_KEY:
+            stripe.api_key = settings.STRIPE_SECRET_KEY
+            for profile, email, first_name, last_name, user_id, is_parent_a in [
+                (pa_profile, pa_email, a_first, a_last, pa_id, True),
+                (pb_profile, pb_email, b_first, b_last, pb_id, False),
+            ]:
+                try:
+                    # Create Stripe customer
+                    customer = stripe.Customer.create(
+                        email=email,
+                        name=f"{first_name} {last_name}",
+                        metadata={"platform": "commonground", "source": "bug_hunt_seed", "user_id": user_id},
+                    )
+                    profile.stripe_customer_id = customer.id
+
+                    # Create subscription (complete tier for Parent A, plus for Parent B)
+                    price_id = "price_1TE0bYBJIivbOFX7VqmtQH23" if is_parent_a else "price_1TE0bXBJIivbOFX70Ysv656Q"
+                    subscription = stripe.Subscription.create(
+                        customer=customer.id,
+                        items=[{"price": price_id}],
+                        metadata={"source": "bug_hunt_seed"},
+                    )
+                    profile.stripe_subscription_id = subscription.id
+                except Exception as e:
+                    logger.warning(f"Stripe setup failed for {email}: {e}")
+
         # Create FamilyFile
         ff_id = str(uuid4())
         family_file = FamilyFile(
@@ -269,7 +323,7 @@ async def generate_seed_families(
         db.add(family_file)
         await db.flush()  # FamilyFile must exist before Children/Exchanges/BugHuntFamily FKs
 
-        # Create 1-2 children
+        # Create 1-2 children (status=active)
         num_children = 1 + (i % 2)  # alternating 1 and 2 children
         child_names = []
         for c in range(num_children):
@@ -325,17 +379,215 @@ async def generate_seed_families(
             )
             db.add(msg)
 
-        if cohort.target_feature in ("agreement", "general"):
-            from app.models.agreement import Agreement
-            agreement = Agreement(
+        # ── Create v1 Agreement with ALL 18 sections ─────────────────
+        children_names_str = " and ".join(child_names)
+        child1_name = child_names[0]
+        activities = ACTIVITIES[i % len(ACTIVITIES)]
+        support_amount = CHILD_SUPPORT_AMOUNTS[i % len(CHILD_SUPPORT_AMOUNTS)]
+
+        agreement = Agreement(
+            id=str(uuid4()),
+            family_file_id=ff_id,
+            agreement_type="shared_care",
+            agreement_version="v1",
+            title=f"{a_last}-{b_last} SharedCare Agreement",
+            status="draft",
+        )
+        db.add(agreement)
+        await db.flush()  # Agreement must exist before sections
+
+        # ── Build structured_data per section ────────────────────────
+        section_structured_data = {
+            "1": {
+                "parent_a_name": f"{a_first} {a_last}",
+                "parent_b_name": f"{b_first} {b_last}",
+                "children": [{"name": n, "dob": f"{2020 - j}-06-15"} for j, n in enumerate(child_names)],
+                "state": "CA",
+            },
+            "2": {
+                "custody_type": "joint_legal",
+                "decision_making": "mutual_consent",
+            },
+            "3": {
+                "physical_custody": "joint",
+                "primary_residence": "equal",
+            },
+            "4": {
+                "primary_residence": "equal",
+                "schedule_pattern": "week_on_week_off",
+                "transition_day": "Sunday",
+                "transition_time": "6:00 PM",
+                "schedule_notes": f"Parents alternate weekly custody of {children_names_str}",
+            },
+            "5": {
+                "holidays": [
+                    {"name": "Thanksgiving", "allocation": "alternating", "parent_this_year": "parent_a"},
+                    {"name": "Christmas Eve", "allocation": "parent_a"},
+                    {"name": "Christmas Day", "allocation": "parent_b"},
+                    {"name": "New Year's Eve", "allocation": "alternating", "parent_this_year": "parent_b"},
+                    {"name": "Easter", "allocation": "alternating", "parent_this_year": "parent_a"},
+                    {"name": "July 4th", "allocation": "alternating", "parent_this_year": "parent_b"},
+                    {"name": "Mother's Day", "allocation": "parent_b"},
+                    {"name": "Father's Day", "allocation": "parent_a"},
+                    {"name": f"{child1_name}'s Birthday", "allocation": "alternating", "parent_this_year": "parent_a"},
+                ],
+            },
+            "6": {
+                "vacation_weeks_per_parent": 2,
+                "advance_notice_days": 30,
+                "blackout_dates": "first_week_of_school",
+            },
+            "7": {
+                "spring_break": "alternating",
+                "winter_break": "split",
+                "summer_break": "two_weeks_each",
+            },
+            "8": {
+                "exchange_location": "school",
+                "exchange_location_address": EXCHANGE_LOCATIONS[i % len(EXCHANGE_LOCATIONS)],
+                "transportation_responsibility": "shared",
+                "transition_communication": "commonground",
+                "backup_plan": "In case of emergency, contact the other parent via phone immediately.",
+            },
+            "9": {
+                "major_decisions": "mutual_consent",
+                "dispute_process": "mediation_first",
+            },
+            "10": {
+                "school_selection": "mutual_consent",
+                "tutoring": "mutual_consent",
+                "special_education": "mutual_consent",
+            },
+            "11": {
+                "routine_medical": "either_parent",
+                "major_medical": "mutual_consent",
+                "therapy": "mutual_consent",
+                "insurance_provider": "parent_a",
+            },
+            "12": {
+                "religious_upbringing": "mutual_respect",
+                "religious_education": "mutual_consent",
+            },
+            "13": {
+                "activities": [
+                    {"name": a["name"], "annual_cost": a["annual_cost"], "frequency": "monthly"}
+                    for a in activities
+                ],
+                "approval_required": "mutual_consent",
+                "cost_sharing": "50/50",
+            },
+            "14": {
+                "has_support": True,
+                "payer_parent_role": "parent_a",
+                "receiver_parent_role": "parent_b",
+                "amount": support_amount,
+                "frequency": "monthly",
+                "due_day": 1,
+                "payment_method": "clearfund",
+            },
+            "15": {
+                "expense_categories": ["medical", "education", "extracurricular"],
+                "split_ratio": "50/50",
+                "reimbursement_window": "30_days",
+                "documentation_required": True,
+                "payment_method": "commonground_clearfund",
+                "shared_expenses": [
+                    {"name": activities[0]["name"], "annual_cost": activities[0]["annual_cost"], "frequency": "monthly"},
+                    {"name": activities[1]["name"], "annual_cost": activities[1]["annual_cost"], "frequency": "monthly"},
+                    {"name": "Summer Camp", "annual_cost": 3000, "frequency": "annual"},
+                ],
+            },
+            "16": {
+                "primary_method": "commonground",
+                "response_time": "24_hours",
+                "emergency_contact": "phone",
+                "communication_tone": "business_like",
+            },
+            "17": {
+                "dispute_process": "mediation_first",
+                "mediator_selection": "mutual_agreement",
+                "cost_sharing": "50/50",
+            },
+            "18": {
+                "modification_process": "mutual_written_consent",
+                "review_frequency": "annual",
+            },
+        }
+
+        # ── Narrative content per section ────────────────────────────
+        section_content = {
+            "1": f"This Parenting Agreement is entered into by {a_first} {a_last} (Parent A) and {b_first} {b_last} (Parent B) regarding the care and custody of their {'child' if num_children == 1 else 'children'}, {children_names_str}. Both parents reside in the state of California.",
+            "2": f"The parties shall share joint legal custody of {children_names_str}. Both parents have equal rights and responsibilities to make major decisions affecting the children's welfare, education, health, and religious upbringing. Neither parent shall make a major decision without consulting the other.",
+            "3": f"The parties agree to share joint physical custody of {children_names_str}. The children shall spend approximately equal time with each parent under a week-on/week-off arrangement.",
+            "4": f"The regular parenting time schedule follows a week-on/week-off pattern. Transitions occur every Sunday at 6:00 PM. Parents alternate weekly custody of {children_names_str}. The schedule begins with Parent A having the first week.",
+            "5": f"Holiday parenting time is allocated on an alternating basis. Thanksgiving, Easter, and July 4th alternate yearly. Christmas Eve is with Parent A and Christmas Day with Parent B each year. Mother's Day is always with Parent B, Father's Day always with Parent A. {child1_name}'s birthday alternates, starting with Parent A this year.",
+            "6": f"Each parent is entitled to two weeks of vacation time with {children_names_str} per year. A minimum of 30 days advance written notice is required. Vacation time may not conflict with the first week of school.",
+            "7": f"Spring break alternates between parents each year. Winter break is split equally, with the first half going to the parent who does not have Christmas Day. Each parent may take two consecutive weeks during summer break.",
+            "8": f"Custody exchanges take place at {EXCHANGE_LOCATIONS[i % len(EXCHANGE_LOCATIONS)]}. Transportation responsibility is shared equally between both parents. All transition communication goes through the CommonGround platform. In case of emergency, parents should contact each other by phone immediately.",
+            "9": f"All major decisions regarding {children_names_str} require mutual consent of both parents. In the event of disagreement, the parties agree to first attempt resolution through the CommonGround platform, then mediation before seeking court intervention.",
+            "10": f"Educational decisions for {children_names_str}, including school selection, special education services, and tutoring, require mutual consent from both parents. Both parents shall attend parent-teacher conferences when possible.",
+            "11": f"Routine medical decisions may be made by either parent during their parenting time. Major medical decisions, including elective procedures and therapy, require mutual consent. Parent A shall maintain health insurance coverage for {children_names_str}.",
+            "12": f"Both parents agree to respect each other's religious beliefs and practices. Any decisions regarding formal religious education for {children_names_str} require mutual consent.",
+            "13": f"{children_names_str} currently participates in {' and '.join(a['name'] for a in activities)}. Both parents agree to share activity costs equally and to consult each other before enrolling the children in new activities.",
+            "14": f"Parent A shall pay ${support_amount} per month in child support to Parent B, due on the 1st of each month. Payments shall be made through the CommonGround ClearFund system for transparent tracking.",
+            "15": f"Extraordinary expenses including medical co-pays, educational fees, and extracurricular costs shall be shared 50/50 between both parents. Reimbursement requests must be submitted within 30 days with supporting documentation through the CommonGround ClearFund platform.",
+            "16": f"All non-emergency communication between parents shall go through the CommonGround messaging platform. Parents agree to respond to messages within 24 hours. Emergency matters may be communicated by phone. All communication shall maintain a respectful, business-like tone.",
+            "17": f"In the event of a dispute, both parents agree to first attempt resolution through the CommonGround platform. If unresolved, the matter shall be referred to a mutually agreed-upon mediator. Mediation costs shall be shared 50/50.",
+            "18": f"This agreement may be modified by mutual written consent of both parents at any time. Both parties agree to review the agreement annually to ensure it continues to serve the best interests of {children_names_str}. Any modifications must be documented in writing through the CommonGround platform.",
+        }
+
+        # ── Create all 18 AgreementSection records ───────────────────
+        for template in SECTION_TEMPLATES:
+            sec_num = template["section_number"]
+            section = AgreementSection(
                 id=str(uuid4()),
-                family_file_id=ff_id,
-                agreement_type="shared_care",
-                agreement_version="v2_standard",
-                title=f"{a_last}-{b_last} SharedCare Agreement",
-                status="draft",
+                agreement_id=agreement.id,
+                section_number=sec_num,
+                section_title=template["section_title"],
+                section_type=template["section_type"],
+                display_order=template["display_order"],
+                is_required=template["is_required"],
+                content=section_content.get(sec_num, template["template"]),
+                structured_data=section_structured_data.get(sec_num),
+                is_completed=True,
             )
-            db.add(agreement)
+            db.add(section)
+
+        # ── Submit + Approve + Activate Agreement ────────────────────
+        agreement.status = "pending_approval"
+
+        # Both parents approve
+        agreement.petitioner_approved = True
+        agreement.petitioner_approved_at = datetime.utcnow()
+        agreement.petitioner_approval_ip = "127.0.0.1"
+        agreement.respondent_approved = True
+        agreement.respondent_approved_at = datetime.utcnow()
+        agreement.respondent_approval_ip = "127.0.0.1"
+        agreement.status = "approved"
+
+        # Flush to DB before activation (activation reads from DB)
+        await db.flush()
+
+        # Activate — this triggers all side effects (exchanges, obligations, etc.)
+        from app.services.agreement_activation import AgreementActivationService
+        activation_service = AgreementActivationService(db)
+        try:
+            activation_result = await activation_service.activate_agreement(
+                agreement=agreement,
+                activated_by=str(parent_a.id),
+            )
+            agreement.status = "active"
+            agreement.effective_date = datetime.utcnow()
+            logger.info(
+                "Agreement activated for family %d: exchanges=%s, obligations=%s",
+                i + 1,
+                getattr(activation_result, "exchanges_created", "?"),
+                getattr(activation_result, "recurring_obligations_created", "?"),
+            )
+        except Exception as e:
+            logger.error("Agreement activation failed for family %d: %s", i + 1, e)
+            agreement.status = "active"  # Still set active even if side effects fail
+            agreement.effective_date = datetime.utcnow()
 
         # Create BugHuntFamily record
         bh_family = BugHuntFamily(
