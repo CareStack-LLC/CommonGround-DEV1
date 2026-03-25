@@ -23,6 +23,8 @@ import {
   Loader2,
   ChevronLeft,
   Handshake,
+  Users,
+  ArrowLeft,
 } from 'lucide-react';
 
 interface FamilyFileAgreement {
@@ -364,147 +366,230 @@ function BuilderChoiceModal({
   isOpen,
   isCreating,
   onClose,
-  onSelectAria,
-  onSelectWizard,
+  onSelectBuilder,
 }: {
   isOpen: boolean;
   isCreating: boolean;
   onClose: () => void;
-  onSelectAria: () => void;
-  onSelectWizard: () => void;
+  onSelectBuilder: (agreementVersion: string, builder: 'aria' | 'wizard' | 'direct') => void;
 }) {
+  const [step, setStep] = useState<'type' | 'builder'>('type');
+  const [selectedType, setSelectedType] = useState<string | null>(null);
+
+  // Reset state when modal opens/closes
+  useEffect(() => {
+    if (isOpen) {
+      setStep('type');
+      setSelectedType(null);
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
+
+  const tierCards = [
+    {
+      id: 'good_faith',
+      title: 'Good Faith',
+      icon: Handshake,
+      description: 'A simple mutual agreement. Both parents acknowledge their commitment to co-parent cooperatively. No detailed sections to complete.',
+      tag: 'Quick Start',
+      tagClass: 'bg-blue-100 text-blue-700',
+    },
+    {
+      id: 'co-operative',
+      title: 'Co-Operative',
+      icon: Users,
+      description: '7 key sections covering parenting time, logistics, expenses, and communication. Automated events and obligations.',
+      tag: 'Recommended',
+      tagClass: 'bg-[#3DAA8A]/20 text-[#3DAA8A]',
+      recommended: true,
+    },
+    {
+      id: 'comprehensive',
+      title: 'Comprehensive',
+      icon: FileText,
+      description: '18 detailed sections for high-conflict or court-ordered situations. Covers holidays, birthdays, vacations, school breaks, healthcare, and more.',
+      tag: 'Most Detailed',
+      tagClass: 'bg-purple-100 text-purple-700',
+    },
+  ];
+
+  const handleTypeSelect = (typeId: string) => {
+    setSelectedType(typeId);
+    if (typeId === 'good_faith') {
+      // Good Faith goes directly to detail page — no builder step
+      onSelectBuilder('good_faith', 'direct');
+    } else {
+      setStep('builder');
+    }
+  };
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
-      <div className="bg-card rounded-2xl shadow-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto animate-in slide-in-from-bottom-4 duration-300 border-2 border-border">
+      <div className="bg-card rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-in slide-in-from-bottom-4 duration-300 border-2 border-border">
         {/* Header */}
         <div className="p-6 border-b-2 border-border">
-          <h2 className="text-2xl font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-            Create Your Agreement
-          </h2>
-          <p className="text-muted-foreground font-medium mt-1">
-            Choose how you'd like to build your parenting agreement
-          </p>
+          <div className="flex items-center gap-3">
+            {step === 'builder' && (
+              <button
+                onClick={() => { setStep('type'); setSelectedType(null); }}
+                className="p-2 rounded-lg hover:bg-muted transition-colors"
+              >
+                <ArrowLeft className="h-5 w-5 text-muted-foreground" />
+              </button>
+            )}
+            <div>
+              <h2 className="text-2xl font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                {step === 'type' ? 'Choose Agreement Type' : 'Choose How to Build'}
+              </h2>
+              <p className="text-muted-foreground font-medium mt-1">
+                {step === 'type'
+                  ? 'Select the level of detail for your co-parenting agreement'
+                  : `Building a ${selectedType === 'co-operative' ? 'Co-Operative' : 'Comprehensive'} agreement`
+                }
+              </p>
+            </div>
+          </div>
+          {/* Step indicator */}
+          <div className="flex items-center gap-2 mt-4">
+            <div className={`h-1.5 flex-1 rounded-full ${step === 'type' ? 'bg-[var(--portal-primary)]' : 'bg-[var(--portal-primary)]/30'}`} />
+            <div className={`h-1.5 flex-1 rounded-full ${step === 'builder' ? 'bg-[var(--portal-primary)]' : 'bg-border'}`} />
+          </div>
         </div>
 
-        {/* Options */}
-        <div className="p-6 space-y-4">
-          {/* Upload Document Option */}
-          <button
-            onClick={onSelectAria}
-            disabled={isCreating}
-            className="
-              w-full text-left p-5 border-2 border-blue-200 rounded-2xl
-              hover:border-blue-400 hover:bg-blue-50
-              transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed
-              group shadow-lg hover:shadow-xl
-            "
-          >
-            <div className="flex items-start gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white flex-shrink-0 shadow-md group-hover:scale-105 transition-transform duration-300">
-                <FileSignature className="h-7 w-7" />
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <h3 className="font-bold text-foreground group-hover:text-blue-700 transition-colors" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-                    I Have an Existing Document
-                  </h3>
-                  <span className="px-2.5 py-0.5 bg-blue-100 text-blue-700 text-xs font-bold rounded-full shadow-sm">
-                    Fastest
-                  </span>
-                </div>
-                <p className="text-sm text-muted-foreground font-medium leading-relaxed">
-                  Upload a custody agreement, parenting plan, or court order (PDF or Word). ARIA will read it and create your digital agreement.
-                </p>
-                <div className="flex flex-wrap gap-2 mt-3">
-                  <span className="px-2.5 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">
-                    Upload PDF/Word
-                  </span>
-                  <span className="px-2.5 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">
-                    AI-Powered
-                  </span>
-                </div>
-              </div>
-            </div>
-          </button>
+        {/* Step 1: Choose Agreement Type */}
+        {step === 'type' && (
+          <div className="p-6 space-y-4">
+            {tierCards.map((tier) => {
+              const Icon = tier.icon;
+              return (
+                <button
+                  key={tier.id}
+                  onClick={() => handleTypeSelect(tier.id)}
+                  disabled={isCreating}
+                  className={`
+                    w-full text-left p-5 rounded-2xl transition-all duration-300
+                    disabled:opacity-50 disabled:cursor-not-allowed group shadow-lg hover:shadow-xl
+                    ${tier.recommended
+                      ? 'border-2 border-[#3DAA8A] bg-[#3DAA8A]/5 hover:bg-[#3DAA8A]/10'
+                      : 'border-2 border-border hover:border-[var(--portal-primary)]/50 hover:bg-[var(--portal-primary)]/5'
+                    }
+                  `}
+                >
+                  <div className="flex items-start gap-4">
+                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-white flex-shrink-0 shadow-md group-hover:scale-105 transition-transform duration-300 ${
+                      tier.recommended
+                        ? 'bg-gradient-to-br from-[#3DAA8A] to-[#2D8A6A]'
+                        : tier.id === 'good_faith'
+                          ? 'bg-gradient-to-br from-blue-500 to-blue-600'
+                          : 'bg-gradient-to-br from-purple-500 to-purple-600'
+                    }`}>
+                      <Icon className="h-7 w-7" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-bold text-foreground group-hover:text-[var(--portal-primary)] transition-colors" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                          {tier.title}
+                        </h3>
+                        <span className={`px-2.5 py-0.5 text-xs font-bold rounded-full shadow-sm ${tier.tagClass}`}>
+                          {tier.tag}
+                        </span>
+                      </div>
+                      <p className="text-sm text-muted-foreground font-medium leading-relaxed">
+                        {tier.description}
+                      </p>
+                    </div>
+                    <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-[var(--portal-primary)] group-hover:translate-x-1 transition-all duration-300 flex-shrink-0 mt-4" />
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        )}
 
-          {/* ARIA Conversational Option */}
-          <button
-            onClick={onSelectAria}
-            disabled={isCreating}
-            className="
-              w-full text-left p-5 border-2 border-amber-200 rounded-2xl
-              hover:border-amber-400 hover:bg-amber-50
-              transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed
-              group shadow-lg hover:shadow-xl
-            "
-          >
-            <div className="flex items-start gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center text-white flex-shrink-0 shadow-md group-hover:scale-105 transition-transform duration-300">
-                <Sparkles className="h-7 w-7" />
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-1">
-                  <h3 className="font-bold text-foreground group-hover:text-amber-700 transition-colors" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-                    Talk It Through with ARIA
-                  </h3>
-                  <span className="px-2.5 py-0.5 bg-amber-100 text-amber-700 text-xs font-bold rounded-full shadow-sm">
-                    Recommended
-                  </span>
+        {/* Step 2: Choose Builder (for co-operative and comprehensive) */}
+        {step === 'builder' && (
+          <div className="p-6 space-y-4">
+            {/* Talk with ARIA */}
+            <button
+              onClick={() => onSelectBuilder(selectedType!, 'aria')}
+              disabled={isCreating}
+              className="
+                w-full text-left p-5 border-2 border-amber-200 rounded-2xl
+                hover:border-amber-400 hover:bg-amber-50
+                transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed
+                group shadow-lg hover:shadow-xl
+              "
+            >
+              <div className="flex items-start gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center text-white flex-shrink-0 shadow-md group-hover:scale-105 transition-transform duration-300">
+                  <Sparkles className="h-7 w-7" />
                 </div>
-                <p className="text-sm text-muted-foreground font-medium leading-relaxed">
-                  Describe your custody arrangement in your own words. ARIA will ask the right questions and build your agreement from the conversation.
-                </p>
-                <div className="flex flex-wrap gap-2 mt-3">
-                  <span className="px-2.5 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-full">
-                    Conversational
-                  </span>
-                  <span className="px-2.5 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-full">
-                    Guided
-                  </span>
-                  <span className="px-2.5 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-full">
-                    AI-Powered
-                  </span>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="font-bold text-foreground group-hover:text-amber-700 transition-colors" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                      Talk with ARIA
+                    </h3>
+                    <span className="px-2.5 py-0.5 bg-amber-100 text-amber-700 text-xs font-bold rounded-full shadow-sm">
+                      Recommended
+                    </span>
+                  </div>
+                  <p className="text-sm text-muted-foreground font-medium leading-relaxed">
+                    Describe your custody arrangement in your own words. ARIA will ask the right questions and build your agreement from the conversation.
+                  </p>
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    <span className="px-2.5 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-full">
+                      Conversational
+                    </span>
+                    <span className="px-2.5 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-full">
+                      Guided
+                    </span>
+                    <span className="px-2.5 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-full">
+                      AI-Powered
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-          </button>
+            </button>
 
-          {/* Wizard Option */}
-          <button
-            onClick={onSelectWizard}
-            disabled={isCreating}
-            className="
-              w-full text-left p-5 border-2 border-border rounded-2xl
-              hover:border-[var(--portal-primary)]/50 hover:bg-[var(--portal-primary)]/5
-              transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed
-              group shadow-lg hover:shadow-xl
-            "
-          >
-            <div className="flex items-start gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] flex items-center justify-center text-white flex-shrink-0 shadow-md group-hover:scale-105 transition-transform duration-300">
-                <FileText className="h-7 w-7" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-bold text-foreground group-hover:text-[var(--portal-primary)] transition-colors mb-1" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-                  Fill Out a Form
-                </h3>
-                <p className="text-sm text-muted-foreground font-medium leading-relaxed">
-                  Prefer structure? Fill out a simple 7-section form covering custody, schedules, logistics, and more.
-                </p>
-                <div className="flex flex-wrap gap-2 mt-3">
-                  <span className="px-2.5 py-1 bg-[var(--portal-primary)]/10 text-[var(--portal-primary)] text-xs font-bold rounded-full">
-                    Structured
-                  </span>
-                  <span className="px-2.5 py-1 bg-[var(--portal-primary)]/10 text-[var(--portal-primary)] text-xs font-bold rounded-full">
-                    7 Sections
-                  </span>
+            {/* Fill Out a Form */}
+            <button
+              onClick={() => onSelectBuilder(selectedType!, 'wizard')}
+              disabled={isCreating}
+              className="
+                w-full text-left p-5 border-2 border-border rounded-2xl
+                hover:border-[var(--portal-primary)]/50 hover:bg-[var(--portal-primary)]/5
+                transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed
+                group shadow-lg hover:shadow-xl
+              "
+            >
+              <div className="flex items-start gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] flex items-center justify-center text-white flex-shrink-0 shadow-md group-hover:scale-105 transition-transform duration-300">
+                  <FileText className="h-7 w-7" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-bold text-foreground group-hover:text-[var(--portal-primary)] transition-colors mb-1" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                    Fill Out a Form
+                  </h3>
+                  <p className="text-sm text-muted-foreground font-medium leading-relaxed">
+                    {selectedType === 'co-operative'
+                      ? 'Fill out a structured 7-section form covering custody, schedules, logistics, and more.'
+                      : 'Fill out a detailed 18-section form covering all aspects of your parenting arrangement.'
+                    }
+                  </p>
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    <span className="px-2.5 py-1 bg-[var(--portal-primary)]/10 text-[var(--portal-primary)] text-xs font-bold rounded-full">
+                      Structured
+                    </span>
+                    <span className="px-2.5 py-1 bg-[var(--portal-primary)]/10 text-[var(--portal-primary)] text-xs font-bold rounded-full">
+                      {selectedType === 'co-operative' ? '7 Sections' : '18 Sections'}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-          </button>
-        </div>
+            </button>
+          </div>
+        )}
 
         {/* Footer */}
         <div className="p-6 border-t-2 border-border bg-muted rounded-b-2xl">
@@ -621,7 +706,7 @@ function AgreementsListContent() {
     }
   };
 
-  const createAgreementWithBuilder = async (useAria: boolean) => {
+  const createAgreementWithBuilder = async (agreementVersion: string, builder: 'aria' | 'wizard' | 'direct') => {
     if (!selectedFamilyFile) return;
 
     try {
@@ -629,15 +714,24 @@ function AgreementsListContent() {
       setShowBuilderChoice(false);
 
       const newAgreement = await agreementsAPI.createForFamilyFile(selectedFamilyFile.id, {
-        title: `${selectedFamilyFile.title} - SharedCare Agreement`,
+        title: 'SharedCare Agreement',
+        agreement_version: agreementVersion,
       });
 
       trackAgreementCreated();
 
-      if (useAria) {
+      if (builder === 'direct') {
+        // Good Faith — go straight to detail/acceptance page
+        router.push(`/agreements/${newAgreement.id}`);
+      } else if (builder === 'aria') {
         router.push(`/agreements/${newAgreement.id}/aria`);
       } else {
-        router.push(`/agreements/${newAgreement.id}/builder-v2`);
+        // Wizard — co-operative uses builder-v2, comprehensive uses builder
+        if (agreementVersion === 'co-operative') {
+          router.push(`/agreements/${newAgreement.id}/builder-v2`);
+        } else {
+          router.push(`/agreements/${newAgreement.id}/builder`);
+        }
       }
     } catch (err: any) {
       console.error('Failed to create agreement:', err);
@@ -976,8 +1070,7 @@ function AgreementsListContent() {
           isOpen={showBuilderChoice}
           isCreating={isCreatingAgreement}
           onClose={() => setShowBuilderChoice(false)}
-          onSelectAria={() => createAgreementWithBuilder(true)}
-          onSelectWizard={() => createAgreementWithBuilder(false)}
+          onSelectBuilder={(agreementVersion, builder) => createAgreementWithBuilder(agreementVersion, builder)}
         />
       </main>
     </div>

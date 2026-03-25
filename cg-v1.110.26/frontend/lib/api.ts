@@ -1066,14 +1066,14 @@ export const agreementsAPI = {
   async createForFamilyFile(familyFileId: string, data: {
     title: string;
     agreement_type?: string;
-    agreement_version?: 'v1' | 'v2_standard' | 'v2_lite';
+    agreement_version?: string;
   }): Promise<Agreement> {
     return fetchAPI<Agreement>(`/family-files/${familyFileId}/agreements`, {
       method: 'POST',
       body: JSON.stringify({
         title: data.title,
         agreement_type: data.agreement_type || 'shared_care',
-        agreement_version: data.agreement_version || 'v2_standard',
+        agreement_version: data.agreement_version || 'co-operative',
       }),
     });
   },

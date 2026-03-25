@@ -82,6 +82,10 @@ class AgreementActivationService:
         """
         result = ActivationResult()
 
+        if agreement.agreement_version == "good_faith" or getattr(agreement, "is_default", False):
+            # Good faith agreements don't trigger events
+            return result
+
         # Get the family file
         family_file = await self._get_family_file(agreement)
         if not family_file:

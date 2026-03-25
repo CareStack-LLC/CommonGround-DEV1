@@ -1455,7 +1455,7 @@ AGREEMENT SECTIONS:
         title: str,
         agreement_type: str,
         user: User,
-        agreement_version: str = "v2_standard"
+        agreement_version: str = "co-operative"
     ) -> Agreement:
         """
         Create a new SharedCare Agreement for a Family File.
@@ -1544,7 +1544,7 @@ AGREEMENT SECTIONS:
             agreement_number=generate_shared_care_number(),
             title="Good Faith Co-Parenting Agreement",
             agreement_type="good_faith",
-            agreement_version="default",
+            agreement_version="good_faith",
             is_default=True,
             status="pending_approval",
             petitioner_approved=True,

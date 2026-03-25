@@ -389,7 +389,7 @@ async def generate_seed_families(
             id=str(uuid4()),
             family_file_id=ff_id,
             agreement_type="shared_care",
-            agreement_version="v1",
+            agreement_version="comprehensive",
             title=f"{a_last}-{b_last} SharedCare Agreement",
             status="draft",
         )

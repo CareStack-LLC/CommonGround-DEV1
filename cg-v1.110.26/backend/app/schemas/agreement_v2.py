@@ -19,9 +19,12 @@ from app.schemas.agreement import SECTION_TEMPLATES
 
 class AgreementVersionType(str, Enum):
     """Agreement version types."""
-    V1 = "v1"  # Original 18-section (ARIA Professional)
-    V2_STANDARD = "v2_standard"  # 7 sections
-    V2_LITE = "v2_lite"  # 5 sections (low-conflict)
+    V1 = "v1"  # Legacy alias
+    V2_STANDARD = "v2_standard"  # Legacy alias
+    V2_LITE = "v2_lite"  # Legacy alias
+    GOOD_FAITH = "good_faith"
+    CO_OPERATIVE = "co-operative"
+    COMPREHENSIVE = "comprehensive"
 
 
 class ConflictLevel(str, Enum):
@@ -223,10 +226,15 @@ SECTION_TEMPLATES_V2_LITE = [
 # Combined Templates Dictionary
 # ============================================================================
 
+SECTION_TEMPLATES_GOOD_FAITH = []  # Good faith agreements have no sections
+
 SECTION_TEMPLATES_V2 = {
     "v2_standard": SECTION_TEMPLATES_V2_STANDARD,
     "v2_lite": SECTION_TEMPLATES_V2_LITE,
     "v1": SECTION_TEMPLATES,  # Original 18-section format (ARIA Professional)
+    "good_faith": SECTION_TEMPLATES_GOOD_FAITH,
+    "co-operative": SECTION_TEMPLATES_V2_STANDARD,
+    "comprehensive": SECTION_TEMPLATES,
 }
 
 
