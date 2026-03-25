@@ -315,6 +315,13 @@ async def generate_seed_families(
                     )
                     profile.stripe_customer_id = customer.id
 
+                    # Attach test payment method so the subscription can be charged
+                    stripe.PaymentMethod.attach("pm_card_visa", customer=customer.id)
+                    stripe.Customer.modify(
+                        customer.id,
+                        invoice_settings={"default_payment_method": "pm_card_visa"},
+                    )
+
                     # Create subscription (same tier for both parents)
                     subscription = stripe.Subscription.create(
                         customer=customer.id,
