@@ -304,26 +304,31 @@ async def generate_seed_families(
                 (pb_profile, pb_email, b_first, b_last, pb_id, False),
             ]:
                 try:
-                    # Create Stripe customer
+                    # Create Stripe customer with test payment method attached
                     customer = stripe.Customer.create(
                         email=email,
                         name=f"{first_name} {last_name}",
+                        payment_method="pm_card_visa",
+                        invoice_settings={"default_payment_method": "pm_card_visa"},
                         metadata={"platform": "commonground", "source": "bug_hunt_seed", "user_id": user_id},
                     )
                     profile.stripe_customer_id = customer.id
 
-                    # Create subscription (complete tier for Parent A, plus for Parent B)
-                    # Use trial_period_days so no payment method is required for seed accounts
+                    # Create paid active subscription using test card
+                    # Parent A gets "complete" tier, Parent B gets "plus" tier
                     price_id = "price_1TE0bYBJIivbOFX7VqmtQH23" if is_parent_a else "price_1TE0bXBJIivbOFX70Ysv656Q"
                     subscription = stripe.Subscription.create(
                         customer=customer.id,
                         items=[{"price": price_id}],
-                        trial_period_days=365,
-                        payment_behavior="default_incomplete",
+                        default_payment_method=customer.invoice_settings.default_payment_method,
                         metadata={"source": "bug_hunt_seed"},
                     )
                     profile.stripe_subscription_id = subscription.id
-                    logger.info(f"Stripe subscription {subscription.id} created for {email} (trial, no payment method needed)")
+                    logger.info(
+                        "Stripe subscription %s created for %s (status=%s, tier=%s)",
+                        subscription.id, email, subscription.status,
+                        "complete" if is_parent_a else "plus",
+                    )
                 except Exception as e:
                     logger.warning(f"Stripe setup failed for {email}: {e}")
 
