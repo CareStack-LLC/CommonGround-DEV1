@@ -320,8 +320,8 @@ async def generate_seed_families(
                     )
 
                     # Step 3: Create paid active subscription
-                    # Parent A gets "complete" tier, Parent B gets "plus" tier
-                    price_id = "price_1TE0bYBJIivbOFX7VqmtQH23" if is_parent_a else "price_1TE0bXBJIivbOFX70Ysv656Q"
+                    # Parent A gets "complete" tier ($34.99/mo), Parent B gets "plus" tier ($17.99/mo)
+                    price_id = "price_1T7WgoB3EXvvERPfDm7qKpBN" if is_parent_a else "price_1T7WgnB3EXvvERPfcpZeMSSH"
                     subscription = stripe.Subscription.create(
                         customer=customer.id,
                         items=[{"price": price_id}],
