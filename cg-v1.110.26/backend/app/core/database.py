@@ -8,7 +8,7 @@ from typing import AsyncGenerator
 
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine, async_sessionmaker
-from sqlalchemy.pool import NullPool, QueuePool
+from sqlalchemy.pool import NullPool, AsyncAdaptedQueuePool
 
 from app.core.config import settings
 from app.models.base import Base
@@ -52,7 +52,7 @@ def create_app_engine(
     if use_null_pool or "sqlite" in url:
         pool_kwargs["poolclass"] = NullPool
     else:
-        pool_kwargs["poolclass"] = QueuePool
+        pool_kwargs["poolclass"] = AsyncAdaptedQueuePool
         pool_kwargs["pool_size"] = 5
         pool_kwargs["max_overflow"] = 10
         pool_kwargs["pool_timeout"] = 30
