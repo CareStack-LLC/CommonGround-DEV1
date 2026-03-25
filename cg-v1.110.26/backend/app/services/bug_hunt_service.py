@@ -518,7 +518,8 @@ async def generate_seed_families(
                     "transition_time": "6:00 PM",
                 },
                 "4": {
-                    "exchange_location": EXCHANGE_LOCATIONS[i % len(EXCHANGE_LOCATIONS)],
+                    "exchange_location": "school",
+                    "exchange_location_address": EXCHANGE_LOCATIONS[i % len(EXCHANGE_LOCATIONS)],
                     "transportation_responsibility": "shared",
                     "expense_split": "50/50",
                     "communication_method": "commonground",
