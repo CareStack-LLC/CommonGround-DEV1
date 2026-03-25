@@ -194,6 +194,9 @@ async def lifespan(app: FastAPI):
                     read_count INTEGER DEFAULT 0, total_pages_turned INTEGER DEFAULT 0,
                     created_at TIMESTAMP DEFAULT NOW()
                 )""",
+                # KidSpace content approval columns
+                "ALTER TABLE kidspace_movies ADD COLUMN IF NOT EXISTS is_approved BOOLEAN DEFAULT FALSE",
+                "ALTER TABLE kidspace_books ADD COLUMN IF NOT EXISTS is_approved BOOLEAN DEFAULT FALSE",
             ]
             for sql in migrations:
                 await conn.execute(text(sql))
@@ -223,7 +226,7 @@ app.add_middleware(
     allow_origins=settings.allowed_origins_list,
     allow_origin_regex=settings.CORS_ORIGIN_REGEX,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allow_methods=["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["Content-Type", "Authorization", "X-Requested-With", "X-Request-ID"],
 )
 
