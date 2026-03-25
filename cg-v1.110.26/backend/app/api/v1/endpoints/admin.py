@@ -305,7 +305,7 @@ async def get_admin_dashboard(
             "estimated_mrr": round(estimated_mrr, 2),
             "mrr": stripe_mrr if stripe_mrr is not None else round(estimated_mrr, 2),
             "mrr_source": "stripe" if stripe_mrr is not None else "db_estimate",
-            "mrr_by_tier": {k: v for k, v in stripe_snapshot.mrr_by_tier.items() if v["count"] > 0} if stripe_snapshot.stripe_available else {},
+            "mrr_by_tier": {k: v for k, v in stripe_snapshot.mrr_by_tier.items() if isinstance(v, dict) and v.get("count", 0) > 0} if stripe_snapshot.stripe_available else {},
             "mrr_by_segment": stripe_snapshot.mrr_by_segment if stripe_snapshot.stripe_available else {},
             "past_due_count": past_due_count,
             "active_subscriptions": stripe_snapshot.active_count if stripe_snapshot.stripe_available else sum(tier_counts.values()),
@@ -1880,17 +1880,24 @@ async def list_paid_report_requests(
     """
     from app.models.report_request import ReportRequest
 
-    query = select(ReportRequest).order_by(ReportRequest.created_at.desc())
+    try:
+        query = select(ReportRequest).order_by(ReportRequest.created_at.desc())
 
-    if request_status:
-        query = query.where(ReportRequest.status == request_status)
+        if request_status:
+            query = query.where(ReportRequest.status == request_status)
 
-    total = await db.scalar(
-        select(func.count()).select_from(query.subquery())
-    )
+        total = await db.scalar(
+            select(func.count(ReportRequest.id)).where(
+                ReportRequest.status == request_status if request_status else True
+            )
+        )
 
-    result = await db.execute(query.offset(offset).limit(limit))
-    requests = result.scalars().all()
+        result = await db.execute(query.offset(offset).limit(limit))
+        requests = result.scalars().all()
+    except Exception as exc:
+        logger.warning("report_requests query failed (table may not exist): %s", exc)
+        await db.rollback()
+        return {"requests": [], "total": 0, "limit": limit, "offset": offset}
 
     return {
         "requests": [
@@ -4928,7 +4935,7 @@ async def get_unit_economics(
 
     return {
         "arpu": econ["arpu"],
-        "mrr": econ["mrr"],
+        "mrr": total_mrr,
         "arr": round(total_mrr * 12, 2),
         "paying_users": paying_users,
         "monthly_churn_rate": econ["monthly_churn"],
@@ -5135,7 +5142,7 @@ async def get_executive_summary(
     # have created a family file (proxy for completing onboarding)
     from app.models.family_file import FamilyFile
     activated_users = await db.scalar(
-        select(func.count(func.distinct(FamilyFile.created_by_user_id))).where(
+        select(func.count(func.distinct(FamilyFile.created_by))).where(
             FamilyFile.status == "active",
         )
     ) or 0

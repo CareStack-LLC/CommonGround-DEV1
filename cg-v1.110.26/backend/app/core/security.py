@@ -170,12 +170,17 @@ async def get_current_user(
     except Exception as e:
         # SECURITY TRADEOFF: Fail-open for availability — if Redis is down, we allow
         # the token through rather than blocking all authenticated requests. This means
-        # revoked tokens may be accepted while Redis is unavailable. We log this as an
-        # error so it can be monitored and addressed quickly.
-        logger.error(
-            "SECURITY: Redis unavailable during token blacklist check — "
-            "revoked tokens may be accepted. Error: %s", str(e)
-        )
+        # revoked tokens may be accepted while Redis is unavailable.
+        # Rate-limit the log to avoid flooding Sentry (log once per 60s).
+        import time
+        _now = time.time()
+        _last = getattr(get_current_user, "_redis_warn_ts", 0)
+        if _now - _last > 60:
+            get_current_user._redis_warn_ts = _now
+            logger.error(
+                "SECURITY: Redis unavailable during token blacklist check — "
+                "revoked tokens may be accepted. Error: %s", str(e)
+            )
 
     # Decode token
     payload = decode_token(token)

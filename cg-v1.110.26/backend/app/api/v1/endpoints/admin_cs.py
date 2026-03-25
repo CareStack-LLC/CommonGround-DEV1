@@ -90,7 +90,7 @@ def _calculate_health_score(user: User, profile: Optional[UserProfile]) -> dict:
             completeness += 20
         if profile.last_name:
             completeness += 20
-        if profile.phone:
+        if user.phone:
             completeness += 20
         factors["profile_completeness"] = min(completeness, 100)
     else:

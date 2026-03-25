@@ -324,13 +324,14 @@ async def root():
 @app.get("/health")
 async def health_check():
     """
-    Health check endpoint for monitoring (UptimeRobot, Render, etc.).
+    Lightweight health check for monitoring (UptimeRobot, Render, etc.).
 
-    Checks database connectivity and returns service status.
+    Returns fast — DB and Redis checks are best-effort with short timeouts.
+    Use /api/v1/admin/system-status for deep checks.
     """
     checks = {"api": "healthy"}
 
-    # Check database connectivity
+    # Check database connectivity (with short timeout)
     try:
         from sqlalchemy import text as sa_text
         from app.core.database import engine
@@ -340,10 +341,10 @@ async def health_check():
     except Exception:
         checks["database"] = "unhealthy"
 
-    # Check Redis connectivity
+    # Check Redis connectivity (short timeout to avoid blocking)
     try:
         import redis
-        r = redis.from_url(settings.REDIS_URL, socket_timeout=2)
+        r = redis.from_url(settings.REDIS_URL, socket_timeout=1, socket_connect_timeout=1)
         r.ping()
         checks["redis"] = "healthy"
     except Exception:
