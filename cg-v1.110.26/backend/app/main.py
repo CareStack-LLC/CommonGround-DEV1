@@ -197,6 +197,10 @@ async def lifespan(app: FastAPI):
                 # KidSpace content approval columns
                 "ALTER TABLE kidspace_movies ADD COLUMN IF NOT EXISTS is_approved BOOLEAN DEFAULT FALSE",
                 "ALTER TABLE kidspace_books ADD COLUMN IF NOT EXISTS is_approved BOOLEAN DEFAULT FALSE",
+                # Ensure admin accounts are properly flagged (idempotent)
+                """UPDATE users SET is_admin = true, admin_role = 'super_admin'
+                   WHERE email IN ('thomas@carestack.us', 'founders@commonground.family')
+                   AND is_admin = false""",
             ]
             for sql in migrations:
                 await conn.execute(text(sql))

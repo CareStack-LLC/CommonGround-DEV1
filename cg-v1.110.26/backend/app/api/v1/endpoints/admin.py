@@ -47,6 +47,9 @@ from app.services.stripe_revenue import (
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
+# Admin / internal emails to always exclude from platform metrics
+ADMIN_EMAILS = {"thomas@carestack.us", "founders@commonground.family"}
+
 
 # =============================================================================
 # Shared tier pricing helper
@@ -132,7 +135,7 @@ async def get_admin_dashboard(
     yesterday = now - timedelta(days=1)
 
     # User counts (exclude admins — admins are operators, not customers)
-    _non_admin = (User.is_deleted == False, User.is_admin == False)
+    _non_admin = (User.is_deleted == False, User.is_admin == False, User.email.notin_(ADMIN_EMAILS))
     total_users = await db.scalar(
         select(func.count(User.id)).where(*_non_admin)
     )
@@ -5102,15 +5105,18 @@ async def get_executive_summary(
     seven_days_ago = now - timedelta(days=7)
     thirty_days_ago = now - timedelta(days=30)
 
+    # Shared filter: exclude admins by both flag AND known admin emails
+    _not_admin = (User.is_deleted == False, User.is_admin == False, User.email.notin_(ADMIN_EMAILS))
+
     # Total users (non-deleted, non-admin)
     total_users = await db.scalar(
-        select(func.count(User.id)).where(User.is_deleted == False, User.is_admin == False)
+        select(func.count(User.id)).where(*_not_admin)
     ) or 0
 
     # DAU: active in last 24h (non-admin)
     dau = await db.scalar(
         select(func.count(User.id)).where(
-            User.is_deleted == False, User.is_admin == False,
+            *_not_admin,
             User.last_active >= yesterday,
         )
     ) or 0
@@ -5118,7 +5124,7 @@ async def get_executive_summary(
     # MAU: active in last 30 days (non-admin)
     mau = await db.scalar(
         select(func.count(User.id)).where(
-            User.is_deleted == False, User.is_admin == False,
+            *_not_admin,
             User.last_active >= thirty_days_ago,
         )
     ) or 0
@@ -5141,8 +5147,7 @@ async def get_executive_summary(
         select(func.count(UserProfile.id))
         .join(User, User.id == UserProfile.user_id)
         .where(
-            User.is_admin == False,
-            User.is_deleted == False,
+            *_not_admin,
             UserProfile.subscription_status == "active",
             UserProfile.subscription_tier.notin_(free_tiers),
         )
@@ -5153,8 +5158,7 @@ async def get_executive_summary(
     # New users in last 7 days (exclude admins)
     new_users_7d = await db.scalar(
         select(func.count(User.id)).where(
-            User.is_deleted == False,
-            User.is_admin == False,
+            *_not_admin,
             User.created_at >= seven_days_ago,
         )
     ) or 0
@@ -5200,28 +5204,32 @@ async def get_ai_summary(
 
     tier_prices = await _get_tier_prices(db)
 
+    # Shared filter: exclude admins by both flag AND known admin emails
+    _not_admin = (User.is_deleted == False, User.is_admin == False, User.email.notin_(ADMIN_EMAILS))
+
     # Core metrics (exclude admins)
     total_users = await db.scalar(
-        select(func.count(User.id)).where(User.is_deleted == False, User.is_admin == False)
+        select(func.count(User.id)).where(*_not_admin)
     ) or 0
 
     dau = await db.scalar(
         select(func.count(User.id)).where(
-            User.is_deleted == False, User.is_admin == False,
+            *_not_admin,
             User.last_active >= yesterday,
         )
     ) or 0
 
     mau = await db.scalar(
         select(func.count(User.id)).where(
-            User.is_deleted == False, User.is_admin == False,
+            *_not_admin,
             User.last_active >= thirty_days_ago,
         )
     ) or 0
 
     new_users_7d = await db.scalar(
         select(func.count(User.id)).where(
-            User.created_at >= seven_days_ago, User.is_deleted == False, User.is_admin == False
+            *_not_admin,
+            User.created_at >= seven_days_ago,
         )
     ) or 0
 
@@ -5230,13 +5238,17 @@ async def get_ai_summary(
     if snapshot.stripe_available:
         mrr = snapshot.total_mrr
     else:
-        # DB fallback
+        # DB fallback (exclude admin profiles)
         tier_result = await db.execute(
             select(
                 UserProfile.subscription_tier,
                 func.count(UserProfile.id),
             )
-            .where(UserProfile.subscription_status == "active")
+            .join(User, User.id == UserProfile.user_id)
+            .where(
+                *_not_admin,
+                UserProfile.subscription_status == "active",
+            )
             .group_by(UserProfile.subscription_tier)
         )
         mrr = 0.0
@@ -5252,8 +5264,7 @@ async def get_ai_summary(
         select(func.count(UserProfile.id))
         .join(User, User.id == UserProfile.user_id)
         .where(
-            User.is_admin == False,
-            User.is_deleted == False,
+            *_not_admin,
             UserProfile.subscription_status == "active",
             UserProfile.subscription_tier.notin_(free_tiers_list),
         )
@@ -5264,8 +5275,7 @@ async def get_ai_summary(
         select(func.count(UserProfile.id))
         .join(User, User.id == UserProfile.user_id)
         .where(
-            User.is_admin == False,
-            User.is_deleted == False,
+            *_not_admin,
             UserProfile.subscription_status == "cancelled",
             UserProfile.updated_at >= thirty_days_ago,
         )
@@ -5407,9 +5417,15 @@ async def get_user_segments(
     """
     from app.models.professional import ProfessionalProfile
 
-    # Admin count
+    # Shared filter: exclude admins by both flag AND known admin emails
+    _not_admin = (User.is_deleted == False, User.is_admin == False, User.email.notin_(ADMIN_EMAILS))
+
+    # Admin count (by flag OR known admin emails)
     admin_count = await db.scalar(
-        select(func.count(User.id)).where(User.is_admin == True, User.is_deleted == False)
+        select(func.count(User.id)).where(
+            User.is_deleted == False,
+            or_(User.is_admin == True, User.email.in_(ADMIN_EMAILS)),
+        )
     ) or 0
 
     # Professional count
@@ -5421,7 +5437,7 @@ async def get_user_segments(
     total_profiles = await db.scalar(
         select(func.count(UserProfile.id))
         .join(User, User.id == UserProfile.user_id)
-        .where(User.is_admin == False, User.is_deleted == False)
+        .where(*_not_admin)
     ) or 0
 
     # Parent count (profiles minus professionals)
@@ -5432,8 +5448,7 @@ async def get_user_segments(
     try:
         partner_staff_count = await db.scalar(
             select(func.count(User.id)).where(
-                User.is_deleted == False,
-                User.is_admin == False,
+                *_not_admin,
                 User.id.notin_(
                     select(ProfessionalProfile.user_id).where(ProfessionalProfile.user_id != None)
                 ),
@@ -5449,8 +5464,7 @@ async def get_user_segments(
         select(func.count(UserProfile.id))
         .join(User, User.id == UserProfile.user_id)
         .where(
-            User.is_admin == False,
-            User.is_deleted == False,
+            *_not_admin,
             UserProfile.subscription_status == "active",
             UserProfile.subscription_tier.notin_(free_tiers_list),
             UserProfile.subscription_tier.in_(list(CONSUMER_TIERS)),
@@ -5460,8 +5474,7 @@ async def get_user_segments(
         select(func.count(UserProfile.id))
         .join(User, User.id == UserProfile.user_id)
         .where(
-            User.is_admin == False,
-            User.is_deleted == False,
+            *_not_admin,
             UserProfile.subscription_status == "active",
             UserProfile.subscription_tier.in_(list(PROFESSIONAL_TIERS)),
         )
