@@ -1008,7 +1008,7 @@ export interface Agreement {
   summary?: string | null;  // Concise agreement description
   version: number;
   agreement_type: string;
-  agreement_version: 'v1' | 'v2_standard' | 'v2_lite';  // v1 = 18 sections, v2_standard = 7 sections
+  agreement_version: 'v1' | 'v2_standard' | 'v2_lite' | 'good_faith' | 'co-operative' | 'comprehensive';
   status: 'draft' | 'pending_approval' | 'approved' | 'rejected' | 'expired' | 'active';
   petitioner_approved: boolean;
   respondent_approved: boolean;

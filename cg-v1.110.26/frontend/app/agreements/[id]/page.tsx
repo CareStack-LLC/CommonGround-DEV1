@@ -44,6 +44,8 @@ import {
   Info,
   Hash,
   Layers,
+  Users,
+  Heart,
 } from 'lucide-react';
 import { useFeatureGate } from '@/hooks/use-feature-gate';
 import { TierBadge } from '@/components/tier-badge';
@@ -681,10 +683,11 @@ function AgreementDetailsContent() {
   };
 
   // Determine total sections based on agreement version
-  const isV2Agreement = agreement?.agreement_version?.startsWith('v2') ?? true;
-  const totalSections = isV2Agreement ? 7 : 18;
+  const isGoodFaith = agreement?.agreement_version === 'good_faith';
+  const isV2Agreement = agreement?.agreement_version?.startsWith('v2') ?? (!isGoodFaith && agreement?.agreement_version !== 'comprehensive');
+  const totalSections = isGoodFaith ? 0 : (agreement?.agreement_version === 'comprehensive' ? 18 : (agreement?.agreement_version === 'co-operative' || isV2Agreement ? 7 : 18));
   const completedSections = sections.filter((s) => s.is_completed).length;
-  const completionPercent = Math.round((completedSections / totalSections) * 100);
+  const completionPercent = totalSections > 0 ? Math.round((completedSections / totalSections) * 100) : 100;
 
   // Find first incomplete section index for auto-expand
   const firstIncompleteIndex = sections.findIndex((s) => !s.is_completed);
@@ -1111,8 +1114,97 @@ function AgreementDetailsContent() {
                 </CGCard>
               )}
 
-              {/* Agreement Sections Card */}
-              {(agreement.status !== 'active' || activeTab === 'details') && (
+              {/* Good Faith Agreement — Simple Card (no sections) */}
+              {isGoodFaith && (agreement.status !== 'active' || activeTab === 'details') && (
+                <CGCard variant="elevated">
+                  <CGCardHeader>
+                    <div className="flex items-center gap-3">
+                      <Heart className="h-6 w-6 text-cg-sage flex-shrink-0" />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <CGCardTitle>{agreement.title}</CGCardTitle>
+                          <CGBadge variant="sage" size="sm">Good Faith Agreement</CGBadge>
+                        </div>
+                        <CGCardDescription className="mt-1">
+                          Agreement #{agreement.version}
+                        </CGCardDescription>
+                      </div>
+                    </div>
+                  </CGCardHeader>
+                  <CGCardContent className="mt-4 space-y-5">
+                    {/* Status */}
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-muted-foreground">Status:</span>
+                      <CGBadge variant={getStatusBadgeVariant(agreement.status)} size="sm" dot>
+                        {getStatusLabel(agreement.status)}
+                      </CGBadge>
+                    </div>
+
+                    {/* Effective date when active */}
+                    {agreement.status === 'active' && agreement.effective_date && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <Calendar className="h-4 w-4 text-cg-success flex-shrink-0" />
+                        <span className="text-muted-foreground">Effective since</span>
+                        <span className="font-medium text-foreground">
+                          {new Date(agreement.effective_date).toLocaleDateString('en-US', {
+                            month: 'long',
+                            day: 'numeric',
+                            year: 'numeric',
+                          })}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Agreement statement */}
+                    <div className="p-4 bg-cg-sage-subtle rounded-2xl border border-cg-sage/20">
+                      <div className="flex items-start gap-3">
+                        <Users className="h-5 w-5 text-cg-sage flex-shrink-0 mt-0.5" />
+                        <p className="text-sm text-foreground leading-relaxed">
+                          Both parents agree to co-parent cooperatively and communicate through CommonGround.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Action buttons */}
+                    {agreement.status === 'draft' && (
+                      <CGButton
+                        variant="primary"
+                        leftIcon={<Send className="h-4 w-4" />}
+                        isLoading={isApproving}
+                        onClick={handleSubmit}
+                        className="w-full"
+                      >
+                        Submit for Approval
+                      </CGButton>
+                    )}
+                    {agreement.status === 'pending_approval' && canApprove() && (
+                      <CGButton
+                        variant="primary"
+                        leftIcon={<CheckCircle className="h-4 w-4" />}
+                        isLoading={isApproving}
+                        onClick={() => setShowApprovalModal(true)}
+                        className="w-full"
+                      >
+                        Approve Agreement
+                      </CGButton>
+                    )}
+                    {agreement.status === 'approved' && (
+                      <CGButton
+                        variant="primary"
+                        leftIcon={<Power className="h-4 w-4" />}
+                        isLoading={isActivating}
+                        onClick={handleActivate}
+                        className="w-full"
+                      >
+                        Activate Agreement
+                      </CGButton>
+                    )}
+                  </CGCardContent>
+                </CGCard>
+              )}
+
+              {/* Agreement Sections Card — co-operative and comprehensive only */}
+              {!isGoodFaith && (agreement.status !== 'active' || activeTab === 'details') && (
                 <CGCard variant="default" noPadding>
                   <div className="p-5 sm:p-6 border-b border-border">
                     <div className="flex items-center justify-between">
@@ -1204,7 +1296,7 @@ function AgreementDetailsContent() {
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-muted-foreground">Type</span>
                     <CGBadge variant="info" size="sm">
-                      {isV2Agreement ? '7-Section' : 'Legacy'}
+                      {isGoodFaith ? 'Good Faith' : agreement.agreement_version === 'comprehensive' ? '18-Section' : (agreement.agreement_version === 'co-operative' || isV2Agreement) ? '7-Section' : 'Legacy'}
                     </CGBadge>
                   </div>
 
@@ -1246,26 +1338,28 @@ function AgreementDetailsContent() {
                 </CGCard>
               )}
 
-              {/* Completion Progress Card */}
-              <CGCard>
-                <CGCardHeader>
-                  <CGCardTitle className="text-base">Progress</CGCardTitle>
-                </CGCardHeader>
-                <CGCardContent className="mt-4">
-                  <div className="flex items-center justify-between text-sm mb-2">
-                    <span className="text-muted-foreground">
-                      {completedSections} of {totalSections} sections
-                    </span>
-                    <span className="font-semibold text-foreground">{completionPercent}%</span>
-                  </div>
-                  <div className="h-2.5 bg-muted rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-cg-sage rounded-full transition-all duration-500"
-                      style={{ width: `${completionPercent}%` }}
-                    />
-                  </div>
-                </CGCardContent>
-              </CGCard>
+              {/* Completion Progress Card — hidden for Good Faith (no sections) */}
+              {!isGoodFaith && (
+                <CGCard>
+                  <CGCardHeader>
+                    <CGCardTitle className="text-base">Progress</CGCardTitle>
+                  </CGCardHeader>
+                  <CGCardContent className="mt-4">
+                    <div className="flex items-center justify-between text-sm mb-2">
+                      <span className="text-muted-foreground">
+                        {completedSections} of {totalSections} sections
+                      </span>
+                      <span className="font-semibold text-foreground">{completionPercent}%</span>
+                    </div>
+                    <div className="h-2.5 bg-muted rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-cg-sage rounded-full transition-all duration-500"
+                        style={{ width: `${completionPercent}%` }}
+                      />
+                    </div>
+                  </CGCardContent>
+                </CGCard>
+              )}
 
               {/* Quick Facts Card */}
               {summary?.key_points && summary.key_points.length > 0 && (

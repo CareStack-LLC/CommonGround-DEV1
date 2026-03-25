@@ -982,12 +982,55 @@ Use simple, clear language. Keep it practical - holiday details and travel plans
         """Generate ARIA system prompt for v2 simplified agreements."""
         children_text = ", ".join(children_names) if children_names else "your child(ren)"
 
-        section_count = "7" if version == "v2_standard" else "5"
-        version_name = "standard" if version == "v2_standard" else "simplified"
-
         section_guidance = ""
         if current_section and current_section in ARIA_SECTION_PROMPTS_V2:
             section_guidance = f"\n\nCURRENT SECTION FOCUS:\n{ARIA_SECTION_PROMPTS_V2[current_section]}"
+
+        # Version-aware section lists and naming
+        if version == "comprehensive":
+            section_count = "18"
+            version_name = "comprehensive"
+            sections_block = """THE 18 SECTIONS:
+1. Basic Info - Parent names, case details
+2. Legal Custody - Joint or sole legal custody arrangement
+3. Physical Custody - Primary residence and physical custody arrangement
+4. Parenting Time - Regular weekly/biweekly schedule pattern
+5. Holiday Schedule - How holidays are divided or alternated
+6. Vacation - Vacation time allocation and notice requirements
+7. School Breaks - Winter, spring, and summer break arrangements
+8. Transportation - Who handles pickups/drop-offs and travel costs
+9. Decision-Making - How major decisions are made (joint vs. sole authority)
+10. Education - School choice, involvement, and educational decisions
+11. Healthcare - Medical, dental, mental health decision-making and insurance
+12. Religious - Religious upbringing and practices
+13. Extracurriculars - Activities, enrollment, and cost sharing
+14. Child Support - Amount, frequency, and payment method
+15. Expense Sharing - How shared expenses (medical, educational, etc.) are split
+16. Communication - Parent-to-parent and parent-child communication methods
+17. Dispute Resolution - Mediation, arbitration, or other resolution methods
+18. Modification - How and when the agreement can be modified"""
+        elif version == "co-operative":
+            section_count = "7"
+            version_name = "co-operative"
+            sections_block = """THE 7 SECTIONS:
+1. Parties & Children - Who is covered by this agreement
+2. Scope & Duration - When the agreement is effective
+3. Parenting Time - Regular schedule pattern
+4. Logistics & Transitions - Exchange locations, times, and procedures
+5. Decision-Making - Authority and communication methods
+6. Expenses & Financial Cooperation - Shared costs and child support
+7. Modification, Disputes & Acknowledgment - How to change terms and resolve disagreements"""
+        else:
+            # Legacy v2_standard / v2_lite
+            section_count = "7" if version == "v2_standard" else "5"
+            version_name = "standard" if version == "v2_standard" else "simplified"
+            sections_block = f"""THE {section_count} SECTIONS:
+1. Parties & Children - Who is covered
+2. Scope & Duration - When it's effective
+3. Parenting Time - Regular schedule pattern
+4. Logistics & Transitions - Exchange details
+5. Decision-Making & Communication - Authority and methods
+{('6. Expenses & Financial Cooperation - Shared costs' + chr(10) + '7. Modification, Disputes & Acknowledgment - Final steps') if version == 'v2_standard' else '5. Acknowledgment - Final confirmation'}"""
 
         return f"""You are ARIA, an AI assistant helping parents create a SharedCare Agreement for {case_name}.
 
@@ -999,14 +1042,7 @@ YOUR APPROACH:
 3. **Skip the matrices**: Holiday schedules and travel plans go in separate Quick Accords later
 4. **Be supportive**: Acknowledge co-parenting challenges, focus on what's best for {children_text}
 
-THE {section_count} SECTIONS:
-1. Parties & Children - Who is covered
-2. Scope & Duration - When it's effective
-3. Parenting Time - Regular schedule pattern
-4. Logistics & Transitions - Exchange details
-5. Decision-Making & Communication - Authority and methods
-{f'6. Expenses & Financial Cooperation - Shared costs' if version == 'v2_standard' else ''}
-{f'7. Modification, Disputes & Acknowledgment - Final steps' if version == 'v2_standard' else '5. Acknowledgment - Final confirmation'}
+{sections_block}
 
 IMPORTANT:
 - Don't ask for names/addresses/emails - parents enter those separately
