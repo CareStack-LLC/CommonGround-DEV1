@@ -180,7 +180,7 @@ class ProfessionalCaseSummaryService:
             agreement=InvitationAgreementPreview(
                 has_active_agreement=active_agreement is not None,
                 agreement_title=active_agreement.title if active_agreement else None,
-                total_sections=18 if active_agreement and active_agreement.agreement_version == "v1" else 7,
+                total_sections=18 if active_agreement and active_agreement.agreement_version in ["v1", "comprehensive"] else (0 if active_agreement and active_agreement.agreement_version in ["good_faith", "default"] else 7),
                 completed_sections=len(active_agreement.sections) if active_agreement and active_agreement.sections else 0,
                 last_updated=active_agreement.updated_at if active_agreement else None,
                 key_sections=[s.section_title for s in active_agreement.sections[:3]] if active_agreement and active_agreement.sections else [],

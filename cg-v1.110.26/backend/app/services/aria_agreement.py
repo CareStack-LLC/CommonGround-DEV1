@@ -961,16 +961,16 @@ Use simple, clear language. Keep it practical - holiday details and travel plans
 
         # Financial disputes bump up complexity
         if has_financial_disputes and conflict_level == "low":
-            return AgreementVersionType.V2_STANDARD.value
+            return AgreementVersionType.CO_OPERATIVE.value
 
-        # Map conflict level to version
+        # Map conflict level to version (new 3-tier system)
         version_map = {
-            "low": AgreementVersionType.V2_LITE.value,
-            "moderate": AgreementVersionType.V2_STANDARD.value,
-            "high": AgreementVersionType.V1.value,
+            "low": AgreementVersionType.GOOD_FAITH.value,
+            "moderate": AgreementVersionType.CO_OPERATIVE.value,
+            "high": AgreementVersionType.COMPREHENSIVE.value,
         }
 
-        return version_map.get(conflict_level, AgreementVersionType.V2_STANDARD.value)
+        return version_map.get(conflict_level, AgreementVersionType.CO_OPERATIVE.value)
 
     def _get_system_prompt_v2(
         self,
