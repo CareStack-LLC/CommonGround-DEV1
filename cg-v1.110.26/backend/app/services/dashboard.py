@@ -30,7 +30,9 @@ from app.schemas.dashboard import (
     CourtNotification,
     UpcomingEvent,
     RecentActivity,
+    KidComsSummary,
 )
+from app.models.kidcoms import KidComsSession, KidComsMessage
 from app.services.activity import ActivityService
 
 
@@ -79,6 +81,10 @@ class DashboardService:
             db, family_file_id, user, family_file
         )
 
+        kidcoms_summary = await DashboardService._get_kidcoms_summary(
+            db, family_file_id
+        )
+
         # Get recent activities
         recent_activities_data = await ActivityService.get_recent_activities(
             db, family_file_id, user, limit=10
@@ -117,6 +123,7 @@ class DashboardService:
             next_event=next_event,
             recent_activities=recent_activities,
             unread_activity_count=unread_activity_count,
+            kidcoms=kidcoms_summary,
         )
 
     @staticmethod
@@ -598,3 +605,84 @@ class DashboardService:
         next_event = items[0] if items else None
 
         return items, next_event
+
+    @staticmethod
+    async def _get_kidcoms_summary(
+        db: AsyncSession,
+        family_file_id: str,
+    ) -> KidComsSummary:
+        """Get KidComs activity summary for the last 7 days."""
+        now = datetime.utcnow()
+        week_ago = now - timedelta(days=7)
+
+        try:
+            # Recent sessions count (last 7 days)
+            sessions_result = await db.execute(
+                select(func.count(KidComsSession.id)).where(
+                    and_(
+                        KidComsSession.family_file_id == family_file_id,
+                        KidComsSession.created_at >= week_ago,
+                    )
+                )
+            )
+            recent_sessions_count = sessions_result.scalar() or 0
+
+            # Total ARIA flags in last 7 days
+            flags_result = await db.execute(
+                select(func.sum(KidComsSession.flagged_messages)).where(
+                    and_(
+                        KidComsSession.family_file_id == family_file_id,
+                        KidComsSession.created_at >= week_ago,
+                    )
+                )
+            )
+            total_aria_flags = flags_result.scalar() or 0
+
+            # Most recent session timestamp
+            last_session_result = await db.execute(
+                select(KidComsSession.started_at).where(
+                    and_(
+                        KidComsSession.family_file_id == family_file_id,
+                        KidComsSession.started_at.isnot(None),
+                    )
+                ).order_by(desc(KidComsSession.started_at)).limit(1)
+            )
+            last_session_at = last_session_result.scalar_one_or_none()
+
+            # Active session (if any)
+            active_result = await db.execute(
+                select(KidComsSession.id).where(
+                    and_(
+                        KidComsSession.family_file_id == family_file_id,
+                        KidComsSession.status.in_(["waiting", "active"]),
+                    )
+                ).limit(1)
+            )
+            active_session_id = active_result.scalar_one_or_none()
+
+            # Unreviewed flagged messages (flagged and not yet hidden/actioned)
+            unreviewed_result = await db.execute(
+                select(func.count(KidComsMessage.id)).where(
+                    and_(
+                        KidComsMessage.session_id.in_(
+                            select(KidComsSession.id).where(
+                                KidComsSession.family_file_id == family_file_id
+                            )
+                        ),
+                        KidComsMessage.aria_flagged == True,
+                        KidComsMessage.is_hidden == False,
+                    )
+                )
+            )
+            unreviewed_flags = unreviewed_result.scalar() or 0
+
+            return KidComsSummary(
+                recent_sessions_count=recent_sessions_count,
+                total_aria_flags=total_aria_flags,
+                last_session_at=last_session_at,
+                active_session=str(active_session_id) if active_session_id else None,
+                unreviewed_flags=unreviewed_flags,
+            )
+        except Exception as e:
+            logger.warning(f"Failed to fetch KidComs summary: {e}")
+            return KidComsSummary()

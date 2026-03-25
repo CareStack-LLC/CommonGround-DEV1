@@ -3,10 +3,12 @@
  *
  * Synchronized video watching with a family member over video call.
  * Features:
- * - Synchronized playback
- * - Picture-in-picture video call
+ * - Synchronized playback with host controls
+ * - Guest sync polling with drift correction
+ * - Reconnect logic with exponential backoff
+ * - Content progress tracking (resume from last position)
  * - Emoji reactions
- * - Host controls playback
+ * - Video error handling with retry
  */
 
 import { useState, useRef, useEffect, useCallback } from "react";
@@ -14,7 +16,6 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Dimensions,
   StatusBar,
   ActivityIndicator,
   Alert,
@@ -27,13 +28,16 @@ import * as Haptics from "expo-haptics";
 
 import { child, type WatchTogetherSession } from "@commonground/api-client";
 
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
-
-// Supabase storage URL for KidComs videos
-const SUPABASE_STORAGE_URL = "https://qqttugwxmkbnrgzgqbkz.supabase.co/storage/v1/object/public/kidcoms";
-
 // Emoji reactions
 const REACTIONS = ["😂", "😍", "😮", "😢", "👍", "👎"];
+
+// Sync constants
+const HOST_SYNC_INTERVAL_MS = 2000;
+const GUEST_SYNC_INTERVAL_MS = 2000;
+const GUEST_DRIFT_THRESHOLD_MS = 3000; // Seek if >3s out of sync
+const PROGRESS_SAVE_INTERVAL_MS = 30000; // Save progress every 30s
+const MAX_BACKOFF_MS = 16000;
+const DISCONNECT_BANNER_THRESHOLD = 3;
 
 export default function WatchTogetherScreen() {
   const params = useLocalSearchParams<{
@@ -44,6 +48,9 @@ export default function WatchTogetherScreen() {
 
   const videoRef = useRef<Video>(null);
   const syncIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const guestSyncRef = useRef<NodeJS.Timeout | null>(null);
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const positionRef = useRef(0); // Avoid stale closure in intervals
 
   const [session, setSession] = useState<WatchTogetherSession | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -56,6 +63,17 @@ export default function WatchTogetherScreen() {
   const [showReactions, setShowReactions] = useState(false);
   const [activeReaction, setActiveReaction] = useState<string | null>(null);
 
+  // Error & reconnect state
+  const [videoError, setVideoError] = useState(false);
+  const [syncFailures, setSyncFailures] = useState(0);
+  const [showDisconnectBanner, setShowDisconnectBanner] = useState(false);
+  const backoffRef = useRef(HOST_SYNC_INTERVAL_MS);
+
+  // Keep positionRef in sync
+  useEffect(() => {
+    positionRef.current = position;
+  }, [position]);
+
   // Initialize session
   useEffect(() => {
     const initSession = async () => {
@@ -65,11 +83,17 @@ export default function WatchTogetherScreen() {
             params.sessionId
           );
           setSession(data);
-          // Check if we're the host
-          // In a real app, compare with current user ID
           setIsHost(false);
-        } else if (params.contentId) {
-          // Create new session (demo mode)
+
+          // Resume from saved progress if available
+          const progress = await child.theater.getWatchProgress(data.content_id);
+          if (progress && !progress.completed && progress.progress_seconds > 0) {
+            setTimeout(() => {
+              videoRef.current?.setPositionAsync(progress.progress_seconds * 1000);
+            }, 500);
+          }
+        } else if (params.contentId && __DEV__) {
+          // Demo mode: only available in development
           setSession({
             id: "demo-session",
             content_id: params.contentId,
@@ -77,8 +101,8 @@ export default function WatchTogetherScreen() {
               id: params.contentId,
               title: "Watch Together Video",
               description: "",
-              thumbnail_url: "https://picsum.photos/seed/wt/800/450",
-              content_url: `${SUPABASE_STORAGE_URL}/videos/Crunch.mp4`,
+              thumbnail_url: "",
+              content_url: "",
               content_type: "video",
               category: "fun",
               duration_seconds: 240,
@@ -93,6 +117,11 @@ export default function WatchTogetherScreen() {
             created_at: new Date().toISOString(),
           });
           setIsHost(true);
+        } else if (params.contentId && !__DEV__) {
+          Alert.alert("Error", "No session ID provided", [
+            { text: "OK", onPress: () => router.back() },
+          ]);
+          return;
         }
       } catch (error) {
         console.error("Failed to join session:", error);
@@ -130,42 +159,131 @@ export default function WatchTogetherScreen() {
     });
   }, []);
 
-  // Sync playback state (host only)
+  // Host: sync playback state to server with exponential backoff on failure
   useEffect(() => {
-    if (!isHost || !session) return;
+    if (!isHost || !session || session.id === "demo-session") return;
 
-    syncIntervalRef.current = setInterval(async () => {
+    const syncState = async () => {
       try {
         await child.theater.updateWatchTogetherState(session.id, {
-          position_seconds: Math.floor(position / 1000),
+          position_seconds: Math.floor(positionRef.current / 1000),
           is_playing: isPlaying,
         });
-      } catch {}
-    }, 2000);
-
-    return () => {
-      if (syncIntervalRef.current) {
-        clearInterval(syncIntervalRef.current);
+        // Reset on success
+        backoffRef.current = HOST_SYNC_INTERVAL_MS;
+        setSyncFailures(0);
+        setShowDisconnectBanner(false);
+      } catch {
+        const newFailures = syncFailures + 1;
+        setSyncFailures(newFailures);
+        if (newFailures >= DISCONNECT_BANNER_THRESHOLD) {
+          setShowDisconnectBanner(true);
+        }
+        // Exponential backoff: 2s → 4s → 8s → 16s max
+        backoffRef.current = Math.min(backoffRef.current * 2, MAX_BACKOFF_MS);
       }
     };
-  }, [isHost, session, position, isPlaying]);
+
+    syncIntervalRef.current = setInterval(syncState, backoffRef.current);
+
+    return () => {
+      if (syncIntervalRef.current) clearInterval(syncIntervalRef.current);
+    };
+  }, [isHost, session, isPlaying, syncFailures]);
+
+  // Guest: poll server state and sync playback
+  useEffect(() => {
+    if (isHost || !session || session.id === "demo-session") return;
+
+    const pollServerState = async () => {
+      try {
+        const data = await child.theater.joinWatchTogetherSession(session.id);
+        const serverPositionMs = data.current_position_seconds * 1000;
+        const drift = Math.abs(positionRef.current - serverPositionMs);
+
+        // Seek if drift exceeds threshold
+        if (drift > GUEST_DRIFT_THRESHOLD_MS) {
+          await videoRef.current?.setPositionAsync(serverPositionMs);
+        }
+
+        // Sync play/pause state
+        if (data.is_playing && !isPlaying) {
+          await videoRef.current?.playAsync();
+        } else if (!data.is_playing && isPlaying) {
+          await videoRef.current?.pauseAsync();
+        }
+
+        setSyncFailures(0);
+        setShowDisconnectBanner(false);
+      } catch {
+        const newFailures = syncFailures + 1;
+        setSyncFailures(newFailures);
+        if (newFailures >= DISCONNECT_BANNER_THRESHOLD) {
+          setShowDisconnectBanner(true);
+        }
+      }
+    };
+
+    guestSyncRef.current = setInterval(pollServerState, GUEST_SYNC_INTERVAL_MS);
+
+    return () => {
+      if (guestSyncRef.current) clearInterval(guestSyncRef.current);
+    };
+  }, [isHost, session, isPlaying, syncFailures]);
+
+  // Content progress tracking (save every 30s)
+  useEffect(() => {
+    if (!session || session.id === "demo-session") return;
+
+    progressIntervalRef.current = setInterval(() => {
+      const posSeconds = Math.floor(positionRef.current / 1000);
+      if (posSeconds > 0) {
+        child.theater
+          .updateWatchProgress(session.content_id, posSeconds)
+          .catch(() => {});
+      }
+    }, PROGRESS_SAVE_INTERVAL_MS);
+
+    return () => {
+      if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+      // Save final progress on unmount
+      const finalPos = Math.floor(positionRef.current / 1000);
+      if (finalPos > 0) {
+        child.theater
+          .updateWatchProgress(session.content_id, finalPos)
+          .catch(() => {});
+      }
+    };
+  }, [session]);
 
   // Handle playback status
   const handlePlaybackStatusUpdate = useCallback((status: AVPlaybackStatus) => {
     if (!status.isLoaded) {
+      if (status.error) {
+        console.error("Video playback error:", status.error);
+        setVideoError(true);
+      }
       setIsBuffering(true);
       return;
     }
 
+    setVideoError(false);
     setIsBuffering(status.isBuffering);
     setIsPlaying(status.isPlaying);
     setPosition(status.positionMillis);
     setDuration(status.durationMillis || 0);
 
     if (status.didJustFinish) {
+      // Save completed progress
+      if (session && session.id !== "demo-session") {
+        const durationSeconds = Math.floor((status.durationMillis || 0) / 1000);
+        child.theater
+          .updateWatchProgress(session.content_id, durationSeconds, true)
+          .catch(() => {});
+      }
       handleClose();
     }
-  }, []);
+  }, [session]);
 
   // Toggle play/pause (host only)
   const togglePlayPause = async () => {
@@ -180,19 +298,30 @@ export default function WatchTogetherScreen() {
     }
   };
 
+  // Retry video load
+  const handleRetryVideo = async () => {
+    setVideoError(false);
+    setIsBuffering(true);
+    try {
+      await videoRef.current?.unloadAsync();
+      const videoUrl = session?.content.content_url || "";
+      await videoRef.current?.loadAsync({ uri: videoUrl }, { shouldPlay: true });
+    } catch {
+      setVideoError(true);
+    }
+  };
+
   // Send reaction
   const sendReaction = (emoji: string) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setActiveReaction(emoji);
     setShowReactions(false);
 
-    // Clear reaction after animation
     setTimeout(() => {
       setActiveReaction(null);
     }, 2000);
 
-    // In real app, send to session
-    if (session) {
+    if (session && session.id !== "demo-session") {
       child.kidcoms.sendTheaterMessage(session.id, {
         type: "emoji",
         content: emoji,
@@ -204,7 +333,7 @@ export default function WatchTogetherScreen() {
   const handleClose = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
-    if (session) {
+    if (session && session.id !== "demo-session") {
       try {
         await child.theater.leaveWatchTogetherSession(session.id);
       } catch {}
@@ -233,11 +362,46 @@ export default function WatchTogetherScreen() {
     );
   }
 
-  const videoUrl = session?.content.content_url || `${SUPABASE_STORAGE_URL}/videos/Crunch.mp4`;
+  const videoUrl = session?.content.content_url || "";
 
   return (
     <View style={{ flex: 1, backgroundColor: "#000" }}>
       <StatusBar hidden />
+
+      {/* Disconnect Banner */}
+      {showDisconnectBanner && (
+        <View style={{ position: "absolute", top: 0, left: 0, right: 0, zIndex: 100, backgroundColor: "rgba(239,68,68,0.9)", paddingVertical: 8, paddingHorizontal: 16, flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+          <Ionicons name="cloud-offline" size={18} color="white" />
+          <Text style={{ color: "white", marginLeft: 8, fontWeight: "bold" }}>
+            Connection lost — retrying...
+          </Text>
+        </View>
+      )}
+
+      {/* Video Error Overlay */}
+      {videoError && (
+        <View style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, zIndex: 50, backgroundColor: "rgba(0,0,0,0.85)", alignItems: "center", justifyContent: "center" }}>
+          <Ionicons name="alert-circle" size={64} color="#ef4444" />
+          <Text style={{ color: "white", fontSize: 20, fontWeight: "bold", marginTop: 16 }}>
+            Video couldn't load
+          </Text>
+          <Text style={{ color: "#a78bfa", fontSize: 16, marginTop: 8, textAlign: "center", paddingHorizontal: 40 }}>
+            There was a problem playing this video. Check your internet connection and try again.
+          </Text>
+          <TouchableOpacity
+            onPress={handleRetryVideo}
+            style={{ marginTop: 24, backgroundColor: "#8b5cf6", paddingHorizontal: 32, paddingVertical: 14, borderRadius: 9999 }}
+          >
+            <Text style={{ color: "white", fontWeight: "bold", fontSize: 16 }}>Retry</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={handleClose}
+            style={{ marginTop: 12 }}
+          >
+            <Text style={{ color: "#a78bfa", fontSize: 14 }}>Go Back</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       {/* Video Player */}
       <TouchableOpacity
@@ -256,7 +420,7 @@ export default function WatchTogetherScreen() {
         />
 
         {/* Buffering */}
-        {isBuffering && (
+        {isBuffering && !videoError && (
           <View style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, alignItems: "center", justifyContent: "center" }}>
             <ActivityIndicator size="large" color="#8b5cf6" />
           </View>
@@ -283,7 +447,7 @@ export default function WatchTogetherScreen() {
 
               <View className="flex-1 mx-4 items-center">
                 <Text className="text-white text-xl font-bold">
-                  👥 Watch Together
+                  Watch Together
                 </Text>
                 <Text className="text-purple-300">
                   with {params.contactName || "Family"}
@@ -313,7 +477,7 @@ export default function WatchTogetherScreen() {
               ) : (
                 <View className="bg-black/60 px-6 py-3 rounded-xl">
                   <Text className="text-white text-lg">
-                    {isPlaying ? "▶ Playing" : "⏸ Paused"}
+                    {isPlaying ? "Playing" : "Paused"}
                   </Text>
                 </View>
               )}

@@ -81,6 +81,7 @@ class KidSpaceMovie(Base, UUIDMixin):
 
     is_featured: Mapped[bool] = mapped_column(Boolean, default=False)
     is_visible: Mapped[bool] = mapped_column(Boolean, default=True)
+    is_approved: Mapped[bool] = mapped_column(Boolean, default=False)  # Requires admin approval before visible to children
     view_count: Mapped[int] = mapped_column(Integer, default=0)
     total_minutes_watched: Mapped[int] = mapped_column(Integer, default=0)
 
@@ -120,6 +121,7 @@ class KidSpaceBook(Base, UUIDMixin):
 
     is_featured: Mapped[bool] = mapped_column(Boolean, default=False)
     is_visible: Mapped[bool] = mapped_column(Boolean, default=True)
+    is_approved: Mapped[bool] = mapped_column(Boolean, default=False)  # Requires admin approval before visible to children
     read_count: Mapped[int] = mapped_column(Integer, default=0)
     total_pages_turned: Mapped[int] = mapped_column(Integer, default=0)
 

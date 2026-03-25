@@ -24,14 +24,45 @@ class DailyVideoService:
     def __init__(self):
         self.api_key = getattr(settings, 'DAILY_API_KEY', None)
         self.domain = getattr(settings, 'DAILY_DOMAIN', 'cg-mvp.daily.co')
+        self._client: Optional[httpx.AsyncClient] = None
+
+    async def _get_client(self) -> httpx.AsyncClient:
+        """Get or create a persistent HTTP client with connection pooling."""
+        if self._client is None or self._client.is_closed:
+            self._client = httpx.AsyncClient(
+                headers={
+                    "Authorization": f"Bearer {self.api_key}",
+                    "Content-Type": "application/json",
+                },
+                timeout=30.0,
+            )
+        return self._client
+
+    async def close(self):
+        """Close the persistent HTTP client."""
+        if self._client and not self._client.is_closed:
+            await self._client.aclose()
+            self._client = None
 
     @property
     def headers(self) -> Dict[str, str]:
-        """Get API headers."""
+        """Get API headers (for backwards compatibility)."""
         return {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json"
         }
+
+    async def health_check(self) -> bool:
+        """Check Daily.co API connectivity."""
+        if not self.api_key:
+            return False
+        try:
+            client = await self._get_client()
+            response = await client.get(f"{DAILY_API_BASE}/rooms", params={"limit": 1})
+            return response.status_code == 200
+        except Exception as e:
+            logger.error(f"Daily.co health check failed: {e}")
+            return False
 
     async def create_room(
         self,
@@ -71,36 +102,45 @@ class DailyVideoService:
 
         exp_time = datetime.utcnow() + timedelta(minutes=exp_minutes)
 
-        # Minimal config - Daily.co has sensible defaults
+        # Full room configuration — forward all properties to Daily.co API
         room_config = {
             "name": room_name,
             "privacy": privacy,
             "properties": {
                 "exp": int(exp_time.timestamp()),
+                "max_participants": max_participants,
+                "enable_chat": enable_chat,
+                "start_video_off": start_video_off,
+                "start_audio_off": start_audio_off,
+                "enable_noise_cancellation_ui": True,
+                "enable_advanced_chat": False,
+                "enable_knocking": True,
             }
         }
 
-        try:
-            async with httpx.AsyncClient() as client:
-                response = await client.post(
-                    f"{DAILY_API_BASE}/rooms",
-                    json=room_config,
-                    headers=self.headers,
-                    timeout=30.0
-                )
+        # Recording configuration
+        if enable_recording:
+            room_config["properties"]["enable_recording"] = "cloud"
 
-                if response.status_code in [200, 201]:
-                    data = response.json()
-                    logger.info(f"Created Daily.co room: {room_name}")
-                    return {
-                        "name": data.get("name"),
-                        "url": data.get("url"),
-                        "privacy": data.get("privacy"),
-                        "created_at": data.get("created_at"),
-                    }
-                else:
-                    logger.error(f"Failed to create room (status {response.status_code}): {response.text}")
-                    raise Exception(f"Failed to create Daily.co room (status {response.status_code}): {response.text}")
+        try:
+            client = await self._get_client()
+            response = await client.post(
+                f"{DAILY_API_BASE}/rooms",
+                json=room_config,
+            )
+
+            if response.status_code in [200, 201]:
+                data = response.json()
+                logger.info(f"Created Daily.co room: {room_name}")
+                return {
+                    "name": data.get("name"),
+                    "url": data.get("url"),
+                    "privacy": data.get("privacy"),
+                    "created_at": data.get("created_at"),
+                }
+            else:
+                logger.error(f"Failed to create room (status {response.status_code}): {response.text}")
+                raise Exception(f"Failed to create Daily.co room (status {response.status_code}): {response.text}")
 
         except httpx.TimeoutException:
             logger.error("Daily.co API timeout")
@@ -123,20 +163,18 @@ class DailyVideoService:
             return None
 
         try:
-            async with httpx.AsyncClient() as client:
-                response = await client.get(
-                    f"{DAILY_API_BASE}/rooms/{room_name}",
-                    headers=self.headers,
-                    timeout=30.0
-                )
+            client = await self._get_client()
+            response = await client.get(
+                f"{DAILY_API_BASE}/rooms/{room_name}",
+            )
 
-                if response.status_code == 200:
-                    return response.json()
-                elif response.status_code == 404:
-                    return None
-                else:
-                    logger.error(f"Failed to get room: {response.text}")
-                    return None
+            if response.status_code == 200:
+                return response.json()
+            elif response.status_code == 404:
+                return None
+            else:
+                logger.error(f"Failed to get room: {response.text}")
+                return None
 
         except Exception as e:
             logger.error(f"Error getting room: {e}")
@@ -156,19 +194,17 @@ class DailyVideoService:
             return True
 
         try:
-            async with httpx.AsyncClient() as client:
-                response = await client.delete(
-                    f"{DAILY_API_BASE}/rooms/{room_name}",
-                    headers=self.headers,
-                    timeout=30.0
-                )
+            client = await self._get_client()
+            response = await client.delete(
+                f"{DAILY_API_BASE}/rooms/{room_name}",
+            )
 
-                if response.status_code in [200, 204, 404]:
-                    logger.info(f"Deleted Daily.co room: {room_name}")
-                    return True
-                else:
-                    logger.error(f"Failed to delete room: {response.text}")
-                    return False
+            if response.status_code in [200, 204, 404]:
+                logger.info(f"Deleted Daily.co room: {room_name}")
+                return True
+            else:
+                logger.error(f"Failed to delete room: {response.text}")
+                return False
 
         except Exception as e:
             logger.error(f"Error deleting room: {e}")
@@ -222,21 +258,19 @@ class DailyVideoService:
         }
 
         try:
-            async with httpx.AsyncClient() as client:
-                response = await client.post(
-                    f"{DAILY_API_BASE}/meeting-tokens",
-                    json=token_config,
-                    headers=self.headers,
-                    timeout=30.0
-                )
+            client = await self._get_client()
+            response = await client.post(
+                f"{DAILY_API_BASE}/meeting-tokens",
+                json=token_config,
+            )
 
-                if response.status_code in [200, 201]:
-                    data = response.json()
-                    logger.info(f"Created meeting token for {user_name} in {room_name}")
-                    return data.get("token")
-                else:
-                    logger.error(f"Failed to create token (status {response.status_code}): {response.text}")
-                    raise Exception(f"Failed to create meeting token (status {response.status_code}): {response.text}")
+            if response.status_code in [200, 201]:
+                data = response.json()
+                logger.info(f"Created meeting token for {user_name} in {room_name}")
+                return data.get("token")
+            else:
+                logger.error(f"Failed to create token (status {response.status_code}): {response.text}")
+                raise Exception(f"Failed to create meeting token (status {response.status_code}): {response.text}")
 
         except httpx.TimeoutException:
             logger.error("Daily.co API timeout")
@@ -259,17 +293,15 @@ class DailyVideoService:
             return {"total_count": 0, "data": []}
 
         try:
-            async with httpx.AsyncClient() as client:
-                response = await client.get(
-                    f"{DAILY_API_BASE}/rooms/{room_name}/presence",
-                    headers=self.headers,
-                    timeout=30.0
-                )
+            client = await self._get_client()
+            response = await client.get(
+                f"{DAILY_API_BASE}/rooms/{room_name}/presence",
+            )
 
-                if response.status_code == 200:
-                    return response.json()
-                else:
-                    return {"total_count": 0, "data": []}
+            if response.status_code == 200:
+                return response.json()
+            else:
+                return {"total_count": 0, "data": []}
 
         except Exception as e:
             logger.error(f"Error getting room presence: {e}")

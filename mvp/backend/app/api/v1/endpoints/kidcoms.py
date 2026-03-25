@@ -27,6 +27,7 @@ from app.models.kidcoms import (
     KidComsSession,
     KidComsMessage,
     KidComsSessionInvite,
+    KidComsCommunicationLog,
     SessionStatus,
     SessionType,
     ParticipantType,
@@ -229,8 +230,16 @@ async def create_session(
     settings = await get_or_create_settings(db, session_data.family_file_id)
 
     # Check if session type is allowed
-    # Map session types to feature keys: video_call -> video, theater -> theater, etc.
-    feature_key = session_data.session_type.split("_")[0]
+    # Map session types to feature keys
+    feature_type_map = {
+        "video_call": "video",
+        "voice_call": "video",  # Voice and video share the same toggle
+        "theater": "theater",
+        "arcade": "arcade",
+        "whiteboard": "whiteboard",
+        "mixed": "video",
+    }
+    feature_key = feature_type_map.get(session_data.session_type, session_data.session_type)
     if not settings.is_feature_allowed(feature_key):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -585,6 +594,45 @@ async def end_session(
     # Delete Daily.co room
     await daily_service.delete_room(session.daily_room_name)
 
+    # Ensure a communication log entry exists for audit trail
+    existing_log = await db.execute(
+        select(KidComsCommunicationLog).where(
+            KidComsCommunicationLog.session_id == session.id
+        )
+    )
+    if not existing_log.scalar_one_or_none():
+        # Determine contact info from session participants
+        contact_type = "circle"
+        contact_id = session.circle_contact_id
+        contact_name = None
+        if session.participants:
+            for p in session.participants:
+                if p.get("type") == "circle_contact":
+                    contact_name = p.get("name")
+                    break
+                elif p.get("type") == "parent":
+                    contact_type = "parent"
+                    contact_id = p.get("id")
+                    contact_name = p.get("name")
+                    break
+
+        comm_log = KidComsCommunicationLog(
+            session_id=session.id,
+            family_file_id=session.family_file_id,
+            child_id=session.child_id,
+            contact_type=contact_type,
+            contact_id=contact_id,
+            contact_name=contact_name,
+            communication_type=session.session_type,
+            started_at=session.started_at or session.created_at,
+            ended_at=session.ended_at,
+            duration_seconds=session.duration_seconds,
+            total_messages=session.total_messages,
+            flagged_messages=session.flagged_messages,
+            recording_url=session.recording_url,
+        )
+        db.add(comm_log)
+
     await db.commit()
     await db.refresh(session)
 
@@ -708,10 +756,92 @@ async def create_child_session(
         target_user_name = circle_contact.contact_name
         target_circle_contact_id = circle_contact.id
 
+        # Enforce CirclePermission checks for circle contacts
+        permission_result = await db.execute(
+            select(CirclePermission).where(
+                and_(
+                    CirclePermission.circle_contact_id == circle_contact.id,
+                    CirclePermission.child_id == current_child.child_id
+                )
+            )
+        )
+        permission = permission_result.scalar_one_or_none()
+        if not permission:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="No permission to communicate with this circle contact"
+            )
+
+        # Check feature permission
+        if session_data.session_type == "video_call" and not permission.can_video_call:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Video calls are not enabled for this connection"
+            )
+        if session_data.session_type == "voice_call" and not permission.can_voice_call:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Voice calls are not enabled for this connection"
+            )
+        if session_data.session_type == "theater" and not permission.can_theater:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Theater is not enabled for this connection"
+            )
+        if session_data.session_type in ("chat", "mixed") and not permission.can_chat:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Chat is not enabled for this connection"
+            )
+
+        # Check time restrictions using family timezone
+        if not permission.is_within_allowed_time(family_timezone=settings.timezone):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Calls are not allowed at this time"
+            )
+
+        # Check if parent presence is required for this contact
+        if permission.require_parent_present:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="A parent must be present for calls with this contact. Ask a parent to start the call."
+            )
+
+    # Enforce max daily sessions
+    from sqlalchemy import func
+    today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+    daily_count_result = await db.execute(
+        select(func.count(KidComsSession.id)).where(
+            and_(
+                KidComsSession.child_id == current_child.child_id,
+                KidComsSession.created_at >= today_start,
+                KidComsSession.status != SessionStatus.CANCELLED.value
+            )
+        )
+    )
+    daily_count = daily_count_result.scalar() or 0
+    if daily_count >= settings.max_daily_sessions:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"Daily session limit ({settings.max_daily_sessions}) reached"
+        )
+
+    # Enforce require_parent_in_call for non-parent targets
+    if settings.require_parent_in_call and session_data.contact_type not in ("parent_a", "parent_b"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="A parent must be present in calls. Ask a parent to start the call."
+        )
+
+    # Determine if voice-only call
+    is_voice_only = session_data.session_type == "voice_call"
+
     # Generate Daily.co room
     room_name = generate_room_name()
 
     # Create room via Daily.co API
+    # ARIA lockdown: recording is always-on for child safety (cannot be disabled)
     try:
         # Handle case where allowed_features might be None for older records
         enable_chat = settings.allowed_features.get("chat", True) if settings.allowed_features else True
@@ -721,7 +851,8 @@ async def create_child_session(
             exp_minutes=settings.max_session_duration_minutes + 30,
             max_participants=settings.max_participants_per_session,
             enable_chat=enable_chat,
-            enable_recording=settings.record_sessions,
+            enable_recording=True,  # Always-on for child safety
+            start_video_off=is_voice_only,
         )
         room_url = room_data.get("url", f"https://{daily_service.domain}/{room_name}")
     except Exception as e:
@@ -1039,34 +1170,59 @@ async def create_circle_contact_session(
             detail="Voice calls are not enabled for this connection"
         )
 
-    # Check time restrictions
-    from datetime import datetime
-    now = datetime.now()
+    if session_data.session_type == "theater" and not permission.can_theater:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Theater is not enabled for this connection"
+        )
 
-    # Check allowed days (0=Sunday, 6=Saturday)
-    if permission.allowed_days:
-        today = now.weekday()
-        # Convert Python weekday (0=Monday) to JS weekday (0=Sunday)
-        js_weekday = (today + 1) % 7
-        if js_weekday not in permission.allowed_days:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Calls are not allowed on this day"
-            )
+    if session_data.session_type in ("chat", "mixed") and not permission.can_chat:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Chat is not enabled for this connection"
+        )
 
-    # Check allowed hours
-    if permission.allowed_start_time and permission.allowed_end_time:
-        current_time = now.strftime("%H:%M")
-        if current_time < permission.allowed_start_time or current_time > permission.allowed_end_time:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail=f"Calls are only allowed between {permission.allowed_start_time} and {permission.allowed_end_time}"
+    # Check time restrictions using family timezone
+    if not permission.is_within_allowed_time(family_timezone=settings.timezone):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Calls are not allowed at this time based on schedule restrictions"
+        )
+
+    # Check if parent presence is required
+    if permission.require_parent_present or settings.require_parent_in_call:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="A parent must be present for calls with this child. The parent needs to initiate the call."
+        )
+
+    # Enforce max daily sessions
+    from sqlalchemy import func as sa_func
+    today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+    daily_count_result = await db.execute(
+        select(sa_func.count(KidComsSession.id)).where(
+            and_(
+                KidComsSession.child_id == session_data.child_id,
+                KidComsSession.created_at >= today_start,
+                KidComsSession.status != SessionStatus.CANCELLED.value
             )
+        )
+    )
+    daily_count = daily_count_result.scalar() or 0
+    if daily_count >= settings.max_daily_sessions:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"Daily session limit ({settings.max_daily_sessions}) reached for this child"
+        )
+
+    # Determine if voice-only call
+    is_voice_only = session_data.session_type == "voice_call"
 
     # Generate Daily.co room
     room_name = generate_room_name()
 
     # Create room via Daily.co API
+    # ARIA lockdown: recording is always-on for child safety
     try:
         max_duration = permission.max_call_duration_minutes or 60
         # Handle case where allowed_features might be None for older records
@@ -1077,7 +1233,8 @@ async def create_circle_contact_session(
             exp_minutes=max_duration + 30,
             max_participants=settings.max_participants_per_session,
             enable_chat=enable_chat,
-            enable_recording=settings.record_sessions,
+            enable_recording=True,  # Always-on for child safety
+            start_video_off=is_voice_only,
         )
         room_url = room_data.get("url", f"https://{daily_service.domain}/{room_name}")
     except Exception as e:
@@ -1706,19 +1863,39 @@ async def analyze_chat_message(
     Analyze a chat message with ARIA.
 
     Returns safety assessment and optional suggested rewrite.
+    Uses regex fast patterns with stricter thresholds for child safety.
     """
-    # TODO: Integrate with OpenAI or Claude for actual analysis
-    # For now, return mock safe response
+    from app.services.aria import ARIAService, ToxicityLevel
+
+    aria = ARIAService()
+
+    # Provide context as a list if available
+    context_messages = [analyze_data.context] if analyze_data.context else None
+
+    analysis = aria.analyze_message(
+        message=analyze_data.content,
+        context=context_messages,
+    )
+
+    # Child safety uses stricter threshold (0.3 vs 0.5 for adults)
+    is_child_context = analyze_data.sender_type == "child"
+    toxicity_threshold = 0.3 if is_child_context else 0.5
+
+    is_flagged = analysis.toxicity_score >= toxicity_threshold
+    should_hide = analysis.block_send or analysis.toxicity_score >= 0.7
+
+    # Map ARIA categories to readable strings
+    category_str = ", ".join(str(c.value) for c in analysis.categories) if analysis.categories else None
 
     return ARIAChatAnalyzeResponse(
-        is_safe=True,
-        should_flag=False,
-        category=None,
-        reason=None,
-        confidence_score=0.95,
-        suggested_rewrite=None,
-        should_hide=False,
-        should_notify_parents=False,
+        is_safe=not is_flagged,
+        should_flag=is_flagged,
+        category=category_str,
+        reason=analysis.explanation if is_flagged else None,
+        confidence_score=min(1.0, analysis.toxicity_score + 0.3) if is_flagged else max(0.0, 1.0 - analysis.toxicity_score),
+        suggested_rewrite=analysis.suggestion,
+        should_hide=should_hide,
+        should_notify_parents=is_flagged and analysis.toxicity_score >= 0.5,
     )
 
 

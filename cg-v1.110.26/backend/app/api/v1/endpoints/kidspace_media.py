@@ -108,8 +108,11 @@ async def list_visible_movies(
     offset: int = Query(0, ge=0),
     db: AsyncSession = Depends(get_db),
 ) -> dict:
-    """List visible movies for the KidSpace theater."""
-    query = select(KidSpaceMovie).where(KidSpaceMovie.is_visible == True)
+    """List visible and approved movies for the KidSpace theater."""
+    query = select(KidSpaceMovie).where(
+        KidSpaceMovie.is_visible == True,
+        KidSpaceMovie.is_approved == True,
+    )
 
     if genre_id:
         query = query.where(KidSpaceMovie.genre_id == genre_id)
@@ -139,8 +142,11 @@ async def list_visible_books(
     offset: int = Query(0, ge=0),
     db: AsyncSession = Depends(get_db),
 ) -> dict:
-    """List visible books for the KidSpace reading section."""
-    query = select(KidSpaceBook).where(KidSpaceBook.is_visible == True)
+    """List visible and approved books for the KidSpace reading section."""
+    query = select(KidSpaceBook).where(
+        KidSpaceBook.is_visible == True,
+        KidSpaceBook.is_approved == True,
+    )
 
     if genre_id:
         query = query.where(KidSpaceBook.genre_id == genre_id)
@@ -845,3 +851,202 @@ async def delete_book(
     await db.commit()
 
     return {"deleted": True, "id": book_id}
+
+
+# =============================================================================
+# CONTENT APPROVAL ENDPOINTS
+# =============================================================================
+
+@router.post(
+    "/admin/movies/{movie_id}/approve",
+    summary="Approve a movie for child viewing (admin)",
+)
+async def approve_movie(
+    movie_id: str,
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Approve a movie so it becomes visible to children."""
+    result = await db.execute(
+        select(KidSpaceMovie).where(KidSpaceMovie.id == movie_id)
+    )
+    movie = result.scalar_one_or_none()
+    if not movie:
+        raise HTTPException(status_code=404, detail="Movie not found")
+
+    movie.is_approved = True
+    await db.commit()
+    return {"approved": True, "id": movie_id, "title": movie.title}
+
+
+@router.post(
+    "/admin/books/{book_id}/approve",
+    summary="Approve a book for child viewing (admin)",
+)
+async def approve_book(
+    book_id: str,
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Approve a book so it becomes visible to children."""
+    result = await db.execute(
+        select(KidSpaceBook).where(KidSpaceBook.id == book_id)
+    )
+    book = result.scalar_one_or_none()
+    if not book:
+        raise HTTPException(status_code=404, detail="Book not found")
+
+    book.is_approved = True
+    await db.commit()
+    return {"approved": True, "id": book_id, "title": book.title}
+
+
+# =============================================================================
+# UNIFIED THEATER CONTENT ENDPOINT
+# =============================================================================
+
+@router.get(
+    "/theater/content",
+    summary="List all theater content (unified movies + books)",
+)
+async def list_theater_content(
+    category: Optional[str] = Query(None),
+    content_type: Optional[str] = Query(None, pattern=r"^(video|story|all)$"),
+    search: Optional[str] = Query(None),
+    age: Optional[int] = Query(None, ge=1, le=18),
+    limit: int = Query(50, ge=1, le=200),
+    offset: int = Query(0, ge=0),
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    """
+    Unified content endpoint that aggregates movies and books.
+
+    Returns content in the TheaterContent format expected by the API client.
+    """
+    items = []
+
+    # Fetch movies (unless type is "story")
+    if content_type != "story":
+        movie_query = select(KidSpaceMovie).where(
+            KidSpaceMovie.is_visible == True,
+            KidSpaceMovie.is_approved == True,
+        )
+        if age is not None:
+            movie_query = movie_query.where(
+                KidSpaceMovie.age_min <= age,
+                KidSpaceMovie.age_max >= age,
+            )
+        if search:
+            movie_query = movie_query.where(
+                KidSpaceMovie.title.ilike(f"%{search}%")
+            )
+        movie_query = movie_query.order_by(
+            desc(KidSpaceMovie.is_featured), desc(KidSpaceMovie.created_at)
+        )
+        result = await db.execute(movie_query)
+        for movie in result.scalars().all():
+            items.append({
+                "id": movie.id,
+                "title": movie.title,
+                "description": movie.description or "",
+                "thumbnail_url": movie.poster_url or "",
+                "content_url": movie.video_url or "",
+                "content_type": "video",
+                "category": "fun",  # Could map from genre
+                "duration_seconds": (movie.duration_minutes or 0) * 60,
+                "age_rating": f"{movie.age_min}-{movie.age_max}",
+                "is_approved": movie.is_approved,
+                "created_at": movie.created_at.isoformat() if movie.created_at else "",
+            })
+
+    # Fetch books (unless type is "video")
+    if content_type != "video":
+        book_query = select(KidSpaceBook).where(
+            KidSpaceBook.is_visible == True,
+            KidSpaceBook.is_approved == True,
+        )
+        if age is not None:
+            book_query = book_query.where(
+                KidSpaceBook.age_min <= age,
+                KidSpaceBook.age_max >= age,
+            )
+        if search:
+            book_query = book_query.where(
+                KidSpaceBook.title.ilike(f"%{search}%")
+            )
+        book_query = book_query.order_by(
+            desc(KidSpaceBook.is_featured), desc(KidSpaceBook.created_at)
+        )
+        result = await db.execute(book_query)
+        for book in result.scalars().all():
+            items.append({
+                "id": book.id,
+                "title": book.title,
+                "description": book.description or "",
+                "thumbnail_url": book.cover_url or "",
+                "content_url": book.pdf_url or "",
+                "content_type": "story",
+                "category": "stories",
+                "duration_seconds": (book.page_count or 0) * 60,  # Estimate reading time
+                "age_rating": f"{book.age_min}-{book.age_max}",
+                "is_approved": book.is_approved,
+                "created_at": book.created_at.isoformat() if book.created_at else "",
+            })
+
+    # Apply pagination
+    total = len(items)
+    items = items[offset:offset + limit]
+
+    return {"items": items, "total": total}
+
+
+# =============================================================================
+# ANALYTICS ENDPOINTS
+# =============================================================================
+
+@router.post(
+    "/movies/{movie_id}/view",
+    summary="Record a movie view",
+)
+async def record_movie_view(
+    movie_id: str,
+    minutes_watched: int = Query(0, ge=0),
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    """Increment view count and total minutes watched for a movie."""
+    result = await db.execute(
+        select(KidSpaceMovie).where(KidSpaceMovie.id == movie_id)
+    )
+    movie = result.scalar_one_or_none()
+    if not movie:
+        raise HTTPException(status_code=404, detail="Movie not found")
+
+    movie.view_count += 1
+    movie.total_minutes_watched += minutes_watched
+    await db.commit()
+
+    return {"view_count": movie.view_count, "total_minutes_watched": movie.total_minutes_watched}
+
+
+@router.post(
+    "/books/{book_id}/read",
+    summary="Record a book read",
+)
+async def record_book_read(
+    book_id: str,
+    pages_turned: int = Query(0, ge=0),
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    """Increment read count and total pages turned for a book."""
+    result = await db.execute(
+        select(KidSpaceBook).where(KidSpaceBook.id == book_id)
+    )
+    book = result.scalar_one_or_none()
+    if not book:
+        raise HTTPException(status_code=404, detail="Book not found")
+
+    book.read_count += 1
+    book.total_pages_turned += pages_turned
+    await db.commit()
+
+    return {"read_count": book.read_count, "total_pages_turned": book.total_pages_turned}

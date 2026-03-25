@@ -92,6 +92,12 @@ class KidComsSettings(Base, UUIDMixin, TimestampMixin):
     max_daily_sessions: Mapped[int] = mapped_column(Integer, default=5)
     max_participants_per_session: Mapped[int] = mapped_column(Integer, default=4)
 
+    # Global toggle
+    is_enabled: Mapped[bool] = mapped_column(Boolean, default=True)
+
+    # Family timezone for time restriction enforcement
+    timezone: Mapped[str] = mapped_column(String(50), default="America/New_York")
+
     # Parental controls
     require_parent_in_call: Mapped[bool] = mapped_column(Boolean, default=False)
     allow_child_to_initiate: Mapped[bool] = mapped_column(Boolean, default=True)
@@ -112,8 +118,10 @@ class KidComsSettings(Base, UUIDMixin, TimestampMixin):
         """
         Check if the current time is within availability schedule.
 
+        Uses the family's configured timezone for accurate time comparison.
+
         Args:
-            check_time: Time to check (defaults to now)
+            check_time: Time to check (defaults to now in family timezone)
 
         Returns:
             True if within schedule or schedule not enforced
@@ -121,7 +129,10 @@ class KidComsSettings(Base, UUIDMixin, TimestampMixin):
         if not self.enforce_availability or not self.availability_schedule:
             return True
 
-        check_time = check_time or datetime.utcnow()
+        if check_time is None:
+            from zoneinfo import ZoneInfo
+            check_time = datetime.now(ZoneInfo(self.timezone))
+
         day_name = check_time.strftime("%A").lower()
         current_time = check_time.strftime("%H:%M")
 
@@ -188,6 +199,10 @@ class KidComsSession(Base, UUIDMixin, TimestampMixin):
     # ARIA stats
     total_messages: Mapped[int] = mapped_column(Integer, default=0)
     flagged_messages: Mapped[int] = mapped_column(Integer, default=0)
+
+    # Recording (populated by Daily.co webhook)
+    recording_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    recording_storage_path: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
 
     # Notes (for parent review)
     notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
@@ -557,17 +572,23 @@ class CirclePermission(Base, UUIDMixin, TimestampMixin):
     def __repr__(self) -> str:
         return f"<CirclePermission contact={self.circle_contact_id} child={self.child_id}>"
 
-    def is_within_allowed_time(self, check_time: Optional[datetime] = None) -> bool:
+    def is_within_allowed_time(self, check_time: Optional[datetime] = None, family_timezone: Optional[str] = None) -> bool:
         """
         Check if current time is within allowed communication window.
 
         Args:
-            check_time: Time to check (defaults to now)
+            check_time: Time to check (defaults to now in family timezone)
+            family_timezone: IANA timezone string (e.g. "America/New_York")
 
         Returns:
             True if within allowed window or no restrictions set
         """
-        check_time = check_time or datetime.utcnow()
+        if check_time is None:
+            from zoneinfo import ZoneInfo
+            if family_timezone:
+                check_time = datetime.now(ZoneInfo(family_timezone))
+            else:
+                check_time = datetime.utcnow()
 
         # Check day of week
         if self.allowed_days is not None:
@@ -662,3 +683,68 @@ class KidComsCommunicationLog(Base, UUIDMixin):
         self.ended_at = datetime.utcnow()
         if self.started_at:
             self.duration_seconds = int((self.ended_at - self.started_at).total_seconds())
+
+
+class DeviceSetupLink(Base, UUIDMixin, TimestampMixin):
+    """
+    DeviceSetupLink - Secure link for setting up a child's device.
+
+    Parents generate a link that can be shared (SMS, messaging) to a child's device.
+    The child opens the link, but must have a parent authenticate on the device
+    before KidSpace access is granted. This provides an alternative to the
+    8-character setup code.
+    """
+
+    __tablename__ = "device_setup_links"
+
+    # Links
+    child_user_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("child_users.id", ondelete="CASCADE"), index=True
+    )
+    family_file_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("family_files.id", ondelete="CASCADE"), index=True
+    )
+
+    # Token
+    token: Mapped[str] = mapped_column(String(100), unique=True, index=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime)
+
+    # Parent verification gate
+    parent_verified: Mapped[bool] = mapped_column(Boolean, default=False)
+    parent_verified_by: Mapped[Optional[str]] = mapped_column(
+        String(36), ForeignKey("users.id"), nullable=True
+    )
+    parent_verified_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+    # Usage tracking
+    used_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+
+    # Relationships
+    child_user = relationship("ChildUser")
+    family_file = relationship("FamilyFile")
+    verified_by = relationship("User", foreign_keys=[parent_verified_by])
+
+    def __repr__(self) -> str:
+        return f"<DeviceSetupLink for child_user={self.child_user_id}>"
+
+    @property
+    def is_expired(self) -> bool:
+        """Check if the link has expired."""
+        return datetime.utcnow() > self.expires_at
+
+    @property
+    def is_valid(self) -> bool:
+        """Check if the link is still usable."""
+        return self.is_active and not self.is_expired and self.used_at is None
+
+    def verify_parent(self, parent_id: str) -> None:
+        """Mark the link as parent-verified."""
+        self.parent_verified = True
+        self.parent_verified_by = parent_id
+        self.parent_verified_at = datetime.utcnow()
+
+    def mark_used(self) -> None:
+        """Mark the link as used (one-time use)."""
+        self.used_at = datetime.utcnow()
+        self.is_active = False

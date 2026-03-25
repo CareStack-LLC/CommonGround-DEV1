@@ -114,6 +114,15 @@ export default function PinLoginScreen() {
               Enter Setup Code
             </Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            className="mt-4 bg-white/20 py-4 px-8 rounded-full border border-white/30"
+            onPress={() => router.push("/setup-link")}
+          >
+            <Text className="text-white font-bold text-lg">
+              I Have a Setup Link
+            </Text>
+          </TouchableOpacity>
         </View>
       </SafeAreaView>
     );

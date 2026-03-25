@@ -560,3 +560,168 @@ WEBHOOK_HANDLERS = {
     # Checkout events
     "checkout.session.completed": handle_checkout_session_completed,
 }
+
+
+# ============================================================
+# Daily.co Webhook Handler
+# ============================================================
+
+@router.post("/daily")
+async def handle_daily_webhook(
+    request: Request,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Handle incoming Daily.co webhooks.
+
+    Processes events:
+    - meeting.ended: Auto-end orphaned sessions
+    - recording.ready-to-download: Update session with recording URL
+    - participant.joined / participant.left: Track participants
+    """
+    import json
+    import hmac
+    import hashlib
+    from datetime import datetime
+    from sqlalchemy import select, and_
+
+    payload = await request.body()
+
+    # Verify webhook signature if configured
+    daily_webhook_secret = getattr(settings, 'DAILY_WEBHOOK_SECRET', None)
+    if daily_webhook_secret:
+        signature = request.headers.get("x-webhook-signature", "")
+        expected = hmac.new(
+            daily_webhook_secret.encode(),
+            payload,
+            hashlib.sha256,
+        ).hexdigest()
+        if not hmac.compare_digest(signature, expected):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid webhook signature"
+            )
+
+    try:
+        event = json.loads(payload)
+    except json.JSONDecodeError:
+        raise HTTPException(status_code=400, detail="Invalid JSON")
+
+    event_type = event.get("event")
+    room_name = event.get("room", {}).get("name") if isinstance(event.get("room"), dict) else event.get("room")
+
+    logger.info(f"Received Daily.co webhook: {event_type} for room {room_name}")
+
+    if not room_name:
+        return {"status": "ok", "message": "No room name in event"}
+
+    from app.models.kidcoms import KidComsSession, KidComsCommunicationLog, SessionStatus
+
+    if event_type == "meeting.ended":
+        # Auto-end any session still in ACTIVE/WAITING/RINGING state for this room
+        result = await db.execute(
+            select(KidComsSession).where(
+                and_(
+                    KidComsSession.daily_room_name == room_name,
+                    KidComsSession.status.in_([
+                        SessionStatus.ACTIVE.value,
+                        SessionStatus.WAITING.value,
+                        SessionStatus.RINGING.value,
+                    ])
+                )
+            )
+        )
+        session = result.scalar_one_or_none()
+        if session:
+            session.end()
+            logger.info(f"Auto-ended session {session.id} via Daily.co webhook")
+
+            # Ensure communication log exists
+            log_result = await db.execute(
+                select(KidComsCommunicationLog).where(
+                    KidComsCommunicationLog.session_id == session.id
+                )
+            )
+            if not log_result.scalar_one_or_none():
+                comm_log = KidComsCommunicationLog(
+                    session_id=session.id,
+                    family_file_id=session.family_file_id,
+                    child_id=session.child_id,
+                    contact_type="circle" if session.circle_contact_id else "parent",
+                    contact_id=session.circle_contact_id,
+                    communication_type=session.session_type,
+                    started_at=session.started_at or session.created_at,
+                    ended_at=session.ended_at,
+                    duration_seconds=session.duration_seconds,
+                    total_messages=session.total_messages,
+                    flagged_messages=session.flagged_messages,
+                    recording_url=session.recording_url,
+                )
+                db.add(comm_log)
+
+            await db.commit()
+
+    elif event_type == "recording.ready-to-download":
+        # Update session with recording URL
+        recording_url = event.get("recording", {}).get("url") or event.get("url")
+        if recording_url:
+            result = await db.execute(
+                select(KidComsSession).where(
+                    KidComsSession.daily_room_name == room_name
+                )
+            )
+            session = result.scalar_one_or_none()
+            if session:
+                session.recording_url = recording_url
+                logger.info(f"Updated recording URL for session {session.id}")
+
+                # Also update communication log if it exists
+                log_result = await db.execute(
+                    select(KidComsCommunicationLog).where(
+                        KidComsCommunicationLog.session_id == session.id
+                    )
+                )
+                comm_log = log_result.scalar_one_or_none()
+                if comm_log:
+                    comm_log.recording_url = recording_url
+
+                await db.commit()
+
+    elif event_type in ("participant.joined", "participant.left"):
+        # Update participant tracking on the session
+        participant_id = event.get("participant", {}).get("user_id")
+        participant_name = event.get("participant", {}).get("user_name")
+
+        if event_type == "participant.joined" and participant_id:
+            result = await db.execute(
+                select(KidComsSession).where(
+                    and_(
+                        KidComsSession.daily_room_name == room_name,
+                        KidComsSession.status.in_([
+                            SessionStatus.ACTIVE.value,
+                            SessionStatus.WAITING.value,
+                            SessionStatus.RINGING.value,
+                        ])
+                    )
+                )
+            )
+            session = result.scalar_one_or_none()
+            if session:
+                # Check if participant already in list
+                existing_ids = [p.get("id") for p in (session.participants or [])]
+                if participant_id not in existing_ids:
+                    session.add_participant(
+                        participant_id=participant_id,
+                        participant_type="unknown",
+                        name=participant_name or "Unknown"
+                    )
+
+                # If session is WAITING/RINGING and now has 2+ participants, mark ACTIVE
+                if session.status in (SessionStatus.WAITING.value, SessionStatus.RINGING.value):
+                    if len(session.participants or []) >= 2:
+                        session.start()
+                        logger.info(f"Session {session.id} now ACTIVE with {len(session.participants)} participants")
+
+                await db.commit()
+
+    return {"status": "ok", "event": event_type}

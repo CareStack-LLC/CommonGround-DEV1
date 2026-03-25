@@ -88,6 +88,15 @@ class RecentActivity(BaseModel):
     subject_id: Optional[str] = None
 
 
+class KidComsSummary(BaseModel):
+    """KidComs activity summary for the dashboard."""
+    recent_sessions_count: int = 0  # Sessions in last 7 days
+    total_aria_flags: int = 0  # ARIA flags in last 7 days
+    last_session_at: Optional[datetime] = None
+    active_session: Optional[str] = None  # Active session ID if any
+    unreviewed_flags: int = 0  # Flagged messages not yet reviewed
+
+
 class DashboardSummary(BaseModel):
     """Complete dashboard activity summary."""
     # Expense counts and items
@@ -118,3 +127,6 @@ class DashboardSummary(BaseModel):
     # Recent activities (new activity feed)
     recent_activities: List[RecentActivity] = []
     unread_activity_count: int = 0
+
+    # KidComs (child communication hub)
+    kidcoms: KidComsSummary = KidComsSummary()
