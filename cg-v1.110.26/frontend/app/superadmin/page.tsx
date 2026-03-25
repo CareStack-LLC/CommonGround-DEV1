@@ -59,18 +59,20 @@ function DashboardInner() {
     try {
       setLoading(true);
       setError(null);
-      const [d, g, h, inbox, bugs] = await Promise.all([
+      const [d, g, h, inbox, bugs, ai] = await Promise.all([
         adminAPI.getDashboard(),
         adminAPI.getGrowthStats(14),
         adminAPI.getPlatformHealth(),
         adminAPI.getInboxStats().catch(() => null),
         adminAPI.getCurrentBugs().catch(() => null),
+        adminAPI.getAISummary().catch(() => null),
       ]);
       setDashboard(d);
       setGrowth(g);
       setHealth(h);
       setInboxStats(inbox);
       setBugStats(bugs);
+      setAISummary(ai);
 
       // Lazy load per-tab data
       if (activeTab === 'performance') {
@@ -132,10 +134,7 @@ function DashboardInner() {
         setRetentionCurve(retention);
       });
     }
-    if (!loading && activeTab === 'glance' && !aiSummary) {
-      adminAPI.getAISummary().catch(() => null).then(setAISummary);
-    }
-  }, [activeTab, loading, perfData, chatbotStats, revenueData, cohortData, aiSummary]);
+  }, [activeTab, loading, perfData, chatbotStats, revenueData, cohortData]);
 
   const setTab = useCallback((tab: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -181,6 +180,64 @@ function DashboardInner() {
       {/* ── At a Glance View ── */}
       {activeTab === 'glance' && (
         <div className="space-y-6">
+          {/* Executive Pulse — top of dashboard */}
+          {aiSummary?.summary && aiSummary.generated && (
+            <div className="bg-gradient-to-br from-[#3DAA8A]/10 via-[#2D6A8F]/5 to-transparent border border-[#3DAA8A]/20 rounded-2xl p-6">
+              <div className="flex items-center gap-2.5 mb-4">
+                <div className="w-7 h-7 rounded-lg bg-[#3DAA8A]/15 flex items-center justify-center">
+                  <Brain className="w-4 h-4 text-[#3DAA8A]" />
+                </div>
+                <div>
+                  <h2 className="text-sm font-bold text-[#D0E4EC] tracking-tight">Executive Pulse</h2>
+                  <span className="text-[10px] text-[#4A6E7F]">Platform overview</span>
+                </div>
+                {aiSummary.generated_at && (
+                  <span className="text-[10px] text-[#4A6E7F] ml-auto">{timeAgo(aiSummary.generated_at)}</span>
+                )}
+              </div>
+
+              {/* Key metric chips */}
+              {aiSummary.metrics && (
+                <div className="flex flex-wrap gap-2 mb-4">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#3DAA8A]/10 border border-[#3DAA8A]/15 text-xs font-medium text-[#5BC4A0]">
+                    <Users className="w-3 h-3" /> {formatNumber(aiSummary.metrics.total_users)} users
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#2D6A8F]/15 border border-[#2D6A8F]/20 text-xs font-medium text-[#4BA8C8]">
+                    <DollarSign className="w-3 h-3" /> {formatCurrency(aiSummary.metrics.mrr)} MRR
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#3DAA8A]/10 border border-[#3DAA8A]/15 text-xs font-medium text-[#5BC4A0]">
+                    <Activity className="w-3 h-3" /> {aiSummary.metrics.dau_mau_ratio ?? (aiSummary.metrics.mau > 0 ? Math.round(aiSummary.metrics.dau / aiSummary.metrics.mau * 100) : 0)}% DAU/MAU
+                  </span>
+                  {aiSummary.metrics.paying_users > 0 && (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#F5A623]/10 border border-[#F5A623]/15 text-xs font-medium text-[#F5A623]">
+                      <CreditCard className="w-3 h-3" /> {aiSummary.metrics.paying_users} paying
+                    </span>
+                  )}
+                  {aiSummary.metrics.messages_7d > 0 && (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#2D6A8F]/15 border border-[#2D6A8F]/20 text-xs font-medium text-[#4BA8C8]">
+                      <MessageSquare className="w-3 h-3" /> {formatNumber(aiSummary.metrics.messages_7d)} msgs (7d)
+                    </span>
+                  )}
+                  {aiSummary.metrics.active_family_files > 0 && (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#3DAA8A]/10 border border-[#3DAA8A]/15 text-xs font-medium text-[#5BC4A0]">
+                      <FileText className="w-3 h-3" /> {aiSummary.metrics.active_family_files} family files
+                    </span>
+                  )}
+                </div>
+              )}
+
+              {/* Summary bullets in 2-column layout */}
+              <ul className={`grid gap-x-6 gap-y-2 ${aiSummary.summary.length > 4 ? 'lg:grid-cols-2' : 'grid-cols-1'}`}>
+                {aiSummary.summary.map((bullet: string, i: number) => (
+                  <li key={i} className="flex gap-2 text-[13px] text-[#8AACBC] leading-relaxed">
+                    <span className="text-[#3DAA8A] mt-0.5 flex-shrink-0">•</span>
+                    <span>{bullet}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           {/* Primary KPIs */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             {loading ? <SkeletonCards count={4} /> : dashboard && (
@@ -371,25 +428,6 @@ function DashboardInner() {
               )}
             </div>
           </div>
-
-          {/* AI Executive Pulse */}
-          {aiSummary?.summary && aiSummary.generated && (
-            <div className="bg-gradient-to-r from-[#3DAA8A]/10 to-[#2D6A8F]/10 border border-[#3DAA8A]/20 rounded-xl p-5">
-              <div className="flex items-center gap-2 mb-3">
-                <Brain className="w-4 h-4 text-[#3DAA8A]" />
-                <h2 className="text-sm font-semibold text-[#D0E4EC]">Executive Pulse</h2>
-                <span className="text-[10px] text-[#4A6E7F] ml-auto">AI-generated</span>
-              </div>
-              <ul className="space-y-2">
-                {aiSummary.summary.map((bullet: string, i: number) => (
-                  <li key={i} className="flex gap-2 text-xs text-[#8AACBC]">
-                    <span className="text-[#3DAA8A] mt-0.5">•</span>
-                    <span>{bullet}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
 
           {/* Quick Links */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">

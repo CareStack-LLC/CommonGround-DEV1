@@ -5135,10 +5135,14 @@ async def get_executive_summary(
     ) or 0
     activation_rate = round(activated_users / total_users, 4) if total_users > 0 else 0.0
 
-    # Paying users: active paid subscription (non-free tiers)
+    # Paying users: active paid subscription (non-free tiers, exclude admins)
     free_tiers = ["essential", "starter", "web_starter", "unknown"]
     paying_users = await db.scalar(
-        select(func.count(UserProfile.id)).where(
+        select(func.count(UserProfile.id))
+        .join(User, User.id == UserProfile.user_id)
+        .where(
+            User.is_admin == False,
+            User.is_deleted == False,
             UserProfile.subscription_status == "active",
             UserProfile.subscription_tier.notin_(free_tiers),
         )
@@ -5146,9 +5150,11 @@ async def get_executive_summary(
 
     paying_conversion = round(paying_users / total_users, 4) if total_users > 0 else 0.0
 
-    # New users in last 7 days
+    # New users in last 7 days (exclude admins)
     new_users_7d = await db.scalar(
         select(func.count(User.id)).where(
+            User.is_deleted == False,
+            User.is_admin == False,
             User.created_at >= seven_days_ago,
         )
     ) or 0
@@ -5240,18 +5246,26 @@ async def get_ai_summary(
             mrr += count * price
         mrr = round(mrr, 2)
 
-    # Paying users count (always from DB)
+    # Paying users count (always from DB, exclude admins)
     free_tiers_list = list(FREE_TIERS)
     paying_users = await db.scalar(
-        select(func.count(UserProfile.id)).where(
+        select(func.count(UserProfile.id))
+        .join(User, User.id == UserProfile.user_id)
+        .where(
+            User.is_admin == False,
+            User.is_deleted == False,
             UserProfile.subscription_status == "active",
             UserProfile.subscription_tier.notin_(free_tiers_list),
         )
     ) or 0
 
-    # Churn
+    # Churn (exclude admins)
     cancelled_30d = await db.scalar(
-        select(func.count(UserProfile.id)).where(
+        select(func.count(UserProfile.id))
+        .join(User, User.id == UserProfile.user_id)
+        .where(
+            User.is_admin == False,
+            User.is_deleted == False,
             UserProfile.subscription_status == "cancelled",
             UserProfile.updated_at >= thirty_days_ago,
         )
@@ -5259,41 +5273,109 @@ async def get_ai_summary(
     churn_base = paying_users + cancelled_30d
     monthly_churn_pct = round(cancelled_30d / churn_base * 100, 1) if churn_base > 0 else 0.0
 
+    # Extended platform metrics
+    from app.models.family_file import FamilyFile
+    from app.models.professional import ProfessionalProfile
+    from app.models.message import Message, MessageFlag
+    from app.models.agreement import Agreement
+    from app.models.custody_exchange import CustodyExchange
+
+    active_family_files = await db.scalar(
+        select(func.count(FamilyFile.id)).where(FamilyFile.status == "active")
+    ) or 0
+
+    total_professionals = await db.scalar(
+        select(func.count(ProfessionalProfile.id))
+    ) or 0
+
+    messages_7d = await db.scalar(
+        select(func.count(Message.id)).where(Message.sent_at >= seven_days_ago)
+    ) or 0
+
+    aria_flags_7d = await db.scalar(
+        select(func.count(MessageFlag.id)).where(MessageFlag.created_at >= seven_days_ago)
+    ) or 0
+
+    active_agreements = await db.scalar(
+        select(func.count(Agreement.id)).where(
+            Agreement.status.in_(["active", "draft", "pending_approval"])
+        )
+    ) or 0
+
+    exchanges_30d = await db.scalar(
+        select(func.count(CustodyExchange.id)).where(
+            CustodyExchange.created_at >= thirty_days_ago
+        )
+    ) or 0
+
     # Build summary bullets
+    dau_mau_ratio = round(dau / mau * 100, 1) if mau > 0 else 0
+    if dau_mau_ratio >= 25:
+        engagement_note = "strong engagement"
+    elif dau_mau_ratio >= 15:
+        engagement_note = "healthy engagement"
+    elif dau_mau_ratio > 0:
+        engagement_note = "early-stage engagement"
+    else:
+        engagement_note = "no recent activity"
+
     summary = []
     summary.append(
         f"Platform has {total_users:,} total users with {dau:,} daily active "
-        f"and {mau:,} monthly active users (DAU/MAU ratio: {round(dau / mau * 100, 1) if mau > 0 else 0}%)."
+        f"and {mau:,} monthly active (DAU/MAU: {dau_mau_ratio}% — {engagement_note})."
     )
     summary.append(
         f"MRR is ${mrr:,.2f} (ARR ${mrr * 12:,.2f}) from {paying_users} paying subscribers."
     )
-    if new_users_7d > 0:
-        summary.append(
-            f"{new_users_7d} new users signed up in the last 7 days."
-        )
-    if monthly_churn_pct > 0:
-        summary.append(
-            f"Monthly churn rate is {monthly_churn_pct}% ({cancelled_30d} cancellations in the last 30 days)."
-        )
-    else:
-        summary.append("No cancellations recorded in the last 30 days — churn rate is 0%.")
 
     paying_conversion = round(paying_users / total_users * 100, 1) if total_users > 0 else 0
+    growth_parts = []
+    if new_users_7d > 0:
+        growth_parts.append(f"{new_users_7d} new signups (7d)")
+    if monthly_churn_pct > 0:
+        growth_parts.append(f"{monthly_churn_pct}% monthly churn ({cancelled_30d} cancellations)")
+    else:
+        growth_parts.append("0% churn (no cancellations in 30d)")
+    growth_parts.append(f"{paying_conversion}% paid conversion")
+    summary.append("Growth: " + ", ".join(growth_parts) + ".")
+
     summary.append(
-        f"Paying user conversion rate is {paying_conversion}% ({paying_users} of {total_users:,} users)."
+        f"Engagement: {messages_7d:,} messages sent (7d) with {aria_flags_7d:,} ARIA interventions."
     )
+
+    files_per_user = round(active_family_files / total_users, 2) if total_users > 0 else 0
+    summary.append(
+        f"Family files: {active_family_files:,} active ({files_per_user} per user). "
+        f"Agreements: {active_agreements:,} in progress or active."
+    )
+
+    if exchanges_30d > 0:
+        summary.append(
+            f"Custody exchanges: {exchanges_30d:,} exchanges logged in last 30 days."
+        )
+
+    if total_professionals > 0:
+        summary.append(
+            f"Professional network: {total_professionals:,} professionals on the platform."
+        )
 
     metrics = {
         "total_users": total_users,
         "dau": dau,
         "mau": mau,
+        "dau_mau_ratio": dau_mau_ratio,
         "mrr": mrr,
         "arr": round(mrr * 12, 2),
         "paying_users": paying_users,
         "new_users_7d": new_users_7d,
         "monthly_churn_pct": monthly_churn_pct,
         "paying_conversion_pct": paying_conversion,
+        "messages_7d": messages_7d,
+        "aria_flags_7d": aria_flags_7d,
+        "active_family_files": active_family_files,
+        "active_agreements": active_agreements,
+        "exchanges_30d": exchanges_30d,
+        "total_professionals": total_professionals,
     }
 
     await _log_admin_action(db, admin_user, "view_ai_summary", "analytics")
@@ -5335,9 +5417,11 @@ async def get_user_segments(
         select(func.count(ProfessionalProfile.id))
     ) or 0
 
-    # Total profiles
+    # Total profiles (exclude admins)
     total_profiles = await db.scalar(
         select(func.count(UserProfile.id))
+        .join(User, User.id == UserProfile.user_id)
+        .where(User.is_admin == False, User.is_deleted == False)
     ) or 0
 
     # Parent count (profiles minus professionals)
@@ -5359,17 +5443,25 @@ async def get_user_segments(
     except Exception:
         pass
 
-    # Paying users per segment from DB
+    # Paying users per segment from DB (exclude admins)
     free_tiers_list = list(FREE_TIERS)
     paying_parents = await db.scalar(
-        select(func.count(UserProfile.id)).where(
+        select(func.count(UserProfile.id))
+        .join(User, User.id == UserProfile.user_id)
+        .where(
+            User.is_admin == False,
+            User.is_deleted == False,
             UserProfile.subscription_status == "active",
             UserProfile.subscription_tier.notin_(free_tiers_list),
             UserProfile.subscription_tier.in_(list(CONSUMER_TIERS)),
         )
     ) or 0
     paying_professionals = await db.scalar(
-        select(func.count(UserProfile.id)).where(
+        select(func.count(UserProfile.id))
+        .join(User, User.id == UserProfile.user_id)
+        .where(
+            User.is_admin == False,
+            User.is_deleted == False,
             UserProfile.subscription_status == "active",
             UserProfile.subscription_tier.in_(list(PROFESSIONAL_TIERS)),
         )
