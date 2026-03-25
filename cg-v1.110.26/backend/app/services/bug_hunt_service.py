@@ -304,23 +304,28 @@ async def generate_seed_families(
                 (pb_profile, pb_email, b_first, b_last, pb_id, False),
             ]:
                 try:
-                    # Create Stripe customer with test payment method attached
+                    # Step 1: Create Stripe customer
                     customer = stripe.Customer.create(
                         email=email,
                         name=f"{first_name} {last_name}",
-                        payment_method="pm_card_visa",
-                        invoice_settings={"default_payment_method": "pm_card_visa"},
                         metadata={"platform": "commonground", "source": "bug_hunt_seed", "user_id": user_id},
                     )
                     profile.stripe_customer_id = customer.id
 
-                    # Create paid active subscription using test card
+                    # Step 2: Attach test card (pm_card_visa) and set as default
+                    pm = stripe.PaymentMethod.attach("pm_card_visa", customer=customer.id)
+                    stripe.Customer.modify(
+                        customer.id,
+                        invoice_settings={"default_payment_method": pm.id},
+                    )
+
+                    # Step 3: Create paid active subscription
                     # Parent A gets "complete" tier, Parent B gets "plus" tier
                     price_id = "price_1TE0bYBJIivbOFX7VqmtQH23" if is_parent_a else "price_1TE0bXBJIivbOFX70Ysv656Q"
                     subscription = stripe.Subscription.create(
                         customer=customer.id,
                         items=[{"price": price_id}],
-                        default_payment_method=customer.invoice_settings.default_payment_method,
+                        default_payment_method=pm.id,
                         metadata={"source": "bug_hunt_seed"},
                     )
                     profile.stripe_subscription_id = subscription.id
@@ -330,7 +335,7 @@ async def generate_seed_families(
                         "complete" if is_parent_a else "plus",
                     )
                 except Exception as e:
-                    logger.warning(f"Stripe setup failed for {email}: {e}")
+                    logger.warning(f"Stripe setup failed for {email}: {e}", exc_info=True)
 
         # Create FamilyFile
         ff_id = str(uuid4())
