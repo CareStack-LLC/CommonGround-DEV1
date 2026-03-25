@@ -313,13 +313,17 @@ async def generate_seed_families(
                     profile.stripe_customer_id = customer.id
 
                     # Create subscription (complete tier for Parent A, plus for Parent B)
+                    # Use trial_period_days so no payment method is required for seed accounts
                     price_id = "price_1TE0bYBJIivbOFX7VqmtQH23" if is_parent_a else "price_1TE0bXBJIivbOFX70Ysv656Q"
                     subscription = stripe.Subscription.create(
                         customer=customer.id,
                         items=[{"price": price_id}],
+                        trial_period_days=365,
+                        payment_behavior="default_incomplete",
                         metadata={"source": "bug_hunt_seed"},
                     )
                     profile.stripe_subscription_id = subscription.id
+                    logger.info(f"Stripe subscription {subscription.id} created for {email} (trial, no payment method needed)")
                 except Exception as e:
                     logger.warning(f"Stripe setup failed for {email}: {e}")
 
