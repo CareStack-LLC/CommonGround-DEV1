@@ -5,9 +5,12 @@ A Family File is the root container for a family's CommonGround data,
 housing parents, children, agreements, and optionally a Court Custody Case.
 """
 
+import logging
 from datetime import datetime
 from typing import List, Optional, Tuple
 import uuid
+
+logger = logging.getLogger(__name__)
 
 from fastapi import HTTPException, status
 from sqlalchemy import select, or_, and_
@@ -627,17 +630,38 @@ class FamilyFileService:
             invite_link = f"{settings.FRONTEND_URL}/family-files/{family_file.id}/accept"
 
             inviter_name = f"{inviter.first_name} {inviter.last_name}"
-            await self.email_service.send_case_invitation(
+
+            # Get children names if loaded
+            children_names = []
+            try:
+                if family_file.children:
+                    children_names = [
+                        f"{c.first_name} {c.last_name}".strip()
+                        for c in family_file.children
+                        if c.first_name
+                    ]
+            except Exception:
+                pass  # Children may not be loaded
+
+            logger.info(
+                f"Sending co-parent invitation: to={family_file.parent_b_email}, "
+                f"from={inviter_name}, file={family_file.title}, "
+                f"email_enabled={self.email_service.enabled}"
+            )
+
+            result = await self.email_service.send_case_invitation(
                 to_email=family_file.parent_b_email,
                 to_name=family_file.parent_b_name or "Co-Parent",
                 inviter_name=inviter_name,
                 case_name=family_file.title,
                 invitation_link=invite_link,
-                children_names=[],
+                children_names=children_names,
             )
-        except Exception:
-            # Don't fail the operation if email fails
-            pass
+            logger.info(f"Co-parent invitation email result: {result}")
+        except Exception as e:
+            # Log but don't fail the operation if email fails
+            logger.error(f"Failed to send co-parent invitation email: {type(e).__name__}: {e}")
+            capture_error(e)
 
 
 # Standalone helper function for accessing family files
