@@ -9,7 +9,9 @@ IMPORTANT: Route ordering matters in FastAPI. Static paths (e.g. /payouts,
 (e.g. /{wallet_id}) to avoid the parameterized route matching first.
 """
 
+import asyncio
 import logging
+import traceback
 from typing import Optional
 
 import stripe
@@ -50,6 +52,73 @@ from app.services.wallet_service import wallet_service
 from app.utils.sentry_helpers import capture_error
 
 router = APIRouter()
+
+
+# ============================================================================
+# Diagnostic endpoint for Connect testing
+# ============================================================================
+
+@router.get("/connect-test")
+async def test_stripe_connect():
+    """
+    Diagnostic endpoint to test Stripe Connect account creation and onboarding link.
+    Creates a test account, generates onboarding URL, then deletes the test account.
+    """
+    from app.core.config import settings as app_settings
+
+    results = {
+        "stripe_key_set": bool(app_settings.STRIPE_SECRET_KEY),
+        "stripe_key_suffix": app_settings.STRIPE_SECRET_KEY[-6:] if app_settings.STRIPE_SECRET_KEY else None,
+        "frontend_url": app_settings.FRONTEND_URL,
+    }
+
+    try:
+        # Step 1: Create test Connect account
+        account = await asyncio.to_thread(
+            stripe.Account.create,
+            type="express",
+            email="connect-diag@commonground.app",
+            metadata={"purpose": "diagnostic_test", "cleanup": "true"},
+            capabilities={
+                "card_payments": {"requested": True},
+                "transfers": {"requested": True},
+            },
+        )
+        results["account_created"] = True
+        results["account_id"] = account.id
+        results["account_type"] = account.type
+
+        # Step 2: Create onboarding link
+        base_url = app_settings.FRONTEND_URL
+        account_link = await asyncio.to_thread(
+            stripe.AccountLink.create,
+            account=account.id,
+            refresh_url=f"{base_url}/wallet/onboarding?wallet_id=diag-test",
+            return_url=f"{base_url}/wallet?wallet_id=diag-test&onboarding=complete",
+            type="account_onboarding",
+        )
+        results["link_created"] = True
+        results["onboarding_url"] = account_link.url
+        results["expires_at"] = account_link.expires_at
+
+        # Step 3: Cleanup
+        await asyncio.to_thread(stripe.Account.delete, account.id)
+        results["cleaned_up"] = True
+        results["status"] = "ALL_PASSING"
+
+    except Exception as e:
+        results["error"] = f"{type(e).__name__}: {str(e)}"
+        results["traceback"] = traceback.format_exc()
+        results["status"] = "FAILED"
+
+        # Try cleanup
+        if "account_id" in results:
+            try:
+                await asyncio.to_thread(stripe.Account.delete, results["account_id"])
+            except Exception:
+                pass
+
+    return results
 
 
 # ============================================================================
@@ -728,6 +797,9 @@ async def start_onboarding(
         )
 
     try:
+        logger.info(f"Starting onboarding for wallet={wallet_id}, user={current_user.id}, email={current_user.email}")
+        logger.info(f"Wallet stripe_account_id={wallet.stripe_account_id}, onboarding_completed={wallet.onboarding_completed}")
+
         url, expires_at = await wallet_service.start_stripe_onboarding(
             db=db,
             wallet=wallet,
@@ -735,6 +807,8 @@ async def start_onboarding(
             refresh_url=data.refresh_url,
             return_url=data.return_url,
         )
+
+        logger.info(f"Onboarding URL generated for wallet={wallet_id}: {url[:80]}...")
         await db.commit()
 
         return WalletOnboardingResponse(
@@ -744,19 +818,19 @@ async def start_onboarding(
         )
     except (stripe.StripeError, stripe.error.StripeError) as e:
         await db.rollback()
-        logger.exception(f"Stripe error during onboarding: {type(e).__name__}: {e}")
+        logger.error(f"Stripe error during onboarding: {type(e).__name__}: {e}\n{traceback.format_exc()}")
         capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
-            detail="Unable to connect to payment provider. Please try again later."
+            detail=f"Unable to connect to payment provider: {type(e).__name__}"
         )
     except Exception as e:
         await db.rollback()
-        logger.exception(f"Failed to start onboarding: {type(e).__name__}: {e}")
+        logger.error(f"Failed to start onboarding: {type(e).__name__}: {e}\n{traceback.format_exc()}")
         capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to start onboarding."
+            detail=f"Failed to start onboarding: {type(e).__name__}: {str(e)}"
         )
 
 
