@@ -7,20 +7,20 @@ Create Date: 2026-03-05
 Updates subscription plan price IDs to match the CommonGround
 Stripe test account products created March 2026.
 
-New Products:
-  Web Starter:              prod_U5i6vWb4ktGrTN
-  Plus:                     prod_U5i6Efw49ipfb3
-  Complete:                 prod_U5i6lsgC2mOHxn
-  Professional - Starter:   prod_U5i6Vfe7E6vHtZ
-  Professional - Solo:      prod_U5i6WdwYSiC9wc
-  Professional - Small Firm: prod_U5i6tXPi3LbW5h
-  Professional - Mid-Size:  prod_U5i6Pvkzonm0fe
-  Court Investigation:      prod_U5i6ZMoAoSQBEH
-  Custody Compliance Report: prod_U5i6FizFNRc51F
-  Comm Analysis Report:     prod_U5i6T4xMbbYmrh
-  Financial Compliance:     prod_U5i6uitcZE1ykf
-  Rush Report Delivery:     prod_U5i7U0VOUv5SSz
-  Urgent Report Delivery:   prod_U5i7ekUzdGW0sX
+New Products (BJIivbOFX7 account):
+  Web Starter:              prod_UCPQdxPYuteQUA
+  Plus:                     prod_UCPQBUvNRmZ4Cs
+  Complete:                 prod_UCPQxC2eRt7g6K
+  Professional - Starter:   prod_UCPQevbVaWJDfT
+  Professional - Solo:      prod_UCPQVLqjYyuiRF
+  Professional - Small Firm: prod_UCPQOK9Qpuw1hB
+  Professional - Mid-Size:  prod_UCPQQwcr2VaCXs
+  Court Investigation:      prod_UCPQOlUDOkaF3u
+  Comm Analysis Report:     prod_UCPQI4zziqm3mM
+  Financial Compliance:     prod_UCPQwdLQurLuJL
+  Custody Compliance:       prod_UCPQNVYgbcZ3Am
+  Rush Report Delivery:     prod_UCPQTRgWRvrgc6
+  Urgent Report Delivery:   prod_UCPQ5vVhbWJRRE
 """
 
 from alembic import op
@@ -39,27 +39,27 @@ def upgrade() -> None:
     # Web Starter (free)
     op.execute("""
         UPDATE subscription_plans
-        SET stripe_price_id_monthly = 'price_1T7WgnB3EXvvERPfyu40gtfE',
+        SET stripe_price_id_monthly = 'price_1TE0bXBJIivbOFX7luV9H7OZ',
             stripe_price_id_annual = NULL,
-            stripe_product_id = 'prod_U5i6vWb4ktGrTN'
+            stripe_product_id = 'prod_UCPQdxPYuteQUA'
         WHERE plan_code = 'web_starter'
     """)
 
     # Plus plan - monthly & annual
     op.execute("""
         UPDATE subscription_plans
-        SET stripe_price_id_monthly = 'price_1T7WgnB3EXvvERPfcpZeMSSH',
-            stripe_price_id_annual = 'price_1T7WgnB3EXvvERPfe7NNFlru',
-            stripe_product_id = 'prod_U5i6Efw49ipfb3'
+        SET stripe_price_id_monthly = 'price_1TE0bXBJIivbOFX70Ysv656Q',
+            stripe_price_id_annual = 'price_1TE0bYBJIivbOFX7atup1qAE',
+            stripe_product_id = 'prod_UCPQBUvNRmZ4Cs'
         WHERE plan_code = 'plus'
     """)
 
     # Complete plan - monthly & annual
     op.execute("""
         UPDATE subscription_plans
-        SET stripe_price_id_monthly = 'price_1T7WgoB3EXvvERPfDm7qKpBN',
-            stripe_price_id_annual = 'price_1T7WgoB3EXvvERPfmDy9KtDh',
-            stripe_product_id = 'prod_U5i6lsgC2mOHxn'
+        SET stripe_price_id_monthly = 'price_1TE0bYBJIivbOFX7VqmtQH23',
+            stripe_price_id_annual = 'price_1TE0bZBJIivbOFX77f2QUPc6',
+            stripe_product_id = 'prod_UCPQxC2eRt7g6K'
         WHERE plan_code = 'complete'
     """)
 

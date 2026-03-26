@@ -19,27 +19,27 @@ def upgrade() -> None:
     # Web Starter (free)
     op.execute("""
         UPDATE subscription_plans
-        SET stripe_product_id = 'prod_U5i6vWb4ktGrTN',
-            stripe_price_id_monthly = 'price_1T7WgnB3EXvvERPfyu40gtfE',
+        SET stripe_product_id = 'prod_UCPQdxPYuteQUA',
+            stripe_price_id_monthly = 'price_1TE0bXBJIivbOFX7luV9H7OZ',
             stripe_price_id_annual = NULL
         WHERE plan_code = 'web_starter'
     """)
-    
+
     # Plus
     op.execute("""
         UPDATE subscription_plans
-        SET stripe_product_id = 'prod_U5i6Efw49ipfb3',
-            stripe_price_id_monthly = 'price_1T7WgnB3EXvvERPfcpZeMSSH',
-            stripe_price_id_annual = 'price_1T7WgnB3EXvvERPfe7NNFlru'
+        SET stripe_product_id = 'prod_UCPQBUvNRmZ4Cs',
+            stripe_price_id_monthly = 'price_1TE0bXBJIivbOFX70Ysv656Q',
+            stripe_price_id_annual = 'price_1TE0bYBJIivbOFX7atup1qAE'
         WHERE plan_code = 'plus'
     """)
-    
+
     # Complete
     op.execute("""
         UPDATE subscription_plans
-        SET stripe_product_id = 'prod_U5i6lsgC2mOHxn',
-            stripe_price_id_monthly = 'price_1T7WgoB3EXvvERPfDm7qKpBN',
-            stripe_price_id_annual = 'price_1T7WgoB3EXvvERPfmDy9KtDh'
+        SET stripe_product_id = 'prod_UCPQxC2eRt7g6K',
+            stripe_price_id_monthly = 'price_1TE0bYBJIivbOFX7VqmtQH23',
+            stripe_price_id_annual = 'price_1TE0bZBJIivbOFX77f2QUPc6'
         WHERE plan_code = 'complete'
     """)
     

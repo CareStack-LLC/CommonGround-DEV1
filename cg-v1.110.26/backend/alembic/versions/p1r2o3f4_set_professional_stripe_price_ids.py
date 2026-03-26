@@ -22,27 +22,27 @@ def upgrade() -> None:
     # Solo Practitioner ($99/mo)
     op.execute("""
         UPDATE subscription_plans
-        SET stripe_product_id = 'prod_U5i6WdwYSiC9wc',
-            stripe_price_id_monthly = 'price_1T7WgpB3EXvvERPfbXPqXJjK',
-            stripe_price_id_annual = 'price_1T7WgpB3EXvvERPfaYzRkMnL'
+        SET stripe_product_id = 'prod_UCPQVLqjYyuiRF',
+            stripe_price_id_monthly = 'price_1TE0baBJIivbOFX7dqc7W1Dp',
+            stripe_price_id_annual = NULL
         WHERE plan_code = 'solo'
     """)
 
     # Small Firm ($299/mo)
     op.execute("""
         UPDATE subscription_plans
-        SET stripe_product_id = 'prod_U5i6tXPi3LbW5h',
-            stripe_price_id_monthly = 'price_1T7WgpB3EXvvERPfcDeFgHiJ',
-            stripe_price_id_annual = 'price_1T7WgpB3EXvvERPfdKlMnOpQ'
+        SET stripe_product_id = 'prod_UCPQOK9Qpuw1hB',
+            stripe_price_id_monthly = 'price_1TE0baBJIivbOFX7smGjiSyj',
+            stripe_price_id_annual = NULL
         WHERE plan_code = 'small_firm'
     """)
 
     # Mid-Size Firm ($799/mo)
     op.execute("""
         UPDATE subscription_plans
-        SET stripe_product_id = 'prod_U5i6Pvkzonm0fe',
-            stripe_price_id_monthly = 'price_1T7WgpB3EXvvERPfeRsTuVwX',
-            stripe_price_id_annual = 'price_1T7WgpB3EXvvERPffYzAbCdE'
+        SET stripe_product_id = 'prod_UCPQQwcr2VaCXs',
+            stripe_price_id_monthly = 'price_1TE0bbBJIivbOFX78k6VF4wC',
+            stripe_price_id_annual = NULL
         WHERE plan_code = 'mid_size'
     """)
 

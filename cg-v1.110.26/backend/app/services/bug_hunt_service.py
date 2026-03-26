@@ -110,8 +110,8 @@ AGREEMENT_ROTATION = ["good_faith", "co-operative", "comprehensive"]
 TIER_ROTATION = ["web_starter", "plus", "complete"]
 TIER_PRICE_IDS: dict[str, str | None] = {
     "web_starter": None,  # free tier — skip Stripe subscription
-    "plus": "price_1T7WgnB3EXvvERPfcpZeMSSH",      # $17.99/mo
-    "complete": "price_1T7WgoB3EXvvERPfDm7qKpBN",   # $34.99/mo
+    "plus": "price_1TE0bXBJIivbOFX70Ysv656Q",      # $17.99/mo
+    "complete": "price_1TE0bYBJIivbOFX7VqmtQH23",   # $34.99/mo
 }
 
 
