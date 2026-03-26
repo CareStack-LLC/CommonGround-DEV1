@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 
 interface Child {
   full_name: string;
@@ -90,7 +91,7 @@ export function ChildrenInfoSection({ data, onSave, onNext, onPrevious }: Childr
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 text-sm font-bold">
+          <span className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary text-sm font-bold">
             3
           </span>
           Children Information
@@ -101,9 +102,9 @@ export function ChildrenInfoSection({ data, onSave, onNext, onPrevious }: Childr
       </CardHeader>
       <CardContent className="space-y-6">
         {children.map((child, index) => (
-          <div key={index} className="border rounded-lg p-6 space-y-4">
+          <div key={index} className="border border-border rounded-lg p-6 space-y-4">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">
+              <h3 className="text-lg font-semibold text-foreground">
                 Child {index + 1}
               </h3>
               {children.length > 1 && (
@@ -111,7 +112,7 @@ export function ChildrenInfoSection({ data, onSave, onNext, onPrevious }: Childr
                   variant="outline"
                   size="sm"
                   onClick={() => removeChild(index)}
-                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
                 >
                   Remove
                 </Button>
@@ -214,38 +215,28 @@ export function ChildrenInfoSection({ data, onSave, onNext, onPrevious }: Childr
           onClick={addChild}
           className="w-full border-dashed"
         >
-          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
+          <Plus className="w-4 h-4 mr-2" />
           Add Another Child
         </Button>
 
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <h4 className="text-sm font-medium text-blue-900 mb-2">Why We Need This</h4>
-          <p className="text-sm text-blue-800">
+        <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
+          <h4 className="text-sm font-medium text-foreground mb-2">Why We Need This</h4>
+          <p className="text-sm text-muted-foreground">
             Child information helps ensure the agreement is specific and clear. Medical and educational details are especially important for emergencies and decision-making.
           </p>
         </div>
 
-        <div className="flex justify-between items-center pt-4 border-t">
-          <Button
-            variant="outline"
-            onClick={onPrevious}
-          >
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
+        <div className="flex justify-between items-center pt-4 border-t border-border">
+          <Button variant="outline" onClick={onPrevious}>
+            <ChevronLeft className="w-4 h-4 mr-2" />
             Previous
           </Button>
           <Button
             onClick={handleSaveAndNext}
             disabled={!isValid || isSaving}
-            className="bg-blue-600 hover:bg-blue-700"
           >
             {isSaving ? 'Saving...' : 'Save & Continue'}
-            <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+            <ChevronRight className="w-4 h-4 ml-2" />
           </Button>
         </div>
       </CardContent>

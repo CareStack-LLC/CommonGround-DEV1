@@ -697,15 +697,29 @@ class CustodyExchangeService:
             from app.services.custody_time import CustodyTimeService
             await CustodyTimeService.update_custody_from_exchange(db, instance)
 
-            # CRITICAL FIX: Update custody override on children to the receiving parent
-            # This ensures the custody days counter updates correctly after exchanges
+            # Update custody override on the specific children in this exchange
+            # Only update children involved in the exchange, not all family children
             from app.models.child import Child
-            children_result = await db.execute(
-                select(Child).where(
-                    Child.family_file_id == exchange.family_file_id,
-                    Child.is_active == True
-                )
+            exchange_child_ids = exchange.child_ids if isinstance(exchange.child_ids, list) else (
+                [exchange.child_ids] if exchange.child_ids else []
             )
+
+            if exchange_child_ids:
+                # Filter to only children involved in this exchange
+                children_result = await db.execute(
+                    select(Child).where(
+                        Child.id.in_(exchange_child_ids),
+                        Child.is_active == True
+                    )
+                )
+            else:
+                # Fallback for legacy exchanges without child_ids
+                children_result = await db.execute(
+                    select(Child).where(
+                        Child.family_file_id == exchange.family_file_id,
+                        Child.is_active == True
+                    )
+                )
             children = children_result.scalars().all()
 
             for child in children:

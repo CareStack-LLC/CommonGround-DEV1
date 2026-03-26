@@ -60,15 +60,15 @@ function LoginContent() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F4F8F7]">
-      {/* Organic decorative background */}
+      {/* On-brand botanical background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div
-          className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full blur-3xl opacity-[0.04]"
-          style={{ background: 'radial-gradient(circle, var(--portal-primary) 0%, transparent 70%)' }}
+          className="absolute inset-0 bg-cover bg-center opacity-[0.08] sm:opacity-[0.12]"
+          style={{ backgroundImage: "url('/images/auth-bg.png')" }}
         />
         <div
-          className="absolute bottom-0 left-0 w-[500px] h-[500px] rounded-full blur-3xl opacity-[0.03]"
-          style={{ background: 'radial-gradient(circle, #F5A623 0%, transparent 70%)' }}
+          className="absolute inset-0"
+          style={{ background: 'radial-gradient(ellipse at center, rgba(244,248,247,0.95) 0%, rgba(244,248,247,0.6) 50%, rgba(244,248,247,0.3) 100%)' }}
         />
       </div>
 

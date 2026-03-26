@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface ParentInfoSectionProps {
   data: any;
@@ -32,12 +33,7 @@ export function ParentInfoSection({ data, onSave, onNext, onPrevious }: ParentIn
   const [isSaving, setIsSaving] = useState(false);
 
   const handleChange = (field: string, value: string) => {
-    console.log(`🎯 ParentInfo handleChange called:`, { field, value });
-    setFormData((prev) => {
-      const updated = { ...prev, [field]: value };
-      console.log(`📊 ParentInfo new state:`, updated);
-      return updated;
-    });
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSaveAndNext = async () => {
@@ -56,7 +52,7 @@ export function ParentInfoSection({ data, onSave, onNext, onPrevious }: ParentIn
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <span className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-600 text-sm font-bold">
+          <span className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary text-sm font-bold">
             1
           </span>
           Your Information
@@ -72,11 +68,7 @@ export function ParentInfoSection({ data, onSave, onNext, onPrevious }: ParentIn
             <Input
               id="full_name"
               value={formData.full_name}
-              onChange={(e) => {
-                console.log(`⚡ Input onChange event:`, e.target.value);
-                handleChange('full_name', e.target.value);
-              }}
-              onInput={(e) => console.log(`⌨️ Input onInput event:`, (e.target as HTMLInputElement).value)}
+              onChange={(e) => handleChange('full_name', e.target.value)}
               placeholder="John Michael Smith"
               required
             />
@@ -88,7 +80,7 @@ export function ParentInfoSection({ data, onSave, onNext, onPrevious }: ParentIn
               id="role"
               value={formData.role}
               onChange={(e) => handleChange('role', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               required
             >
               <option value="">Select role</option>
@@ -187,38 +179,30 @@ export function ParentInfoSection({ data, onSave, onNext, onPrevious }: ParentIn
               onChange={(e) => handleChange('work_hours', e.target.value)}
               placeholder="Monday-Friday, 9am-5pm"
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               Helps determine availability for parenting time
             </p>
           </div>
         </div>
 
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <h4 className="text-sm font-medium text-blue-900 mb-2">Privacy Note</h4>
-          <p className="text-sm text-blue-800">
+        <div className="bg-muted border border-border rounded-lg p-4">
+          <h4 className="text-sm font-medium text-foreground mb-2">Privacy Note</h4>
+          <p className="text-sm text-muted-foreground">
             This information will be included in your custody agreement and may be shared with the court if needed. All information is stored securely and only accessible to you and the other parent.
           </p>
         </div>
 
-        <div className="flex justify-between items-center pt-4 border-t">
-          <Button
-            variant="outline"
-            onClick={onPrevious}
-          >
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
+        <div className="flex justify-between items-center pt-4 border-t border-border">
+          <Button variant="outline" onClick={onPrevious}>
+            <ChevronLeft className="w-4 h-4 mr-2" />
             Previous
           </Button>
           <Button
             onClick={handleSaveAndNext}
             disabled={!formData.full_name || !formData.role || !formData.email || isSaving}
-            className="bg-blue-600 hover:bg-blue-700"
           >
             {isSaving ? 'Saving...' : 'Save & Continue'}
-            <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+            <ChevronRight className="w-4 h-4 ml-2" />
           </Button>
         </div>
       </CardContent>

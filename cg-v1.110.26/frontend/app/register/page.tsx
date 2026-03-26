@@ -244,10 +244,16 @@ function RegisterContent() {
 
   return (
     <div className="min-h-screen flex flex-col bg-cg-sand">
-      {/* Decorative Background Elements */}
+      {/* On-brand botanical background */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-gradient-to-br from-cg-sage-subtle/50 to-transparent rounded-full blur-3xl transform -translate-x-1/2 -translate-y-1/2" />
-        <div className="absolute bottom-0 right-0 w-80 h-80 bg-gradient-to-tl from-cg-slate-subtle/30 to-transparent rounded-full blur-3xl transform translate-x-1/2 translate-y-1/2" />
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-[0.08] sm:opacity-[0.12]"
+          style={{ backgroundImage: "url('/images/auth-bg.png')" }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{ background: 'radial-gradient(ellipse at center, rgba(244,248,247,0.95) 0%, rgba(244,248,247,0.6) 50%, rgba(244,248,247,0.3) 100%)' }}
+        />
       </div>
 
       {/* Header */}
