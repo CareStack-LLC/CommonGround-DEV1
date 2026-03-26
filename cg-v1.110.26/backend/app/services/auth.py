@@ -133,9 +133,9 @@ class AuthService:
 
             # 2. Handle Subscription Checkout if needed
             checkout_url = None
-            if request.subscription_price_id and "price_1TE0bXBJIivbOFX7luV9H7OZ" not in request.subscription_price_id:
+            if request.subscription_price_id and "price_1T7WgnB3EXvvERPfyu40gtfE" not in request.subscription_price_id:
                 logger.info(f"Initiating checkout for price: {request.subscription_price_id}")
-                is_free = request.subscription_price_id == "price_1TE0bXBJIivbOFX7luV9H7OZ"
+                is_free = request.subscription_price_id == "price_1T7WgnB3EXvvERPfyu40gtfE"
                 
                 if not is_free:
                     from app.core.config import settings

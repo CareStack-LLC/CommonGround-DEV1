@@ -59,44 +59,44 @@ REPORT_TYPES = {
         "name": "Court Investigation Package",
         "description": "Comprehensive court-ready documentation package",
         "base_price_cents": 14900,
-        "stripe_price_id": "price_1TE0bbBJIivbOFX7FwW5R7E9",  # Court Investigation Package
-        "stripe_product_id": "prod_UCPQOlUDOkaF3u",
+        "stripe_price_id": "price_1T7WgqB3EXvvERPfdLfdqwwC",  # Court Investigation Package
+        "stripe_product_id": "prod_U5i6ZMoAoSQBEH",
     },
     "communication_analysis": {
         "name": "Communication Analysis Report",
         "description": "In-depth analysis of communication patterns and ARIA interventions",
         "base_price_cents": 7900,
-        "stripe_price_id": "price_1TE0bcBJIivbOFX7d92QMhVJ",  # Communication Analysis Report
-        "stripe_product_id": "prod_UCPQI4zziqm3mM",
+        "stripe_price_id": "price_1T7WgrB3EXvvERPfgGIUwJwa",  # Communication Analysis Report
+        "stripe_product_id": "prod_U5i6T4xMbbYmrh",
     },
     "financial_compliance_report": {
         "name": "Financial Compliance Report",
         "description": "Detailed expense tracking and financial compliance analysis",
         "base_price_cents": 7900,
-        "stripe_price_id": "price_1TE0bdBJIivbOFX7NIrWMiSg",  # Financial Compliance Report
-        "stripe_product_id": "prod_UCPQwdLQurLuJL",
+        "stripe_price_id": "price_1T7WgrB3EXvvERPfR1NuSnre",  # Financial Compliance Report
+        "stripe_product_id": "prod_U5i6uitcZE1ykf",
     },
     "custody_compliance_report": {
         "name": "Custody Compliance Report",
         "description": "Exchange-by-exchange analysis with GPS verification data",
         "base_price_cents": 9900,
-        "stripe_price_id": "price_1TE0bcBJIivbOFX7gMG8gSwq",  # Custody Compliance Report
-        "stripe_product_id": "prod_UCPQNVYgbcZ3Am",
+        "stripe_price_id": "price_1T7WgqB3EXvvERPfyT0LGidv",  # Custody Compliance Report
+        "stripe_product_id": "prod_U5i6FizFNRc51F",
     },
     "kidspace_court_communication": {
         "name": "KidSpace Court Communication Report",
         "description": "Court-ready KidSpace communication analysis with full session logs and ARIA flags",
         "base_price_cents": 7900,
         "stripe_price_id": "price_1TBOCNB3EXvvERPfgsjL8kHo",  # KidSpace Court Communication Report
-        "stripe_product_id": "",  # Will be resolved from price ID by Stripe
+        "stripe_product_id": "prod_U9hbZEZJE9Cf8z",
     },
 }
 
 # Urgency add-on Stripe price IDs
 URGENCY_STRIPE_PRICES = {
     "standard": None,
-    "rush": "price_1TE0bdBJIivbOFX758bn5Kto",    # Rush Report Delivery ($50)
-    "urgent": "price_1TE0beBJIivbOFX7o1Cxoczu",  # Urgent Report Delivery ($100)
+    "rush": "price_1T7WgsB3EXvvERPfzQwnJ8yq",    # Rush Report Delivery ($50)
+    "urgent": "price_1T7WgsB3EXvvERPfSV4M1DmI",   # Urgent Report Delivery ($100)
 }
 
 

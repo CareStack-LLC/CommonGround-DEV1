@@ -386,26 +386,26 @@ async def handle_payout_failed(db: AsyncSession, event_data: dict) -> None:
 # Canonical mapping of Stripe Price IDs → tier codes (from Stripe test export)
 STRIPE_PRICE_TO_TIER: dict[str, str] = {
     # Consumer tiers
-    "price_1TE0bXBJIivbOFX7luV9H7OZ": "web_starter",      # $0/mo
-    "price_1TE0bXBJIivbOFX70Ysv656Q": "plus",              # $17.99/mo
-    "price_1TE0bYBJIivbOFX7atup1qAE": "plus",              # $199.99/yr
-    "price_1TE0bYBJIivbOFX7VqmtQH23": "complete",          # $34.99/mo
-    "price_1TE0bZBJIivbOFX77f2QUPc6": "complete",          # $349.99/yr
+    "price_1T7WgnB3EXvvERPfyu40gtfE": "web_starter",           # $0/mo
+    "price_1T7WgnB3EXvvERPfcpZeMSSH": "plus",                  # $17.99/mo
+    "price_1T7WgnB3EXvvERPfe7NNFlru": "plus",                  # $199.99/yr
+    "price_1T7WgoB3EXvvERPfDm7qKpBN": "complete",              # $34.99/mo
+    "price_1T7WgoB3EXvvERPfmDy9KtDh": "complete",              # $349.99/yr
     # Professional tiers
-    "price_1TE0bZBJIivbOFX7kmvDAoqr": "professional_starter",  # $49/mo
-    "price_1TE0baBJIivbOFX7dqc7W1Dp": "solo",              # $99/mo
-    "price_1TE0baBJIivbOFX7smGjiSyj": "small_firm",        # $299/mo
-    "price_1TE0bbBJIivbOFX78k6VF4wC": "mid_size",          # $799/mo
+    "price_1T7WgoB3EXvvERPfTe6d3Ccx": "professional_starter",  # $49.99/mo
+    "price_1T7WgpB3EXvvERPfjThfJqeO": "solo",                  # $99/mo
+    "price_1T7WgpB3EXvvERPf4wDi0fjN": "small_firm",            # $299/mo
+    "price_1T7WgqB3EXvvERPftbsE7Y2f": "mid_size",              # $799/mo
 }
 
 STRIPE_PRODUCT_TO_TIER: dict[str, str] = {
-    "prod_UCPQdxPYuteQUA": "web_starter",
-    "prod_UCPQBUvNRmZ4Cs": "plus",
-    "prod_UCPQxC2eRt7g6K": "complete",
-    "prod_UCPQevbVaWJDfT": "professional_starter",
-    "prod_UCPQVLqjYyuiRF": "solo",
-    "prod_UCPQOK9Qpuw1hB": "small_firm",
-    "prod_UCPQQwcr2VaCXs": "mid_size",
+    "prod_U5i6vWb4ktGrTN": "web_starter",
+    "prod_U5i6Efw49ipfb3": "plus",
+    "prod_U5i6lsgC2mOHxn": "complete",
+    "prod_U5i6Vfe7E6vHtZ": "professional_starter",
+    "prod_U5i6WdwYSiC9wc": "solo",
+    "prod_U5i6tXPi3LbW5h": "small_firm",
+    "prod_U5i6Pvkzonm0fe": "mid_size",
 }
 
 
