@@ -651,7 +651,7 @@ class FamilyFileService:
 
             result = await self.email_service.send_case_invitation(
                 to_email=family_file.parent_b_email,
-                to_name=family_file.parent_b_name or "Co-Parent",
+                to_name="Co-Parent",
                 inviter_name=inviter_name,
                 case_name=family_file.title,
                 invitation_link=invite_link,
