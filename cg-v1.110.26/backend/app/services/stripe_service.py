@@ -91,7 +91,7 @@ class StripeService:
             },
         )
 
-        return account.id, account.get("status", "pending")
+        return account.id, getattr(account, "status", "pending")
 
     async def create_account_link(
         self,
@@ -151,18 +151,18 @@ class StripeService:
         bank_name = None
         if account.external_accounts and account.external_accounts.data:
             bank = account.external_accounts.data[0]
-            bank_last_four = bank.get("last4")
-            bank_name = bank.get("bank_name")
+            bank_last_four = getattr(bank, "last4", None)
+            bank_name = getattr(bank, "bank_name", None)
 
         return {
             "id": account.id,
-            "status": account.get("status", "pending"),
+            "status": getattr(account, "status", "pending"),
             "charges_enabled": account.charges_enabled,
             "payouts_enabled": account.payouts_enabled,
             "requirements": {
-                "currently_due": account.requirements.get("currently_due", []) if account.requirements else [],
-                "eventually_due": account.requirements.get("eventually_due", []) if account.requirements else [],
-                "past_due": account.requirements.get("past_due", []) if account.requirements else [],
+                "currently_due": getattr(account.requirements, "currently_due", []) if account.requirements else [],
+                "eventually_due": getattr(account.requirements, "eventually_due", []) if account.requirements else [],
+                "past_due": getattr(account.requirements, "past_due", []) if account.requirements else [],
             },
             "bank_last_four": bank_last_four,
             "bank_name": bank_name,
