@@ -330,36 +330,39 @@ async def create_checkout_session(
             detail="Invalid plan code. Must be 'web_starter', 'plus', or 'complete'"
         )
 
-    # Get plan for price ID
+    # Get plan for price ID — fall back to HARDCODED_PLANS if DB is empty
     result = await db.execute(
         select(SubscriptionPlan)
         .where(SubscriptionPlan.plan_code == request.plan_code)
     )
     plan = result.scalar_one_or_none()
 
-    if not plan:
+    fallback_plan = next((p for p in HARDCODED_PLANS if p.plan_code == request.plan_code), None)
+
+    if plan:
+        price_id = (
+            plan.stripe_price_id_annual if request.period == "annual"
+            else plan.stripe_price_id_monthly
+        )
+        # If DB has outdated price ID, use hardcoded fallback
+        if price_id == OLD_PRICE_ID or not price_id:
+            logger.warning(f"Outdated or missing price ID in DB for {request.plan_code}. Using fallback.")
+            if fallback_plan:
+                price_id = (
+                    fallback_plan.stripe_price_id_annual if request.period == "annual"
+                    else fallback_plan.stripe_price_id_monthly
+                )
+    elif fallback_plan:
+        logger.warning(f"Plan '{request.plan_code}' not in DB. Using hardcoded fallback.")
+        price_id = (
+            fallback_plan.stripe_price_id_annual if request.period == "annual"
+            else fallback_plan.stripe_price_id_monthly
+        )
+    else:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Plan '{request.plan_code}' not found"
         )
-
-    # Get appropriate price ID
-    price_id = (
-        plan.stripe_price_id_annual if request.period == "annual"
-        else plan.stripe_price_id_monthly
-    )
-
-    # CRITICAL: If the database contains the outdated price ID, force a fallback
-    # to the hardcoded March 2026 IDs to resolve the "No such price" error immediately.
-    if price_id == OLD_PRICE_ID or not price_id:
-        logger.warning(f"Outdated or missing price ID found in DB for {request.plan_code}. Forcing fallback.")
-        fallback_plan = next((p for p in HARDCODED_PLANS if p.plan_code == request.plan_code), None)
-        if fallback_plan:
-            price_id = (
-                fallback_plan.stripe_price_id_annual if request.period == "annual"
-                else fallback_plan.stripe_price_id_monthly
-            )
-            logger.info(f"Using fallback price ID: {price_id}")
 
     if not price_id:
         raise HTTPException(
@@ -588,34 +591,38 @@ async def upgrade_subscription(
             detail="No active subscription found. Use checkout to subscribe first."
         )
 
-    # Get the new plan's price ID
+    # Get the new plan's price ID — fall back to HARDCODED_PLANS if DB is empty
     result = await db.execute(
         select(SubscriptionPlan)
         .where(SubscriptionPlan.plan_code == request.plan_code)
     )
     plan = result.scalar_one_or_none()
 
-    if not plan:
+    fallback_plan = next((p for p in HARDCODED_PLANS if p.plan_code == request.plan_code), None)
+
+    if plan:
+        price_id = (
+            plan.stripe_price_id_annual if request.period == "annual"
+            else plan.stripe_price_id_monthly
+        )
+        if price_id == OLD_PRICE_ID or not price_id:
+            logger.warning(f"Outdated or missing price ID in DB for {request.plan_code}. Using fallback.")
+            if fallback_plan:
+                price_id = (
+                    fallback_plan.stripe_price_id_annual if request.period == "annual"
+                    else fallback_plan.stripe_price_id_monthly
+                )
+    elif fallback_plan:
+        logger.warning(f"Plan '{request.plan_code}' not in DB for upgrade. Using hardcoded fallback.")
+        price_id = (
+            fallback_plan.stripe_price_id_annual if request.period == "annual"
+            else fallback_plan.stripe_price_id_monthly
+        )
+    else:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Plan '{request.plan_code}' not found"
         )
-
-    price_id = (
-        plan.stripe_price_id_annual if request.period == "annual"
-        else plan.stripe_price_id_monthly
-    )
-
-    # CRITICAL: Same fallback logic for upgrade as for initial subscription
-    if price_id == OLD_PRICE_ID or not price_id:
-        logger.warning(f"Outdated or missing price ID found in DB for {request.plan_code}. Forcing fallback.")
-        fallback_plan = next((p for p in HARDCODED_PLANS if p.plan_code == request.plan_code), None)
-        if fallback_plan:
-            price_id = (
-                fallback_plan.stripe_price_id_annual if request.period == "annual"
-                else fallback_plan.stripe_price_id_monthly
-            )
-            logger.info(f"Using fallback price ID: {price_id}")
 
     if not price_id:
         raise HTTPException(
