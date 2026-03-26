@@ -112,38 +112,35 @@ export async function POST(request: NextRequest) {
       })
     );
 
-    // Try Anthropic first
-    const anthropicKey = process.env.ANTHROPIC_API_KEY;
-    if (anthropicKey) {
+    // Try OpenAI first (primary)
+    const openaiKey = process.env.OPENAI_API_KEY;
+    if (openaiKey) {
       try {
-        const anthropic = new Anthropic({ apiKey: anthropicKey });
+        const openai = new OpenAI({ apiKey: openaiKey });
 
-        const stream = anthropic.messages.stream({
-          model: 'claude-sonnet-4-20250514',
+        const openaiMessages: OpenAI.ChatCompletionMessageParam[] = [
+          { role: 'system' as const, content: SYSTEM_PROMPT },
+          ...sanitizedMessages.map((m: { role: string; content: string }) => ({
+            role: m.role as 'user' | 'assistant',
+            content: m.content,
+          })),
+        ];
+
+        const openaiStream = await openai.chat.completions.create({
+          model: 'gpt-4o-mini',
           max_tokens: 600,
-          system: SYSTEM_PROMPT,
-          messages: sanitizedMessages.map(
-            (m: { role: string; content: string }) => ({
-              role: m.role as 'user' | 'assistant',
-              content: m.content,
-            })
-          ),
+          stream: true,
+          messages: openaiMessages,
         });
 
-        // Stream the response
         const encoder = new TextEncoder();
         const readable = new ReadableStream({
           async start(controller) {
             try {
-              for await (const event of stream) {
-                if (
-                  event.type === 'content_block_delta' &&
-                  'delta' in event &&
-                  event.delta.type === 'text_delta'
-                ) {
-                  controller.enqueue(
-                    encoder.encode(event.delta.text)
-                  );
+              for await (const chunk of openaiStream) {
+                const text = chunk.choices[0]?.delta?.content;
+                if (text) {
+                  controller.enqueue(encoder.encode(text));
                 }
               }
               controller.close();
@@ -160,62 +157,72 @@ export async function POST(request: NextRequest) {
             'Transfer-Encoding': 'chunked',
           },
         });
-      } catch (anthropicError) {
-        console.error('Anthropic API error, falling back to OpenAI:', anthropicError);
-        // Fall through to OpenAI
+      } catch (openaiError) {
+        console.error('OpenAI API error, falling back to Anthropic:', openaiError);
+        // Fall through to Anthropic
       }
     }
 
-    // Fallback: OpenAI
-    const openaiKey = process.env.OPENAI_API_KEY;
-    if (!openaiKey) {
+    // Fallback: Anthropic Claude
+    const anthropicKey = process.env.ANTHROPIC_API_KEY;
+    if (!anthropicKey) {
       return NextResponse.json(
         { error: 'AI service is temporarily unavailable. Please try again later or contact support@find-commonground.com.' },
         { status: 503 }
       );
     }
 
-    const openai = new OpenAI({ apiKey: openaiKey });
+    try {
+      const anthropic = new Anthropic({ apiKey: anthropicKey });
 
-    const openaiMessages: OpenAI.ChatCompletionMessageParam[] = [
-      { role: 'system' as const, content: SYSTEM_PROMPT },
-      ...sanitizedMessages.map((m: { role: string; content: string }) => ({
-        role: m.role as 'user' | 'assistant',
-        content: m.content,
-      })),
-    ];
+      const stream = anthropic.messages.stream({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 600,
+        system: SYSTEM_PROMPT,
+        messages: sanitizedMessages.map(
+          (m: { role: string; content: string }) => ({
+            role: m.role as 'user' | 'assistant',
+            content: m.content,
+          })
+        ),
+      });
 
-    const openaiStream = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      max_tokens: 600,
-      stream: true,
-      messages: openaiMessages,
-    });
-
-    const encoder = new TextEncoder();
-    const readable = new ReadableStream({
-      async start(controller) {
-        try {
-          for await (const chunk of openaiStream) {
-            const text = chunk.choices[0]?.delta?.content;
-            if (text) {
-              controller.enqueue(encoder.encode(text));
+      const encoder = new TextEncoder();
+      const readable = new ReadableStream({
+        async start(controller) {
+          try {
+            for await (const event of stream) {
+              if (
+                event.type === 'content_block_delta' &&
+                'delta' in event &&
+                event.delta.type === 'text_delta'
+              ) {
+                controller.enqueue(
+                  encoder.encode(event.delta.text)
+                );
+              }
             }
+            controller.close();
+          } catch (err) {
+            controller.error(err);
           }
-          controller.close();
-        } catch (err) {
-          controller.error(err);
-        }
-      },
-    });
+        },
+      });
 
-    return new Response(readable, {
-      headers: {
-        'Content-Type': 'text/plain; charset=utf-8',
-        'Cache-Control': 'no-cache',
-        'Transfer-Encoding': 'chunked',
-      },
-    });
+      return new Response(readable, {
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'Cache-Control': 'no-cache',
+          'Transfer-Encoding': 'chunked',
+        },
+      });
+    } catch (anthropicError) {
+      console.error('Anthropic API error:', anthropicError);
+      return NextResponse.json(
+        { error: 'AI service is temporarily unavailable. Please try again later or contact support@find-commonground.com.' },
+        { status: 503 }
+      );
+    }
   } catch (error) {
     console.error('Help chat error:', error);
     return NextResponse.json(
