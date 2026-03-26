@@ -140,6 +140,7 @@ async def get_user_profile(
         subscription_status=profile.subscription_status,
         created_at=profile.created_at,
         is_professional=is_professional,
+        is_admin=user.is_admin,
     )
 
 
@@ -212,6 +213,7 @@ async def update_user_profile(
         subscription_status=profile.subscription_status,
         created_at=profile.created_at,
         is_professional=is_professional,
+        is_admin=user.is_admin,
     )
 
 

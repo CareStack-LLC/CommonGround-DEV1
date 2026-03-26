@@ -358,6 +358,7 @@ export interface UserProfile {
   subscription_status: string;
   created_at: string;
   is_professional?: boolean;
+  is_admin?: boolean;
 }
 
 export interface UserProfileUpdate {

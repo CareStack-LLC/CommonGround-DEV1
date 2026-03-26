@@ -26,6 +26,7 @@ class UserProfileResponse(BaseModel):
     subscription_status: str
     created_at: datetime
     is_professional: bool = False
+    is_admin: bool = False
 
     class Config:
         from_attributes = True

@@ -15,7 +15,12 @@ export default function AuthRedirectGuard() {
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      router.replace(profile?.is_professional ? '/professional/dashboard' : '/dashboard');
+      const dest = profile?.is_admin
+        ? '/superadmin'
+        : profile?.is_professional
+          ? '/professional/dashboard'
+          : '/dashboard';
+      router.replace(dest);
     }
   }, [isAuthenticated, isLoading, profile, router]);
 

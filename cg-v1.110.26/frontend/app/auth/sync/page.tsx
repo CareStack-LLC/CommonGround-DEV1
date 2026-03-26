@@ -71,12 +71,14 @@ function AuthSyncContent() {
                     localStorage.setItem('user', JSON.stringify(response.user));
                 }
 
-                // Determine redirect: professionals go to professional dashboard
+                // Determine redirect: admin → superadmin, professional → pro dashboard
                 let destination = next;
                 if (next === '/dashboard') {
                     try {
                         const profileData = await usersAPI.getProfile();
-                        if (profileData?.is_professional) {
+                        if (profileData?.is_admin) {
+                            destination = '/superadmin';
+                        } else if (profileData?.is_professional) {
                             destination = '/professional/dashboard';
                         }
                     } catch {

@@ -72,13 +72,13 @@ function LoginContent() {
         />
       </div>
 
-      {/* Header */}
-      <header className="relative z-10 p-6 flex justify-center sm:justify-start">
+      {/* Header — centered logo */}
+      <header className="relative z-10 pt-10 pb-2 flex justify-center">
         <Link
           href="/"
-          className="inline-flex items-center gap-3 text-[#1E3A4A] hover:text-[var(--portal-primary)] transition-colors group"
+          className="inline-flex flex-col items-center gap-3 text-[#1E3A4A] hover:text-[var(--portal-primary)] transition-colors group"
         >
-          <svg className="w-[52px] h-[52px] sm:w-[40px] sm:h-[40px]" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg className="w-[72px] h-[72px] sm:w-[80px] sm:h-[80px]" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <linearGradient id="login-bg" x1="0" y1="0" x2="1" y2="1">
                 <stop offset="0%" stopColor="#E8F4F8" />
@@ -103,7 +103,7 @@ function LoginContent() {
             <path d="M218 382 Q256 414 294 382" stroke="#F5A623" strokeWidth="12" strokeLinecap="round" fill="none" />
           </svg>
           <span
-            className="text-xl tracking-tight"
+            className="text-2xl sm:text-3xl tracking-tight"
             style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
           >
             <span className="font-bold text-[#1E3A4A]">Common</span><span className="font-normal text-[#3DAA8A]">Ground</span>
