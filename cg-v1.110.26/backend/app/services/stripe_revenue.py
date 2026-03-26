@@ -317,9 +317,17 @@ def _invoice_line_description(inv: object) -> Optional[str]:
 def fetch_stripe_customers_count() -> int:
     """
     Paginate through all Stripe customers and return the total count.
+
+    Excludes internal/admin emails and orphaned test accounts so the
+    superadmin dashboard reflects real paying customers only.
     """
     if not _ensure_stripe_key():
         return 0
+
+    _EXCLUDED_EMAILS: set[str] = {
+        "thomas.wilform@gmail.com",
+        "testaccount@example.com",
+    }
 
     try:
         count = 0
@@ -332,7 +340,9 @@ def fetch_stripe_customers_count() -> int:
                 params["starting_after"] = starting_after
 
             customers = stripe.Customer.list(**params)
-            count += len(customers.data)
+            for cust in customers.data:
+                if getattr(cust, "email", None) not in _EXCLUDED_EMAILS:
+                    count += 1
             has_more = customers.has_more
             if has_more and customers.data:
                 starting_after = customers.data[-1].id
