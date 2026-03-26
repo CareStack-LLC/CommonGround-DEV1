@@ -411,7 +411,7 @@ export function Navigation() {
 
       {/* Mobile Bottom Navigation - App Items */}
       {user && (
-        <nav className="bottom-nav flex lg:hidden">
+        <nav className="bottom-nav flex">
           {appNavItems.map((item) => {
             // Special handling for Clearfund to also highlight on /wallet
             const isActive =
