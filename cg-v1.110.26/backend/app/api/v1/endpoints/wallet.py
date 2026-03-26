@@ -61,15 +61,19 @@ router = APIRouter()
 @router.get("/connect-test")
 async def test_stripe_connect():
     """
-    Diagnostic endpoint to test Stripe Connect account creation and onboarding link.
+    Diagnostic endpoint to test Stripe Connect and email configuration.
     Creates a test account, generates onboarding URL, then deletes the test account.
     """
     from app.core.config import settings as app_settings
+    from app.services.email import email_service
 
     results = {
         "stripe_key_set": bool(app_settings.STRIPE_SECRET_KEY),
         "stripe_key_suffix": app_settings.STRIPE_SECRET_KEY[-6:] if app_settings.STRIPE_SECRET_KEY else None,
         "frontend_url": app_settings.FRONTEND_URL,
+        "email_enabled": email_service.enabled,
+        "sendgrid_key_set": bool(email_service.api_key),
+        "from_email": email_service.from_email,
     }
 
     try:
