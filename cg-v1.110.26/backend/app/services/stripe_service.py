@@ -14,6 +14,7 @@ All Stripe interactions should go through this service for:
 - Audit logging
 """
 
+import asyncio
 import stripe
 from decimal import Decimal
 from datetime import datetime, timedelta
@@ -67,7 +68,8 @@ class StripeService:
         Raises:
             stripe.error.StripeError: If account creation fails
         """
-        account = stripe.Account.create(
+        account = await asyncio.to_thread(
+            stripe.Account.create,
             type="express",
             email=email,
             metadata={
@@ -83,7 +85,7 @@ class StripeService:
             settings={
                 "payouts": {
                     "schedule": {
-                        "interval": "daily",  # Automatic daily payouts
+                        "interval": "daily",
                     },
                 },
             },
@@ -117,7 +119,8 @@ class StripeService:
         if not return_url:
             return_url = f"{base_url}/wallet?wallet_id={wallet_id}&onboarding=complete"
 
-        account_link = stripe.AccountLink.create(
+        account_link = await asyncio.to_thread(
+            stripe.AccountLink.create,
             account=account_id,
             refresh_url=refresh_url,
             return_url=return_url,
@@ -141,7 +144,7 @@ class StripeService:
         - requirements: Pending requirements
         - external_accounts: Linked bank accounts
         """
-        account = stripe.Account.retrieve(account_id)
+        account = await asyncio.to_thread(stripe.Account.retrieve, account_id)
 
         # Get bank account info if available
         bank_last_four = None

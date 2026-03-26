@@ -742,9 +742,9 @@ async def start_onboarding(
             onboarding_url=url,
             expires_in_minutes=5,
         )
-    except stripe.error.StripeError as e:
+    except (stripe.StripeError, stripe.error.StripeError) as e:
         await db.rollback()
-        logger.exception(f"Stripe error during onboarding: {e}")
+        logger.exception(f"Stripe error during onboarding: {type(e).__name__}: {e}")
         capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
@@ -752,7 +752,7 @@ async def start_onboarding(
         )
     except Exception as e:
         await db.rollback()
-        logger.exception(f"Failed to start onboarding: {e}")
+        logger.exception(f"Failed to start onboarding: {type(e).__name__}: {e}")
         capture_error(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

@@ -192,7 +192,7 @@ export function HelpChat() {
       {/* Chat container — conversation on top, input on bottom */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-md overflow-hidden">
         {/* Header bar */}
-        <div className="flex items-center gap-3 px-5 py-3 border-b border-gray-100 bg-[#F4F8F7]">
+        <div className="flex items-center gap-3 px-5 py-3 border-b border-gray-100 bg-[#1E3A4A] rounded-t-2xl">
           <Image
             src="/images/Aria.png"
             alt="ARIA"
@@ -200,13 +200,13 @@ export function HelpChat() {
             height={32}
             className="rounded-full object-cover"
           />
-          <span className="text-sm font-semibold text-[#1E3A4A]">
+          <span className="text-sm font-semibold text-white">
             Ask ARIA
           </span>
           {hasStarted && (
             <button
               onClick={handleReset}
-              className="ml-auto flex items-center gap-1 text-xs text-gray-400 hover:text-[#3DAA8A] transition-colors"
+              className="ml-auto flex items-center gap-1 text-xs text-white/60 hover:text-white transition-colors"
               title="Start new conversation"
             >
               <RotateCcw className="w-3 h-3" />
@@ -307,7 +307,7 @@ export function HelpChat() {
               onKeyDown={handleKeyDown}
               placeholder="Ask ARIA a question..."
               disabled={isLoading}
-              rows={2}
+              rows={1}
               className="flex-1 px-4 py-3 bg-[#F4F8F7] rounded-xl border border-gray-200 text-[15px] text-[#1E3A4A] placeholder:text-gray-400 focus:outline-none focus:border-[#3DAA8A] focus:ring-2 focus:ring-[#3DAA8A]/20 transition-all disabled:opacity-50 resize-none"
               maxLength={2000}
             />
