@@ -4,12 +4,15 @@ Custom in-memory rate limiting middleware.
 Replaces slowapi which crashes on Render. Uses a simple dict-based
 approach with automatic cleanup to prevent memory leaks.
 
-Limits:
-- Auth endpoints (login, register, password reset): 10 requests/minute per IP
-- Payment/wallet endpoints: 10 requests/minute per IP
-- Export/report endpoints: 5 requests/minute per IP
-- File upload endpoints: 10 requests/minute per IP
-- General API: 100 requests/minute per IP
+Limits (relaxed for bug hunt testing, revert after ~2026-04-23):
+- Auth endpoints (login, register, password reset): 30 requests/minute per IP
+- Payment/wallet endpoints: 30 requests/minute per IP
+- Export/report endpoints: 15 requests/minute per IP
+- File upload endpoints: 30 requests/minute per IP
+- General API: 300 requests/minute per IP
+
+Original limits (restore after bug hunt):
+- Auth: 10/min, Payment: 10/min, Export: 5/min, Upload: 10/min, General: 100/min
 """
 
 import logging
@@ -39,11 +42,13 @@ EXPORT_PATHS = {"/export", "/report", "/download-report"}
 UPLOAD_PATHS = {"/upload", "/attachment"}
 
 # Rate limit settings: (max_requests, window_seconds)
-AUTH_RATE_LIMIT: Tuple[int, int] = (10, 60)          # 10 requests per 60 seconds
-PAYMENT_RATE_LIMIT: Tuple[int, int] = (10, 60)       # 10 requests per 60 seconds
-EXPORT_RATE_LIMIT: Tuple[int, int] = (5, 60)         # 5 requests per 60 seconds
-UPLOAD_RATE_LIMIT: Tuple[int, int] = (10, 60)        # 10 requests per 60 seconds
-GENERAL_RATE_LIMIT: Tuple[int, int] = (100, 60)      # 100 requests per 60 seconds
+# TODO: Revert to original limits after bug hunt ends (~2026-04-23)
+# Original values: Auth=10, Payment=10, Export=5, Upload=10, General=100
+AUTH_RATE_LIMIT: Tuple[int, int] = (30, 60)          # 30 requests per 60 seconds
+PAYMENT_RATE_LIMIT: Tuple[int, int] = (30, 60)       # 30 requests per 60 seconds
+EXPORT_RATE_LIMIT: Tuple[int, int] = (15, 60)        # 15 requests per 60 seconds
+UPLOAD_RATE_LIMIT: Tuple[int, int] = (30, 60)        # 30 requests per 60 seconds
+GENERAL_RATE_LIMIT: Tuple[int, int] = (300, 60)      # 300 requests per 60 seconds
 
 # Cleanup interval in seconds (remove stale entries every 5 minutes)
 CLEANUP_INTERVAL = 300
@@ -190,11 +195,11 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
     """
     Middleware that enforces per-IP rate limits.
 
-    - 10 req/min for auth endpoints (login, register, password reset)
-    - 10 req/min for payment/wallet endpoints
-    - 5 req/min for export/report endpoints
-    - 10 req/min for file upload endpoints
-    - 100 req/min for all other endpoints
+    - 30 req/min for auth endpoints (login, register, password reset)
+    - 30 req/min for payment/wallet endpoints
+    - 15 req/min for export/report endpoints
+    - 30 req/min for file upload endpoints
+    - 300 req/min for all other endpoints
     - Returns 429 with Retry-After header when exceeded
     """
 
