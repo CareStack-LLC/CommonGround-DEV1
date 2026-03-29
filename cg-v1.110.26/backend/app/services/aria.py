@@ -1131,7 +1131,7 @@ This message was flagged for: {flag_reason}
                     model="gpt-4o",
                     messages=[
                         {"role": "system", "content": "You are ARIA, a co-parenting communication assistant for CommonGround. Rewrite provided toxic messages to be calm, child-focused, and productive. Follow the BIFF method (Brief, Informative, Friendly, Firm). Output ONLY the rewritten message."},
-                        {"role": "user", "content": prompt}
+                        {"role": "user", "content": user_prompt}
                     ],
                     max_tokens=256,
                     temperature=0.7
@@ -1231,7 +1231,7 @@ An incoming message was just received:
                     model="gpt-4o",
                     messages=[
                         {"role": "system", "content": "You are ARIA, a co-parenting communication assistant for CommonGround. Provide concise, civil reply options in JSON format: {\"suggestions\": [\"reply one\", \"reply two\"]}"},
-                        {"role": "user", "content": prompt}
+                        {"role": "user", "content": user_prompt}
                     ],
                     max_tokens=200,
                     response_format={"type": "json_object"}
