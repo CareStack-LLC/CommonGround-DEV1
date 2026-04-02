@@ -498,7 +498,7 @@ export function MessageCompose({
               onBlur={onStopTyping}
               onKeyDown={handleKeyDown}
               placeholder="Type your message..."
-              className={`w-full cg-input min-h-[100px] pr-24 resize-none transition-all duration-300 ${isAnalyzing ? 'blur-sm opacity-50' : ''}`}
+              className={`w-full cg-input min-h-[100px] max-h-[200px] pr-24 resize-none overflow-y-auto transition-all duration-300 ${isAnalyzing ? 'blur-sm opacity-50' : ''}`}
               disabled={isSending || isAnalyzing}
             />
 

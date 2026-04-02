@@ -112,7 +112,7 @@ THREATENING_PATTERNS = [
 # ==============================================================================
 CUSTODY_WEAPONIZATION_PATTERNS = [
     # Gatekeeping - Access denial (allow fillers between key phrases)
-    r'\b(won\'?t|never|can\'?t|cannot|not\s+gonna|not\s+going\s+to)\b.*?\bsee\b.*?\b(kids?|child(ren)?|bab[yi]es?|son|daughter|him|her|daddy|mommy|your\s+father|your\s+mother)\b',
+    r'\b(won\'?t|never|can\'?t|cannot|not\s+gonna|not\s+going\s+to)\b.*?\bsee\b.*?\b(kids?|child(ren)?|bab[yi]es?|son|daughter|him|her|them|daddy|mommy|your\s+father|your\s+mother)\b',
     r'\btaking\b.*?\b(kids?|child(ren)?|bab[yi]es?|them)\b.*?\baway\b',
     r'\brun\s+away\s+with\b.*?\b(them|kids?|child(ren)?|bab[yi]es?)\b',
     r'\bkeeping\b.*?\b(you|them|kids?|child(ren)?)\b.*?\b(forever|away|with\s+me)\b',
@@ -442,6 +442,59 @@ CHILD_DISTRESS_PATTERNS = [
 # ==============================================================================
 # AGE-INAPPROPRIATE CONTENT (Moderate - Child Context Only)
 # ==============================================================================
+# ==============================================================================
+# HOSTILE EMOJIS & UNICODE GESTURES (Contextual)
+# ==============================================================================
+HOSTILE_EMOJI_PATTERNS = [
+    # Offensive hand gestures
+    r'\U0001F595',  # 🖕 middle finger
+    r'\U0001F926',  # 🤦 facepalm (dismissive in context)
+
+    # Hostile / mocking combos
+    r'[\U0001F921\U0001F4A9]{2,}',  # 🤡💩 repeated clown/poop (mocking)
+    r'\U0001F4A9',  # 💩 poop emoji used as insult
+    r'\U0001F921',  # 🤡 clown emoji used as insult
+
+    # Threatening gestures
+    r'\U0001F52A',  # 🔪 knife
+    r'\U0001F52B',  # 🔫 gun
+    r'\U0001F480',  # 💀 skull (death threat context)
+    r'\u2620',      # ☠ skull and crossbones
+
+    # Sexual / inappropriate
+    r'[\U0001F346\U0001F351\U0001F4A6]{2,}',  # 🍆🍑💦 combo
+]
+
+# ==============================================================================
+# IMPLICIT HOSTILITY & SARCASM (Moderate)
+# ==============================================================================
+IMPLICIT_HOSTILITY_PATTERNS = [
+    # Conditional threats with money/access
+    r'\bif\s+you\s+(don\'?t|do\s+not)\s+give\s+me\b.*?\b(money|cash|pay)\b',
+    r'\bgive\s+me\s+(the\s+)?(money|cash)\b.*?\b(or\s+else|or\s+you)\b',
+    r'\bgive\s+me\s+(the\s+)?money\b.*?\b(won\'?t|not\s+gonna|never)\b.*?\bsee\b',
+
+    # Dismissive / mocking sarcasm
+    r'\byeah\s+okay\b',
+    r'\bsure\s+jan\b',
+    r'\blol\s+okay\b',
+    r'\bgood\s+(luck|for\s+you)\b',
+    r'\bhow\s+cute\b',
+    r'\baww?\s+poor\s+(you|baby|thing)\b',
+    r'\bkeep\s+telling\s+yourself\s+that\b',
+    r'\bwhatever\s+helps\s+you\s+sleep\b',
+    r'\bif\s+you\s+say\s+so\b',
+    r'\bok\s+buddy\b',
+    r'\bok\s+pal\b',
+    r'\bnice\s+try\b',
+    r'\bidc\b',  # "I don't care"
+    r'\bidgaf\b',  # profane dismissal
+    r'\blmao\s+(ok|okay|sure|right|whatever)\b',
+
+    # "No more" access denial (catches "you won't see them no more")
+    r'\b(won\'?t|not\s+gonna|never)\b.*?\bno\s+more\b',
+]
+
 AGE_INAPPROPRIATE_PATTERNS = [
     # Drugs / substances
     r'\b(drugs?|weed|marijuana|cocaine|heroin|meth|ecstasy|molly|edibles?)\b',

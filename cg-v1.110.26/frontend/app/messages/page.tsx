@@ -1079,7 +1079,7 @@ function MessagesContent() {
 
                 {/* Compose Area */}
                 {showCompose ? (
-                  <div className="border-t-2 border-border p-3 sm:p-4 bg-card flex-shrink-0 shadow-inner">
+                  <div className="border-t-2 border-border p-3 sm:p-4 bg-card shrink-0 min-h-0 max-h-[45vh] overflow-y-auto shadow-inner">
                     {getOtherParentId() ? (
                       <MessageCompose
                         caseId={selectedAgreement.case_id || undefined}

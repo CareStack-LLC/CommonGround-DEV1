@@ -95,6 +95,8 @@ class ARIAService:
             PROFANITY_PATTERNS,
             EVASION_PATTERNS,
             EMOTIONAL_MANIPULATION_PATTERNS,
+            HOSTILE_EMOJI_PATTERNS,
+            IMPLICIT_HOSTILITY_PATTERNS,
         )
 
         # Regex patterns for sarcasm, blame, dismissive, passive-aggressive detection
@@ -137,9 +139,10 @@ class ARIAService:
             ToxicityCategory.FINANCIAL_COERCION: [
                 re.compile(p, re.IGNORECASE) for p in FINANCIAL_COERCION_PATTERNS
             ],
-            ToxicityCategory.HOSTILITY: [
-                re.compile(p, re.IGNORECASE) for p in HOSTILITY_PATTERNS
-            ],
+            ToxicityCategory.HOSTILITY: (
+                [re.compile(p, re.IGNORECASE) for p in HOSTILITY_PATTERNS] +
+                [re.compile(p, re.UNICODE) for p in HOSTILE_EMOJI_PATTERNS]
+            ),
             ToxicityCategory.INSULT: [
                 re.compile(p, re.IGNORECASE) for p in MODERN_SLANG_PATTERNS
             ],
@@ -159,9 +162,10 @@ class ARIAService:
             ToxicityCategory.DISMISSIVE: [
                 re.compile(p, re.IGNORECASE) for p in DISMISSIVE_PATTERNS
             ],
-            ToxicityCategory.PASSIVE_AGGRESSIVE: [
-                re.compile(p, re.IGNORECASE) for p in PASSIVE_AGGRESSIVE_PATTERNS
-            ],
+            ToxicityCategory.PASSIVE_AGGRESSIVE: (
+                [re.compile(p, re.IGNORECASE) for p in PASSIVE_AGGRESSIVE_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in IMPLICIT_HOSTILITY_PATTERNS]
+            ),
             ToxicityCategory.MANIPULATION: [
                 re.compile(p, re.IGNORECASE) for p in EMOTIONAL_MANIPULATION_PATTERNS
             ],

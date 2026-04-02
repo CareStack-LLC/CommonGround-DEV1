@@ -959,7 +959,8 @@ async def send_message(
         read_at=new_message.read_at,
         acknowledged_at=new_message.acknowledged_at,
         was_flagged=new_message.was_flagged,
-        original_content=None
+        original_content=None,
+        attachments=[]
     )
 
 
