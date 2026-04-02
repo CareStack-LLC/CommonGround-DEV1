@@ -481,7 +481,7 @@ CONTEMPT_PATTERNS = [
     r'\b(i\'?m\s+)?sick\s+of\s+(you|this|your)\b',
     r'\b(i\'?m\s+)?tired\s+of\s+(you|this|your)\b',
     r'\b(i\'?m\s+)?done\s+with\s+(you|this|your)\b',
-    r'\bcan\'?t\s+stand\s+(you|this)\b',
+    r'\bcan\'?t\s+stand\s+(you|this|dealing|talking|being)\b',
     r'\bdisgust(ed|ing|s)?\s*(by\s+)?(me|you|this)?\b',
     r'\bmake\s+me\s+sick\b',
     r'\byou\s+make\s+me\s+(sick|nauseous|want\s+to\s+puke)\b',
@@ -549,6 +549,9 @@ IMPLICIT_HOSTILITY_PATTERNS = [
 
     # "No more" access denial (catches "you won't see them no more")
     r'\b(won\'?t|not\s+gonna|never)\b.*?\bno\s+more\b',
+
+    # Veiled coercion — "you know what you gotta/have to do"
+    r'\byou\s+know\s+what\s+(you\s+)?(gotta|have\s+to|need\s+to)\s+do\b',
 ]
 
 AGE_INAPPROPRIATE_PATTERNS = [

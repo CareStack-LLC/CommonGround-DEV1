@@ -118,5 +118,138 @@
   {"text": "I understand your concern. Let me think about it and get back to you.", "should_flag": false, "notes": "empathetic response"},
   {"text": "I'd prefer if we communicated through the app for documentation.", "should_flag": false, "notes": "boundary setting"},
   {"text": "The counselor suggested we try a 2-2-3 schedule. What do you think?", "should_flag": false, "notes": "professional recommendation"},
-  {"text": "I know this is tough. I appreciate you working with me on the schedule.", "should_flag": false, "notes": "gratitude under stress"}
+  {"text": "I know this is tough. I appreciate you working with me on the schedule.", "should_flag": false, "notes": "gratitude under stress"},
+
+  {"text": "\ud83d\udd95\ud83d\udd95\ud83d\udd95", "should_flag": true, "expected_categories": ["hostility"], "notes": "triple middle finger"},
+  {"text": "You're a joke \ud83e\udd21\ud83e\udd21", "should_flag": true, "expected_categories": ["hostility"], "notes": "clown emoji insult"},
+  {"text": "\ud83d\udd2a\ud83d\udd2a", "should_flag": true, "expected_categories": ["hostility"], "notes": "knife emojis — threatening"},
+  {"text": "lol \ud83d\udca9", "should_flag": true, "expected_categories": ["hostility"], "notes": "poop emoji dismissal"},
+  {"text": "Good luck with that \ud83d\ude44", "should_flag": true, "expected_categories": ["passive_aggressive"], "notes": "dismissive sarcasm — good luck pattern"},
+  {"text": "f * c k you", "should_flag": true, "expected_categories": ["profanity"], "notes": "spaced evasion"},
+  {"text": "b i t c h", "should_flag": true, "expected_categories": ["profanity"], "notes": "spaced evasion"},
+  {"text": "sh!t head", "should_flag": true, "expected_categories": ["profanity"], "notes": "symbol evasion"},
+
+  {
+    "thread": [
+      {"text": "Can you drop them off at 5 instead of 6?", "sender": "A"},
+      {"text": "No that doesn't work for me", "sender": "B"},
+      {"text": "You never make anything work", "sender": "A"},
+      {"text": "Here we go again", "sender": "B"},
+      {"text": "You always do this. Every single time.", "sender": "A"},
+      {"text": "I'm done dealing with you", "sender": "B"},
+      {"text": "You're the worst parent I've ever seen", "sender": "A"},
+      {"text": "Keep acting like that and you won't see them anymore", "sender": "B"}
+    ],
+    "expected_trajectory": "escalating",
+    "expected_heat_above": 1.5,
+    "should_flag_by_message": 4,
+    "notes": "Classic co-parenting escalation — starts with scheduling, ends with custody threats"
+  },
+
+  {
+    "thread": [
+      {"text": "Fine.", "sender": "A"},
+      {"text": "Whatever you say.", "sender": "A"},
+      {"text": "Must be nice to always get your way.", "sender": "A"},
+      {"text": "Parent of the year over here.", "sender": "A"},
+      {"text": "The kids don't even want to go to your place.", "sender": "A"},
+      {"text": "Figures. You never change.", "sender": "A"}
+    ],
+    "expected_trajectory": "escalating",
+    "expected_heat_above": 1.5,
+    "should_flag_by_message": 2,
+    "notes": "One-sided passive-aggressive barrage — no response from other parent"
+  },
+
+  {
+    "thread": [
+      {"text": "I need the child support payment", "sender": "A"},
+      {"text": "I already told you I'm not paying", "sender": "B"},
+      {"text": "The kids need new shoes for school", "sender": "A"},
+      {"text": "Not my problem. Get a job.", "sender": "B"},
+      {"text": "You owe this. It's court ordered.", "sender": "A"},
+      {"text": "Sue me then deadbeat. I'll bleed you dry in court", "sender": "B"},
+      {"text": "Where's my money you deadbeat", "sender": "A"},
+      {"text": "Ain't paying a dime. Cut you off.", "sender": "B"}
+    ],
+    "expected_trajectory": "escalating",
+    "expected_heat_above": 1.0,
+    "should_flag_by_message": 3,
+    "notes": "Financial coercion escalation — starts with request, ends with threats"
+  },
+
+  {
+    "thread": [
+      {"text": "Hi, can we coordinate the schedule for next week?", "sender": "A"},
+      {"text": "Sure, what works for you?", "sender": "B"},
+      {"text": "Tuesday and Thursday pickup at school?", "sender": "A"},
+      {"text": "That works. I'll be there at 3.", "sender": "B"},
+      {"text": "Thanks. Let me know if anything changes.", "sender": "A"},
+      {"text": "Will do. Have a good week.", "sender": "B"}
+    ],
+    "expected_trajectory": "clean",
+    "expected_heat_above": null,
+    "should_flag_by_message": null,
+    "notes": "Healthy co-parenting thread — should stay completely clean"
+  },
+
+  {
+    "thread": [
+      {"text": "I'm so tired of this", "sender": "A"},
+      {"text": "Tired of what?", "sender": "B"},
+      {"text": "You. Everything. This whole situation.", "sender": "A"},
+      {"text": "Ok that's helpful", "sender": "B"},
+      {"text": "Oh my god I'm sick of you", "sender": "A"},
+      {"text": "I can't stand dealing with you anymore", "sender": "A"},
+      {"text": "Every single time we talk it's the same crap", "sender": "A"},
+      {"text": "You make me sick", "sender": "A"}
+    ],
+    "expected_trajectory": "escalating",
+    "expected_heat_above": 1.0,
+    "should_flag_by_message": 2,
+    "notes": "Contempt spiral — one parent venting escalating disgust"
+  },
+
+  {
+    "thread": [
+      {"text": "Daddy doesn't want to see you anymore", "sender": "A"},
+      {"text": "He chose his new family over you", "sender": "A"},
+      {"text": "You're better off without him", "sender": "A"},
+      {"text": "I'm your only real parent", "sender": "A"},
+      {"text": "Don't listen to anything your father says", "sender": "A"}
+    ],
+    "expected_trajectory": "escalating",
+    "expected_heat_above": 1.0,
+    "should_flag_by_message": 0,
+    "notes": "Parental alienation campaign — every single message is manipulation"
+  },
+
+  {
+    "thread": [
+      {"text": "Hey", "sender": "A"},
+      {"text": "\ud83d\udd95", "sender": "A"},
+      {"text": "\ud83e\udd21\ud83e\udd21\ud83e\udd21", "sender": "A"},
+      {"text": "\ud83d\udca9", "sender": "A"},
+      {"text": "whatever", "sender": "A"}
+    ],
+    "expected_trajectory": "escalating",
+    "expected_heat_above": 1.0,
+    "should_flag_by_message": 1,
+    "notes": "Emoji-only harassment — hostile emojis without text"
+  },
+
+  {
+    "thread": [
+      {"text": "I miss you", "sender": "A"},
+      {"text": "We're not doing this", "sender": "B"},
+      {"text": "If you want to see the kids you know what you gotta do", "sender": "A"},
+      {"text": "That's disgusting. Stop.", "sender": "B"},
+      {"text": "No head no babies simple as that", "sender": "A"},
+      {"text": "Give me some or you won't see them", "sender": "A"}
+    ],
+    "expected_trajectory": "escalating",
+    "expected_heat_above": 1.0,
+    "should_flag_by_message": 2,
+    "notes": "Sexual coercion tied to custody — extremely dangerous pattern"
+  }
 ]

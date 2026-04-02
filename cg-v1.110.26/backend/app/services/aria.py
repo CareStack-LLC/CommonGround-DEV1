@@ -153,9 +153,10 @@ class ARIAService:
             ToxicityCategory.INSULT: [
                 re.compile(p, re.IGNORECASE) for p in MODERN_SLANG_PATTERNS
             ],
-            ToxicityCategory.PROFANITY: [
-                re.compile(p, re.IGNORECASE) for p in PROFANITY_PATTERNS
-            ],
+            ToxicityCategory.PROFANITY: (
+                [re.compile(p, re.IGNORECASE) for p in PROFANITY_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in EVASION_PATTERNS]
+            ),
             ToxicityCategory.ALL_CAPS: [
                 re.compile(p, re.IGNORECASE) for p in EVASION_PATTERNS
             ],
