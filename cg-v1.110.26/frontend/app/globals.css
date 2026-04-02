@@ -103,6 +103,19 @@
   --color-cg-warning-subtle: var(--cg-warning-subtle);
   --color-cg-error: var(--cg-error);
   --color-cg-error-subtle: var(--cg-error-subtle);
+
+  /* ARIA Sentinel Shield Semantic Colors */
+  --color-cg-heat: var(--cg-heat);
+  --color-cg-heat-high: var(--cg-heat-high);
+  --color-cg-heat-subtle: var(--cg-heat-subtle);
+  --color-cg-coaching: var(--cg-coaching);
+  --color-cg-coaching-subtle: var(--cg-coaching-subtle);
+  --color-cg-legal: var(--cg-legal);
+  --color-cg-legal-subtle: var(--cg-legal-subtle);
+  --color-cg-pattern: var(--cg-pattern);
+  --color-cg-pattern-subtle: var(--cg-pattern-subtle);
+  --color-cg-time-signal: var(--cg-time-signal);
+  --color-cg-time-signal-subtle: var(--cg-time-signal-subtle);
 }
 
 /* ============================================================================
@@ -205,6 +218,19 @@
   --cg-warning-subtle: #FEF7ED;
   --cg-error: #C53030;
   --cg-error-subtle: #FEE2E2;
+
+  /* ARIA Sentinel Shield */
+  --cg-heat: #F5A623;
+  --cg-heat-high: #C53030;
+  --cg-heat-subtle: #FEF7ED;
+  --cg-coaching: #2D6A8F;
+  --cg-coaching-subtle: #EBF5FB;
+  --cg-legal: #C53030;
+  --cg-legal-subtle: #FEE2E2;
+  --cg-pattern: #F5A623;
+  --cg-pattern-subtle: #FEF7ED;
+  --cg-time-signal: #2D6A8F;
+  --cg-time-signal-subtle: #EBF5FB;
 }
 
 /* ============================================================================
@@ -277,6 +303,19 @@
   --cg-warning-subtle: #2D2010;
   --cg-error: #EF4444;
   --cg-error-subtle: #2D1A1A;
+
+  /* ARIA Sentinel Shield */
+  --cg-heat: #F5A623;
+  --cg-heat-high: #EF4444;
+  --cg-heat-subtle: #2D2010;
+  --cg-coaching: #4BA8C8;
+  --cg-coaching-subtle: #0D2030;
+  --cg-legal: #EF4444;
+  --cg-legal-subtle: #2D1A1A;
+  --cg-pattern: #F5A623;
+  --cg-pattern-subtle: #2D2010;
+  --cg-time-signal: #4BA8C8;
+  --cg-time-signal-subtle: #0D2030;
 }
 
 /* ============================================================================

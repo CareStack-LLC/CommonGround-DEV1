@@ -30,6 +30,8 @@ interface MessageComposeProps {
   ariaMode?: 'off' | 'standard' | 'strict';
   onTyping?: () => void;
   onStopTyping?: () => void;
+  /** Portal context — determines ARIA modal presentation */
+  context?: 'parent' | 'child' | 'circle_contact';
 }
 
 interface AttachmentFile {
@@ -59,6 +61,7 @@ export function MessageCompose({
   ariaMode = 'standard',
   onTyping,
   onStopTyping,
+  context = 'parent',
 }: MessageComposeProps) {
   const [message, setMessage] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -179,7 +182,16 @@ export function MessageCompose({
           suggested_rewrite: result.suggestion,
           explanation: result.explanation,
           categories: result.categories,
-          toxicity_score: result.toxicity_score
+          toxicity_score: result.toxicity_score,
+          // V2 Sentinel Shield enrichment
+          v2_category_confidence: result.category_confidence,
+          v2_window_heat: result.window_heat_score,
+          v2_domain_scores: result.domain_scores,
+          v2_session_patterns: result.session_patterns,
+          v2_time_signals: result.time_frequency_flags,
+          v2_recipient_coaching: result.recipient_coaching,
+          v2_reporting_tags: result.reporting_tags,
+          v2_legal_flags: result.legal_flags,
         });
         setLastFlaggedAnalysis(result);
         setLastFlaggedMessage(message);
@@ -399,6 +411,7 @@ export function MessageCompose({
           onSendOriginal={ariaRewritePayload.aria_mode === 'standard' ? handleSendOriginalAnyway : undefined}
           onCancel={handleDismissRewriteModal}
           isSending={isSending}
+          context={context}
         />
       )}
 

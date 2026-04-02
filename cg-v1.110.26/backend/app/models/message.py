@@ -176,6 +176,15 @@ class MessageFlag(Base, UUIDMixin, TimestampMixin):
     # Analytics
     processing_time_ms: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
 
+    # V2 Sentinel Shield (added via Alembic migrations phase 2-4)
+    category_confidence: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    window_heat_score: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    v2_categories: Mapped[Optional[list]] = mapped_column(JSON, nullable=True)
+    domain_scores: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    time_frequency_flags: Mapped[Optional[list]] = mapped_column(JSON, nullable=True)
+    recipient_coaching: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    reporting_tags: Mapped[Optional[list]] = mapped_column(JSON, nullable=True)
+
     # Relationships
     message: Mapped["Message"] = relationship("Message", back_populates="flags")
 

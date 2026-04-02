@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Shield, ShieldAlert, ShieldX, RotateCcw, Send, Edit3, X, AlertTriangle, Sparkles, Scale } from 'lucide-react';
+import { Shield, ShieldAlert, ShieldX, RotateCcw, Send, Edit3, X, AlertTriangle, Sparkles, Scale, Flame, Clock, Zap, TrendingUp, MessageSquare, Lightbulb } from 'lucide-react';
 
 export interface ARIARewritePayload {
     aria_flagged: true;
@@ -14,6 +14,15 @@ export interface ARIARewritePayload {
     severity?: string;
     confidence_score?: number;
     response_time_ms?: number;
+    // V2 Sentinel Shield enrichment
+    v2_category_confidence?: Record<string, number>;
+    v2_window_heat?: number;
+    v2_domain_scores?: Record<string, number>;
+    v2_session_patterns?: string[];
+    v2_time_signals?: string[];
+    v2_recipient_coaching?: string;
+    v2_reporting_tags?: string[];
+    v2_legal_flags?: string[];
 }
 
 interface ARIARewriteModalProps {
@@ -28,26 +37,62 @@ interface ARIARewriteModalProps {
     context?: 'parent' | 'child' | 'circle_contact';
 }
 
-/** Category display config */
+/** Time signal display config */
+const TIME_SIGNAL_CONFIG: Record<string, { label: string; icon: string }> = {
+    late_night: { label: 'Late Night', icon: '🌙' },
+    message_storm: { label: 'Rapid Messages', icon: '⚡' },
+    silence_to_flood: { label: 'Silence then Flood', icon: '🌊' },
+    sustained_campaign: { label: 'Sustained Pattern', icon: '📈' },
+};
+
+/** V2 Domain display config — severity-tiered using semantic CSS variables */
+const DOMAIN_CONFIG: Record<string, { label: string; color: string }> = {
+    CTRL: { label: 'Coercive Control', color: 'bg-cg-error' },
+    THRT: { label: 'Threats', color: 'bg-cg-error' },
+    PSYB: { label: 'Psychological', color: 'bg-cg-warning' },
+    CONT: { label: 'Contempt', color: 'bg-cg-warning' },
+    ALNT: { label: 'Alienation', color: 'bg-cg-warning' },
+    ESCP: { label: 'Escalation', color: 'bg-cg-warning' },
+    PAGG: { label: 'Passive Aggression', color: 'bg-[var(--portal-accent)]' },
+    MNIP: { label: 'Manipulation', color: 'bg-[var(--portal-accent)]' },
+};
+
+/** Severity tier color classes — portal-aware, dark mode compatible */
+const SEVERITY_COLORS = {
+    severe: 'bg-cg-error-subtle text-cg-error border-cg-error/20',
+    moderate: 'bg-cg-warning-subtle text-cg-warning border-cg-warning/20',
+    mild: 'bg-[var(--portal-accent)]/10 text-[var(--portal-accent)] border-[var(--portal-accent)]/20',
+} as const;
+
+/** Category display config — V1 labels + V2 Sentinel Shield categories */
 const CATEGORY_CONFIG: Record<string, { label: string; color: string; icon?: string }> = {
-    profanity: { label: 'Profanity', color: 'bg-orange-100 text-orange-700 dark:bg-orange-950/40 dark:text-orange-400 border-orange-200 dark:border-orange-900' },
-    hate_speech: { label: 'Hate Speech', color: 'bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400 border-red-200 dark:border-red-900' },
-    sexual_harassment: { label: 'Sexual Harassment', color: 'bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400 border-red-200 dark:border-red-900' },
-    threats: { label: 'Threats', color: 'bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400 border-red-200 dark:border-red-900' },
-    threatening: { label: 'Threats', color: 'bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400 border-red-200 dark:border-red-900' },
-    custody_weaponization: { label: 'Custody Weaponization', color: 'bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border-rose-200 dark:border-rose-900' },
-    parental_alienation: { label: 'Parental Alienation', color: 'bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-400 border-rose-200 dark:border-rose-900' },
-    grooming: { label: 'Grooming', color: 'bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400 border-red-200 dark:border-red-900' },
-    manipulation: { label: 'Manipulation', color: 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border-amber-200 dark:border-amber-900' },
-    emotional_manipulation: { label: 'Emotional Manipulation', color: 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border-amber-200 dark:border-amber-900' },
-    coparenting_conflict: { label: 'Co-Parenting Conflict', color: 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border-amber-200 dark:border-amber-900' },
-    hostility: { label: 'Hostility', color: 'bg-orange-100 text-orange-700 dark:bg-orange-950/40 dark:text-orange-400 border-orange-200 dark:border-orange-900' },
-    stranger_danger: { label: 'Stranger Danger', color: 'bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400 border-red-200 dark:border-red-900' },
-    financial_coercion: { label: 'Financial Coercion', color: 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400 border-amber-200 dark:border-amber-900' },
-    age_inappropriate: { label: 'Age Inappropriate', color: 'bg-purple-100 text-purple-700 dark:bg-purple-950/40 dark:text-purple-400 border-purple-200 dark:border-purple-900' },
-    bullying: { label: 'Bullying', color: 'bg-orange-100 text-orange-700 dark:bg-orange-950/40 dark:text-orange-400 border-orange-200 dark:border-orange-900' },
-    modern_slang: { label: 'Inappropriate Slang', color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-950/40 dark:text-yellow-400 border-yellow-200 dark:border-yellow-900' },
-    evasion: { label: 'Evasion Attempt', color: 'bg-slate-100 text-slate-700 dark:bg-slate-950/40 dark:text-slate-400 border-slate-200 dark:border-slate-900' },
+    // Severe — confirmed harmful patterns
+    hate_speech: { label: 'Hate Speech', color: SEVERITY_COLORS.severe },
+    sexual_harassment: { label: 'Sexual Harassment', color: SEVERITY_COLORS.severe },
+    threats: { label: 'Threats', color: SEVERITY_COLORS.severe },
+    threatening: { label: 'Threats', color: SEVERITY_COLORS.severe },
+    grooming: { label: 'Grooming', color: SEVERITY_COLORS.severe },
+    stranger_danger: { label: 'Stranger Danger', color: SEVERITY_COLORS.severe },
+    // Moderate — escalation risk
+    custody_weaponization: { label: 'Custody Weaponization', color: SEVERITY_COLORS.moderate },
+    parental_alienation: { label: 'Parental Alienation', color: SEVERITY_COLORS.moderate },
+    manipulation: { label: 'Manipulation', color: SEVERITY_COLORS.moderate },
+    emotional_manipulation: { label: 'Emotional Manipulation', color: SEVERITY_COLORS.moderate },
+    coparenting_conflict: { label: 'Co-Parenting Conflict', color: SEVERITY_COLORS.moderate },
+    hostility: { label: 'Hostility', color: SEVERITY_COLORS.moderate },
+    financial_coercion: { label: 'Financial Coercion', color: SEVERITY_COLORS.moderate },
+    bullying: { label: 'Bullying', color: SEVERITY_COLORS.moderate },
+    controlling: { label: 'Controlling', color: SEVERITY_COLORS.moderate },
+    insult: { label: 'Insult', color: SEVERITY_COLORS.moderate },
+    blame: { label: 'Blame', color: SEVERITY_COLORS.moderate },
+    age_inappropriate: { label: 'Age Inappropriate', color: SEVERITY_COLORS.moderate },
+    // Mild — tone concerns
+    profanity: { label: 'Profanity', color: SEVERITY_COLORS.mild },
+    sarcasm: { label: 'Sarcasm', color: SEVERITY_COLORS.mild },
+    dismissive: { label: 'Dismissive', color: SEVERITY_COLORS.mild },
+    passive_aggressive: { label: 'Passive Aggressive', color: SEVERITY_COLORS.mild },
+    modern_slang: { label: 'Inappropriate Slang', color: SEVERITY_COLORS.mild },
+    evasion: { label: 'Evasion Attempt', color: SEVERITY_COLORS.mild },
 };
 
 /** Severity tier config */
@@ -197,6 +242,26 @@ export function ARIARewriteModal({
                     </div>
                 </div>
 
+                {/* V2: Child-friendly heat indicator (only when heat is noticeable) */}
+                {payload.v2_window_heat != null && payload.v2_window_heat > 2 && (
+                    <div className="mx-5 mb-3 flex items-start gap-2.5 px-4 py-3 rounded-2xl bg-[var(--portal-accent)]/10 border border-[var(--portal-accent)]/20">
+                        <Sparkles className="h-5 w-5 text-[var(--portal-accent)] flex-shrink-0 mt-0.5" />
+                        <p className="text-sm text-foreground leading-relaxed">
+                            This conversation is getting a little warm. Let&apos;s take a deep breath! 🌿
+                        </p>
+                    </div>
+                )}
+
+                {/* V2: Child-friendly coaching tip */}
+                {payload.v2_recipient_coaching && (
+                    <div className="mx-5 mb-3 flex items-start gap-2.5 px-4 py-3 rounded-2xl bg-[var(--portal-primary)]/10 border border-[var(--portal-primary)]/20">
+                        <Sparkles className="h-5 w-5 text-[var(--portal-primary)] flex-shrink-0 mt-0.5" />
+                        <p className="text-sm text-foreground leading-relaxed">
+                            ARIA&apos;s tip: {payload.v2_recipient_coaching}
+                        </p>
+                    </div>
+                )}
+
                 {/* Kid-friendly action buttons — big and friendly */}
                 <div className="flex gap-3 px-5 pb-5">
                     {!editingRewrite && payload.suggested_rewrite && (
@@ -248,7 +313,7 @@ export function ARIARewriteModal({
                     <div className="flex items-center gap-2">
                         <h3 className="font-semibold text-foreground text-sm">{config.title}</h3>
                         {isStrict && (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-red-100 dark:bg-red-950/40 text-red-600 dark:text-red-400 border border-red-200/60 dark:border-red-900/60">
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-cg-error-subtle text-cg-error border border-cg-error/20">
                                 Strict
                             </span>
                         )}
@@ -264,20 +329,24 @@ export function ARIARewriteModal({
                 </button>
             </div>
 
-            {/* Category badges */}
+            {/* Category badges with optional confidence */}
             {payload.categories && payload.categories.length > 0 && (
                 <div className="flex flex-wrap gap-1.5 px-5 pt-3">
                     {payload.categories.map((cat) => {
                         const catConfig = CATEGORY_CONFIG[cat] || {
                             label: cat.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
-                            color: 'bg-slate-100 text-slate-700 dark:bg-slate-950/40 dark:text-slate-400 border-slate-200 dark:border-slate-900',
+                            color: 'bg-[var(--portal-surface)] text-foreground border-[var(--portal-border)]',
                         };
+                        const confidence = payload.v2_category_confidence?.[cat];
                         return (
                             <span
                                 key={cat}
-                                className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold border ${catConfig.color}`}
+                                className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border ${catConfig.color}`}
                             >
                                 {catConfig.label}
+                                {confidence != null && confidence > 0.5 && (
+                                    <span className="text-[9px] opacity-70 tabular-nums">{Math.round(confidence * 100)}%</span>
+                                )}
                             </span>
                         );
                     })}
@@ -298,6 +367,112 @@ export function ARIARewriteModal({
                         <span className="text-[10px] font-semibold tabular-nums text-muted-foreground">
                             {Math.round((payload.toxicity_score ?? payload.confidence_score ?? 0) * 100)}%
                         </span>
+                    </div>
+                </div>
+            )}
+
+            {/* V2: Window Heat Indicator */}
+            {payload.v2_window_heat != null && payload.v2_window_heat > 0 && (
+                <div className="px-5 pt-2">
+                    <div className="flex items-center gap-2">
+                        <Flame className="h-3 w-3 text-cg-heat flex-shrink-0" />
+                        <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Conversation Heat</span>
+                        <div
+                            className="flex-1 h-1.5 bg-[var(--portal-border)] rounded-full overflow-hidden"
+                            role="progressbar"
+                            aria-valuenow={payload.v2_window_heat}
+                            aria-valuemin={0}
+                            aria-valuemax={5}
+                            aria-label={`Conversation heat: ${payload.v2_window_heat.toFixed(1)} out of 5`}
+                        >
+                            <div
+                                className={`h-full rounded-full transition-all duration-700 ease-out ${payload.v2_window_heat >= 3.5 ? 'bg-cg-heat-high' : 'bg-cg-heat'}`}
+                                style={{ width: `${Math.min((payload.v2_window_heat / 5) * 100, 100)}%` }}
+                            />
+                        </div>
+                        <span className="text-[10px] font-semibold tabular-nums text-muted-foreground">
+                            {payload.v2_window_heat.toFixed(1)}/5
+                        </span>
+                    </div>
+                </div>
+            )}
+
+            {/* V2: Domain Scores */}
+            {payload.v2_domain_scores && Object.keys(payload.v2_domain_scores).length > 0 && (
+                <div className="flex flex-wrap gap-1.5 px-5 pt-2">
+                    {Object.entries(payload.v2_domain_scores)
+                        .filter(([, score]) => score > 0)
+                        .sort(([, a], [, b]) => b - a)
+                        .map(([domain, score]) => {
+                            const domainCfg = DOMAIN_CONFIG[domain];
+                            if (!domainCfg) return null;
+                            return (
+                                <span
+                                    key={domain}
+                                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[var(--portal-surface)] text-foreground border border-[var(--portal-border)]"
+                                >
+                                    <span className={`w-1.5 h-1.5 rounded-full ${domainCfg.color}`} />
+                                    {domainCfg.label}
+                                    <span className="text-muted-foreground ml-0.5">{Math.round(score * 100)}%</span>
+                                </span>
+                            );
+                        })}
+                </div>
+            )}
+
+            {/* V2: Time Signal Badges */}
+            {payload.v2_time_signals && payload.v2_time_signals.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 px-5 pt-2">
+                    {payload.v2_time_signals.map((signal) => {
+                        const signalCfg = TIME_SIGNAL_CONFIG[signal] || { label: signal, icon: '?' };
+                        return (
+                            <span
+                                key={signal}
+                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-cg-time-signal-subtle text-cg-time-signal border border-cg-time-signal/20"
+                            >
+                                <span className="text-xs">{signalCfg.icon}</span>
+                                {signalCfg.label}
+                            </span>
+                        );
+                    })}
+                </div>
+            )}
+
+            {/* V2: Session Patterns */}
+            {payload.v2_session_patterns && payload.v2_session_patterns.length > 0 && (
+                <div className="mx-5 mt-2 flex items-start gap-2 px-3 py-2 rounded-lg bg-cg-pattern-subtle border border-cg-pattern/20">
+                    <TrendingUp className="h-3.5 w-3.5 text-cg-pattern flex-shrink-0 mt-0.5" />
+                    <div>
+                        <p className="text-[10px] font-semibold text-cg-pattern uppercase tracking-wider mb-1">Recurring Patterns</p>
+                        <p className="text-xs text-foreground leading-relaxed">
+                            {payload.v2_session_patterns.join(' · ')}
+                        </p>
+                    </div>
+                </div>
+            )}
+
+            {/* V2: Recipient Coaching Note */}
+            {payload.v2_recipient_coaching && (
+                <div className="mx-5 mt-2 flex items-start gap-2 px-3 py-2 rounded-lg bg-cg-coaching-subtle border border-cg-coaching/20">
+                    <Lightbulb className="h-3.5 w-3.5 text-cg-coaching flex-shrink-0 mt-0.5" />
+                    <div>
+                        <p className="text-[10px] font-semibold text-cg-coaching uppercase tracking-wider mb-1">ARIA Coaching Tip</p>
+                        <p className="text-xs text-foreground leading-relaxed">
+                            {payload.v2_recipient_coaching}
+                        </p>
+                    </div>
+                </div>
+            )}
+
+            {/* V2: Legal Flags (if present) */}
+            {payload.v2_legal_flags && payload.v2_legal_flags.length > 0 && (
+                <div className="mx-5 mt-2 flex items-start gap-2 px-3 py-2 rounded-lg bg-cg-legal-subtle border border-cg-legal/20">
+                    <Scale className="h-3.5 w-3.5 text-cg-legal flex-shrink-0 mt-0.5" />
+                    <div>
+                        <p className="text-[10px] font-semibold text-cg-legal uppercase tracking-wider mb-1">Legal Concern</p>
+                        <p className="text-xs text-foreground leading-relaxed">
+                            {payload.v2_legal_flags.map(f => f.replace(/_/g, ' ')).join(', ')}
+                        </p>
                     </div>
                 </div>
             )}

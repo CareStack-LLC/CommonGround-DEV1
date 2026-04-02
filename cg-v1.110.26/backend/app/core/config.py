@@ -75,7 +75,13 @@ class Settings(BaseSettings):
     ANTHROPIC_API_KEY: Optional[str] = None
     OPENAI_API_KEY: Optional[str] = None
     GEMINI_API_KEY: Optional[str] = None
-    ARIA_DEFAULT_PROVIDER: str = "claude"  # "claude", "openai", or "gemini"
+    ARIA_DEFAULT_PROVIDER: str = "openai"  # "openai", "claude", or "gemini"
+
+    # ARIA V2 Sentinel Shield
+    ARIA_V2_ENABLED: bool = True  # Feature flag for V2 analysis pipeline
+    ARIA_V3_BETA_ENABLED: bool = False  # Feature flag for V3 beta features
+    ARIA_V2_LLM_MODEL: str = "gpt-4o-mini"  # Default LLM for V2 analysis
+    ARIA_V2_SEVERITY_MODEL: str = "gpt-4o"  # Model for severity 4-5 analysis
 
     # Stripe
     STRIPE_SECRET_KEY: Optional[str] = None

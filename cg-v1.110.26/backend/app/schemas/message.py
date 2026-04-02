@@ -94,6 +94,7 @@ class InterventionAction(BaseModel):
 class ARIAAnalysisResponse(BaseModel):
     """ARIA sentiment analysis result."""
 
+    # V1 fields (always present)
     toxicity_level: str
     toxicity_score: float
     categories: List[str]
@@ -101,6 +102,21 @@ class ARIAAnalysisResponse(BaseModel):
     explanation: str
     suggestion: Optional[str]
     is_flagged: bool
+
+    # V2 fields (optional, populated when ARIA_V2_ENABLED=True)
+    category_confidence: Optional[Dict[str, float]] = None
+    window_heat_score: Optional[float] = None
+    domain_scores: Optional[Dict[str, float]] = None
+    session_patterns: Optional[List[str]] = None
+    baseline_deviation: Optional[Dict[str, Any]] = None
+    time_frequency_flags: Optional[List[str]] = None
+    recipient_coaching: Optional[str] = None
+    reporting_tags: Optional[List[str]] = None
+
+    # V3 fields (optional, beta only)
+    draft_coaching: Optional[str] = None
+    pattern_forecast: Optional[str] = None
+    legal_flags: Optional[List[str]] = None
 
 
 class InterventionResponse(BaseModel):

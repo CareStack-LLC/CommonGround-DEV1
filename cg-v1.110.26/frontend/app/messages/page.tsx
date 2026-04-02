@@ -50,48 +50,48 @@ function WelcomeDisclaimer({ onAccept }: { onAccept: () => void }) {
             <Shield className="w-8 h-8 text-white" />
           </div>
           <h2 className="text-2xl font-bold text-white" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-            Welcome to Messages
+            Before You Begin
           </h2>
           <p className="text-white/80 mt-1 text-sm font-medium">
-            A safe space for co-parenting communication
+            A quick note about how messaging works here
           </p>
         </div>
 
         {/* Content */}
         <div className="p-6 space-y-4">
-          <p className="text-foreground text-center font-medium">
-            This secure messaging platform is designed for conversations about your children and custody matters.
+          <p className="text-foreground text-center font-medium leading-relaxed">
+            CommonGround is here to help you and your co-parent communicate with less conflict and more clarity — for your children.
           </p>
 
           {/* Key Points */}
           <div className="space-y-3">
             <div className="flex items-start gap-3 p-3 bg-muted rounded-xl">
               <div className="w-10 h-10 bg-[var(--portal-primary)]/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                <Lock className="w-5 h-5 text-[var(--portal-primary)]" />
+                <Sparkles className="w-5 h-5 text-[var(--portal-primary)]" />
               </div>
               <div>
-                <p className="font-semibold text-foreground text-sm">Secure & Documented</p>
-                <p className="text-xs text-muted-foreground">All messages and calls are encrypted, timestamped, and digitally signed for your protection.</p>
+                <p className="font-semibold text-foreground text-sm">ARIA Is On Your Side</p>
+                <p className="text-xs text-muted-foreground">Our AI reads your messages before they send and may suggest a calmer way to say the same thing. It's not censorship — it's a second pair of eyes helping you put your best foot forward.</p>
               </div>
             </div>
 
             <div className="flex items-start gap-3 p-3 bg-muted rounded-xl">
-              <div className="w-10 h-10 bg-amber-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                <Eye className="w-5 h-5 text-amber-600" />
+              <div className="w-10 h-10 bg-[var(--portal-primary)]/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Scale className="w-5 h-5 text-[var(--portal-primary)]" />
               </div>
               <div>
-                <p className="font-semibold text-foreground text-sm">ARIA Guardian Active</p>
-                <p className="text-xs text-muted-foreground">Our AI assistant monitors conversations and gently guides toward constructive communication.</p>
+                <p className="font-semibold text-foreground text-sm">Everything Is On the Record</p>
+                <p className="text-xs text-muted-foreground">Every message is encrypted, timestamped, and permanently stored. This record can be reviewed by judges, attorneys, and assigned professionals. Once sent, it cannot be deleted or taken back.</p>
               </div>
             </div>
 
-            <div className="flex items-start gap-3 p-3 bg-muted rounded-xl">
-              <div className="w-10 h-10 bg-purple-500/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                <Scale className="w-5 h-5 text-purple-600" />
+            <div className="flex items-start gap-3 p-3 bg-cg-warning-subtle rounded-xl border border-cg-warning/20">
+              <div className="w-10 h-10 bg-cg-warning/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                <AlertTriangle className="w-5 h-5 text-cg-warning" />
               </div>
               <div>
-                <p className="font-semibold text-foreground text-sm">Court-Ready Records</p>
-                <p className="text-xs text-muted-foreground">Communication records may be used as documentation in legal proceedings if needed.</p>
+                <p className="font-semibold text-foreground text-sm">Write Like a Judge Is Reading</p>
+                <p className="text-xs text-muted-foreground">Because one might be. Keep it focused on your kids, keep it respectful, and let ARIA help when things feel heated.</p>
               </div>
             </div>
           </div>
@@ -102,10 +102,10 @@ function WelcomeDisclaimer({ onAccept }: { onAccept: () => void }) {
               onClick={onAccept}
               className="w-full py-3 px-6 bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white font-bold rounded-xl hover:shadow-lg transition-all duration-300"
             >
-              I Understand, Continue
+              I Understand, Let's Go
             </button>
             <p className="text-xs text-muted-foreground text-center mt-3">
-              By continuing, you acknowledge these terms for using CommonGround messaging.
+              By continuing, you agree to communicate respectfully through CommonGround.
             </p>
           </div>
         </div>

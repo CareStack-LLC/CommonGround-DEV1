@@ -12,6 +12,10 @@ import {
   ChevronUp,
   Shield,
   MicOff,
+  Flame,
+  TrendingUp,
+  Lightbulb,
+  Scale,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -177,6 +181,125 @@ export function ARIAIntervention({
             </div>
           </div>
         )}
+
+        {/* V2: Window Heat */}
+        {(analysis.window_heat_score != null && analysis.window_heat_score > 0) && (
+          <div className="mt-4">
+            <div className="flex items-center gap-2">
+              <Flame className="h-3.5 w-3.5 text-cg-heat flex-shrink-0" />
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Conversation Heat</span>
+              <div
+                className="flex-1 h-2 bg-[var(--portal-border)] rounded-full overflow-hidden"
+                role="progressbar"
+                aria-valuenow={analysis.window_heat_score}
+                aria-valuemin={0}
+                aria-valuemax={5}
+                aria-label={`Conversation heat: ${analysis.window_heat_score.toFixed(1)} out of 5`}
+              >
+                <div
+                  className={`h-full rounded-full transition-all duration-700 ease-out ${analysis.window_heat_score >= 3.5 ? 'bg-cg-heat-high' : 'bg-cg-heat'}`}
+                  style={{ width: `${Math.min((analysis.window_heat_score / 5) * 100, 100)}%` }}
+                />
+              </div>
+              <span className="text-xs font-semibold tabular-nums text-muted-foreground">
+                {analysis.window_heat_score.toFixed(1)}/5
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* V2: Domain Score Bars */}
+        {analysis.domain_scores && Object.keys(analysis.domain_scores).length > 0 && (
+          <div className="mt-4 bg-card/80 rounded-xl p-4 border border-border shadow-sm space-y-2">
+            <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Domain Analysis</p>
+            {Object.entries(analysis.domain_scores)
+              .filter(([, score]) => (score as number) > 0)
+              .sort(([, a], [, b]) => (b as number) - (a as number))
+              .map(([domain, score]) => (
+                <div key={domain} className="flex items-center gap-2">
+                  <span className="text-xs font-medium text-foreground w-24 truncate capitalize">{domain.replace(/_/g, ' ')}</span>
+                  <div
+                    className="flex-1 h-1.5 bg-[var(--portal-border)] rounded-full overflow-hidden"
+                    role="progressbar"
+                    aria-valuenow={score as number}
+                    aria-valuemin={0}
+                    aria-valuemax={1}
+                    aria-label={`${domain} score: ${Math.round((score as number) * 100)}%`}
+                  >
+                    <div
+                      className={`h-full rounded-full ${(score as number) >= 0.7 ? 'bg-cg-heat-high' : 'bg-cg-heat'}`}
+                      style={{ width: `${Math.min((score as number) * 100, 100)}%` }}
+                    />
+                  </div>
+                  <span className="text-[10px] font-semibold tabular-nums text-muted-foreground w-8 text-right">
+                    {Math.round((score as number) * 100)}%
+                  </span>
+                </div>
+              ))}
+          </div>
+        )}
+
+        {/* V2: Session Patterns */}
+        {analysis.session_patterns && analysis.session_patterns.length > 0 && (
+          <div className="mt-4 flex items-start gap-2 px-4 py-3 rounded-xl bg-cg-pattern-subtle border border-cg-pattern/20">
+            <TrendingUp className="h-4 w-4 text-cg-pattern flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-xs font-semibold text-cg-pattern uppercase tracking-wider mb-1">Recurring Patterns</p>
+              <p className="text-sm text-foreground leading-relaxed">
+                {analysis.session_patterns.join(' · ')}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* V2: Recipient Coaching */}
+        {analysis.recipient_coaching && (
+          <div className="mt-4 flex items-start gap-2 px-4 py-3 rounded-xl bg-cg-coaching-subtle border border-cg-coaching/20">
+            <Lightbulb className="h-4 w-4 text-cg-coaching flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-xs font-semibold text-cg-coaching uppercase tracking-wider mb-1">ARIA Coaching Tip</p>
+              <p className="text-sm text-foreground leading-relaxed">
+                {analysis.recipient_coaching}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* V2: Time Signal Badges */}
+        {analysis.time_frequency_flags && analysis.time_frequency_flags.length > 0 && (
+          <div className="mt-4 flex flex-wrap gap-2">
+            {analysis.time_frequency_flags.map((signal) => {
+              const icons: Record<string, string> = {
+                late_night: '🌙', message_storm: '⚡', silence_to_flood: '🌊', sustained_campaign: '📈',
+              };
+              const labels: Record<string, string> = {
+                late_night: 'Late Night', message_storm: 'Rapid Messages', silence_to_flood: 'Silence then Flood', sustained_campaign: 'Sustained Pattern',
+              };
+              return (
+                <span
+                  key={signal}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-cg-time-signal-subtle text-cg-time-signal border border-cg-time-signal/20"
+                >
+                  <span>{icons[signal] || '?'}</span>
+                  {labels[signal] || signal.replace(/_/g, ' ')}
+                </span>
+              );
+            })}
+          </div>
+        )}
+
+        {/* V2: Legal Flags */}
+        {analysis.legal_flags && analysis.legal_flags.length > 0 && (
+          <div className="mt-4 flex items-start gap-2 px-4 py-3 rounded-xl bg-cg-legal-subtle border border-cg-legal/20">
+            <Scale className="h-4 w-4 text-cg-legal flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-xs font-semibold text-cg-legal uppercase tracking-wider mb-1">Legal Concern</p>
+              <p className="text-sm text-foreground leading-relaxed">
+                {analysis.legal_flags.map(f => f.replace(/_/g, ' ')).join(', ')}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Actions */}
@@ -203,7 +326,7 @@ export function ARIAIntervention({
 
           {/* Blocked - Cannot Send */}
           {!canSendAnyway && (
-            <div className="flex-1 px-6 py-3.5 bg-red-100 dark:bg-red-950/40 text-red-700 dark:text-red-400 font-bold rounded-xl text-center border-2 border-red-200 dark:border-red-900/60 cursor-not-allowed">
+            <div className="flex-1 px-6 py-3.5 bg-cg-error-subtle text-cg-error font-bold rounded-xl text-center border-2 border-cg-error/20 cursor-not-allowed">
               Message Restricted
             </div>
           )}

@@ -867,7 +867,20 @@ export interface ARIAAnalysisResponse {
   explanation: string;
   suggestion: string | null;
   is_flagged: boolean;
-  block_send?: boolean; // New field for blocking severe threats
+  block_send?: boolean;
+  // V2 Sentinel Shield fields
+  category_confidence?: Record<string, number>;
+  window_heat_score?: number;
+  domain_scores?: Record<string, number>;
+  session_patterns?: string[];
+  baseline_deviation?: Record<string, unknown>;
+  time_frequency_flags?: string[];
+  recipient_coaching?: string;
+  reporting_tags?: string[];
+  // V3 Beta fields
+  draft_coaching?: string;
+  pattern_forecast?: string;
+  legal_flags?: string[];
 }
 
 export const messagesAPI = {

@@ -201,14 +201,60 @@ async def analyze_message_content(
             is_flagged=False
         )
 
-    # Analyze with ARIA using settings
+    # Check if V2 is enabled
+    use_v2 = getattr(settings, 'ARIA_V2_ENABLED', False) and family_file_id
 
+    if use_v2:
+        # V2 Sentinel Shield analysis
+        try:
+            v2_result = await aria_service.analyze_message_v2(
+                db=db,
+                message_text=content,
+                sender_id=str(current_user.id),
+                recipient_id="",  # Not known in analyze-only mode
+                family_file_id=family_file_id,
+            )
+
+            score = v2_result["toxicity_score"]
+            if score < 0.2:
+                toxicity_level = "green"
+            elif score < 0.5:
+                toxicity_level = "yellow"
+            elif score < 0.8:
+                toxicity_level = "orange"
+            else:
+                toxicity_level = "red"
+
+            return ARIAAnalysisResponse(
+                toxicity_level=toxicity_level,
+                toxicity_score=score,
+                categories=v2_result.get("categories", []),
+                triggers=v2_result.get("triggers", []),
+                explanation=v2_result.get("explanation", ""),
+                suggestion=v2_result.get("suggestion"),
+                is_flagged=v2_result.get("is_flagged", False),
+                category_confidence=v2_result.get("category_confidence"),
+                window_heat_score=v2_result.get("window_heat_score"),
+                domain_scores=v2_result.get("domain_scores"),
+                session_patterns=v2_result.get("session_patterns"),
+                baseline_deviation=v2_result.get("baseline_deviation"),
+                time_frequency_flags=v2_result.get("time_frequency_flags"),
+                recipient_coaching=v2_result.get("recipient_coaching"),
+                reporting_tags=v2_result.get("reporting_tags"),
+                draft_coaching=v2_result.get("draft_coaching"),
+                pattern_forecast=v2_result.get("pattern_forecast"),
+                legal_flags=v2_result.get("legal_flags"),
+            )
+        except Exception as e:
+            logger.warning(f"[ARIA V2] Analyze endpoint failed, falling back to V1: {e}")
+            # Fall through to V1
+
+    # V1 analysis
     if ai_provider == "claude":
         analysis = await aria_service.analyze_with_ai(content, case_context)
     elif ai_provider == "openai":
         analysis = await aria_service.analyze_with_openai(content, case_context)
     else:
-        # Fast regex analysis (ai_provider=settings.ARIA_DEFAULT_PROVIDER or default)
         result = aria_service.analyze_message(content)
         analysis = {
             "toxicity_score": result.toxicity_score,
@@ -220,10 +266,7 @@ async def analyze_message_content(
             "provider": settings.ARIA_DEFAULT_PROVIDER
         }
 
-    # Determine if flagged
     is_flagged = analysis["toxicity_score"] > 0.3
-
-    # Map score to level
     score = analysis["toxicity_score"]
     if score < 0.2:
         toxicity_level = "green"
@@ -474,94 +517,148 @@ async def send_message(
             detail="Either case_id or family_file_id is required"
         )
 
-    # Analyze with ARIA — Hybrid approach: ALWAYS run regex + LLM for complete coverage
+    # Analyze with ARIA
     aria_analysis = None
+    v2_enrichment = None  # V2 extra fields for response
     if aria_enabled:
         from app.services.aria import SentimentAnalysis, ToxicityCategory, ToxicityLevel
 
-        # STEP 1: Always run regex first (fast, catches obvious patterns)
-        regex_analysis = aria_service.analyze_message(message_data.content)
+        # Check if V2 is enabled and we have a family_file_id (V2 needs sender/recipient context)
+        use_v2 = getattr(settings, 'ARIA_V2_ENABLED', False) and message_data.family_file_id
 
-        # STEP 2: Run LLM for contextual analysis (catches what regex misses)
-        llm_categories = []
-        llm_score = 0.0
-        llm_explanation = ""
-        llm_triggers = []
-        llm_suggestion = None
-
-        if ai_provider in ("claude", "openai"):
+        if use_v2:
+            # ── ARIA V2 Sentinel Shield Pipeline ──
             try:
-                if ai_provider == "claude":
-                    analysis_result = await aria_service.analyze_with_ai(message_data.content, case_context)
-                else:
-                    analysis_result = await aria_service.analyze_with_openai(message_data.content, case_context)
+                v2_result = await aria_service.analyze_message_v2(
+                    db=db,
+                    message_text=message_data.content,
+                    sender_id=str(current_user.id),
+                    recipient_id=message_data.recipient_id,
+                    family_file_id=message_data.family_file_id,
+                )
 
-                llm_score = analysis_result.get("toxicity_score", 0.0)
-                llm_categories = aria_service.map_categories(analysis_result.get("categories", []))
-                llm_explanation = analysis_result.get("explanation", "")
-                llm_triggers = analysis_result.get("triggers", [])
-                llm_suggestion = analysis_result["suggestions"][0] if analysis_result.get("suggestions") else None
+                # Map V2 result to SentimentAnalysis for downstream compatibility
+                level_map = {
+                    "none": ToxicityLevel.NONE, "low": ToxicityLevel.LOW,
+                    "medium": ToxicityLevel.MEDIUM, "high": ToxicityLevel.HIGH,
+                    "severe": ToxicityLevel.SEVERE,
+                }
+                toxicity_level = level_map.get(v2_result["toxicity_level"], ToxicityLevel.NONE)
+
+                # Map V1 category strings back to enum
+                v1_cats = []
+                for cat_str in v2_result.get("categories", []):
+                    try:
+                        v1_cats.append(ToxicityCategory(cat_str))
+                    except ValueError:
+                        pass
+
+                aria_analysis = SentimentAnalysis(
+                    original_message=message_data.content,
+                    toxicity_level=toxicity_level,
+                    toxicity_score=v2_result["toxicity_score"],
+                    categories=v1_cats,
+                    triggers=v2_result.get("triggers", []),
+                    explanation=v2_result.get("explanation", ""),
+                    suggestion=v2_result.get("suggestion"),
+                    is_flagged=v2_result.get("is_flagged", False),
+                    block_send=v2_result.get("block_send", False),
+                    timestamp=datetime.utcnow(),
+                )
+
+                # Store V2 enrichment for the 202 response
+                v2_enrichment = {
+                    "category_confidence": v2_result.get("category_confidence"),
+                    "window_heat_score": v2_result.get("window_heat_score"),
+                    "domain_scores": v2_result.get("domain_scores"),
+                    "session_patterns": v2_result.get("session_patterns"),
+                    "baseline_deviation": v2_result.get("baseline_deviation"),
+                    "time_frequency_flags": v2_result.get("time_frequency_flags"),
+                    "recipient_coaching": v2_result.get("recipient_coaching"),
+                    "reporting_tags": v2_result.get("reporting_tags"),
+                    "draft_coaching": v2_result.get("draft_coaching"),
+                    "pattern_forecast": v2_result.get("pattern_forecast"),
+                    "legal_flags": v2_result.get("legal_flags"),
+                }
+
             except Exception as e:
-                logger.warning(f"LLM analysis failed, using regex only: {e}")
+                logger.error(f"[ARIA V2] Full pipeline failed, falling back to V1: {e}")
+                use_v2 = False  # Fall through to V1
 
-        # STEP 3: Merge regex + LLM results — all categories, highest severity
-        merged_categories = list(set(regex_analysis.categories + llm_categories))
+        if not use_v2:
+            # ── V1 Legacy Pipeline ──
+            regex_analysis = aria_service.analyze_message(message_data.content)
 
-        # Use highest score from either source
-        merged_score = max(regex_analysis.toxicity_score, llm_score)
+            llm_categories = []
+            llm_score = 0.0
+            llm_explanation = ""
+            llm_triggers = []
+            llm_suggestion = None
 
-        # Combine triggers from both sources
-        merged_triggers = list(set(regex_analysis.triggers + llm_triggers))
+            if ai_provider in ("claude", "openai"):
+                try:
+                    if ai_provider == "claude":
+                        analysis_result = await aria_service.analyze_with_ai(message_data.content, case_context)
+                    else:
+                        analysis_result = await aria_service.analyze_with_openai(message_data.content, case_context)
 
-        # Build comprehensive explanation mentioning ALL detected issues
-        explanations = []
-        if regex_analysis.explanation and regex_analysis.explanation != "No issues detected":
-            explanations.append(regex_analysis.explanation)
-        if llm_explanation and llm_explanation != regex_analysis.explanation:
-            explanations.append(llm_explanation)
+                    llm_score = analysis_result.get("toxicity_score", 0.0)
+                    llm_categories = aria_service.map_categories(analysis_result.get("categories", []))
+                    llm_explanation = analysis_result.get("explanation", "")
+                    llm_triggers = analysis_result.get("triggers", [])
+                    llm_suggestion = analysis_result["suggestions"][0] if analysis_result.get("suggestions") else None
+                except Exception as e:
+                    logger.warning(f"LLM analysis failed, using regex only: {e}")
 
-        if len(merged_categories) > 1:
-            cat_names = [cat.value.replace("_", " ").title() for cat in merged_categories]
-            merged_explanation = f"Multiple issues detected: {', '.join(cat_names)}. " + " ".join(explanations)
-        elif explanations:
-            merged_explanation = " ".join(explanations)
-        else:
-            merged_explanation = regex_analysis.explanation or ""
+            merged_categories = list(set(regex_analysis.categories + llm_categories))
+            merged_score = max(regex_analysis.toxicity_score, llm_score)
+            merged_triggers = list(set(regex_analysis.triggers + llm_triggers))
 
-        # Use the best suggestion available (LLM generally better)
-        merged_suggestion = llm_suggestion or regex_analysis.suggestion
+            explanations = []
+            if regex_analysis.explanation and regex_analysis.explanation != "No issues detected":
+                explanations.append(regex_analysis.explanation)
+            if llm_explanation and llm_explanation != regex_analysis.explanation:
+                explanations.append(llm_explanation)
 
-        # Determine toxicity level from merged score
-        if merged_score < 0.2:
-            toxicity_level = ToxicityLevel.NONE
-        elif merged_score < 0.4:
-            toxicity_level = ToxicityLevel.LOW
-        elif merged_score < 0.6:
-            toxicity_level = ToxicityLevel.MEDIUM
-        elif merged_score < 0.8:
-            toxicity_level = ToxicityLevel.HIGH
-        else:
-            toxicity_level = ToxicityLevel.SEVERE
+            if len(merged_categories) > 1:
+                cat_names = [cat.value.replace("_", " ").title() for cat in merged_categories]
+                merged_explanation = f"Multiple issues detected: {', '.join(cat_names)}. " + " ".join(explanations)
+            elif explanations:
+                merged_explanation = " ".join(explanations)
+            else:
+                merged_explanation = regex_analysis.explanation or ""
 
-        # STRICT BLOCKING: Enforce zero tolerance for combined results
-        block_send = (
-            ToxicityCategory.THREATENING in merged_categories or
-            ToxicityCategory.HATE_SPEECH in merged_categories or
-            ToxicityCategory.SEXUAL_HARASSMENT in merged_categories
-        )
+            merged_suggestion = llm_suggestion or regex_analysis.suggestion
 
-        aria_analysis = SentimentAnalysis(
-            original_message=message_data.content,
-            toxicity_level=toxicity_level,
-            toxicity_score=merged_score,
-            categories=merged_categories,
-            triggers=merged_triggers,
-            explanation=merged_explanation,
-            suggestion=merged_suggestion,
-            is_flagged=merged_score > 0.3 or regex_analysis.is_flagged,
-            block_send=block_send or getattr(regex_analysis, 'block_send', False),
-            timestamp=datetime.utcnow()
-        )
+            if merged_score < 0.2:
+                toxicity_level = ToxicityLevel.NONE
+            elif merged_score < 0.4:
+                toxicity_level = ToxicityLevel.LOW
+            elif merged_score < 0.6:
+                toxicity_level = ToxicityLevel.MEDIUM
+            elif merged_score < 0.8:
+                toxicity_level = ToxicityLevel.HIGH
+            else:
+                toxicity_level = ToxicityLevel.SEVERE
+
+            block_send = (
+                ToxicityCategory.THREATENING in merged_categories or
+                ToxicityCategory.HATE_SPEECH in merged_categories or
+                ToxicityCategory.SEXUAL_HARASSMENT in merged_categories
+            )
+
+            aria_analysis = SentimentAnalysis(
+                original_message=message_data.content,
+                toxicity_level=toxicity_level,
+                toxicity_score=merged_score,
+                categories=merged_categories,
+                triggers=merged_triggers,
+                explanation=merged_explanation,
+                suggestion=merged_suggestion,
+                is_flagged=merged_score > 0.3 or regex_analysis.is_flagged,
+                block_send=block_send or getattr(regex_analysis, 'block_send', False),
+                timestamp=datetime.utcnow()
+            )
     else:
         # ARIA disabled - create clean result
         from app.services.aria import SentimentAnalysis, ToxicityLevel
@@ -625,20 +722,32 @@ async def send_message(
         elif aria_analysis.toxicity_score >= 0.3:
             severity_str = "mild"
 
-        return JSONResponse(
-            status_code=202,
-            content={
-                "aria_flagged": True,
-                "aria_mode": aria_mode,
-                "original_message": message_data.content,
-                "suggested_rewrite": rewrite,
-                "explanation": aria_analysis.explanation,
-                "categories": [cat.value for cat in aria_analysis.categories],
-                "toxicity_score": aria_analysis.toxicity_score,
-                "severity": severity_str,
-                "confidence_score": aria_analysis.toxicity_score,
-            }
-        )
+        response_content = {
+            "aria_flagged": True,
+            "aria_mode": aria_mode,
+            "original_message": message_data.content,
+            "suggested_rewrite": rewrite,
+            "explanation": aria_analysis.explanation,
+            "categories": [cat.value for cat in aria_analysis.categories],
+            "toxicity_score": aria_analysis.toxicity_score,
+            "severity": severity_str,
+            "confidence_score": aria_analysis.toxicity_score,
+        }
+
+        # Include V2 enrichment if available
+        if v2_enrichment:
+            response_content.update({
+                "v2_category_confidence": v2_enrichment.get("category_confidence"),
+                "v2_window_heat": v2_enrichment.get("window_heat_score"),
+                "v2_domain_scores": v2_enrichment.get("domain_scores"),
+                "v2_session_patterns": v2_enrichment.get("session_patterns"),
+                "v2_time_signals": v2_enrichment.get("time_frequency_flags"),
+                "v2_recipient_coaching": v2_enrichment.get("recipient_coaching"),
+                "v2_reporting_tags": v2_enrichment.get("reporting_tags"),
+                "v2_legal_flags": v2_enrichment.get("legal_flags"),
+            })
+
+        return JSONResponse(status_code=202, content=response_content)
 
     # In strict mode: if the message was flagged and user has NOT accepted a rewrite,
     # we block the send even if aria_accepted_rewrite is somehow missing.

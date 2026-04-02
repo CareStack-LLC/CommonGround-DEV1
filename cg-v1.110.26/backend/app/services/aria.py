@@ -2,16 +2,20 @@
 ARIA Service - AI-Powered Sentiment Analysis
 Analyzes parent-to-parent communication and helps prevent conflict.
 
-Two-tier analysis:
-1. Fast regex-based pattern matching for obvious cases
-2. Deep Claude AI analysis for nuanced detection
+V2 Sentinel Shield Architecture (4 layers):
+1. Regex pattern matching (always runs) — 32-category V2 taxonomy
+2. Thread Intelligence (rolling window heat + session memory)
+3. LLM Deep Analysis (triggered by heat/severity/novelty) — OpenAI primary
+4. V3 Proactive Intelligence (beta, toggled)
+
+V1 fallback: When ARIA_V2_ENABLED=False, uses original 14-category flat scoring.
 """
 
 import re
 import json
 import logging
 from typing import List, Optional, Dict, Any
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 from datetime import datetime, timedelta
 import anthropic
@@ -1221,7 +1225,7 @@ An incoming message was just received:
         except Exception as e:
             logger.error(f"[ARIA v2] generate_reply_suggestion (Claude) failed: {e}")
             capture_error(e, tags={"service": "aria", "operation": "reply_suggestion"})
-            
+
             # Fallback to OpenAI if Anthropic fails
             try:
                 logger.info("[ARIA v2] Attempting OpenAI fallback for reply suggestions...")
@@ -1236,7 +1240,7 @@ An incoming message was just received:
                     max_tokens=200,
                     response_format={"type": "json_object"}
                 )
-                
+
                 import json as _json
                 parsed = _json.loads(response.choices[0].message.content)
                 suggestions = parsed.get("suggestions", [])[:2]
@@ -1245,8 +1249,288 @@ An incoming message was just received:
                     return suggestions
             except Exception as oe:
                 logger.error(f"[ARIA v2] OpenAI fallback failed: {oe}")
-                
+
             return []
+
+    # =========================================================================
+    # ARIA V2 Sentinel Shield — Full Pipeline
+    # =========================================================================
+
+    async def analyze_message_v2(
+        self,
+        db: AsyncSession,
+        message_text: str,
+        sender_id: str,
+        recipient_id: str,
+        family_file_id: str,
+        sensitivity_offset: float = 0.0,
+    ) -> Dict[str, Any]:
+        """
+        ARIA V2 Sentinel Shield — 4-Layer Analysis Pipeline.
+
+        Layer 1: Regex (32-category taxonomy with confidence scoring)
+        Layer 2: Thread Intelligence (rolling window heat + session memory)
+        Layer 3: LLM Deep Analysis (triggered by heat/severity/novelty)
+        Layer 4: V3 Proactive Intelligence (beta, if enabled)
+
+        Returns a dict compatible with ARIAAnalysisResponse (V1 fields + V2 enrichment).
+        Falls back to V1 analysis on any critical failure.
+        """
+        from app.services.aria_confidence import score_categories, get_triggers_for_categories
+        from app.services.aria_taxonomy_v2 import (
+            calculate_v2_score, get_max_severity, get_reporting_tags,
+            get_domain_scores, v2_categories_to_v1_labels,
+        )
+        from app.services.aria_heat_window import get_rolling_window_heat, should_trigger_llm
+        from app.services.aria_session_memory import (
+            get_session_context, update_session_memory, format_session_context_for_llm,
+        )
+        from app.services.aria_baseline import get_baseline, update_baseline, check_deviation
+        from app.services.aria_bidirectional import get_recipient_context, generate_coaching_note
+        from app.services.aria_time_signals import detect_time_signals
+        from app.services.aria_llm_router import (
+            run_llm_deep_analysis, run_llm_severity_analysis, merge_regex_and_llm_results,
+        )
+
+        try:
+            # ── Layer 1: Regex with V2 Taxonomy ──
+            metric_increment("aria.v2.analysis.total")
+            category_confidence = score_categories(message_text)
+            triggers = get_triggers_for_categories(message_text, category_confidence)
+
+            # Also check ALL CAPS (not regex-based)
+            words = message_text.split()
+            if len(words) > 3:
+                caps_words = sum(1 for w in words if w.isupper() and len(w) > 1)
+                if caps_words / len(words) > 0.6:
+                    from app.services.aria_taxonomy_v2 import V2Category
+                    category_confidence[V2Category.ANGER_ESCALATION] = max(
+                        category_confidence.get(V2Category.ANGER_ESCALATION, 0.0), 0.7
+                    )
+                    triggers.append("EXCESSIVE CAPS")
+
+            # Calculate V2 score
+            v2_score = calculate_v2_score(category_confidence)
+            max_severity = get_max_severity(list(category_confidence.keys()))
+
+            # Apply sensitivity offset for DV cases
+            if sensitivity_offset > 0:
+                v2_score = min(1.0, v2_score + sensitivity_offset)
+
+            # ── Layer 2: Thread Intelligence ──
+            window_heat, window_scores = await get_rolling_window_heat(
+                db, sender_id, family_file_id, v2_score,
+            )
+
+            session_context = await get_session_context(
+                db, sender_id, recipient_id, family_file_id,
+            )
+            session_context_str = format_session_context_for_llm(session_context)
+
+            # Baseline check
+            baseline = await get_baseline(db, sender_id, family_file_id)
+            baseline_deviation = None
+            is_new_pattern = False
+            if baseline:
+                baseline_deviation = check_deviation(
+                    baseline, len(message_text), v2_score,
+                )
+                if baseline_deviation:
+                    is_new_pattern = True
+
+            # ── Layer 3: LLM Deep Analysis (conditional) ──
+            llm_result = None
+            if should_trigger_llm(window_heat, max_severity, is_new_pattern):
+                metric_increment("aria.v2.llm_triggered")
+                baseline_info = ""
+                if baseline_deviation:
+                    baseline_info = f"Deviation from baseline: {json.dumps(baseline_deviation)}"
+
+                time_signals = await detect_time_signals(
+                    db, sender_id, family_file_id,
+                )
+
+                if max_severity >= 4:
+                    llm_result = await run_llm_severity_analysis(
+                        message_text, session_context_str,
+                    )
+                else:
+                    llm_result = await run_llm_deep_analysis(
+                        message_text, session_context_str, baseline_info, time_signals,
+                    )
+
+                # Merge regex + LLM results
+                if llm_result:
+                    category_confidence = merge_regex_and_llm_results(
+                        category_confidence, llm_result,
+                    )
+                    # Re-calculate score after merge
+                    v2_score = calculate_v2_score(category_confidence)
+                    max_severity = get_max_severity(list(category_confidence.keys()))
+                    if llm_result.get("triggers"):
+                        triggers = list(set(triggers + llm_result["triggers"]))
+            else:
+                time_signals = await detect_time_signals(
+                    db, sender_id, family_file_id,
+                )
+
+            # ── Bidirectional analysis ──
+            recipient_context = await get_recipient_context(
+                db, recipient_id, family_file_id,
+            )
+            v2_cat_names = [cat.value for cat in category_confidence.keys()]
+            coaching_note = generate_coaching_note(v2_cat_names, recipient_context)
+
+            # ── Update session memory and baseline (fire-and-forget) ──
+            try:
+                await update_session_memory(
+                    db, sender_id, recipient_id, family_file_id,
+                    v2_cat_names, v2_score,
+                )
+                await update_baseline(
+                    db, sender_id, family_file_id,
+                    len(message_text), v2_score,
+                )
+            except Exception as e:
+                logger.error(f"[ARIA V2] Memory/baseline update failed: {e}")
+
+            # ── Layer 4: V3 Beta (if enabled) ──
+            draft_coaching = None
+            pattern_forecast = None
+            legal_flags = None
+            if getattr(settings, 'ARIA_V3_BETA_ENABLED', False):
+                from app.services.aria_v3_beta import (
+                    detect_legal_language, generate_draft_coaching,
+                    generate_pattern_forecast,
+                )
+                legal_flags = detect_legal_language(message_text)
+                draft_coaching = generate_draft_coaching(
+                    message_text, v2_cat_names, v2_score,
+                )
+                pattern_forecast = generate_pattern_forecast(session_context)
+
+            # ── Build response ──
+            # V1 compatible fields
+            v1_categories = v2_categories_to_v1_labels(list(category_confidence.keys()))
+            reporting_tags = get_reporting_tags(list(category_confidence.keys()))
+            domain_scores = get_domain_scores(category_confidence)
+
+            # Determine toxicity level (V1 compatible)
+            effective_offset = sensitivity_offset
+            if v2_score == 0:
+                toxicity_level = "none"
+            elif v2_score < (0.3 - effective_offset):
+                toxicity_level = "low"
+            elif v2_score < (0.6 - effective_offset):
+                toxicity_level = "medium"
+            elif v2_score < (0.85 - effective_offset):
+                toxicity_level = "high"
+            else:
+                toxicity_level = "severe"
+
+            is_flagged = v2_score > 0.3
+
+            # Generate explanation
+            explanation = self._generate_explanation(
+                [cat for cat in self._v2_to_v1_categories(category_confidence)]
+            )
+            if llm_result and llm_result.get("explanation"):
+                explanation = llm_result["explanation"]
+
+            # Generate suggestion
+            suggestion = None
+            if is_flagged:
+                if llm_result and llm_result.get("suggestion"):
+                    suggestion = llm_result["suggestion"]
+                else:
+                    v1_cats = self._v2_to_v1_categories(category_confidence)
+                    suggestion = self._generate_suggestion(
+                        message_text, v1_cats,
+                        ToxicityLevel(toxicity_level) if toxicity_level != "none" else ToxicityLevel.LOW,
+                    )
+
+            # Block logic
+            from app.services.aria_taxonomy_v2 import V2Category
+            block_send = (
+                V2Category.DIRECT_THREAT in category_confidence or
+                V2Category.CHILD_THREAT in category_confidence or
+                V2Category.BOUNDARY_VIOLATION in category_confidence and
+                any(cat.value in ["direct_threat", "child_threat"] for cat in category_confidence)
+            )
+            # Also check for hate speech / sexual harassment via high severity
+            if max_severity >= 5:
+                block_send = True
+            if sensitivity_offset > 0 and toxicity_level in ["high", "severe"]:
+                block_send = True
+
+            metric_distribution("aria.v2.toxicity_score", v2_score, unit="none")
+            if is_flagged:
+                metric_increment("aria.v2.flagged")
+
+            return {
+                # V1 fields
+                "toxicity_level": toxicity_level,
+                "toxicity_score": round(v2_score, 3),
+                "categories": v1_categories,
+                "triggers": triggers,
+                "explanation": explanation,
+                "suggestion": suggestion,
+                "is_flagged": is_flagged,
+                "block_send": block_send,
+                # V2 enrichment
+                "category_confidence": {cat.value: conf for cat, conf in category_confidence.items()},
+                "window_heat_score": window_heat,
+                "domain_scores": domain_scores,
+                "session_patterns": session_context.get("recurring_patterns", []),
+                "baseline_deviation": baseline_deviation,
+                "time_frequency_flags": time_signals,
+                "recipient_coaching": coaching_note,
+                "reporting_tags": reporting_tags,
+                # V3 beta
+                "draft_coaching": draft_coaching,
+                "pattern_forecast": pattern_forecast,
+                "legal_flags": legal_flags,
+            }
+
+        except Exception as e:
+            logger.error(f"[ARIA V2] Pipeline failed, falling back to V1: {e}")
+            capture_error(e, tags={"service": "aria_v2", "operation": "analyze_message_v2"})
+            # Fall back to V1 analysis
+            v1_result = self.analyze_message(message_text, sensitivity_offset=sensitivity_offset)
+            return {
+                "toxicity_level": v1_result.toxicity_level.value,
+                "toxicity_score": v1_result.toxicity_score,
+                "categories": [cat.value for cat in v1_result.categories],
+                "triggers": v1_result.triggers,
+                "explanation": v1_result.explanation,
+                "suggestion": v1_result.suggestion,
+                "is_flagged": v1_result.is_flagged,
+                "block_send": v1_result.block_send,
+                "category_confidence": None,
+                "window_heat_score": None,
+                "domain_scores": None,
+                "session_patterns": None,
+                "baseline_deviation": None,
+                "time_frequency_flags": None,
+                "recipient_coaching": None,
+                "reporting_tags": None,
+                "draft_coaching": None,
+                "pattern_forecast": None,
+                "legal_flags": None,
+            }
+
+    def _v2_to_v1_categories(self, category_confidence: Dict) -> List['ToxicityCategory']:
+        """Convert V2 category confidence dict to V1 ToxicityCategory list for existing methods."""
+        from app.services.aria_taxonomy_v2 import V2_TO_V1_MAP
+        v1_cats = set()
+        for v2_cat in category_confidence.keys():
+            v1_label = V2_TO_V1_MAP.get(v2_cat)
+            if v1_label:
+                try:
+                    v1_cats.add(ToxicityCategory(v1_label))
+                except ValueError:
+                    pass
+        return list(v1_cats)
 
 
 # Singleton instance

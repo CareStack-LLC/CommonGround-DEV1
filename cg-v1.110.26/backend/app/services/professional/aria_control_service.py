@@ -326,10 +326,9 @@ class ARIAControlService:
         Get ARIA metrics for a case.
 
         Returns:
-        - Message volume
-        - Flag rate
-        - Sentiment trends
-        - Good faith indicators
+        - Message volume, flag rate, sentiment trends, good faith (V1)
+        - Heat per parent, domain breakdown, session patterns,
+          time signals, legal flags, coaching acceptance, category breakdown (V2)
         """
         await self._verify_aria_access(professional_id, family_file_id)
 
@@ -343,35 +342,35 @@ class ARIAControlService:
 
         since = datetime.utcnow() - timedelta(days=days)
 
-        # Total messages
+        # V1 metrics
         total_messages = await self._count_messages(case_id, since)
-
-        # Flagged messages
         flagged_messages = await self._count_flagged_messages(case_id, since)
-
-        # Average sentiment by sender
-        sentiment_by_sender = await self._get_sentiment_by_sender(
-            case_id, since
-        )
-
-        # Flag rate
+        sentiment_by_sender = await self._get_sentiment_by_sender(case_id, since)
         flag_rate = (flagged_messages / total_messages * 100) if total_messages > 0 else 0
 
-        # Sentiment trend (last 7 days vs previous 7 days)
         recent_sentiment = await self._get_average_sentiment(
-            case_id,
-            datetime.utcnow() - timedelta(days=7),
-            datetime.utcnow(),
+            case_id, datetime.utcnow() - timedelta(days=7), datetime.utcnow(),
         )
         previous_sentiment = await self._get_average_sentiment(
-            case_id,
-            datetime.utcnow() - timedelta(days=14),
-            datetime.utcnow() - timedelta(days=7),
+            case_id, datetime.utcnow() - timedelta(days=14), datetime.utcnow() - timedelta(days=7),
         )
-
         sentiment_trend = "improving" if recent_sentiment > previous_sentiment else (
             "declining" if recent_sentiment < previous_sentiment else "stable"
         )
+
+        # V2 Sentinel Shield aggregations
+        parent_a_id = family_file.parent_a_id
+        parent_b_id = family_file.parent_b_id
+        heat_by_sender = await self._get_v2_heat_by_sender(case_id, since)
+        domain_breakdown = await self._get_v2_domain_breakdown(case_id, since)
+        session_patterns = await self._get_v2_session_patterns(case_id, since)
+        time_signals = await self._get_v2_time_signal_distribution(case_id, since)
+        legal_count = await self._get_v2_legal_flag_count(case_id, since)
+        coaching_rate = await self._get_v2_coaching_acceptance_rate(case_id, since)
+        category_breakdown = await self._get_v2_category_breakdown(case_id, since)
+
+        all_heats = [v for v in heat_by_sender.values() if v is not None]
+        overall_avg_heat = round(sum(all_heats) / len(all_heats), 2) if all_heats else None
 
         return {
             "period_days": days,
@@ -382,8 +381,18 @@ class ARIAControlService:
             "average_sentiment": round(recent_sentiment, 2) if recent_sentiment else None,
             "sentiment_trend": sentiment_trend,
             "good_faith_score": await self._calculate_good_faith_score(
-                case_id, since
+                case_id, since, heat_by_sender, legal_count, domain_breakdown,
             ),
+            # V2 Sentinel Shield
+            "v2_heat_parent_a": heat_by_sender.get(parent_a_id),
+            "v2_heat_parent_b": heat_by_sender.get(parent_b_id),
+            "v2_avg_heat": overall_avg_heat,
+            "v2_domain_breakdown": domain_breakdown,
+            "v2_session_pattern_frequency": session_patterns,
+            "v2_time_signal_distribution": time_signals,
+            "v2_legal_flag_count": legal_count,
+            "v2_coaching_acceptance_rate": coaching_rate,
+            "v2_category_breakdown": category_breakdown,
         }
 
     async def get_parent_metrics(
@@ -634,18 +643,210 @@ class ARIAControlService:
         avg = result.scalar()
         return float(avg) if avg else None
 
+    # -------------------------------------------------------------------------
+    # V2 Sentinel Shield Aggregation Helpers
+    # -------------------------------------------------------------------------
+
+    async def _get_v2_heat_by_sender(
+        self, case_id: str, since: datetime,
+    ) -> dict:
+        """Average window_heat_score grouped by sender."""
+        result = await self.db.execute(
+            select(
+                Message.sender_id,
+                func.avg(MessageFlag.window_heat_score).label("avg_heat"),
+            )
+            .join(MessageFlag, MessageFlag.message_id == Message.id)
+            .where(
+                and_(
+                    Message.case_id == case_id,
+                    Message.created_at >= since,
+                    MessageFlag.window_heat_score.isnot(None),
+                )
+            )
+            .group_by(Message.sender_id)
+        )
+        return {
+            row.sender_id: round(float(row.avg_heat), 2)
+            for row in result.fetchall()
+        }
+
+    async def _get_v2_domain_breakdown(
+        self, case_id: str, since: datetime,
+    ) -> dict:
+        """Aggregate domain_scores across all flagged messages."""
+        result = await self.db.execute(
+            select(MessageFlag.domain_scores)
+            .join(Message, MessageFlag.message_id == Message.id)
+            .where(
+                and_(
+                    Message.case_id == case_id,
+                    Message.created_at >= since,
+                    MessageFlag.domain_scores.isnot(None),
+                )
+            )
+        )
+        domain_totals: dict = {}
+        for (scores,) in result.fetchall():
+            if not isinstance(scores, dict):
+                continue
+            for domain, score in scores.items():
+                if domain not in domain_totals:
+                    domain_totals[domain] = {"total": 0.0, "count": 0}
+                domain_totals[domain]["total"] += float(score)
+                domain_totals[domain]["count"] += 1
+
+        return {
+            domain: {
+                "count": data["count"],
+                "avg_score": round(data["total"] / data["count"], 3),
+            }
+            for domain, data in domain_totals.items()
+        }
+
+    async def _get_v2_session_patterns(
+        self, case_id: str, since: datetime,
+    ) -> dict:
+        """Count frequency of each reporting_tag across flagged messages."""
+        result = await self.db.execute(
+            select(MessageFlag.reporting_tags)
+            .join(Message, MessageFlag.message_id == Message.id)
+            .where(
+                and_(
+                    Message.case_id == case_id,
+                    Message.created_at >= since,
+                    MessageFlag.reporting_tags.isnot(None),
+                )
+            )
+        )
+        tag_counts: dict = {}
+        for (tags,) in result.fetchall():
+            if not isinstance(tags, list):
+                continue
+            for tag in tags:
+                tag_counts[tag] = tag_counts.get(tag, 0) + 1
+        return tag_counts
+
+    async def _get_v2_time_signal_distribution(
+        self, case_id: str, since: datetime,
+    ) -> dict:
+        """Count frequency of each time_frequency_flag."""
+        result = await self.db.execute(
+            select(MessageFlag.time_frequency_flags)
+            .join(Message, MessageFlag.message_id == Message.id)
+            .where(
+                and_(
+                    Message.case_id == case_id,
+                    Message.created_at >= since,
+                    MessageFlag.time_frequency_flags.isnot(None),
+                )
+            )
+        )
+        signal_counts: dict = {}
+        for (flags,) in result.fetchall():
+            if not isinstance(flags, list):
+                continue
+            for flag in flags:
+                signal_counts[flag] = signal_counts.get(flag, 0) + 1
+        return signal_counts
+
+    async def _get_v2_legal_flag_count(
+        self, case_id: str, since: datetime,
+    ) -> int:
+        """Count flags with legal-relevant reporting tags."""
+        legal_categories = {"threats", "grooming", "hate_speech", "sexual_harassment",
+                           "custody_weaponization", "parental_alienation"}
+        result = await self.db.execute(
+            select(MessageFlag.reporting_tags)
+            .join(Message, MessageFlag.message_id == Message.id)
+            .where(
+                and_(
+                    Message.case_id == case_id,
+                    Message.created_at >= since,
+                    MessageFlag.reporting_tags.isnot(None),
+                )
+            )
+        )
+        count = 0
+        for (tags,) in result.fetchall():
+            if isinstance(tags, list) and any(t in legal_categories for t in tags):
+                count += 1
+        return count
+
+    async def _get_v2_coaching_acceptance_rate(
+        self, case_id: str, since: datetime,
+    ) -> Optional[float]:
+        """Acceptance rate for messages that had coaching suggestions."""
+        result = await self.db.execute(
+            select(MessageFlag.user_action)
+            .join(Message, MessageFlag.message_id == Message.id)
+            .where(
+                and_(
+                    Message.case_id == case_id,
+                    Message.created_at >= since,
+                    MessageFlag.recipient_coaching.isnot(None),
+                )
+            )
+        )
+        actions = [row[0] for row in result.fetchall()]
+        if not actions:
+            return None
+        accepted = sum(1 for a in actions if a in ("accepted", "modified"))
+        return round(accepted / len(actions), 3)
+
+    async def _get_v2_category_breakdown(
+        self, case_id: str, since: datetime,
+    ) -> dict:
+        """Aggregate V2 categories with average confidence scores."""
+        result = await self.db.execute(
+            select(MessageFlag.v2_categories, MessageFlag.category_confidence)
+            .join(Message, MessageFlag.message_id == Message.id)
+            .where(
+                and_(
+                    Message.case_id == case_id,
+                    Message.created_at >= since,
+                    MessageFlag.v2_categories.isnot(None),
+                )
+            )
+        )
+        cat_data: dict = {}
+        for v2_cats, confidences in result.fetchall():
+            if not isinstance(v2_cats, list):
+                continue
+            conf = confidences if isinstance(confidences, dict) else {}
+            for cat in v2_cats:
+                if cat not in cat_data:
+                    cat_data[cat] = {"count": 0, "conf_total": 0.0, "conf_count": 0}
+                cat_data[cat]["count"] += 1
+                if cat in conf:
+                    cat_data[cat]["conf_total"] += float(conf[cat])
+                    cat_data[cat]["conf_count"] += 1
+
+        return {
+            cat: {
+                "count": data["count"],
+                "avg_confidence": round(data["conf_total"] / data["conf_count"], 3)
+                if data["conf_count"] > 0 else None,
+            }
+            for cat, data in cat_data.items()
+        }
+
     async def _calculate_good_faith_score(
         self,
         case_id: str,
         since: datetime,
+        heat_by_sender: Optional[dict] = None,
+        legal_flag_count: Optional[int] = None,
+        domain_breakdown: Optional[dict] = None,
     ) -> Optional[float]:
         """
         Calculate a good faith score based on messaging patterns.
 
         Score is 0-100 based on:
-        - Response rate
-        - Flag rate (inverse)
-        - Sentiment trends
+        - Flag rate (inverse, up to -40)
+        - Sentiment trends (±30)
+        - V2: High heat (-10), legal flags (-5 each, max -15),
+          severe domains THRT/CTRL (-10)
         """
         total = await self._count_messages(case_id, since)
         flagged = await self._count_flagged_messages(case_id, since)
@@ -653,22 +854,33 @@ class ARIAControlService:
         if total == 0:
             return None
 
-        # Base score of 100
         score = 100.0
 
-        # Deduct for flag rate (up to 40 points)
+        # V1: Deduct for flag rate (up to 40 points)
         flag_rate = flagged / total
         score -= min(flag_rate * 100, 40)
 
-        # Factor in average sentiment (up to 30 points bonus/deduction)
+        # V1: Factor in average sentiment (±30 points)
         avg_sentiment = await self._get_average_sentiment(
-            case_id,
-            since,
-            datetime.utcnow(),
+            case_id, since, datetime.utcnow(),
         )
         if avg_sentiment is not None:
-            # Sentiment is typically -1 to 1, map to -30 to +30
-            sentiment_factor = avg_sentiment * 30
-            score += sentiment_factor
+            score += avg_sentiment * 30
+
+        # V2: Deduct for sustained high heat (avg > 3.0 across senders)
+        if heat_by_sender:
+            heats = [v for v in heat_by_sender.values() if v is not None]
+            if heats and (sum(heats) / len(heats)) > 3.0:
+                score -= 10
+
+        # V2: Deduct for legal flags (-5 each, max -15)
+        if legal_flag_count and legal_flag_count > 0:
+            score -= min(legal_flag_count * 5, 15)
+
+        # V2: Deduct for severe domain presence (THRT or CTRL)
+        if domain_breakdown:
+            severe_domains = {"THRT", "CTRL"}
+            if any(d in domain_breakdown for d in severe_domains):
+                score -= 10
 
         return max(0, min(100, round(score, 1)))

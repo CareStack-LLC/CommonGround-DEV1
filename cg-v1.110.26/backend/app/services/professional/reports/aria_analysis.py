@@ -6,14 +6,20 @@ Focused report on hostile communication patterns with:
 - Sentiment analysis and hostility trends
 - Communication pattern analysis (time of day, triggers)
 - Threat detection and escalations
+- V2 Sentinel Shield: domain analysis, heat tracking, legal flags,
+  session patterns, time signals, coaching effectiveness
 """
 
+import hashlib
+import json
+from collections import defaultdict
 from datetime import datetime, timedelta
 from typing import Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_
 
 from sqlalchemy import func
+from sqlalchemy.orm import selectinload
 
 from app.services.professional.aria_control_service import ARIAControlService
 from app.models.family_file import FamilyFile
@@ -40,9 +46,8 @@ class ARIAAnalysisReport:
         """
         Generate ARIA communication analysis payload.
 
-        Includes detailed before/after examples of interventions.
+        Includes V1 intervention examples and V2 Sentinel Shield analysis.
         """
-        # Get case metadata
         family_file = await self.db.get(FamilyFile, family_file_id)
         if not family_file:
             raise ValueError(f"Family file {family_file_id} not found")
@@ -50,29 +55,31 @@ class ARIAAnalysisReport:
         parent_a = await self.db.get(User, family_file.parent_a_id)
         parent_b = await self.db.get(User, family_file.parent_b_id)
 
-        # Get ARIA metrics and interventions
+        # Get ARIA metrics (now includes V2) and interventions
         aria_metrics = await self.aria_service.get_aria_metrics(family_file_id)
         interventions = await self.aria_service.get_aria_interventions(
             family_file_id=family_file_id
         )
 
-        # Filter interventions by date range
         filtered_interventions = [
             i for i in interventions
             if start_date <= i["timestamp"] <= end_date
         ]
 
-        # Build intervention examples with before/after
         intervention_examples = await self._build_intervention_examples(
-            filtered_interventions[:10]  # Top 10 most severe
+            filtered_interventions[:10]
         )
 
-        # Circle ARIA data (child safety monitoring)
         circle_aria_data = await self._build_circle_aria_section(
             family_file_id, start_date, end_date
         )
 
-        return {
+        # V2 Sentinel Shield aggregation
+        v2_shield = await self._build_v2_sentinel_shield(
+            family_file_id, parent_a, parent_b, start_date, end_date
+        )
+
+        report_data = {
             "report_type": "aria_analysis",
             "metadata": {
                 "family_file_id": family_file_id,
@@ -97,6 +104,10 @@ class ARIAAnalysisReport:
                 "trend": "increasing" if len(filtered_interventions) > 10 else "stable",
                 "circle_flagged_messages": circle_aria_data.get("flagged_messages", 0),
                 "circle_terminated_calls": circle_aria_data.get("terminated_calls", 0),
+                # V2 summary
+                "v2_avg_heat": aria_metrics.get("v2_avg_heat"),
+                "v2_legal_flag_count": aria_metrics.get("v2_legal_flag_count", 0),
+                "v2_good_faith_score": aria_metrics.get("good_faith_score"),
             },
             "intervention_breakdown": {
                 "by_type": self._count_by_type(filtered_interventions),
@@ -106,9 +117,166 @@ class ARIAAnalysisReport:
             "intervention_examples": intervention_examples,
             "communication_patterns": self._analyze_patterns(filtered_interventions),
             "circle_aria_activity": circle_aria_data,
+            "v2_sentinel_shield": v2_shield,
             "recommendations": self._build_recommendations(
-                filtered_interventions, circle_aria_data
+                filtered_interventions, circle_aria_data, v2_shield
             ),
+        }
+
+        # Compute content hash for court verification
+        hash_payload = json.dumps(report_data, sort_keys=True, default=str)
+        report_data["content_hash"] = hashlib.sha256(hash_payload.encode()).hexdigest()
+
+        return report_data
+
+    async def _build_v2_sentinel_shield(
+        self,
+        family_file_id: str,
+        parent_a: User,
+        parent_b: User,
+        start_date: datetime,
+        end_date: datetime,
+    ) -> dict:
+        """Build V2 Sentinel Shield section from MessageFlag V2 columns."""
+        legal_categories = {
+            "threats", "grooming", "hate_speech", "sexual_harassment",
+            "custody_weaponization", "parental_alienation",
+        }
+
+        result = await self.db.execute(
+            select(Message.sender_id, Message.created_at, MessageFlag)
+            .join(MessageFlag, MessageFlag.message_id == Message.id)
+            .where(
+                and_(
+                    Message.family_file_id == family_file_id,
+                    Message.created_at >= start_date,
+                    Message.created_at <= end_date,
+                )
+            )
+        )
+        rows = result.fetchall()
+
+        # Accumulators
+        heat_a, heat_b = [], []
+        heat_timeline = []
+        domain_totals: dict = defaultdict(lambda: {"total": 0.0, "count": 0})
+        category_totals: dict = defaultdict(
+            lambda: {"count": 0, "conf_total": 0.0, "conf_count": 0, "parent_a": 0, "parent_b": 0}
+        )
+        legal_flags = []
+        time_signal_counts: dict = defaultdict(int)
+        pattern_counts: dict = defaultdict(int)
+        coaching_offered = 0
+        coaching_accepted = 0
+
+        for sender_id, created_at, flag in rows:
+            is_parent_a = sender_id == parent_a.id
+
+            # Heat
+            if flag.window_heat_score is not None:
+                heat_val = float(flag.window_heat_score)
+                (heat_a if is_parent_a else heat_b).append(heat_val)
+                heat_timeline.append({
+                    "date": created_at.isoformat(),
+                    "parent_a": round(heat_val, 2) if is_parent_a else None,
+                    "parent_b": round(heat_val, 2) if not is_parent_a else None,
+                })
+
+            # Domains
+            if isinstance(flag.domain_scores, dict):
+                for domain, score in flag.domain_scores.items():
+                    domain_totals[domain]["total"] += float(score)
+                    domain_totals[domain]["count"] += 1
+
+            # Categories
+            if isinstance(flag.v2_categories, list):
+                conf = flag.category_confidence if isinstance(flag.category_confidence, dict) else {}
+                for cat in flag.v2_categories:
+                    category_totals[cat]["count"] += 1
+                    if is_parent_a:
+                        category_totals[cat]["parent_a"] += 1
+                    else:
+                        category_totals[cat]["parent_b"] += 1
+                    if cat in conf:
+                        category_totals[cat]["conf_total"] += float(conf[cat])
+                        category_totals[cat]["conf_count"] += 1
+
+            # Reporting tags / legal flags
+            if isinstance(flag.reporting_tags, list):
+                for tag in flag.reporting_tags:
+                    pattern_counts[tag] += 1
+                    if tag in legal_categories:
+                        legal_flags.append({
+                            "date": created_at.isoformat(),
+                            "category": tag,
+                            "severity": flag.severity or "unknown",
+                            "parent": "Parent A" if is_parent_a else "Parent B",
+                        })
+
+            # Time signals
+            if isinstance(flag.time_frequency_flags, list):
+                for sig in flag.time_frequency_flags:
+                    time_signal_counts[sig] += 1
+
+            # Coaching
+            if flag.recipient_coaching:
+                coaching_offered += 1
+                if flag.user_action in ("accepted", "modified"):
+                    coaching_accepted += 1
+
+        # Compute heat trend
+        def _heat_trend(heats: list) -> str:
+            if len(heats) < 4:
+                return "insufficient_data"
+            mid = len(heats) // 2
+            first_avg = sum(heats[:mid]) / mid
+            second_avg = sum(heats[mid:]) / (len(heats) - mid)
+            if second_avg > first_avg + 0.3:
+                return "escalating"
+            elif second_avg < first_avg - 0.3:
+                return "de-escalating"
+            return "stable"
+
+        all_heats = heat_a + heat_b
+        heat_trend = _heat_trend(all_heats)
+
+        return {
+            "heat_analysis": {
+                "parent_a_avg_heat": round(sum(heat_a) / len(heat_a), 2) if heat_a else None,
+                "parent_b_avg_heat": round(sum(heat_b) / len(heat_b), 2) if heat_b else None,
+                "overall_avg_heat": round(sum(all_heats) / len(all_heats), 2) if all_heats else None,
+                "heat_trend": heat_trend,
+                "heat_timeline": heat_timeline,
+            },
+            "domain_analysis": {
+                domain: {
+                    "count": data["count"],
+                    "avg_score": round(data["total"] / data["count"], 3),
+                }
+                for domain, data in domain_totals.items()
+            },
+            "category_analysis": {
+                cat: {
+                    "count": data["count"],
+                    "avg_confidence": round(data["conf_total"] / data["conf_count"], 3)
+                    if data["conf_count"] > 0 else None,
+                    "by_parent": {"a": data["parent_a"], "b": data["parent_b"]},
+                }
+                for cat, data in category_totals.items()
+            },
+            "session_patterns": {
+                "frequency": dict(pattern_counts),
+            },
+            "time_signals": dict(time_signal_counts),
+            "legal_flags": {
+                "count": len(legal_flags),
+                "details": legal_flags,
+            },
+            "coaching_effectiveness": {
+                "offered": coaching_offered,
+                "accepted": coaching_accepted,
+                "rate": round(coaching_accepted / coaching_offered, 3) if coaching_offered > 0 else None,
+            },
         }
 
     def _count_by_type(self, interventions: list) -> dict:
@@ -378,8 +546,11 @@ class ARIAAnalysisReport:
 
         return section
 
-    def _build_recommendations(self, interventions: list, circle_data: Optional[dict] = None) -> list:
-        """Build recommendations based on ARIA data."""
+    def _build_recommendations(
+        self, interventions: list, circle_data: Optional[dict] = None,
+        v2_shield: Optional[dict] = None,
+    ) -> list:
+        """Build recommendations based on ARIA V1 and V2 data."""
         recommendations = []
 
         if len(interventions) > 20:
@@ -400,6 +571,61 @@ class ARIAAnalysisReport:
                 "priority": "medium",
                 "recommendation": "Recommend parenting coordinator appointment to mediate communication"
             })
+
+        # V2 Sentinel Shield recommendations
+        if v2_shield:
+            heat = v2_shield.get("heat_analysis", {})
+            if heat.get("overall_avg_heat") and heat["overall_avg_heat"] > 3.0:
+                recommendations.append({
+                    "priority": "high",
+                    "recommendation": (
+                        f"Sustained high conversation heat ({heat['overall_avg_heat']:.1f}/5.0) — "
+                        "recommend communication restrictions or supervised messaging"
+                    )
+                })
+            if heat.get("heat_trend") == "escalating":
+                recommendations.append({
+                    "priority": "high",
+                    "recommendation": (
+                        "Escalating heat trajectory detected — intervention urgency increasing. "
+                        "Consider immediate professional mediation session"
+                    )
+                })
+
+            domains = v2_shield.get("domain_analysis", {})
+            severe_domains = {d: v for d, v in domains.items() if d in ("THRT", "CTRL")}
+            if severe_domains:
+                domain_details = ", ".join(
+                    f"{d} ({v['count']} instances, avg {v['avg_score']:.2f})"
+                    for d, v in severe_domains.items()
+                )
+                recommendations.append({
+                    "priority": "urgent",
+                    "recommendation": (
+                        f"Severe behavioral domains active: {domain_details} — "
+                        "document for court review and consider protective measures"
+                    )
+                })
+
+            legal = v2_shield.get("legal_flags", {})
+            if legal.get("count", 0) > 0:
+                recommendations.append({
+                    "priority": "urgent",
+                    "recommendation": (
+                        f"{legal['count']} legal flag(s) detected across communication — "
+                        "review flagged instances for court documentation"
+                    )
+                })
+
+            coaching = v2_shield.get("coaching_effectiveness", {})
+            if coaching.get("rate") is not None and coaching["rate"] < 0.3 and coaching.get("offered", 0) >= 5:
+                recommendations.append({
+                    "priority": "medium",
+                    "recommendation": (
+                        f"Low coaching acceptance rate ({coaching['rate']:.0%}) — "
+                        "parent may benefit from mandatory communication coaching sessions"
+                    )
+                })
 
         # Circle child-safety recommendations
         if circle_data:
