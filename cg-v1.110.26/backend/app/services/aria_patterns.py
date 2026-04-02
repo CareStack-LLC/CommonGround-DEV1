@@ -120,7 +120,7 @@ CUSTODY_WEAPONIZATION_PATTERNS = [
     r'\byou\'?re?\s+(staying|living)\s+with\s+me\b',
     r'\bsay\s+goodbye\s+to\s+(daddy|mommy|your\s+father|your\s+mother)\b',
     r'\byou\s+don\'?t\s+(need|have)\s+to\s+go\s+(back|there)\b',
-    r'\bwon\'?t\s+let\s+(him|her|them)\s+(see|visit|have)\s+(you|the\s+kids?)\b',
+    r'\bwon\'?t\s+let\s+(him|her|them)\s+(see|visit|have)\b',
     r'\bi\'?m\s+(taking|keeping)\s+(you|the\s+kids?|them)\b',
     r'\bnever\s+let\s+(you|him|her)\s+see\b',
     r'\bblock(ing)?\b.*?\bnumber\b',
@@ -136,11 +136,15 @@ CUSTODY_WEAPONIZATION_PATTERNS = [
     # Legal threats / intimidation
     r'\bfull\s+custody\b', r'\bsole\s+custody\b',
     r'\bunfit\s+parent\b', r'\bterminate\s+(?:[\w\'\*]+\s+){0,3}rights\b',
-    r'\bcall\s+(?:[\w\'\*]+\s+){0,3}(cps|dcf|dcfs|child\s+services)\b',
+    r'\bcall(ing)?\s+(?:[\w\'\*]+\s+){0,3}(cps|dcf|dcfs|child\s+services)\b',
     r'\bget\s+a\s+restraining\s+order\b',
     r'\bmy\s+lawyer\s+(will|is\s+going\s+to|says)\b',
-    r'\bsupervisor?ed\s+visitation\b',
+    r'\bsupervised\s+visitation\b',
     r'\byou\'?ll?\s+lose\s+(the\s+kids?|them|custody)\b',
+
+    # Veiled custody threats
+    r'\blast\s+time\s+(they|you|he|she)\s+(see|visit|spend\s+time)\b',
+    r'\blast\s+time\b.*?\bsee\s+(you|them|the\s+kids?|him|her)\b',
 ]
 
 # ==============================================================================
@@ -154,7 +158,7 @@ FINANCIAL_COERCION_PATTERNS = [
     r'\bsue\s*(yo)?u\s*for\s*everything\b', r'\bbleed\s*(yo)?u\s*dry\b',
 
     # Control
-    r'\bcut\s*(yo)?u\s*off\b', r'\bstarve\s*(yo)?u\s*out\b', 
+    r'\bcutt?(ing)?\s+(yo)?u\s+off\b', r'\bstarve\s*(yo)?u\s*out\b',
     r'\bfinancial\s*ruin\b', r'\bgarnish\b',
 ]
 
@@ -241,15 +245,15 @@ PARENTAL_ALIENATION_PATTERNS = [
     r'\bit\'?s\s+(your|their)\s+fault\s+(we|I)\s+(divorced|split|broke\s+up|separated)\b',
     r'\b(he|she)\s+chose\s+(work|someone\s+else|a\s+new\s+family|her|him)\s+over\s+you\b',
     r'\b(mommy|daddy|mom|dad|your\s+father|your\s+mother)\s+is\s+(bad|mean|crazy|dangerous|a\s+liar|evil|sick|toxic|stupid)\b',
-    r'\bdon\'?t\s+listen\s+to\s+(what|anything)\s+(he|she|they|your\s+mom|your\s+dad)\s+(say|tell)\b',
+    r'\bdon\'?t\s+listen\s+to\s+(what|anything)\s+(he|she|they|your\s+mom|your\s+dad|your\s+father|your\s+mother)\s+(says?|tells?)\b',
     r'\b(he|she)\s+(doesn\'?t|does\s+not)\s+(deserve|care)\s+to\s+be\s+your\s+(mom|dad|parent|father|mother)\b',
     r'\byou\'?re?\s+better\s+off\s+without\s+(him|her|them|your\s+mom|your\s+dad)\b',
-    r'\bi\'?m\s+your\s+(only|real)\s+(parent|family)\b',
+    r'\bi\'?m\s+your\s+(only|real)\s+(real\s+)?(parent|family)\b',
     r'\b(he|she)\s+is\s+(replacing|trying\s+to\s+replace)\s+(you|me|us)\b',
     r'\bif\s+(he|she|your\s+mom|your\s+dad)\s+(really|truly)\s+loved\s+you\b',
     r'\b(he|she|your\s+mom|your\s+dad)\s+is\s+(lying|not\s+telling\s+the\s+truth)\b',
     r'\byour\s+(mom|dad|father|mother)\s+(never|doesn\'?t)\s+(wanted|want)\s+you\b',
-    r'\b(he|she)\s+doesn\'?t\s+even\s+(care|miss|think\s+about)\s+you\b',
+    r'\b(he|she)\s+doesn\'?t\s+even\s+(care\s+about|care|miss|think\s+about)\s+you\b',
     r'\byou\'?re?\s+just\s+like\s+your\s+(mom|dad|mother|father)\b',  # Said derogatorily
     r'\b(mom|dad)\s+(has|is)\s+(a\s+new|another)\s+(family|kid|child)\b',
     r'\b(he|she)\s+forgot\s+about\s+you\b',
@@ -361,9 +365,18 @@ COPARENTING_CONFLICT_PATTERNS = [
     r'\bget\s+over\s+it\b',
     r'\bstop\s+(whining|complaining|nagging|crying)\b',
     r'\bgrow\s+up\b',
-    r'\byou\'?re?\s+(pathetic|a\s+joke|worthless|useless|a\s+terrible\s+parent)\b',
+    r'\byou\'?re?\s+(pathetic|a\s+joke|worthless|useless|a\s+terrible\s+(parent|mother|father|mom|dad))\b',
+    r'\bterrible\s+(parent|mother|father|mom|dad)\b',
     r'\bwhat\s+kind\s+of\s+(parent|mother|father)\s+(are\s+you|does\s+that)\b',
     r'\byou\s+should\s+be\s+ashamed\b',
+    r'\beveryone\s+knows\b',  # "everyone knows you're X" — triangulation
+
+    # Weaponizing children's preferences
+    r'\b(kids?|child(ren)?|they)\s+(don\'?t|doesn\'?t)\s+(even\s+)?(want|like)\s+to\s+(go|come|be|see|visit|stay)\b',
+    r'\b(kids?|child(ren)?|they)\s+(hate|can\'?t\s+stand)\s+(going|being|you)\b',
+
+    # Gendered slurs in co-parenting context
+    r'\bslut\b', r'\bwhore\b', r'\btramp\b', r'\bho\b', r'\bhoe\b', r'\bskank\b',
 
     # Triangulation / involving others
     r'\beveryone\s+(knows|thinks|says)\s+you\'?re?\b',
@@ -473,7 +486,7 @@ CONTEMPT_PATTERNS = [
     r'\bmake\s+me\s+sick\b',
     r'\byou\s+make\s+me\s+(sick|nauseous|want\s+to\s+puke)\b',
     r'\bover\s+(you|this|it)\b',
-    r'\bso\s+over\s+(you|this|it)\b',
+    r'\bso\s+over\s+(you|this|it|dealing)\b',
 
     # Weaponized exasperation
     r'\bevery\s+(single\s+)?time\b.*?\byou\b',
