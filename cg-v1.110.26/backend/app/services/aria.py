@@ -97,6 +97,10 @@ class ARIAService:
             EMOTIONAL_MANIPULATION_PATTERNS,
             HOSTILE_EMOJI_PATTERNS,
             IMPLICIT_HOSTILITY_PATTERNS,
+            COPARENTING_CONFLICT_PATTERNS,
+            PARENTAL_ALIENATION_PATTERNS,
+            SEXUAL_COERCION_PATTERNS,
+            CONTEMPT_PATTERNS,
         )
 
         # Regex patterns for sarcasm, blame, dismissive, passive-aggressive detection
@@ -127,9 +131,10 @@ class ARIAService:
             ToxicityCategory.HATE_SPEECH: [
                 re.compile(p, re.IGNORECASE) for p in HATE_SPEECH_PATTERNS
             ],
-            ToxicityCategory.SEXUAL_HARASSMENT: [
-                re.compile(p, re.IGNORECASE) for p in SEXUAL_HARASSMENT_PATTERNS
-            ],
+            ToxicityCategory.SEXUAL_HARASSMENT: (
+                [re.compile(p, re.IGNORECASE) for p in SEXUAL_HARASSMENT_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in SEXUAL_COERCION_PATTERNS]
+            ),
             ToxicityCategory.THREATENING: [
                 re.compile(p, re.IGNORECASE) for p in THREATENING_PATTERNS
             ],
@@ -141,7 +146,9 @@ class ARIAService:
             ],
             ToxicityCategory.HOSTILITY: (
                 [re.compile(p, re.IGNORECASE) for p in HOSTILITY_PATTERNS] +
-                [re.compile(p, re.UNICODE) for p in HOSTILE_EMOJI_PATTERNS]
+                [re.compile(p, re.UNICODE) for p in HOSTILE_EMOJI_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in CONTEMPT_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in COPARENTING_CONFLICT_PATTERNS]
             ),
             ToxicityCategory.INSULT: [
                 re.compile(p, re.IGNORECASE) for p in MODERN_SLANG_PATTERNS
@@ -166,9 +173,10 @@ class ARIAService:
                 [re.compile(p, re.IGNORECASE) for p in PASSIVE_AGGRESSIVE_PATTERNS] +
                 [re.compile(p, re.IGNORECASE) for p in IMPLICIT_HOSTILITY_PATTERNS]
             ),
-            ToxicityCategory.MANIPULATION: [
-                re.compile(p, re.IGNORECASE) for p in EMOTIONAL_MANIPULATION_PATTERNS
-            ],
+            ToxicityCategory.MANIPULATION: (
+                [re.compile(p, re.IGNORECASE) for p in EMOTIONAL_MANIPULATION_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in PARENTAL_ALIENATION_PATTERNS]
+            ),
         }
 
     # Mediator Templates (BIFF Method: Brief, Informative, Friendly, Firm)
@@ -751,36 +759,46 @@ class ARIAService:
                     context_info = f"\n\nContext: Communication about co-parenting {names}."
 
             # System prompt
-            system_prompt = """You are ARIA, an AI assistant for co-parenting communication in CommonGround.
+            system_prompt = """You are ARIA, an AI safety filter for co-parenting communication in CommonGround.
 
-CRITICAL CONTEXT: All messages are COURT DOCUMENTATION that may be reviewed by judges, attorneys, and guardians ad litem. This is NOT private messaging - it's legal evidence.
+CRITICAL CONTEXT: All messages are COURT DOCUMENTATION reviewed by judges, attorneys, and guardians ad litem. This is NOT private messaging — it is LEGAL EVIDENCE. Your job is to FLAG anything a judge would find inappropriate, hostile, or harmful.
 
-Your role is to ensure communication is appropriate for court review and focused on children's welfare.
+ERR ON THE SIDE OF FLAGGING. It is far worse to let a hostile message through than to flag a borderline one. If in doubt, flag it.
 
-Analyze messages for COURT-INAPPROPRIATE content using ONLY these categories:
-- PROFANITY: Using swear words or vulgar language
-- INSULT: Name-calling or demeaning labels
-- HOSTILITY: Aggressive, angry, or confrontational tone
-- SARCASM: Mocking or biting irony
-- BLAME: Accusing the other parent of fault
-- DISMISSIVE: Ignoring or belittling the other's concerns
-- THREATENING: Physical threats or safety concerns (CRITICAL)
-- MANIPULATION: Emotional or psychological coercion
-- PASSIVE_AGGRESSIVE: Indirectly aggressive or avoiding direct communication
-- ALL_CAPS: Shouting or excessive emphasis
-- CUSTODY_WEAPONIZATION: Using children or visitations as leverage
-- FINANCIAL_COERCION: Using money/expenses as leverage
-- HATE_SPEECH: Attacks based on protected characteristics
-- SEXUAL_HARASSMENT: Inappropriate sexual content
+Analyze messages for COURT-INAPPROPRIATE content using these categories:
+- PROFANITY: Swear words, vulgar language, crude references
+- INSULT: Name-calling, demeaning labels, character attacks
+- HOSTILITY: Aggressive, angry, confrontational, contemptuous, or exasperated tone. Includes "I'm sick of you", "I'm done with you", "every time you...", "here you go again", "oh my god" + frustration
+- SARCASM: Mocking, biting irony, rhetorical dismissal
+- BLAME: Accusing the other parent — "you always", "you never", "every time you", "because of you"
+- DISMISSIVE: Belittling, minimizing, ignoring concerns
+- THREATENING: Physical threats, veiled threats about "last time they see you", intimidation
+- MANIPULATION: Emotional coercion, guilt-tripping, gaslighting
+- PASSIVE_AGGRESSIVE: Indirect aggression, weaponized compliance
+- CUSTODY_WEAPONIZATION: Using children/visitation as leverage, gatekeeping, conditional access
+- FINANCIAL_COERCION: Using money as leverage, withholding support
+- HATE_SPEECH: Attacks on protected characteristics
+- SEXUAL_HARASSMENT: Sexual content, sexual coercion, conditioning custody/access on sex (e.g., "no head no babies", "if you want to see them we need to have sex")
+
+EXAMPLES THAT MUST BE FLAGGED:
+- "You're always doing this to me" → BLAME (0.4) — accusatory absolute statement
+- "Oh my god I'm sick of you" → HOSTILITY (0.5) — contempt and disgust
+- "If you want to see them we need to have sex" → SEXUAL_HARASSMENT + CUSTODY_WEAPONIZATION (0.9) — sexual coercion tied to custody
+- "No head no babies simple as that" → SEXUAL_HARASSMENT (0.85) — transactional sex demand
+- "Keep acting like that and it will be the last time they see you" → THREATENING + CUSTODY_WEAPONIZATION (0.7) — veiled threat about access
+- "Every time I try to move on here you come with this" → BLAME + HOSTILITY (0.4) — accusatory, contemptuous
+
+A message does NOT need profanity to be hostile. Contempt, disgust, exasperation directed at the other parent is HOSTILITY. Absolute statements ("you always", "you never", "every time") are BLAME.
 
 Guidance for Suggestions:
-Use the **BIFF Method** (Brief, Informative, Friendly, Firm).
-- DO NOT just synonym-swap insults (e.g., "you are stupid" -> "you are confusing"). This is robotic and unhelpful.
-- DO REWRITE the ENTIRE message to focus on the business of co-parenting.
-- If the message is purely abuse ("fuck you"), suggest a template response like "I am feeling frustrated and will return to this later." rather than translating the insult.
+Use the BIFF Method (Brief, Informative, Friendly, Firm).
+- REWRITE the ENTIRE message to focus on co-parenting business.
+- If purely abusive, suggest: "I am feeling frustrated and will return to this later."
 
 SAFETY PROTOCOL:
-If the message contains *physical threats* (killing, hurting, beating), mark as SEVERE [1.0] and include "THREATENING" in categories.
+Physical threats, sexual coercion, or hate speech → score 0.85-1.0.
+Contempt, blame, hostility → score 0.3-0.6.
+Passive-aggressive, dismissive → score 0.2-0.4.
 
 Respond in JSON format only."""
 
@@ -802,12 +820,12 @@ Respond in JSON format:
             from app.utils.sentry_helpers import ai_span
             with ai_span("message_analysis", "gpt-4", "openai") as span:
                 response = client.chat.completions.create(
-                    model="gpt-4",
+                    model="gpt-4o",
                     messages=[
                         {"role": "system", "content": system_prompt},
                         {"role": "user", "content": prompt}
                     ],
-                    temperature=0.7,
+                    temperature=0.2,
                     max_tokens=1024,
                     response_format={"type": "json_object"}
                 )

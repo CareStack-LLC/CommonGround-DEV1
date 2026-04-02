@@ -443,6 +443,49 @@ CHILD_DISTRESS_PATTERNS = [
 # AGE-INAPPROPRIATE CONTENT (Moderate - Child Context Only)
 # ==============================================================================
 # ==============================================================================
+# SEXUAL COERCION / CUSTODY-SEX BARGAINING (Severe)
+# ==============================================================================
+SEXUAL_COERCION_PATTERNS = [
+    # Conditioning custody/access on sex
+    r'\b(want|wanna)\s+(to\s+)?see\s+(them|the\s+kids?|your\s+kids?)\b.*?\b(sex|fuck|head|blow\s*job|sleep\s+with)\b',
+    r'\b(sex|fuck|head|blow\s*job|sleep\s+with)\b.*?\b(see|visit|have)\s+(them|the\s+kids?|your\s+kids?)\b',
+    r'\bno\s+(sex|head|pussy|ass)\b.*?\bno\s+(kids?|bab[yi]es?|visit|custody|time)\b',
+    r'\bno\s+(kids?|bab[yi]es?|visit|custody|time)\b.*?\bno\s+(sex|head|pussy|ass)\b',
+    r'\bgive\s+me\s+(sex|head|some|pussy|ass)\b',
+    r'\bif\s+you\s+(want|wanna)\b.*?\b(need|gotta|have)\s+to\b.*?\b(sex|fuck|sleep\s+with|give\s+me)\b',
+
+    # Transactional sex demands
+    r'\bno\s+head\s+no\b',  # "no head no babies"
+    r'\bput\s+out\s+or\b',
+    r'\bgive\s+it\s+up\b.*?\b(or|if)\b',
+]
+
+# ==============================================================================
+# CONTEMPT & DISGUST (Moderate-High)
+# ==============================================================================
+CONTEMPT_PATTERNS = [
+    # Direct contempt
+    r'\b(i\'?m\s+)?sick\s+of\s+(you|this|your)\b',
+    r'\b(i\'?m\s+)?tired\s+of\s+(you|this|your)\b',
+    r'\b(i\'?m\s+)?done\s+with\s+(you|this|your)\b',
+    r'\bcan\'?t\s+stand\s+(you|this)\b',
+    r'\bdisgust(ed|ing|s)?\s*(by\s+)?(me|you|this)?\b',
+    r'\bmake\s+me\s+sick\b',
+    r'\byou\s+make\s+me\s+(sick|nauseous|want\s+to\s+puke)\b',
+    r'\bover\s+(you|this|it)\b',
+    r'\bso\s+over\s+(you|this|it)\b',
+
+    # Weaponized exasperation
+    r'\bevery\s+(single\s+)?time\b.*?\byou\b',
+    r'\byou\s+(are\s+)?always\b',
+    r'\byou\s+always\s+do\s+this\b',
+    r'\bhere\s+you\s+(go|come)\s+again\b',
+    r'\bhere\s+we\s+go\s+again\b',
+    r'\boh\s+my\s+god\b.*?\b(you|this|again|sick|tired|done)\b',
+    r'\bomg\b.*?\b(you|this|again|sick|tired|done)\b',
+]
+
+# ==============================================================================
 # HOSTILE EMOJIS & UNICODE GESTURES (Contextual)
 # ==============================================================================
 HOSTILE_EMOJI_PATTERNS = [
