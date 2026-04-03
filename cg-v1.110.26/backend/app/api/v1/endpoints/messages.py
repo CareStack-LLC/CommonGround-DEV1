@@ -207,12 +207,29 @@ async def analyze_message_content(
     if use_v2:
         # V2 Sentinel Shield analysis
         try:
+            # Get the other parent's first name for context-aware coaching
+            other_parent_name = None
+            analyze_recipient_id = ""
+            if family_file_id and family_file:
+                analyze_other_parent_id = (
+                    family_file.parent_b_id
+                    if current_user.id == family_file.parent_a_id
+                    else family_file.parent_a_id
+                )
+                if analyze_other_parent_id:
+                    analyze_recipient_id = str(analyze_other_parent_id)
+                    other_parent_result = await db.execute(
+                        select(User.first_name).where(User.id == analyze_other_parent_id)
+                    )
+                    other_parent_name = other_parent_result.scalar_one_or_none()
+
             v2_result = await aria_service.analyze_message_v2(
                 db=db,
                 message_text=content,
                 sender_id=str(current_user.id),
-                recipient_id="",  # Not known in analyze-only mode
+                recipient_id=analyze_recipient_id,
                 family_file_id=family_file_id,
+                other_parent_name=other_parent_name,
             )
 
             score = v2_result["toxicity_score"]
@@ -529,12 +546,21 @@ async def send_message(
         if use_v2:
             # ── ARIA V2 Sentinel Shield Pipeline ──
             try:
+                # Get the other parent's name for context-aware coaching
+                send_other_parent_name = None
+                if message_data.family_file_id and message_data.recipient_id:
+                    _opr = await db.execute(
+                        select(User.first_name).where(User.id == message_data.recipient_id)
+                    )
+                    send_other_parent_name = _opr.scalar_one_or_none()
+
                 v2_result = await aria_service.analyze_message_v2(
                     db=db,
                     message_text=message_data.content,
                     sender_id=str(current_user.id),
                     recipient_id=message_data.recipient_id,
                     family_file_id=message_data.family_file_id,
+                    other_parent_name=send_other_parent_name,
                 )
 
                 # Map V2 result to SentimentAnalysis for downstream compatibility

@@ -1287,6 +1287,7 @@ An incoming message was just received:
         recipient_id: str,
         family_file_id: str,
         sensitivity_offset: float = 0.0,
+        other_parent_name: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
         ARIA V2 Sentinel Shield — 4-Layer Analysis Pipeline.
@@ -1309,7 +1310,7 @@ An incoming message was just received:
             get_session_context, update_session_memory, format_session_context_for_llm,
         )
         from app.services.aria_baseline import get_baseline, update_baseline, check_deviation
-        from app.services.aria_bidirectional import get_recipient_context, generate_coaching_note
+        from app.services.aria_bidirectional import get_recipient_context, get_conversation_context, generate_coaching_note
         from app.services.aria_time_signals import detect_time_signals
         from app.services.aria_llm_router import (
             run_llm_deep_analysis, run_llm_severity_analysis, merge_regex_and_llm_results,
@@ -1397,12 +1398,19 @@ An incoming message was just received:
                     db, sender_id, family_file_id,
                 )
 
-            # ── Bidirectional analysis ──
+            # ── Bidirectional analysis + sender coaching ──
             recipient_context = await get_recipient_context(
                 db, recipient_id, family_file_id,
             )
+            conversation_context = await get_conversation_context(
+                db, family_file_id, sender_id,
+            )
             v2_cat_names = [cat.value for cat in category_confidence.keys()]
-            coaching_note = generate_coaching_note(v2_cat_names, recipient_context)
+            coaching_note = generate_coaching_note(
+                v2_cat_names, recipient_context,
+                conversation_context=conversation_context,
+                other_parent_name=other_parent_name,
+            )
 
             # ── Update session memory and baseline (fire-and-forget) ──
             try:
