@@ -101,6 +101,58 @@ class ARIAService:
             PARENTAL_ALIENATION_PATTERNS,
             SEXUAL_COERCION_PATTERNS,
             CONTEMPT_PATTERNS,
+            # Extended patterns
+            CONTEMPT_EXTENDED_PATTERNS,
+            HOSTILITY_EXTENDED_PATTERNS,
+            THREATENING_EXTENDED_PATTERNS,
+            MANIPULATION_EXTENDED_PATTERNS,
+            GASLIGHTING_EXTENDED_PATTERNS,
+            CUSTODY_WEAPONIZATION_EXTENDED_PATTERNS,
+            FINANCIAL_ABUSE_EXTENDED_PATTERNS,
+            SEXUAL_HARASSMENT_EXTENDED_PATTERNS,
+            PASSIVE_AGGRESSIVE_EXTENDED_PATTERNS,
+            DISMISSIVE_EXTENDED_PATTERNS,
+            PARENTAL_ALIENATION_EXTENDED_PATTERNS,
+            HATE_SPEECH_CULTURAL_PATTERNS,
+            ALL_CAPS_EXTENDED_PATTERNS,
+            # Flexible patterns (shorter, word-order-flexible)
+            PARENTAL_ALIENATION_FLEX_PATTERNS,
+            HATE_SPEECH_FLEX_PATTERNS,
+            GASLIGHTING_FLEX_PATTERNS,
+            SEXUAL_HARASSMENT_FLEX_PATTERNS,
+            FINANCIAL_ABUSE_FLEX_PATTERNS,
+            CUSTODY_WEAPONIZATION_FLEX_PATTERNS,
+            MANIPULATION_FLEX_PATTERNS,
+            DISMISSIVE_FLEX_PATTERNS,
+            CONTEMPT_FLEX_PATTERNS,
+            HOSTILITY_FLEX_PATTERNS,
+            PASSIVE_AGGRESSIVE_FLEX_PATTERNS,
+            THREATENING_FLEX_PATTERNS,
+            ALL_CAPS_FLEX_PATTERNS,
+            # Round 2 flex patterns
+            HATE_SPEECH_FLEX2_PATTERNS,
+            THREATENING_FLEX2_PATTERNS,
+            SEXUAL_HARASSMENT_FLEX2_PATTERNS,
+            FINANCIAL_ABUSE_FLEX2_PATTERNS,
+            CONTEMPT_FLEX2_PATTERNS,
+            PASSIVE_AGGRESSIVE_FLEX2_PATTERNS,
+            CUSTODY_WEAPONIZATION_FLEX2_PATTERNS,
+            MANIPULATION_FLEX2_PATTERNS,
+            DISMISSIVE_FLEX2_PATTERNS,
+            GASLIGHTING_FLEX2_PATTERNS,
+            # Round 3 flex patterns
+            DISMISSIVE_FLEX3_PATTERNS,
+            HOSTILITY_FLEX3_PATTERNS,
+            GASLIGHTING_FLEX3_PATTERNS,
+            ALL_CAPS_FLEX3_PATTERNS,
+            CONTEMPT_FLEX3_PATTERNS,
+            THREATENING_FLEX3_PATTERNS,
+            SEXUAL_HARASSMENT_FLEX3_PATTERNS,
+            MANIPULATION_FLEX3_PATTERNS,
+            PASSIVE_AGGRESSIVE_FLEX3_PATTERNS,
+            CUSTODY_WEAPONIZATION_FLEX3_PATTERNS,
+            FINANCIAL_ABUSE_FLEX3_PATTERNS,
+            HATE_SPEECH_FLEX3_PATTERNS,
         )
 
         # Regex patterns for sarcasm, blame, dismissive, passive-aggressive detection
@@ -128,27 +180,54 @@ class ARIAService:
         ]
 
         return {
-            ToxicityCategory.HATE_SPEECH: [
-                re.compile(p, re.IGNORECASE) for p in HATE_SPEECH_PATTERNS
-            ],
+            ToxicityCategory.HATE_SPEECH: (
+                [re.compile(p, re.IGNORECASE) for p in HATE_SPEECH_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in HATE_SPEECH_CULTURAL_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in HATE_SPEECH_FLEX_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in HATE_SPEECH_FLEX2_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in HATE_SPEECH_FLEX3_PATTERNS]
+            ),
             ToxicityCategory.SEXUAL_HARASSMENT: (
                 [re.compile(p, re.IGNORECASE) for p in SEXUAL_HARASSMENT_PATTERNS] +
-                [re.compile(p, re.IGNORECASE) for p in SEXUAL_COERCION_PATTERNS]
+                [re.compile(p, re.IGNORECASE) for p in SEXUAL_COERCION_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in SEXUAL_HARASSMENT_EXTENDED_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in SEXUAL_HARASSMENT_FLEX_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in SEXUAL_HARASSMENT_FLEX2_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in SEXUAL_HARASSMENT_FLEX3_PATTERNS]
             ),
-            ToxicityCategory.THREATENING: [
-                re.compile(p, re.IGNORECASE) for p in THREATENING_PATTERNS
-            ],
-            ToxicityCategory.CUSTODY_WEAPONIZATION: [
-                re.compile(p, re.IGNORECASE) for p in CUSTODY_WEAPONIZATION_PATTERNS
-            ],
-            ToxicityCategory.FINANCIAL_COERCION: [
-                re.compile(p, re.IGNORECASE) for p in FINANCIAL_COERCION_PATTERNS
-            ],
+            ToxicityCategory.THREATENING: (
+                [re.compile(p, re.IGNORECASE) for p in THREATENING_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in THREATENING_EXTENDED_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in THREATENING_FLEX_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in THREATENING_FLEX2_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in THREATENING_FLEX3_PATTERNS]
+            ),
+            ToxicityCategory.CUSTODY_WEAPONIZATION: (
+                [re.compile(p, re.IGNORECASE) for p in CUSTODY_WEAPONIZATION_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in CUSTODY_WEAPONIZATION_EXTENDED_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in CUSTODY_WEAPONIZATION_FLEX_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in CUSTODY_WEAPONIZATION_FLEX2_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in CUSTODY_WEAPONIZATION_FLEX3_PATTERNS]
+            ),
+            ToxicityCategory.FINANCIAL_COERCION: (
+                [re.compile(p, re.IGNORECASE) for p in FINANCIAL_COERCION_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in FINANCIAL_ABUSE_EXTENDED_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in FINANCIAL_ABUSE_FLEX_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in FINANCIAL_ABUSE_FLEX2_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in FINANCIAL_ABUSE_FLEX3_PATTERNS]
+            ),
             ToxicityCategory.HOSTILITY: (
                 [re.compile(p, re.IGNORECASE) for p in HOSTILITY_PATTERNS] +
                 [re.compile(p, re.UNICODE) for p in HOSTILE_EMOJI_PATTERNS] +
                 [re.compile(p, re.IGNORECASE) for p in CONTEMPT_PATTERNS] +
-                [re.compile(p, re.IGNORECASE) for p in COPARENTING_CONFLICT_PATTERNS]
+                [re.compile(p, re.IGNORECASE) for p in COPARENTING_CONFLICT_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in CONTEMPT_EXTENDED_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in HOSTILITY_EXTENDED_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in CONTEMPT_FLEX_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in HOSTILITY_FLEX_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in CONTEMPT_FLEX2_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in CONTEMPT_FLEX3_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in HOSTILITY_FLEX3_PATTERNS]
             ),
             ToxicityCategory.INSULT: [
                 re.compile(p, re.IGNORECASE) for p in MODERN_SLANG_PATTERNS
@@ -157,26 +236,47 @@ class ARIAService:
                 [re.compile(p, re.IGNORECASE) for p in PROFANITY_PATTERNS] +
                 [re.compile(p, re.IGNORECASE) for p in EVASION_PATTERNS]
             ),
-            ToxicityCategory.ALL_CAPS: [
-                re.compile(p, re.IGNORECASE) for p in EVASION_PATTERNS
-            ],
+            ToxicityCategory.ALL_CAPS: (
+                [re.compile(p, re.IGNORECASE) for p in EVASION_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in ALL_CAPS_EXTENDED_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in ALL_CAPS_FLEX_PATTERNS]
+                [re.compile(p, re.IGNORECASE) for p in ALL_CAPS_FLEX3_PATTERNS]
+            ),
             # Nuanced categories — regex fallback when LLM worker is unavailable
             ToxicityCategory.SARCASM: [
                 re.compile(p, re.IGNORECASE) for p in SARCASM_PATTERNS
             ],
-            ToxicityCategory.BLAME: [
-                re.compile(p, re.IGNORECASE) for p in BLAME_PATTERNS
-            ],
-            ToxicityCategory.DISMISSIVE: [
-                re.compile(p, re.IGNORECASE) for p in DISMISSIVE_PATTERNS
-            ],
+            ToxicityCategory.BLAME: (
+                [re.compile(p, re.IGNORECASE) for p in BLAME_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in GASLIGHTING_EXTENDED_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in GASLIGHTING_FLEX_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in GASLIGHTING_FLEX2_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in GASLIGHTING_FLEX3_PATTERNS]
+            ),
+            ToxicityCategory.DISMISSIVE: (
+                [re.compile(p, re.IGNORECASE) for p in DISMISSIVE_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in DISMISSIVE_EXTENDED_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in DISMISSIVE_FLEX_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in DISMISSIVE_FLEX2_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in DISMISSIVE_FLEX3_PATTERNS]
+            ),
             ToxicityCategory.PASSIVE_AGGRESSIVE: (
                 [re.compile(p, re.IGNORECASE) for p in PASSIVE_AGGRESSIVE_PATTERNS] +
-                [re.compile(p, re.IGNORECASE) for p in IMPLICIT_HOSTILITY_PATTERNS]
+                [re.compile(p, re.IGNORECASE) for p in IMPLICIT_HOSTILITY_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in PASSIVE_AGGRESSIVE_EXTENDED_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in PASSIVE_AGGRESSIVE_FLEX_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in PASSIVE_AGGRESSIVE_FLEX2_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in PASSIVE_AGGRESSIVE_FLEX3_PATTERNS]
             ),
             ToxicityCategory.MANIPULATION: (
                 [re.compile(p, re.IGNORECASE) for p in EMOTIONAL_MANIPULATION_PATTERNS] +
-                [re.compile(p, re.IGNORECASE) for p in PARENTAL_ALIENATION_PATTERNS]
+                [re.compile(p, re.IGNORECASE) for p in PARENTAL_ALIENATION_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in MANIPULATION_EXTENDED_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in PARENTAL_ALIENATION_EXTENDED_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in MANIPULATION_FLEX_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in PARENTAL_ALIENATION_FLEX_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in MANIPULATION_FLEX2_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in MANIPULATION_FLEX3_PATTERNS]
             ),
         }
 
@@ -445,6 +545,53 @@ class ARIAService:
             capture_error(e, tags={"service": "aria", "operation": "queue_image_job"})
 
 
+    @staticmethod
+    def _normalize_text(text: str) -> str:
+        """Normalize leetspeak, txtspeak, and common evasions for pattern matching."""
+        normalized = text
+        # Leetspeak → letters (only when adjacent to letters, not standalone numbers)
+        leet_map = {
+            '0': 'o', '3': 'e', '4': 'a', '5': 's',
+            '7': 't', '@': 'a', '$': 's',
+        }
+        for leet, letter in leet_map.items():
+            normalized = re.sub(
+                rf'(?<=[a-zA-Z]){re.escape(leet)}|{re.escape(leet)}(?=[a-zA-Z])',
+                letter, normalized
+            )
+
+        # Common txtspeak → full words
+        txtspeak = [
+            (r'\bur\b', 'your'), (r'\bu\b', 'you'), (r'\byr\b', 'your'),
+            (r'\bda\b', 'the'), (r'\bw/', 'with'), (r'\bb/c\b', 'because'),
+            (r'\bwont\b', "won't"), (r'\bdont\b', "don't"), (r'\bcant\b', "can't"),
+            (r'\bwanna\b', 'want to'), (r'\bgonna\b', 'going to'),
+            (r'\bgotta\b', 'got to'), (r'\bimo\b', 'in my opinion'),
+            (r'\btho\b', 'though'), (r'\bthru\b', 'through'),
+            (r'\bcuz\b', 'because'), (r'\bwut\b', 'what'), (r'\bdat\b', 'that'),
+            (r'\bdem\b', 'them'), (r'\bdis\b', 'this'), (r'\bnuthin\b', 'nothing'),
+            (r'\bnothin\b', 'nothing'), (r'\bsumthin\b', 'something'),
+            (r'\bsomethin\b', 'something'), (r'\bwutever\b', 'whatever'),
+            (r'\bwhatevr\b', 'whatever'), (r'\bwatever\b', 'whatever'),
+            (r'\byew\b', 'you'), (r'\byu\b', 'you'), (r'\byer\b', 'your'),
+            (r'\bma\b', 'my'), (r'\btat\b', 'that'), (r'\bwif\b', 'with'),
+            (r'\blyke\b', 'like'), (r'\bwen\b', 'when'), (r'\bwit\b', 'with'),
+            (r'\bnaw\b', 'no'), (r'\bder\b', 'their'), (r'\bde\b', 'the'),
+            (r'\btha\b', 'the'), (r'\bn\b', 'and'), (r'\bthnk\b', 'think'),
+            (r'\bthk\b', 'think'), (r'\bknw\b', 'know'),
+        ]
+        for pattern, replacement in txtspeak:
+            normalized = re.sub(pattern, replacement, normalized, flags=re.IGNORECASE)
+
+        # Collapse repeated characters (e.g., "stopp" → "stop", "riight" → "right")
+        normalized = re.sub(r'(.)\1{2,}', r'\1\1', normalized)  # 3+ → 2
+        # Common doubled-letter typos (careful not to break valid doubles like "ll", "ss", "ee")
+        normalized = re.sub(r'\b(\w*?)([^lsetnr])\2(\w*)\b',
+                           lambda m: m.group(1) + m.group(2) + m.group(3) if len(m.group(0)) > 3 else m.group(0),
+                           normalized)
+
+        return normalized
+
     def analyze_message(
         self,
         message: str,
@@ -474,23 +621,27 @@ class ARIAService:
                 categories.append(ToxicityCategory.ALL_CAPS)
                 triggers.append("EXCESSIVE CAPS")
 
-        # Check each category of patterns
+        # Normalize text for evasion-resistant matching (leetspeak, txtspeak)
+        normalized = self._normalize_text(message)
+        texts_to_check = [message] if normalized == message else [message, normalized]
+
         # Check each category of patterns
         for category, patterns in self.compiled_patterns.items():
             # Skip ALL_CAPS in regex loop since we handled it manually above
             if category == ToxicityCategory.ALL_CAPS:
                 continue
-                
-            for pattern in patterns:
-                # Use finditer to get the FULL MATCH, ignoring capture groups
-                # valid_triggers avoids returning just "yo" from "(yo)?u"
-                matches = pattern.finditer(message)
-                for match in matches:
-                    full_phrase = match.group().strip()
-                    if full_phrase:
-                        if category not in categories:
-                            categories.append(category)
-                        triggers.append(full_phrase)
+
+            for text_variant in texts_to_check:
+                for pattern in patterns:
+                    # Use finditer to get the FULL MATCH, ignoring capture groups
+                    # valid_triggers avoids returning just "yo" from "(yo)?u"
+                    matches = pattern.finditer(text_variant)
+                    for match in matches:
+                        full_phrase = match.group().strip()
+                        if full_phrase:
+                            if category not in categories:
+                                categories.append(category)
+                            triggers.append(full_phrase)
 
         # Calculate toxicity score and level
         toxicity_score = self._calculate_score(categories, triggers)

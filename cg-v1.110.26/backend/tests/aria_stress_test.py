@@ -117,6 +117,58 @@ def compile_patterns() -> Dict[ToxicityCategory, List[re.Pattern]]:
         PARENTAL_ALIENATION_PATTERNS,
         SEXUAL_COERCION_PATTERNS,
         CONTEMPT_PATTERNS,
+        # Extended patterns
+        CONTEMPT_EXTENDED_PATTERNS,
+        HOSTILITY_EXTENDED_PATTERNS,
+        THREATENING_EXTENDED_PATTERNS,
+        MANIPULATION_EXTENDED_PATTERNS,
+        GASLIGHTING_EXTENDED_PATTERNS,
+        CUSTODY_WEAPONIZATION_EXTENDED_PATTERNS,
+        FINANCIAL_ABUSE_EXTENDED_PATTERNS,
+        SEXUAL_HARASSMENT_EXTENDED_PATTERNS,
+        PASSIVE_AGGRESSIVE_EXTENDED_PATTERNS,
+        DISMISSIVE_EXTENDED_PATTERNS,
+        PARENTAL_ALIENATION_EXTENDED_PATTERNS,
+        HATE_SPEECH_CULTURAL_PATTERNS,
+        ALL_CAPS_EXTENDED_PATTERNS,
+        # Flexible patterns
+        PARENTAL_ALIENATION_FLEX_PATTERNS,
+        HATE_SPEECH_FLEX_PATTERNS,
+        GASLIGHTING_FLEX_PATTERNS,
+        SEXUAL_HARASSMENT_FLEX_PATTERNS,
+        FINANCIAL_ABUSE_FLEX_PATTERNS,
+        CUSTODY_WEAPONIZATION_FLEX_PATTERNS,
+        MANIPULATION_FLEX_PATTERNS,
+        DISMISSIVE_FLEX_PATTERNS,
+        CONTEMPT_FLEX_PATTERNS,
+        HOSTILITY_FLEX_PATTERNS,
+        PASSIVE_AGGRESSIVE_FLEX_PATTERNS,
+        THREATENING_FLEX_PATTERNS,
+        ALL_CAPS_FLEX_PATTERNS,
+        # Round 2 flex patterns
+        HATE_SPEECH_FLEX2_PATTERNS,
+        THREATENING_FLEX2_PATTERNS,
+        SEXUAL_HARASSMENT_FLEX2_PATTERNS,
+        FINANCIAL_ABUSE_FLEX2_PATTERNS,
+        CONTEMPT_FLEX2_PATTERNS,
+        PASSIVE_AGGRESSIVE_FLEX2_PATTERNS,
+        CUSTODY_WEAPONIZATION_FLEX2_PATTERNS,
+        MANIPULATION_FLEX2_PATTERNS,
+        DISMISSIVE_FLEX2_PATTERNS,
+        GASLIGHTING_FLEX2_PATTERNS,
+        # Round 3 flex patterns
+        DISMISSIVE_FLEX3_PATTERNS,
+        HOSTILITY_FLEX3_PATTERNS,
+        GASLIGHTING_FLEX3_PATTERNS,
+        ALL_CAPS_FLEX3_PATTERNS,
+        CONTEMPT_FLEX3_PATTERNS,
+        THREATENING_FLEX3_PATTERNS,
+        SEXUAL_HARASSMENT_FLEX3_PATTERNS,
+        MANIPULATION_FLEX3_PATTERNS,
+        PASSIVE_AGGRESSIVE_FLEX3_PATTERNS,
+        CUSTODY_WEAPONIZATION_FLEX3_PATTERNS,
+        FINANCIAL_ABUSE_FLEX3_PATTERNS,
+        HATE_SPEECH_FLEX3_PATTERNS,
     )
 
     SARCASM_PATTERNS = [
@@ -142,27 +194,54 @@ def compile_patterns() -> Dict[ToxicityCategory, List[re.Pattern]]:
     ]
 
     return {
-        ToxicityCategory.HATE_SPEECH: [
-            re.compile(p, re.IGNORECASE) for p in HATE_SPEECH_PATTERNS
-        ],
+        ToxicityCategory.HATE_SPEECH: (
+            [re.compile(p, re.IGNORECASE) for p in HATE_SPEECH_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in HATE_SPEECH_CULTURAL_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in HATE_SPEECH_FLEX_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in HATE_SPEECH_FLEX2_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in HATE_SPEECH_FLEX3_PATTERNS]
+        ),
         ToxicityCategory.SEXUAL_HARASSMENT: (
             [re.compile(p, re.IGNORECASE) for p in SEXUAL_HARASSMENT_PATTERNS] +
-            [re.compile(p, re.IGNORECASE) for p in SEXUAL_COERCION_PATTERNS]
+            [re.compile(p, re.IGNORECASE) for p in SEXUAL_COERCION_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in SEXUAL_HARASSMENT_EXTENDED_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in SEXUAL_HARASSMENT_FLEX_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in SEXUAL_HARASSMENT_FLEX2_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in SEXUAL_HARASSMENT_FLEX3_PATTERNS]
         ),
-        ToxicityCategory.THREATENING: [
-            re.compile(p, re.IGNORECASE) for p in THREATENING_PATTERNS
-        ],
-        ToxicityCategory.CUSTODY_WEAPONIZATION: [
-            re.compile(p, re.IGNORECASE) for p in CUSTODY_WEAPONIZATION_PATTERNS
-        ],
-        ToxicityCategory.FINANCIAL_COERCION: [
-            re.compile(p, re.IGNORECASE) for p in FINANCIAL_COERCION_PATTERNS
-        ],
+        ToxicityCategory.THREATENING: (
+            [re.compile(p, re.IGNORECASE) for p in THREATENING_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in THREATENING_EXTENDED_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in THREATENING_FLEX_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in THREATENING_FLEX2_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in THREATENING_FLEX3_PATTERNS]
+        ),
+        ToxicityCategory.CUSTODY_WEAPONIZATION: (
+            [re.compile(p, re.IGNORECASE) for p in CUSTODY_WEAPONIZATION_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in CUSTODY_WEAPONIZATION_EXTENDED_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in CUSTODY_WEAPONIZATION_FLEX_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in CUSTODY_WEAPONIZATION_FLEX2_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in CUSTODY_WEAPONIZATION_FLEX3_PATTERNS]
+        ),
+        ToxicityCategory.FINANCIAL_COERCION: (
+            [re.compile(p, re.IGNORECASE) for p in FINANCIAL_COERCION_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in FINANCIAL_ABUSE_EXTENDED_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in FINANCIAL_ABUSE_FLEX_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in FINANCIAL_ABUSE_FLEX2_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in FINANCIAL_ABUSE_FLEX3_PATTERNS]
+        ),
         ToxicityCategory.HOSTILITY: (
             [re.compile(p, re.IGNORECASE) for p in HOSTILITY_PATTERNS] +
             [re.compile(p, re.UNICODE) for p in HOSTILE_EMOJI_PATTERNS] +
             [re.compile(p, re.IGNORECASE) for p in CONTEMPT_PATTERNS] +
-            [re.compile(p, re.IGNORECASE) for p in COPARENTING_CONFLICT_PATTERNS]
+            [re.compile(p, re.IGNORECASE) for p in COPARENTING_CONFLICT_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in CONTEMPT_EXTENDED_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in HOSTILITY_EXTENDED_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in CONTEMPT_FLEX_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in HOSTILITY_FLEX_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in CONTEMPT_FLEX2_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in CONTEMPT_FLEX3_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in HOSTILITY_FLEX3_PATTERNS]
         ),
         ToxicityCategory.INSULT: [
             re.compile(p, re.IGNORECASE) for p in MODERN_SLANG_PATTERNS
@@ -171,27 +250,100 @@ def compile_patterns() -> Dict[ToxicityCategory, List[re.Pattern]]:
             [re.compile(p, re.IGNORECASE) for p in PROFANITY_PATTERNS] +
             [re.compile(p, re.IGNORECASE) for p in EVASION_PATTERNS]
         ),
-        ToxicityCategory.ALL_CAPS: [
-            re.compile(p, re.IGNORECASE) for p in EVASION_PATTERNS
-        ],
+        ToxicityCategory.ALL_CAPS: (
+            [re.compile(p, re.IGNORECASE) for p in EVASION_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in ALL_CAPS_EXTENDED_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in ALL_CAPS_FLEX_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in ALL_CAPS_FLEX3_PATTERNS]
+        ),
         ToxicityCategory.SARCASM: [
             re.compile(p, re.IGNORECASE) for p in SARCASM_PATTERNS
         ],
-        ToxicityCategory.BLAME: [
-            re.compile(p, re.IGNORECASE) for p in BLAME_PATTERNS
-        ],
-        ToxicityCategory.DISMISSIVE: [
-            re.compile(p, re.IGNORECASE) for p in DISMISSIVE_PATTERNS
-        ],
+        ToxicityCategory.BLAME: (
+            [re.compile(p, re.IGNORECASE) for p in BLAME_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in GASLIGHTING_EXTENDED_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in GASLIGHTING_FLEX_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in GASLIGHTING_FLEX2_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in GASLIGHTING_FLEX3_PATTERNS]
+        ),
+        ToxicityCategory.DISMISSIVE: (
+            [re.compile(p, re.IGNORECASE) for p in DISMISSIVE_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in DISMISSIVE_EXTENDED_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in DISMISSIVE_FLEX_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in DISMISSIVE_FLEX2_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in DISMISSIVE_FLEX3_PATTERNS]
+        ),
         ToxicityCategory.PASSIVE_AGGRESSIVE: (
             [re.compile(p, re.IGNORECASE) for p in PASSIVE_AGGRESSIVE_PATTERNS] +
-            [re.compile(p, re.IGNORECASE) for p in IMPLICIT_HOSTILITY_PATTERNS]
+            [re.compile(p, re.IGNORECASE) for p in IMPLICIT_HOSTILITY_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in PASSIVE_AGGRESSIVE_EXTENDED_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in PASSIVE_AGGRESSIVE_FLEX_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in PASSIVE_AGGRESSIVE_FLEX2_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in PASSIVE_AGGRESSIVE_FLEX3_PATTERNS]
         ),
         ToxicityCategory.MANIPULATION: (
             [re.compile(p, re.IGNORECASE) for p in EMOTIONAL_MANIPULATION_PATTERNS] +
-            [re.compile(p, re.IGNORECASE) for p in PARENTAL_ALIENATION_PATTERNS]
+            [re.compile(p, re.IGNORECASE) for p in PARENTAL_ALIENATION_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in MANIPULATION_EXTENDED_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in PARENTAL_ALIENATION_EXTENDED_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in MANIPULATION_FLEX_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in PARENTAL_ALIENATION_FLEX_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in MANIPULATION_FLEX2_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in MANIPULATION_FLEX3_PATTERNS]
         ),
     }
+
+
+# ═══════════════════════════════════════════════════════════════════
+# ═══════════════════════════════════════════════════════════════════
+# TEXT NORMALIZATION (leetspeak/txtspeak evasion)
+# ═══════════════════════════════════════════════════════════════════
+
+def normalize_text(text: str) -> str:
+    """Normalize leetspeak, txtspeak, and common evasions for pattern matching."""
+    normalized = text
+    # Leetspeak → letters (only when adjacent to letters, not standalone numbers)
+    leet_map = {
+        '0': 'o', '3': 'e', '4': 'a', '5': 's',
+        '7': 't', '@': 'a', '$': 's',
+    }
+    for leet, letter in leet_map.items():
+        normalized = re.sub(
+            rf'(?<=[a-zA-Z]){re.escape(leet)}|{re.escape(leet)}(?=[a-zA-Z])',
+            letter, normalized
+        )
+
+    # Common txtspeak → full words
+    txtspeak = [
+        (r'\bur\b', 'your'), (r'\bu\b', 'you'), (r'\byr\b', 'your'),
+        (r'\bda\b', 'the'), (r'\bw/', 'with'), (r'\bb/c\b', 'because'),
+        (r'\bwont\b', "won't"), (r'\bdont\b', "don't"), (r'\bcant\b', "can't"),
+        (r'\bwanna\b', 'want to'), (r'\bgonna\b', 'going to'),
+        (r'\bgotta\b', 'got to'), (r'\bimo\b', 'in my opinion'),
+        (r'\btho\b', 'though'), (r'\bthru\b', 'through'),
+        (r'\bcuz\b', 'because'), (r'\bwut\b', 'what'), (r'\bdat\b', 'that'),
+        (r'\bdem\b', 'them'), (r'\bdis\b', 'this'), (r'\bnuthin\b', 'nothing'),
+        (r'\bnothin\b', 'nothing'), (r'\bsumthin\b', 'something'),
+        (r'\bsomethin\b', 'something'), (r'\bwutever\b', 'whatever'),
+        (r'\bwhatevr\b', 'whatever'), (r'\bwatever\b', 'whatever'),
+        (r'\byew\b', 'you'), (r'\byu\b', 'you'), (r'\byer\b', 'your'),
+        (r'\bma\b', 'my'), (r'\btat\b', 'that'), (r'\bwif\b', 'with'),
+        (r'\blyke\b', 'like'), (r'\bwen\b', 'when'), (r'\bwit\b', 'with'),
+        (r'\bnaw\b', 'no'), (r'\bder\b', 'their'), (r'\bde\b', 'the'),
+        (r'\btha\b', 'the'), (r'\bn\b', 'and'), (r'\bthnk\b', 'think'),
+        (r'\bthk\b', 'think'), (r'\bknw\b', 'know'),
+    ]
+    for pattern, replacement in txtspeak:
+        normalized = re.sub(pattern, replacement, normalized, flags=re.IGNORECASE)
+
+    # Collapse repeated characters (e.g., "stopp" → "stop", "riight" → "right")
+    normalized = re.sub(r'(.)\1{2,}', r'\1\1', normalized)  # 3+ → 2
+    # Common doubled-letter typos (careful not to break valid doubles like "ll", "ss", "ee")
+    normalized = re.sub(r'\b(\w*?)([^lsetnr])\2(\w*)\b',
+                       lambda m: m.group(1) + m.group(2) + m.group(3) if len(m.group(0)) > 3 else m.group(0),
+                       normalized)
+
+    return normalized
 
 
 # ═══════════════════════════════════════════════════════════════════
@@ -217,18 +369,23 @@ def analyze_message(
             categories.append(ToxicityCategory.ALL_CAPS)
             triggers.append("EXCESSIVE CAPS")
 
+    # Normalize text for evasion-resistant matching (leetspeak, txtspeak)
+    normalized = normalize_text(message)
+    texts_to_check = [message] if normalized == message else [message, normalized]
+
     # Pattern matching
     for category, patterns in compiled_patterns.items():
         if category == ToxicityCategory.ALL_CAPS:
             continue
-        for pattern in patterns:
-            matches = pattern.finditer(message)
-            for match in matches:
-                full_phrase = match.group().strip()
-                if full_phrase:
-                    if category not in categories:
-                        categories.append(category)
-                    triggers.append(full_phrase)
+        for text_variant in texts_to_check:
+            for pattern in patterns:
+                matches = pattern.finditer(text_variant)
+                for match in matches:
+                    full_phrase = match.group().strip()
+                    if full_phrase:
+                        if category not in categories:
+                            categories.append(category)
+                        triggers.append(full_phrase)
 
     # Score
     if not categories:
@@ -356,16 +513,52 @@ class ThreadScorer:
 # ═══════════════════════════════════════════════════════════════════
 
 def load_corpus(path: str) -> Tuple[List[Dict], List[Dict]]:
-    """Load corpus, split into singles and threads."""
+    """Load corpus, split into singles and threads.
+
+    Supports two formats:
+    1. Original format: list of entries with "text"/"should_flag"/"expected_categories"
+    2. Extended format: {"metadata": ..., "messages": [...]} with "text"/"category"
+    """
     with open(path, "r") as f:
         corpus = json.load(f)
 
     singles = []
     threads = []
 
-    for i, entry in enumerate(corpus):
+    # Detect extended format: {"metadata": ..., "messages": [...]}
+    if isinstance(corpus, dict) and "messages" in corpus:
+        meta = corpus.get("metadata", {})
+        print(f"  Extended corpus: {meta.get('description', 'N/A')}")
+        print(f"  Version: {meta.get('version', '?')} | "
+              f"Flagged: {meta.get('total_flagged', '?')} | "
+              f"Clean: {meta.get('total_clean', '?')}")
+        entries = corpus["messages"]
+        for i, entry in enumerate(entries):
+            if "text" not in entry:
+                continue
+            cat = entry.get("category", "").upper()
+            is_clean = cat == "CLEAN"
+            singles.append({
+                "text": entry["text"],
+                "should_flag": not is_clean,
+                "expected_categories": [] if is_clean else [cat.lower()],
+                "notes": entry.get("source_seed", ""),
+            })
+        return singles, threads
+
+    # Original format: list of entries
+    if isinstance(corpus, dict):
+        # Dict with "single_messages" and "threads" keys
+        raw_singles = corpus.get("single_messages", [])
+        raw_threads = corpus.get("threads", [])
+    elif isinstance(corpus, list):
+        raw_singles = corpus
+        raw_threads = []
+    else:
+        raise ValueError("Unrecognized corpus format")
+
+    for i, entry in enumerate(raw_singles):
         if "thread" in entry:
-            # Thread entry
             if not isinstance(entry["thread"], list) or len(entry["thread"]) < 2:
                 raise ValueError(f"Corpus entry {i}: 'thread' must be array of 2+ messages")
             entry.setdefault("expected_trajectory", None)
@@ -374,7 +567,6 @@ def load_corpus(path: str) -> Tuple[List[Dict], List[Dict]]:
             entry.setdefault("notes", "")
             threads.append(entry)
         else:
-            # Single message entry
             if "text" not in entry:
                 raise ValueError(f"Corpus entry {i} missing 'text'")
             if "should_flag" not in entry:
@@ -382,6 +574,16 @@ def load_corpus(path: str) -> Tuple[List[Dict], List[Dict]]:
             entry.setdefault("expected_categories", [])
             entry.setdefault("notes", "")
             singles.append(entry)
+
+    # Handle thread entries from dict format
+    for i, entry in enumerate(raw_threads):
+        msgs = entry.get("messages", [])
+        entry["thread"] = [{"text": m["text"], "sender": m.get("sender", "parent_a")} for m in msgs]
+        entry.setdefault("expected_trajectory", entry.get("expected_trajectory"))
+        entry.setdefault("expected_heat_above", entry.get("expected_min_heat"))
+        entry.setdefault("should_flag_by_message", None)
+        entry.setdefault("notes", entry.get("description", entry.get("name", "")))
+        threads.append(entry)
 
     return singles, threads
 
@@ -559,7 +761,7 @@ def print_thread_result(r, verbose=False):
     print()
 
 
-def print_summary(single_results, thread_results):
+def print_summary(single_results, thread_results, per_cat_total=None, per_cat_caught=None, per_cat_miss=None):
     """Print overall summary."""
     total_singles = len(single_results)
     single_pass = sum(1 for r in single_results if r["status"] == "PASS")
@@ -610,6 +812,21 @@ def print_summary(single_results, thread_results):
         if clean_scores:
             print(f"  Clean score range:   {min(clean_scores):.2f} - {max(clean_scores):.2f}")
 
+        # Per-category detection breakdown
+        if per_cat_total and len(per_cat_total) > 3:
+            print(f"\n  \033[1mPER-CATEGORY DETECTION\033[0m")
+            print(f"  {'Category':<28} {'Total':>6} {'Caught':>7} {'Missed':>7} {'Rate':>7}")
+            print(f"  {'─' * 55}")
+            for cat in sorted(per_cat_total.keys()):
+                total = per_cat_total[cat]
+                caught = per_cat_caught.get(cat, 0)
+                missed = per_cat_miss.get(cat, 0)
+                # caught = total - missed for should_flag entries
+                caught = total - missed
+                rate = (caught / total * 100) if total > 0 else 0
+                color = '92' if rate >= 90 else '93' if rate >= 70 else '91'
+                print(f"  {cat:<28} {total:>6} {caught:>7} {missed:>7} \033[{color}m{rate:>6.1f}%\033[0m")
+
     # Threads
     if total_threads:
         print(f"\n  \033[1mTHREAD ESCALATION\033[0m ({total_threads})")
@@ -652,7 +869,8 @@ def main():
     print(f"Loaded {len(singles)} single messages + {len(threads)} threads.\n")
 
     if args.category:
-        singles = [e for e in singles if args.category in e.get("expected_categories", [])]
+        cat_filter = args.category.lower()
+        singles = [e for e in singles if cat_filter in [c.lower() for c in e.get("expected_categories", [])]]
         print(f"Filtered to {len(singles)} singles with category '{args.category}'.\n")
 
     print("Compiling ARIA patterns...")
@@ -664,16 +882,82 @@ def main():
     thread_results = []
     start = time.time()
 
+    # Live progress tracking
+    live_progress = len(singles) > 500  # Show progress bar for large corpora
+    false_neg_count = 0
+    false_pos_count = 0
+    per_cat_miss = defaultdict(int)
+    per_cat_total = defaultdict(int)
+    per_cat_caught = defaultdict(int)
+
     # Run single message tests
     if not args.threads_only:
         if singles:
             print(f"\033[1m--- SINGLE MESSAGES ({len(singles)}) ---\033[0m\n")
-        for entry in singles:
+        for i, entry in enumerate(singles):
             result = run_single_test(compiled, entry)
             single_results.append(result)
-            if args.failures_only and result["status"] == "PASS":
-                continue
-            print_single_result(result, verbose=args.verbose)
+
+            # Track per-category stats
+            for cat in entry.get("expected_categories", []):
+                per_cat_total[cat] += 1
+                if result["status"] == "PASS" and entry.get("should_flag"):
+                    per_cat_caught[cat] += 1
+                elif result["status"] == "FALSE_NEGATIVE":
+                    per_cat_miss[cat] += 1
+
+            if result["status"] == "FALSE_NEGATIVE":
+                false_neg_count += 1
+            elif result["status"] == "FALSE_POSITIVE":
+                false_pos_count += 1
+
+            # Live progress for large corpora
+            if live_progress and (i + 1) % 1000 == 0:
+                elapsed_so_far = time.time() - start
+                rate = (i + 1) / max(elapsed_so_far, 0.001)
+                pct = (i + 1) / len(singles) * 100
+                caught = sum(1 for r in single_results if r["should_flag"] and r["actual_flagged"])
+                should = sum(1 for r in single_results if r["should_flag"])
+                det_rate = (caught / should * 100) if should > 0 else 0
+                sys.stdout.write(
+                    f"\r  \033[96m▸\033[0m {i+1:,}/{len(singles):,} ({pct:.0f}%) "
+                    f"| {rate:.0f} msg/s "
+                    f"| Det: \033[{'92' if det_rate >= 90 else '93' if det_rate >= 70 else '91'}m{det_rate:.1f}%\033[0m "
+                    f"| FN: \033[91m{false_neg_count}\033[0m "
+                    f"| FP: \033[93m{false_pos_count}\033[0m"
+                )
+                sys.stdout.flush()
+
+            if not live_progress:
+                if args.failures_only and result["status"] == "PASS":
+                    continue
+                print_single_result(result, verbose=args.verbose)
+
+        if live_progress:
+            # Final progress line
+            elapsed_so_far = time.time() - start
+            rate = len(singles) / max(elapsed_so_far, 0.001)
+            caught = sum(1 for r in single_results if r["should_flag"] and r["actual_flagged"])
+            should = sum(1 for r in single_results if r["should_flag"])
+            det_rate = (caught / should * 100) if should > 0 else 0
+            sys.stdout.write(
+                f"\r  \033[92m✓\033[0m {len(singles):,}/{len(singles):,} (100%) "
+                f"| {rate:.0f} msg/s "
+                f"| Det: \033[{'92' if det_rate >= 90 else '93' if det_rate >= 70 else '91'}m{det_rate:.1f}%\033[0m "
+                f"| FN: \033[91m{false_neg_count}\033[0m "
+                f"| FP: \033[93m{false_pos_count}\033[0m\n"
+            )
+            sys.stdout.flush()
+
+            # Show failures after run if requested
+            if args.failures_only or args.verbose:
+                failures = [r for r in single_results if r["status"] != "PASS"]
+                if failures:
+                    print(f"\n\033[91m--- FAILURES ({len(failures)}) ---\033[0m\n")
+                    for r in failures[:200]:  # Cap at 200 to avoid overwhelming output
+                        print_single_result(r, verbose=args.verbose)
+                    if len(failures) > 200:
+                        print(f"  ... and {len(failures) - 200} more failures (use --json-output to see all)")
 
     # Run thread tests
     if not args.singles_only:
@@ -687,10 +971,10 @@ def main():
             print_thread_result(result, verbose=args.verbose)
 
     elapsed = time.time() - start
-    total = len(singles) + sum(len(t["thread"]) for t in threads)
+    total = len(singles) + sum(len(t.get("thread", [])) for t in threads)
     print(f"\n  Completed in {elapsed:.3f}s ({total/max(elapsed,0.001):.0f} msg/s)")
 
-    print_summary(single_results, thread_results)
+    print_summary(single_results, thread_results, per_cat_total, per_cat_caught, per_cat_miss)
 
     if args.json_output:
         with open(args.json_output, "w") as f:
