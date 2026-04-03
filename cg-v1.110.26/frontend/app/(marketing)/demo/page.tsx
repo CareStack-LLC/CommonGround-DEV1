@@ -735,7 +735,7 @@ export default function ARIADemoPage() {
                         <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                         <XAxis dataKey="message" tick={{ fontSize: 12 }} label={{ value: 'Message #', position: 'bottom', fontSize: 12 }} />
                         <YAxis tick={{ fontSize: 12 }} domain={[0, 100]} label={{ value: 'Toxicity %', angle: -90, position: 'insideLeft', fontSize: 12 }} />
-                        <Tooltip formatter={(value: number) => [`${value}%`, 'Toxicity']} />
+                        <Tooltip formatter={(value) => [`${value}%`, 'Toxicity']} />
                         <Line type="monotone" dataKey="score" stroke="#ef4444" strokeWidth={2} dot={{ fill: '#ef4444', r: 4 }} />
                       </LineChart>
                     </ResponsiveContainer>

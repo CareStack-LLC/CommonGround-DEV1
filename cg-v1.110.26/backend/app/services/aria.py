@@ -239,7 +239,7 @@ class ARIAService:
             ToxicityCategory.ALL_CAPS: (
                 [re.compile(p, re.IGNORECASE) for p in EVASION_PATTERNS] +
                 [re.compile(p, re.IGNORECASE) for p in ALL_CAPS_EXTENDED_PATTERNS] +
-                [re.compile(p, re.IGNORECASE) for p in ALL_CAPS_FLEX_PATTERNS]
+                [re.compile(p, re.IGNORECASE) for p in ALL_CAPS_FLEX_PATTERNS] +
                 [re.compile(p, re.IGNORECASE) for p in ALL_CAPS_FLEX3_PATTERNS]
             ),
             # Nuanced categories — regex fallback when LLM worker is unavailable
