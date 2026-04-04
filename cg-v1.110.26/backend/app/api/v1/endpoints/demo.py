@@ -87,6 +87,7 @@ def _check_rate_limit(request: Request):
 class DemoAnalyzeRequest(BaseModel):
     content: str = Field(..., min_length=1, max_length=5000)
     conversation_history: List[dict] = Field(default_factory=list)
+    force_rewrite: bool = Field(default=False, description="Always generate a rewrite (used when ARIA is ON in demo)")
 
 
 class CoparentReplyRequest(BaseModel):
@@ -282,8 +283,21 @@ async def demo_analyze(
 
     analysis = _aria_service.analyze_message(body.content)
 
-    # If flagged and we have conversation history, generate a context-aware suggestion via AI
-    if analysis.is_flagged and body.conversation_history:
+    # When force_rewrite is True (ARIA ON in demo), ALWAYS generate an AI rewrite
+    # regardless of whether regex flagged the message. This catches slang, subtle
+    # hostility, and off-topic messages that regex misses.
+    if body.force_rewrite and body.conversation_history:
+        ai_suggestion = await _generate_context_aware_suggestion(
+            body.content, body.conversation_history
+        )
+        if ai_suggestion:
+            analysis.suggestion = ai_suggestion
+            # If regex didn't flag it but we're force-rewriting, mark as flagged
+            # so the frontend knows to use the suggestion
+            if not analysis.is_flagged:
+                analysis.is_flagged = True
+    elif analysis.is_flagged and body.conversation_history:
+        # Normal mode: only rewrite if regex flagged it
         ai_suggestion = await _generate_context_aware_suggestion(
             body.content, body.conversation_history
         )
@@ -368,9 +382,10 @@ async def demo_coparent_reply(
     reply_analysis = _aria_service.analyze_message(reply_text)
     aria_response = _sentiment_to_response(reply_analysis)
 
-    # Generate rewritten version if flagged and ARIA is enabled
+    # When ARIA is enabled, ALWAYS generate a civil rewrite of the co-parent's reply.
+    # The co-parent is intentionally hostile in the demo, so every message needs rewriting.
     rewritten = None
-    if body.aria_enabled and reply_analysis.is_flagged:
+    if body.aria_enabled:
         # Build conversation history for context-aware rewrite
         conv_history = []
         for msg in body.conversation_history[-6:]:

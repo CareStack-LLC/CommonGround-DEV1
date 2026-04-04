@@ -169,11 +169,11 @@ const beforeAfter = [
 // API helpers
 // ---------------------------------------------------------------------------
 
-async function analyzeMessage(content: string, conversationHistory?: { role: string; text: string }[]): Promise<ARIAAnalysis> {
+async function analyzeMessage(content: string, conversationHistory?: { role: string; text: string }[], forceRewrite = false): Promise<ARIAAnalysis> {
   const res = await fetch(`${API_URL}/demo/analyze`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ content, conversation_history: conversationHistory || [] }),
+    body: JSON.stringify({ content, conversation_history: conversationHistory || [], force_rewrite: forceRewrite }),
   });
   if (!res.ok) throw new Error('Analysis failed');
   return res.json();
@@ -306,9 +306,10 @@ export default function ARIAPage() {
 
     if (ariaEnabled) {
       try {
+        // When ARIA is ON, force_rewrite=true means EVERY message gets a civil rewrite
         const history = messages.slice(-6).map(m => ({ role: m.role, text: m.text }));
-        const analysis = await analyzeMessage(inputText, history);
-        if (analysis.is_flagged && analysis.suggestion) {
+        const analysis = await analyzeMessage(inputText, history, true);
+        if (analysis.suggestion) {
           setAriaScore(prev => prev + 1);
           setCurrentTaunt(getRandomTaunt());
           // Auto-send the ARIA suggestion (no intervention panel)
@@ -867,9 +868,14 @@ export default function ARIAPage() {
                     </button>
                   </div>
                   {ariaEnabled && (
-                    <p className="text-xs text-gray-400 mt-2 flex items-center gap-1">
-                      <Shield className="w-3 h-3" /> ARIA is active — your messages will be analyzed before sending
-                    </p>
+                    <div className="mt-2 space-y-1">
+                      <p className="text-xs text-gray-400 flex items-center gap-1">
+                        <Shield className="w-3 h-3" /> ARIA is rewriting all messages to be civil and child-focused
+                      </p>
+                      <p className="text-[11px] text-gray-400/70 italic pl-4">
+                        The <span className="text-red-400 line-through">crossed-out text</span> is shown here so you can see what ARIA blocked — in the real app, only the rewritten message is sent.
+                      </p>
+                    </div>
                   )}
                 </div>
               )}
