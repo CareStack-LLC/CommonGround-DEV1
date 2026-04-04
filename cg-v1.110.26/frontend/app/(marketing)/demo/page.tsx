@@ -79,7 +79,10 @@ type Scenario = 'schedule' | 'medical' | 'financial' | 'holiday' | 'communicatio
 // Constants
 // ---------------------------------------------------------------------------
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+let _apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+if (_apiUrl.endsWith('/')) _apiUrl = _apiUrl.slice(0, -1);
+if (!_apiUrl.endsWith('/api/v1')) _apiUrl += '/api/v1';
+const API_URL = _apiUrl;
 
 const SCENARIOS: { key: Scenario; label: string; description: string; icon: React.ElementType }[] = [
   { key: 'schedule', label: 'Schedule Disputes', description: 'Pickup times, weekend swaps, last-minute changes', icon: Calendar },
