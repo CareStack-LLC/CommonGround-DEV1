@@ -1465,10 +1465,9 @@ Respond with a JSON object (no markdown, just raw JSON) with these fields:
 }}"""
 
     try:
-        import anthropic
-        from app.core.config import settings
+        from app.core.ai_clients import get_async_anthropic
 
-        client = anthropic.AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY)
+        client = get_async_anthropic()
         response = await client.messages.create(
             model="claude-sonnet-4-5-20250514",
             max_tokens=4096,

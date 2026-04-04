@@ -101,10 +101,10 @@ class Settings(BaseSettings):
     TRANSCRIPTION_ENABLED: bool = True
 
     # ARIA Call Monitoring - Video & Audio Supervisor
-    ARIA_FRAME_CAPTURE_INTERVAL_SECONDS: int = 10
-    ARIA_FRAME_RESOLUTION: str = "640x480"
-    ARIA_FRAME_JPEG_QUALITY: int = 60
-    ARIA_VISION_MODEL: str = "claude-sonnet-4-5-20250514"
+    ARIA_FRAME_CAPTURE_INTERVAL_SECONDS: int = 30
+    ARIA_FRAME_RESOLUTION: str = "320x240"
+    ARIA_FRAME_JPEG_QUALITY: int = 40
+    ARIA_VISION_MODEL: str = "claude-haiku-4-5-20251001"
     ARIA_MAX_STRIKES: int = 3
     ARIA_SEVERE_IMMEDIATE_TERMINATE: bool = True
     ARIA_DEFAULT_SENSITIVITY: str = "moderate"  # strict, moderate, relaxed, off

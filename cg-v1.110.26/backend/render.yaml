@@ -4,6 +4,9 @@ services:
     runtime: docker
     dockerfilePath: ./Dockerfile
     healthCheckPath: /health
+    plan: standard  # 2GB RAM, 1 vCPU — required for 300 concurrent users
+    numInstances: 2  # Scale to 3-4 if needed
+    autoDeploy: true
     envVars:
       - key: PORT
         value: 10000

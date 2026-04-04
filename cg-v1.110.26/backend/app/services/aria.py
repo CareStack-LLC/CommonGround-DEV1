@@ -18,12 +18,11 @@ from typing import List, Optional, Dict, Any
 from dataclasses import dataclass, field
 from enum import Enum
 from datetime import datetime, timedelta
-import anthropic
-from openai import OpenAI
 from sqlalchemy import select, and_, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
+from app.core.ai_clients import get_openai, get_anthropic
 from app.models.message import Message, MessageFlag
 from app.utils.sentry_helpers import capture_error, metric_increment, metric_distribution
 
@@ -80,7 +79,14 @@ class ARIAService:
 
     def __init__(self):
         """Initialize ARIA service"""
-        self.compiled_patterns = self._compile_patterns()
+        self._compiled_patterns_cache = None
+
+    @property
+    def compiled_patterns(self) -> "Dict[ToxicityCategory, List[re.Pattern]]":
+        """Lazy-load regex patterns on first access to save ~5-10MB startup RAM."""
+        if self._compiled_patterns_cache is None:
+            self._compiled_patterns_cache = self._compile_patterns()
+        return self._compiled_patterns_cache
 
     def _compile_patterns(self) -> Dict[ToxicityCategory, List[re.Pattern]]:
         """Pre-compile regex patterns for performance"""
@@ -1053,7 +1059,7 @@ class ARIAService:
             AI analysis result with detailed feedback
         """
         try:
-            client = OpenAI(api_key=settings.OPENAI_API_KEY, timeout=30.0)
+            client = get_openai()
 
             # Build context
             context_info = ""
@@ -1398,7 +1404,7 @@ Respond in JSON format:
             The rewritten message string, or None if rewrite fails
         """
         try:
-            client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY, timeout=30.0)
+            client = get_anthropic()
 
             thread_context = ""
             if thread_history:
@@ -1455,7 +1461,7 @@ This message was flagged for: {flag_reason}
             # Fallback to OpenAI if Anthropic fails
             try:
                 logger.info("[ARIA v2] Attempting OpenAI fallback for contextual rewrite...")
-                openai_client = OpenAI(api_key=settings.OPENAI_API_KEY, timeout=30.0)
+                openai_client = get_openai()
 
                 # Use a similar prompt for OpenAI
                 response = openai_client.chat.completions.create(
@@ -1501,7 +1507,7 @@ This message was flagged for: {flag_reason}
             return []
 
         try:
-            client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY, timeout=30.0)
+            client = get_anthropic()
 
             thread_context = ""
             if thread_history:
@@ -1556,7 +1562,7 @@ An incoming message was just received:
             # Fallback to OpenAI if Anthropic fails
             try:
                 logger.info("[ARIA v2] Attempting OpenAI fallback for reply suggestions...")
-                openai_client = OpenAI(api_key=settings.OPENAI_API_KEY, timeout=30.0)
+                openai_client = get_openai()
 
                 response = openai_client.chat.completions.create(
                     model="gpt-4o",

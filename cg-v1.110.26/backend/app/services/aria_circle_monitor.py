@@ -221,9 +221,8 @@ Be very sensitive to child safety but avoid false positives on normal family con
 """
 
         try:
-            import anthropic
-
-            client = anthropic.Anthropic(api_key=self.anthropic_api_key, timeout=30.0)
+            from app.core.ai_clients import get_anthropic
+            client = get_anthropic()
 
             from app.utils.sentry_helpers import ai_span
             with ai_span("child_safety_analysis", "claude-sonnet-4-5-20250514") as span:

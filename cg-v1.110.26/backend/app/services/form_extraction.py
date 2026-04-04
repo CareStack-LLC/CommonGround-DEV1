@@ -20,12 +20,12 @@ import json
 
 logger = logging.getLogger(__name__)
 
-from openai import OpenAI
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.intake import IntakeSession, IntakeExtraction
 from app.core.config import settings
+from app.core.ai_clients import get_openai
 
 
 # =============================================================================
@@ -337,7 +337,7 @@ class FormExtractionService:
 
     def __init__(self, db: AsyncSession):
         self.db = db
-        self.client = OpenAI(api_key=settings.OPENAI_API_KEY)
+        self.client = get_openai()
 
     def _get_extraction_prompt(self, form_type: str) -> str:
         """Generate extraction prompt for specific form type."""

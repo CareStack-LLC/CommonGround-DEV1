@@ -15,8 +15,8 @@ import io
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-import openai
 import fitz  # PyMuPDF for PDF to image conversion
+from app.core.ai_clients import get_openai
 
 from app.core.config import settings
 from app.models.custody_order import (
@@ -187,7 +187,7 @@ class CustodyExtractionService:
 
     def __init__(self, db: AsyncSession):
         self.db = db
-        self.client = openai.OpenAI(api_key=settings.OPENAI_API_KEY)
+        self.client = get_openai()
 
     def _pdf_to_images(self, pdf_content: bytes, max_pages: int = 10) -> list[str]:
         """

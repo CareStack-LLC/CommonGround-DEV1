@@ -232,9 +232,9 @@ async def _generate_context_aware_suggestion(
 
     # Primary: OpenAI
     try:
-        from openai import AsyncOpenAI
+        from app.core.ai_clients import get_async_openai
 
-        oai_client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY, timeout=15.0)
+        oai_client = get_async_openai()
         oai_response = await oai_client.chat.completions.create(
             model="gpt-4o-mini",
             max_tokens=150,
@@ -251,9 +251,9 @@ async def _generate_context_aware_suggestion(
 
     # Fallback: Anthropic
     try:
-        import anthropic
+        from app.core.ai_clients import get_async_anthropic
 
-        client = anthropic.AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY)
+        client = get_async_anthropic()
         response = await client.messages.create(
             model="claude-sonnet-4-20250514",
             max_tokens=150,
@@ -347,9 +347,9 @@ async def demo_coparent_reply(
 
     # Primary: OpenAI
     try:
-        from openai import AsyncOpenAI
+        from app.core.ai_clients import get_async_openai
 
-        oai_client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY, timeout=30.0)
+        oai_client = get_async_openai()
         oai_messages = [{"role": "system", "content": system_prompt}] + messages
         oai_response = await oai_client.chat.completions.create(
             model="gpt-4o",
@@ -363,9 +363,9 @@ async def demo_coparent_reply(
     # Fallback: Anthropic
     if not reply_text:
         try:
-            import anthropic
+            from app.core.ai_clients import get_async_anthropic
 
-            client = anthropic.AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY)
+            client = get_async_anthropic()
             response = await client.messages.create(
                 model="claude-sonnet-4-20250514",
                 max_tokens=300,

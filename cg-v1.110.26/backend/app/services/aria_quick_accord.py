@@ -17,9 +17,8 @@ import json
 import logging
 import uuid
 
-from openai import OpenAI
-from anthropic import Anthropic
 from fastapi import HTTPException, status
+from app.core.ai_clients import get_openai, get_anthropic
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -146,7 +145,7 @@ class AriaQuickAccordService:
         if settings.ARIA_DEFAULT_PROVIDER == "claude" and settings.ANTHROPIC_API_KEY:
             self.provider = "claude"
             try:
-                self.anthropic = Anthropic(api_key=settings.ANTHROPIC_API_KEY, timeout=30.0)
+                self.anthropic = get_anthropic()
             except Exception:
                 self.provider = "openai"
         else:
@@ -155,7 +154,7 @@ class AriaQuickAccordService:
         # Always initialize OpenAI as fallback
         if settings.OPENAI_API_KEY:
             try:
-                self.openai = OpenAI(api_key=settings.OPENAI_API_KEY, timeout=30.0)
+                self.openai = get_openai()
             except Exception:
                 pass
 

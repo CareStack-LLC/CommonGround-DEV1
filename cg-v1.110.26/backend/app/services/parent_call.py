@@ -65,7 +65,7 @@ class ParentCallService:
                 daily_room = await self.daily_service.create_room_if_not_exists(
                     room_name=room.daily_room_name,
                     privacy="private",
-                    exp_minutes=525600,  # 1 year
+                    exp_minutes=1440,  # 24 hours — rooms are recreated on demand
                     max_participants=4,
                     enable_recording=True,
                 )
@@ -98,11 +98,11 @@ class ParentCallService:
         room_name = f"cg-parent-{family_file.family_file_number}"
 
         try:
-            # Create room with no expiration (permanent)
+            # Create room with 24h expiry — recreated on demand via get_or_create
             daily_room = await self.daily_service.create_room(
                 room_name=room_name,
                 privacy="private",
-                exp_minutes=525600,  # 1 year (effectively permanent)
+                exp_minutes=1440,  # 24 hours — rooms are recreated on demand
                 max_participants=4,  # 2 parents + 2 lawyers
                 enable_recording=True,
             )

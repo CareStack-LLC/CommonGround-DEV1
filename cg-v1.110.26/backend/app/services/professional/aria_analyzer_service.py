@@ -18,11 +18,10 @@ logger = logging.getLogger(__name__)
 from sqlalchemy import select, and_, asc
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-from openai import OpenAI
-
 from app.models.message import Message, MessageFlag
 from app.models.user import User
 from app.core.config import settings
+from app.core.ai_clients import get_openai
 
 
 class ARIAAnalyzerService:
@@ -30,7 +29,7 @@ class ARIAAnalyzerService:
 
     def __init__(self, db: AsyncSession):
         self.db = db
-        self.openai_client = OpenAI(api_key=settings.OPENAI_API_KEY)
+        self.openai_client = get_openai()
 
     async def analyze_thread(
         self,

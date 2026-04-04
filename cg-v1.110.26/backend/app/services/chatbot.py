@@ -14,12 +14,12 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple
 
-import openai
 from sqlalchemy import select, func, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.core.config import settings
+from app.core.ai_clients import get_openai
 from app.models.chatbot import ChatbotVisitor, ChatbotSession, ChatbotMessage, ChatbotConfig
 from app.services.email import email_service
 from app.utils.sentry_helpers import capture_error
@@ -211,7 +211,7 @@ class ChatbotService:
 
         # Call OpenAI
         try:
-            client = openai.OpenAI(api_key=settings.OPENAI_API_KEY)
+            client = get_openai()
             oai_messages = [{"role": "system", "content": system_prompt}] + messages
             response = client.chat.completions.create(
                 model=self.MODEL,

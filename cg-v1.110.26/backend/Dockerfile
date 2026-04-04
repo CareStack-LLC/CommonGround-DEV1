@@ -34,7 +34,7 @@ echo "PORT=$PORT"\n\
 echo "Running database migrations (60s timeout)..."\n\
 timeout 60 alembic upgrade head 2>&1 && echo "Migrations complete!" || echo "Migration warning (skipped or already applied)"\n\
 echo "Starting uvicorn on port ${PORT:-8000}..."\n\
-exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers 1 --log-level info --access-log\n\
+exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers 2 --loop uvloop --no-access-log --limit-concurrency 20 --timeout-keep-alive 10 --log-level warning\n\
 ' > /app/start.sh && chmod +x /app/start.sh
 
 # Run application

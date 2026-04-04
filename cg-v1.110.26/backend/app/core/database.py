@@ -53,10 +53,10 @@ def create_app_engine(
         pool_kwargs["poolclass"] = NullPool
     else:
         pool_kwargs["poolclass"] = AsyncAdaptedQueuePool
-        pool_kwargs["pool_size"] = 5
-        pool_kwargs["max_overflow"] = 10
-        pool_kwargs["pool_timeout"] = 30
-        pool_kwargs["pool_recycle"] = 300  # Recycle connections every 5 min
+        pool_kwargs["pool_size"] = 15
+        pool_kwargs["max_overflow"] = 20
+        pool_kwargs["pool_timeout"] = 10  # Fail fast instead of queueing
+        pool_kwargs["pool_recycle"] = 600  # Recycle connections every 10 min
         pool_kwargs["pool_pre_ping"] = True  # Auto-detect stale connections
 
     return create_async_engine(

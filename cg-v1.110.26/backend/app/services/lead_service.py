@@ -8,12 +8,12 @@ import re
 from datetime import datetime
 from typing import Optional
 
-import anthropic
 import httpx
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import Settings
+from app.core.ai_clients import get_async_anthropic, get_async_openai
 from app.models.lead import LeadList, Lead, EmailCampaign, CampaignTemplate, LandingPage
 from app.models.user import User
 
@@ -247,7 +247,7 @@ async def generate_campaign_content(
     )
 
     try:
-        client = anthropic.AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY, timeout=30.0)
+        client = get_async_anthropic()
         response = await client.messages.create(
             model="claude-sonnet-4-5-20250514",
             max_tokens=4096,
@@ -903,7 +903,7 @@ async def ai_generate_landing_page(
     result = None
     try:
         if settings.ANTHROPIC_API_KEY:
-            client = anthropic.AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY)
+            client = get_async_anthropic()
             response = await client.messages.create(
                 model="claude-sonnet-4-20250514",
                 max_tokens=4096,
@@ -920,9 +920,8 @@ async def ai_generate_landing_page(
 
     if not result:
         try:
-            from openai import AsyncOpenAI
             if settings.OPENAI_API_KEY:
-                client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+                client = get_async_openai()
                 resp = await client.chat.completions.create(
                     model="gpt-4o",
                     messages=[{"role": "user", "content": prompt}],
@@ -1101,7 +1100,7 @@ async def _generate_landing_page_social_posts(
 
     try:
         if settings.ANTHROPIC_API_KEY:
-            client = anthropic.AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY)
+            client = get_async_anthropic()
             response = await client.messages.create(
                 model="claude-sonnet-4-20250514",
                 max_tokens=4096,

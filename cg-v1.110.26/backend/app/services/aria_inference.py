@@ -3,32 +3,21 @@ ARIA Inference Service (The "Smart Path")
 Implements LLM-as-a-Classifier for high-nuance toxicity detection.
 """
 
-import os
 import json
+import logging
 from typing import Dict, Any, List, Optional
 from datetime import datetime
-from openai import OpenAI
+from app.core.ai_clients import get_openai
 from app.services.aria_sanitize import (
     sanitize_for_prompt,
     sanitize_context_messages,
     add_injection_guard,
 )
-# from app.core.config import settings # In production, use settings
-
-# --- CONFIGURATION ---
-# Using the key provided by the user for this implementation
-# In a real deployment, this would be in os.environ ("OPENAI_API_KEY")
-import logging
 
 from app.utils.sentry_helpers import capture_error
 logger = logging.getLogger(__name__)
 
-API_KEY = os.environ.get("OPENAI_API_KEY")
-if not API_KEY:
-    # Fallback to prevent crash if not set, but won't work for inference
-    logger.warning("OPENAI_API_KEY not found in environment")
-
-client = OpenAI(api_key=API_KEY)
+client = get_openai()
 
 ARIA_SYSTEM_PROMPT = """
 You are ARIA (AI-Powered Relationship Intelligence Assistant), a court-grade safety monitor for co-parenting communication.

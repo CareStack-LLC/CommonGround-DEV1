@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 DECAY_WEIGHTS = [0.5, 0.75, 1.0]
 
 # Heat threshold for triggering LLM deep analysis
-LLM_TRIGGER_HEAT = 3.5
+LLM_TRIGGER_HEAT = 1.8
 
 
 async def get_rolling_window_heat(

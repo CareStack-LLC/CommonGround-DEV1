@@ -1,8 +1,9 @@
 """
 Activity tracking middleware.
 
-Updates User.last_active on every authenticated API request,
-throttled to once per 60 seconds to avoid excessive DB writes.
+Updates User.last_active on authenticated API requests,
+throttled via Redis SET NX (60s TTL) to avoid excessive DB writes.
+Falls back to DB-only throttling if Redis is unavailable.
 """
 
 import logging
@@ -24,37 +25,58 @@ logger = logging.getLogger(__name__)
 # Throttle: only update if last_active is older than this
 THROTTLE_SECONDS = 60
 
+# Redis client (lazy-initialized)
+_redis = None
+_redis_checked = False
+
+
+async def _get_redis():
+    """Get Redis client for activity throttling. Returns None if unavailable."""
+    global _redis, _redis_checked
+    if _redis_checked:
+        return _redis
+    _redis_checked = True
+    try:
+        import redis.asyncio as aioredis
+        _redis = aioredis.from_url(
+            settings.REDIS_URL,
+            decode_responses=True,
+            socket_connect_timeout=2,
+            socket_timeout=2,
+        )
+        await _redis.ping()
+        return _redis
+    except Exception:
+        _redis = None
+        return None
+
 
 class ActivityTrackingMiddleware(BaseHTTPMiddleware):
     """
     Middleware that updates User.last_active on authenticated requests.
 
-    - Extracts Bearer token from Authorization header
-    - Decodes JWT to get user sub (supabase_id)
-    - Updates last_active if stale (>60s old)
-    - Fire-and-forget: never blocks or fails the request
+    Uses Redis SET NX with 60s TTL as a fast throttle gate:
+    - If Redis key doesn't exist → set it + update DB (once per 60s per user)
+    - If Redis key exists → skip DB entirely (~0.1ms Redis check vs ~5-20ms DB)
+    - Falls back to DB conditional update if Redis unavailable
     """
 
     async def dispatch(self, request: Request, call_next) -> Response:
-        # Process the request first — never block
         response = await call_next(request)
 
-        # After response, try to update last_active in background
         try:
             auth_header = request.headers.get("authorization", "")
             if not auth_header.startswith("Bearer "):
                 return response
 
-            token = auth_header[7:]  # Strip "Bearer "
+            token = auth_header[7:]
 
-            # Decode token without raising HTTP exceptions
             try:
                 secret_key = settings.JWT_SECRET_KEY or settings.SECRET_KEY
                 payload = jwt.decode(token, secret_key, algorithms=[settings.JWT_ALGORITHM])
             except JWTError:
                 return response
 
-            # Only process access tokens
             if payload.get("type") != "access":
                 return response
 
@@ -62,23 +84,30 @@ class ActivityTrackingMiddleware(BaseHTTPMiddleware):
             if not sub:
                 return response
 
-            # Fire-and-forget DB update with throttling
             await self._update_last_active(sub)
 
         except Exception:
-            # Never fail the request due to activity tracking
             pass
 
         return response
 
     async def _update_last_active(self, supabase_id: str) -> None:
-        """Update last_active only if it's stale (>60s old)."""
+        """Update last_active with Redis throttle gate."""
         try:
+            # Try Redis throttle first (fast path: ~0.1ms)
+            redis_client = await _get_redis()
+            if redis_client:
+                key = f"activity:{supabase_id}"
+                # SET NX: only sets if key doesn't exist. Returns True if set, False if exists.
+                was_set = await redis_client.set(key, "1", nx=True, ex=THROTTLE_SECONDS)
+                if not was_set:
+                    return  # Key exists = recently updated, skip DB
+
+            # DB update (only reached if Redis gate passed or Redis unavailable)
             now = datetime.utcnow()
             threshold = now - timedelta(seconds=THROTTLE_SECONDS)
 
             async with AsyncSessionLocal() as session:
-                # Conditional update: only write if last_active is old or null
                 result = await session.execute(
                     update(User)
                     .where(

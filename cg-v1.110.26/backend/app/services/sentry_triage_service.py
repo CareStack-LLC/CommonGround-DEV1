@@ -240,9 +240,9 @@ async def ai_triage(issues: list[dict]) -> dict:
     # --- Try Claude first ---
     if settings.ANTHROPIC_API_KEY:
         try:
-            import anthropic
+            from app.core.ai_clients import get_async_anthropic
 
-            client = anthropic.AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY, timeout=30.0)
+            client = get_async_anthropic()
             response = await client.messages.create(
                 model="claude-sonnet-4-5-20250514",
                 max_tokens=4096,
@@ -258,9 +258,9 @@ async def ai_triage(issues: list[dict]) -> dict:
     # --- Fallback to OpenAI ---
     if settings.OPENAI_API_KEY:
         try:
-            from openai import AsyncOpenAI
+            from app.core.ai_clients import get_async_openai
 
-            oai_client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY, timeout=30.0)
+            oai_client = get_async_openai()
             oai_response = await oai_client.chat.completions.create(
                 model="gpt-4o",
                 max_tokens=4096,

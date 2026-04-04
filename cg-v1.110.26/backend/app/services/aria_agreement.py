@@ -12,9 +12,8 @@ import json
 
 import logging
 
-import anthropic
-from openai import OpenAI
 from fastapi import HTTPException, status
+from app.core.ai_clients import get_openai, get_anthropic
 
 logger = logging.getLogger(__name__)
 from sqlalchemy import select
@@ -53,12 +52,8 @@ class AriaAgreementService:
     def __init__(self, db: AsyncSession):
         self.db = db
         # Initialize AI clients - prefer Claude, fallback to OpenAI
-        self._anthropic_client = None
-        self._openai_client = None
-        if settings.ANTHROPIC_API_KEY:
-            self._anthropic_client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
-        if getattr(settings, 'OPENAI_API_KEY', None):
-            self._openai_client = OpenAI(api_key=settings.OPENAI_API_KEY)
+        self._anthropic_client = get_anthropic() if settings.ANTHROPIC_API_KEY else None
+        self._openai_client = get_openai() if getattr(settings, 'OPENAI_API_KEY', None) else None
         # Legacy attribute for any direct references
         self.client = self._openai_client
 

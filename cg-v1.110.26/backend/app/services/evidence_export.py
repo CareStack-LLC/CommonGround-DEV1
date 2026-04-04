@@ -11,6 +11,7 @@ Generates comprehensive evidence packages including:
 import hashlib
 import json
 import logging
+import tempfile
 import zipfile
 import io
 from datetime import datetime
@@ -67,8 +68,8 @@ class EvidenceExportService:
         timestamp = datetime.utcnow()
         export_id = f"EXP-{timestamp.strftime('%Y%m%d%H%M%S')}-{recording_id[:8]}"
 
-        # Create in-memory ZIP archive
-        zip_buffer = io.BytesIO()
+        # Create ZIP archive — spills to disk if over 10MB to prevent OOM
+        zip_buffer = tempfile.SpooledTemporaryFile(max_size=10 * 1024 * 1024)
 
         with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zf:
             # 1. Add recording file

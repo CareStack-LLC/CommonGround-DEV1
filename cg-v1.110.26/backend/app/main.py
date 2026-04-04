@@ -65,11 +65,11 @@ if settings.SENTRY_DSN:
 
         # ── Traces (Performance Monitoring) ──
         # Sample 30% of transactions in prod, 100% in dev
-        traces_sample_rate=0.3 if settings.is_production else 1.0,
+        traces_sample_rate=0.1 if settings.is_production else 1.0,
 
         # ── Profiling ──
         # Profile 20% of sampled transactions for CPU/memory insights
-        profiles_sample_rate=0.2 if settings.is_production else 0.0,
+        profiles_sample_rate=0.05 if settings.is_production else 0.0,
 
         # ── Logs (SDK 2.35+) ──
         # Stream Python logs to Sentry Logs (viewable in Explore > Logs)
@@ -208,9 +208,17 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.warning(f"Startup migration warning (may already exist): {e}")
 
+    # Initialize Redis-backed services for multi-instance support
+    from app.core.websocket import manager as ws_manager
+    await ws_manager.init_redis()
+    await ws_manager.start_subscriber()
+    from app.core.rate_limit import _redis_limiter
+    await _redis_limiter.init()
+
     yield
     # Shutdown
     logger.info("Shutting down...")
+    await ws_manager.shutdown()
     await close_db()
 
 
@@ -234,8 +242,8 @@ app.add_middleware(
     allow_headers=["Content-Type", "Authorization", "X-Requested-With", "X-Request-ID"],
 )
 
-# Rate limiting disabled for testing — re-enable when going to production
-# app.add_middleware(RateLimitMiddleware)
+# Rate limiting — re-enabled for production scaling
+app.add_middleware(RateLimitMiddleware)
 
 # Request ID tracing + canonical log lines (wide events)
 from app.middleware.request_id import RequestIDMiddleware

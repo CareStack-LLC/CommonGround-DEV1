@@ -16,9 +16,8 @@ from typing import Optional, Dict, Any, List
 import json
 import logging
 
-import anthropic
-from openai import OpenAI
 from fastapi import HTTPException, status
+from app.core.ai_clients import get_openai, get_anthropic
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -41,8 +40,8 @@ class AriaParalegalService:
 
     def __init__(self, db: AsyncSession):
         self.db = db
-        self.anthropic_client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY, timeout=30.0)
-        self.openai_client = OpenAI(api_key=settings.OPENAI_API_KEY, timeout=30.0)
+        self.anthropic_client = get_anthropic()
+        self.openai_client = get_openai()
 
     def _get_system_prompt(
         self,

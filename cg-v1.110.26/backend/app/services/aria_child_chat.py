@@ -30,10 +30,8 @@ from enum import Enum
 from typing import Optional, List, Dict, Any
 from dataclasses import dataclass, field
 
-import anthropic
-from openai import OpenAI
-
 from app.core.config import settings
+from app.core.ai_clients import get_anthropic, get_openai
 from app.services.aria_sanitize import (
     sanitize_for_prompt,
     sanitize_name,
@@ -554,7 +552,7 @@ Return ONLY valid JSON. No extra text."""
         try:
             if not settings.ANTHROPIC_API_KEY:
                 return None
-            client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
+            client = get_anthropic()
             response = client.messages.create(
                 model="claude-3-5-sonnet-20241022",
                 max_tokens=500,
@@ -572,7 +570,7 @@ Return ONLY valid JSON. No extra text."""
         try:
             if not settings.OPENAI_API_KEY:
                 return None
-            client = OpenAI(api_key=settings.OPENAI_API_KEY)
+            client = get_openai()
             response = client.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=[

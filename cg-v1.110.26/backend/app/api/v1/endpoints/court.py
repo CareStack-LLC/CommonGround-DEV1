@@ -3444,7 +3444,7 @@ async def extract_case_from_forms(
     - FL-300: Request for Order (required)
     - FL-311: Child Custody and Visitation Application (optional, provides more detail)
     """
-    import anthropic
+    from app.core.ai_clients import get_anthropic
     import base64
     import json
     import os
@@ -3501,8 +3501,7 @@ For children, extract all children listed in the forms.
 
     try:
         # Try using Claude to extract data
-        from app.core.config import settings
-        client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
+        client = get_anthropic()
 
         # Build message content with PDFs
         content = []

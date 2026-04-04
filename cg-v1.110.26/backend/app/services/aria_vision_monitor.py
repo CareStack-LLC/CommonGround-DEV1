@@ -31,14 +31,14 @@ logger = logging.getLogger(__name__)
 
 # Frame capture intervals by sensitivity level (seconds)
 FRAME_INTERVALS = {
-    "strict": 5,
-    "moderate": 10,
-    "relaxed": 15,
+    "strict": 15,
+    "moderate": 30,
+    "relaxed": 60,
     "off": 0,  # No capture
 }
 
 # Adaptive interval after violation (seconds)
-ADAPTIVE_INTERVAL = 3
+ADAPTIVE_INTERVAL = 10
 ADAPTIVE_DURATION = 30  # How long to use adaptive interval after a violation
 
 
@@ -112,10 +112,8 @@ Child safety threshold is LOWER - flag anything that would be concerning for a c
 
     def __init__(self):
         """Initialize with Claude API client."""
-        self.client = anthropic.AsyncAnthropic(
-            api_key=settings.ANTHROPIC_API_KEY,
-            timeout=30.0
-        ) if settings.ANTHROPIC_API_KEY else None
+        from app.core.ai_clients import get_async_anthropic
+        self.client = get_async_anthropic() if settings.ANTHROPIC_API_KEY else None
         # Track last frame hashes per participant for similarity detection
         self._last_frame_hashes: Dict[str, str] = {}
         # Cache previous analysis result per participant to return on skip
@@ -189,8 +187,8 @@ Child safety threshold is LOWER - flag anything that would be concerning for a c
 
         try:
             response = await self.client.messages.create(
-                model="claude-sonnet-4-5-20250514",
-                max_tokens=300,
+                model=settings.ARIA_VISION_MODEL,
+                max_tokens=150,
                 system=[{"type": "text", "text": prompt, "cache_control": {"type": "ephemeral"}}],
                 messages=[
                     {
@@ -356,7 +354,7 @@ Child safety threshold is LOWER - flag anything that would be concerning for a c
             captured_at=datetime.utcnow(),
             call_time_seconds=call_time_seconds,
             frame_hash=frame_hash,
-            analysis_model="claude-sonnet-4-5-20250514",
+            analysis_model=settings.ARIA_VISION_MODEL,
             analysis_result=result.raw_response,
             is_flagged=result.is_flagged,
             violation_type=result.violation_type,

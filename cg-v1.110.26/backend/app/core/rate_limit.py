@@ -1,24 +1,20 @@
 """
-Custom in-memory rate limiting middleware.
+Rate limiting middleware with Redis backend for multi-instance support.
 
-Replaces slowapi which crashes on Render. Uses a simple dict-based
-approach with automatic cleanup to prevent memory leaks.
+Falls back to in-memory rate limiting if Redis is unavailable.
 
-Limits (relaxed for bug hunt testing, revert after ~2026-04-23):
-- Auth endpoints (login, register, password reset): 30 requests/minute per IP
-- Payment/wallet endpoints: 30 requests/minute per IP
-- Export/report endpoints: 15 requests/minute per IP
-- File upload endpoints: 30 requests/minute per IP
-- General API: 300 requests/minute per IP
-
-Original limits (restore after bug hunt):
-- Auth: 10/min, Payment: 10/min, Export: 5/min, Upload: 10/min, General: 100/min
+Limits:
+- Auth endpoints (login, register, password reset): 10 requests/minute per IP
+- Payment/wallet endpoints: 10 requests/minute per IP
+- Export/report endpoints: 5 requests/minute per IP
+- File upload endpoints: 10 requests/minute per IP
+- General API: 100 requests/minute per IP
 """
 
 import logging
 import time
 from collections import defaultdict
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 
 from fastapi import HTTPException
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -42,37 +38,113 @@ EXPORT_PATHS = {"/export", "/report", "/download-report"}
 UPLOAD_PATHS = {"/upload", "/attachment"}
 
 # Rate limit settings: (max_requests, window_seconds)
-# TODO: Revert to original limits after bug hunt ends (~2026-04-23)
-# Original values: Auth=10, Payment=10, Export=5, Upload=10, General=100
-AUTH_RATE_LIMIT: Tuple[int, int] = (30, 60)          # 30 requests per 60 seconds
-PAYMENT_RATE_LIMIT: Tuple[int, int] = (30, 60)       # 30 requests per 60 seconds
-EXPORT_RATE_LIMIT: Tuple[int, int] = (15, 60)        # 15 requests per 60 seconds
-UPLOAD_RATE_LIMIT: Tuple[int, int] = (30, 60)        # 30 requests per 60 seconds
-GENERAL_RATE_LIMIT: Tuple[int, int] = (300, 60)      # 300 requests per 60 seconds
+AUTH_RATE_LIMIT: Tuple[int, int] = (10, 60)          # 10 requests per 60 seconds
+PAYMENT_RATE_LIMIT: Tuple[int, int] = (10, 60)       # 10 requests per 60 seconds
+EXPORT_RATE_LIMIT: Tuple[int, int] = (5, 60)         # 5 requests per 60 seconds
+UPLOAD_RATE_LIMIT: Tuple[int, int] = (10, 60)        # 10 requests per 60 seconds
+GENERAL_RATE_LIMIT: Tuple[int, int] = (100, 60)      # 100 requests per 60 seconds
 
 # Cleanup interval in seconds (remove stale entries every 5 minutes)
 CLEANUP_INTERVAL = 300
 
 
-class InMemoryRateLimiter:
-    """
-    Simple in-memory rate limiter using a sliding window approach.
+def _get_rate_limit(path: str) -> Tuple[int, int, str]:
+    """Determine which rate limit applies to a given path."""
+    if any(auth_path in path for auth_path in AUTH_PATHS):
+        return AUTH_RATE_LIMIT[0], AUTH_RATE_LIMIT[1], "auth"
+    if any(p in path for p in PAYMENT_PATHS):
+        return PAYMENT_RATE_LIMIT[0], PAYMENT_RATE_LIMIT[1], "payment"
+    if any(p in path for p in EXPORT_PATHS):
+        return EXPORT_RATE_LIMIT[0], EXPORT_RATE_LIMIT[1], "export"
+    if any(p in path for p in UPLOAD_PATHS):
+        return UPLOAD_RATE_LIMIT[0], UPLOAD_RATE_LIMIT[1], "upload"
+    return GENERAL_RATE_LIMIT[0], GENERAL_RATE_LIMIT[1], "general"
 
-    Stores timestamps of recent requests per client IP. Periodically
-    cleans up expired entries to prevent unbounded memory growth.
+
+class RedisRateLimiter:
+    """
+    Redis-backed rate limiter using sorted sets for sliding window.
+
+    Each request is stored as a member in a sorted set keyed by IP:category,
+    with the score being the timestamp. ZRANGEBYSCORE trims old entries.
     """
 
     def __init__(self):
-        # Key: (ip, path_category) -> List of request timestamps
+        self._redis = None
+        self._initialized = False
+
+    async def init(self):
+        """Initialize Redis connection. Safe to call multiple times."""
+        if self._initialized:
+            return
+        try:
+            from app.core.config import settings
+            import redis.asyncio as aioredis
+            self._redis = aioredis.from_url(
+                settings.REDIS_URL,
+                decode_responses=True,
+                socket_connect_timeout=2,
+                socket_timeout=2,
+            )
+            await self._redis.ping()
+            self._initialized = True
+            logger.info("Redis rate limiter initialized")
+        except Exception as e:
+            logger.warning(f"Redis unavailable for rate limiting, using in-memory fallback: {e}")
+            self._redis = None
+            self._initialized = True
+
+    async def is_rate_limited(self, client_ip: str, path: str) -> Tuple[bool, int]:
+        """Check if request should be rate limited using Redis sorted sets."""
+        if not self._redis:
+            return False, 0
+
+        max_requests, window, category = _get_rate_limit(path)
+        key = f"rl:{client_ip}:{category}"
+        now = time.time()
+        window_start = now - window
+
+        try:
+            pipe = self._redis.pipeline()
+            pipe.zremrangebyscore(key, 0, window_start)  # Remove expired
+            pipe.zcard(key)  # Count remaining
+            pipe.zadd(key, {str(now): now})  # Add current request
+            pipe.expire(key, window + 10)  # TTL slightly longer than window
+            results = await pipe.execute()
+
+            count = results[1]  # zcard result
+            if count >= max_requests:
+                # Over limit — remove the request we just added
+                await self._redis.zrem(key, str(now))
+                # Calculate retry-after
+                oldest = await self._redis.zrange(key, 0, 0, withscores=True)
+                if oldest:
+                    retry_after = int(oldest[0][1] + window - now) + 1
+                    return True, max(retry_after, 1)
+                return True, 1
+
+            return False, 0
+        except Exception as e:
+            logger.warning(f"Redis rate limit check failed: {e}")
+            return False, 0  # Fail open
+
+
+class InMemoryRateLimiter:
+    """
+    Fallback in-memory rate limiter using a sliding window approach.
+
+    Used when Redis is unavailable. Note: not shared across instances.
+    """
+
+    def __init__(self):
         self._requests: Dict[str, List[float]] = defaultdict(list)
         self._last_cleanup: float = time.time()
 
     def _cleanup(self, now: float) -> None:
-        """Remove entries older than the largest window (60s) + buffer."""
-        cutoff = now - 120  # 2 minutes — generous buffer
+        """Remove entries older than the largest window + buffer."""
+        cutoff = now - 120
         keys_to_delete = []
         for key, timestamps in self._requests.items():
-            # Filter out old timestamps
             self._requests[key] = [t for t in timestamps if t > cutoff]
             if not self._requests[key]:
                 keys_to_delete.append(key)
@@ -81,75 +153,36 @@ class InMemoryRateLimiter:
         self._last_cleanup = now
 
     def is_rate_limited(self, client_ip: str, path: str) -> Tuple[bool, int]:
-        """
-        Check if a request should be rate limited.
-
-        Args:
-            client_ip: The client's IP address
-            path: The request path
-
-        Returns:
-            Tuple of (is_limited, retry_after_seconds)
-        """
+        """Check if a request should be rate limited."""
         now = time.time()
 
-        # Periodic cleanup to prevent memory leak
         if now - self._last_cleanup > CLEANUP_INTERVAL:
             self._cleanup(now)
 
-        # Determine which rate limit applies
-        is_auth = any(auth_path in path for auth_path in AUTH_PATHS)
-        is_payment = any(p in path for p in PAYMENT_PATHS)
-        is_export = any(p in path for p in EXPORT_PATHS)
-        is_upload = any(p in path for p in UPLOAD_PATHS)
-
-        if is_auth:
-            max_requests, window = AUTH_RATE_LIMIT
-            category = "auth"
-        elif is_payment:
-            max_requests, window = PAYMENT_RATE_LIMIT
-            category = "payment"
-        elif is_export:
-            max_requests, window = EXPORT_RATE_LIMIT
-            category = "export"
-        elif is_upload:
-            max_requests, window = UPLOAD_RATE_LIMIT
-            category = "upload"
-        else:
-            max_requests, window = GENERAL_RATE_LIMIT
-            category = "general"
+        max_requests, window, category = _get_rate_limit(path)
         key = f"{client_ip}:{category}"
 
-        # Filter timestamps within the current window
         window_start = now - window
         self._requests[key] = [t for t in self._requests[key] if t > window_start]
 
-        # Check if over limit
         if len(self._requests[key]) >= max_requests:
-            # Calculate retry-after from the oldest request in window
             oldest = self._requests[key][0]
             retry_after = int(oldest + window - now) + 1
             return True, max(retry_after, 1)
 
-        # Record this request
         self._requests[key].append(now)
         return False, 0
 
 
-# Global instance
-_rate_limiter = InMemoryRateLimiter()
+# Global instances
+_redis_limiter = RedisRateLimiter()
+_memory_limiter = InMemoryRateLimiter()
 
 
 def _get_client_ip(request: Request) -> str:
-    """
-    Extract the real client IP from the request.
-
-    Checks X-Forwarded-For header (set by Render/load balancers) first,
-    then falls back to the direct client address.
-    """
+    """Extract the real client IP from the request."""
     forwarded = request.headers.get("x-forwarded-for")
     if forwarded:
-        # X-Forwarded-For can contain multiple IPs; the first is the client
         return forwarded.split(",")[0].strip()
     if request.client:
         return request.client.host
@@ -160,12 +193,8 @@ def strict_rate_limit(max_requests: int = 10, window_seconds: int = 60):
     """
     Factory function for creating stricter rate limit dependencies.
 
-    Usage as a FastAPI dependency:
+    Usage:
         @router.post("/sensitive", dependencies=[Depends(strict_rate_limit(5, 60))])
-
-    Args:
-        max_requests: Maximum number of requests allowed in the window.
-        window_seconds: Duration of the sliding window in seconds.
     """
     async def _rate_limit_dep(request: Request):
         client_ip = _get_client_ip(request)
@@ -173,12 +202,12 @@ def strict_rate_limit(max_requests: int = 10, window_seconds: int = 60):
         key = f"{client_ip}:strict:{request.url.path}"
 
         window_start = now - window_seconds
-        _rate_limiter._requests[key] = [
-            t for t in _rate_limiter._requests[key] if t > window_start
+        _memory_limiter._requests[key] = [
+            t for t in _memory_limiter._requests[key] if t > window_start
         ]
 
-        if len(_rate_limiter._requests[key]) >= max_requests:
-            oldest = _rate_limiter._requests[key][0]
+        if len(_memory_limiter._requests[key]) >= max_requests:
+            oldest = _memory_limiter._requests[key][0]
             retry_after = int(oldest + window_seconds - now) + 1
             raise HTTPException(
                 status_code=429,
@@ -186,7 +215,7 @@ def strict_rate_limit(max_requests: int = 10, window_seconds: int = 60):
                 headers={"Retry-After": str(max(retry_after, 1))},
             )
 
-        _rate_limiter._requests[key].append(now)
+        _memory_limiter._requests[key].append(now)
 
     return _rate_limit_dep
 
@@ -195,12 +224,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
     """
     Middleware that enforces per-IP rate limits.
 
-    - 30 req/min for auth endpoints (login, register, password reset)
-    - 30 req/min for payment/wallet endpoints
-    - 15 req/min for export/report endpoints
-    - 30 req/min for file upload endpoints
-    - 300 req/min for all other endpoints
-    - Returns 429 with Retry-After header when exceeded
+    Uses Redis when available (shared across instances), falls back to in-memory.
     """
 
     async def dispatch(self, request: Request, call_next):
@@ -209,12 +233,19 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             return await call_next(request)
 
         client_ip = _get_client_ip(request)
-        is_limited, retry_after = _rate_limiter.is_rate_limited(client_ip, request.url.path)
+
+        # Try Redis first, fall back to in-memory
+        if _redis_limiter._redis:
+            is_limited, retry_after = await _redis_limiter.is_rate_limited(
+                client_ip, request.url.path
+            )
+        else:
+            is_limited, retry_after = _memory_limiter.is_rate_limited(
+                client_ip, request.url.path
+            )
 
         if is_limited:
-            logger.warning(
-                f"Rate limit exceeded: {client_ip} on {request.url.path}"
-            )
+            logger.warning(f"Rate limit exceeded: {client_ip} on {request.url.path}")
             return JSONResponse(
                 status_code=429,
                 content={

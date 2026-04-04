@@ -178,7 +178,7 @@ class CircleCallService:
                 daily_room = await self.daily_service.create_room_if_not_exists(
                     room_name=room.daily_room_name,
                     privacy="private",
-                    exp_minutes=525600,  # 1 year
+                    exp_minutes=1440,  # 24 hours — rooms are recreated on demand
                     max_participants=4,  # Contact + child + 2 parents (if required)
                     enable_recording=True,
                 )
@@ -200,7 +200,7 @@ class CircleCallService:
             daily_room = await self.daily_service.create_room(
                 room_name=room_name,
                 privacy="private",
-                exp_minutes=525600,  # 1 year (like parent calls)
+                exp_minutes=1440,  # 24 hours — rooms are recreated on demand
                 max_participants=4,  # Contact + child + 2 parents (if supervision required)
                 enable_recording=True,
             )

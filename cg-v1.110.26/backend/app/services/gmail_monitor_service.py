@@ -8,12 +8,12 @@ from email.mime.text import MIMEText
 from typing import Optional
 from urllib.parse import urlencode
 
-import anthropic
 import httpx
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import Settings
+from app.core.ai_clients import get_async_anthropic, get_async_openai
 from app.models.inbox import MonitoredEmail, EmailDigest, GoogleOAuthToken
 
 logger = logging.getLogger(__name__)
@@ -359,7 +359,7 @@ async def analyze_email(db: AsyncSession, email_id: str) -> dict:
     )
 
     try:
-        client = anthropic.AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY, timeout=30.0)
+        client = get_async_anthropic()
         response = await client.messages.create(
             model="claude-sonnet-4-5-20250514",
             max_tokens=2048,
@@ -822,7 +822,7 @@ async def generate_thread_reply(
 
     try:
         if settings.ANTHROPIC_API_KEY:
-            client = anthropic.AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY, timeout=30.0)
+            client = get_async_anthropic()
             response = await client.messages.create(
                 model="claude-sonnet-4-5-20250514",
                 max_tokens=1500,
@@ -835,9 +835,8 @@ async def generate_thread_reply(
 
     if not draft:
         try:
-            from openai import AsyncOpenAI
             if settings.OPENAI_API_KEY:
-                oai = AsyncOpenAI(api_key=settings.OPENAI_API_KEY, timeout=30.0)
+                oai = get_async_openai()
                 resp = await oai.chat.completions.create(
                     model="gpt-4o",
                     messages=[{"role": "user", "content": prompt}],

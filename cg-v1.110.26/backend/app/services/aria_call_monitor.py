@@ -139,9 +139,10 @@ class ARIACallMonitor:
         self.violation_tracker = ARIAViolationTrackerService()
         self.compiled_patterns = self._compile_patterns()
 
-        # Initialize AI clients
-        self.claude_client = anthropic.AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY, timeout=30.0)
-        self.openai_client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY, timeout=30.0) if settings.OPENAI_API_KEY else None
+        # Initialize AI clients (shared singletons)
+        from app.core.ai_clients import get_async_anthropic, get_async_openai
+        self.claude_client = get_async_anthropic()
+        self.openai_client = get_async_openai() if settings.OPENAI_API_KEY else None
 
     def _compile_patterns(self) -> Dict[ToxicityCategory, List[re.Pattern]]:
         """Compile all detection patterns for real-time analysis"""

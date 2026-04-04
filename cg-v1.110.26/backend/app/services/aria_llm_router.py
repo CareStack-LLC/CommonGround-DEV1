@@ -130,7 +130,8 @@ async def run_llm_deep_analysis(
         return None
 
     try:
-        client = OpenAI(api_key=settings.OPENAI_API_KEY, timeout=30.0)
+        from app.core.ai_clients import get_openai
+        client = get_openai()
 
         # Build enriched user prompt
         context_parts = []
@@ -159,7 +160,7 @@ Respond in JSON format with categories, triggers, explanation, and suggestion.""
                     {"role": "user", "content": user_prompt},
                 ],
                 temperature=0.1,
-                max_tokens=1024,
+                max_tokens=512,
                 response_format={"type": "json_object"},
             )
             if hasattr(response, "usage") and response.usage:
@@ -212,7 +213,8 @@ async def run_llm_severity_analysis(
         return None
 
     try:
-        client = OpenAI(api_key=settings.OPENAI_API_KEY, timeout=30.0)
+        from app.core.ai_clients import get_openai
+        client = get_openai()
 
         user_prompt = f"""CRITICAL SEVERITY ANALYSIS — this message requires careful review:
 
@@ -231,7 +233,7 @@ Respond in JSON format with categories, triggers, explanation, and suggestion.""
                     {"role": "user", "content": user_prompt},
                 ],
                 temperature=0.1,
-                max_tokens=1024,
+                max_tokens=512,
                 response_format={"type": "json_object"},
             )
             if hasattr(response, "usage") and response.usage:
