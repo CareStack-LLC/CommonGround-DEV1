@@ -888,10 +888,19 @@ class ARIAService:
         self,
         message: str,
         categories: List[ToxicityCategory],
-        toxicity_level: ToxicityLevel
+        toxicity_level: ToxicityLevel,
+        conversation_context: Optional[List[str]] = None,
     ) -> str:
         """
         Generate a gentler alternative message.
+
+        Args:
+            message: The flagged message
+            categories: Detected toxicity categories
+            toxicity_level: Overall toxicity level
+            conversation_context: Optional list of recent message strings for context-aware rewrites.
+                When provided (future use), can be used to make suggestions more relevant
+                to the conversation topic.
         """
         import random
 
@@ -904,11 +913,11 @@ class ARIAService:
                 ToxicityCategory.PROFANITY,
                 ToxicityCategory.BLAME
             ]
-            
+
             for category in priority_order:
                 if category in categories and category in self.TEMPLATES:
                     return random.choice(self.TEMPLATES[category])
-            
+
             return "I am feeling frustrated. I would like to pause this conversation and return to it later when I can be more productive."
 
         # STRATEGY 2: INTELLIGENT REPLACEMENT (For Low/Medium Toxicity)

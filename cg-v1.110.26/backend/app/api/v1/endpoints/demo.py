@@ -86,6 +86,7 @@ def _check_rate_limit(request: Request):
 
 class DemoAnalyzeRequest(BaseModel):
     content: str = Field(..., min_length=1, max_length=5000)
+    conversation_history: List[dict] = Field(default_factory=list)
 
 
 class CoparentReplyRequest(BaseModel):
@@ -191,6 +192,82 @@ def _sentiment_to_response(analysis) -> ARIAAnalysisResponse:
     )
 
 
+async def _generate_context_aware_suggestion(
+    message: str,
+    conversation_history: List[dict],
+) -> Optional[str]:
+    """
+    Use AI to generate a context-aware rewrite suggestion.
+
+    Looks at the last few messages to understand what the conversation is about,
+    then rewrites the flagged message to stay on-topic, be civil, and child-focused.
+    Returns None on failure (caller falls back to regex suggestion).
+    """
+    # Build thread context from recent messages
+    recent = conversation_history[-6:]  # Last 6 messages for context
+    thread_lines = []
+    for msg in recent:
+        role_label = "Co-parent" if msg.get("role") == "coparent" else "You"
+        thread_lines.append(f"{role_label}: {msg.get('text', '')}")
+    thread_context = "\n".join(thread_lines) if thread_lines else "No prior messages."
+
+    system_prompt = (
+        "You are ARIA, an AI co-parenting communication assistant. "
+        "A parent is about to send a message that contains toxic language. "
+        "Your job is to rewrite it so it is:\n"
+        "1. RELEVANT to the current conversation topic (look at recent messages)\n"
+        "2. Civil, respectful, and child-focused\n"
+        "3. Preserves the sender's core intent and any logistics\n"
+        "4. Uses 'I' statements instead of 'you' accusations\n"
+        "5. 1-2 sentences max, natural texting tone\n\n"
+        "If the sender is going off-topic from the conversation, steer them back "
+        "to what was actually being discussed.\n\n"
+        "Return ONLY the rewritten message text. No explanation, no quotes."
+    )
+    user_prompt = (
+        f"RECENT CONVERSATION:\n{thread_context}\n\n"
+        f"MESSAGE TO REWRITE:\n\"{message}\""
+    )
+
+    # Primary: OpenAI
+    try:
+        from openai import AsyncOpenAI
+
+        oai_client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY, timeout=15.0)
+        oai_response = await oai_client.chat.completions.create(
+            model="gpt-4o-mini",
+            max_tokens=150,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ],
+        )
+        result = oai_response.choices[0].message.content.strip()
+        if result:
+            return result
+    except Exception as e:
+        logger.warning(f"Context-aware suggestion (OpenAI) failed: {e}")
+
+    # Fallback: Anthropic
+    try:
+        import anthropic
+
+        client = anthropic.AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY)
+        response = await client.messages.create(
+            model="claude-sonnet-4-20250514",
+            max_tokens=150,
+            system=system_prompt,
+            messages=[{"role": "user", "content": user_prompt}],
+        )
+        result = response.content[0].text.strip()
+        if result:
+            return result
+    except Exception as e:
+        logger.warning(f"Context-aware suggestion (Anthropic fallback) failed: {e}")
+
+    return None
+
+
 # ---------------------------------------------------------------------------
 # Endpoints
 # ---------------------------------------------------------------------------
@@ -204,6 +281,15 @@ async def demo_analyze(
     _check_rate_limit(request)
 
     analysis = _aria_service.analyze_message(body.content)
+
+    # If flagged and we have conversation history, generate a context-aware suggestion via AI
+    if analysis.is_flagged and body.conversation_history:
+        ai_suggestion = await _generate_context_aware_suggestion(
+            body.content, body.conversation_history
+        )
+        if ai_suggestion:
+            analysis.suggestion = ai_suggestion
+
     response = _sentiment_to_response(analysis)
 
     # Log for corpus generation
@@ -214,6 +300,7 @@ async def demo_analyze(
         "toxicity_score": round(analysis.toxicity_score, 3),
         "categories": [c.value for c in analysis.categories],
         "suggestion": analysis.suggestion,
+        "conversation_history_len": len(body.conversation_history),
         "source": "demo_analyze",
     })
 
@@ -283,8 +370,15 @@ async def demo_coparent_reply(
 
     # Generate rewritten version if flagged and ARIA is enabled
     rewritten = None
-    if body.aria_enabled and reply_analysis.is_flagged and reply_analysis.suggestion:
-        rewritten = reply_analysis.suggestion
+    if body.aria_enabled and reply_analysis.is_flagged:
+        # Build conversation history for context-aware rewrite
+        conv_history = []
+        for msg in body.conversation_history[-6:]:
+            conv_history.append({"role": msg.get("role", "user"), "text": msg.get("text", "")})
+        conv_history.append({"role": "user", "text": body.user_message})
+
+        ai_rewrite = await _generate_context_aware_suggestion(reply_text, conv_history)
+        rewritten = ai_rewrite or reply_analysis.suggestion
 
     # Log user message + AI coparent reply for corpus generation
     _log_to_corpus({

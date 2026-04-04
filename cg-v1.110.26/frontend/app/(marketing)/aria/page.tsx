@@ -169,11 +169,11 @@ const beforeAfter = [
 // API helpers
 // ---------------------------------------------------------------------------
 
-async function analyzeMessage(content: string): Promise<ARIAAnalysis> {
+async function analyzeMessage(content: string, conversationHistory?: { role: string; text: string }[]): Promise<ARIAAnalysis> {
   const res = await fetch(`${API_URL}/demo/analyze`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ content }),
+    body: JSON.stringify({ content, conversation_history: conversationHistory || [] }),
   });
   if (!res.ok) throw new Error('Analysis failed');
   return res.json();
@@ -203,7 +203,7 @@ export default function ARIAPage() {
   const [scenario, setScenario] = useState<Scenario | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
-  const [ariaEnabled, setAriaEnabled] = useState(true);
+  const [ariaEnabled, setAriaEnabled] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [interventions, setInterventions] = useState<Intervention[]>([]);
   const [showReport, setShowReport] = useState(false);
@@ -215,12 +215,19 @@ export default function ARIAPage() {
   const [userScore, setUserScore] = useState(0);
   const [currentTaunt, setCurrentTaunt] = useState('');
 
-  const chatEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
   const challengeRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
-  useEffect(() => { if (!pendingIntervention && scenario) inputRef.current?.focus(); }, [pendingIntervention, scenario]);
+  useEffect(() => {
+    // Scroll only the chat container, not the page
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
+  useEffect(() => {
+    if (!pendingIntervention && scenario) inputRef.current?.focus({ preventScroll: true });
+  }, [pendingIntervention, scenario]);
 
   const scrollToChallenge = () => challengeRef.current?.scrollIntoView({ behavior: 'smooth' });
   const getRandomTaunt = () => ARIA_TAUNTS[Math.floor(Math.random() * ARIA_TAUNTS.length)];
@@ -290,6 +297,7 @@ export default function ARIAPage() {
       console.error('Failed to get reply:', err);
     } finally {
       setIsLoading(false);
+      inputRef.current?.focus({ preventScroll: true });
     }
   }, [scenario, messages, ariaEnabled]);
 
@@ -298,11 +306,13 @@ export default function ARIAPage() {
 
     if (ariaEnabled) {
       try {
-        const analysis = await analyzeMessage(inputText);
+        const history = messages.slice(-6).map(m => ({ role: m.role, text: m.text }));
+        const analysis = await analyzeMessage(inputText, history);
         if (analysis.is_flagged && analysis.suggestion) {
           setAriaScore(prev => prev + 1);
           setCurrentTaunt(getRandomTaunt());
-          setPendingIntervention({ analysis, originalText: inputText });
+          // Auto-send the ARIA suggestion (no intervention panel)
+          await sendMessage(analysis.suggestion, true, inputText);
           return;
         }
       } catch (err) {
@@ -663,10 +673,17 @@ export default function ARIAPage() {
             >
               Think you can get past <span className="text-[#3DAA8A]">ARIA</span>?
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-5">
               Pick a co-parenting scenario, chat with a hostile AI co-parent, and try to outsmart ARIA.
               This is the <span className="font-semibold text-[#1E3A4A]">exact same system</span> that protects real families. Go ahead — be difficult.
             </p>
+            <div className="inline-flex items-center gap-2.5 bg-[#3DAA8A]/5 border border-[#3DAA8A]/20 rounded-full px-5 py-2.5">
+              <Sparkles className="w-4 h-4 text-[#F5A623]" />
+              <p className="text-sm text-[#1E3A4A]">
+                <span className="font-semibold">ARIA is always improving.</span>{' '}
+                Every message you test helps us catch new patterns — your creativity makes co-parenting safer for real families.
+              </p>
+            </div>
           </div>
 
           {/* Scenario Picker */}
@@ -734,7 +751,7 @@ export default function ARIAPage() {
               </div>
 
               {/* Messages Area */}
-              <div className="h-[460px] overflow-y-auto px-6 py-4 space-y-4 bg-[#fafbfc]">
+              <div ref={chatContainerRef} className="h-[460px] overflow-y-auto px-6 py-4 space-y-4 bg-[#fafbfc]">
                 {messages.map(msg => (
                   <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                     <div className="max-w-[75%] space-y-1">
@@ -774,7 +791,7 @@ export default function ARIAPage() {
                   </div>
                 )}
 
-                <div ref={chatEndRef} />
+                {/* scroll handled by chatContainerRef */}
               </div>
 
               {/* ARIA Intervention Panel */}
@@ -856,6 +873,16 @@ export default function ARIAPage() {
                   )}
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Encouraging nudge below chat */}
+          {scenario && (
+            <div className="flex items-center justify-center gap-2 mt-5 text-sm text-gray-500">
+              <RefreshCw className="w-3.5 h-3.5 text-[#3DAA8A]" />
+              <span>
+                Keep going! The more you test, the smarter ARIA gets. Try switching scenarios to challenge different detection patterns.
+              </span>
             </div>
           )}
 

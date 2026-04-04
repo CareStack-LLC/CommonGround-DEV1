@@ -45,11 +45,11 @@ if (_apiUrl.endsWith('/')) _apiUrl = _apiUrl.slice(0, -1);
 if (!_apiUrl.endsWith('/api/v1')) _apiUrl += '/api/v1';
 const API_URL = _apiUrl;
 
-async function analyzeMessage(content: string): Promise<ARIAAnalysis> {
+async function analyzeMessage(content: string, conversationHistory?: { role: string; text: string }[]): Promise<ARIAAnalysis> {
   const res = await fetch(`${API_URL}/demo/analyze`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ content }),
+    body: JSON.stringify({ content, conversation_history: conversationHistory || [] }),
   });
   if (!res.ok) throw new Error('Analysis failed');
   return res.json();
@@ -118,7 +118,7 @@ export function HomeARIADemo() {
     },
   ]);
   const [inputText, setInputText] = useState('');
-  const [ariaEnabled, setAriaEnabled] = useState(true);
+  const [ariaEnabled, setAriaEnabled] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [pendingIntervention, setPendingIntervention] = useState<{
     analysis: ARIAAnalysis;
@@ -126,11 +126,20 @@ export function HomeARIADemo() {
   } | null>(null);
   const [currentTaunt, setCurrentTaunt] = useState('');
 
-  const chatEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages]);
-  useEffect(() => { if (!pendingIntervention) inputRef.current?.focus(); }, [pendingIntervention]);
+  useEffect(() => {
+    // Scroll only the chat container, not the page
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [messages]);
+  useEffect(() => {
+    if (!pendingIntervention) {
+      // Re-focus input without scrolling the page
+      inputRef.current?.focus({ preventScroll: true });
+    }
+  }, [pendingIntervention]);
 
   const sendMessage = useCallback(async (text: string, isRewrite = false, originalText?: string) => {
     if (!text.trim()) return;
@@ -159,6 +168,7 @@ export function HomeARIADemo() {
       console.error('Failed to get reply:', err);
     } finally {
       setIsLoading(false);
+      inputRef.current?.focus({ preventScroll: true });
     }
   }, [messages, ariaEnabled]);
 
@@ -167,10 +177,13 @@ export function HomeARIADemo() {
 
     if (ariaEnabled) {
       try {
-        const analysis = await analyzeMessage(inputText);
+        // Pass recent conversation history for context-aware suggestions
+        const history = messages.slice(-6).map(m => ({ role: m.role, text: m.text }));
+        const analysis = await analyzeMessage(inputText, history);
         if (analysis.is_flagged && analysis.suggestion) {
+          // Auto-send the ARIA suggestion (shows original crossed out + rewrite)
           setCurrentTaunt(TAUNTS[Math.floor(Math.random() * TAUNTS.length)]);
-          setPendingIntervention({ analysis, originalText: inputText });
+          await sendMessage(analysis.suggestion, true, inputText);
           return;
         }
       } catch (err) {
@@ -215,12 +228,24 @@ export function HomeARIADemo() {
           Think you can get past{' '}
           <span className="text-[#F5A623]">ARIA</span>?
         </h2>
-        <p className="text-lg text-white/80 mb-6 leading-relaxed">
+        <p className="text-lg text-white/80 mb-4 leading-relaxed">
           Type something petty, hostile, or passive-aggressive. ARIA catches it in real-time — the same AI protecting real families on CommonGround.
         </p>
-        <p className="text-sm text-white/50 mb-6">
+        <p className="text-sm text-white/50 mb-4">
           Toggle ARIA off to see messages without protection.
         </p>
+
+        <div className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 mb-6">
+          <div className="flex items-start gap-2.5">
+            <Sparkles className="w-4 h-4 text-[#F5A623] mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="text-sm text-white/80 font-medium mb-1">ARIA is always learning</p>
+              <p className="text-xs text-white/50 leading-relaxed">
+                Every message you test here helps us improve ARIA for real families. Go ahead — try your worst and help make co-parenting communication safer for everyone.
+              </p>
+            </div>
+          </div>
+        </div>
 
         <Link
           href="/aria"
@@ -262,7 +287,7 @@ export function HomeARIADemo() {
           </div>
 
           {/* Messages */}
-          <div className="h-[300px] sm:h-[340px] overflow-y-auto px-4 sm:px-5 py-3 space-y-3" style={{ background: 'rgba(11,20,26,0.6)' }}>
+          <div ref={chatContainerRef} className="h-[300px] sm:h-[340px] overflow-y-auto px-4 sm:px-5 py-3 space-y-3" style={{ background: 'rgba(11,20,26,0.6)' }}>
             {messages.map(msg => (
               <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className="max-w-[85%] space-y-1">
@@ -302,7 +327,7 @@ export function HomeARIADemo() {
               </div>
             )}
 
-            <div ref={chatEndRef} />
+            {/* scroll anchor handled by chatContainerRef */}
           </div>
 
           {/* Intervention Panel */}
@@ -396,6 +421,10 @@ export function HomeARIADemo() {
             </div>
           )}
         </div>
+        <p className="text-center text-xs text-white/30 mt-3 flex items-center justify-center gap-1.5">
+          <CheckCircle2 className="w-3 h-3" />
+          Your conversations help train ARIA to catch new patterns — keep testing!
+        </p>
       </div>
     </div>
   );
