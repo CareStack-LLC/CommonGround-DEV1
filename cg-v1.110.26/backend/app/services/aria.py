@@ -176,6 +176,34 @@ class ARIAService:
             CUSTODY_WEAPONIZATION_FLEX5_PATTERNS,
             MANIPULATION_FLEX5_PATTERNS,
             CONTEMPT_FLEX5_PATTERNS,
+            # Round 6 flex patterns (Corpus C targeted)
+            CUSTODY_WEAPONIZATION_FLEX6_PATTERNS,
+            THREATENING_FLEX6_PATTERNS,
+            HATE_SPEECH_FLEX6_PATTERNS,
+            FINANCIAL_ABUSE_FLEX6_PATTERNS,
+            MANIPULATION_FLEX6_PATTERNS,
+            DISMISSIVE_FLEX6_PATTERNS,
+            CONTEMPT_FLEX6_PATTERNS,
+            HOSTILITY_FLEX6_PATTERNS,
+            PASSIVE_AGGRESSIVE_FLEX6_PATTERNS,
+            GASLIGHTING_FLEX6_PATTERNS,
+            SEXUAL_HARASSMENT_FLEX6_PATTERNS,
+            PARENTAL_ALIENATION_FLEX6_PATTERNS,
+            PROFANITY_FLEX6_PATTERNS,
+            ALL_CAPS_FLEX6_PATTERNS,
+            # Round 7 flex patterns (structural/cross-cutting)
+            HOSTILITY_FLEX7_PATTERNS,
+            CONTEMPT_FLEX7_PATTERNS,
+            THREATENING_FLEX7_PATTERNS,
+            MANIPULATION_FLEX7_PATTERNS,
+            PASSIVE_AGGRESSIVE_FLEX7_PATTERNS,
+            GASLIGHTING_FLEX7_PATTERNS,
+            DISMISSIVE_FLEX7_PATTERNS,
+            FINANCIAL_ABUSE_FLEX7_PATTERNS,
+            CUSTODY_WEAPONIZATION_FLEX7_PATTERNS,
+            PARENTAL_ALIENATION_FLEX7_PATTERNS,
+            HATE_SPEECH_FLEX7_PATTERNS,
+            SEXUAL_HARASSMENT_FLEX7_PATTERNS,
         )
 
         # Regex patterns for sarcasm, blame, dismissive, passive-aggressive detection
@@ -209,7 +237,9 @@ class ARIAService:
                 [re.compile(p, re.IGNORECASE) for p in HATE_SPEECH_FLEX_PATTERNS] +
                 [re.compile(p, re.IGNORECASE) for p in HATE_SPEECH_FLEX2_PATTERNS] +
                 [re.compile(p, re.IGNORECASE) for p in HATE_SPEECH_FLEX3_PATTERNS] +
-                [re.compile(p, re.IGNORECASE) for p in HATE_SPEECH_FLEX4_PATTERNS]
+                [re.compile(p, re.IGNORECASE) for p in HATE_SPEECH_FLEX4_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in HATE_SPEECH_FLEX6_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in HATE_SPEECH_FLEX7_PATTERNS]
             ),
             ToxicityCategory.SEXUAL_HARASSMENT: (
                 [re.compile(p, re.IGNORECASE) for p in SEXUAL_HARASSMENT_PATTERNS] +
@@ -218,7 +248,9 @@ class ARIAService:
                 [re.compile(p, re.IGNORECASE) for p in SEXUAL_HARASSMENT_FLEX_PATTERNS] +
                 [re.compile(p, re.IGNORECASE) for p in SEXUAL_HARASSMENT_FLEX2_PATTERNS] +
                 [re.compile(p, re.IGNORECASE) for p in SEXUAL_HARASSMENT_FLEX3_PATTERNS] +
-                [re.compile(p, re.IGNORECASE) for p in SEXUAL_HARASSMENT_FLEX4_PATTERNS]
+                [re.compile(p, re.IGNORECASE) for p in SEXUAL_HARASSMENT_FLEX4_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in SEXUAL_HARASSMENT_FLEX6_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in SEXUAL_HARASSMENT_FLEX7_PATTERNS]
             ),
             ToxicityCategory.THREATENING: (
                 [re.compile(p, re.IGNORECASE) for p in THREATENING_PATTERNS] +
@@ -227,7 +259,9 @@ class ARIAService:
                 [re.compile(p, re.IGNORECASE) for p in THREATENING_FLEX2_PATTERNS] +
                 [re.compile(p, re.IGNORECASE) for p in THREATENING_FLEX3_PATTERNS] +
                 [re.compile(p, re.IGNORECASE) for p in THREATENING_FLEX4_PATTERNS] +
-                [re.compile(p, re.IGNORECASE) for p in THREATENING_FLEX5_PATTERNS]
+                [re.compile(p, re.IGNORECASE) for p in THREATENING_FLEX5_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in THREATENING_FLEX6_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in THREATENING_FLEX7_PATTERNS]
             ),
             ToxicityCategory.CUSTODY_WEAPONIZATION: (
                 [re.compile(p, re.IGNORECASE) for p in CUSTODY_WEAPONIZATION_PATTERNS] +
@@ -236,7 +270,9 @@ class ARIAService:
                 [re.compile(p, re.IGNORECASE) for p in CUSTODY_WEAPONIZATION_FLEX2_PATTERNS] +
                 [re.compile(p, re.IGNORECASE) for p in CUSTODY_WEAPONIZATION_FLEX3_PATTERNS] +
                 [re.compile(p, re.IGNORECASE) for p in CUSTODY_WEAPONIZATION_FLEX4_PATTERNS] +
-                [re.compile(p, re.IGNORECASE) for p in CUSTODY_WEAPONIZATION_FLEX5_PATTERNS]
+                [re.compile(p, re.IGNORECASE) for p in CUSTODY_WEAPONIZATION_FLEX5_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in CUSTODY_WEAPONIZATION_FLEX6_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in CUSTODY_WEAPONIZATION_FLEX7_PATTERNS]
             ),
             ToxicityCategory.FINANCIAL_COERCION: (
                 [re.compile(p, re.IGNORECASE) for p in FINANCIAL_COERCION_PATTERNS] +
@@ -245,7 +281,9 @@ class ARIAService:
                 [re.compile(p, re.IGNORECASE) for p in FINANCIAL_ABUSE_FLEX2_PATTERNS] +
                 [re.compile(p, re.IGNORECASE) for p in FINANCIAL_ABUSE_FLEX3_PATTERNS] +
                 [re.compile(p, re.IGNORECASE) for p in FINANCIAL_ABUSE_FLEX4_PATTERNS] +
-                [re.compile(p, re.IGNORECASE) for p in FINANCIAL_ABUSE_FLEX5_PATTERNS]
+                [re.compile(p, re.IGNORECASE) for p in FINANCIAL_ABUSE_FLEX5_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in FINANCIAL_ABUSE_FLEX6_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in FINANCIAL_ABUSE_FLEX7_PATTERNS]
             ),
             ToxicityCategory.HOSTILITY: (
                 [re.compile(p, re.IGNORECASE) for p in HOSTILITY_PATTERNS] +
@@ -262,7 +300,11 @@ class ARIAService:
                 [re.compile(p, re.IGNORECASE) for p in HOSTILITY_FLEX4_PATTERNS] +
                 [re.compile(p, re.IGNORECASE) for p in CONTEMPT_FLEX4_PATTERNS] +
                 [re.compile(p, re.IGNORECASE) for p in HOSTILITY_FLEX5_PATTERNS] +
-                [re.compile(p, re.IGNORECASE) for p in CONTEMPT_FLEX5_PATTERNS]
+                [re.compile(p, re.IGNORECASE) for p in CONTEMPT_FLEX5_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in CONTEMPT_FLEX6_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in HOSTILITY_FLEX6_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in CONTEMPT_FLEX7_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in HOSTILITY_FLEX7_PATTERNS]
             ),
             ToxicityCategory.INSULT: [
                 re.compile(p, re.IGNORECASE) for p in MODERN_SLANG_PATTERNS
@@ -270,14 +312,16 @@ class ARIAService:
             ToxicityCategory.PROFANITY: (
                 [re.compile(p, re.IGNORECASE) for p in PROFANITY_PATTERNS] +
                 [re.compile(p, re.IGNORECASE) for p in EVASION_PATTERNS] +
-                [re.compile(p, re.IGNORECASE) for p in PROFANITY_FLEX4_PATTERNS]
+                [re.compile(p, re.IGNORECASE) for p in PROFANITY_FLEX4_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in PROFANITY_FLEX6_PATTERNS]
             ),
             ToxicityCategory.ALL_CAPS: (
                 [re.compile(p, re.IGNORECASE) for p in EVASION_PATTERNS] +
                 [re.compile(p, re.IGNORECASE) for p in ALL_CAPS_EXTENDED_PATTERNS] +
                 [re.compile(p, re.IGNORECASE) for p in ALL_CAPS_FLEX_PATTERNS] +
                 [re.compile(p, re.IGNORECASE) for p in ALL_CAPS_FLEX3_PATTERNS] +
-                [re.compile(p, re.IGNORECASE) for p in ALL_CAPS_FLEX4_PATTERNS]
+                [re.compile(p, re.IGNORECASE) for p in ALL_CAPS_FLEX4_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in ALL_CAPS_FLEX6_PATTERNS]
             ),
             # Nuanced categories — regex fallback when LLM worker is unavailable
             ToxicityCategory.SARCASM: [
@@ -289,7 +333,9 @@ class ARIAService:
                 [re.compile(p, re.IGNORECASE) for p in GASLIGHTING_FLEX_PATTERNS] +
                 [re.compile(p, re.IGNORECASE) for p in GASLIGHTING_FLEX2_PATTERNS] +
                 [re.compile(p, re.IGNORECASE) for p in GASLIGHTING_FLEX3_PATTERNS] +
-                [re.compile(p, re.IGNORECASE) for p in GASLIGHTING_FLEX4_PATTERNS]
+                [re.compile(p, re.IGNORECASE) for p in GASLIGHTING_FLEX4_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in GASLIGHTING_FLEX6_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in GASLIGHTING_FLEX7_PATTERNS]
             ),
             ToxicityCategory.DISMISSIVE: (
                 [re.compile(p, re.IGNORECASE) for p in DISMISSIVE_PATTERNS] +
@@ -298,7 +344,9 @@ class ARIAService:
                 [re.compile(p, re.IGNORECASE) for p in DISMISSIVE_FLEX2_PATTERNS] +
                 [re.compile(p, re.IGNORECASE) for p in DISMISSIVE_FLEX3_PATTERNS] +
                 [re.compile(p, re.IGNORECASE) for p in DISMISSIVE_FLEX4_PATTERNS] +
-                [re.compile(p, re.IGNORECASE) for p in DISMISSIVE_FLEX5_PATTERNS]
+                [re.compile(p, re.IGNORECASE) for p in DISMISSIVE_FLEX5_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in DISMISSIVE_FLEX6_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in DISMISSIVE_FLEX7_PATTERNS]
             ),
             ToxicityCategory.PASSIVE_AGGRESSIVE: (
                 [re.compile(p, re.IGNORECASE) for p in PASSIVE_AGGRESSIVE_PATTERNS] +
@@ -307,7 +355,9 @@ class ARIAService:
                 [re.compile(p, re.IGNORECASE) for p in PASSIVE_AGGRESSIVE_FLEX_PATTERNS] +
                 [re.compile(p, re.IGNORECASE) for p in PASSIVE_AGGRESSIVE_FLEX2_PATTERNS] +
                 [re.compile(p, re.IGNORECASE) for p in PASSIVE_AGGRESSIVE_FLEX3_PATTERNS] +
-                [re.compile(p, re.IGNORECASE) for p in PASSIVE_AGGRESSIVE_FLEX4_PATTERNS]
+                [re.compile(p, re.IGNORECASE) for p in PASSIVE_AGGRESSIVE_FLEX4_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in PASSIVE_AGGRESSIVE_FLEX6_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in PASSIVE_AGGRESSIVE_FLEX7_PATTERNS]
             ),
             ToxicityCategory.MANIPULATION: (
                 [re.compile(p, re.IGNORECASE) for p in EMOTIONAL_MANIPULATION_PATTERNS] +
@@ -320,7 +370,11 @@ class ARIAService:
                 [re.compile(p, re.IGNORECASE) for p in MANIPULATION_FLEX3_PATTERNS] +
                 [re.compile(p, re.IGNORECASE) for p in MANIPULATION_FLEX4_PATTERNS] +
                 [re.compile(p, re.IGNORECASE) for p in PARENTAL_ALIENATION_FLEX4_PATTERNS] +
-                [re.compile(p, re.IGNORECASE) for p in MANIPULATION_FLEX5_PATTERNS]
+                [re.compile(p, re.IGNORECASE) for p in MANIPULATION_FLEX5_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in MANIPULATION_FLEX6_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in PARENTAL_ALIENATION_FLEX6_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in MANIPULATION_FLEX7_PATTERNS] +
+                [re.compile(p, re.IGNORECASE) for p in PARENTAL_ALIENATION_FLEX7_PATTERNS]
             ),
         }
 
@@ -591,8 +645,34 @@ class ARIAService:
 
     @staticmethod
     def _normalize_text(text: str) -> str:
-        """Normalize leetspeak, txtspeak, and common evasions for pattern matching."""
+        """Normalize leetspeak, txtspeak, censored words, and common evasions for pattern matching."""
         normalized = text
+
+        # Censored/masked profanity expansion (f**k, sh*t, b*tch, etc.)
+        censored_words = [
+            (r'\bf[\*\#]{1,3}k\w*\b', 'fuck'),
+            (r'\bs[\*\#]{1,2}t\b', 'shit'),
+            (r'\bsh[\*\#]t\b', 'shit'),
+            (r'\bb[\*\#]{1,2}ch\b', 'bitch'),
+            (r'\bb[\*\#]tch\b', 'bitch'),
+            (r'\ba[\*\#]{1,2}hole\b', 'asshole'),
+            (r'\ba[\*\#]s\b', 'ass'),
+            (r'\bd[\*\#]mn\b', 'damn'),
+            (r'\bd[\*\#]{1,2}n\b', 'damn'),
+            (r'\bh[\*\#]ll\b', 'hell'),
+            (r'\bb[\*\#]stard\b', 'bastard'),
+            (r'\bcr[\*\#]p\b', 'crap'),
+            (r'\bwh[\*\#]re\b', 'whore'),
+            (r'\bsl[\*\#]t\b', 'slut'),
+            (r'\bp[\*\#]ss\b', 'piss'),
+            (r'\bd[\*\#]ck\w*\b', 'dick'),
+            (r'\bc[\*\#]{1,2}k\b', 'cock'),
+            (r'\bpr[\*\#]ck\b', 'prick'),
+            (r'\bp[\*\#]thetic\b', 'pathetic'),
+        ]
+        for pattern, replacement in censored_words:
+            normalized = re.sub(pattern, replacement, normalized, flags=re.IGNORECASE)
+
         # Leetspeak → letters (only when adjacent to letters, not standalone numbers)
         leet_map = {
             '0': 'o', '3': 'e', '4': 'a', '5': 's',
@@ -603,6 +683,15 @@ class ARIAService:
                 rf'(?<=[a-zA-Z]){re.escape(leet)}|{re.escape(leet)}(?=[a-zA-Z])',
                 letter, normalized
             )
+
+        # Toxic emoji → text
+        emoji_map = {
+            '💩': ' shit ', '🖕': ' fuck you ', '🤡': ' clown ',
+            '🐍': ' snake ', '🗑': ' trash ', '🗑️': ' trash ',
+            '💀': ' dead ', '🤮': ' disgusting ',
+        }
+        for emoji, text_val in emoji_map.items():
+            normalized = normalized.replace(emoji, text_val)
 
         # Common txtspeak → full words
         txtspeak = [
@@ -658,10 +747,21 @@ class ARIAService:
         # Check for ALL CAPS (shouting)
         # TWEAK: Only trigger if message is reasonably long (>3 words) to avoid "LOL" or "OKAY" false positives
         # TWEAK: Require > 60% caps to be safer
+        # Also check character-level: >60% uppercase alpha chars with >3 words catches mixed-case shouting
         words = message.split()
+        is_caps = False
         if len(words) > 3:
             caps_words = sum(1 for w in words if w.isupper() and len(w) > 1) # Ignore single letter "I" or "A"
             if caps_words / len(words) > 0.6:
+                is_caps = True
+            else:
+                # Character-level check for mixed-case shouting (e.g., "STOP talking to ME like THAT")
+                alpha_chars = [c for c in message if c.isalpha()]
+                if len(alpha_chars) > 10:
+                    upper_ratio = sum(1 for c in alpha_chars if c.isupper()) / len(alpha_chars)
+                    if upper_ratio > 0.6:
+                        is_caps = True
+        if is_caps:
                 categories.append(ToxicityCategory.ALL_CAPS)
                 triggers.append("EXCESSIVE CAPS")
 

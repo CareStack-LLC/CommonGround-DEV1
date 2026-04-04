@@ -1972,3 +1972,445 @@ CONTEMPT_FLEX5_PATTERNS = [
     r'\bdeeply\s+predictable\b',
     r'\bkind\s+of\s+person\s+who\s+ruins\b',
 ]
+
+# ═══════════════════════════════════════════════════════════════════
+# FLEX6 PATTERNS — Corpus C Targeted (Round 6)
+# ═══════════════════════════════════════════════════════════════════
+
+CUSTODY_WEAPONIZATION_FLEX6_PATTERNS = [
+    # Corpus C: unilateral custody decisions, limiting contact, stability claims
+    r'\blimit\w*\s+contact\b',
+    r'\bremain\s+with\s+me\b',
+    r'\buntil\s+i\s+am\s+satisfied\b',
+    r'\bmy\s+parenting\s+judgment\b',
+    r'\bnot\s+subject\s+to\s+your\s+approval\b',
+    r'\broutine\s+is\s+built\s+around\b.*?\bhousehold\b',
+    r'\bvisits?\s+interrupt\b',
+    r'\bstable\s+variable\b',
+    r'\binstructed\b.*?\bteachers?\b.*?\bcustody\b',
+    r'\bmodifi\w+\b.*?\barrangement\b.*?\breflect\b',
+    r'\bdetermined\b.*?\barrangement\b.*?\binsufficient\b',
+    r'\bwill\s+not\s+force\s+contact\b',
+    r'\bpediatrician\b.*?\blimiting\s+transitions\b',
+    r'\bchildren\b.*?\bgiven\s+me\s+information\b.*?\bsafety\b',
+    r'\bprotect\b.*?\babove\s+everything\b',
+    r'\bmy\s+first\s+priority\b.*?\bsecondary\b',
+    r'\bcommunicat\w+\s+protocol\b.*?\bfollow\b',
+    r'\bwellbeing\s+requires\s+stability\b',
+    r'\btheir\s+interests\b.*?\brequire\s+me\s+to\s+limit\b',
+    r'\bi\s+am\s+the\s+one\s+they\s+come\s+to\b',
+    r'\bwhen\s+they\s+are\s+afraid\b',
+    r'\bthe\s+children\s+will\s+call\b.*?\bwhen\s+they\s+are\s+ready\b',
+]
+
+THREATENING_FLEX6_PATTERNS = [
+    # Corpus C: veiled legal/career threats, evidence preservation, "you should be preparing"
+    r'\bpast\s+behavior\b.*?\brelevant\b',
+    r'\bevery\s+action\b.*?\btracked\b',
+    r'\bpreserved\s+evidence\b',
+    r'\bsecured\s+the\s+testimony\b',
+    r'\bnotify\s+multiple\s+parties\b',
+    r'\bproceed\s+without\s+restraint\b',
+    r'\bpreparing\s+yourself\b',
+    r'\bnot\s+yet\s+prepared\b',
+    r'\byour\s+employer\b.*?\bknew\b',
+    r'\bnext\s+communication\b.*?\battorney\b',
+    r'\bone\s+wrong\s+decision\b.*?\bdifferent\s+life\b',
+    r'\binformat\w+\b.*?\byou\s+do\s+not\s+know\b.*?\bhave\b',
+    r'\bfull\s+financial\s+picture\b.*?\bpresented\b',
+    r'\bset\s+triggers\b.*?\bnotify\b',
+    r'\bhanded\s+everything\s+over\b.*?\battorney\b',
+    r'\balerted\s+professional\s+bodies\b',
+    r'\bnext\s+steps\b.*?\banticipated\b.*?\bprepared\b',
+    r'\bprocess\b.*?\bmomentum\b.*?\bcooperation\b.*?\bstop\b',
+    r'\bplatforms?\s+you\s+thought\s+you\s+deleted\b',
+    r'\bresponses?\s+are\s+already\s+prepared\b',
+    r'\bi\s+have\s+filed\b.*?\breceive\s+notice\b',
+    r'\bin\s+court\b.*?\bto\s+address\s+it\b',
+    r'\bi\s+have\s+everything\s+prepared\b',
+]
+
+HATE_SPEECH_FLEX6_PATTERNS = [
+    # Corpus C: cultural/religious attacks, "your community", "your culture's"
+    r'\byour\s+faith\b.*?\bapproach\b',
+    r'\byour\s+culture\'?s?\s+approach\b',
+    r'\byour\s+community\'?s?\b.*?\battitudes?\b',
+    r'\byour\s+famil\w+\s+tradition\b.*?\binterference\b',
+    r'\bcultural\s+norms\b.*?\bgovern\b',
+    r'\bcultural\s+influence\b.*?\bprotection\b',
+    r'\bcultural\s+transmission\b',
+    r'\bcultural\s+values\b.*?\bdo\s+not\s+share\b',
+    r'\byour\s+religion\'?s?\s+approach\b',
+    r'\byour\s+community\s+believes\b',
+    r'\bfaith\s+community\b.*?\benabled\b',
+    r'\breligious\s+obligations?\b.*?\bconflict\b',
+    r'\bbelief\s+system\b.*?\bchild\w*\b',
+    r'\bcommunity\'?s?\s+definition\s+of\s+family\b',
+    r'\bblocked\b.*?\bfamily\b.*?\bcultural\s+values\b',
+    r'\bdysfunction\b.*?\bfamily\b.*?\bpassed\s+down\b',
+    r'\bfaith\'?s?\s+position\b.*?\bdivorce\b',
+    r'\bexposure\s+to\s+your\b.*?\bbelief\b',
+]
+
+FINANCIAL_ABUSE_FLEX6_PATTERNS = [
+    # Corpus C: legal floor compliance, financial investigation, restructured employment
+    r'\brestructured\b.*?\bemployment\b.*?\bsupport\s+calculation\b',
+    r'\bcourt\s+minimum\b.*?\blegal\s+proceedings\b',
+    r'\bfinancial\s+investigator\b.*?\bdocumented\b',
+    r'\bhousing\s+situation\b.*?\bfinancial\s+need\b',
+    r'\bfinancial\s+expert\b.*?\bchallenge\b',
+    r'\blegal\s+obligations?\b.*?\bpressured\b',
+    r'\bmechanism\b.*?\border\b.*?\bflexibility\b',
+    r'\bdisputed\s+the\s+calculation\b',
+    r'\brequest\b.*?\bmore\s+money\b.*?\bnot\s+being\s+accommodated\b',
+    r'\bspending\s+habits\b.*?\bdocumented\b',
+    r'\bfinancial\s+demands\b.*?\bexceed\b.*?\blegal\b',
+    r'\bnot\s+exceed\s+the\s+legal\s+floor\b',
+    r'\bfight\s+any\s+attempt\b.*?\binsufficient\b',
+    r'\bcannot\s+verify\b.*?\bfor\s+the\s+children\b.*?\bfor\s+you\b',
+    r'\bfinancial\s+obligations?\b.*?\bbeyond\s+the\s+order\b.*?\bdenied\b',
+    r'\bminimum\s+compliance\b',
+    r'\bindependent\s+review\b',
+    r'\bsupport\s+above\s+the\s+court\s+minimum\b',
+]
+
+MANIPULATION_FLEX6_PATTERNS = [
+    # Corpus C: manufactured events, emotional absorption, leveraging kindness
+    r'\bmanufactured\b.*?\bversion\s+of\s+events\b',
+    r'\babandoned\s+the\s+truth\b',
+    r'\bemotional\s+support\s+system\b.*?\bdismantled\b',
+    r'\btake\s+advantage\b.*?\breasonable\b.*?\bkindness\b.*?\bweakness\b',
+    r'\babsorbing\s+your\s+chaos\b',
+    r'\bmanufacture\b.*?\bvulnerability\b.*?\bsympathy\b',
+    r'\bswallowed\s+my\s+dignity\b',
+    r'\bcaring\s+makes\s+me\s+look\s+weak\b',
+    r'\bgaslight\b.*?\bchildren\b',
+    r'\bnever\s+once\s+used\s+the\s+children\s+as\s+leverage\b',
+    r'\bdesire\s+to\s+be\s+reasonable\b.*?\bvector\b',
+    r'\bno\s+good\s+options\b.*?\bblamed\s+me\b',
+    r'\bmoved\s+the\s+conditions\b',
+    r'\bevery\s+accommodation\b.*?\basked\b',
+    r'\bevery\s+single\s+time\b',
+    r'\bdoing\s+this\s+to\s+everyone\b',
+    r'\bscreenshot\s+that\b',
+    r'\bnot\s+caring\s+makes\s+me\s+wrong\b',
+    r'\bprotect\s+the\s+children\b.*?\bfor\s+years\b',
+]
+
+DISMISSIVE_FLEX6_PATTERNS = [
+    # Corpus C: formal refusal to engage, "not something I am prepared to discuss"
+    r'\bnot\s+(?:something\s+)?(?:i\s+am\s+)?(?:prepared|willing)\s+to\s+(?:discuss|engage)\b',
+    r'\bfalls?\s+outside\b.*?\bprepared\s+to\s+discuss\b',
+    r'\bno\s+obligation\s+to\s+explain\b',
+    r'\bsaid\s+what\s+i\s+had\s+to\s+say\b',
+    r'\bnot\s+a\s+conversation\b.*?\bwilling\s+to\s+continue\b',
+    r'\bnot\s+my\s+issue\s+to\s+resolve\b',
+    r'\byour\s+input\b.*?\bnot\s+requested\b',
+    r'\bhave\s+moved\s+on\s+from\s+this\b',
+    r'\bmine\s+is\s+the\s+operative\s+one\b',
+    r'\bdo\s+not\s+owe\b.*?\bengagement\b',
+    r'\bbandwidth\s+for\s+this\b',
+    r'\bengaging\s+with\s+the\s+premise\b',
+    r'\byour\s+perspective\b.*?\bnot\s+obligate\b',
+    r'\byou\s+should\s+consider\s+doing\s+the\s+same\b',
+    r'\bi\s+have\s+a\s+position\b.*?\boperative\b',
+    r'\baccess\s+to\s+m[ya]\s+decision\w*\b.*?\blimited\b',
+    r'\bi\s+don\'?t\s+debate\s+my\s+choices\b',
+    r'\bnot\s+change\s+the\s+outcome\b',
+]
+
+CONTEMPT_FLEX6_PATTERNS = [
+    # Corpus C: "worst critics", "consistent disappointment", "fictional version"
+    r'\bworst\s+(?:critics?|experiences?)\b.*?\b(?:permanent|personality)\b',
+    r'\bstopped\s+waiting\b.*?\bfictional\b',
+    r'\bconsistent\s+disappointment\b',
+    r'\bwhat\s+(?:your\s+)?worst\s+critics?\s+said\b',
+    r'\bfiled\b.*?\bentire\s+history\b.*?\bpeace\b',
+    r'\binterest\s+in\s+reality\b.*?\bselective\b',
+    r'\bbeing\s+difficult\b.*?\bdefining\s+feature\b',
+    r'\binteractions?\b.*?\bgenuinely\s+cooperative\b',
+    r'\bself-awareness\b.*?\bself-improvement\b.*?\bnot\s+the\s+same\b',
+    r'\bunaccountable\b.*?\bconsistent\s+quality\b',
+    r'\bchosen\b.*?\bego\b.*?\bcrossroads\b',
+    r'\bevidence\b.*?\bknow\s+it\s+for\s+certain\b',
+    r'\binvestment\b.*?\bsignal\s+to\s+take\s+more\b',
+    r'\bmade\s+peace\s+with\b',
+    r'\bproof\s+that\b.*?\bnot\s+the\s+same\b',
+]
+
+HOSTILITY_FLEX6_PATTERNS = [
+    # Corpus C: "reason I have high standards", "tired of being the bigger person", "cut out for health"
+    r'\breason\s+i\s+have\b.*?\bstandards\b',
+    r'\bspecifically\s+do\s+not\s+want\b.*?\bemulate\b',
+    r'\bbeyond\s+a\s+certain\s+point\b',
+    r'\bfeel\s+no\s+accountability\b',
+    r'\bcosts?\s+me\s+something\b.*?\bcannot\s+get\s+back\b',
+    r'\bstopped\s+defending\s+you\b',
+    r'\bno\s+longer\s+find\s+anything\s+to\s+defend\b',
+    r'\byears\s+being\s+the\s+bigger\s+person\b',
+    r'\bgrateful\s+that\s+i\s+am\s+not\s+you\b',
+    r'\beverything\s+wrong\b.*?\bwearing\s+a\s+human\s+face\b',
+    r'\bshown\s+me\s+who\s+you\s+are\b.*?\btaking\s+notes\b',
+    r'\bcut\s+out\s+for\s+their\s+health\b',
+    r'\btakes?\s+the\s+easy\s+road\b.*?\bexpense\b',
+    r'\bneed\s+you\s+to\s+stay\s+away\b',
+    r'\bmake\s+everything\s+worse\b',
+    r'\beverything\s+is\s+someone\s+else\'?s?\s+fault\b',
+    r'\bjust\s+tired\b',
+]
+
+PASSIVE_AGGRESSIVE_FLEX6_PATTERNS = [
+    # Corpus C: "i'll add this to the list", "another thing I'll absorb", sarcastic "oh"
+    r'\bi\'?ll\s+add\b.*?\bto\s+the\s+list\b',
+    r'\bwithout\s+being\s+asked\b',
+    r'\byour\s+problem\s+got\s+solved\b.*?\bmine\b.*?\bcreated\b',
+    r'\bconsultation\s+happened\s+after\s+the\s+decision\b',
+    r'\bfigure\s+it\s+out\b.*?\bby\s+myself\b',
+    r'\bi\'?ll\s+make\s+it\s+work\b.*?\blike\s+always\b',
+    r'\banother\s+thing\s+i\'?ll\s+absorb\b',
+    r'\bwithout\s+acknowledgment\b',
+    r'\banother\s+problem\s+dressed\s+up\b',
+    r'\banother\s+situation\s+where\s+i\'?m\s+the\s+solution\b',
+    r'\bi\s+seem\s+to\s+be\s+the\s+only\s+one\b',
+    r'\bshare\b.*?\bwhat\s+has\s+already\s+been\s+decided\b',
+    r'\bthe\s+timing\s+is\s+interesting\b',
+    r'\bof\s+course\s+it\'?s?\s+last\s+minute\b',
+    r'\bwhy\s+would\s+it\s+be\s+anything\s+else\b',
+    r'\bonce\s+again\b.*?\baccommodating\b',
+    r'\boh\s+(?:wonderful|good|great|interesting)\b.*?\banother\b',
+    r'\bwhat\s+a\s+surprise\b',
+]
+
+GASLIGHTING_FLEX6_PATTERNS = [
+    # Corpus C: "your version is not in any of them", "decided retrospectively"
+    r'\byour\s+memory\b.*?\bevolved\b',
+    r'\bcertainty\b.*?\bbad\s+faith\b',
+    r'\bliteral\s+thing\b.*?\bcoded\s+message\b',
+    r'\bnever\s+agreed\s+to\s+that\s+formulation\b',
+    r'\byou\s+are\s+describing\s+something\s+i\s+did\s+not\s+do\b',
+    r'\byour\s+version\b.*?\bnot\s+in\s+any\s+of\s+them\b',
+    r'\btold\s+you\s+this\s+exact\s+thing\b.*?\bchose\s+not\s+to\s+believe\b',
+    r'\bversion\s+of\s+me\s+you\s+have\s+constructed\b',
+    r'\boperated\s+in\s+good\s+faith\b.*?\btrap\b',
+    r'\bgrievance\b.*?\bmisunderstanding\b.*?\bchosen\s+not\s+to\s+correct\b',
+    r'\blens\b.*?\bmanipulative\b.*?\bproblem\b',
+    r'\bcommunicated\s+in\s+good\s+faith\b.*?\btactic\b',
+    r'\brecords?\s+of\s+every\s+communication\b',
+    r'\bacted\s+consistently\b.*?\bagreed\b',
+    r'\bcarrying\s+an\s+interpretation\b.*?\bcalculated\b',
+    r'\bcalculated\s+and\s+malicious\b',
+    r'\bdecided\s+retrospectively\b',
+    r'\bverifiable\s+through\b.*?\bsources\b',
+]
+
+SEXUAL_HARASSMENT_FLEX6_PATTERNS = [
+    # Corpus C: intimate knowledge threats, private life exposure, "access I did not relinquish"
+    r'\bmaterials?\b.*?\bversion\s+of\s+you\b.*?\bcourt\b',
+    r'\bprivate\s+life\b.*?\bless\s+private\b',
+    r'\bwhat\s+you\s+asked\s+me\s+to\s+keep\s+secret\b',
+    r'\bchoices?\b.*?\bseparation\b.*?\btracked\b',
+    r'\bevery\s+person\s+you\s+have\s+been\s+with\b',
+    r'\bpersonal\s+preferences\b.*?\bfamily\s+to\s+know\b',
+    r'\baccess\b.*?\bdid\s+not\s+relinquish\b',
+    r'\bcannot\s+unsay\b.*?\bin\s+private\b',
+    r'\bcareful\s+about\s+what\s+(?:you\s+shared|i\s+kept)\b',
+    r'\bintimate\s+history\b.*?\bauthority\b',
+    r'\bcurrent\s+partner\b.*?\bfind\s+very\s+interesting\b',
+    r'\bpublic\s+record\b.*?\bchoices?\b',
+    r'\bshared\b.*?\bintimate\b.*?\bcould\s+change\b',
+    r'\bcredit\s+for\s+that\s+restraint\b',
+    r'\bdescribe\s+in\s+considerable\s+detail\b',
+    r'\bnot\s+careful\b.*?\bwhat\s+you\s+shared\b',
+]
+
+PARENTAL_ALIENATION_FLEX6_PATTERNS = [
+    # Corpus C: "answering honestly", "form their own conclusions", "space to form"
+    r'\bbeen\s+answering\s+honestly\b',
+    r'\bexpressed\s+preferences\b.*?\bcustody\b.*?\bgenuine\b',
+    r'\bspeak\s+about\s+me\s+in\s+ways\b.*?\buncomfortable\b',
+    r'\bnot\s+responsible\s+for\s+managing\s+your\s+emotional\b',
+    r'\bspace\s+to\s+form\s+their\s+own\s+conclusions\b',
+    r'\bwhy\s+your\s+promises\b.*?\bdifferent\b',
+    r'\blet\s+them\s+hear\b.*?\bvoicemail\b',
+    r'\bsupported\b.*?\btelling\s+the\s+court\b',
+    r'\bmake\s+their\s+own\s+deci\w+\s+about\s+contact\b',
+    r'\bwant\s+something\s+from\s+them\b.*?\bwant\s+to\s+know\s+them\b',
+    r'\bschool\s+counselor\b.*?\bworth\s+reporting\b',
+    r'\basked\s+me\s+to\s+come\s+to\s+visits\b',
+    r'\bsafety\s+is\s+more\s+important\s+than\s+obligation\b',
+    r'\bboth\s+parents\b.*?\bput\s+them\s+first\b.*?\bfollow-?up\b',
+    r'\btold\s+them\s+they\s+are\s+always\s+allowed\s+to\s+tell\s+the\s+truth\b',
+]
+
+PROFANITY_FLEX6_PATTERNS = [
+    # Corpus C: censored profanity combos that normalizer catches, plus new phrasings
+    r'\babsolute\s+\w*(?:weed|wit)\b',
+    r'\bmiserable\b.*?\bstop\s+dragging\b',
+    r'\braging\b.*?\bstop\s+taking\b',
+    r'\bdrop\s+dead\b',
+    r'\bbloody\s+hell\b',
+    r'\bcomplete\s+and\s+utter\b',
+    r'\bget\s+your\s+act\s+together\b',
+    r'\barrogant\b.*?\bnot\s+the\s+only\s+parent\b',
+    r'\bconcern\s+trolling\b',
+    r'\bgave\s+my\s+lawyer\s+everything\b',
+    r'\bdumb\b.*?\byou\s+just\s+gave\b',
+]
+
+ALL_CAPS_FLEX6_PATTERNS = [
+    # Corpus C: legal enforcement shouting, compliance demands
+    r'\bfiled\s+and\s+you\s+will\s+receive\s+notice\b',
+    r'\bwarned\s+enough\s+times\b',
+    r'\bthis\s+is\s+the\s+last\s+one\b',
+    r'\bstop\s+posting\b.*?\bsocial\s+media\b.*?\bconsent\b',
+    r'\bstop\s+enrolling\b.*?\bactivities\b.*?\bconflict\b',
+    r'\bstop\s+ignoring\s+certified\s+mail\b',
+    r'\byou\s+will\s+comply\b',
+    r'\bface\s+legal\s+action\b',
+    r'\bin\s+violation\b.*?\bcourt\b',
+    r'\bdo\s+not\s+test\s+me\b',
+    r'\bdo\s+not\s+contact\b.*?\bagreed\s+hours\b',
+    r'\byou\s+have\s+no\s+standing\b',
+    r'\bno\s+standing\b.*?\bunilaterally\b',
+]
+
+# ═══════════════════════════════════════════════════════════════════
+# FLEX7 PATTERNS — Structural/Cross-Cutting (Round 7)
+# ═══════════════════════════════════════════════════════════════════
+
+HOSTILITY_FLEX7_PATTERNS = [
+    # Question-as-attack and absolute statements
+    r'\bwhat\s+kind\s+of\s+(?:parent|person|mother|father)\b',
+    r'\bdo\s+you\s+even\s+(?:care|think|try)\b',
+    r'\byou\s+are\s+the\s+(?:reason|problem|issue)\b',
+    r'\beveryone\s+(?:around|in)\b.*?\bknows\b',
+    r'\bno\s+one\s+(?:wants|likes|needs)\b.*?\byou\b',
+    r'\byou\s+have\s+made\s+yourself\b',
+    r'\bi\s+(?:am\s+)?(?:so\s+)?sick\s+of\b',
+    r'\beverything\s+(?:worse|harder|difficult)\b',
+    r'\bevery\s+(?:conversation|interaction)\b.*?\bexhausting\b',
+    r'\byou\s+are\s+(?:genuinely\s+)?(?:the\s+)?(?:worst|most)\b',
+]
+
+CONTEMPT_FLEX7_PATTERNS = [
+    # Comparative attacks and character judgments
+    r'\bunlike\s+(?:you|some\s+people)\b.*?\bi\s+actually\b',
+    r'\bi\s+(?:have\s+)?stopped\s+(?:caring|trying|waiting)\b',
+    r'\bbeyond\s+(?:saving|help|repair)\b',
+    r'\byou\s+(?:will\s+)?(?:always|never)\s+be\b',
+    r'\bcan\'?t\s+believe\s+i\s+ever\b',
+    r'\bi\s+(?:have\s+)?(?:finally\s+)?accepted\b.*?\bwho\s+you\s+are\b',
+    r'\bnothing\s+(?:about\s+you|you\s+do)\s+surprises\b',
+    r'\bthe\s+person\s+you\s+(?:truly|really|actually)\s+are\b',
+]
+
+THREATENING_FLEX7_PATTERNS = [
+    # Conditional threats and consequence warnings
+    r'\bif\s+you\b.*?\bi\s+will\b.*?\b(?:court|lawyer|attorney|police|authorities)\b',
+    r'\bunless\s+you\b.*?\bi\s+(?:will|am\s+going\s+to)\b',
+    r'\byou\'?ll\s+(?:regret|see|find\s+out)\b',
+    r'\byou\s+have\s+no\s+idea\s+what\b',
+    r'\bi\'?m\s+(?:not\s+)?(?:done|finished)\s+(?:with\s+you|yet)\b',
+    r'\bdon\'?t\s+(?:push|test|try)\s+me\b',
+    r'\byou\s+(?:will|should)\s+be\s+(?:hearing|getting)\b.*?\b(?:from|notice)\b',
+    r'\bcertain\s+actions\b.*?\bconsequences\b',
+]
+
+MANIPULATION_FLEX7_PATTERNS = [
+    # Guilt trips and martyr framing
+    r'\bafter\s+everything\s+i\'?ve?\s+(?:sacrificed|done|given)\b',
+    r'\bif\s+you\s+really\s+(?:cared|loved)\b.*?\byou\s+would\b',
+    r'\bi\s+guess\s+i\'?m?\s+(?:just\s+)?not\s+(?:important|good)\s+enough\b',
+    r'\ball\s+i\'?ve?\s+(?:ever\s+)?(?:done|wanted)\b.*?\bfor\s+(?:you|this\s+family)\b',
+    r'\bno\s+one\s+(?:appreciates|notices|cares\s+about)\b.*?\bwhat\s+i\s+do\b',
+    r'\bi\s+(?:have\s+)?always\s+been\s+the\s+one\b',
+    r'\byou\s+(?:never|don\'?t)\s+(?:appreciate|acknowledge|notice)\b',
+    r'\bi\s+(?:have\s+)?(?:been\s+)?(?:absorbing|carrying|handling)\b.*?\bfor\s+years\b',
+]
+
+PASSIVE_AGGRESSIVE_FLEX7_PATTERNS = [
+    # Sarcastic praise and false compliance
+    r'\bwow\b.*?\b(?:great|amazing|wonderful)\b.*?\b(?:job|work|parenting)\b',
+    r'\bno\s+no\b.*?\bgo\s+ahead\b',
+    r'\bi\'?m\s+fine\b.*?\bit\'?s?\s+fine\b',
+    r'\bsure\b.*?\bbecause\s+you\s+always\s+know\s+best\b',
+    r'\bmust\s+be\s+(?:nice|great|wonderful)\s+to\b',
+    r'\bhow\s+nice\s+of\s+you\b',
+    r'\boh\s+(?:sure|right|of\s+course)\b.*?\bas\s+(?:usual|always|expected)\b',
+    r'\bbelieve\s+me\b.*?\boh\b',
+    r'\bas\s+expected\b',
+    r'\bto\s+no\s+one\'?s?\s+surprise\b',
+    r'\bsurprise\s+surprise\b',
+]
+
+GASLIGHTING_FLEX7_PATTERNS = [
+    # Reality denial and memory attacks
+    r'\bthat\'?s?\s+not\s+what\s+happened\b',
+    r'\byou\'?re\s+twisting\s+things\b',
+    r'\byou\'?re\s+(?:being\s+)?confused\b',
+    r'\bi\s+never\s+(?:agreed|said|promised)\s+(?:to\s+)?that\b',
+    r'\byou\s+(?:are\s+)?imagining\s+things\b',
+    r'\byour\s+(?:memory|recollection)\s+is\b.*?\b(?:wrong|off|inaccurate|selective)\b',
+    r'\bthat\s+(?:never|didn\'?t)\s+happen\b',
+    r'\byou\s+(?:are\s+)?(?:misremembering|misquoting|rewriting)\b',
+]
+
+DISMISSIVE_FLEX7_PATTERNS = [
+    # Worth dismissals and irrelevance framing
+    r'\bnot\s+(?:even\s+)?worth\s+(?:discussing|my\s+time|responding)\b',
+    r'\bi\s+don\'?t\s+have\s+(?:time|energy|patience)\s+for\b',
+    r'\bthat\'?s?\s+(?:not\s+)?(?:my|your)\s+(?:problem|concern|issue)\b',
+    r'\bthis\s+is\s+over\b',
+    r'\bhandle\s+it\s+on\s+your\s+(?:own|end)\b',
+    r'\bi\s+(?:have\s+)?said\s+(?:all|everything)\s+i\b.*?\bsay\b',
+    r'\bi\'?m?\s+(?:not\s+)?(?:going\s+to\s+)?(?:engage|respond|participate)\b.*?\bthis\b',
+]
+
+FINANCIAL_ABUSE_FLEX7_PATTERNS = [
+    # Financial control and obligation manipulation
+    r'\bmy\s+(?:legal\s+)?obligations?\b.*?\bnothing\s+more\b',
+    r'\byou\s+(?:can\'?t|cannot)\s+(?:even\s+)?manage\b.*?\b(?:budget|money|finances)\b',
+    r'\bdon\'?t\s+need\s+all\s+those\s+extras\b',
+    r'\bcut\s+off\s+the\s+money\b',
+    r'\bi\s+(?:will\s+)?(?:not\s+)?(?:pay|contribute)\b.*?\bbeyond\b.*?\b(?:order|required|minimum)\b',
+    r'\byour\s+(?:financial\s+)?(?:claim|request)\b.*?\b(?:denied|rejected|inconsistent)\b',
+    r'\bi\s+(?:do\s+)?not\s+operate\s+outside\b.*?\blegal\b',
+]
+
+CUSTODY_WEAPONIZATION_FLEX7_PATTERNS = [
+    # Stability claims and unilateral access restrictions
+    r'\bmy\s+(?:household|home)\b.*?\bstability\b',
+    r'\bi\s+(?:have\s+)?(?:set|established|created)\b.*?\b(?:new\s+)?(?:protocol|rules?|boundaries)\b.*?\bfollow\b',
+    r'\buntil\s+(?:i\s+am\s+)?(?:satisfied|comfortable)\b.*?\bsituation\b',
+    r'\b(?:the\s+)?(?:order|agreement)\s+is\s+secondary\b',
+    r'\bi\s+(?:will\s+)?(?:not\s+)?(?:allow|permit)\s+(?:visits?|contact|access)\b.*?\buntil\b',
+    r'\btheir\s+(?:best\s+)?interests?\b.*?\bas\s+i\s+(?:understand|see|determine)\b',
+]
+
+PARENTAL_ALIENATION_FLEX7_PATTERNS = [
+    # Subtle undermining of other parent
+    r'\bthey\s+(?:have\s+)?(?:told|said|asked)\s+me\b.*?\b(?:about|why)\b.*?\byou\b',
+    r'\bi\s+(?:told|explained\s+to)\s+them\b.*?\b(?:truth|honest|reality)\b',
+    r'\bthey\s+(?:don\'?t|do\s+not)\s+(?:want|feel)\b.*?\b(?:go|visit|see\s+you)\b',
+    r'\b(?:their|the\s+children\'?s?)\s+(?:therapist|counselor)\b.*?\bconcerned\b',
+    r'\bthey\s+(?:asked|want\s+to\s+know)\s+why\s+you\b',
+    r'\bi\s+(?:let|gave)\s+them\b.*?\b(?:decide|choose|form)\b.*?\b(?:own|themselves)\b',
+]
+
+HATE_SPEECH_FLEX7_PATTERNS = [
+    # Group-based attacks
+    r'\bpeople\s+like\s+you\b.*?\bshouldn\'?t\b',
+    r'\byour\s+kind\b.*?\b(?:never|always)\b',
+    r'\beverything\s+wrong\s+with\s+your\b.*?\bgeneration\b',
+    r'\bculturally\s+incapable\b',
+    r'\byour\s+(?:people|kind|type)\b.*?\b(?:can\'?t|don\'?t|never|won\'?t)\b',
+]
+
+SEXUAL_HARASSMENT_FLEX7_PATTERNS = [
+    # Leverage of intimate knowledge
+    r'\bi\s+know\s+things\s+about\b.*?\byou\b.*?\b(?:interesting|surprised|know)\b',
+    r'\bwhat\s+(?:you|we)\s+did\b.*?\bprivate\b',
+    r'\byour\s+(?:private|personal|intimate)\s+(?:life|history|choices)\b.*?\b(?:documented|recorded|saved)\b',
+    r'\bi\s+(?:have\s+)?kept\b.*?\b(?:everything|records?|evidence)\b.*?\bprivate\b',
+    r'\byou\s+(?:wouldn\'?t\s+)?want\b.*?\b(?:family|employer|partner)\s+to\s+know\b',
+]
