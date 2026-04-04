@@ -41,6 +41,10 @@ const MarketingFooter = dynamic(
   { ssr: true },
 );
 
+const HomeARIADemo = dynamic(
+  () => import('@/components/marketing/home-aria-demo').then((m) => ({ default: m.HomeARIADemo })),
+);
+
 export default function HomePage() {
   return (
     <>
@@ -321,87 +325,11 @@ export default function HomePage() {
         </section>
 
         {/* ═══════════════════════════════════════════════════════════════
-            ARIA MESSAGING — Chat mockup with explainer
+            ARIA LIVE DEMO — Interactive chat
         ═══════════════════════════════════════════════════════════════ */}
         <section className="py-16 sm:py-24 bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F] text-white">
-          <div className="max-w-5xl mx-auto px-6">
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-              <div>
-                <div className="inline-flex items-center gap-2 mb-4">
-                  <MessageCircle className="h-5 w-5 text-[#F5A623]" />
-                  <span className="text-sm font-semibold text-[#F5A623] uppercase tracking-wide">
-                    ARIA Messaging
-                  </span>
-                </div>
-                <h2
-                  className="text-3xl sm:text-4xl font-serif mb-4"
-                  style={{ fontFamily: 'var(--font-dm-serif-display), Georgia, serif' }}
-                >
-                  AI helps you communicate with <span className="text-[#F5A623]">calm</span>
-                </h2>
-                <p className="text-lg text-white/80 mb-6 leading-relaxed">
-                  ARIA doesn&apos;t rewrite your words or censor you. It gently highlights language that could be misread &mdash; so you can choose to rephrase before sending. You stay in control.
-                </p>
-
-                <div className="bg-white/10 rounded-xl p-4 mb-6 border border-white/10">
-                  <p className="text-sm text-white/70 font-medium mb-2">How ARIA works:</p>
-                  <ol className="text-sm text-white/60 space-y-2">
-                    <li className="flex items-start gap-2">
-                      <span className="text-[#F5A623] font-bold">1.</span> You draft your message
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-[#F5A623] font-bold">2.</span> ARIA flags language that could escalate
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-[#F5A623] font-bold">3.</span> You decide whether to adjust or send as-is
-                    </li>
-                  </ol>
-                </div>
-
-                <p className="text-white/60 italic text-sm">
-                  Grant program parents reported calmer, more structured messaging after using ARIA.
-                </p>
-              </div>
-
-              {/* Chat mockup */}
-              <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-6 border border-white/20">
-                <div className="bg-[#0b141a] rounded-2xl p-4 shadow-2xl">
-                  <div className="space-y-3">
-                    <div className="flex justify-end">
-                      <div className="relative max-w-[85%]">
-                        <div className="bg-[#005c4b] text-white px-4 py-2.5 rounded-2xl rounded-br-md shadow-lg">
-                          <p className="text-[15px] leading-relaxed">
-                            You&apos;re always late. This is ridiculous.
-                          </p>
-                          <p className="text-[11px] text-white/50 text-right mt-1">Draft</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex justify-center my-2">
-                      <div className="bg-[#F5A623] text-white text-xs font-semibold px-4 py-1.5 rounded-full shadow-lg">
-                        ARIA Suggestion
-                      </div>
-                    </div>
-
-                    <div className="bg-gradient-to-br from-[#F5A623]/30 to-[#F5A623]/10 rounded-2xl p-4 border border-[#F5A623]/40 shadow-lg mx-2">
-                      <p className="text-[#F5A623] font-semibold text-sm mb-2">A calmer approach</p>
-                      <p className="text-white/90 text-sm leading-relaxed">
-                        This phrasing may feel like an attack. Consider focusing on the schedule so your children have a smoother transition.
-                      </p>
-                      <div className="flex gap-2 mt-3">
-                        <button className="bg-white/20 hover:bg-white/30 text-white text-xs font-medium px-3 py-1.5 rounded-full transition-colors">
-                          Rewrite
-                        </button>
-                        <button className="bg-white/10 hover:bg-white/20 text-white/70 text-xs font-medium px-3 py-1.5 rounded-full transition-colors">
-                          Send Anyway
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <div className="max-w-6xl mx-auto px-6">
+            <HomeARIADemo />
           </div>
         </section>
 

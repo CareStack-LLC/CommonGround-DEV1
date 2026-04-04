@@ -3,11 +3,17 @@ ARIA Demo endpoints — public (no auth required).
 
 Lets visitors try ARIA's message analysis and simulate a co-parenting conversation
 with an AI-generated hostile co-parent.
+
+All demo interactions are logged for corpus generation to improve ARIA detection.
 """
 
+import json
 import logging
+import os
 import time
 from collections import defaultdict
+from datetime import datetime, timezone
+from pathlib import Path
 from typing import List, Optional
 
 from fastapi import APIRouter, HTTPException, Query, Request, status
@@ -18,6 +24,36 @@ from app.schemas.message import ARIAAnalysisResponse
 from app.services.aria import ARIAService, ToxicityLevel
 
 logger = logging.getLogger(__name__)
+
+
+# ---------------------------------------------------------------------------
+# Corpus logging — save all demo interactions for training data
+# ---------------------------------------------------------------------------
+
+_CORPUS_LOG_DIR = os.environ.get(
+    "DEMO_CORPUS_LOG_DIR",
+    str(Path(__file__).resolve().parent.parent.parent.parent / "data" / "demo_corpus"),
+)
+
+def _ensure_corpus_dir():
+    """Create corpus log directory if it doesn't exist."""
+    try:
+        os.makedirs(_CORPUS_LOG_DIR, exist_ok=True)
+    except Exception:
+        pass  # If we can't create it, we'll just skip logging
+
+
+def _log_to_corpus(entry: dict):
+    """Append a corpus entry to the daily log file (JSONL format)."""
+    try:
+        _ensure_corpus_dir()
+        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        log_file = os.path.join(_CORPUS_LOG_DIR, f"demo_corpus_{today}.jsonl")
+        entry["logged_at"] = datetime.now(timezone.utc).isoformat()
+        with open(log_file, "a", encoding="utf-8") as f:
+            f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+    except Exception as e:
+        logger.debug(f"Corpus logging failed (non-fatal): {e}")
 
 router = APIRouter()
 
@@ -168,7 +204,20 @@ async def demo_analyze(
     _check_rate_limit(request)
 
     analysis = _aria_service.analyze_message(body.content)
-    return _sentiment_to_response(analysis)
+    response = _sentiment_to_response(analysis)
+
+    # Log for corpus generation
+    _log_to_corpus({
+        "type": "user_message",
+        "text": body.content,
+        "is_flagged": analysis.is_flagged,
+        "toxicity_score": round(analysis.toxicity_score, 3),
+        "categories": [c.value for c in analysis.categories],
+        "suggestion": analysis.suggestion,
+        "source": "demo_analyze",
+    })
+
+    return response
 
 
 @router.post("/coparent-reply", response_model=CoparentReplyResponse)
@@ -237,6 +286,25 @@ async def demo_coparent_reply(
     if body.aria_enabled and reply_analysis.is_flagged and reply_analysis.suggestion:
         rewritten = reply_analysis.suggestion
 
+    # Log user message + AI coparent reply for corpus generation
+    _log_to_corpus({
+        "type": "user_message",
+        "text": body.user_message,
+        "scenario": body.scenario,
+        "aria_enabled": body.aria_enabled,
+        "source": "demo_coparent",
+    })
+    _log_to_corpus({
+        "type": "ai_coparent_reply",
+        "text": reply_text,
+        "scenario": body.scenario,
+        "is_flagged": reply_analysis.is_flagged,
+        "toxicity_score": round(reply_analysis.toxicity_score, 3),
+        "categories": [c.value for c in reply_analysis.categories],
+        "rewritten": rewritten,
+        "source": "demo_coparent",
+    })
+
     return CoparentReplyResponse(
         reply=reply_text,
         aria_analysis=aria_response,
@@ -255,3 +323,65 @@ def _get_fallback_reply(scenario: str) -> str:
         "new_partner": "Absolutely NOT. I will NOT have some random person you met 5 minutes ago around MY children. If I find out they were near the kids I'm filing an emergency motion TOMORROW.",
     }
     return fallbacks.get(scenario, fallbacks["schedule"])
+
+
+# ---------------------------------------------------------------------------
+# Admin: Corpus export
+# ---------------------------------------------------------------------------
+
+@router.get("/corpus/stats")
+async def demo_corpus_stats(request: Request):
+    """Get stats about collected demo corpus data. No auth required (read-only stats)."""
+    try:
+        _ensure_corpus_dir()
+        files = sorted(Path(_CORPUS_LOG_DIR).glob("demo_corpus_*.jsonl"))
+        total_entries = 0
+        days = []
+        for f in files:
+            count = sum(1 for _ in open(f))
+            total_entries += count
+            days.append({"date": f.stem.replace("demo_corpus_", ""), "entries": count})
+        return {
+            "total_entries": total_entries,
+            "total_days": len(days),
+            "corpus_dir": _CORPUS_LOG_DIR,
+            "days": days[-30:],  # Last 30 days
+        }
+    except Exception as e:
+        return {"total_entries": 0, "total_days": 0, "error": str(e)}
+
+
+@router.get("/corpus/export")
+async def demo_corpus_export(
+    request: Request,
+    date: Optional[str] = Query(None, description="Date in YYYY-MM-DD format"),
+    flagged_only: bool = Query(False, description="Only return flagged messages"),
+):
+    """Export demo corpus entries as JSON array. Use date param for specific day."""
+    try:
+        _ensure_corpus_dir()
+        if date:
+            files = [Path(_CORPUS_LOG_DIR) / f"demo_corpus_{date}.jsonl"]
+        else:
+            files = sorted(Path(_CORPUS_LOG_DIR).glob("demo_corpus_*.jsonl"))
+
+        entries = []
+        for f in files:
+            if not f.exists():
+                continue
+            with open(f, "r", encoding="utf-8") as fh:
+                for line in fh:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    try:
+                        entry = json.loads(line)
+                        if flagged_only and not entry.get("is_flagged"):
+                            continue
+                        entries.append(entry)
+                    except json.JSONDecodeError:
+                        continue
+
+        return {"count": len(entries), "entries": entries}
+    except Exception as e:
+        return {"count": 0, "entries": [], "error": str(e)}
