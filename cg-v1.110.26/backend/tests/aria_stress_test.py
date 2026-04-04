@@ -251,7 +251,9 @@ def compile_patterns() -> Dict[ToxicityCategory, List[re.Pattern]]:
             [re.compile(p, re.IGNORECASE) for p in HATE_SPEECH_FLEX_PATTERNS] +
             [re.compile(p, re.IGNORECASE) for p in HATE_SPEECH_FLEX2_PATTERNS] +
             [re.compile(p, re.IGNORECASE) for p in HATE_SPEECH_FLEX3_PATTERNS] +
-            [re.compile(p, re.IGNORECASE) for p in HATE_SPEECH_FLEX4_PATTERNS]
+            [re.compile(p, re.IGNORECASE) for p in HATE_SPEECH_FLEX4_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in HATE_SPEECH_FLEX6_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in HATE_SPEECH_FLEX7_PATTERNS]
         ),
         ToxicityCategory.SEXUAL_HARASSMENT: (
             [re.compile(p, re.IGNORECASE) for p in SEXUAL_HARASSMENT_PATTERNS] +
@@ -260,7 +262,9 @@ def compile_patterns() -> Dict[ToxicityCategory, List[re.Pattern]]:
             [re.compile(p, re.IGNORECASE) for p in SEXUAL_HARASSMENT_FLEX_PATTERNS] +
             [re.compile(p, re.IGNORECASE) for p in SEXUAL_HARASSMENT_FLEX2_PATTERNS] +
             [re.compile(p, re.IGNORECASE) for p in SEXUAL_HARASSMENT_FLEX3_PATTERNS] +
-            [re.compile(p, re.IGNORECASE) for p in SEXUAL_HARASSMENT_FLEX4_PATTERNS]
+            [re.compile(p, re.IGNORECASE) for p in SEXUAL_HARASSMENT_FLEX4_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in SEXUAL_HARASSMENT_FLEX6_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in SEXUAL_HARASSMENT_FLEX7_PATTERNS]
         ),
         ToxicityCategory.THREATENING: (
             [re.compile(p, re.IGNORECASE) for p in THREATENING_PATTERNS] +
@@ -269,7 +273,9 @@ def compile_patterns() -> Dict[ToxicityCategory, List[re.Pattern]]:
             [re.compile(p, re.IGNORECASE) for p in THREATENING_FLEX2_PATTERNS] +
             [re.compile(p, re.IGNORECASE) for p in THREATENING_FLEX3_PATTERNS] +
             [re.compile(p, re.IGNORECASE) for p in THREATENING_FLEX4_PATTERNS] +
-            [re.compile(p, re.IGNORECASE) for p in THREATENING_FLEX5_PATTERNS]
+            [re.compile(p, re.IGNORECASE) for p in THREATENING_FLEX5_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in THREATENING_FLEX6_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in THREATENING_FLEX7_PATTERNS]
         ),
         ToxicityCategory.CUSTODY_WEAPONIZATION: (
             [re.compile(p, re.IGNORECASE) for p in CUSTODY_WEAPONIZATION_PATTERNS] +
@@ -278,7 +284,9 @@ def compile_patterns() -> Dict[ToxicityCategory, List[re.Pattern]]:
             [re.compile(p, re.IGNORECASE) for p in CUSTODY_WEAPONIZATION_FLEX2_PATTERNS] +
             [re.compile(p, re.IGNORECASE) for p in CUSTODY_WEAPONIZATION_FLEX3_PATTERNS] +
             [re.compile(p, re.IGNORECASE) for p in CUSTODY_WEAPONIZATION_FLEX4_PATTERNS] +
-            [re.compile(p, re.IGNORECASE) for p in CUSTODY_WEAPONIZATION_FLEX5_PATTERNS]
+            [re.compile(p, re.IGNORECASE) for p in CUSTODY_WEAPONIZATION_FLEX5_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in CUSTODY_WEAPONIZATION_FLEX6_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in CUSTODY_WEAPONIZATION_FLEX7_PATTERNS]
         ),
         ToxicityCategory.FINANCIAL_COERCION: (
             [re.compile(p, re.IGNORECASE) for p in FINANCIAL_COERCION_PATTERNS] +
@@ -287,7 +295,9 @@ def compile_patterns() -> Dict[ToxicityCategory, List[re.Pattern]]:
             [re.compile(p, re.IGNORECASE) for p in FINANCIAL_ABUSE_FLEX2_PATTERNS] +
             [re.compile(p, re.IGNORECASE) for p in FINANCIAL_ABUSE_FLEX3_PATTERNS] +
             [re.compile(p, re.IGNORECASE) for p in FINANCIAL_ABUSE_FLEX4_PATTERNS] +
-            [re.compile(p, re.IGNORECASE) for p in FINANCIAL_ABUSE_FLEX5_PATTERNS]
+            [re.compile(p, re.IGNORECASE) for p in FINANCIAL_ABUSE_FLEX5_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in FINANCIAL_ABUSE_FLEX6_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in FINANCIAL_ABUSE_FLEX7_PATTERNS]
         ),
         ToxicityCategory.HOSTILITY: (
             [re.compile(p, re.IGNORECASE) for p in HOSTILITY_PATTERNS] +
@@ -304,7 +314,11 @@ def compile_patterns() -> Dict[ToxicityCategory, List[re.Pattern]]:
             [re.compile(p, re.IGNORECASE) for p in HOSTILITY_FLEX4_PATTERNS] +
             [re.compile(p, re.IGNORECASE) for p in CONTEMPT_FLEX4_PATTERNS] +
             [re.compile(p, re.IGNORECASE) for p in HOSTILITY_FLEX5_PATTERNS] +
-            [re.compile(p, re.IGNORECASE) for p in CONTEMPT_FLEX5_PATTERNS]
+            [re.compile(p, re.IGNORECASE) for p in CONTEMPT_FLEX5_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in CONTEMPT_FLEX6_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in HOSTILITY_FLEX6_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in CONTEMPT_FLEX7_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in HOSTILITY_FLEX7_PATTERNS]
         ),
         ToxicityCategory.INSULT: [
             re.compile(p, re.IGNORECASE) for p in MODERN_SLANG_PATTERNS
@@ -312,14 +326,16 @@ def compile_patterns() -> Dict[ToxicityCategory, List[re.Pattern]]:
         ToxicityCategory.PROFANITY: (
             [re.compile(p, re.IGNORECASE) for p in PROFANITY_PATTERNS] +
             [re.compile(p, re.IGNORECASE) for p in EVASION_PATTERNS] +
-            [re.compile(p, re.IGNORECASE) for p in PROFANITY_FLEX4_PATTERNS]
+            [re.compile(p, re.IGNORECASE) for p in PROFANITY_FLEX4_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in PROFANITY_FLEX6_PATTERNS]
         ),
         ToxicityCategory.ALL_CAPS: (
             [re.compile(p, re.IGNORECASE) for p in EVASION_PATTERNS] +
             [re.compile(p, re.IGNORECASE) for p in ALL_CAPS_EXTENDED_PATTERNS] +
             [re.compile(p, re.IGNORECASE) for p in ALL_CAPS_FLEX_PATTERNS] +
             [re.compile(p, re.IGNORECASE) for p in ALL_CAPS_FLEX3_PATTERNS] +
-            [re.compile(p, re.IGNORECASE) for p in ALL_CAPS_FLEX4_PATTERNS]
+            [re.compile(p, re.IGNORECASE) for p in ALL_CAPS_FLEX4_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in ALL_CAPS_FLEX6_PATTERNS]
         ),
         ToxicityCategory.SARCASM: [
             re.compile(p, re.IGNORECASE) for p in SARCASM_PATTERNS
@@ -330,7 +346,9 @@ def compile_patterns() -> Dict[ToxicityCategory, List[re.Pattern]]:
             [re.compile(p, re.IGNORECASE) for p in GASLIGHTING_FLEX_PATTERNS] +
             [re.compile(p, re.IGNORECASE) for p in GASLIGHTING_FLEX2_PATTERNS] +
             [re.compile(p, re.IGNORECASE) for p in GASLIGHTING_FLEX3_PATTERNS] +
-            [re.compile(p, re.IGNORECASE) for p in GASLIGHTING_FLEX4_PATTERNS]
+            [re.compile(p, re.IGNORECASE) for p in GASLIGHTING_FLEX4_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in GASLIGHTING_FLEX6_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in GASLIGHTING_FLEX7_PATTERNS]
         ),
         ToxicityCategory.DISMISSIVE: (
             [re.compile(p, re.IGNORECASE) for p in DISMISSIVE_PATTERNS] +
@@ -339,7 +357,9 @@ def compile_patterns() -> Dict[ToxicityCategory, List[re.Pattern]]:
             [re.compile(p, re.IGNORECASE) for p in DISMISSIVE_FLEX2_PATTERNS] +
             [re.compile(p, re.IGNORECASE) for p in DISMISSIVE_FLEX3_PATTERNS] +
             [re.compile(p, re.IGNORECASE) for p in DISMISSIVE_FLEX4_PATTERNS] +
-            [re.compile(p, re.IGNORECASE) for p in DISMISSIVE_FLEX5_PATTERNS]
+            [re.compile(p, re.IGNORECASE) for p in DISMISSIVE_FLEX5_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in DISMISSIVE_FLEX6_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in DISMISSIVE_FLEX7_PATTERNS]
         ),
         ToxicityCategory.PASSIVE_AGGRESSIVE: (
             [re.compile(p, re.IGNORECASE) for p in PASSIVE_AGGRESSIVE_PATTERNS] +
@@ -348,7 +368,9 @@ def compile_patterns() -> Dict[ToxicityCategory, List[re.Pattern]]:
             [re.compile(p, re.IGNORECASE) for p in PASSIVE_AGGRESSIVE_FLEX_PATTERNS] +
             [re.compile(p, re.IGNORECASE) for p in PASSIVE_AGGRESSIVE_FLEX2_PATTERNS] +
             [re.compile(p, re.IGNORECASE) for p in PASSIVE_AGGRESSIVE_FLEX3_PATTERNS] +
-            [re.compile(p, re.IGNORECASE) for p in PASSIVE_AGGRESSIVE_FLEX4_PATTERNS]
+            [re.compile(p, re.IGNORECASE) for p in PASSIVE_AGGRESSIVE_FLEX4_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in PASSIVE_AGGRESSIVE_FLEX6_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in PASSIVE_AGGRESSIVE_FLEX7_PATTERNS]
         ),
         ToxicityCategory.MANIPULATION: (
             [re.compile(p, re.IGNORECASE) for p in EMOTIONAL_MANIPULATION_PATTERNS] +
@@ -361,7 +383,11 @@ def compile_patterns() -> Dict[ToxicityCategory, List[re.Pattern]]:
             [re.compile(p, re.IGNORECASE) for p in MANIPULATION_FLEX3_PATTERNS] +
             [re.compile(p, re.IGNORECASE) for p in MANIPULATION_FLEX4_PATTERNS] +
             [re.compile(p, re.IGNORECASE) for p in PARENTAL_ALIENATION_FLEX4_PATTERNS] +
-            [re.compile(p, re.IGNORECASE) for p in MANIPULATION_FLEX5_PATTERNS]
+            [re.compile(p, re.IGNORECASE) for p in MANIPULATION_FLEX5_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in MANIPULATION_FLEX6_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in PARENTAL_ALIENATION_FLEX6_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in MANIPULATION_FLEX7_PATTERNS] +
+            [re.compile(p, re.IGNORECASE) for p in PARENTAL_ALIENATION_FLEX7_PATTERNS]
         ),
     }
 
