@@ -173,21 +173,42 @@ async def demo_coparent_reply(
     # Add the latest user message
     messages.append({"role": "user", "content": body.user_message})
 
-    # Generate hostile co-parent reply via Anthropic
-    try:
-        import anthropic
+    # Generate hostile co-parent reply via OpenAI (primary) with Anthropic fallback
+    reply_text = None
 
-        client = anthropic.AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY)
-        response = await client.messages.create(
-            model="claude-sonnet-4-20250514",
+    # Primary: OpenAI
+    try:
+        from openai import AsyncOpenAI
+
+        oai_client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY, timeout=30.0)
+        oai_messages = [{"role": "system", "content": system_prompt}] + messages
+        oai_response = await oai_client.chat.completions.create(
+            model="gpt-4o",
             max_tokens=300,
-            system=system_prompt,
-            messages=messages,
+            messages=oai_messages,
         )
-        reply_text = response.content[0].text.strip()
+        reply_text = oai_response.choices[0].message.content.strip()
     except Exception as e:
-        logger.error(f"Demo coparent reply generation failed: {e}")
-        # Fallback: use a canned hostile reply
+        logger.warning(f"Demo coparent reply (OpenAI) failed: {e}")
+
+    # Fallback: Anthropic
+    if not reply_text:
+        try:
+            import anthropic
+
+            client = anthropic.AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY)
+            response = await client.messages.create(
+                model="claude-sonnet-4-20250514",
+                max_tokens=300,
+                system=system_prompt,
+                messages=messages,
+            )
+            reply_text = response.content[0].text.strip()
+        except Exception as e:
+            logger.error(f"Demo coparent reply (Anthropic fallback) failed: {e}")
+
+    # Last resort: canned reply
+    if not reply_text:
         reply_text = _get_fallback_reply(body.scenario)
 
     # Run the AI's reply through ARIA
