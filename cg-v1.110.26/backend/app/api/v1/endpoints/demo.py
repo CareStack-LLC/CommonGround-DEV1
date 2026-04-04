@@ -279,7 +279,8 @@ async def demo_analyze(
     body: DemoAnalyzeRequest,
 ):
     """Analyze a message with ARIA (no auth required). Returns toxicity analysis and rewrite suggestion."""
-    _check_rate_limit(request)
+    # Rate limiting disabled for demo testing
+    # _check_rate_limit(request)
 
     analysis = _aria_service.analyze_message(body.content)
 
@@ -327,7 +328,8 @@ async def demo_coparent_reply(
     body: CoparentReplyRequest,
 ):
     """Generate a hostile co-parent reply and run it through ARIA."""
-    _check_rate_limit(request)
+    # Rate limiting disabled for demo testing
+    # _check_rate_limit(request)
 
     # Build conversation for the LLM
     system_prompt = _build_system_prompt(body.scenario)
