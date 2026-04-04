@@ -167,14 +167,14 @@ class ChatbotService:
         user_content: str,
     ) -> Tuple[str, str]:
         """Send a user message and get an AI reply."""
-        # Rate limiting
-        count, last_ts = _rate_limits[session_id]
-        now = time.time()
-        if count >= MAX_MESSAGES_PER_SESSION:
-            raise ValueError("Message limit reached for this session. Please start a new chat or email hello@find-commonground.com.")
-        if now - last_ts < MIN_MESSAGE_INTERVAL_SECONDS:
-            raise ValueError("Please wait a moment before sending another message.")
-        _rate_limits[session_id] = (count + 1, now)
+        # Rate limiting disabled for testing — re-enable for production
+        # count, last_ts = _rate_limits[session_id]
+        # now = time.time()
+        # if count >= MAX_MESSAGES_PER_SESSION:
+        #     raise ValueError("Message limit reached for this session. Please start a new chat or email hello@find-commonground.com.")
+        # if now - last_ts < MIN_MESSAGE_INTERVAL_SECONDS:
+        #     raise ValueError("Please wait a moment before sending another message.")
+        # _rate_limits[session_id] = (count + 1, now)
 
         # Load system prompt FIRST — if chatbot_config table is missing,
         # this may rollback, so do it before loading any other data

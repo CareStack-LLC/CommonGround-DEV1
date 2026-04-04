@@ -234,8 +234,8 @@ app.add_middleware(
     allow_headers=["Content-Type", "Authorization", "X-Requested-With", "X-Request-ID"],
 )
 
-# Custom in-memory rate limiting (replaces slowapi which crashes on Render)
-app.add_middleware(RateLimitMiddleware)
+# Rate limiting disabled for testing — re-enable when going to production
+# app.add_middleware(RateLimitMiddleware)
 
 # Request ID tracing + canonical log lines (wide events)
 from app.middleware.request_id import RequestIDMiddleware
