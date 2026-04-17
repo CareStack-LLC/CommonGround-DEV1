@@ -1021,6 +1021,164 @@ export const adminAPI = {
     return `${path}${query ? `?${query}` : ''}`;
   },
 
+  // ── Alert rules + runbooks (Phase C) ────────────────────────────────
+  listAlertMetrics: () =>
+    adminFetch<{
+      metrics: Array<{ path: string; description: string; units: string }>;
+      comparisons: string[];
+    }>('/admin/alerts/metrics'),
+
+  listAlertRules: () =>
+    adminFetch<Array<{
+      id: string;
+      name: string;
+      description: string | null;
+      metric_path: string;
+      comparison: string;
+      threshold_value: number;
+      check_interval_minutes: number;
+      stability_factor: number;
+      notify_emails: string[];
+      notify_push: boolean;
+      runbook_id: string | null;
+      enabled: boolean;
+      last_evaluated_at: string | null;
+      last_value: number | null;
+      current_state: string;
+      created_at: string | null;
+    }>>('/admin/alerts/rules'),
+
+  createAlertRule: (data: {
+    name: string;
+    description?: string;
+    metric_path: string;
+    comparison: string;
+    threshold_value: number;
+    check_interval_minutes?: number;
+    stability_factor?: number;
+    notify_emails?: string[];
+    notify_push?: boolean;
+    runbook_id?: string | null;
+    enabled?: boolean;
+  }) =>
+    adminFetch<any>('/admin/alerts/rules', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  updateAlertRule: (
+    ruleId: string,
+    data: Partial<{
+      name: string;
+      description: string | null;
+      metric_path: string;
+      comparison: string;
+      threshold_value: number;
+      check_interval_minutes: number;
+      stability_factor: number;
+      notify_emails: string[];
+      notify_push: boolean;
+      runbook_id: string | null;
+      enabled: boolean;
+    }>,
+  ) =>
+    adminFetch<any>(`/admin/alerts/rules/${ruleId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+
+  deleteAlertRule: (ruleId: string) =>
+    adminFetch<{ deleted: boolean; id: string }>(`/admin/alerts/rules/${ruleId}`, {
+      method: 'DELETE',
+    }),
+
+  forceEvaluateRule: (ruleId: string) =>
+    adminFetch<{ rule: any; previous_state: string; transitioned: boolean }>(
+      `/admin/alerts/rules/${ruleId}/evaluate`,
+      { method: 'POST' },
+    ),
+
+  listAlertHistory: (params?: { rule_id?: string; days?: number; page?: number; page_size?: number; open_only?: boolean }) => {
+    const qs = new URLSearchParams();
+    if (params?.rule_id) qs.set('rule_id', params.rule_id);
+    if (params?.days) qs.set('days', String(params.days));
+    if (params?.page) qs.set('page', String(params.page));
+    if (params?.page_size) qs.set('page_size', String(params.page_size));
+    if (params?.open_only) qs.set('open_only', 'true');
+    const query = qs.toString();
+    return adminFetch<{
+      total: number;
+      page: number;
+      page_size: number;
+      items: Array<{
+        id: string;
+        rule_id: string;
+        rule_name: string;
+        metric_path: string;
+        fired_at: string | null;
+        fired_value: number;
+        threshold_value: number;
+        comparison: string;
+        resolved_at: string | null;
+        resolved_value: number | null;
+        duration_seconds: number | null;
+        notifications_sent: { push?: string[]; email?: string[]; errors?: string[] } | null;
+      }>;
+    }>(`/admin/alerts/history${query ? `?${query}` : ''}`);
+  },
+
+  // Runbooks
+  listRunbooks: (category?: string) =>
+    adminFetch<Array<{
+      id: string;
+      title: string;
+      category: string;
+      summary: string | null;
+      steps: Array<{ title: string; body: string; expected_outcome?: string | null }>;
+      notes: string | null;
+      tags: string[];
+      enabled: boolean;
+      owner_id: string | null;
+      created_at: string | null;
+      updated_at: string | null;
+    }>>(`/admin/runbooks${category ? `?category=${encodeURIComponent(category)}` : ''}`),
+
+  getRunbook: (id: string) =>
+    adminFetch<any>(`/admin/runbooks/${id}`),
+
+  createRunbook: (data: {
+    title: string;
+    category?: string;
+    summary?: string;
+    steps?: Array<{ title: string; body: string; expected_outcome?: string }>;
+    notes?: string;
+    tags?: string[];
+    enabled?: boolean;
+  }) =>
+    adminFetch<any>('/admin/runbooks', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  updateRunbook: (id: string, data: Partial<{
+    title: string;
+    category: string;
+    summary: string | null;
+    steps: Array<{ title: string; body: string; expected_outcome?: string }>;
+    notes: string | null;
+    tags: string[];
+    enabled: boolean;
+  }>) =>
+    adminFetch<any>(`/admin/runbooks/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+
+  deleteRunbook: (id: string) =>
+    adminFetch<{ deleted: boolean; id: string }>(`/admin/runbooks/${id}`, {
+      method: 'DELETE',
+    }),
+
   // Campaigns
   getCampaigns: () => adminFetch<EmailCampaign[]>('/admin/leads/campaigns'),
   createCampaign: (data: { name: string; lead_list_id: string; subject: string; html_content?: string }) =>

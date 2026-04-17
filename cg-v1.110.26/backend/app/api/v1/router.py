@@ -15,6 +15,7 @@ from app.api.v1.endpoints import (
     admin_marketing as admin_mktg,
     admin_ga4,
     admin_impersonation,
+    admin_ops,
     auth,
     notifications,
     parent_child_messages,
@@ -299,6 +300,13 @@ api_router.include_router(
     admin_impersonation.router,
     prefix="/admin",
     tags=["SuperAdmin Impersonation / Bulk / Exports"],
+)
+
+# Admin ops infrastructure — alert rules, history, runbooks (Wave 6 Phase C)
+api_router.include_router(
+    admin_ops.router,
+    prefix="/admin",
+    tags=["SuperAdmin Ops (Alerts / Runbooks)"],
 )
 
 # Admin Maintenance — Daily.co room sweeper & other ops jobs (Wave 1 A8)

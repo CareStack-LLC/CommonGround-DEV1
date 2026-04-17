@@ -128,6 +128,23 @@ async def _run_auto_close_expired_exchanges() -> None:
         sentry_sdk.capture_exception(exc)
 
 
+async def _run_alert_evaluator_tick() -> None:
+    """Wave 6 Phase C: evaluate all enabled AlertRules every 5 minutes.
+
+    The evaluator opens its own session internally; we just log results
+    and swallow exceptions so APScheduler continues scheduling future
+    runs even if the alert system is temporarily broken.
+    """
+    try:
+        from app.services.alert_evaluator import run_alert_evaluator
+        summary = await run_alert_evaluator()
+        if summary.get("transitions", 0) > 0 or summary.get("errors"):
+            logger.info("scheduler: alert_evaluator result=%s", summary)
+    except Exception as exc:  # noqa: BLE001
+        logger.exception("scheduler: alert_evaluator failed: %s", exc)
+        sentry_sdk.capture_exception(exc)
+
+
 async def _run_daily_room_cleanup() -> None:
     """
     Scheduled wrapper around cleanup_abandoned_sessions.
@@ -217,6 +234,17 @@ def start_scheduler(app) -> AsyncIOScheduler:  # noqa: ARG001 — FastAPI app ke
         trigger=IntervalTrigger(minutes=5),
         id="auto_close_expired_exchanges",
         name="Custody exchange window auto-closer",
+        replace_existing=True,
+        coalesce=True,
+        max_instances=1,
+    )
+    # Wave 6 Phase C: alert rule evaluator — every 5 minutes, evaluate every
+    # enabled AlertRule and fire notifications on state transitions.
+    _scheduler.add_job(
+        _run_alert_evaluator_tick,
+        trigger=IntervalTrigger(minutes=5),
+        id="alert_evaluator",
+        name="Superadmin alert rule evaluator",
         replace_existing=True,
         coalesce=True,
         max_instances=1,

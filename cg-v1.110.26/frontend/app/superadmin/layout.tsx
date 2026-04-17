@@ -29,6 +29,7 @@ import {
   BarChart3,
   Search,
   Shield,
+  BookOpen,
 } from 'lucide-react';
 import { adminAPI, type PlatformHealth } from '@/lib/admin-api';
 import { AdminLogo } from '@/components/superadmin';
@@ -49,6 +50,8 @@ const navSections = [
       { href: '/superadmin/bug-hunts', label: 'Bug Hunts', icon: FlaskConical },
       { href: '/superadmin/customer-success', label: 'Customer Success', icon: Heart },
       { href: '/superadmin/system-health', label: 'System Health', icon: Server },
+      { href: '/superadmin/alerts', label: 'Alert Rules', icon: Bell },
+      { href: '/superadmin/runbook', label: 'Runbooks', icon: BookOpen },
     ],
   },
   {
