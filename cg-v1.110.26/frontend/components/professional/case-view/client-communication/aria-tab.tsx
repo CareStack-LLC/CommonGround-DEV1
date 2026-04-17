@@ -44,15 +44,19 @@ interface ARIASettings {
     custom_rules: Record<string, any>;
 }
 
+/**
+ * Shape returned by GET /api/v1/professional/cases/{id}/aria/metrics
+ * — see backend aria_control_service.get_aria_metrics. All `*_rate` fields
+ * are 0-100 per ADR-001, except v2_coaching_acceptance_rate which is 0-1.
+ */
 interface ARIAMetrics {
-    total_messages_analyzed: number;
-    total_interventions: number;
-    intervention_rate: number;
-    acceptance_rate: number;
-    trend: string;
-    by_category: Record<string, number>;
-    good_faith_score_a: number;
-    good_faith_score_b: number;
+    period_days?: number;
+    total_messages: number;
+    flagged_messages: number;
+    flag_rate: number; // 0-100
+    sentiment_trend: string;
+    good_faith_score: number | null; // 0-100, case-level
+    v2_coaching_acceptance_rate?: number | null; // 0-1
 }
 
 interface ARIAIntervention {
@@ -223,34 +227,40 @@ export function AriaTab({ familyFileId, token }: { familyFileId: string, token: 
                 </div>
             </div>
 
-            {/* Metrics Overview */}
+            {/* Metrics Overview — field names mapped to what the backend
+                returns. flag_rate is 0-100 (ADR-001); coaching-acceptance
+                is 0-1. */}
             {metrics && (
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                     <MetricCard
                         label="Messages Analyzed"
-                        value={metrics.total_messages_analyzed}
+                        value={metrics.total_messages ?? 0}
                         icon={<MessageSquare className="h-5 w-5" />}
                     />
                     <MetricCard
-                        label="Interventions"
-                        value={metrics.total_interventions}
-                        subtitle={`${(metrics.intervention_rate * 100).toFixed(1)}% rate`}
+                        label="Flagged Messages"
+                        value={metrics.flagged_messages ?? 0}
+                        subtitle={`${(metrics.flag_rate ?? 0).toFixed(1)}% flag rate`}
                         icon={<AlertTriangle className="h-5 w-5" />}
                     />
                     <MetricCard
-                        label="Acceptance Rate"
-                        value={`${(metrics.acceptance_rate * 100).toFixed(0)}%`}
+                        label="Coaching Acceptance"
+                        value={
+                            metrics.v2_coaching_acceptance_rate != null
+                                ? `${Math.round(metrics.v2_coaching_acceptance_rate * 100)}%`
+                                : '—'
+                        }
                         icon={<CheckCircle2 className="h-5 w-5" />}
-                        trend={metrics.trend}
+                        trend={metrics.sentiment_trend}
                     />
                     <MetricCard
                         label="Trend"
-                        value={metrics.trend === "improving" ? "Improving" : metrics.trend === "declining" ? "Needs Attention" : "Stable"}
-                        icon={getTrendIcon(metrics.trend)}
+                        value={metrics.sentiment_trend === "improving" ? "Improving" : metrics.sentiment_trend === "declining" ? "Needs Attention" : "Stable"}
+                        icon={getTrendIcon(metrics.sentiment_trend)}
                         valueColor={
-                            metrics.trend === "improving"
+                            metrics.sentiment_trend === "improving"
                                 ? "text-emerald-600"
-                                : metrics.trend === "declining"
+                                : metrics.sentiment_trend === "declining"
                                     ? "text-red-600"
                                     : "text-muted-foreground"
                         }
@@ -258,57 +268,40 @@ export function AriaTab({ familyFileId, token }: { familyFileId: string, token: 
                 </div>
             )}
 
-            {/* Good Faith Scores */}
-            {metrics && (
+            {/* Good Faith Score — case-level. Per-parent scores aren't
+                computed by the backend today; refer to the full ARIA page
+                at /professional/cases/{id}/aria for V2 Sentinel Shield
+                per-parent heat scores. */}
+            {metrics && metrics.good_faith_score != null && (
                 <Card>
                     <CardHeader>
                         <CardTitle className="text-base flex items-center gap-2">
                             <Shield className="h-5 w-5 text-emerald-600" />
-                            Good Faith Scores
+                            Good Faith Score
                         </CardTitle>
                         <CardDescription>
-                            Communication quality metrics for each parent
+                            Case-level communication quality over the last {metrics.period_days ?? 30} days
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="grid md:grid-cols-2 gap-6">
-                            <div className="space-y-2">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-sm font-medium">Parent A (Petitioner)</span>
-                                    <span className={`text-2xl font-bold ${getGoodFaithColor(metrics.good_faith_score_a)}`}>
-                                        {metrics.good_faith_score_a}%
-                                    </span>
-                                </div>
-                                <div className="h-2 bg-muted rounded-full overflow-hidden">
-                                    <div
-                                        className={`h-full rounded-full transition-all ${metrics.good_faith_score_a >= 80
-                                                ? "bg-emerald-500"
-                                                : metrics.good_faith_score_a >= 60
-                                                    ? "bg-amber-500"
-                                                    : "bg-red-500"
-                                            }`}
-                                        style={{ width: `${metrics.good_faith_score_a}%` }}
-                                    />
-                                </div>
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                                <span className="text-sm font-medium">Overall</span>
+                                <span className={`text-3xl font-bold ${getGoodFaithColor(metrics.good_faith_score)}`}>
+                                    {Math.round(metrics.good_faith_score)}%
+                                </span>
                             </div>
-                            <div className="space-y-2">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-sm font-medium">Parent B (Respondent)</span>
-                                    <span className={`text-2xl font-bold ${getGoodFaithColor(metrics.good_faith_score_b)}`}>
-                                        {metrics.good_faith_score_b}%
-                                    </span>
-                                </div>
-                                <div className="h-2 bg-muted rounded-full overflow-hidden">
-                                    <div
-                                        className={`h-full rounded-full transition-all ${metrics.good_faith_score_b >= 80
-                                                ? "bg-emerald-500"
-                                                : metrics.good_faith_score_b >= 60
-                                                    ? "bg-amber-500"
-                                                    : "bg-red-500"
-                                            }`}
-                                        style={{ width: `${metrics.good_faith_score_b}%` }}
-                                    />
-                                </div>
+                            <div className="h-2 bg-muted rounded-full overflow-hidden">
+                                <div
+                                    className={`h-full rounded-full transition-all ${
+                                        metrics.good_faith_score >= 80
+                                            ? "bg-emerald-500"
+                                            : metrics.good_faith_score >= 60
+                                                ? "bg-amber-500"
+                                                : "bg-red-500"
+                                    }`}
+                                    style={{ width: `${metrics.good_faith_score}%` }}
+                                />
                             </div>
                         </div>
                     </CardContent>

@@ -584,7 +584,11 @@ function DashboardInner() {
                 />
                 <MetricCard
                   icon={AlertTriangle} label="Error Rate"
-                  value={`${((perfData.transactions || []).reduce((a: number, t: any) => a + (t.failure_rate || 0), 0) / Math.max((perfData.transactions || []).length, 1) * 100).toFixed(1)}%`}
+                  // failure_rate arrives from Sentry triage in 0-100 (see
+                  // sentry_triage_service.py — raw rate is already
+                  // multiplied by 100 before serialization). Don't
+                  // multiply again; the averaged value stays 0-100.
+                  value={`${((perfData.transactions || []).reduce((a: number, t: any) => a + (t.failure_rate || 0), 0) / Math.max((perfData.transactions || []).length, 1)).toFixed(1)}%`}
                   color="coral"
                   tooltip="Average failure rate across all API endpoints"
                 />

@@ -70,24 +70,32 @@ interface ARIASettings {
   custom_rules: Record<string, any>;
 }
 
+/**
+ * Shape returned by GET /api/v1/professional/cases/{id}/aria/metrics
+ * (see backend/app/services/professional/aria_control_service.py::get_aria_metrics).
+ *
+ * All `*_rate` fields are 0-100 per ADR-001, except v2_coaching_acceptance_rate
+ * which stays 0-1 because it's used inline in a per-category chart.
+ */
 interface ARIAMetrics {
-  total_messages_analyzed: number;
-  total_interventions: number;
-  intervention_rate: number;
-  acceptance_rate: number;
-  trend: string;
-  by_category: Record<string, number>;
-  good_faith_score_a: number;
-  good_faith_score_b: number;
+  period_days?: number;
+  total_messages: number;
+  flagged_messages: number;
+  flag_rate: number; // 0-100
+  sentiment_by_sender?: Record<string, number | null>;
+  average_sentiment?: number | null;
+  sentiment_trend: string; // "improving" | "declining" | "stable"
+  good_faith_score: number | null; // 0-100, overall (case-level)
   // V2 Sentinel Shield
-  v2_avg_heat?: number;
-  v2_heat_parent_a?: number;
-  v2_heat_parent_b?: number;
+  v2_avg_heat?: number | null;
+  v2_heat_parent_a?: number | null;
+  v2_heat_parent_b?: number | null;
   v2_domain_breakdown?: Record<string, { count: number; avg_score: number }>;
   v2_session_pattern_frequency?: Record<string, number>;
-  v2_coaching_acceptance_rate?: number;
+  v2_coaching_acceptance_rate?: number | null; // 0-1
   v2_time_signal_distribution?: Record<string, number>;
   v2_legal_flag_count?: number;
+  v2_category_breakdown?: Record<string, { count: number; avg_score: number }>;
 }
 
 interface ARIAIntervention {
@@ -392,34 +400,41 @@ export default function ARIAControlPage() {
         </TabsList>
 
         <TabsContent value="controls" className="space-y-6 mt-6">
-          {/* Metrics Overview */}
+          {/* Metrics Overview — fields mapped to what the backend actually
+              returns (see ARIAMetrics interface). flag_rate is already 0-100
+              per ADR-001; v2_coaching_acceptance_rate is still 0-1. */}
           {metrics && (
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               <MetricCard
                 label="Messages Analyzed"
-                value={metrics.total_messages_analyzed}
+                value={metrics.total_messages ?? 0}
                 icon={<MessageSquare className="h-5 w-5" />}
               />
               <MetricCard
-                label="Interventions"
-                value={metrics.total_interventions}
-                subtitle={`${(metrics.intervention_rate * 100).toFixed(1)}% rate`}
+                label="Flagged Messages"
+                value={metrics.flagged_messages ?? 0}
+                subtitle={`${(metrics.flag_rate ?? 0).toFixed(1)}% flag rate`}
                 icon={<AlertTriangle className="h-5 w-5" />}
               />
               <MetricCard
-                label="Acceptance Rate"
-                value={`${(metrics.acceptance_rate * 100).toFixed(0)}%`}
+                label="Coaching Acceptance"
+                value={
+                  metrics.v2_coaching_acceptance_rate != null
+                    ? `${Math.round(metrics.v2_coaching_acceptance_rate * 100)}%`
+                    : '—'
+                }
+                subtitle="Messages rewritten after ARIA suggestion"
                 icon={<CheckCircle2 className="h-5 w-5" />}
-                trend={metrics.trend}
+                trend={metrics.sentiment_trend}
               />
               <MetricCard
                 label="Trend"
-                value={metrics.trend === "improving" ? "Improving" : metrics.trend === "declining" ? "Needs Attention" : "Stable"}
-                icon={getTrendIcon(metrics.trend)}
+                value={metrics.sentiment_trend === "improving" ? "Improving" : metrics.sentiment_trend === "declining" ? "Needs Attention" : "Stable"}
+                icon={getTrendIcon(metrics.sentiment_trend)}
                 valueColor={
-                  metrics.trend === "improving"
+                  metrics.sentiment_trend === "improving"
                     ? "text-emerald-600"
-                    : metrics.trend === "declining"
+                    : metrics.sentiment_trend === "declining"
                       ? "text-red-600"
                       : "text-muted-foreground"
                 }
@@ -427,58 +442,44 @@ export default function ARIAControlPage() {
             </div>
           )}
 
-          {/* Good Faith Scores */}
-          {metrics && (
+          {/* Good Faith Score — case-level. Per-parent scores aren't
+              computed by the backend today; per-parent HEAT scores appear
+              in the V2 Sentinel Shield section below and give a
+              comparable at-a-glance read. */}
+          {metrics && metrics.good_faith_score != null && (
             <Card>
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
                   <Shield className="h-5 w-5 text-emerald-600" />
-                  Good Faith Scores
+                  Good Faith Score
                 </CardTitle>
                 <CardDescription>
-                  Communication quality metrics for each parent
+                  Case-level communication quality over the last {metrics.period_days ?? 30} days
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">Parent A (Petitioner)</span>
-                      <span className={`text-2xl font-bold ${getGoodFaithColor(metrics.good_faith_score_a)}`}>
-                        {metrics.good_faith_score_a}%
-                      </span>
-                    </div>
-                    <div className="h-2 bg-muted rounded-full overflow-hidden">
-                      <div
-                        className={`h-full rounded-full transition-all ${metrics.good_faith_score_a >= 80
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">Overall</span>
+                    <span className={`text-3xl font-bold ${getGoodFaithColor(metrics.good_faith_score)}`}>
+                      {Math.round(metrics.good_faith_score)}%
+                    </span>
+                  </div>
+                  <div className="h-2 bg-muted rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all ${
+                        metrics.good_faith_score >= 80
                           ? "bg-emerald-500"
-                          : metrics.good_faith_score_a >= 60
+                          : metrics.good_faith_score >= 60
                             ? "bg-amber-500"
                             : "bg-red-500"
-                          }`}
-                        style={{ width: `${metrics.good_faith_score_a}%` }}
-                      />
-                    </div>
+                      }`}
+                      style={{ width: `${metrics.good_faith_score}%` }}
+                    />
                   </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">Parent B (Respondent)</span>
-                      <span className={`text-2xl font-bold ${getGoodFaithColor(metrics.good_faith_score_b)}`}>
-                        {metrics.good_faith_score_b}%
-                      </span>
-                    </div>
-                    <div className="h-2 bg-muted rounded-full overflow-hidden">
-                      <div
-                        className={`h-full rounded-full transition-all ${metrics.good_faith_score_b >= 80
-                          ? "bg-emerald-500"
-                          : metrics.good_faith_score_b >= 60
-                            ? "bg-amber-500"
-                            : "bg-red-500"
-                          }`}
-                        style={{ width: `${metrics.good_faith_score_b}%` }}
-                      />
-                    </div>
-                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Scores reflect flag rate, sentiment trends, heat, legal flags, and severe-domain presence.
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -580,43 +581,50 @@ export default function ARIAControlPage() {
             </Card>
           )}
 
-          {/* Category Breakdown */}
-          {metrics?.by_category && Object.keys(metrics.by_category).length > 0 && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-base">Intervention Categories</CardTitle>
-                <CardDescription>
-                  Breakdown of issues flagged by ARIA
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {Object.entries(metrics.by_category)
-                    .sort(([, a], [, b]) => b - a)
-                    .map(([category, count]) => (
-                      <div key={category} className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="capitalize">
-                            {category.replace(/_/g, " ")}
-                          </Badge>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <div className="w-32 h-2 bg-muted rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-emerald-500 rounded-full"
-                              style={{
-                                width: `${(count / metrics.total_interventions) * 100}%`,
-                              }}
-                            />
+          {/* Category Breakdown — sourced from v2_category_breakdown
+              which has shape {cat: {count, avg_score}}. Normalize to counts
+              for display; width proportional to the max count in the set
+              so the largest bar fills the row. */}
+          {metrics?.v2_category_breakdown && Object.keys(metrics.v2_category_breakdown).length > 0 && (() => {
+            const entries = Object.entries(metrics.v2_category_breakdown);
+            const maxCount = entries.reduce((m, [, v]) => Math.max(m, v.count), 0) || 1;
+            return (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base">Intervention Categories</CardTitle>
+                  <CardDescription>
+                    Breakdown of issues flagged by ARIA (V2 Sentinel Shield)
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {entries
+                      .sort(([, a], [, b]) => b.count - a.count)
+                      .map(([category, data]) => (
+                        <div key={category} className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="outline" className="capitalize">
+                              {category.replace(/_/g, " ")}
+                            </Badge>
                           </div>
-                          <span className="text-sm font-medium w-8 text-right">{count}</span>
+                          <div className="flex items-center gap-3">
+                            <div className="w-32 h-2 bg-muted rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-emerald-500 rounded-full"
+                                style={{
+                                  width: `${(data.count / maxCount) * 100}%`,
+                                }}
+                              />
+                            </div>
+                            <span className="text-sm font-medium w-8 text-right">{data.count}</span>
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+                      ))}
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })()}
 
           {/* Recent Interventions */}
           <Card>
@@ -874,7 +882,7 @@ export default function ARIAControlPage() {
                 <CardContent>
                   <div className="text-center py-4">
                     <p className="text-4xl font-bold text-cg-coaching">
-                      {Math.round(metrics.v2_coaching_acceptance_rate * 100)}%
+                      {Math.round(metrics.v2_coaching_acceptance_rate! * 100)}%
                     </p>
                     <p className="text-sm text-muted-foreground mt-1">
                       of coaching suggestions were accepted
