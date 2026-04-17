@@ -4159,9 +4159,12 @@ async def get_exchange_compliance(
 
 @router.get(
     "/cases/{case_id}/exchange-details",
-    response_model=list[dict],
+    response_model=dict,
     summary="Get detailed exchange data for export",
-    description="Get detailed GPS verification data for each exchange (for court exports).",
+    description=(
+        "Get detailed GPS verification data for each exchange (for court "
+        "exports). Returns {exchanges, data_gaps} — see ADR-001."
+    ),
 )
 async def get_exchange_details(
     case_id: str,
