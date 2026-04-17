@@ -60,8 +60,26 @@ class ConnectionManager:
             self._pubsub = None
 
     async def start_subscriber(self):
-        """Start background task that listens for Redis pub/sub messages."""
+        """Start background task that listens for Redis pub/sub messages.
+
+        `redis-py` doesn't open a connection when `.pubsub()` is called —
+        only the first `subscribe/psubscribe` does. If we spin up the
+        subscriber loop before any user has joined a case,
+        `get_message()` raises "pubsub connection not set" forever in a
+        tight 1 s retry loop. We bootstrap with a single `psubscribe`
+        on the `ws:*` pattern so the connection is live, and each
+        individual `subscribe_to_case(...)` still calls `subscribe()`
+        to pin the exact channel (redis-py handles duplicates fine).
+        """
         if not self._pubsub:
+            return
+        try:
+            await self._pubsub.psubscribe("ws:*")
+        except Exception as e:
+            logger.warning(f"Failed to psubscribe ws:* on startup: {e}")
+            # Don't spin the loop if we can't even attach the pattern —
+            # the service will degrade to single-instance broadcast via
+            # the in-memory path.
             return
         self._subscriber_task = asyncio.create_task(self._redis_subscriber())
 
@@ -87,9 +105,19 @@ class ConnectionManager:
                         ignore_subscribe_messages=True,
                         timeout=1.0,
                     )
-                    if message and message["type"] == "message":
-                        data = json.loads(message["data"])
+                    # After the `psubscribe("ws:*")` bootstrap, matching
+                    # events come through as `"pmessage"`. The older
+                    # per-case `subscribe()` path still produces
+                    # `"message"`. Accept both so re-subscription
+                    # timing doesn't drop events.
+                    if message and message["type"] in ("message", "pmessage"):
+                        raw = message.get("data")
+                        if isinstance(raw, bytes):
+                            raw = raw.decode("utf-8", errors="replace")
+                        data = json.loads(raw)
                         channel = message["channel"]
+                        if isinstance(channel, bytes):
+                            channel = channel.decode("utf-8", errors="replace")
 
                         if channel.startswith("ws:case:"):
                             exclude_user = data.pop("_exclude_user", None)
