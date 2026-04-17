@@ -206,23 +206,85 @@ export default function GTMCommandCenter() {
   }, []);
 
   // ── Load / Save ──
+  //
+  // The backend (admin_kv table, /admin/reddit/playbook/state) is the source
+  // of truth. localStorage is a fallback when the backend call fails (e.g.
+  // pre-migration) so offline edits still survive a page reload.
+  //
+  // Strategy: on mount, load from backend; if that fails, fall back to
+  // localStorage. On any state change, write to localStorage immediately
+  // (cheap, fire-and-forget) AND push to the backend with a debounce. Last
+  // write wins on conflict — the UI is single-user so this is fine.
+  const [backendLoaded, setBackendLoaded] = useState(false);
   useEffect(() => {
-    try {
-      const p = localStorage.getItem(STORAGE.playbook);
-      if (p) { const parsed = JSON.parse(p); setCheckedTasks(parsed.checked || {}); setTaskNotes(parsed.notes || {}); }
-      const d = localStorage.getItem(STORAGE.drafts);
-      if (d) setDrafts(JSON.parse(d));
-      const o = localStorage.getItem(STORAGE.outreach);
-      if (o) setContacts(JSON.parse(o));
-      const a = localStorage.getItem(STORAGE.activity);
-      if (a) setActivity(JSON.parse(a));
-    } catch {}
+    (async () => {
+      // Try backend first
+      try {
+        const state = await adminAPI.getPlaybookState();
+        if (state?.playbook) {
+          const pb = state.playbook as { checked?: Record<string, boolean>; notes?: Record<string, string> };
+          setCheckedTasks(pb.checked || {});
+          setTaskNotes(pb.notes || {});
+        }
+        if (state?.drafts) setDrafts(state.drafts as typeof drafts);
+        if (state?.outreach) setContacts(state.outreach as typeof contacts);
+        if (state?.activity) setActivity(state.activity as typeof activity);
+        setBackendLoaded(true);
+        return;
+      } catch (err) {
+        // Pre-migration or network failure — fall through to localStorage.
+        console.warn('playbook backend load failed, falling back to localStorage:', err);
+      }
+      try {
+        const p = localStorage.getItem(STORAGE.playbook);
+        if (p) { const parsed = JSON.parse(p); setCheckedTasks(parsed.checked || {}); setTaskNotes(parsed.notes || {}); }
+        const d = localStorage.getItem(STORAGE.drafts);
+        if (d) setDrafts(JSON.parse(d));
+        const o = localStorage.getItem(STORAGE.outreach);
+        if (o) setContacts(JSON.parse(o));
+        const a = localStorage.getItem(STORAGE.activity);
+        if (a) setActivity(JSON.parse(a));
+      } catch {}
+      setBackendLoaded(true);
+    })();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => { localStorage.setItem(STORAGE.playbook, JSON.stringify({ checked: checkedTasks, notes: taskNotes })); }, [checkedTasks, taskNotes]);
-  useEffect(() => { localStorage.setItem(STORAGE.drafts, JSON.stringify(drafts)); }, [drafts]);
-  useEffect(() => { localStorage.setItem(STORAGE.outreach, JSON.stringify(contacts)); }, [contacts]);
-  useEffect(() => { localStorage.setItem(STORAGE.activity, JSON.stringify(activity)); }, [activity]);
+  // Debounced backend sync — 600ms after the last change. localStorage is
+  // written immediately (synchronous, no failure mode).
+  const _syncToBackend = useCallback((key: string, value: unknown) => {
+    // Skip until the initial load settles, otherwise we clobber server state
+    // with the default-initialised empty UI state.
+    if (!backendLoaded) return;
+    adminAPI.savePlaybookState(key, value).catch((err) => {
+      console.warn(`playbook backend save failed for ${key}:`, err);
+    });
+  }, [backendLoaded]);
+
+  useEffect(() => {
+    const value = { checked: checkedTasks, notes: taskNotes };
+    localStorage.setItem(STORAGE.playbook, JSON.stringify(value));
+    const t = setTimeout(() => _syncToBackend('playbook', value), 600);
+    return () => clearTimeout(t);
+  }, [checkedTasks, taskNotes, _syncToBackend]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE.drafts, JSON.stringify(drafts));
+    const t = setTimeout(() => _syncToBackend('drafts', drafts), 600);
+    return () => clearTimeout(t);
+  }, [drafts, _syncToBackend]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE.outreach, JSON.stringify(contacts));
+    const t = setTimeout(() => _syncToBackend('outreach', contacts), 600);
+    return () => clearTimeout(t);
+  }, [contacts, _syncToBackend]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE.activity, JSON.stringify(activity));
+    const t = setTimeout(() => _syncToBackend('activity', activity), 600);
+    return () => clearTimeout(t);
+  }, [activity, _syncToBackend]);
 
   // Fetch API metrics
   useEffect(() => {

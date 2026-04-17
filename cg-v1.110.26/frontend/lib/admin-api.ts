@@ -1179,6 +1179,28 @@ export const adminAPI = {
       method: 'DELETE',
     }),
 
+  // ── Reddit / GTM Playbook state (Phase D3) ──────────────────────────
+  /**
+   * Read all playbook state blobs (checked tasks, drafts, outreach contacts,
+   * activity log) for the current admin. Returns a dict keyed by blob name.
+   * Missing keys are simply absent — caller falls back to localStorage.
+   */
+  getPlaybookState: () =>
+    adminFetch<Record<string, any>>('/admin/reddit/playbook/state'),
+
+  /**
+   * Upsert one playbook state blob. `key` must be one of: playbook,
+   * drafts, outreach, activity (enforced server-side).
+   */
+  savePlaybookState: (key: string, value: unknown) =>
+    adminFetch<{ saved: boolean; key: string }>(
+      `/admin/reddit/playbook/state/${encodeURIComponent(key)}`,
+      {
+        method: 'PUT',
+        body: JSON.stringify({ value }),
+      },
+    ),
+
   // Campaigns
   getCampaigns: () => adminFetch<EmailCampaign[]>('/admin/leads/campaigns'),
   createCampaign: (data: { name: string; lead_list_id: string; subject: string; html_content?: string }) =>

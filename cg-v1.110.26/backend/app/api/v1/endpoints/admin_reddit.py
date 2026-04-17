@@ -357,3 +357,85 @@ async def create_reddit_post(
     )
     logger.info("Admin %s created Reddit post in r/%s", admin_user.email, body.subreddit)
     return result
+
+
+# ═══════════════════════════════════════════════════════════════
+# GTM Playbook persistence (admin_kv-backed)
+# ═══════════════════════════════════════════════════════════════
+# The /superadmin/reddit page used to stash its state (checked tasks, drafts,
+# outreach, activity) in localStorage, which meant admins lost everything
+# when switching browsers. These endpoints give it a backend home — one
+# admin_kv row per (admin, key) pair.
+
+_PLAYBOOK_ALLOWED_KEYS = {"playbook", "drafts", "outreach", "activity"}
+
+
+class PlaybookStatePayload(BaseModel):
+    """Arbitrary JSON blob matching what the frontend previously stored in
+    localStorage for this key."""
+    value: dict | list | None = None
+
+
+@router.get("/playbook/state", summary="Read all playbook state blobs for this admin")
+async def get_playbook_state(
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Return a dict keyed by {playbook, drafts, outreach, activity} for the
+    current admin. Missing keys are absent — the frontend falls back to its
+    default shape."""
+    from app.models.admin_kv import AdminKV
+
+    result = await db.execute(
+        select(AdminKV).where(AdminKV.user_id == str(admin_user.id))
+    )
+    rows = list(result.scalars())
+    return {
+        r.key: r.value_json
+        for r in rows
+        if r.key in _PLAYBOOK_ALLOWED_KEYS
+    }
+
+
+@router.put(
+    "/playbook/state/{key}",
+    summary="Save one playbook state blob for this admin",
+)
+async def put_playbook_state(
+    key: str,
+    body: PlaybookStatePayload,
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Upsert the value for (admin, key). key is restricted to the 4 known
+    playbook blob keys so admins can't silently pollute the table."""
+    from app.models.admin_kv import AdminKV
+
+    if key not in _PLAYBOOK_ALLOWED_KEYS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unknown key. Must be one of: {sorted(_PLAYBOOK_ALLOWED_KEYS)}",
+        )
+
+    result = await db.execute(
+        select(AdminKV).where(
+            AdminKV.user_id == str(admin_user.id),
+            AdminKV.key == key,
+        )
+    )
+    row = result.scalar_one_or_none()
+    value: dict | list | None = body.value
+    if row:
+        # value_json is typed dict in the model, but SQLAlchemy's JSON
+        # column accepts list/dict — cast for type checkers.
+        row.value_json = value  # type: ignore[assignment]
+    else:
+        row = AdminKV(
+            user_id=str(admin_user.id),
+            key=key,
+            value_json=value,  # type: ignore[arg-type]
+        )
+        db.add(row)
+
+    await db.commit()
+    return {"saved": True, "key": key}
