@@ -101,6 +101,22 @@ class RedditService:
             "connected": True,
         }
 
+    async def get_subreddit_about(self, subreddit: str) -> Dict[str, Any]:
+        """Get subreddit metadata (subscribers, active users, description).
+
+        Used by marketing analytics to compute platform-level social stats.
+        """
+        data = await self._request("GET", f"/r/{subreddit}/about")
+        sub = data.get("data", {}) if isinstance(data, dict) else {}
+        return {
+            "name": sub.get("display_name"),
+            "subscribers": sub.get("subscribers", 0),
+            "active_users": sub.get("active_user_count", 0),
+            "title": sub.get("title"),
+            "description": sub.get("public_description"),
+            "created_utc": sub.get("created_utc"),
+        }
+
     async def get_subreddit_posts(
         self,
         subreddit: str,

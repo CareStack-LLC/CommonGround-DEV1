@@ -27,6 +27,7 @@ const TABS = [
   { key: 'pipeline', label: 'Pipeline', icon: Target },
   { key: 'conversions', label: 'Conversions', icon: TrendingUp },
   { key: 'forecast', label: 'Forecast', icon: BarChart3 },
+  { key: 'win-loss', label: 'Win/Loss', icon: AlertTriangle },
   { key: 'unit-economics', label: 'Unit Economics', icon: DollarSign },
   { key: 'ai-advisor', label: 'AI Advisor', icon: Brain },
 ];
@@ -80,6 +81,7 @@ export default function SalesIntelligencePage() {
         {tab === 'pipeline' && <PipelineTab />}
         {tab === 'conversions' && loadedTabs.has('conversions') && <ConversionsTab />}
         {tab === 'forecast' && loadedTabs.has('forecast') && <ForecastTab />}
+        {tab === 'win-loss' && loadedTabs.has('win-loss') && <WinLossTab />}
         {tab === 'unit-economics' && loadedTabs.has('unit-economics') && <UnitEconomicsTab />}
         {tab === 'ai-advisor' && loadedTabs.has('ai-advisor') && <AIAdvisorTab />}
       </Suspense>
@@ -361,20 +363,62 @@ function ForecastTab() {
     );
   }
 
+  // Merge historical (actual) + forecast (projected) into a single series
+  // keyed by label so Recharts can render a continuous line with a confidence
+  // band on the projected half.
+  const chartData = (() => {
+    if (!data) return [];
+    const hist = (data.historical ?? []) as { date: string; mrr: number }[];
+    const fcst = (data.forecast ?? []) as {
+      month: string;
+      projected_mrr: number;
+      projected_arr: number;
+      low_mrr: number;
+      high_mrr: number;
+    }[];
+    // Downsample historical to weekly points to keep chart readable
+    const historicalSparse = hist.filter((_, i) => i % 7 === 0 || i === hist.length - 1);
+    const historicalRows = historicalSparse.map((h) => ({
+      label: h.date,
+      actual: h.mrr,
+    }));
+    const forecastRows = fcst.map((f) => ({
+      label: `${f.month}-30`,
+      projected: f.projected_mrr,
+      low: f.low_mrr,
+      high: f.high_mrr,
+    }));
+    return [...historicalRows, ...forecastRows];
+  })();
+
+  const lastForecast = data?.forecast?.[data.forecast.length - 1];
+
   return (
     <div className="space-y-6">
       {/* MRR Forecast Chart */}
       <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
-        <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">
-          MRR Forecast
-          <InfoTooltip text="Projected monthly recurring revenue with confidence intervals" />
-        </h2>
-        {loading ? <Skeleton className="h-72" /> : data?.forecast_points?.length ? (
+        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+          <h2 className="text-sm font-semibold text-[#D0E4EC]">
+            MRR Forecast
+            <InfoTooltip text="OLS linear regression on real daily MRR history; shaded band is ±1σ residual." />
+          </h2>
+          {data && (
+            <span className="text-[11px] text-[#6B8A9A]">
+              method: <span className="text-[#D0E4EC]">{data.method}</span>
+              {' · '}implied MoM growth:{' '}
+              <span className={(data.implied_mom_growth_pct ?? 0) >= 0 ? 'text-[#3DAA8A]' : 'text-red-400'}>
+                {(data.implied_mom_growth_pct ?? 0) >= 0 ? '+' : ''}
+                {(data.implied_mom_growth_pct ?? 0).toFixed(2)}%
+              </span>
+            </span>
+          )}
+        </div>
+        {loading ? <Skeleton className="h-72" /> : chartData.length ? (
           <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={data.forecast_points}>
+            <AreaChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#2D6A8F" opacity={0.2} />
               <XAxis
-                dataKey="month"
+                dataKey="label"
                 stroke="#4A6E7F"
                 tick={{ fill: '#6B8A9A', fontSize: 10 }}
                 axisLine={{ stroke: '#4A6E7F' }}
@@ -391,25 +435,8 @@ function ForecastTab() {
                 contentStyle={RECHARTS_TOOLTIP}
                 formatter={(value: any) => [formatCurrency(Number(value ?? 0)), '']}
               />
-              {/* Confidence band (high) */}
-              <Area
-                type="monotone"
-                dataKey="high"
-                name="High"
-                stroke="none"
-                fill="#3DAA8A"
-                fillOpacity={0.1}
-              />
-              {/* Confidence band (low) */}
-              <Area
-                type="monotone"
-                dataKey="low"
-                name="Low"
-                stroke="none"
-                fill="#1A3648"
-                fillOpacity={0.8}
-              />
-              {/* Projected MRR line */}
+              <Area type="monotone" dataKey="high" name="High" stroke="none" fill="#3DAA8A" fillOpacity={0.1} />
+              <Area type="monotone" dataKey="low" name="Low" stroke="none" fill="#1A3648" fillOpacity={0.8} />
               <Area
                 type="monotone"
                 dataKey="projected"
@@ -419,7 +446,6 @@ function ForecastTab() {
                 fill="#3DAA8A"
                 fillOpacity={0.15}
               />
-              {/* Actual MRR line */}
               <Area
                 type="monotone"
                 dataKey="actual"
@@ -437,41 +463,187 @@ function ForecastTab() {
       </div>
 
       {/* Forecast Metrics */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {loading ? (
-          Array.from({ length: 3 }).map((_, i) => <div key={i} className="animate-pulse bg-[#2D6A8F]/20 rounded-xl h-24" />)
+          Array.from({ length: 4 }).map((_, i) => <div key={i} className="animate-pulse bg-[#2D6A8F]/20 rounded-xl h-24" />)
         ) : data && (
           <>
             <MetricCard
-              icon={TrendingUp} label="Projected MRR (3mo)"
-              value={formatCurrency(data.projected_mrr_3mo ?? 0)}
+              icon={DollarSign} label="Current MRR"
+              value={formatCurrency(data.current_mrr ?? 0)}
+              sub={`${data.paying_subscribers ?? 0} paying subscribers`}
               color="sage"
-              tooltip="Expected MRR in 3 months based on current trends"
+              tooltip="MRR at today across all paying subscription tiers."
             />
             <MetricCard
-              icon={BarChart3} label="Confidence Low"
-              value={formatCurrency(data.confidence_low ?? 0)}
-              sub="pessimistic scenario"
+              icon={TrendingUp} label={`Projected MRR (${data.forecast?.length ?? 3}mo)`}
+              value={formatCurrency(lastForecast?.projected_mrr ?? 0)}
+              color="sage"
+              tooltip="OLS projection at end of the last forecasted month."
+            />
+            <MetricCard
+              icon={BarChart3} label="Low Band"
+              value={formatCurrency(lastForecast?.low_mrr ?? 0)}
+              sub="-1σ residual"
               color="sky"
-              tooltip="Lower bound of MRR projection at 90% confidence"
+              tooltip="Pessimistic scenario — one standard deviation below the regression line."
             />
             <MetricCard
-              icon={BarChart3} label="Confidence High"
-              value={formatCurrency(data.confidence_high ?? 0)}
-              sub="optimistic scenario"
+              icon={BarChart3} label="High Band"
+              value={formatCurrency(lastForecast?.high_mrr ?? 0)}
+              sub="+1σ residual"
               color="sage"
-              tooltip="Upper bound of MRR projection at 90% confidence"
+              tooltip="Optimistic scenario — one standard deviation above the regression line."
             />
           </>
         )}
       </div>
+    </div>
+  );
+}
 
-      {/* Scenario Summary */}
-      {data?.scenario_summary && (
-        <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-[#D0E4EC] mb-3">Scenario Analysis</h2>
-          <p className="text-sm text-[#8AACBC] leading-relaxed">{data.scenario_summary}</p>
-        </div>
+/* ── Win/Loss Tab ──────────────────────────────────────────────────── */
+
+function WinLossTab() {
+  const [data, setData] = useState<any>(null);
+  const [days, setDays] = useState(90);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const result = await adminAPI.getSalesWinLoss(days);
+      setData(result);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to load win/loss data');
+    } finally {
+      setLoading(false);
+    }
+  }, [days]);
+
+  useEffect(() => { fetchData(); }, [fetchData]);
+
+  if (error && !data) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20">
+        <AlertTriangle className="w-10 h-10 text-amber-500 mb-3" />
+        <p className="text-[#8AACBC] mb-4">{error}</p>
+        <button onClick={fetchData} className="px-4 py-2 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium">Retry</button>
+      </div>
+    );
+  }
+
+  const funnel = data?.funnel;
+  const signups = data?.signups;
+  const funnelEmpty = funnel && funnel.tracked_leads === 0;
+
+  return (
+    <div className="space-y-6">
+      {/* Period picker */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-xs text-[#6B8A9A]">Window:</span>
+        {[30, 60, 90, 180, 365].map((d) => (
+          <button
+            key={d}
+            onClick={() => setDays(d)}
+            className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
+              days === d
+                ? 'bg-[#3DAA8A] text-white'
+                : 'bg-[#1A3648]/60 text-[#8AACBC] hover:text-white border border-[#2D6A8F]/20'
+            }`}
+          >
+            {d}d
+          </button>
+        ))}
+      </div>
+
+      {loading ? <SkeletonCards count={4} /> : (
+        <>
+          {/* Funnel summary */}
+          <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+            <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+              <h2 className="text-sm font-semibold text-[#D0E4EC]">
+                Funnel-based Win/Loss
+                <InfoTooltip text="Based on Lead.stage — populated by the 'Close as lost' UX on the Leads page." />
+              </h2>
+              <span className="text-[11px] text-[#6B8A9A]">
+                {funnel?.tracked_leads ?? 0} leads tracked
+              </span>
+            </div>
+
+            {funnelEmpty ? (
+              <div className="text-center py-8">
+                <p className="text-sm text-[#8AACBC] mb-1">No funnel-tracked leads in this window.</p>
+                <p className="text-xs text-[#6B8A9A]">
+                  Mark leads as <span className="text-[#D0E4EC]">closed_won</span> or{' '}
+                  <span className="text-[#D0E4EC]">closed_lost</span> from the Leads page
+                  to populate this view.
+                </p>
+              </div>
+            ) : funnel && (
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                <MetricCard icon={TrendingUp} label="Wins" value={formatNumber(funnel.wins)} color="sage" />
+                <MetricCard icon={AlertTriangle} label="Losses" value={formatNumber(funnel.losses)} color="sky" />
+                <MetricCard
+                  icon={Target}
+                  label="Win Rate"
+                  value={`${funnel.win_rate?.toFixed(1) ?? 0}%`}
+                  color={funnel.win_rate >= 25 ? 'sage' : 'sky'}
+                />
+                <MetricCard
+                  icon={BarChart3}
+                  label="Avg Days to Close"
+                  value={`${funnel.avg_days_to_close?.toFixed(1) ?? 0}`}
+                  sub="days"
+                  color="sage"
+                />
+              </div>
+            )}
+
+            {/* Loss reasons breakdown */}
+            {funnel?.by_reason?.length > 0 && (
+              <div className="mt-5 pt-5 border-t border-[#2D6A8F]/20">
+                <h3 className="text-xs font-medium text-[#8AACBC] mb-3">Why Deals Are Lost</h3>
+                <div className="space-y-2">
+                  {funnel.by_reason.map((r: any) => (
+                    <div key={r.reason}>
+                      <div className="flex items-center justify-between mb-1 text-xs">
+                        <span className="text-[#D0E4EC] capitalize">{r.reason?.replace(/_/g, ' ')}</span>
+                        <span className="text-[#6B8A9A]">
+                          {r.count} ({r.pct_of_losses?.toFixed(1) ?? 0}%)
+                        </span>
+                      </div>
+                      <div className="h-1.5 bg-[#1E3A4A] rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full bg-gradient-to-r from-red-500/60 to-amber-500/60 transition-all duration-500"
+                          style={{ width: `${Math.max(r.pct_of_losses ?? 0, 2)}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Signup fallback view — shown alongside for context */}
+          {signups && (
+            <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+              <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">
+                Signup-based (fallback)
+                <InfoTooltip text="Signups vs paid conversions in window. Useful when funnel tracking is sparse." />
+              </h2>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                <MetricCard icon={TrendingUp} label="Signups" value={formatNumber(signups.total)} color="sky" />
+                <MetricCard icon={TrendingUp} label="Paid" value={formatNumber(signups.wins)} color="sage" />
+                <MetricCard icon={Target} label="Win Rate" value={`${signups.win_rate?.toFixed(1) ?? 0}%`} color="sage" />
+                <MetricCard icon={AlertTriangle} label="Loss Rate" value={`${signups.loss_rate?.toFixed(1) ?? 0}%`} color="sky" />
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
@@ -694,8 +866,7 @@ function UnitEconomicsTab() {
 
 function AIAdvisorTab() {
   const [suggestions, setSuggestions] = useState<any[] | null>(null);
-  const [isSample, setIsSample] = useState(false);
-  const [sampleReason, setSampleReason] = useState<string | null>(null);
+  const [dataSummary, setDataSummary] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -704,9 +875,19 @@ function AIAdvisorTab() {
       setLoading(true);
       setError(null);
       const result = await adminAPI.postSalesAISuggestions();
-      setSuggestions(result.suggestions || result);
-      setIsSample(!!result.is_sample);
-      setSampleReason(result.sample_reason ?? null);
+      // Backend now always returns { suggestions: [...], data_summary: {...} }
+      // Normalize old field names if Claude returns them: category→type alias,
+      // suggestion→action alias, estimated_impact→expected_impact alias.
+      const normalized = (result.suggestions || []).map((s: any) => ({
+        type: s.type || s.category || 'general',
+        action: s.action || s.suggestion || '',
+        reasoning: s.reasoning,
+        expected_impact: s.expected_impact || s.estimated_impact,
+        priority: s.priority,
+        target: s.target,
+      }));
+      setSuggestions(normalized);
+      setDataSummary(result.data_summary ?? null);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to generate insights');
     } finally {
@@ -778,15 +959,17 @@ function AIAdvisorTab() {
       {/* Suggestions */}
       {suggestions && !loading && (
         <div className="space-y-3">
-          {isSample && (
-            <div className="flex items-start gap-3 px-4 py-3 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-100 text-sm">
-              <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-amber-400" />
-              <div className="flex-1">
-                <p className="font-semibold">Placeholder suggestions — not from live sales data.</p>
-                {sampleReason && (
-                  <p className="text-xs text-amber-200/80 mt-1 leading-relaxed">{sampleReason}</p>
-                )}
-              </div>
+          {dataSummary && (
+            <div className="bg-[#0F2533]/60 border border-[#2D6A8F]/20 rounded-lg p-3 text-xs text-[#8AACBC]">
+              <span className="font-medium text-[#D0E4EC]">Grounded on: </span>
+              {formatNumber(dataSummary.total_users ?? 0)} users,
+              {' '}{formatNumber(dataSummary.paid_users ?? 0)} paying
+              {' '}({(dataSummary.conversion_rate ?? 0).toFixed(1)}% conversion),
+              {' '}MRR {formatCurrency(dataSummary.current_mrr ?? 0)},
+              {' '}growth {(dataSummary.growth_pct ?? 0) >= 0 ? '+' : ''}{(dataSummary.growth_pct ?? 0).toFixed(1)}% MoM
+              {dataSummary.top_lost_reasons?.length > 0 && (
+                <>, top lost reason: <span className="text-[#D0E4EC]">{dataSummary.top_lost_reasons[0].reason}</span> ({dataSummary.top_lost_reasons[0].count})</>
+              )}
             </div>
           )}
           <h2 className="text-sm font-semibold text-[#D0E4EC]">

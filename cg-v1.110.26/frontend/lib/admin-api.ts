@@ -598,6 +598,15 @@ export interface Lead {
   title: string | null;
   source: string;
   status: string;
+  // Sales funnel (populated by PATCH /admin/leads/leads/{id}/stage)
+  stage?: string | null;
+  lost_reason?: string | null;
+  closed_at?: string | null;
+  utm_source?: string | null;
+  utm_medium?: string | null;
+  utm_campaign?: string | null;
+  converted_user_id?: string | null;
+  converted_at?: string | null;
 }
 
 export interface EmailCampaign {
@@ -876,6 +885,22 @@ export const adminAPI = {
     adminFetch<{ leads: Lead[]; total: number }>(`/admin/leads/lists/${listId}/leads?limit=${limit}&offset=${offset}`),
   syncLeadsToSendGrid: (listId: string) =>
     adminFetch<any>(`/admin/leads/lists/${listId}/sync-sendgrid`, { method: 'POST' }),
+
+  /**
+   * Move a lead through the sales funnel. Stage is one of:
+   *   new | contacted | qualified | negotiation | closed_won | closed_lost
+   * When stage=closed_lost, lost_reason is required (price | feature_gap |
+   * competitor | timing | unresponsive | other). Powers the /sales/win-loss
+   * aggregation.
+   */
+  updateLeadStage: (
+    leadId: string,
+    data: { stage: string; lost_reason?: string; note?: string },
+  ) =>
+    adminFetch<Lead>(`/admin/leads/leads/${leadId}/stage`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
 
   // Campaigns
   getCampaigns: () => adminFetch<EmailCampaign[]>('/admin/leads/campaigns'),

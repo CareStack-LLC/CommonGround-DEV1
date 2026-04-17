@@ -152,6 +152,13 @@ class Settings(BaseSettings):
     GA4_CLIENT_SECRET: Optional[str] = None
     GA4_PROPERTY_ID: Optional[str] = None
 
+    # Google Search Console (reuses GA4 OAuth token — scope already granted)
+    # Set to the verified property identifier:
+    #   URL-prefix: "https://www.find-commonground.com/"
+    #   Domain:     "sc-domain:find-commonground.com"
+    # If unset, defaults to FRONTEND_URL.
+    SEARCH_CONSOLE_SITE: Optional[str] = None
+
     # Rate Limiting
     RATE_LIMIT_REQUESTS: int = 100
     RATE_LIMIT_PERIOD: int = 60  # seconds

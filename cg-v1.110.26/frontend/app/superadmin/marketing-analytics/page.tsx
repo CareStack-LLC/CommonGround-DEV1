@@ -29,10 +29,10 @@ interface ContentPost {
 }
 
 interface ContentPerformance {
+  connected: boolean;
   posts: ContentPost[];
   trend: { date: string; views: number }[];
-  is_sample?: boolean;
-  sample_reason?: string;
+  reason?: string;
 }
 
 interface SEOQuery {
@@ -43,25 +43,38 @@ interface SEOQuery {
   ctr: number;
 }
 
-interface SEOInsights {
-  queries: SEOQuery[];
-  position_trend: { date: string; avg_position: number }[];
-  is_sample?: boolean;
-  sample_reason?: string;
+interface SEOPage {
+  page: string;
+  position: number;
+  impressions: number;
+  clicks: number;
+  ctr: number;
 }
 
+interface SEOInsights {
+  connected: boolean;
+  queries: SEOQuery[];
+  top_pages: SEOPage[];
+  position_trend: { date: string; avg_position: number; clicks?: number; impressions?: number }[];
+  site?: string | null;
+}
+
+// Matches the new backend shape — numeric fields, not rate-as-fraction.
 interface SocialPlatform {
   platform: string;
   followers: number;
-  engagement_rate: number;
-  referral_visits: number;
+  impressions: number;
+  engagement: number;
+  referral_clicks: number;
+  leads_generated: number;
+  connected: boolean;
 }
 
 interface SocialTracking {
   platforms: SocialPlatform[];
   referral_chart: { platform: string; visits: number }[];
-  is_sample?: boolean;
-  sample_reason?: string;
+  reddit_connected?: boolean;
+  ga4_connected?: boolean;
 }
 
 interface AttributionChannel {
@@ -69,15 +82,18 @@ interface AttributionChannel {
   first_touch: number;
   last_touch: number;
   assisted: number;
+  total_leads?: number;
   conversion_rate: number;
+  attributed_mrr?: number;
 }
 
 interface Attribution {
+  period_days?: number;
   first_touch: { channel: string; value: number }[];
   last_touch: { channel: string; value: number }[];
   channels: AttributionChannel[];
-  is_sample?: boolean;
-  sample_reason?: string;
+  total_conversions?: number;
+  total_attributed_mrr?: number;
 }
 
 interface AIInsights {
@@ -85,6 +101,13 @@ interface AIInsights {
   campaign_suggestions: { title: string; description: string }[];
   audience_insights: string[];
   timing_recommendations: string[];
+  context?: {
+    recent_signups_30d?: number;
+    prev_signups_30d?: number;
+    growth_pct?: number;
+    top_sources?: { source: string; leads: number }[];
+    best_campaign?: { name: string; ctr: number } | null;
+  };
 }
 
 type TabKey = 'content' | 'seo' | 'social' | 'attribution' | 'ai';
@@ -134,18 +157,38 @@ function EmptyData({ message = 'No data yet' }: { message?: string }) {
 }
 
 /**
- * Shown above tab content when the backend returned `is_sample: true`.
- * Tells the admin the numbers are placeholders from hardcoded arrays, not
- * real audience data, so decisions aren't made from fabricated CTR / rank
- * values.
+ * Compact "integration not connected" CTA shown inline in a tab. Used when a
+ * specific data source (Search Console, Reddit) isn't wired up — different
+ * from the page-level GA4 gate.
  */
-function SampleBanner({ reason }: { reason?: string }) {
+function IntegrationNotConnected({
+  title,
+  description,
+  cta,
+  ctaHref,
+}: {
+  title: string;
+  description: string;
+  cta?: string;
+  ctaHref?: string;
+}) {
   return (
-    <div className="flex items-start gap-3 px-4 py-3 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-100 text-sm">
-      <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-amber-400" />
-      <div className="flex-1">
-        <p className="font-semibold">Sample data — not from your real traffic.</p>
-        {reason && <p className="text-xs text-amber-200/80 mt-1 leading-relaxed">{reason}</p>}
+    <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-6">
+      <div className="flex items-start gap-3">
+        <AlertTriangle className="w-5 h-5 mt-0.5 shrink-0 text-amber-400" />
+        <div className="flex-1">
+          <p className="text-sm font-semibold text-white">{title}</p>
+          <p className="text-xs text-amber-200/80 mt-1 leading-relaxed">{description}</p>
+          {cta && ctaHref && (
+            <a
+              href={ctaHref}
+              className="inline-flex items-center gap-1.5 mt-3 px-3 py-1.5 text-xs font-medium bg-amber-500/20 hover:bg-amber-500/30 text-amber-100 rounded-md border border-amber-500/40 transition-colors"
+            >
+              <Link2 className="w-3 h-3" />
+              {cta}
+            </a>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -177,12 +220,20 @@ function ContentTab() {
   if (error) return <ErrorState message={error} onRetry={fetch_} />;
   if (!data) return <EmptyData />;
 
+  if (data.connected === false) {
+    return (
+      <IntegrationNotConnected
+        title="Google Analytics 4 not connected"
+        description="Content performance reads real blog page views from GA4. Connect GA4 above to populate this tab."
+      />
+    );
+  }
+
   const posts = data.posts ?? [];
   const trend = data.trend ?? [];
 
   return (
     <div className="space-y-6">
-      {data.is_sample && <SampleBanner reason={data.sample_reason} />}
       {/* Top performing posts table */}
       <Card>
         <SectionTitle>Top Performing Posts</SectionTitle>
@@ -278,12 +329,23 @@ function SEOTab() {
   if (error) return <ErrorState message={error} onRetry={fetch_} />;
   if (!data) return <EmptyData />;
 
+  if (!data.connected) {
+    return (
+      <IntegrationNotConnected
+        title="Google Search Console not connected"
+        description={`Search Console uses the same OAuth token as GA4 — once you've connected GA4 with the webmasters.readonly scope, verify the property ${data.site ?? 'www.find-commonground.com'} at search.google.com/search-console. This tab will then populate with real queries, clicks, and positions.`}
+        cta="Open Search Console"
+        ctaHref="https://search.google.com/search-console"
+      />
+    );
+  }
+
   const queries = data.queries ?? [];
+  const topPages = data.top_pages ?? [];
   const positionTrend = data.position_trend ?? [];
 
   return (
     <div className="space-y-6">
-      {data.is_sample && <SampleBanner reason={data.sample_reason} />}
       {/* Top queries table */}
       <Card>
         <SectionTitle>Top Search Queries</SectionTitle>
@@ -317,9 +379,42 @@ function SEOTab() {
         )}
       </Card>
 
+      {/* Top landing pages from organic search */}
+      <Card>
+        <SectionTitle>Top Landing Pages (Organic)</SectionTitle>
+        {topPages.length === 0 ? (
+          <EmptyData message="No page data yet" />
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-[#2D6A8F]/20">
+                  <th className="text-left py-2 pr-4 text-[#6B8A9A] font-medium">Page</th>
+                  <th className="text-right py-2 px-3 text-[#6B8A9A] font-medium">Position</th>
+                  <th className="text-right py-2 px-3 text-[#6B8A9A] font-medium">Impressions</th>
+                  <th className="text-right py-2 px-3 text-[#6B8A9A] font-medium">Clicks</th>
+                  <th className="text-right py-2 pl-3 text-[#6B8A9A] font-medium">CTR</th>
+                </tr>
+              </thead>
+              <tbody>
+                {topPages.map((p, i) => (
+                  <tr key={i} className="border-b border-[#2D6A8F]/10 last:border-0 hover:bg-[#2D6A8F]/10 transition-colors">
+                    <td className="py-2.5 pr-4 text-[#D0E4EC] font-medium max-w-[320px] truncate">{p.page}</td>
+                    <td className="py-2.5 px-3 text-right text-[#D0E4EC]">{p.position.toFixed(1)}</td>
+                    <td className="py-2.5 px-3 text-right text-[#D0E4EC]">{formatNumber(p.impressions)}</td>
+                    <td className="py-2.5 px-3 text-right text-[#D0E4EC]">{formatNumber(p.clicks)}</td>
+                    <td className="py-2.5 pl-3 text-right text-[#3DAA8A]">{(p.ctr * 100).toFixed(1)}%</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Card>
+
       {/* Avg position trend chart */}
       <Card>
-        <SectionTitle>Average Position Trend</SectionTitle>
+        <SectionTitle>Average Position Trend (lower is better)</SectionTitle>
         {positionTrend.length === 0 ? (
           <EmptyData message="No position trend data yet" />
         ) : (
@@ -379,20 +474,37 @@ function SocialTab() {
 
   const platforms = data.platforms ?? [];
   const referralChart = data.referral_chart ?? [];
+  const anyConnected = data.reddit_connected || data.ga4_connected || platforms.some((p) => p.connected);
 
   return (
     <div className="space-y-6">
-      {data.is_sample && <SampleBanner reason={data.sample_reason} />}
+      {!anyConnected && (
+        <IntegrationNotConnected
+          title="No social data sources connected"
+          description="Connect Reddit (admin settings) or GA4 above to see real engagement, referral traffic, and lead attribution per platform. Until then, every row will show zeros."
+        />
+      )}
       {/* Platform cards */}
       {platforms.length === 0 ? (
         <EmptyData message="No social platform data yet" />
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {platforms.map((p) => (
             <Card key={p.platform}>
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-lg">{PLATFORM_ICONS[p.platform.toLowerCase()] ?? '🌐'}</span>
-                <span className="text-sm font-semibold text-white capitalize">{p.platform}</span>
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">{PLATFORM_ICONS[p.platform.toLowerCase().replace('/x', '').replace(' ', '')] ?? '🌐'}</span>
+                  <span className="text-sm font-semibold text-white capitalize">{p.platform}</span>
+                </div>
+                {p.connected ? (
+                  <span className="text-[10px] font-medium text-emerald-300 bg-emerald-500/10 border border-emerald-500/30 rounded px-1.5 py-0.5">
+                    live
+                  </span>
+                ) : (
+                  <span className="text-[10px] font-medium text-[#6B8A9A] bg-[#0F2533]/80 border border-[#2D6A8F]/20 rounded px-1.5 py-0.5">
+                    no data
+                  </span>
+                )}
               </div>
               <div className="space-y-2">
                 <div className="flex justify-between">
@@ -400,12 +512,20 @@ function SocialTab() {
                   <span className="text-sm font-medium text-[#D0E4EC]">{formatNumber(p.followers)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-xs text-[#6B8A9A]">Engagement</span>
-                  <span className="text-sm font-medium text-[#3DAA8A]">{(p.engagement_rate * 100).toFixed(1)}%</span>
+                  <span className="text-xs text-[#6B8A9A]">Impressions</span>
+                  <span className="text-sm font-medium text-[#D0E4EC]">{formatNumber(p.impressions)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-xs text-[#6B8A9A]">Referral Visits</span>
-                  <span className="text-sm font-medium text-[#D0E4EC]">{formatNumber(p.referral_visits)}</span>
+                  <span className="text-xs text-[#6B8A9A]">Engagement</span>
+                  <span className="text-sm font-medium text-[#3DAA8A]">{formatNumber(p.engagement)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-xs text-[#6B8A9A]">Referral Clicks</span>
+                  <span className="text-sm font-medium text-[#D0E4EC]">{formatNumber(p.referral_clicks)}</span>
+                </div>
+                <div className="flex justify-between pt-1 border-t border-[#2D6A8F]/20">
+                  <span className="text-xs text-[#6B8A9A]">Leads Generated</span>
+                  <span className="text-sm font-medium text-[#3DAA8A]">{formatNumber(p.leads_generated)}</span>
                 </div>
               </div>
             </Card>
@@ -466,7 +586,28 @@ function AttributionTab() {
 
   return (
     <div className="space-y-6">
-      {data.is_sample && <SampleBanner reason={data.sample_reason} />}
+      {/* Summary strip */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <Card>
+          <div className="text-xs text-[#6B8A9A] mb-1">Window</div>
+          <div className="text-lg font-semibold text-white">
+            {data.period_days ?? 90} days
+          </div>
+        </Card>
+        <Card>
+          <div className="text-xs text-[#6B8A9A] mb-1">Total Conversions</div>
+          <div className="text-lg font-semibold text-white">
+            {formatNumber(data.total_conversions ?? 0)}
+          </div>
+        </Card>
+        <Card>
+          <div className="text-xs text-[#6B8A9A] mb-1">Attributed MRR</div>
+          <div className="text-lg font-semibold text-[#3DAA8A]">
+            ${formatNumber(Math.round(data.total_attributed_mrr ?? 0))}
+          </div>
+        </Card>
+      </div>
+
       {/* Side-by-side bar charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Card>
@@ -515,20 +656,24 @@ function AttributionTab() {
               <thead>
                 <tr className="border-b border-[#2D6A8F]/20">
                   <th className="text-left py-2 pr-4 text-[#6B8A9A] font-medium">Channel</th>
+                  <th className="text-right py-2 px-3 text-[#6B8A9A] font-medium">Total Leads</th>
                   <th className="text-right py-2 px-3 text-[#6B8A9A] font-medium">First Touch</th>
                   <th className="text-right py-2 px-3 text-[#6B8A9A] font-medium">Last Touch</th>
                   <th className="text-right py-2 px-3 text-[#6B8A9A] font-medium">Assisted</th>
-                  <th className="text-right py-2 pl-3 text-[#6B8A9A] font-medium">Conv. Rate</th>
+                  <th className="text-right py-2 px-3 text-[#6B8A9A] font-medium">Conv. Rate</th>
+                  <th className="text-right py-2 pl-3 text-[#6B8A9A] font-medium">Attr. MRR</th>
                 </tr>
               </thead>
               <tbody>
                 {channels.map((ch, i) => (
                   <tr key={i} className="border-b border-[#2D6A8F]/10 last:border-0 hover:bg-[#2D6A8F]/10 transition-colors">
                     <td className="py-2.5 pr-4 text-[#D0E4EC] font-medium">{ch.channel}</td>
+                    <td className="py-2.5 px-3 text-right text-[#D0E4EC]">{formatNumber(ch.total_leads ?? 0)}</td>
                     <td className="py-2.5 px-3 text-right text-[#D0E4EC]">{formatNumber(ch.first_touch)}</td>
                     <td className="py-2.5 px-3 text-right text-[#D0E4EC]">{formatNumber(ch.last_touch)}</td>
                     <td className="py-2.5 px-3 text-right text-[#D0E4EC]">{formatNumber(ch.assisted)}</td>
-                    <td className="py-2.5 pl-3 text-right text-[#3DAA8A]">{(ch.conversion_rate * 100).toFixed(1)}%</td>
+                    <td className="py-2.5 px-3 text-right text-[#3DAA8A]">{(ch.conversion_rate * 100).toFixed(1)}%</td>
+                    <td className="py-2.5 pl-3 text-right text-[#D0E4EC]">${formatNumber(Math.round(ch.attributed_mrr ?? 0))}</td>
                   </tr>
                 ))}
               </tbody>
@@ -612,8 +757,21 @@ function AIInsightsTab() {
 
   return (
     <div className="space-y-6">
-      {/* Regenerate button */}
-      <div className="flex justify-end">
+      {/* Context + regenerate */}
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        {data.context && (
+          <div className="text-xs text-[#6B8A9A] bg-[#0F2533]/60 border border-[#2D6A8F]/20 rounded-lg px-3 py-2 flex-1 min-w-[280px]">
+            <span className="font-medium text-[#D0E4EC]">Grounded on: </span>
+            {data.context.recent_signups_30d ?? 0} signups (30d),
+            {' '}growth {data.context.growth_pct != null && data.context.growth_pct >= 0 ? '+' : ''}{data.context.growth_pct?.toFixed(1) ?? '0'}%
+            {data.context.top_sources && data.context.top_sources.length > 0 && (
+              <>, top source <span className="text-[#D0E4EC]">{data.context.top_sources[0].source}</span></>
+            )}
+            {data.context.best_campaign && (
+              <>, best campaign <span className="text-[#D0E4EC]">{data.context.best_campaign.name}</span> (CTR {(data.context.best_campaign.ctr * 100).toFixed(1)}%)</>
+            )}
+          </div>
+        )}
         <button
           onClick={generate}
           disabled={loading}

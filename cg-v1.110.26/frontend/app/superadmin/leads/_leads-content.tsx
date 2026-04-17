@@ -7,7 +7,7 @@ import {
   ChevronLeft, ChevronRight, TrendingUp, Users,
   FileSpreadsheet, BarChart3, ArrowRight, Zap,
   Mail, Globe, Calendar, Megaphone, Share2, Gift, Hash,
-  ListFilter,
+  ListFilter, CheckCircle2, XCircle, MoreVertical,
 } from 'lucide-react';
 import { adminAPI, type LeadList, type Lead } from '@/lib/admin-api';
 
@@ -43,6 +43,25 @@ const SOURCE_ICONS: Record<string, React.ReactNode> = {
   other: <Hash className="w-4 h-4" />,
 };
 
+// Sales funnel stages (matches backend admin_leads.py _VALID_STAGES)
+const STAGE_OPTIONS = [
+  { value: 'new',          label: 'New',          color: 'bg-zinc-500/20 text-[#D0E4EC]' },
+  { value: 'contacted',    label: 'Contacted',    color: 'bg-sky-500/20 text-sky-300' },
+  { value: 'qualified',    label: 'Qualified',    color: 'bg-violet-500/20 text-violet-300' },
+  { value: 'negotiation',  label: 'Negotiation',  color: 'bg-amber-500/20 text-amber-300' },
+  { value: 'closed_won',   label: 'Closed Won',   color: 'bg-emerald-500/20 text-emerald-300' },
+  { value: 'closed_lost',  label: 'Closed Lost',  color: 'bg-red-500/20 text-red-300' },
+] as const;
+
+const LOST_REASONS = [
+  { value: 'price',         label: 'Price' },
+  { value: 'feature_gap',   label: 'Feature Gap' },
+  { value: 'competitor',    label: 'Chose Competitor' },
+  { value: 'timing',        label: 'Wrong Timing' },
+  { value: 'unresponsive',  label: 'Unresponsive' },
+  { value: 'other',         label: 'Other' },
+] as const;
+
 interface PipelineData {
   funnel: { total: number; contacted: number; responded: number; converted: number };
   by_source: Record<string, number>;
@@ -73,6 +92,56 @@ export default function LeadsContent() {
   const [selectedList, setSelectedList] = useState<(LeadList & { leads: Lead[] }) | null>(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
   const [syncing, setSyncing] = useState<string | null>(null);
+
+  // --- Stage change modal state ---
+  const [stageLead, setStageLead] = useState<Lead | null>(null);
+  const [stageChoice, setStageChoice] = useState<string>('contacted');
+  const [lostReason, setLostReason] = useState<string>('price');
+  const [stageNote, setStageNote] = useState<string>('');
+  const [stageSaving, setStageSaving] = useState(false);
+
+  const openStageModal = (lead: Lead) => {
+    setStageLead(lead);
+    setStageChoice(lead.stage || 'contacted');
+    setLostReason(lead.lost_reason || 'price');
+    setStageNote('');
+  };
+
+  const closeStageModal = () => {
+    setStageLead(null);
+    setStageNote('');
+  };
+
+  const submitStageChange = async () => {
+    if (!stageLead) return;
+    setStageSaving(true);
+    try {
+      const updated = await adminAPI.updateLeadStage(stageLead.id, {
+        stage: stageChoice,
+        lost_reason: stageChoice === 'closed_lost' ? lostReason : undefined,
+        note: stageNote || undefined,
+      });
+      // Patch the selectedList in place so the table refreshes without a full reload
+      setSelectedList((prev) =>
+        prev
+          ? {
+              ...prev,
+              leads: prev.leads.map((l) => (l.id === updated.id ? { ...l, ...updated } : l)),
+            }
+          : prev,
+      );
+      setSuccess(
+        stageChoice === 'closed_lost'
+          ? `Marked ${stageLead.email} as Closed Lost (${lostReason.replace(/_/g, ' ')}).`
+          : `Moved ${stageLead.email} to ${stageChoice.replace(/_/g, ' ')}.`,
+      );
+      closeStageModal();
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to update lead stage');
+    } finally {
+      setStageSaving(false);
+    }
+  };
 
   // --- Import state ---
   const [importListId, setImportListId] = useState<string>('');
@@ -319,33 +388,183 @@ export default function LeadsContent() {
                   <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider hidden md:table-cell">Name</th>
                   <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider hidden lg:table-cell">Company</th>
                   <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Source</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Status</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Stage</th>
+                  <th className="text-right px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-800/40">
                 {(!selectedList?.leads || selectedList.leads.length === 0) ? (
-                  <tr><td colSpan={5} className="px-4 py-12 text-center text-[#6B8A9A]">No leads yet. Import a CSV or add manually.</td></tr>
-                ) : selectedList.leads.map(lead => (
-                  <tr key={lead.id} className="hover:bg-[#2D6A8F]/10 transition-colors">
-                    <td className="px-4 py-3 text-white">{lead.email}</td>
-                    <td className="px-4 py-3 text-[#8AACBC] hidden md:table-cell">{[lead.first_name, lead.last_name].filter(Boolean).join(' ') || '\u2014'}</td>
-                    <td className="px-4 py-3 text-[#8AACBC] hidden lg:table-cell">{lead.company || '\u2014'}</td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium border ${SOURCE_COLORS[lead.source] || SOURCE_COLORS.other}`}>
-                        {lead.source}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium ${
-                        lead.status === 'active' ? 'bg-emerald-500/15 text-emerald-400' :
-                        lead.status === 'bounced' ? 'bg-red-500/15 text-red-400' :
-                        'bg-zinc-700/50 text-[#8AACBC]'
-                      }`}>{lead.status}</span>
-                    </td>
-                  </tr>
-                ))}
+                  <tr><td colSpan={6} className="px-4 py-12 text-center text-[#6B8A9A]">No leads yet. Import a CSV or add manually.</td></tr>
+                ) : selectedList.leads.map(lead => {
+                  const stage = lead.stage;
+                  const stageMeta = STAGE_OPTIONS.find(s => s.value === stage);
+                  const isClosed = stage === 'closed_won' || stage === 'closed_lost';
+                  return (
+                    <tr key={lead.id} className="hover:bg-[#2D6A8F]/10 transition-colors">
+                      <td className="px-4 py-3 text-white">{lead.email}</td>
+                      <td className="px-4 py-3 text-[#8AACBC] hidden md:table-cell">{[lead.first_name, lead.last_name].filter(Boolean).join(' ') || '\u2014'}</td>
+                      <td className="px-4 py-3 text-[#8AACBC] hidden lg:table-cell">{lead.company || '\u2014'}</td>
+                      <td className="px-4 py-3">
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium border ${SOURCE_COLORS[lead.source] || SOURCE_COLORS.other}`}>
+                          {lead.source}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        {stageMeta ? (
+                          <span className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium ${stageMeta.color}`}>
+                            {stageMeta.label}
+                            {stage === 'closed_lost' && lead.lost_reason && (
+                              <span className="ml-1 text-[10px] opacity-75">({lead.lost_reason.replace(/_/g, ' ')})</span>
+                            )}
+                          </span>
+                        ) : (
+                          <span className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium ${
+                            lead.status === 'active' ? 'bg-emerald-500/15 text-emerald-400' :
+                            lead.status === 'bounced' ? 'bg-red-500/15 text-red-400' :
+                            'bg-zinc-700/50 text-[#8AACBC]'
+                          }`}>
+                            {lead.status}
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <div className="inline-flex items-center gap-1.5">
+                          {!isClosed && (
+                            <>
+                              <button
+                                onClick={() => {
+                                  setStageLead(lead);
+                                  setStageChoice('closed_won');
+                                  setStageNote('');
+                                }}
+                                title="Mark as Closed Won"
+                                className="p-1.5 rounded text-emerald-300 hover:bg-emerald-500/20 transition-colors"
+                              >
+                                <CheckCircle2 className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setStageLead(lead);
+                                  setStageChoice('closed_lost');
+                                  setLostReason(lead.lost_reason || 'price');
+                                  setStageNote('');
+                                }}
+                                title="Mark as Closed Lost"
+                                className="p-1.5 rounded text-red-300 hover:bg-red-500/20 transition-colors"
+                              >
+                                <XCircle className="w-4 h-4" />
+                              </button>
+                            </>
+                          )}
+                          <button
+                            onClick={() => openStageModal(lead)}
+                            title="Change stage"
+                            className="p-1.5 rounded text-[#8AACBC] hover:bg-[#2D6A8F]/30 hover:text-white transition-colors"
+                          >
+                            <MoreVertical className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* Stage change modal — shared between "Close Won", "Close Lost", and "More" */}
+        {stageLead && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+            onClick={closeStageModal}
+          >
+            <div
+              className="bg-[#0F2533] border border-[#2D6A8F]/30 rounded-xl p-6 w-full max-w-md shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <h3 className="text-base font-semibold text-white">Update Lead Stage</h3>
+                  <p className="text-xs text-[#8AACBC] mt-0.5 truncate max-w-[280px]">{stageLead.email}</p>
+                </div>
+                <button
+                  onClick={closeStageModal}
+                  className="p-1 rounded text-[#8AACBC] hover:bg-[#2D6A8F]/30 hover:text-white transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-xs font-medium text-[#8AACBC] mb-2">Stage</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {STAGE_OPTIONS.map((s) => (
+                      <button
+                        key={s.value}
+                        onClick={() => setStageChoice(s.value)}
+                        className={`px-3 py-2 rounded text-xs font-medium text-left transition-colors border ${
+                          stageChoice === s.value
+                            ? 'border-[#3DAA8A] bg-[#3DAA8A]/15 text-white'
+                            : 'border-[#2D6A8F]/20 text-[#8AACBC] hover:text-white hover:border-[#2D6A8F]/50'
+                        }`}
+                      >
+                        {s.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {stageChoice === 'closed_lost' && (
+                  <div>
+                    <label className="block text-xs font-medium text-[#8AACBC] mb-2">
+                      Lost Reason <span className="text-red-400">*</span>
+                    </label>
+                    <select
+                      value={lostReason}
+                      onChange={(e) => setLostReason(e.target.value)}
+                      className="w-full bg-[#1A3648]/80 border border-[#2D6A8F]/30 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-[#3DAA8A]"
+                    >
+                      {LOST_REASONS.map((r) => (
+                        <option key={r.value} value={r.value}>{r.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-xs font-medium text-[#8AACBC] mb-2">
+                    Note (optional)
+                  </label>
+                  <textarea
+                    value={stageNote}
+                    onChange={(e) => setStageNote(e.target.value)}
+                    placeholder="Context for this stage change — stored in the audit trail"
+                    rows={2}
+                    className="w-full bg-[#1A3648]/80 border border-[#2D6A8F]/30 rounded px-3 py-2 text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-[#3DAA8A] resize-none"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 mt-6">
+                <button
+                  onClick={closeStageModal}
+                  disabled={stageSaving}
+                  className="px-4 py-2 rounded text-sm font-medium text-[#8AACBC] hover:text-white transition-colors disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={submitStageChange}
+                  disabled={stageSaving || (stageChoice === 'closed_lost' && !lostReason)}
+                  className="px-4 py-2 rounded bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors disabled:opacity-50 inline-flex items-center gap-2"
+                >
+                  {stageSaving && <RefreshCw className="w-4 h-4 animate-spin" />}
+                  Save Stage
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>

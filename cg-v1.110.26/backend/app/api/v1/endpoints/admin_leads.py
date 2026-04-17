@@ -68,6 +68,17 @@ class TemplateCreate(BaseModel):
     category: Optional[str] = None
 
 
+class LeadStageUpdate(BaseModel):
+    """Sales funnel stage update for a single lead.
+
+    Stages: new | contacted | qualified | negotiation | closed_won | closed_lost
+    When stage=closed_lost, lost_reason is required.
+    """
+    stage: str
+    lost_reason: Optional[str] = None  # price, feature_gap, competitor, timing, unresponsive, other
+    note: Optional[str] = None
+
+
 # =============================================================================
 # Lead Lists
 # =============================================================================
@@ -239,6 +250,86 @@ async def list_leads(
     from app.services.lead_service import get_leads_paginated
 
     return await get_leads_paginated(db, list_id, page, page_size)
+
+
+_VALID_STAGES = {"new", "contacted", "qualified", "negotiation", "closed_won", "closed_lost"}
+_VALID_LOST_REASONS = {"price", "feature_gap", "competitor", "timing", "unresponsive", "other"}
+
+
+@router.patch(
+    "/leads/{lead_id}/stage",
+    summary="Update lead sales funnel stage (and lost_reason if closed_lost)",
+)
+async def update_lead_stage(
+    lead_id: str,
+    body: LeadStageUpdate,
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Move a lead through the sales funnel.
+
+    Powers the "Close as lost" UX and the /sales/win-loss aggregation.
+    When stage=closed_lost or closed_won, closed_at is auto-stamped.
+    """
+    from datetime import datetime
+    from sqlalchemy import select
+    from app.models.lead import Lead
+
+    if body.stage not in _VALID_STAGES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid stage. Must be one of: {sorted(_VALID_STAGES)}",
+        )
+
+    if body.stage == "closed_lost":
+        if not body.lost_reason:
+            raise HTTPException(
+                status_code=400,
+                detail="lost_reason is required when stage=closed_lost",
+            )
+        if body.lost_reason not in _VALID_LOST_REASONS:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid lost_reason. Must be one of: {sorted(_VALID_LOST_REASONS)}",
+            )
+
+    result = await db.execute(select(Lead).where(Lead.id == lead_id))
+    lead = result.scalar_one_or_none()
+    if not lead:
+        raise HTTPException(status_code=404, detail="Lead not found")
+
+    lead.stage = body.stage
+    if body.stage == "closed_lost":
+        lead.lost_reason = body.lost_reason
+        lead.closed_at = datetime.utcnow()
+    elif body.stage == "closed_won":
+        lead.lost_reason = None
+        lead.closed_at = datetime.utcnow()
+    else:
+        # Moving back to an open stage — clear closed metadata
+        if lead.closed_at:
+            lead.closed_at = None
+        if lead.lost_reason:
+            lead.lost_reason = None
+
+    # Optional note — stash in metadata_json
+    if body.note:
+        meta = dict(lead.metadata_json or {})
+        notes = list(meta.get("stage_notes", []))
+        notes.append({
+            "at": datetime.utcnow().isoformat(),
+            "stage": body.stage,
+            "reason": body.lost_reason,
+            "note": body.note,
+            "by": getattr(admin_user, "email", None),
+        })
+        meta["stage_notes"] = notes
+        lead.metadata_json = meta
+
+    await db.commit()
+
+    from app.services.lead_service import _lead_to_dict
+    return _lead_to_dict(lead)
 
 
 @router.post(

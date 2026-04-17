@@ -58,6 +58,13 @@ class Lead(Base, UUIDMixin, TimestampMixin):
     converted_user_id: Mapped[Optional[str]] = mapped_column(String(36), nullable=True, index=True)
     converted_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
 
+    # Sales funnel stage + outcome tracking (for win-loss analytics)
+    stage: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
+    # Stages: new, contacted, qualified, negotiation, closed_won, closed_lost
+    lost_reason: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    # Lost reasons: price, feature_gap, competitor, timing, unresponsive, other
+    closed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
     lead_list: Mapped["LeadList"] = relationship("LeadList", back_populates="leads")
 
     def __repr__(self) -> str:

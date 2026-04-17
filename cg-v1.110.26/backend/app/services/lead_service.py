@@ -401,6 +401,9 @@ def _lead_to_dict(lead: Lead) -> dict:
         "utm_campaign": getattr(lead, "utm_campaign", None),
         "converted_user_id": getattr(lead, "converted_user_id", None),
         "converted_at": lead.converted_at.isoformat() if getattr(lead, "converted_at", None) else None,
+        "stage": getattr(lead, "stage", None),
+        "lost_reason": getattr(lead, "lost_reason", None),
+        "closed_at": lead.closed_at.isoformat() if getattr(lead, "closed_at", None) else None,
         "created_at": lead.created_at.isoformat() if lead.created_at else None,
     }
 
