@@ -257,14 +257,15 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
     return { label: 'Significant Deviation', color: 'red', desc: `${maxVariance.toFixed(1)}% deviation — review recommended` };
   }, [childStats]);
 
-  if (loading) {
-    return <CustodyDashboardSkeleton />;
-  }
-
   // Data quality score + grade for the court-readiness banner at the top.
   // See ADR-001. The backend computes this from the ratio of high-confidence
   // days (exchange completions, check-ins, manual overrides, or record
   // confidence >= 90) to total days in the period.
+  //
+  // NOTE: this useMemo MUST stay above the `if (loading) return ...` early
+  // return below. Moving it below would break the Rules of Hooks — on the
+  // loading render it wouldn't execute, on the next render it would, and
+  // React would throw "rendered more hooks than during the previous render".
   const qualityScore = timelineData?.quality_score ?? null;
   const qualityBand = useMemo(() => {
     if (qualityScore == null) return null;
@@ -272,6 +273,10 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
     if (qualityScore >= 70) return { label: 'Acceptable with gaps', color: 'amber', desc: 'Enough evidence to read trends; some days lack hard proof' };
     return { label: 'Insufficient evidence', color: 'red', desc: 'Too many days without check-ins or completed exchanges to trust totals' };
   }, [qualityScore]);
+
+  if (loading) {
+    return <CustodyDashboardSkeleton />;
+  }
 
   return (
     <div className="space-y-6">
