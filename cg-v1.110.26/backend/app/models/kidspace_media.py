@@ -79,6 +79,17 @@ class KidSpaceMovie(Base, UUIDMixin):
     video_url: Mapped[Optional[str]] = mapped_column(String(2048), nullable=True)
     trailer_url: Mapped[Optional[str]] = mapped_column(String(2048), nullable=True)
 
+    # Mux streaming. When `playback_provider="mux"`, the frontend uses
+    # `<MuxPlayer playbackId=mux_playback_id>`; otherwise it falls back
+    # to `<video src=video_url>`. Keeping `video_url` populated even for
+    # Mux-backed rows gives us a source-of-truth URL for re-ingest or
+    # migration to a different provider later.
+    playback_provider: Mapped[str] = mapped_column(
+        String(20), default="direct", nullable=False
+    )  # "direct" | "mux" | "archive"
+    mux_asset_id: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    mux_playback_id: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+
     is_featured: Mapped[bool] = mapped_column(Boolean, default=False)
     is_visible: Mapped[bool] = mapped_column(Boolean, default=True)
     is_approved: Mapped[bool] = mapped_column(Boolean, default=False)  # Requires admin approval before visible to children

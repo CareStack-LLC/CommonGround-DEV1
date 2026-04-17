@@ -27,7 +27,14 @@ import {
   Pencil,
   Check,
 } from 'lucide-react';
-import { myCircleAPI, circleCallsAPI, CirclePermission, IncomingCall } from '@/lib/api';
+import {
+  myCircleAPI,
+  circleCallsAPI,
+  circleParentMessagesAPI,
+  CirclePermission,
+  IncomingCall,
+  ContactSideThreadInfo,
+} from '@/lib/api';
 import IncomingCallAlert from '@/components/my-circle/incoming-call-alert';
 import { cn } from '@/lib/utils';
 
@@ -247,6 +254,10 @@ export default function CircleContactDashboardPage() {
   const [profileEditPhoto, setProfileEditPhoto] = useState<string | undefined>(undefined);
   const profileFileInputRef = useRef<HTMLInputElement>(null);
 
+  // Parent-chat thread info (for the "Message parent" card badge)
+  const [parentThread, setParentThread] = useState<ContactSideThreadInfo | null>(null);
+  const [parentThreadUnread, setParentThreadUnread] = useState(0);
+
   // Poll for incoming calls
   const checkIncomingCalls = useCallback(async () => {
     try {
@@ -314,6 +325,18 @@ export default function CircleContactDashboardPage() {
         permissions: perm,
       }));
       setChildren(childrenData);
+
+      // Load parent-thread info for the "Message parent" card. Failures
+      // are non-fatal — the card just won't render the badge.
+      try {
+        const thread = await circleParentMessagesAPI.getThreadAsContact({
+          limit: 1,
+        });
+        setParentThread(thread.info);
+        setParentThreadUnread(thread.unread_count);
+      } catch {
+        setParentThread(null);
+      }
     } catch (err) {
       console.error('Error loading permissions:', err);
       setError('Failed to load your connections. Please try again.');
@@ -593,6 +616,16 @@ export default function CircleContactDashboardPage() {
                 </div>
               </button>
               <button
+                onClick={() => router.push('/my-circle/contact/schedule')}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#2D6A8F] hover:text-[#3DAA8A] rounded-lg hover:bg-[#3DAA8A]/5 transition-colors"
+                style={{ fontFamily: "'Inter', sans-serif" }}
+                aria-label="See when you can call"
+                title="When can I call?"
+              >
+                <Calendar className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">When can I call?</span>
+              </button>
+              <button
                 onClick={handleLogout}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted transition-colors"
                 style={{ fontFamily: "'Inter', sans-serif" }}
@@ -645,6 +678,54 @@ export default function CircleContactDashboardPage() {
               <X className="h-4 w-4 text-red-600 dark:text-red-400" />
             </div>
             <p className="text-red-600 dark:text-red-400 font-medium text-sm" style={{ fontFamily: "'Inter', sans-serif" }}>{error}</p>
+          </div>
+        )}
+
+        {/* Parent Coordination Channel */}
+        {parentThread && (
+          <div className="mb-6">
+            <button
+              onClick={() => router.push('/my-circle/contact/chat')}
+              disabled={!parentThread.is_active || !parentThread.is_verified}
+              className={cn(
+                'w-full bg-card rounded-2xl border border-border p-5 text-left transition-all',
+                'hover:border-[#3DAA8A]/40 hover:shadow-lg hover:shadow-[#3DAA8A]/5',
+                (!parentThread.is_active || !parentThread.is_verified) &&
+                  'opacity-60 cursor-not-allowed hover:border-border hover:shadow-none'
+              )}
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#3DAA8A]/20 to-[#2D6A8F]/20 dark:from-[#3DAA8A]/30 dark:to-[#2D6A8F]/30 flex items-center justify-center flex-shrink-0">
+                  <MessageCircle className="h-6 w-6 text-[#3DAA8A]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h4
+                      className="font-bold text-foreground truncate"
+                      style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                    >
+                      Message {parentThread.parent_name}
+                    </h4>
+                    {parentThreadUnread > 0 && (
+                      <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-[#3DAA8A] text-white text-[10px] font-semibold flex items-center justify-center">
+                        {parentThreadUnread}
+                      </span>
+                    )}
+                  </div>
+                  <p
+                    className="text-xs text-muted-foreground mt-0.5"
+                    style={{ fontFamily: "'Inter', sans-serif" }}
+                  >
+                    {!parentThread.is_active
+                      ? 'This contact is no longer active.'
+                      : !parentThread.is_verified
+                      ? 'Waiting on verification.'
+                      : 'Coordinate plans directly — ARIA monitored.'}
+                  </p>
+                </div>
+                <ChevronRight className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+              </div>
+            </button>
           </div>
         )}
 

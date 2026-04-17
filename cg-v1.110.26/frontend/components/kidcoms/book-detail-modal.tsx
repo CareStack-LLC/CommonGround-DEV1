@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { BookOpen, User, Clock, Layers, Tag } from 'lucide-react';
+import { BookOpen, User, Clock, Layers, Tag, Users } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -17,6 +17,12 @@ interface BookDetailModalProps {
   book: StorybookContent | null;
   onClose: () => void;
   onStartReading: (book: StorybookContent) => void;
+  /**
+   * Optional: if provided, the modal shows a secondary "Read with a
+   * grown-up" button that hands the same book into the synced reader.
+   * Pass undefined on pages where co-reading is not available.
+   */
+  onStartReadTogether?: (book: StorybookContent) => void;
   progress?: ReadingProgress | null;
 }
 
@@ -24,6 +30,7 @@ export function BookDetailModal({
   book,
   onClose,
   onStartReading,
+  onStartReadTogether,
   progress,
 }: BookDetailModalProps) {
   if (!book) return null;
@@ -183,8 +190,8 @@ export function BookDetailModal({
             </div>
           )}
 
-          {/* CTA Button */}
-          <div className="pt-1">
+          {/* CTA Buttons */}
+          <div className="pt-1 space-y-2">
             <button
               onClick={() => onStartReading(book)}
               className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-white transition-all duration-200 hover:shadow-lg active:scale-[0.98]"
@@ -197,6 +204,21 @@ export function BookDetailModal({
               <BookOpen className="w-5 h-5" />
               {isInProgress ? 'Continue Reading' : isCompleted ? 'Read Again' : 'Start Reading'}
             </button>
+            {onStartReadTogether && (
+              <button
+                onClick={() => onStartReadTogether(book)}
+                className="w-full flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-semibold transition-all duration-200 hover:shadow active:scale-[0.98]"
+                style={{
+                  fontFamily: 'Space Grotesk, sans-serif',
+                  background: 'var(--portal-background)',
+                  color: 'var(--portal-text-heading)',
+                  border: '2px solid var(--portal-border)',
+                }}
+              >
+                <Users className="w-5 h-5" />
+                Read with a grown-up
+              </button>
+            )}
           </div>
         </div>
       </DialogContent>

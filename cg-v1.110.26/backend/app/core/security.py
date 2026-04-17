@@ -153,33 +153,34 @@ async def get_current_user(
     """
     token = credentials.credentials
 
-    # Check if token has been blacklisted (logout)
+    # Check if token has been blacklisted (logout).
+    # Uses pooled async redis client — no per-request connection, no event-loop block.
+    # SECURITY TRADEOFF: Fail-open for availability — if Redis is unreachable, tokens
+    # pass through rather than blocking all authenticated traffic.
+    redis_client = None
     try:
         import hashlib
-        import redis
-        token_hash = hashlib.sha256(token.encode()).hexdigest()
-        r = redis.from_url(settings.REDIS_URL, socket_timeout=1)
-        if r.get(f"blacklist:{token_hash}"):
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Token has been revoked",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
+        from app.core.redis_client import get_redis
+        redis_client = await get_redis()
+        if redis_client is not None:
+            token_hash = hashlib.sha256(token.encode()).hexdigest()
+            if await redis_client.get(f"blacklist:{token_hash}"):
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Token has been revoked",
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
     except HTTPException:
         raise
     except Exception as e:
-        # SECURITY TRADEOFF: Fail-open for availability — if Redis is down, we allow
-        # the token through rather than blocking all authenticated requests. This means
-        # revoked tokens may be accepted while Redis is unavailable.
-        # Rate-limit the log to avoid flooding Sentry (log once per 60s).
         import time
         _now = time.time()
         _last = getattr(get_current_user, "_redis_warn_ts", 0)
         if _now - _last > 60:
             get_current_user._redis_warn_ts = _now
             logger.error(
-                "SECURITY: Redis unavailable during token blacklist check — "
-                "revoked tokens may be accepted. Error: %s", str(e)
+                "SECURITY: Redis blacklist check failed — revoked tokens may be "
+                "accepted. Error: %s", str(e),
             )
 
     # Decode token
@@ -201,6 +202,22 @@ async def get_current_user(
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+    # Wave 3 C13: deleted users carry a user-scoped revocation sentinel.
+    # Checked here so any existing JWT stops working immediately after
+    # the user calls DELETE /users/me, without waiting for token expiry.
+    if redis_client is not None:
+        try:
+            if await redis_client.get(f"user_revoked:{user_id}"):
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="User account has been deleted",
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
+        except HTTPException:
+            raise
+        except Exception:
+            pass  # fail-open on Redis hiccup
 
     # Get user from database with profile eager-loaded
     result = await db.execute(
@@ -413,6 +430,17 @@ async def get_current_circle_user(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Inactive circle user",
         )
+
+    # Attach the JWT-scoped circle context to the returned ORM row so
+    # downstream endpoints (e.g. circle_messages.py) can read
+    # `.contact_id` and `.family_file_id` directly. These are NOT columns
+    # on `circle_users` — the parent↔contact relationship lives on
+    # `circle_contacts`, and a single circle-user session is pinned to
+    # one contact_id + family_file_id pair at token-issue time. We
+    # hydrate them here so the endpoints don't have to re-query
+    # CircleContact on every request.
+    circle_user.contact_id = payload.get("contact_id") or circle_user.circle_contact_id  # type: ignore[attr-defined]
+    circle_user.family_file_id = payload.get("family_file_id")  # type: ignore[attr-defined]
 
     return circle_user
 

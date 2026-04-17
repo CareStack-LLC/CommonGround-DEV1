@@ -63,6 +63,21 @@ async def get_ga4_status(
 
 # ── Analytics Data ───────────────────────────────────────────────────────
 
+# Wave 5 Phase A: each data endpoint returns 200 with
+# `{status: "not_connected", connect_url: ...}` when GA4 isn't connected,
+# instead of 503. That lets the frontend render a "Connect GA4" CTA
+# rather than a red error banner — the previous behavior made the
+# SuperAdmin dashboard feel broken by default.
+
+
+def _not_connected_payload() -> dict:
+    return {
+        "status": "not_connected",
+        "connect_url": "/admin/ga4/connect",
+        "message": "Google Analytics is not connected yet. Connect via OAuth to see live metrics.",
+    }
+
+
 @router.get("/ga4/overview")
 async def get_ga4_overview(
     days: int = Query(30, ge=1, le=365),
@@ -73,11 +88,8 @@ async def get_ga4_overview(
     from app.services.ga4_service import get_overview
     data = await get_overview(db, days)
     if data is None:
-        raise HTTPException(
-            status_code=503,
-            detail="GA4 not connected or property not configured. Connect via OAuth first.",
-        )
-    return data
+        return _not_connected_payload()
+    return {"status": "ok", "data": data}
 
 
 @router.get("/ga4/top-pages")
@@ -91,8 +103,8 @@ async def get_ga4_top_pages(
     from app.services.ga4_service import get_top_pages
     data = await get_top_pages(db, days, limit)
     if data is None:
-        raise HTTPException(status_code=503, detail="GA4 not connected")
-    return {"pages": data}
+        return _not_connected_payload()
+    return {"status": "ok", "pages": data}
 
 
 @router.get("/ga4/traffic-sources")
@@ -105,8 +117,8 @@ async def get_ga4_traffic_sources(
     from app.services.ga4_service import get_traffic_sources
     data = await get_traffic_sources(db, days)
     if data is None:
-        raise HTTPException(status_code=503, detail="GA4 not connected")
-    return {"sources": data}
+        return _not_connected_payload()
+    return {"status": "ok", "sources": data}
 
 
 @router.get("/ga4/geo")
@@ -119,8 +131,8 @@ async def get_ga4_geo(
     from app.services.ga4_service import get_geo_data
     data = await get_geo_data(db, days)
     if data is None:
-        raise HTTPException(status_code=503, detail="GA4 not connected")
-    return {"countries": data}
+        return _not_connected_payload()
+    return {"status": "ok", "countries": data}
 
 
 @router.get("/ga4/devices")
@@ -133,5 +145,5 @@ async def get_ga4_devices(
     from app.services.ga4_service import get_device_data
     data = await get_device_data(db, days)
     if data is None:
-        raise HTTPException(status_code=503, detail="GA4 not connected")
-    return {"devices": data}
+        return _not_connected_payload()
+    return {"status": "ok", "devices": data}

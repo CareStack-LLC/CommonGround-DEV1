@@ -14,7 +14,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { User, Mail, Phone, MapPin, Clock, CheckCircle } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Clock, CheckCircle, Download, AlertTriangle, Loader2, Trash2, ShieldCheck } from 'lucide-react';
 
 /**
  * Account Settings Page
@@ -36,12 +36,70 @@ interface ProfileFormData {
   zip_code: string;
 }
 
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
 export default function AccountSettingsPage() {
   const { user, profile, refreshProfile } = useAuth();
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showSuccess, setShowSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Data & Privacy state
+  const [exportStatus, setExportStatus] = useState<'idle' | 'working' | 'done' | 'error'>('idle');
+  const [exportError, setExportError] = useState<string | null>(null);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [deleteStatus, setDeleteStatus] = useState<'idle' | 'working' | 'done' | 'error'>('idle');
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  async function handleExport() {
+    setExportStatus('working');
+    setExportError(null);
+    try {
+      const token = localStorage.getItem('access_token');
+      const res = await fetch(`${API_BASE}/api/v1/users/me/export`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error(`Export failed (${res.status})`);
+      const data = await res.json();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      const stamp = new Date().toISOString().slice(0, 10);
+      a.download = `commonground-data-${stamp}.json`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      setExportStatus('done');
+      setTimeout(() => setExportStatus('idle'), 4000);
+    } catch (err: any) {
+      setExportError(err?.message || 'Could not prepare your data. Try again in a moment.');
+      setExportStatus('error');
+    }
+  }
+
+  async function handleRequestDeletion() {
+    setDeleteStatus('working');
+    setDeleteError(null);
+    try {
+      const token = localStorage.getItem('access_token');
+      const res = await fetch(`${API_BASE}/api/v1/users/request-deletion`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body?.detail || `Deletion request failed (${res.status})`);
+      }
+      setDeleteStatus('done');
+    } catch (err: any) {
+      setDeleteError(err?.message || 'Could not schedule deletion. Please contact support.');
+      setDeleteStatus('error');
+    }
+  }
 
   const [formData, setFormData] = useState<ProfileFormData>({
     first_name: '',
@@ -438,6 +496,187 @@ export default function AccountSettingsPage() {
           </button>
         </div>
       </form>
+
+      {/* Data & Privacy */}
+      <Card className="border-2 border-border rounded-2xl shadow-lg">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+            <div className="p-2 bg-gradient-to-br from-slate-500/10 to-slate-600/5 rounded-xl shadow-md">
+              <ShieldCheck className="h-5 w-5 text-slate-700" />
+            </div>
+            Data &amp; Privacy
+          </CardTitle>
+          <CardDescription className="font-medium">
+            Your data belongs to you. Download a copy anytime — or delete your account.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Export */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl border-2 border-border bg-card">
+            <div className="flex-1">
+              <p className="font-bold text-foreground">Download my data</p>
+              <p className="text-sm text-muted-foreground font-medium">
+                Get a JSON file with your profile, agreements, messages, schedules, and financial records.
+              </p>
+              {exportStatus === 'done' && (
+                <p className="text-xs text-emerald-600 font-semibold mt-1.5">
+                  Download started — check your browser's downloads folder.
+                </p>
+              )}
+              {exportStatus === 'error' && exportError && (
+                <p className="text-xs text-rose-600 font-semibold mt-1.5">{exportError}</p>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={handleExport}
+              disabled={exportStatus === 'working'}
+              className="shrink-0 inline-flex items-center gap-2 px-4 py-2.5 bg-card border-2 border-[var(--portal-primary)]/30 text-[var(--portal-primary)] rounded-xl font-bold hover:bg-[var(--portal-primary)]/5 hover:shadow-md transition-all disabled:opacity-60"
+            >
+              {exportStatus === 'working' ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Preparing…
+                </>
+              ) : (
+                <>
+                  <Download className="h-4 w-4" />
+                  Download
+                </>
+              )}
+            </button>
+          </div>
+
+          {/* Delete */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl border-2 border-rose-200 bg-rose-50/40">
+            <div className="flex-1">
+              <p className="font-bold text-rose-900">Delete my account</p>
+              <p className="text-sm text-rose-800/80 font-medium">
+                Schedules your account for deletion in 30 days. You can cancel by contacting
+                support before then. This is permanent once the grace period ends.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setDeleteModalOpen(true);
+                setDeleteStatus('idle');
+                setDeleteConfirmText('');
+                setDeleteError(null);
+              }}
+              className="shrink-0 inline-flex items-center gap-2 px-4 py-2.5 bg-white border-2 border-rose-300 text-rose-700 rounded-xl font-bold hover:bg-rose-50 hover:border-rose-400 transition-all"
+            >
+              <Trash2 className="h-4 w-4" />
+              Delete account
+            </button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Delete confirmation modal */}
+      {deleteModalOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          onClick={() => deleteStatus !== 'working' && setDeleteModalOpen(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-card rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border-2 border-border"
+          >
+            <div className="bg-rose-50 border-b-2 border-rose-200 p-5 flex items-start gap-3">
+              <div className="p-2 bg-rose-100 rounded-xl">
+                <AlertTriangle className="h-6 w-6 text-rose-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-rose-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                  Delete your CommonGround account?
+                </h3>
+                <p className="text-sm text-rose-800/90 mt-1 font-medium">
+                  Your account will be scheduled for deletion on a 30-day timer.
+                </p>
+              </div>
+            </div>
+
+            <div className="p-5 space-y-4">
+              {deleteStatus === 'done' ? (
+                <div className="flex flex-col items-center gap-3 py-4">
+                  <CheckCircle className="h-12 w-12 text-emerald-500" />
+                  <p className="font-bold text-foreground text-center">Deletion scheduled</p>
+                  <p className="text-sm text-muted-foreground text-center">
+                    We've sent a confirmation email. Your data will be removed in 30 days
+                    unless you contact support to cancel.
+                  </p>
+                  <button
+                    onClick={() => setDeleteModalOpen(false)}
+                    className="mt-2 px-4 py-2 bg-card border-2 border-border rounded-xl font-bold"
+                  >
+                    Close
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div className="text-sm text-foreground space-y-2">
+                    <p className="font-semibold">What happens next:</p>
+                    <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                      <li>We email you a confirmation with the exact deletion date.</li>
+                      <li>Your co-parent keeps access to shared family-file records.</li>
+                      <li>Court-ordered audit logs are retained per legal requirement.</li>
+                      <li>You can cancel by emailing support within 30 days.</li>
+                    </ul>
+                  </div>
+
+                  <label className="block">
+                    <span className="text-sm font-semibold text-foreground">
+                      Type <span className="font-mono text-rose-700">DELETE</span> to confirm
+                    </span>
+                    <Input
+                      value={deleteConfirmText}
+                      onChange={(e) => setDeleteConfirmText(e.target.value)}
+                      placeholder="DELETE"
+                      className="mt-1.5"
+                      disabled={deleteStatus === 'working'}
+                      autoFocus
+                    />
+                  </label>
+
+                  {deleteError && (
+                    <p className="text-sm text-rose-600 font-medium">{deleteError}</p>
+                  )}
+
+                  <div className="flex justify-end gap-2 pt-2">
+                    <button
+                      onClick={() => setDeleteModalOpen(false)}
+                      disabled={deleteStatus === 'working'}
+                      className="px-4 py-2.5 bg-card border-2 border-border rounded-xl font-bold hover:shadow-md transition"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleRequestDeletion}
+                      disabled={deleteConfirmText !== 'DELETE' || deleteStatus === 'working'}
+                      className="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold transition disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
+                    >
+                      {deleteStatus === 'working' ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          Scheduling…
+                        </>
+                      ) : (
+                        <>
+                          <Trash2 className="h-4 w-4" />
+                          Schedule deletion
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

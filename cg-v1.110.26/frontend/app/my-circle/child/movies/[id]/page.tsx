@@ -2,9 +2,22 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import { ArrowLeft, Play, Pause, Volume2, VolumeX, Maximize } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { OriginalsBadge } from '@/components/kidcoms/originals-badge';
+
+// MuxPlayer ships its own media element (Web Components) — dynamic import
+// so it never runs at SSR time, and bundle stays off the critical path
+// until the theater page actually mounts.
+const MuxPlayer = dynamic(() => import('@mux/mux-player-react'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full bg-black flex items-center justify-center text-white">
+      Loading player…
+    </div>
+  ),
+});
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -16,6 +29,8 @@ interface ApiMovie {
   poster_url: string;
   duration_minutes: number;
   is_featured: boolean;
+  playback_provider?: 'direct' | 'mux' | 'archive';
+  mux_playback_id?: string | null;
 }
 
 interface ChildUserData {
@@ -42,7 +57,15 @@ export default function MoviePlayerPage() {
   const [showControls, setShowControls] = useState(true);
 
   // Fetch video from API
-  const [video, setVideo] = useState<{ id: string; title: string; url: string; thumbnail: string; description: string } | null>(null);
+  const [video, setVideo] = useState<{
+    id: string;
+    title: string;
+    url: string;
+    thumbnail: string;
+    description: string;
+    playbackProvider: 'direct' | 'mux' | 'archive';
+    muxPlaybackId: string | null;
+  } | null>(null);
 
   useEffect(() => {
     validateAndLoadUser();
@@ -53,7 +76,7 @@ export default function MoviePlayerPage() {
         if (res.ok) {
           const data = await res.json();
           const items = data.movies || data || [];
-          const found = items.find((m: any) => m.id === videoId);
+          const found = items.find((m: ApiMovie) => m.id === videoId);
           if (found) {
             setVideo({
               id: found.id,
@@ -61,6 +84,8 @@ export default function MoviePlayerPage() {
               url: found.video_url || '',
               thumbnail: found.poster_url || '',
               description: found.description || '',
+              playbackProvider: found.playback_provider || 'direct',
+              muxPlaybackId: found.mux_playback_id ?? null,
             });
           }
         }
@@ -196,21 +221,47 @@ export default function MoviePlayerPage() {
 
       {/* Video Player */}
       <div className="relative h-screen flex items-center justify-center">
-        <video
-          ref={videoRef}
-          src={video.url}
-          className="max-w-full max-h-full"
-          onTimeUpdate={(e) => {
-            setCurrentTime(e.currentTarget.currentTime);
-            setDuration(e.currentTarget.duration);
-          }}
-          onPlay={() => setIsPlaying(true)}
-          onPause={() => setIsPlaying(false)}
-          onEnded={() => setIsPlaying(false)}
-        />
+        {video.playbackProvider === 'mux' && video.muxPlaybackId ? (
+          // Mux player handles HLS/adaptive bitrate, Safari iOS, analytics,
+          // and the play/mute/fullscreen controls natively. We hide the
+          // custom controls below in this branch to avoid double UI.
+          <MuxPlayer
+            playbackId={video.muxPlaybackId}
+            streamType="on-demand"
+            accentColor="#3DAA8A"
+            poster={video.thumbnail || undefined}
+            metadata={{
+              video_id: video.id,
+              video_title: video.title,
+              viewer_user_id: userData?.childId,
+            }}
+            style={{
+              width: '100%',
+              height: '100%',
+              aspectRatio: '16 / 9',
+              maxWidth: '100vw',
+              maxHeight: '100vh',
+            }}
+          />
+        ) : (
+          <video
+            ref={videoRef}
+            src={video.url}
+            className="max-w-full max-h-full"
+            onTimeUpdate={(e) => {
+              setCurrentTime(e.currentTarget.currentTime);
+              setDuration(e.currentTarget.duration);
+            }}
+            onPlay={() => setIsPlaying(true)}
+            onPause={() => setIsPlaying(false)}
+            onEnded={() => setIsPlaying(false)}
+          />
+        )}
 
-        {/* Play/Pause Overlay */}
-        {!isPlaying && (
+        {/* Custom controls only apply to the fallback <video> element —
+            MuxPlayer renders its own play button + scrubber + volume.
+            Render nothing over Mux so we don't double up the UI. */}
+        {video.playbackProvider !== 'mux' && !isPlaying && (
           <div className="absolute inset-0 flex items-center justify-center">
             <button
               onClick={togglePlay}
@@ -223,7 +274,7 @@ export default function MoviePlayerPage() {
         )}
 
         {/* Controls */}
-        <div
+        {video.playbackProvider !== 'mux' && <div
           className={cn(
             'absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-6 transition-opacity duration-300',
             showControls ? 'opacity-100' : 'opacity-0'
@@ -304,7 +355,7 @@ export default function MoviePlayerPage() {
               </button>
             </div>
           </div>
-        </div>
+        </div>}
       </div>
     </div>
   );

@@ -32,6 +32,11 @@ const ArcadeMode = dynamic(
   () => import('@/components/kidcoms/arcade-mode').then((mod) => mod.ArcadeMode),
   { ssr: false }
 );
+// Dynamically import WhiteboardMode (Excalidraw is browser-only)
+const WhiteboardMode = dynamic(
+  () => import('@/components/kidcoms/whiteboard-mode').then((mod) => mod.WhiteboardMode),
+  { ssr: false }
+);
 
 interface CallSession {
   sessionId: string;
@@ -82,6 +87,8 @@ function ChildCallContent() {
   const [isTheaterMode, setIsTheaterMode] = useState(false);
   // Arcade mode
   const [isArcadeMode, setIsArcadeMode] = useState(false);
+  // Whiteboard mode
+  const [isWhiteboardMode, setIsWhiteboardMode] = useState(false);
 
   // Child user data
   const [childUserId, setChildUserId] = useState<string>('');
@@ -662,11 +669,15 @@ function ChildCallContent() {
               <Gamepad2 className="h-5 w-5" />
             </button>
 
-            {/* Whiteboard - Coming Soon */}
+            {/* Whiteboard - Draw Together */}
             <button
-              disabled
-              className="hidden md:flex p-3 rounded-full bg-[#1E3A4A]/50 text-[#CBD8E0]/30 opacity-50 cursor-not-allowed"
-              title="Draw Together (Coming Soon!)"
+              onClick={() => setIsWhiteboardMode(true)}
+              disabled={!isCallJoined}
+              className={`hidden md:flex p-3 rounded-full transition-all ${!isCallJoined
+                ? 'bg-[#1E3A4A]/50 text-[#CBD8E0]/30 opacity-50 cursor-not-allowed'
+                : 'bg-[#1E3A4A] hover:bg-[#1E3A4A]/80 text-white'
+                }`}
+              title="Draw Together"
             >
               <PenTool className="h-5 w-5" />
             </button>
@@ -783,7 +794,18 @@ function ChildCallContent() {
       <ArcadeMode
         isActive={isArcadeMode}
         userId={childUserId}
+        callRef={callRef}
+        participants={participants}
         onExit={() => setIsArcadeMode(false)}
+      />
+
+      {/* Whiteboard Mode Overlay */}
+      <WhiteboardMode
+        isActive={isWhiteboardMode}
+        userId={childUserId}
+        userName={childUserName}
+        callRef={callRef}
+        onExit={() => setIsWhiteboardMode(false)}
       />
     </div>
   );

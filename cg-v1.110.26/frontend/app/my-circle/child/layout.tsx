@@ -2,6 +2,7 @@
 
 import { ChildIncomingCallBanner } from '@/components/kidcoms/child-incoming-call-banner';
 import { KidSpaceThemeProvider } from '@/components/kidcoms/kidspace-theme-provider';
+import { ChildSosButton } from '@/components/kidcoms/child-sos-button';
 
 export default function ChildLayout({
     children,
@@ -12,6 +13,7 @@ export default function ChildLayout({
         <KidSpaceThemeProvider>
             <ChildIncomingCallBanner />
             {children}
+            <ChildSosButton />
         </KidSpaceThemeProvider>
     );
 }

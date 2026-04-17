@@ -164,6 +164,15 @@ from app.models.kidcoms import (
     RoomType,
 )
 from app.models.circle_message import CircleMessage, SenderType
+from app.models.parent_child_message import ParentChildMessage
+from app.models.circle_parent_message import CircleParentMessage
+from app.models.notification import Notification, NotificationType
+from app.models.chore import Chore, ChoreStatus
+from app.models.cs_intervention import CSIntervention, CSInterventionStatus, CSInterventionOutcome
+from app.models.reward import Reward, RewardRedemption, RedemptionStatus
+from app.models.child_support_payment_log import ChildSupportPaymentLog
+from app.models.recurring_parent_card import RecurringParentCard
+from app.models.stripe_webhook_event import StripeWebhookEvent
 from app.models.subscription import (
     SubscriptionPlan,
     GrantCode,
@@ -439,6 +448,30 @@ __all__ = [
     "SessionStatus",
     "ParticipantType",
     "RoomType",
+    # Parent ↔ Child Messaging (persistent async inbox — Wave 1 A1)
+    "ParentChildMessage",
+    # Parent ↔ Circle-Contact Messaging (dedicated coordination channel)
+    "CircleParentMessage",
+    # Notifications (Wave 1 A6)
+    "Notification",
+    "NotificationType",
+    # Chores / Tasks (Wave 3 C2)
+    "Chore",
+    "ChoreStatus",
+    # CS Interventions (SuperAdmin persistence fix)
+    "CSIntervention",
+    "CSInterventionStatus",
+    "CSInterventionOutcome",
+    # Rewards Store (Wave 3 C3)
+    "Reward",
+    "RewardRedemption",
+    "RedemptionStatus",
+    # Child Support Payment Log (Wave 4-Alt)
+    "ChildSupportPaymentLog",
+    # Recurring Parent Card (Wave 4-Alt)
+    "RecurringParentCard",
+    # Stripe webhook idempotency (Wave 4-Alt)
+    "StripeWebhookEvent",
     # Subscription System (GTM)
     "SubscriptionPlan",
     "GrantCode",

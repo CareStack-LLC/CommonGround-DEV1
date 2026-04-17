@@ -57,6 +57,8 @@ import {
   Sparkles,
   ChevronRight,
   Wallet,
+  ListChecks,
+  Gift,
 } from 'lucide-react';
 import {
   Dialog,
@@ -83,7 +85,7 @@ import { cn } from '@/lib/utils';
 import { useFeatureGate } from '@/hooks/use-feature-gate';
 import { TierBadge } from '@/components/tier-badge';
 import { Lock } from 'lucide-react';
-import { Trash2, UserMinus, Pencil, Gavel, Briefcase, Building2, XCircle, CheckCircle2, ExternalLink } from 'lucide-react';
+import { Trash2, UserMinus, Pencil, Gavel, Briefcase, Building2, XCircle, CheckCircle2, ExternalLink, BookOpen } from 'lucide-react';
 import { trackInviteCoParent } from '@/lib/analytics';
 
 /* =============================================================================
@@ -771,6 +773,24 @@ function FamilyFileDetailContent() {
                 </button>
 
                 <button
+                  onClick={() => router.push(`/family-files/${id}/child-support`)}
+                  className="flex items-start gap-4 p-4 rounded-xl border-2 border-border bg-card hover:bg-muted hover:border-[var(--portal-primary)]/30 hover:shadow-md transition-all text-left group"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/10 to-yellow-600/5 flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
+                    <Scale className="h-5 w-5 text-amber-600" />
+                  </div>
+                  <div>
+                    <div className="font-bold text-foreground flex items-center gap-1.5">
+                      Child Support
+                      <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 uppercase tracking-wide">SDU</span>
+                    </div>
+                    <div className="text-sm text-muted-foreground font-medium">
+                      Log state disbursement payments
+                    </div>
+                  </div>
+                </button>
+
+                <button
                   onClick={() => router.push(`/schedule?familyFileId=${id}&action=new-event`)}
                   className="flex items-start gap-4 p-4 rounded-xl border-2 border-border bg-card hover:bg-muted hover:border-[var(--portal-primary)]/30 hover:shadow-md transition-all text-left group"
                 >
@@ -835,6 +855,36 @@ function FamilyFileDetailContent() {
                     </div>
                   </button>
                 )}
+
+                <button
+                  onClick={() => router.push(`/family-files/${id}/chores`)}
+                  className="flex items-start gap-4 p-4 rounded-xl border-2 border-border bg-card hover:bg-muted hover:border-[var(--portal-primary)]/30 hover:shadow-md transition-all text-left group"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500/10 to-violet-500/5 flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
+                    <ListChecks className="h-5 w-5 text-indigo-600" />
+                  </div>
+                  <div>
+                    <div className="font-bold text-foreground">Chores</div>
+                    <div className="text-sm text-muted-foreground font-medium">
+                      Assign tasks, approve completions
+                    </div>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => router.push(`/family-files/${id}/rewards`)}
+                  className="flex items-start gap-4 p-4 rounded-xl border-2 border-border bg-card hover:bg-muted hover:border-[var(--portal-primary)]/30 hover:shadow-md transition-all text-left group"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500/10 to-rose-500/5 flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
+                    <Gift className="h-5 w-5 text-pink-600" />
+                  </div>
+                  <div>
+                    <div className="font-bold text-foreground">Rewards</div>
+                    <div className="text-sm text-muted-foreground font-medium">
+                      Curate rewards, fulfill redemptions
+                    </div>
+                  </div>
+                </button>
 
                 {!familyFile.parent_b_id && (
                   <Dialog open={isInviteOpen} onOpenChange={setIsInviteOpen}>
@@ -1128,34 +1178,66 @@ function FamilyFileDetailContent() {
                 />
               ) : (
                 <div className="space-y-2">
-                  {familyFile.children.map((child) => (
-                    <button
-                      key={child.id}
-                      className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-colors text-left"
-                      onClick={() => router.push(`/family-files/${id}/children/${child.id}`)}
-                    >
-                      <CGAvatar
-                        name={child.preferred_name || child.first_name}
-                        src={child.photo_url ? getImageUrl(child.photo_url) ?? undefined : undefined}
-                        size="sm"
-                        color="sage"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium text-foreground truncate">
-                          {child.preferred_name || child.first_name} {child.last_name}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {new Date(child.date_of_birth).toLocaleDateString()}
-                        </div>
+                  {familyFile.children.map((child) => {
+                    const childDisplayName = child.preferred_name || child.first_name;
+                    return (
+                      <div
+                        key={child.id}
+                        className="flex items-center gap-3 p-3 rounded-xl hover:bg-muted/50 transition-colors"
+                      >
+                        <button
+                          className="flex items-center gap-3 flex-1 min-w-0 text-left"
+                          onClick={() => router.push(`/family-files/${id}/children/${child.id}`)}
+                        >
+                          <CGAvatar
+                            name={childDisplayName}
+                            src={child.photo_url ? getImageUrl(child.photo_url) ?? undefined : undefined}
+                            size="sm"
+                            color="sage"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium text-foreground truncate">
+                              {childDisplayName} {child.last_name}
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              {new Date(child.date_of_birth).toLocaleDateString()}
+                            </div>
+                          </div>
+                          {child.status !== 'active' && (
+                            <CGBadge variant="default" className="flex-shrink-0">
+                              {child.status}
+                            </CGBadge>
+                          )}
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            router.push(`/messages/child/${child.id}`);
+                          }}
+                          className="flex items-center gap-1.5 flex-shrink-0 px-3 py-2 rounded-xl bg-[var(--portal-primary)]/10 text-[var(--portal-primary)] hover:bg-[var(--portal-primary)]/20 transition-colors text-xs font-semibold"
+                          aria-label={`Message ${childDisplayName}`}
+                          title={`Message ${childDisplayName}`}
+                        >
+                          <MessageSquare className="h-3.5 w-3.5" />
+                          <span className="hidden sm:inline">Message</span>
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            router.push(
+                              `/family-files/${familyFile.id}/library?childId=${child.id}`,
+                            );
+                          }}
+                          className="flex items-center gap-1.5 flex-shrink-0 px-3 py-2 rounded-xl bg-amber-500/10 text-amber-700 hover:bg-amber-500/20 transition-colors text-xs font-semibold"
+                          aria-label={`Read together with ${childDisplayName}`}
+                          title={`Read a book together with ${childDisplayName}`}
+                        >
+                          <BookOpen className="h-3.5 w-3.5" />
+                          <span className="hidden sm:inline">Read together</span>
+                        </button>
                       </div>
-                      {child.status !== 'active' && (
-                        <CGBadge variant="default" className="flex-shrink-0">
-                          {child.status}
-                        </CGBadge>
-                      )}
-                      <ChevronRight className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                    </button>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>

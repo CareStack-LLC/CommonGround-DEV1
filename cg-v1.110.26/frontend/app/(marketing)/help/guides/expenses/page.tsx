@@ -271,7 +271,7 @@ export default function ExpensesGuidePage() {
             </h2>
           </div>
           <p className="text-gray-600 leading-relaxed mb-4">
-            ClearFund can track recurring court-ordered financial obligations separately from one-time expenses. This includes child support payments, medical insurance premiums, and education contributions.
+            ClearFund can track recurring court-ordered financial obligations separately from one-time expenses. Child support payments are made directly through your state&rsquo;s State Disbursement Unit (SDU) — CommonGround records the payment for court evidence. Other recurring obligations like medical insurance premiums and education contributions are funded through the platform.
           </p>
           <p className="text-gray-600 leading-relaxed mb-4">
             Set up each obligation with its amount, frequency, and due date. ClearFund sends reminders before payments are due and tracks compliance automatically. Late or missed payments are documented with timestamps for your records.

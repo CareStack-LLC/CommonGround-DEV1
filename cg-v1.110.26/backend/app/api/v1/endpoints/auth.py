@@ -135,15 +135,21 @@ async def logout(
     Returns:
         Success message
     """
-    # Blacklist the current token in Redis
+    # Blacklist the current token in Redis (pooled async client).
+    # Non-blocking — on Redis outage the token just expires naturally.
     try:
         import hashlib
-        import redis as redis_lib
-        token_hash = hashlib.sha256(credentials.credentials.encode()).hexdigest()
-        r = redis_lib.from_url(settings.REDIS_URL, socket_timeout=1)
-        r.setex(f"blacklist:{token_hash}", settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60, "1")
+        from app.core.redis_client import get_redis
+        r = await get_redis()
+        if r is not None:
+            token_hash = hashlib.sha256(credentials.credentials.encode()).hexdigest()
+            await r.setex(
+                f"blacklist:{token_hash}",
+                settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+                "1",
+            )
     except Exception:
-        pass  # Non-blocking — token will expire naturally
+        pass
 
     auth_service = AuthService(db)
     await auth_service.logout_user(current_user.id)

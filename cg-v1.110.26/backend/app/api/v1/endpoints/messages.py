@@ -203,6 +203,7 @@ async def analyze_message_content(
 
     # Check if V2 is enabled
     use_v2 = getattr(settings, 'ARIA_V2_ENABLED', False) and family_file_id
+    analyze_degraded = False
 
     if use_v2:
         # V2 Sentinel Shield analysis
@@ -264,6 +265,16 @@ async def analyze_message_content(
             )
         except Exception as e:
             logger.warning(f"[ARIA V2] Analyze endpoint failed, falling back to V1: {e}")
+            analyze_degraded = True
+            try:
+                from app.utils.sentry_helpers import capture_error
+                capture_error(
+                    e,
+                    tags={"service": "aria", "operation": "v2_analyze_fallback"},
+                    context={"family_file_id": str(family_file_id)},
+                )
+            except Exception:
+                pass
             # Fall through to V1
 
     # V1 analysis
@@ -301,7 +312,8 @@ async def analyze_message_content(
         triggers=analysis.get("triggers", []),
         explanation=analysis.get("explanation", ""),
         suggestion=analysis["suggestions"][0] if analysis.get("suggestions") else None,
-        is_flagged=is_flagged
+        is_flagged=is_flagged,
+        analysis_degraded=analyze_degraded if analyze_degraded else None,
     )
 
 
@@ -537,6 +549,7 @@ async def send_message(
     # Analyze with ARIA
     aria_analysis = None
     v2_enrichment = None  # V2 extra fields for response
+    analysis_degraded = False  # True when V2 pipeline fails and we fall back to V1
     if aria_enabled:
         from app.services.aria import SentimentAnalysis, ToxicityCategory, ToxicityLevel
 
@@ -610,6 +623,19 @@ async def send_message(
             except Exception as e:
                 logger.error(f"[ARIA V2] Full pipeline failed, falling back to V1: {e}")
                 use_v2 = False  # Fall through to V1
+                analysis_degraded = True
+                try:
+                    from app.utils.sentry_helpers import capture_error
+                    capture_error(
+                        e,
+                        tags={"service": "aria", "operation": "v2_pipeline_fallback"},
+                        context={
+                            "family_file_id": str(message_data.family_file_id),
+                            "sender_id": str(current_user.id),
+                        },
+                    )
+                except Exception:
+                    pass
 
         if not use_v2:
             # ── V1 Legacy Pipeline ──
@@ -757,6 +783,7 @@ async def send_message(
             "categories": [cat.value for cat in aria_analysis.categories],
             "toxicity_score": aria_analysis.toxicity_score,
             "severity": severity_str,
+            "analysis_degraded": analysis_degraded,
             "confidence_score": aria_analysis.toxicity_score,
         }
 

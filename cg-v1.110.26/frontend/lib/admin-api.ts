@@ -830,6 +830,11 @@ export const adminAPI = {
   sendAllBugHuntInvitations: (cohortId: string) =>
     adminFetch<{ sent: number; failed: number; skipped: number }>(`/admin/bug-hunts/${cohortId}/send-all-invitations`, { method: 'POST' }),
 
+  // SuperAdmin reliability — status probes
+  getGa4Status: () => adminFetch<any>('/admin/ga4/status'),
+  getInboxStatus: () => adminFetch<any>('/admin/inbox/status'),
+  getLeadsStatus: () => adminFetch<any>('/admin/leads/status'),
+
   // Reddit
   getRedditStatus: () => adminFetch<any>('/admin/reddit/status'),
   getRedditConfig: () => adminFetch<any>('/admin/reddit/config'),
@@ -1068,11 +1073,11 @@ export const adminAPI = {
     return adminFetch<{ scores: HealthScoreEntry[]; total: number }>(`/admin/cs/health-scores?${sp}`);
   },
 
-  calculateHealthScores: (userId?: string) =>
-    adminFetch<any>('/admin/cs/health-scores/calculate', {
-      method: 'POST',
-      body: JSON.stringify(userId ? { user_id: userId } : {}),
-    }),
+  // NOTE: calculateHealthScores() stub removed — the backend endpoint
+  // `POST /admin/cs/health-scores/calculate` was deleted in the SuperAdmin
+  // reliability pass because it duplicated `GET /admin/cs/health-scores`
+  // (scores are computed on-read). Re-add if a cache/backing-table ever
+  // needs an explicit refresh hook.
 
   getChurnRisk: (threshold = 0.7) =>
     adminFetch<{ at_risk: HealthScoreEntry[] }>(`/admin/cs/churn-risk?threshold=${threshold}`),

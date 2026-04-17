@@ -2199,3 +2199,83 @@ async def accept_terms(
         "terms_accepted_at": current_circle_user.terms_accepted_at,
         "terms_version": current_circle_user.terms_version,
     }
+
+
+# ============================================================
+# Circle-contact schedule visibility (Wave 5 gap fix)
+# ============================================================
+
+
+@router.get(
+    "/circle-users/schedule",
+    summary="When can I call my grandkids (read-only)",
+    description=(
+        "Returns each child the circle contact is permitted to reach, along "
+        "with the allowed days/hours set by the parents and the child's name. "
+        "Read-only — contacts cannot change these rules. Designed for a simple "
+        "'When can I call?' card on the contact dashboard."
+    ),
+)
+async def circle_contact_schedule(
+    current_circle_user=Depends(get_current_circle_user),
+    db: AsyncSession = Depends(get_db),
+):
+    circle_contact_id = current_circle_user.circle_contact_id
+    if not circle_contact_id:
+        return {"children": []}
+
+    # Pull all permission rows for this contact — one per (child, family_file)
+    perm_result = await db.execute(
+        select(CirclePermission).where(
+            CirclePermission.circle_contact_id == circle_contact_id
+        )
+    )
+    perms = list(perm_result.scalars().all())
+    if not perms:
+        return {"children": []}
+
+    child_ids = list({str(p.child_id) for p in perms if p.child_id})
+    children_by_id: dict[str, Child] = {}
+    if child_ids:
+        child_result = await db.execute(select(Child).where(Child.id.in_(child_ids)))
+        for c in child_result.scalars().all():
+            children_by_id[str(c.id)] = c
+
+    # Default day labels — parents set `allowed_days` as JS weekday ints (Sun=0..Sat=6)
+    day_labels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+
+    def format_time(t):
+        if not t:
+            return None
+        try:
+            return t.strftime("%I:%M %p").lstrip("0")
+        except Exception:
+            return str(t)
+
+    entries = []
+    for p in perms:
+        child = children_by_id.get(str(p.child_id))
+        allowed_days = p.allowed_days or list(range(7))  # None = anytime
+        days_readable = [day_labels[d] for d in allowed_days if 0 <= d < 7]
+        always_available = (
+            p.allowed_days is None
+            and p.allowed_start_time is None
+            and p.allowed_end_time is None
+        )
+        entries.append(
+            {
+                "child_id": str(p.child_id),
+                "child_name": child.first_name if child else "Child",
+                "can_chat": p.can_chat,
+                "can_video_call": p.can_video_call,
+                "can_voice_call": p.can_voice_call,
+                "can_theater": p.can_theater,
+                "allowed_days_raw": allowed_days,
+                "allowed_days_readable": days_readable,
+                "allowed_start_time": format_time(p.allowed_start_time),
+                "allowed_end_time": format_time(p.allowed_end_time),
+                "always_available": always_available,
+            }
+        )
+
+    return {"children": entries}

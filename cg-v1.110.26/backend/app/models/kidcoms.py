@@ -161,9 +161,9 @@ class KidComsSession(Base, UUIDMixin, TimestampMixin):
     title: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
     status: Mapped[str] = mapped_column(String(20), default=SessionStatus.WAITING.value, index=True)
 
-    # Daily.co room info
-    daily_room_name: Mapped[str] = mapped_column(String(100), unique=True, index=True)
-    daily_room_url: Mapped[str] = mapped_column(String(500))
+    # Daily.co room info (nullable: solo theater/progress sessions do not create a Daily room)
+    daily_room_name: Mapped[Optional[str]] = mapped_column(String(100), unique=True, index=True, nullable=True)
+    daily_room_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     daily_room_token: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)  # Owner token
 
     # Initiation
@@ -583,17 +583,42 @@ class CirclePermission(Base, UUIDMixin, TimestampMixin):
     def __repr__(self) -> str:
         return f"<CirclePermission contact={self.circle_contact_id} child={self.child_id}>"
 
-    def is_within_allowed_time(self, check_time: Optional[datetime] = None) -> bool:
+    def is_within_allowed_time(
+        self,
+        check_time: Optional[datetime] = None,
+        tz_name: Optional[str] = None,
+    ) -> bool:
         """
         Check if current time is within allowed communication window.
 
         Args:
-            check_time: Time to check (defaults to now)
+            check_time: Time to check (defaults to utcnow). Interpreted as UTC
+                when naive.
+            tz_name: IANA timezone (e.g. "America/Los_Angeles") for converting
+                the UTC time into the child's local wall clock before
+                comparing against allowed_start_time/allowed_end_time.
+                When None, falls back to legacy UTC comparison — which means
+                parents' locally-entered hours effectively run on UTC. Prefer
+                passing a zone.
 
         Returns:
-            True if within allowed window or no restrictions set
+            True if within allowed window or no restrictions set.
         """
         check_time = check_time or datetime.utcnow()
+
+        # Wave 3 C14: honor the child's / parent's timezone so "9:00 to 20:00"
+        # means local wall-clock hours, not UTC.
+        if tz_name:
+            try:
+                from zoneinfo import ZoneInfo
+                if check_time.tzinfo is None:
+                    # Assume naive datetimes are UTC (matches utcnow()).
+                    from datetime import timezone as _tz
+                    check_time = check_time.replace(tzinfo=_tz.utc)
+                check_time = check_time.astimezone(ZoneInfo(tz_name))
+            except Exception:
+                # Unknown zone — fall back to UTC compare rather than erroring.
+                pass
 
         # Check day of week
         if self.allowed_days is not None:

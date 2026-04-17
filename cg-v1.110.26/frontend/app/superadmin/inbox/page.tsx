@@ -397,6 +397,39 @@ export default function InboxPage() {
   const oauthHandled = useRef(false);
   const successTimeout = useRef<NodeJS.Timeout>(undefined);
 
+  // Gmail connection status (Wave 5 endpoint). When not connected we stop
+  // polling — previously the page hit /admin/emails every 30s forever,
+  // spamming logs and producing a misleading "0 emails" state with no
+  // banner telling the admin why.
+  type InboxStatusShape = {
+    status?: string;
+    connected?: boolean;
+    client_configured?: boolean;
+    message?: string;
+  };
+  const [inboxStatus, setInboxStatus] = useState<InboxStatusShape | null>(null);
+  const [statusLoaded, setStatusLoaded] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const s = await adminAPI.getInboxStatus();
+        if (!cancelled) setInboxStatus(s as InboxStatusShape);
+      } catch {
+        if (!cancelled) setInboxStatus({ connected: false, status: 'not_configured' });
+      } finally {
+        if (!cancelled) setStatusLoaded(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const gmailConnected = !!inboxStatus?.connected;
+  const clientConfigured = inboxStatus?.client_configured !== false; // default true if absent
+
   // Handle OAuth callback
   useEffect(() => {
     const code = searchParams.get('oauth_code');
@@ -451,18 +484,30 @@ export default function InboxPage() {
     }
   }, [categoryFilter, urgentOnly]);
 
-  useEffect(() => { fetchEmails(); }, [fetchEmails]);
-
-  // Auto-poll every 30 seconds
   useEffect(() => {
+    // Only hit /admin/emails once Gmail is actually connected. Prevents
+    // the polling loop from spamming when OAuth isn't done yet.
+    if (statusLoaded && gmailConnected) {
+      fetchEmails();
+    } else if (statusLoaded && !gmailConnected) {
+      // Flush the loading spinner so the banner can render.
+      setLoading(false);
+    }
+  }, [fetchEmails, statusLoaded, gmailConnected]);
+
+  // Auto-poll every 30 seconds — skipped entirely when Gmail is disconnected.
+  useEffect(() => {
+    if (!statusLoaded || !gmailConnected) return;
     const interval = setInterval(fetchEmails, 30000);
     return () => clearInterval(interval);
-  }, [fetchEmails]);
+  }, [fetchEmails, statusLoaded, gmailConnected]);
 
-  // Fetch KPIs
+  // Fetch KPIs (only if connected — otherwise the backend has nothing
+  // useful to report and the call just errors in the console).
   useEffect(() => {
+    if (!gmailConnected) return;
     adminAPI.getInboxKPIs().then(setKpis).catch(() => {});
-  }, []);
+  }, [gmailConnected]);
 
   // ── Threads ────────────────────────────────────────────────────────────
 
@@ -621,21 +666,49 @@ export default function InboxPage() {
             <Mail className="w-5 h-5 text-[#3DAA8A]" /> Command Inbox
           </h1>
           <p className="text-sm text-[#6B8A9A] mt-0.5">
-            {total} emails · {allThreads.length} threads · Auto-refreshes every 30s
+            {total} emails · {allThreads.length} threads ·{' '}
+            {gmailConnected ? 'Auto-refreshes every 30s' : 'Polling paused'}
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={runAnalysis} disabled={analyzing} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-500/15 hover:bg-violet-500/25 text-violet-300 text-xs font-medium transition-colors disabled:opacity-50">
+          <button onClick={runAnalysis} disabled={analyzing || !gmailConnected} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-500/15 hover:bg-violet-500/25 text-violet-300 text-xs font-medium transition-colors disabled:opacity-50">
             <Brain className={`w-3.5 h-3.5 ${analyzing ? 'animate-pulse' : ''}`} /> {analyzing ? 'Analyzing...' : 'AI Summary'}
           </button>
-          <button onClick={connectGoogleOAuth} disabled={connectingOAuth} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#2D6A8F]/20 hover:bg-[#2D6A8F]/30 text-[#8AACBC] text-xs font-medium transition-colors disabled:opacity-50">
+          <button onClick={connectGoogleOAuth} disabled={connectingOAuth || !clientConfigured} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#2D6A8F]/20 hover:bg-[#2D6A8F]/30 text-[#8AACBC] text-xs font-medium transition-colors disabled:opacity-50">
             <Link className="w-3.5 h-3.5" /> Connect
           </button>
-          <button onClick={syncInbox} disabled={syncing} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-xs font-medium transition-colors disabled:opacity-50">
+          <button onClick={syncInbox} disabled={syncing || !gmailConnected} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-xs font-medium transition-colors disabled:opacity-50">
             <RefreshCw className={`w-3.5 h-3.5 ${syncing ? 'animate-spin' : ''}`} /> {syncing ? 'Syncing...' : 'Sync Now'}
           </button>
         </div>
       </div>
+
+      {/* ── Gmail status banner (hidden when connected) ─────────────────── */}
+      {statusLoaded && !gmailConnected && (
+        !clientConfigured ? (
+          <div className="flex items-start gap-3 px-4 py-3 rounded-lg border border-red-500/30 bg-red-500/10 text-red-100 text-sm">
+            <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-red-400" />
+            <div className="flex-1">
+              <p className="font-semibold">Gmail OAuth client isn&apos;t set up.</p>
+              <p className="text-xs text-red-200/80 mt-1">
+                The <code>GOOGLE_OAUTH_CLIENT_SECRET</code> env var isn&apos;t set on the API server.
+                Add it in Render (or your backend host) and restart — the Connect button won&apos;t do anything until then.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-start gap-3 px-4 py-3 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-100 text-sm">
+            <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-amber-400" />
+            <div className="flex-1">
+              <p className="font-semibold">Gmail isn&apos;t connected yet.</p>
+              <p className="text-xs text-amber-200/80 mt-1">
+                Click <span className="font-semibold">Connect</span> to sign in with the Google account you want to monitor.
+                Nothing will poll until the OAuth handshake completes — you won&apos;t miss emails, we just stopped hitting an empty endpoint every 30s.
+              </p>
+            </div>
+          </div>
+        )
+      )}
 
       {/* ── KPI Row ─────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">

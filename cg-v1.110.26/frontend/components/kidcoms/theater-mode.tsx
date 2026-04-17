@@ -55,6 +55,10 @@ interface TheaterModeProps {
   onToggleVideo: () => void;
   onToggleAudio: () => void;
   onExit: () => void;
+  /** KidComs session ID — used for server-side audit log of theater events. */
+  sessionId?: string;
+  /** Bearer token for authenticated audit calls. Falls back to localStorage. */
+  authToken?: string;
 }
 
 export function TheaterMode({
@@ -68,6 +72,8 @@ export function TheaterMode({
   onToggleVideo,
   onToggleAudio,
   onExit,
+  sessionId,
+  authToken,
 }: TheaterModeProps) {
   const [showLibrary, setShowLibrary] = useState(false);
   const [content, setContent] = useState<TheaterContent | null>(null);
@@ -75,9 +81,46 @@ export function TheaterMode({
     isPlaying: false,
     currentTime: 0,
   });
+  const [presenterDisconnected, setPresenterDisconnected] = useState(false);
 
   const lastActionRef = useRef<string>('');
   const syncIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const presenterIdRef = useRef<string | null>(null);
+
+  // Server-side audit trail (Wave 2 B5). Non-blocking — localStorage and
+  // peer-to-peer sync remain the source of truth for live playback; the
+  // server log is evidence and safety review.
+  const reportTheaterEvent = useCallback(
+    (action: string, extra: Record<string, unknown> = {}) => {
+      if (!sessionId) return;
+      const token =
+        authToken ||
+        (typeof window !== 'undefined'
+          ? localStorage.getItem('access_token') || localStorage.getItem('authToken')
+          : null);
+      if (!token) return;
+      const payload = {
+        session_id: sessionId,
+        action,
+        content_type: content?.type,
+        content_url: content?.url,
+        content_title: content?.title,
+        current_time: theaterState.currentTime,
+        current_page: theaterState.currentPage,
+        is_playing: theaterState.isPlaying,
+        ...extra,
+      };
+      // Fire-and-forget. Don't block UI on audit.
+      fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/v1/kidcoms/theater/audit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify(payload),
+      }).catch((err) => {
+        console.warn('theater audit: POST failed', err);
+      });
+    },
+    [sessionId, authToken, content, theaterState.currentTime, theaterState.currentPage, theaterState.isPlaying],
+  );
 
   // Handle incoming theater messages from other participant
   useEffect(() => {
@@ -105,6 +148,9 @@ export function TheaterMode({
             currentTime: currentTime ?? 0,
             currentPage: currentPage,
           });
+          // Remember the presenter so we can detect when they drop (B6).
+          presenterIdRef.current = message.data.senderId;
+          setPresenterDisconnected(false);
           break;
 
         case 'stop':
@@ -167,12 +213,30 @@ export function TheaterMode({
       }
     };
 
+    // B6: disconnect recovery. If the remote presenter leaves the call while
+    // theater is active, auto-pause and surface a banner so the local user
+    // isn't left staring at a frozen frame.
+    const handleParticipantLeft = (evt: { participant?: { user_id?: string; session_id?: string } }) => {
+      const leftId =
+        evt?.participant?.user_id || evt?.participant?.session_id;
+      if (!leftId) return;
+      if (presenterIdRef.current && leftId === presenterIdRef.current) {
+        setTheaterState((prev) => ({ ...prev, isPlaying: false }));
+        setPresenterDisconnected(true);
+        reportTheaterEvent('presenter_left', { presenter_id: leftId });
+      } else {
+        reportTheaterEvent('participant_left', { participant_id: leftId });
+      }
+    };
+
     call.on('app-message', handleAppMessage);
+    call.on('participant-left', handleParticipantLeft as Parameters<typeof call.on>[1]);
 
     return () => {
       call.off('app-message', handleAppMessage);
+      call.off('participant-left', handleParticipantLeft as Parameters<typeof call.on>[1]);
     };
-  }, [callRef, userId, content]);
+  }, [callRef, userId, content, reportTheaterEvent]);
 
   // Request sync when entering theater mode
   useEffect(() => {
@@ -231,6 +295,8 @@ export function TheaterMode({
     setContent(selected);
     setShowLibrary(false);
     setTheaterState({ isPlaying: false, currentTime: 0, currentPage: 1 });
+    presenterIdRef.current = userId; // we are now the presenter
+    setPresenterDisconnected(false);
 
     if (callRef.current) {
       const message = createTheaterMessage(
@@ -248,6 +314,11 @@ export function TheaterMode({
       );
       callRef.current.sendAppMessage(message, '*');
     }
+    reportTheaterEvent('content_selected', {
+      content_type: selected.type,
+      content_url: selected.url,
+      content_title: selected.title,
+    });
   };
 
   const handlePlay = () => {
@@ -268,6 +339,7 @@ export function TheaterMode({
       );
       call.sendAppMessage(message, '*');
     }
+    reportTheaterEvent('play');
   };
 
   const handlePause = () => {
@@ -288,6 +360,7 @@ export function TheaterMode({
       );
       call.sendAppMessage(message, '*');
     }
+    reportTheaterEvent('pause');
   };
 
   const handleSeek = (time: number) => {
@@ -338,6 +411,9 @@ export function TheaterMode({
       const message = createTheaterMessage('stop', 'video', '', userId, { senderName: userName });
       callRef.current.sendAppMessage(message, '*');
     }
+    reportTheaterEvent('stop');
+    presenterIdRef.current = null;
+    setPresenterDisconnected(false);
     setContent(null);
     setTheaterState({ isPlaying: false, currentTime: 0 });
     onExit();
@@ -351,6 +427,15 @@ export function TheaterMode({
 
   return (
     <div className="fixed inset-0 z-40 bg-gradient-to-b from-[#0D1B24] via-[#1E3A4A]/95 to-[#0D1B24] flex flex-col">
+      {presenterDisconnected && (
+        <div
+          className="bg-amber-500/95 text-[#0D1B24] text-sm font-medium px-4 py-2 text-center"
+          style={{ fontFamily: "'Inter', sans-serif" }}
+          role="status"
+        >
+          The presenter disconnected — playback paused. Pick a new video from the Library or exit theater mode.
+        </div>
+      )}
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-2.5 bg-[#0D1B24]/90 backdrop-blur-sm border-b border-[#3DAA8A]/10">
         <div className="flex items-center space-x-3">

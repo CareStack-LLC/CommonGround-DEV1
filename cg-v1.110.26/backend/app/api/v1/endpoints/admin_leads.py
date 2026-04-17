@@ -73,6 +73,47 @@ class TemplateCreate(BaseModel):
 # =============================================================================
 
 @router.get(
+    "/status",
+    summary="Admin leads module status (Wave 5 Phase A)",
+)
+async def get_leads_status(
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Quick health check — returns which leads sub-features are usable in
+    this environment. Lets the SuperAdmin UI hide buttons for features
+    whose tables haven't been migrated yet, instead of rendering them
+    and 503ing on click."""
+    from sqlalchemy import text
+    from app.core.config import settings
+
+    features = {"lists": True, "campaigns": True, "landing_pages": True, "sendgrid": False}
+    for table, key in (
+        ("lead_lists", "lists"),
+        ("lead_campaigns", "campaigns"),
+        ("landing_pages", "landing_pages"),
+    ):
+        try:
+            await db.execute(text(f"SELECT 1 FROM {table} LIMIT 1"))
+        except Exception:
+            # rollback so subsequent probes in the same request aren't blocked
+            # by the aborted-transaction state Postgres leaves behind.
+            await db.rollback()
+            features[key] = False
+    features["sendgrid"] = bool(getattr(settings, "SENDGRID_API_KEY", None))
+    # Top-level fields mirrored for UI convenience so callers don't have to
+    # pattern-match `features.landing_pages` — follows the shape other
+    # status endpoints (inbox, reddit) expose.
+    return {
+        "features": features,
+        "landing_pages_table": features["landing_pages"],
+        "campaigns_table": features["campaigns"],
+        "lists_table": features["lists"],
+        "sendgrid_configured": features["sendgrid"],
+    }
+
+
+@router.get(
     "/lists",
     summary="List all lead lists",
 )
@@ -453,7 +494,13 @@ async def generate_landing_page(
     db: AsyncSession = Depends(get_db),
     admin_user: User = Depends(get_current_admin_user),
 ) -> dict:
-    """Generate a full landing page using AI (Claude/OpenAI) with SEO + UTM."""
+    """Generate a full landing page using AI (Claude/OpenAI) with SEO + UTM.
+
+    If the `landing_pages` table isn't migrated yet we 503 instead of
+    returning a 200 with `saved: false` — the old behaviour made the UI
+    think the page was saved when it wasn't. Frontend branches on 503
+    + the `/admin/leads/status` response to show a migration banner.
+    """
     from app.services.lead_service import ai_generate_landing_page, create_landing_page as svc_create
 
     generated = await ai_generate_landing_page(
@@ -462,31 +509,27 @@ async def generate_landing_page(
         tone=body.tone,
         cta_destination=body.cta_destination,
     )
-    # Try to save to database; return generated content even if DB fails
     try:
         result = await svc_create(db, generated)
         await db.commit()
         return result
+    except ProgrammingError as exc:
+        logger.warning("landing_pages table missing (generate): %s", exc)
+        await db.rollback()
+        raise HTTPException(
+            status_code=503,
+            detail="Landing pages table not yet created. Run the database migration.",
+        )
     except Exception as exc:
         import traceback
         logger.error("Failed to save landing page to DB: %s\n%s", exc, traceback.format_exc())
         await db.rollback()
-        # Parse sections_json from body_html for the frontend
-        sections_json = None
-        if generated.get("body_html", "").strip().startswith("{"):
-            try:
-                import json as _json
-                parsed = _json.loads(generated["body_html"])
-                if parsed.get("format_version") == 2:
-                    sections_json = parsed
-            except Exception:
-                pass
-        generated["id"] = "preview"
-        generated["status"] = "draft"
-        generated["saved"] = False
-        generated["save_error"] = str(exc)
-        generated["sections_json"] = sections_json
-        return generated
+        # Genuine save failure (not a missing table) — surface as 500 so the
+        # UI can show a real error instead of pretending the save succeeded.
+        raise HTTPException(
+            status_code=500,
+            detail=f"Landing page generated but DB save failed: {exc}",
+        )
 
 
 @router.put(

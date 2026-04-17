@@ -113,6 +113,18 @@ async def _validate_chat_permission(
             detail="This contact has not been fully approved yet",
         )
 
+    # Wave 3.5 D2: verified-contact requirement — contact must have clicked
+    # their verification link before any chat or call can begin. Protects
+    # against a stranger being added by a compromised parent account.
+    if not contact.is_verified:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=(
+                "This contact hasn't verified their email yet. "
+                "They need to accept the invite before messages can go through."
+            ),
+        )
+
     result = await db.execute(
         select(CirclePermission).where(
             and_(
@@ -2022,3 +2034,218 @@ async def get_intervention_stats(
         escalation_trend=escalation_trend,
         time_distribution=time_distribution,
     )
+
+
+# ============================================================
+# Child-initiated safety: report/block a circle contact + SOS
+# ============================================================
+
+
+@router.post(
+    "/child/report-contact/{contact_id}",
+    status_code=status.HTTP_202_ACCEPTED,
+    summary="Child reports/blocks a circle contact (C4)",
+    description=(
+        "Child-side safety action. Auto-deactivates the contact immediately and "
+        "fires high-priority notifications to BOTH parents. No child reasoning "
+        "string is required — a kid's tap is enough. Tamper-evident EventLog entry."
+    ),
+)
+async def child_report_contact(
+    contact_id: str,
+    body: dict | None = None,
+    current_child: ChildUser = Depends(get_current_child_user),
+    db: AsyncSession = Depends(get_db),
+):
+    result = await db.execute(select(CircleContact).where(CircleContact.id == contact_id))
+    contact = result.scalar_one_or_none()
+    if not contact:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Contact not found")
+
+    # Verify the contact belongs to this child's family file
+    if str(contact.family_file_id) != str(current_child.family_file_id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized to report this contact",
+        )
+
+    reason = ((body or {}).get("reason") or "").strip()[:500]
+    category = (body or {}).get("category") or "safety"
+    if category not in ("safety", "inappropriate", "bypass", "other"):
+        category = "safety"
+
+    # Kid-initiated report is always treated as critical — auto-block
+    contact.is_active = False
+
+    # Fetch family file + child for notifications
+    ff_result = await db.execute(
+        select(FamilyFile).where(FamilyFile.id == current_child.family_file_id)
+    )
+    family_file = ff_result.scalar_one_or_none()
+    child_result = await db.execute(select(Child).where(Child.id == current_child.child_id))
+    child = child_result.scalar_one_or_none()
+    child_name = (child.first_name if child else None) or current_child.username or "Your child"
+    contact_name = contact.contact_name or "Contact"
+
+    # Tamper-evident audit entry
+    event_data = {
+        "contact_name": contact_name,
+        "contact_email": contact.contact_email,
+        "relationship_type": contact.relationship_type,
+        "reported_by": "child",
+        "child_id": str(current_child.child_id),
+        "child_user_id": str(current_child.id),
+        "category": category,
+        "severity": "critical",
+        "reason": reason or "(no reason given — child-initiated)",
+        "auto_blocked": True,
+    }
+    event_log = EventLog(
+        family_file_id=str(contact.family_file_id),
+        event_type="circle_contact_reported",
+        category="safety",
+        actor_id=str(current_child.id),
+        severity="critical",
+        related_resource_type="circle_contact",
+        related_resource_id=str(contact.id),
+        event_data=event_data,
+    )
+    db.add(event_log)
+
+    # Notify BOTH parents — high priority, not silent
+    parent_ids = []
+    if family_file:
+        if family_file.parent_a_id:
+            parent_ids.append(str(family_file.parent_a_id))
+        if family_file.parent_b_id:
+            parent_ids.append(str(family_file.parent_b_id))
+
+    for pid in parent_ids:
+        try:
+            await push_service.send_notification(
+                db=db,
+                user_id=pid,
+                title=f"Safety alert: {child_name} blocked a contact",
+                body=(
+                    f"{child_name} used the block & report button on {contact_name}. "
+                    f"The contact has been removed. Open CommonGround to review."
+                ),
+                url="/my-circle/contact",
+                tag=f"child-safety-report-{contact.id}",
+                data={
+                    "type": "child_reported_contact",
+                    "contact_id": str(contact.id),
+                    "child_id": str(current_child.child_id),
+                    "priority": "high",
+                },
+            )
+        except Exception as e:
+            logger.error(f"Failed to notify parent {pid} of child safety report: {e}")
+            capture_error(e)
+
+    try:
+        await ActivityService.create_activity(
+            db=db,
+            family_file_id=str(contact.family_file_id),
+            activity_type=ActivityType.CIRCLE_CONTACT_BLOCKED.value,
+            actor_id=str(current_child.id),
+            actor_name=child_name,
+            subject_type="circle_contact",
+            subject_id=str(contact.id),
+            subject_name=contact_name,
+            title=f"{child_name} reported and blocked {contact_name}",
+            description=reason or "Child used the in-app block & report button.",
+            severity="critical",
+        )
+    except Exception as e:
+        logger.error(f"Failed to log child-safety activity: {e}")
+        capture_error(e)
+
+    await db.commit()
+    return {
+        "reported": True,
+        "blocked": True,
+        "contact_id": str(contact.id),
+        "message": "This contact has been blocked. Your parents have been notified.",
+    }
+
+
+@router.post(
+    "/child/sos",
+    status_code=status.HTTP_202_ACCEPTED,
+    summary="Child 'I need help' signal",
+    description=(
+        "Fires an urgent notification to BOTH parents. Never blocks — designed to "
+        "be reachable from any KidSpace screen. Logs an EventLog with severity=critical."
+    ),
+)
+async def child_sos(
+    body: dict | None = None,
+    current_child: ChildUser = Depends(get_current_child_user),
+    db: AsyncSession = Depends(get_db),
+):
+    note = ((body or {}).get("note") or "").strip()[:500]
+    context = ((body or {}).get("context") or "").strip()[:100]  # e.g. "chat", "call", "theater"
+
+    ff_result = await db.execute(
+        select(FamilyFile).where(FamilyFile.id == current_child.family_file_id)
+    )
+    family_file = ff_result.scalar_one_or_none()
+    child_result = await db.execute(select(Child).where(Child.id == current_child.child_id))
+    child = child_result.scalar_one_or_none()
+    child_name = (child.first_name if child else None) or current_child.username or "Your child"
+
+    event_log = EventLog(
+        family_file_id=str(current_child.family_file_id),
+        event_type="child_safety_sos",
+        category="safety",
+        actor_id=str(current_child.id),
+        severity="critical",
+        related_resource_type="child",
+        related_resource_id=str(current_child.child_id),
+        event_data={
+            "child_name": child_name,
+            "child_id": str(current_child.child_id),
+            "context": context or "unspecified",
+            "note": note,
+        },
+    )
+    db.add(event_log)
+
+    parent_ids = []
+    if family_file:
+        if family_file.parent_a_id:
+            parent_ids.append(str(family_file.parent_a_id))
+        if family_file.parent_b_id:
+            parent_ids.append(str(family_file.parent_b_id))
+
+    for pid in parent_ids:
+        try:
+            await push_service.send_notification(
+                db=db,
+                user_id=pid,
+                title=f"{child_name} needs help",
+                body=(
+                    f"{child_name} tapped the help button"
+                    + (f" from {context}" if context else "")
+                    + ". Please check on them."
+                ),
+                url=f"/family-files/{current_child.family_file_id}",
+                tag=f"child-sos-{current_child.id}",
+                data={
+                    "type": "child_sos",
+                    "child_id": str(current_child.child_id),
+                    "context": context,
+                    "priority": "high",
+                },
+            )
+        except Exception as e:
+            logger.error(f"Failed to send SOS to parent {pid}: {e}")
+            capture_error(e)
+
+    await db.commit()
+    return {
+        "sent": True,
+        "parents_notified": len(parent_ids),
+        "message": "Your parents have been notified. They'll check on you soon.",
+    }

@@ -33,6 +33,7 @@ async def get_content_performance(
         from app.services.ga4_service import get_content_performance as ga4_content
         ga4_data = await ga4_content(db)
         if ga4_data and ga4_data.get("posts"):
+            ga4_data.setdefault("is_sample", False)
             return ga4_data
     except Exception as e:
         logger.debug("GA4 content data not available: %s", e)
@@ -77,7 +78,16 @@ async def get_content_performance(
             "views": max(base_views + daily_variation, 10),
         })
 
-    return {"posts": posts, "trend": trend}
+    return {
+        "posts": posts,
+        "trend": trend,
+        "is_sample": True,
+        "sample_reason": (
+            "GA4 not connected — showing blog titles with synthetic view / CTR / "
+            "conversion numbers derived from a hash of each title. Connect GA4 "
+            "in the admin settings to see real audience data."
+        ),
+    }
 
 
 # ── SEO Insights ─────────────────────────────────────────────────────────
@@ -115,7 +125,16 @@ async def get_seo_insights(
             "avg_position": round(base_pos + variation - improving, 1),
         })
 
-    return {"queries": queries, "position_trend": position_trend}
+    return {
+        "queries": queries,
+        "position_trend": position_trend,
+        "is_sample": True,
+        "sample_reason": (
+            "Google Search Console is not connected. These queries and positions "
+            "are placeholder data — connect a Search Console property to see "
+            "real keyword performance."
+        ),
+    }
 
 
 # ── Campaign Analytics ───────────────────────────────────────────────────
@@ -164,6 +183,12 @@ async def get_campaign_analytics(
             "total_spend": sum(c["spend"] for c in campaigns),
             "total_conversions": sum(c["conversions"] for c in campaigns),
         },
+        "is_sample": True,
+        "sample_reason": (
+            "Signup counts are real. Campaign names, impressions, clicks, and "
+            "spend are placeholder — connect Google Ads / Meta / SendGrid "
+            "reporting to populate real campaign data."
+        ),
     }
 
 
@@ -189,7 +214,16 @@ async def get_social_tracking(
         for p in platforms
     ]
 
-    return {"platforms": platforms, "referral_chart": referral_chart}
+    return {
+        "platforms": platforms,
+        "referral_chart": referral_chart,
+        "is_sample": True,
+        "sample_reason": (
+            "Social platform API integrations are not wired. Follower and "
+            "engagement counts are placeholder — connect each platform's "
+            "Graph / Insights API to populate real data."
+        ),
+    }
 
 
 # ── Attribution ──────────────────────────────────────────────────────────
@@ -228,7 +262,17 @@ async def get_attribution(
         for c in channel_data
     ]
 
-    return {"first_touch": first_touch, "last_touch": last_touch, "channels": channels}
+    return {
+        "first_touch": first_touch,
+        "last_touch": last_touch,
+        "channels": channels,
+        "is_sample": True,
+        "sample_reason": (
+            "Total user count is real. Channel attribution percentages "
+            "(35% organic, 25% direct, …) are hardcoded — connect GA4 "
+            "with UTM tagging to compute real multi-touch attribution."
+        ),
+    }
 
 
 # ── AI Marketing Suggestions ────────────────────────────────────────────

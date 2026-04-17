@@ -1,8 +1,32 @@
 # KidComs - Child Communication System
 
-**Last Updated:** January 22, 2026
-**Version:** 1.6.0
-**Status:** Production Ready
+**Last Updated:** April 16, 2026 (Wave 1–3 audit)
+**Version:** 1.6.0 + Waves 1–3
+**Status:** Production Ready for 300-user pilot (paid-tier infra required)
+
+---
+
+## April 2026 Audit — What Ships vs. What's Planned
+
+| Feature | Status | Notes |
+|---|---|---|
+| Video / voice calls | ✅ **Shipped** | Daily.co, confirmed end-to-end |
+| Persistent parent↔child text | ✅ **Shipped (Wave 1)** | `/family-messaging/threads/*` — no call required |
+| Theater / Watch Together | ✅ **Shipped** | Server-side audit (Wave 2 B5), auto-pause on presenter disconnect (B6) |
+| Circle in-call chat | ✅ **Shipped** | ARIA monitoring is real (Wave 1 unstubbed A2); sender-type fixed (A4) |
+| Theater time-window enforcement | ✅ **Shipped (Wave 3 C14)** | Timezone-aware — "9am–8pm" respects parent's local zone |
+| Circle-contact block / report | ✅ **Shipped (Wave 3 C4)** | `POST /circle/{id}/report`; severity='critical' auto-blocks |
+| Daily.co room sweep | ✅ **Shipped (Wave 1 A8)** | Sessions abandoned >60min auto-cleaned every 15min |
+| YouTube content validation | ✅ **Shipped (Wave 3 C8)** | Format check + strict-mode whitelist; expansion via YouTube Data API pending |
+| ARIA circuit breaker | ✅ **Shipped (Wave 2 B2)** | 3 failures → 30s fast-fail; prevents LLM outage from starving workers |
+| Child wallet UI | ⚠️ **Backend only** | Endpoints complete; child-facing UI still parent-only (Wave 3 C1 pending) |
+| Chores / Rewards | ❌ **Not built** | Wave 3 C2/C3 — gated on product review |
+| Whiteboard | ❌ **Stub** | "Coming soon" in UI, no backend (Wave 3 C5 — ship or remove) |
+| Read-Along real-time sync | ❌ **Not built** | Progress tracking exists; no page-sync (Wave 3 C6) |
+| Arcade multiplayer | ⚠️ **Single-player only** | Shared-state sync not implemented (Wave 3 C7) |
+| Stripe Issuing (virtual cards) | 🚧 **Wave 4** | Gated on legal + `card_issuing` capability approval |
+
+**Infrastructure reminder (April 2026):** Free tiers of Render, Vercel, and Supabase are insufficient for 300 concurrent users. Paid tiers required before launch — see the audit plan in `/Users/tj/.claude/plans/we-want-to-do-enchanted-island.md`.
 
 ---
 

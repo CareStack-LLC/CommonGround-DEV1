@@ -33,7 +33,8 @@ import {
   AlertCircle,
   X,
   ChevronRight,
-  CheckCircle
+  CheckCircle,
+  Scale
 } from 'lucide-react';
 
 type TabType = 'overview' | 'transactions' | 'children' | 'payouts';
@@ -188,9 +189,14 @@ function WalletContent() {
         setWallet(currentWallet);
       }
 
-      // Start onboarding
-      const { onboarding_url } = await walletAPI.startOnboarding(currentWallet.id);
-      window.location.href = onboarding_url;
+      // Wave 4-Alt: Stripe Connect onboarding is retired. We no longer
+      // redirect users off-site to complete KYC — funding is done directly
+      // via Stripe Checkout when they pay an obligation. Route them back
+      // to the wallet home with an info state instead of kicking off
+      // onboarding that the backend will now 410.
+      setError(
+        'Good news — you don\u2019t need to connect a bank account anymore. CommonGround now uses virtual cards for shared expenses, so you just pay with your usual debit or credit card when it\u2019s time to fund a request.',
+      );
     } catch (err: any) {
       setError(err.message || 'Failed to start wallet setup');
     }
@@ -354,7 +360,7 @@ function WalletContent() {
             <div className="space-y-6">
               {/* Quick Actions */}
               {wallet?.onboarding_completed && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   <button
                     onClick={() => setShowDepositModal(true)}
                     className="p-5 bg-card rounded-2xl border-2 border-border hover:border-[var(--portal-primary)]/30 hover:shadow-xl transition-all duration-300 hover:scale-[1.01] text-left group"
@@ -385,6 +391,29 @@ function WalletContent() {
                       <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-[var(--portal-primary)] group-hover:translate-x-1 transition-all duration-300" />
                     </div>
                   </button>
+                  {familyFiles.length > 0 && (
+                    <button
+                      onClick={() => {
+                        const targetId = familyFileId || familyFiles[0]?.id;
+                        if (targetId) router.push(`/family-files/${targetId}/child-support`);
+                      }}
+                      className="p-5 bg-gradient-to-br from-amber-50 to-card rounded-2xl border-2 border-amber-200 hover:border-amber-400 hover:shadow-xl transition-all duration-300 hover:scale-[1.01] text-left group relative overflow-hidden"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="w-14 h-14 bg-gradient-to-br from-amber-500/15 to-yellow-600/10 rounded-2xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
+                          <Scale className="h-6 w-6 text-amber-700" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-bold text-foreground flex items-center gap-1.5" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                            Child Support
+                            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 uppercase tracking-wide">SDU</span>
+                          </p>
+                          <p className="text-sm text-muted-foreground font-medium">Log state disbursement payments</p>
+                        </div>
+                        <ChevronRight className="h-5 w-5 text-amber-600 group-hover:text-amber-700 group-hover:translate-x-1 transition-all duration-300" />
+                      </div>
+                    </button>
+                  )}
                 </div>
               )}
 

@@ -65,6 +65,11 @@ def _movie_to_dict(m: KidSpaceMovie) -> dict:
         "poster_url": m.poster_url,
         "video_url": m.video_url,
         "trailer_url": m.trailer_url,
+        # Frontend chooses <MuxPlayer> vs <video> based on playback_provider.
+        # `mux_asset_id` is NOT included here — asset_id is an admin-facing
+        # internal identifier; only `mux_playback_id` is playback-relevant.
+        "playback_provider": getattr(m, "playback_provider", "direct"),
+        "mux_playback_id": getattr(m, "mux_playback_id", None),
         "is_featured": m.is_featured,
         "is_visible": m.is_visible,
         "view_count": m.view_count,
@@ -74,10 +79,20 @@ def _movie_to_dict(m: KidSpaceMovie) -> dict:
 
 
 def _book_to_dict(b: KidSpaceBook) -> dict:
+    # `b.author` is loaded via the relationship when the query eager-loads
+    # (`selectinload`) or lazy-loads inside an async session. When neither
+    # is set up, fall back to None so the UI can still render.
+    author_name: Optional[str] = None
+    try:
+        if b.author is not None:
+            author_name = b.author.name
+    except Exception:  # pragma: no cover — relationship not loaded
+        author_name = None
     return {
         "id": str(b.id),
         "title": b.title,
         "author_id": b.author_id,
+        "author_name": author_name,
         "description": b.description,
         "page_count": b.page_count,
         "age_min": b.age_min,

@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "frontend",
+      "runtimeExecutable": "/bin/bash",
+      "runtimeArgs": ["-c", "export PATH=/Users/tj/.nvm/versions/node/v20.19.1/bin:/usr/local/bin:/usr/bin:/bin:$PATH && pnpm run dev"],
+      "port": 3000,
+      "cwd": "frontend"
+    }
+  ]
+}

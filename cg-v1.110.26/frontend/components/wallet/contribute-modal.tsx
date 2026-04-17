@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { walletAPI, ChildWallet } from '@/lib/api';
+import { useEffect, useState } from 'react';
+import { walletAPI, myCircleAPI, ChildWallet, CirclePermission } from '@/lib/api';
 import {
   Gift,
   DollarSign,
@@ -12,7 +12,8 @@ import {
   Heart,
   MessageSquare,
   User,
-  Mail
+  Mail,
+  Users
 } from 'lucide-react';
 
 interface ContributeModalProps {
@@ -20,6 +21,31 @@ interface ContributeModalProps {
   isGuest?: boolean; // True for circle members without accounts
   onSuccess?: () => void;
   onClose: () => void;
+}
+
+interface CircleSession {
+  contactId: string;
+  contactName?: string;
+}
+
+/**
+ * Detect if the current browser session belongs to a circle contact.
+ * Circle contacts authenticate via a separate flow and store `circle_token`
+ * plus a `circle_user` blob (see /my-circle/contact login page).
+ */
+function getCircleSession(): CircleSession | null {
+  if (typeof window === 'undefined') return null;
+  const token = localStorage.getItem('circle_token');
+  if (!token) return null;
+  try {
+    const raw = localStorage.getItem('circle_user');
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed?.contactId) return null;
+    return { contactId: parsed.contactId, contactName: parsed.contactName };
+  } catch {
+    return null;
+  }
 }
 
 const PRESET_AMOUNTS = [10, 25, 50, 100];
@@ -53,6 +79,45 @@ export default function ContributeModal({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+
+  // Circle contact ("grandparent" style) session, if any. When present we show
+  // a child picker above the amount field and forward contributor_circle_contact_id.
+  const [circleSession, setCircleSession] = useState<CircleSession | null>(null);
+  const [allowedChildren, setAllowedChildren] = useState<CirclePermission[]>([]);
+  const [selectedChildId, setSelectedChildId] = useState<string>(childWallet.child_id);
+  const [childrenLoading, setChildrenLoading] = useState(false);
+
+  useEffect(() => {
+    const session = getCircleSession();
+    setCircleSession(session);
+    if (!session) return;
+
+    let cancelled = false;
+    setChildrenLoading(true);
+    myCircleAPI
+      .getMyPermissions()
+      .then((res) => {
+        if (cancelled) return;
+        // De-dupe by child_id (a contact may have multiple permission rows per child).
+        const seen = new Set<string>();
+        const unique = res.items.filter((p) => {
+          if (seen.has(p.child_id)) return false;
+          seen.add(p.child_id);
+          return true;
+        });
+        setAllowedChildren(unique);
+      })
+      .catch(() => {
+        // Non-fatal: we simply fall back to the wallet that was opened.
+      })
+      .finally(() => {
+        if (!cancelled) setChildrenLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [childWallet.child_id]);
 
   const handleAmountChange = (value: string) => {
     const cleaned = value.replace(/[^0-9.]/g, '');
@@ -91,14 +156,19 @@ export default function ContributeModal({
     setIsLoading(true);
     setError(null);
 
+    const targetChildId = circleSession ? selectedChildId : childWallet.child_id;
+
     try {
-      await walletAPI.contributeToChild(childWallet.child_id, {
+      await walletAPI.contributeToChild(targetChildId, {
         amount: numAmount,
         payment_method_id: 'pm_xxx', // Would come from Stripe Elements
-        contributor_name: contributorName || 'Anonymous',
+        contributor_name: contributorName || circleSession?.contactName || 'Anonymous',
         contributor_email: contributorEmail,
         purpose: purpose || undefined,
         message: message || undefined,
+        contributor_circle_contact_id: circleSession
+          ? circleSession.contactId
+          : undefined,
       });
 
       setSuccess(true);
@@ -161,6 +231,60 @@ export default function ContributeModal({
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
+          {/* Circle-contact child picker */}
+          {circleSession && (
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-2">
+                <Users className="h-4 w-4 inline mr-1" style={{ color: '#3DAA8A' }} />
+                Which kid?
+              </label>
+              {childrenLoading ? (
+                <div className="flex items-center gap-2 px-4 py-2.5 bg-muted/40 border border-border rounded-xl text-sm text-muted-foreground">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Loading children...
+                </div>
+              ) : allowedChildren.length > 0 ? (
+                <select
+                  value={selectedChildId}
+                  onChange={(e) => setSelectedChildId(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-card border border-border rounded-xl focus:outline-none focus:ring-2 focus:border-transparent appearance-none"
+                  style={{
+                    // KidSpace accent focus ring
+                    boxShadow: 'none',
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = '#3DAA8A';
+                    e.currentTarget.style.boxShadow = '0 0 0 2px rgba(61, 170, 138, 0.2)';
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = '';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                >
+                  {/* Ensure the wallet's child is always selectable, even if the
+                      permissions endpoint returned nothing for them yet. */}
+                  {!allowedChildren.some((p) => p.child_id === childWallet.child_id) && (
+                    <option value={childWallet.child_id}>
+                      {childWallet.child_name}
+                    </option>
+                  )}
+                  {allowedChildren.map((p) => (
+                    <option key={p.child_id} value={p.child_id}>
+                      {p.child_name || 'Child'}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <div className="px-4 py-2.5 bg-muted/40 border border-border rounded-xl text-sm text-foreground">
+                  {childWallet.child_name}
+                </div>
+              )}
+              <p className="text-xs text-muted-foreground mt-1.5">
+                Your gift will land in this child&apos;s savings.
+              </p>
+            </div>
+          )}
+
           {/* Guest Info */}
           {isGuest && (
             <div className="space-y-4">

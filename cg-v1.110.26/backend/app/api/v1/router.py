@@ -7,6 +7,7 @@ from app.core.security import require_parent_user
 
 from app.api.v1.endpoints import (
     admin,
+    admin_cleanup,
     admin_leads,
     admin_inbox,
     admin_sales,
@@ -14,6 +15,9 @@ from app.api.v1.endpoints import (
     admin_marketing as admin_mktg,
     admin_ga4,
     auth,
+    notifications,
+    parent_child_messages,
+    circle_parent_messages,
     users,
     partners,
     cases,
@@ -68,6 +72,10 @@ from app.api.v1.endpoints import (
     kidspace_media,
     chatbot,
     demo,
+    chores,
+    rewards,
+    sdu,
+    stripe_issuing_webhooks,
 )
 
 api_router = APIRouter()
@@ -130,8 +138,25 @@ api_router.include_router(kidcoms.router, prefix="/kidcoms", tags=["KidComs"])
 # My Circle - Child/Contact Communication Portal
 api_router.include_router(my_circle.router, prefix="/my-circle", tags=["My Circle"])
 
+# Family Messaging — persistent parent ↔ child async inbox (Wave 1 A1)
+api_router.include_router(
+    parent_child_messages.router,
+    prefix="/family-messaging",
+    tags=["Family Messaging"],
+)
+
+# Notifications — in-app inbox + email dispatch (Wave 1 A6)
+api_router.include_router(notifications.router, tags=["Notifications"])
+
 # Circle Messages - Text messaging between children, parents, and circle contacts
 api_router.include_router(circle_messages.router, prefix="/circle-messages", tags=["Circle Messages"])
+
+# Circle Parent Messages - Dedicated parent ↔ circle-contact coordination thread
+api_router.include_router(
+    circle_parent_messages.router,
+    prefix="/circle-parent-messages",
+    tags=["Circle Parent Messages"],
+)
 
 # Subscriptions - Pricing tiers and billing
 api_router.include_router(subscriptions.router, prefix="/subscriptions", tags=["Subscriptions"])
@@ -221,6 +246,22 @@ api_router.include_router(chatbot.router, prefix="/chatbot", tags=["Chatbot"])
 # ARIA Demo - Public interactive demo (no auth)
 api_router.include_router(demo.router, prefix="/demo", tags=["ARIA Demo"])
 
+# Chores / Tasks (Wave 3 C2) — parent assigns, child completes, parent approves
+api_router.include_router(chores.router, prefix="/chores", tags=["Chores"])
+
+# Rewards Store (Wave 3 C3) — parent catalog, child redeems from wallet
+api_router.include_router(rewards.router, prefix="/rewards", tags=["Rewards"])
+
+# State Disbursement Unit redirect + child-support payment log (Wave 4-Alt)
+api_router.include_router(sdu.router, prefix="/sdu", tags=["Child Support Tracking"])
+
+# Stripe Issuing webhooks (Wave 4-Alt) — separate from /webhooks/stripe so the
+# Stripe dashboard can route issuing.* events to their own handler with
+# persistent idempotency via StripeWebhookEvent.
+api_router.include_router(
+    stripe_issuing_webhooks.router, prefix="/webhooks", tags=["Stripe Issuing Webhooks"]
+)
+
 # Bug Hunt Tester - Public testing portal (no auth)
 from app.api.v1.endpoints import bug_hunt_tester
 api_router.include_router(bug_hunt_tester.router, prefix="/bug-hunt", tags=["Bug Hunt Tester"])
@@ -243,3 +284,10 @@ api_router.include_router(admin_ga4.router, prefix="/admin", tags=["Admin GA4 An
 
 # SuperAdmin Portal - Platform administration
 api_router.include_router(admin.router, prefix="/admin", tags=["SuperAdmin Portal"])
+
+# Admin Maintenance — Daily.co room sweeper & other ops jobs (Wave 1 A8)
+api_router.include_router(
+    admin_cleanup.router,
+    prefix="/admin/cleanup",
+    tags=["Admin Maintenance"],
+)

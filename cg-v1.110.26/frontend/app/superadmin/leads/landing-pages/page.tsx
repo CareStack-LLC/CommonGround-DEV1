@@ -50,13 +50,56 @@ export default function LandingPagesPage() {
   const [publishingId, setPublishingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
+  // Leads/landing-pages status. When `landing_pages_table` is false the
+  // backend returns `[]` from getLandingPages — which used to look like "no
+  // pages yet" instead of "this feature was never migrated." The migration
+  // banner below now makes that distinction explicit.
+  type LeadsStatus = {
+    landing_pages_table?: boolean;
+    campaigns_table?: boolean;
+    lists_table?: boolean;
+    sendgrid_configured?: boolean;
+    features?: Record<string, boolean>;
+  };
+  const [leadsStatus, setLeadsStatus] = useState<LeadsStatus | null>(null);
+  const [statusLoaded, setStatusLoaded] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const s = await adminAPI.getLeadsStatus();
+        if (!cancelled) setLeadsStatus(s as LeadsStatus);
+      } catch {
+        if (!cancelled) setLeadsStatus({ landing_pages_table: false });
+      } finally {
+        if (!cancelled) setStatusLoaded(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const landingPagesMissing =
+    statusLoaded && leadsStatus?.landing_pages_table === false;
+
   const fetchPages = useCallback(async () => {
     try { setLoading(true); setError(null); const r = await adminAPI.getLandingPages(); setPages(Array.isArray(r) ? r : []); }
     catch (err: unknown) { setError(err instanceof Error ? err.message : 'Failed to load'); }
     finally { setLoading(false); }
   }, []);
 
-  useEffect(() => { fetchPages(); }, [fetchPages]);
+  useEffect(() => {
+    // Don't bother hitting /admin/landing-pages until we know the table
+    // exists. Prevents a throwaway request on every mount in unmigrated envs.
+    if (!statusLoaded) return;
+    if (landingPagesMissing) {
+      setLoading(false);
+      return;
+    }
+    fetchPages();
+  }, [fetchPages, statusLoaded, landingPagesMissing]);
 
   const handleGenerate = async () => {
     if (!genAudience.trim() || !genMessage.trim()) return;
@@ -75,7 +118,19 @@ export default function LandingPagesPage() {
         setTab('detail');
       }
       setTimeout(() => setSuccess(null), 5000);
-    } catch (err: unknown) { setError(err instanceof Error ? err.message : 'Generation failed'); }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Generation failed';
+      // Backend now returns 503 with a "table not yet created" detail when
+      // the migration hasn't run — translate into the user-facing banner
+      // instead of a scary red toast.
+      if (/table not yet created|landing_pages|503/i.test(msg)) {
+        setError(
+          'Landing pages table not migrated yet. Run the database migration, then retry.',
+        );
+      } else {
+        setError(msg);
+      }
+    }
     finally { setGenerating(false); }
   };
 
@@ -156,7 +211,7 @@ export default function LandingPagesPage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {tab === 'list' && (
+          {tab === 'list' && !landingPagesMissing && (
             <>
               <button onClick={fetchPages} disabled={loading} className="p-2 rounded-lg bg-[#2D6A8F]/20 hover:bg-[#2D6A8F]/30 text-[#8AACBC] hover:text-white transition-colors disabled:opacity-50">
                 <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -186,6 +241,28 @@ export default function LandingPagesPage() {
           )}
         </div>
       </div>
+
+      {/* Missing-table banner — shown instead of the list when the landing_pages
+          table was never migrated to this environment. Without this, the
+          admin saw "0 pages" and had no idea the feature wasn't set up. */}
+      {landingPagesMissing && (
+        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 px-5 py-4 space-y-2">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+            <div className="flex-1 space-y-1">
+              <p className="text-sm font-semibold text-amber-100">
+                Landing pages need a one-time database migration.
+              </p>
+              <p className="text-xs text-amber-200/80 leading-relaxed">
+                The <code>landing_pages</code> table doesn&apos;t exist in this environment yet,
+                so nothing can be created, viewed, or published. Run <code>alembic upgrade head</code>{' '}
+                against the backend database, then reload this page. The AI Generate button will
+                reappear once the table is ready.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Messages */}
       {error && (

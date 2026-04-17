@@ -14,6 +14,13 @@ __pycache__/
 *$py.class
 *.so
 
+# Python virtualenvs
+.venv/
+venv/
+env/
+backend/.venv/
+backend/venv/
+
 # Environment variables
 .env
 .env.local

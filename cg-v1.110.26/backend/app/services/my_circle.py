@@ -9,10 +9,13 @@ Handles:
 - Communication logging
 """
 
+import logging
 import secrets
 from datetime import datetime, timedelta
 from typing import Optional, List, Dict, Any
 from uuid import uuid4
+
+logger = logging.getLogger(__name__)
 
 from sqlalchemy import select, and_, or_, func
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -331,6 +334,24 @@ async def accept_circle_invite(
     user.invite_accepted_at = datetime.utcnow()
     user.invite_token = None  # Clear token
     user.email_verified = True  # They verified by clicking the link
+
+    # Also flip the backing CircleContact's is_verified flag. Without this
+    # `_validate_chat_permission` in circle_messages.py keeps blocking the
+    # contact forever (see pre-existing bug note in the companion report).
+    try:
+        contact_result = await db.execute(
+            select(CircleContact).where(CircleContact.id == user.circle_contact_id)
+        )
+        contact = contact_result.scalar_one_or_none()
+        if contact is not None and not contact.is_verified:
+            contact.is_verified = True
+            contact.verified_at = datetime.utcnow()
+    except Exception:
+        # Non-fatal: the user still has an account; we just log and move on.
+        logger.warning(
+            "Failed to set is_verified on CircleContact during invite acceptance",
+            exc_info=True,
+        )
 
     await db.flush()
     return user

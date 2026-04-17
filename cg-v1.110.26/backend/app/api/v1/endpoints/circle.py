@@ -27,6 +27,7 @@ from app.models.audit import EventLog
 from app.models.case import Case
 from app.models.activity import ActivityType
 from app.services.activity import ActivityService
+from app.services.notification_service import notification_service
 from app.services.push import push_service
 from app.schemas.circle import (
     CircleContactCreate,
@@ -456,6 +457,15 @@ async def delete_circle_contact(
         logger.error(f"Failed to log circle contact-blocked activity: {e}")
         capture_error(e)
 
+    # Notify the contact themselves that their access has been revoked.
+    try:
+        await notification_service.notify_circle_contact(
+            db=db, contact=contact, action="revoked", inviter_name=actor_name
+        )
+    except Exception as exc:
+        logger.warning("Circle contact revoke notification failed: %s", exc)
+        capture_error(exc)
+
     await db.commit()
 
 
@@ -494,6 +504,11 @@ async def approve_circle_contact(
         db, contact.family_file_id, current_user.id
     )
 
+    # Track prior state so we only notify on *transitions*.
+    was_communicable = contact.can_communicate(
+        await get_approval_mode(db, contact.family_file_id)
+    )
+
     if approval.approved:
         # Set approval timestamp for this parent
         if is_parent_a(family_file, current_user.id):
@@ -513,7 +528,154 @@ async def approve_circle_contact(
     # Get approval mode
     approval_mode = await get_approval_mode(db, contact.family_file_id)
 
+    # Notify the contact on approval transitions — only fire when the
+    # communicable state actually flips so we don't spam the contact on
+    # every toggle.
+    now_communicable = contact.can_communicate(approval_mode)
+    actor_name = (
+        f"{current_user.first_name or ''} {current_user.last_name or ''}".strip()
+        or "A parent"
+    )
+    try:
+        if approval.approved and now_communicable and not was_communicable:
+            await notification_service.notify_circle_contact(
+                db=db, contact=contact, action="verified", inviter_name=actor_name
+            )
+        elif (not approval.approved) and was_communicable and not now_communicable:
+            await notification_service.notify_circle_contact(
+                db=db, contact=contact, action="revoked", inviter_name=actor_name
+            )
+    except Exception as exc:
+        logger.warning("Circle contact lifecycle notification failed: %s", exc)
+        capture_error(exc)
+
     return _contact_to_response(contact, approval_mode)
+
+
+@router.post(
+    "/{contact_id}/report",
+    status_code=status.HTTP_202_ACCEPTED,
+    summary="Report circle contact (Wave 3 C4)",
+    description=(
+        "Parents can report a circle contact for safety concerns — inappropriate "
+        "language, attempting to bypass the circle, or child-safety red flags. "
+        "Logs a tamper-evident EventLog entry and, if severity=='critical', "
+        "auto-deactivates the contact. Notifies the other parent."
+    ),
+)
+async def report_circle_contact(
+    contact_id: str,
+    body: dict,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    reason = (body or {}).get("reason")
+    category = (body or {}).get("category") or "safety"
+    severity = (body or {}).get("severity") or "warning"
+    if not reason or not isinstance(reason, str) or len(reason.strip()) < 3:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="'reason' is required (min 3 chars).",
+        )
+    if severity not in ("info", "warning", "critical"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="severity must be 'info', 'warning', or 'critical'.",
+        )
+    if category not in ("safety", "inappropriate", "bypass", "other"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="category must be safety|inappropriate|bypass|other.",
+        )
+
+    result = await db.execute(select(CircleContact).where(CircleContact.id == contact_id))
+    contact = result.scalar_one_or_none()
+    if not contact:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Circle contact not found")
+
+    family_file = await get_family_file_with_access(db, contact.family_file_id, current_user.id)
+
+    actor_name = f"{current_user.first_name or ''} {current_user.last_name or ''}".strip() or "Parent"
+    contact_name = contact.contact_name or "Contact"
+    auto_blocked = severity == "critical"
+    if auto_blocked:
+        contact.is_active = False
+
+    await _create_event_log(
+        db=db,
+        family_file_id=contact.family_file_id,
+        event_type="circle_contact_reported",
+        category="safety",
+        actor_id=str(current_user.id),
+        severity=severity,
+        related_resource_type="circle_contact",
+        related_resource_id=str(contact.id),
+        event_data={
+            "contact_name": contact_name,
+            "contact_email": contact.contact_email,
+            "relationship_type": contact.relationship_type,
+            "reported_by": actor_name,
+            "category": category,
+            "severity": severity,
+            "reason": reason[:500],
+            "auto_blocked": auto_blocked,
+        },
+    )
+
+    # Notify the other parent so both sides see the safety signal.
+    other_parent_id = (
+        family_file.parent_b_id
+        if str(family_file.parent_a_id) == str(current_user.id)
+        else family_file.parent_a_id
+    )
+    if other_parent_id:
+        try:
+            await push_service.send_notification(
+                db=db,
+                user_id=other_parent_id,
+                title="Circle Contact Reported",
+                body=(
+                    f"{actor_name} reported {contact_name} for {category}"
+                    + (" (auto-blocked)" if auto_blocked else "")
+                ),
+                url="/my-circle/contact",
+                tag=f"circle-contact-reported-{contact.id}",
+                data={
+                    "type": "circle_contact_reported",
+                    "contact_id": str(contact.id),
+                    "severity": severity,
+                    "category": category,
+                },
+            )
+        except Exception as e:
+            logger.error(f"Failed to send contact-reported notification: {e}")
+            capture_error(e)
+
+    try:
+        await ActivityService.create_activity(
+            db=db,
+            family_file_id=contact.family_file_id,
+            activity_type=ActivityType.CIRCLE_CONTACT_BLOCKED.value,
+            actor_id=str(current_user.id),
+            actor_name=actor_name,
+            subject_type="circle_contact",
+            subject_id=str(contact.id),
+            subject_name=contact_name,
+            title=f"{actor_name} reported {contact_name}",
+            description=f"Reason: {reason[:200]}",
+            severity=severity,
+        )
+    except Exception as e:
+        logger.error(f"Failed to log circle contact-reported activity: {e}")
+        capture_error(e)
+
+    await db.commit()
+    return {
+        "reported": True,
+        "contact_id": str(contact.id),
+        "auto_blocked": auto_blocked,
+        "severity": severity,
+    }
 
 
 @router.post(

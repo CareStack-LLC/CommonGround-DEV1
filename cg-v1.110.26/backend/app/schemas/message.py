@@ -118,6 +118,11 @@ class ARIAAnalysisResponse(BaseModel):
     pattern_forecast: Optional[str] = None
     legal_flags: Optional[List[str]] = None
 
+    # Degradation signal: true when the V2 pipeline failed and analysis fell
+    # back to the V1 legacy pipeline (regex + single-shot LLM). Lets the UI
+    # warn that the shown analysis is not Sentinel Shield quality.
+    analysis_degraded: Optional[bool] = None
+
 
 class InterventionResponse(BaseModel):
     """ARIA intervention message."""

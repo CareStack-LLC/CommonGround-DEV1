@@ -6,6 +6,7 @@ import {
   Eye, Clock, MousePointerClick, ArrowRightLeft,
   TrendingUp, Users, ExternalLink, RefreshCw, Loader2,
   Lightbulb, Target, UserCheck, CalendarClock,
+  AlertTriangle, Link2, PlugZap,
 } from 'lucide-react';
 import {
   LineChart, Line, BarChart, Bar,
@@ -30,6 +31,8 @@ interface ContentPost {
 interface ContentPerformance {
   posts: ContentPost[];
   trend: { date: string; views: number }[];
+  is_sample?: boolean;
+  sample_reason?: string;
 }
 
 interface SEOQuery {
@@ -43,6 +46,8 @@ interface SEOQuery {
 interface SEOInsights {
   queries: SEOQuery[];
   position_trend: { date: string; avg_position: number }[];
+  is_sample?: boolean;
+  sample_reason?: string;
 }
 
 interface SocialPlatform {
@@ -55,6 +60,8 @@ interface SocialPlatform {
 interface SocialTracking {
   platforms: SocialPlatform[];
   referral_chart: { platform: string; visits: number }[];
+  is_sample?: boolean;
+  sample_reason?: string;
 }
 
 interface AttributionChannel {
@@ -69,6 +76,8 @@ interface Attribution {
   first_touch: { channel: string; value: number }[];
   last_touch: { channel: string; value: number }[];
   channels: AttributionChannel[];
+  is_sample?: boolean;
+  sample_reason?: string;
 }
 
 interface AIInsights {
@@ -124,6 +133,24 @@ function EmptyData({ message = 'No data yet' }: { message?: string }) {
   );
 }
 
+/**
+ * Shown above tab content when the backend returned `is_sample: true`.
+ * Tells the admin the numbers are placeholders from hardcoded arrays, not
+ * real audience data, so decisions aren't made from fabricated CTR / rank
+ * values.
+ */
+function SampleBanner({ reason }: { reason?: string }) {
+  return (
+    <div className="flex items-start gap-3 px-4 py-3 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-100 text-sm">
+      <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-amber-400" />
+      <div className="flex-1">
+        <p className="font-semibold">Sample data — not from your real traffic.</p>
+        {reason && <p className="text-xs text-amber-200/80 mt-1 leading-relaxed">{reason}</p>}
+      </div>
+    </div>
+  );
+}
+
 /* ── Content Tab ───────────────────────────────────────────────────── */
 
 function ContentTab() {
@@ -155,6 +182,7 @@ function ContentTab() {
 
   return (
     <div className="space-y-6">
+      {data.is_sample && <SampleBanner reason={data.sample_reason} />}
       {/* Top performing posts table */}
       <Card>
         <SectionTitle>Top Performing Posts</SectionTitle>
@@ -255,6 +283,7 @@ function SEOTab() {
 
   return (
     <div className="space-y-6">
+      {data.is_sample && <SampleBanner reason={data.sample_reason} />}
       {/* Top queries table */}
       <Card>
         <SectionTitle>Top Search Queries</SectionTitle>
@@ -353,6 +382,7 @@ function SocialTab() {
 
   return (
     <div className="space-y-6">
+      {data.is_sample && <SampleBanner reason={data.sample_reason} />}
       {/* Platform cards */}
       {platforms.length === 0 ? (
         <EmptyData message="No social platform data yet" />
@@ -436,6 +466,7 @@ function AttributionTab() {
 
   return (
     <div className="space-y-6">
+      {data.is_sample && <SampleBanner reason={data.sample_reason} />}
       {/* Side-by-side bar charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Card>
@@ -681,14 +712,78 @@ function AIInsightsTab() {
 
 /* ── Main Page ─────────────────────────────────────────────────────── */
 
+interface Ga4Status {
+  status?: 'ok' | 'not_connected' | string;
+  connect_url?: string;
+  message?: string;
+}
+
+/**
+ * Top-level gate. GA4 is the source of truth for every tab on this page.
+ * When OAuth isn't connected the backend returns
+ * `{status: "not_connected", connect_url}` (Wave 5 graceful response).
+ * We render a dedicated Connect GA4 card instead of the red ErrorState
+ * that previously showed because the page treated not_connected as a fetch
+ * failure.
+ */
+function ConnectGa4Card({ connectUrl, message }: { connectUrl?: string; message?: string }) {
+  return (
+    <div className="rounded-xl border border-[#2D6A8F]/30 bg-gradient-to-br from-[#1A3648]/80 to-[#0F2533]/60 p-8 max-w-2xl mx-auto text-center">
+      <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[#3DAA8A]/10 border border-[#3DAA8A]/30 mb-4">
+        <PlugZap className="w-7 h-7 text-[#3DAA8A]" />
+      </div>
+      <h2 className="text-lg font-semibold text-white mb-2">
+        Connect Google Analytics 4
+      </h2>
+      <p className="text-sm text-[#6B8A9A] leading-relaxed mb-5">
+        {message ||
+          'This page reads real content, SEO, social, and attribution data from GA4. Link your Google account to populate the tabs with live numbers — otherwise every tab shows sample data.'}
+      </p>
+      {connectUrl ? (
+        <a
+          href={connectUrl}
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#3DAA8A] hover:bg-[#2E8A6E] text-white text-sm font-semibold transition-colors"
+        >
+          <Link2 className="w-4 h-4" />
+          Connect GA4
+        </a>
+      ) : (
+        <p className="text-xs text-[#6B8A9A]">
+          Ask an engineer to set <code className="text-[#D0E4EC]">GA4_*</code> env vars and restart the API.
+        </p>
+      )}
+    </div>
+  );
+}
+
 export default function MarketingAnalyticsPage() {
   const [tab, setTab] = useTabState('content');
   const [loadedTabs, setLoadedTabs] = useState<Set<string>>(new Set(['content']));
+  const [ga4, setGa4] = useState<Ga4Status | null>(null);
+  const [ga4Loading, setGa4Loading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const result = await adminAPI.getGa4Status();
+        setGa4(result as Ga4Status);
+      } catch {
+        // On hard error (network, 500) assume not_connected so we show the
+        // Connect card rather than the red ErrorState — admins have always
+        // been able to retry by reloading.
+        setGa4({ status: 'not_connected' });
+      } finally {
+        setGa4Loading(false);
+      }
+    })();
+  }, []);
 
   const handleTabChange = (key: string) => {
     setTab(key);
     setLoadedTabs((prev) => new Set(prev).add(key));
   };
+
+  const notConnected = !ga4Loading && ga4?.status === 'not_connected';
 
   return (
     <div className="space-y-6">
@@ -699,13 +794,23 @@ export default function MarketingAnalyticsPage() {
         </p>
       </div>
 
-      <TabBar tabs={TABS} activeTab={tab} onTabChange={handleTabChange} />
+      {ga4Loading ? (
+        <div className="flex items-center gap-2 text-[#6B8A9A] text-sm py-12 justify-center">
+          <Loader2 className="w-4 h-4 animate-spin" /> Checking GA4 connection…
+        </div>
+      ) : notConnected ? (
+        <ConnectGa4Card connectUrl={ga4?.connect_url} message={ga4?.message} />
+      ) : (
+        <>
+          <TabBar tabs={TABS} activeTab={tab} onTabChange={handleTabChange} />
 
-      {tab === 'content' && <ContentTab />}
-      {tab === 'seo' && loadedTabs.has('seo') && <SEOTab />}
-      {tab === 'social' && loadedTabs.has('social') && <SocialTab />}
-      {tab === 'attribution' && loadedTabs.has('attribution') && <AttributionTab />}
-      {tab === 'ai' && loadedTabs.has('ai') && <AIInsightsTab />}
+          {tab === 'content' && <ContentTab />}
+          {tab === 'seo' && loadedTabs.has('seo') && <SEOTab />}
+          {tab === 'social' && loadedTabs.has('social') && <SocialTab />}
+          {tab === 'attribution' && loadedTabs.has('attribution') && <AttributionTab />}
+          {tab === 'ai' && loadedTabs.has('ai') && <AIInsightsTab />}
+        </>
+      )}
     </div>
   );
 }

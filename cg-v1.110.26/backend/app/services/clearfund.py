@@ -10,10 +10,13 @@ Key Invariants:
 5. All state transitions logged
 """
 
+import logging
 import uuid
 from datetime import datetime
 from decimal import Decimal
 from typing import Optional, Tuple, List
+
+logger = logging.getLogger(__name__)
 
 from fastapi import HTTPException, status
 from sqlalchemy import select, and_, or_, func
@@ -782,6 +785,19 @@ class ClearFundService:
                         "total_amount": str(obligation.total_amount),
                     }
                 )
+
+            # Wave 4-Alt: when an obligation transitions to fully-funded, attempt
+            # to auto-issue a virtual card. Non-fatal if Issuing is not yet
+            # configured — the obligation still goes to `funded` and can be
+            # retried via an admin endpoint once the account is approved.
+            if obligation.status == "funded":
+                try:
+                    await issue_virtual_card_on_funding(self.db, str(obligation.id))
+                except Exception as issuing_exc:  # pragma: no cover — best-effort
+                    logger.warning(
+                        "issue_virtual_card_on_funding failed for obligation=%s: %s",
+                        obligation.id, issuing_exc,
+                    )
 
             return funding
 
@@ -1932,3 +1948,168 @@ class LedgerService:
             )
         )
         return result.scalar() or Decimal("0")
+
+
+# ─────────────────────────────────────────────────────────────────────────
+# Wave 4-Alt: auto-issue virtual card on obligation fully-funded
+# ─────────────────────────────────────────────────────────────────────────
+
+async def issue_virtual_card_on_funding(
+    db: AsyncSession, obligation_id: str
+) -> Optional[VirtualCardAuthorization]:
+    """Create (or retrieve) a Stripe Issuing virtual card for a funded obligation.
+
+    Idempotent: if a `VirtualCardAuthorization` already exists for this
+    obligation with a `stripe_card_id`, we return it unchanged. If Issuing
+    is not configured on the platform (no `STRIPE_SECRET_KEY`), we quietly
+    return None — the obligation stays `funded` so the parent can retry
+    once the capability is provisioned.
+
+    Flow:
+        1. Load the obligation.
+        2. Resolve the "requesting" (= spending) parent from the `created_by`
+           field — this is who the card gets issued to.
+        3. Create or reuse a Stripe cardholder for that parent.
+        4. Build spending_controls from mcc_mapping + obligation amount.
+        5. Create the virtual card via Stripe Issuing.
+        6. Upsert the `VirtualCardAuthorization` row linking the card to the
+           obligation.
+    """
+    from app.models.user import UserProfile
+    from app.services.mcc_mapping import build_spending_controls
+    from app.services.stripe_issuing import (
+        create_cardholder,
+        create_virtual_card,
+        is_issuing_available,
+    )
+
+    obligation = (
+        await db.execute(select(Obligation).where(Obligation.id == obligation_id))
+    ).scalar_one_or_none()
+    if not obligation:
+        logger.warning("issue_virtual_card_on_funding: obligation %s not found", obligation_id)
+        return None
+
+    if obligation.status != "funded":
+        logger.info(
+            "issue_virtual_card_on_funding: obligation %s status=%s (expected 'funded'); skipping",
+            obligation_id, obligation.status,
+        )
+        return None
+
+    # Idempotency check — already issued?
+    existing = (
+        await db.execute(
+            select(VirtualCardAuthorization).where(
+                VirtualCardAuthorization.obligation_id == obligation_id
+            )
+        )
+    ).scalar_one_or_none()
+    if existing and getattr(existing, "stripe_card_id", None):
+        return existing
+
+    if not is_issuing_available():
+        logger.info(
+            "issue_virtual_card_on_funding: STRIPE_SECRET_KEY missing; leaving obligation %s at 'funded' for retry",
+            obligation_id,
+        )
+        return None
+
+    # Resolve requesting parent.
+    requester_id = obligation.created_by
+    requester = (
+        await db.execute(
+            select(User).where(User.id == requester_id).options(selectinload(User.profile))
+        )
+    ).scalar_one_or_none()
+    if not requester:
+        logger.warning("issue_virtual_card_on_funding: requester %s not found", requester_id)
+        return None
+
+    # Create / reuse Stripe cardholder. UserProfile carries stripe_cardholder_id
+    # on a field we reuse to dedupe across obligations.
+    profile: Optional[UserProfile] = getattr(requester, "profile", None)
+    cardholder_id: Optional[str] = getattr(profile, "stripe_cardholder_id", None) if profile else None
+
+    if not cardholder_id:
+        try:
+            cardholder = await create_cardholder(
+                name=(
+                    f"{requester.first_name or ''} {requester.last_name or ''}".strip()
+                    or requester.email
+                ),
+                email=requester.email,
+                phone=getattr(requester, "phone", None) or "+10000000000",
+                billing_address={
+                    "line1": getattr(profile, "address_line1", None) or "N/A",
+                    "city": getattr(profile, "city", None) or "N/A",
+                    "state": getattr(profile, "state", None) or "CA",
+                    "postal_code": getattr(profile, "zip_code", None) or "00000",
+                    "country": "US",
+                },
+                external_ref=str(requester.id),
+            )
+            cardholder_id = cardholder.get("id")
+            if profile and cardholder_id:
+                # Persist on the profile for reuse across future obligations.
+                # If the attr doesn't exist (new deploys pre-migration), skip.
+                try:
+                    profile.stripe_cardholder_id = cardholder_id
+                except Exception:
+                    pass
+        except Exception as exc:
+            logger.warning(
+                "issue_virtual_card_on_funding: create_cardholder failed for user=%s: %s",
+                requester.id, exc,
+            )
+            return None
+
+    # Build spending controls from the obligation purpose category.
+    spending_controls = build_spending_controls(
+        category=getattr(obligation, "purpose_category", "general"),
+        amount_usd=float(obligation.total_amount or 0),
+    )
+
+    try:
+        card = await create_virtual_card(
+            cardholder_id=cardholder_id,
+            spending_controls=spending_controls,
+            card_ref=str(obligation.id),
+        )
+    except Exception as exc:
+        logger.warning(
+            "issue_virtual_card_on_funding: create_virtual_card failed for obligation=%s: %s",
+            obligation_id, exc,
+        )
+        return None
+
+    # Upsert the VCA row.
+    if existing:
+        existing.stripe_card_id = card.get("id")
+        existing.stripe_cardholder_id = cardholder_id
+        try:
+            existing.amount_remaining = obligation.total_amount
+            existing.amount_spent = Decimal(0)
+        except Exception:
+            pass
+        vca = existing
+    else:
+        vca = VirtualCardAuthorization(
+            id=str(uuid.uuid4()),
+            obligation_id=str(obligation.id),
+            stripe_card_id=card.get("id"),
+            stripe_cardholder_id=cardholder_id,
+            amount_authorized=obligation.total_amount,
+            amount_spent=Decimal(0),
+            amount_remaining=obligation.total_amount,
+            status="active",
+        )
+        db.add(vca)
+
+    await db.commit()
+    await db.refresh(vca)
+    logger.info(
+        "issue_virtual_card_on_funding: issued stripe_card_id=%s for obligation=%s",
+        vca.stripe_card_id, obligation.id,
+    )
+    return vca

@@ -3074,6 +3074,7 @@ export interface ChildContributionRequest {
   contributor_email: string;
   purpose?: string;
   message?: string;
+  contributor_circle_contact_id?: string;
 }
 
 export interface ChildContributionResponse {
@@ -7788,6 +7789,14 @@ export const walletAPI = {
   },
 
   /**
+   * Wave 3 C1 — a child views their OWN wallet. Uses child-auth. Server
+   * resolves the child from the JWT, so no id is passed.
+   */
+  async getMyChildWalletAsChild(): Promise<ChildWallet> {
+    return fetchAPIWithChildAuth<ChildWallet>('/wallets/child/me/summary');
+  },
+
+  /**
    * Contribute to a child's wallet (guest checkout supported)
    */
   async contributeToChild(
@@ -9025,6 +9034,584 @@ export const smartAnalytics = {
     });
     return fetchAPI<ComplianceLogEntry[]>(`/analytics/compliance?${params.toString()}`);
   }
+};
+
+// ============================================================
+// Family Messaging — persistent parent ↔ child inbox (Wave 1 A1)
+// ============================================================
+
+export interface ParentChildMessage {
+  id: string;
+  family_file_id: string;
+  child_id: string;
+  sender_id: string;
+  sender_type: 'parent' | 'child';
+  sender_name: string;
+  content: string;
+  original_content?: string | null;
+  aria_analyzed: boolean;
+  aria_flagged: boolean;
+  aria_hidden: boolean;
+  aria_category?: string | null;
+  aria_reason?: string | null;
+  aria_score?: number | null;
+  read_by_recipient: boolean;
+  read_at?: string | null;
+  created_at: string;
+}
+
+export interface ParentChildMessageList {
+  items: ParentChildMessage[];
+  total: number;
+  unread_count: number;
+}
+
+export interface ParentChildThreadSummary {
+  child_id: string;
+  child_name: string;
+  child_avatar_url?: string | null;
+  last_message_preview?: string | null;
+  last_message_at?: string | null;
+  unread_count: number;
+}
+
+export interface ParentChildThreadList {
+  items: ParentChildThreadSummary[];
+  total: number;
+}
+
+export const familyMessagingAPI = {
+  /** List all child threads for the authenticated parent. */
+  async listThreads(): Promise<ParentChildThreadList> {
+    return fetchAPI<ParentChildThreadList>('/family-messaging/threads');
+  },
+
+  /** List messages in a single thread (parent auth). */
+  async listMessages(
+    childId: string,
+    options?: { limit?: number; offset?: number }
+  ): Promise<ParentChildMessageList> {
+    const params = new URLSearchParams();
+    if (options?.limit) params.append('limit', options.limit.toString());
+    if (options?.offset) params.append('offset', options.offset.toString());
+    const qs = params.toString();
+    return fetchAPI<ParentChildMessageList>(
+      `/family-messaging/threads/${childId}/messages${qs ? `?${qs}` : ''}`
+    );
+  },
+
+  /** Send a message from the authenticated parent. */
+  async sendParentMessage(
+    childId: string,
+    content: string
+  ): Promise<ParentChildMessage> {
+    return fetchAPI<ParentChildMessage>(
+      `/family-messaging/threads/${childId}/messages`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ content }),
+      }
+    );
+  },
+
+  /** Mark all messages from the other side as read (parent auth). */
+  async markThreadRead(childId: string): Promise<{ updated: number }> {
+    return fetchAPI<{ updated: number }>(
+      `/family-messaging/threads/${childId}/mark-read`,
+      { method: 'POST' }
+    );
+  },
+
+  // --- Child-authenticated (KidSpace) variants ---
+
+  /** Child lists their own messages. */
+  async listMessagesAsChild(
+    childId: string,
+    options?: { limit?: number; offset?: number }
+  ): Promise<ParentChildMessageList> {
+    const params = new URLSearchParams();
+    if (options?.limit) params.append('limit', options.limit.toString());
+    if (options?.offset) params.append('offset', options.offset.toString());
+    const qs = params.toString();
+    return fetchAPIWithChildAuth<ParentChildMessageList>(
+      `/family-messaging/threads/${childId}/messages${qs ? `?${qs}` : ''}`
+    );
+  },
+
+  /** Child sends a message to their parents. */
+  async sendChildMessage(
+    childId: string,
+    content: string
+  ): Promise<ParentChildMessage> {
+    return fetchAPIWithChildAuth<ParentChildMessage>(
+      `/family-messaging/threads/${childId}/messages/from-child`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ content }),
+      }
+    );
+  },
+
+  /** Child marks their thread read. */
+  async markThreadReadAsChild(childId: string): Promise<{ updated: number }> {
+    return fetchAPIWithChildAuth<{ updated: number }>(
+      `/family-messaging/threads/${childId}/mark-read`,
+      { method: 'POST' }
+    );
+  },
+};
+
+// ============================================================
+// Circle Parent Messages — parent ↔ circle-contact thread
+// ============================================================
+
+export interface CircleParentMessage {
+  id: string;
+  family_file_id: string;
+  circle_contact_id: string;
+  parent_user_id: string;
+  sender_type: 'parent' | 'contact';
+  sender_name: string;
+  content: string;
+  original_content?: string | null;
+  aria_flagged: boolean;
+  aria_reason?: string | null;
+  read_at?: string | null;
+  created_at: string;
+}
+
+export interface CircleParentMessageList {
+  items: CircleParentMessage[];
+  total: number;
+  unread_count: number;
+}
+
+export interface CircleParentThreadSummary {
+  circle_contact_id: string;
+  contact_name: string;
+  contact_photo_url?: string | null;
+  relationship_type?: string | null;
+  is_verified: boolean;
+  is_active: boolean;
+  last_message_preview?: string | null;
+  last_message_at?: string | null;
+  unread_count: number;
+}
+
+export interface CircleParentThreadList {
+  items: CircleParentThreadSummary[];
+  total: number;
+}
+
+export interface ContactSideThreadInfo {
+  circle_contact_id: string;
+  parent_user_id: string;
+  parent_name: string;
+  family_file_id: string;
+  is_active: boolean;
+  is_verified: boolean;
+}
+
+export interface ContactSideThreadResponse {
+  info: ContactSideThreadInfo;
+  items: CircleParentMessage[];
+  total: number;
+  unread_count: number;
+}
+
+export const circleParentMessagesAPI = {
+  // ---- Parent auth ----
+
+  /** List all circle-contact threads for the authenticated parent. */
+  async listThreads(): Promise<CircleParentThreadList> {
+    return fetchAPI<CircleParentThreadList>('/circle-parent-messages/threads');
+  },
+
+  /** Parent views a single thread. */
+  async getThread(
+    circleContactId: string,
+    options?: { limit?: number; offset?: number }
+  ): Promise<CircleParentMessageList> {
+    const params = new URLSearchParams();
+    if (options?.limit) params.append('limit', String(options.limit));
+    if (options?.offset) params.append('offset', String(options.offset));
+    const qs = params.toString();
+    return fetchAPI<CircleParentMessageList>(
+      `/circle-parent-messages/thread/${circleContactId}${qs ? `?${qs}` : ''}`
+    );
+  },
+
+  /** Parent sends a message to the contact. */
+  async sendAsParent(
+    circleContactId: string,
+    content: string
+  ): Promise<CircleParentMessage> {
+    return fetchAPI<CircleParentMessage>(
+      `/circle-parent-messages/${circleContactId}/send`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ content }),
+      }
+    );
+  },
+
+  /** Parent marks the thread read. */
+  async markThreadReadAsParent(
+    circleContactId: string
+  ): Promise<{ updated: number }> {
+    return fetchAPI<{ updated: number }>(
+      `/circle-parent-messages/${circleContactId}/mark-read`,
+      { method: 'POST' }
+    );
+  },
+
+  // ---- Contact auth ----
+
+  /**
+   * Contact views their thread with the associated parent. The backend
+   * picks the parent from the CircleContact so the contact can't forge
+   * a thread key.
+   */
+  async getThreadAsContact(options?: {
+    limit?: number;
+    offset?: number;
+  }): Promise<ContactSideThreadResponse> {
+    const params = new URLSearchParams();
+    if (options?.limit) params.append('limit', String(options.limit));
+    if (options?.offset) params.append('offset', String(options.offset));
+    const qs = params.toString();
+    return fetchAPIWithCircleAuth<ContactSideThreadResponse>(
+      `/circle-parent-messages/thread${qs ? `?${qs}` : ''}`
+    );
+  },
+
+  /** Contact sends a message to the parent. */
+  async sendAsContact(content: string): Promise<CircleParentMessage> {
+    return fetchAPIWithCircleAuth<CircleParentMessage>(
+      '/circle-parent-messages/send',
+      {
+        method: 'POST',
+        body: JSON.stringify({ content }),
+      }
+    );
+  },
+
+  /** Contact marks the thread read. */
+  async markThreadReadAsContact(): Promise<{ updated: number }> {
+    return fetchAPIWithCircleAuth<{ updated: number }>(
+      '/circle-parent-messages/mark-read-as-contact',
+      { method: 'POST' }
+    );
+  },
+};
+
+// ─── Wave 3 C2/C3 — Chores & Rewards ───────────────────────────────────────
+
+export interface Chore {
+  id: string;
+  family_file_id: string;
+  child_id: string;
+  assigned_by: string;
+  title: string;
+  description: string | null;
+  reward_amount: string | null;
+  status: 'pending' | 'completed' | 'approved' | 'rejected' | 'cancelled';
+  due_at: string | null;
+  completed_at: string | null;
+  approved_at: string | null;
+  approved_by: string | null;
+  rejection_reason: string | null;
+  reward_credited: boolean;
+  // Wave 3 C2 proof-of-completion — both fields optional and filled in by
+  // the child when they hit "I did it!".
+  completion_photo_url: string | null;
+  completion_note: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export const choresAPI = {
+  async createChore(data: {
+    family_file_id: string;
+    child_id: string;
+    title: string;
+    description?: string;
+    reward_amount?: number;
+    due_at?: string;
+  }): Promise<Chore> {
+    return fetchAPI<Chore>('/chores', { method: 'POST', body: JSON.stringify(data) });
+  },
+  async listChores(params: {
+    family_file_id: string;
+    child_id?: string;
+    status?: string;
+  }): Promise<Chore[]> {
+    const q = new URLSearchParams({ family_file_id: params.family_file_id });
+    if (params.child_id) q.append('child_id', params.child_id);
+    if (params.status) q.append('status', params.status);
+    return fetchAPI<Chore[]>(`/chores?${q.toString()}`);
+  },
+  async updateChore(
+    id: string,
+    patch: Partial<Pick<Chore, 'title' | 'description'>> & {
+      reward_amount?: number;
+      due_at?: string;
+    }
+  ): Promise<Chore> {
+    return fetchAPI<Chore>(`/chores/${id}`, { method: 'PATCH', body: JSON.stringify(patch) });
+  },
+  async approveChore(id: string): Promise<Chore> {
+    return fetchAPI<Chore>(`/chores/${id}/approve`, { method: 'POST' });
+  },
+  async rejectChore(id: string, reason?: string): Promise<Chore> {
+    return fetchAPI<Chore>(`/chores/${id}/reject`, {
+      method: 'POST',
+      body: JSON.stringify({ reason }),
+    });
+  },
+  async cancelChore(id: string): Promise<void> {
+    await fetchAPI(`/chores/${id}`, { method: 'DELETE' });
+  },
+
+  // Child-authed
+  async listMyChoresAsChild(): Promise<Chore[]> {
+    return fetchAPIWithChildAuth<Chore[]>('/chores/mine');
+  },
+  async markChoreCompleteAsChild(
+    id: string,
+    opts?: { photo?: File; note?: string }
+  ): Promise<Chore> {
+    // When there's neither a photo nor a note, stay on JSON so Content-Type
+    // stays null-ish and the server's Form(None) defaults kick in cleanly.
+    if (!opts?.photo && !opts?.note) {
+      return fetchAPIWithChildAuth<Chore>(`/chores/${id}/complete`, { method: 'POST' });
+    }
+
+    // Multipart path: photo and/or note present. We build the body by hand
+    // and skip the JSON helper so the browser sets the correct boundary.
+    const formData = new FormData();
+    if (opts.photo) formData.append('photo', opts.photo);
+    if (opts.note && opts.note.trim()) formData.append('note', opts.note.trim());
+
+    const token = getChildAuthToken();
+    if (!token) throw new Error('Child not authenticated');
+
+    const response = await fetch(`${API_URL}/chores/${id}/complete`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const error = await response
+        .json()
+        .catch(() => ({ detail: `API error: ${response.status}` }));
+      throw new Error(error.detail || error.message || 'Failed to mark chore complete');
+    }
+
+    return response.json();
+  },
+};
+
+export interface Reward {
+  id: string;
+  family_file_id: string;
+  title: string;
+  description: string | null;
+  cost_amount: string;
+  image_emoji: string | null;
+  stock_limit: number | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RewardRedemption {
+  id: string;
+  reward_id: string;
+  child_id: string;
+  family_file_id: string;
+  cost_at_redemption: string;
+  status: 'requested' | 'fulfilled' | 'cancelled';
+  wallet_transaction_id: string | null;
+  fulfilled_by: string | null;
+  fulfilled_at: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export const rewardsAPI = {
+  async createReward(data: {
+    family_file_id: string;
+    title: string;
+    description?: string;
+    cost_amount: number;
+    image_emoji?: string;
+    stock_limit?: number;
+  }): Promise<Reward> {
+    return fetchAPI<Reward>('/rewards', { method: 'POST', body: JSON.stringify(data) });
+  },
+  async listRewards(family_file_id: string, includeInactive = false): Promise<Reward[]> {
+    const q = new URLSearchParams({ family_file_id });
+    if (includeInactive) q.append('include_inactive', 'true');
+    return fetchAPI<Reward[]>(`/rewards?${q.toString()}`);
+  },
+  async updateReward(
+    id: string,
+    patch: Partial<Pick<Reward, 'title' | 'description' | 'image_emoji' | 'is_active'>> & {
+      cost_amount?: number;
+      stock_limit?: number;
+    }
+  ): Promise<Reward> {
+    return fetchAPI<Reward>(`/rewards/${id}`, { method: 'PATCH', body: JSON.stringify(patch) });
+  },
+  async deleteReward(id: string): Promise<void> {
+    await fetchAPI(`/rewards/${id}`, { method: 'DELETE' });
+  },
+  async listRedemptions(family_file_id: string, statusFilter?: string): Promise<RewardRedemption[]> {
+    const q = new URLSearchParams({ family_file_id });
+    if (statusFilter) q.append('status', statusFilter);
+    return fetchAPI<RewardRedemption[]>(`/rewards/redemptions?${q.toString()}`);
+  },
+  async fulfillRedemption(id: string): Promise<RewardRedemption> {
+    return fetchAPI<RewardRedemption>(`/rewards/redemptions/${id}/fulfill`, { method: 'POST' });
+  },
+  async cancelRedemption(id: string): Promise<RewardRedemption> {
+    return fetchAPI<RewardRedemption>(`/rewards/redemptions/${id}/cancel`, { method: 'POST' });
+  },
+
+  // Child-authed
+  async listCatalogAsChild(): Promise<Reward[]> {
+    return fetchAPIWithChildAuth<Reward[]>('/rewards/catalog');
+  },
+  async redeemRewardAsChild(rewardId: string): Promise<RewardRedemption> {
+    return fetchAPIWithChildAuth<RewardRedemption>('/rewards/redeem', {
+      method: 'POST',
+      body: JSON.stringify({ reward_id: rewardId }),
+    });
+  },
+  async listMyRedemptionsAsChild(): Promise<RewardRedemption[]> {
+    return fetchAPIWithChildAuth<RewardRedemption[]>('/rewards/my-redemptions');
+  },
+};
+
+// ─── Wave 4-Alt — SDU + child-support payment logs ─────────────────────────
+
+export interface SduInfo {
+  state_code: string;
+  state_name: string;
+  sdu_name: string;
+  sdu_url: string;
+  info_url: string;
+  phone: string | null;
+  requires_county: boolean;
+  accepts_online: boolean;
+  notes: string | null;
+}
+
+export interface ChildSupportPaymentLog {
+  id: string;
+  family_file_id: string;
+  obligation_id: string | null;
+  logged_by: string;
+  payer_id: string;
+  state_code: string;
+  county: string | null;
+  amount: string;
+  currency: string;
+  payment_date: string;
+  confirmation_number: string | null;
+  receipt_url: string | null;
+  payment_channel: 'sdu' | 'informal';
+  notes: string | null;
+  status: 'logged' | 'verified' | 'contested' | 'voided';
+  contested_by: string | null;
+  contested_reason: string | null;
+  contested_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export const sduAPI = {
+  async listStates(): Promise<SduInfo[]> {
+    return fetchAPI<SduInfo[]>('/sdu/states');
+  },
+  async getState(stateCode: string): Promise<SduInfo> {
+    return fetchAPI<SduInfo>(`/sdu/states/${stateCode.toUpperCase()}`);
+  },
+  async createPaymentLog(data: {
+    family_file_id: string;
+    obligation_id?: string;
+    payer_id?: string;
+    state_code: string;
+    county?: string;
+    amount: number;
+    payment_date: string;
+    confirmation_number?: string;
+    receipt_url?: string;
+    payment_channel?: 'sdu' | 'informal';
+    notes?: string;
+  }): Promise<ChildSupportPaymentLog> {
+    return fetchAPI<ChildSupportPaymentLog>('/sdu/payment-logs', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+  async listPaymentLogs(params: {
+    family_file_id: string;
+    obligation_id?: string;
+    status?: string;
+  }): Promise<ChildSupportPaymentLog[]> {
+    const q = new URLSearchParams({ family_file_id: params.family_file_id });
+    if (params.obligation_id) q.append('obligation_id', params.obligation_id);
+    if (params.status) q.append('status', params.status);
+    return fetchAPI<ChildSupportPaymentLog[]>(`/sdu/payment-logs?${q.toString()}`);
+  },
+  async updatePaymentLog(
+    id: string,
+    patch: Partial<{
+      amount: number;
+      payment_date: string;
+      confirmation_number: string;
+      receipt_url: string;
+      notes: string;
+    }>,
+  ): Promise<ChildSupportPaymentLog> {
+    return fetchAPI<ChildSupportPaymentLog>(`/sdu/payment-logs/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(patch),
+    });
+  },
+  async contestPaymentLog(id: string, reason: string): Promise<ChildSupportPaymentLog> {
+    return fetchAPI<ChildSupportPaymentLog>(`/sdu/payment-logs/${id}/contest`, {
+      method: 'POST',
+      body: JSON.stringify({ reason }),
+    });
+  },
+  async verifyPaymentLog(id: string): Promise<ChildSupportPaymentLog> {
+    return fetchAPI<ChildSupportPaymentLog>(`/sdu/payment-logs/${id}/verify`, {
+      method: 'POST',
+    });
+  },
+};
+
+// Obligation Checkout — replaces Connect-based funding (Wave 4-Alt)
+export const obligationCheckoutAPI = {
+  async createSession(
+    obligationId: string,
+    data: { amount: number; return_url: string },
+  ): Promise<{
+    checkout_url: string | null;
+    session_id: string | null;
+    status: 'created' | 'stripe_unavailable';
+    message?: string;
+  }> {
+    return fetchAPI(`/wallets/obligations/${obligationId}/checkout-session`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
 };
 
 // Export commonly used functions

@@ -133,6 +133,31 @@ def _calculate_health_score(user: User, profile: Optional[UserProfile]) -> dict:
         "overall_score": round(overall, 1),
         "risk_level": risk_level,
         "factors": factors,
+        "weights": weights,
+        # Transparency block — surfaced to the UI so admins know these
+        # numbers are a heuristic, not engagement data from product usage.
+        "transparency": {
+            "is_heuristic": True,
+            "confidence": "low",
+            "data_sources": [
+                "User.last_active",
+                "UserProfile.subscription_tier",
+                "UserProfile.first_name / last_name",
+                "User.phone",
+                "User.created_at",
+            ],
+            "not_included": [
+                "message volume",
+                "ARIA intervention history",
+                "ClearFund activity",
+                "custody-exchange adherence",
+                "KidSpace engagement",
+            ],
+            "weighting": (
+                "35% login recency · 25% subscription tier · "
+                "20% profile completeness · 20% account age"
+            ),
+        },
     }
 
 
@@ -220,27 +245,11 @@ async def get_health_scores(
     return {"scores": scores, "total": total}
 
 
-@router.post("/cs/health-scores/calculate")
-async def calculate_health_scores(
-    body: CalculateRequest,
-    db: AsyncSession = Depends(get_db),
-    admin: User = Depends(get_current_admin_user),
-):
-    """Recalculate health scores for all or a specific user."""
-    if body.user_id:
-        user_q = await db.execute(
-            select(User, UserProfile)
-            .outerjoin(UserProfile, User.id == UserProfile.user_id)
-            .where(User.id == body.user_id)
-        )
-        row = user_q.first()
-        if not row:
-            raise HTTPException(status_code=404, detail="User not found")
-        user, profile = row
-        health = _calculate_health_score(user, profile)
-        return {"user_id": body.user_id, **health}
-
-    return {"status": "ok", "message": "Health scores recalculated"}
+# NOTE: `POST /cs/health-scores/calculate` was removed in the SuperAdmin
+# reliability pass. It had no frontend caller and was functionally identical
+# to `GET /cs/health-scores` — scores are computed on-read, so a "recalculate"
+# trigger was a vestigial noop. Re-add only when a real cache/backing-table
+# exists that needs explicit refresh.
 
 
 @router.get("/cs/churn-risk")
@@ -379,10 +388,41 @@ async def get_account_health(
 
 
 # =============================================================================
-# Interventions (in-memory store until DB table is created)
+# Interventions — persisted to `cs_interventions` table
+# (see backend/app/models/cs_intervention.py + alembic migration
+# add_cs_interventions_20260416). Run `alembic upgrade head` if the table
+# is missing on your environment.
 # =============================================================================
 
-_interventions: list[dict] = []
+from datetime import date as _date
+
+from app.models.cs_intervention import CSIntervention
+
+
+def _parse_follow_up(value) -> Optional[_date]:
+    if value is None:
+        return None
+    if isinstance(value, _date):
+        return value
+    try:
+        return datetime.strptime(str(value)[:10], "%Y-%m-%d").date()
+    except Exception:
+        return None
+
+
+def _intervention_to_dict(row: CSIntervention) -> dict:
+    return {
+        "id": row.id,
+        "user_id": row.user_id,
+        "type": row.type,
+        "channel": row.channel,
+        "notes": row.notes,
+        "follow_up_date": row.follow_up_date.isoformat() if row.follow_up_date else None,
+        "outcome": row.outcome,
+        "status": row.status,
+        "created_at": row.created_at.isoformat() if row.created_at else None,
+        "created_by": row.created_by,
+    }
 
 
 @router.post("/cs/interventions")
@@ -391,21 +431,20 @@ async def create_intervention(
     db: AsyncSession = Depends(get_db),
     admin: User = Depends(get_current_admin_user),
 ):
-    """Create a customer success intervention."""
-    intervention = {
-        "id": str(uuid.uuid4()),
-        "user_id": body.user_id,
-        "type": body.type,
-        "channel": body.channel,
-        "notes": body.notes,
-        "follow_up_date": body.follow_up_date,
-        "outcome": None,
-        "status": "open",
-        "created_at": datetime.utcnow().isoformat(),
-        "created_by": str(admin.id),
-    }
-    _interventions.append(intervention)
-    return intervention
+    """Create a customer success intervention (persisted)."""
+    row = CSIntervention(
+        user_id=body.user_id,
+        type=body.type,
+        channel=body.channel,
+        notes=body.notes,
+        follow_up_date=_parse_follow_up(body.follow_up_date),
+        status="open",
+        created_by=str(admin.id),
+    )
+    db.add(row)
+    await db.commit()
+    await db.refresh(row)
+    return _intervention_to_dict(row)
 
 
 @router.get("/cs/interventions")
@@ -419,17 +458,28 @@ async def get_interventions(
     admin: User = Depends(get_current_admin_user),
 ):
     """List customer success interventions."""
-    filtered = _interventions
+    filters = []
     if user_id:
-        filtered = [i for i in filtered if i["user_id"] == user_id]
+        filters.append(CSIntervention.user_id == user_id)
     if type:
-        filtered = [i for i in filtered if i["type"] == type]
+        filters.append(CSIntervention.type == type)
     if outcome:
-        filtered = [i for i in filtered if i.get("outcome") == outcome]
+        filters.append(CSIntervention.outcome == outcome)
 
-    total = len(filtered)
+    base = select(CSIntervention)
+    if filters:
+        base = base.where(and_(*filters))
+
+    total_res = await db.execute(select(func.count()).select_from(base.subquery()))
+    total = int(total_res.scalar() or 0)
+
+    rows_res = await db.execute(
+        base.order_by(desc(CSIntervention.created_at)).offset(offset).limit(limit)
+    )
+    rows = list(rows_res.scalars().all())
+
     return {
-        "interventions": filtered[offset:offset + limit],
+        "interventions": [_intervention_to_dict(r) for r in rows],
         "total": total,
     }
 
@@ -441,14 +491,21 @@ async def update_intervention(
     db: AsyncSession = Depends(get_db),
     admin: User = Depends(get_current_admin_user),
 ):
-    """Update an intervention."""
-    for i, intervention in enumerate(_interventions):
-        if intervention["id"] == intervention_id:
-            if body.outcome is not None:
-                _interventions[i]["outcome"] = body.outcome
-            if body.notes is not None:
-                _interventions[i]["notes"] = body.notes
-            if body.status is not None:
-                _interventions[i]["status"] = body.status
-            return _interventions[i]
-    raise HTTPException(status_code=404, detail="Intervention not found")
+    """Update an intervention (persisted)."""
+    res = await db.execute(
+        select(CSIntervention).where(CSIntervention.id == intervention_id)
+    )
+    row = res.scalar_one_or_none()
+    if row is None:
+        raise HTTPException(status_code=404, detail="Intervention not found")
+
+    if body.outcome is not None:
+        row.outcome = body.outcome
+    if body.notes is not None:
+        row.notes = body.notes
+    if body.status is not None:
+        row.status = body.status
+
+    await db.commit()
+    await db.refresh(row)
+    return _intervention_to_dict(row)

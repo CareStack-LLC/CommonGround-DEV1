@@ -413,6 +413,9 @@ export default function LibraryPage() {
         book={selectedBook}
         onClose={() => setSelectedBook(null)}
         onStartReading={(b) => router.push(`/my-circle/child/library/${b.id}`)}
+        onStartReadTogether={(b) =>
+          router.push(`/my-circle/child/library/${b.id}?together=1`)
+        }
         progress={selectedBook ? progressMap[selectedBook.id] : null}
       />
 

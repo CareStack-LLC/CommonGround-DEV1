@@ -117,7 +117,21 @@ async def get_sales_pipeline(
     ]
 
     total_pipeline_value = sum(s["value"] for s in stages)
-    return {"stages": stages, "total_pipeline_value": round(total_pipeline_value, 2)}
+    return {
+        "stages": stages,
+        "total_pipeline_value": round(total_pipeline_value, 2),
+        # Counts come from real queries. Per-stage `value` uses fabricated
+        # per-lead / per-stage rates (e.g. $2.50 per lead) — the frontend
+        # should render the value columns with an "Estimated" pill.
+        "is_estimate": True,
+        "counts_are_real": True,
+        "methodology": (
+            "Stage counts are live queries on User / UserProfile. Stage values "
+            "multiply counts by placeholder rates (lead=$2.50, signup=$5.00, "
+            "trial=$10.00, paid=tier-weighted avg, expansion=$199) and do not "
+            "reflect real pipeline economics."
+        ),
+    }
 
 
 @router.get("/sales/conversions")
@@ -197,6 +211,12 @@ async def get_sales_forecast(
         "current_mrr": round(current_mrr, 2),
         "growth_rate_pct": growth_rate * 100,
         "forecast": forecast,
+        "is_estimate": True,
+        "methodology": (
+            "current_mrr is real (subscription tiers * published prices). "
+            "Forecast assumes a hardcoded 5% month-over-month growth rate "
+            "and does not factor in churn, seasonality, or real cohort data."
+        ),
     }
 
 
@@ -224,6 +244,12 @@ async def get_sales_cac(
         "estimated_spend": round(total_spend, 2),
         "cac": round(total_spend / new_users, 2),
         "note": "Spend is estimated. Connect actual marketing spend for accurate CAC.",
+        "is_estimate": True,
+        "methodology": (
+            f"new_customers is a real count. estimated_spend assumes "
+            f"${estimated_spend:.0f}/month placeholder marketing spend — "
+            "not sourced from GA4, Google Ads, or any real channel data."
+        ),
     }
 
 
@@ -259,6 +285,12 @@ async def get_sales_ltv(
         "avg_ltv": round(total_ltv / max(total_customers, 1), 2),
         "by_tier": ltv_by_tier,
         "total_customers": total_customers,
+        "is_estimate": True,
+        "methodology": (
+            "total_customers is a real count. LTV uses a placeholder "
+            f"{avg_lifetime_months}-month average customer lifetime — "
+            "not sourced from actual cohort retention data."
+        ),
     }
 
 
@@ -305,8 +337,10 @@ async def get_sales_ai_suggestions(
     db: AsyncSession = Depends(get_db),
     admin: User = Depends(get_current_admin_user),
 ):
-    """AI-powered sales suggestions based on current data."""
-    # Gather key metrics
+    """Placeholder sales suggestions — a hardcoded template decorated with
+    one live stat (current conversion rate). Flagged `is_sample: true` so
+    the frontend can render a "sample data" banner. Replace with a real
+    Claude/OpenAI call driven by sales data when that integration lands."""
     total_q = await db.execute(select(func.count(User.id)))
     total_users = total_q.scalar() or 0
 
@@ -348,8 +382,17 @@ async def get_sales_ai_suggestions(
         },
     ]
 
-    return {"suggestions": suggestions, "data_summary": {
-        "total_users": total_users,
-        "paid_users": paid_users,
-        "conversion_rate": round(conversion_rate, 2),
-    }}
+    return {
+        "suggestions": suggestions,
+        "data_summary": {
+            "total_users": total_users,
+            "paid_users": paid_users,
+            "conversion_rate": round(conversion_rate, 2),
+        },
+        "is_sample": True,
+        "sample_reason": (
+            "Suggestion text is a hardcoded template — only the conversion_rate "
+            "stat is live. Wire Claude or OpenAI into this endpoint to generate "
+            "real suggestions from sales data."
+        ),
+    }

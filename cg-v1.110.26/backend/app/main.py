@@ -115,6 +115,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 from app.core.database import init_db, close_db
 from app.api.v1.router import api_router
 from app.core.rate_limit import RateLimitMiddleware
+from app.services.scheduler import start_scheduler, stop_scheduler
 
 
 @asynccontextmanager
@@ -215,10 +216,19 @@ async def lifespan(app: FastAPI):
     from app.core.rate_limit import _redis_limiter
     await _redis_limiter.init()
 
+    # Background scheduler — sweeps abandoned KidComs / Daily.co rooms (Wave 1 A8)
+    start_scheduler(app)
+
     yield
     # Shutdown
     logger.info("Shutting down...")
+    stop_scheduler()
     await ws_manager.shutdown()
+    try:
+        from app.core.redis_client import close_redis
+        await close_redis()
+    except Exception:
+        pass
     await close_db()
 
 

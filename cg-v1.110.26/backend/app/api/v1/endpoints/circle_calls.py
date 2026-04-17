@@ -98,6 +98,23 @@ async def initiate_circle_call(
             detail="Circle contact not found"
         )
 
+    # Wave 3.5 D2: Verified-contact requirement — no calls before
+    # the contact has accepted their email invitation. Blocks both
+    # directions (contact-initiated and child-initiated).
+    if not contact.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="This contact is blocked or has been removed",
+        )
+    if not contact.is_verified:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=(
+                "This contact hasn't verified their email yet. "
+                "They need to accept the invite before calls can start."
+            ),
+        )
+
     # Get child
     child_result = await db.execute(
         select(Child).where(Child.id == call_create.child_id)

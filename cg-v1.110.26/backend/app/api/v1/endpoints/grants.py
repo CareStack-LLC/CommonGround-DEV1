@@ -153,6 +153,20 @@ async def redeem_grant_code(
         f"(nonprofit: {grant_code.nonprofit_name})"
     )
 
+    # Wave 5 B4: notify partner admins so they see activity in near-real-time.
+    # Best-effort — a notification failure must not break the redemption.
+    try:
+        await _notify_partner_admins_of_redemption(
+            db=db,
+            grant_code=grant_code,
+            redeemer=current_user,
+        )
+    except Exception as notify_exc:  # pragma: no cover — best-effort
+        logger.warning(
+            "partner-redemption notification failed for code=%s: %s",
+            code_upper, notify_exc,
+        )
+
     return GrantRedemptionResponse(
         success=True,
         message=f"Grant code redeemed successfully! You now have {grant_code.granted_plan_code.title()} access.",
@@ -160,6 +174,62 @@ async def redeem_grant_code(
         granted_tier=grant_code.granted_plan_code,
         expires_at=expires_at,
     )
+
+
+async def _notify_partner_admins_of_redemption(
+    *,
+    db: AsyncSession,
+    grant_code: GrantCode,
+    redeemer: User,
+) -> None:
+    """Fire an in-app notification to every admin of the partner that
+    allocated this grant code. We intentionally don't leak PII — the
+    notification says "someone redeemed" rather than naming the user."""
+    if not getattr(grant_code, "partner_id", None):
+        return  # legacy non-partner code
+
+    from app.models.partner import Partner, PartnerStaff, PartnerStaffRole
+    from app.models.notification import NotificationType
+    from app.services.notification_service import NotificationService
+
+    partner_row = (
+        await db.execute(select(Partner).where(Partner.id == grant_code.partner_id))
+    ).scalar_one_or_none()
+    if not partner_row:
+        return
+
+    staff_rows = (
+        await db.execute(
+            select(PartnerStaff).where(
+                PartnerStaff.partner_id == partner_row.id,
+                PartnerStaff.role == PartnerStaffRole.ADMIN,
+            )
+        )
+    ).scalars().all()
+
+    if not staff_rows:
+        return
+
+    service = NotificationService()
+    for staff in staff_rows:
+        try:
+            await service.create(
+                db=db,
+                user_id=str(staff.user_id),
+                notification_type=NotificationType.OTHER.value,
+                title=f"Grant code redeemed · {partner_row.display_name}",
+                body=(
+                    f"A client just activated a {grant_code.granted_plan_code} "
+                    f"grant through {partner_row.display_name}."
+                ),
+                action_url=f"/partners/admin",
+                send_email=True,
+            )
+        except Exception as per_user_exc:  # pragma: no cover
+            logger.warning(
+                "partner admin notify failed user=%s: %s",
+                staff.user_id, per_user_exc,
+            )
 
 
 @router.get("/status", response_model=GrantStatusResponse)

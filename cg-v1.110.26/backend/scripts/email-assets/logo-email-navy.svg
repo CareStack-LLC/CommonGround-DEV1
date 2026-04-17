@@ -1,0 +1,30 @@
+<svg width="480" height="90" viewBox="0 0 480 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#E8F4F8" />
+      <stop offset="100%" stop-color="#D6ECE8" />
+    </linearGradient>
+    <linearGradient id="lf" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#5BC4A0" />
+      <stop offset="100%" stop-color="#3DAA8A" />
+    </linearGradient>
+    <linearGradient id="rf" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#4BA8C8" />
+      <stop offset="100%" stop-color="#2D6A8F" />
+    </linearGradient>
+  </defs>
+  <!-- Icon: 72x72, centered vertically in 90px height => y offset = 9 -->
+  <g transform="translate(4, 9) scale(0.1406)">
+    <rect width="512" height="512" rx="120" fill="url(#bg)" />
+    <circle cx="168" cy="148" r="48" fill="url(#lf)" />
+    <path d="M118 218 Q168 258 218 218" stroke="url(#lf)" stroke-width="16" stroke-linecap="round" fill="none" />
+    <circle cx="344" cy="148" r="48" fill="url(#rf)" />
+    <path d="M294 218 Q344 258 394 218" stroke="url(#rf)" stroke-width="16" stroke-linecap="round" fill="none" />
+    <path d="M218 168 Q256 104 294 168" stroke="#F5A623" stroke-width="10" stroke-linecap="round" fill="none" opacity="0.95" />
+    <circle cx="256" cy="330" r="38" fill="#F5A623" />
+    <path d="M218 382 Q256 414 294 382" stroke="#F5A623" stroke-width="12" stroke-linecap="round" fill="none" />
+  </g>
+  <!-- Text aligned to icon, y=58 for baseline -->
+  <text x="90" y="58" font-family="Georgia, 'Times New Roman', serif" font-size="36" fill="#FFFFFF" font-weight="700">Common</text>
+  <text x="280" y="58" font-family="Georgia, 'Times New Roman', serif" font-size="36" fill="#7ECDB8" font-weight="400">Ground</text>
+</svg>

@@ -4,7 +4,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
-import { familyFilesAPI, agreementsAPI, messagesAPI, FamilyFile, FamilyFileDetail, Agreement, Message } from '@/lib/api';
+import { familyFilesAPI, agreementsAPI, messagesAPI, familyMessagingAPI, FamilyFile, FamilyFileDetail, Agreement, Message, ParentChildThreadSummary } from '@/lib/api';
 import { useRealtimeMessages } from '@/hooks/use-realtime-messages';
 import { useRealtimeTyping } from '@/hooks/use-realtime-typing';
 import { useRealtimePresence } from '@/hooks/use-realtime-presence';
@@ -37,6 +37,7 @@ import {
   Scale,
   Eye,
   X,
+  Heart,
 } from 'lucide-react';
 
 // Welcome Disclaimer Modal
@@ -599,6 +600,61 @@ function ConversationSelector({
 
 
 
+// Parent ↔ Child messaging shortcut — shows a quick-link to the kids inbox
+// with a summary of unread messages from children. This is visually distinct
+// from the co-parent conversations below.
+function ChildThreadsShortcut() {
+  const [threads, setThreads] = useState<ParentChildThreadSummary[]>([]);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const data = await familyMessagingAPI.listThreads();
+        if (!cancelled) setThreads(data.items || []);
+      } catch {
+        // Silent: this is a shortcut, not a critical surface.
+      } finally {
+        if (!cancelled) setLoaded(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const totalUnread = threads.reduce((sum, t) => sum + (t.unread_count || 0), 0);
+  // Hide the shortcut entirely if there are no children on any family file.
+  if (loaded && threads.length === 0) return null;
+
+  return (
+    <div className="border-b-2 border-border">
+      <Link
+        href="/messages/child"
+        className="flex items-center gap-3 p-4 hover:bg-[var(--portal-primary)]/5 transition-colors"
+      >
+        <div className="relative w-12 h-12 rounded-full bg-gradient-to-br from-amber-500/20 to-amber-600/10 flex items-center justify-center flex-shrink-0 shadow-sm">
+          <Heart className="h-5 w-5 text-amber-600" />
+          {totalUnread > 0 && (
+            <span className="absolute -top-1 -right-1 min-w-[22px] h-[22px] px-1.5 rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center shadow-md">
+              {totalUnread > 99 ? '99+' : totalUnread}
+            </span>
+          )}
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="font-bold text-foreground truncate">Messages with your kids</p>
+          <p className="text-xs text-muted-foreground truncate mt-0.5">
+            {threads.length} {threads.length === 1 ? 'child thread' : 'child threads'}
+            {totalUnread > 0 ? ` · ${totalUnread} unread` : ''}
+          </p>
+        </div>
+        <ChevronLeft className="w-5 h-5 text-muted-foreground flex-shrink-0 rotate-180" />
+      </Link>
+    </div>
+  );
+}
+
 function MessagesContent() {
   const { user } = useAuth();
   const router = useRouter();
@@ -950,6 +1006,7 @@ function MessagesContent() {
 
             {/* Conversations List */}
             <div className="flex-1 overflow-y-auto">
+              <ChildThreadsShortcut />
               <ConversationSelector
                 familyFilesWithAgreements={familyFilesWithAgreements}
                 selectedFamilyFile={selectedFamilyFile}

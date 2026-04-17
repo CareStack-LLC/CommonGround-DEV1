@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useState, useEffect, useRef } from 'react';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
@@ -12,9 +12,11 @@ import {
   ZoomIn,
   ZoomOut,
   Loader2,
+  Users,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { OriginalsBadge } from '@/components/kidcoms/originals-badge';
+import { useRealtimeBookRead } from '@/hooks/use-realtime-book-read';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -32,7 +34,13 @@ interface ChildUserData {
 export default function BookReaderPage() {
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const bookId = params.id as string;
+
+  // Read-together is opt-in via ?together=1 (kid clicks "Read with a
+  // grown-up" from the library). Once enabled, we subscribe to the
+  // broadcast channel AND announce the current page on every turn.
+  const togetherMode = searchParams?.get('together') === '1';
 
   const [userData, setUserData] = useState<ChildUserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -40,6 +48,12 @@ export default function BookReaderPage() {
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [scale, setScale] = useState<number>(1.2);
   const [error, setError] = useState<string | null>(null);
+  const [togetherStatus, setTogetherStatus] = useState<
+    'subscribing' | 'connected' | 'error'
+  >('subscribing');
+  // Suppress the broadcast when the page change came FROM the remote
+  // side (otherwise we'd echo it back and start a loop).
+  const remoteDrivenRef = useRef<boolean>(false);
 
   // Fetch book from API
   const [book, setBook] = useState<{ id: string; title: string; url: string; cover: string; pages: number; author: string } | null>(null);
@@ -109,6 +123,32 @@ export default function BookReaderPage() {
     setError('Failed to load the book. Please try again.');
   }
 
+  // Broadcast to the remote side whenever THIS client turned the page.
+  // `remoteDrivenRef` is flipped when we snap to the other side's page,
+  // preventing the echo.
+  const { sendPageChange } = useRealtimeBookRead({
+    bookId: togetherMode ? bookId : null,
+    childId: togetherMode ? userData?.childId ?? null : null,
+    senderId: userData?.childId ?? 'anon',
+    onPageReceived: (remotePage) => {
+      if (remotePage < 1) return;
+      remoteDrivenRef.current = true;
+      setPageNumber(remotePage);
+    },
+    onStatusChange: setTogetherStatus,
+  });
+
+  useEffect(() => {
+    if (!togetherMode) return;
+    if (remoteDrivenRef.current) {
+      // Local state caught up to the remote page — clear the flag and
+      // skip the broadcast so we don't loop.
+      remoteDrivenRef.current = false;
+      return;
+    }
+    sendPageChange(pageNumber);
+  }, [pageNumber, togetherMode, sendPageChange]);
+
   function goToPrevPage() {
     setPageNumber((prev) => Math.max(1, prev - 1));
   }
@@ -152,6 +192,29 @@ export default function BookReaderPage() {
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--portal-background)' }}>
+      {togetherMode && (
+        <div
+          className={cn(
+            'w-full text-center py-2 text-sm font-semibold',
+            togetherStatus === 'connected'
+              ? 'bg-gradient-to-r from-amber-400 to-orange-400 text-white'
+              : togetherStatus === 'error'
+                ? 'bg-red-100 text-red-700'
+                : 'bg-amber-50 text-amber-700',
+          )}
+          style={{ fontFamily: 'Space Grotesk, sans-serif' }}
+        >
+          <span className="inline-flex items-center gap-2">
+            <Users className="w-4 h-4" />
+            {togetherStatus === 'connected'
+              ? 'Reading together — turn a page, they\u2019ll see it too'
+              : togetherStatus === 'error'
+                ? 'Could not sync the pages. You can keep reading on your own.'
+                : 'Connecting\u2026'}
+          </span>
+        </div>
+      )}
+
       {/* Header */}
       <header className="backdrop-blur-lg sticky top-0 z-10" style={{ background: 'var(--portal-background)', borderBottom: '1px solid var(--portal-border)' }}>
         <div className="max-w-5xl mx-auto px-4 py-3">

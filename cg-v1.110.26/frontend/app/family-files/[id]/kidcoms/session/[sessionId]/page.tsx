@@ -23,6 +23,7 @@ import { kidcomsAPI, KidComsSession, KidComsMessage } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { TheaterMode } from '@/components/kidcoms/theater-mode';
 import { ArcadeMode } from '@/components/kidcoms/arcade-mode';
+import { WhiteboardMode } from '@/components/kidcoms/whiteboard-mode';
 
 interface VideoParticipant {
   odId: string;
@@ -67,6 +68,7 @@ export default function SessionPage() {
   const [isTheaterMode, setIsTheaterMode] = useState(false);
   // Arcade mode
   const [isArcadeMode, setIsArcadeMode] = useState(false);
+  const [isWhiteboardMode, setIsWhiteboardMode] = useState(false);
 
   // Load session data
   useEffect(() => {
@@ -518,7 +520,15 @@ export default function SessionPage() {
             >
               <Gamepad2 className="h-5 w-5" />
             </button>
-            <button disabled className="hidden md:flex p-3 rounded-full bg-gray-700 text-gray-500 opacity-50 cursor-not-allowed" title="Whiteboard (Coming Soon)">
+            <button
+              onClick={() => setIsWhiteboardMode(true)}
+              disabled={!isCallJoined}
+              className={`hidden md:flex p-3 rounded-full transition-colors ${!isCallJoined
+                  ? 'bg-gray-700 text-gray-500 opacity-50 cursor-not-allowed'
+                  : 'bg-gray-700 hover:bg-cg-sage text-gray-300 hover:text-white'
+                }`}
+              title="Whiteboard"
+            >
               <PenTool className="h-5 w-5" />
             </button>
           </div>
@@ -618,12 +628,25 @@ export default function SessionPage() {
         onToggleVideo={toggleVideo}
         onToggleAudio={toggleAudio}
         onExit={() => setIsTheaterMode(false)}
+        sessionId={sessionId}
       />
 
       <ArcadeMode
         isActive={isArcadeMode}
         userId={user?.id || ''}
+        userName={user?.first_name || 'Guest'}
+        callRef={callRef}
+        participants={participants}
         onExit={() => setIsArcadeMode(false)}
+      />
+
+      <WhiteboardMode
+        isActive={isWhiteboardMode}
+        userId={user?.id || ''}
+        userName={user?.first_name || 'Guest'}
+        callRef={callRef}
+        sessionId={sessionId}
+        onExit={() => setIsWhiteboardMode(false)}
       />
     </div>
   );

@@ -96,6 +96,47 @@ async def get_my_partner_access(
 # Public Endpoints (No Auth)
 # ============================================================================
 
+_DEFAULT_BRANDING = {
+    "logo_url": "",
+    "primary_color": "#2C5F5D",
+    "secondary_color": "#D4A853",
+    "accent_color": "#4A90A4",
+    "font_family": "system-ui",
+    "hero_image_url": "",
+    "tagline": "",
+}
+
+_DEFAULT_LANDING = {
+    "show_mission": True,
+    "show_stats": True,
+    "show_testimonials": False,
+    "custom_welcome_message": "",
+    "faq_items": [],
+    "contact_method": "email",
+}
+
+
+def _safe_branding(raw: Optional[dict]) -> PartnerBrandingConfig:
+    """Coerce a JSONB branding_config blob into PartnerBrandingConfig with
+    graceful fallback. Returning a 500 just because an optional field is
+    missing would take down a live partner landing page."""
+    merged = {**_DEFAULT_BRANDING, **(raw or {})}
+    try:
+        return PartnerBrandingConfig(**merged)
+    except Exception as exc:
+        logger.warning("partner branding_config malformed, using defaults: %s", exc)
+        return PartnerBrandingConfig(**_DEFAULT_BRANDING)
+
+
+def _safe_landing(raw: Optional[dict]) -> PartnerLandingConfig:
+    merged = {**_DEFAULT_LANDING, **(raw or {})}
+    try:
+        return PartnerLandingConfig(**merged)
+    except Exception as exc:
+        logger.warning("partner landing_config malformed, using defaults: %s", exc)
+        return PartnerLandingConfig(**_DEFAULT_LANDING)
+
+
 @router.get("/{partner_slug}", response_model=PartnerPublicInfo)
 async def get_partner_landing(
     partner_slug: str,
@@ -103,8 +144,11 @@ async def get_partner_landing(
 ):
     """
     Get partner landing page data (public).
-    
-    Used to render the partner-branded landing page at {slug}.commonground.app
+
+    Used to render the partner-branded landing page at /{slug}. Must not
+    500 on a malformed config blob — a broken branding JSON should fall
+    back to defaults, not take down the page. A missing partner is the
+    only legitimate 404.
     """
     result = await db.execute(
         select(Partner).where(
@@ -112,29 +156,34 @@ async def get_partner_landing(
         )
     )
     partner = result.scalar_one_or_none()
-    
+
     if not partner:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Partner not found"
         )
-    
-    # Count remaining codes
-    codes_result = await db.execute(
-        select(func.count(GrantCode.id)).where(
-            GrantCode.partner_id == partner.id,
-            GrantCode.is_active == True,
-            GrantCode.redemption_count == 0
+
+    # Count remaining unredeemed codes. Wrap in try/except so a DB blip
+    # doesn't take the landing page down — we can serve with codes_remaining=0.
+    codes_remaining = 0
+    try:
+        codes_result = await db.execute(
+            select(func.count(GrantCode.id)).where(
+                GrantCode.partner_id == partner.id,
+                GrantCode.is_active == True,
+                GrantCode.redemption_count == 0
+            )
         )
-    )
-    codes_remaining = codes_result.scalar() or 0
-    
+        codes_remaining = codes_result.scalar() or 0
+    except Exception as exc:
+        logger.warning("codes_remaining count failed for %s: %s", partner_slug, exc)
+
     return PartnerPublicInfo(
         partner_slug=partner.partner_slug,
         display_name=partner.display_name,
         mission_statement=partner.mission_statement,
-        branding_config=PartnerBrandingConfig(**partner.branding_config),
-        landing_config=PartnerLandingConfig(**partner.landing_config),
+        branding_config=_safe_branding(partner.branding_config),
+        landing_config=_safe_landing(partner.landing_config),
         codes_remaining=codes_remaining,
         is_active=partner.status == PartnerStatus.ACTIVE
     )
@@ -326,14 +375,20 @@ async def get_public_impact_metrics(
             )
             aria_interventions = aria_result.scalar() or 0
             
-            # Also count blocked interventions
+            # Also count blocked interventions (aria_events table). If the
+            # table isn't present in this environment (older deployments)
+            # we swallow the error but record it in Sentry so we notice.
             try:
                 blocked_stmt = text("SELECT COUNT(*) FROM aria_events WHERE user_id IN :user_ids AND created_at >= :period_start")
                 blocked_stmt = blocked_stmt.bindparams(bindparam("user_ids", expanding=True))
                 blocked_result = await db.execute(blocked_stmt, {"user_ids": list(user_ids), "period_start": period_start})
                 aria_interventions += (blocked_result.scalar() or 0)
-            except Exception:
-                pass
+            except Exception as aria_exc:
+                logger.warning(
+                    "partner metrics: aria_events query failed for partner=%s: %s",
+                    partner.partner_slug, aria_exc,
+                )
+                capture_error(aria_exc, tags={"service": "partners", "operation": "aria_events_count"})
         
         # Get schedule count
         schedules_created = 0
@@ -346,6 +401,14 @@ async def get_public_impact_metrics(
             )
             schedules_created = sched_result.scalar() or 0
             
+        # conflict_reduction_pct — simple heuristic: % of messages NOT
+        # flagged by ARIA. When total_messages=0 we can't measure anything
+        # yet, so emit None and let the UI show "not enough data yet."
+        conflict_reduction_pct: Optional[float] = None
+        if total_messages > 0:
+            clean_messages = max(0, total_messages - aria_interventions)
+            conflict_reduction_pct = round((clean_messages / total_messages) * 100, 1)
+
         metrics_summary = PartnerMetricsSummary(
             codes_distributed=codes_distributed,
             codes_activated=codes_activated,
@@ -353,7 +416,8 @@ async def get_public_impact_metrics(
             active_users=len(user_ids),
             messages_sent=total_messages,
             aria_interventions=aria_interventions,
-            schedules_created=schedules_created
+            schedules_created=schedules_created,
+            conflict_reduction_pct=conflict_reduction_pct,
         )
 
     # Count remaining codes
@@ -366,13 +430,19 @@ async def get_public_impact_metrics(
     )
     codes_remaining = rem_result.scalar() or 0
 
+    # conflict_reduction_pct for the dashboard return (recomputed against
+    # the just-calculated totals so the value matches metrics_summary).
+    _crp: Optional[float] = None
+    if total_messages > 0:
+        _crp = round(((max(0, total_messages - aria_interventions)) / total_messages) * 100, 1)
+
     return PartnerDashboardData(
         partner=PartnerPublicInfo(
             partner_slug=partner.partner_slug,
             display_name=partner.display_name,
             mission_statement=partner.mission_statement,
-            branding_config=PartnerBrandingConfig(**partner.branding_config),
-            landing_config=PartnerLandingConfig(**partner.landing_config),
+            branding_config=_safe_branding(partner.branding_config),
+            landing_config=_safe_landing(partner.landing_config),
             codes_remaining=codes_remaining,
             is_active=partner.status == PartnerStatus.ACTIVE
         ),
@@ -383,7 +453,8 @@ async def get_public_impact_metrics(
             active_users=len(user_ids),
             messages_sent=total_messages,
             aria_interventions=aria_interventions,
-            schedules_created=schedules_created
+            schedules_created=schedules_created,
+            conflict_reduction_pct=_crp,
         ),
         active_users=[], # Hide for public view
         grant_codes=[], # Hide for public view

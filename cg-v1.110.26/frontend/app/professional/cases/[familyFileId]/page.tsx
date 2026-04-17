@@ -9,7 +9,6 @@ import {
   Users,
   Calendar,
   MessageSquare,
-  Bot,
   FileText,
   Scale,
   Clock,
@@ -35,7 +34,6 @@ import { DocumentList } from "@/components/professional/document-list";
 import { CaseSummaryAlert, generateSampleCaseSummary } from "@/components/professional/case-summary-alert";
 import { CaseDetailSkeleton } from "@/components/professional/case-detail-skeleton";
 import { ComplianceReportGenerator } from "@/components/professional/compliance-report-generator";
-import { ARIAControlsPanel } from "@/components/professional/aria-controls-panel";
 import { toast } from "@/hooks/use-toast";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -73,7 +71,6 @@ export default function CaseDetailPage() {
   const [timelineSummary, setTimelineSummary] = useState<TimelineSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showComplianceReport, setShowComplianceReport] = useState(false);
-  const [showARIAControls, setShowARIAControls] = useState(false);
 
   useEffect(() => {
     fetchCaseData();
@@ -276,7 +273,7 @@ export default function CaseDetailPage() {
                 </div>
               </div>
 
-              {/* Quick Actions */}
+              {/* Quick Actions — evidence & reports only */}
               <div className="flex flex-wrap gap-3">
                 <Button
                   onClick={() => setShowComplianceReport(true)}
@@ -285,16 +282,16 @@ export default function CaseDetailPage() {
                   <Download className="h-4 w-4" strokeWidth={2} />
                   Generate Report
                 </Button>
-                {caseData.can_control_aria && (
-                  <Button
-                    onClick={() => setShowARIAControls(true)}
-                    variant="outline"
-                    className="sans font-semibold px-5 h-11 border-2 border-[#1E3A4A]/30 text-[#1E3A4A] hover:bg-[#F4F8F7] gap-2"
-                  >
-                    <Bot className="h-4 w-4" strokeWidth={2} />
-                    ARIA Controls
-                  </Button>
-                )}
+                <Button
+                  asChild
+                  variant="outline"
+                  className="sans font-semibold px-5 h-11 border-2 border-[#1E3A4A]/30 text-[#1E3A4A] hover:bg-[#F4F8F7] gap-2"
+                >
+                  <Link href={`/professional/cases/${familyFileId}/exports`}>
+                    <Files className="h-4 w-4" strokeWidth={2} />
+                    Court Package
+                  </Link>
+                </Button>
               </div>
             </div>
           </div>
@@ -356,43 +353,50 @@ export default function CaseDetailPage() {
               <DocumentList familyFileId={familyFileId} token={token || ""} />
             </TabsContent>
 
-            {/* Sub-Portals Tab */}
+            {/* Sub-Portals Tab — read-only evidence views */}
             <TabsContent value="compliance" className="parchment-texture m-0 outline-none">
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <NavigationCard
-                  title="Compliance Dashboard"
-                  description="Analysis of parenting plan adherence"
+                  title="Compliance Analysis"
+                  description="Parenting plan adherence metrics — exchange, financial, communication"
                   icon={<BarChart3 className="h-6 w-6" />}
                   href={`/professional/cases/${familyFileId}/compliance`}
                   color="burgundy"
                 />
                 <NavigationCard
-                  title="ClearFund"
-                  description="Financial obligations and payment tracking"
+                  title="Financial Record"
+                  description="Read-only log of obligations, contributions, and child-support history"
                   icon={<DollarSign className="h-6 w-6" />}
                   href={`/professional/cases/${familyFileId}/clearfund`}
                   color="navy"
                 />
                 <NavigationCard
-                  title="Agreement Review"
-                  description="Current version of the parenting agreement"
+                  title="Agreement (Read-Only)"
+                  description="Current parenting agreement as filed — not editable from this portal"
                   icon={<FileText className="h-6 w-6" />}
                   href={`/professional/cases/${familyFileId}/agreement`}
                   color="amber"
                 />
                 <NavigationCard
-                  title="Exchange Schedule"
-                  description="Detailed calendar of past and future swaps"
+                  title="Exchange History"
+                  description="Custody exchanges with GPS check-ins — past and scheduled"
                   icon={<Calendar className="h-6 w-6" />}
                   href={`/professional/cases/${familyFileId}/schedule`}
                   color="gold"
                 />
                 <NavigationCard
                   title="Parent Communications"
-                  description="View message history between co-parents"
+                  description="Message history between co-parents with ARIA intervention markers"
                   icon={<MessageSquare className="h-6 w-6" />}
                   href={`/professional/cases/${familyFileId}/communications`}
                   color="slate"
+                />
+                <NavigationCard
+                  title="Court Package Export"
+                  description="Compile timeline, messages, and exhibits into a SHA-256 signed bundle"
+                  icon={<Download className="h-6 w-6" />}
+                  href={`/professional/cases/${familyFileId}/exports`}
+                  color="navy"
                 />
               </div>
             </TabsContent>
@@ -404,15 +408,6 @@ export default function CaseDetailPage() {
       <ComplianceReportGenerator
         open={showComplianceReport}
         onClose={() => setShowComplianceReport(false)}
-        familyFileId={familyFileId}
-        caseName={caseData.family_file_number || familyFileId.slice(0, 8).toUpperCase()}
-        token={token || ""}
-      />
-
-      {/* ARIA Controls Dialog */}
-      <ARIAControlsPanel
-        open={showARIAControls}
-        onClose={() => setShowARIAControls(false)}
         familyFileId={familyFileId}
         caseName={caseData.family_file_number || familyFileId.slice(0, 8).toUpperCase()}
         token={token || ""}

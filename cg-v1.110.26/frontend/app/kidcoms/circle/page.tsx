@@ -14,15 +14,18 @@ import {
   Edit,
   Trash2,
   Send,
+  MessageSquare,
   CheckCircle,
   Clock,
   AlertCircle,
 } from 'lucide-react';
 import {
   circleAPI,
+  circleParentMessagesAPI,
   familyFilesAPI,
   CircleContact,
   CircleContactCreate,
+  CircleParentThreadSummary,
   RelationshipChoice,
 } from '@/lib/api';
 
@@ -46,6 +49,9 @@ function CircleManagementContent() {
   const [editingContact, setEditingContact] = useState<CircleContact | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [approvingContactId, setApprovingContactId] = useState<string | null>(null);
+  const [threadSummaries, setThreadSummaries] = useState<
+    Record<string, CircleParentThreadSummary>
+  >({});
 
   // Form state
   const [formData, setFormData] = useState<CircleContactCreate>({
@@ -77,6 +83,19 @@ function CircleManagementContent() {
       setContacts(contactsData.items);
       setChildren(familyData.children || []);
       setRelationshipChoices(choices);
+
+      // Load parent↔contact thread summaries for unread badges. Failures
+      // here shouldn't block the circle UI.
+      try {
+        const threads = await circleParentMessagesAPI.listThreads();
+        const map: Record<string, CircleParentThreadSummary> = {};
+        for (const t of threads.items) {
+          map[t.circle_contact_id] = t;
+        }
+        setThreadSummaries(map);
+      } catch {
+        // Non-fatal.
+      }
     } catch (err) {
       console.error('Error loading circle data:', err);
       setError('Failed to load circle contacts');
@@ -454,6 +473,27 @@ function CircleManagementContent() {
                           <Send className="h-5 w-5" />
                         </button>
                       )}
+
+                      {/* Message (parent ↔ contact coordination thread) */}
+                      <button
+                        onClick={() => router.push(`/my-circle/${contact.id}/chat`)}
+                        disabled={!contact.is_active || !contact.is_verified}
+                        className="relative p-2 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950/50 rounded-lg disabled:opacity-40 disabled:cursor-not-allowed"
+                        title={
+                          !contact.is_active
+                            ? 'Contact no longer active'
+                            : !contact.is_verified
+                            ? 'Waiting for contact to verify'
+                            : 'Message contact'
+                        }
+                      >
+                        <MessageSquare className="h-5 w-5" />
+                        {threadSummaries[contact.id]?.unread_count ? (
+                          <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 rounded-full bg-purple-600 text-white text-[10px] font-semibold flex items-center justify-center">
+                            {threadSummaries[contact.id].unread_count}
+                          </span>
+                        ) : null}
+                      </button>
 
                       {/* Edit */}
                       <button

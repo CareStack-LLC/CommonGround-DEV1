@@ -694,6 +694,8 @@ function UnitEconomicsTab() {
 
 function AIAdvisorTab() {
   const [suggestions, setSuggestions] = useState<any[] | null>(null);
+  const [isSample, setIsSample] = useState(false);
+  const [sampleReason, setSampleReason] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -703,6 +705,8 @@ function AIAdvisorTab() {
       setError(null);
       const result = await adminAPI.postSalesAISuggestions();
       setSuggestions(result.suggestions || result);
+      setIsSample(!!result.is_sample);
+      setSampleReason(result.sample_reason ?? null);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to generate insights');
     } finally {
@@ -774,6 +778,17 @@ function AIAdvisorTab() {
       {/* Suggestions */}
       {suggestions && !loading && (
         <div className="space-y-3">
+          {isSample && (
+            <div className="flex items-start gap-3 px-4 py-3 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-100 text-sm">
+              <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-amber-400" />
+              <div className="flex-1">
+                <p className="font-semibold">Placeholder suggestions — not from live sales data.</p>
+                {sampleReason && (
+                  <p className="text-xs text-amber-200/80 mt-1 leading-relaxed">{sampleReason}</p>
+                )}
+              </div>
+            </div>
+          )}
           <h2 className="text-sm font-semibold text-[#D0E4EC]">
             AI Suggestions ({suggestions.length})
           </h2>

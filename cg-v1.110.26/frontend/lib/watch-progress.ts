@@ -23,6 +23,79 @@ export interface VideoStats {
 const STORAGE_KEY_PREFIX = 'kidcom_watch_';
 const FAVORITES_KEY = 'kidcom_favorites';
 const STATS_KEY = 'kidcom_video_stats';
+const SYNC_QUEUE_KEY = 'kidcom_watch_sync_queue';
+const MAX_QUEUED_SYNCS = 25; // drop oldest beyond this
+
+// Pending server-sync payloads while offline / server is erroring.
+// Drained on next successful saveWatchProgress.
+type PendingSync = {
+  videoId: string;
+  progress: number;
+  currentTime: number;
+  completed: boolean;
+  queuedAt: number;
+};
+
+function readSyncQueue(): PendingSync[] {
+  try {
+    const raw = localStorage.getItem(SYNC_QUEUE_KEY);
+    return raw ? (JSON.parse(raw) as PendingSync[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeSyncQueue(queue: PendingSync[]): void {
+  try {
+    // Keep only the most recent entries.
+    const trimmed = queue.slice(-MAX_QUEUED_SYNCS);
+    localStorage.setItem(SYNC_QUEUE_KEY, JSON.stringify(trimmed));
+  } catch {
+    // quota exceeded — drop queue rather than fail
+    try { localStorage.removeItem(SYNC_QUEUE_KEY); } catch {}
+  }
+}
+
+async function postSync(token: string, childUserId: string, body: PendingSync): Promise<boolean> {
+  try {
+    const resp = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL || ''}/api/v1/kidcoms/progress/${childUserId}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({
+          media_id: body.videoId,
+          media_type: 'video',
+          progress: body.progress,
+          current_position: body.currentTime,
+          completed: body.completed,
+        }),
+      },
+    );
+    return resp.ok;
+  } catch {
+    return false;
+  }
+}
+
+async function drainSyncQueue(token: string, childUserId: string): Promise<void> {
+  const queue = readSyncQueue();
+  if (queue.length === 0) return;
+  const remaining: PendingSync[] = [];
+  for (const item of queue) {
+    // Drop entries older than 7 days — they're no longer useful.
+    if (Date.now() - item.queuedAt > 7 * 24 * 60 * 60 * 1000) continue;
+    const ok = await postSync(token, childUserId, item);
+    if (!ok) {
+      remaining.push(item);
+      break; // stop draining once we hit failure; try again next time
+    }
+  }
+  // Keep anything we couldn't send PLUS anything after the first failure.
+  const firstFailIndex = queue.findIndex((q) => remaining.includes(q));
+  const carry = firstFailIndex >= 0 ? queue.slice(firstFailIndex) : remaining;
+  writeSyncQueue(carry);
+}
 
 /**
  * Save watch progress for a video
@@ -54,22 +127,38 @@ export function saveWatchProgress(
     JSON.stringify(watchProgress)
   );
 
-  // Sync to server for cross-device persistence (non-blocking)
+  // Sync to server for cross-device persistence. On failure, queue the payload
+  // and retry on the next save (drain-on-write). localStorage remains primary.
   try {
     const token = localStorage.getItem('child_access_token');
     const childUserId = localStorage.getItem('child_user_id');
     if (token && childUserId) {
-      fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/v1/kidcoms/progress/${childUserId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({
-          media_id: videoId,
-          media_type: 'video',
-          progress,
-          current_position: currentTime,
-          completed,
-        }),
-      }).catch(() => {}); // Silent fail — localStorage is the primary store
+      const payload: PendingSync = {
+        videoId,
+        progress,
+        currentTime,
+        completed,
+        queuedAt: Date.now(),
+      };
+      // Fire-and-forget: drain previously queued syncs, then push this one.
+      // Any failure is caught and re-queued so nothing is silently dropped.
+      void (async () => {
+        try {
+          await drainSyncQueue(token, childUserId);
+          const ok = await postSync(token, childUserId, payload);
+          if (!ok) {
+            const queue = readSyncQueue();
+            queue.push(payload);
+            writeSyncQueue(queue);
+            console.warn('watch-progress: server sync failed, queued for retry');
+          }
+        } catch (err) {
+          const queue = readSyncQueue();
+          queue.push(payload);
+          writeSyncQueue(queue);
+          console.warn('watch-progress: unexpected sync error', err);
+        }
+      })();
     }
   } catch {}
 

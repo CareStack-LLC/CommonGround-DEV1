@@ -19,6 +19,8 @@ from sqlalchemy import select, func, and_, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from fastapi import HTTPException, status
+
 from app.models.wallet import (
     Wallet,
     WalletTransaction,
@@ -35,6 +37,7 @@ from app.models.wallet import (
 from app.models.clearfund import Obligation
 from app.models.user import User
 from app.models.child import Child
+from app.models.circle import CircleContact
 from app.services.stripe_service import stripe_service
 
 
@@ -960,6 +963,37 @@ class WalletService:
         """
         if not child_wallet.is_child_wallet:
             raise ValueError("Can only contribute to child wallets")
+
+        # Trust & safety: when a circle contact is attributed as the contributor,
+        # require they be verified + active and belong to the same family file.
+        if contributor_circle_contact_id:
+            circle_result = await db.execute(
+                select(CircleContact).where(
+                    CircleContact.id == contributor_circle_contact_id
+                )
+            )
+            circle_contact = circle_result.scalar_one_or_none()
+
+            if not circle_contact:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Circle contact not found.",
+                )
+
+            if not circle_contact.is_verified or not circle_contact.is_active:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail=(
+                        "This circle contact must verify their identity before "
+                        "funding a child's wallet."
+                    ),
+                )
+
+            if circle_contact.family_file_id != family_file_id:
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="Circle contact does not belong to this family file.",
+                )
 
         # Calculate fee (sender pays)
         fee_amount = stripe_service.calculate_stripe_fee(amount, "card")

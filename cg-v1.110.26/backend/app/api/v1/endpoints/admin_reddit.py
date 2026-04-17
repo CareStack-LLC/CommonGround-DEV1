@@ -108,16 +108,78 @@ async def reddit_status(
     db: AsyncSession = Depends(get_db),
     admin_user: User = Depends(get_current_admin_user),
 ) -> dict:
-    """Check if Reddit credentials are configured and valid."""
+    """Check if the Reddit integration is ready.
+
+    The frontend needs three levels of signal to avoid showing "0 campaigns"
+    for a module that has never been migrated:
+      - `table_ready`: the `reddit_config` table exists (alembic migration ran)
+      - `configured`: all four credentials keys are present
+      - `connected`: Reddit accepted those credentials just now
+    """
+    from sqlalchemy import text
+
+    # Level 1 — does the table exist?
+    table_ready = True
+    try:
+        await db.execute(text("SELECT 1 FROM reddit_config LIMIT 1"))
+    except ProgrammingError:
+        await db.rollback()
+        table_ready = False
+    except Exception as e:
+        logger.warning("reddit_config probe failed: %s", e)
+        await db.rollback()
+        table_ready = False
+
+    if not table_ready:
+        return {
+            "table_ready": False,
+            "configured": False,
+            "connected": False,
+            "reason": "table_missing",
+            "message": "Reddit integration not set up — run the reddit_config migration.",
+        }
+
+    # Level 2 — are all credentials present?
+    client_id = await _get_config(db, "client_id")
+    client_secret = await _get_config(db, "client_secret")
+    username = await _get_config(db, "username")
+    password = await _get_config(db, "password")
+    configured = bool(client_id and client_secret and username and password)
+
+    if not configured:
+        return {
+            "table_ready": True,
+            "configured": False,
+            "connected": False,
+            "reason": "not_configured",
+            "message": "Credentials missing — open the settings form to add them.",
+        }
+
+    # Level 3 — can we actually talk to Reddit?
     try:
         service = await _get_reddit_service(db)
         user_info = await service.verify_auth()
-        return {"connected": True, **user_info}
+        return {
+            "table_ready": True,
+            "configured": True,
+            "connected": True,
+            **user_info,
+        }
     except HTTPException:
-        return {"connected": False, "reason": "not_configured"}
+        return {
+            "table_ready": True,
+            "configured": True,
+            "connected": False,
+            "reason": "auth_failed",
+        }
     except Exception as e:
         logger.warning("Reddit auth check failed: %s", e)
-        return {"connected": False, "reason": str(e)}
+        return {
+            "table_ready": True,
+            "configured": True,
+            "connected": False,
+            "reason": str(e),
+        }
 
 
 @router.post("/config", summary="Save Reddit credentials")

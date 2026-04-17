@@ -22,7 +22,8 @@ from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_TIMEOUT = 30.0
+DEFAULT_TIMEOUT = 15.0
+DEFAULT_MAX_RETRIES = 1
 
 # Lazy singletons — created on first access
 _openai_sync: Optional["openai.OpenAI"] = None
@@ -39,6 +40,7 @@ def get_openai() -> "openai.OpenAI":
         _openai_sync = OpenAI(
             api_key=settings.OPENAI_API_KEY,
             timeout=DEFAULT_TIMEOUT,
+            max_retries=DEFAULT_MAX_RETRIES,
         )
     return _openai_sync
 
@@ -51,6 +53,7 @@ def get_async_openai() -> "openai.AsyncOpenAI":
         _openai_async = AsyncOpenAI(
             api_key=settings.OPENAI_API_KEY,
             timeout=DEFAULT_TIMEOUT,
+            max_retries=DEFAULT_MAX_RETRIES,
         )
     return _openai_async
 
@@ -63,6 +66,7 @@ def get_anthropic() -> "anthropic.Anthropic":
         _anthropic_sync = anthropic.Anthropic(
             api_key=settings.ANTHROPIC_API_KEY,
             timeout=DEFAULT_TIMEOUT,
+            max_retries=DEFAULT_MAX_RETRIES,
         )
     return _anthropic_sync
 
@@ -75,5 +79,6 @@ def get_async_anthropic() -> "anthropic.AsyncAnthropic":
         _anthropic_async = anthropic.AsyncAnthropic(
             api_key=settings.ANTHROPIC_API_KEY,
             timeout=DEFAULT_TIMEOUT,
+            max_retries=DEFAULT_MAX_RETRIES,
         )
     return _anthropic_async

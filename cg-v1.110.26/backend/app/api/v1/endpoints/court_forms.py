@@ -19,10 +19,29 @@ from jose import jwt
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.core.config import settings
+from app.services.feature_gate import feature_gate, TIER_DISPLAY_NAMES
 
 # HTTP Bearer scheme for court professional tokens
 court_bearer_scheme = HTTPBearer(auto_error=False)
 from app.models.user import User
+
+
+def require_court_reporting(
+    current_user: User = Depends(get_current_user),
+) -> User:
+    """Wave 3 C10: backend gate on court-reporting feature.
+
+    Front-end already hides the button on lower tiers but power users can
+    still POST directly to `/court/forms/fl300/start/...` etc. Enforce here.
+    """
+    if not feature_gate.has_feature(current_user, "court_reporting"):
+        required = feature_gate.get_required_tier("court_reporting")
+        label = TIER_DISPLAY_NAMES.get(required or "", "Complete")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"Court reporting requires the {label} plan.",
+        )
+    return current_user
 from app.models.court_form import (
     CourtFormType,
     CourtFormStatus,
@@ -156,7 +175,7 @@ async def start_fl300(
     case_id: str,
     data: Optional[FL300CreateRequest] = None,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_court_reporting),
 ):
     """
     Start a new FL-300 (Request for Order) submission.
@@ -191,7 +210,7 @@ async def start_fl311(
     case_id: str,
     data: Optional[FL311CreateRequest] = None,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_court_reporting),
 ):
     """
     Start a new FL-311 (Child Custody and Visitation Application) submission.
@@ -226,7 +245,7 @@ async def start_fl320(
     case_id: str,
     data: FL320CreateRequest,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_court_reporting),
 ):
     """
     Start a new FL-320 (Responsive Declaration) submission.

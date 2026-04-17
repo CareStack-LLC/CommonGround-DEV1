@@ -268,6 +268,14 @@ class ChildContributionCreate(BaseModel):
     message: Optional[str] = Field(None, max_length=1000, description="Personal message to child")
     payment_method_id: str = Field(..., description="Stripe payment method ID")
     idempotency_key: Optional[str] = Field(None, description="Idempotency key")
+    contributor_circle_contact_id: Optional[str] = Field(
+        None,
+        description=(
+            "Optional circle contact ID when contribution comes from a circle member "
+            "(e.g. a grandparent logged in as a circle contact). Must reference a "
+            "verified, active circle contact on the same family file as the child."
+        ),
+    )
 
     @field_validator("contributor_email")
     @classmethod

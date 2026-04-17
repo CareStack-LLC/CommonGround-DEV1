@@ -11,6 +11,7 @@ V2 Sentinel Shield Architecture (4 layers):
 V1 fallback: When ARIA_V2_ENABLED=False, uses original 14-category flat scoring.
 """
 
+import asyncio
 import re
 import json
 import logging
@@ -1684,14 +1685,37 @@ An incoming message was just received:
                     db, sender_id, family_file_id,
                 )
 
-                if max_severity >= 4:
-                    llm_result = await run_llm_severity_analysis(
-                        message_text, session_context_str,
+                # Soft deadline: keep Layer 3 from starving request workers under load.
+                # Client-level timeout is 15s (incl. 1 retry); cap total wall time to 10s.
+                # On deadline: fall through with regex-only analysis (graceful degradation).
+                llm_deadline_s = 10.0
+                try:
+                    if max_severity >= 4:
+                        llm_result = await asyncio.wait_for(
+                            run_llm_severity_analysis(
+                                message_text, session_context_str,
+                            ),
+                            timeout=llm_deadline_s,
+                        )
+                    else:
+                        llm_result = await asyncio.wait_for(
+                            run_llm_deep_analysis(
+                                message_text, session_context_str, baseline_info, time_signals,
+                            ),
+                            timeout=llm_deadline_s,
+                        )
+                except asyncio.TimeoutError:
+                    logger.warning(
+                        "[ARIA V2] Layer 3 exceeded %.1fs deadline, "
+                        "continuing with regex-only analysis.", llm_deadline_s,
                     )
-                else:
-                    llm_result = await run_llm_deep_analysis(
-                        message_text, session_context_str, baseline_info, time_signals,
-                    )
+                    try:
+                        from app.services.aria_circuit_breaker import aria_breaker
+                        aria_breaker.record_failure(TimeoutError("Layer 3 soft deadline"))
+                    except Exception:
+                        pass
+                    metric_increment("aria.v2.llm_deadline_exceeded")
+                    llm_result = None
 
                 # Merge regex + LLM results
                 if llm_result:

@@ -1,8 +1,39 @@
 # ClearFund - Purpose-Locked Financial Obligations System
 
-**Last Updated:** January 17, 2026
-**Version:** 1.5.0
+**Last Updated:** April 16, 2026 (Wave 4-Alt pivot)
+**Version:** 1.5.0 + Wave 4-Alt
 **Module:** Financial Tracking & Expense Management
+
+---
+
+## April 2026 Pivot — Stripe Issuing + SDU Redirect
+
+CommonGround has moved off of Stripe Connect. Two flows now cover all
+financial obligations:
+
+1. **Child support tracking (NOT payment processing).** Parents pay their
+   state's official State Disbursement Unit (SDU) directly through the
+   state portal. CommonGround redirects them from the child-support
+   section (`/family-files/[id]/child-support`), then records the
+   confirmation number, amount, date, and optional receipt for court
+   evidence. CommonGround never touches child-support money.
+
+2. **Shared-expense obligations → Stripe Issuing virtual cards.** When
+   both parents fully fund an obligation (school supplies, camp,
+   medical copay, etc.), a virtual card is auto-issued to the
+   requesting parent with MCC spending controls scoped to the
+   obligation's purpose category. Spend is captured via Stripe
+   webhooks — no manual receipt upload required.
+
+**Stripe Connect onboarding is deprecated.** Legacy Connect wallets
+remain readable for accounts that previously onboarded, but
+`POST /wallets/` and `POST /wallets/{id}/onboarding` now return
+HTTP 410 Gone. Parents fund obligations through Stripe Checkout with
+their normal debit/credit card — no KYC flow on CommonGround.
+
+See `app/services/sdu_registry.py`, `app/services/mcc_mapping.py`,
+`app/services/stripe_issuing.py`, and
+`app/api/v1/endpoints/stripe_issuing_webhooks.py` for implementation.
 
 ---
 

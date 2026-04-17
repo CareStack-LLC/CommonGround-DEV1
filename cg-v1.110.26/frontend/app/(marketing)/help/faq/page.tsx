@@ -167,7 +167,7 @@ const faqCategories = [
       {
         question: 'Can I track child support payments?',
         answer:
-          'Yes. ClearFund includes court-ordered obligations tracking. You can log child support, medical, and education obligation payments separately from day-to-day expenses.',
+          'Yes — CommonGround tracks child support, it doesn\u2019t process it. You pay through your state\u2019s official State Disbursement Unit (SDU), then log the payment in CommonGround so both parents and the court see the record. Other obligations like medical copays and education expenses can be funded through the platform with a virtual card.',
       },
     ],
   },

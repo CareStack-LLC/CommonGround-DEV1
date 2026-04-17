@@ -64,3 +64,12 @@ jinja2>=3.1.2
 
 # Email
 sendgrid>=6.11.0
+
+# Scheduler (background jobs — Daily.co room cleanup, etc.)
+apscheduler>=3.10.0
+
+# Image processing for chore-proof photos
+# Pillow handles JPEG/PNG/WebP decoding + EXIF stripping. pillow-heif plugs
+# HEIC support into Pillow so kid photos taken on iPhone also get stripped.
+Pillow>=11.0.0
+pillow-heif>=1.3.0

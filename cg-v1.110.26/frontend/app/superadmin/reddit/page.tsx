@@ -5,7 +5,7 @@ import {
   Rocket, Check, Copy, Trash2, ExternalLink, Pencil, Target, Clock,
   ChevronDown, ChevronUp, Plus, Send, MessageCircle, FileText,
   Mail, Globe, Linkedin, Instagram, Hash, Video, Users, Briefcase,
-  BarChart3, TrendingUp, CheckCircle2, Circle, ArrowRight,
+  BarChart3, TrendingUp, CheckCircle2, Circle, ArrowRight, AlertTriangle,
 } from 'lucide-react';
 import { adminAPI } from '@/lib/admin-api';
 
@@ -175,6 +175,36 @@ export default function GTMCommandCenter() {
   const [campaignCount, setCampaignCount] = useState(0);
   const [lpCount, setLpCount] = useState(0);
 
+  // Integration status (Wave 5 + SuperAdmin reliability fix). Without this
+  // the page used to show "0 campaigns / 0 landing pages" when the Reddit
+  // table was never migrated — no setup guidance, just misleading zeros.
+  type RedditStatus = {
+    table_ready?: boolean;
+    configured?: boolean;
+    connected?: boolean;
+    reason?: string;
+    message?: string;
+  };
+  const [redditStatus, setRedditStatus] = useState<RedditStatus | null>(null);
+  const [redditStatusLoaded, setRedditStatusLoaded] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const s = await adminAPI.getRedditStatus();
+        if (!cancelled) setRedditStatus(s as RedditStatus);
+      } catch {
+        if (!cancelled) setRedditStatus({ table_ready: false, reason: 'unknown' });
+      } finally {
+        if (!cancelled) setRedditStatusLoaded(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   // ── Load / Save ──
   useEffect(() => {
     try {
@@ -284,6 +314,10 @@ export default function GTMCommandCenter() {
     { id: 'metrics' as Tab, label: 'Metrics', icon: TrendingUp },
   ];
 
+  const tableMissing = redditStatusLoaded && redditStatus?.table_ready === false;
+  const credsMissing =
+    redditStatusLoaded && redditStatus?.table_ready && !redditStatus?.configured;
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -300,6 +334,38 @@ export default function GTMCommandCenter() {
           {completedCount}/{totalTasks} tasks ({progressPct}%)
         </div>
       </div>
+
+      {/* Reddit integration status banner. Playbook / drafts / outreach work
+          offline (localStorage) regardless — the banner only warns that the
+          Reddit-powered widgets and the API-driven metrics won't populate
+          until the migration + credentials are in place. */}
+      {tableMissing && (
+        <div className="flex items-start gap-3 px-4 py-3 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-100 text-sm">
+          <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-amber-400" />
+          <div className="flex-1">
+            <p className="font-semibold">Reddit integration not set up.</p>
+            <p className="text-xs text-amber-200/80 mt-1 leading-relaxed">
+              The <code>reddit_config</code> table isn&apos;t migrated on this environment, so the
+              Reddit browsing, commenting, and tracked-subreddit widgets won&apos;t load.
+              Run the reddit_config migration against the database to enable them. The
+              playbook, drafts, and outreach tabs below keep working offline (localStorage).
+            </p>
+          </div>
+        </div>
+      )}
+      {credsMissing && (
+        <div className="flex items-start gap-3 px-4 py-3 rounded-lg border border-[#3DAA8A]/30 bg-[#3DAA8A]/5 text-[#D0E4EC] text-sm">
+          <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-[#3DAA8A]" />
+          <div className="flex-1">
+            <p className="font-semibold">Reddit credentials missing.</p>
+            <p className="text-xs text-[#8AACBC] mt-1 leading-relaxed">
+              The table is ready but no client_id / client_secret / username / password
+              stored yet. Open the Reddit settings form to add credentials — until then,
+              subreddit browsing is disabled.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="flex gap-1 bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-1">

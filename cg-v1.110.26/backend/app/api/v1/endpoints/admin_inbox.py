@@ -35,6 +35,42 @@ class ReplyBody(BaseModel):
 # OAuth
 # =============================================================================
 
+
+@router.get(
+    "/status",
+    summary="Gmail integration status (Wave 5 Phase A)",
+)
+async def get_inbox_status(
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Report whether Gmail is connected + whether the env is configured.
+
+    Returns 200 in all cases so the UI can render the correct affordance
+    (connect CTA, disconnect button, or error banner) without having to
+    catch a 503 first.
+    """
+    from app.core.config import settings
+    client_configured = bool(getattr(settings, "GOOGLE_OAUTH_CLIENT_ID", None)) and bool(
+        getattr(settings, "GOOGLE_OAUTH_CLIENT_SECRET", None)
+    )
+    connected = False
+    monitored_emails = getattr(settings, "GOOGLE_MONITORED_EMAILS", "") or ""
+    try:
+        from app.services.gmail_monitor_service import is_gmail_connected
+        connected = await is_gmail_connected(db)
+    except Exception as exc:
+        # Service or table may not be present in this env — report rather than 500.
+        logger.info("gmail_monitor_service.is_gmail_connected failed: %s", exc)
+
+    return {
+        "status": "connected" if connected else ("configurable" if client_configured else "not_configured"),
+        "connected": connected,
+        "client_configured": client_configured,
+        "monitored_emails": [e.strip() for e in monitored_emails.split(",") if e.strip()],
+    }
+
+
 @router.get(
     "/oauth/url",
     summary="Get Google OAuth consent URL",
@@ -42,18 +78,31 @@ class ReplyBody(BaseModel):
 async def get_oauth_url(
     admin_user: User = Depends(get_current_admin_user),
 ) -> dict:
-    """Generate a Google OAuth consent URL for Gmail API access."""
-    from app.services.gmail_monitor_service import get_google_oauth_url
+    """Generate a Google OAuth consent URL for Gmail API access.
 
+    Returns 200 with `status: not_configured` when the env isn't set, so
+    the UI can surface a "Gmail integration disabled" banner instead of
+    a red error spinner.
+    """
+    from app.core.config import settings
+    if not getattr(settings, "GOOGLE_OAUTH_CLIENT_SECRET", None):
+        return {
+            "status": "not_configured",
+            "url": None,
+            "message": "Google OAuth client secret is not set. Configure GOOGLE_OAUTH_CLIENT_ID and GOOGLE_OAUTH_CLIENT_SECRET in the backend environment.",
+        }
+
+    from app.services.gmail_monitor_service import get_google_oauth_url
     try:
         url = await get_google_oauth_url()
-        return {"url": url}
+        return {"status": "ok", "url": url}
     except Exception as exc:
         logger.warning("OAuth URL generation failed: %s", exc)
-        raise HTTPException(
-            status_code=503,
-            detail="Google OAuth is not configured. Set GOOGLE_OAUTH_CLIENT_SECRET in environment.",
-        )
+        return {
+            "status": "error",
+            "url": None,
+            "message": f"Failed to build OAuth URL: {type(exc).__name__}",
+        }
 
 
 @router.post(

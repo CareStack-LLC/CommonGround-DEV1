@@ -24,6 +24,7 @@ from app.services.aria_taxonomy_v2 import (
     get_max_severity, get_reporting_tags, get_domain_scores,
 )
 from app.services.aria_session_memory import format_session_context_for_llm
+from app.services.aria_circuit_breaker import aria_breaker
 from app.utils.sentry_helpers import capture_error, ai_span
 
 logger = logging.getLogger(__name__)
@@ -129,6 +130,10 @@ async def run_llm_deep_analysis(
         logger.warning("[ARIA V2] No OpenAI API key configured, skipping LLM analysis")
         return None
 
+    if aria_breaker.is_open():
+        logger.info("[ARIA V2] Circuit breaker OPEN, skipping LLM deep analysis")
+        return None
+
     try:
         from app.core.ai_clients import get_openai
         client = get_openai()
@@ -184,6 +189,7 @@ Respond in JSON format with categories, triggers, explanation, and suggestion.""
                         llm_categories[member] = float(confidence)
                         break
 
+        aria_breaker.record_success()
         return {
             "categories": llm_categories,
             "triggers": result.get("triggers", []),
@@ -194,6 +200,7 @@ Respond in JSON format with categories, triggers, explanation, and suggestion.""
         }
 
     except Exception as e:
+        aria_breaker.record_failure(e)
         logger.error(f"[ARIA V2] LLM deep analysis failed: {e}")
         capture_error(e, tags={"service": "aria_v2", "operation": "llm_deep_analysis"})
         return None
@@ -210,6 +217,10 @@ async def run_llm_severity_analysis(
     Falls back to gpt-4o-mini if gpt-4o fails.
     """
     if not settings.OPENAI_API_KEY:
+        return None
+
+    if aria_breaker.is_open():
+        logger.info("[ARIA V2] Circuit breaker OPEN, skipping severity analysis")
         return None
 
     try:
@@ -251,6 +262,7 @@ Respond in JSON format with categories, triggers, explanation, and suggestion.""
             except ValueError:
                 pass
 
+        aria_breaker.record_success()
         return {
             "categories": llm_categories,
             "triggers": result.get("triggers", []),
@@ -261,8 +273,9 @@ Respond in JSON format with categories, triggers, explanation, and suggestion.""
         }
 
     except Exception as e:
+        aria_breaker.record_failure(e)
         logger.error(f"[ARIA V2] Severity analysis (gpt-4o) failed, trying gpt-4o-mini: {e}")
-        # Fallback to standard analysis
+        # Fallback to standard analysis (respects breaker)
         return await run_llm_deep_analysis(message, session_context)
 
 

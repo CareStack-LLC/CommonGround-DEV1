@@ -10,6 +10,9 @@ import {
   Gamepad2,
   Film,
   Users,
+  Wallet,
+  ListChecks,
+  Gift as GiftIcon,
   Calendar,
   ChevronRight,
   Plus,
@@ -38,6 +41,7 @@ import {
   circleMessagesAPI,
   circleCallsAPI,
   childEventsAPI,
+  familyMessagingAPI,
   type CircleConversationData,
   type ChildCallHistoryEntry,
   type ChildEvent,
@@ -129,6 +133,10 @@ export default function ChildDashboardPage() {
   const [progressMap, setProgressMap] = useState<Record<string, WatchProgress | null>>({});
   const [bookProgressMap, setBookProgressMap] = useState<Record<string, ReadingProgress | null>>({});
   const [recentMessages, setRecentMessages] = useState<CircleConversationData[]>([]);
+  // Parent ↔ child inbox summary (for the "Messages from your grown-ups" card)
+  const [parentInboxUnread, setParentInboxUnread] = useState<number>(0);
+  const [parentInboxLastSender, setParentInboxLastSender] = useState<string | null>(null);
+  const [parentInboxLastPreview, setParentInboxLastPreview] = useState<string | null>(null);
 
   // Real API data
   const [recentCalls, setRecentCalls] = useState<ChildCallHistoryEntry[]>([]);
@@ -198,6 +206,22 @@ export default function ChildDashboardPage() {
     validateAndLoadUser();
   }, []);
 
+  // Refresh the parent↔child unread count when the window regains focus
+  // (e.g. returning from /kidspace/messages after reading).
+  useEffect(() => {
+    function onFocus() {
+      if (userData?.childId) {
+        loadParentInbox(userData.childId);
+      }
+    }
+    window.addEventListener('focus', onFocus);
+    document.addEventListener('visibilitychange', onFocus);
+    return () => {
+      window.removeEventListener('focus', onFocus);
+      document.removeEventListener('visibilitychange', onFocus);
+    };
+  }, [userData?.childId]);
+
   async function validateAndLoadUser() {
     try {
       const token = localStorage.getItem('child_token');
@@ -236,6 +260,7 @@ export default function ChildDashboardPage() {
       loadRecentMessages();
       loadRecentCalls();
       loadUpcomingEvents();
+      loadParentInbox(user.childId);
     } catch (error) {
       console.error('Failed to load user:', error);
       if (typeof localStorage !== 'undefined') localStorage.clear();
@@ -249,6 +274,30 @@ export default function ChildDashboardPage() {
       setRecentMessages(convos.items.slice(0, 3));
     } catch (err) {
       console.error('Failed to load messages:', err);
+    }
+  }
+
+  async function loadParentInbox(childId: string) {
+    try {
+      // Fetch most recent messages in the parent↔child thread.
+      const data = await familyMessagingAPI.listMessagesAsChild(childId, { limit: 10 });
+      setParentInboxUnread(data.unread_count || 0);
+      // The list returns newest-first; find the most recent message from a parent.
+      const lastFromParent = data.items.find((m) => m.sender_type === 'parent');
+      if (lastFromParent) {
+        setParentInboxLastSender(lastFromParent.sender_name);
+        // Do NOT surface flagged/hidden content — show a neutral placeholder instead.
+        if (lastFromParent.aria_hidden) {
+          setParentInboxLastPreview('A message is being reviewed.');
+        } else {
+          const preview = lastFromParent.content || '';
+          setParentInboxLastPreview(
+            preview.length > 70 ? preview.slice(0, 69).trimEnd() + '…' : preview,
+          );
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load parent inbox:', err);
     }
   }
 
@@ -422,6 +471,63 @@ export default function ChildDashboardPage() {
           </div>
         </div>
 
+        {/* Parent↔Child Messages Card — always visible, unread badge draws the eye */}
+        <section className="px-4">
+          <button
+            onClick={() => router.push('/kidspace/messages')}
+            className="w-full relative overflow-hidden rounded-2xl p-5 text-left transition-all hover:scale-[1.01] active:scale-[0.99]"
+            style={{
+              background:
+                'linear-gradient(135deg, #F5A623 0%, #E89514 60%, #D97706 100%)',
+              boxShadow: '0 10px 30px -10px rgba(245, 166, 35, 0.5)',
+            }}
+            aria-label={
+              parentInboxUnread > 0
+                ? `Messages from your grown-ups — ${parentInboxUnread} new`
+                : 'Messages from your grown-ups'
+            }
+          >
+            {/* Decorative background blob */}
+            <div className="absolute -right-6 -bottom-6 w-32 h-32 rounded-full bg-white/10" />
+            <div className="absolute -right-10 -top-10 w-24 h-24 rounded-full bg-white/5" />
+
+            <div className="relative flex items-center gap-4">
+              {/* Icon with unread dot/badge */}
+              <div className="relative w-16 h-16 rounded-2xl bg-white/25 flex items-center justify-center shadow-lg flex-shrink-0 backdrop-blur-sm">
+                <MessageCircle className="w-9 h-9 text-white" strokeWidth={2} />
+                {parentInboxUnread > 0 && (
+                  <span
+                    className="absolute -top-2 -right-2 min-w-[26px] h-[26px] px-1.5 rounded-full bg-red-500 text-white text-xs font-black flex items-center justify-center shadow-lg border-2 border-white"
+                    aria-label={`${parentInboxUnread} unread messages`}
+                  >
+                    {parentInboxUnread > 99 ? '99+' : parentInboxUnread}
+                  </span>
+                )}
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <h2
+                  className="text-xl font-black text-white leading-tight"
+                  style={{ fontFamily: 'var(--portal-font-display, DM Serif Display), Georgia, serif' }}
+                >
+                  {parentInboxLastSender
+                    ? `Messages from ${parentInboxLastSender}`
+                    : 'Messages from your grown-ups'}
+                </h2>
+                <p
+                  className="text-sm text-white/90 font-semibold mt-1 truncate"
+                  style={{ fontFamily: 'var(--portal-font-body)' }}
+                >
+                  {parentInboxUnread > 0
+                    ? `${parentInboxUnread} new message${parentInboxUnread === 1 ? '' : 's'} — tap to read`
+                    : parentInboxLastPreview || 'Say hi to your mom or dad 💛'}
+                </p>
+              </div>
+              <ChevronRight className="w-6 h-6 text-white flex-shrink-0" strokeWidth={2.5} />
+            </div>
+          </button>
+        </section>
+
         {/* Featured Hero Banner */}
         {featuredVideo ? (
           <div className="px-4">
@@ -523,6 +629,9 @@ export default function ChildDashboardPage() {
               { label: 'MOVIES', icon: Film, color: 'from-red-600 to-red-500', shadow: 'shadow-red-500/20', href: '/my-circle/child/movies' },
               { label: 'BOOKS', icon: BookOpen, color: 'from-amber-500 to-orange-400', shadow: 'shadow-amber-500/20', href: '/my-circle/child/library' },
               { label: 'GAMES', icon: Gamepad2, color: 'from-[#4BA8C8] to-[#3DAA8A]', shadow: 'shadow-[#4BA8C8]/20', href: '/my-circle/child/arcade' },
+              { label: 'WALLET', icon: Wallet, color: 'from-[#3DAA8A] to-[#2D6A8F]', shadow: 'shadow-[#3DAA8A]/20', href: '/my-circle/child/wallet' },
+              { label: 'CHORES', icon: ListChecks, color: 'from-indigo-500 to-violet-500', shadow: 'shadow-indigo-500/20', href: '/my-circle/child/chores' },
+              { label: 'REWARDS', icon: GiftIcon, color: 'from-pink-500 to-rose-500', shadow: 'shadow-pink-500/20', href: '/my-circle/child/rewards' },
               { label: 'MY CIRCLE', icon: Users, color: 'from-emerald-500 to-[#3DAA8A]', shadow: 'shadow-emerald-500/20', href: '/my-circle/child/my-circle-page' },
             ].map(({ label, icon: Icon, color, shadow, href }) => (
               <button

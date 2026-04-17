@@ -31,6 +31,9 @@ RUN echo '#!/bin/bash\n\
 set -e\n\
 echo "Starting CommonGround API..."\n\
 echo "PORT=$PORT"\n\
+echo "DATABASE_URL set: $([ -n "$DATABASE_URL" ] && echo YES || echo NO)"\n\
+echo "SECRET_KEY set: $([ -n "$SECRET_KEY" ] && echo YES || echo NO)"\n\
+echo "SUPABASE_URL set: $([ -n "$SUPABASE_URL" ] && echo YES || echo NO)"\n\
 echo "Running database migrations (60s timeout)..."\n\
 timeout 60 alembic upgrade head 2>&1 && echo "Migrations complete!" || echo "Migration warning (skipped or already applied)"\n\
 echo "Starting uvicorn on port ${PORT:-8000}..."\n\

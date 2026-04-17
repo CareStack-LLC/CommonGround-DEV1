@@ -96,6 +96,16 @@ class Settings(BaseSettings):
     DAILY_DOMAIN: str = "cg-mvp.daily.co"
     DAILY_WEBHOOK_SECRET: Optional[str] = None  # For verifying webhook signatures
 
+    # Mux (KidSpace theater streaming). Token is created in the Mux dashboard
+    # under Settings → Access Tokens → "Full access (video)".
+    MUX_TOKEN_ID: Optional[str] = None
+    MUX_TOKEN_SECRET: Optional[str] = None
+    MUX_WEBHOOK_SECRET: Optional[str] = None  # For asset.ready webhooks later
+
+    # Daily.co room cleanup scheduler (Wave 1 A8)
+    DAILY_ROOM_CLEANUP_INTERVAL_MIN: int = 15   # how often the sweeper runs
+    DAILY_ROOM_ABANDON_THRESHOLD_MIN: int = 60  # session age before sweep
+
     # Recording settings (recordings stored in Supabase Storage - call_recordings bucket)
     RECORDING_ENABLED: bool = True
     TRANSCRIPTION_ENABLED: bool = True

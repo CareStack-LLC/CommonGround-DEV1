@@ -443,7 +443,7 @@ function ProfessionalNavigation({
 
   const isFirmOwner = !!(activeFirm && (activeFirm.role === "owner" || activeFirm.role === "admin"));
 
-  // Primary navigation items (6 max for clean UX)
+  // Primary navigation items — evidence-gathering workspace (read-only views + report generation)
   const mainNavItems: { href: string; label: string; icon: React.ReactNode; badge?: string }[] = [
     {
       href: "/professional/dashboard",
@@ -452,7 +452,7 @@ function ProfessionalNavigation({
     },
     {
       href: "/professional/cases",
-      label: "Cases",
+      label: "Client Files",
       icon: <Briefcase className="h-4 w-4" />,
       badge: dashboardData?.case_count?.toString(),
     },
@@ -468,15 +468,14 @@ function ProfessionalNavigation({
       icon: <FileBarChart className="h-4 w-4" />,
     },
     {
+      href: "/professional/documents",
+      label: "Court Orders",
+      icon: <FileText className="h-4 w-4" />,
+    },
+    {
       href: "/professional/calendar",
       label: "Calendar",
       icon: <Calendar className="h-4 w-4" />,
-    },
-    {
-      href: "/professional/messages",
-      label: "Messages",
-      icon: <MessageSquare className="h-4 w-4" />,
-      badge: dashboardData?.unread_messages > 0 ? dashboardData.unread_messages.toString() : undefined,
     },
   ];
 

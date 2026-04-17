@@ -164,6 +164,38 @@ export function TheaterPdfViewer({
         </Document>
       </div>
 
+      {/* Read-Along progress bar — updates via the same page sync that Theater
+          Mode already broadcasts (no new wiring). When isSynced, both sides
+          see the same fill. Clicking seeks to that relative page. */}
+      {numPages > 0 && (
+        <div className="px-4 pt-2 pb-1 bg-gray-800/90 border-t border-gray-700">
+          <button
+            type="button"
+            onClick={(e) => {
+              const rect = e.currentTarget.getBoundingClientRect();
+              const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+              const target = Math.max(1, Math.min(numPages, Math.round(ratio * numPages)));
+              goToPage(target);
+            }}
+            className="group relative h-2 w-full rounded-full bg-gray-700 overflow-hidden cursor-pointer"
+            aria-label={`Story progress, page ${pageNumber} of ${numPages}`}
+          >
+            <div
+              className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-300 ease-out"
+              style={{ width: `${(pageNumber / numPages) * 100}%` }}
+            />
+            <div
+              className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-white shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
+              style={{ left: `${(pageNumber / numPages) * 100}%` }}
+            />
+          </button>
+          <div className="flex items-center justify-between mt-1 text-[11px] text-gray-400">
+            <span>{Math.round((pageNumber / numPages) * 100)}% through</span>
+            <span>{numPages - pageNumber} {numPages - pageNumber === 1 ? 'page' : 'pages'} left</span>
+          </div>
+        </div>
+      )}
+
       {/* Page Navigation */}
       <div className="flex items-center justify-center px-4 py-3 bg-gray-800/90 border-t border-gray-700">
         <div className="flex items-center space-x-4">

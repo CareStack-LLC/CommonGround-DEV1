@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { ArrowLeft, Send, Shield, Loader2, AlertTriangle, Paperclip, X, Image as ImageIcon, FileText } from 'lucide-react';
+import { ArrowLeft, Send, Shield, Loader2, AlertTriangle, Paperclip, X, Image as ImageIcon, FileText, ShieldAlert, CheckCircle2 } from 'lucide-react';
 import { circleMessagesAPI, CircleMessageData, CircleARIAInterventionPayload } from '@/lib/api';
 import { ARIARewriteModal, ARIARewritePayload } from '@/components/messages/aria-rewrite-modal';
 import { useRealtimeCircleMessages } from '@/hooks/use-realtime-circle-messages';
@@ -27,6 +27,39 @@ export default function ChildChatPage() {
   const [contactName, setContactName] = useState('');
   const [childId, setChildId] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [blockOpen, setBlockOpen] = useState(false);
+  const [blockStatus, setBlockStatus] = useState<'idle' | 'sending' | 'done' | 'error'>('idle');
+  const [blockReason, setBlockReason] = useState('');
+
+  async function handleBlockReport() {
+    setBlockStatus('sending');
+    const token = typeof window !== 'undefined' ? localStorage.getItem('child_token') : null;
+    if (!token) {
+      setBlockStatus('error');
+      return;
+    }
+    try {
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const res = await fetch(`${API_BASE}/api/v1/circle-messages/child/report-contact/${contactId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ reason: blockReason, category: 'safety' }),
+      });
+      if (res.ok) {
+        setBlockStatus('done');
+        setTimeout(() => {
+          router.push('/my-circle/child/my-circle-page');
+        }, 2200);
+      } else {
+        setBlockStatus('error');
+      }
+    } catch {
+      setBlockStatus('error');
+    }
+  }
 
   // ARIA intervention state
   const [ariaIntervention, setAriaIntervention] = useState<CircleARIAInterventionPayload | null>(null);
@@ -281,7 +314,112 @@ export default function ChildChatPage() {
             </div>
           </div>
         </div>
+
+        <button
+          onClick={() => { setBlockOpen(true); setBlockStatus('idle'); setBlockReason(''); }}
+          aria-label="Block and report this person"
+          className="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 border-2 border-rose-200 transition"
+        >
+          <ShieldAlert className="w-4 h-4" />
+          <span className="hidden sm:inline">Block</span>
+        </button>
       </header>
+
+      {blockOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-[80] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          onClick={() => blockStatus === 'idle' && setBlockOpen(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden"
+          >
+            <div className="bg-gradient-to-br from-rose-500 to-rose-600 text-white p-6 relative">
+              <button
+                onClick={() => setBlockOpen(false)}
+                aria-label="Close"
+                className="absolute top-4 right-4 p-1.5 rounded-full bg-white/20 hover:bg-white/30 transition"
+              >
+                <X className="w-4 h-4" />
+              </button>
+              <div className="flex items-center gap-3 mb-2">
+                <ShieldAlert className="w-7 h-7" strokeWidth={2.5} />
+                <h2 className="text-2xl font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                  Block {contactName || 'this person'}?
+                </h2>
+              </div>
+              <p className="text-rose-50 text-sm leading-relaxed">
+                They won't be able to message or call you anymore. Both of your parents
+                will see that you used this button.
+              </p>
+            </div>
+
+            <div className="p-6 space-y-4">
+              {blockStatus === 'done' ? (
+                <div className="flex flex-col items-center gap-3 py-6">
+                  <CheckCircle2 className="w-14 h-14 text-emerald-500" strokeWidth={2} />
+                  <p className="font-bold text-lg text-slate-900 text-center">Blocked</p>
+                  <p className="text-sm text-slate-600 text-center">
+                    Your parents have been told. Taking you back to your contacts…
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <label className="block">
+                    <span className="text-sm font-semibold text-slate-700 mb-1.5 block">
+                      Want to tell your parents what happened? (optional)
+                    </span>
+                    <textarea
+                      value={blockReason}
+                      onChange={(e) => setBlockReason(e.target.value)}
+                      placeholder="You don't have to explain — blocking is enough."
+                      maxLength={500}
+                      rows={3}
+                      disabled={blockStatus === 'sending'}
+                      className="w-full border-2 border-slate-200 rounded-xl p-3 text-sm focus:border-rose-400 focus:ring-0 outline-none resize-none"
+                    />
+                  </label>
+
+                  <button
+                    onClick={handleBlockReport}
+                    disabled={blockStatus === 'sending'}
+                    className="w-full bg-rose-500 hover:bg-rose-600 disabled:opacity-70 text-white font-bold py-4 rounded-2xl shadow-lg flex items-center justify-center gap-2 transition"
+                    style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
+                  >
+                    {blockStatus === 'sending' ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        Blocking…
+                      </>
+                    ) : (
+                      <>
+                        <ShieldAlert className="w-5 h-5" strokeWidth={2.5} />
+                        Block and tell my parents
+                      </>
+                    )}
+                  </button>
+
+                  {blockStatus === 'error' && (
+                    <p className="text-sm text-rose-600 text-center font-medium">
+                      Something went wrong. Please find a grown-up right now.
+                    </p>
+                  )}
+
+                  <button
+                    onClick={() => setBlockOpen(false)}
+                    disabled={blockStatus === 'sending'}
+                    className="w-full text-slate-600 hover:text-slate-900 font-semibold py-2 text-sm transition"
+                  >
+                    Not now
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 pb-20">

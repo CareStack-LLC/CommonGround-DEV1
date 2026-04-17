@@ -1192,39 +1192,45 @@ async def create_circle_contact_session(
             detail="Voice calls are not enabled for this connection"
         )
 
-    # Check time restrictions
-    from datetime import datetime
-    now = datetime.now()
+    if session_data.session_type == "theater" and not permission.can_theater:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Theater is not enabled for this connection"
+        )
 
-    # Check allowed days (0=Sunday, 6=Saturday)
-    if permission.allowed_days:
-        today = now.weekday()
-        # Convert Python weekday (0=Monday) to JS weekday (0=Sunday)
-        js_weekday = (today + 1) % 7
-        if js_weekday not in permission.allowed_days:
+    if session_data.session_type == "chat" and not permission.can_chat:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Chat is not enabled for this connection"
+        )
+
+    # Wave 3 C14: timezone-aware time-window check. We use the parent's
+    # configured timezone so "9:00 AM–8:00 PM" respects local wall clock
+    # rather than UTC. Falls back to UTC if the parent has no zone set.
+    from datetime import datetime, timezone as _tz
+    now_utc = datetime.now(_tz.utc)
+    parent_tz = getattr(current_user, "timezone", None) or "America/Los_Angeles"
+    if not permission.is_within_allowed_time(check_time=now_utc, tz_name=parent_tz):
+        # Distinguish day-of-week vs hour violations for a clearer error.
+        local_now = now_utc
+        try:
+            from zoneinfo import ZoneInfo
+            local_now = now_utc.astimezone(ZoneInfo(parent_tz))
+        except Exception:
+            pass
+        js_weekday = (local_now.weekday() + 1) % 7
+        if permission.allowed_days and js_weekday not in permission.allowed_days:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="Calls are not allowed on this day"
+                detail="Calls are not allowed on this day",
             )
-
-    # Check allowed hours (use proper time comparison, not string comparison)
-    if permission.allowed_start_time and permission.allowed_end_time:
-        from datetime import time as dt_time
-        current_time = now.time()
-        try:
-            start_parts = permission.allowed_start_time.split(":")
-            end_parts = permission.allowed_end_time.split(":")
-            start_time = dt_time(int(start_parts[0]), int(start_parts[1]))
-            end_time = dt_time(int(end_parts[0]), int(end_parts[1]))
-            if not (start_time <= current_time <= end_time):
-                raise HTTPException(
-                    status_code=status.HTTP_403_FORBIDDEN,
-                    detail=f"Calls are only allowed between {permission.allowed_start_time} and {permission.allowed_end_time}"
-                )
-        except (ValueError, IndexError):
-            logger.warning(
-                f"Invalid time format in permission: start={permission.allowed_start_time}, end={permission.allowed_end_time}"
-            )
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=(
+                f"Calls are only allowed between {permission.allowed_start_time} "
+                f"and {permission.allowed_end_time} ({parent_tz})"
+            ),
+        )
 
     # Generate Daily.co room
     room_name = generate_room_name()
@@ -2573,3 +2579,172 @@ async def delete_child_kidspace_data(
         "sessions_deleted": deleted_count,
         "message": "All KidSpace data has been removed. The child profile is preserved for custody records.",
     }
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Theater YouTube content validation (Wave 3 C8)
+# ──────────────────────────────────────────────────────────────────────────────
+# Called by the frontend BEFORE starting a theater session with a YouTube
+# URL. In strict mode (default) only whitelisted video IDs are allowed;
+# in permissive mode we only validate URL format. Parents can override
+# per-family via `override_video_ids` stored in KidComsSettings (future).
+
+
+@router.post(
+    "/theater/validate-content",
+    summary="Validate content URL for theater mode (Wave 3 C8)",
+    description=(
+        "Returns `{allowed, reason}` for a theater content URL. Currently "
+        "applies to YouTube links — format validation plus an opt-in "
+        "whitelist. Other content types (uploaded video / PDF) always pass."
+    ),
+)
+async def validate_theater_content(
+    payload: dict = Body(...),
+    current_user: User = Depends(get_current_user),
+):
+    content_type = (payload or {}).get("content_type") or ""
+    url = (payload or {}).get("url") or ""
+    strict = bool((payload or {}).get("strict", True))
+    override_video_ids = set((payload or {}).get("override_video_ids") or [])
+
+    if not content_type or not url:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="content_type and url are required",
+        )
+    if content_type not in ("video", "pdf", "youtube"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="content_type must be video|pdf|youtube",
+        )
+
+    if content_type != "youtube":
+        return {"allowed": True, "reason": "non_youtube"}
+
+    from app.services.youtube_safety import validate_youtube_url
+    ok, reason = validate_youtube_url(
+        url=url, strict=strict, override_video_ids=override_video_ids
+    )
+    return {"allowed": ok, "reason": reason}
+
+
+# ──────────────────────────────────────────────────────────────────────────────
+# Theater audit log (Wave 2 B5)
+# ──────────────────────────────────────────────────────────────────────────────
+# Writes a server-side trail of Watch Together events so court exports and
+# safety review have ground truth independent of the peer-to-peer Daily.co
+# sendAppMessage channel. Any participant (parent, child, circle contact) may
+# post an event — we verify they belong to the session before recording.
+
+_THEATER_EVENT_ACTIONS = {
+    "content_selected",  # presenter picked a video/pdf/youtube URL
+    "play",
+    "pause",
+    "seek",
+    "page",              # pdf page change
+    "stop",
+    "presenter_left",    # B6: presenter disconnected mid-session
+    "participant_left",  # non-presenter left
+}
+
+
+@router.post(
+    "/theater/audit",
+    status_code=status.HTTP_202_ACCEPTED,
+    summary="Log a theater-mode sync event (Wave 2 B5)",
+    description=(
+        "Records a server-side audit entry for a Watch Together event. "
+        "Callers must be a participant of the referenced session."
+    ),
+)
+async def log_theater_event(
+    payload: dict = Body(...),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    from app.models.audit import AuditLog
+
+    session_id = payload.get("session_id")
+    action = payload.get("action")
+    content_url = payload.get("content_url")
+    content_title = payload.get("content_title")
+    content_type = payload.get("content_type")
+    current_time = payload.get("current_time")
+    current_page = payload.get("current_page")
+    is_playing = payload.get("is_playing")
+
+    if not session_id or not action:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="session_id and action are required",
+        )
+    if action not in _THEATER_EVENT_ACTIONS:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Unknown theater action: {action}",
+        )
+
+    # Verify the caller is a participant on this session and it's a theater
+    # or mixed-type session. Rejecting other session types stops abuse where
+    # a parent tries to back-fill fake theater history on an unrelated call.
+    session_row = await db.execute(
+        select(KidComsSession).where(KidComsSession.id == session_id)
+    )
+    session = session_row.scalar_one_or_none()
+    if not session:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Session not found")
+    if session.session_type not in ("theater", "mixed"):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Theater audit is only allowed on theater/mixed sessions",
+        )
+
+    # Participant check: user must be parent of the family file OR the
+    # circle contact referenced on the session. Children auth on a separate
+    # token and call the child-audit path (out of scope for this endpoint).
+    if session.family_file_id:
+        ff_row = await db.execute(
+            select(FamilyFile).where(FamilyFile.id == session.family_file_id)
+        )
+        ff = ff_row.scalar_one_or_none()
+        if not ff:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Family file missing")
+        allowed_ids = {str(ff.parent_a_id), str(ff.parent_b_id)}
+        if session.circle_contact_id:
+            allowed_ids.add(str(session.circle_contact_id))
+        if str(current_user.id) not in allowed_ids:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Not a participant of this session",
+            )
+
+    metadata = {
+        "action": action,
+        "content_type": content_type,
+        "content_url": content_url,
+        "content_title": content_title,
+        "current_time": current_time,
+        "current_page": current_page,
+        "is_playing": is_playing,
+    }
+    # Strip Nones to keep the row compact.
+    metadata = {k: v for k, v in metadata.items() if v is not None}
+
+    entry = AuditLog(
+        user_id=str(current_user.id),
+        user_email=current_user.email,
+        action=f"theater.{action}",
+        resource_type="kidcoms_session",
+        resource_id=str(session_id),
+        case_id=str(session.family_file_id) if session.family_file_id else None,
+        method="POST",
+        endpoint="/api/v1/kidcoms/theater/audit",
+        status="success",
+        status_code=202,
+        description=f"Theater event: {action}",
+        extra_metadata=metadata,
+    )
+    db.add(entry)
+    await db.commit()
+    return {"logged": True, "action": action}

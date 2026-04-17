@@ -137,6 +137,60 @@ export default function KidSpacePage() {
                             </p>
                         </div>
                     </div>
+
+                    {/* What's new in KidSpace — April 2026 */}
+                    <div className="mt-12 rounded-3xl border border-[#3DAA8A]/20 bg-[#F4F8F7] p-6 md:p-8">
+                        <p className="text-xs font-bold uppercase tracking-wider text-[#3DAA8A] mb-3">
+                            New in KidSpace
+                        </p>
+                        <h3 className="text-2xl text-[#1E3A4A] mb-4" style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}>
+                            More ways to stay close
+                        </h3>
+                        <div className="grid sm:grid-cols-2 gap-4 text-sm text-gray-700">
+                            <div className="flex items-start gap-3">
+                                <span className="text-2xl leading-none">🖌️</span>
+                                <div>
+                                    <p className="font-semibold text-[#1E3A4A]">Shared whiteboard</p>
+                                    <p className="text-gray-600 mt-0.5">Draw together in real time — math homework or silly doodles, same canvas.</p>
+                                </div>
+                            </div>
+                            <div className="flex items-start gap-3">
+                                <span className="text-2xl leading-none">❌⭕</span>
+                                <div>
+                                    <p className="font-semibold text-[#1E3A4A]">Two-player games</p>
+                                    <p className="text-gray-600 mt-0.5">Play Tic-Tac-Toe vs. a parent, grandparent, or the computer — moves sync live.</p>
+                                </div>
+                            </div>
+                            <div className="flex items-start gap-3">
+                                <span className="text-2xl leading-none">✅</span>
+                                <div>
+                                    <p className="font-semibold text-[#1E3A4A]">Chores &amp; allowance</p>
+                                    <p className="text-gray-600 mt-0.5">Parents assign chores with an optional reward. Kids mark them done; wallet credits on approval.</p>
+                                </div>
+                            </div>
+                            <div className="flex items-start gap-3">
+                                <span className="text-2xl leading-none">🎁</span>
+                                <div>
+                                    <p className="font-semibold text-[#1E3A4A]">Rewards store</p>
+                                    <p className="text-gray-600 mt-0.5">Kids spend earned wallet balance on rewards you curate — ice cream trip, new book, whatever fits.</p>
+                                </div>
+                            </div>
+                            <div className="flex items-start gap-3">
+                                <span className="text-2xl leading-none">🎂</span>
+                                <div>
+                                    <p className="font-semibold text-[#1E3A4A]">Birthdays on the calendar</p>
+                                    <p className="text-gray-600 mt-0.5">Upcoming birthdays show up automatically on the shared family calendar.</p>
+                                </div>
+                            </div>
+                            <div className="flex items-start gap-3">
+                                <span className="text-2xl leading-none">🛡️</span>
+                                <div>
+                                    <p className="font-semibold text-[#1E3A4A]">Block &amp; report</p>
+                                    <p className="text-gray-600 mt-0.5">One tap to flag a circle contact for safety concerns — severe reports auto-block.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
 
