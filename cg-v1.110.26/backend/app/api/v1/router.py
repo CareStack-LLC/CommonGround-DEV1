@@ -76,6 +76,7 @@ from app.api.v1.endpoints import (
     rewards,
     sdu,
     stripe_issuing_webhooks,
+    mux_webhooks,
 )
 
 api_router = APIRouter()
@@ -260,6 +261,13 @@ api_router.include_router(sdu.router, prefix="/sdu", tags=["Child Support Tracki
 # persistent idempotency via StripeWebhookEvent.
 api_router.include_router(
     stripe_issuing_webhooks.router, prefix="/webhooks", tags=["Stripe Issuing Webhooks"]
+)
+
+# Mux webhooks (KidSpace theater) — `video.asset.ready` flips a newly
+# ingested asset to approved/visible; `video.asset.errored` hides broken
+# uploads. Signature verified via MUX_WEBHOOK_SECRET.
+api_router.include_router(
+    mux_webhooks.router, prefix="/webhooks", tags=["Mux Webhooks"]
 )
 
 # Bug Hunt Tester - Public testing portal (no auth)
