@@ -400,7 +400,16 @@ async def log_court_action(
 
 
 async def get_user_case_role(db: AsyncSession, user_id: str, case_id: str) -> str:
-    """Get a user's role in a case (petitioner or respondent)."""
+    """Get a user's role in a case (petitioner or respondent).
+
+    `case_id` may also be a `family_file_id` — the parent-side family-
+    files UI passes the family file id into the /court/cases/{id}/...
+    endpoints because many family files predate the `cases` table
+    migration and never got a matching Case row. When the CaseParticipant
+    lookup misses, we fall back to `family_files.parent_a_id /
+    parent_b_id` and return a synthetic role. Court / GAL access still
+    goes through the CaseParticipant path.
+    """
     from sqlalchemy import select
 
     result = await db.execute(
@@ -410,12 +419,56 @@ async def get_user_case_role(db: AsyncSession, user_id: str, case_id: str) -> st
         )
     )
     participant = result.scalar_one_or_none()
-    if not participant:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not a participant in this case",
-        )
-    return participant.role
+    if participant:
+        return participant.role
+
+    # Family-file fallback — same ID format (uuid), different table.
+    from app.models.family_file import FamilyFile
+
+    ff_result = await db.execute(
+        select(FamilyFile).where(FamilyFile.id == case_id)
+    )
+    family_file = ff_result.scalar_one_or_none()
+    if family_file:
+        uid = str(user_id)
+        if uid == str(family_file.parent_a_id):
+            return "petitioner"
+        if uid == str(family_file.parent_b_id):
+            return "respondent"
+
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="Not a participant in this case",
+    )
+
+
+async def resolve_case_or_family_ids(
+    db: AsyncSession, maybe_id: str
+) -> tuple[Optional[str], Optional[str]]:
+    """Resolve an incoming `{id}` URL segment to a (case_id, family_file_id)
+    pair. Exactly one will be non-None when the ID is known to either
+    table, or both None when it's unknown.
+
+    Several services on the custody side (ExchangeComplianceService
+    among them) accept *either* key. This lets the caller pass through
+    whichever the client provided without guessing.
+    """
+    from sqlalchemy import select
+
+    from app.models.case import Case
+    from app.models.family_file import FamilyFile
+
+    case_result = await db.execute(select(Case.id).where(Case.id == maybe_id))
+    if case_result.scalar_one_or_none():
+        return maybe_id, None
+
+    ff_result = await db.execute(
+        select(FamilyFile.id).where(FamilyFile.id == maybe_id)
+    )
+    if ff_result.scalar_one_or_none():
+        return None, maybe_id
+
+    return None, None
 
 
 # =============================================================================
@@ -4056,12 +4109,19 @@ async def get_exchange_compliance(
             detail="Authentication required",
         )
 
-    # Get compliance data
+    # Many families have no Case row (pre-`cases` migration). Resolve the
+    # incoming `case_id` URL param to (case_id | family_file_id) so the
+    # service queries the right FK. Service signature already supports
+    # either.
+    resolved_case_id, resolved_family_file_id = await resolve_case_or_family_ids(
+        db, case_id
+    )
     summary = await ExchangeComplianceService.get_compliance_summary(
         db=db,
-        case_id=case_id,
+        case_id=resolved_case_id,
         start_date=start_date,
         end_date=end_date,
+        family_file_id=resolved_family_file_id,
     )
 
     metrics = summary["metrics"]
@@ -4172,12 +4232,17 @@ async def get_exchange_details(
             detail="Authentication required",
         )
 
-    # Get detailed exchange data
+    # Same case_id vs family_file_id resolution as the compliance endpoint;
+    # see `resolve_case_or_family_ids` for the rationale.
+    resolved_case_id, resolved_family_file_id = await resolve_case_or_family_ids(
+        db, case_id
+    )
     details = await ExchangeComplianceService.get_exchange_details_for_export(
         db=db,
-        case_id=case_id,
+        case_id=resolved_case_id,
         start_date=start_date,
         end_date=end_date,
+        family_file_id=resolved_family_file_id,
     )
 
     # Optionally add static map URLs

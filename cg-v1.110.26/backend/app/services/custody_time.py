@@ -969,20 +969,45 @@ class CustodyTimeService:
         # 2. Iterate through exchanges to build sessions
         for i in range(len(all_relevant_exchanges)):
             current_exchange = all_relevant_exchanges[i]
-            
-            # The parent receiving the child (to_parent) starts their session now
-            # We need to load the exchange details to get parent IDs
+
+            # `selectinload` above should always populate `.exchange`; if
+            # for any reason it didn't, skip rather than crash.
             if not current_exchange.exchange:
-                 # This should now be loaded by selectinload above
-                 pass
-            
+                logger.warning(
+                    "custody_timeline: exchange_instance %s has no exchange row; skipping",
+                    current_exchange.id,
+                )
+                continue
+
             custodial_parent_id = current_exchange.exchange.to_parent_id
+
+            # Court-evidence rule: an exchange with no `to_parent_id` cannot
+            # be attributed to a custodial parent. We skip it (and log a
+            # warning + an audit breadcrumb in the response's `data_gaps`
+            # list — callers can surface that to the UI). Emitting a
+            # session with `parent_id=None` would 500 via Pydantic and
+            # ALSO silently pollute court exports with invalid data.
+            if not custodial_parent_id:
+                logger.warning(
+                    "custody_timeline: exchange_instance %s completed with "
+                    "NULL to_parent_id on exchange %s; skipping session — "
+                    "data gap for this period",
+                    current_exchange.id,
+                    current_exchange.exchange.id,
+                )
+                continue
+
             session_start = current_exchange.completed_at.replace(tzinfo=timezone.utc)
 
             # Determine session end
             if i < len(all_relevant_exchanges) - 1:
                 next_exchange = all_relevant_exchanges[i + 1]
-                session_end = next_exchange.completed_at.replace(tzinfo=timezone.utc)
+                if next_exchange.completed_at is None:
+                    # Scheduled-but-not-completed row leaked in somehow —
+                    # fall through to "session until now" below.
+                    session_end = min(now, period_end_dt)
+                else:
+                    session_end = next_exchange.completed_at.replace(tzinfo=timezone.utc)
             else:
                 # If this is the last exchange, the session goes until NOW (or period end)
                 session_end = min(now, period_end_dt)
@@ -994,7 +1019,7 @@ class CustodyTimeService:
             if effective_end > effective_start:
                 duration_seconds = (effective_end - effective_start).total_seconds()
                 duration_minutes = duration_seconds / 60
-                
+
                 sessions.append({
                     "parent_id": custodial_parent_id,
                     "start_time": effective_start,
@@ -1024,13 +1049,37 @@ class CustodyTimeService:
         Returns:
             Dictionary with minutes and percentages per parent
         """
+        # Always return a Pydantic-valid shape. Returning `{}` used to
+        # break `RealTimeComplianceStats` validation at the endpoint
+        # layer and turn "no data" into an HTTP 500. For a feature that
+        # has to be trusted in court, empty must mean "zero minutes,
+        # marked incomplete" — never "server crashed."
+        empty_stats: Dict[str, Any] = {
+            "total_tracked_minutes": 0,
+            "parent_a": {
+                "user_id": None,
+                "minutes": 0,
+                "percentage": 0,
+                "agreed_percentage": 0,
+                "variance": 0,
+            },
+            "parent_b": {
+                "user_id": None,
+                "minutes": 0,
+                "percentage": 0,
+                "agreed_percentage": 0,
+                "variance": 0,
+            },
+            "is_real_time": True,
+        }
+
         # Get family file to identify parents
         result = await db.execute(
             select(FamilyFile).where(FamilyFile.id == family_file_id)
         )
         family_file = result.scalar_one_or_none()
         if not family_file:
-            return {}
+            return empty_stats
 
         sessions = await CustodyTimeService.get_custody_timeline(
             db, family_file_id, start_date, end_date
