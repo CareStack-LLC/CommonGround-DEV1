@@ -3152,6 +3152,13 @@ export interface ChildWallet {
 export interface ChildContribution {
   id: string;
   amount: string;
+  // `net_amount` is what the child actually receives after the
+  // platform fee; the kid wallet UI prefers it over `amount` so the
+  // displayed number matches the wallet balance impact. Backend always
+  // sends it (see ChildContributionResponse on the server), but older
+  // cached rows may have it zero/null — UI falls back to `amount`.
+  net_amount?: string | null;
+  fee_amount?: string | null;
   contributor_name: string;
   purpose: string | null;
   message: string | null;
