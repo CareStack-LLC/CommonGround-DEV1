@@ -16,6 +16,7 @@ from app.api.v1.endpoints import (
     admin_ga4,
     admin_impersonation,
     admin_ops,
+    admin_geo,
     auth,
     notifications,
     parent_child_messages,
@@ -307,6 +308,13 @@ api_router.include_router(
     admin_ops.router,
     prefix="/admin",
     tags=["SuperAdmin Ops (Alerts / Runbooks)"],
+)
+
+# Admin geospatial — users/pros by state + exchange GPS points
+api_router.include_router(
+    admin_geo.router,
+    prefix="/admin",
+    tags=["SuperAdmin Geospatial"],
 )
 
 # Admin Maintenance — Daily.co room sweeper & other ops jobs (Wave 1 A8)

@@ -35,3 +35,8 @@ export { UserHoverCard } from "./UserHoverCard";
 // Wave 1 chart + table primitives
 export { CompareToggleChart } from "./CompareToggleChart";
 export { ExpandableRowsTable, type ExpandableColumn } from "./ExpandableRowsTable";
+
+// Wave 2 geospatial primitives
+export { StateBubbleMap } from "./StateBubbleMap";
+export { PointMap } from "./PointMap";
+export { US_STATE_CENTROIDS, US_CENTER } from "./_us-states";

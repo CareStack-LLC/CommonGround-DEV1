@@ -1183,6 +1183,21 @@ export const adminAPI = {
       method: 'DELETE',
     }),
 
+  // ── Geospatial (Wave 2 visual) ─────────────────────────────────────
+  getGeoStats: (exchangeDays = 30, exchangeLimit = 1000) =>
+    adminFetch<{
+      users_by_state: Record<string, number>;
+      users_unknown_state_count: number;
+      total_users_geotagged: number;
+      professionals_by_state: Record<string, number>;
+      professionals_unknown_state_count: number;
+      total_professionals_geotagged: number;
+      exchange_points: Array<{ lat: number; lng: number; status: string; at: string | null }>;
+      exchange_point_count: number;
+      exchange_window_days: number;
+      generated_at: string;
+    }>(`/admin/stats/geo?exchange_days=${exchangeDays}&exchange_limit=${exchangeLimit}`),
+
   // ── Reddit / GTM Playbook state (Phase D3) ──────────────────────────
   /**
    * Read all playbook state blobs (checked tasks, drafts, outreach contacts,

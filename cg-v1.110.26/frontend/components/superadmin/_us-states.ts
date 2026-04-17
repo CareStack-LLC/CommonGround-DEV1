@@ -1,0 +1,69 @@
+/**
+ * US state centroid coordinates — used by <StateBubbleMap> to position one
+ * circle per state. Approximate geographic centroids; good enough for
+ * a dot-on-a-map visualization (not intended for precise spatial analysis).
+ */
+
+export interface StateCentroid {
+  code: string;
+  name: string;
+  lat: number;
+  lng: number;
+}
+
+// Approximate geographic centroids (lat, lng) for all 50 US states + DC.
+export const US_STATE_CENTROIDS: StateCentroid[] = [
+  { code: 'AL', name: 'Alabama',        lat: 32.806671, lng: -86.791130 },
+  { code: 'AK', name: 'Alaska',         lat: 61.370716, lng: -152.404419 },
+  { code: 'AZ', name: 'Arizona',        lat: 33.729759, lng: -111.431221 },
+  { code: 'AR', name: 'Arkansas',       lat: 34.969704, lng: -92.373123 },
+  { code: 'CA', name: 'California',     lat: 36.116203, lng: -119.681564 },
+  { code: 'CO', name: 'Colorado',       lat: 39.059811, lng: -105.311104 },
+  { code: 'CT', name: 'Connecticut',    lat: 41.597782, lng: -72.755371 },
+  { code: 'DE', name: 'Delaware',       lat: 39.318523, lng: -75.507141 },
+  { code: 'DC', name: 'D.C.',           lat: 38.897438, lng: -77.026817 },
+  { code: 'FL', name: 'Florida',        lat: 27.766279, lng: -81.686783 },
+  { code: 'GA', name: 'Georgia',        lat: 33.040619, lng: -83.643074 },
+  { code: 'HI', name: 'Hawaii',         lat: 21.094318, lng: -157.498337 },
+  { code: 'ID', name: 'Idaho',          lat: 44.240459, lng: -114.478828 },
+  { code: 'IL', name: 'Illinois',       lat: 40.349457, lng: -88.986137 },
+  { code: 'IN', name: 'Indiana',        lat: 39.849426, lng: -86.258278 },
+  { code: 'IA', name: 'Iowa',           lat: 42.011539, lng: -93.210526 },
+  { code: 'KS', name: 'Kansas',         lat: 38.526600, lng: -96.726486 },
+  { code: 'KY', name: 'Kentucky',       lat: 37.668140, lng: -84.670067 },
+  { code: 'LA', name: 'Louisiana',      lat: 31.169546, lng: -91.867805 },
+  { code: 'ME', name: 'Maine',          lat: 44.693947, lng: -69.381927 },
+  { code: 'MD', name: 'Maryland',       lat: 39.063946, lng: -76.802101 },
+  { code: 'MA', name: 'Massachusetts',  lat: 42.230171, lng: -71.530106 },
+  { code: 'MI', name: 'Michigan',       lat: 43.326618, lng: -84.536095 },
+  { code: 'MN', name: 'Minnesota',      lat: 45.694454, lng: -93.900192 },
+  { code: 'MS', name: 'Mississippi',    lat: 32.741646, lng: -89.678696 },
+  { code: 'MO', name: 'Missouri',       lat: 38.456085, lng: -92.288368 },
+  { code: 'MT', name: 'Montana',        lat: 46.921925, lng: -110.454353 },
+  { code: 'NE', name: 'Nebraska',       lat: 41.125370, lng: -98.268082 },
+  { code: 'NV', name: 'Nevada',         lat: 38.313515, lng: -117.055374 },
+  { code: 'NH', name: 'New Hampshire',  lat: 43.452492, lng: -71.563896 },
+  { code: 'NJ', name: 'New Jersey',     lat: 40.298904, lng: -74.521011 },
+  { code: 'NM', name: 'New Mexico',     lat: 34.840515, lng: -106.248482 },
+  { code: 'NY', name: 'New York',       lat: 42.165726, lng: -74.948051 },
+  { code: 'NC', name: 'North Carolina', lat: 35.630066, lng: -79.806419 },
+  { code: 'ND', name: 'North Dakota',   lat: 47.528912, lng: -99.784012 },
+  { code: 'OH', name: 'Ohio',           lat: 40.388783, lng: -82.764915 },
+  { code: 'OK', name: 'Oklahoma',       lat: 35.565342, lng: -96.928917 },
+  { code: 'OR', name: 'Oregon',         lat: 44.572021, lng: -122.070938 },
+  { code: 'PA', name: 'Pennsylvania',   lat: 40.590752, lng: -77.209755 },
+  { code: 'RI', name: 'Rhode Island',   lat: 41.680893, lng: -71.511780 },
+  { code: 'SC', name: 'South Carolina', lat: 33.856892, lng: -80.945007 },
+  { code: 'SD', name: 'South Dakota',   lat: 44.299782, lng: -99.438828 },
+  { code: 'TN', name: 'Tennessee',      lat: 35.747845, lng: -86.692345 },
+  { code: 'TX', name: 'Texas',          lat: 31.054487, lng: -97.563461 },
+  { code: 'UT', name: 'Utah',           lat: 40.150032, lng: -111.862434 },
+  { code: 'VT', name: 'Vermont',        lat: 44.045876, lng: -72.710686 },
+  { code: 'VA', name: 'Virginia',       lat: 37.769337, lng: -78.169968 },
+  { code: 'WA', name: 'Washington',     lat: 47.400902, lng: -121.490494 },
+  { code: 'WV', name: 'West Virginia',  lat: 38.491226, lng: -80.954453 },
+  { code: 'WI', name: 'Wisconsin',      lat: 44.268543, lng: -89.616508 },
+  { code: 'WY', name: 'Wyoming',        lat: 42.755966, lng: -107.302490 },
+];
+
+export const US_CENTER = { lat: 39.8283, lng: -98.5795, zoom: 3.3 };

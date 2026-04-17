@@ -28,6 +28,7 @@ import {
   BarChart3,
   Shield,
   BookOpen,
+  MapPin,
 } from 'lucide-react';
 
 export interface NavItem {
@@ -74,6 +75,7 @@ export const navSections: NavSection[] = [
     items: [
       { href: '/superadmin/growth', label: 'Growth & Engagement', icon: TrendingUp },
       { href: '/superadmin/marketing-analytics', label: 'Marketing Analytics', icon: BarChart3 },
+      { href: '/superadmin/geo', label: 'Geospatial', icon: MapPin },
     ],
   },
   {
