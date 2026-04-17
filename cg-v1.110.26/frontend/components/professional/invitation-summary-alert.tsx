@@ -169,17 +169,18 @@ export function InvitationSummaryAlert({
                     <div className="space-y-4">
                         <Label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">30D Health Metrics</Label>
                         <div className="grid grid-cols-2 gap-3">
+                            {/* Rates are 0-100 on the wire per ADR-001. */}
                             <MetricBox
                                 label="Exchange"
-                                value={`${Math.round(preview.compliance.exchange_completion_rate * 100)}%`}
+                                value={`${Math.round(preview.compliance.exchange_completion_rate ?? 0)}%`}
                                 subtext="Completion"
-                                status={preview.compliance.exchange_completion_rate > 0.8 ? "good" : "warning"}
+                                status={(preview.compliance.exchange_completion_rate ?? 0) > 80 ? "good" : "warning"}
                             />
                             <MetricBox
                                 label="Messaging"
                                 value={`${preview.messages.total_messages_30d}`}
-                                subtext={`${Math.round(preview.messages.flag_rate * 100)}% Flagged`}
-                                status={preview.messages.flag_rate < 0.1 ? "good" : "warning"}
+                                subtext={`${Math.round(preview.messages.flag_rate ?? 0)}% Flagged`}
+                                status={(preview.messages.flag_rate ?? 0) < 10 ? "good" : "warning"}
                             />
                         </div>
                         <div className="flex items-center gap-2 text-xs text-slate-500 bg-white border border-slate-200 p-2 rounded-lg">

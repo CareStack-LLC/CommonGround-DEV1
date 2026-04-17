@@ -97,6 +97,7 @@ from app.services.court import (
 from app.services.exchange_compliance import ExchangeComplianceService
 from app.models.message import Message, MessageFlag
 from sqlalchemy import select, and_, func
+from sqlalchemy.exc import ProgrammingError
 from sqlalchemy.orm import selectinload
 
 from app.utils.sentry_helpers import capture_error
@@ -4240,15 +4241,43 @@ async def get_exchange_details(
     resolved_case_id, resolved_family_file_id = await resolve_case_or_family_ids(
         db, case_id
     )
-    payload = await ExchangeComplianceService.get_exchange_details_for_export(
-        db=db,
-        case_id=resolved_case_id,
-        start_date=start_date,
-        end_date=end_date,
-        family_file_id=resolved_family_file_id,
-    )
-    details = payload["exchanges"]
-    data_gaps = payload["data_gaps"]
+    try:
+        payload = await ExchangeComplianceService.get_exchange_details_for_export(
+            db=db,
+            case_id=resolved_case_id,
+            start_date=start_date,
+            end_date=end_date,
+            family_file_id=resolved_family_file_id,
+        )
+        details = payload["exchanges"]
+        data_gaps = payload["data_gaps"]
+    except ProgrammingError as schema_err:
+        # Code expects a column/table the DB doesn't have yet — e.g. a
+        # deploy landed before `alembic upgrade head` was run. 500-ing
+        # the whole dashboard here is worse than surfacing the real
+        # reason, since the rest of the page renders fine without this
+        # payload. Return an empty result + one data gap so the UI
+        # shows a "service catching up" banner instead of white-
+        # screening. Log + Sentry-capture so we see it in ops.
+        logger.error(
+            "exchange-details: schema drift detected (likely pending "
+            "migration) — returning empty payload: %s",
+            schema_err,
+        )
+        capture_error(schema_err)
+        details = []
+        data_gaps = [{
+            "instance_id": "schema-drift",
+            "exchange_id": "schema-drift",
+            "scheduled_time": datetime.utcnow().isoformat(),
+            "status": "unavailable",
+            "reason": "schema_migration_pending",
+            "description": (
+                "Exchange history temporarily unavailable while a database "
+                "migration is being applied. Please reload in a moment. "
+                "If this persists, contact support."
+            ),
+        }]
 
     # Optionally add static map URLs
     if include_maps:

@@ -443,25 +443,27 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
             </p>
           )}
 
-          {/* Compliance Bar */}
+          {/* Compliance Bar — show actual % as the hero number, variance
+              as a small explicitly-labeled line below so the two don't
+              read as "two adjacent percentages" like they did before. */}
           <div className="space-y-2">
-            <div className="flex justify-between items-end">
+            <div className="flex justify-between items-start">
               <div>
                 <span className="text-xs font-medium text-muted-foreground">{parentAName}</span>
-                <div className="flex items-baseline gap-1.5">
-                  <span className="text-xl font-bold text-foreground">{childStats.parent_a.percentage}%</span>
-                  <span className={`text-xs font-medium ${childStats.variance.parent_a >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
-                    {childStats.variance.parent_a >= 0 ? '+' : ''}{childStats.variance.parent_a}%
-                  </span>
+                <div className="text-xl font-bold text-foreground leading-tight">
+                  {childStats.parent_a.percentage}%
+                </div>
+                <div className={`text-[11px] font-medium ${childStats.variance.parent_a >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+                  {childStats.variance.parent_a >= 0 ? '+' : ''}{childStats.variance.parent_a}% vs target
                 </div>
               </div>
               <div className="text-right">
                 <span className="text-xs font-medium text-muted-foreground">{parentBName}</span>
-                <div className="flex items-baseline gap-1.5 justify-end">
-                  <span className={`text-xs font-medium ${childStats.variance.parent_b >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
-                    {childStats.variance.parent_b >= 0 ? '+' : ''}{childStats.variance.parent_b}%
-                  </span>
-                  <span className="text-xl font-bold text-foreground">{childStats.parent_b.percentage}%</span>
+                <div className="text-xl font-bold text-foreground leading-tight">
+                  {childStats.parent_b.percentage}%
+                </div>
+                <div className={`text-[11px] font-medium ${childStats.variance.parent_b >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+                  {childStats.variance.parent_b >= 0 ? '+' : ''}{childStats.variance.parent_b}% vs target
                 </div>
               </div>
             </div>

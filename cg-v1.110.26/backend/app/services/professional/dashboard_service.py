@@ -354,11 +354,12 @@ class ProfessionalDashboardService:
             try:
                 preview = await summary_service.get_case_preview(family_file_id)
                 
-                # Calculate basic urgency score (placeholder for now)
-                # 0-100 based on flag rate and upcoming events
+                # Calculate basic urgency score (placeholder for now).
+                # flag_rate + exchange_completion_rate are both 0-100 on the
+                # wire per ADR-001 — don't multiply again.
                 flag_rate = preview.compliance.communication_flag_rate or 0
-                urgency = min(100, int(flag_rate * 100) + 10) # Base 10 urgency
-                
+                urgency = min(100, int(flag_rate) + 10)  # Base 10 urgency
+
                 priority_cases.append({
                     "id": family_file_id,
                     "family_file_id": family_file_id,
@@ -368,7 +369,7 @@ class ProfessionalDashboardService:
                     "urgency_score": urgency,
                     "message_count": preview.messages.total_messages_30d,
                     "flagged_count": preview.messages.flagged_messages_30d,
-                    "compliance_score": int((preview.compliance.exchange_completion_rate or 1.0) * 100),
+                    "compliance_score": int(preview.compliance.exchange_completion_rate or 100),
                     "next_event_title": preview.compliance.overall_health.upper() + " CASE HEALTH",
                     "next_event_date": "Updated Daily"
                 })
