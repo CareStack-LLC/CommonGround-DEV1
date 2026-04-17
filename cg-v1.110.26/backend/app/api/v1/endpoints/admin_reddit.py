@@ -367,7 +367,18 @@ async def create_reddit_post(
 # when switching browsers. These endpoints give it a backend home — one
 # admin_kv row per (admin, key) pair.
 
-_PLAYBOOK_ALLOWED_KEYS = {"playbook", "drafts", "outreach", "activity"}
+_PLAYBOOK_ALLOWED_KEYS = {
+    # GTM Playbook state (original 4 blobs — keep working)
+    "playbook", "drafts", "outreach", "activity",
+    # Generic superadmin UI state — "ui:*" namespace. admin_kv is a per-admin
+    # KV store; these playbook endpoints are the convenient surface but the
+    # keys below are for dashboard layout + density/theme preferences used
+    # across /superadmin. Adding a new UI-state key? Add it here + validate
+    # shape on the client.
+    "ui:dashboard_layout",
+    "ui:density",
+    "ui:theme",
+}
 
 
 class PlaybookStatePayload(BaseModel):

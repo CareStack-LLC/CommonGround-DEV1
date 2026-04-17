@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import {
   UserPlus, Upload, RefreshCw, Trash2, Plus, X,
   AlertTriangle, ExternalLink, CloudUpload, Search,
-  ChevronLeft, ChevronRight, TrendingUp, Users,
+  ChevronLeft, ChevronRight, ChevronDown, TrendingUp, Users,
   FileSpreadsheet, BarChart3, ArrowRight, Zap,
   Mail, Globe, Calendar, Megaphone, Share2, Gift, Hash,
-  ListFilter, CheckCircle2, XCircle, MoreVertical,
+  ListFilter, CheckCircle2, XCircle, MoreVertical, Copy, Clock,
 } from 'lucide-react';
 import { adminAPI, type LeadList, type Lead } from '@/lib/admin-api';
 
@@ -99,6 +99,21 @@ export default function LeadsContent() {
   const [lostReason, setLostReason] = useState<string>('price');
   const [stageNote, setStageNote] = useState<string>('');
   const [stageSaving, setStageSaving] = useState(false);
+
+  // --- Inline expandable-row state for the leads table ---
+  const [expandedLeadIds, setExpandedLeadIds] = useState<Set<string>>(new Set());
+  const toggleLeadExpand = (id: string) => {
+    setExpandedLeadIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else {
+        // single-expand UX (match ExpandableRowsTable default)
+        next.clear();
+        next.add(id);
+      }
+      return next;
+    });
+  };
 
   const openStageModal = (lead: Lead) => {
     setStageLead(lead);
@@ -384,6 +399,7 @@ export default function LeadsContent() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-[#2D6A8F]/20">
+                  <th className="w-8" />
                   <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Email</th>
                   <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider hidden md:table-cell">Name</th>
                   <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider hidden lg:table-cell">Company</th>
@@ -394,78 +410,155 @@ export default function LeadsContent() {
               </thead>
               <tbody className="divide-y divide-zinc-800/40">
                 {(!selectedList?.leads || selectedList.leads.length === 0) ? (
-                  <tr><td colSpan={6} className="px-4 py-12 text-center text-[#6B8A9A]">No leads yet. Import a CSV or add manually.</td></tr>
+                  <tr><td colSpan={7} className="px-4 py-12 text-center text-[#6B8A9A]">No leads yet. Import a CSV or add manually.</td></tr>
                 ) : selectedList.leads.map(lead => {
                   const stage = lead.stage;
                   const stageMeta = STAGE_OPTIONS.find(s => s.value === stage);
                   const isClosed = stage === 'closed_won' || stage === 'closed_lost';
+                  const isOpen = expandedLeadIds.has(lead.id);
+                  const stageNotes = (lead.metadata_json as any)?.stage_notes as Array<{ at?: string; stage?: string; reason?: string; note?: string; by?: string }> | undefined;
                   return (
-                    <tr key={lead.id} className="hover:bg-[#2D6A8F]/10 transition-colors">
-                      <td className="px-4 py-3 text-white">{lead.email}</td>
-                      <td className="px-4 py-3 text-[#8AACBC] hidden md:table-cell">{[lead.first_name, lead.last_name].filter(Boolean).join(' ') || '\u2014'}</td>
-                      <td className="px-4 py-3 text-[#8AACBC] hidden lg:table-cell">{lead.company || '\u2014'}</td>
-                      <td className="px-4 py-3">
-                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium border ${SOURCE_COLORS[lead.source] || SOURCE_COLORS.other}`}>
-                          {lead.source}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        {stageMeta ? (
-                          <span className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium ${stageMeta.color}`}>
-                            {stageMeta.label}
-                            {stage === 'closed_lost' && lead.lost_reason && (
-                              <span className="ml-1 text-[10px] opacity-75">({lead.lost_reason.replace(/_/g, ' ')})</span>
-                            )}
-                          </span>
-                        ) : (
-                          <span className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium ${
-                            lead.status === 'active' ? 'bg-emerald-500/15 text-emerald-400' :
-                            lead.status === 'bounced' ? 'bg-red-500/15 text-red-400' :
-                            'bg-zinc-700/50 text-[#8AACBC]'
-                          }`}>
-                            {lead.status}
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        <div className="inline-flex items-center gap-1.5">
-                          {!isClosed && (
-                            <>
-                              <button
-                                onClick={() => {
-                                  setStageLead(lead);
-                                  setStageChoice('closed_won');
-                                  setStageNote('');
-                                }}
-                                title="Mark as Closed Won"
-                                className="p-1.5 rounded text-emerald-300 hover:bg-emerald-500/20 transition-colors"
-                              >
-                                <CheckCircle2 className="w-4 h-4" />
-                              </button>
-                              <button
-                                onClick={() => {
-                                  setStageLead(lead);
-                                  setStageChoice('closed_lost');
-                                  setLostReason(lead.lost_reason || 'price');
-                                  setStageNote('');
-                                }}
-                                title="Mark as Closed Lost"
-                                className="p-1.5 rounded text-red-300 hover:bg-red-500/20 transition-colors"
-                              >
-                                <XCircle className="w-4 h-4" />
-                              </button>
-                            </>
-                          )}
+                    <React.Fragment key={lead.id}>
+                      <tr className={`transition-colors ${isOpen ? 'bg-[#2D6A8F]/10' : 'hover:bg-[#2D6A8F]/10'}`}>
+                        <td className="w-8 px-2 py-3">
                           <button
-                            onClick={() => openStageModal(lead)}
-                            title="Change stage"
-                            className="p-1.5 rounded text-[#8AACBC] hover:bg-[#2D6A8F]/30 hover:text-white transition-colors"
+                            onClick={() => toggleLeadExpand(lead.id)}
+                            title={isOpen ? 'Collapse' : 'Expand'}
+                            className="p-1 rounded text-[#8AACBC] hover:text-white hover:bg-[#2D6A8F]/30 transition-colors"
                           >
-                            <MoreVertical className="w-4 h-4" />
+                            {isOpen ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
                           </button>
-                        </div>
-                      </td>
-                    </tr>
+                        </td>
+                        <td className="px-4 py-3 text-white">{lead.email}</td>
+                        <td className="px-4 py-3 text-[#8AACBC] hidden md:table-cell">{[lead.first_name, lead.last_name].filter(Boolean).join(' ') || '\u2014'}</td>
+                        <td className="px-4 py-3 text-[#8AACBC] hidden lg:table-cell">{lead.company || '\u2014'}</td>
+                        <td className="px-4 py-3">
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium border ${SOURCE_COLORS[lead.source] || SOURCE_COLORS.other}`}>
+                            {lead.source}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          {stageMeta ? (
+                            <span className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium ${stageMeta.color}`}>
+                              {stageMeta.label}
+                              {stage === 'closed_lost' && lead.lost_reason && (
+                                <span className="ml-1 text-[10px] opacity-75">({lead.lost_reason.replace(/_/g, ' ')})</span>
+                              )}
+                            </span>
+                          ) : (
+                            <span className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium ${
+                              lead.status === 'active' ? 'bg-emerald-500/15 text-emerald-400' :
+                              lead.status === 'bounced' ? 'bg-red-500/15 text-red-400' :
+                              'bg-zinc-700/50 text-[#8AACBC]'
+                            }`}>
+                              {lead.status}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <div className="inline-flex items-center gap-1.5">
+                            {!isClosed && (
+                              <>
+                                <button
+                                  onClick={() => {
+                                    setStageLead(lead);
+                                    setStageChoice('closed_won');
+                                    setStageNote('');
+                                  }}
+                                  title="Mark as Closed Won"
+                                  className="p-1.5 rounded text-emerald-300 hover:bg-emerald-500/20 transition-colors"
+                                >
+                                  <CheckCircle2 className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setStageLead(lead);
+                                    setStageChoice('closed_lost');
+                                    setLostReason(lead.lost_reason || 'price');
+                                    setStageNote('');
+                                  }}
+                                  title="Mark as Closed Lost"
+                                  className="p-1.5 rounded text-red-300 hover:bg-red-500/20 transition-colors"
+                                >
+                                  <XCircle className="w-4 h-4" />
+                                </button>
+                              </>
+                            )}
+                            <button
+                              onClick={() => openStageModal(lead)}
+                              title="Change stage"
+                              className="p-1.5 rounded text-[#8AACBC] hover:bg-[#2D6A8F]/30 hover:text-white transition-colors"
+                            >
+                              <MoreVertical className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                      {isOpen && (
+                        <tr className="bg-[#0F2533]/40 border-t border-[#2D6A8F]/10">
+                          <td colSpan={7} className="px-6 py-4">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                              <div>
+                                <div className="text-[10px] uppercase tracking-wider text-[#6B8A9A] mb-2">Attribution</div>
+                                <div className="space-y-1 text-[#D0E4EC]">
+                                  <div><span className="text-[#6B8A9A]">utm_source:</span> <span className="font-mono">{lead.utm_source || '\u2014'}</span></div>
+                                  <div><span className="text-[#6B8A9A]">utm_medium:</span> <span className="font-mono">{lead.utm_medium || '\u2014'}</span></div>
+                                  <div><span className="text-[#6B8A9A]">utm_campaign:</span> <span className="font-mono">{lead.utm_campaign || '\u2014'}</span></div>
+                                </div>
+                              </div>
+                              <div>
+                                <div className="text-[10px] uppercase tracking-wider text-[#6B8A9A] mb-2">Timeline</div>
+                                <div className="space-y-1 text-[#D0E4EC]">
+                                  <div><span className="text-[#6B8A9A]">Created:</span> {lead.created_at ? new Date(lead.created_at).toLocaleString() : '\u2014'}</div>
+                                  <div><span className="text-[#6B8A9A]">Converted:</span> {lead.converted_at ? new Date(lead.converted_at).toLocaleString() : '\u2014'}</div>
+                                  <div><span className="text-[#6B8A9A]">Closed:</span> {lead.closed_at ? new Date(lead.closed_at).toLocaleString() : '\u2014'}</div>
+                                </div>
+                              </div>
+                              <div>
+                                <div className="text-[10px] uppercase tracking-wider text-[#6B8A9A] mb-2">Identifiers</div>
+                                <div className="space-y-1 text-[#D0E4EC]">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-[#6B8A9A]">id:</span>
+                                    <span className="font-mono truncate">{lead.id}</span>
+                                    <button
+                                      onClick={() => {
+                                        navigator.clipboard.writeText(lead.id);
+                                        setSuccess('Lead id copied');
+                                      }}
+                                      title="Copy lead id"
+                                      className="p-0.5 rounded text-[#8AACBC] hover:text-white hover:bg-[#2D6A8F]/30 transition-colors"
+                                    >
+                                      <Copy className="w-3 h-3" />
+                                    </button>
+                                  </div>
+                                  {lead.converted_user_id && (
+                                    <div><span className="text-[#6B8A9A]">user_id:</span> <span className="font-mono truncate">{lead.converted_user_id}</span></div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            {stageNotes && stageNotes.length > 0 && (
+                              <div className="mt-4 pt-3 border-t border-[#2D6A8F]/15">
+                                <div className="text-[10px] uppercase tracking-wider text-[#6B8A9A] mb-2 flex items-center gap-1">
+                                  <Clock className="w-3 h-3" /> Stage history
+                                </div>
+                                <div className="space-y-1">
+                                  {stageNotes.map((n, i) => (
+                                    <div key={i} className="text-xs text-[#D0E4EC] flex items-start gap-2">
+                                      <span className="text-[#6B8A9A] whitespace-nowrap">{n.at ? new Date(n.at).toLocaleDateString() : '\u2014'}</span>
+                                      <span className="capitalize text-[#8AACBC]">{(n.stage || '').replace(/_/g, ' ')}</span>
+                                      {n.reason && <span className="text-amber-300/80">({n.reason.replace(/_/g, ' ')})</span>}
+                                      {n.note && <span className="text-[#D0E4EC]">— {n.note}</span>}
+                                      {n.by && <span className="text-[#6B8A9A] ml-auto text-[10px]">by {n.by}</span>}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
                   );
                 })}
               </tbody>

@@ -20,7 +20,7 @@ import {
   ChevronLeft, ChevronRight, ExternalLink, XCircle, RefreshCw,
 } from 'lucide-react';
 import { adminAPI } from '@/lib/admin-api';
-import { PageHeader, ErrorState } from '@/components/superadmin';
+import { PageHeader, ErrorState, UserHoverCard } from '@/components/superadmin';
 
 interface Session {
   id: string;
@@ -198,13 +198,15 @@ export default function ImpersonationAuditPage() {
                         <div className="text-[#D0E4EC] font-medium">{s.superadmin_email || s.superadmin_id.slice(0, 8)}</div>
                       </td>
                       <td className="px-4 py-3">
-                        <Link
-                          href={`/superadmin/users/${s.target_user_id}`}
-                          className="inline-flex items-center gap-1 text-[#3DAA8A] hover:text-[#5BC4A0] transition-colors"
-                        >
-                          {s.target_email || s.target_user_id.slice(0, 8)}
-                          <ExternalLink className="w-3 h-3" />
-                        </Link>
+                        <UserHoverCard userId={s.target_user_id}>
+                          <Link
+                            href={`/superadmin/users/${s.target_user_id}`}
+                            className="inline-flex items-center gap-1 text-[#3DAA8A] hover:text-[#5BC4A0] transition-colors"
+                          >
+                            {s.target_email || s.target_user_id.slice(0, 8)}
+                            <ExternalLink className="w-3 h-3" />
+                          </Link>
+                        </UserHoverCard>
                       </td>
                       <td className="px-4 py-3 text-[#8AACBC] text-xs">{formatTime(s.started_at)}</td>
                       <td className="px-4 py-3 text-[#8AACBC] text-xs">

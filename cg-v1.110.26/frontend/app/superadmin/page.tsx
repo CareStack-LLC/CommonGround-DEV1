@@ -8,7 +8,7 @@ import {
   ArrowDownRight, UserPlus, CreditCard,
   FileText, ExternalLink, RefreshCw, AlertTriangle,
   Radio, Mail, Bug, Brain, PenTool, Server,
-  MessageCircle, Gauge,
+  MessageCircle, Gauge, Settings2, Eye, EyeOff, X,
 } from 'lucide-react';
 import { adminAPI, type DashboardData, type GrowthStats, type PlatformHealth, type RevenueMetrics, type ExecutiveSummary } from '@/lib/admin-api';
 import {
@@ -54,6 +54,119 @@ function DashboardInner() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const refreshRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Customize modal state (glance tab only)
+  const [customizeOpen, setCustomizeOpen] = useState(false);
+  // hidden widget ids on the glance tab
+  const [hiddenWidgets, setHiddenWidgets] = useState<string[]>([]);
+  // order of widget ids; unknown ids fall to the end
+  const [widgetOrder, setWidgetOrder] = useState<string[] | null>(null);
+  const [density, setDensity] = useState<'compact' | 'comfortable'>('comfortable');
+  const [prefsLoaded, setPrefsLoaded] = useState(false);
+
+  // Load layout + density from backend (admin_kv) with localStorage fallback
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      // Try backend first (admin_kv via /admin/reddit/playbook/state)
+      try {
+        const state = await adminAPI.getPlaybookState();
+        if (!cancelled) {
+          const layout = state?.['ui:dashboard_layout'] as
+            | { hidden?: string[]; order?: string[] }
+            | undefined;
+          if (layout?.hidden) setHiddenWidgets(layout.hidden);
+          if (layout?.order) setWidgetOrder(layout.order);
+          const dens = state?.['ui:density'] as string | undefined;
+          if (dens === 'compact' || dens === 'comfortable') setDensity(dens);
+        }
+      } catch {
+        // Fall back to localStorage
+        try {
+          const raw = localStorage.getItem('cg_admin_dashboard_layout');
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed?.hidden)) setHiddenWidgets(parsed.hidden);
+            if (Array.isArray(parsed?.order)) setWidgetOrder(parsed.order);
+          }
+          const d = localStorage.getItem('cg_admin_dashboard_density');
+          if (d === 'compact' || d === 'comfortable') setDensity(d);
+        } catch {
+          // ignore
+        }
+      } finally {
+        if (!cancelled) setPrefsLoaded(true);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  // Persist on change (debounced via effect; backend + localStorage)
+  useEffect(() => {
+    if (!prefsLoaded) return;
+    const payload = { hidden: hiddenWidgets, order: widgetOrder };
+    try {
+      localStorage.setItem('cg_admin_dashboard_layout', JSON.stringify(payload));
+    } catch { /* ignore */ }
+    const t = setTimeout(() => {
+      adminAPI.savePlaybookState('ui:dashboard_layout', payload).catch(() => {
+        // silent — localStorage already has it
+      });
+    }, 600);
+    return () => clearTimeout(t);
+  }, [hiddenWidgets, widgetOrder, prefsLoaded]);
+
+  useEffect(() => {
+    if (!prefsLoaded) return;
+    try {
+      localStorage.setItem('cg_admin_dashboard_density', density);
+    } catch { /* ignore */ }
+    const t = setTimeout(() => {
+      adminAPI.savePlaybookState('ui:density', density).catch(() => {});
+    }, 600);
+    return () => clearTimeout(t);
+  }, [density, prefsLoaded]);
+
+  // Widget registry — defines the glance tab's customizable sections.
+  // Each entry has an id (stable, used for hide/reorder) and label.
+  const GLANCE_WIDGETS: { id: string; label: string }[] = [
+    { id: 'executive_pulse', label: 'Executive Pulse' },
+    { id: 'primary_kpis', label: 'Primary KPIs' },
+    { id: 'todays_pulse', label: "Today's Pulse" },
+    { id: 'charts_row', label: 'User Growth + Revenue Split' },
+    { id: 'activity_feeds', label: 'Recent Signups + Admin Activity' },
+    { id: 'quick_links', label: 'Quick Links' },
+  ];
+
+  const isWidgetVisible = (id: string) => !hiddenWidgets.includes(id);
+  const toggleWidgetHidden = (id: string) => {
+    setHiddenWidgets((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+  const moveWidget = (id: string, dir: -1 | 1) => {
+    const base = widgetOrder ?? GLANCE_WIDGETS.map((w) => w.id);
+    const idx = base.indexOf(id);
+    if (idx < 0) return;
+    const j = idx + dir;
+    if (j < 0 || j >= base.length) return;
+    const next = [...base];
+    [next[idx], next[j]] = [next[j], next[idx]];
+    setWidgetOrder(next);
+  };
+  const resetCustomize = () => {
+    setHiddenWidgets([]);
+    setWidgetOrder(null);
+    setDensity('comfortable');
+  };
+
+  // Effective ordered widget ids for the glance tab
+  const orderedGlanceWidgets = (() => {
+    const known = GLANCE_WIDGETS.map((w) => w.id);
+    const base = widgetOrder ?? known;
+    // Include any known widgets that aren't in the saved order (defensive for future additions)
+    return [...base, ...known.filter((id) => !base.includes(id))];
+  })();
 
   const fetchData = useCallback(async () => {
     try {
@@ -157,6 +270,45 @@ function DashboardInner() {
         onRefresh={fetchData}
         loading={loading}
         showLiveIndicator
+        actions={
+          activeTab === 'glance' ? (
+            <div className="flex items-center gap-1.5">
+              {/* Density toggle — glance tab only */}
+              <div className="hidden md:flex items-center gap-0.5 p-0.5 rounded-lg bg-[#0F2533]/60 border border-[#2D6A8F]/20">
+                <button
+                  onClick={() => setDensity('comfortable')}
+                  className={`px-2 py-0.5 text-[11px] font-medium rounded transition-colors ${
+                    density === 'comfortable'
+                      ? 'bg-[#2D6A8F]/40 text-white'
+                      : 'text-[#8AACBC] hover:text-white'
+                  }`}
+                  title="Comfortable spacing"
+                >
+                  Comfortable
+                </button>
+                <button
+                  onClick={() => setDensity('compact')}
+                  className={`px-2 py-0.5 text-[11px] font-medium rounded transition-colors ${
+                    density === 'compact'
+                      ? 'bg-[#2D6A8F]/40 text-white'
+                      : 'text-[#8AACBC] hover:text-white'
+                  }`}
+                  title="Dense, information-packed layout"
+                >
+                  Compact
+                </button>
+              </div>
+              <button
+                onClick={() => setCustomizeOpen(true)}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#0F2533]/60 border border-[#2D6A8F]/20 hover:border-[#2D6A8F]/50 text-xs text-[#8AACBC] hover:text-white transition-colors"
+                title="Customize dashboard"
+              >
+                <Settings2 className="w-3.5 h-3.5" />
+                <span className="hidden md:inline">Customize</span>
+              </button>
+            </div>
+          ) : null
+        }
       />
 
       {/* Health Banner */}
@@ -181,7 +333,7 @@ function DashboardInner() {
       {activeTab === 'glance' && (
         <div className="space-y-6">
           {/* Executive Pulse — top of dashboard */}
-          {aiSummary?.summary && aiSummary.generated && (
+          {isWidgetVisible('executive_pulse') && aiSummary?.summary && aiSummary.generated && (
             <div className="bg-gradient-to-br from-[#3DAA8A]/10 via-[#2D6A8F]/5 to-transparent border border-[#3DAA8A]/20 rounded-2xl p-6">
               <div className="flex items-center gap-2.5 mb-4">
                 <div className="w-7 h-7 rounded-lg bg-[#3DAA8A]/15 flex items-center justify-center">
@@ -239,7 +391,8 @@ function DashboardInner() {
           )}
 
           {/* Primary KPIs */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          {isWidgetVisible('primary_kpis') && (
+          <div className={`grid grid-cols-2 lg:grid-cols-4 ${density === 'compact' ? 'gap-2' : 'gap-3'}`}>
             {loading ? <SkeletonCards count={4} /> : dashboard && (
               <>
                 <MetricCard
@@ -247,31 +400,39 @@ function DashboardInner() {
                   sub={`${dashboard.users.new_24h} new today`}
                   trend={growthTrend} color="sage"
                   tooltip="Total registered users across all plans"
-                  sparklineData={sparklineData}
+                  trendData={sparklineData}
+                  trendLabel="7d"
+                  comparisonPct={growthTrend}
+                  density={density}
                 />
                 <MetricCard
                   icon={DollarSign} label={dashboard.subscriptions.mrr_source === 'stripe' ? 'MRR' : 'Est. MRR'} value={formatCurrency(dashboard.subscriptions.mrr ?? dashboard.subscriptions.estimated_mrr)}
                   sub={`${dashboard.subscriptions.past_due_count} past due`}
                   color="ocean" alert={dashboard.subscriptions.past_due_count > 0}
                   tooltip={dashboard.subscriptions.mrr_source === 'stripe' ? 'Verified MRR from Stripe' : 'Estimated MRR from database'}
+                  density={density}
                 />
                 <MetricCard
                   icon={Activity} label="Active (30d)" value={formatNumber(dashboard.users.active_30d)}
                   sub={`${dashboard.users.active_today} online now`}
                   color="sky"
                   tooltip="Users who logged in at least once in the past 30 days"
+                  density={density}
                 />
                 <MetricCard
                   icon={MessageSquare} label="Messages (7d)" value={formatNumber(dashboard.engagement.messages_7d)}
                   sub={`${dashboard.engagement.aria_interventions_7d} ARIA flags`}
                   color="gold"
                   tooltip="Total co-parent messages sent in the past 7 days"
+                  density={density}
                 />
               </>
             )}
           </div>
+          )}
 
           {/* Today's Pulse */}
+          {isWidgetVisible('todays_pulse') && (
           <div className="grid grid-cols-3 gap-3">
             {loading ? <SkeletonCards count={3} /> : dashboard && (
               <>
@@ -287,8 +448,10 @@ function DashboardInner() {
               </>
             )}
           </div>
+          )}
 
           {/* Charts Row */}
+          {isWidgetVisible('charts_row') && (
           <div className="grid lg:grid-cols-3 gap-4">
             {/* User Growth Chart */}
             <div className="lg:col-span-2 bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
@@ -369,8 +532,10 @@ function DashboardInner() {
               )}
             </div>
           </div>
+          )}
 
           {/* Activity Feeds */}
+          {isWidgetVisible('activity_feeds') && (
           <div className="grid lg:grid-cols-2 gap-4">
             {/* Recent Signups */}
             <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
@@ -428,14 +593,17 @@ function DashboardInner() {
               )}
             </div>
           </div>
+          )}
 
           {/* Quick Links */}
+          {isWidgetVisible('quick_links') && (
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             <QuickLink icon={Bug} label="DevOps Hub" badge={bugStats?.critical} badgeColor="text-red-400" onClick={() => router.push('/superadmin/bug-triage')} />
             <QuickLink icon={Users} label="Customer Success" onClick={() => router.push('/superadmin/customer-success')} />
             <QuickLink icon={DollarSign} label="Sales Intelligence" onClick={() => router.push('/superadmin/sales')} />
             <QuickLink icon={TrendingUp} label="Marketing Analytics" onClick={() => router.push('/superadmin/marketing-analytics')} />
           </div>
+          )}
         </div>
       )}
 
@@ -766,6 +934,116 @@ function DashboardInner() {
             <QuickLink icon={MessageCircle} label="View All Chats" onClick={() => router.push('/superadmin/chatbot')} />
             <QuickLink icon={Brain} label="ARIA Insights" onClick={() => router.push('/superadmin/aria')} />
             <QuickLink icon={Mail} label="Email Inbox" badge={inboxStats?.urgent_pending} badgeColor="text-amber-400" onClick={() => router.push('/superadmin/inbox')} />
+          </div>
+        </div>
+      )}
+
+      {/* Customize dashboard modal (glance tab only) */}
+      {customizeOpen && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+          onClick={() => setCustomizeOpen(false)}
+        >
+          <div
+            className="bg-[#0F2533] border border-[#2D6A8F]/30 rounded-xl p-6 w-full max-w-md shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h3 className="text-base font-semibold text-white">Customize Dashboard</h3>
+                <p className="text-xs text-[#8AACBC] mt-0.5">Show, hide, or reorder glance-tab widgets.</p>
+              </div>
+              <button
+                onClick={() => setCustomizeOpen(false)}
+                className="p-1 text-[#8AACBC] hover:text-white transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Density */}
+            <div className="mb-4">
+              <label className="block text-xs font-medium text-[#8AACBC] mb-2">Density</label>
+              <div className="flex items-center gap-0.5 p-0.5 rounded bg-[#1A3648]/60 border border-[#2D6A8F]/20">
+                <button
+                  onClick={() => setDensity('comfortable')}
+                  className={`flex-1 px-2 py-1 text-xs font-medium rounded transition-colors ${
+                    density === 'comfortable' ? 'bg-[#2D6A8F]/40 text-white' : 'text-[#8AACBC] hover:text-white'
+                  }`}
+                >
+                  Comfortable
+                </button>
+                <button
+                  onClick={() => setDensity('compact')}
+                  className={`flex-1 px-2 py-1 text-xs font-medium rounded transition-colors ${
+                    density === 'compact' ? 'bg-[#2D6A8F]/40 text-white' : 'text-[#8AACBC] hover:text-white'
+                  }`}
+                >
+                  Compact
+                </button>
+              </div>
+            </div>
+
+            {/* Widget list with show/hide + reorder */}
+            <div className="space-y-1 mb-4">
+              <label className="block text-xs font-medium text-[#8AACBC] mb-2">Widgets</label>
+              {orderedGlanceWidgets.map((id) => {
+                const w = GLANCE_WIDGETS.find((x) => x.id === id);
+                if (!w) return null;
+                const visible = isWidgetVisible(id);
+                return (
+                  <div
+                    key={id}
+                    className="flex items-center justify-between gap-2 px-3 py-2 rounded bg-[#1A3648]/60 border border-[#2D6A8F]/20"
+                  >
+                    <button
+                      onClick={() => toggleWidgetHidden(id)}
+                      className={`flex items-center gap-2 flex-1 text-left ${visible ? 'text-white' : 'text-[#6B8A9A]'}`}
+                    >
+                      {visible ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                      <span className="text-xs font-medium">{w.label}</span>
+                    </button>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => moveWidget(id, -1)}
+                        className="px-1.5 py-0.5 text-[10px] text-[#8AACBC] hover:text-white transition-colors"
+                        title="Move up"
+                      >
+                        ↑
+                      </button>
+                      <button
+                        onClick={() => moveWidget(id, 1)}
+                        className="px-1.5 py-0.5 text-[10px] text-[#8AACBC] hover:text-white transition-colors"
+                        title="Move down"
+                      >
+                        ↓
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="flex items-center justify-between gap-2">
+              <button
+                onClick={resetCustomize}
+                className="text-xs text-[#8AACBC] hover:text-white transition-colors"
+              >
+                Reset to defaults
+              </button>
+              <button
+                onClick={() => setCustomizeOpen(false)}
+                className="px-4 py-2 rounded bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors"
+              >
+                Done
+              </button>
+            </div>
+
+            <p className="text-[10px] text-[#6B8A9A] mt-3">
+              Note: reordering is best-effort — widgets render in the saved order
+              when the page layout supports it. Changes persist to your admin
+              profile + this browser.
+            </p>
           </div>
         </div>
       )}

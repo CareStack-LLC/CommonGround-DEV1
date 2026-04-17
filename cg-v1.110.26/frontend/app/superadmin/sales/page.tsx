@@ -13,7 +13,7 @@ import {
 import {
   MetricCard, PageHeader, TabBar, useTabState,
   Skeleton, SkeletonCards, ErrorState, InfoTooltip,
-  FunnelChart, ProgressRing,
+  FunnelChart, ProgressRing, CompareToggleChart,
   formatNumber, formatCurrency,
 } from '@/components/superadmin';
 import {
@@ -498,6 +498,27 @@ function ForecastTab() {
           </>
         )}
       </div>
+
+      {/* Period-over-period MRR compare — toggleable overlay of prior 30d */}
+      {!loading && data?.historical?.length > 0 && (() => {
+        const hist = data.historical as { date: string; mrr: number }[];
+        const last30 = hist.slice(-30).map((h) => ({ date: h.date, value: h.mrr }));
+        const prior30 = hist
+          .slice(-60, -30)
+          .map((h) => ({ date: h.date, prior_value: h.mrr }));
+        return (
+          <CompareToggleChart
+            title="Historical MRR — last 30 days"
+            data={last30}
+            priorData={prior30.length === 30 ? prior30 : undefined}
+            valueLabel="MRR"
+            color="#3DAA8A"
+            height={240}
+            formatValue={(n) => `$${n.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
+            tooltip="Daily MRR for the last 30 days. Toggle 'Compare' to overlay the 30 days before that."
+          />
+        );
+      })()}
     </div>
   );
 }

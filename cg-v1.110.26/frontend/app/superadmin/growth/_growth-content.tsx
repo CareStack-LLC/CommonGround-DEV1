@@ -7,6 +7,7 @@ import {
   FileText, CheckCircle,
 } from 'lucide-react';
 import { adminAPI, type GrowthStats, type EngagementStats } from '@/lib/admin-api';
+import { CompareToggleChart } from '@/components/superadmin';
 
 function formatNumber(n: number): string {
   if (n >= 1000) return `${(n / 1000).toFixed(1)}K`;
@@ -196,6 +197,28 @@ export default function GrowthContent() {
           </div>
         </div>
       )}
+
+      {/* Signups — compare current window to prior window of same length */}
+      {!loading && growth?.daily_registrations && growth.daily_registrations.length > 0 && (() => {
+        const all = [...growth.daily_registrations].sort((a, b) => a.date.localeCompare(b.date));
+        const halfCount = Math.min(Math.floor(days / 2), Math.floor(all.length / 2));
+        // current = last half, prior = first half
+        const current = all.slice(-halfCount).map((d) => ({ date: d.date, value: d.count }));
+        const prior = halfCount > 0
+          ? all.slice(-halfCount * 2, -halfCount).map((d) => ({ date: d.date, prior_value: d.count }))
+          : [];
+        return (
+          <CompareToggleChart
+            title={`Daily signups — last ${halfCount} days`}
+            data={current}
+            priorData={prior.length === halfCount && halfCount > 0 ? prior : undefined}
+            valueLabel="signups"
+            color="#3DAA8A"
+            height={220}
+            tooltip={`Toggle to overlay the prior ${halfCount} days so you can compare the same-length windows side by side.`}
+          />
+        );
+      })()}
     </div>
   );
 }

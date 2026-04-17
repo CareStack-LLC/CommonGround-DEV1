@@ -16,6 +16,7 @@ import { adminAPI } from '@/lib/admin-api';
 import {
   MetricCard, PageHeader, TabBar, useTabState,
   Skeleton, SkeletonCards, ErrorState, InfoTooltip, formatNumber,
+  CompareToggleChart,
 } from '@/components/superadmin';
 
 /* ── Types ─────────────────────────────────────────────────────────── */
@@ -275,30 +276,32 @@ function ContentTab() {
         )}
       </Card>
 
-      {/* Content views trend chart */}
-      <Card>
-        <SectionTitle>Content Views Over Time</SectionTitle>
-        {trend.length === 0 ? (
+      {/* Content views trend chart with compare-to-prior-period toggle */}
+      {trend.length === 0 ? (
+        <Card>
+          <SectionTitle>Content Views Over Time</SectionTitle>
           <EmptyData message="No trend data yet" />
-        ) : (
-          <ResponsiveContainer width="100%" height={280}>
-            <LineChart data={trend}>
-              <CartesianGrid {...GRID_PROPS} />
-              <XAxis dataKey="date" {...AXIS_PROPS} />
-              <YAxis {...AXIS_PROPS} />
-              <Tooltip contentStyle={TOOLTIP_STYLE} />
-              <Line
-                type="monotone"
-                dataKey="views"
-                stroke="#3DAA8A"
-                strokeWidth={2}
-                dot={false}
-                activeDot={{ r: 4, fill: '#3DAA8A' }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        )}
-      </Card>
+        </Card>
+      ) : (() => {
+        // Split trend into current + prior halves for compare overlay
+        const sorted = [...trend].sort((a, b) => a.date.localeCompare(b.date));
+        const half = Math.floor(sorted.length / 2);
+        const current = sorted.slice(-half).map((d) => ({ date: d.date, value: d.views }));
+        const prior = half > 0
+          ? sorted.slice(-half * 2, -half).map((d) => ({ date: d.date, prior_value: d.views }))
+          : [];
+        return (
+          <CompareToggleChart
+            title="Content Views Over Time"
+            data={current}
+            priorData={prior.length === half && half > 0 ? prior : undefined}
+            valueLabel="views"
+            color="#3DAA8A"
+            height={280}
+            tooltip="Daily page views from GA4. Toggle 'Compare' to overlay the previous same-length window."
+          />
+        );
+      })()}
     </div>
   );
 }

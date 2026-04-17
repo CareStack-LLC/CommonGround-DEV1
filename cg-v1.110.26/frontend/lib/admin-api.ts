@@ -631,6 +631,10 @@ export interface Lead {
   utm_campaign?: string | null;
   converted_user_id?: string | null;
   converted_at?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  // Flexible JSON blob — currently holds stage_notes array
+  metadata_json?: { stage_notes?: Array<{ at?: string; stage?: string; reason?: string; note?: string; by?: string }>; [key: string]: unknown } | null;
 }
 
 export interface EmailCampaign {

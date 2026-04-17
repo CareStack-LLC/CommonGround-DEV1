@@ -26,3 +26,12 @@ export { DeploymentTimeline } from "./DeploymentTimeline";
 export { HealthScoreBadge } from "./HealthScoreBadge";
 export { CSAgentChat } from "./CSAgentChat";
 export { ExportCsvButton } from "./ExportCsvButton";
+
+// Wave 1 visual primitives — power-user chrome
+export { CommandPalette, pushRecentPage } from "./CommandPalette";
+export { LiveStatusBar } from "./LiveStatusBar";
+export { UserHoverCard } from "./UserHoverCard";
+
+// Wave 1 chart + table primitives
+export { CompareToggleChart } from "./CompareToggleChart";
+export { ExpandableRowsTable, type ExpandableColumn } from "./ExpandableRowsTable";

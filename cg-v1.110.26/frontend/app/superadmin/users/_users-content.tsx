@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { adminAPI, type AdminUser, type UserSearchResult } from '@/lib/admin-api';
-import { ExportCsvButton } from '@/components/superadmin';
+import { ExportCsvButton, UserHoverCard } from '@/components/superadmin';
 
 const TIERS = [
   { value: '', label: 'All tiers' },
@@ -474,7 +474,9 @@ export default function UsersContent() {
                           {user.first_name} {user.last_name}
                           {user.is_admin && <Shield className="w-3 h-3 text-[#3DAA8A]" />}
                         </div>
-                        <div className="text-xs text-[#6B8A9A] truncate">{user.email}</div>
+                        <UserHoverCard userId={user.id}>
+                          <span className="text-xs text-[#6B8A9A] truncate">{user.email}</span>
+                        </UserHoverCard>
                       </div>
                     </div>
                   </td>

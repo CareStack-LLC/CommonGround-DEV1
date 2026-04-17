@@ -1,6 +1,6 @@
 "use client";
 
-import { type LucideIcon, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { type LucideIcon, ArrowUpRight, ArrowDownRight, TrendingUp, TrendingDown } from "lucide-react";
 import { InfoTooltip } from "./InfoTooltip";
 
 interface MetricCardProps {
@@ -8,11 +8,21 @@ interface MetricCardProps {
   label: string;
   value: string | number;
   sub?: string;
+  /** Numeric trend percentage (signed). Displayed as arrow + abs value. Kept for backward compat. */
   trend?: number;
   color?: "sage" | "ocean" | "gold" | "sky" | "coral" | "neutral";
   alert?: boolean;
   tooltip?: string;
+  /** Legacy prop — short numeric series for the inline sparkline. */
   sparklineData?: number[];
+  /** Wave 1: same purpose as sparklineData, clearer name. If both are passed, trendData wins. */
+  trendData?: number[];
+  /** Wave 1: label shown next to comparisonPct, e.g. "7d". */
+  trendLabel?: string;
+  /** Wave 1: signed percent delta vs prior period, e.g. +12 or -8. Renders below the main value. */
+  comparisonPct?: number;
+  /** Wave 1: switches padding + text size for dense dashboards. */
+  density?: "compact" | "comfortable";
 }
 
 const COLOR_MAP = {
@@ -27,15 +37,23 @@ const COLOR_MAP = {
 function MiniSparkline({ data }: { data: number[] }) {
   if (!data || data.length < 2) return null;
   const max = Math.max(...data, 1);
+  const min = Math.min(...data);
+  const range = max - min || 1;
   const w = 60;
-  const h = 20;
+  const h = 24;
+  // Build polyline points (normalized to min..max so flat-ish series doesn't pin to y=0)
   const points = data.map((v, i) => {
     const x = (i / (data.length - 1)) * w;
-    const y = h - (v / max) * h;
+    const y = h - ((v - min) / range) * h;
     return `${x},${y}`;
   });
+  // Build filled-area path (polyline + baseline close)
+  const lastX = w;
+  const firstX = 0;
+  const areaPath = `M ${firstX},${h} L ${points.join(" L ")} L ${lastX},${h} Z`;
   return (
-    <svg width={w} height={h} className="opacity-60">
+    <svg width={w} height={h} className="opacity-80 overflow-visible">
+      <path d={areaPath} fill="currentColor" fillOpacity={0.15} />
       <polyline
         points={points.join(" ")}
         fill="none"
@@ -58,34 +76,42 @@ export function MetricCard({
   alert,
   tooltip,
   sparklineData,
+  trendData,
+  trendLabel,
+  comparisonPct,
+  density = "comfortable",
 }: MetricCardProps) {
   const c = COLOR_MAP[color];
+  const compact = density === "compact";
+
+  // Prefer the newer prop name when both are provided.
+  const spark = trendData ?? sparklineData;
 
   return (
     <div
-      className={`rounded-xl border p-4 transition-colors ${c.bg} ${c.border} ${
+      className={`rounded-xl border ${compact ? "p-3" : "p-4"} transition-colors ${c.bg} ${c.border} ${
         alert ? "ring-1 ring-[#F5A623]/40" : ""
       }`}
     >
       <div className="flex items-start justify-between">
-        <div className="flex items-center gap-2 mb-2">
-          <div className={`p-1.5 rounded-lg ${c.bg}`}>
-            <Icon className={`w-4 h-4 ${c.icon}`} />
+        <div className={`flex items-center gap-2 ${compact ? "mb-1" : "mb-2"}`}>
+          <div className={`${compact ? "p-1" : "p-1.5"} rounded-lg ${c.bg}`}>
+            <Icon className={`${compact ? "w-3.5 h-3.5" : "w-4 h-4"} ${c.icon}`} />
           </div>
-          <span className="text-xs text-[#8AACBC] font-medium">
+          <span className={`${compact ? "text-[11px]" : "text-xs"} text-[#8AACBC] font-medium`}>
             {label}
             {tooltip && <InfoTooltip text={tooltip} />}
           </span>
         </div>
-        {sparklineData && (
+        {spark && (
           <div className={c.icon}>
-            <MiniSparkline data={sparklineData} />
+            <MiniSparkline data={spark} />
           </div>
         )}
       </div>
-      <div className="text-2xl font-bold text-white">{value}</div>
-      <div className="flex items-center gap-2 mt-1">
-        {sub && <span className="text-[11px] text-[#6B8A9A]">{sub}</span>}
+      <div className={`${compact ? "text-xl" : "text-2xl"} font-bold text-white`}>{value}</div>
+      <div className="flex items-center gap-2 mt-1 flex-wrap">
+        {sub && <span className={`${compact ? "text-[10px]" : "text-[11px]"} text-[#6B8A9A]`}>{sub}</span>}
         {trend !== undefined && trend !== 0 && (
           <span
             className={`flex items-center gap-0.5 text-[11px] font-medium ${
@@ -98,6 +124,17 @@ export function MetricCard({
               <ArrowDownRight className="w-3 h-3" />
             )}
             {Math.abs(trend)}%
+          </span>
+        )}
+        {comparisonPct !== undefined && comparisonPct !== 0 && (
+          <span
+            className={`flex items-center gap-0.5 text-[11px] font-medium ${
+              comparisonPct > 0 ? "text-[#3DAA8A]" : "text-[#C53030]"
+            }`}
+          >
+            {comparisonPct > 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
+            {comparisonPct > 0 ? "+" : ""}{comparisonPct}%
+            {trendLabel ? <span className="text-[#6B8A9A] ml-0.5">vs prior {trendLabel}</span> : null}
           </span>
         )}
       </div>
