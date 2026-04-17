@@ -59,14 +59,38 @@ class ExchangeGPSVerificationGenerator(BaseSectionGenerator):
         )
         instances = list(instances_result.scalars().all())
 
-        # Calculate metrics
-        metrics = self._calculate_metrics(instances, role_map)
+        # Split instances into renderable + data gaps.
+        # Any row whose parent exchange is missing from_parent_id or
+        # to_parent_id is excluded from the exchange log and surfaced as a
+        # data gap so the court reader sees exactly what couldn't be counted.
+        # See ADR-001 and exchange_compliance.get_exchange_details_for_export.
+        renderable_instances: list[CustodyExchangeInstance] = []
+        data_gaps: list[dict] = []
+        for instance in instances:
+            exchange = instance.exchange
+            if not exchange or not exchange.from_parent_id or not exchange.to_parent_id:
+                data_gaps.append({
+                    "instance_id": str(instance.id),
+                    "scheduled_time": instance.scheduled_time.isoformat(),
+                    "status": instance.status,
+                    "reason": "missing_parent_assignment",
+                    "description": (
+                        "Excluded from compliance totals: no confirmed "
+                        "sending or receiving parent on this exchange."
+                    ),
+                })
+                continue
+            renderable_instances.append(instance)
+
+        # Calculate metrics against renderable rows only — gaps don't count
+        # toward compliance totals (see ADR-001).
+        metrics = self._calculate_metrics(renderable_instances, role_map)
 
         # Build detailed exchange log with GPS data
-        exchange_log = await self._build_exchange_log(instances, role_map, context)
+        exchange_log = await self._build_exchange_log(renderable_instances, role_map, context)
 
         # Generate static map URLs for evidence
-        map_urls = self._generate_map_urls(instances)
+        map_urls = self._generate_map_urls(renderable_instances)
 
         content_data = {
             "summary": {
@@ -74,10 +98,14 @@ class ExchangeGPSVerificationGenerator(BaseSectionGenerator):
                     "start": self._format_date(context.date_start),
                     "end": self._format_date(context.date_end),
                 },
-                "total_exchanges": len(instances),
+                "total_exchanges": len(renderable_instances),
+                "excluded_exchanges": len(data_gaps),
                 "gps_verified_count": metrics["gps_verified_count"],
                 "gps_verified_rate": metrics["gps_verified_rate"],
             },
+            # Distinct "Excluded exchanges" block so the PDF mirrors the UI
+            # rather than silently dropping these rows.
+            "data_gaps": data_gaps,
             "compliance_metrics": {
                 "overall": {
                     "geofence_compliance_rate": metrics["geofence_compliance_rate"],
@@ -291,6 +319,9 @@ class ExchangeGPSVerificationGenerator(BaseSectionGenerator):
                         instance.from_parent_check_in_time.strftime("%I:%M %p")
                         if instance.from_parent_check_in_time else None
                     ),
+                    # Evidence chain for the court reader — which signal
+                    # fired this check-in. See ADR-001.
+                    "check_in_source": instance.from_parent_check_in_source,
                     "gps_lat": instance.from_parent_check_in_lat,
                     "gps_lng": instance.from_parent_check_in_lng,
                     "device_accuracy_meters": instance.from_parent_device_accuracy,
@@ -304,6 +335,7 @@ class ExchangeGPSVerificationGenerator(BaseSectionGenerator):
                         instance.to_parent_check_in_time.strftime("%I:%M %p")
                         if instance.to_parent_check_in_time else None
                     ),
+                    "check_in_source": instance.to_parent_check_in_source,
                     "gps_lat": instance.to_parent_check_in_lat,
                     "gps_lng": instance.to_parent_check_in_lng,
                     "device_accuracy_meters": instance.to_parent_device_accuracy,

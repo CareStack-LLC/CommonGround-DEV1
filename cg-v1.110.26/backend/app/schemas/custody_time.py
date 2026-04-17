@@ -137,6 +137,12 @@ class CustodySession(BaseModel):
     end_time: datetime
     duration_minutes: float
     is_current: bool = False
+    # Where this session came from. One of:
+    #   "exchange_completed" — minute-level from a completed exchange (court-grade)
+    #   "scheduled" | "backfilled" | "check_in" | "manual_override" — CustodyDayRecord fallback
+    # See ADR-001 and get_custody_timeline.
+    source: Optional[str] = "exchange_completed"
+    confidence_score: Optional[int] = 100
 
 
 class RealTimeComplianceStats(BaseModel):
@@ -147,10 +153,28 @@ class RealTimeComplianceStats(BaseModel):
     is_real_time: bool = True
 
 
+class CustodyDataGap(BaseModel):
+    """
+    A day in the timeline window with no signal of any kind.
+
+    Surfaced to the UI so users can see *why* percentages might look low
+    and what to do about it (add check-ins, enable silent-handoff geofences,
+    backfill from schedule). See ADR-001 and
+    ``custody_time.get_custody_timeline``.
+    """
+    date: str  # ISO YYYY-MM-DD
+    reason: str  # e.g. "no_signal"
+    description: str
+
+
 class CustodyTimelineResponse(BaseModel):
-    """Full timeline response with sessions and stats."""
+    """Full timeline response with sessions, stats, gaps, and quality score."""
     sessions: List[CustodySession]
     stats: RealTimeComplianceStats
+    data_gaps: List[CustodyDataGap] = []
+    # Data quality score 0-100. "Court-grade" at >=90, "acceptable" at
+    # 70-89, "insufficient evidence" below. See ADR-001.
+    quality_score: int = 0
 
 
 # =============================================================================

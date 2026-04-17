@@ -3,6 +3,16 @@ Exchange Compliance Service for Court Portal.
 
 Calculates exchange compliance metrics from Silent Handoff GPS verification data.
 Used by GALs, attorneys, and court staff to view objective exchange evidence.
+
+PERCENTAGE CONTRACT
+-------------------
+All ``*_rate`` fields returned by this module (and every service that feeds the
+court dashboards) are ``float`` in ``[0, 100]`` with at most one decimal place.
+Consumers never multiply again; they render with ``.toFixed(0)``.
+
+See ``docs/architecture/ADR-001-percentage-contract.md`` for the full decision.
+Enforced at runtime by the ``Rate`` type alias in
+``app/schemas/exchange_compliance.py``.
 """
 
 from datetime import datetime, timedelta
@@ -337,11 +347,22 @@ class ExchangeComplianceService:
         start_date: Optional[datetime] = None,
         end_date: Optional[datetime] = None,
         family_file_id: Optional[str] = None
-    ) -> List[Dict[str, Any]]:
+    ) -> Dict[str, Any]:
         """
         Get detailed exchange data for court export/report.
 
-        Returns structured data suitable for PDF generation.
+        Returns::
+
+            {
+              "exchanges": [...],   # rows where both parents are identified
+              "data_gaps": [...],   # rows excluded because of missing evidence
+            }
+
+        Exchanges are excluded (and reported as data gaps) when the parent
+        ``CustodyExchange`` row lacks ``from_parent_id`` or ``to_parent_id``.
+        Silently rendering those as "unassigned → unassigned" would undermine
+        court trust; surfacing them as gaps lets the user see what couldn't
+        be counted and why.
         """
         instances = await cls.get_exchange_instances(
             db, case_id, start_date, end_date, include_exchange=True, family_file_id=family_file_id
@@ -361,15 +382,36 @@ class ExchangeComplianceService:
                  if ff.parent_b_id:
                      roles[str(ff.parent_b_id)] = "respondent"
 
-        details = []
+        details: List[Dict[str, Any]] = []
+        data_gaps: List[Dict[str, Any]] = []
+
         for instance in instances:
             exchange = instance.exchange
 
             # Determine parent roles for this exchange
             from_parent_id = exchange.from_parent_id if exchange else None
             to_parent_id = exchange.to_parent_id if exchange else None
-            from_role = roles.get(from_parent_id, "unknown") if from_parent_id else "unassigned"
-            to_role = roles.get(to_parent_id, "unknown") if to_parent_id else "unassigned"
+
+            # If either parent isn't identified, this row can't support a
+            # court-grade attribution. Emit a data gap so the UI/export can
+            # tell the user "1 exchange excluded: missing receiving parent"
+            # rather than silently show "unassigned → unassigned".
+            if not from_parent_id or not to_parent_id:
+                data_gaps.append({
+                    "instance_id": str(instance.id),
+                    "exchange_id": str(instance.exchange_id),
+                    "scheduled_time": instance.scheduled_time.isoformat(),
+                    "status": instance.status,
+                    "reason": "missing_parent_assignment",
+                    "description": (
+                        "Exchange excluded from compliance totals: "
+                        "missing sending or receiving parent."
+                    ),
+                })
+                continue
+
+            from_role = roles.get(from_parent_id, "unknown")
+            to_role = roles.get(to_parent_id, "unknown")
 
             detail = {
                 "id": instance.id,
@@ -388,6 +430,9 @@ class ExchangeComplianceService:
                     "role": from_role,
                     "checked_in": instance.from_parent_checked_in,
                     "check_in_time": instance.from_parent_check_in_time.isoformat() if instance.from_parent_check_in_time else None,
+                    # Evidence chain: which signal fired this check-in?
+                    # See ADR-001 and CustodyExchangeInstance.*_check_in_source.
+                    "check_in_source": instance.from_parent_check_in_source,
                     "gps": {
                         "lat": instance.from_parent_check_in_lat,
                         "lng": instance.from_parent_check_in_lng,
@@ -400,6 +445,7 @@ class ExchangeComplianceService:
                     "role": to_role,
                     "checked_in": instance.to_parent_checked_in,
                     "check_in_time": instance.to_parent_check_in_time.isoformat() if instance.to_parent_check_in_time else None,
+                    "check_in_source": instance.to_parent_check_in_source,
                     "gps": {
                         "lat": instance.to_parent_check_in_lat,
                         "lng": instance.to_parent_check_in_lng,
@@ -422,7 +468,7 @@ class ExchangeComplianceService:
             }
             details.append(detail)
 
-        return details
+        return {"exchanges": details, "data_gaps": data_gaps}
 
     @classmethod
     async def get_compliance_summary(

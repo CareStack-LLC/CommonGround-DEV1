@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { AlertTriangle, Navigation, QrCode, Loader2 } from 'lucide-react';
+import { AlertTriangle, Navigation, Loader2 } from 'lucide-react';
 import {
   eventsAPI,
   exchangesAPI,
@@ -466,27 +466,9 @@ export default function EventForm({
                     </select>
                   </div>
 
-                  {/* QR Code Toggle */}
-                  <div className="flex items-center gap-3 p-3 bg-muted rounded-lg border border-border">
-                    <div className="flex items-center h-5">
-                      <input
-                        type="checkbox"
-                        id="qr_required"
-                        checked={formData.qr_confirmation_required}
-                        onChange={(e) => setFormData({ ...formData, qr_confirmation_required: e.target.checked })}
-                        className="rounded border-border text-[var(--portal-primary)] focus:ring-[var(--portal-primary)] h-4 w-4"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <Label htmlFor="qr_required" className="text-sm font-medium text-foreground flex items-center gap-2 cursor-pointer">
-                        <QrCode className="w-4 h-4 text-muted-foreground" />
-                        Require QR Code Check-in
-                      </Label>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        Co-parent must scan a code on your device to confirm transfer.
-                      </p>
-                    </div>
-                  </div>
+                  {/* QR confirmation removed 2026-04 — once both parents
+                      check in (GPS or manual tap), the exchange completes
+                      automatically. See ADR-001. */}
                 </div>
               )}
             </div>

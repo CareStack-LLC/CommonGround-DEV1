@@ -178,9 +178,9 @@ async def get_child_custody_timeline(
     else:
         start, end = get_period_dates(period.value)
 
-    # Get timeline sessions
-    sessions = await CustodyTimeService.get_custody_timeline(
-        db, child.family_file_id, start, end
+    # Get timeline sessions + data gaps + quality score (see ADR-001)
+    timeline = await CustodyTimeService.get_custody_timeline(
+        db, child.family_file_id, start, end, child_id=str(child.id)
     )
 
     # Get real-time stats
@@ -189,8 +189,10 @@ async def get_child_custody_timeline(
     )
 
     return CustodyTimelineResponse(
-        sessions=sessions,
-        stats=stats
+        sessions=timeline["sessions"],
+        stats=stats,
+        data_gaps=timeline["data_gaps"],
+        quality_score=timeline["quality_score"],
     )
 
 

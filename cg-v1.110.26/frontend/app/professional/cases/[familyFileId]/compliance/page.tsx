@@ -260,15 +260,16 @@ export default function CompliancePage() {
               />
 
               <div className="grid md:grid-cols-4 gap-4">
+                {/* Rates are 0-100 on the wire per ADR-001 — no more * 100. */}
                 <MetricCard
                   label="On-Time Rate"
-                  value={`${(dashboard.exchange_compliance.on_time_rate * 100).toFixed(0)}%`}
+                  value={`${dashboard.exchange_compliance.on_time_rate.toFixed(0)}%`}
                   icon={<Clock className="h-5 w-5" />}
-                  color={dashboard.exchange_compliance.on_time_rate >= 0.8 ? "green" : "amber"}
+                  color={dashboard.exchange_compliance.on_time_rate >= 80 ? "green" : "amber"}
                 />
                 <MetricCard
                   label="GPS Verified"
-                  value={`${(dashboard.exchange_compliance.gps_verified_rate * 100).toFixed(0)}%`}
+                  value={`${dashboard.exchange_compliance.gps_verified_rate.toFixed(0)}%`}
                   icon={<MapPin className="h-5 w-5" />}
                   color="blue"
                 />
@@ -375,9 +376,9 @@ export default function CompliancePage() {
               <div className="grid md:grid-cols-4 gap-4">
                 <MetricCard
                   label="Payment Rate"
-                  value={`${(dashboard.financial_compliance.payment_rate * 100).toFixed(0)}%`}
+                  value={`${dashboard.financial_compliance.payment_rate.toFixed(0)}%`}
                   icon={<CheckCircle2 className="h-5 w-5" />}
-                  color={dashboard.financial_compliance.payment_rate >= 0.9 ? "green" : "amber"}
+                  color={dashboard.financial_compliance.payment_rate >= 90 ? "green" : "amber"}
                 />
                 <MetricCard
                   label="Total Paid"
@@ -529,15 +530,15 @@ export default function CompliancePage() {
               <div className="grid md:grid-cols-4 gap-4">
                 <MetricCard
                   label="Good Faith Score"
-                  value={`${(dashboard.communication_compliance.good_faith_score * 100).toFixed(0)}%`}
+                  value={`${dashboard.communication_compliance.good_faith_score.toFixed(0)}%`}
                   icon={<TrendingUp className="h-5 w-5" />}
-                  color={dashboard.communication_compliance.good_faith_score >= 0.7 ? "green" : "amber"}
+                  color={dashboard.communication_compliance.good_faith_score >= 70 ? "green" : "amber"}
                 />
                 <MetricCard
                   label="Intervention Rate"
-                  value={`${(dashboard.communication_compliance.intervention_rate * 100).toFixed(1)}%`}
+                  value={`${dashboard.communication_compliance.intervention_rate.toFixed(1)}%`}
                   icon={<AlertTriangle className="h-5 w-5" />}
-                  color={dashboard.communication_compliance.intervention_rate <= 0.1 ? "green" : "red"}
+                  color={dashboard.communication_compliance.intervention_rate <= 10 ? "green" : "red"}
                 />
                 <MetricCard
                   label="Avg Response Time"
@@ -562,17 +563,17 @@ export default function CompliancePage() {
                     <div className="flex-1">
                       <p className="text-sm text-muted-foreground mb-2">Good Faith Score</p>
                       <Progress
-                        value={dashboard.communication_compliance.good_faith_score * 100}
+                        value={dashboard.communication_compliance.good_faith_score}
                         className="h-3"
                       />
                     </div>
                     <div className="text-right">
                       <p
                         className={`text-2xl font-bold ${getScoreColor(
-                          dashboard.communication_compliance.good_faith_score * 100
+                          dashboard.communication_compliance.good_faith_score
                         )}`}
                       >
-                        {(dashboard.communication_compliance.good_faith_score * 100).toFixed(0)}%
+                        {dashboard.communication_compliance.good_faith_score.toFixed(0)}%
                       </p>
                     </div>
                   </div>

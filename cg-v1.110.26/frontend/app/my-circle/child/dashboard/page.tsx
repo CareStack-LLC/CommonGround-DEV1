@@ -528,6 +528,46 @@ export default function ChildDashboardPage() {
           </button>
         </section>
 
+        {/* My Calendar — sibling tile to Messages. Kid sees events their
+            grown-ups added and events they created themselves. Data source:
+            GET /events/child/upcoming (see app/kidspace/calendar/page.tsx). */}
+        <section className="px-4">
+          <button
+            onClick={() => router.push('/kidspace/calendar')}
+            className="w-full relative overflow-hidden rounded-2xl p-5 text-left transition-all hover:scale-[1.01] active:scale-[0.99]"
+            style={{
+              background: 'linear-gradient(135deg, #4BA8C8 0%, #3D8DB4 60%, #2D6A8F 100%)',
+              boxShadow: '0 10px 30px -10px rgba(75, 168, 200, 0.5)',
+            }}
+            aria-label="My calendar"
+          >
+            <div className="absolute -right-6 -bottom-6 w-32 h-32 rounded-full bg-white/10" />
+            <div className="absolute -right-10 -top-10 w-24 h-24 rounded-full bg-white/5" />
+
+            <div className="relative flex items-center gap-4">
+              <div className="relative w-16 h-16 rounded-2xl bg-white/25 flex items-center justify-center shadow-lg flex-shrink-0 backdrop-blur-sm">
+                <Calendar className="w-9 h-9 text-white" strokeWidth={2} />
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <h2
+                  className="text-xl font-black text-white leading-tight"
+                  style={{ fontFamily: 'var(--portal-font-display, DM Serif Display), Georgia, serif' }}
+                >
+                  My Calendar
+                </h2>
+                <p
+                  className="text-sm text-white/90 font-semibold mt-1 truncate"
+                  style={{ fontFamily: 'var(--portal-font-body)' }}
+                >
+                  See what&apos;s coming up this week
+                </p>
+              </div>
+              <ChevronRight className="w-6 h-6 text-white flex-shrink-0" strokeWidth={2.5} />
+            </div>
+          </button>
+        </section>
+
         {/* Featured Hero Banner */}
         {featuredVideo ? (
           <div className="px-4">

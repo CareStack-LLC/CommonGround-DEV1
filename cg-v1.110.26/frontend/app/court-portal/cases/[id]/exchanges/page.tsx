@@ -85,7 +85,14 @@ export default function ExchangeCompliancePage() {
       ]);
 
       setCompliance(complianceData);
-      setDetails(detailsData);
+      // /exchange-details now returns {exchanges, data_gaps} per ADR-001.
+      // Accept either shape so this page still works against older backends
+      // during a staged deploy.
+      if (Array.isArray(detailsData)) {
+        setDetails(detailsData);
+      } else {
+        setDetails(detailsData?.exchanges ?? []);
+      }
     } catch (err: any) {
       console.error("Failed to load exchange data:", err);
       setError(err.message || "Failed to load exchange compliance data");

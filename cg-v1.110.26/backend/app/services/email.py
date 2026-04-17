@@ -583,7 +583,7 @@ class EmailService:
             to_email: Recipient email
             to_name: Recipient name
             case_name: Name of the case
-            on_time_rate: Percentage on-time (0-1)
+            on_time_rate: Percentage on-time in [0, 100] per ADR-001
             total_exchanges: Total number of exchanges
             report_link: Link to full report
             month_name: Month name for report
@@ -600,15 +600,18 @@ class EmailService:
         now = datetime.now()
         subject = f"Monthly Compliance Report - {case_name}"
 
+        # Rates are 0-100 on the wire per ADR-001 (previously this code
+        # multiplied by 100 while callers also passed 0-100, producing
+        # "9450% on time" in the rendered email).
         html_body = self._render_template('reports/compliance_monthly.html', {
             'to_name': to_name,
             'family_file_name': case_name,
-            'compliance_rate': int(on_time_rate * 100),
+            'compliance_rate': int(on_time_rate),
             'total_exchanges': total_exchanges,
             'full_report_url': report_link,
             'month_name': month_name or now.strftime('%B'),
             'year': year or now.year,
-            'on_time_count': on_time_count or int(total_exchanges * on_time_rate),
+            'on_time_count': on_time_count or int(total_exchanges * on_time_rate / 100),
             'completed_exchanges': completed_exchanges or total_exchanges,
             'missed_exchanges': missed_exchanges or 0,
             'gps_verified_count': gps_verified_count or 0,

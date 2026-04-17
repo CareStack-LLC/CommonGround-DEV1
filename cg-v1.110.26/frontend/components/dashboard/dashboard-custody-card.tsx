@@ -169,8 +169,20 @@ export function DashboardCustodyCard({
     const hasCurrentSession = !!currentSession;
     const isWithYou = currentSession ? currentSession.parent_id === user?.id : false;
 
-    const isParentA = timelineData.stats.parent_a.user_id === user?.id;
-    const myStats = isParentA ? timelineData.stats.parent_a : timelineData.stats.parent_b;
+    // Defensive: when a parent slot is unassigned both user_id fields are
+    // null. Without the explicit `user?.id` check, `null === null` silently
+    // evaluates true and the card would render the OTHER parent's stats as
+    // "yours" — a court-evidence hazard. We only match if the current
+    // logged-in user's id is actually present in one of the slots.
+    const parentAUid = timelineData.stats.parent_a?.user_id ?? null;
+    const parentBUid = timelineData.stats.parent_b?.user_id ?? null;
+    const isParentA = !!user?.id && parentAUid === user.id;
+    const isParentB = !!user?.id && parentBUid === user.id;
+    const myStats = isParentA
+        ? timelineData.stats.parent_a
+        : isParentB
+            ? timelineData.stats.parent_b
+            : timelineData.stats.parent_a; // fall back rather than crash
 
     // Status
     let statusColor = 'bg-cg-slate';

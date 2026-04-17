@@ -893,22 +893,46 @@ class CustodyTimeService:
         db: AsyncSession,
         family_file_id: str,
         start_date: date,
-        end_date: date
-    ) -> List[Dict[str, Any]]:
+        end_date: date,
+        child_id: Optional[str] = None,
+    ) -> Dict[str, Any]:
         """
-        Generate a chronological timeline of custody sessions based on check-ins.
+        Generate a chronological timeline of custody sessions.
 
-        A 'Custody Session' is the duration between two completed exchanges.
-        This provides minute-level accuracy for custody tracking.
+        Sessions are built from two complementary sources:
+
+        1. **Completed exchange instances** — minute-level accuracy, highest
+           confidence. A session is the duration between two completed
+           exchanges.
+        2. **Custody day records** — fallback for days not covered by any
+           exchange session. These come from schedule projections, check-ins,
+           or manual overrides, each carrying its own ``determination_method``
+           and ``confidence_score``. Emitted as day-long synthetic sessions
+           so the timeline feels continuous to the user.
+
+        Days with *neither* a session nor a day record are reported as
+        ``data_gaps`` so the UI can tell the user what's missing and why —
+        this is the difference between a hidden "29 untracked days" banner
+        and a concrete "no check-in or schedule projection on these dates"
+        explanation.
 
         Args:
             db: Database session
             family_file_id: Family file ID
             start_date: Start of calculation period
             end_date: End of calculation period
+            child_id: Optional child filter for day-record lookup. When
+                provided, day records are scoped to this child; when None,
+                all children in the family are considered (any record counts
+                as coverage).
 
-        Returns:
-            List of custody sessions (start, end, duration, parent_id)
+        Returns::
+
+            {
+              "sessions": [...],        # minute-level + day-record synthetic
+              "data_gaps": [...],       # days with no signal of any kind
+              "quality_score": int,     # 0-100, see ADR-001
+            }
         """
         # 1. Fetch completed exchanges in the period (plus one before to establish start state)
         # We need the last exchange BEFORE the start_date to know who started with custody
@@ -962,9 +986,13 @@ class CustodyTimeService:
         period_end_dt = datetime.combine(end_date, datetime.max.time()).replace(tzinfo=timezone.utc)
         now = datetime.utcnow().replace(tzinfo=timezone.utc)
 
-        # If no exchanges at all, we can't calculate real-time custody
+        # If no exchanges at all, we still need to return the canonical
+        # {sessions, data_gaps, quality_score} shape — all zero/empty. The
+        # rest of the function (the day-record fallback and gap filler)
+        # runs unconditionally below so the caller can see exactly which
+        # days are missing and why.
         if not all_relevant_exchanges:
-            return []
+            all_relevant_exchanges = []
 
         # 2. Iterate through exchanges to build sessions
         for i in range(len(all_relevant_exchanges)):
@@ -1025,10 +1053,130 @@ class CustodyTimeService:
                     "start_time": effective_start,
                     "end_time": effective_end,
                     "duration_minutes": round(duration_minutes, 1),
-                    "is_current": (i == len(all_relevant_exchanges) - 1) and (session_end == now)
+                    "is_current": (i == len(all_relevant_exchanges) - 1) and (session_end == now),
+                    # Evidence source for this session — lets the UI tag
+                    # court-grade (exchange_completed) vs lower-confidence
+                    # (scheduled/backfilled) attributions distinctly.
+                    "source": "exchange_completed",
+                    "confidence_score": 100,
                 })
 
-        return sessions
+        # =====================================================================
+        # 2. Fill gaps with CustodyDayRecord fallback
+        # =====================================================================
+        # Build a set of days already covered by exchange-based sessions.
+        # A session starting on day X and ending day Y covers [X..Y].
+        covered_days: set[date] = set()
+        for sess in sessions:
+            d = sess["start_time"].date()
+            end_d = sess["end_time"].date()
+            while d <= end_d:
+                covered_days.add(d)
+                d += timedelta(days=1)
+
+        # Load CustodyDayRecord rows for the same period.
+        record_filters = [
+            CustodyDayRecord.family_file_id == family_file_id,
+            CustodyDayRecord.record_date >= start_date,
+            CustodyDayRecord.record_date <= end_date,
+        ]
+        if child_id:
+            record_filters.append(CustodyDayRecord.child_id == child_id)
+        record_result = await db.execute(
+            select(CustodyDayRecord).where(and_(*record_filters))
+            .order_by(CustodyDayRecord.record_date)
+        )
+        day_records = record_result.scalars().all()
+
+        # Group by date — if multiple children produce multiple records per
+        # date, take the first one (all children in a family typically share
+        # a custodial parent on a given day; this is a display approximation).
+        records_by_date: Dict[date, CustodyDayRecord] = {}
+        for rec in day_records:
+            if rec.record_date not in records_by_date and rec.custodial_parent_id:
+                records_by_date[rec.record_date] = rec
+
+        # Emit synthetic day-long sessions for days covered only by records.
+        for rec_date, rec in records_by_date.items():
+            if rec_date in covered_days:
+                continue
+            day_start = datetime.combine(rec_date, datetime.min.time()).replace(tzinfo=timezone.utc)
+            day_end = datetime.combine(rec_date, datetime.max.time()).replace(tzinfo=timezone.utc)
+            # Clip to period boundaries
+            eff_start = max(day_start, period_start_dt)
+            eff_end = min(day_end, period_end_dt, now if rec_date == now.date() else day_end)
+            if eff_end <= eff_start:
+                continue
+            duration_minutes = (eff_end - eff_start).total_seconds() / 60
+            sessions.append({
+                "parent_id": rec.custodial_parent_id,
+                "start_time": eff_start,
+                "end_time": eff_end,
+                "duration_minutes": round(duration_minutes, 1),
+                "is_current": False,
+                "source": rec.determination_method or "day_record",
+                "confidence_score": rec.confidence_score if rec.confidence_score is not None else 50,
+            })
+            covered_days.add(rec_date)
+
+        # =====================================================================
+        # 3. Data gaps: days in range with no session and no day record
+        # =====================================================================
+        data_gaps: List[Dict[str, Any]] = []
+        day = start_date
+        while day <= end_date:
+            if day not in covered_days:
+                data_gaps.append({
+                    "date": day.isoformat(),
+                    "reason": "no_signal",
+                    "description": (
+                        "No check-in, completed exchange, or schedule "
+                        "projection recorded for this day."
+                    ),
+                })
+            day += timedelta(days=1)
+
+        # =====================================================================
+        # 4. Data quality score
+        # =====================================================================
+        # High confidence = came from an exchange completion, check-in, or
+        # manual override; also any record with confidence_score >= 90.
+        total_days_in_range = (end_date - start_date).days + 1
+        high_confidence_days = 0
+        for d in covered_days:
+            # Find a source for this day (exchange session wins over record)
+            covered_by_exchange = any(
+                s["start_time"].date() <= d <= s["end_time"].date()
+                and s["source"] == "exchange_completed"
+                for s in sessions
+            )
+            if covered_by_exchange:
+                high_confidence_days += 1
+                continue
+            rec = records_by_date.get(d)
+            if rec is None:
+                continue
+            if rec.determination_method in (
+                DeterminationMethod.CHECK_IN.value,
+                DeterminationMethod.EXCHANGE_COMPLETED.value,
+                DeterminationMethod.MANUAL_OVERRIDE.value,
+            ) or (rec.confidence_score is not None and rec.confidence_score >= 90):
+                high_confidence_days += 1
+
+        quality_score = (
+            round(100 * high_confidence_days / total_days_in_range)
+            if total_days_in_range > 0 else 0
+        )
+
+        # Sort sessions chronologically so the UI renders them in order
+        # regardless of which bucket (exchange vs record) they came from.
+        sessions.sort(key=lambda s: s["start_time"])
+
+        return {
+            "sessions": sessions,
+            "data_gaps": data_gaps,
+            "quality_score": quality_score,
+        }
 
     @staticmethod
     async def calculate_real_time_compliance(
@@ -1081,9 +1229,10 @@ class CustodyTimeService:
         if not family_file:
             return empty_stats
 
-        sessions = await CustodyTimeService.get_custody_timeline(
+        timeline = await CustodyTimeService.get_custody_timeline(
             db, family_file_id, start_date, end_date
         )
+        sessions = timeline["sessions"]
 
         total_minutes = sum(s["duration_minutes"] for s in sessions)
         parent_a_minutes = sum(s["duration_minutes"] for s in sessions if s["parent_id"] == family_file.parent_a_id)

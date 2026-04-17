@@ -738,129 +738,52 @@ async def get_window_status(
 
 @router.get(
     "/instances/{instance_id}/qr-token",
-    response_model=QRTokenResponse,
-    summary="Get QR confirmation token",
-    description="Get the QR token to display for mutual confirmation. Only available after both parents have checked in."
+    summary="[Deprecated] Get QR confirmation token",
+    description=(
+        "Deprecated 2026-04. QR confirmation was removed in favor of "
+        "both-parent GPS/manual check-in, which is the authoritative "
+        "court-grade evidence. Returns HTTP 410 Gone."
+    ),
+    deprecated=True,
 )
 async def get_qr_token(
     instance_id: str,
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
-    """
-    Get the QR confirmation token for this exchange instance.
-
-    The QR token is generated after both parents have checked in
-    (when QR confirmation is required). Display this as a QR code
-    for the other parent to scan.
-    """
-    instance = await CustodyExchangeService.get_instance_with_exchange(
-        db=db,
-        instance_id=instance_id
-    )
-
-    if not instance:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Exchange instance not found"
-        )
-
-    if not instance.qr_confirmation_token:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="QR token not available. Both parents must check in first, or QR confirmation is not required for this exchange."
-        )
-
-    return QRTokenResponse(
-        token=instance.qr_confirmation_token,
-        instance_id=instance.id
+    """Deprecated endpoint — retained only so old mobile clients get a
+    clear 410 instead of a mysterious 404."""
+    raise HTTPException(
+        status_code=status.HTTP_410_GONE,
+        detail=(
+            "QR confirmation is no longer required. An exchange completes "
+            "automatically when both parents check in (GPS or manual tap)."
+        ),
     )
 
 
 @router.post(
     "/instances/{instance_id}/confirm-qr",
-    response_model=CustodyExchangeInstanceResponse,
-    summary="Confirm exchange via QR scan",
-    description="Complete the exchange by scanning the QR code displayed by the other parent."
+    summary="[Deprecated] Confirm exchange via QR scan",
+    description=(
+        "Deprecated 2026-04. Returns HTTP 410 Gone. Use the regular "
+        "check-in endpoints instead."
+    ),
+    deprecated=True,
 )
 async def confirm_qr(
     instance_id: str,
     confirmation: QRConfirmationRequest,
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
 ):
-    """
-    Confirm the exchange by providing the QR token.
-
-    Scan the QR code displayed by the other parent and submit
-    the token to complete the exchange with mutual verification.
-    """
-    try:
-        instance = await CustodyExchangeService.confirm_qr(
-            db=db,
-            instance_id=instance_id,
-            user_id=current_user.id,
-            confirmation_token=confirmation.confirmation_token
-        )
-    except ValueError as e:
-        logger.error(f"Failed to confirm QR exchange: {e}")
-        capture_error(e)
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Failed to confirm QR exchange"
-        )
-
-    if not instance:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Exchange instance not found"
-        )
-
-    # Get other parent info for perspective-aware display
-    other_parent_name, other_parent_id = await CustodyExchangeService.get_other_parent_info(
-        db=db,
-        exchange=instance.exchange,
-        viewer_id=current_user.id
-    )
-
-    exchange_data = CustodyExchangeService.filter_for_viewer(
-        exchange=instance.exchange,
-        viewer_id=current_user.id,
-        other_parent_name=other_parent_name,
-        other_parent_id=other_parent_id
-    )
-
-    return CustodyExchangeInstanceResponse(
-        id=instance.id,
-        exchange_id=instance.exchange_id,
-        scheduled_time=instance.scheduled_time,
-        status=instance.status,
-        from_parent_checked_in=instance.from_parent_checked_in,
-        from_parent_check_in_time=instance.from_parent_check_in_time,
-        to_parent_checked_in=instance.to_parent_checked_in,
-        to_parent_check_in_time=instance.to_parent_check_in_time,
-        completed_at=instance.completed_at,
-        notes=instance.notes,
-        override_location=instance.override_location,
-        override_time=instance.override_time,
-        from_parent_check_in_lat=instance.from_parent_check_in_lat,
-        from_parent_check_in_lng=instance.from_parent_check_in_lng,
-        from_parent_device_accuracy=instance.from_parent_device_accuracy,
-        from_parent_distance_meters=instance.from_parent_distance_meters,
-        from_parent_in_geofence=instance.from_parent_in_geofence,
-        to_parent_check_in_lat=instance.to_parent_check_in_lat,
-        to_parent_check_in_lng=instance.to_parent_check_in_lng,
-        to_parent_device_accuracy=instance.to_parent_device_accuracy,
-        to_parent_distance_meters=instance.to_parent_distance_meters,
-        to_parent_in_geofence=instance.to_parent_in_geofence,
-        qr_confirmed_at=instance.qr_confirmed_at,
-        handoff_outcome=instance.handoff_outcome,
-        window_start=instance.window_start,
-        window_end=instance.window_end,
-        auto_closed=instance.auto_closed,
-        exchange=CustodyExchangeResponse(**exchange_data),
-        created_at=instance.created_at,
-        updated_at=instance.updated_at,
+    """Deprecated endpoint — see get_qr_token."""
+    raise HTTPException(
+        status_code=status.HTTP_410_GONE,
+        detail=(
+            "QR confirmation is no longer required. An exchange completes "
+            "automatically when both parents check in (GPS or manual tap)."
+        ),
     )
 
 

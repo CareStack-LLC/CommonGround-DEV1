@@ -101,9 +101,13 @@ class ProfessionalComplianceService:
         }
         exchange_compliance = {
             **exchange_metrics,
-            # Normalize rates to 0-1 for frontend
-            "on_time_rate": exchange_metrics.get("on_time_rate", 0) / 100.0,
-            "gps_verified_rate": exchange_metrics.get("geofence_compliance_rate", 0) / 100.0,
+            # Rates are 0-100 on the wire per ADR-001
+            # (docs/architecture/ADR-001-percentage-contract.md). Previously
+            # this service divided by 100 to emit 0-1, which diverged from the
+            # court endpoint's 0-100 contract. Consumers (the professional
+            # compliance page) have been updated to match.
+            "on_time_rate": exchange_metrics.get("on_time_rate", 0),
+            "gps_verified_rate": exchange_metrics.get("geofence_compliance_rate", 0),
             "by_parent": exc_by_parent
         }
 
@@ -133,10 +137,10 @@ class ProfessionalComplianceService:
         
         communication_compliance = {
             **communication_metrics,
-            # Normalize rates to 0-1 for frontend and map fields
-            "intervention_rate": communication_metrics.get("flag_rate", 0) / 100.0,
+            # Rates are 0-100 on the wire per ADR-001. See note above.
+            "intervention_rate": communication_metrics.get("flag_rate", 0),
             "avg_response_time_hours": communication_metrics.get("avg_response_time_hours", 0.0),
-            "good_faith_score": communication_metrics.get("good_faith_rate", 100) / 100.0,
+            "good_faith_score": communication_metrics.get("good_faith_rate", 100),
             "by_parent": comm_by_parent
         }
 
@@ -149,7 +153,8 @@ class ProfessionalComplianceService:
             "outstanding": obligation_metrics.get("pending_count", 0),
             "total_amount_due": obligation_metrics.get("total_amount", 0),
             "total_amount_paid": obligation_metrics.get("amount_funded", 0),
-            "payment_rate": (obligation_metrics.get("child_support_paid_pct", 0) / 100),
+            # 0-100 per ADR-001 (upstream already returns 0-100)
+            "payment_rate": obligation_metrics.get("child_support_paid_pct", 0),
             "by_parent": {
                 "parent_a": {
                     "paid": obligation_metrics.get("parent_a_contribution", 0),
@@ -206,7 +211,7 @@ class ProfessionalComplianceService:
             family_file_id=family_file_id
         )
 
-        details = await ExchangeComplianceService.get_exchange_details_for_export(
+        details_payload = await ExchangeComplianceService.get_exchange_details_for_export(
             self.db,
             case_id=case_id,
             start_date=start_date,
@@ -216,7 +221,10 @@ class ProfessionalComplianceService:
 
         return {
             "summary": summary,
-            "exchanges": details,
+            # get_exchange_details_for_export now returns
+            # {exchanges, data_gaps} — see ADR-001 / court-ready rework.
+            "exchanges": details_payload["exchanges"],
+            "data_gaps": details_payload["data_gaps"],
             "period_days": days,
         }
 

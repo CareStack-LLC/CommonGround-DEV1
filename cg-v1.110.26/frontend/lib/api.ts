@@ -687,6 +687,24 @@ export interface CustodySession {
   end_time: string;
   duration_minutes: number;
   is_current: boolean;
+  /**
+   * Evidence source for this session. "exchange_completed" is court-grade
+   * (minute-level from a completed exchange). Other values come from
+   * CustodyDayRecord fallback and have lower confidence. See ADR-001.
+   */
+  source?: string;
+  confidence_score?: number;
+}
+
+/**
+ * A day in the timeline range with no signal of any kind — no completed
+ * exchange, no check-in, no schedule projection. Surfaced to explain *why*
+ * compliance percentages might look low.
+ */
+export interface CustodyDataGap {
+  date: string; // ISO YYYY-MM-DD
+  reason: string;
+  description: string;
 }
 
 export interface RealTimeComplianceStats {
@@ -711,6 +729,12 @@ export interface RealTimeComplianceStats {
 export interface CustodyTimelineResponse {
   sessions: CustodySession[];
   stats: RealTimeComplianceStats;
+  data_gaps?: CustodyDataGap[];
+  /**
+   * Data quality score 0-100. Court-grade at >=90, acceptable at 70-89,
+   * insufficient evidence below. See ADR-001.
+   */
+  quality_score?: number;
 }
 
 export type TimePeriod = '30_days' | '90_days' | 'ytd' | 'all_time';
@@ -4861,6 +4885,12 @@ export interface ExchangeDetailParent {
   role: string;
   checked_in: boolean;
   check_in_time: string | null;
+  /**
+   * Evidence source for this parent's check-in. One of
+   * 'gps' | 'qr' | 'manual' | 'silent_geofence' | 'coparent_confirm'.
+   * Null for pre-migration rows. See ADR-001.
+   */
+  check_in_source: string | null;
   gps: ExchangeGPSData | null;
 }
 
@@ -4893,6 +4923,25 @@ export interface ExchangeDetail {
   static_map_url?: string;
 }
 
+/**
+ * An exchange instance that couldn't be counted toward compliance totals.
+ * Surfaced to the UI so users see *why* numbers might look low, rather than
+ * a silent drop. See backend `get_exchange_details_for_export`.
+ */
+export interface ExchangeDataGap {
+  instance_id: string;
+  exchange_id: string;
+  scheduled_time: string;
+  status: string;
+  reason: 'missing_parent_assignment' | string;
+  description: string;
+}
+
+export interface ExchangeDetailsResponse {
+  exchanges: ExchangeDetail[];
+  data_gaps: ExchangeDataGap[];
+}
+
 export const exchangeComplianceAPI = {
   /**
    * Get exchange compliance metrics for a case (Silent Handoff GPS verification data)
@@ -4910,19 +4959,24 @@ export const exchangeComplianceAPI = {
   },
 
   /**
-   * Get detailed exchange data with GPS verification for court exports
+   * Get detailed exchange data with GPS verification for court exports.
+   *
+   * Returns exchanges + any data gaps (exchanges excluded from compliance
+   * totals because of missing evidence like an unassigned receiving parent).
+   * Callers should render the gaps as a distinct "Excluded exchanges"
+   * section so users see what couldn't be counted and why.
    */
   async getDetails(
     caseId: string,
     startDate?: string,
     endDate?: string,
     includeMaps: boolean = true
-  ): Promise<ExchangeDetail[]> {
+  ): Promise<ExchangeDetailsResponse> {
     const params = new URLSearchParams();
     if (startDate) params.append('start_date', startDate);
     if (endDate) params.append('end_date', endDate);
     params.append('include_maps', includeMaps.toString());
-    return fetchAPI<ExchangeDetail[]>(`/court/cases/${caseId}/exchange-details?${params.toString()}`);
+    return fetchAPI<ExchangeDetailsResponse>(`/court/cases/${caseId}/exchange-details?${params.toString()}`);
   },
 };
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { MapPin, Clock, CheckCircle, XCircle, Loader2, QrCode, Navigation, Users, Package, ArrowDown, ArrowUp, Hand, AlertTriangle } from 'lucide-react';
+import { MapPin, Clock, CheckCircle, XCircle, Loader2, Navigation, Users, Package, ArrowDown, ArrowUp, Hand, AlertTriangle } from 'lucide-react';
 import { useGeolocation } from '@/hooks/use-geolocation';
 import {
   exchangesAPI,
@@ -187,7 +187,6 @@ export default function SilentHandoffCheckIn({
     const isInGeofence = checkInSuccess.from_parent_in_geofence || checkInSuccess.to_parent_in_geofence;
     const distance = checkInSuccess.from_parent_distance_meters ?? checkInSuccess.to_parent_distance_meters;
     const bothCheckedIn = checkInSuccess.from_parent_checked_in && checkInSuccess.to_parent_checked_in;
-    const needsQR = exchange?.qr_confirmation_required && bothCheckedIn && !checkInSuccess.qr_confirmed_at;
 
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -240,18 +239,9 @@ export default function SilentHandoffCheckIn({
 
               <p className="text-muted-foreground mb-4">
                 {bothCheckedIn
-                  ? needsQR
-                    ? 'Both parents checked in. Scan QR code to complete.'
-                    : 'Both parents have checked in. Exchange complete!'
+                  ? 'Both parents have checked in. Exchange complete!'
                   : 'Waiting for other parent to check in.'}
               </p>
-
-              {needsQR && (
-                <Button onClick={() => window.location.reload()} className="mb-4">
-                  <QrCode className="h-4 w-4 mr-2" />
-                  View QR Code
-                </Button>
-              )}
 
               <Button onClick={onClose} variant="outline" className="w-full">
                 Close

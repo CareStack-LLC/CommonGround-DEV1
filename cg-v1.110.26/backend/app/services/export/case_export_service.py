@@ -177,6 +177,14 @@ class CaseExportService:
 
             export.evidence_counts = evidence_counts
 
+            # Compute a data-quality score for the export period. We base it
+            # on the ratio of total-exchanges-with-full-evidence to
+            # total-exchanges-in-period, read out of the exchange_gps_verification
+            # section we just generated. Low-score periods still export
+            # (courts need to see what exists) but with a red banner so the
+            # reader sees the gap up front. See ADR-001.
+            warning_banner = self._compute_quality_banner(section_contents)
+
             # Build PDF
             pdf_builder = ExportPDFBuilder(
                 case_name=case.case_name,
@@ -188,6 +196,7 @@ class CaseExportService:
                 claim_type=claim_type,
                 claim_description=claim_description,
                 watermark_text=watermark,
+                warning_banner=warning_banner,
             )
 
             pdf_bytes = pdf_builder.build(section_contents)
@@ -253,6 +262,48 @@ class CaseExportService:
         date_part = datetime.utcnow().strftime("%Y%m%d")
         random_part = uuid.uuid4().hex[:4].upper()
         return f"EXP-{date_part}-{random_part}"
+
+    def _compute_quality_banner(
+        self,
+        section_contents: list[SectionContent],
+    ) -> Optional[str]:
+        """
+        Compute a data-quality warning banner for the cover page.
+
+        Reads the exchange_gps_verification section (if present) and looks
+        at the ratio of renderable rows to excluded rows ("data gaps"). If
+        more than half of the exchanges in the period were excluded because
+        of missing evidence, we return a banner string. Otherwise None.
+
+        This is a minimal check aligned with the user's "nothing complex"
+        scope — a fuller quality score would consult the custody timeline
+        as well, but for court export purposes the exchange-evidence ratio
+        is the dominant signal. See ADR-001.
+        """
+        for content in section_contents:
+            if content.section_type != "exchange_gps_verification":
+                continue
+            summary = (content.content_data or {}).get("summary", {}) or {}
+            total = int(summary.get("total_exchanges", 0) or 0)
+            excluded = int(summary.get("excluded_exchanges", 0) or 0)
+            grand_total = total + excluded
+            if grand_total == 0:
+                return (
+                    "This report covers a period with <b>no recorded exchanges</b>. "
+                    "Any claims based on exchange compliance cannot be substantiated "
+                    "from this export. Consider enabling silent-handoff geofences "
+                    "or daily check-ins for future periods."
+                )
+            if excluded > 0 and (excluded * 2) >= grand_total:
+                return (
+                    f"<b>{excluded} of {grand_total}</b> exchanges in this period "
+                    f"were excluded from compliance totals because they lacked a "
+                    f"confirmed sending or receiving parent. Any claims based on "
+                    f"rate percentages below should be read with this exclusion "
+                    f"in mind. See the &quot;Excluded exchanges&quot; list for details."
+                )
+            return None
+        return None
 
     async def _get_chain_hash(
         self,

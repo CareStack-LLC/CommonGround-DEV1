@@ -31,6 +31,7 @@ from app.services.daily_room_cleaner import cleanup_abandoned_sessions
 from app.services.aria_session_memory import cleanup_old_sessions as aria_cleanup_old_sessions
 from app.services.birthday_events import generate_birthday_events
 from app.services.schedule_roller import run_schedule_roller
+from app.services.custody_exchange import CustodyExchangeService
 
 logger = logging.getLogger(__name__)
 
@@ -94,6 +95,36 @@ async def _run_schedule_roller() -> None:
         logger.info("scheduler: schedule_roller result=%s", summary)
     except Exception as exc:  # noqa: BLE001
         logger.exception("scheduler: schedule_roller failed: %s", exc)
+        sentry_sdk.capture_exception(exc)
+
+
+async def _run_auto_close_expired_exchanges() -> None:
+    """
+    Court-ready custody tracking: auto-close exchange instances whose
+    check-in window has expired.
+
+    Without this, instances stay in ``scheduled`` forever and never get a
+    final outcome — compliance totals are perpetually incomplete. Runs
+    every 5 minutes so a missed handoff is surfaced quickly on the
+    dashboard.
+
+    Promotion to ``completed`` passes through ``_guard_completion`` (see
+    ADR-001 / the court_ready_exchange_integrity migration), so any row
+    that fails the evidence chain falls through to ``disputed`` with an
+    audit breadcrumb instead of silently sliding to ``completed``.
+    """
+    try:
+        async with AsyncSessionLocal() as db:
+            try:
+                # auto_close_expired_windows commits internally.
+                closed = await CustodyExchangeService.auto_close_expired_windows(db)
+            except Exception:
+                await db.rollback()
+                raise
+        if closed:
+            logger.info("scheduler: auto_close_expired_exchanges closed=%d", closed)
+    except Exception as exc:  # noqa: BLE001 — never kill the scheduler
+        logger.exception("scheduler: auto_close_expired_exchanges failed: %s", exc)
         sentry_sdk.capture_exception(exc)
 
 
@@ -174,6 +205,18 @@ def start_scheduler(app) -> AsyncIOScheduler:  # noqa: ARG001 — FastAPI app ke
         trigger=CronTrigger(hour=4, minute=0),
         id="birthday_event_generator",
         name="Upcoming-birthday calendar event generator",
+        replace_existing=True,
+        coalesce=True,
+        max_instances=1,
+    )
+    # Court-ready custody tracking: auto-close expired exchange windows
+    # every 5 minutes so missed/incomplete handoffs get a final outcome
+    # quickly. Idempotent — already-closed rows are skipped.
+    _scheduler.add_job(
+        _run_auto_close_expired_exchanges,
+        trigger=IntervalTrigger(minutes=5),
+        id="auto_close_expired_exchanges",
+        name="Custody exchange window auto-closer",
         replace_existing=True,
         coalesce=True,
         max_instances=1,

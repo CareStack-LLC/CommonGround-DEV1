@@ -4237,13 +4237,15 @@ async def get_exchange_details(
     resolved_case_id, resolved_family_file_id = await resolve_case_or_family_ids(
         db, case_id
     )
-    details = await ExchangeComplianceService.get_exchange_details_for_export(
+    payload = await ExchangeComplianceService.get_exchange_details_for_export(
         db=db,
         case_id=resolved_case_id,
         start_date=start_date,
         end_date=end_date,
         family_file_id=resolved_family_file_id,
     )
+    details = payload["exchanges"]
+    data_gaps = payload["data_gaps"]
 
     # Optionally add static map URLs
     if include_maps:
@@ -4278,4 +4280,7 @@ async def get_exchange_details(
                 )
                 detail["static_map_url"] = map_url
 
-    return details
+    # Return both the renderable exchanges and the excluded data gaps, so the
+    # frontend can show a distinct "Excluded exchanges" section rather than
+    # silently dropping them. See ADR-001 and get_exchange_details_for_export.
+    return {"exchanges": details, "data_gaps": data_gaps}

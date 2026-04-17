@@ -200,9 +200,20 @@ class CustodyExchangeInstance(Base):
         DateTime,
         nullable=True
     )
+    # Evidence chain: which signal fired this check-in? One of
+    # "gps", "qr", "manual", "silent_geofence", "coparent_confirm".
+    # Required for court-grade proof; see ADR-001 and _guard_completion.
+    from_parent_check_in_source: Mapped[Optional[str]] = mapped_column(
+        String(20),
+        nullable=True
+    )
     to_parent_checked_in: Mapped[bool] = mapped_column(Boolean, default=False)
     to_parent_check_in_time: Mapped[Optional[datetime]] = mapped_column(
         DateTime,
+        nullable=True
+    )
+    to_parent_check_in_source: Mapped[Optional[str]] = mapped_column(
+        String(20),
         nullable=True
     )
 

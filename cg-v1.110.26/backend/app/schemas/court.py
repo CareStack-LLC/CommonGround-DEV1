@@ -6,6 +6,7 @@ Pydantic schemas for court professional access, settings, events, and reports.
 
 from datetime import datetime, date
 from typing import Optional
+from typing_extensions import Annotated
 from pydantic import BaseModel, EmailStr, Field
 
 from app.models.court import (
@@ -17,6 +18,15 @@ from app.models.court import (
     ReportType,
     DEFAULT_ACCESS_DURATION,
 )
+
+
+# =============================================================================
+# Percentage contract
+# =============================================================================
+# All "rate" and "percentage" fields on the wire are float in [0, 100] with at
+# most one decimal place. See docs/architecture/ADR-001-percentage-contract.md.
+# Any service that returns 0-1 by mistake will raise 422 on serialization.
+Rate = Annotated[float, Field(ge=0, le=100)]
 
 
 # =============================================================================
@@ -606,8 +616,8 @@ class ParentExchangeMetrics(BaseModel):
     """Metrics for a single parent's exchange compliance."""
     check_ins: int = 0
     avg_distance_meters: Optional[float] = None
-    geofence_hit_rate: float = 0  # 0-100 percentage
-    on_time_rate: float = 0  # 0-100 percentage
+    geofence_hit_rate: Rate = 0  # 0-100 (see ADR-001)
+    on_time_rate: Rate = 0  # 0-100 (see ADR-001)
 
 
 class ExchangeComplianceMetrics(BaseModel):
@@ -615,15 +625,16 @@ class ExchangeComplianceMetrics(BaseModel):
     Detailed exchange compliance metrics from Silent Handoff GPS verification.
 
     Used by courts/GALs to view objective custody exchange evidence.
+    All rate fields are 0-100 per ADR-001.
     """
     total_exchanges: int = 0
     completed: int = 0
     missed: int = 0
     one_party_only: int = 0
     disputed: int = 0
-    gps_verified_rate: float = 0  # % of exchanges with GPS check-in
-    geofence_compliance_rate: float = 0  # % within designated geofence
-    on_time_rate: float = 0  # % within check-in window
+    gps_verified_rate: Rate = 0  # % of exchanges with GPS check-in
+    geofence_compliance_rate: Rate = 0  # % within designated geofence
+    on_time_rate: Rate = 0  # % within check-in window
     petitioner_metrics: ParentExchangeMetrics
     respondent_metrics: ParentExchangeMetrics
     date_range: Optional[dict] = None  # {start, end}

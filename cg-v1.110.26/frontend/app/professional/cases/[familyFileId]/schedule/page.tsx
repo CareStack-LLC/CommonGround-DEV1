@@ -118,7 +118,10 @@ export default function CaseSchedulePage() {
         }
       }
 
-      // Fetch stats separately if not included
+      // Fetch stats separately if not included. The professional
+      // /compliance/exchanges endpoint returns {summary, exchanges, data_gaps,
+      // period_days} where the rate fields live under summary.metrics. Flatten
+      // to match the ExchangeStats shape this page renders from.
       if (!stats) {
         const statsResponse = await fetch(
           `${API_BASE}/api/v1/professional/cases/${familyFileId}/compliance/exchanges`,
@@ -128,7 +131,19 @@ export default function CaseSchedulePage() {
         );
         if (statsResponse.ok) {
           const statsData = await statsResponse.json();
-          setStats(statsData);
+          const metrics = statsData?.summary?.metrics ?? statsData ?? {};
+          setStats({
+            total: metrics.total_exchanges ?? metrics.total ?? 0,
+            completed: metrics.completed ?? 0,
+            missed: metrics.missed ?? 0,
+            scheduled: metrics.scheduled ?? 0,
+            // Rates are 0-100 on the wire per ADR-001 — convert to the
+            // legacy 0-1 the UI's `* 100` expects. Swap to
+            // ADR-001-native rendering is a follow-up across this file.
+            on_time_rate: (metrics.on_time_rate ?? 0) / 100,
+            geofence_compliance_rate:
+              (metrics.geofence_compliance_rate ?? 0) / 100,
+          });
         }
       }
     } catch (error) {

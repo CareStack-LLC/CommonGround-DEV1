@@ -25,12 +25,30 @@ import {
   exchangeComplianceAPI,
   ExchangeComplianceResponse,
   ExchangeDetail,
+  ExchangeDataGap,
   eventsAPI,
   EventV2,
   FamilyFileDetail,
 } from '@/lib/api';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
+
+// =============================================================================
+// HELPERS
+// =============================================================================
+
+/**
+ * Render a rate/percentage value that arrives on the wire in [0, 100].
+ * See ADR-001 (docs/architecture/ADR-001-percentage-contract.md).
+ *
+ * Clamps to [0, 100] as a silent defense: if any upstream service ever
+ * slips back to 0–1 math we render 100% at worst, never 4000%.
+ */
+const pct = (v: number | null | undefined, decimals = 0): string => {
+  if (v == null || Number.isNaN(v)) return '—';
+  const clamped = Math.max(0, Math.min(100, v));
+  return `${clamped.toFixed(decimals)}%`;
+};
 
 // =============================================================================
 // TYPES
@@ -132,6 +150,7 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
   const [childStats, setChildStats] = useState<ChildCustodyStats | null>(null);
   const [complianceData, setComplianceData] = useState<ExchangeComplianceResponse | null>(null);
   const [exchangeDetails, setExchangeDetails] = useState<ExchangeDetail[]>([]);
+  const [exchangeDataGaps, setExchangeDataGaps] = useState<ExchangeDataGap[]>([]);
   const [swapEvents, setSwapEvents] = useState<EventV2[]>([]);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
@@ -154,10 +173,15 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
     return 'Unknown';
   };
 
-  const getRoleName = (role: string): string => {
+  const getRoleName = (role: string | null | undefined): string => {
+    // Defensive: map null, empty, or unknown roles to 'Unassigned' so we
+    // never render raw "null → null" or "unassigned → unassigned" rows.
+    // The backend already filters NULL-parent rows into data_gaps, but
+    // pre-migration rows and transient states still surface here.
+    if (!role) return 'Unassigned';
     if (role === 'petitioner') return parentAName;
     if (role === 'respondent') return parentBName;
-    return role;
+    return 'Unassigned';
   };
 
   // Load all data
@@ -186,8 +210,13 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
     else loadErrors.push('Custody stats unavailable');
     if (results[2].status === 'fulfilled') setComplianceData(results[2].value);
     else loadErrors.push('Compliance data unavailable');
-    if (results[3].status === 'fulfilled') setExchangeDetails(results[3].value);
-    else loadErrors.push('Exchange history unavailable');
+    if (results[3].status === 'fulfilled') {
+      // getDetails now returns {exchanges, data_gaps} — see ADR-001.
+      setExchangeDetails(results[3].value.exchanges);
+      setExchangeDataGaps(results[3].value.data_gaps);
+    } else {
+      loadErrors.push('Exchange history unavailable');
+    }
     if (results[4].status === 'fulfilled') {
       const swaps = results[4].value.filter((e: EventV2) => e.event_type === 'swap_request');
       setSwapEvents(swaps);
@@ -232,8 +261,54 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
     return <CustodyDashboardSkeleton />;
   }
 
+  // Data quality score + grade for the court-readiness banner at the top.
+  // See ADR-001. The backend computes this from the ratio of high-confidence
+  // days (exchange completions, check-ins, manual overrides, or record
+  // confidence >= 90) to total days in the period.
+  const qualityScore = timelineData?.quality_score ?? null;
+  const qualityBand = useMemo(() => {
+    if (qualityScore == null) return null;
+    if (qualityScore >= 90) return { label: 'Court-grade', color: 'emerald', desc: 'High confidence across this period' };
+    if (qualityScore >= 70) return { label: 'Acceptable with gaps', color: 'amber', desc: 'Enough evidence to read trends; some days lack hard proof' };
+    return { label: 'Insufficient evidence', color: 'red', desc: 'Too many days without check-ins or completed exchanges to trust totals' };
+  }, [qualityScore]);
+
   return (
     <div className="space-y-6">
+      {/* Data Quality Score — the first thing the user sees. Speaks in
+          plain language so a non-technical reader (judge, GAL, co-parent)
+          knows whether to trust the numbers below it. */}
+      {qualityScore != null && qualityBand && (
+        <div className={`flex items-center justify-between p-3 rounded-xl border ${
+          qualityBand.color === 'emerald' ? 'bg-emerald-50 border-emerald-200 dark:bg-emerald-950/20 dark:border-emerald-800' :
+          qualityBand.color === 'amber' ? 'bg-amber-50 border-amber-200 dark:bg-amber-950/20 dark:border-amber-800' :
+          'bg-red-50 border-red-200 dark:bg-red-950/20 dark:border-red-800'
+        }`}>
+          <div className="flex items-center gap-3">
+            <Shield className={`h-5 w-5 ${
+              qualityBand.color === 'emerald' ? 'text-emerald-600 dark:text-emerald-400' :
+              qualityBand.color === 'amber' ? 'text-amber-600 dark:text-amber-400' :
+              'text-red-600 dark:text-red-400'
+            }`} />
+            <div>
+              <p className={`text-sm font-semibold ${
+                qualityBand.color === 'emerald' ? 'text-emerald-800 dark:text-emerald-300' :
+                qualityBand.color === 'amber' ? 'text-amber-800 dark:text-amber-300' :
+                'text-red-800 dark:text-red-300'
+              }`}>
+                Data Quality: {qualityBand.label}
+              </p>
+              <p className="text-xs text-muted-foreground">{qualityBand.desc}</p>
+            </div>
+          </div>
+          <span className={`px-3 py-1 rounded-full text-sm font-bold ${
+            qualityBand.color === 'emerald' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300' :
+            qualityBand.color === 'amber' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300' :
+            'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300'
+          }`}>{qualityScore}/100</span>
+        </div>
+      )}
+
       {/* Period Selector */}
       <div className="flex gap-2 overflow-x-auto pb-1">
         {PERIODS.map((p) => (
@@ -298,17 +373,24 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
         </div>
       )}
 
-      {/* Untracked Days Warning */}
-      {childStats && childStats.unknown_days > 0 && (childStats.unknown_days / (childStats.parent_a.days + childStats.parent_b.days + childStats.unknown_days)) > 0.1 && (
+      {/* Days Without Signal — replaces the legacy "untracked days" banner
+          with a concrete explanation. Uses timeline.data_gaps so the user
+          sees WHY the timeline has gaps, not just that gaps exist. */}
+      {timelineData?.data_gaps && timelineData.data_gaps.length > 0 && (
         <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-xl p-3">
           <div className="flex items-start gap-2">
             <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
-            <div>
+            <div className="flex-1">
               <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
-                {childStats.unknown_days} untracked day{childStats.unknown_days !== 1 ? 's' : ''} in this period
+                {timelineData.data_gaps.length} day{timelineData.data_gaps.length !== 1 ? 's' : ''} without signal in this period
               </p>
               <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
-                Untracked days reduce data reliability. Use check-ins or exchanges to improve accuracy.
+                No check-in, completed exchange, or schedule projection on{' '}
+                {timelineData.data_gaps.length <= 3
+                  ? timelineData.data_gaps.map(g => format(parseISO(g.date), 'MMM d')).join(', ')
+                  : `${format(parseISO(timelineData.data_gaps[0].date), 'MMM d')}–${format(parseISO(timelineData.data_gaps[timelineData.data_gaps.length - 1].date), 'MMM d')}`
+                }
+                . Add silent-handoff geofences, QR-code check-ins, or daily &quot;With Me&quot; taps to close the gap.
               </p>
             </div>
           </div>
@@ -461,8 +543,8 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
             <MetricCard label="Completed" value={complianceData.metrics.completed} icon={<CheckCircle2 className="h-3.5 w-3.5" />} color="emerald" />
             <MetricCard label="Missed" value={complianceData.metrics.missed} icon={<XCircle className="h-3.5 w-3.5" />} color="red" />
             <MetricCard label="Disputed" value={complianceData.metrics.disputed} icon={<AlertCircle className="h-3.5 w-3.5" />} color="amber" />
-            <MetricCard label="GPS Verified" value={`${Math.round(complianceData.metrics.gps_verified_rate * 100)}%`} icon={<Navigation className="h-3.5 w-3.5" />} />
-            <MetricCard label="On-Time" value={`${Math.round(complianceData.metrics.on_time_rate * 100)}%`} icon={<Timer className="h-3.5 w-3.5" />} />
+            <MetricCard label="GPS Verified" value={pct(complianceData.metrics.gps_verified_rate)} icon={<Navigation className="h-3.5 w-3.5" />} />
+            <MetricCard label="On-Time" value={pct(complianceData.metrics.on_time_rate)} icon={<Timer className="h-3.5 w-3.5" />} />
           </div>
         </div>
       )}
@@ -492,6 +574,43 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
               <Badge className="text-xs bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400 border-0">
                 Pending: {swapCounts.pending}
               </Badge>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Excluded exchanges (data gaps) — shown before the history so users
+          see what couldn't be counted and why. These rows are NOT included
+          in the Exchange Metrics totals above. */}
+      {exchangeDataGaps.length > 0 && (
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+            <span className="text-sm font-semibold text-amber-800 dark:text-amber-300">
+              {exchangeDataGaps.length} exchange{exchangeDataGaps.length !== 1 ? 's' : ''} excluded from totals
+            </span>
+          </div>
+          <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 rounded-xl p-3 space-y-2">
+            <p className="text-xs text-amber-800 dark:text-amber-300">
+              These exchanges couldn&apos;t be counted toward compliance because they&apos;re missing required evidence. Fixing them improves the data quality of your court record.
+            </p>
+            {exchangeDataGaps.slice(0, 5).map((gap) => (
+              <div
+                key={gap.instance_id}
+                className="text-xs flex items-start gap-2 pt-2 border-t border-amber-200/70 dark:border-amber-900/40 first:border-t-0 first:pt-0"
+              >
+                <span className="text-muted-foreground whitespace-nowrap">
+                  {format(parseISO(gap.scheduled_time), 'MMM d')}
+                </span>
+                <span className="text-amber-800 dark:text-amber-300">
+                  {gap.description}
+                </span>
+              </div>
+            ))}
+            {exchangeDataGaps.length > 5 && (
+              <p className="text-xs text-muted-foreground pt-2 border-t border-amber-200/70 dark:border-amber-900/40">
+                +{exchangeDataGaps.length - 5} more — see court export for the full list.
+              </p>
             )}
           </div>
         </div>
@@ -567,12 +686,28 @@ function MetricCard({
   );
 }
 
+// Display label for an evidence source. Keep in sync with
+// backend/app/services/custody_exchange.py::VALID_CHECK_IN_SOURCES
+// and the CustodyExchangeInstance *_check_in_source columns.
+const SOURCE_LABELS: Record<string, string> = {
+  gps: 'GPS',
+  qr: 'QR scan',
+  manual: 'Manual tap',
+  silent_geofence: 'Silent handoff',
+  coparent_confirm: 'Co-parent confirm',
+};
+
+function sourceLabel(source: string | null | undefined): string {
+  if (!source) return 'No evidence';
+  return SOURCE_LABELS[source] ?? source;
+}
+
 function ExchangeRow({
   exchange,
   getRoleName,
 }: {
   exchange: ExchangeDetail;
-  getRoleName: (role: string) => string;
+  getRoleName: (role: string | null | undefined) => string;
 }) {
   const fromName = getRoleName(exchange.from_parent.role);
   const toName = getRoleName(exchange.to_parent.role);
@@ -600,6 +735,24 @@ function ExchangeRow({
           {outcomeLabel(exchange.outcome || exchange.status)}
         </span>
       </div>
+
+      {/* Middle row: evidence source per parent — one-glance court story */}
+      {(exchange.from_parent.check_in_source || exchange.to_parent.check_in_source) && (
+        <div className="flex flex-wrap items-center gap-1.5 mb-1.5 text-[11px]">
+          {exchange.from_parent.check_in_source && (
+            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-muted text-muted-foreground border border-border/60">
+              <span className="font-semibold text-foreground/70">From:</span>
+              {sourceLabel(exchange.from_parent.check_in_source)}
+            </span>
+          )}
+          {exchange.to_parent.check_in_source && (
+            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-muted text-muted-foreground border border-border/60">
+              <span className="font-semibold text-foreground/70">To:</span>
+              {sourceLabel(exchange.to_parent.check_in_source)}
+            </span>
+          )}
+        </div>
+      )}
 
       {/* Bottom row: time, location, GPS */}
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { MapPin, Clock, CheckCircle, XCircle, Loader2, QrCode, Navigation, Users, Package, ArrowDown, ArrowUp } from 'lucide-react';
+import { MapPin, Clock, CheckCircle, XCircle, Loader2, Navigation, Users, Package, ArrowDown, ArrowUp } from 'lucide-react';
 import { useGeolocation } from '@/hooks/use-geolocation';
 import {
     scheduleAPI,
@@ -182,7 +182,6 @@ export default function EventSilentHandoffCheckIn({
 
                             <p className="text-muted-foreground mb-4">
                                 You have successfully checked in for this event.
-                                {event.qr_confirmation_required && " QR Confirmation logic is not fully active for standard events yet."}
                             </p>
 
                             <Button onClick={onClose} variant="outline" className="w-full">

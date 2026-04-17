@@ -68,6 +68,7 @@ class ExportPDFBuilder:
         claim_type: Optional[str] = None,
         claim_description: Optional[str] = None,
         watermark_text: Optional[str] = None,
+        warning_banner: Optional[str] = None,
     ):
         self.case_name = case_name
         self.export_number = export_number
@@ -78,6 +79,12 @@ class ExportPDFBuilder:
         self.claim_type = claim_type
         self.claim_description = claim_description
         self.watermark_text = watermark_text or f"CommonGround Export: {export_number}"
+        # Non-dismissible banner rendered on the cover page when set. Used
+        # for data-quality warnings (see ADR-001): if the export period has
+        # too few high-confidence days to support its own claims, the court
+        # reader sees this up-front rather than discovering the gap via the
+        # details section.
+        self.warning_banner = warning_banner
 
         self._styles = self._create_styles()
         self._page_count = 0
@@ -210,6 +217,28 @@ class ExportPDFBuilder:
         package_label = "COURT FILING PACKAGE" if self.package_type == "court" else "INVESTIGATION PACKAGE"
         story.append(Paragraph(f"<b>{package_label}</b>", self._styles['CGHeading1']))
         story.append(Spacer(1, 0.3 * inch))
+
+        # Data quality warning banner (red, non-dismissible). Set by
+        # case_export_service when the period has insufficient evidence to
+        # support the export's own claims. See ADR-001.
+        if self.warning_banner:
+            banner_style = ParagraphStyle(
+                name='CGWarningBanner',
+                parent=self._styles['CGBody'],
+                fontSize=11,
+                textColor=colors.HexColor("#991b1b"),  # red-800
+                backColor=colors.HexColor("#fee2e2"),  # red-100
+                borderColor=colors.HexColor("#dc2626"),  # red-600
+                borderWidth=1.5,
+                borderPadding=10,
+                spaceBefore=6,
+                spaceAfter=6,
+            )
+            story.append(Paragraph(
+                f"<b>⚠ DATA QUALITY WARNING</b><br/><br/>{self.warning_banner}",
+                banner_style,
+            ))
+            story.append(Spacer(1, 0.3 * inch))
 
         # Case info table
         case_data = [

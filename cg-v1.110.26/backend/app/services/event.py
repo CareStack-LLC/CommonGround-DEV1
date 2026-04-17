@@ -211,7 +211,11 @@ class EventService:
         await db.flush()
         await db.refresh(event)
 
-        # WS5: Broadcast event creation for real-time updates
+        # WS5: Broadcast event creation for real-time updates. Include
+        # child_ids so a kidspace WS subscriber (future work) can filter
+        # "was I tagged?" and surface a toast on the child dashboard
+        # without a re-fetch. The /kidspace/calendar page today just re-
+        # fetches on mount, which is fine for the MVP.
         if event.visibility == "co_parent" and (event.family_file_id or event.case_id):
             broadcast_id = event.family_file_id or event.case_id
             await manager.broadcast_to_case({
@@ -227,6 +231,7 @@ class EventService:
                     "event_category": event.event_category,
                     "visibility": event.visibility,
                     "location": event.location if event.location_shared else None,
+                    "child_ids": list(event.child_ids or []),
                 },
                 "timestamp": datetime.utcnow().isoformat()
             }, broadcast_id)

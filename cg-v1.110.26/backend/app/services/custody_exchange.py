@@ -50,6 +50,69 @@ async def _check_case_or_family_file_access(
 class CustodyExchangeService:
     """Service for managing custody exchanges."""
 
+    # Valid evidence sources for a check-in. Kept in sync with the
+    # CHECK constraint and UI chip rendering. See
+    # docs/architecture/ADR-001-percentage-contract.md and the migration
+    # backend/alembic/versions/court_ready_exchange_integrity_20260417.py.
+    VALID_CHECK_IN_SOURCES = (
+        "gps",
+        "qr",
+        "manual",
+        "silent_geofence",
+        "coparent_confirm",
+    )
+
+    @staticmethod
+    def _guard_completion(
+        instance: CustodyExchangeInstance,
+        exchange: CustodyExchange,
+    ) -> None:
+        """
+        Refuse to promote an instance to ``status='completed'`` without the
+        evidence required for court-grade proof.
+
+        Requirements:
+        - Parent exchange has both ``from_parent_id`` and ``to_parent_id`` set.
+        - Both ``from_parent_checked_in`` and ``to_parent_checked_in`` are True.
+        - Both ``from_parent_check_in_source`` and ``to_parent_check_in_source``
+          are set to a known source tag.
+
+        Raises:
+            ValueError: if any requirement is unmet. The caller should either
+                fix the missing evidence or leave the instance in a non-completed
+                state (``disputed``, ``one_party_present``, etc.).
+
+        This guard is belt-and-suspenders: a DB-level trigger enforces the
+        parent-id requirement, and a CHECK constraint enforces the both-
+        checked-in requirement. The service-level guard surfaces a clear
+        error message before the DB rejects.
+        """
+        if not exchange.from_parent_id or not exchange.to_parent_id:
+            raise ValueError(
+                f"Refusing to complete instance {instance.id}: parent exchange "
+                f"{exchange.id} missing from_parent_id or to_parent_id. "
+                f"Assign both parents to the exchange before completing."
+            )
+        if not (
+            instance.from_parent_checked_in and instance.to_parent_checked_in
+        ):
+            raise ValueError(
+                f"Refusing to complete instance {instance.id}: both parents "
+                f"must check in. from={instance.from_parent_checked_in}, "
+                f"to={instance.to_parent_checked_in}."
+            )
+        if not (
+            instance.from_parent_check_in_source
+            and instance.to_parent_check_in_source
+        ):
+            raise ValueError(
+                f"Refusing to complete instance {instance.id}: each check-in "
+                f"must record its evidence source (gps/qr/manual/silent_geofence/"
+                f"coparent_confirm). from_source="
+                f"{instance.from_parent_check_in_source!r}, to_source="
+                f"{instance.to_parent_check_in_source!r}."
+            )
+
     @staticmethod
     async def create_exchange(
         db: AsyncSession,
@@ -80,6 +143,8 @@ class CustodyExchangeService:
         check_in_window_before_minutes: int = 30,
         check_in_window_after_minutes: int = 30,
         silent_handoff_enabled: bool = False,
+        # Deprecated 2026-04 — both-parent check-in is sufficient evidence.
+        # Parameter retained for API compatibility but always coerced to False.
         qr_confirmation_required: bool = False,
         # Swap flag
         is_swap: bool = False,
@@ -159,7 +224,8 @@ class CustodyExchangeService:
             check_in_window_before_minutes=check_in_window_before_minutes,
             check_in_window_after_minutes=check_in_window_after_minutes,
             silent_handoff_enabled=silent_handoff_enabled,
-            qr_confirmation_required=qr_confirmation_required,
+            # QR deprecated — always stored as False regardless of caller.
+            qr_confirmation_required=False,
             # Swap flag
             is_swap=is_swap,
             swap_reason=swap_reason,
@@ -668,28 +734,35 @@ class CustodyExchangeService:
 
         exchange = instance.exchange
 
-        # Determine which parent is checking in
+        # Determine which parent is checking in. Every check-in records its
+        # evidence source so the court export can reconstruct the chain.
         if user_id == exchange.from_parent_id:
             instance.from_parent_checked_in = True
             instance.from_parent_check_in_time = datetime.utcnow()
+            instance.from_parent_check_in_source = "manual"
         elif user_id == exchange.to_parent_id:
             instance.to_parent_checked_in = True
             instance.to_parent_check_in_time = datetime.utcnow()
+            instance.to_parent_check_in_source = "manual"
         else:
             # User is a participant but not specified as from/to
             # Allow them to check in as from_parent if not set
             if not instance.from_parent_checked_in:
                 instance.from_parent_checked_in = True
                 instance.from_parent_check_in_time = datetime.utcnow()
+                instance.from_parent_check_in_source = "manual"
             elif not instance.to_parent_checked_in:
                 instance.to_parent_checked_in = True
                 instance.to_parent_check_in_time = datetime.utcnow()
+                instance.to_parent_check_in_source = "manual"
 
         if notes:
             instance.notes = notes
 
-        # Mark as completed if both parents checked in
+        # Mark as completed if both parents checked in — guard rejects any
+        # promotion without both parent ids, both booleans, and both sources.
         if instance.from_parent_checked_in and instance.to_parent_checked_in:
+            CustodyExchangeService._guard_completion(instance, exchange)
             instance.status = "completed"
             instance.completed_at = datetime.utcnow()
 
@@ -1126,7 +1199,11 @@ class CustodyExchangeService:
                 device_accuracy_meters=device_accuracy
             )
 
-        # Determine which parent is checking in and record GPS data
+        # Determine which parent is checking in and record GPS data.
+        # Source is 'silent_geofence' when the fix is inside the geofence
+        # (a passive, zero-tap handoff); otherwise plain 'gps' (manual tap
+        # with location enabled but fence missed or unset).
+        gps_source = "silent_geofence" if in_geofence is True else "gps"
         if user_id == exchange.from_parent_id:
             instance.from_parent_checked_in = True
             instance.from_parent_check_in_time = now
@@ -1135,6 +1212,7 @@ class CustodyExchangeService:
             instance.from_parent_device_accuracy = device_accuracy
             instance.from_parent_distance_meters = distance_meters
             instance.from_parent_in_geofence = in_geofence
+            instance.from_parent_check_in_source = gps_source
         elif user_id == exchange.to_parent_id:
             instance.to_parent_checked_in = True
             instance.to_parent_check_in_time = now
@@ -1143,6 +1221,7 @@ class CustodyExchangeService:
             instance.to_parent_device_accuracy = device_accuracy
             instance.to_parent_distance_meters = distance_meters
             instance.to_parent_in_geofence = in_geofence
+            instance.to_parent_check_in_source = gps_source
         else:
             # Fallback for unassigned parents - fill in order
             if not instance.from_parent_checked_in:
@@ -1153,6 +1232,7 @@ class CustodyExchangeService:
                 instance.from_parent_device_accuracy = device_accuracy
                 instance.from_parent_distance_meters = distance_meters
                 instance.from_parent_in_geofence = in_geofence
+                instance.from_parent_check_in_source = gps_source
             elif not instance.to_parent_checked_in:
                 instance.to_parent_checked_in = True
                 instance.to_parent_check_in_time = now
@@ -1161,6 +1241,7 @@ class CustodyExchangeService:
                 instance.to_parent_device_accuracy = device_accuracy
                 instance.to_parent_distance_meters = distance_meters
                 instance.to_parent_in_geofence = in_geofence
+                instance.to_parent_check_in_source = gps_source
 
         if notes:
             if instance.notes:
@@ -1168,22 +1249,23 @@ class CustodyExchangeService:
             else:
                 instance.notes = notes
 
-        # Generate QR token if both parents checked in and QR required
-        if (exchange.qr_confirmation_required and
-            instance.from_parent_checked_in and
-            instance.to_parent_checked_in and
-            not instance.qr_confirmation_token):
-            instance.qr_confirmation_token = secrets.token_urlsafe(32)
+        # QR confirmation was deprecated in 2026-04 — both-parent check-in
+        # (via GPS or manual tap) is sufficient evidence of a completed
+        # handoff. The ``qr_confirmation_*`` columns remain on the model
+        # for backward compatibility with historical rows, but no new
+        # tokens are generated and ``qr_confirmation_required`` is
+        # effectively ignored by the completion path. See ADR-001.
 
         # Update handoff outcome
         instance.handoff_outcome = CustodyExchangeService._determine_handoff_outcome(
             instance, exchange
         )
 
-        # Auto-complete if both checked in and QR not required
+        # Auto-complete when both parents have checked in. Guard rejects any
+        # promotion without both parent ids, both booleans, and both sources.
         if (instance.from_parent_checked_in and
-            instance.to_parent_checked_in and
-            not exchange.qr_confirmation_required):
+            instance.to_parent_checked_in):
+            CustodyExchangeService._guard_completion(instance, exchange)
             instance.status = "completed"
             instance.completed_at = now
 
@@ -1257,12 +1339,16 @@ class CustodyExchangeService:
         instance: CustodyExchangeInstance,
         exchange: CustodyExchange
     ) -> str:
-        """Determine the handoff outcome based on check-in status."""
+        """Determine the handoff outcome based on check-in status.
+
+        QR confirmation was deprecated in 2026-04: once both parents have
+        checked in (via GPS, silent-geofence, or manual tap), the handoff
+        is considered completed. The ``exchange`` parameter is retained
+        for signature compatibility and future outcome rules.
+        """
         both_checked_in = instance.from_parent_checked_in and instance.to_parent_checked_in
 
         if both_checked_in:
-            if exchange.qr_confirmation_required and not instance.qr_confirmed_at:
-                return "pending_qr"
             return "completed"
         elif instance.from_parent_checked_in or instance.to_parent_checked_in:
             return "one_party_present"
@@ -1308,10 +1394,47 @@ class CustodyExchangeService:
         if instance.qr_confirmation_token != confirmation_token:
             raise ValueError("Invalid confirmation token")
 
-        # Record confirmation
+        # Record confirmation. QR is the *mutual* verification step, so the
+        # scanning parent's check-in (if not already recorded via GPS/manual)
+        # is captured here with source='qr'. The OTHER parent must have
+        # previously checked in via some other source — we never allow a
+        # single QR scan to complete an exchange by itself.
+        exchange = instance.exchange
         now = datetime.utcnow()
         instance.qr_confirmed_at = now
         instance.qr_confirmed_by = user_id
+
+        # Figure out which parent is scanning and promote their check-in if
+        # still missing.
+        if user_id == exchange.from_parent_id:
+            if not instance.from_parent_checked_in:
+                instance.from_parent_checked_in = True
+                instance.from_parent_check_in_time = now
+                instance.from_parent_check_in_source = "qr"
+        elif user_id == exchange.to_parent_id:
+            if not instance.to_parent_checked_in:
+                instance.to_parent_checked_in = True
+                instance.to_parent_check_in_time = now
+                instance.to_parent_check_in_source = "qr"
+        else:
+            # Fallback: fill the first missing slot. This preserves the
+            # legacy behavior where a participant who is neither from nor to
+            # can still confirm (e.g. family-file exchange with unassigned
+            # parents). _guard_completion will reject if both parents aren't
+            # ultimately identified on the exchange.
+            if not instance.from_parent_checked_in:
+                instance.from_parent_checked_in = True
+                instance.from_parent_check_in_time = now
+                instance.from_parent_check_in_source = "qr"
+            elif not instance.to_parent_checked_in:
+                instance.to_parent_checked_in = True
+                instance.to_parent_check_in_time = now
+                instance.to_parent_check_in_source = "qr"
+
+        # Guard before promoting. If this raises, we leave the QR
+        # confirmation recorded but status stays as-is so the admin/court
+        # trail shows the attempt.
+        CustodyExchangeService._guard_completion(instance, exchange)
         instance.status = "completed"
         instance.completed_at = now
         instance.handoff_outcome = "completed"
@@ -1368,13 +1491,24 @@ class CustodyExchangeService:
         for instance in instances:
             exchange = instance.exchange
 
-            # Determine final outcome
+            # Determine final outcome. Promotion to 'completed' is guarded —
+            # if the evidence chain is incomplete, fall through to 'disputed'
+            # so the row is surfaced as a gap rather than silently dropped.
+            # QR check deprecated 2026-04 — both-parent check-in is
+            # sufficient evidence on its own.
             if instance.from_parent_checked_in and instance.to_parent_checked_in:
-                if exchange.qr_confirmation_required and not instance.qr_confirmed_at:
-                    instance.handoff_outcome = "disputed"  # Both present but no QR confirm
-                else:
+                try:
+                    CustodyExchangeService._guard_completion(instance, exchange)
                     instance.handoff_outcome = "completed"
                     instance.status = "completed"
+                except ValueError as guard_err:
+                    logger.warning(
+                        "auto_close_expired_windows: instance %s rejected "
+                        "by _guard_completion, marking disputed: %s",
+                        instance.id, guard_err,
+                    )
+                    instance.handoff_outcome = "disputed"
+                    instance.status = "disputed"
             elif instance.from_parent_checked_in or instance.to_parent_checked_in:
                 instance.handoff_outcome = "one_party_present"
                 instance.status = "missed"
