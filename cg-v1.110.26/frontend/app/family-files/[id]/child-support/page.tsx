@@ -35,9 +35,8 @@ import {
 } from '@/lib/api';
 import { safeCurrency } from '@/lib/format-utils';
 import { useAuth } from '@/lib/auth-context';
-import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
-import { Navigation } from '@/components/layout/Navigation';
-import { PageContainer } from '@/components/layout/PageContainer';
+import { ProtectedRoute } from '@/components/protected-route';
+import { Navigation } from '@/components/navigation';
 
 function todayIsoDate(): string {
   const d = new Date();
@@ -554,9 +553,9 @@ export default function ChildSupportTrackingPage() {
   return (
     <ProtectedRoute>
       <Navigation />
-      <PageContainer>
+      <div className="max-w-7xl mx-auto px-4 py-6">
         <ChildSupportTrackingInner />
-      </PageContainer>
+      </div>
     </ProtectedRoute>
   );
 }

@@ -24,8 +24,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { ProtectedRoute } from '@/components/protected-route';
-import { Navigation } from '@/components/layout/Navigation';
-import { PageContainer } from '@/components/layout/PageContainer';
+import { Navigation } from '@/components/navigation';
 import { fetchAPI } from '@/lib/api';
 
 interface PartnerStaffInfo {
@@ -249,9 +248,9 @@ export default function PartnerAdminDashboardPage() {
   return (
     <ProtectedRoute>
       <Navigation />
-      <PageContainer>
+      <div className="max-w-7xl mx-auto px-4 py-6">
         <DashboardInner />
-      </PageContainer>
+      </div>
     </ProtectedRoute>
   );
 }

@@ -47,7 +47,11 @@ export class APIError extends Error {
 /**
  * Base fetch wrapper with error handling
  */
-async function fetchAPI<T>(
+// Exported so feature pages can call arbitrary endpoints without a
+// dedicated client (e.g. partners/admin, which hits /partners/*). Prefer
+// the domain-specific clients below (authAPI, familyFilesAPI, etc.)
+// for anything that has one.
+export async function fetchAPI<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
