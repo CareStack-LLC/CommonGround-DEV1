@@ -14,6 +14,7 @@ from app.api.v1.endpoints import (
     admin_cs,
     admin_marketing as admin_mktg,
     admin_ga4,
+    admin_impersonation,
     auth,
     notifications,
     parent_child_messages,
@@ -292,6 +293,13 @@ api_router.include_router(admin_ga4.router, prefix="/admin", tags=["Admin GA4 An
 
 # SuperAdmin Portal - Platform administration
 api_router.include_router(admin.router, prefix="/admin", tags=["SuperAdmin Portal"])
+
+# Admin impersonation + bulk actions + CSV exports (Wave 6 Phase B)
+api_router.include_router(
+    admin_impersonation.router,
+    prefix="/admin",
+    tags=["SuperAdmin Impersonation / Bulk / Exports"],
+)
 
 # Admin Maintenance — Daily.co room sweeper & other ops jobs (Wave 1 A8)
 api_router.include_router(

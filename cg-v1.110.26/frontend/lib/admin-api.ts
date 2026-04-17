@@ -115,6 +115,30 @@ async function adminFetchBlob(endpoint: string): Promise<Blob> {
   return res.blob();
 }
 
+/**
+ * Trigger a browser file download for an auth-protected CSV endpoint.
+ * Uses fetch + blob + a synthetic anchor so the Authorization header is
+ * included (plain <a href> / window.open don't send headers).
+ */
+export async function triggerCsvDownload(
+  endpoint: string,
+  filename?: string,
+): Promise<void> {
+  const blob = await adminFetchBlob(endpoint);
+  // Fallback filename from the endpoint path if none provided
+  const name =
+    filename ||
+    (endpoint.split('?')[0].split('/').pop() || 'export.csv');
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
 // --- Types ---
 
 export interface DashboardData {
@@ -901,6 +925,101 @@ export const adminAPI = {
       method: 'PATCH',
       body: JSON.stringify(data),
     }),
+
+  // ── Impersonation ───────────────────────────────────────────────────
+  /** Start impersonating a user. Returns a short-lived token + session id. */
+  startImpersonation: (userId: string, reason?: string) =>
+    adminFetch<{
+      session_id: string;
+      target_user_id: string;
+      target_email: string;
+      expires_in_minutes: number;
+      access_token: string;
+      started_at: string;
+    }>(`/admin/users/${userId}/impersonate`, {
+      method: 'POST',
+      body: JSON.stringify({ reason }),
+    }),
+
+  endImpersonation: (sessionId: string, endReason?: string) =>
+    adminFetch<{ session_id: string; ended_at?: string; duration_seconds?: number; already_ended?: boolean }>(
+      '/admin/impersonate/end',
+      {
+        method: 'POST',
+        body: JSON.stringify({ session_id: sessionId, end_reason: endReason }),
+      },
+    ),
+
+  listImpersonationSessions: (params?: {
+    page?: number;
+    page_size?: number;
+    target_user_id?: string;
+    superadmin_id?: string;
+    open_only?: boolean;
+  }) => {
+    const qs = new URLSearchParams();
+    if (params?.page) qs.set('page', String(params.page));
+    if (params?.page_size) qs.set('page_size', String(params.page_size));
+    if (params?.target_user_id) qs.set('target_user_id', params.target_user_id);
+    if (params?.superadmin_id) qs.set('superadmin_id', params.superadmin_id);
+    if (params?.open_only) qs.set('open_only', 'true');
+    const query = qs.toString();
+    return adminFetch<{
+      total: number;
+      page: number;
+      page_size: number;
+      sessions: Array<{
+        id: string;
+        superadmin_id: string;
+        superadmin_email: string | null;
+        target_user_id: string;
+        target_email: string | null;
+        started_at: string | null;
+        ended_at: string | null;
+        end_reason: string | null;
+        duration_seconds: number | null;
+        action_count: number;
+        ip_address: string | null;
+        reason: string | null;
+      }>;
+    }>(`/admin/impersonation/sessions${query ? `?${query}` : ''}`);
+  },
+
+  // ── Bulk user actions ───────────────────────────────────────────────
+  bulkUserAction: (data: {
+    user_ids: string[];
+    action: 'status' | 'tier';
+    params: Record<string, unknown>;
+  }) =>
+    adminFetch<{
+      total_requested: number;
+      succeeded: number;
+      failed: number;
+      succeeded_ids: string[];
+      failures: Array<{ user_id: string; error: string }>;
+    }>('/admin/users/bulk', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  // ── CSV exports ─────────────────────────────────────────────────────
+  /**
+   * Build the URL for a CSV export endpoint so components can trigger a
+   * browser-native download (window.open) while letting adminFetch handle
+   * auth via an Authorization header is not possible — use
+   * triggerCsvDownload() instead which constructs the URL + auth header via
+   * a fetch + blob.
+   */
+  csvExportUrl: (path: string, params?: Record<string, string | number | boolean | undefined>) => {
+    const qs = new URLSearchParams();
+    if (params) {
+      for (const [k, v] of Object.entries(params)) {
+        if (v !== undefined && v !== null && v !== '') qs.set(k, String(v));
+      }
+    }
+    const query = qs.toString();
+    return `${path}${query ? `?${query}` : ''}`;
+  },
 
   // Campaigns
   getCampaigns: () => adminFetch<EmailCampaign[]>('/admin/leads/campaigns'),

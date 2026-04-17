@@ -28,6 +28,7 @@ import {
   DollarSign,
   BarChart3,
   Search,
+  Shield,
 } from 'lucide-react';
 import { adminAPI, type PlatformHealth } from '@/lib/admin-api';
 import { AdminLogo } from '@/components/superadmin';
@@ -38,6 +39,7 @@ const navSections = [
     items: [
       { href: '/superadmin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
       { href: '/superadmin/users', label: 'Users & Activity', icon: Users },
+      { href: '/superadmin/audit/impersonation', label: 'Impersonation Audit', icon: Shield },
     ],
   },
   {

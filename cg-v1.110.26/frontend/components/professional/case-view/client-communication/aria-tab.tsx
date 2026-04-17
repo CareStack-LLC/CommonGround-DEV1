@@ -404,43 +404,9 @@ export function AriaTab({ familyFileId, token }: { familyFileId: string, token: 
                 </Card>
             )}
 
-            {/* Category Breakdown */}
-            {metrics?.by_category && Object.keys(metrics.by_category).length > 0 && (
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="text-base">Intervention Categories</CardTitle>
-                        <CardDescription>
-                            Breakdown of issues flagged by ARIA
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="space-y-3">
-                            {Object.entries(metrics.by_category)
-                                .sort(([, a], [, b]) => b - a)
-                                .map(([category, count]) => (
-                                    <div key={category} className="flex items-center justify-between">
-                                        <div className="flex items-center gap-2">
-                                            <Badge variant="outline" className="capitalize">
-                                                {category.replace(/_/g, " ")}
-                                            </Badge>
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-32 h-2 bg-muted rounded-full overflow-hidden">
-                                                <div
-                                                    className="h-full bg-emerald-500 rounded-full"
-                                                    style={{
-                                                        width: `${(count / metrics.total_interventions) * 100}%`,
-                                                    }}
-                                                />
-                                            </div>
-                                            <span className="text-sm font-medium w-8 text-right">{count}</span>
-                                        </div>
-                                    </div>
-                                ))}
-                        </div>
-                    </CardContent>
-                </Card>
-            )}
+            {/* Category Breakdown — intentionally removed. The simplified
+                ARIAMetrics interface used on this case-view tab doesn't carry
+                v2_category_breakdown; see /superadmin/aria for full breakdown. */}
 
             {/* Recent Interventions */}
             <Card>

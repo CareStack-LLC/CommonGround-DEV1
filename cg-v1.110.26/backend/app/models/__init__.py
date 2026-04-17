@@ -70,6 +70,7 @@ from app.models.wallet import (
 )
 from app.models.legal import LegalAccess, CourtExport
 from app.models.audit import AuditLog, EventLog
+from app.models.impersonation import ImpersonationSession
 from app.models.activity import (
     Activity,
     ActivityType,

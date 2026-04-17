@@ -124,9 +124,26 @@ async def get_leads_status(
     }
 
 
+class LeadListResponse(BaseModel):
+    """Shape of a single lead list returned by GET /admin/leads/lists.
+
+    Mirrors `_list_to_dict` in lead_service.py — declared here so OpenAPI
+    surfaces a proper array type (fixes the `response_model=list` warning).
+    """
+    id: str
+    name: str
+    description: Optional[str] = None
+    lead_type: str
+    lead_count: int
+    sendgrid_list_id: Optional[str] = None
+    created_at: Optional[str] = None
+    updated_at: Optional[str] = None
+
+
 @router.get(
     "/lists",
     summary="List all lead lists",
+    response_model=list[LeadListResponse],
 )
 async def list_lead_lists(
     db: AsyncSession = Depends(get_db),

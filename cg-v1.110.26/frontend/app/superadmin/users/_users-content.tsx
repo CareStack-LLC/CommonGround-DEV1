@@ -6,9 +6,11 @@ import {
   Users, Search, ChevronLeft, ChevronRight, Shield,
   ArrowUpDown, Eye, UserPlus, UserCheck, UserX, Briefcase,
   TrendingUp, PieChart as PieChartIcon,
+  CheckSquare, Square, UserCog, Loader2, AlertTriangle, X,
 } from 'lucide-react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { adminAPI, type AdminUser, type UserSearchResult } from '@/lib/admin-api';
+import { ExportCsvButton } from '@/components/superadmin';
 
 const TIERS = [
   { value: '', label: 'All tiers' },
@@ -80,6 +82,130 @@ export default function UsersContent() {
   const [sortBy, setSortBy] = useState('created_at');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [page, setPage] = useState(0);
+
+  // --- Bulk selection state ---
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [bulkAction, setBulkAction] = useState<'suspend' | 'reactivate' | 'tier' | null>(null);
+  const [bulkTierChoice, setBulkTierChoice] = useState('plus');
+  const [bulkReason, setBulkReason] = useState('');
+  const [bulkRunning, setBulkRunning] = useState(false);
+  const [bulkResult, setBulkResult] = useState<
+    | { succeeded: number; failed: number; failures: Array<{ user_id: string; error: string }> }
+    | null
+  >(null);
+
+  // --- Impersonation state (for "View as") ---
+  const [impersonating, setImpersonating] = useState<string | null>(null);
+
+  const toggleSelect = (userId: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(userId)) next.delete(userId);
+      else next.add(userId);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (!data?.users) return;
+    setSelected((prev) => {
+      const pageIds = data.users.map((u) => u.id);
+      const allSelected = pageIds.every((id) => prev.has(id));
+      const next = new Set(prev);
+      if (allSelected) {
+        pageIds.forEach((id) => next.delete(id));
+      } else {
+        pageIds.forEach((id) => next.add(id));
+      }
+      return next;
+    });
+  };
+
+  const clearSelection = () => setSelected(new Set());
+
+  const runBulkAction = async () => {
+    if (!bulkAction || selected.size === 0) return;
+    const reason = bulkReason.trim();
+    if (!reason || reason.length < 3) {
+      setBulkResult({ succeeded: 0, failed: selected.size, failures: [{ user_id: '-', error: 'Reason (min 3 chars) required' }] });
+      return;
+    }
+    setBulkRunning(true);
+    setBulkResult(null);
+    try {
+      const userIds = Array.from(selected);
+      let result;
+      if (bulkAction === 'suspend') {
+        result = await adminAPI.bulkUserAction({
+          user_ids: userIds,
+          action: 'status',
+          params: { is_active: false, reason },
+        });
+      } else if (bulkAction === 'reactivate') {
+        result = await adminAPI.bulkUserAction({
+          user_ids: userIds,
+          action: 'status',
+          params: { is_active: true, reason },
+        });
+      } else {
+        // tier
+        result = await adminAPI.bulkUserAction({
+          user_ids: userIds,
+          action: 'tier',
+          params: { subscription_tier: bulkTierChoice, reason },
+        });
+      }
+      setBulkResult({
+        succeeded: result.succeeded,
+        failed: result.failed,
+        failures: result.failures,
+      });
+      // Clear selection on success and refetch list
+      if (result.succeeded > 0) {
+        clearSelection();
+        await fetchUsers();
+      }
+    } catch (err) {
+      setBulkResult({
+        succeeded: 0,
+        failed: selected.size,
+        failures: [{ user_id: '-', error: err instanceof Error ? err.message : 'Bulk action failed' }],
+      });
+    } finally {
+      setBulkRunning(false);
+    }
+  };
+
+  const closeBulkModal = () => {
+    setBulkAction(null);
+    setBulkReason('');
+    setBulkResult(null);
+  };
+
+  const startImpersonation = async (userId: string, email: string) => {
+    if (!confirm(`View the app as ${email}?\n\nThe session is audit-logged and expires after 30 minutes.`)) return;
+    setImpersonating(userId);
+    try {
+      const result = await adminAPI.startImpersonation(userId, 'Superadmin viewing user account for support/debug');
+      // Swap out the admin's token for the impersonation token. localStorage key
+      // matches `getAuthToken` in admin-api.ts (access_token).
+      const prevToken = localStorage.getItem('access_token');
+      if (prevToken) {
+        localStorage.setItem('admin_original_token', prevToken);
+      }
+      localStorage.setItem('access_token', result.access_token);
+      localStorage.setItem('impersonation_session_id', result.session_id);
+      alert(
+        `Now viewing as ${result.target_email}.\n\nSession expires in ${result.expires_in_minutes} minutes.\n\nClick "End impersonation" from the profile menu (or /superadmin/audit/impersonation → End) to return to your admin session.`,
+      );
+      // Redirect to the target user's dashboard
+      router.push('/dashboard');
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Failed to start impersonation');
+    } finally {
+      setImpersonating(null);
+    }
+  };
 
   const fetchUsers = useCallback(async () => {
     try {
@@ -195,7 +321,7 @@ export default function UsersContent() {
             className="w-full pl-10 pr-4 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 transition-colors"
           />
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <select
             value={tier}
             onChange={(e) => setTier(e.target.value)}
@@ -212,8 +338,63 @@ export default function UsersContent() {
             <option value="active">Active</option>
             <option value="inactive">Inactive</option>
           </select>
+          <ExportCsvButton
+            endpoint="/admin/users/export.csv"
+            filenameHint="users"
+            filters={{
+              search: query || undefined,
+              tier: tier || undefined,
+              is_active:
+                statusFilter === 'all'
+                  ? undefined
+                  : statusFilter === 'active'
+                    ? 'true'
+                    : 'false',
+            }}
+          />
         </div>
       </div>
+
+      {/* Bulk action toolbar — visible when 1+ rows are selected */}
+      {selected.size > 0 && (
+        <div className="flex items-center justify-between gap-3 px-4 py-3 bg-[#3DAA8A]/10 border border-[#3DAA8A]/30 rounded-lg">
+          <div className="flex items-center gap-3">
+            <CheckSquare className="w-4 h-4 text-[#3DAA8A]" />
+            <span className="text-sm text-white font-medium">
+              {selected.size} user{selected.size === 1 ? '' : 's'} selected
+            </span>
+            <button
+              onClick={clearSelection}
+              className="text-xs text-[#8AACBC] hover:text-white transition-colors"
+            >
+              Clear
+            </button>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setBulkAction('suspend')}
+              className="px-3 py-1.5 text-xs font-medium rounded border border-red-500/30 bg-red-500/10 text-red-300 hover:bg-red-500/20 transition-colors"
+            >
+              <UserX className="w-3 h-3 inline mr-1" />
+              Suspend
+            </button>
+            <button
+              onClick={() => setBulkAction('reactivate')}
+              className="px-3 py-1.5 text-xs font-medium rounded border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 transition-colors"
+            >
+              <UserCheck className="w-3 h-3 inline mr-1" />
+              Reactivate
+            </button>
+            <button
+              onClick={() => setBulkAction('tier')}
+              className="px-3 py-1.5 text-xs font-medium rounded border border-violet-500/30 bg-violet-500/10 text-violet-300 hover:bg-violet-500/20 transition-colors"
+            >
+              <UserCog className="w-3 h-3 inline mr-1" />
+              Change Tier
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Table */}
       <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl overflow-hidden">
@@ -221,6 +402,17 @@ export default function UsersContent() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-[#2D6A8F]/20">
+                <th className="w-10 px-4 py-3">
+                  <button
+                    onClick={toggleSelectAll}
+                    className="text-[#6B8A9A] hover:text-[#3DAA8A] transition-colors"
+                    title="Select all on this page"
+                  >
+                    {(data?.users && data.users.length > 0 && data.users.every(u => selected.has(u.id)))
+                      ? <CheckSquare className="w-4 h-4 text-[#3DAA8A]" />
+                      : <Square className="w-4 h-4" />}
+                  </button>
+                </th>
                 <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">
                   <button onClick={() => toggleSort('first_name')} className="flex items-center gap-1 hover:text-[#D0E4EC] transition-colors">
                     User <ArrowUpDown className="w-3 h-3" />
@@ -238,27 +430,41 @@ export default function UsersContent() {
                   </button>
                 </th>
                 <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Status</th>
-                <th className="text-right px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider w-16" />
+                <th className="text-right px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider w-28">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-800/40">
               {loading ? (
                 Array.from({ length: 10 }).map((_, i) => (
                   <tr key={i}>
-                    <td colSpan={6} className="px-4 py-3"><div className="animate-pulse bg-[#2D6A8F]/20 rounded h-8" /></td>
+                    <td colSpan={7} className="px-4 py-3"><div className="animate-pulse bg-[#2D6A8F]/20 rounded h-8" /></td>
                   </tr>
                 ))
               ) : data?.users?.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-12 text-center text-[#6B8A9A]">No users found matching your criteria.</td>
+                  <td colSpan={7} className="px-4 py-12 text-center text-[#6B8A9A]">No users found matching your criteria.</td>
                 </tr>
               ) : data?.users?.map((user) => (
                 <tr
                   key={user.id}
-                  onClick={() => router.push(`/superadmin/users/${user.id}`)}
-                  className="hover:bg-[#2D6A8F]/10 cursor-pointer transition-colors"
+                  className={`transition-colors ${selected.has(user.id) ? 'bg-[#3DAA8A]/5' : 'hover:bg-[#2D6A8F]/10'}`}
                 >
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); toggleSelect(user.id); }}
+                      className="text-[#6B8A9A] hover:text-[#3DAA8A] transition-colors"
+                      disabled={user.is_admin}
+                      title={user.is_admin ? 'Cannot bulk-select admin users' : 'Select'}
+                    >
+                      {selected.has(user.id)
+                        ? <CheckSquare className="w-4 h-4 text-[#3DAA8A]" />
+                        : <Square className={`w-4 h-4 ${user.is_admin ? 'opacity-30' : ''}`} />}
+                    </button>
+                  </td>
+                  <td
+                    className="px-4 py-3 cursor-pointer"
+                    onClick={() => router.push(`/superadmin/users/${user.id}`)}
+                  >
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-medium text-[#8AACBC]">
                         {user.first_name?.[0]}{user.last_name?.[0]}
@@ -272,18 +478,30 @@ export default function UsersContent() {
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-3">
+                  <td
+                    className="px-4 py-3 cursor-pointer"
+                    onClick={() => router.push(`/superadmin/users/${user.id}`)}
+                  >
                     <span className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium capitalize ${TIER_COLORS[user.subscription_tier || ''] || 'bg-zinc-800 text-[#6B8A9A]'}`}>
                       {(user.subscription_tier || 'free').replace('_', ' ')}
                     </span>
                   </td>
-                  <td className="px-4 py-3 hidden lg:table-cell text-[#6B8A9A] text-xs">
+                  <td
+                    className="px-4 py-3 hidden lg:table-cell text-[#6B8A9A] text-xs cursor-pointer"
+                    onClick={() => router.push(`/superadmin/users/${user.id}`)}
+                  >
                     {user.created_at ? new Date(user.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' }) : '\u2014'}
                   </td>
-                  <td className="px-4 py-3 hidden md:table-cell text-[#6B8A9A] text-xs">
+                  <td
+                    className="px-4 py-3 hidden md:table-cell text-[#6B8A9A] text-xs cursor-pointer"
+                    onClick={() => router.push(`/superadmin/users/${user.id}`)}
+                  >
                     {timeAgo(user.last_active)}
                   </td>
-                  <td className="px-4 py-3">
+                  <td
+                    className="px-4 py-3 cursor-pointer"
+                    onClick={() => router.push(`/superadmin/users/${user.id}`)}
+                  >
                     <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${
                       user.is_active ? 'bg-emerald-500/15 text-emerald-400' : 'bg-red-500/15 text-red-400'
                     }`}>
@@ -292,7 +510,27 @@ export default function UsersContent() {
                     </span>
                   </td>
                   <td className="px-4 py-3 text-right">
-                    <Eye className="w-4 h-4 text-[#4A6E7F] hover:text-[#D0E4EC] inline-block" />
+                    <div className="inline-flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+                      {!user.is_admin && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); startImpersonation(user.id, user.email); }}
+                          disabled={impersonating === user.id}
+                          title="View the app as this user (audit-logged)"
+                          className="p-1.5 rounded text-[#8AACBC] hover:bg-[#3DAA8A]/20 hover:text-[#3DAA8A] transition-colors disabled:opacity-50"
+                        >
+                          {impersonating === user.id
+                            ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            : <UserCog className="w-3.5 h-3.5" />}
+                        </button>
+                      )}
+                      <button
+                        onClick={() => router.push(`/superadmin/users/${user.id}`)}
+                        title="Open detail"
+                        className="p-1.5 rounded text-[#4A6E7F] hover:bg-[#2D6A8F]/30 hover:text-[#D0E4EC] transition-colors"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -318,6 +556,111 @@ export default function UsersContent() {
           </div>
         )}
       </div>
+
+      {/* Bulk action confirmation modal */}
+      {bulkAction && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+          onClick={closeBulkModal}
+        >
+          <div
+            className="bg-[#0F2533] border border-[#2D6A8F]/30 rounded-xl p-6 w-full max-w-md shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between mb-4">
+              <h3 className="text-base font-semibold text-white">
+                {bulkAction === 'suspend' && `Suspend ${selected.size} user${selected.size === 1 ? '' : 's'}`}
+                {bulkAction === 'reactivate' && `Reactivate ${selected.size} user${selected.size === 1 ? '' : 's'}`}
+                {bulkAction === 'tier' && `Change tier for ${selected.size} user${selected.size === 1 ? '' : 's'}`}
+              </h3>
+              <button
+                onClick={closeBulkModal}
+                className="p-1 rounded text-[#8AACBC] hover:bg-[#2D6A8F]/30 hover:text-white transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {bulkAction === 'suspend' && (
+              <div className="flex items-start gap-2 px-3 py-2 mb-4 bg-red-500/10 border border-red-500/30 rounded text-xs text-red-300">
+                <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+                <span>
+                  Suspended users cannot log in. All existing sessions remain valid until expiry.
+                </span>
+              </div>
+            )}
+
+            {bulkAction === 'tier' && (
+              <div className="mb-4">
+                <label className="block text-xs font-medium text-[#8AACBC] mb-2">New Tier</label>
+                <select
+                  value={bulkTierChoice}
+                  onChange={(e) => setBulkTierChoice(e.target.value)}
+                  className="w-full bg-[#1A3648]/80 border border-[#2D6A8F]/30 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-[#3DAA8A]"
+                >
+                  {TIERS.filter(t => t.value).map((t) => (
+                    <option key={t.value} value={t.value}>{t.label}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+
+            <div className="mb-4">
+              <label className="block text-xs font-medium text-[#8AACBC] mb-2">
+                Reason <span className="text-red-400">*</span>
+                <span className="ml-1 text-[#6B8A9A] font-normal">(min 3 chars, recorded in audit log)</span>
+              </label>
+              <textarea
+                value={bulkReason}
+                onChange={(e) => setBulkReason(e.target.value)}
+                placeholder="Why are you making this change?"
+                rows={3}
+                className="w-full bg-[#1A3648]/80 border border-[#2D6A8F]/30 rounded px-3 py-2 text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-[#3DAA8A] resize-none"
+              />
+            </div>
+
+            {bulkResult && (
+              <div className={`mb-4 px-3 py-2 rounded text-xs ${
+                bulkResult.failed === 0
+                  ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-300'
+                  : 'bg-amber-500/10 border border-amber-500/30 text-amber-300'
+              }`}>
+                <div className="font-medium mb-1">
+                  {bulkResult.succeeded} succeeded, {bulkResult.failed} failed.
+                </div>
+                {bulkResult.failures.slice(0, 3).map((f, i) => (
+                  <div key={i} className="text-[11px] opacity-80">
+                    {f.user_id.slice(0, 8)}…: {f.error}
+                  </div>
+                ))}
+                {bulkResult.failures.length > 3 && (
+                  <div className="text-[11px] opacity-60">
+                    …and {bulkResult.failures.length - 3} more.
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="flex items-center justify-end gap-2">
+              <button
+                onClick={closeBulkModal}
+                disabled={bulkRunning}
+                className="px-4 py-2 rounded text-sm font-medium text-[#8AACBC] hover:text-white transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={runBulkAction}
+                disabled={bulkRunning || bulkReason.trim().length < 3}
+                className="px-4 py-2 rounded bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors disabled:opacity-50 inline-flex items-center gap-2"
+              >
+                {bulkRunning && <Loader2 className="w-4 h-4 animate-spin" />}
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
