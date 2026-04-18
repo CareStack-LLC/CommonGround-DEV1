@@ -338,6 +338,14 @@ async def lifespan(app: FastAPI):
                 )""",
                 "CREATE INDEX IF NOT EXISTS ix_alert_history_rule_fired ON alert_history(rule_id, fired_at)",
                 "CREATE INDEX IF NOT EXISTS ix_alert_history_unresolved ON alert_history(resolved_at)",
+                # circle_messages attachment columns — were on the SQLAlchemy
+                # model but never made it to prod DB. Missing columns break
+                # the kidspace_communication report with
+                # "column circle_messages.attachment_url does not exist".
+                "ALTER TABLE circle_messages ADD COLUMN IF NOT EXISTS attachment_url TEXT",
+                "ALTER TABLE circle_messages ADD COLUMN IF NOT EXISTS attachment_type VARCHAR(20)",
+                "ALTER TABLE circle_messages ADD COLUMN IF NOT EXISTS attachment_name VARCHAR(255)",
+                "ALTER TABLE circle_messages ADD COLUMN IF NOT EXISTS attachment_size INTEGER",
                 # Ensure admin accounts are properly flagged (idempotent)
                 """UPDATE users SET is_admin = true, admin_role = 'super_admin'
                    WHERE email IN ('thomas@carestack.us', 'founders@commonground.family')

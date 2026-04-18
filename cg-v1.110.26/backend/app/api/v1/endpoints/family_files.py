@@ -30,6 +30,7 @@ from app.schemas.family_file import (
 from app.schemas.agreement import AgreementCreateForFamilyFile
 from app.services.family_file import FamilyFileService
 from app.services.agreement import AgreementService
+from app.models.child import ChildProfileStatus
 from app.services.professional import ProfessionalAccessService, CaseAssignmentService
 from app.services.parent_call import parent_call_service
 from app.schemas.professional import CaseAssignmentCreate, AssignmentRole
@@ -488,6 +489,37 @@ async def get_children(
         "items": [_build_child_response(c) for c in family_file.children],
         "total": len(family_file.children)
     }
+
+
+@router.post("/{family_file_id}/children/{child_id}/approve")
+async def approve_child(
+    family_file_id: str,
+    child_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Approve a child profile added by the co-parent.
+
+    Flow:
+      1. Parent A adds child → status=pending_approval, approved_by_a set
+      2. Parent B logs in, sees pending child, calls this endpoint →
+         approved_by_b set, status flips to active
+      3. After that the child appears in normal flows (agreements,
+         exchanges, reports, etc.)
+
+    Idempotent — calling it after both sides have already approved just
+    returns the child.
+    """
+    service = FamilyFileService(db)
+    child = await service.approve_child(family_file_id, child_id, current_user)
+    response = _build_child_response(child)
+    response["message"] = (
+        "Child approved — now active in family file."
+        if child.status == ChildProfileStatus.ACTIVE.value
+        else "Child approval recorded — awaiting the other parent."
+    )
+    return response
 
 
 @router.post("/{family_file_id}/court-case", status_code=status.HTTP_201_CREATED)

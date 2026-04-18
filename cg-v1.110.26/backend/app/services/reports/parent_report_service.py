@@ -1428,12 +1428,23 @@ class ParentReportService:
     ) -> dict:
         """Calculate communication stats for a specific parent."""
         if not parent_id:
+            # Empty-parent case fires when a family file has no parent_b yet.
+            # The communication_summary template reads every key on this dict,
+            # so the early-return must include EVERY field the full-return
+            # provides — otherwise Jinja raises
+            # "'dict object' has no attribute 'communication_score'" and the
+            # report 500s. Defaults chosen so the empty side doesn't drag
+            # down the average in the header stat.
             return {
                 "messages_sent": 0,
                 "interventions": 0,
                 "intervention_rate": 0,
                 "accepted": 0,
-                "good_faith_rate": 0,
+                "good_faith_rate": 100,
+                "avg_toxicity": 0,
+                "severe_count": 0,
+                "avg_response_hours": 0,
+                "communication_score": 100,
             }
 
         # Get messages sent by this parent

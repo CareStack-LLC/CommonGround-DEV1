@@ -431,15 +431,34 @@ class FamilyFileService:
         """
         Add a child to a Family File.
 
-        Args:
-            family_file_id: ID of the Family File
-            child_data: Child information
-            user: User adding the child
-
-        Returns:
-            Created Child
+        Dual-parent approval rules:
+          - The creating parent's approval is auto-set on creation (approved_by_a
+            if they are parent_a, approved_by_b if parent_b).
+          - If the co-parent hasn't joined the family file yet (invite pending),
+            the child goes straight to ACTIVE so the creating parent can keep
+            working; the other parent can mark it pending-review when they
+            accept the invite.
+          - If both parents are on the family file, the child stays at
+            PENDING_APPROVAL until the other parent calls the approve endpoint.
         """
         family_file = await self.get_family_file(family_file_id, user)
+
+        # Which side (A or B) is the creator?
+        is_parent_a = user.id == family_file.parent_a_id
+        is_parent_b = user.id == family_file.parent_b_id
+        has_coparent = bool(family_file.parent_b_id) and bool(family_file.parent_a_id)
+
+        approved_by_a = user.id if is_parent_a else None
+        approved_at_a = datetime.utcnow() if is_parent_a else None
+        approved_by_b = user.id if is_parent_b else None
+        approved_at_b = datetime.utcnow() if is_parent_b else None
+
+        # If only one parent is on the family file, auto-activate — there's
+        # no other parent whose approval we're waiting on.
+        if has_coparent:
+            initial_status = ChildProfileStatus.PENDING_APPROVAL.value
+        else:
+            initial_status = ChildProfileStatus.ACTIVE.value
 
         child = Child(
             id=str(uuid.uuid4()),
@@ -450,12 +469,71 @@ class FamilyFileService:
             date_of_birth=datetime.fromisoformat(child_data.date_of_birth).date(),
             gender=child_data.gender,
             created_by=user.id,
-            status=ChildProfileStatus.PENDING_APPROVAL.value,
+            approved_by_a=approved_by_a,
+            approved_at_a=approved_at_a,
+            approved_by_b=approved_by_b,
+            approved_at_b=approved_at_b,
+            status=initial_status,
         )
         self.db.add(child)
         await self.db.commit()
         await self.db.refresh(child)
 
+        return child
+
+    async def approve_child(
+        self,
+        family_file_id: str,
+        child_id: str,
+        user: User,
+    ) -> Child:
+        """
+        Approve a pending child profile from the co-parent's side.
+
+        Only the "other" parent (the one whose approval slot is still empty)
+        can call this. Sets approved_by_{a|b} + approved_at_{a|b}, and flips
+        status to ACTIVE once both slots are filled.
+        """
+        family_file = await self.get_family_file(family_file_id, user)
+
+        result = await self.db.execute(
+            select(Child).where(
+                Child.id == child_id,
+                Child.family_file_id == family_file_id,
+            )
+        )
+        child = result.scalar_one_or_none()
+        if not child:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Child not found",
+            )
+
+        is_parent_a = user.id == family_file.parent_a_id
+        is_parent_b = user.id == family_file.parent_b_id
+        if not (is_parent_a or is_parent_b):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Only parents on this family file can approve children",
+            )
+
+        now = datetime.utcnow()
+        if is_parent_a and not child.approved_by_a:
+            child.approved_by_a = user.id
+            child.approved_at_a = now
+        elif is_parent_b and not child.approved_by_b:
+            child.approved_by_b = user.id
+            child.approved_at_b = now
+        else:
+            # Already approved from this side — idempotent, just return.
+            return child
+
+        # Flip to ACTIVE if both sides have approved.
+        if child.approved_by_a and child.approved_by_b:
+            child.status = ChildProfileStatus.ACTIVE.value
+
+        await self.db.commit()
+        await self.db.refresh(child)
         return child
 
     async def create_court_custody_case(
