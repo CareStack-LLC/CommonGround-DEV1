@@ -1086,9 +1086,46 @@ class EmailService:
             if resp.status_code in [200, 201, 202]:
                 logger.info(f"Marketing contact added: {email}")
                 return True
-            else:
-                logger.error(f"SendGrid Marketing Contacts returned {resp.status_code}: {resp.text}")
+
+            # SendGrid rejects with 400 "invalid custom field names" when
+            # the caller passes custom fields (e1_T, e2_T, etc.) that don't
+            # exist in the account's custom-fields schema. The core contact
+            # add (email + first/last name + list assignment) would succeed
+            # without them — so retry once, dropping the custom fields, so
+            # signups actually land in the Marketing Contacts list. The
+            # custom fields can be wired later via the SendGrid dashboard
+            # and this retry becomes a no-op.
+            if (
+                resp.status_code == 400
+                and custom_fields
+                and "custom_field" in resp.text.lower()
+            ):
+                logger.warning(
+                    f"SendGrid rejected custom_fields for {email} "
+                    f"({resp.text[:120]}); retrying without them."
+                )
+                contact_data.pop("custom_fields", None)
+                async with httpx.AsyncClient() as retry_client:
+                    retry_resp = await retry_client.put(
+                        "https://api.sendgrid.com/v3/marketing/contacts",
+                        headers={
+                            "Authorization": f"Bearer {self.api_key}",
+                            "Content-Type": "application/json",
+                        },
+                        json={"contacts": [contact_data], **({"list_ids": list_ids} if list_ids else {})},
+                        timeout=10.0,
+                    )
+                if retry_resp.status_code in [200, 201, 202]:
+                    logger.info(f"Marketing contact added (without custom_fields): {email}")
+                    return True
+                logger.error(
+                    f"SendGrid Marketing Contacts retry also failed: "
+                    f"{retry_resp.status_code} {retry_resp.text[:160]}"
+                )
                 return False
+
+            logger.error(f"SendGrid Marketing Contacts returned {resp.status_code}: {resp.text}")
+            return False
 
         except ImportError:
             logger.error("httpx not installed. Run: pip install httpx")
