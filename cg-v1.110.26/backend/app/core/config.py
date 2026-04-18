@@ -86,7 +86,16 @@ class Settings(BaseSettings):
     # Stripe
     STRIPE_SECRET_KEY: Optional[str] = None
     STRIPE_PUBLISHABLE_KEY: Optional[str] = None
+    # Signing secret for the generic Payments webhook endpoint (payment_intent
+    # success/failure, Connect account events).
     STRIPE_WEBHOOK_SECRET: Optional[str] = None
+    # Separate signing secret for the Stripe Issuing webhook endpoint
+    # (`issuing_authorization.request`, `issuing_transaction.created`, etc.)
+    # Stripe issues a distinct secret per webhook endpoint — you cannot share
+    # one secret across multiple endpoints. If unset, the Issuing handler
+    # falls back to STRIPE_WEBHOOK_SECRET (fine when only one endpoint is
+    # configured in the Dashboard and you've pointed it at /webhooks/stripe/issuing).
+    STRIPE_ISSUING_WEBHOOK_SECRET: Optional[str] = None
 
     # Mapbox (for geocoding in Silent Handoff)
     MAPBOX_API_KEY: str = ""  # Set via MAPBOX_API_KEY environment variable

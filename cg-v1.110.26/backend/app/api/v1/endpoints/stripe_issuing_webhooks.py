@@ -67,8 +67,21 @@ async def handle_issuing_webhook(
     payload_bytes = await request.body()
     sig_header = request.headers.get("stripe-signature")
 
-    if not getattr(settings, "STRIPE_WEBHOOK_SECRET", None):
-        logger.warning("Issuing webhook received but STRIPE_WEBHOOK_SECRET unset — dropping")
+    # Prefer the Issuing-specific signing secret; fall back to the generic
+    # STRIPE_WEBHOOK_SECRET so single-endpoint deployments still work.
+    # Stripe signs each webhook endpoint with a distinct secret, so when the
+    # Payments webhook and the Issuing webhook are configured as separate
+    # endpoints in the Dashboard (which is the recommended setup),
+    # STRIPE_ISSUING_WEBHOOK_SECRET must be set.
+    issuing_secret = (
+        getattr(settings, "STRIPE_ISSUING_WEBHOOK_SECRET", None)
+        or getattr(settings, "STRIPE_WEBHOOK_SECRET", None)
+    )
+    if not issuing_secret:
+        logger.warning(
+            "Issuing webhook received but neither STRIPE_ISSUING_WEBHOOK_SECRET "
+            "nor STRIPE_WEBHOOK_SECRET is set — dropping"
+        )
         return {"status": "unconfigured"}
     if not sig_header:
         raise HTTPException(
@@ -80,7 +93,7 @@ async def handle_issuing_webhook(
         import stripe  # type: ignore
 
         event = stripe.Webhook.construct_event(
-            payload_bytes, sig_header, settings.STRIPE_WEBHOOK_SECRET
+            payload_bytes, sig_header, issuing_secret
         )
     except Exception as exc:
         logger.warning("Issuing webhook signature verification failed: %s", exc)
