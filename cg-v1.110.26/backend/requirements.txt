@@ -52,6 +52,13 @@ structlog>=24.1.0
 pytest>=7.4.4
 pytest-asyncio>=0.23.3
 pytest-cov>=4.1.0
+# End-to-end orchestrated test deps (tests/e2e/test_full_system_e2e.py):
+#   pytest-order enforces @pytest.mark.order sequencing
+#   pytest-dependency skips downstream stages when an upstream one fails
+#   pytest-html produces the launch-day HTML report
+pytest-order>=1.2.1
+pytest-dependency>=0.6.0
+pytest-html>=4.1.1
 httpx>=0.26.0  # For testing API calls
 
 # Code Quality
