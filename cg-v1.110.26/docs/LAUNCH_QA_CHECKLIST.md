@@ -35,26 +35,47 @@ current stage 06 uses the manual-funding path which doesn't require webhook
 forwarding. Start the listener if/when you add real-card PaymentIntent
 testing.
 
-### Known launch-blockers found during the first test run (file + fix)
+### Launch-blockers found during the first test run — ALL FIXED 2026-04-18
 
-1. **`POST /messages/` 500 under certain ARIA V2 paths** — `InFailedSQLTransactionError`
-   when the ARIA V2 pipeline raises mid-request and the DB session isn't
-   rolled back before the `INSERT INTO messages`. Stage 07 passes because
-   ARIA analyze is validated separately, but real parents can't send
-   messages when this fires. File issue + fix `except Exception` block in
-   `backend/app/api/v1/endpoints/messages.py` around the v2 pipeline to
-   `await db.rollback()` before falling through to V1.
-2. **`settings` undefined in auth email helper** — `Failed to send welcome
-   email: cannot access local variable 'settings'`. Log-only failure, but
-   means new users never get a welcome email. Find the scoping bug in the
-   auth service and import at module level.
-3. **SendGrid 403 from growth@/onboarding@find-commonground.com senders** —
-   sender-identity verification not completed for those addresses. Either
-   verify them in SendGrid or change the from-address in the relevant
-   handlers to `commonground.notify@gmail.com` which is verified.
-4. **Backend cold-start takes ~130s** (scheduler 108s + DB engine init 21s)
-   — acceptable on dedicated infra but kills Render free-tier spin-up.
-   Document as "paid tier only" in launch infra notes (already covered).
+1. ✅ **`POST /messages/` 500** — root cause turned out to be
+   `UndefinedTableError: aria_sender_baseline does not exist`. The ARIA V2
+   Phase 3 migration was merged into the 8-head merge but never applied to
+   this Supabase project. Fixed two layers:
+   - Backfilled the missing tables via direct SQL (`aria_session_memory`,
+     `aria_sender_baseline`, plus three columns on `message_flags`).
+   - Added the same `CREATE TABLE IF NOT EXISTS` / `ALTER … ADD COLUMN IF
+     NOT EXISTS` DDL to `app/main.py` startup lifespan so other deployments
+     that stamped past the merge self-heal on boot.
+   - Added `await db.rollback()` to every `except Exception` in the 5
+     ARIA V2 helper modules (`aria_baseline`, `aria_bidirectional`,
+     `aria_time_signals`, `aria_session_memory`) so a future DB hiccup
+     doesn't poison the session and cascade-fail subsequent queries.
+   - Wrapped the outer V2→V1 fallback in messages.py with a rollback too.
+
+2. ✅ **`settings` undefined in `AuthService.register_user`** — inner
+   `from app.core.config import settings` inside a conditional branch
+   was shadowing the module-level import throughout the whole function.
+   Fix: removed the inner import; module-level import covers it.
+
+3. ✅ **SendGrid 403** — `FROM_EMAIL=noreply@commonground.family` wasn't a
+   verified sender on this SendGrid account. Verified senders (queried via
+   `GET /v3/verified_senders`): `support@`, `noreply@`, `info@`, `hello@
+   find-commonground.com`. Fix: `FROM_EMAIL=noreply@find-commonground.com`.
+
+4. 📝 **Backend cold-start ~130s** — profiled: 22s module-import +
+   ALTER-TABLE lifespan work + Redis TLS handshake. Acceptable on the $25
+   paid tier where the service stays warm. Documented.
+
+### Known non-blockers surfaced by the second run (file + fix, not urgent)
+
+- **SendGrid Marketing Contacts 400** — `invalid custom field names or
+  ID's supplied - e1_T,e2_T,e4_T,e6_T,e7_T`. Those custom fields aren't
+  defined in the SendGrid Marketing Contacts schema. Either create them in
+  the dashboard or strip them in `email_service.add_marketing_contact()`.
+  Log-only failure; doesn't affect transactional email delivery.
+- **`send_report_ready()` got unexpected kwarg `report_highlights`** —
+  stale call-site in parent-reports. Report PDF still generates fine; the
+  post-generation notification email just doesn't send.
 
 ---
 

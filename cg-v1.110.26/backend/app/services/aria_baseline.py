@@ -67,6 +67,15 @@ async def get_baseline(
         }
     except Exception as e:
         logger.error(f"[ARIA V2] Baseline lookup failed: {e}")
+        # If the SELECT errored on the DB side (missing table, bad data,
+        # connection blip) the asyncpg transaction is left in the
+        # InFailedSQLTransaction state — every subsequent query in the same
+        # session errors until we rollback. Callers shouldn't have to know
+        # about this; clear it here before returning.
+        try:
+            await db.rollback()
+        except Exception:
+            pass
         return None
 
 
@@ -176,6 +185,10 @@ async def update_baseline(
 
     except Exception as e:
         logger.error(f"[ARIA V2] Baseline update failed: {e}")
+        try:
+            await db.rollback()
+        except Exception:
+            pass
 
 
 def check_deviation(

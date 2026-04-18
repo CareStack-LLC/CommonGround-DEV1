@@ -63,6 +63,10 @@ async def get_conversation_context(
 
     except Exception as e:
         logger.error(f"[ARIA V2] Conversation context lookup failed: {e}")
+        try:
+            await db.rollback()
+        except Exception:
+            pass
         return []
 
 
@@ -107,6 +111,10 @@ async def get_recipient_context(
 
     except Exception as e:
         logger.error(f"[ARIA V2] Recipient context lookup failed: {e}")
+        try:
+            await db.rollback()
+        except Exception:
+            pass
         return {}
 
 

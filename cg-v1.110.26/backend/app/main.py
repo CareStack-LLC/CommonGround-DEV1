@@ -198,6 +198,41 @@ async def lifespan(app: FastAPI):
                 # KidSpace content approval columns
                 "ALTER TABLE kidspace_movies ADD COLUMN IF NOT EXISTS is_approved BOOLEAN DEFAULT FALSE",
                 "ALTER TABLE kidspace_books ADD COLUMN IF NOT EXISTS is_approved BOOLEAN DEFAULT FALSE",
+                # ARIA V2 Phase 3 + 4 — backfill for deployments that
+                # stamped past the merge without running the real upgrade
+                # (symptom: POST /messages/ 500s with UndefinedTableError on
+                # aria_sender_baseline / aria_session_memory).
+                """CREATE TABLE IF NOT EXISTS aria_session_memory (
+                    id VARCHAR(36) PRIMARY KEY,
+                    sender_id VARCHAR(36) NOT NULL,
+                    recipient_id VARCHAR(36) NOT NULL,
+                    family_file_id VARCHAR(36) NOT NULL,
+                    session_date DATE NOT NULL,
+                    summary JSON, recurring_patterns JSON,
+                    created_at TIMESTAMP DEFAULT NOW(),
+                    updated_at TIMESTAMP DEFAULT NOW()
+                )""",
+                "CREATE INDEX IF NOT EXISTS ix_aria_session_memory_sender_id ON aria_session_memory(sender_id)",
+                "CREATE INDEX IF NOT EXISTS ix_aria_session_memory_recipient_id ON aria_session_memory(recipient_id)",
+                "CREATE INDEX IF NOT EXISTS ix_aria_session_memory_family_file_id ON aria_session_memory(family_file_id)",
+                "CREATE INDEX IF NOT EXISTS ix_aria_session_memory_lookup ON aria_session_memory(sender_id, recipient_id, family_file_id, session_date)",
+                """CREATE TABLE IF NOT EXISTS aria_sender_baseline (
+                    id VARCHAR(36) PRIMARY KEY,
+                    sender_id VARCHAR(36) NOT NULL,
+                    family_file_id VARCHAR(36) NOT NULL,
+                    session_count INTEGER DEFAULT 0,
+                    avg_message_length FLOAT, avg_frequency FLOAT, avg_heat_score FLOAT,
+                    sentiment_distribution JSON, std_deviations JSON,
+                    baseline_established BOOLEAN DEFAULT FALSE,
+                    created_at TIMESTAMP DEFAULT NOW(),
+                    updated_at TIMESTAMP DEFAULT NOW()
+                )""",
+                "CREATE INDEX IF NOT EXISTS ix_aria_sender_baseline_sender_id ON aria_sender_baseline(sender_id)",
+                "CREATE INDEX IF NOT EXISTS ix_aria_sender_baseline_family_file_id ON aria_sender_baseline(family_file_id)",
+                "CREATE UNIQUE INDEX IF NOT EXISTS ix_aria_sender_baseline_lookup ON aria_sender_baseline(sender_id, family_file_id)",
+                "ALTER TABLE message_flags ADD COLUMN IF NOT EXISTS time_frequency_flags JSON",
+                "ALTER TABLE message_flags ADD COLUMN IF NOT EXISTS recipient_coaching TEXT",
+                "ALTER TABLE message_flags ADD COLUMN IF NOT EXISTS reporting_tags JSON",
                 # Ensure admin accounts are properly flagged (idempotent)
                 """UPDATE users SET is_admin = true, admin_role = 'super_admin'
                    WHERE email IN ('thomas@carestack.us', 'founders@commonground.family')

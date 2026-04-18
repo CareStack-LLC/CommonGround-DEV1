@@ -138,7 +138,12 @@ class AuthService:
                 is_free = request.subscription_price_id == "price_1TE0bXBJIivbOFX7luV9H7OZ"
                 
                 if not is_free:
-                    from app.core.config import settings
+                    # Note: `settings` is imported at module level (line 13);
+                    # a local `from app.core.config import settings` inside
+                    # this `if` branch would cause Python to treat `settings`
+                    # as a function-local variable throughout register_user,
+                    # which raises UnboundLocalError on lines 168+178 when
+                    # this branch isn't taken (free-tier signups).
                     checkout = await stripe_service.create_subscription_checkout(
                         customer_id=stripe_customer["id"],
                         price_id=request.subscription_price_id,

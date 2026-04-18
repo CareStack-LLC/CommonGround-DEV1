@@ -150,6 +150,10 @@ async def detect_time_signals(
 
     except Exception as e:
         logger.error(f"[ARIA V2] Time signal detection failed: {e}")
+        try:
+            await db.rollback()
+        except Exception:
+            pass
 
     return signals
 

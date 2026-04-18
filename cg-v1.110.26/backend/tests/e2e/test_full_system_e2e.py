@@ -618,10 +618,11 @@ async def test_07_message_with_aria(
         f"ARIA returned no signal on a clearly-hostile message: {body}"
     )
 
-    # Send the message (rewritten or original). There's a known bug where
-    # /messages/ can 500 with a stale transaction when the ARIA V2 pipeline
-    # errors mid-request — we flag that explicitly but don't fail this stage
-    # on it (analyze working is the critical ARIA assertion).
+    # Send the message. The ARIA V2 InFailedSQLTransactionError bug (where
+    # an internal V2 DB failure poisoned the session for the subsequent
+    # INSERT INTO messages) was fixed by adding `await db.rollback()` to
+    # every ARIA V2 silent-catch site. POST /messages/ should return 2xx
+    # now even if V2 sub-operations encounter data-shape issues.
     r = await http.post(
         "/messages/",
         headers=hdr,
@@ -631,20 +632,10 @@ async def test_07_message_with_aria(
             "content": (suggestion if isinstance(suggestion, str) and suggestion else hostile)[:500],
         },
     )
-    if r.status_code in (200, 201):
-        state.message_id = r.json().get("id") or ""
-    elif r.status_code == 500:
-        # Known production bug — see reports/backend-server.log for the
-        # InFailedSQLTransactionError trace. Captured in QA checklist as
-        # launch-blocker. Don't fail the stage on it — ARIA analyze worked,
-        # which is what we're testing here.
-        print(
-            f"WARNING: POST /messages/ returned 500 — known backend bug "
-            f"(InFailedSQLTransactionError after ARIA V2 error). File as "
-            f"launch-blocker separately. Response: {r.text[:200]}"
-        )
-    else:
-        pytest.fail(f"POST /messages/: HTTP {r.status_code} {r.text[:300]}")
+    assert r.status_code in (200, 201), (
+        f"POST /messages/: HTTP {r.status_code} {r.text[:300]}"
+    )
+    state.message_id = r.json().get("id") or ""
 
 
 # ===========================================================================

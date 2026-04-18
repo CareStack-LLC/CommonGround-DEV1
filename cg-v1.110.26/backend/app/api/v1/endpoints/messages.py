@@ -624,6 +624,26 @@ async def send_message(
                 logger.error(f"[ARIA V2] Full pipeline failed, falling back to V1: {e}")
                 use_v2 = False  # Fall through to V1
                 analysis_degraded = True
+
+                # CRITICAL: the V2 pipeline makes SELECTs against `db` before
+                # it raises. If any of those fail at the DB layer (asyncpg
+                # connection blip, bad data, pool exhaustion) the Postgres
+                # transaction is left in the aborted-until-rollback state,
+                # and every subsequent statement — including our INSERT INTO
+                # messages below — will fail with
+                # `InFailedSQLTransactionError: current transaction is
+                # aborted, commands ignored until end of transaction block`.
+                # The user experience is "ARIA broke, plus your message
+                # won't send." Roll back here so the V1 pipeline + INSERT
+                # run on a fresh transaction.
+                try:
+                    await db.rollback()
+                except Exception as rollback_exc:  # noqa: BLE001
+                    logger.warning(
+                        "[ARIA V2] rollback after pipeline failure also failed: %s",
+                        rollback_exc,
+                    )
+
                 try:
                     from app.utils.sentry_helpers import capture_error
                     capture_error(

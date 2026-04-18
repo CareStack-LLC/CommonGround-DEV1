@@ -107,6 +107,10 @@ async def get_session_context(
 
     except Exception as e:
         logger.error(f"[ARIA V2] Session memory lookup failed: {e}")
+        try:
+            await db.rollback()
+        except Exception:
+            pass
         return {}
 
 
@@ -237,7 +241,12 @@ async def update_session_memory(
 
     except Exception as e:
         logger.error(f"[ARIA V2] Session memory update failed: {e}")
-        # Don't crash the message flow
+        # Don't crash the message flow, but do clear the poisoned tx so
+        # the caller's subsequent INSERTs / SELECTs don't cascade-fail.
+        try:
+            await db.rollback()
+        except Exception:
+            pass
 
 
 async def cleanup_old_sessions(db: AsyncSession) -> int:
@@ -252,6 +261,10 @@ async def cleanup_old_sessions(db: AsyncSession) -> int:
         return result.rowcount or 0
     except Exception as e:
         logger.error(f"[ARIA V2] Session cleanup failed: {e}")
+        try:
+            await db.rollback()
+        except Exception:
+            pass
         return 0
 
 
