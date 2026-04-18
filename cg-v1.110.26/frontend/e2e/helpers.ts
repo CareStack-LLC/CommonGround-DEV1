@@ -17,7 +17,7 @@ const RUN_ID =
 
 export function uniqueEmail(prefix: string): string {
   const rand = Math.random().toString(36).slice(2, 8);
-  return `e2e_ui_${prefix}_${RUN_ID}_${rand}@commonground.test`;
+  return `e2e_ui_${prefix}_${RUN_ID}_${rand}@cg-qa.dev`;
 }
 
 export const TEST_PASSWORD = "TestPass123!Seed";
@@ -96,16 +96,36 @@ export async function loginViaUi(
   email: string,
   password: string = TEST_PASSWORD,
 ): Promise<void> {
-  await page.goto("/login");
-  await page.getByLabel(/email/i).first().fill(email);
-  await page.getByLabel(/password/i).first().fill(password);
-  await page
-    .getByRole("button", { name: /sign in|log in|login/i })
-    .first()
-    .click();
-  await page.waitForURL(/dashboard|family-files|welcome|kidspace|professional/i, {
-    timeout: 20_000,
+  // Surface console errors + failed requests to the Playwright trace so we
+  // can diagnose "Failed to fetch" / CORS / JWT issues without guessing.
+  page.on("console", (msg) => {
+    if (msg.type() === "error" || msg.type() === "warning") {
+      // eslint-disable-next-line no-console
+      console.log(`[browser-${msg.type()}] ${msg.text()}`);
+    }
   });
+  page.on("requestfailed", (req) => {
+    // eslint-disable-next-line no-console
+    console.log(
+      `[browser-reqfailed] ${req.method()} ${req.url()} — ${req.failure()?.errorText}`,
+    );
+  });
+
+  await page.goto("/login");
+  // Scope to the form so we don't match the OAuth button or marketing copy.
+  const form = page.locator("form").first();
+  await form.getByLabel(/email/i).fill(email);
+  await form.getByLabel(/password/i).fill(password);
+
+  // Wait for the navigation triggered by form submit. Using expect() on the
+  // URL avoids coupling to a specific destination — login may redirect to
+  // /dashboard, /professional/dashboard, or /superadmin depending on role.
+  await Promise.all([
+    page.waitForURL((url) => !url.pathname.startsWith("/login"), {
+      timeout: 30_000,
+    }),
+    form.getByRole("button", { name: /sign in|log in|login/i }).click(),
+  ]);
 }
 
 /**

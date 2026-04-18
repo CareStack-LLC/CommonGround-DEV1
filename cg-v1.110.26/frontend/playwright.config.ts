@@ -28,8 +28,11 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   workers: 1,
   reporter: [["html", { open: "never" }], ["list"]],
-  timeout: 90_000,
-  expect: { timeout: 10_000 },
+  // Generous timeouts — Next.js 16 + Turbopack dev mode compiles each new
+  // route on first navigation. Cold-compile for /family-files/[id] alone
+  // routinely runs 30-60s; a full spec must allow for two or three of those.
+  timeout: 240_000,
+  expect: { timeout: 15_000 },
 
   use: {
     baseURL: E2E_BASE_URL,

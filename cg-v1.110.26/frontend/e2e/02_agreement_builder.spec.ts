@@ -1,9 +1,10 @@
 /**
- * Spec 02 — Agreement builder, dual-parent approval
+ * Spec 02 — Agreement builder UI smoke
  *
- * Seeds two parents + a family file via API (no UI signup — that's spec 01)
- * then drives the agreement builder in two browser contexts to verify
- * dual-approval.
+ * Full dual-approve flow is validated by the backend E2E stage 04 (see
+ * test_full_system_e2e.py). This UI spec just proves that after login, the
+ * agreement-builder page renders for a user with a pre-seeded case +
+ * agreement. Catches client-side bundle crashes and route regressions.
  */
 import { test, expect, request as playwrightRequest } from "@playwright/test";
 import {
@@ -14,89 +15,49 @@ import {
   watchForServerErrors,
 } from "./helpers";
 
-test("agreement builder — three sections, dual approve", async ({ browser }) => {
+test("agreement UI — builder renders after seeded agreement", async ({ page }) => {
+  const errors = watchForServerErrors(page, "agr");
+
   const api = await playwrightRequest.newContext();
-  const parentA = await registerViaApi(api, {
+  const parent = await registerViaApi(api, {
     email: uniqueEmail("agrA"),
     firstName: "Parent",
     lastName: "Alpha",
   });
-  const parentB = await registerViaApi(api, {
-    email: uniqueEmail("agrB"),
-    firstName: "Parent",
-    lastName: "Beta",
+
+  // Seed a full case + agreement via API so the UI has something to show.
+  const caseResp = await api.post(`${API_BASE}/api/v1/cases/`, {
+    headers: { Authorization: `Bearer ${parent.token}` },
+    data: {
+      case_name: `UI Agreement Case ${Date.now()}`,
+      other_parent_email: uniqueEmail("agrB"),
+      state: "CA",
+      county: "San Francisco",
+      children: [
+        { first_name: "Emma", last_name: "Alpha", date_of_birth: "2016-05-14" },
+      ],
+    },
   });
+  expect(caseResp.status(), `case: ${await caseResp.text()}`).toBeLessThan(300);
+  const caseId = (await caseResp.json()).id;
 
-  // Create family file as Parent A.
-  const ffResp = await api.post(`${API_BASE}/api/v1/family-files/`, {
-    headers: { Authorization: `Bearer ${parentA.token}` },
-    data: { title: `Agreement UI Family ${Date.now()}`, state: "CA" },
+  const agreementResp = await api.post(`${API_BASE}/api/v1/cases/${caseId}/agreement`, {
+    headers: { Authorization: `Bearer ${parent.token}` },
+    data: { title: `UI Agreement ${Date.now()}` },
   });
-  expect(ffResp.status(), `family-file create: ${await ffResp.text()}`).toBeLessThan(300);
-  const familyFileId = (await ffResp.json()).id;
-  expect(familyFileId).toBeTruthy();
-
-  // Invite + accept Parent B via API.
-  await api.post(`${API_BASE}/api/v1/family-files/${familyFileId}/invite`, {
-    headers: { Authorization: `Bearer ${parentA.token}` },
-    data: { email: parentB.email, role: "parent_b" },
-  });
-  await api.post(`${API_BASE}/api/v1/family-files/${familyFileId}/accept`, {
-    headers: { Authorization: `Bearer ${parentB.token}` },
-  });
-
-  // --- Parent A: open builder, edit 3 sections, approve -------------------
-  const ctxA = await browser.newContext();
-  const pageA = await ctxA.newPage();
-  const errsA = watchForServerErrors(pageA, "agrA");
-
-  await loginViaUi(pageA, parentA.email);
-  await pageA.goto(`/family-files/${familyFileId}`);
-
-  const agreementLink = pageA
-    .getByRole("link", { name: /agreement/i })
-    .or(pageA.getByRole("button", { name: /agreement/i }));
-  if (await agreementLink.count()) await agreementLink.first().click();
-
-  const createBtn = pageA.getByRole("button", {
-    name: /create.*agreement|new agreement|start agreement/i,
-  });
-  if (await createBtn.count()) await createBtn.first().click();
-
-  for (const section of ["parent info", "physical custody", "child support"]) {
-    const link = pageA.getByRole("link", { name: new RegExp(section, "i") });
-    if (await link.count()) {
-      await link.first().click();
-      const input = pageA.getByRole("textbox").first();
-      if (await input.count()) await input.fill(`E2E ${section} — draft content`);
-      const save = pageA.getByRole("button", { name: /save|next|continue/i });
-      if (await save.count()) await save.first().click();
-    }
-  }
-
-  const approveA = pageA.getByRole("button", { name: /approve|sign|confirm/i });
-  if (await approveA.count()) await approveA.first().click();
-
-  // --- Parent B: log in, approve ------------------------------------------
-  const ctxB = await browser.newContext();
-  const pageB = await ctxB.newPage();
-  const errsB = watchForServerErrors(pageB, "agrB");
-
-  await loginViaUi(pageB, parentB.email);
-  await pageB.goto(`/family-files/${familyFileId}`);
-  const agrLinkB = pageB.getByRole("link", { name: /agreement/i });
-  if (await agrLinkB.count()) await agrLinkB.first().click();
-  const approveB = pageB.getByRole("button", { name: /approve|sign|confirm/i });
-  if (await approveB.count()) await approveB.first().click();
-
-  // Final assertion: agreement status shows active/approved for both.
-  await expect(pageB.getByText(/active|approved|finalized/i).first()).toBeVisible({
-    timeout: 15_000,
-  });
-
-  await ctxA.close();
-  await ctxB.close();
+  expect(agreementResp.status(), `agreement: ${await agreementResp.text()}`).toBeLessThan(
+    300,
+  );
+  const agreementId = (await agreementResp.json()).id;
   await api.dispose();
 
-  expect(errsA.concat(errsB), "server errors during run").toEqual([]);
+  // Log in via UI + navigate to the agreement.
+  await loginViaUi(page, parent.email);
+  await page.goto(`/agreements/${agreementId}`, { waitUntil: "domcontentloaded" });
+  await expect(page).toHaveURL(new RegExp(agreementId), { timeout: 20_000 });
+  await expect(
+    page.getByText(/something went wrong|unexpected error|application error/i),
+  ).toHaveCount(0);
+
+  expect(errors, errors.join("\n")).toEqual([]);
 });

@@ -21,14 +21,40 @@ Must be GREEN before you start the manual walk.
 
 | # | Check | Owner | Result |
 |---|-------|-------|--------|
-| P1 | `python backend/scripts/preflight_launch_check.py` exited 0 with `GO` | | |
-| P2 | Stripe CLI listener running (`stripe listen --forward-to …/webhooks/stripe`) | | |
-| P3 | `pytest backend/tests/e2e/test_full_system_e2e.py -v` — all 13 stages green | | |
-| P4 | `cd frontend && npx playwright test` — all 5 specs green | | |
-| P5 | Sentry dashboard open, zero new errors since preflight | | |
+| P1 | `ALLOW_DESTRUCTIVE_PREFLIGHT=true python backend/scripts/preflight_launch_check.py` exited 0 with `GO` | | |
+| P2 | `pytest backend/tests/e2e/test_full_system_e2e.py -v` — 12 real stages PASS, 1 (test_99) intentionally SKIP | | |
+| P3 | `cd frontend && npx playwright test` — 5 specs green | | |
+| P4 | Sentry dashboard open, zero new errors since preflight | | |
 
-If any of P1–P5 is red, STOP. Fix it before the manual pass — otherwise the
+If any of P1–P4 is red, STOP. Fix it before the manual pass — otherwise the
 manual results aren't trustworthy.
+
+Stripe CLI listener (`stripe listen --forward-to localhost:8000/api/v1/webhooks/stripe`)
+is only required when running a full Stripe-funded obligation flow; the
+current stage 06 uses the manual-funding path which doesn't require webhook
+forwarding. Start the listener if/when you add real-card PaymentIntent
+testing.
+
+### Known launch-blockers found during the first test run (file + fix)
+
+1. **`POST /messages/` 500 under certain ARIA V2 paths** — `InFailedSQLTransactionError`
+   when the ARIA V2 pipeline raises mid-request and the DB session isn't
+   rolled back before the `INSERT INTO messages`. Stage 07 passes because
+   ARIA analyze is validated separately, but real parents can't send
+   messages when this fires. File issue + fix `except Exception` block in
+   `backend/app/api/v1/endpoints/messages.py` around the v2 pipeline to
+   `await db.rollback()` before falling through to V1.
+2. **`settings` undefined in auth email helper** — `Failed to send welcome
+   email: cannot access local variable 'settings'`. Log-only failure, but
+   means new users never get a welcome email. Find the scoping bug in the
+   auth service and import at module level.
+3. **SendGrid 403 from growth@/onboarding@find-commonground.com senders** —
+   sender-identity verification not completed for those addresses. Either
+   verify them in SendGrid or change the from-address in the relevant
+   handlers to `commonground.notify@gmail.com` which is verified.
+4. **Backend cold-start takes ~130s** (scheduler 108s + DB engine init 21s)
+   — acceptable on dedicated infra but kills Render free-tier spin-up.
+   Document as "paid tier only" in launch infra notes (already covered).
 
 ---
 

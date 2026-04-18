@@ -10,9 +10,25 @@ from supabase import create_client
 # ── Config (reads from environment variables) ────────────────────────────
 ADMIN_EMAIL = "thomas.wilform@gmail.com"
 
-DATABASE_URL = os.environ.get("DATABASE_URL", "")
+def _to_async_db_url(raw: str) -> str:
+    """create_async_engine requires an async driver prefix. Rewrite the two
+    common plain forms so operators can pass any standard Postgres URL."""
+    if not raw:
+        return raw
+    if raw.startswith("postgres://"):
+        return raw.replace("postgres://", "postgresql+asyncpg://", 1)
+    if raw.startswith("postgresql://") and "+asyncpg" not in raw:
+        return raw.replace("postgresql://", "postgresql+asyncpg://", 1)
+    return raw
+
+
+DATABASE_URL = _to_async_db_url(os.environ.get("DATABASE_URL", ""))
 SUPABASE_URL = os.environ.get("SUPABASE_URL", "")
-SUPABASE_SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
+# Accept either name; newer .env files use SUPABASE_SERVICE_ROLE_KEY.
+SUPABASE_SERVICE_KEY = (
+    os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
+    or os.environ.get("SUPABASE_SERVICE_KEY", "")
+)
 STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "")
 
 

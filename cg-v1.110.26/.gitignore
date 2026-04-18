@@ -52,3 +52,7 @@ htmlcov/
 
 # Uploads (local dev only)
 backend/uploads/
+backend/reports/
+frontend/playwright-report/
+frontend/test-results/
+frontend/.auth/

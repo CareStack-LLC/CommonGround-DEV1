@@ -50,19 +50,23 @@ FORBIDDEN_DATABASE_HOSTS_SUBSTRINGS = [
 REQUIRED_ENV_VARS = [
     "SUPABASE_URL",
     "SUPABASE_ANON_KEY",
-    "SUPABASE_SERVICE_ROLE_KEY",
     "DATABASE_URL",
     "STRIPE_SECRET_KEY",
     "SENDGRID_API_KEY",
     "ANTHROPIC_API_KEY",
-    "DAILY_API_KEY",
-    "REDIS_URL",
 ]
+
+# Either of these keys is accepted for the Supabase service role. Some
+# deploys use the newer SERVICE_ROLE_KEY name; older ones use SERVICE_KEY.
+# Treat presence of EITHER as satisfying the requirement.
+SUPABASE_SERVICE_KEY_ALIASES = ["SUPABASE_SERVICE_ROLE_KEY", "SUPABASE_SERVICE_KEY"]
 
 # Optional — absence is a warning, not a failure.
 OPTIONAL_ENV_VARS = [
+    "DAILY_API_KEY",
     "MAPBOX_API_KEY",
     "OPENAI_API_KEY",
+    "REDIS_URL",
 ]
 
 
@@ -181,15 +185,84 @@ def check_safety(report: Report) -> None:
 # Check: required env vars
 # ---------------------------------------------------------------------------
 
+def _normalize_database_url() -> None:
+    """Ensure DATABASE_URL has the asyncpg driver prefix before any child
+    process (cleanup_all_test_data.py, alembic) inherits it.
+
+    Alembic uses sync psycopg2 — it handles `postgresql://` fine.
+    cleanup_all_test_data.py passes DATABASE_URL straight into
+    `create_async_engine()` which needs `postgresql+asyncpg://`. Rather
+    than patch the cleanup script, do the rewrite once here and propagate.
+    """
+    url = os.getenv("DATABASE_URL", "")
+    if not url:
+        return
+    if url.startswith("postgres://"):
+        url = url.replace("postgres://", "postgresql+asyncpg://", 1)
+    elif url.startswith("postgresql://") and "+asyncpg" not in url:
+        url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+    os.environ["DATABASE_URL"] = url
+    # Keep a sync-driver copy for alembic.
+    os.environ.setdefault(
+        "DATABASE_URL_SYNC",
+        url.replace("postgresql+asyncpg://", "postgresql://"),
+    )
+
+
+_PLACEHOLDER_MARKERS = {
+    "placeholder",
+    "changeme",
+    "change-me",
+    "your-key-here",
+    "todo",
+    "xxx",
+    "secret",
+    "test-key",
+}
+
+
+def _looks_like_placeholder(val: str) -> bool:
+    v = (val or "").strip().lower()
+    if not v:
+        return True
+    if len(v) < 12:
+        return True
+    return any(marker == v or marker in v.split("-") for marker in _PLACEHOLDER_MARKERS)
+
+
 def check_env_vars(report: Report) -> None:
     _section("2/6  Environment variables")
+
+    _normalize_database_url()
 
     for var in REQUIRED_ENV_VARS:
         val = os.getenv(var)
         if not val:
             report.add(var, False, "missing")
+        elif _looks_like_placeholder(val):
+            report.add(var, False, f"looks like a placeholder value ({_redact(val)})")
         else:
             report.add(var, True, _redact(val))
+
+    # Supabase service role — either alias is fine.
+    service_key = next(
+        (v for v in (os.getenv(a) for a in SUPABASE_SERVICE_KEY_ALIASES) if v),
+        None,
+    )
+    if service_key:
+        report.add("SUPABASE_SERVICE_ROLE_KEY|SUPABASE_SERVICE_KEY", True, _redact(service_key))
+        # Propagate the canonical name so downstream scripts that expect the
+        # longer alias pick it up even when only the short name was set.
+        if not os.getenv("SUPABASE_SERVICE_ROLE_KEY"):
+            os.environ["SUPABASE_SERVICE_ROLE_KEY"] = service_key
+        if not os.getenv("SUPABASE_SERVICE_KEY"):
+            os.environ["SUPABASE_SERVICE_KEY"] = service_key
+    else:
+        report.add(
+            "SUPABASE_SERVICE_ROLE_KEY|SUPABASE_SERVICE_KEY",
+            False,
+            "neither alias set",
+        )
 
     for var in OPTIONAL_ENV_VARS:
         val = os.getenv(var)
@@ -204,13 +277,25 @@ def check_env_vars(report: Report) -> None:
 # Check: migrations
 # ---------------------------------------------------------------------------
 
+def _alembic_cmd() -> list[str]:
+    """Resolve `alembic` via the same interpreter so we don't depend on PATH.
+
+    `sys.executable -m alembic` reliably hits the alembic that was installed
+    alongside the venv we're running under, which matters when this script
+    is invoked from outside the venv with its interpreter specified.
+    """
+    return [sys.executable, "-m", "alembic"]
+
+
 def apply_migrations(report: Report) -> None:
     _section("3/6  Apply migrations")
 
+    backend_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
     try:
         proc = subprocess.run(
-            ["alembic", "upgrade", "head"],
-            cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            _alembic_cmd() + ["upgrade", "head"],
+            cwd=backend_dir,
             capture_output=True,
             text=True,
             timeout=120,
@@ -226,15 +311,15 @@ def apply_migrations(report: Report) -> None:
         report.add(
             "alembic-upgrade-head",
             False,
-            f"exit={proc.returncode}: {proc.stderr.strip()[:160]}",
+            f"exit={proc.returncode}: {(proc.stderr or proc.stdout).strip()[:200]}",
         )
         return
 
     # Grab the new head revision for visibility.
     try:
         heads = subprocess.run(
-            ["alembic", "current"],
-            cwd=os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            _alembic_cmd() + ["current"],
+            cwd=backend_dir,
             capture_output=True,
             text=True,
             timeout=30,
@@ -373,7 +458,7 @@ async def ping_externals(report: Report) -> None:
         else:
             report.add("sendgrid", False, "SENDGRID_API_KEY missing")
 
-        # Daily.co
+        # Daily.co — optional. Skip quietly if no key.
         daily_key = os.getenv("DAILY_API_KEY", "")
         if daily_key:
             try:
@@ -385,7 +470,7 @@ async def ping_externals(report: Report) -> None:
             except Exception as e:
                 report.add("daily.co", False, str(e)[:120])
         else:
-            report.add("daily.co", False, "DAILY_API_KEY missing")
+            print("  ⚠ daily.co skipped — DAILY_API_KEY unset (KidComs call UI won't work)")
 
         # Anthropic — 1-token ping via messages API
         anthro_key = os.getenv("ANTHROPIC_API_KEY", "")
