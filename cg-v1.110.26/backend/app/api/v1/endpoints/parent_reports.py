@@ -130,19 +130,33 @@ async def generate_parent_report(
     report_name = report_names.get(report_type, "Report")
     filename = f"CommonGround-{report_name}-{date.today().isoformat()}.pdf"
 
-    # Email the parent a report-ready notification (non-blocking)
+    # Email the parent a report-ready notification (non-blocking).
+    # NOTE: send_report_ready expects keyword args {to_email, to_name,
+    # report_type, date_range, family_file_name, download_url,
+    # highlights?, expiry_date?}. Earlier call-site used `report_highlights`
+    # and omitted `date_range` + `family_file_name`, which raised TypeError
+    # on every report download (caught by the except but users never got
+    # the "your report is ready" email). Fixed here by matching the
+    # signature and looking up the family file name from the row we
+    # already verified access to above.
     try:
         from app.services.email import email_service
         report_display = report_name.replace("-", " ")
+        ff_name_result = await db.execute(
+            select(FamilyFile.title).where(FamilyFile.id == family_file_id)
+        )
+        family_file_name = ff_name_result.scalar_one_or_none() or "Family"
         await email_service.send_report_ready(
             to_email=current_user.email,
             to_name=current_user.first_name or "Parent",
             report_type=report_display,
-            report_highlights=[
-                f"Period: {date_start.strftime('%b %d')} – {date_end.strftime('%b %d, %Y')}",
-                f"Report ID: {result.report_id}",
-            ],
+            date_range=f"{date_start.strftime('%b %d')} – {date_end.strftime('%b %d, %Y')}",
+            family_file_name=family_file_name,
             download_url=f"{email_service.frontend_url}/reports",
+            highlights=[
+                {"label": "Report ID", "value": str(result.report_id)},
+                {"label": "Generated", "value": date.today().strftime("%B %d, %Y")},
+            ],
         )
     except Exception as e:
         logger.warning(f"Failed to send report-ready email: {e}")
