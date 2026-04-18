@@ -3451,26 +3451,30 @@ async def apply_custody_order_to_case(
             detail="Custody order must be reviewed before applying to case"
         )
 
-    # TODO: Implement the logic to:
-    # 1. Update case settings from custody order
-    # 2. Generate recurring schedule events from visitation schedules
-    # 3. Create exchange rules in the case
-    # 4. Set up holiday schedule events
-
-    # For now, return a success message indicating this is a future feature
+    # Schedule generation from a parsed custody order requires:
+    # 1. Updating case settings from the custody order fields
+    # 2. Generating recurring schedule events from visitation schedules
+    # 3. Creating exchange rules on the case
+    # 4. Seeding holiday schedule events
+    # That pipeline isn't wired up yet. Until it lands we refuse loudly so the
+    # UI doesn't show a success toast and professionals don't assume the case
+    # actually has a populated schedule.
     await log_court_action(
         db, request, grant_id, professional_id, order.case_id,
-        action="apply_custody_order",
+        action="apply_custody_order_attempt",
         resource_type="custody_order",
         resource_id=order_id,
     )
 
-    return {
-        "success": True,
-        "message": "Custody order applied to case (schedule generation coming soon)",
-        "order_id": order_id,
-        "case_id": order.case_id,
-    }
+    raise HTTPException(
+        status_code=status.HTTP_501_NOT_IMPLEMENTED,
+        detail=(
+            "Applying a parsed custody order to a case is not yet available. "
+            "The order is parsed and reviewable, but schedule/exchange "
+            "generation is still in development. Configure the schedule "
+            "manually via the Agreement builder in the meantime."
+        ),
+    )
 
 
 # =============================================================================

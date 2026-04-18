@@ -3149,7 +3149,43 @@ async def resend_intake_link(
             detail="Session not found or cannot resend link.",
         )
 
-    # TODO: Send email with new link
+    # Re-send the invitation email with the freshly rotated access token.
+    # Mirrors the pattern used on initial create_session above — best-effort,
+    # never fails the API call (the link is still returned in `result` so the
+    # professional can copy it manually if SendGrid is down).
+    try:
+        from app.services.email import EmailService
+        from app.models.intake import IntakeSession
+        from sqlalchemy import select
+
+        # Pull the session row for client_name/email (service returns a dict).
+        session_row = await db.execute(
+            select(IntakeSession).where(IntakeSession.id == session_id)
+        )
+        session_obj = session_row.scalar_one_or_none()
+        if session_obj and session_obj.client_email:
+            email_svc = EmailService()
+            professional_name = (
+                f"{profile.user.first_name} {profile.user.last_name}"
+                if profile.user else "Your attorney"
+            )
+            await email_svc.send_generic_notification(
+                to_email=session_obj.client_email,
+                to_name=session_obj.client_name or "there",
+                subject=f"{professional_name} has resent your intake link",
+                message=(
+                    f"{professional_name} has resent your intake questionnaire link. "
+                    f"The previous link is no longer valid — please use the new one below. "
+                    f"This link will expire in 7 days."
+                ),
+                cta_url=str(result.get("intake_link") or session_obj.intake_link),
+                cta_text="Continue Intake",
+                title="Your intake link has been resent",
+            )
+    except Exception as e:
+        logger.error(
+            f"Failed to send resent intake link email for session {session_id}: {e}"
+        )
 
     return result
 
