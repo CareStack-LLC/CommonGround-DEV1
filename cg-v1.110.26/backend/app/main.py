@@ -338,14 +338,23 @@ async def lifespan(app: FastAPI):
                 )""",
                 "CREATE INDEX IF NOT EXISTS ix_alert_history_rule_fired ON alert_history(rule_id, fired_at)",
                 "CREATE INDEX IF NOT EXISTS ix_alert_history_unresolved ON alert_history(resolved_at)",
-                # circle_messages attachment columns — were on the SQLAlchemy
-                # model but never made it to prod DB. Missing columns break
-                # the kidspace_communication report with
-                # "column circle_messages.attachment_url does not exist".
+                # circle_messages model columns that were missing from prod.
+                # The SQLAlchemy model defines attachment_* + the v2 ARIA
+                # intervention-tracking fields (user_action, intervention_level,
+                # etc.) but prod was stamped past the migrations without
+                # running the ADD COLUMN DDL. Any report touching
+                # CircleMessage (kidspace_communication) 500's with
+                # "column does not exist" until these are present. All
+                # additions are idempotent.
                 "ALTER TABLE circle_messages ADD COLUMN IF NOT EXISTS attachment_url TEXT",
                 "ALTER TABLE circle_messages ADD COLUMN IF NOT EXISTS attachment_type VARCHAR(20)",
                 "ALTER TABLE circle_messages ADD COLUMN IF NOT EXISTS attachment_name VARCHAR(255)",
                 "ALTER TABLE circle_messages ADD COLUMN IF NOT EXISTS attachment_size INTEGER",
+                "ALTER TABLE circle_messages ADD COLUMN IF NOT EXISTS user_action VARCHAR(20)",
+                "ALTER TABLE circle_messages ADD COLUMN IF NOT EXISTS aria_intervention_level INTEGER",
+                "ALTER TABLE circle_messages ADD COLUMN IF NOT EXISTS aria_all_categories TEXT",
+                "ALTER TABLE circle_messages ADD COLUMN IF NOT EXISTS aria_suggested_rewrite TEXT",
+                "ALTER TABLE circle_messages ADD COLUMN IF NOT EXISTS aria_response_time_ms INTEGER",
                 # Ensure admin accounts are properly flagged (idempotent)
                 """UPDATE users SET is_admin = true, admin_role = 'super_admin'
                    WHERE email IN ('thomas@carestack.us', 'founders@commonground.family')
