@@ -55,6 +55,11 @@ const nextConfig: NextConfig = {
       { source: '/superadmin/kidspace/media', destination: '/superadmin/media-library', permanent: true },
       { source: '/superadmin/reports', destination: '/superadmin/billing?tab=reports', permanent: true },
       { source: '/superadmin/leads/analytics', destination: '/superadmin/leads?tab=analytics', permanent: true },
+      {
+        source: '/demo/walkthrough',
+        destination: '/walkthrough',
+        permanent: true,
+      },
     ];
   },
   async headers() {

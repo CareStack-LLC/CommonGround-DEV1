@@ -20,3 +20,6 @@ export { StatCounter } from './primitives/stat-counter';
 // — Structured data
 export { FaqJsonLd } from './faq-json-ld';
 export { GlobalJsonLd } from './global-json-ld';
+
+// — FAQ accordion (props-driven)
+export { FaqAccordion } from './faq-accordion';
