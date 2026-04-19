@@ -9,8 +9,12 @@ export default function robots(): MetadataRoute.Robots {
         disallow: [
           '/dashboard/',
           '/settings/',
+          '/parent/',
           '/professional/',
+          '/superadmin/',
+          '/court/',
           '/court-portal/',
+          '/auth/',
           '/api/',
           '/messages/',
           '/schedule/',

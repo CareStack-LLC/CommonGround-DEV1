@@ -12,6 +12,7 @@ import {
   Zap,
   HeadphonesIcon,
 } from 'lucide-react';
+import { FaqJsonLd } from '@/components/marketing';
 
 export const metadata: Metadata = {
   title: 'Professional Pricing | CommonGround',
@@ -159,6 +160,8 @@ const faqs = [
 export default function ProfessionalPricingPage() {
   return (
     <div className="bg-background">
+      {/* FAQPage structured data — paired with the visible FAQ below */}
+      <FaqJsonLd items={faqs} />
       {/* Hero Section */}
       <section className="relative py-20 lg:py-28 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">

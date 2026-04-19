@@ -1,6 +1,8 @@
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import { EarlyAdopterForm } from '@/components/marketing/early-adopter-form';
 import { JsonLd } from '@/components/marketing/json-ld';
+import { FaqJsonLd } from '@/components/marketing';
 import {
   Video,
   BookOpen,
@@ -12,6 +14,27 @@ import {
   Shield,
   Heart,
 } from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: 'My Circle — grandparents & extended family | CommonGround',
+  description:
+    'Stay connected with your grandkids between visits. Video calls, story time, and game nights through KidSpace — with parent-approved safety.',
+  alternates: { canonical: '/my-circle' },
+  openGraph: {
+    type: 'website',
+    title: 'My Circle — grandparents & extended family | CommonGround',
+    description:
+      'Video calls, story time, and games to stay close to your grandkids between visits.',
+    url: 'https://www.find-commonground.com/my-circle',
+    siteName: 'CommonGround',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'My Circle | CommonGround',
+    description:
+      'Stay connected with your grandkids through KidSpace — safely.',
+  },
+};
 
 const painPoints = [
   {
@@ -81,6 +104,10 @@ const faqs = [
 export default function MyCirclePage() {
   return (
     <div className="min-h-screen">
+      {/* FAQPage structured data — paired with the visible FAQ below */}
+      <FaqJsonLd
+        items={faqs.map((f) => ({ question: f.q, answer: f.a }))}
+      />
       <JsonLd
         data={{
           '@context': 'https://schema.org',

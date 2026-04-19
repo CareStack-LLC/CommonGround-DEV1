@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
   ArrowRight,
@@ -13,6 +14,26 @@ import {
   Shield,
   Wallet,
 } from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: 'CommonGround guides & tutorials | CommonGround',
+  description:
+    'Step-by-step guides for every CommonGround feature — messaging with ARIA, calendar, expenses, agreements, KidSpace, court exports, and billing.',
+  alternates: { canonical: '/help/guides' },
+  openGraph: {
+    type: 'website',
+    title: 'CommonGround guides & tutorials',
+    description:
+      'Step-by-step guides for every CommonGround feature.',
+    url: 'https://www.find-commonground.com/help/guides',
+    siteName: 'CommonGround',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'CommonGround guides & tutorials',
+    description: 'Step-by-step guides for every CommonGround feature.',
+  },
+};
 
 const guides = [
   {

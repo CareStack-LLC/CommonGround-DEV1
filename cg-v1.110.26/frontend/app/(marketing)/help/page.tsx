@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { HelpChat } from '@/components/marketing/help-chat';
 import {
@@ -17,6 +18,26 @@ import {
   Shield,
   Wallet,
 } from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: 'Help Center | CommonGround',
+  description:
+    'Find guides, answers, and support for every CommonGround feature — from ARIA coaching to KidSpace, expenses, and court-ready exports.',
+  alternates: { canonical: '/help' },
+  openGraph: {
+    type: 'website',
+    title: 'Help Center | CommonGround',
+    description:
+      'Guides, FAQs, and support for every CommonGround feature.',
+    url: 'https://www.find-commonground.com/help',
+    siteName: 'CommonGround',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Help Center | CommonGround',
+    description: 'Guides, FAQs, and support for every CommonGround feature.',
+  },
+};
 
 /**
  * Help Center Hub

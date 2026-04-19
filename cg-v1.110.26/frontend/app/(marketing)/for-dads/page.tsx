@@ -1,6 +1,8 @@
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import { EarlyAdopterForm } from '@/components/marketing/early-adopter-form';
 import { JsonLd } from '@/components/marketing/json-ld';
+import { FaqJsonLd } from '@/components/marketing';
 import {
   MessageSquare,
   Video,
@@ -11,6 +13,27 @@ import {
   Quote,
   Shield,
 } from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: 'Co-parenting app for dads | CommonGround',
+  description:
+    'Tools for dads who want more time with their kids — documented messaging, KidSpace video calls, and court-ready records that protect every interaction.',
+  alternates: { canonical: '/for-dads' },
+  openGraph: {
+    type: 'website',
+    title: 'Co-parenting app for dads | CommonGround',
+    description:
+      'Documented messaging, KidSpace video calls, and court-ready records built for dads fighting for more time with their kids.',
+    url: 'https://www.find-commonground.com/for-dads',
+    siteName: 'CommonGround',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Co-parenting app for dads | CommonGround',
+    description:
+      'Documented messaging, KidSpace video, and court-ready records for dads.',
+  },
+};
 
 const painPoints = [
   {
@@ -80,6 +103,10 @@ const faqs = [
 export default function ForDadsPage() {
   return (
     <div className="min-h-screen">
+      {/* FAQPage structured data — paired with the visible FAQ below */}
+      <FaqJsonLd
+        items={faqs.map((f) => ({ question: f.q, answer: f.a }))}
+      />
       <JsonLd
         data={{
           '@context': 'https://schema.org',

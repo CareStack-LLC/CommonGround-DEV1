@@ -16,6 +16,7 @@ import {
   Download,
   Gavel,
 } from 'lucide-react';
+import { FaqJsonLd } from '@/components/marketing';
 
 export const metadata: Metadata = {
   title: 'When Communication Is Difficult | Co-Parenting Support | CommonGround',
@@ -165,6 +166,8 @@ const faqs = [
 export default function HighConflictPage() {
   return (
     <div className="bg-background">
+      {/* FAQPage structured data — paired with the visible FAQ below */}
+      <FaqJsonLd items={faqs} />
       {/* Hero Section */}
       <section className="relative py-20 lg:py-28 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">

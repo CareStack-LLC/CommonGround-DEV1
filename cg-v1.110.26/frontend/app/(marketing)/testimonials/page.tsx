@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -10,6 +11,27 @@ import {
   Quote,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: 'Co-parenting stories from real families | CommonGround',
+  description:
+    'Read how real parents, kids, and legal professionals use CommonGround to reduce conflict, document custody, and keep kids at the center.',
+  alternates: { canonical: '/testimonials' },
+  openGraph: {
+    type: 'website',
+    title: 'Co-parenting stories from real families | CommonGround',
+    description:
+      'Real stories from families and professionals who use CommonGround to co-parent calmly.',
+    url: 'https://www.find-commonground.com/testimonials',
+    siteName: 'CommonGround',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'CommonGround stories from real families',
+    description:
+      'Real stories from families and professionals who use CommonGround.',
+  },
+};
 
 /**
  * Stories Page

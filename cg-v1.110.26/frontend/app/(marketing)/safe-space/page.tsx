@@ -1,6 +1,8 @@
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import { EarlyAdopterForm } from '@/components/marketing/early-adopter-form';
 import { JsonLd } from '@/components/marketing/json-ld';
+import { FaqJsonLd } from '@/components/marketing';
 import {
   MapPin,
   MessageSquare,
@@ -11,6 +13,27 @@ import {
   Quote,
   Shield,
 } from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: 'Safe Space — for parents who need distance | CommonGround',
+  description:
+    'Silent Handoff GPS exchanges, no-contact messaging, and court-ready records for parents who need safety and distance from a difficult ex.',
+  alternates: { canonical: '/safe-space' },
+  openGraph: {
+    type: 'website',
+    title: 'Safe Space — for parents who need distance | CommonGround',
+    description:
+      'GPS-verified Silent Handoff, no-contact messaging, and court-ready records built for safety.',
+    url: 'https://www.find-commonground.com/safe-space',
+    siteName: 'CommonGround',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Safe Space | CommonGround',
+    description:
+      'GPS-verified exchanges and no-contact messaging for parents who need distance.',
+  },
+};
 
 const painPoints = [
   {
@@ -80,6 +103,10 @@ const faqs = [
 export default function SafeSpacePage() {
   return (
     <div className="min-h-screen">
+      {/* FAQPage structured data — paired with the visible FAQ below */}
+      <FaqJsonLd
+        items={faqs.map((f) => ({ question: f.q, answer: f.a }))}
+      />
       <JsonLd
         data={{
           '@context': 'https://schema.org',

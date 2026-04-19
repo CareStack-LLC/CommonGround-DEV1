@@ -1,6 +1,8 @@
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import { EarlyAdopterForm } from '@/components/marketing/early-adopter-form';
 import { JsonLd } from '@/components/marketing/json-ld';
+import { FaqJsonLd } from '@/components/marketing';
 import {
   FileCheck,
   Calendar,
@@ -11,6 +13,27 @@ import {
   Quote,
   Shield,
 } from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: 'Starting over? A fresh start for co-parents | CommonGround',
+  description:
+    'Reset your co-parenting relationship. Put everything in writing, set a shared schedule, and track expenses — without a lawyer or a fight.',
+  alternates: { canonical: '/fresh-start' },
+  openGraph: {
+    type: 'website',
+    title: 'Starting over? A fresh start for co-parents | CommonGround',
+    description:
+      'Put agreements in writing, set a shared schedule, and track expenses without a lawyer or a fight.',
+    url: 'https://www.find-commonground.com/fresh-start',
+    siteName: 'CommonGround',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'A fresh start for co-parents | CommonGround',
+    description:
+      'Reset your co-parenting relationship with shared agreements and a common calendar.',
+  },
+};
 
 const painPoints = [
   {
@@ -80,6 +103,10 @@ const faqs = [
 export default function FreshStartPage() {
   return (
     <div className="min-h-screen">
+      {/* FAQPage structured data — paired with the visible FAQ below */}
+      <FaqJsonLd
+        items={faqs.map((f) => ({ question: f.q, answer: f.a }))}
+      />
       <JsonLd
         data={{
           '@context': 'https://schema.org',

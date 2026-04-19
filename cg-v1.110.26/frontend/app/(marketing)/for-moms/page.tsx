@@ -1,7 +1,9 @@
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { EarlyAdopterForm } from '@/components/marketing/early-adopter-form';
 import { JsonLd } from '@/components/marketing/json-ld';
+import { FaqJsonLd } from '@/components/marketing';
 import {
   MessageSquare,
   Calendar,
@@ -12,6 +14,27 @@ import {
   Quote,
   Shield,
 } from 'lucide-react';
+
+export const metadata: Metadata = {
+  title: 'Co-parenting app for moms | CommonGround',
+  description:
+    'Built for moms managing the mental load of co-parenting — automatic expense tracking, exchange reminders, and ARIA coaching that keeps messages calm.',
+  alternates: { canonical: '/for-moms' },
+  openGraph: {
+    type: 'website',
+    title: 'Co-parenting app for moms | CommonGround',
+    description:
+      'Expense tracking, exchange reminders, and ARIA coaching built for moms carrying the mental load.',
+    url: 'https://www.find-commonground.com/for-moms',
+    siteName: 'CommonGround',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Co-parenting app for moms | CommonGround',
+    description:
+      'Expense tracking, reminders, and calm-tone coaching built for moms.',
+  },
+};
 
 const painPoints = [
   {
@@ -81,6 +104,10 @@ const faqs = [
 export default function ForMomsPage() {
   return (
     <div className="min-h-screen">
+      {/* FAQPage structured data — paired with the visible FAQ below */}
+      <FaqJsonLd
+        items={faqs.map((f) => ({ question: f.q, answer: f.a }))}
+      />
       <JsonLd
         data={{
           '@context': 'https://schema.org',
