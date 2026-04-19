@@ -208,19 +208,88 @@ def _extract_header(headers: list[dict], name: str) -> str:
     return ""
 
 
+async def _resolve_sync_addresses(db: AsyncSession) -> list[str]:
+    """Figure out which Gmail inboxes to pull from on a sync run.
+
+    Priority:
+      1. Env var ``GOOGLE_MONITORED_EMAILS`` intersected with addresses that
+         actually have an OAuth token row (avoids trying to sync an address
+         the admin never authorized).
+      2. If (1) is empty, fall back to **every** stored Gmail token
+         (``scopes`` contains "gmail" — this excludes the GA4 token which
+         lives in the same table under email ``ga4-analytics@commonground``).
+
+    Rationale: the env-var whitelist pattern is brittle — one typo on Render
+    and sync silently returns ``{fetched: 0}`` because no address matches.
+    After a successful OAuth handshake the admin is absolutely expecting the
+    connected inbox to start syncing; falling back to the token table makes
+    that the default behavior.
+    """
+    env_list = [
+        e.strip()
+        for e in (settings.GOOGLE_MONITORED_EMAILS or "").split(",")
+        if e.strip()
+    ]
+
+    if env_list:
+        matched_rows = await db.execute(
+            select(GoogleOAuthToken.email).where(
+                GoogleOAuthToken.email.in_(env_list)
+            )
+        )
+        matched = [r[0] for r in matched_rows.all()]
+        if matched:
+            return matched
+        logger.warning(
+            "GOOGLE_MONITORED_EMAILS=%s has no matching OAuth token rows; "
+            "falling back to every Gmail-scoped token in the DB.",
+            env_list,
+        )
+
+    fallback_rows = await db.execute(
+        select(GoogleOAuthToken.email).where(
+            GoogleOAuthToken.scopes.ilike("%gmail%")
+        )
+    )
+    return [r[0] for r in fallback_rows.all()]
+
+
+async def is_gmail_connected(db: AsyncSession) -> bool:
+    """Return True when we have at least one Gmail-scoped OAuth token.
+
+    Called by ``/admin/inbox/status``. Previously this function did not
+    exist and the endpoint silently caught the ``ImportError`` and
+    returned ``connected: false`` forever — which is why the frontend kept
+    showing "Gmail isn't connected yet" right after a successful OAuth
+    handshake.
+
+    We filter on ``scopes LIKE '%gmail%'`` so the GA4 token (stored in the
+    same ``google_oauth_tokens`` table under the sentinel email
+    ``ga4-analytics@commonground`` with analytics/webmasters scopes) does
+    not count as a Gmail connection.
+    """
+    result = await db.execute(
+        select(func.count(GoogleOAuthToken.id)).where(
+            GoogleOAuthToken.scopes.ilike("%gmail%")
+        )
+    )
+    return (result.scalar() or 0) > 0
+
+
 async def fetch_new_emails(
     db: AsyncSession,
     since_hours: int = 72,
 ) -> list[MonitoredEmail]:
     """Fetch recent emails for all monitored accounts and create MonitoredEmail records."""
-    monitored_addresses = [
-        e.strip()
-        for e in settings.GOOGLE_MONITORED_EMAILS.split(",")
-        if e.strip()
-    ]
+    monitored_addresses = await _resolve_sync_addresses(db)
     new_emails: list[MonitoredEmail] = []
 
     logger.info("Syncing emails for monitored addresses: %s", monitored_addresses)
+    if not monitored_addresses:
+        logger.warning(
+            "No Gmail OAuth tokens found. Set GOOGLE_MONITORED_EMAILS and "
+            "complete the Connect flow on /superadmin/inbox."
+        )
 
     after_epoch = int((datetime.utcnow() - timedelta(hours=since_hours)).timestamp())
 
