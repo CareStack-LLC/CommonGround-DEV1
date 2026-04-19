@@ -1,17 +1,25 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Features | AI Messaging, Automated Schedules, Video Calls & Court Docs | CommonGround',
+  title: 'Features | CommonGround AI co-parenting platform',
   description:
-    'Explore CommonGround features: ARIA AI messaging, TimeBridge automated schedules, ClearFund expense tracking, KidSpace video calls, Silent Handoff GPS exchanges, and court-ready evidence exports.',
+    'ARIA AI messaging, TimeBridge scheduling, ClearFund expenses, KidSpace video calls, Silent Handoff GPS exchanges, and court-ready evidence.',
   keywords:
     'co-parenting features, AI co-parenting messaging, custody schedule app, child video calls co-parenting, GPS custody exchange, court ready evidence app, ARIA messaging, KidSpace, Silent Handoff, TimeBridge, ClearFund',
-  alternates: { canonical: 'https://www.find-commonground.com/features' },
+  alternates: { canonical: '/features' },
   openGraph: {
-    title: 'CommonGround Features — Tools for Calmer Co-Parenting',
-    description:
-      'AI messaging, automated schedules, child video calls, GPS-verified exchanges, and court-ready evidence. Features no other co-parenting app offers.',
     type: 'website',
+    title: 'Features | CommonGround AI co-parenting platform',
+    description:
+      'AI messaging, automated schedules, child video calls, GPS-verified exchanges, and court-ready evidence.',
+    url: 'https://www.find-commonground.com/features',
+    siteName: 'CommonGround',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Features | CommonGround AI co-parenting platform',
+    description:
+      'AI messaging, automated schedules, child video calls, GPS handoffs, and court-ready evidence.',
   },
 };
 

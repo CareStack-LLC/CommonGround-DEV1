@@ -1,8 +1,15 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
+import type { Metadata } from 'next';
 import { MarketingHeader } from '@/components/marketing';
 import { JsonLd } from '@/components/marketing/json-ld';
+import {
+  TrustBar,
+  CtaBand,
+  FaqJsonLd,
+  ImagePlaceholder,
+} from '@/components/marketing';
 import {
   ArrowRight,
   Calendar,
@@ -18,15 +25,66 @@ import {
   Smile,
   Heart,
   Quote,
-  Scale,
   Phone,
-  Zap,
 } from 'lucide-react';
 
-/* ── Client Islands ────────────────────────────────────────────────────
- * Only interactive pieces are loaded as client components.
- * The hero / LCP content renders on the server with zero JS needed.
- * ------------------------------------------------------------------- */
+/* ── Per-page metadata (home = canonical "/") ────────────────────── */
+export const metadata: Metadata = {
+  title: 'CommonGround — The calm way to co-parent',
+  description:
+    'Keep handoffs smooth, messages steady, and kids centered. ARIA messaging, automated schedules, KidSpace, and court-ready records in one place.',
+  alternates: { canonical: '/' },
+  openGraph: {
+    type: 'website',
+    title: 'CommonGround — The calm way to co-parent',
+    description:
+      'Keep handoffs smooth, messages steady, and kids centered. ARIA messaging, automated schedules, and court-ready records in one place.',
+    url: 'https://www.find-commonground.com/',
+    siteName: 'CommonGround',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'CommonGround — The calm way to co-parent',
+    description:
+      'Keep handoffs smooth, messages steady, and kids centered. ARIA, automated schedules, and court-ready records.',
+  },
+};
+
+/* ── Home FAQ items — shared by visual FAQ and FAQPage JSON-LD ──── */
+const HOME_FAQ_ITEMS = [
+  {
+    question: "What if my co-parent won't sign up?",
+    answer:
+      'You can still use the calendar, expense tracking, and court documentation on your own. When they join, everything syncs automatically.',
+  },
+  {
+    question: 'Is this really free?',
+    answer:
+      "The Web Starter plan is free forever — no credit card, no trial that expires. Paid plans add automation and advanced features when you're ready.",
+  },
+  {
+    question: 'Will this hold up in court?',
+    answer:
+      'Every message, schedule change, and payment is timestamped and securely stored. Our exports are designed for family law proceedings.',
+  },
+  {
+    question: 'What about my kids?',
+    answer:
+      'KidSpace lets children video call, read stories, and play games with both parents — a safe space designed around them, not the conflict.',
+  },
+  {
+    question: 'How is CommonGround different from other co-parenting apps?',
+    answer:
+      'CommonGround includes ARIA messaging free (most competitors charge for AI features), plus unique features like KidSpace for direct parent-child video calls and Silent Handoff for GPS-verified contactless exchanges. No other co-parenting app offers these.',
+  },
+  {
+    question: 'Can my attorney access my records?',
+    answer:
+      'Yes. You can invite your attorney, mediator, or other family law professional to view your CommonGround data. They get read-only access to verified records at no cost to them.',
+  },
+];
+
+/* ── Client Islands ───────────────────────────────────────────────── */
 
 const FAQSection = dynamic(() => import('@/components/marketing/faq-section'), {
   ssr: true,
@@ -44,6 +102,71 @@ const MarketingFooter = dynamic(
 const HomeARIADemo = dynamic(
   () => import('@/components/marketing/home-aria-demo').then((m) => ({ default: m.HomeARIADemo })),
 );
+
+/* ── Home pricing teaser tiers ───────────────────────────────────── */
+const PRICING_TEASER_TIERS = [
+  {
+    name: 'Web Starter',
+    price: '$0',
+    period: 'forever',
+    tagline: 'Start calm today',
+    features: [
+      'ARIA-assisted messaging',
+      'Shared custody calendar',
+      'ClearFund expenses',
+    ],
+    highlight: false,
+  },
+  {
+    name: 'Plus',
+    price: '$17.99',
+    period: '/month',
+    tagline: 'Automate the hard parts',
+    features: [
+      'Everything in Web Starter',
+      'Automated recurring schedules',
+      'PDF court exports',
+    ],
+    highlight: true,
+  },
+  {
+    name: 'Complete',
+    price: '$34.99',
+    period: '/month',
+    tagline: 'Peace of mind, documented',
+    features: [
+      'Everything in Plus',
+      'Silent Handoff GPS exchanges',
+      'KidSpace video calls',
+    ],
+    highlight: false,
+  },
+];
+
+function HomeDemoVideoSlot() {
+  const url = process.env.NEXT_PUBLIC_HOME_DEMO_VIDEO_URL;
+  if (url) {
+    return (
+      <div className="relative w-full overflow-hidden rounded-2xl shadow-lg" style={{ aspectRatio: '16/9' }}>
+        <iframe
+          src={url}
+          title="CommonGround 60-second product overview"
+          loading="lazy"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          className="absolute inset-0 h-full w-full border-0"
+        />
+      </div>
+    );
+  }
+  return (
+    <ImagePlaceholder
+      alt="CommonGround 60-second product overview"
+      prompt="Short product overview video placeholder — shows parent using the CommonGround app on a phone, calm interface, teal brand color, 16:9"
+      aspectRatio="16/9"
+    />
+  );
+}
 
 export default function HomePage() {
   return (
@@ -81,6 +204,9 @@ export default function HomePage() {
         }}
       />
 
+      {/* FAQPage structured data — paired with visual FAQSection below */}
+      <FaqJsonLd items={HOME_FAQ_ITEMS} />
+
       <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#E8F4F8]">
         <MarketingHeader />
 
@@ -95,16 +221,13 @@ export default function HomePage() {
 
           <div className="max-w-6xl mx-auto px-6 relative">
             <div className="max-w-4xl mx-auto text-center">
-              <h1
-                className="text-5xl sm:text-6xl lg:text-7xl font-serif text-[#1E3A4A] mb-6 leading-[1.05]"
-                style={{ fontFamily: 'var(--font-dm-serif-display), Georgia, serif' }}
-              >
+              <h1 className="font-serif text-[#1E3A4A] text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight tracking-tight mb-6">
                 The calm way to
                 <br />
                 <span className="text-[#3DAA8A]">co-parent</span>
               </h1>
 
-              <p className="text-xl sm:text-2xl text-gray-600 mb-8 leading-relaxed max-w-2xl mx-auto">
+              <p className="text-lg sm:text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed max-w-2xl mx-auto">
                 ARIA keeps conversations calm. Schedules run on autopilot. Your kids can video call you directly. Everything is documented
                 <br />
                 <span className="font-medium text-[var(--portal-primary)]">&mdash; so you have energy left to actually parent.</span>
@@ -149,28 +272,38 @@ export default function HomePage() {
         </section>
 
         {/* ═══════════════════════════════════════════════════════════════
-            TRUST BAR — Credibility at a glance
+            TRUST BAR — Concrete credibility directly under the hero
         ═══════════════════════════════════════════════════════════════ */}
-        <section className="py-8 bg-white border-y border-gray-100">
+        <section className="bg-white border-y border-gray-100">
           <div className="max-w-6xl mx-auto px-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-              <div className="flex flex-col items-center gap-2">
-                <Scale className="h-5 w-5 text-[var(--portal-primary)]" />
-                <p className="text-sm font-medium text-[#1E3A4A]">Built with family law professionals</p>
-              </div>
-              <div className="flex flex-col items-center gap-2">
-                <Shield className="h-5 w-5 text-[var(--portal-primary)]" />
-                <p className="text-sm font-medium text-[#1E3A4A]">Court-ready documentation</p>
-              </div>
-              <div className="flex flex-col items-center gap-2">
-                <Zap className="h-5 w-5 text-[#F5A623]" />
-                <p className="text-sm font-medium text-[#1E3A4A]">Free forever tier &mdash; no ads</p>
-              </div>
-              <div className="flex flex-col items-center gap-2">
-                <Heart className="h-5 w-5 text-[var(--portal-primary)]" />
-                <p className="text-sm font-medium text-[#1E3A4A]">4Ever Forward Foundation partner</p>
-              </div>
+            <TrustBar
+              variant="stats"
+              items={[
+                { value: 'Built by', label: 'a co-parent' },
+                { value: 'HIPAA', label: 'aligned encryption' },
+                { value: 'Attorney', label: 'reviewed workflows' },
+              ]}
+            />
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════════════
+            PRODUCT OVERVIEW VIDEO — env-driven iframe or placeholder
+        ═══════════════════════════════════════════════════════════════ */}
+        <section className="py-16 sm:py-20 bg-white">
+          <div className="max-w-4xl mx-auto px-6">
+            <div className="text-center mb-8">
+              <h2
+                className="text-2xl sm:text-3xl md:text-4xl font-serif text-[#1E3A4A] mb-3"
+                style={{ fontFamily: 'var(--font-dm-serif-display), Georgia, serif' }}
+              >
+                See CommonGround in 60 seconds
+              </h2>
+              <p className="text-base sm:text-lg text-gray-600">
+                Parents get a quick tour of the tools that bring peace to high-conflict co-parenting.
+              </p>
             </div>
+            <HomeDemoVideoSlot />
           </div>
         </section>
 
@@ -246,7 +379,7 @@ export default function HomePage() {
         </section>
 
         {/* ═══════════════════════════════════════════════════════════════
-            CORE BENEFITS — 4-card grid with unique features highlighted
+            CORE BENEFITS — outcome-first headline
         ═══════════════════════════════════════════════════════════════ */}
         <section className="py-16 sm:py-24 bg-gradient-to-br from-[#F4F8F7] to-white">
           <div className="max-w-6xl mx-auto px-6">
@@ -255,7 +388,7 @@ export default function HomePage() {
                 className="text-3xl sm:text-5xl font-serif text-[#1E3A4A] mb-4"
                 style={{ fontFamily: 'var(--font-dm-serif-display), Georgia, serif' }}
               >
-                Everything your <span className="text-[#3DAA8A]">family needs</span>
+                Fewer fights. Better handoffs. <span className="text-[#3DAA8A]">Happier kids.</span>
               </h2>
               <p className="text-lg text-gray-600 max-w-2xl mx-auto">
                 Tools that bring peace and structure to co-parenting &mdash; including features no other app offers.
@@ -325,6 +458,76 @@ export default function HomePage() {
         </section>
 
         {/* ═══════════════════════════════════════════════════════════════
+            PRICING TEASER — 3-tier condensed cards
+        ═══════════════════════════════════════════════════════════════ */}
+        <section className="py-16 sm:py-20 bg-white">
+          <div className="max-w-6xl mx-auto px-6">
+            <div className="text-center mb-12">
+              <h2
+                className="text-3xl sm:text-4xl md:text-5xl font-serif text-[#1E3A4A] mb-4"
+                style={{ fontFamily: 'var(--font-dm-serif-display), Georgia, serif' }}
+              >
+                Start free. <span className="text-[#3DAA8A]">Upgrade when ready.</span>
+              </h2>
+              <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
+                Three tiers. No hidden fees. Parents pick what fits the week they&apos;re having.
+              </p>
+            </div>
+            <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
+              {PRICING_TEASER_TIERS.map((tier) => (
+                <div
+                  key={tier.name}
+                  className={`relative flex h-full flex-col rounded-2xl border p-6 lg:p-7 transition-all ${
+                    tier.highlight
+                      ? 'border-[#F5A623] shadow-md ring-1 ring-[#F5A623]/30 bg-gradient-to-br from-[#FEF7ED] to-white'
+                      : 'border-gray-100 bg-white shadow-sm hover:border-[#3DAA8A]/30 hover:shadow-md'
+                  }`}
+                >
+                  {tier.highlight && (
+                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#F5A623] text-white text-xs font-semibold px-3 py-1 rounded-full">
+                      Most popular
+                    </span>
+                  )}
+                  <h3 className="font-serif text-xl text-[#1E3A4A]">{tier.name}</h3>
+                  <p className="mt-1 text-sm text-gray-500">{tier.tagline}</p>
+                  <div className="mt-4 flex items-baseline gap-1">
+                    <span className="font-serif text-3xl sm:text-4xl text-[#1E3A4A]">{tier.price}</span>
+                    <span className="text-sm text-gray-500">{tier.period}</span>
+                  </div>
+                  <ul className="mt-5 space-y-2 flex-1">
+                    {tier.features.map((f) => (
+                      <li key={f} className="flex items-start gap-2 text-sm text-gray-700">
+                        <Check className="h-4 w-4 text-[#3DAA8A] mt-0.5 flex-shrink-0" />
+                        <span>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Link
+                    href="/pricing"
+                    className={`mt-6 inline-flex items-center justify-center rounded-full px-5 py-2.5 text-sm font-semibold transition-colors ${
+                      tier.highlight
+                        ? 'bg-[#1E3A4A] text-white hover:bg-[#13252F]'
+                        : 'border-2 border-[#1E3A4A]/15 text-[#1E3A4A] hover:border-[#3DAA8A] hover:text-[#3DAA8A]'
+                    }`}
+                  >
+                    See {tier.name} details
+                  </Link>
+                </div>
+              ))}
+            </div>
+            <div className="text-center mt-8">
+              <Link
+                href="/pricing"
+                className="inline-flex items-center gap-2 text-[var(--portal-primary)] font-medium hover:underline"
+              >
+                Compare every feature across plans
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════════════
             ARIA LIVE DEMO — Interactive chat
         ═══════════════════════════════════════════════════════════════ */}
         <section className="py-16 sm:py-24 bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F] text-white">
@@ -346,7 +549,7 @@ export default function HomePage() {
                 Built for every <span className="text-[#3DAA8A]">situation</span>
               </h2>
               <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                Whether you&apos;re navigating a new separation or managing years of conflict, CommonGround adapts to your needs.
+                Parents navigating a new separation or years of conflict both find stability here.
               </p>
             </div>
 
@@ -416,115 +619,7 @@ export default function HomePage() {
         </section>
 
         {/* ═══════════════════════════════════════════════════════════════
-            WHY COMMONGROUND — Comparison table
-        ═══════════════════════════════════════════════════════════════ */}
-        <section className="py-16 sm:py-24 bg-gradient-to-br from-[#F4F8F7] to-white">
-          <div className="max-w-5xl mx-auto px-6">
-            <div className="text-center mb-12">
-              <h2
-                className="text-3xl sm:text-5xl font-serif text-[#1E3A4A] mb-4"
-                style={{ fontFamily: 'var(--font-dm-serif-display), Georgia, serif' }}
-              >
-                Why families choose <span className="text-[#3DAA8A]">CommonGround</span>
-              </h2>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                Other co-parenting apps handle messaging and calendars. CommonGround goes further.
-              </p>
-            </div>
-
-            {(() => {
-              const comparisonRows = [
-                { feature: 'AI messaging assistance', cg: true, others: 'Paid only' as const },
-                { feature: 'Free tier with no ads', cg: true, others: 'Ads or limited' as const },
-                { feature: 'Automated recurring schedules', cg: true, others: true as const },
-                { feature: 'Expense tracking & splitting', cg: true, others: true as const },
-                { feature: 'Court-ready exports (SHA-256)', cg: true, others: 'Basic exports' as const },
-                { feature: 'Child video calls (KidSpace)', cg: true, others: false as const, unique: true },
-                { feature: 'GPS-verified exchanges (Silent Handoff)', cg: true, others: false as const, unique: true },
-                { feature: 'QR code check-in confirmation', cg: true, others: false as const, unique: true },
-                { feature: 'Professional portal for attorneys', cg: true, others: true as const },
-                { feature: 'Grant program for families in need', cg: true, others: 'Varies' as const },
-              ];
-
-              const renderOthers = (val: boolean | string) => {
-                if (val === true) return <Check className="h-5 w-5 text-gray-600 mx-auto" />;
-                if (val === false) return <span className="text-gray-300">&mdash;</span>;
-                return <span className="text-gray-600 text-xs">{val}</span>;
-              };
-
-              return (
-                <>
-                  {/* Desktop table */}
-                  <div className="hidden md:block bg-white rounded-2xl border-2 border-gray-100 overflow-hidden shadow-sm">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="bg-[#1E3A4A] text-white">
-                          <th className="text-left py-4 px-6 font-semibold">Feature</th>
-                          <th className="text-center py-4 px-6 font-semibold text-[#F5A623]">CommonGround</th>
-                          <th className="text-center py-4 px-6 font-semibold text-white/60">Other Apps</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-100">
-                        {comparisonRows.map((row) => (
-                          <tr key={row.feature} className={row.unique ? 'bg-[#F5A623]/5' : ''}>
-                            <td className="py-3 px-6 text-gray-700">
-                              {row.feature}
-                              {row.unique && (
-                                <span className="ml-2 text-xs font-bold text-[#F5A623] uppercase">Unique</span>
-                              )}
-                            </td>
-                            <td className="py-3 px-6 text-center">
-                              <Check className="h-5 w-5 text-[var(--portal-primary)] mx-auto" />
-                            </td>
-                            <td className="py-3 px-6 text-center">
-                              {renderOthers(row.others)}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  {/* Mobile cards */}
-                  <div className="md:hidden space-y-3">
-                    {comparisonRows.map((row) => (
-                      <div
-                        key={row.feature}
-                        className={`rounded-xl border p-4 ${row.unique ? 'border-[#F5A623]/30 bg-[#F5A623]/5' : 'border-gray-100 bg-white'}`}
-                      >
-                        <div className="font-medium text-gray-700 text-sm mb-3">
-                          {row.feature}
-                          {row.unique && (
-                            <span className="ml-2 text-xs font-bold text-[#F5A623] uppercase">Unique</span>
-                          )}
-                        </div>
-                        <div className="grid grid-cols-2 gap-3 text-xs">
-                          <div className="flex items-center gap-2 rounded-lg bg-[var(--portal-primary)]/5 py-2 px-3">
-                            <Check className="h-4 w-4 text-[var(--portal-primary)] shrink-0" />
-                            <span className="font-medium text-[var(--portal-primary)]">CommonGround</span>
-                          </div>
-                          <div className="flex items-center gap-2 rounded-lg bg-gray-50 py-2 px-3">
-                            {row.others === true ? (
-                              <Check className="h-4 w-4 text-gray-600 shrink-0" />
-                            ) : row.others === false ? (
-                              <span className="text-gray-300 text-base shrink-0">&mdash;</span>
-                            ) : null}
-                            <span className="text-gray-600">
-                              {row.others === true ? 'Others' : row.others === false ? 'Not available' : row.others}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              );
-            })()}
-          </div>
-        </section>
-
-        {/* ═══════════════════════════════════════════════════════════════
-            SOCIAL PROOF — Real testimonials from 4Ever Forward grant
+            SOCIAL PROOF — Real stories from 4Ever Forward grant
         ═══════════════════════════════════════════════════════════════ */}
         <section className="py-16 sm:py-24 bg-white">
           <div className="max-w-6xl mx-auto px-6">
@@ -654,34 +749,21 @@ export default function HomePage() {
         <FAQSection />
 
         {/* ═══════════════════════════════════════════════════════════════
-            FINAL CTA
+            SPLIT-FUNNEL CTA — Parents vs Firms
         ═══════════════════════════════════════════════════════════════ */}
-        <section className="py-20 sm:py-28 bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F] text-white">
-          <div className="max-w-4xl mx-auto px-6 text-center">
-            <h2
-              className="text-4xl sm:text-5xl font-serif mb-6"
-              style={{ fontFamily: 'var(--font-dm-serif-display), Georgia, serif' }}
-            >
-              Ready to find common ground?
-            </h2>
-            <p className="text-xl text-white/80 mb-10 max-w-2xl mx-auto">
-              Join families who&apos;ve found a calmer way to co-parent &mdash; one that puts children first.
-            </p>
-            <Link
-              href="/early-access"
-              className="inline-flex items-center justify-center px-10 py-5 bg-[#F5A623] text-white font-bold text-lg rounded-full hover:bg-[#E09520] transition-all shadow-2xl hover:shadow-3xl hover:-translate-y-1 group"
-            >
-              Start Free Today
-              <ArrowRight className="ml-2 h-6 w-6 group-hover:translate-x-2 transition-transform" />
-            </Link>
-            <p className="text-sm text-white/60 mt-6">
-              Forever free tier for parents. No credit card required. Cancel anytime.
-            </p>
-            <p className="text-sm text-white/50 mt-3">
-              Family law professional?{' '}
-              <Link href="/professionals" className="text-[#F5A623] hover:underline">Schedule a demo for your practice</Link>.
-            </p>
-          </div>
+        <section className="grid md:grid-cols-2">
+          <CtaBand
+            headline="Parents — start your family file"
+            subheadline="Two minutes to sign up. Forever free to stay."
+            primaryCta={{ label: 'Start free', href: '/parents' }}
+            background="teal"
+          />
+          <CtaBand
+            headline="Firms & mediators — book a demo"
+            subheadline="See how CommonGround fits your cases in 15 minutes."
+            primaryCta={{ label: 'Book a demo', href: '/demo' }}
+            background="gold"
+          />
         </section>
 
         <MarketingFooter />

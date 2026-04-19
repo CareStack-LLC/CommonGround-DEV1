@@ -4,6 +4,12 @@ import { JsonLd } from '@/components/marketing/json-ld';
 import { ProfessionalInterestForm } from '@/components/marketing/professional-interest-form';
 import { SectionTracker } from '@/components/marketing/analytics-tracker';
 import {
+  TrustBar,
+  CtaBand,
+  TestimonialCard,
+  FaqJsonLd,
+} from '@/components/marketing';
+import {
   Scale,
   Users,
   Building2,
@@ -214,6 +220,21 @@ export default function ProfessionalsPage() {
               />
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* TrustBar — firm-grade credibility under the hero */}
+      <section className="bg-white border-y border-gray-100" data-section="trust-bar">
+        <div className="max-w-5xl mx-auto px-6">
+          <TrustBar
+            variant="stats"
+            items={[
+              { value: 'Free', label: 'for professionals' },
+              { value: 'SHA-256', label: 'verified exports' },
+              { value: '15 min', label: 'setup, zero install' },
+              { value: 'Firm-ready', label: 'audit trails' },
+            ]}
+          />
         </div>
       </section>
 
@@ -447,8 +468,70 @@ export default function ProfessionalsPage() {
         </div>
       </section>
 
+      {/* Professional Testimonials — placeholder quotes pending real reviews */}
+      <section className="py-16 sm:py-24 bg-white" data-section="testimonials">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-10">
+            <h2
+              className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+              style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
+            >
+              What professionals <span className="text-[#3DAA8A]">are saying</span>
+            </h2>
+            <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
+              Attorneys, mediators, and GALs reach for CommonGround when a case needs clean evidence fast.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            {/* TODO(marketing): replace with real quote */}
+            <div data-seed="placeholder">
+              <TestimonialCard
+                variant="featured"
+                quote="Verified timestamps and calm-messaging data saved me hours of deposition prep — the exports hold up under scrutiny."
+                name="Attorney placeholder"
+                role="Attorney, Family Law · Austin, TX"
+                rating={5}
+              />
+            </div>
+            {/* TODO(marketing): replace with real quote */}
+            <div data-seed="placeholder">
+              <TestimonialCard
+                variant="featured"
+                quote="Couples arrive at mediation less defensive because ARIA already lowered the temperature between sessions."
+                name="Mediator placeholder"
+                role="Mediator · Los Angeles, CA"
+                rating={5}
+              />
+            </div>
+            {/* TODO(marketing): replace with real quote */}
+            <div data-seed="placeholder">
+              <TestimonialCard
+                variant="featured"
+                quote="I can see the family's real dynamics instead of reconstructing them from screenshots — it changes my recommendations."
+                name="Guardian ad Litem placeholder"
+                role="Guardian ad Litem · Atlanta, GA"
+                rating={5}
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Book-a-demo CTA band */}
+      <section data-section="book-demo">
+        <CtaBand
+          headline="Book a 15-minute demo"
+          subheadline="See how your cases look inside CommonGround before you recommend it to a client."
+          primaryCta={{ label: 'Book demo', href: '/demo' }}
+          background="gold"
+        />
+      </section>
+
       {/* FAQ — Questions Professionals Ask */}
       <section className="py-16 sm:py-24 bg-[#F4F8F7]" data-section="faq">
+        <FaqJsonLd
+          items={objections.map((o) => ({ question: o.question, answer: o.answer }))}
+        />
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2

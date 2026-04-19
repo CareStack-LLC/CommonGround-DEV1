@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'For Family Law Professionals | Free Case Data Access | CommonGround',
+  title: 'CommonGround for Family-Law Professionals | Firm-grade case visibility',
   description:
-    'Access verified co-parenting data for custody cases. Communications, exchanges, financial records, compliance metrics, and court-ready SHA-256 verified exports. Free for attorneys, mediators, GALs, and evaluators.',
+    'Attorneys, mediators, and GALs get verified timestamps, ARIA insights, and SHA-256 exports across every case — free for professionals.',
   keywords: [
     'family law software',
     'custody case management',
@@ -18,11 +18,20 @@ export const metadata: Metadata = {
     'CommonGround professionals',
     'KidSpace',
   ],
+  alternates: { canonical: '/professionals' },
   openGraph: {
-    title: 'For Family Law Professionals | Free Case Data Access | CommonGround',
-    description:
-      'Access verified co-parenting data for your cases. Free for professionals — communications, custody exchanges, financial records, and SHA-256 verified court-ready exports.',
     type: 'website',
+    title: 'CommonGround for Family-Law Professionals | Firm-grade case visibility',
+    description:
+      'Verified timestamps, ARIA insights, and SHA-256 exports across every case — free for attorneys, mediators, and GALs.',
+    url: 'https://www.find-commonground.com/professionals',
+    siteName: 'CommonGround',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'CommonGround for Family-Law Professionals',
+    description:
+      'Verified case visibility and court-ready exports, free for family-law professionals.',
   },
 };
 

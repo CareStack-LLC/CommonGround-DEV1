@@ -1,17 +1,25 @@
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Pricing | Free Co-Parenting App | Plans from $0/month | CommonGround',
+  title: 'Pricing — CommonGround plans from $17.99/mo',
   description:
-    'Start co-parenting for free, forever. No credit card required. Upgrade for automated schedules ($17.99/mo), GPS exchanges, KidSpace video calls, and court-ready evidence ($34.99/mo). 14-day free trial on all paid plans.',
+    'Start free. Upgrade to Plus ($17.99/mo) or Complete ($34.99/mo) when you need automation, GPS handoffs, and court-ready records.',
   keywords:
     'co-parenting app pricing, free co-parenting app, custody app cost, co-parenting subscription, CommonGround plans, affordable co-parenting, KidSpace video calls pricing',
-  alternates: { canonical: 'https://www.find-commonground.com/pricing' },
+  alternates: { canonical: '/pricing' },
   openGraph: {
-    title: 'CommonGround Pricing — Free Forever Tier Available',
-    description:
-      'Start free. Upgrade when you need automation, GPS tracking, KidSpace video calls, and court-ready documentation. Compare all features across plans.',
     type: 'website',
+    title: 'Pricing — CommonGround plans from $17.99/mo',
+    description:
+      'Start free. Upgrade to Plus ($17.99/mo) or Complete ($34.99/mo) for automation, GPS handoffs, and court-ready records.',
+    url: 'https://www.find-commonground.com/pricing',
+    siteName: 'CommonGround',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Pricing — CommonGround plans from $17.99/mo',
+    description:
+      'Free tier forever. Paid plans from $17.99/mo for automation, GPS handoffs, and court-ready records.',
   },
 };
 

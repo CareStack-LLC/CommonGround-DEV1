@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { Check, Clock, DollarSign, Scale, Minus } from 'lucide-react';
 import { InlineNewsletterCta } from '@/components/marketing/inline-newsletter-cta';
+import { ComparisonTable, FaqJsonLd } from '@/components/marketing';
 import { trackViewPricing, trackBeginCheckout } from '@/lib/analytics';
 
 const plans = [
@@ -127,6 +128,41 @@ const comparisonCategories = [
       { name: 'Priority support', free: false, plus: false, complete: true },
     ],
   },
+];
+
+/* ── Competitor comparison rows — publicly listed pricing snapshot ─ */
+const OFW_ROWS = [
+  { feature: 'Price', ours: '$17.99/mo flat', theirs: '$174/yr per parent' },
+  { feature: 'Per-child fees', ours: 'None', theirs: 'Yes' },
+  { feature: 'AI message coaching', ours: true, theirs: 'Limited' },
+  { feature: 'Child app (KidSpace)', ours: true, theirs: false },
+  { feature: 'GPS-verified handoffs', ours: true, theirs: false },
+  { feature: 'Court-ready exports', ours: true, theirs: true },
+  { feature: 'iOS + Android', ours: true, theirs: true },
+  { feature: 'Free tier', ours: true, theirs: false },
+];
+
+const TP_ROWS = [
+  { feature: 'Price', ours: '$17.99/mo flat', theirs: '$12.99/mo per parent' },
+  { feature: 'Per-child fees', ours: 'None', theirs: 'None' },
+  { feature: 'AI message coaching', ours: true, theirs: false },
+  { feature: 'Child app (KidSpace)', ours: true, theirs: false },
+  { feature: 'GPS-verified handoffs', ours: true, theirs: false },
+  { feature: 'Court-ready exports', ours: true, theirs: true },
+  { feature: 'iOS + Android', ours: true, theirs: true },
+  { feature: 'Free tier', ours: true, theirs: false },
+];
+
+/* ── Pricing FAQ items (shared between visual FAQ + JSON-LD) ─────── */
+const PRICING_FAQ_ITEMS: { question: string; answer: string }[] = [
+  { question: 'Do both parents need to pay?', answer: 'No. Each parent manages their own subscription. You can message each other regardless of plan.' },
+  { question: 'Can I cancel anytime?', answer: 'Yes. No contracts. No commitments. Cancel with one click from your settings.' },
+  { question: 'What happens to my data if I cancel?', answer: 'You keep read-only access for 90 days. Export everything before that if you need it.' },
+  { question: 'Do you offer financial hardship discounts?', answer: "Yes. Every family deserves access to these tools. Email support@find-commonground.com and we'll work with you." },
+  { question: 'How does CommonGround compare to other co-parenting apps?', answer: 'CommonGround includes ARIA messaging free (most competitors charge), plus unique features like KidSpace video calls and Silent Handoff GPS exchanges that no other app offers.' },
+  { question: 'What happens after the 14-day trial?', answer: "You'll be charged for your chosen plan. Cancel before the trial ends and you won't be charged. You can always downgrade to the free Web Starter plan." },
+  { question: 'Can I switch plans anytime?', answer: 'Yes. Upgrade or downgrade anytime from your settings. Changes take effect on your next billing cycle.' },
+  { question: 'Is there a family or couple discount?', answer: 'Each parent has their own account and subscription. We keep pricing simple — the same price for everyone, with financial hardship discounts available.' },
 ];
 
 export default function PricingPage() {
@@ -472,6 +508,49 @@ export default function PricingPage() {
         </div>
       </section>
 
+      {/* Competitor Comparisons — publicly listed pricing snapshot */}
+      <section className="py-16 px-6 bg-white">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-10">
+            <h2
+              className="text-3xl sm:text-4xl font-serif text-[#1E3A4A] mb-3"
+              style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
+            >
+              How CommonGround <span className="text-[#3DAA8A]">stacks up</span>
+            </h2>
+            <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
+              A side-by-side look at what each app includes at the subscription tier families actually pay for.
+            </p>
+          </div>
+
+          <div className="mb-12">
+            <h3 className="font-serif text-xl sm:text-2xl text-[#1E3A4A] mb-4 text-center">
+              CommonGround vs OurFamilyWizard
+            </h3>
+            <ComparisonTable
+              ourProduct="CommonGround"
+              competitor="OurFamilyWizard"
+              rows={OFW_ROWS}
+            />
+          </div>
+
+          <div className="mb-6">
+            <h3 className="font-serif text-xl sm:text-2xl text-[#1E3A4A] mb-4 text-center">
+              CommonGround vs TalkingParents
+            </h3>
+            <ComparisonTable
+              ourProduct="CommonGround"
+              competitor="TalkingParents"
+              rows={TP_ROWS}
+            />
+          </div>
+
+          <p className="text-xs text-gray-500 text-center mt-6">
+            Competitor figures based on publicly listed pricing as of 2026-04-18.
+          </p>
+        </div>
+      </section>
+
       {/* Professional Pricing */}
       <section className="py-12 px-6">
         <div className="max-w-6xl mx-auto">
@@ -497,6 +576,7 @@ export default function PricingPage() {
 
       {/* FAQ */}
       <section className="py-20 px-6 bg-white">
+        <FaqJsonLd items={PRICING_FAQ_ITEMS} />
         <div className="max-w-3xl mx-auto">
           <h2
             className="text-4xl font-serif text-[#1E3A4A] mb-12 text-center"
@@ -506,22 +586,13 @@ export default function PricingPage() {
           </h2>
 
           <div className="space-y-6">
-            {[
-              { q: 'Do both parents need to pay?', a: 'No. Each parent manages their own subscription. You can message each other regardless of plan.' },
-              { q: 'Can I cancel anytime?', a: 'Yes. No contracts. No commitments. Cancel with one click from your settings.' },
-              { q: 'What happens to my data if I cancel?', a: "You keep read-only access for 90 days. Export everything before that if you need it." },
-              { q: 'Do you offer financial hardship discounts?', a: "Yes. Every family deserves access to these tools. Email support@find-commonground.com and we'll work with you." },
-              { q: 'How does CommonGround compare to other co-parenting apps?', a: 'CommonGround includes ARIA messaging free (most competitors charge), plus unique features like KidSpace video calls and Silent Handoff GPS exchanges that no other app offers.' },
-              { q: 'What happens after the 14-day trial?', a: "You'll be charged for your chosen plan. Cancel before the trial ends and you won't be charged. You can always downgrade to the free Web Starter plan." },
-              { q: 'Can I switch plans anytime?', a: 'Yes. Upgrade or downgrade anytime from your settings. Changes take effect on your next billing cycle.' },
-              { q: 'Is there a family or couple discount?', a: 'Each parent has their own account and subscription. We keep pricing simple — the same price for everyone, with financial hardship discounts available.' },
-            ].map((faq) => (
-              <details key={faq.q} className="group bg-gray-50 rounded-xl p-6">
+            {PRICING_FAQ_ITEMS.map((faq) => (
+              <details key={faq.question} className="group bg-gray-50 rounded-xl p-6">
                 <summary className="cursor-pointer list-none flex items-center justify-between font-medium text-[#1E3A4A]">
-                  {faq.q}
+                  {faq.question}
                   <span className="text-gray-600 group-open:rotate-180 transition-transform">▼</span>
                 </summary>
-                <p className="mt-4 text-gray-600">{faq.a}</p>
+                <p className="mt-4 text-gray-600">{faq.answer}</p>
               </details>
             ))}
           </div>
