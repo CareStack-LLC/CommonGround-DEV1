@@ -1311,11 +1311,11 @@ async def get_platform_health(
     one_hour_ago = now - timedelta(hours=1)
     twenty_four_hours_ago = now - timedelta(hours=24)
 
-    # Active sessions (users active in last hour)
+    # Active sessions (users active in last hour, admins excluded)
     active_sessions = await db.scalar(
         select(func.count(User.id)).where(
+            *non_admin_user_filters(),
             User.last_active >= one_hour_ago,
-            User.is_deleted == False,
         )
     )
 
@@ -1335,9 +1335,16 @@ async def get_platform_health(
         )
     )
 
-    # Database row counts
-    total_users = await db.scalar(select(func.count(User.id)))
-    total_profiles = await db.scalar(select(func.count(UserProfile.id)))
+    # Database row counts — customer-facing totals exclude admin accounts;
+    # audit logs are infrastructure and include everything.
+    total_users = await db.scalar(
+        select(func.count(User.id)).where(*non_admin_user_filters())
+    )
+    total_profiles = await db.scalar(
+        select(func.count(UserProfile.id)).where(
+            UserProfile.user_id.in_(non_admin_profile_subq())
+        )
+    )
     total_audit_logs = await db.scalar(select(func.count(AuditLog.id)))
 
     # Determine overall health status
@@ -4897,13 +4904,18 @@ async def get_unit_economics(
 
     tier_prices = await _get_tier_prices(db)
 
+    # Exclude admin profiles from every count — the founder's own test
+    # subscription shouldn't count as paying_users or MRR here (that
+    # inflates ARPU / LTV / the LTV:CAC ratio shown on /superadmin/sales).
+    _non_admin_profile = UserProfile.user_id.in_(non_admin_profile_subq())
+
     # Active tier counts (still needed for DB-side breakdown)
     tier_result = await db.execute(
         select(
             UserProfile.subscription_tier,
             func.count(UserProfile.id),
         )
-        .where(UserProfile.subscription_status == "active")
+        .where(_non_admin_profile, UserProfile.subscription_status == "active")
         .group_by(UserProfile.subscription_tier)
     )
     tier_breakdown: dict = {}
@@ -4925,6 +4937,7 @@ async def get_unit_economics(
     # Churn rate: cancelled in 30d / (active paying + cancelled)
     cancelled_30d = await db.scalar(
         select(func.count(UserProfile.id)).where(
+            _non_admin_profile,
             UserProfile.subscription_status == "cancelled",
             UserProfile.updated_at >= thirty_days_ago,
         )
@@ -4976,10 +4989,11 @@ async def get_cohort_analysis(
         else:
             cohort_end = cohort_start.replace(month=cohort_start.month + 1)
 
-        # Users created in this month
+        # Users created in this month (admins excluded — cohort analysis
+        # is about real customer retention)
         cohort_size = await db.scalar(
             select(func.count(User.id)).where(
-                User.is_deleted == False,
+                *non_admin_user_filters(),
                 User.created_at >= cohort_start,
                 User.created_at < cohort_end,
             )
@@ -5006,7 +5020,7 @@ async def get_cohort_analysis(
             # Count users from this cohort who were active in the check_month
             active_in_month = await db.scalar(
                 select(func.count(User.id)).where(
-                    User.is_deleted == False,
+                    *non_admin_user_filters(),
                     User.created_at >= cohort_start,
                     User.created_at < cohort_end,
                     User.last_active >= check_month,
@@ -5050,10 +5064,10 @@ async def get_retention_curve(
     now = datetime.utcnow()
     cutoff = now - timedelta(days=days)
 
-    # Total cohort: all users created in the period
+    # Total cohort: all users created in the period (admins excluded)
     total_cohort_size = await db.scalar(
         select(func.count(User.id)).where(
-            User.is_deleted == False,
+            *non_admin_user_filters(),
             User.created_at >= cutoff,
         )
     ) or 0
@@ -5070,7 +5084,7 @@ async def get_retention_curve(
         eligible_cutoff = now - timedelta(days=day_n)
         eligible_count = await db.scalar(
             select(func.count(User.id)).where(
-                User.is_deleted == False,
+                *non_admin_user_filters(),
                 User.created_at >= cutoff,
                 User.created_at <= eligible_cutoff,
             )
@@ -5083,7 +5097,7 @@ async def get_retention_curve(
         # Count users from the eligible set whose last_active is at least day_n days after created_at
         retained = await db.scalar(
             select(func.count(User.id)).where(
-                User.is_deleted == False,
+                *non_admin_user_filters(),
                 User.created_at >= cutoff,
                 User.created_at <= eligible_cutoff,
                 User.last_active >= User.created_at + timedelta(days=day_n),
