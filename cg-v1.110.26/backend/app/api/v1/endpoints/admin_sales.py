@@ -14,6 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.core.security import get_current_admin_user
+from app.core.admin_filters import non_admin_user_filters, non_admin_profile_subq
 from app.models.user import User, UserProfile
 
 logger = logging.getLogger(__name__)
@@ -45,20 +46,29 @@ async def get_sales_pipeline(
     admin: User = Depends(get_current_admin_user),
 ):
     """Sales funnel pipeline with stage counts and values."""
+    # Every count here excludes admin/operator accounts — the funnel is about
+    # real customers, and inflating Awareness → Paid Conversion with a
+    # founder's own test subscription gives a misleading picture.
+    _non_admin = non_admin_user_filters()
+    _non_admin_profile = UserProfile.user_id.in_(non_admin_profile_subq())
+
     # Total users (awareness/signup)
-    total_q = await db.execute(select(func.count(User.id)))
+    total_q = await db.execute(
+        select(func.count(User.id)).where(*_non_admin)
+    )
     total_users = total_q.scalar() or 0
 
     # Users with profiles (completed signup)
     signed_up_q = await db.execute(
-        select(func.count(UserProfile.id))
+        select(func.count(UserProfile.id)).where(_non_admin_profile)
     )
     signed_up = signed_up_q.scalar() or 0
 
     # Free tier users
     free_q = await db.execute(
         select(func.count(UserProfile.id)).where(
-            UserProfile.subscription_tier.in_(["web_starter", "free", None])
+            _non_admin_profile,
+            UserProfile.subscription_tier.in_(["web_starter", "free", None]),
         )
     )
     free_users = free_q.scalar() or 0
@@ -66,15 +76,18 @@ async def get_sales_pipeline(
     # Paid users
     paid_q = await db.execute(
         select(func.count(UserProfile.id)).where(
-            UserProfile.subscription_tier.notin_(["web_starter", "free", ""])
-        ).where(UserProfile.subscription_tier.isnot(None))
+            _non_admin_profile,
+            UserProfile.subscription_tier.notin_(["web_starter", "free", ""]),
+            UserProfile.subscription_tier.isnot(None),
+        )
     )
     paid_users = paid_q.scalar() or 0
 
     # Premium paid (solo+)
     premium_q = await db.execute(
         select(func.count(UserProfile.id)).where(
-            UserProfile.subscription_tier.in_(["solo", "small_firm", "mid_size"])
+            _non_admin_profile,
+            UserProfile.subscription_tier.in_(["solo", "small_firm", "mid_size"]),
         )
     )
     premium_users = premium_q.scalar() or 0
@@ -142,25 +155,30 @@ async def get_sales_conversions(
 ):
     """Daily conversion metrics over the specified period."""
     cutoff = datetime.utcnow() - timedelta(days=days)
+    _non_admin = non_admin_user_filters()
+    _non_admin_profile = UserProfile.user_id.in_(non_admin_profile_subq())
 
-    # Daily signups
+    # Daily signups (real customers only)
     daily_q = await db.execute(
         select(
             cast(User.created_at, Date).label("date"),
             func.count(User.id).label("signups"),
         )
-        .where(User.created_at >= cutoff)
+        .where(*_non_admin, User.created_at >= cutoff)
         .group_by(cast(User.created_at, Date))
         .order_by(cast(User.created_at, Date))
     )
     daily_signups = [{"date": str(r.date), "signups": r.signups} for r in daily_q]
 
     # Overall conversion rate
-    total_q = await db.execute(select(func.count(User.id)).where(User.created_at >= cutoff))
+    total_q = await db.execute(
+        select(func.count(User.id)).where(*_non_admin, User.created_at >= cutoff)
+    )
     total_signups = total_q.scalar() or 0
 
     paid_q = await db.execute(
         select(func.count(UserProfile.id)).where(
+            _non_admin_profile,
             UserProfile.subscription_tier.notin_(["web_starter", "free", ""]),
             UserProfile.subscription_tier.isnot(None),
         )
@@ -197,15 +215,20 @@ async def get_sales_forecast(
     now = datetime.utcnow()
     history_cutoff = now - timedelta(days=history_days)
 
-    # Pull paying subscriptions with their start dates
+    # Pull paying subscriptions with their start dates.
     # subscription_period_start is the Stripe period start; fall back to
     # created_at (profile row) if the Stripe link is missing or preceded it.
+    # Exclude admin profiles so the founder's own test subscriptions don't
+    # skew the forecast regression.
     sub_q = await db.execute(
         select(
             UserProfile.subscription_tier,
             UserProfile.subscription_period_start,
             UserProfile.created_at,
-        ).where(UserProfile.subscription_tier.isnot(None))
+        ).where(
+            UserProfile.user_id.in_(non_admin_profile_subq()),
+            UserProfile.subscription_tier.isnot(None),
+        )
     )
     subs = [
         (tier, started or created)
@@ -294,8 +317,11 @@ async def get_sales_cac(
 ):
     """Customer acquisition cost estimates."""
     cutoff = datetime.utcnow() - timedelta(days=period)
+    # Real customer acquisition — admins don't get "acquired".
     new_q = await db.execute(
-        select(func.count(User.id)).where(User.created_at >= cutoff)
+        select(func.count(User.id)).where(
+            *non_admin_user_filters(), User.created_at >= cutoff
+        )
     )
     new_users = new_q.scalar() or 1
 
@@ -327,7 +353,10 @@ async def get_sales_ltv(
     """Customer lifetime value by tier."""
     tier_q = await db.execute(
         select(UserProfile.subscription_tier, func.count(UserProfile.id))
-        .where(UserProfile.subscription_tier.isnot(None))
+        .where(
+            UserProfile.user_id.in_(non_admin_profile_subq()),
+            UserProfile.subscription_tier.isnot(None),
+        )
         .group_by(UserProfile.subscription_tier)
     )
 
@@ -418,8 +447,9 @@ async def get_sales_win_loss(
     ]
 
     # ── Signup-based fallback view (no funnel tracking required)
+    _non_admin = non_admin_user_filters()
     total_q = await db.execute(
-        select(func.count(User.id)).where(User.created_at >= cutoff)
+        select(func.count(User.id)).where(*_non_admin, User.created_at >= cutoff)
     )
     signup_total = total_q.scalar() or 0
 
@@ -427,6 +457,7 @@ async def get_sales_win_loss(
         select(func.count(UserProfile.id))
         .join(User, User.id == UserProfile.user_id)
         .where(
+            *_non_admin,
             User.created_at >= cutoff,
             UserProfile.subscription_tier.notin_(["web_starter", "free", "", "essential"]),
             UserProfile.subscription_tier.isnot(None),
@@ -475,11 +506,18 @@ async def get_sales_ai_suggestions(
     cutoff_30 = now - timedelta(days=30)
     cutoff_60 = now - timedelta(days=60)
 
-    total_q = await db.execute(select(func.count(User.id)))
+    # Every count here excludes admin/operator accounts so the Claude
+    # prompt (and the deterministic fallback) is grounded in real customer
+    # economics, not an inflated view with the founder's test subscription.
+    _non_admin = non_admin_user_filters()
+    _non_admin_profile = UserProfile.user_id.in_(non_admin_profile_subq())
+
+    total_q = await db.execute(select(func.count(User.id)).where(*_non_admin))
     total_users = total_q.scalar() or 0
 
     paid_q = await db.execute(
         select(func.count(UserProfile.id)).where(
+            _non_admin_profile,
             UserProfile.subscription_tier.notin_(["web_starter", "free", "", "essential"]),
             UserProfile.subscription_tier.isnot(None),
         )
@@ -489,7 +527,7 @@ async def get_sales_ai_suggestions(
     # Tier mix
     tier_mix_q = await db.execute(
         select(UserProfile.subscription_tier, func.count(UserProfile.id))
-        .where(UserProfile.subscription_tier.isnot(None))
+        .where(_non_admin_profile, UserProfile.subscription_tier.isnot(None))
         .group_by(UserProfile.subscription_tier)
     )
     tier_mix = {str(t): int(c) for t, c in tier_mix_q if t}
@@ -499,13 +537,13 @@ async def get_sales_ai_suggestions(
 
     # Growth: last 30 vs prior 30
     recent_q = await db.execute(
-        select(func.count(User.id)).where(User.created_at >= cutoff_30)
+        select(func.count(User.id)).where(*_non_admin, User.created_at >= cutoff_30)
     )
     recent_signups = recent_q.scalar() or 0
 
     prev_q = await db.execute(
         select(func.count(User.id))
-        .where(User.created_at >= cutoff_60, User.created_at < cutoff_30)
+        .where(*_non_admin, User.created_at >= cutoff_60, User.created_at < cutoff_30)
     )
     prev_signups = prev_q.scalar() or 0
     growth_pct = ((recent_signups - prev_signups) / max(prev_signups, 1)) * 100

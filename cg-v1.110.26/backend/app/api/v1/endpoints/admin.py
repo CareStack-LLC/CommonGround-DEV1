@@ -32,6 +32,11 @@ from sqlalchemy.orm import selectinload
 
 from app.core.database import get_db
 from app.core.security import get_current_admin_user
+from app.core.admin_filters import (
+    ADMIN_EMAILS,
+    non_admin_user_filters,
+    non_admin_profile_subq,
+)
 from app.models.user import User, UserProfile
 from app.models.audit import AuditLog
 
@@ -47,8 +52,9 @@ from app.services.stripe_revenue import (
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
-# Admin / internal emails to always exclude from platform metrics
-ADMIN_EMAILS = {"thomas@carestack.us", "founders@commonground.family"}
+# ADMIN_EMAILS now lives in app.core.admin_filters so sales/report modules
+# share the same allow-list. Re-exported above for backward compatibility
+# with this module's older ``User.email.notin_(ADMIN_EMAILS)`` sites.
 
 
 # =============================================================================
@@ -134,8 +140,9 @@ async def get_admin_dashboard(
     seven_days_ago = now - timedelta(days=7)
     yesterday = now - timedelta(days=1)
 
-    # User counts (exclude admins — admins are operators, not customers)
-    _non_admin = (User.is_deleted == False, User.is_admin == False, User.email.notin_(ADMIN_EMAILS))
+    # User counts (exclude admins — admins are operators, not customers).
+    # See app/core/admin_filters.py for the shared filter definition.
+    _non_admin = non_admin_user_filters()
     total_users = await db.scalar(
         select(func.count(User.id)).where(*_non_admin)
     )
@@ -233,23 +240,24 @@ async def get_admin_dashboard(
     # Active users today (last 24 hours, exclude admins)
     active_today = await db.scalar(
         select(func.count(User.id)).where(
+            *_non_admin,
             User.last_active >= yesterday,
-            User.is_deleted == False,
-            User.is_admin == False,
         )
     )
 
-    # Past-due count
+    # Past-due count (exclude admin accounts — previously unfiltered, so any
+    # lapsed founder test-subscription counted toward customer past-due totals).
     past_due_count = await db.scalar(
         select(func.count(UserProfile.id)).where(
-            UserProfile.subscription_status == "past_due"
+            UserProfile.user_id.in_(non_admin_profile_subq()),
+            UserProfile.subscription_status == "past_due",
         )
     )
 
     # Recent signups (last 10 for feed, exclude admins)
     recent_signups_result = await db.execute(
         select(User.id, User.first_name, User.last_name, User.created_at)
-        .where(User.is_deleted == False, User.is_admin == False)
+        .where(*_non_admin)
         .order_by(User.created_at.desc())
         .limit(10)
     )
@@ -670,12 +678,10 @@ async def get_billing_overview(
     For detailed Stripe data, use Stripe Dashboard directly.
     """
     # ── Exclude admin users from all subscription queries ──
-    admin_ids_result = await db.execute(
-        select(User.id).where(User.is_admin == True, User.is_deleted == False)
-    )
-    admin_user_ids = [str(r[0]) for r in admin_ids_result.all()]
-
-    non_admin_filter = UserProfile.user_id.notin_(admin_user_ids) if admin_user_ids else True
+    # Shared filter (see app/core/admin_filters.py) — uses both
+    # User.is_admin and the ADMIN_EMAILS allow-list so that founders who
+    # signed up with Gmail before the flag was set still get excluded.
+    non_admin_filter = UserProfile.user_id.in_(non_admin_profile_subq())
 
     # Subscription tier breakdown (excludes admins)
     tier_result = await db.execute(

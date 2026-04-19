@@ -14,6 +14,7 @@ from typing import Any
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.admin_filters import non_admin_user_filters, non_admin_profile_subq
 from app.models.user import User, UserProfile
 from app.models.audit import AuditLog
 
@@ -55,13 +56,18 @@ async def generate_report(
 
 
 async def _generate_user_export(db: AsyncSession, days: int) -> dict:
-    """Full user list with subscription data and activity."""
+    """Full user list with subscription data and activity.
+
+    Exports are for customer-success / revenue analysis — the founder's
+    admin account isn't a customer and would skew the summary counts, so
+    we exclude admin rows here the same way the dashboard does.
+    """
     cutoff = datetime.utcnow() - timedelta(days=days)
 
     result = await db.execute(
         select(User, UserProfile)
         .outerjoin(UserProfile, UserProfile.user_id == User.id)
-        .where(User.is_deleted == False)
+        .where(*non_admin_user_filters())
         .order_by(User.created_at.desc())
     )
 
@@ -112,8 +118,14 @@ async def _generate_user_export(db: AsyncSession, days: int) -> dict:
 
 
 async def _generate_billing_summary(db: AsyncSession, days: int) -> dict:
-    """Revenue and subscription metrics."""
+    """Revenue and subscription metrics.
+
+    All counts exclude admin/operator profiles — admins aren't customers,
+    and including them inflates MRR, tier totals, and new-subscription
+    counts with internal noise.
+    """
     cutoff = datetime.utcnow() - timedelta(days=days)
+    _non_admin_profile = UserProfile.user_id.in_(non_admin_profile_subq())
 
     # Tier breakdown
     tier_result = await db.execute(
@@ -122,6 +134,7 @@ async def _generate_billing_summary(db: AsyncSession, days: int) -> dict:
             UserProfile.subscription_status,
             func.count(UserProfile.id),
         )
+        .where(_non_admin_profile)
         .group_by(UserProfile.subscription_tier, UserProfile.subscription_status)
     )
 
@@ -142,6 +155,7 @@ async def _generate_billing_summary(db: AsyncSession, days: int) -> dict:
     # New subscriptions in period
     new_subs = await db.scalar(
         select(func.count(UserProfile.id)).where(
+            _non_admin_profile,
             UserProfile.created_at >= cutoff,
             UserProfile.subscription_status == "active",
         )
@@ -150,12 +164,15 @@ async def _generate_billing_summary(db: AsyncSession, days: int) -> dict:
     # Cancelled in period
     cancelled = await db.scalar(
         select(func.count(UserProfile.id)).where(
+            _non_admin_profile,
             UserProfile.subscription_status == "cancelled",
             UserProfile.updated_at >= cutoff,
         )
     )
 
-    total_profiles = await db.scalar(select(func.count(UserProfile.id)))
+    total_profiles = await db.scalar(
+        select(func.count(UserProfile.id)).where(_non_admin_profile)
+    )
 
     return {
         "columns": ["tier", "status", "count"],
@@ -277,8 +294,9 @@ async def _generate_compliance_report(db: AsyncSession, days: int) -> dict:
 
 
 async def _generate_growth_report(db: AsyncSession, days: int) -> dict:
-    """User acquisition and retention analysis."""
+    """User acquisition and retention analysis (excludes admin accounts)."""
     cutoff = datetime.utcnow() - timedelta(days=days)
+    _non_admin = non_admin_user_filters()
 
     # Daily registrations
     result = await db.execute(
@@ -286,7 +304,7 @@ async def _generate_growth_report(db: AsyncSession, days: int) -> dict:
             func.date(User.created_at).label("date"),
             func.count(User.id).label("count"),
         )
-        .where(User.created_at >= cutoff)
+        .where(*_non_admin, User.created_at >= cutoff)
         .group_by(func.date(User.created_at))
         .order_by(func.date(User.created_at))
     )
@@ -303,6 +321,7 @@ async def _generate_growth_report(db: AsyncSession, days: int) -> dict:
     # Retention: of users created in this period, how many are still active
     retained = await db.scalar(
         select(func.count(User.id)).where(
+            *_non_admin,
             User.created_at >= cutoff,
             User.is_active == True,
             User.last_active >= cutoff,
