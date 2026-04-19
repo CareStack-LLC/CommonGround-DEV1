@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
 import {
   FileText, Search, Share2, GitBranch, Sparkles,
   Eye, Clock, MousePointerClick, ArrowRightLeft,
@@ -922,22 +923,67 @@ export default function MarketingAnalyticsPage() {
   const [loadedTabs, setLoadedTabs] = useState<Set<string>>(new Set(['content']));
   const [ga4, setGa4] = useState<Ga4Status | null>(null);
   const [ga4Loading, setGa4Loading] = useState(true);
+  const [ga4Banner, setGa4Banner] = useState<
+    { kind: 'success' | 'error'; msg: string } | null
+  >(null);
+
+  const searchParams = useSearchParams();
+  const oauthHandled = useRef(false);
+
+  const loadGa4Status = useCallback(async () => {
+    try {
+      const result = await adminAPI.getGa4Status();
+      setGa4(result as Ga4Status);
+    } catch {
+      // On hard error (network, 500) assume not_connected so we show the
+      // Connect card rather than the red ErrorState — admins have always
+      // been able to retry by reloading.
+      setGa4({ status: 'not_connected' });
+    } finally {
+      setGa4Loading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const result = await adminAPI.getGa4Status();
-        setGa4(result as Ga4Status);
-      } catch {
-        // On hard error (network, 500) assume not_connected so we show the
-        // Connect card rather than the red ErrorState — admins have always
-        // been able to retry by reloading.
-        setGa4({ status: 'not_connected' });
-      } finally {
-        setGa4Loading(false);
-      }
-    })();
-  }, []);
+    loadGa4Status();
+  }, [loadGa4Status]);
+
+  // Handle GA4 OAuth callback. The shared Google callback route lands us
+  // here with `?ga4_code=…` (success) or `?ga4_error=…` (user denied /
+  // redirect_uri_mismatch / etc). Without this effect the code just sits in
+  // the URL bar and GA4 never gets connected — which is exactly the "I
+  // pressed Connect and nothing happened" bug.
+  useEffect(() => {
+    if (oauthHandled.current) return;
+    const code = searchParams.get('ga4_code');
+    const err = searchParams.get('ga4_error');
+    const stripUrl = () =>
+      window.history.replaceState({}, '', '/superadmin/marketing-analytics');
+
+    if (err) {
+      oauthHandled.current = true;
+      setGa4Banner({ kind: 'error', msg: `Google OAuth failed: ${err}` });
+      stripUrl();
+      return;
+    }
+    if (code) {
+      oauthHandled.current = true;
+      (async () => {
+        try {
+          await adminAPI.exchangeGa4Code(code);
+          setGa4Banner({ kind: 'success', msg: 'GA4 connected!' });
+          stripUrl();
+          await loadGa4Status();
+        } catch (e: unknown) {
+          setGa4Banner({
+            kind: 'error',
+            msg: e instanceof Error ? e.message : 'GA4 token exchange failed',
+          });
+          stripUrl();
+        }
+      })();
+    }
+  }, [searchParams, loadGa4Status]);
 
   const handleTabChange = (key: string) => {
     setTab(key);
@@ -954,6 +1000,18 @@ export default function MarketingAnalyticsPage() {
           Content performance, SEO insights, social tracking, and attribution analysis
         </p>
       </div>
+
+      {ga4Banner && (
+        <div
+          className={`rounded-lg px-4 py-2.5 text-sm ${
+            ga4Banner.kind === 'success'
+              ? 'bg-[#3DAA8A]/10 border border-[#3DAA8A]/40 text-[#9BD8C3]'
+              : 'bg-[#C15B5B]/10 border border-[#C15B5B]/40 text-[#E8A8A8]'
+          }`}
+        >
+          {ga4Banner.msg}
+        </div>
+      )}
 
       {ga4Loading ? (
         <div className="flex items-center gap-2 text-[#6B8A9A] text-sm py-12 justify-center">

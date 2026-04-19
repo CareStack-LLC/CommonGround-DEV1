@@ -1258,6 +1258,14 @@ export const adminAPI = {
   getOAuthUrl: () => adminFetch<{ url: string }>('/admin/inbox/oauth/url'),
   exchangeOAuthCode: (code: string) =>
     adminFetch<{ success: boolean }>(`/admin/inbox/oauth/callback?code=${code}`, { method: 'POST' }),
+
+  // GA4 — shares the same Google callback URL as Gmail; the callback route
+  // disambiguates on `state=ga4` and lands the user here with ?ga4_code=...
+  exchangeGa4Code: (code: string) =>
+    adminFetch<{ status: string; scopes?: string[] }>(
+      `/admin/ga4/oauth/callback?code=${encodeURIComponent(code)}`,
+      { method: 'POST' },
+    ),
   getEmails: (params?: { category?: string; is_urgent?: boolean; draft_status?: string; limit?: number; offset?: number }) => {
     const sp = new URLSearchParams();
     if (params?.category) sp.set('category', params.category);
