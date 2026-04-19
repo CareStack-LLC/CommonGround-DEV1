@@ -36,6 +36,7 @@ from app.core.admin_filters import (
     ADMIN_EMAILS,
     non_admin_user_filters,
     non_admin_profile_subq,
+    get_admin_stripe_customer_ids,
 )
 from app.models.user import User, UserProfile
 from app.models.audit import AuditLog
@@ -175,15 +176,16 @@ async def get_admin_dashboard(
         select(func.count(ProfessionalProfile.id))
     )
 
-    # User type counts (needed for filtering)
+    # User type counts. admin_count/ids kept local to render the "admins"
+    # widget — the customer-facing profile counts below switch to the
+    # shared helper (app/core/admin_filters.py) so the filter matches
+    # every other superadmin endpoint (is_admin flag *plus* the email
+    # allow-list, not just the flag).
     admin_count = await db.scalar(
         select(func.count(User.id)).where(User.is_admin == True, User.is_deleted == False)
     ) or 0
-    admin_ids_result = await db.execute(
-        select(User.id).where(User.is_admin == True, User.is_deleted == False)
-    )
-    dash_admin_ids = [str(r[0]) for r in admin_ids_result.all()]
-    dash_non_admin = UserProfile.user_id.notin_(dash_admin_ids) if dash_admin_ids else True
+
+    dash_non_admin = UserProfile.user_id.in_(non_admin_profile_subq())
 
     total_profiles = await db.scalar(
         select(func.count(UserProfile.id)).where(dash_non_admin)
@@ -210,8 +212,12 @@ async def get_admin_dashboard(
         for tier, count in tier_counts.items()
     )
 
-    # Stripe-verified MRR (best-effort, falls back gracefully)
-    stripe_snapshot = fetch_stripe_revenue()
+    # Stripe-verified MRR (best-effort, falls back gracefully).
+    # Exclude admin-linked Stripe customers — otherwise the founder's
+    # own test subscription leaks into the "real customer" MRR shown on
+    # the dashboard hero card and the Revenue Split pie chart.
+    admin_stripe_excludes = await get_admin_stripe_customer_ids(db)
+    stripe_snapshot = fetch_stripe_revenue(exclude_customer_ids=admin_stripe_excludes)
     stripe_mrr = stripe_snapshot.total_mrr if stripe_snapshot.stripe_available else None
 
     # Override tier_breakdown with Stripe data when available
@@ -768,14 +774,22 @@ async def get_billing_overview(
     )
 
     # --- Stripe Health: DB integration stats ---
+    # All four counts are customer-facing (shown on the billing page's
+    # "Stripe Integration Health" card). Admin profiles were leaking
+    # into them before because the queries didn't apply the shared
+    # filter — fixed by requiring ``user_id in non_admin_profile_subq()``
+    # on every count.
     stripe_health = {}
     try:
         paid_tiers = ["plus", "complete", "professional_starter", "solo", "small_firm", "mid_size"]
 
-        total_profiles = await db.scalar(select(func.count(UserProfile.id))) or 0
+        total_profiles = await db.scalar(
+            select(func.count(UserProfile.id)).where(non_admin_filter)
+        ) or 0
 
         users_with_stripe_customer = await db.scalar(
             select(func.count(UserProfile.id)).where(
+                non_admin_filter,
                 UserProfile.stripe_customer_id != None,
                 UserProfile.stripe_customer_id != "",
             )
@@ -783,6 +797,7 @@ async def get_billing_overview(
 
         users_with_stripe_sub = await db.scalar(
             select(func.count(UserProfile.id)).where(
+                non_admin_filter,
                 UserProfile.stripe_subscription_id != None,
                 UserProfile.stripe_subscription_id != "",
             )
@@ -790,6 +805,7 @@ async def get_billing_overview(
 
         mismatch_count = await db.scalar(
             select(func.count(UserProfile.id)).where(
+                non_admin_filter,
                 UserProfile.subscription_tier.in_(paid_tiers),
                 UserProfile.subscription_status == "active",
                 or_(
@@ -811,13 +827,17 @@ async def get_billing_overview(
         logger.warning("Stripe health DB queries failed: %s", exc)
 
     # --- Live Stripe data via centralised service ---
-    snapshot = fetch_stripe_revenue()
+    # Same admin-exclusion pattern as /admin/dashboard — without it, the
+    # founder's test subscription inflates total_mrr / active_count /
+    # total_customers and shows up in the Recent Payments widget.
+    admin_stripe_excludes = await get_admin_stripe_customer_ids(db)
+    snapshot = fetch_stripe_revenue(exclude_customer_ids=admin_stripe_excludes)
     stripe_live = {
         "stripe_available": snapshot.stripe_available,
         "active_subscriptions": snapshot.active_count,
         "total_mrr": snapshot.total_mrr,
-        "total_customers": fetch_stripe_customers_count(),
-        "recent_payments": fetch_stripe_payments(20),
+        "total_customers": fetch_stripe_customers_count(exclude_customer_ids=admin_stripe_excludes),
+        "recent_payments": fetch_stripe_payments(20, exclude_customer_ids=admin_stripe_excludes),
     }
     if not snapshot.stripe_available:
         stripe_live["error"] = snapshot.error or "Stripe API unavailable."
@@ -4907,8 +4927,9 @@ async def get_revenue_metrics(
         breakdown[tier_name] = {"count": count, "revenue": revenue}
         db_mrr += revenue
 
-    # Stripe-verified MRR via centralised service
-    snapshot = fetch_stripe_revenue()
+    # Stripe-verified MRR via centralised service (admin-excluded).
+    admin_stripe_excludes = await get_admin_stripe_customer_ids(db)
+    snapshot = fetch_stripe_revenue(exclude_customer_ids=admin_stripe_excludes)
     stripe_mrr = snapshot.total_mrr if snapshot.stripe_available else None
 
     mrr = stripe_mrr if stripe_mrr is not None else round(db_mrr, 2)
@@ -5037,8 +5058,9 @@ async def get_unit_economics(
         if price > 0:
             paying_users += count
 
-    # Stripe-verified MRR via service
-    snapshot = fetch_stripe_revenue()
+    # Stripe-verified MRR via service (admin-excluded).
+    admin_stripe_excludes = await get_admin_stripe_customer_ids(db)
+    snapshot = fetch_stripe_revenue(exclude_customer_ids=admin_stripe_excludes)
     total_mrr = snapshot.total_mrr if snapshot.stripe_available and snapshot.total_mrr > 0 else db_mrr
 
     # Churn rate: cancelled in 30d / (active paying + cancelled)
@@ -5297,8 +5319,9 @@ async def get_executive_summary(
         )
     ) or 0
 
-    # Revenue from centralised Stripe service
-    snapshot = fetch_stripe_revenue()
+    # Revenue from centralised Stripe service (admin-excluded).
+    admin_stripe_excludes = await get_admin_stripe_customer_ids(db)
+    snapshot = fetch_stripe_revenue(exclude_customer_ids=admin_stripe_excludes)
     mrr = snapshot.total_mrr if snapshot.stripe_available else 0.0
     arr = round(mrr * 12, 2)
 
@@ -5367,8 +5390,9 @@ async def get_ai_summary(
         )
     ) or 0
 
-    # MRR from centralised Stripe service (with DB fallback)
-    snapshot = fetch_stripe_revenue()
+    # MRR from centralised Stripe service (admin-excluded, with DB fallback)
+    admin_stripe_excludes = await get_admin_stripe_customer_ids(db)
+    snapshot = fetch_stripe_revenue(exclude_customer_ids=admin_stripe_excludes)
     if snapshot.stripe_available:
         mrr = snapshot.total_mrr
     else:
@@ -5614,8 +5638,9 @@ async def get_user_segments(
         )
     ) or 0
 
-    # Revenue from Stripe service
-    snapshot = fetch_stripe_revenue()
+    # Revenue from Stripe service (admin-excluded).
+    admin_stripe_excludes = await get_admin_stripe_customer_ids(db)
+    snapshot = fetch_stripe_revenue(exclude_customer_ids=admin_stripe_excludes)
     mrr_by_segment = snapshot.mrr_by_segment if snapshot.stripe_available else {}
 
     await _log_admin_action(db, admin_user, "view_user_segments", "analytics")

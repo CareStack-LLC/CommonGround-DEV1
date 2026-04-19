@@ -24,6 +24,7 @@ export { ProgressRing } from "./ProgressRing";
 export { KanbanBoard } from "./KanbanBoard";
 export { DeploymentTimeline } from "./DeploymentTimeline";
 export { HealthScoreBadge } from "./HealthScoreBadge";
+export { SafetyScoreExplainer } from "./SafetyScoreExplainer";
 export { CSAgentChat } from "./CSAgentChat";
 export { ExportCsvButton } from "./ExportCsvButton";
 

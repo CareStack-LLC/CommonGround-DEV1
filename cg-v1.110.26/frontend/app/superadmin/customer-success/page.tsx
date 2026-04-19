@@ -25,11 +25,17 @@ import {
   ErrorState,
   EmptyState,
   HealthScoreBadge,
+  SafetyScoreExplainer,
   CSAgentChat,
   formatNumber,
   timeAgo,
 } from '@/components/superadmin';
-import { adminAPI, type CSOverview, type HealthScoreEntry } from '@/lib/admin-api';
+import {
+  adminAPI,
+  type CSOverview,
+  type HealthScoreEntry,
+  type HealthScoringExplainer,
+} from '@/lib/admin-api';
 
 // ── Types ────────────────────────────────────────────────────────────────
 
@@ -79,6 +85,7 @@ const TYPE_COLORS: Record<string, string> = {
 function OverviewTab() {
   const [overview, setOverview] = useState<CSOverview | null>(null);
   const [healthScores, setHealthScores] = useState<HealthScoreEntry[]>([]);
+  const [scoring, setScoring] = useState<HealthScoringExplainer | null>(null);
   const [interventions, setInterventions] = useState<Intervention[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -94,6 +101,7 @@ function OverviewTab() {
       ]);
       setOverview(ov);
       setHealthScores(hs.scores);
+      setScoring(hs.scoring);
       setInterventions(iv.interventions as Intervention[]);
     } catch (err: any) {
       setError(err.message || 'Failed to load overview');
@@ -148,7 +156,10 @@ function OverviewTab() {
 
       {/* Health Distribution Chart */}
       <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
-        <h3 className="text-sm font-semibold text-[#D0E4EC] mb-4">Health Score Distribution</h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-sm font-semibold text-[#D0E4EC]">Health Score Distribution</h3>
+          <SafetyScoreExplainer scoring={scoring} variant="inline" />
+        </div>
         <div className="space-y-3">
           {distribution.map((range) => (
             <div key={range.label} className="flex items-center gap-3">
@@ -210,6 +221,7 @@ function OverviewTab() {
 
 function HealthScoresTab() {
   const [scores, setScores] = useState<HealthScoreEntry[]>([]);
+  const [scoring, setScoring] = useState<HealthScoringExplainer | null>(null);
   const [total, setTotal] = useState(0);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
@@ -223,6 +235,7 @@ function HealthScoresTab() {
     try {
       const data = await adminAPI.getHealthScores({ limit, offset });
       setScores(data.scores);
+      setScoring(data.scoring);
       setTotal(data.total);
     } catch (err: any) {
       setError(err.message || 'Failed to load health scores');
@@ -248,6 +261,14 @@ function HealthScoresTab() {
 
   return (
     <div className="space-y-4">
+      {/* Explainer row — so admins understand what "25" actually means. */}
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-[#6B8A9A]">
+          {total} account{total === 1 ? '' : 's'} · sorted by newest
+        </p>
+        <SafetyScoreExplainer scoring={scoring} variant="badge" />
+      </div>
+
       {/* Search */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#4A6E7F]" />

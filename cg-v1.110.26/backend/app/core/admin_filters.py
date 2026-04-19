@@ -39,9 +39,12 @@ Usage:
   )
 """
 
-from sqlalchemy import select
+import time
 
-from app.models.user import User
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.models.user import User, UserProfile
 
 # ---------------------------------------------------------------------------
 # Admin identity
@@ -97,3 +100,69 @@ def non_admin_profile_subq():
         .where(*non_admin_user_filters())
         .scalar_subquery()
     )
+
+
+# ---------------------------------------------------------------------------
+# Stripe-side admin exclusion
+# ---------------------------------------------------------------------------
+#
+# The DB-side filters above keep admin rows out of user counts, MRR
+# estimates from ``subscription_tier``, etc. But the live Stripe-based
+# revenue snapshot (``stripe_revenue.fetch_stripe_revenue``) iterates
+# ``stripe.Subscription.list()`` and sums *every* active subscription —
+# Stripe doesn't know about our ``is_admin`` flag. When an admin has a
+# real Stripe subscription (testing Plus at $17.99 etc.), it leaks
+# straight into dashboard MRR + Revenue Split + billing overview.
+#
+# The fix is a thin bridge: look up the Stripe customer IDs that belong
+# to our admin accounts, and let callers pass that set into the Stripe
+# fetch functions as an exclusion list.
+
+_stripe_admin_cache: set[str] = set()
+_stripe_admin_cache_ts: float = 0.0
+_STRIPE_ADMIN_CACHE_TTL = 60.0  # matches stripe_revenue._CACHE_TTL
+
+
+async def get_admin_stripe_customer_ids(db: AsyncSession) -> set[str]:
+    """Return the set of Stripe customer IDs belonging to admin accounts.
+
+    Results are cached in-process for 60 seconds — same TTL as the
+    Stripe revenue cache so the exclusion set never drifts behind the
+    data it's excluding from. Safe for the sync Stripe callers to
+    consume: resolve once per request at the endpoint layer, pass the
+    set into ``fetch_stripe_revenue(exclude_customer_ids=...)`` and
+    friends.
+
+    Returns an empty set if no admin has a linked Stripe customer yet
+    (cold start, fresh prod, etc.) — callers then behave as before.
+    """
+    global _stripe_admin_cache, _stripe_admin_cache_ts
+
+    now = time.time()
+    if now - _stripe_admin_cache_ts < _STRIPE_ADMIN_CACHE_TTL and _stripe_admin_cache_ts > 0:
+        return _stripe_admin_cache
+
+    result = await db.execute(
+        select(UserProfile.stripe_customer_id)
+        .join(User, User.id == UserProfile.user_id)
+        .where(
+            UserProfile.stripe_customer_id.isnot(None),
+            UserProfile.stripe_customer_id != "",
+        )
+        # Inverse of non_admin_user_filters — we WANT the admin rows here.
+        .where(
+            (User.is_admin.is_(True)) | (User.email.in_(ADMIN_EMAILS))
+        )
+    )
+    ids = {row[0] for row in result.all() if row[0]}
+
+    _stripe_admin_cache = ids
+    _stripe_admin_cache_ts = now
+    return ids
+
+
+def invalidate_stripe_admin_cache() -> None:
+    """Drop the cached admin-customer-id set (useful for tests)."""
+    global _stripe_admin_cache, _stripe_admin_cache_ts
+    _stripe_admin_cache = set()
+    _stripe_admin_cache_ts = 0.0

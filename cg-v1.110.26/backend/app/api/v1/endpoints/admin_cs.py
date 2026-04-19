@@ -16,6 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.core.security import get_current_admin_user
+from app.core.admin_filters import non_admin_user_filters
 from app.models.user import User, UserProfile
 
 logger = logging.getLogger(__name__)
@@ -53,6 +54,47 @@ class CalculateRequest(BaseModel):
 # =============================================================================
 # Health score calculation helpers
 # =============================================================================
+
+
+def _empty_scoring_transparency() -> dict:
+    """Stand-in ``scoring`` payload for the UI when there are zero rows.
+
+    Mirrors the ``weights`` + ``transparency`` block baked into
+    ``_calculate_health_score``'s return so the "About this score"
+    explainer can render even before any customers exist. Keep in sync
+    with the real version below.
+    """
+    return {
+        "weights": {
+            "login_recency": 0.35,
+            "subscription_value": 0.25,
+            "profile_completeness": 0.20,
+            "account_maturity": 0.20,
+        },
+        "transparency": {
+            "is_heuristic": True,
+            "confidence": "low",
+            "data_sources": [
+                "User.last_active",
+                "UserProfile.subscription_tier",
+                "UserProfile.first_name / last_name",
+                "User.phone",
+                "User.created_at",
+            ],
+            "not_included": [
+                "message volume",
+                "ARIA intervention history",
+                "ClearFund activity",
+                "custody-exchange adherence",
+                "KidSpace engagement",
+            ],
+            "weighting": (
+                "35% login recency · 25% subscription tier · "
+                "20% profile completeness · 20% account age"
+            ),
+        },
+    }
+
 
 def _calculate_health_score(user: User, profile: Optional[UserProfile]) -> dict:
     """Calculate a health score for a user based on available data."""
@@ -170,15 +212,28 @@ async def get_cs_overview(
     db: AsyncSession = Depends(get_db),
     admin: User = Depends(get_current_admin_user),
 ):
-    """Customer success overview dashboard."""
-    # Total accounts
-    total_q = await db.execute(select(func.count(User.id)))
+    """Customer success overview dashboard.
+
+    Admin/operator accounts are excluded from every count here — they
+    were polluting Total Accounts, Avg Health Score, At-Risk Count, and
+    Est. NPS on the /superadmin/customer-success page. The admin's own
+    health score (a low 25 "heuristic" tied to no profile + no recent
+    login) was dragging aggregate averages down and showing up as an
+    at-risk user in the sidebar.
+    """
+    _non_admin = non_admin_user_filters()
+
+    # Total accounts (real customers only)
+    total_q = await db.execute(
+        select(func.count(User.id)).where(*_non_admin)
+    )
     total_accounts = total_q.scalar() or 0
 
     # Calculate health scores for a sample to get averages
     users_q = await db.execute(
         select(User, UserProfile)
         .outerjoin(UserProfile, User.id == UserProfile.user_id)
+        .where(*_non_admin)
         .limit(500)
     )
     users = users_q.all()
@@ -210,10 +265,21 @@ async def get_health_scores(
     db: AsyncSession = Depends(get_db),
     admin: User = Depends(get_current_admin_user),
 ):
-    """List health scores for all accounts."""
+    """List health scores for customer accounts (excludes admin/operator).
+
+    We also return a ``scoring`` block surfacing the formula + data
+    sources used by ``_calculate_health_score``. The frontend Health
+    tab renders this inline as an "About this score" explainer so
+    admins know the 0-100 number is a heuristic on login recency /
+    subscription tier / profile completeness / account age — NOT a
+    real engagement signal from messaging, ARIA, or ClearFund.
+    """
+    _non_admin = non_admin_user_filters()
+
     query = (
         select(User, UserProfile)
         .outerjoin(UserProfile, User.id == UserProfile.user_id)
+        .where(*_non_admin)
         .order_by(desc(User.created_at))
         .offset(offset)
         .limit(limit)
@@ -222,8 +288,16 @@ async def get_health_scores(
     users = result.all()
 
     scores = []
+    scoring_transparency: Optional[dict] = None
     for user, profile in users:
         health = _calculate_health_score(user, profile)
+        # Capture transparency once — it's identical across rows, but
+        # we pick it up from a real row so the frontend always has it.
+        if scoring_transparency is None:
+            scoring_transparency = {
+                "weights": health.get("weights"),
+                "transparency": health.get("transparency"),
+            }
         if risk and health["risk_level"] != risk:
             continue
         scores.append({
@@ -238,11 +312,18 @@ async def get_health_scores(
             "factors": health["factors"],
         })
 
-    # Get total count
-    count_q = await db.execute(select(func.count(User.id)))
+    # Get total count (customer-only)
+    count_q = await db.execute(
+        select(func.count(User.id)).where(*_non_admin)
+    )
     total = count_q.scalar() or 0
 
-    return {"scores": scores, "total": total}
+    return {
+        "scores": scores,
+        "total": total,
+        # Even on an empty customer set we want the explainer to render.
+        "scoring": scoring_transparency or _empty_scoring_transparency(),
+    }
 
 
 # NOTE: `POST /cs/health-scores/calculate` was removed in the SuperAdmin
@@ -258,11 +339,12 @@ async def get_churn_risk(
     db: AsyncSession = Depends(get_db),
     admin: User = Depends(get_current_admin_user),
 ):
-    """Get accounts at risk of churning."""
+    """Get customer accounts at risk of churning (admin/operator excluded)."""
     score_threshold = threshold * 100
     users_q = await db.execute(
         select(User, UserProfile)
         .outerjoin(UserProfile, User.id == UserProfile.user_id)
+        .where(*non_admin_user_filters())
         .limit(500)
     )
 

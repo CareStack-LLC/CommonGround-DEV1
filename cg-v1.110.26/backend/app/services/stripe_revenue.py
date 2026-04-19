@@ -90,13 +90,21 @@ class StripeRevenueResult:
 # Simple in-memory cache
 # ─────────────────────────────────────────────────────────────────────
 
-_cache: dict[str, object] = {}
-_cache_ts: float = 0.0
+# Keyed by a hash of the exclusion set so that e.g. the "no-exclusion"
+# view (internal callers that want raw totals) and the admin-excluded
+# superadmin view don't clobber each other's cache slots.
+_cache: dict[int, StripeRevenueResult] = {}
+_cache_ts: dict[int, float] = {}
 _CACHE_TTL: float = 60.0  # seconds
 
 
-def _is_cache_valid() -> bool:
-    return bool(_cache) and (time.time() - _cache_ts) < _CACHE_TTL
+def _exclude_key(exclude_customer_ids: Optional[set[str]]) -> int:
+    return hash(frozenset(exclude_customer_ids or ()))
+
+
+def _is_cache_valid(key: int) -> bool:
+    ts = _cache_ts.get(key, 0.0)
+    return key in _cache and (time.time() - ts) < _CACHE_TTL
 
 
 def invalidate_cache() -> None:
@@ -199,17 +207,28 @@ def _ensure_stripe_key() -> bool:
 # Public API
 # ─────────────────────────────────────────────────────────────────────
 
-def fetch_stripe_revenue(*, force: bool = False) -> StripeRevenueResult:
+def fetch_stripe_revenue(
+    *,
+    force: bool = False,
+    exclude_customer_ids: Optional[set[str]] = None,
+) -> StripeRevenueResult:
     """
     Fetch and aggregate MRR / ARR from Stripe subscriptions.
 
+    ``exclude_customer_ids`` — customer IDs to skip when summing. Resolve
+    it from ``app.core.admin_filters.get_admin_stripe_customer_ids(db)``
+    at the endpoint layer; we don't touch the DB here because the rest
+    of this module is sync. Cache is keyed by the exclusion set so the
+    no-exclusion and admin-excluded views don't collide.
+
     Results are cached for 60 seconds unless *force* is True.
     """
-    global _cache, _cache_ts
+    key = _exclude_key(exclude_customer_ids)
 
-    if not force and _is_cache_valid():
-        return _cache["result"]  # type: ignore[return-value]
+    if not force and _is_cache_valid(key):
+        return _cache[key]
 
+    excludes = exclude_customer_ids or set()
     result = StripeRevenueResult()
 
     if not _ensure_stripe_key():
@@ -220,6 +239,7 @@ def fetch_stripe_revenue(*, force: bool = False) -> StripeRevenueResult:
         active_count = 0
         mrr_by_tier: dict[str, dict] = {}  # {tier: {"count": N, "mrr": X}}
         mrr_by_segment: dict[str, float] = {"consumer": 0.0, "professional": 0.0}
+        skipped_admins = 0
 
         # Fetch both active and trialing subscriptions
         for status in ("active", "trialing"):
@@ -234,6 +254,13 @@ def fetch_stripe_revenue(*, force: bool = False) -> StripeRevenueResult:
                 subs = stripe.Subscription.list(**params)
 
                 for sub in subs.data:
+                    # Admin-account subscriptions must not flow into MRR
+                    # or active_count — they're operators, not customers.
+                    # ``sub.customer`` is a string customer-id.
+                    if excludes and getattr(sub, "customer", None) in excludes:
+                        skipped_admins += 1
+                        continue
+
                     mrr, tier = _extract_mrr_from_subscription(sub)
 
                     total_mrr += mrr
@@ -252,6 +279,12 @@ def fetch_stripe_revenue(*, force: bool = False) -> StripeRevenueResult:
                 if has_more and subs.data:
                     starting_after = subs.data[-1].id
 
+        if skipped_admins:
+            logger.info(
+                "Stripe MRR: skipped %d admin subscription(s) via exclude_customer_ids",
+                skipped_admins,
+            )
+
         result = StripeRevenueResult(
             total_mrr=round(total_mrr, 2),
             total_arr=round(total_mrr * 12, 2),
@@ -262,8 +295,8 @@ def fetch_stripe_revenue(*, force: bool = False) -> StripeRevenueResult:
             fetched_at=datetime.utcnow().isoformat(),
         )
 
-        _cache = {"result": result}
-        _cache_ts = time.time()
+        _cache[key] = result
+        _cache_ts[key] = time.time()
 
     except stripe.error.AuthenticationError:
         logger.error("Stripe authentication failed — check STRIPE_SECRET_KEY")
@@ -275,17 +308,33 @@ def fetch_stripe_revenue(*, force: bool = False) -> StripeRevenueResult:
     return result
 
 
-def fetch_stripe_payments(limit: int = 20) -> list[dict]:
+def fetch_stripe_payments(
+    limit: int = 20,
+    *,
+    exclude_customer_ids: Optional[set[str]] = None,
+) -> list[dict]:
     """
     Return the most recent paid invoices from Stripe.
+
+    Admin-customer invoices are filtered out via ``exclude_customer_ids``
+    so the "Recent Payments" widget on /superadmin/billing doesn't show
+    the founder's test subscription renewals as though they were real
+    customer activity. We over-fetch slightly to compensate for filter
+    drop so the UI still gets up to ``limit`` rows.
     """
     if not _ensure_stripe_key():
         return []
 
+    excludes = exclude_customer_ids or set()
+    # Over-fetch so post-filter we still hit the requested limit.
+    api_limit = min(limit + len(excludes) + 5, 100) if excludes else limit
+
     try:
-        invoices = stripe.Invoice.list(limit=limit, status="paid")
+        invoices = stripe.Invoice.list(limit=api_limit, status="paid")
         results: list[dict] = []
         for inv in invoices.data:
+            if excludes and getattr(inv, "customer", None) in excludes:
+                continue
             results.append({
                 "id": getattr(inv, "id", None),
                 "customer_email": getattr(inv, "customer_email", None),
@@ -297,6 +346,8 @@ def fetch_stripe_payments(limit: int = 20) -> list[dict]:
                 "description": getattr(inv, "description", None)
                     or _invoice_line_description(inv),
             })
+            if len(results) >= limit:
+                break
         return results
     except stripe.error.StripeError as exc:
         logger.error("Stripe API error fetching payments: %s", exc)
@@ -314,18 +365,39 @@ def _invoice_line_description(inv: object) -> Optional[str]:
     return None
 
 
-def fetch_stripe_customers_count() -> int:
+def fetch_stripe_customers_count(
+    *,
+    exclude_customer_ids: Optional[set[str]] = None,
+) -> int:
     """
     Paginate through all Stripe customers and return the total count.
 
-    Excludes internal/admin emails and orphaned test accounts so the
-    superadmin dashboard reflects real paying customers only.
+    Two-layer admin exclusion:
+
+    1. ``exclude_customer_ids`` — the authoritative set, resolved from
+       ``admin_filters.get_admin_stripe_customer_ids(db)`` at the
+       endpoint layer. Drops customers we've already linked to a DB
+       admin user via ``UserProfile.stripe_customer_id``.
+    2. ``_EXCLUDED_EMAILS`` — belt-and-suspenders fallback for admin
+       accounts whose DB row isn't yet linked to the Stripe customer
+       (e.g. Stripe customer created by CLI/Dashboard before the local
+       user was provisioned). Mirrors ``ADMIN_EMAILS`` from
+       ``app.core.admin_filters``.
     """
     if not _ensure_stripe_key():
         return 0
 
+    excludes = exclude_customer_ids or set()
+
+    # Kept in sync with app.core.admin_filters.ADMIN_EMAILS — that module
+    # is the real source of truth; the duplication here is deliberate to
+    # avoid an import cycle (admin_filters needs to stay dependency-free
+    # at import time since it's consumed everywhere).
     _EXCLUDED_EMAILS: set[str] = {
         "thomas.wilform@gmail.com",
+        "thomas@carestack.us",
+        "founders@commonground.family",
+        "commonground.notify@gmail.com",
         "testaccount@example.com",
     }
 
@@ -341,8 +413,13 @@ def fetch_stripe_customers_count() -> int:
 
             customers = stripe.Customer.list(**params)
             for cust in customers.data:
-                if getattr(cust, "email", None) not in _EXCLUDED_EMAILS:
-                    count += 1
+                cust_id = getattr(cust, "id", None)
+                cust_email = getattr(cust, "email", None)
+                if cust_id and cust_id in excludes:
+                    continue
+                if cust_email and cust_email in _EXCLUDED_EMAILS:
+                    continue
+                count += 1
             has_more = customers.has_more
             if has_more and customers.data:
                 starting_after = customers.data[-1].id

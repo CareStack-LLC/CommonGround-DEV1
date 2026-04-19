@@ -1424,9 +1424,9 @@ export const adminAPI = {
   getHealthScores: (params?: { risk?: string; limit?: number; offset?: number }) => {
     const sp = new URLSearchParams();
     if (params?.risk) sp.set('risk', params.risk);
-    if (params?.limit) sp.set('limit', String(params.limit));
-    if (params?.offset) sp.set('offset', String(params.offset));
-    return adminFetch<{ scores: HealthScoreEntry[]; total: number }>(`/admin/cs/health-scores?${sp}`);
+    if (params?.limit !== undefined) sp.set('limit', String(params.limit));
+    if (params?.offset !== undefined) sp.set('offset', String(params.offset));
+    return adminFetch<HealthScoresResponse>(`/admin/cs/health-scores?${sp}`);
   },
 
   // NOTE: calculateHealthScores() stub removed — the backend endpoint
@@ -1601,6 +1601,29 @@ export interface HealthScoreEntry {
   last_active?: string;
   subscription_tier?: string;
   factors?: Record<string, number>;
+}
+
+/**
+ * Weight + transparency metadata that ships alongside the health-score
+ * list. Surfaced in the UI via the SafetyScoreExplainer popover so
+ * admins know the 0-100 score is a heuristic on four weighted factors —
+ * not an engagement signal from product usage.
+ */
+export interface HealthScoringExplainer {
+  weights: Record<string, number>;
+  transparency: {
+    is_heuristic: boolean;
+    confidence: 'low' | 'medium' | 'high';
+    data_sources: string[];
+    not_included: string[];
+    weighting: string;
+  };
+}
+
+export interface HealthScoresResponse {
+  scores: HealthScoreEntry[];
+  total: number;
+  scoring: HealthScoringExplainer;
 }
 
 export interface SatisfactionData {
