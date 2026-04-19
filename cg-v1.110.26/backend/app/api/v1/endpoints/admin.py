@@ -3911,12 +3911,119 @@ async def get_system_status(
         return "API key configured"
 
     async def check_stripe():
+        """Rich Stripe health: mode, account, webhooks, recent payments.
+
+        Previously this returned a one-line "Account: CommonGround" which
+        didn't surface any of the things that matter at launch — whether
+        the key is in TEST or LIVE mode, whether webhook endpoints are
+        configured (no webhooks = failed checkouts silently drop),
+        whether there's been any real payment activity, and whether the
+        split Issuing webhook secret is set.
+        """
         if not cfg.STRIPE_SECRET_KEY:
             raise ValueError("STRIPE_SECRET_KEY not set")
+
         import stripe
         stripe.api_key = cfg.STRIPE_SECRET_KEY
-        acct = stripe.Account.retrieve()
-        return f"Account: {acct.get('business_profile', {}).get('name', acct.id)}"
+
+        # Mode detection from the key prefix — no API call needed.
+        key = cfg.STRIPE_SECRET_KEY
+        if key.startswith("sk_live_"):
+            mode = "LIVE"
+        elif key.startswith("sk_test_"):
+            mode = "TEST"
+        elif key.startswith("rk_live_"):
+            mode = "LIVE (restricted)"
+        elif key.startswith("rk_test_"):
+            mode = "TEST (restricted)"
+        else:
+            mode = "UNKNOWN"
+
+        # Offload the three sync Stripe calls so they don't block the
+        # event loop for each other; each has its own 5s wait_for budget
+        # already wrapped around the whole check_fn by _check_service.
+        import asyncio as _aio
+
+        def _pull_account():
+            return stripe.Account.retrieve()
+
+        def _pull_webhooks():
+            # ``.list`` returns a ListObject; take .data for the list.
+            return stripe.WebhookEndpoint.list(limit=10).data
+
+        def _pull_recent_charges():
+            # Last 24h of successful charges — lightweight sanity check
+            # that money has actually moved recently.
+            since = int((datetime.utcnow() - timedelta(hours=24)).timestamp())
+            return stripe.Charge.list(
+                limit=5, created={"gte": since}
+            ).data
+
+        acct, webhooks, recent = await _aio.gather(
+            _aio.to_thread(_pull_account),
+            _aio.to_thread(_pull_webhooks),
+            _aio.to_thread(_pull_recent_charges),
+            return_exceptions=True,
+        )
+
+        # Account info (fatal if this one fails — key is probably revoked)
+        if isinstance(acct, Exception):
+            raise ValueError(f"Account.retrieve failed: {type(acct).__name__}")
+        acct_name = (
+            (acct.get("business_profile") or {}).get("name")
+            or acct.get("email")
+            or acct.get("id", "unknown")
+        )
+        charges_enabled = bool(acct.get("charges_enabled"))
+        payouts_enabled = bool(acct.get("payouts_enabled"))
+
+        # Webhooks — missing endpoints is a launch-blocker
+        webhook_parts: list[str]
+        if isinstance(webhooks, Exception):
+            webhook_parts = ["webhook list unavailable"]
+        else:
+            enabled = [w for w in webhooks if w.get("status") == "enabled"]
+            webhook_parts = [f"{len(enabled)}/{len(webhooks)} webhooks enabled"]
+            if not enabled:
+                # Still operational from a key-validity standpoint, but we
+                # surface it as part of the detail string so the admin
+                # sees it without clicking into Stripe Dashboard.
+                webhook_parts.append("⚠ no enabled endpoints")
+
+        # Recent activity
+        if isinstance(recent, Exception):
+            activity = "activity check failed"
+        else:
+            succeeded = [c for c in recent if c.get("status") == "succeeded"]
+            activity = f"{len(succeeded)} charges in last 24h"
+
+        # Webhook signing secrets present?
+        secrets_set = []
+        if cfg.STRIPE_WEBHOOK_SECRET:
+            secrets_set.append("primary")
+        if cfg.STRIPE_ISSUING_WEBHOOK_SECRET:
+            secrets_set.append("issuing")
+        secrets_str = (
+            f"signing secrets: {'+'.join(secrets_set)}"
+            if secrets_set else "⚠ no webhook signing secrets"
+        )
+
+        # Flag a dangerous combo: LIVE mode but charges/payouts disabled
+        # (happens when a newly-verified account hasn't finished KYC)
+        flags: list[str] = []
+        if not charges_enabled:
+            flags.append("⚠ charges disabled")
+        if not payouts_enabled:
+            flags.append("⚠ payouts disabled")
+
+        pieces = [
+            f"{mode} · {acct_name}",
+            *webhook_parts,
+            activity,
+            secrets_str,
+            *flags,
+        ]
+        return " · ".join(pieces)
 
     async def check_daily():
         if not cfg.DAILY_API_KEY:
