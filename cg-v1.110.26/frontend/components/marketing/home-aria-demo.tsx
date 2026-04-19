@@ -403,7 +403,16 @@ export function HomeARIADemo() {
                   onKeyDown={handleKeyDown}
                   placeholder={isLoading ? 'Waiting for reply...' : 'Type something petty...'}
                   disabled={isLoading}
-                  className="flex-1 bg-white/10 border border-white/10 rounded-full px-4 py-2.5 text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-1 focus:ring-[#3DAA8A]/50 focus:border-[#3DAA8A]/50 disabled:opacity-50 transition-all"
+                  // Mobile: text-base (16px) is required so iOS Safari doesn't
+                  // auto-zoom into the input on focus — the demo chat window
+                  // must stay fully in view so the user can see ARIA's
+                  // responses without having to pinch-zoom back out.
+                  // Desktop: drops to text-sm to match the visual density
+                  // of the rest of the card.
+                  className="flex-1 bg-white/10 border border-white/10 rounded-full px-4 py-2.5 text-base sm:text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-1 focus:ring-[#3DAA8A]/50 focus:border-[#3DAA8A]/50 disabled:opacity-50 transition-all"
+                  autoCapitalize="sentences"
+                  autoComplete="off"
+                  autoCorrect="on"
                 />
                 <button
                   onClick={handleSend}
