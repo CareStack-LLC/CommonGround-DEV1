@@ -50,14 +50,48 @@ async def get_ga4_status(
     db: AsyncSession = Depends(get_db),
     admin: User = Depends(get_current_admin_user),
 ):
-    """Check if GA4 is connected."""
-    from app.services.ga4_service import is_ga4_connected
+    """Check if GA4 is connected.
+
+    Frontend gates the big "Connect GA4" card on
+    `response.status === "not_connected"` (see
+    frontend/app/superadmin/marketing-analytics/page.tsx ConnectGa4Card).
+    Prior shape only had `{connected: bool}` — so the check `status ===
+    'not_connected'` was always false and the Connect card never rendered
+    even when the user wasn't connected. Include `status` + `connect_url`
+    (the real Google consent URL) so the frontend can wire the button.
+    """
+    from app.services.ga4_service import is_ga4_connected, get_ga4_oauth_url
     from app.core.config import settings
+
     connected = await is_ga4_connected(db)
+    client_configured = bool(settings.GA4_CLIENT_ID) and bool(settings.GA4_CLIENT_SECRET)
+
+    # Build the consent URL up front so the frontend can just use
+    # `<a href={connect_url}>`. If GA4_* env vars aren't set we surface a
+    # configuration message instead of a broken link.
+    connect_url: str | None = None
+    message: str | None = None
+    if not connected:
+        if client_configured:
+            try:
+                connect_url = get_ga4_oauth_url()
+            except Exception as e:  # noqa: BLE001
+                logger.warning("GA4 oauth URL build failed: %s", e)
+                message = f"Google OAuth URL could not be built: {e}"
+        else:
+            message = (
+                "GA4 client credentials aren't configured on the API. Set "
+                "GA4_CLIENT_ID and GA4_CLIENT_SECRET in the backend env, then "
+                "restart."
+            )
+
     return {
+        "status": "connected" if connected else "not_connected",
         "connected": connected,
+        "client_configured": client_configured,
         "property_id": settings.GA4_PROPERTY_ID,
-        "client_configured": bool(settings.GA4_CLIENT_ID),
+        "connect_url": connect_url,
+        "message": message,
     }
 
 
