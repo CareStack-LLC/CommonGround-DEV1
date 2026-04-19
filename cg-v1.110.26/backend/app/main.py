@@ -355,9 +355,46 @@ async def lifespan(app: FastAPI):
                 "ALTER TABLE circle_messages ADD COLUMN IF NOT EXISTS aria_all_categories TEXT",
                 "ALTER TABLE circle_messages ADD COLUMN IF NOT EXISTS aria_suggested_rewrite TEXT",
                 "ALTER TABLE circle_messages ADD COLUMN IF NOT EXISTS aria_response_time_ms INTEGER",
-                # Ensure admin accounts are properly flagged (idempotent)
+                # family_files model columns that are NOT in the
+                # a1b2c3d4e5f6 create-table migration and either have no
+                # follow-up migration at all OR live in a migration whose
+                # down_revision is None (g1a2p3_gap) so alembic never
+                # chained it in. Result: `SELECT family_files.*` from the
+                # ORM fails with UndefinedColumnError on the parent-side
+                # dashboard (GET /family-files/) — which was the exact
+                # 500 the user flagged. All additions are idempotent.
+                #
+                # Safety case: DV-mode + granular ARIA sensitivity (from
+                # the orphaned g1a2p3 migration).
+                "ALTER TABLE family_files ADD COLUMN IF NOT EXISTS is_dv_case BOOLEAN NOT NULL DEFAULT FALSE",
+                "ALTER TABLE family_files ADD COLUMN IF NOT EXISTS aria_sensitivity_level VARCHAR(20) NOT NULL DEFAULT 'standard'",
+                # Model-defined ARIA mode + smart config (no migration).
+                "ALTER TABLE family_files ADD COLUMN IF NOT EXISTS aria_mode VARCHAR(20) NOT NULL DEFAULT 'balanced'",
+                "ALTER TABLE family_files ADD COLUMN IF NOT EXISTS smart_config JSON",
+                # Agreement activation — expense split configuration
+                # (model adds these to persist the agreed-on split when
+                # an Agreement is activated; no migration ships them).
+                "ALTER TABLE family_files ADD COLUMN IF NOT EXISTS agreement_expense_split_ratio VARCHAR(20)",
+                "ALTER TABLE family_files ADD COLUMN IF NOT EXISTS agreement_split_parent_a_percentage INTEGER",
+                "ALTER TABLE family_files ADD COLUMN IF NOT EXISTS agreement_split_locked BOOLEAN NOT NULL DEFAULT FALSE",
+                "ALTER TABLE family_files ADD COLUMN IF NOT EXISTS agreement_split_source_id VARCHAR(36)",
+                "ALTER TABLE family_files ADD COLUMN IF NOT EXISTS agreement_split_set_at TIMESTAMP",
+                "ALTER TABLE family_files ADD COLUMN IF NOT EXISTS agreement_category_splits JSON",
+                # Default exchange location (from Agreement activation).
+                "ALTER TABLE family_files ADD COLUMN IF NOT EXISTS default_exchange_location VARCHAR(500)",
+                "ALTER TABLE family_files ADD COLUMN IF NOT EXISTS default_exchange_location_type VARCHAR(50)",
+                # Ensure admin accounts are properly flagged (idempotent).
+                # thomas.wilform@gmail.com is the real primary admin —
+                # was missing from the hardcoded set until now, so it
+                # was slipping through "exclude admin from metrics"
+                # filters that relied on the is_admin flag being set.
                 """UPDATE users SET is_admin = true, admin_role = 'super_admin'
-                   WHERE email IN ('thomas@carestack.us', 'founders@commonground.family')
+                   WHERE email IN (
+                       'thomas.wilform@gmail.com',
+                       'thomas@carestack.us',
+                       'founders@commonground.family',
+                       'commonground.notify@gmail.com'
+                   )
                    AND is_admin = false""",
             ]
             for sql in migrations:

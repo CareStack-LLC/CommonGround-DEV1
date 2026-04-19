@@ -259,23 +259,43 @@ async def get_current_subscription(
     grant_expires_at = None
 
     if profile.active_grant_id:
-        result = await db.execute(
-            select(GrantRedemption)
-            .where(GrantRedemption.id == profile.active_grant_id)
-        )
-        grant = result.scalar_one_or_none()
-        if grant and grant.is_valid:
-            has_active_grant = True
-            # Load grant code for nonprofit name
-            await db.refresh(grant, ["grant_code"])
-            if grant.grant_code:
-                grant_nonprofit_name = grant.grant_code.nonprofit_name
-            grant_expires_at = grant.expires_at
+        try:
+            result = await db.execute(
+                select(GrantRedemption)
+                .where(GrantRedemption.id == profile.active_grant_id)
+            )
+            grant = result.scalar_one_or_none()
+            if grant and grant.is_valid:
+                has_active_grant = True
+                # Load grant code for nonprofit name
+                await db.refresh(grant, ["grant_code"])
+                if grant.grant_code:
+                    grant_nonprofit_name = grant.grant_code.nonprofit_name
+                grant_expires_at = grant.expires_at
+        except Exception as e:
+            # Model-DB drift on grant_redemptions / grant_codes shouldn't
+            # take down /subscriptions/current for every authenticated
+            # request — it just means we can't surface grant details.
+            # Log so we can fix the column later without a user-facing 500.
+            logger.warning(
+                "Grant lookup for active_grant_id=%s failed: %s",
+                profile.active_grant_id, e,
+            )
+            capture_error(e)
+
+    # Required pydantic fields on SubscriptionStatusResponse — `tier`,
+    # `tier_display_name`, and `status` are non-optional. Any of them being
+    # None (stale row from before the column gained a default, or a manual
+    # INSERT that bypassed the ORM) used to 500 the whole endpoint with a
+    # Pydantic ValidationError. Coerce to sensible defaults so the parent
+    # dashboard still loads.
+    safe_tier = effective_tier or "web_starter"
+    safe_status = profile.subscription_status or "trial"
 
     return SubscriptionStatusResponse(
-        tier=effective_tier,
-        tier_display_name=TIER_DISPLAY_NAMES.get(effective_tier, effective_tier),
-        status=profile.subscription_status,
+        tier=safe_tier,
+        tier_display_name=TIER_DISPLAY_NAMES.get(safe_tier, safe_tier),
+        status=safe_status,
         stripe_subscription_id=profile.stripe_subscription_id,
         period_start=profile.subscription_period_start,
         period_end=profile.subscription_period_end,
@@ -283,8 +303,8 @@ async def get_current_subscription(
         grant_nonprofit_name=grant_nonprofit_name,
         grant_expires_at=grant_expires_at,
         features=features,
-        is_trial=profile.subscription_status == "trial",
-        trial_ends_at=profile.subscription_period_end if profile.subscription_status == "trial" else None,
+        is_trial=safe_status == "trial",
+        trial_ends_at=profile.subscription_period_end if safe_status == "trial" else None,
     )
 
 
