@@ -208,6 +208,61 @@ def _extract_header(headers: list[dict], name: str) -> str:
     return ""
 
 
+_ALIAS_DOMAIN = "find-commonground.com"
+
+
+def _parse_email_list(raw: str) -> list[str]:
+    """Pull bare email addresses out of a raw ``To:``-style header string.
+
+    Gmail hands us strings like ``"CG Info" <info@find-commonground.com>,
+    "CG Sales" <sales@find-commonground.com>``. We want just the addresses,
+    lowercased, in order.
+    """
+    if not raw:
+        return []
+    out: list[str] = []
+    for part in raw.split(","):
+        part = part.strip()
+        if "<" in part and ">" in part:
+            part = part.split("<", 1)[1].split(">", 1)[0]
+        part = part.strip().strip('"').strip("'")
+        if "@" in part:
+            out.append(part.lower())
+    return out
+
+
+def _extract_recipient_alias(headers: list[dict], fallback: str) -> str:
+    """Figure out which alias the admin actually sent mail *to*.
+
+    When all of ``info@``, ``partnerships@``, ``hello@``, etc. forward to
+    the same authenticated mailbox (``teejay@find-commonground.com``),
+    Gmail's ``message.messages.get`` still exposes the original recipient
+    two ways:
+
+    1. ``Delivered-To:`` — the most reliable signal. Gmail writes the
+       actual alias here even when the ``To:`` header was a BCC, a group
+       address, or a list. We prefer this.
+    2. ``To:`` — fallback when ``Delivered-To`` is absent (some automated
+       senders strip it).
+
+    If both headers contain several addresses, we prefer one on our own
+    domain (``find-commonground.com``) over third-party ones. If nothing
+    useful is found we fall back to the authenticated OAuth account —
+    that preserves the old behavior instead of 500'ing the sync.
+    """
+    for header_name in ("Delivered-To", "To"):
+        candidates = _parse_email_list(_extract_header(headers, header_name))
+        if not candidates:
+            continue
+        # Prefer the matching-domain address (our alias) if present.
+        own_domain = [c for c in candidates if c.endswith(f"@{_ALIAS_DOMAIN}")]
+        if own_domain:
+            return own_domain[0]
+        # Otherwise return whatever we found — better than no data.
+        return candidates[0]
+    return (fallback or "").lower()
+
+
 async def _resolve_sync_addresses(db: AsyncSession) -> list[str]:
     """Figure out which Gmail inboxes to pull from on a sync run.
 
@@ -347,12 +402,19 @@ async def fetch_new_emails(
                     from_name = from_raw.split("<")[0].strip().strip('"')
                     from_email = from_raw.split("<")[1].split(">")[0]
 
+                # Use the *actual* alias from the message headers, not the
+                # account we authenticated as. All of info@, partnerships@,
+                # hello@, etc. route to the same mailbox — storing the
+                # authenticated address here made every email appear under
+                # the "TeeJay" tab on /superadmin/inbox.
+                recipient_alias = _extract_recipient_alias(headers, address)
+
                 email_record = MonitoredEmail(
                     gmail_message_id=msg_id,
                     thread_id=msg_data.get("threadId"),
                     from_email=from_email,
                     from_name=from_name,
-                    to_email=address,
+                    to_email=recipient_alias,
                     subject=_extract_header(headers, "Subject") or "(no subject)",
                     body_preview=body[:500] if body else "",
                     body_full=body or "",
@@ -805,6 +867,91 @@ async def sync_emails(db: AsyncSession) -> dict:
         "fetched": len(new_emails),
         "analyzed": analyzed,
     }
+
+
+async def backfill_recipient_aliases(
+    db: AsyncSession,
+    limit: int = 500,
+) -> dict:
+    """Re-hydrate the ``to_email`` column for emails synced before the alias fix.
+
+    Before the alias fix, every synced email got stored with
+    ``to_email = <the authenticated OAuth account>`` — which meant the
+    frontend's per-alias tab bar (Hello / Info / Partnerships / etc.) put
+    everything under "TeeJay." This function walks existing
+    ``MonitoredEmail`` rows, re-fetches the original message from Gmail
+    (by ``gmail_message_id``), and updates ``to_email`` to the real
+    recipient alias extracted from ``Delivered-To`` / ``To`` headers.
+
+    Returns counts so the admin UI can show a summary. Caps at ``limit``
+    so the request can't hang forever on a huge inbox — just call it
+    again if more need fixing.
+    """
+    addresses = await _resolve_sync_addresses(db)
+    if not addresses:
+        return {"updated": 0, "checked": 0, "skipped": 0, "reason": "no_gmail_tokens"}
+
+    # One Gmail client per authenticated account; reused across rows.
+    clients: dict[str, httpx.AsyncClient] = {}
+    try:
+        for addr in addresses:
+            try:
+                client, _ = await _get_gmail_client(db, addr)
+                clients[addr] = client
+            except ValueError as ve:
+                logger.warning("backfill: cannot auth %s — %s", addr, ve)
+
+        if not clients:
+            return {"updated": 0, "checked": 0, "skipped": 0, "reason": "all_clients_failed"}
+
+        # Only touch rows whose current to_email is one of the authenticated
+        # addresses (the pre-fix default). Rows already on the right alias
+        # are skipped — cheap idempotence.
+        result = await db.execute(
+            select(MonitoredEmail)
+            .where(MonitoredEmail.to_email.in_(list(clients.keys())))
+            .order_by(MonitoredEmail.received_at.desc())
+            .limit(limit)
+        )
+        rows = list(result.scalars().all())
+
+        updated = 0
+        skipped = 0
+        # Gmail's v1 API doesn't let us batch message.get by ID in a single
+        # call, but since we only need headers we can request a tiny
+        # ``metadata`` format which is ~10x cheaper than ``full``.
+        for row in rows:
+            # Pick a client — use the account that originally synced this row.
+            client = clients.get(row.to_email) or next(iter(clients.values()))
+            try:
+                resp = await client.get(
+                    f"{GMAIL_API_BASE}/users/me/messages/{row.gmail_message_id}",
+                    params={
+                        "format": "metadata",
+                        "metadataHeaders": "To,Delivered-To",
+                    },
+                )
+                if resp.status_code != 200:
+                    skipped += 1
+                    continue
+                headers = resp.json().get("payload", {}).get("headers", [])
+                new_alias = _extract_recipient_alias(headers, row.to_email)
+                if new_alias and new_alias != row.to_email:
+                    row.to_email = new_alias
+                    updated += 1
+                else:
+                    skipped += 1
+            except Exception as exc:
+                logger.warning(
+                    "backfill: failed to refetch %s: %s", row.gmail_message_id, exc
+                )
+                skipped += 1
+
+        await db.flush()
+        return {"updated": updated, "checked": len(rows), "skipped": skipped}
+    finally:
+        for c in clients.values():
+            await c.aclose()
 
 
 async def get_digests(db: AsyncSession, limit: int = 20) -> list[dict]:

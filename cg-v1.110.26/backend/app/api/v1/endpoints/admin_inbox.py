@@ -270,6 +270,39 @@ async def trigger_sync(
         )
 
 
+@router.post(
+    "/backfill-aliases",
+    summary="Re-hydrate to_email for emails synced before the alias-routing fix",
+)
+async def backfill_aliases(
+    limit: int = Query(500, ge=1, le=2000),
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """Re-fetch Gmail headers for existing rows and correct their ``to_email``.
+
+    Before the alias-routing fix every email's ``to_email`` was stored as
+    the authenticated OAuth account (e.g. ``teejay@find-commonground.com``),
+    so the inbox UI's per-alias tabs (Hello/Info/Partnerships/etc.) all
+    funneled into the "TeeJay" tab. Call this endpoint once after the fix
+    ships to retro-categorize the previously-synced messages. Idempotent —
+    rows already on the correct alias are skipped.
+    """
+    from app.services.gmail_monitor_service import backfill_recipient_aliases
+
+    try:
+        result = await backfill_recipient_aliases(db, limit=limit)
+        await db.commit()
+        return result
+    except Exception as exc:
+        logger.error("Alias backfill failed: %s", exc)
+        await db.rollback()
+        raise HTTPException(
+            status_code=502,
+            detail=f"Backfill failed: {type(exc).__name__}: {exc}",
+        )
+
+
 @router.get(
     "/digests",
     summary="List past email digests",

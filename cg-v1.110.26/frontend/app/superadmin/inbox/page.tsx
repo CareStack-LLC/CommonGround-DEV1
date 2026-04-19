@@ -544,6 +544,32 @@ export default function InboxPage() {
     }
   };
 
+  // One-shot re-categorize for emails synced before the alias-routing fix.
+  // Everything previously landed on the "TeeJay" tab because the backend
+  // stored to_email as the authenticated OAuth account, not the actual
+  // Delivered-To alias. Runs on-demand (cheap after the first pass —
+  // idempotent).
+  const [backfilling, setBackfilling] = useState(false);
+  const backfillAliases = async () => {
+    try {
+      setBackfilling(true);
+      setError(null);
+      const result = await adminAPI.backfillAliases();
+      if (result.reason) {
+        setError(`Backfill could not run: ${result.reason}`);
+      } else {
+        showSuccessMsg(
+          `Re-routed ${result.updated} of ${result.checked} emails to their correct alias tab`,
+        );
+        await fetchEmails();
+      }
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Backfill failed');
+    } finally {
+      setBackfilling(false);
+    }
+  };
+
   const selectThread = async (thread: EmailThread) => {
     try {
       // Load full detail for latest email
@@ -679,6 +705,14 @@ export default function InboxPage() {
           </button>
           <button onClick={syncInbox} disabled={syncing || !gmailConnected} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-xs font-medium transition-colors disabled:opacity-50">
             <RefreshCw className={`w-3.5 h-3.5 ${syncing ? 'animate-spin' : ''}`} /> {syncing ? 'Syncing...' : 'Sync Now'}
+          </button>
+          <button
+            onClick={backfillAliases}
+            disabled={backfilling || !gmailConnected}
+            title="Re-tag previously-synced emails with their real recipient alias (info@, partnerships@, etc.). Safe to run anytime."
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#2D6A8F]/15 hover:bg-[#2D6A8F]/25 text-[#8AACBC] text-xs font-medium transition-colors disabled:opacity-50"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${backfilling ? 'animate-spin' : ''}`} /> {backfilling ? 'Re-tagging...' : 'Fix alias tabs'}
           </button>
         </div>
       </div>

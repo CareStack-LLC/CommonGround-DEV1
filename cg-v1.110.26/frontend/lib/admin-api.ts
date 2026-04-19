@@ -1281,6 +1281,11 @@ export const adminAPI = {
   sendReply: (id: string, body: string) =>
     adminFetch<any>(`/admin/inbox/emails/${id}/reply`, { method: 'POST', body: JSON.stringify({ response_body: body }) }),
   syncInbox: () => adminFetch<any>('/admin/inbox/sync', { method: 'POST' }),
+  backfillAliases: (limit = 500) =>
+    adminFetch<{ updated: number; checked: number; skipped: number; reason?: string }>(
+      `/admin/inbox/backfill-aliases?limit=${limit}`,
+      { method: 'POST' },
+    ),
   getDigests: () => adminFetch<any[]>('/admin/inbox/digests'),
   getInboxStats: () => adminFetch<InboxStats>('/admin/inbox/stats'),
   analyzeInbox: () => adminFetch<{ analysis: any; provider: string | null; email_count: number; error?: string }>('/admin/inbox/analyze', { method: 'POST' }),
