@@ -166,3 +166,63 @@ def invalidate_stripe_admin_cache() -> None:
     global _stripe_admin_cache, _stripe_admin_cache_ts
     _stripe_admin_cache = set()
     _stripe_admin_cache_ts = 0.0
+
+
+# ---------------------------------------------------------------------------
+# Real-customer allowlist (strictly tighter than admin exclusion)
+# ---------------------------------------------------------------------------
+#
+# Excluding admin customer IDs isn't enough on its own. If the Stripe
+# account has orphan test subscriptions (left over from earlier E2E
+# runs, demo seeds, or manual Stripe-Dashboard creations) that never had
+# a matching local DB user, the "exclude admin" filter can't catch them —
+# there's nothing to match on. Result: MRR stays inflated even though
+# the app says 0 paying subscribers.
+#
+# Solution: compute a positive allowlist of Stripe customer IDs that
+# belong to *real, non-admin* UserProfile rows, and count a Stripe
+# subscription only if its customer is in that set. Anything without a
+# DB link (test orphans, manual Stripe edits) is treated as not-a-customer.
+
+_stripe_customer_cache: set[str] = set()
+_stripe_customer_cache_ts: float = 0.0
+
+
+async def get_customer_stripe_customer_ids(db: AsyncSession) -> set[str]:
+    """Stripe customer IDs linked to *real non-admin* UserProfile rows.
+
+    Use this as a positive allowlist in Stripe aggregations so that
+    orphan Stripe subscriptions (no matching DB row at all) don't flow
+    into MRR / ARR / Revenue Split / Recent Payments. 60-second cache
+    matches the Stripe-revenue cache TTL.
+    """
+    global _stripe_customer_cache, _stripe_customer_cache_ts
+
+    now = time.time()
+    if (
+        now - _stripe_customer_cache_ts < _STRIPE_ADMIN_CACHE_TTL
+        and _stripe_customer_cache_ts > 0
+    ):
+        return _stripe_customer_cache
+
+    result = await db.execute(
+        select(UserProfile.stripe_customer_id)
+        .join(User, User.id == UserProfile.user_id)
+        .where(
+            UserProfile.stripe_customer_id.isnot(None),
+            UserProfile.stripe_customer_id != "",
+            *non_admin_user_filters(),
+        )
+    )
+    ids = {row[0] for row in result.all() if row[0]}
+
+    _stripe_customer_cache = ids
+    _stripe_customer_cache_ts = now
+    return ids
+
+
+def invalidate_stripe_customer_cache() -> None:
+    """Drop the cached real-customer-id set (useful for tests)."""
+    global _stripe_customer_cache, _stripe_customer_cache_ts
+    _stripe_customer_cache = set()
+    _stripe_customer_cache_ts = 0.0

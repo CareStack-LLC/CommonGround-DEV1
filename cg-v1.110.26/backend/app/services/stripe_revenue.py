@@ -98,8 +98,16 @@ _cache_ts: dict[int, float] = {}
 _CACHE_TTL: float = 60.0  # seconds
 
 
-def _exclude_key(exclude_customer_ids: Optional[set[str]]) -> int:
-    return hash(frozenset(exclude_customer_ids or ()))
+def _exclude_key(
+    exclude_customer_ids: Optional[set[str]],
+    customer_id_allowlist: Optional[set[str]] = None,
+) -> int:
+    # Cache key folds both filters so "allowlist + no-excludes",
+    # "excludes only", and "no filter" get separate cache slots.
+    return hash((
+        frozenset(exclude_customer_ids or ()),
+        frozenset(customer_id_allowlist) if customer_id_allowlist is not None else None,
+    ))
 
 
 def _is_cache_valid(key: int) -> bool:
@@ -211,24 +219,36 @@ def fetch_stripe_revenue(
     *,
     force: bool = False,
     exclude_customer_ids: Optional[set[str]] = None,
+    customer_id_allowlist: Optional[set[str]] = None,
 ) -> StripeRevenueResult:
     """
     Fetch and aggregate MRR / ARR from Stripe subscriptions.
 
-    ``exclude_customer_ids`` — customer IDs to skip when summing. Resolve
-    it from ``app.core.admin_filters.get_admin_stripe_customer_ids(db)``
-    at the endpoint layer; we don't touch the DB here because the rest
-    of this module is sync. Cache is keyed by the exclusion set so the
-    no-exclusion and admin-excluded views don't collide.
+    Two filters, resolved at the endpoint layer and passed in:
+
+    - ``customer_id_allowlist`` — positive filter. If set, a Stripe
+      subscription is only counted when its ``sub.customer`` is in this
+      set. Use ``admin_filters.get_customer_stripe_customer_ids(db)``
+      to get the set of Stripe IDs belonging to real, non-admin DB
+      users. This is the strong mode: orphan test subs and admin subs
+      both get dropped because neither corresponds to a real customer.
+    - ``exclude_customer_ids`` — negative filter, applied *after* the
+      allowlist. Mostly redundant when an allowlist is set, but kept
+      for callers that want to suppress specific IDs without computing
+      a full allowlist (e.g. legacy backward-compat callers).
+
+    Cache is keyed by the combination so every filter mode gets its
+    own slot.
 
     Results are cached for 60 seconds unless *force* is True.
     """
-    key = _exclude_key(exclude_customer_ids)
+    key = _exclude_key(exclude_customer_ids, customer_id_allowlist)
 
     if not force and _is_cache_valid(key):
         return _cache[key]
 
     excludes = exclude_customer_ids or set()
+    allowlist = customer_id_allowlist  # None = no allowlist filter
     result = StripeRevenueResult()
 
     if not _ensure_stripe_key():
@@ -254,10 +274,18 @@ def fetch_stripe_revenue(
                 subs = stripe.Subscription.list(**params)
 
                 for sub in subs.data:
+                    sub_customer = getattr(sub, "customer", None)
+                    # Allowlist wins: only count subs belonging to real
+                    # non-admin DB customers. Filters out orphan test
+                    # subs (no DB link at all) in addition to admins.
+                    if allowlist is not None and sub_customer not in allowlist:
+                        skipped_admins += 1
+                        continue
                     # Admin-account subscriptions must not flow into MRR
                     # or active_count — they're operators, not customers.
-                    # ``sub.customer`` is a string customer-id.
-                    if excludes and getattr(sub, "customer", None) in excludes:
+                    # (Mostly redundant when allowlist is set, but kept
+                    # as a safety net for mixed call patterns.)
+                    if excludes and sub_customer in excludes:
                         skipped_admins += 1
                         continue
 
@@ -280,9 +308,10 @@ def fetch_stripe_revenue(
                     starting_after = subs.data[-1].id
 
         if skipped_admins:
+            mode = "allowlist" if allowlist is not None else "excludes"
             logger.info(
-                "Stripe MRR: skipped %d admin subscription(s) via exclude_customer_ids",
-                skipped_admins,
+                "Stripe MRR: filtered out %d non-customer subscription(s) via %s",
+                skipped_admins, mode,
             )
 
         result = StripeRevenueResult(
@@ -312,28 +341,36 @@ def fetch_stripe_payments(
     limit: int = 20,
     *,
     exclude_customer_ids: Optional[set[str]] = None,
+    customer_id_allowlist: Optional[set[str]] = None,
 ) -> list[dict]:
     """
     Return the most recent paid invoices from Stripe.
 
-    Admin-customer invoices are filtered out via ``exclude_customer_ids``
-    so the "Recent Payments" widget on /superadmin/billing doesn't show
-    the founder's test subscription renewals as though they were real
-    customer activity. We over-fetch slightly to compensate for filter
-    drop so the UI still gets up to ``limit`` rows.
+    Same filter semantics as ``fetch_stripe_revenue``: allowlist (if set)
+    keeps only invoices from real non-admin DB customers; exclude_set
+    drops specific customer_ids. Applied so the "Recent Payments" card
+    on /superadmin/billing doesn't show renewals from orphan test
+    subscriptions or the founder's own test subscription as though they
+    were real customer activity. We over-fetch slightly to compensate
+    for filter drop so the UI still gets up to ``limit`` rows.
     """
     if not _ensure_stripe_key():
         return []
 
     excludes = exclude_customer_ids or set()
+    allowlist = customer_id_allowlist
     # Over-fetch so post-filter we still hit the requested limit.
-    api_limit = min(limit + len(excludes) + 5, 100) if excludes else limit
+    need_headroom = bool(excludes) or allowlist is not None
+    api_limit = min(limit * 3 + 5, 100) if need_headroom else limit
 
     try:
         invoices = stripe.Invoice.list(limit=api_limit, status="paid")
         results: list[dict] = []
         for inv in invoices.data:
-            if excludes and getattr(inv, "customer", None) in excludes:
+            inv_customer = getattr(inv, "customer", None)
+            if allowlist is not None and inv_customer not in allowlist:
+                continue
+            if excludes and inv_customer in excludes:
                 continue
             results.append({
                 "id": getattr(inv, "id", None),
@@ -368,26 +405,28 @@ def _invoice_line_description(inv: object) -> Optional[str]:
 def fetch_stripe_customers_count(
     *,
     exclude_customer_ids: Optional[set[str]] = None,
+    customer_id_allowlist: Optional[set[str]] = None,
 ) -> int:
     """
     Paginate through all Stripe customers and return the total count.
 
-    Two-layer admin exclusion:
+    Filter priority (strongest first):
 
-    1. ``exclude_customer_ids`` — the authoritative set, resolved from
-       ``admin_filters.get_admin_stripe_customer_ids(db)`` at the
-       endpoint layer. Drops customers we've already linked to a DB
-       admin user via ``UserProfile.stripe_customer_id``.
-    2. ``_EXCLUDED_EMAILS`` — belt-and-suspenders fallback for admin
-       accounts whose DB row isn't yet linked to the Stripe customer
-       (e.g. Stripe customer created by CLI/Dashboard before the local
-       user was provisioned). Mirrors ``ADMIN_EMAILS`` from
-       ``app.core.admin_filters``.
+    1. ``customer_id_allowlist`` — if set, count ONLY customers whose
+       ``id`` is in this set. Resolve from
+       ``admin_filters.get_customer_stripe_customer_ids(db)``. Orphan
+       test customers with no DB link get dropped automatically.
+    2. ``exclude_customer_ids`` — applied when no allowlist is given.
+       Drops admin-linked IDs.
+    3. ``_EXCLUDED_EMAILS`` — belt-and-suspenders for Stripe customers
+       whose email matches a known admin account but whose DB row
+       isn't yet linked (manual Stripe Dashboard creations, etc.).
     """
     if not _ensure_stripe_key():
         return 0
 
     excludes = exclude_customer_ids or set()
+    allowlist = customer_id_allowlist
 
     # Kept in sync with app.core.admin_filters.ADMIN_EMAILS — that module
     # is the real source of truth; the duplication here is deliberate to
@@ -415,6 +454,10 @@ def fetch_stripe_customers_count(
             for cust in customers.data:
                 cust_id = getattr(cust, "id", None)
                 cust_email = getattr(cust, "email", None)
+                if allowlist is not None:
+                    if cust_id and cust_id in allowlist:
+                        count += 1
+                    continue
                 if cust_id and cust_id in excludes:
                     continue
                 if cust_email and cust_email in _EXCLUDED_EMAILS:
