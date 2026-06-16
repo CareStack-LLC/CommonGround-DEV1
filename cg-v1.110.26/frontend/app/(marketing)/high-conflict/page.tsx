@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   Shield,
   FileText,
@@ -175,40 +176,59 @@ export default function HighConflictPage() {
           <div className="absolute bottom-20 left-[5%] w-48 h-48 rounded-full bg-cg-sage/5 blur-3xl" />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-cg-amber/10 rounded-full mb-6">
-              <Shield className="w-4 h-4 text-cg-amber" />
-              <span className="text-sm font-medium text-cg-amber">
-                Extra Support for Your Family
-              </span>
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid items-center gap-10 lg:gap-14 lg:grid-cols-2">
+            <div className="text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-cg-amber/10 rounded-full mb-6">
+                <Shield className="w-4 h-4 text-cg-amber" />
+                <span className="text-sm font-medium text-cg-amber">
+                  Built for high-conflict situations
+                </span>
+              </div>
+              <h1 className="text-4xl sm:text-5xl lg:text-[3.4rem] font-semibold text-foreground mb-6 leading-[1.1]">
+                When every exchange feels like a battle,{' '}
+                <span className="text-cg-sage">put the facts on your side.</span>
+              </h1>
+              <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+                You shouldn&apos;t have to brace for every message and handoff. CommonGround
+                strips the heat out of communication, keeps contact to zero when it has to be,
+                and quietly documents everything &mdash; so your kids stay protected and the
+                record speaks for itself.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                <Link
+                  href="/early-access"
+                  className="inline-flex items-center justify-center gap-2 bg-cg-sage text-white font-medium px-8 py-4 rounded-full text-lg transition-all duration-300 hover:bg-cg-sage-light hover:shadow-xl hover:-translate-y-1"
+                >
+                  Get Started Free
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
+                <Link
+                  href="#how-it-works"
+                  className="inline-flex items-center justify-center gap-2 border-2 border-cg-sage text-cg-sage font-medium px-8 py-4 rounded-full text-lg transition-all hover:bg-cg-sage hover:text-white"
+                >
+                  See How It Works
+                </Link>
+              </div>
+              <div className="mt-6 flex flex-wrap items-center justify-center lg:justify-start gap-x-5 gap-y-2 text-sm text-muted-foreground">
+                {['Court-ready records', 'Time-stamped & tamper-evident', 'Zero-contact handoffs', 'Free forever tier'].map((t) => (
+                  <span key={t} className="flex items-center gap-1.5">
+                    <Check className="w-4 h-4 text-cg-sage" />
+                    {t}
+                  </span>
+                ))}
+              </div>
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-foreground mb-6">
-              When communication is difficult,{' '}
-              <span className="text-cg-sage">your children still come first.</span>
-            </h1>
-            <p className="text-xl text-muted-foreground mb-4">
-              Some families need more structure. CommonGround provides the tools
-              to keep things calm, clear, and focused on your children.
-            </p>
-            <p className="text-lg text-muted-foreground mb-8">
-              AI-powered communication support and court-ready documentation
-              that helps your family find stability.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/early-access"
-                className="inline-flex items-center justify-center gap-2 bg-cg-sage text-white font-medium px-8 py-4 rounded-full text-lg transition-all duration-300 hover:bg-cg-sage-light hover:shadow-xl hover:-translate-y-1"
-              >
-                Get Started Free
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-              <Link
-                href="#how-it-works"
-                className="inline-flex items-center justify-center gap-2 border-2 border-cg-sage text-cg-sage font-medium px-8 py-4 rounded-full text-lg transition-all hover:bg-cg-sage hover:text-white"
-              >
-                See How It Works
-              </Link>
+
+            <div className="relative mx-auto w-full max-w-xl lg:max-w-none">
+              <Image
+                src="/images/blog/blog_highconflict.jpg"
+                alt="A calm, strong parent holding their child close at home, feeling protected"
+                width={1000}
+                height={667}
+                priority
+                className="w-full h-auto rounded-3xl shadow-xl object-cover"
+              />
             </div>
           </div>
         </div>

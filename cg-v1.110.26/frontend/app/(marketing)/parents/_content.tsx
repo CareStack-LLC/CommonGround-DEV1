@@ -166,9 +166,14 @@ export function ParentsContent() {
                 </Link>
               </div>
 
-              <p className="text-sm text-[#6A6A6A]">
-                No credit card required • 14-day free trial • Cancel anytime
-              </p>
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-5 gap-y-2 text-sm text-gray-600">
+                {['Free forever tier', 'No credit card', 'Court-ready records', "Works even if they won't join"].map((t) => (
+                  <span key={t} className="flex items-center gap-1.5">
+                    <Check className="w-4 h-4 text-[#3DAA8A]" />
+                    {t}
+                  </span>
+                ))}
+              </div>
             </div>
 
             {/* Right: Hero image */}
