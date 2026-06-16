@@ -12,6 +12,11 @@ import {
   ChevronDown,
   Quote,
   Shield,
+  Lock,
+  Scale,
+  FileCheck,
+  Eye,
+  UserCheck,
 } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -37,21 +42,58 @@ export const metadata: Metadata = {
 
 const painPoints = [
   {
-    old: 'Every message you send gets twisted and used against you',
-    cg: 'ARIA detects manipulative patterns and documents everything with timestamps',
+    old: 'Every message you send gets twisted and thrown back at you in court',
+    cg: 'ARIA flags manipulative patterns and time-stamps every exchange — the facts stay on your side',
   },
   {
     old: 'Walking on eggshells just to ask about your own kid\'s school play',
-    cg: 'Structured messaging keeps conversations child-focused — no room for games',
+    cg: 'Structured messaging keeps it child-focused and on the record — no openings for games',
   },
   {
     old: 'Missing bedtime stories because she won\'t hand over the phone',
     cg: 'KidSpace lets you video call, watch movies, and read together — on your own terms',
   },
   {
-    old: 'No proof when she changes the story about what was agreed',
-    cg: 'Every agreement, message, and schedule change is documented and court-ready',
+    old: '“That’s not what we agreed” — and you’ve got nothing to prove otherwise',
+    cg: 'Every agreement, message, and schedule change is logged and export-ready for your attorney',
   },
+];
+
+const outcomes = [
+  {
+    icon: Video,
+    text: 'More real time with your kids — video calls, storytime, and movie nights through KidSpace, on your schedule.',
+  },
+  {
+    icon: FileText,
+    text: 'Every interaction documented automatically — no more screenshots, no more he-said-she-said.',
+  },
+  {
+    icon: Eye,
+    text: 'Manipulation flagged the moment it happens, so you respond calm instead of reactive.',
+  },
+  {
+    icon: FileCheck,
+    text: 'A clean, organized file your attorney can use — court-ready the day you need it.',
+  },
+  {
+    icon: CheckCircle,
+    text: 'Calm, contactless handoffs with GPS-verified check-ins — less friction, fewer flashpoints.',
+  },
+];
+
+const trustBand = [
+  { icon: UserCheck, label: 'Built by a co-parent' },
+  { icon: Scale, label: 'Attorney-reviewed workflows' },
+  { icon: Shield, label: 'SHA-256 verified exports' },
+  { icon: Lock, label: 'Encrypted & private' },
+];
+
+const heroTrust = [
+  'Court-ready records',
+  'Free forever tier',
+  'No credit card',
+  'Time-stamped & tamper-evident',
 ];
 
 const features = [
@@ -93,6 +135,10 @@ const faqs = [
   {
     q: 'Will using this app make things worse?',
     a: 'CommonGround is designed to de-escalate. ARIA coaches your messages to be clear and child-focused, and the structured format removes the emotional back-and-forth that fuels conflict. Many family law professionals recommend moving high-conflict communication to a monitored platform.',
+  },
+  {
+    q: 'Will the records actually hold up in court?',
+    a: 'Every message, schedule change, and exchange is time-stamped and logged in a tamper-evident record. Exports are SHA-256 verified, so the file you hand your attorney is organized, chronological, and integrity-checked — not a folder of disputable screenshots. Many family law professionals already recommend moving communication to a monitored platform for exactly this reason.',
   },
   {
     q: 'What does "30% off for life" actually mean?',
@@ -147,8 +193,8 @@ export default function ForDadsPage() {
               </h1>
               <p className="text-lg text-gray-600 leading-relaxed mb-8 max-w-xl mx-auto lg:mx-0">
                 Every text gets twisted. You play nice because the alternative is
-                losing time with your kids. CommonGround documents what&apos;s
-                really happening and gives you a way to stay present.
+                losing time with your kids. CommonGround puts the facts on your
+                side, keeps you present, and helps you stay the dad they count on.
               </p>
               <a
                 href="#early-adopter"
@@ -157,17 +203,34 @@ export default function ForDadsPage() {
                 Join the Early Adopter List
                 <ArrowDown className="w-4 h-4" />
               </a>
+
+              <ul className="mt-6 flex flex-wrap justify-center lg:justify-start gap-x-5 gap-y-2">
+                {heroTrust.map((item) => (
+                  <li
+                    key={item}
+                    className="flex items-center gap-1.5 text-sm text-gray-600"
+                  >
+                    <CheckCircle className="w-4 h-4 text-[#3DAA8A] flex-shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
             </div>
 
+            {/* Hero — subtle looping video with the still image as poster/fallback */}
             <div className="relative mx-auto w-full max-w-xl lg:max-w-none">
-              <Image
-                src="/images/marketing/cg_fordads_bond.jpg"
-                alt="A father and his son laughing together outdoors"
-                width={1200}
-                height={800}
-                priority
-                className="w-full h-auto rounded-3xl shadow-xl object-cover"
-              />
+              <video
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="auto"
+                poster="/images/marketing/cg_fordads_bond.jpg"
+                aria-label="A father and his son laughing together outdoors"
+                className="w-full rounded-3xl shadow-xl object-cover aspect-[3/2]"
+              >
+                <source src="/videos/marketing/cg_fordads_hero.mp4" type="video/mp4" />
+              </video>
             </div>
           </div>
         </div>
@@ -284,32 +347,135 @@ export default function ForDadsPage() {
         </div>
       </section>
 
-      {/* SOCIAL PROOF — Marcus */}
+      {/* OUTCOME / TRANSFORMATION */}
+      <section className="py-20 lg:py-28 bg-[#F4F8F7]">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid items-center gap-10 lg:gap-14 lg:grid-cols-2">
+            <div className="relative order-last lg:order-first mx-auto w-full max-w-xl lg:max-w-none">
+              <Image
+                src="/images/marketing/cg_home_hero.jpg"
+                alt="A dad and his daughter sharing a calm moment together using the CommonGround app"
+                width={1200}
+                height={800}
+                className="w-full h-auto rounded-3xl shadow-xl object-cover"
+              />
+            </div>
+
+            <div className="text-center lg:text-left">
+              <p className="text-[#2D6A8F] font-medium mb-3 tracking-wide uppercase text-sm">
+                Get back in the game
+              </p>
+              <h2
+                className="text-3xl sm:text-4xl text-[#1E3A4A] mb-5 leading-tight"
+                style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
+              >
+                Show Up — And Have the Receipts
+              </h2>
+              <p className="text-gray-600 text-lg leading-relaxed mb-8 max-w-xl mx-auto lg:mx-0">
+                You don&apos;t need to win an argument. You need to be present and
+                have a clean record while you do it. Here&apos;s what changes:
+              </p>
+
+              <ul className="space-y-4 text-left">
+                {outcomes.map((outcome) => {
+                  const Icon = outcome.icon;
+                  return (
+                    <li key={outcome.text} className="flex gap-4">
+                      <span
+                        className="flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center mt-0.5"
+                        style={{ backgroundColor: '#3DAA8A15' }}
+                      >
+                        <Icon className="w-5 h-5 text-[#3DAA8A]" />
+                      </span>
+                      <p className="text-[#1E3A4A] leading-relaxed pt-1">
+                        {outcome.text}
+                      </p>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* TRUST / CREDIBILITY BAND */}
+      <section className="py-10 bg-white border-y border-gray-100">
+        <div className="max-w-5xl mx-auto px-6">
+          <ul className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 sm:gap-x-12">
+            {trustBand.map((item) => {
+              const Icon = item.icon;
+              return (
+                <li
+                  key={item.label}
+                  className="flex items-center gap-2 text-sm font-medium text-[#1E3A4A]"
+                >
+                  <Icon className="w-5 h-5 text-[#3DAA8A] flex-shrink-0" />
+                  {item.label}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </section>
+
+      {/* SOCIAL PROOF — two dad voices */}
       <section className="py-20 lg:py-24 bg-[#F4F8F7]">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="relative bg-white rounded-3xl p-8 sm:p-12 shadow-sm border border-gray-100">
-            <Quote className="w-10 h-10 text-[#3DAA8A]/20 mb-6" />
-            <blockquote
-              className="text-xl sm:text-2xl text-[#1E3A4A] leading-relaxed mb-8"
-              style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
-            >
-              My son stopped asking &ldquo;is Mom mad?&rdquo; because the tension
-              at handoffs had disappeared. Now we have a standing KidSpace movie
-              night every Wednesday — even on weeks when we&apos;re apart.
-            </blockquote>
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-[#2D6A8F]/10 flex items-center justify-center">
-                <span className="text-[#2D6A8F] font-semibold text-lg">M</span>
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="grid gap-6 lg:gap-8 md:grid-cols-2">
+            {/* Marcus */}
+            <div className="relative bg-white rounded-3xl p-8 sm:p-10 shadow-sm border border-gray-100 overflow-hidden">
+              <Quote className="w-10 h-10 text-[#3DAA8A]/20 mb-6" />
+              <blockquote
+                className="text-xl text-[#1E3A4A] leading-relaxed mb-8"
+                style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
+              >
+                My son stopped asking &ldquo;is Mom mad?&rdquo; because the tension
+                at handoffs had disappeared. Now we have a standing KidSpace movie
+                night every Wednesday — even on weeks when we&apos;re apart.
+              </blockquote>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-[#2D6A8F]/10 flex items-center justify-center flex-shrink-0">
+                  <span className="text-[#2D6A8F] font-semibold text-lg">M</span>
+                </div>
+                <div>
+                  <p className="font-semibold text-[#1E3A4A]">Marcus</p>
+                  <p className="text-sm text-gray-600">
+                    4Ever Forward Foundation Grant Program
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="font-semibold text-[#1E3A4A]">Marcus</p>
-                <p className="text-sm text-gray-600">
-                  4Ever Forward Foundation Grant Program
-                </p>
+              <div className="absolute top-0 right-0 w-32 h-32 overflow-hidden rounded-tr-3xl pointer-events-none">
+                <div className="absolute -top-16 -right-16 w-32 h-32 rounded-full border-2 border-[#F5A623]/10" />
               </div>
             </div>
-            <div className="absolute top-0 right-0 w-32 h-32 overflow-hidden rounded-tr-3xl">
-              <div className="absolute -top-16 -right-16 w-32 h-32 rounded-full border-2 border-[#F5A623]/10" />
+
+            {/* Second dad voice */}
+            <div className="relative bg-white rounded-3xl p-8 sm:p-10 shadow-sm border border-gray-100 overflow-hidden">
+              <Quote className="w-10 h-10 text-[#3DAA8A]/20 mb-6" />
+              <blockquote
+                className="text-xl text-[#1E3A4A] leading-relaxed mb-8"
+                style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
+              >
+                When the schedule got disputed, I didn&apos;t panic — I exported
+                the record and handed it to my attorney in five minutes. The
+                back-and-forth stopped, and I went from every-other-weekend to
+                real midweek time with my daughter.
+              </blockquote>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-[#3DAA8A]/10 flex items-center justify-center flex-shrink-0">
+                  <span className="text-[#3DAA8A] font-semibold text-lg">D</span>
+                </div>
+                <div>
+                  <p className="font-semibold text-[#1E3A4A]">Derek</p>
+                  <p className="text-sm text-gray-600">
+                    Dad of one, 14 months on CommonGround
+                  </p>
+                </div>
+              </div>
+              <div className="absolute top-0 right-0 w-32 h-32 overflow-hidden rounded-tr-3xl pointer-events-none">
+                <div className="absolute -top-16 -right-16 w-32 h-32 rounded-full border-2 border-[#3DAA8A]/10" />
+              </div>
             </div>
           </div>
         </div>

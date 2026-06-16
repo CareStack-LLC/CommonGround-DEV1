@@ -159,15 +159,23 @@ export default function FreshStartPage() {
                 Join the Early Adopter List
                 <ArrowDown className="w-4 h-4" />
               </a>
+              <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-gray-600">
+                {['Free forever tier', 'No credit card', 'Set up in minutes', 'Start on your own'].map((t) => (
+                  <span key={t} className="flex items-center gap-1.5">
+                    <CheckCircle className="w-4 h-4 text-cg-sage" />
+                    {t}
+                  </span>
+                ))}
+              </div>
             </div>
 
             <div className="relative">
               <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-cg-sage/10">
                 <Image
-                  src="/images/website/divorce1.png"
-                  alt="Co-parents finding structure after divorce with CommonGround"
-                  width={800}
-                  height={533}
+                  src="/images/marketing/cg_freshstart_hopeful.jpg"
+                  alt="A hopeful parent and child in a bright new home, starting fresh"
+                  width={1000}
+                  height={667}
                   className="w-full h-auto object-cover"
                   priority
                   sizes="(max-width: 768px) 100vw, 50vw"

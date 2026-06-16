@@ -25,6 +25,7 @@ const footerLinks = {
     links: [
       { label: 'For Parents', href: '/pricing' },
       { label: 'For Professionals', href: '/professionals' },
+      { label: 'For Grandparents', href: '/grandparents' },
       { label: 'Nonprofit Support', href: '/partners' },
     ],
   },

@@ -160,15 +160,23 @@ export default function SafeSpacePage() {
                 Join the Early Adopter List
                 <ArrowDown className="w-4 h-4" />
               </a>
+              <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-gray-600">
+                {['Contactless exchanges', 'Private & encrypted', 'Court-ready evidence', 'You control contact'].map((t) => (
+                  <span key={t} className="flex items-center gap-1.5">
+                    <CheckCircle className="w-4 h-4 text-cg-sage" />
+                    {t}
+                  </span>
+                ))}
+              </div>
             </div>
 
             <div className="relative">
               <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-cg-sage/10">
                 <Image
-                  src="/images/website/dv1.png"
-                  alt="Mother feeling safe and empowered using CommonGround co-parenting"
-                  width={800}
-                  height={533}
+                  src="/images/marketing/cg_safespace_calm.jpg"
+                  alt="A calm, composed parent feeling safe and at ease at home"
+                  width={1000}
+                  height={667}
                   className="w-full h-auto object-cover"
                   priority
                   sizes="(max-width: 768px) 100vw, 50vw"

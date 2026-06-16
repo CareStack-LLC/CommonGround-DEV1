@@ -30,6 +30,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // /lawyers redirects to /professionals — no separate sitemap entry needed
     { url: `${baseUrl}/aria`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${baseUrl}/kidspace`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${baseUrl}/grandparents`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${baseUrl}/safe-handoff`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${baseUrl}/testimonials`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
     { url: `${baseUrl}/grant-partnership`, lastModified: now, changeFrequency: 'monthly', priority: 0.6 },
