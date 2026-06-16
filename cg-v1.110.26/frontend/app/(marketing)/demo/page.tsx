@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import {
   HeroSection,
   TrustBar,
@@ -65,12 +66,25 @@ export default function DemoPage() {
     <>
       <HeroSection
         variant="split"
-        eyebrow="For professionals"
+        eyebrow="For family-law professionals"
         headline="See CommonGround in action"
         headlineAccent="in action"
-        subheadline="Book a 15-minute walkthrough tailored to your firm's workflow — intake, case timeline, court-ready exports."
+        subheadline="Book a 15-minute walkthrough tailored to your firm's workflow — client intake, case timeline, ARIA controls, and court-ready exports."
         primaryCta={{ label: 'Book a demo', href: '#book' }}
         secondaryCta={{ label: 'See our walkthrough', href: '/walkthrough' }}
+        trustItems={['15-minute walkthrough', 'No commitment', 'Court-ready exports']}
+        media={
+          <div className="relative mx-auto w-full max-w-xl lg:max-w-none">
+            <Image
+              src="/images/marketing/pro1.png"
+              alt="The CommonGround professional portal — case timeline, ARIA controls, and court-ready exports"
+              width={1200}
+              height={800}
+              priority
+              className="w-full h-auto rounded-3xl shadow-xl object-cover"
+            />
+          </div>
+        }
       />
 
       <section className="px-6 py-8 bg-cg-sand">

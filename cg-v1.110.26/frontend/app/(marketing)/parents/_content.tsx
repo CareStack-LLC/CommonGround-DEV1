@@ -116,7 +116,7 @@ const PARENTS_FAQ_ITEMS = [
 
 export function ParentsContent() {
   return (
-    <div className="min-h-screen bg-[#FDFCFA]">
+    <div className="min-h-screen bg-[#F4F8F7]">
       <FaqJsonLd items={PARENTS_FAQ_ITEMS} />
 
       {/* Hero Section */}
@@ -140,20 +140,20 @@ export function ParentsContent() {
                 <span className="text-sm font-medium text-[#3DAA8A]">Trusted by 10,000+ families</span>
               </div>
 
-              <h1 className="font-serif text-[#1A1A1A] text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight tracking-tight">
+              <h1 className="font-serif text-[#1E3A4A] text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight tracking-tight">
                 Peaceful co-parenting,
                 <br />
                 <span className="text-[#3DAA8A]">finally made simple</span>
               </h1>
 
-              <p className="text-lg sm:text-xl text-[#4A4A4A] leading-relaxed max-w-xl mx-auto lg:mx-0">
+              <p className="text-lg sm:text-xl text-[#4b5563] leading-relaxed max-w-xl mx-auto lg:mx-0">
                 Keep every message calm, every exchange documented, and every expense fair — so your kids get the stability they deserve.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 pt-4 justify-center lg:justify-start">
                 <Link
-                  href="/auth/register"
-                  className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#3DAA8A] text-white text-lg font-semibold rounded-xl hover:bg-[#3D5A49] transition-all hover:scale-105 shadow-lg hover:shadow-xl"
+                  href="/early-access"
+                  className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#3DAA8A] text-white text-lg font-semibold rounded-xl hover:bg-[#2E9577] transition-all hover:scale-105 shadow-lg hover:shadow-xl"
                 >
                   Start Your Free Trial
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -195,12 +195,12 @@ export function ParentsContent() {
       <section className="py-20 lg:py-32 bg-white">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif text-[#1A1A1A] mb-4 leading-tight tracking-tight">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif text-[#1E3A4A] mb-4 leading-tight tracking-tight">
               You shouldn&apos;t have to dread
               <br />
               <span className="text-[#3DAA8A]">every message</span>
             </h2>
-            <p className="text-lg sm:text-xl text-[#6A6A6A] max-w-2xl mx-auto">
+            <p className="text-lg sm:text-xl text-[#6b7280] max-w-2xl mx-auto">
               Parents deserve peace of mind — not more stress. Each problem below maps to a tool built to remove it.
             </p>
           </div>
@@ -211,7 +211,7 @@ export function ParentsContent() {
                 icon: MessageSquare,
                 problem: '"Every message feels stressful"',
                 solution: 'ARIA supports calm, child-focused communication',
-                color: '#D4956C',
+                color: '#F5A623',
               },
               {
                 icon: DollarSign,
@@ -223,7 +223,7 @@ export function ParentsContent() {
                 icon: FileCheck,
                 problem: '"I have no proof for court"',
                 solution: 'Everything documented, court-ready, uneditable',
-                color: '#8B7355',
+                color: '#2D6A8F',
               },
             ].map((item, i) => (
               <div key={i} className="space-y-6">
@@ -237,19 +237,19 @@ export function ParentsContent() {
 
                 {/* Problem */}
                 <div className="space-y-2">
-                  <div className="text-sm font-semibold text-[#6A6A6A] uppercase tracking-wide">
+                  <div className="text-sm font-semibold text-[#6b7280] uppercase tracking-wide">
                     The Problem
                   </div>
-                  <div className="text-xl font-serif text-[#1A1A1A] italic">
+                  <div className="text-xl font-serif text-[#1E3A4A] italic">
                     {item.problem}
                   </div>
                 </div>
 
                 {/* Arrow */}
                 <div className="flex items-center">
-                  <div className="flex-1 h-px bg-gradient-to-r from-[#E8E5E0] to-transparent" />
+                  <div className="flex-1 h-px bg-gradient-to-r from-[#e5e7eb] to-transparent" />
                   <ArrowRight className="w-5 h-5 text-[#3DAA8A] mx-2" />
-                  <div className="flex-1 h-px bg-gradient-to-l from-[#E8E5E0] to-transparent" />
+                  <div className="flex-1 h-px bg-gradient-to-l from-[#e5e7eb] to-transparent" />
                 </div>
 
                 {/* Solution */}
@@ -257,7 +257,7 @@ export function ParentsContent() {
                   <div className="text-sm font-semibold uppercase tracking-wide" style={{ color: item.color }}>
                     The Solution
                   </div>
-                  <div className="text-lg text-[#2A2A2A] font-medium leading-snug">
+                  <div className="text-lg text-[#374151] font-medium leading-snug">
                     {item.solution}
                   </div>
                 </div>
@@ -268,7 +268,7 @@ export function ParentsContent() {
       </section>
 
       {/* Key Features — FeatureGrid columns=3 */}
-      <section className="bg-[#FDFCFA]">
+      <section className="bg-[#F4F8F7]">
         <FeatureGrid
           columns={3}
           heading="Six tools. One calmer family."
@@ -281,10 +281,10 @@ export function ParentsContent() {
       <section className="py-20 lg:py-28 bg-white">
         <div className="max-w-5xl mx-auto px-6 sm:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif text-[#1A1A1A] mb-4 leading-tight tracking-tight">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif text-[#1E3A4A] mb-4 leading-tight tracking-tight">
               Life before vs. <span className="text-[#3DAA8A]">life with CommonGround</span>
             </h2>
-            <p className="text-lg text-[#6A6A6A] max-w-2xl mx-auto">
+            <p className="text-lg text-[#6b7280] max-w-2xl mx-auto">
               Parents describe the shift more than any single feature.
             </p>
           </div>
@@ -297,7 +297,7 @@ export function ParentsContent() {
       </section>
 
       {/* Social Proof / Stats Section */}
-      <section className="py-20 lg:py-32 bg-gradient-to-br from-[#3DAA8A] to-[#3D5A49] text-white">
+      <section className="py-20 lg:py-32 bg-gradient-to-br from-[#3DAA8A] to-[#2E9577] text-white">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif mb-4 leading-tight tracking-tight">
@@ -327,32 +327,33 @@ export function ParentsContent() {
         </div>
       </section>
 
-      {/* Testimonial Section — placeholder quote pending real review */}
+      {/* Testimonial Section */}
       <section className="py-20 lg:py-32 bg-white">
         <div className="max-w-4xl mx-auto px-6 sm:px-8">
-          {/* TODO(marketing): replace with real quote */}
-          <div className="bg-[#FDFCFA] rounded-3xl p-12 border-2 border-[#E8E5E0]" data-seed="placeholder">
+          <div className="bg-[#F4F8F7] rounded-3xl p-8 sm:p-12 border border-gray-100">
             <div className="flex items-start gap-2 mb-6">
               {[1, 2, 3, 4, 5].map((star) => (
                 <svg
                   key={star}
-                  className="w-6 h-6 text-[#D4956C] fill-current"
+                  className="w-6 h-6 text-[#F5A623] fill-current"
                   viewBox="0 0 24 24"
                 >
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                 </svg>
               ))}
             </div>
-            <blockquote className="text-2xl font-serif text-[#1A1A1A] mb-6 leading-relaxed italic">
-              &ldquo;Parent placeholder: ARIA helped me stop dreading my phone. I actually feel safe communicating about our daughter now.&rdquo;
+            <blockquote className="text-xl sm:text-2xl font-serif text-[#1E3A4A] mb-6 leading-relaxed">
+              CommonGround gave us structure when everything felt chaotic. The automated
+              schedule means neither of us can &ldquo;forget&rdquo; anymore — and our
+              daughter stopped getting caught in the middle.
             </blockquote>
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-full bg-[#3DAA8A]/10 flex items-center justify-center">
                 <Heart className="w-6 h-6 text-[#3DAA8A]" />
               </div>
               <div>
-                <div className="font-semibold text-[#1A1A1A]">Parent placeholder</div>
-                <div className="text-sm text-[#6A6A6A]">Parent, California</div>
+                <div className="font-semibold text-[#1E3A4A]">The Rivera Family</div>
+                <div className="text-sm text-[#6b7280]">4Ever Forward Foundation Grant Program</div>
               </div>
             </div>
           </div>
@@ -360,19 +361,19 @@ export function ParentsContent() {
       </section>
 
       {/* FAQ — Parents */}
-      <section className="py-16 lg:py-24 bg-[#FDFCFA]">
+      <section className="py-16 lg:py-24 bg-[#F4F8F7]">
         <div className="max-w-3xl mx-auto px-6 sm:px-8">
-          <h2 className="text-3xl sm:text-4xl font-serif text-[#1A1A1A] mb-10 text-center leading-tight tracking-tight">
+          <h2 className="text-3xl sm:text-4xl font-serif text-[#1E3A4A] mb-10 text-center leading-tight tracking-tight">
             Questions parents ask
           </h2>
           <div className="space-y-4">
             {PARENTS_FAQ_ITEMS.map((faq) => (
-              <details key={faq.question} className="group bg-white rounded-xl p-6 border border-[#E8E5E0]">
-                <summary className="cursor-pointer list-none flex items-center justify-between font-medium text-[#1A1A1A]">
+              <details key={faq.question} className="group bg-white rounded-xl p-6 border border-[#e5e7eb]">
+                <summary className="cursor-pointer list-none flex items-center justify-between font-medium text-[#1E3A4A]">
                   {faq.question}
-                  <span className="text-[#6A6A6A] group-open:rotate-180 transition-transform">▼</span>
+                  <span className="text-[#6b7280] group-open:rotate-180 transition-transform">▼</span>
                 </summary>
-                <p className="mt-4 text-[#4A4A4A] leading-relaxed">{faq.answer}</p>
+                <p className="mt-4 text-[#4b5563] leading-relaxed">{faq.answer}</p>
               </details>
             ))}
           </div>
@@ -385,13 +386,13 @@ export function ParentsContent() {
           <div className="grid md:grid-cols-2 gap-6">
             <Link
               href="/for-moms"
-              className="group rounded-2xl border-2 border-[#E8E5E0] p-6 sm:p-8 bg-gradient-to-br from-[#F4F8F7] to-white hover:border-[#3DAA8A]/40 transition-all hover:shadow-md"
+              className="group rounded-2xl border-2 border-[#e5e7eb] p-6 sm:p-8 bg-gradient-to-br from-[#F4F8F7] to-white hover:border-[#3DAA8A]/40 transition-all hover:shadow-md"
             >
               <div className="flex items-center gap-3 mb-3">
                 <Shield className="h-6 w-6 text-[#3DAA8A]" />
-                <h3 className="font-serif text-xl sm:text-2xl text-[#1A1A1A]">For moms</h3>
+                <h3 className="font-serif text-xl sm:text-2xl text-[#1E3A4A]">For moms</h3>
               </div>
-              <p className="text-[#4A4A4A] mb-3 leading-relaxed">
+              <p className="text-[#4b5563] mb-3 leading-relaxed">
                 Mothers navigating custody get the calm tools, documented exchanges, and kid-first workflows made for their reality.
               </p>
               <span className="inline-flex items-center gap-1 text-sm font-semibold text-[#3DAA8A] group-hover:underline">
@@ -401,13 +402,13 @@ export function ParentsContent() {
             </Link>
             <Link
               href="/for-dads"
-              className="group rounded-2xl border-2 border-[#E8E5E0] p-6 sm:p-8 bg-gradient-to-br from-[#FEF7ED] to-white hover:border-[#F5A623]/40 transition-all hover:shadow-md"
+              className="group rounded-2xl border-2 border-[#e5e7eb] p-6 sm:p-8 bg-gradient-to-br from-[#FEF7ED] to-white hover:border-[#F5A623]/40 transition-all hover:shadow-md"
             >
               <div className="flex items-center gap-3 mb-3">
                 <Shield className="h-6 w-6 text-[#F5A623]" />
-                <h3 className="font-serif text-xl sm:text-2xl text-[#1A1A1A]">For dads</h3>
+                <h3 className="font-serif text-xl sm:text-2xl text-[#1E3A4A]">For dads</h3>
               </div>
-              <p className="text-[#4A4A4A] mb-3 leading-relaxed">
+              <p className="text-[#4b5563] mb-3 leading-relaxed">
                 Fathers get tools that prove parenting time, keep communication even-toned, and document every handoff.
               </p>
               <span className="inline-flex items-center gap-1 text-sm font-semibold text-[#F5A623] group-hover:underline">
@@ -420,38 +421,30 @@ export function ParentsContent() {
       </section>
 
       {/* Final CTA Section */}
-      <section className="py-20 lg:py-32 bg-[#FDFCFA]">
+      <section className="py-20 lg:py-32 bg-[#F4F8F7]">
         <div className="max-w-4xl mx-auto px-6 sm:px-8 text-center">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif text-[#1A1A1A] mb-6 leading-tight tracking-tight">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif text-[#1E3A4A] mb-6 leading-tight tracking-tight">
             Ready to reclaim
             <br />
             <span className="text-[#3DAA8A]">your peace?</span>
           </h2>
-          <p className="text-lg sm:text-xl text-[#6A6A6A] mb-10 max-w-2xl mx-auto">
+          <p className="text-lg sm:text-xl text-[#6b7280] mb-10 max-w-2xl mx-auto">
             Parents who chose a calmer path started here — free trial, no credit card.
           </p>
 
           <Link
-            href="/auth/register"
-            className="group inline-flex items-center justify-center gap-3 px-12 py-5 bg-[#3DAA8A] text-white text-xl font-semibold rounded-2xl hover:bg-[#3D5A49] transition-all hover:scale-105 shadow-2xl hover:shadow-3xl"
+            href="/early-access"
+            className="group inline-flex items-center justify-center gap-3 px-12 py-5 bg-[#3DAA8A] text-white text-xl font-semibold rounded-2xl hover:bg-[#2E9577] transition-all hover:scale-105 shadow-2xl hover:shadow-3xl"
           >
             Start Your Free Trial
             <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
           </Link>
 
-          <p className="mt-6 text-sm text-[#6A6A6A]">
+          <p className="mt-6 text-sm text-[#6b7280]">
             Questions? <Link href="/help/contact" className="text-[#3DAA8A] hover:underline">Contact us</Link> • Takes 2 minutes to set up
           </p>
         </div>
       </section>
-
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&display=swap');
-
-        .font-serif {
-          font-family: 'Cormorant Garamond', serif;
-        }
-      `}</style>
     </div>
   );
 }
