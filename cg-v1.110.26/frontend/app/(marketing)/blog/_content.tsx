@@ -96,17 +96,20 @@ export function BlogContent() {
         // API unavailable
       }
 
-      if (apiPosts.length > 0) {
-        setPosts(apiPosts);
-      } else {
-        // Fallback to legacy hardcoded posts
-        setPosts(legacyPosts.map(p => ({
-          slug: p.slug, title: p.title, excerpt: p.excerpt,
-          category: p.category, pillClasses: categoryToPillClasses(p.category),
-          author: p.author, date: p.date, readTime: p.readTime,
-          featured: p.featured, image: p.image, isApi: false,
-        })));
-      }
+      // Merge CMS (API) posts with the curated local library so both show.
+      // Dedupe by slug (API wins), sort newest-first, then mark the first
+      // three as featured so the featured grid never hides extras.
+      const legacyMapped: DisplayPost[] = legacyPosts.map(p => ({
+        slug: p.slug, title: p.title, excerpt: p.excerpt,
+        category: p.category, pillClasses: categoryToPillClasses(p.category),
+        author: p.author, date: p.date, readTime: p.readTime,
+        featured: p.featured, image: p.image, isApi: false,
+      }));
+      const apiSlugs = new Set(apiPosts.map(p => p.slug));
+      const merged = [...apiPosts, ...legacyMapped.filter(p => !apiSlugs.has(p.slug))]
+        .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
+        .map((p, i) => ({ ...p, featured: i < 3 }));
+      setPosts(merged);
       setIsLoading(false);
     };
     fetchPosts();
