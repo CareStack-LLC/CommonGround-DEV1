@@ -191,6 +191,10 @@ class KidComsSession(Base, UUIDMixin, TimestampMixin):
     # Notes (for parent review)
     notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
+    # Post-call ARIA analysis (full-transcript report; see aria_call_monitor)
+    aria_report: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    aria_analyzed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
     # Relationships
     family_file = relationship("FamilyFile", back_populates="kidcoms_sessions")
     child = relationship("Child", back_populates="kidcoms_sessions")

@@ -28,7 +28,7 @@ function MessageContent({ content }: { content: string }) {
             <Link
               key={i}
               href={linkMatch[2]}
-              className="text-[#3DAA8A] underline underline-offset-2 hover:text-[#2D8A70] font-medium"
+              className="text-cg-sage underline underline-offset-2 hover:text-cg-sage-dark font-medium"
             >
               {linkMatch[1]}
             </Link>
@@ -192,7 +192,7 @@ export function HelpChat() {
       {/* Chat container — conversation on top, input on bottom */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-md overflow-hidden">
         {/* Header bar */}
-        <div className="flex items-center gap-3 px-5 py-3 border-b border-gray-100 bg-[#1E3A4A] rounded-t-2xl">
+        <div className="flex items-center gap-3 px-5 py-3 border-b border-gray-100 bg-foreground rounded-t-2xl">
           <Image
             src="/images/Aria.png"
             alt="ARIA"
@@ -230,7 +230,7 @@ export function HelpChat() {
                 height={28}
                 className="rounded-full object-cover flex-shrink-0 mt-1"
               />
-              <div className="max-w-[85%] rounded-2xl rounded-bl-md px-4 py-3 text-sm leading-relaxed bg-[#F4F8F7] text-[#1E3A4A]">
+              <div className="max-w-[85%] rounded-2xl rounded-bl-md px-4 py-3 text-sm leading-relaxed bg-cg-sand text-foreground">
                 Hi! I&apos;m ARIA. Ask me anything about CommonGround &mdash; features, pricing, how to get started, or troubleshooting. I&apos;ll point you to the right guide!
               </div>
             </div>
@@ -253,8 +253,8 @@ export function HelpChat() {
               <div
                 className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                   msg.role === 'user'
-                    ? 'bg-[#3DAA8A] text-white rounded-br-md'
-                    : 'bg-[#F4F8F7] text-[#1E3A4A] rounded-bl-md'
+                    ? 'bg-cg-sage text-white rounded-br-md'
+                    : 'bg-cg-sand text-foreground rounded-bl-md'
                 }`}
               >
                 {msg.role === 'assistant' ? (
@@ -266,7 +266,7 @@ export function HelpChat() {
                 )}
               </div>
               {msg.role === 'user' && (
-                <div className="w-7 h-7 rounded-full bg-[#1E3A4A] flex items-center justify-center flex-shrink-0 mt-1">
+                <div className="w-7 h-7 rounded-full bg-foreground flex items-center justify-center flex-shrink-0 mt-1">
                   <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
                   </svg>
@@ -285,7 +285,7 @@ export function HelpChat() {
                   height={28}
                   className="rounded-full object-cover flex-shrink-0 mt-1"
                 />
-                <div className="bg-[#F4F8F7] text-[#1E3A4A] rounded-2xl rounded-bl-md px-4 py-3">
+                <div className="bg-cg-sand text-foreground rounded-2xl rounded-bl-md px-4 py-3">
                   <div className="flex items-center gap-2 text-sm text-gray-400">
                     <Loader2 className="w-4 h-4 animate-spin" />
                     ARIA is thinking...
@@ -308,13 +308,13 @@ export function HelpChat() {
               placeholder="Ask ARIA a question..."
               disabled={isLoading}
               rows={1}
-              className="flex-1 px-4 py-3 bg-[#F4F8F7] rounded-xl border border-gray-200 text-[15px] text-[#1E3A4A] placeholder:text-gray-400 focus:outline-none focus:border-[#3DAA8A] focus:ring-2 focus:ring-[#3DAA8A]/20 transition-all disabled:opacity-50 resize-none"
+              className="flex-1 px-4 py-3 bg-cg-sand rounded-xl border border-gray-200 text-[15px] text-foreground placeholder:text-gray-400 focus:outline-none focus:border-cg-sage focus:ring-2 focus:ring-cg-sage/20 transition-all disabled:opacity-50 resize-none"
               maxLength={2000}
             />
             <button
               onClick={handleSend}
               disabled={isLoading || !input.trim()}
-              className="flex items-center justify-center w-11 h-11 bg-[#3DAA8A] text-white rounded-xl hover:bg-[#34967a] transition-colors disabled:opacity-40 disabled:hover:bg-[#3DAA8A] flex-shrink-0 self-end shadow-sm"
+              className="flex items-center justify-center w-11 h-11 bg-cg-sage text-white rounded-xl hover:bg-cg-sage-dark transition-colors disabled:opacity-40 disabled:hover:bg-cg-sage flex-shrink-0 self-end shadow-sm"
               aria-label="Send message"
             >
               {isLoading ? (

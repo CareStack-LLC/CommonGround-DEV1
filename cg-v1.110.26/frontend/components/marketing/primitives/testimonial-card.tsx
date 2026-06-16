@@ -33,7 +33,7 @@ function StarRow({ rating }: { rating: number }) {
         <Star
           key={i}
           className={`h-4 w-4 ${
-            i < clamped ? 'fill-[#F5A623] text-[#F5A623]' : 'text-gray-300'
+            i < clamped ? 'fill-cg-amber text-cg-amber' : 'text-gray-300'
           }`}
           aria-hidden="true"
         />
@@ -68,7 +68,7 @@ function Avatar({
   const dim = { width: size, height: size };
   return (
     <div
-      className="flex items-center justify-center rounded-full bg-[#3DAA8A]/15 text-[#3DAA8A] font-semibold"
+      className="flex items-center justify-center rounded-full bg-cg-sage/15 text-cg-sage font-semibold"
       style={dim}
       aria-hidden="true"
     >
@@ -90,10 +90,10 @@ export function TestimonialCard({
   if (variant === 'featured') {
     return (
       <figure
-        className={`relative mx-auto max-w-2xl rounded-3xl border border-gray-100 bg-gradient-to-br from-[#F4F8F7] to-white p-8 sm:p-10 text-center shadow-sm ${className}`.trim()}
+        className={`relative mx-auto max-w-2xl rounded-3xl border border-gray-100 bg-gradient-to-br from-cg-sand to-white p-8 sm:p-10 text-center shadow-sm ${className}`.trim()}
       >
         <Quote
-          className="mx-auto mb-4 h-8 w-8 text-[#3DAA8A]/60"
+          className="mx-auto mb-4 h-8 w-8 text-cg-sage/60"
           aria-hidden="true"
         />
         {rating !== undefined && (
@@ -101,7 +101,7 @@ export function TestimonialCard({
             <StarRow rating={rating} />
           </div>
         )}
-        <blockquote className="font-serif text-xl sm:text-2xl text-[#1E3A4A] leading-snug">
+        <blockquote className="font-serif text-xl sm:text-2xl text-foreground leading-snug">
           &ldquo;{quote}&rdquo;
         </blockquote>
         <figcaption className="mt-6 flex flex-col items-center gap-3">
@@ -112,7 +112,7 @@ export function TestimonialCard({
             size={56}
           />
           <div>
-            <div className="font-semibold text-[#1E3A4A]">{name}</div>
+            <div className="font-semibold text-foreground">{name}</div>
             <div className="text-sm text-gray-500">{role}</div>
           </div>
         </figcaption>
@@ -140,7 +140,7 @@ export function TestimonialCard({
           size={40}
         />
         <div>
-          <div className="text-sm font-semibold text-[#1E3A4A]">{name}</div>
+          <div className="text-sm font-semibold text-foreground">{name}</div>
           <div className="text-xs text-gray-500">{role}</div>
         </div>
       </figcaption>

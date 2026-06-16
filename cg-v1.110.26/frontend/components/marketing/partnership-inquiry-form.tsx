@@ -104,13 +104,13 @@ export function PartnershipInquiryForm({
   if (isSubmitted) {
     return (
       <div
-        className={`text-center py-12 px-6 rounded-2xl bg-gradient-to-b from-[#3DAA8A]/10 to-transparent border-2 border-[#3DAA8A]/20 ${className}`}
+        className={`text-center py-12 px-6 rounded-2xl bg-gradient-to-b from-cg-sage/10 to-transparent border-2 border-cg-sage/20 ${className}`}
       >
-        <div className="w-16 h-16 bg-[#3DAA8A]/15 rounded-full flex items-center justify-center mx-auto mb-5">
-          <Check className="w-8 h-8 text-[#3DAA8A]" />
+        <div className="w-16 h-16 bg-cg-sage/15 rounded-full flex items-center justify-center mx-auto mb-5">
+          <Check className="w-8 h-8 text-cg-sage" />
         </div>
         <h3
-          className="text-2xl font-semibold text-[#1E3A4A] mb-3"
+          className="text-2xl font-semibold text-foreground mb-3"
           style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
         >
           We&rsquo;ll be in touch!
@@ -128,7 +128,7 @@ export function PartnershipInquiryForm({
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Organization Type */}
         <div>
-          <label className="block text-sm font-medium text-[#1E3A4A] mb-2">
+          <label className="block text-sm font-medium text-foreground mb-2">
             Organization Type
           </label>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -144,8 +144,8 @@ export function PartnershipInquiryForm({
                   }
                   className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border-2 text-sm font-medium transition-all ${
                     isSelected
-                      ? 'border-[#3DAA8A] bg-[#3DAA8A]/5 text-[#3DAA8A]'
-                      : 'border-gray-200 text-gray-600 hover:border-[#3DAA8A]/30'
+                      ? 'border-cg-sage bg-cg-sage/5 text-cg-sage'
+                      : 'border-gray-200 text-gray-600 hover:border-cg-sage/30'
                   }`}
                 >
                   <Icon className="w-4 h-4 flex-shrink-0" />
@@ -165,7 +165,7 @@ export function PartnershipInquiryForm({
           }
           placeholder="Organization name *"
           required
-          className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white text-[#1E3A4A] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/50 focus:border-transparent"
+          className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white text-foreground placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-cg-sage/50 focus:border-transparent"
         />
 
         {/* Name Fields */}
@@ -177,7 +177,7 @@ export function PartnershipInquiryForm({
               setFormState({ ...formState, first_name: e.target.value })
             }
             placeholder="Your first name"
-            className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white text-[#1E3A4A] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/50 focus:border-transparent"
+            className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white text-foreground placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-cg-sage/50 focus:border-transparent"
           />
           <input
             type="text"
@@ -186,7 +186,7 @@ export function PartnershipInquiryForm({
               setFormState({ ...formState, last_name: e.target.value })
             }
             placeholder="Your last name"
-            className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white text-[#1E3A4A] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/50 focus:border-transparent"
+            className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white text-foreground placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-cg-sage/50 focus:border-transparent"
           />
         </div>
 
@@ -199,7 +199,7 @@ export function PartnershipInquiryForm({
           }
           placeholder="Work email *"
           required
-          className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white text-[#1E3A4A] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/50 focus:border-transparent"
+          className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white text-foreground placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-cg-sage/50 focus:border-transparent"
         />
 
         {/* Families served */}
@@ -210,7 +210,7 @@ export function PartnershipInquiryForm({
             setFormState({ ...formState, families_served: e.target.value })
           }
           placeholder="Approx. families served per year"
-          className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white text-[#1E3A4A] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/50 focus:border-transparent"
+          className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white text-foreground placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-cg-sage/50 focus:border-transparent"
         />
 
         {/* Message */}
@@ -221,14 +221,14 @@ export function PartnershipInquiryForm({
           }
           placeholder="Tell us about the families you serve (optional)"
           rows={3}
-          className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white text-[#1E3A4A] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/50 focus:border-transparent resize-none"
+          className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white text-foreground placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-cg-sage/50 focus:border-transparent resize-none"
         />
 
         {/* Submit */}
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-[#3DAA8A] text-white font-semibold px-6 py-4 rounded-lg transition-all duration-200 hover:bg-[#34967a] hover:shadow-lg disabled:opacity-50 text-lg flex items-center justify-center gap-2"
+          className="w-full bg-cg-sage text-white font-semibold px-6 py-4 rounded-lg transition-all duration-200 hover:bg-cg-sage-dark hover:shadow-lg disabled:opacity-50 text-lg flex items-center justify-center gap-2"
         >
           {isSubmitting ? (
             'Submitting...'

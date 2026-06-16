@@ -131,11 +131,10 @@ export default function ForDadsPage() {
       {/* HERO */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-[#F4F8F7] via-[#F4F8F7] to-white" />
-        <div className="absolute top-0 left-0 w-[500px] h-[500px] rounded-full bg-[#2D6A8F]/[0.04] blur-3xl -translate-y-1/2 -translate-x-1/3" />
 
         <div className="relative max-w-6xl mx-auto px-6 pt-16 pb-20 lg:pt-24 lg:pb-28">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            <div>
+          <div className="grid items-center gap-10 lg:gap-14 lg:grid-cols-2">
+            <div className="text-center lg:text-left">
               <p className="text-[#2D6A8F] font-medium mb-4 tracking-wide uppercase text-sm">
                 For dads who refuse to disappear
               </p>
@@ -143,14 +142,13 @@ export default function ForDadsPage() {
                 className="text-4xl sm:text-5xl lg:text-[3.4rem] text-[#1E3A4A] mb-6 leading-[1.1] tracking-tight"
                 style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
               >
-                Being a Good Dad Shouldn&apos;t Feel Like{' '}
+                Being a Good Dad Shouldn&apos;t Mean{' '}
                 <span className="text-[#3DAA8A]">Walking on Eggshells</span>
               </h1>
-              <p className="text-lg text-gray-600 leading-relaxed mb-8 max-w-xl">
-                Everything gets weaponized. Every text gets twisted. You play nice
-                because the alternative is losing time with your kids. CommonGround
-                sees what&apos;s happening, documents it, and gives you a way to stay
-                present — even when she makes it hard.
+              <p className="text-lg text-gray-600 leading-relaxed mb-8 max-w-xl mx-auto lg:mx-0">
+                Every text gets twisted. You play nice because the alternative is
+                losing time with your kids. CommonGround documents what&apos;s
+                really happening and gives you a way to stay present.
               </p>
               <a
                 href="#early-adopter"
@@ -161,20 +159,15 @@ export default function ForDadsPage() {
               </a>
             </div>
 
-            <div className="relative">
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-[#2D6A8F]/10">
-                <Image
-                  src="/images/Website pictes/father1.png"
-                  alt="Father bonding with his child through CommonGround KidSpace"
-                  width={800}
-                  height={533}
-                  className="w-full h-auto object-cover"
-                  priority
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                />
-              </div>
-              <div className="absolute -bottom-4 -right-4 w-24 h-24 rounded-full border-2 border-[#3DAA8A]/30 -z-10" />
-              <div className="absolute -top-4 -left-4 w-16 h-16 rounded-full bg-[#F5A623]/10 -z-10" />
+            <div className="relative mx-auto w-full max-w-xl lg:max-w-none">
+              <Image
+                src="/images/marketing/cg_fordads_bond.jpg"
+                alt="A father and his son laughing together outdoors"
+                width={1200}
+                height={800}
+                priority
+                className="w-full h-auto rounded-3xl shadow-xl object-cover"
+              />
             </div>
           </div>
         </div>

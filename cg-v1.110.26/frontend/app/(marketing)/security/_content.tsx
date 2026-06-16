@@ -60,24 +60,24 @@ const commitments = [
 
 export function SecurityContent() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9]">
+    <div className="min-h-screen bg-gradient-to-b from-cg-sand via-white to-cg-mist">
       {/* Hero */}
       <section className="pt-24 pb-16 sm:pt-32 sm:pb-24">
         <div className="max-w-5xl mx-auto px-6 text-center">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 rounded-3xl mb-8 shadow-lg">
-            <Shield className="w-10 h-10 text-[var(--portal-primary)]" />
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-cg-sage/10 to-cg-sage/5 rounded-3xl mb-8 shadow-lg">
+            <Shield className="w-10 h-10 text-cg-sage" />
           </div>
           <h1
-            className="text-5xl sm:text-6xl lg:text-7xl font-serif text-[#1E3A4A] mb-6 leading-[1.05]"
+            className="text-5xl sm:text-6xl lg:text-7xl font-serif text-foreground mb-6 leading-[1.05]"
             style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
             Your family's data
             <br />
-            <span className="text-[#F5A623]">is sacred</span>
+            <span className="text-cg-amber">is sacred</span>
           </h1>
           <p className="text-xl sm:text-2xl text-gray-600 mb-8 max-w-2xl mx-auto">
             We built CommonGround knowing your most sensitive information would live here.
-            <span className="font-medium text-[var(--portal-primary)]"> That trust is everything to us.</span>
+            <span className="font-medium text-cg-sage"> That trust is everything to us.</span>
           </p>
         </div>
       </section>
@@ -87,7 +87,7 @@ export function SecurityContent() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2
-              className="text-3xl sm:text-4xl font-serif text-[#1E3A4A] mb-4"
+              className="text-3xl sm:text-4xl font-serif text-foreground mb-4"
               style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
             >
               Enterprise-grade protection
@@ -103,13 +103,13 @@ export function SecurityContent() {
               return (
                 <div
                   key={feature.title}
-                  className="bg-gradient-to-br from-[#F5F9F9] to-white rounded-3xl p-8 border-2 border-[var(--portal-primary)]/10 hover:border-[var(--portal-primary)]/30 transition-all hover:shadow-lg group"
+                  className="bg-gradient-to-br from-cg-mist to-white rounded-3xl p-8 border-2 border-cg-sage/10 hover:border-cg-sage/30 transition-all hover:shadow-lg group"
                 >
-                  <div className="h-14 w-14 rounded-2xl bg-[var(--portal-primary)]/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                    <Icon className="h-7 w-7 text-[var(--portal-primary)]" />
+                  <div className="h-14 w-14 rounded-2xl bg-cg-sage/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                    <Icon className="h-7 w-7 text-cg-sage" />
                   </div>
                   <h3
-                    className="text-xl font-semibold text-[#1E3A4A] mb-3"
+                    className="text-xl font-semibold text-foreground mb-3"
                     style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
                   >
                     {feature.title}
@@ -128,10 +128,10 @@ export function SecurityContent() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2
-                className="text-3xl sm:text-4xl font-serif text-[#1E3A4A] mb-6"
+                className="text-3xl sm:text-4xl font-serif text-foreground mb-6"
                 style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
               >
-                Your data. <span className="text-[#F5A623]">Your control.</span>
+                Your data. <span className="text-cg-amber">Your control.</span>
               </h2>
               <p className="text-lg text-gray-600 mb-8">
                 We don't monetize your information. We don't analyze it for ads.
@@ -140,16 +140,16 @@ export function SecurityContent() {
               <ul className="space-y-4">
                 {commitments.map((item) => (
                   <li key={item} className="flex items-center gap-3">
-                    <div className="w-6 h-6 rounded-full bg-[var(--portal-primary)]/10 flex items-center justify-center">
-                      <Check className="w-4 h-4 text-[var(--portal-primary)]" />
+                    <div className="w-6 h-6 rounded-full bg-cg-sage/10 flex items-center justify-center">
+                      <Check className="w-4 h-4 text-cg-sage" />
                     </div>
-                    <span className="text-[#1E3A4A] font-medium">{item}</span>
+                    <span className="text-foreground font-medium">{item}</span>
                   </li>
                 ))}
               </ul>
             </div>
 
-            <div className="bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] rounded-3xl p-8 text-white">
+            <div className="bg-gradient-to-br from-cg-sage to-cg-slate rounded-3xl p-8 text-white">
               <div className="flex items-center gap-3 mb-6">
                 <Lock className="w-8 h-8" />
                 <span
@@ -183,7 +183,7 @@ export function SecurityContent() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 sm:py-28 bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] text-white">
+      <section className="py-20 sm:py-28 bg-gradient-to-br from-cg-sage to-cg-slate text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2
             className="text-4xl sm:text-5xl font-serif mb-6"
@@ -197,7 +197,7 @@ export function SecurityContent() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/early-access"
-              className="inline-flex items-center justify-center px-10 py-5 bg-[#F5A623] text-white font-bold text-lg rounded-full hover:bg-[#c26647] transition-all shadow-2xl hover:-translate-y-1 group"
+              className="inline-flex items-center justify-center px-10 py-5 bg-cg-amber text-white font-bold text-lg rounded-full hover:bg-[#c26647] transition-all shadow-2xl hover:-translate-y-1 group"
             >
               Start Free Today
               <ArrowRight className="ml-2 h-6 w-6 group-hover:translate-x-2 transition-transform" />

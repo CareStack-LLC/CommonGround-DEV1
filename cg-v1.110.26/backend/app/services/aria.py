@@ -1711,7 +1711,7 @@ An incoming message was just received:
                     )
                     try:
                         from app.services.aria_circuit_breaker import aria_breaker
-                        aria_breaker.record_failure(TimeoutError("Layer 3 soft deadline"))
+                        await aria_breaker.record_failure(TimeoutError("Layer 3 soft deadline"))
                     except Exception:
                         pass
                     metric_increment("aria.v2.llm_deadline_exceeded")

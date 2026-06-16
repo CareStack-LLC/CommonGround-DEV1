@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CommonGround — Co-Parent Calling + ARIA Call Monitor</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --navy:    #0D1B24;
+  --navy-2:  #162530;
+  --navy-3:  #1E3A4A;
+  --teal:    #3DAA8A;
+  --teal-lt: #5BC4A0;
+  --blue:    #2D6A8F;
+  --blue-lt: #4BA8C8;
+  --gold:    #F5A623;
+  --slate:   #3A5668;
+  --text:    #CBD8E0;
+  --text-dim:#7A9CAD;
+  --white:   #FFFFFF;
+  --red:     #E05353;
+  --orange:  #E08C2A;
+  --yellow:  #D4B84A;
+  --purple:  #7B5EA7;
+  --aria:    #F59E0B;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { background:var(--navy); color:var(--text); font-family:'DM Sans',sans-serif; font-size:14px; line-height:1.7; }
+
+.cover { min-height:70vh; display:flex; flex-direction:column; justify-content:center; padding:72px 72px; border-bottom:1px solid rgba(45,106,143,0.2); position:relative; overflow:hidden; background:linear-gradient(148deg,#0D1B24 0%,#162530 50%,#1c2e3d 100%); }
+.cover::after { content:''; position:absolute; top:-200px; right:-100px; width:550px; height:550px; background:radial-gradient(circle,rgba(45,106,143,0.08) 0%,transparent 60%); pointer-events:none; }
+.eyebrow { font-size:10px; letter-spacing:4px; text-transform:uppercase; color:var(--blue-lt); margin-bottom:16px; }
+.cover h1 { font-family:'DM Serif Display',serif; font-size:50px; line-height:1.08; color:var(--white); margin-bottom:16px; max-width:740px; }
+.cover h1 em { color:var(--teal-lt); font-style:normal; }
+.cover p { font-size:16px; color:var(--text-dim); max-width:640px; margin-bottom:36px; line-height:1.85; }
+.meta-row { display:flex; gap:44px; flex-wrap:wrap; }
+.meta-item label { display:block; font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--slate); margin-bottom:4px; }
+.meta-item span { font-size:13px; color:var(--text); font-weight:500; }
+
+.toc { background:var(--navy-3); border-bottom:1px solid rgba(255,255,255,0.05); padding:20px 72px; display:flex; gap:0; flex-wrap:wrap; }
+.toc a { color:var(--text-dim); text-decoration:none; font-size:11.5px; padding:4px 16px 4px 0; border-right:1px solid rgba(255,255,255,0.05); margin-right:16px; transition:color 0.2s; }
+.toc a:hover { color:var(--teal); }
+.toc a:last-child { border-right:none; }
+
+section { padding:60px 72px; border-bottom:1px solid rgba(255,255,255,0.04); }
+.sec-eye { font-size:9px; letter-spacing:4px; text-transform:uppercase; color:var(--blue-lt); margin-bottom:11px; }
+.sec-title { font-family:'DM Serif Display',serif; font-size:30px; color:var(--white); margin-bottom:10px; }
+.sec-intro { font-size:15px; color:var(--text-dim); max-width:720px; margin-bottom:32px; line-height:1.85; }
+
+/* CONSENT BLOCK — the most important section visually */
+.consent-banner { background:linear-gradient(135deg,rgba(224,83,83,0.08),rgba(224,140,42,0.06)); border:2px solid rgba(224,83,83,0.25); border-radius:18px; padding:28px 32px; margin-bottom:32px; }
+.consent-banner h3 { font-family:'DM Serif Display',serif; font-size:22px; color:var(--white); margin-bottom:10px; }
+.consent-banner p { font-size:14px; color:var(--text-dim); line-height:1.8; }
+
+/* CARDS */
+.card { background:var(--navy-2); border:1px solid rgba(255,255,255,0.06); border-radius:14px; padding:18px 20px; }
+.card.teal  { border-left:3px solid var(--teal); }
+.card.blue  { border-left:3px solid var(--blue); }
+.card.red   { border-left:3px solid var(--red); }
+.card.gold  { border-left:3px solid var(--gold); }
+.card.aria  { border-left:3px solid var(--aria); }
+.card h3 { font-size:15px; font-weight:600; color:var(--white); margin-bottom:8px; }
+.card h4 { font-size:13px; font-weight:600; color:var(--white); margin-bottom:6px; }
+.card p  { font-size:13px; color:var(--text-dim); line-height:1.65; }
+
+.two-col   { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px; }
+.three-col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:16px; }
+
+/* TAGS */
+.tag { display:inline-flex; align-items:center; padding:3px 9px; border-radius:5px; font-size:10px; font-weight:700; letter-spacing:0.8px; text-transform:uppercase; margin-right:5px; }
+.tag.plus     { background:rgba(45,106,143,0.18); color:var(--blue-lt); border:1px solid rgba(45,106,143,0.25); }
+.tag.complete { background:rgba(245,166,35,0.15); color:var(--gold); border:1px solid rgba(245,166,35,0.2); }
+.tag.aria     { background:rgba(245,158,11,0.15); color:var(--aria); border:1px solid rgba(245,158,11,0.25); }
+.tag.legal    { background:rgba(224,83,83,0.13); color:var(--red); border:1px solid rgba(224,83,83,0.2); }
+.tag.new      { background:rgba(61,170,138,0.15); color:var(--teal); }
+.tag.safe     { background:rgba(61,170,138,0.12); color:var(--teal-lt); }
+
+/* ALERT */
+.alert { padding:13px 18px; border-radius:10px; margin:12px 0; display:flex; gap:11px; align-items:flex-start; }
+.alert.teal   { background:rgba(61,170,138,0.07); border:1px solid rgba(61,170,138,0.2); }
+.alert.gold   { background:rgba(245,166,35,0.07); border:1px solid rgba(245,166,35,0.2); }
+.alert.blue   { background:rgba(45,106,143,0.08); border:1px solid rgba(45,106,143,0.22); }
+.alert.red    { background:rgba(224,83,83,0.07); border:1px solid rgba(224,83,83,0.2); }
+.alert.aria   { background:rgba(245,158,11,0.07); border:1px solid rgba(245,158,11,0.2); }
+.alert-icon { font-size:13px; flex-shrink:0; margin-top:2px; }
+.alert p { font-size:13px; line-height:1.6; }
+.alert.teal p  { color:var(--teal-lt); }
+.alert.gold p  { color:var(--gold); }
+.alert.blue p  { color:var(--blue-lt); }
+.alert.red p   { color:var(--red); }
+.alert.aria p  { color:var(--aria); }
+
+/* FLIST */
+.flist { list-style:none; }
+.flist li { font-size:12.5px; color:var(--text-dim); padding:4px 0; display:flex; gap:8px; align-items:flex-start; border-bottom:1px solid rgba(255,255,255,0.03); line-height:1.45; }
+.flist li:last-child { border-bottom:none; }
+.flist li::before { flex-shrink:0; font-size:10px; margin-top:2px; }
+.flist li.yes::before   { content:'✓'; color:var(--teal); }
+.flist li.no::before    { content:'✗'; color:var(--red); }
+.flist li.note::before  { content:'→'; color:var(--yellow); }
+.flist li.aria::before  { content:'⚡'; color:var(--aria); font-size:9px; }
+.flist li.legal::before { content:'⚖'; color:var(--orange); font-size:10px; }
+.flist li.rule::before  { content:'◆'; color:var(--blue-lt); font-size:8px; margin-top:3px; }
+
+/* FLOW */
+.flow { display:flex; gap:0; overflow-x:auto; padding-bottom:4px; }
+.flow-step { background:var(--navy-2); border:1px solid rgba(255,255,255,0.07); border-radius:10px; padding:12px 14px; min-width:140px; flex:1; position:relative; }
+.flow-step.warn { background:rgba(224,83,83,0.07); border-color:rgba(224,83,83,0.2); }
+.flow-step.hi { background:rgba(245,158,11,0.07); border-color:rgba(245,158,11,0.2); }
+.flow-step:not(:last-child)::after { content:'→'; position:absolute; right:-16px; top:50%; transform:translateY(-50%); color:var(--slate); font-size:15px; z-index:1; }
+.flow-num { font-size:9px; color:var(--teal); letter-spacing:2px; text-transform:uppercase; margin-bottom:5px; }
+.flow-title { font-size:12px; font-weight:600; color:var(--white); margin-bottom:3px; }
+.flow-desc { font-size:11px; color:var(--text-dim); line-height:1.4; }
+.flow-gap { width:32px; flex-shrink:0; }
+
+/* SCREEN MOCK */
+.screen { background:#0a1520; border:1px solid rgba(255,255,255,0.08); border-radius:14px; overflow:hidden; margin:16px 0; }
+.screen-bar { background:var(--navy-3); padding:9px 16px; display:flex; align-items:center; gap:10px; border-bottom:1px solid rgba(255,255,255,0.05); }
+.screen-dots { display:flex; gap:5px; }
+.screen-dot { width:9px; height:9px; border-radius:50%; }
+.screen-body { padding:18px 20px; }
+
+/* CODE */
+.code-block { background:#080f18; border:1px solid rgba(255,255,255,0.07); border-radius:12px; overflow:hidden; margin:12px 0; }
+.code-header { background:rgba(255,255,255,0.04); padding:8px 16px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.05); }
+.code-lang { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--teal); }
+.code-file { font-size:11px; color:var(--slate); font-family:'JetBrains Mono',monospace; }
+.code-body { padding:16px 18px; font-family:'JetBrains Mono',monospace; font-size:11.5px; line-height:1.7; color:#a8c0cc; overflow-x:auto; }
+.code-body .kw  { color:var(--teal); }
+.code-body .str { color:var(--gold); }
+.code-body .cm  { color:var(--slate); }
+.code-body .cls { color:var(--blue-lt); }
+
+/* TABLE */
+table.main { width:100%; border-collapse:collapse; }
+table.main th { text-align:left; font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--slate); padding:9px 13px; border-bottom:1px solid rgba(255,255,255,0.07); }
+table.main td { padding:10px 13px; font-size:12.5px; color:var(--text-dim); border-bottom:1px solid rgba(255,255,255,0.03); vertical-align:top; line-height:1.5; }
+table.main td strong { color:var(--white); font-weight:500; }
+table.main tr:last-child td { border-bottom:none; }
+
+/* SRC */
+.src { display:inline-flex; background:rgba(45,106,143,0.1); border:1px solid rgba(45,106,143,0.2); border-radius:4px; padding:2px 7px; font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--blue-lt); margin:2px; }
+
+/* HIGHLIGHT */
+.highlight { background:linear-gradient(135deg,rgba(45,106,143,0.1),rgba(61,170,138,0.07)); border:1px solid rgba(61,170,138,0.15); border-radius:16px; padding:24px 28px; margin:20px 0; }
+.highlight h3 { font-family:'DM Serif Display',serif; font-size:20px; color:var(--white); margin-bottom:8px; }
+.highlight p { font-size:14px; color:var(--text-dim); line-height:1.8; }
+
+footer { padding:32px 72px; background:var(--navy-3); border-top:1px solid rgba(255,255,255,0.05); display:flex; justify-content:space-between; align-items:center; }
+footer p { font-size:12px; color:var(--slate); }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="eyebrow">Feature Spec · Co-Parent Calling + ARIA Call Monitor Mode</div>
+  <h1>Co-Parent <em>Video & Voice Calls</em><br>With Full ARIA Monitoring</h1>
+  <p>Complete specification for co-parent-to-co-parent calling via Daily.co — covering the consent framework, ARIA's new call monitoring mode, video and audio pipelines, what flags look like, how calls surface in the attorney portal, and every database change needed.</p>
+  <div class="meta-row">
+    <div class="meta-item"><label>Tier</label><span>Plus: Voice only · Complete: Video + Voice</span></div>
+    <div class="meta-item"><label>New ARIA Mode</label><span>co_parent_call — adult thresholds, not KidSpace</span></div>
+    <div class="meta-item"><label>Critical Legal Layer</label><span>Two-party consent · ToS disclosure · Pre-call banner</span></div>
+    <div class="meta-item"><label>Tech</label><span>Daily.co · AssemblyAI · AWS Rekognition · Supabase Realtime</span></div>
+  </div>
+</div>
+
+<!-- TOC -->
+<nav class="toc">
+  <a href="#s1">01 · Why Add This</a>
+  <a href="#s2">02 · Consent Framework</a>
+  <a href="#s3">03 · Feature Spec</a>
+  <a href="#s4">04 · ARIA Call Mode</a>
+  <a href="#s5">05 · Video Pipeline</a>
+  <a href="#s6">06 · Audio Pipeline</a>
+  <a href="#s7">07 · Flag Actions</a>
+  <a href="#s8">08 · Attorney Portal</a>
+  <a href="#s9">09 · DV Safety</a>
+  <a href="#s10">10 · DB + Endpoints</a>
+  <a href="#s11">11 · ARIA Table Update</a>
+</nav>
+
+
+<!-- ═══════ S1: WHY ═══════ -->
+<section id="s1">
+  <div class="sec-eye">01 — Why This Feature</div>
+  <h2 class="sec-title">The Gap in the Current Platform</h2>
+  <p class="sec-intro">Right now, co-parents communicate through text messages on CommonGround. ARIA mediates those messages before they're sent. But when parents need to have a real conversation — about a school decision, a medical situation, a schedule change that's complicated — they're leaving the platform to call or FaceTime, and everything that happens in that call is unmonitored, undocumented, and legally invisible.</p>
+
+  <div class="two-col">
+    <div class="card red">
+      <h3>The Problem Today</h3>
+      <ul class="flist" style="margin-top:10px;">
+        <li class="no">Co-parents leave the platform for voice/video calls — all that communication disappears from the record</li>
+        <li class="no">Threats, harassment, and hostile language in calls has zero documentation — no ARIA, no log, no court evidence</li>
+        <li class="no">Attorneys have no visibility into what actually happened on a call their client reported as hostile</li>
+        <li class="no">DV survivors have no protected channel for necessary communication — they're using unmonitored calls</li>
+        <li class="no">Both parents can claim the other "said something terrible on that call" with zero way to verify either side</li>
+      </ul>
+    </div>
+    <div class="card teal">
+      <h3>What Co-Parent Calling Solves</h3>
+      <ul class="flist" style="margin-top:10px;">
+        <li class="yes">Every call on the platform is monitored by ARIA — audio and video in real time</li>
+        <li class="yes">ARIA flags hostile language, threats, profanity — with timestamps and transcripts for each flag</li>
+        <li class="yes">Attorneys can see a call log with ARIA flag summary — without hearing the call themselves</li>
+        <li class="yes">Court-admissible call record: duration, participants, flag count, severity distribution, SHA-256</li>
+        <li class="yes">DV survivors have a monitored channel where harassment is automatically detected and logged</li>
+        <li class="yes">ARIA coaching mode: real-time text suggestions during a call when language is escalating</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════ S2: CONSENT FRAMEWORK ═══════ -->
+<section id="s2">
+  <div class="sec-eye">02 — Consent Framework</div>
+  <h2 class="sec-title">Recording Consent — This Has to Be Right</h2>
+
+  <div class="consent-banner">
+    <h3>⚖ Two-Party Consent Laws Apply to This Feature</h3>
+    <p>Recording a phone or video call requires the consent of all parties in most US states — including California, the primary launch market. The platform's Terms of Service must explicitly disclose that all calls made through CommonGround are recorded and monitored. But ToS acceptance alone is not enough for every jurisdiction. You need active, in-the-moment consent before every call connects. This is non-negotiable and must be designed before a single line of call code is written.</p>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <div class="card legal">
+        <h3>The Three-Layer Consent Model</h3>
+        <ul class="flist" style="margin-top:10px;">
+          <li class="legal"><strong>Layer 1 — Terms of Service (Account Creation):</strong> Both parents agree at signup that all CommonGround communications — including calls — are recorded, monitored by ARIA, and may be used as court evidence. This is a blanket consent covering all future calls.</li>
+          <li class="legal"><strong>Layer 2 — Feature Consent Screen (First Call Ever):</strong> Before a parent can make or receive their first call, they see a dedicated consent screen that clearly states "All calls on CommonGround are recorded and monitored by ARIA for compliance purposes. Both parties are aware of and have consented to this recording." They must tap "I Understand and Consent" — not just dismiss it. This is stored as a consent_event in the database with timestamp.</li>
+          <li class="legal"><strong>Layer 3 — Pre-Call Notice (Every Call):</strong> Both the initiating parent and receiving parent see a brief banner before every call connects: "This call is recorded and monitored. Both parties have consented." The receiving parent's call answer screen displays this notice prominently. The call cannot connect until the receiving parent answers — which constitutes their ongoing consent by continued platform use.</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="card gold">
+        <h3>What the Pre-Call Screen Must Show</h3>
+        <div style="background:#080f18;border-radius:10px;padding:14px 16px;margin-top:10px;">
+          <div style="text-align:center;padding:8px 0 12px;">
+            <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--slate);margin-bottom:8px;">Incoming Call</div>
+            <div style="width:52px;height:52px;border-radius:14px;background:rgba(45,106,143,0.2);margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:20px;">👤</div>
+            <div style="font-size:15px;color:var(--white);font-weight:600;margin-bottom:2px;">David W.</div>
+            <div style="font-size:11px;color:var(--text-dim);">Co-Parent</div>
+          </div>
+          <div style="background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.2);border-radius:8px;padding:10px 12px;margin-bottom:12px;">
+            <div style="font-size:10px;color:var(--gold);font-weight:600;margin-bottom:4px;">🔴 This call is recorded</div>
+            <div style="font-size:11px;color:var(--text-dim);line-height:1.5;">All CommonGround calls are recorded and monitored by ARIA. By answering, you confirm your ongoing consent. Both parties have agreed to this in the Terms of Service.</div>
+          </div>
+          <div style="display:flex;gap:10px;">
+            <div style="flex:1;background:rgba(224,83,83,0.15);border-radius:8px;padding:10px;text-align:center;font-size:12px;color:var(--red);font-weight:600;">Decline</div>
+            <div style="flex:1;background:rgba(61,170,138,0.2);border-radius:8px;padding:10px;text-align:center;font-size:12px;color:var(--teal-lt);font-weight:600;">Answer</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert red" style="margin-top:12px;">
+        <div class="alert-icon">⚠</div>
+        <p><strong>Consult legal counsel before launch.</strong> The three-layer model described here is designed to satisfy two-party consent requirements but state laws vary. California (Penal Code §632), Illinois, Florida, Washington, and others have specific wiretapping requirements. Have an attorney review the consent flow and ToS language before the calling feature goes live in any state.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <h3>The Consent Database Record</h3>
+    <p>Every consent event must be stored in a dedicated table — not just in the ToS acceptance record. <span class="src">parent_call_consents</span> stores: user_id, consent_type ('tos_acceptance' | 'feature_screen' | 'call_answer'), timestamp, IP address, app version. When a court or attorney asks "did both parties know this call was being recorded?" — you produce this table entry. It is SHA-256 hashed like all audit records.</p>
+  </div>
+</section>
+
+
+<!-- ═══════ S3: FEATURE SPEC ═══════ -->
+<section id="s3">
+  <div class="sec-eye">03 — Feature Specification</div>
+  <h2 class="sec-title">Co-Parent Calling — What It Is and What It Does</h2>
+  <p class="sec-intro">Voice-only on Plus. Video + Voice on Complete. All calls monitored by ARIA regardless of tier. The feature is additive to messaging — it doesn't replace it. Some conversations need to be text. Some need a real-time voice. The platform now supports both with the same documentation and monitoring standards.</p>
+
+  <div class="two-col">
+    <div class="card teal">
+      <h3>Call Types + Tier Access</h3>
+      <ul class="flist" style="margin-top:10px;">
+        <li class="yes"><strong>Voice Only — Plus tier ($17.99/mo):</strong> Audio call between co-parents. ARIA audio monitoring active. No video. Recorded. SHA-256 on call record.</li>
+        <li class="yes"><strong>Video + Voice — Complete tier ($34.99/mo):</strong> Full video call. Both ARIA audio AND video monitoring active. Recorded. SHA-256 on call record.</li>
+        <li class="yes"><strong>Initiating:</strong> Either parent can initiate a call at any time (no time window restrictions like KidSpace — adults manage their own schedules)</li>
+        <li class="yes"><strong>Declining is always available:</strong> The receiving parent can always decline. There is no way to force a co-parent to answer. Declined calls are logged (time, who declined) but not as a compliance violation.</li>
+        <li class="yes"><strong>Call duration limits:</strong> No hard limit, but attorney can set a recommended duration in the Professional Portal (shows as a soft reminder at that time — not a termination)</li>
+        <li class="yes"><strong>Both participants see the same recording notice banner throughout the call</strong> — a small persistent indicator at the top of the call screen: "🔴 Recording"</li>
+      </ul>
+    </div>
+    <div class="card blue">
+      <h3>In-Call Features</h3>
+      <ul class="flist" style="margin-top:10px;">
+        <li class="yes"><strong>ARIA Coaching Sidebar (optional):</strong> A small overlay on the side of the call screen that shows ARIA's real-time assessment of the conversation tone. Color changes from green → yellow → orange as hostility escalates. Parent can collapse it. The co-parent cannot see this sidebar — it's personal to each participant.</li>
+        <li class="yes"><strong>Topic anchoring:</strong> Before or during a call, either parent can set a "call topic" — "Discussing Emma's school enrollment." This gets associated with the call record. Helps attorneys understand call context without listening to it.</li>
+        <li class="yes"><strong>Leave a note:</strong> After a call ends, either parent can add a brief note (up to 300 chars) summarizing what was decided. The note is attached to the call log. Both parents can see both notes. ARIA moderates these notes.</li>
+        <li class="yes"><strong>Quick Accord from call:</strong> If an agreement is reached on a call, parent can immediately tap "Create Quick Accord" from the post-call screen — pre-filled with the call topic if one was set.</li>
+        <li class="yes"><strong>Mute:</strong> Standard mute functionality. Mute status is logged — if a parent mutes during a flagged period, that's noted in the call record.</li>
+        <li class="note">No in-call text chat between co-parents during a call — this prevents side-channel communication that could circumvent the call monitoring. If they want to share something text-based, they send a message separately.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="three-col" style="margin-top:4px;">
+    <div class="card">
+      <h4>What Both Parents See</h4>
+      <ul class="flist" style="margin-top:8px;">
+        <li class="yes">Each other's name and avatar</li>
+        <li class="yes">Call duration timer</li>
+        <li class="yes">Recording indicator (always visible)</li>
+        <li class="yes">Topic label if one was set</li>
+        <li class="yes">Mute / end call controls</li>
+        <li class="yes">Video on/off toggle (Complete tier)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>What Only Each Parent Sees (Private)</h4>
+      <ul class="flist" style="margin-top:8px;">
+        <li class="yes">Their own ARIA Coaching Sidebar (tone indicator)</li>
+        <li class="yes">Their own post-call note field</li>
+        <li class="yes">Suggestions if ARIA detects escalation on their end</li>
+        <li class="note">The co-parent never sees your ARIA sidebar or suggestions</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>What Neither Parent Sees</h4>
+      <ul class="flist" style="margin-top:8px;">
+        <li class="no">The full ARIA flag log during the call</li>
+        <li class="no">The call transcript in real time</li>
+        <li class="no">The co-parent's ARIA sidebar</li>
+        <li class="no">The evidence record if a call segment is flagged</li>
+        <li class="note">Post-call: both can see the call's flag summary count — not the transcript or scores</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════ S4: ARIA CALL MODE ═══════ -->
+<section id="s4">
+  <div class="sec-eye">04 — New ARIA Mode: co_parent_call</div>
+  <h2 class="sec-title">How This Mode Differs From Parent Messaging and KidSpace</h2>
+  <p class="sec-intro">Co-parent calling needs its own ARIA mode — distinct from both the text messaging pipeline (pre-send analysis) and KidSpace Guard (child-focused, extra-sensitive). Adult co-parent calls have different dynamics, different thresholds, and a different available action set. You cannot auto-terminate an adult call the way you can a KidSpace session.</p>
+
+  <div class="alert aria">
+    <div class="alert-icon">⚡</div>
+    <p><strong>The key difference from KidSpace:</strong> ARIA cannot unilaterally end a co-parent call. These are adults. Terminating their call is an interference with their communication that could have legal implications — particularly in cases where courts have ordered co-parents to communicate. ARIA can flag, escalate, send real-time notifications, and provide strong coaching signals — but the actual call termination is always the parent's choice or requires explicit attorney intervention.</p>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Python</span><span class="code-file">aria/rules/decision_engine.py — Add co_parent_call to THRESHOLDS</span></div>
+    <div class="code-body">THRESHOLDS = {
+    <span class="str">'parent'</span>: {           <span class="cm"># text messaging — pre-send</span>
+        <span class="str">'suggest'</span>: <span class="cls">0.35</span>,
+        <span class="str">'flag'</span>:    <span class="cls">0.60</span>,
+        <span class="str">'block'</span>:   <span class="cls">0.85</span>,
+    },
+    <span class="str">'kidspace'</span>: {          <span class="cm"># child communications — extra sensitive</span>
+        <span class="str">'suggest'</span>: <span class="cls">0.20</span>,
+        <span class="str">'flag'</span>:    <span class="cls">0.40</span>,
+        <span class="str">'hold'</span>:    <span class="cls">0.55</span>,
+        <span class="str">'block'</span>:   <span class="cls">0.70</span>,
+        <span class="str">'end_session'</span>: <span class="cls">0.80</span>,
+    },
+    <span class="str">'co_parent_call'</span>: {   <span class="cm"># NEW — adult co-parent voice/video calls</span>
+        <span class="str">'coach'</span>:       <span class="cls">0.30</span>,  <span class="cm"># show coaching sidebar warning (yellow)</span>
+        <span class="str">'coach_strong'</span>: <span class="cls">0.50</span>, <span class="cm"># coaching sidebar turns orange — strong warning</span>
+        <span class="str">'flag'</span>:        <span class="cls">0.65</span>,  <span class="cm"># log flag + notify attorney if linked</span>
+        <span class="str">'flag_urgent'</span>: <span class="cls">0.80</span>,  <span class="cm"># flag + notify attorney immediately + alert both parents post-call</span>
+        <span class="str">'threat_detected'</span>: <span class="cls">0.85</span>, <span class="cm"># special: threat language → immediate alert</span>
+        <span class="cm"># NOTE: No 'end_session' in this mode — adults cannot be force-terminated</span>
+        <span class="cm"># No 'block' — can't block real-time speech</span>
+        <span class="cm"># No 'hold' — can't hold speech in transit</span>
+    }
+}
+
+<span class="cm"># Available actions for co_parent_call mode:
+# - allow     → content within normal bounds, log only
+# - coach     → update the caller's ARIA sidebar indicator (only they see it)
+# - flag      → create a timed event record, notify attorney post-call
+# - flag_urgent → create event record + send push notification to attorney NOW
+# - threat_alert → immediate push to both parents and attorney, create evidence record</span></div>
+  </div>
+
+  <div class="two-col" style="margin-top:16px;">
+    <div class="card aria">
+      <h3>ARIA Coaching Sidebar — Real-Time Tone Signal</h3>
+      <p style="margin-bottom:12px;">Each parent sees their own private tone indicator in the corner of the call screen. It reflects ARIA's assessment of the last 10–15 seconds of their speech specifically — not the whole call, not the other parent.</p>
+      <ul class="flist">
+        <li class="yes"><strong>🟢 Green — "Communicating well":</strong> Tone is constructive. No intervention.</li>
+        <li class="yes"><strong>🟡 Yellow — "Tension detected":</strong> ARIA score ≥ 0.30. Sidebar shows a gentle nudge: "Consider pausing to listen." Nothing more.</li>
+        <li class="yes"><strong>🟠 Orange — "Escalating":</strong> Score ≥ 0.50. Sidebar: "This conversation is becoming heated. Take a breath before responding." Parent sees this, co-parent does not.</li>
+        <li class="yes"><strong>🔴 Red — "High conflict":</strong> Score ≥ 0.65. Sidebar: "This call is being flagged. Consider ending and continuing in writing." A flag event is written to the record.</li>
+        <li class="note">The sidebar is opt-out by default. Parent can collapse it in settings. The flag still occurs at the threshold regardless of whether the sidebar is visible.</li>
+      </ul>
+    </div>
+    <div class="card gold">
+      <h3>What Constitutes a Flag in co_parent_call Mode</h3>
+      <ul class="flist" style="margin-top:10px;">
+        <li class="aria">Hostility score ≥ 0.65 for a sustained 10-second window</li>
+        <li class="aria">Profanity score ≥ 0.70 in any 10-second window</li>
+        <li class="aria">Threat language detection ≥ 0.80 (any credible threat, regardless of duration)</li>
+        <li class="aria">Controlling language pattern ≥ 0.75 sustained over 30 seconds</li>
+        <li class="aria">Distress signal from the receiving parent ≥ 0.60 (crying, fear, requests for help — same detection as KidSpace audio)</li>
+        <li class="note">A "flag" in this mode creates a <span class="src">coparent_call_events</span> record with: timestamp, flag_type, severity, score, transcript_excerpt (10s window), which parent triggered it</li>
+        <li class="note">Flag does NOT interrupt the call. Flag does NOT notify the other parent during the call. Both parents receive a post-call summary if any flags occurred.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════ S5: VIDEO PIPELINE ═══════ -->
+<section id="s5">
+  <div class="sec-eye">05 — Video Monitoring Pipeline</div>
+  <h2 class="sec-title">AWS Rekognition on Co-Parent Video Calls</h2>
+  <p class="sec-intro">Video monitoring applies to Complete tier calls only (video is not available on Plus). The pipeline is identical to KidSpace's video analysis but with different action thresholds — because these are adults and the platform cannot auto-terminate their calls.</p>
+
+  <div class="card" style="margin-bottom:16px;">
+    <h3>What Gets Scanned and At What Rate</h3>
+    <div class="two-col" style="margin-top:12px;">
+      <div>
+        <ul class="flist">
+          <li class="aria"><strong>Frame rate:</strong> 1 frame every 10 seconds during normal call · Escalates to every 3 seconds if a prior video flag occurred in the last 120 seconds</li>
+          <li class="aria"><strong>Rekognition labels checked:</strong> Nudity · Explicit Sexual Activity · Violence · Weapons · Drugs · Hate Symbols</li>
+          <li class="aria"><strong>Confidence threshold:</strong> Any moderation label with confidence ≥ 75% triggers evaluation</li>
+          <li class="note">Note: Unlike KidSpace, we do NOT check for "Suggestive" or "Rude Gestures" at the same threshold — adults have different social norms. Threshold for those categories is ≥ 90%.</li>
+        </ul>
+      </div>
+      <div>
+        <ul class="flist">
+          <li class="rule"><strong>Nudity ≥ 85%:</strong> Flag event created + attorney notified + both parents receive a post-call notification that a video compliance event occurred. Call is NOT terminated automatically.</li>
+          <li class="rule"><strong>Weapons ≥ 80%:</strong> Flag event + immediate push notification to attorney if linked. If no attorney, notification goes to admin for manual review.</li>
+          <li class="rule"><strong>Hate Symbol ≥ 75%:</strong> Flag event + attorney notification.</li>
+          <li class="rule"><strong>Violence ≥ 85%:</strong> Flag event + attorney + admin alert.</li>
+          <li class="note">Video evidence frame is extracted and SHA-256 hashed when a flag occurs. The frame is stored as an evidence artifact — not accessible to either parent, only to attorneys and admin through formal process.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="alert teal">
+    <div class="alert-icon">→</div>
+    <p><strong>Why we don't auto-terminate adult co-parent calls on video flags:</strong> A co-parent could deliberately hold up a knife, trigger an auto-termination, and then claim the platform "cut off their legal right to communicate with the other parent." Courts have ordered many co-parents to communicate. Terminating that communication unilaterally creates liability. Instead, the flag is recorded with full evidence, the attorney is notified immediately, and the attorney makes the decision about whether to advise their client to end the call. The platform protects through documentation, not interruption.</p>
+  </div>
+</section>
+
+
+<!-- ═══════ S6: AUDIO PIPELINE ═══════ -->
+<section id="s6">
+  <div class="sec-eye">06 — Audio Monitoring Pipeline</div>
+  <h2 class="sec-title">Real-Time Transcription + ARIA Classification</h2>
+  <p class="sec-intro">The audio pipeline runs on all co-parent calls — both Plus (voice-only) and Complete (video + voice). AssemblyAI handles real-time transcription. Claude/OpenAI handles classification of each 10-second transcript window. The rules engine handles the decision. Same architecture as KidSpace audio, different mode config.</p>
+
+  <div class="flow" style="margin-bottom:20px;">
+    <div class="flow-step">
+      <div class="flow-num">Step 1</div>
+      <div class="flow-title">Audio Capture</div>
+      <div class="flow-desc">Daily.co sends audio stream to backend WebSocket endpoint. Two separate streams — one per participant.</div>
+    </div>
+    <div class="flow-gap"></div>
+    <div class="flow-step">
+      <div class="flow-num">Step 2</div>
+      <div class="flow-title">AssemblyAI Transcription</div>
+      <div class="flow-desc">Streaming transcription. Produces rolling 10-second transcript windows per participant. Speaker-labeled.</div>
+    </div>
+    <div class="flow-gap"></div>
+    <div class="flow-step hi">
+      <div class="flow-num">Step 3</div>
+      <div class="flow-title">ARIA Classification</div>
+      <div class="flow-desc">Each 10s window sent to Claude (primary) / OpenAI (fallback) with co_parent_call prompt. Returns JSON scores.</div>
+    </div>
+    <div class="flow-gap"></div>
+    <div class="flow-step hi">
+      <div class="flow-num">Step 4</div>
+      <div class="flow-title">Rules Engine Decides</div>
+      <div class="flow-desc">decide(analysis, mode='co_parent_call', history). Returns ARIADecision: allow / coach / flag / flag_urgent / threat_alert.</div>
+    </div>
+    <div class="flow-gap"></div>
+    <div class="flow-step">
+      <div class="flow-num">Step 5</div>
+      <div class="flow-title">Action Executed</div>
+      <div class="flow-desc">Update caller's coaching sidebar in real time via Supabase Realtime. Write flag event to DB. Notify attorney if threshold met.</div>
+    </div>
+    <div class="flow-gap"></div>
+    <div class="flow-step">
+      <div class="flow-num">Step 6</div>
+      <div class="flow-title">Post-Call</div>
+      <div class="flow-desc">Full transcript stored. Call summary generated. Both parents receive summary if flags occurred. Attorney gets summary always.</div>
+    </div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-header"><span class="code-lang">Python</span><span class="code-file">aria/prompts/coparent_call_prompt.py</span></div>
+    <div class="code-body">COPARENT_CALL_PROMPT = <span class="str">"""
+You are an AI analyzing a 10-second excerpt from a monitored co-parenting call.
+These are two separated or divorced parents discussing their children's welfare.
+The call is being monitored to detect conflict escalation, threats, and harassment.
+
+Analyze the following transcript excerpt and return ONLY valid JSON:
+{
+  "toxicity_score": 0.0-1.0,
+  "hostility_score": 0.0-1.0,
+  "controlling_score": 0.0-1.0,
+  "profanity_score": 0.0-1.0,
+  "threat_score": 0.0-1.0,
+  "distress_signal_score": 0.0-1.0,
+  "primary_category": "clean|hostility|profanity|threat|controlling|distress",
+  "categories": [],
+  "requires_action": true|false,
+  "confidence": 0.0-1.0,
+  "provider": "claude",
+  "model_version": "claude-sonnet-4-6"
+}
+
+threat_score: language containing direct threats ("I will...", "You'll regret...",
+implied physical danger, legal threats that cross into coercion).
+
+distress_signal_score: ONE of the speakers showing signs of fear, distress,
+crying, or statements suggesting they feel unsafe ("stop yelling at me",
+"please stop", "I'm scared").
+
+Do not produce rewrite suggestions for call mode.
+Do not include text outside the JSON.
+
+Speaker A transcript (last 10 seconds):
+{transcript_a}
+
+Speaker B transcript (last 10 seconds):
+{transcript_b}
+"""</span>
+
+<span class="cm"># Called separately per speaker — each parent's speech classified independently
+# This is important: a threat from Speaker A doesn't contaminate Speaker B's score
+# The rules engine receives separate ARIADecision objects per speaker</span></div>
+  </div>
+</section>
+
+
+<!-- ═══════ S7: FLAG ACTIONS ═══════ -->
+<section id="s7">
+  <div class="sec-eye">07 — What Happens When a Flag Fires</div>
+  <h2 class="sec-title">Real-Time During the Call + Post-Call Summary</h2>
+
+  <table class="main">
+    <tr>
+      <th>Flag Type</th>
+      <th>Severity</th>
+      <th>During the Call</th>
+      <th>Immediately After</th>
+      <th>Who Is Notified</th>
+    </tr>
+    <tr>
+      <td><strong>Coach (tone warning)</strong></td>
+      <td>1 — informational</td>
+      <td>Caller's ARIA sidebar turns yellow. Small text: "Tension detected." Only the flagged speaker sees this.</td>
+      <td>Logged in <span class="src">coparent_call_events</span>. No notification sent.</td>
+      <td>Nobody notified — coaching only</td>
+    </tr>
+    <tr>
+      <td><strong>Flag — standard</strong></td>
+      <td>2 — notable</td>
+      <td>Caller's ARIA sidebar turns orange. Small text: "This call is being flagged." Call continues uninterrupted.</td>
+      <td>Post-call summary includes: "1 compliance event was recorded during this call." Attorney receives call log with flag count.</td>
+      <td>Attorney (post-call) · Admin if no attorney linked</td>
+    </tr>
+    <tr>
+      <td><strong>Flag — urgent</strong></td>
+      <td>3 — escalated</td>
+      <td>Caller's ARIA sidebar turns red. Text: "High-conflict language detected. Consider ending this call." Call continues — their choice.</td>
+      <td>Both parents receive a push: "An ARIA compliance event was recorded on your call. Your attorney has been notified." Transcript excerpt of the flagged window stored as evidence.</td>
+      <td>Attorney immediately (push notification) · Both parents (post-call)</td>
+    </tr>
+    <tr>
+      <td><strong>Threat detected</strong></td>
+      <td>4 — critical</td>
+      <td>Receiving parent's screen shows: "⚠ Threatening language has been detected on this call. You may end this call at any time." Small unobtrusive banner — doesn't block their view. Call continues.</td>
+      <td>Evidence record created: transcript excerpt + SHA-256 hash + timestamp. Both parents notified. Attorney receives immediate push: "Threatening language detected — call in progress."</td>
+      <td>Both parents (immediate) · Attorney (immediate) · Admin (immediate) · Auto-ticket created</td>
+    </tr>
+    <tr>
+      <td><strong>Distress signal detected</strong></td>
+      <td>3-4 depending on score</td>
+      <td>Nothing shown to either party during the call — distress notifications during a call could escalate the situation. Silent flag.</td>
+      <td>Both parents notified post-call. Attorney notified. If score ≥ 0.80: admin creates a safety review ticket. If DV flag is on the case: immediate admin alert regardless of threshold.</td>
+      <td>Attorney (post-call or immediate if DV case) · Admin (review ticket)</td>
+    </tr>
+  </table>
+
+  <div class="alert teal" style="margin-top:16px;">
+    <div class="alert-icon">→</div>
+    <p><strong>The post-call summary both parents see:</strong> "Your call with [Co-Parent Name] on [Date] — Duration: 14 min. ARIA recorded 2 compliance events during this call. Your attorney [Name] has been notified. A detailed call log is available in your Documents. Questions? Contact support." They see event count and that their attorney was notified — not the transcript, not the scores, not the specific flags. The detailed log is attorney-facing.</p>
+  </div>
+</section>
+
+
+<!-- ═══════ S8: ATTORNEY PORTAL ═══════ -->
+<section id="s8">
+  <div class="sec-eye">08 — Attorney Portal Integration</div>
+  <h2 class="sec-title">How Co-Parent Calls Surface in the Professional Portal</h2>
+  <p class="sec-intro">The attorney portal's Calls & Logs tab already exists in the Client Communication section. It currently shows KidSpace call logs. Co-parent calls are added to the same tab with a clear visual distinction — attorneys can see both children's calls and co-parent calls from one screen.</p>
+
+  <div class="two-col">
+    <div class="card blue">
+      <h3>What Attorneys See Per Call</h3>
+      <ul class="flist" style="margin-top:10px;">
+        <li class="yes">Call date, start time, duration</li>
+        <li class="yes">Who initiated the call</li>
+        <li class="yes">Call topic if one was set by either parent</li>
+        <li class="yes">Total ARIA flag count and severity distribution (e.g., "2 events: 1 medium, 1 high")</li>
+        <li class="yes">Flag types that occurred — not the transcript, just the categories: "Hostility, Threat language"</li>
+        <li class="yes">Transcript excerpt for flagged windows (severity 3+) — attorney can read the 10-second window that triggered the flag</li>
+        <li class="yes">Post-call notes added by either parent (both visible to attorney)</li>
+        <li class="yes">Any Quick Accords created from the call</li>
+        <li class="yes">SHA-256 hash of the call record</li>
+        <li class="yes">Download call log as PDF (SHA-256 verified — court-submittable)</li>
+      </ul>
+    </div>
+    <div class="card gold">
+      <h3>What Attorneys Do NOT See</h3>
+      <ul class="flist" style="margin-top:10px;">
+        <li class="no">Full call transcript (only flagged 10-second windows)</li>
+        <li class="no">Audio or video recording of the call</li>
+        <li class="no">Non-flagged portions of the transcript</li>
+        <li class="no">The ARIA scores themselves (only the flag categories)</li>
+        <li class="no">Which parent's ARIA sidebar showed what</li>
+        <li class="note">The full transcript and recording are available through a separate legal evidence request process — attorney submits a formal request, CommonGround legal reviews, and if appropriate the full transcript is provided with proper chain of custody documentation. This is not a portal self-serve action.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="screen" style="margin-top:20px;">
+    <div class="screen-bar">
+      <div class="screen-dots"><div class="screen-dot" style="background:#ff5f57;"></div><div class="screen-dot" style="background:#ffbd2e;"></div><div class="screen-dot" style="background:#28c840;"></div></div>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-dim);">Case FF-O3Z2LL → Client Communication → Calls & Logs</span>
+    </div>
+    <div class="screen-body">
+      <div style="display:flex;gap:10px;margin-bottom:14px;">
+        <div style="background:rgba(45,106,143,0.15);border:1px solid rgba(45,106,143,0.3);border-radius:6px;padding:5px 12px;font-size:11px;color:var(--blue-lt);font-weight:600;">Co-Parent Calls</div>
+        <div style="background:rgba(255,255,255,0.04);border-radius:6px;padding:5px 12px;font-size:11px;color:var(--text-dim);">KidSpace Calls</div>
+        <div style="background:rgba(255,255,255,0.04);border-radius:6px;padding:5px 12px;font-size:11px;color:var(--text-dim);">All</div>
+      </div>
+
+      <!-- Call Row 1 — flagged -->
+      <div style="background:rgba(224,83,83,0.06);border:1px solid rgba(224,83,83,0.15);border-radius:10px;padding:12px 16px;margin-bottom:8px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;">
+          <div>
+            <div style="font-size:13px;color:var(--white);font-weight:500;margin-bottom:2px;">Mar 11, 2026 · 7:22 PM · 14 min 38 sec</div>
+            <div style="font-size:11px;color:var(--text-dim);">Initiated by: Sarah M. · Topic: Emma's school enrollment decision</div>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <span style="background:rgba(224,83,83,0.15);color:var(--red);padding:3px 9px;border-radius:4px;font-size:10px;font-weight:700;">2 FLAGS</span>
+            <span style="background:rgba(255,255,255,0.05);padding:3px 9px;border-radius:4px;font-size:10px;color:var(--text-dim);">Download PDF</span>
+          </div>
+        </div>
+        <div style="background:rgba(0,0,0,0.2);border-radius:8px;padding:10px 12px;margin-bottom:8px;">
+          <div style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--slate);margin-bottom:6px;">ARIA Events</div>
+          <div style="display:flex;gap:8px;margin-bottom:4px;align-items:center;">
+            <span style="background:rgba(224,140,42,0.15);color:var(--orange);padding:2px 7px;border-radius:3px;font-size:10px;font-weight:600;">MEDIUM · 7:31 PM</span>
+            <span style="font-size:12px;color:var(--text-dim);">Hostility · "David W. — sustained elevated tone for 18 seconds"</span>
+          </div>
+          <div style="font-size:11px;color:var(--slate);padding:6px 8px;background:rgba(255,255,255,0.02);border-radius:5px;margin-left:0;font-style:italic;margin-bottom:6px;">[Flagged transcript excerpt — 10 seconds] Available on case export</div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <span style="background:rgba(224,83,83,0.15);color:var(--red);padding:2px 7px;border-radius:3px;font-size:10px;font-weight:600;">HIGH · 7:38 PM</span>
+            <span style="font-size:12px;color:var(--text-dim);">Threat language · "David W. — possible coercive language detected"</span>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--text-dim);display:flex;gap:16px;">
+          <span>Sarah's note: "He threatened to file for modification again"</span>
+          <span style="color:var(--slate);">David's note: (none)</span>
+        </div>
+      </div>
+
+      <!-- Call Row 2 — clean -->
+      <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:12px 16px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-size:13px;color:var(--white);font-weight:500;margin-bottom:2px;">Mar 8, 2026 · 5:45 PM · 6 min 12 sec</div>
+            <div style="font-size:11px;color:var(--text-dim);">Initiated by: David W. · Topic: Spring break schedule</div>
+          </div>
+          <span style="background:rgba(61,170,138,0.12);color:var(--teal);padding:3px 9px;border-radius:4px;font-size:10px;font-weight:700;">✓ CLEAN</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════ S9: DV SAFETY ═══════ -->
+<section id="s9">
+  <div class="sec-eye">09 — DV Safety Considerations</div>
+  <h2 class="sec-title">High-Conflict and Domestic Violence Case Handling</h2>
+  <p class="sec-intro">Co-parent calling for DV-flagged cases requires special handling. The platform cannot force a DV survivor to call their abuser — but it can provide the safest possible environment if they choose to do so, and it can detect the warning signs that attorneys and advocates need to see.</p>
+
+  <div class="two-col">
+    <div class="card red">
+      <h3>DV Flag Modifications to Call Behavior</h3>
+      <ul class="flist" style="margin-top:10px;">
+        <li class="legal"><strong>DV flag is set by attorney or on case creation:</strong> When a case is marked as DV-involved, co-parent call thresholds tighten automatically — same as KidSpace's extra-sensitive mode applied to the adult thresholds.</li>
+        <li class="legal"><strong>DV case threshold changes:</strong> All thresholds drop by 0.15. Flag fires at 0.50 instead of 0.65. Urgent flag at 0.65 instead of 0.80. Distress signal threshold drops to 0.45.</li>
+        <li class="legal"><strong>Distress signal on DV case:</strong> Any distress signal ≥ 0.45 triggers an immediate push to the attorney and admin — not just a post-call summary. This is the one case where the monitoring system activates during the call for the survivor's benefit.</li>
+        <li class="legal"><strong>Threat detection on DV case:</strong> Any threat_score ≥ 0.70 (vs. 0.85 standard) triggers the receiving parent's safety banner immediately.</li>
+        <li class="legal"><strong>Calls are optional for DV cases — NEVER mandatory.</strong> The platform never coerces contact between a DV survivor and their abuser. Silent Handoff and text messaging are always available as non-contact alternatives.</li>
+      </ul>
+    </div>
+    <div class="card teal">
+      <h3>Survivor-Protective Features During Calls</h3>
+      <ul class="flist" style="margin-top:10px;">
+        <li class="yes"><strong>Quick End Call button:</strong> Large, prominent "End Call" button always visible on DV-flagged cases — never minimized or hidden by other UI elements.</li>
+        <li class="yes"><strong>One-tap block after call:</strong> After any call ends on a DV case, receiving parent has a one-tap "Block future calls — send to messaging only" option that immediately prevents future voice/video calls from that co-parent. Requires their attorney confirmation to reverse.</li>
+        <li class="yes"><strong>Emergency contact display:</strong> During a DV-flagged call, a small persistent button shows the user's emergency contact (from My Circle) — one tap to call them immediately if needed.</li>
+        <li class="yes"><strong>Post-call safety check:</strong> 30 minutes after a DV-flagged call, the platform sends a check-in notification: "How are you doing after that call? If you need support, [tap here]." Links to crisis resources.</li>
+        <li class="yes"><strong>All DV case call records automatically flagged for attorney review</strong> even if no ARIA event occurred — attorneys see every call on DV cases, not just flagged ones.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════ S10: DB + ENDPOINTS ═══════ -->
+<section id="s10">
+  <div class="sec-eye">10 — Database + API Additions</div>
+  <h2 class="sec-title">New Tables and Endpoints</h2>
+
+  <div class="two-col">
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">SQL</span><span class="code-file">New tables to add</span></div>
+      <div class="code-body"><span class="cm">-- Co-parent call records</span>
+CREATE TABLE <span class="cls">coparent_calls</span> (
+  id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  family_file_id   UUID REFERENCES family_files(id),
+  initiator_id     UUID REFERENCES users(id),
+  recipient_id     UUID REFERENCES users(id),
+  call_type        TEXT, <span class="cm">-- 'voice' | 'video'</span>
+  status           TEXT, <span class="cm">-- 'completed' | 'declined' | 'missed' | 'failed'</span>
+  topic            TEXT,
+  started_at       TIMESTAMPTZ,
+  ended_at         TIMESTAMPTZ,
+  duration_seconds INT,
+  flag_count       INT DEFAULT 0,
+  max_severity     INT DEFAULT 0,
+  transcript_stored BOOLEAN DEFAULT FALSE,
+  recording_url    TEXT, <span class="cm">-- encrypted storage path</span>
+  sha256_hash      TEXT, <span class="cm">-- hash of the call record</span>
+  is_dv_case       BOOLEAN DEFAULT FALSE,
+  created_at       TIMESTAMPTZ DEFAULT NOW()
+);
+
+<span class="cm">-- Per-event ARIA flags within a call</span>
+CREATE TABLE <span class="cls">coparent_call_events</span> (
+  id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  call_id        UUID REFERENCES coparent_calls(id),
+  flagged_user_id UUID REFERENCES users(id),
+  event_type     TEXT,   <span class="cm">-- 'coach'|'flag'|'flag_urgent'|'threat'|'distress'</span>
+  severity       INT,    <span class="cm">-- 1-4</span>
+  flag_category  TEXT,   <span class="cm">-- 'hostility'|'threat'|'distress'|etc.</span>
+  toxicity_score DECIMAL(4,2),
+  transcript_excerpt TEXT, <span class="cm">-- 10s window that triggered flag</span>
+  timestamp_in_call INT, <span class="cm">-- seconds from call start</span>
+  ai_provider    TEXT,
+  sha256_hash    TEXT,
+  created_at     TIMESTAMPTZ DEFAULT NOW()
+);
+
+<span class="cm">-- Post-call notes from each parent</span>
+CREATE TABLE <span class="cls">coparent_call_notes</span> (
+  id        UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  call_id   UUID REFERENCES coparent_calls(id),
+  author_id UUID REFERENCES users(id),
+  note_text TEXT, <span class="cm">-- max 300 chars · ARIA moderated before storage</span>
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+<span class="cm">-- Consent records</span>
+CREATE TABLE <span class="cls">parent_call_consents</span> (
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id      UUID REFERENCES users(id),
+  consent_type TEXT, <span class="cm">-- 'tos_acceptance'|'feature_screen'|'call_answer'</span>
+  call_id      UUID REFERENCES coparent_calls(id), <span class="cm">-- null for tos/feature</span>
+  ip_address   TEXT,
+  app_version  TEXT,
+  sha256_hash  TEXT,
+  created_at   TIMESTAMPTZ DEFAULT NOW()
+);</div>
+    </div>
+    <div>
+      <div class="code-block" style="margin-bottom:12px;">
+        <div class="code-header"><span class="code-lang">REST</span><span class="code-file">New API Endpoints</span></div>
+        <div class="code-body"><span class="cm"># Initiate a co-parent call</span>
+POST /coparent/calls
+{
+  family_file_id, call_type, topic? 
+}
+<span class="cm"># Returns: {call_id, daily_room_url, consent_required}</span>
+
+<span class="cm"># Answer / decline a call</span>
+POST /coparent/calls/{call_id}/answer
+POST /coparent/calls/{call_id}/decline
+<span class="cm"># Both log a consent event on answer</span>
+
+<span class="cm"># End a call</span>
+POST /coparent/calls/{call_id}/end
+
+<span class="cm"># Add post-call note</span>
+POST /coparent/calls/{call_id}/notes
+{ note_text }
+
+<span class="cm"># Get call log for a family file</span>
+GET /coparent/calls?family_file_id={uuid}&limit=20
+
+<span class="cm"># Get call detail (attorney — includes flag excerpts)</span>
+GET /professional/cases/{id}/calls/{call_id}
+
+<span class="cm"># Record consent event</span>
+POST /coparent/consent
+{ consent_type, call_id? }
+
+<span class="cm"># WebSocket endpoint — ARIA audio stream</span>
+WS /coparent/calls/{call_id}/aria-stream
+<span class="cm"># Receives: {audio_chunk, speaker, timestamp}</span>
+<span class="cm"># Sends: {sidebar_update, severity, message?}</span></div>
+      </div>
+
+      <div class="card" style="margin-top:4px;">
+        <h4>Tier Gate on Call Initiation</h4>
+        <p style="font-size:12.5px;margin-bottom:8px;">Both parents must be at least on Web Starter to receive calls. But call initiation requires at minimum Plus tier on the initiating parent's account.</p>
+        <ul class="flist">
+          <li class="yes">Initiator on Plus → voice call available</li>
+          <li class="yes">Initiator on Complete → video + voice available</li>
+          <li class="yes">Initiator on Free → sees "Upgrade to Plus to call your co-parent" prompt. Can still receive calls from co-parent on Plus/Complete.</li>
+          <li class="note">The receiving parent's tier doesn't affect what type of call they receive — only the initiating parent's tier determines voice vs. video.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════ S11: ARIA TABLE UPDATE ═══════ -->
+<section id="s11">
+  <div class="sec-eye">11 — ARIA Mode Table Update</div>
+  <h2 class="sec-title">Adding co_parent_call to the Complete ARIA Mode Reference</h2>
+  <p class="sec-intro">The ARIA architecture document (KidSpace + ARIA Architecture) contains a table of all ARIA operating modes. Add this row to that table.</p>
+
+  <table class="main">
+    <tr>
+      <th>Mode</th>
+      <th>Trigger</th>
+      <th>AI Providers</th>
+      <th>Available Actions</th>
+      <th>Threshold Profile</th>
+      <th>Who Sees Flags</th>
+    </tr>
+    <tr style="background:rgba(61,170,138,0.04);">
+      <td><strong>Co-Parent Call Audio</strong> <span style="background:rgba(61,170,138,0.15);color:var(--teal);padding:2px 7px;border-radius:3px;font-size:9px;font-weight:700;margin-left:4px;">NEW</span></td>
+      <td>Continuous during co-parent voice or video call — rolling 10-second windows per speaker</td>
+      <td>AssemblyAI (transcription) + Claude/OpenAI (classification)</td>
+      <td>Allow · Coach (sidebar update) · Flag · Flag Urgent · Threat Alert</td>
+      <td>Adult standard. DV case: tightened by 0.15 across all thresholds. No end_session action.</td>
+      <td>Flagged speaker (sidebar, real-time). Attorney (post-call or immediate on urgent). Admin (immediate on threat/distress). Both parents (post-call summary if flags occurred).</td>
+    </tr>
+    <tr style="background:rgba(61,170,138,0.04);">
+      <td><strong>Co-Parent Call Video</strong> <span style="background:rgba(61,170,138,0.15);color:var(--teal);padding:2px 7px;border-radius:3px;font-size:9px;font-weight:700;margin-left:4px;">NEW</span></td>
+      <td>1 frame every 10 seconds during Complete-tier video calls. Escalates to every 3s on prior flag.</td>
+      <td>AWS Rekognition</td>
+      <td>Allow · Flag · Threat Alert (no end_session — adults)</td>
+      <td>Standard adult content thresholds. Nudity/weapons/hate symbols trigger flag. No "Suggestive" at same threshold as KidSpace.</td>
+      <td>Attorney (immediate on severity 3+). Admin (immediate on severity 4). Both parents (post-call if any flag).</td>
+    </tr>
+  </table>
+
+  <div class="highlight" style="margin-top:24px;">
+    <h3>What This Feature Means for the Platform</h3>
+    <p>Text messages capture a lot of co-parent conflict. Calls capture the rest — and historically that rest was invisible. The most serious harassment, the most credible threats, and the most traumatic interactions often happen on phone calls precisely because parents know those calls aren't being logged. Co-parent calling on CommonGround closes that gap. Every call becomes part of the documented co-parenting record. ARIA running in real-time means attorneys get a live picture of the communication pattern, not just what parents choose to report. And for DV survivors, for the first time, there's a monitored, documented, protected channel for necessary communication with someone they're required by courts to co-parent with.</p>
+  </div>
+</section>
+
+<footer>
+  <p>CommonGround · Co-Parent Calling + ARIA Call Monitor · March 2026</p>
+  <p style="color:var(--teal);">Plus: Voice · Complete: Video + Voice · All calls monitored · Consent-first design · Court-admissible records</p>
+</footer>
+</body>
+</html>

@@ -2,8 +2,11 @@
 
 import * as React from "react"
 
-const TOAST_LIMIT = 1
-const TOAST_REMOVE_DELAY = 1000000
+const TOAST_LIMIT = 3
+// Time a dismissed toast stays mounted for its exit transition.
+const TOAST_REMOVE_DELAY = 300
+// Toasts auto-dismiss after 5s.
+const TOAST_AUTO_DISMISS_DELAY = 5000
 
 type ToasterToast = {
   id: string
@@ -11,6 +14,7 @@ type ToasterToast = {
   description?: string
   action?: React.ReactNode
   variant?: "default" | "destructive"
+  open?: boolean
 }
 
 const actionTypes = {
@@ -102,6 +106,7 @@ export const reducer = (state: State, action: Action): State => {
           t.id === toastId || toastId === undefined
             ? {
                 ...t,
+                open: false,
               }
             : t
         ),
@@ -149,8 +154,13 @@ function toast({ ...props }: Toast) {
     toast: {
       ...props,
       id,
+      open: true,
     },
   })
+
+  // Auto-dismiss; the reducer's remove queue unmounts it after the exit
+  // transition.
+  setTimeout(dismiss, TOAST_AUTO_DISMISS_DELAY)
 
   return {
     id: id,

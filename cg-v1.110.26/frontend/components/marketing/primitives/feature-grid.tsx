@@ -22,12 +22,12 @@ type Accent = 'teal' | 'gold';
 
 const ACCENT_STYLES: Record<Accent, { bg: string; icon: string }> = {
   teal: {
-    bg: 'bg-[#3DAA8A]/10',
-    icon: 'text-[#3DAA8A]',
+    bg: 'bg-cg-sage/10',
+    icon: 'text-cg-sage',
   },
   gold: {
-    bg: 'bg-[#F5A623]/10',
-    icon: 'text-[#F5A623]',
+    bg: 'bg-cg-amber/10',
+    icon: 'text-cg-amber',
   },
 };
 
@@ -73,20 +73,20 @@ export function FeatureGrid({
             const Icon = feature.icon;
             const accent = ACCENT_STYLES[feature.accent ?? 'teal'];
             const cardBody = (
-              <div className="h-full rounded-2xl border border-gray-100 bg-white p-6 shadow-sm transition-all hover:border-[#3DAA8A]/30 hover:shadow-md">
+              <div className="cg-card-hover h-full rounded-2xl border border-gray-100 bg-white p-6 shadow-sm hover:border-cg-sage/30">
                 <div
                   className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl ${accent.bg}`}
                 >
                   <Icon className={`h-6 w-6 ${accent.icon}`} aria-hidden="true" />
                 </div>
-                <h3 className="font-serif text-xl text-[#1E3A4A]">
+                <h3 className="font-serif text-xl text-foreground">
                   {feature.title}
                 </h3>
                 <p className="mt-2 text-sm sm:text-base text-gray-600 leading-relaxed">
                   {feature.description}
                 </p>
                 {feature.href && (
-                  <span className="mt-4 inline-flex items-center text-sm font-semibold text-[#3DAA8A]">
+                  <span className="mt-4 inline-flex items-center text-sm font-semibold text-cg-sage">
                     Learn more
                     <span aria-hidden="true" className="ml-1">
                       &rarr;
@@ -100,7 +100,7 @@ export function FeatureGrid({
               <Link
                 key={feature.title}
                 href={feature.href}
-                className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3DAA8A] focus-visible:ring-offset-2 rounded-2xl"
+                className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cg-sage focus-visible:ring-offset-2 rounded-2xl"
               >
                 {cardBody}
               </Link>

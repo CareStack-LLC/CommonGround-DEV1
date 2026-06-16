@@ -216,8 +216,8 @@ export function HomeARIADemo() {
       {/* Left side — copy */}
       <div className="lg:col-span-2">
         <div className="inline-flex items-center gap-2 mb-4">
-          <MessageCircle className="h-5 w-5 text-[#F5A623]" />
-          <span className="text-sm font-semibold text-[#F5A623] uppercase tracking-wide">
+          <MessageCircle className="h-5 w-5 text-cg-amber" />
+          <span className="text-sm font-semibold text-cg-amber uppercase tracking-wide">
             Try ARIA Live
           </span>
         </div>
@@ -226,7 +226,7 @@ export function HomeARIADemo() {
           style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
         >
           Think you can get past{' '}
-          <span className="text-[#F5A623]">ARIA</span>?
+          <span className="text-cg-amber">ARIA</span>?
         </h2>
         <p className="text-lg text-white/80 mb-4 leading-relaxed">
           Type something petty, hostile, or passive-aggressive. ARIA catches it in real-time — the same AI protecting real families on CommonGround.
@@ -237,7 +237,7 @@ export function HomeARIADemo() {
 
         <div className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 mb-6">
           <div className="flex items-start gap-2.5">
-            <Sparkles className="w-4 h-4 text-[#F5A623] mt-0.5 flex-shrink-0" />
+            <Sparkles className="w-4 h-4 text-cg-amber mt-0.5 flex-shrink-0" />
             <div>
               <p className="text-sm text-white/80 font-medium mb-1">ARIA is always learning</p>
               <p className="text-xs text-white/50 leading-relaxed">
@@ -249,7 +249,7 @@ export function HomeARIADemo() {
 
         <Link
           href="/aria"
-          className="inline-flex items-center gap-2 text-[#F5A623] font-medium hover:text-[#F5A623]/80 transition-colors text-sm"
+          className="inline-flex items-center gap-2 text-cg-amber font-medium hover:text-cg-amber/80 transition-colors text-sm"
         >
           Learn more about ARIA
           <ArrowRight className="w-4 h-4" />
@@ -276,7 +276,7 @@ export function HomeARIADemo() {
               className={`
                 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all
                 ${ariaEnabled
-                  ? 'bg-[#3DAA8A]/30 text-[#7DDFB8] border border-[#3DAA8A]/40'
+                  ? 'bg-cg-sage/30 text-[#7DDFB8] border border-cg-sage/40'
                   : 'bg-white/10 text-white/50 border border-white/20'
                 }
               `}
@@ -307,8 +307,8 @@ export function HomeARIADemo() {
                   </div>
                   {msg.original && (
                     <div className={`flex items-center gap-1 text-[11px] ${msg.role === 'user' ? 'justify-end' : ''}`}>
-                      <Shield className="w-2.5 h-2.5 text-[#3DAA8A]" />
-                      <span className="text-[#3DAA8A]">Rewritten by ARIA</span>
+                      <Shield className="w-2.5 h-2.5 text-cg-sage" />
+                      <span className="text-cg-sage">Rewritten by ARIA</span>
                     </div>
                   )}
                 </div>
@@ -332,10 +332,10 @@ export function HomeARIADemo() {
 
           {/* Intervention Panel */}
           {pendingIntervention && (
-            <div className="border-t border-[#3DAA8A]/40 bg-[#3DAA8A]/10 px-4 sm:px-5 py-4">
+            <div className="border-t border-cg-sage/40 bg-cg-sage/10 px-4 sm:px-5 py-4">
               <div className="flex items-start gap-2.5">
-                <div className="w-8 h-8 bg-[#3DAA8A]/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Shield className="w-4 h-4 text-[#3DAA8A]" />
+                <div className="w-8 h-8 bg-cg-sage/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Shield className="w-4 h-4 text-cg-sage" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-white text-sm font-semibold mb-1">{currentTaunt}</p>
@@ -363,8 +363,8 @@ export function HomeARIADemo() {
                       <p className="text-[10px] text-red-400 font-medium mb-0.5">Your message</p>
                       <p className="text-xs text-red-300 line-clamp-2">{pendingIntervention.originalText}</p>
                     </div>
-                    <div className="bg-white/10 rounded-lg px-3 py-2 border border-[#3DAA8A]/20">
-                      <p className="text-[10px] text-[#3DAA8A] font-medium mb-0.5">ARIA&apos;s suggestion</p>
+                    <div className="bg-white/10 rounded-lg px-3 py-2 border border-cg-sage/20">
+                      <p className="text-[10px] text-cg-sage font-medium mb-0.5">ARIA&apos;s suggestion</p>
                       <p className="text-xs text-white/80 line-clamp-2">{pendingIntervention.analysis.suggestion}</p>
                     </div>
                   </div>
@@ -372,7 +372,7 @@ export function HomeARIADemo() {
                   <div className="flex gap-2">
                     <button
                       onClick={handleAcceptSuggestion}
-                      className="flex items-center gap-1.5 bg-[#3DAA8A] hover:bg-[#2D8A70] text-white text-xs font-medium rounded-full px-4 py-1.5 transition-colors"
+                      className="flex items-center gap-1.5 bg-cg-sage hover:bg-cg-sage-dark text-white text-xs font-medium rounded-full px-4 py-1.5 transition-colors"
                     >
                       <CheckCircle2 className="w-3.5 h-3.5" /> Use Suggestion
                     </button>
@@ -409,7 +409,7 @@ export function HomeARIADemo() {
                   // responses without having to pinch-zoom back out.
                   // Desktop: drops to text-sm to match the visual density
                   // of the rest of the card.
-                  className="flex-1 bg-white/10 border border-white/10 rounded-full px-4 py-2.5 text-base sm:text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-1 focus:ring-[#3DAA8A]/50 focus:border-[#3DAA8A]/50 disabled:opacity-50 transition-all"
+                  className="flex-1 bg-white/10 border border-white/10 rounded-full px-4 py-2.5 text-base sm:text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-1 focus:ring-cg-sage/50 focus:border-cg-sage/50 disabled:opacity-50 transition-all"
                   autoCapitalize="sentences"
                   autoComplete="off"
                   autoCorrect="on"
@@ -417,7 +417,7 @@ export function HomeARIADemo() {
                 <button
                   onClick={handleSend}
                   disabled={!inputText.trim() || isLoading}
-                  className="w-10 h-10 bg-[#3DAA8A] hover:bg-[#2D8A70] text-white rounded-full flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0"
+                  className="w-10 h-10 bg-cg-sage hover:bg-cg-sage-dark text-white rounded-full flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0"
                 >
                   <Send className="w-4 h-4" />
                 </button>

@@ -174,7 +174,7 @@ function CoParentingBestPractices() {
       </ul>
 
       <div className="bg-cg-sage-subtle rounded-xl p-6 my-8 not-prose">
-        <h3 className="text-lg font-semibold text-[#1E3A4A] mb-2">The Bottom Line</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-2">The Bottom Line</h3>
         <p className="text-gray-600">
           Successful co-parenting isn&apos;t about liking your ex or pretending the past didn&apos;t
           happen. It&apos;s about consistently choosing to put your children&apos;s needs above your
@@ -232,7 +232,7 @@ function CommunicationProgress() {
       </ul>
 
       <div className="bg-white rounded-xl p-6 my-8 border border-gray-200 not-prose">
-        <h3 className="text-lg font-semibold text-[#1E3A4A] mb-4">Example: BIFF in Action</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-4">Example: BIFF in Action</h3>
         <div className="space-y-4">
           <div className="bg-red-50 dark:bg-red-950/20 rounded-lg p-4">
             <p className="text-sm font-medium text-red-700 dark:text-red-400 mb-2">Before (reactive):</p>
@@ -353,7 +353,7 @@ function CommunicationProgress() {
       </ul>
 
       <div className="bg-cg-sage-subtle rounded-xl p-6 my-8 not-prose">
-        <h3 className="text-lg font-semibold text-[#1E3A4A] mb-2">Remember This</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-2">Remember This</h3>
         <p className="text-gray-600">
           You can&apos;t control how your co-parent communicates. You can only control
           how you respond. Every message you send is a choice. Choose to model the
@@ -487,7 +487,7 @@ function WrittenAgreements() {
       </ul>
 
       <div className="bg-cg-sage-subtle rounded-xl p-6 my-8 not-prose">
-        <h3 className="text-lg font-semibold text-[#1E3A4A] mb-2">Pro Tip: The 18-Section Approach</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-2">Pro Tip: The 18-Section Approach</h3>
         <p className="text-gray-600">
           Comprehensive parenting plans typically cover 18 key areas of co-parenting.
           Missing even one section can create gaps that lead to future conflicts.
@@ -578,7 +578,7 @@ function WrittenAgreements() {
       <p>Then build from there, adding sections as you&apos;re able to reach agreement.</p>
 
       <div className="bg-cg-amber-subtle rounded-xl p-6 my-8 not-prose">
-        <h3 className="text-lg font-semibold text-[#1E3A4A] mb-2">The Bottom Line</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-2">The Bottom Line</h3>
         <p className="text-gray-600">
           Written agreements aren&apos;t about trust or distrust—they&apos;re about clarity.
           The most amicable co-parents benefit from documentation just as much as
@@ -603,7 +603,7 @@ function HighConflictGuide() {
         <div className="flex items-start gap-3">
           <AlertTriangle className="w-6 h-6 text-amber-600 flex-shrink-0 mt-0.5" />
           <div>
-            <h3 className="text-lg font-semibold text-[#1E3A4A] mb-2">Important Note</h3>
+            <h3 className="text-lg font-semibold text-foreground mb-2">Important Note</h3>
             <p className="text-gray-600 text-sm">
               If you are experiencing domestic violence, threats, or fear for your safety,
               please contact the National Domestic Violence Hotline at 1-800-799-7233 or
@@ -645,14 +645,14 @@ function HighConflictGuide() {
       </ul>
 
       <div className="bg-cg-sage-subtle rounded-xl p-6 my-8 not-prose">
-        <h3 className="text-lg font-semibold text-[#1E3A4A] mb-2">Parallel vs. Cooperative Parenting</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-2">Parallel vs. Cooperative Parenting</h3>
         <p className="text-gray-600 mb-4">
           Parallel parenting isn&apos;t a failure—it&apos;s a strategic choice to protect your children
           from conflict while still ensuring they have relationships with both parents.
         </p>
         <div className="grid sm:grid-cols-2 gap-4 text-sm">
-          <div className="bg-[#F4F8F7] rounded-lg p-4">
-            <p className="font-medium text-[#1E3A4A] mb-2">Cooperative Parenting</p>
+          <div className="bg-cg-sand rounded-lg p-4">
+            <p className="font-medium text-foreground mb-2">Cooperative Parenting</p>
             <ul className="text-gray-600 space-y-1">
               <li>Joint decisions</li>
               <li>Flexible scheduling</li>
@@ -660,8 +660,8 @@ function HighConflictGuide() {
               <li>Shared events</li>
             </ul>
           </div>
-          <div className="bg-[#F4F8F7] rounded-lg p-4">
-            <p className="font-medium text-[#1E3A4A] mb-2">Parallel Parenting</p>
+          <div className="bg-cg-sand rounded-lg p-4">
+            <p className="font-medium text-foreground mb-2">Parallel Parenting</p>
             <ul className="text-gray-600 space-y-1">
               <li>Independent decisions</li>
               <li>Strict schedule adherence</li>
@@ -706,7 +706,7 @@ function HighConflictGuide() {
       </ul>
 
       <div className="bg-white rounded-xl p-6 my-6 border border-gray-200 not-prose">
-        <h3 className="text-lg font-semibold text-[#1E3A4A] mb-4">BIFF Response Examples</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-4">BIFF Response Examples</h3>
         <div className="space-y-4">
           <div>
             <p className="text-sm font-medium text-red-600 dark:text-red-400 mb-1">Incoming hostile message:</p>
@@ -784,7 +784,7 @@ function HighConflictGuide() {
         <div className="flex items-start gap-3">
           <Shield className="w-6 h-6 text-cg-sage flex-shrink-0 mt-0.5" />
           <div>
-            <h3 className="text-lg font-semibold text-[#1E3A4A] mb-2">How CommonGround Helps</h3>
+            <h3 className="text-lg font-semibold text-foreground mb-2">How CommonGround Helps</h3>
             <p className="text-gray-600 text-sm">
               CommonGround was designed with high-conflict situations in mind. ARIA analyzes
               messages before sending, helping you maintain composure. Every message, schedule
@@ -848,7 +848,7 @@ function HighConflictGuide() {
       </ul>
 
       <div className="bg-cg-amber-subtle rounded-xl p-6 my-8 not-prose">
-        <h3 className="text-lg font-semibold text-[#1E3A4A] mb-2">Remember This</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-2">Remember This</h3>
         <p className="text-gray-600">
           You cannot change your co-parent&apos;s behavior. You can only control your responses,
           protect your children, and document everything. Stay calm, stay consistent, and keep
@@ -966,7 +966,7 @@ function ChildrenFirst() {
         <div className="flex items-start gap-3">
           <Heart className="w-6 h-6 text-cg-sage flex-shrink-0 mt-0.5" />
           <div>
-            <h3 className="text-lg font-semibold text-[#1E3A4A] mb-2">The Bottom Line</h3>
+            <h3 className="text-lg font-semibold text-foreground mb-2">The Bottom Line</h3>
             <p className="text-gray-600">
               Children need two parents who can put aside their own pain, anger, and
               grievances to cooperate in raising them. This is incredibly hard—and
@@ -979,7 +979,7 @@ function ChildrenFirst() {
       <h2>Practical Ways to Put Children First</h2>
 
       <div className="bg-white rounded-xl p-6 my-8 border border-gray-200 not-prose">
-        <h3 className="text-lg font-semibold text-[#1E3A4A] mb-4">Child-First Actions</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-4">Child-First Actions</h3>
         <div className="space-y-4">
           {comparisons.map((item, index) => (
             <div key={index} className="grid sm:grid-cols-2 gap-3">
@@ -1112,7 +1112,7 @@ function ChildrenFirst() {
       </p>
 
       <div className="bg-cg-amber-subtle rounded-xl p-6 my-8 not-prose">
-        <h3 className="text-lg font-semibold text-[#1E3A4A] mb-2">A Daily Reminder</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-2">A Daily Reminder</h3>
         <p className="text-gray-600">
           Your children didn&apos;t choose divorce. They didn&apos;t ask for two homes, shuffled
           schedules, or split holidays. What they need most is two parents who love them
@@ -1191,7 +1191,7 @@ function HolidayPlanning() {
         <div className="flex items-start gap-3">
           <Star className="w-6 h-6 text-cg-sage flex-shrink-0 mt-0.5" />
           <div>
-            <h3 className="text-lg font-semibold text-[#1E3A4A] mb-2">Pro Tip: Be Specific</h3>
+            <h3 className="text-lg font-semibold text-foreground mb-2">Pro Tip: Be Specific</h3>
             <p className="text-gray-600 text-sm">
               Don&apos;t just say &quot;alternating years.&quot; Specify exact times: &quot;Parent A has
               children from December 24 at 4:00 PM until December 26 at 4:00 PM in
@@ -1287,7 +1287,7 @@ function HolidayPlanning() {
         <div className="flex items-start gap-3">
           <Gift className="w-6 h-6 text-cg-sage flex-shrink-0 mt-0.5" />
           <div>
-            <h3 className="text-lg font-semibold text-[#1E3A4A] mb-2">Creating New Traditions</h3>
+            <h3 className="text-lg font-semibold text-foreground mb-2">Creating New Traditions</h3>
             <p className="text-gray-600 text-sm mb-3">
               Post-separation holidays are a chance to create traditions unique to your home:
             </p>
@@ -1341,7 +1341,7 @@ function HolidayPlanning() {
       </ul>
 
       <div className="bg-cg-amber-subtle rounded-xl p-6 my-8 not-prose">
-        <h3 className="text-lg font-semibold text-[#1E3A4A] mb-2">Remember This</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-2">Remember This</h3>
         <p className="text-gray-600">
           Holidays are about connection, not perfection. Your children don&apos;t need
           Pinterest-worthy celebrations—they need parents who can cooperate, adults who

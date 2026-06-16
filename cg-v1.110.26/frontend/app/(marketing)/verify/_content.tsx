@@ -27,19 +27,19 @@ export function VerifyContent() {
       {/* Hero */}
       <section className="pt-24 pb-16 px-6">
         <div className="max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-[#E8F4F8] border border-[#3DAA8A]/20 rounded-full px-4 py-1.5 mb-8">
-            <ShieldCheck className="w-4 h-4 text-[#3DAA8A]" />
-            <span className="text-sm font-semibold text-[#1E3A4A] tracking-wide uppercase">
+          <div className="inline-flex items-center gap-2 bg-cg-mist border border-cg-sage/20 rounded-full px-4 py-1.5 mb-8">
+            <ShieldCheck className="w-4 h-4 text-cg-sage" />
+            <span className="text-sm font-semibold text-foreground tracking-wide uppercase">
               Document Verification
             </span>
           </div>
 
           <h1
-            className="text-5xl sm:text-6xl font-serif text-[#1E3A4A] mb-6"
+            className="text-5xl sm:text-6xl font-serif text-foreground mb-6"
             style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
             Report{' '}
-            <span className="text-[#3DAA8A]">Verification</span>
+            <span className="text-cg-sage">Verification</span>
           </h1>
 
           <p className="text-lg text-[#4A6670] max-w-xl mx-auto mb-12">
@@ -56,13 +56,13 @@ export function VerifyContent() {
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
                 placeholder="RPT-20260315-A1B2 or SHA-256 hash"
-                className="w-full pl-12 pr-4 py-4 rounded-xl border border-[#D1E0E5] bg-white text-[#1E3A4A] text-lg placeholder:text-[#8BA3AE] focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/40 focus:border-[#3DAA8A] shadow-sm"
+                className="w-full pl-12 pr-4 py-4 rounded-xl border border-[#D1E0E5] bg-white text-foreground text-lg placeholder:text-[#8BA3AE] focus:outline-none focus:ring-2 focus:ring-cg-sage/40 focus:border-cg-sage shadow-sm"
               />
             </div>
             <button
               type="submit"
               disabled={!identifier.trim()}
-              className="mt-4 w-full py-4 px-6 bg-[#3DAA8A] hover:bg-[#2D9A7A] disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-colors text-lg shadow-md"
+              className="mt-4 w-full py-4 px-6 bg-cg-sage hover:bg-[#2D9A7A] disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-colors text-lg shadow-md"
             >
               Verify Report
             </button>
@@ -74,7 +74,7 @@ export function VerifyContent() {
       <section className="pb-24 px-6">
         <div className="max-w-4xl mx-auto">
           <h2
-            className="text-2xl font-serif text-[#1E3A4A] text-center mb-12"
+            className="text-2xl font-serif text-foreground text-center mb-12"
             style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
             How Verification Works
@@ -105,10 +105,10 @@ export function VerifyContent() {
                 key={i}
                 className="bg-white rounded-xl border border-[#D1E0E5] p-6 text-center shadow-sm"
               >
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#E8F4F8] mb-4">
-                  <step.icon className="w-6 h-6 text-[#3DAA8A]" />
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-cg-mist mb-4">
+                  <step.icon className="w-6 h-6 text-cg-sage" />
                 </div>
-                <h3 className="text-lg font-semibold text-[#1E3A4A] mb-2">
+                <h3 className="text-lg font-semibold text-foreground mb-2">
                   {step.title}
                 </h3>
                 <p className="text-sm text-[#4A6670]">{step.description}</p>

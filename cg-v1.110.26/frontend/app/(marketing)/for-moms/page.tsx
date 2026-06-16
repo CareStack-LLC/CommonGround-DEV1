@@ -135,12 +135,11 @@ export default function ForMomsPage() {
       <section className="relative overflow-hidden">
         {/* Gradient backdrop */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#F4F8F7] via-[#F4F8F7] to-white" />
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-[#3DAA8A]/[0.04] blur-3xl -translate-y-1/2 translate-x-1/3" />
 
         <div className="relative max-w-6xl mx-auto px-6 pt-16 pb-20 lg:pt-24 lg:pb-28">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          <div className="grid items-center gap-10 lg:gap-14 lg:grid-cols-2">
             {/* Copy */}
-            <div>
+            <div className="text-center lg:text-left">
               <p className="text-[#E85D75] font-medium mb-4 tracking-wide uppercase text-sm">
                 For moms who are done chasing
               </p>
@@ -148,14 +147,13 @@ export default function ForMomsPage() {
                 className="text-4xl sm:text-5xl lg:text-[3.4rem] text-[#1E3A4A] mb-6 leading-[1.1] tracking-tight"
                 style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
               >
-                You Shouldn&apos;t Have to{' '}
-                <span className="text-[#3DAA8A]">Chase Him</span> to Be a Good Parent
+                Stop Chasing Him.{' '}
+                <span className="text-[#3DAA8A]">Start Focusing</span> on Your Kids.
               </h1>
-              <p className="text-lg text-gray-600 leading-relaxed mb-8 max-w-xl">
-                He forgets pickups. He turns every text into something else.
-                He makes moving on feel impossible. You&apos;re not asking for perfection —
-                just someone who shows up. CommonGround helps you stop managing him
-                and start focusing on your kids.
+              <p className="text-lg text-gray-600 leading-relaxed mb-8 max-w-xl mx-auto lg:mx-0">
+                Forgotten pickups. Texts that turn into something else. You&apos;re not
+                asking for perfection — just someone who shows up. CommonGround handles
+                the chasing so you can show up for what matters.
               </p>
               <a
                 href="#early-adopter"
@@ -167,21 +165,15 @@ export default function ForMomsPage() {
             </div>
 
             {/* Hero Image */}
-            <div className="relative">
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-[#3DAA8A]/10">
-                <Image
-                  src="/images/Website pictes/mom1.png"
-                  alt="Mother finding peace with CommonGround co-parenting app"
-                  width={800}
-                  height={533}
-                  className="w-full h-auto object-cover"
-                  priority
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                />
-              </div>
-              {/* Decorative accent */}
-              <div className="absolute -bottom-4 -left-4 w-24 h-24 rounded-full border-2 border-[#F5A623]/30 -z-10" />
-              <div className="absolute -top-4 -right-4 w-16 h-16 rounded-full bg-[#E85D75]/10 -z-10" />
+            <div className="relative mx-auto w-full max-w-xl lg:max-w-none">
+              <Image
+                src="/images/marketing/cg_formoms_calm.jpg"
+                alt="A calm mother relaxing at home, smiling at her phone"
+                width={1200}
+                height={800}
+                priority
+                className="w-full h-auto rounded-3xl shadow-xl object-cover"
+              />
             </div>
           </div>
         </div>

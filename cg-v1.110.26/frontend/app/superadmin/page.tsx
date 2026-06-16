@@ -630,7 +630,7 @@ function DashboardInner() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#2D6A8F" opacity={0.2} />
                   <XAxis dataKey="date" stroke="#4A6E7F" tick={{ fill: '#6B8A9A', fontSize: 10 }} tickFormatter={(v) => new Date(v).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} />
                   <YAxis stroke="#4A6E7F" tick={{ fill: '#6B8A9A', fontSize: 10 }} tickFormatter={(v) => `$${v}`} />
-                  <Tooltip contentStyle={RECHARTS_TOOLTIP} formatter={(v: number | undefined) => [`$${(v ?? 0).toFixed(2)}`, 'MRR']} />
+                  <Tooltip contentStyle={RECHARTS_TOOLTIP} formatter={(v) => [`$${Number(v ?? 0).toFixed(2)}`, 'MRR']} />
                   <defs>
                     <linearGradient id="mrrGrad" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#3DAA8A" stopOpacity={0.3} />
@@ -656,7 +656,7 @@ function DashboardInner() {
                         <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip contentStyle={RECHARTS_TOOLTIP} formatter={(v: number | undefined) => [`$${(v ?? 0).toFixed(2)}`, 'Revenue']} />
+                    <Tooltip contentStyle={RECHARTS_TOOLTIP} formatter={(v) => [`$${Number(v ?? 0).toFixed(2)}`, 'Revenue']} />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
@@ -726,7 +726,7 @@ function DashboardInner() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#2D6A8F" opacity={0.2} />
                   <XAxis dataKey="day" stroke="#4A6E7F" tick={{ fill: '#6B8A9A', fontSize: 10 }} label={{ value: 'Days', position: 'insideBottom', offset: -5, fill: '#6B8A9A', fontSize: 10 }} />
                   <YAxis stroke="#4A6E7F" tick={{ fill: '#6B8A9A', fontSize: 10 }} domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
-                  <Tooltip contentStyle={RECHARTS_TOOLTIP} formatter={(v: number | undefined) => [`${v ?? 0}%`, 'Retained']} />
+                  <Tooltip contentStyle={RECHARTS_TOOLTIP} formatter={(v) => [`${Number(v ?? 0)}%`, 'Retained']} />
                   <Line type="monotone" dataKey="pct" stroke="#3DAA8A" strokeWidth={2} dot={{ r: 2, fill: '#3DAA8A' }} />
                 </LineChart>
               </ResponsiveContainer>

@@ -33,7 +33,7 @@ export function FaqAccordion({
     <section className={`py-16 sm:py-24 bg-white ${className}`.trim()}>
       <div className="max-w-3xl mx-auto px-6">
         <div className="text-center mb-12">
-          <h2 className="font-serif text-3xl sm:text-4xl text-[#1E3A4A]">
+          <h2 className="font-serif text-3xl sm:text-4xl text-foreground">
             {heading}
           </h2>
         </div>
@@ -42,7 +42,7 @@ export function FaqAccordion({
           {items.map((item, index) => (
             <div
               key={item.question}
-              className="bg-gradient-to-br from-[#F4F8F7] to-white rounded-2xl border-2 border-gray-100 hover:border-[#3DAA8A]/20 transition-all overflow-hidden"
+              className="bg-gradient-to-br from-cg-sand to-white rounded-2xl border-2 border-gray-100 hover:border-cg-sage/20 transition-all overflow-hidden"
             >
               <button
                 type="button"
@@ -50,11 +50,11 @@ export function FaqAccordion({
                 className="w-full flex items-center justify-between px-6 py-5 text-left group"
                 aria-expanded={openIndex === index}
               >
-                <span className="text-lg font-semibold text-[#1E3A4A] group-hover:text-[#3DAA8A] transition-colors">
+                <span className="text-lg font-semibold text-foreground group-hover:text-cg-sage transition-colors">
                   {item.question}
                 </span>
                 <ChevronDown
-                  className={`h-5 w-5 text-gray-400 group-hover:text-[#3DAA8A] transition-transform duration-200 flex-shrink-0 ml-4 ${
+                  className={`h-5 w-5 text-gray-400 group-hover:text-cg-sage transition-transform duration-200 flex-shrink-0 ml-4 ${
                     openIndex === index ? 'rotate-180' : ''
                   }`}
                 />

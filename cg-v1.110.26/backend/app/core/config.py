@@ -82,6 +82,11 @@ class Settings(BaseSettings):
     ARIA_V3_BETA_ENABLED: bool = False  # Feature flag for V3 beta features
     ARIA_V2_LLM_MODEL: str = "gpt-4o-mini"  # Default LLM for V2 analysis
     ARIA_V2_SEVERITY_MODEL: str = "gpt-4o"  # Model for severity 4-5 analysis
+    ARIA_JOB_MAX_RETRIES: int = 3  # aria_jobs worker retries before dead-letter
+
+    # AI usage tracking (reliability batch 1) — alert-only daily token
+    # budget across all providers; 0 disables the budget alert.
+    AI_DAILY_TOKEN_BUDGET: int = 0
 
     # Stripe
     STRIPE_SECRET_KEY: Optional[str] = None

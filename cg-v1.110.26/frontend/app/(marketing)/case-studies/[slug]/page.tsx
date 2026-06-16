@@ -7,6 +7,7 @@ import {
   StatCounter,
   TestimonialCard,
   CtaBand,
+  BreadcrumbJsonLd,
 } from '@/components/marketing';
 import {
   CASE_STUDIES,
@@ -86,23 +87,29 @@ export default async function CaseStudyPage({ params }: Props) {
   if (!study) notFound();
 
   return (
-    <div data-seed="placeholder">
-      {/* TODO(marketing): replace with real case study */}
+    <div>
       <ArticleJsonLd study={study} />
+      <BreadcrumbJsonLd
+        items={[
+          { name: 'Home', href: '/' },
+          { name: 'Case Studies', href: '/case-studies' },
+          { name: study.title, href: `/case-studies/${study.slug}` },
+        ]}
+      />
 
       <section className="px-6 py-12 sm:py-16">
         <div className="max-w-3xl mx-auto">
           <Link
             href="/case-studies"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-[#3DAA8A] hover:text-[#2F8C70] mb-8"
+            className="inline-flex items-center gap-2 text-sm font-semibold text-cg-sage hover:text-cg-sage-dark mb-8"
           >
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
             All case studies
           </Link>
-          <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.18em] text-[#3DAA8A] mb-3">
+          <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.18em] text-cg-sage mb-3">
             Case study
           </p>
-          <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl text-[#1E3A4A] leading-tight tracking-tight">
+          <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl text-foreground leading-tight tracking-tight">
             {study.title}
           </h1>
           <p className="mt-5 text-lg sm:text-xl text-gray-600 leading-relaxed">
@@ -137,7 +144,7 @@ export default async function CaseStudyPage({ params }: Props) {
         </div>
       </section>
 
-      <section className="px-6 py-16 sm:py-20 bg-[#F4F8F7]">
+      <section className="px-6 py-16 sm:py-20 bg-cg-sand">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-10">
             <SectionHeading

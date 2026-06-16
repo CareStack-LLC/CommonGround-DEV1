@@ -42,12 +42,12 @@ export function SectionHeading({
       className={`${alignment} max-w-3xl ${align === 'center' ? '' : ''} ${className}`.trim()}
     >
       {eyebrow && (
-        <p className="mb-3 text-xs sm:text-sm font-semibold uppercase tracking-[0.18em] text-[#3DAA8A]">
+        <p className="mb-3 text-xs sm:text-sm font-semibold uppercase tracking-[0.18em] text-cg-sage">
           {eyebrow}
         </p>
       )}
       <Tag
-        className={`font-serif text-[#1E3A4A] leading-tight tracking-tight ${titleSize}`}
+        className={`font-serif text-foreground leading-tight tracking-tight ${titleSize}`}
       >
         {title}
       </Tag>

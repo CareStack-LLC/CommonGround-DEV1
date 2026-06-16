@@ -8,6 +8,7 @@ Create Date: 2026-03-06 10:40:23.299148
 from typing import Sequence, Union
 
 from alembic import op
+import migration_guards as mg
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
@@ -43,7 +44,7 @@ def upgrade() -> None:
     sa.Column('updated_at', sa.DateTime(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_partners_partner_slug'), 'partners', ['partner_slug'], unique=True)
+    mg.safe_create_index('ix_partners_partner_slug', 'partners', ['partner_slug'], unique=True)
     op.create_table('partner_metrics',
     sa.Column('partner_id', sa.String(length=36), nullable=False),
     sa.Column('period_start', sa.DateTime(), nullable=False),
@@ -76,7 +77,7 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('partner_id', 'period_start', 'period_type', name='uq_partner_metrics_period')
     )
-    op.create_index(op.f('ix_partner_metrics_partner_id'), 'partner_metrics', ['partner_id'], unique=False)
+    mg.safe_create_index('ix_partner_metrics_partner_id', 'partner_metrics', ['partner_id'], unique=False)
     op.create_table('partner_staff',
     sa.Column('partner_id', sa.String(length=36), nullable=False),
     sa.Column('user_id', sa.String(length=36), nullable=False),
@@ -89,8 +90,8 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('partner_id', 'user_id', name='uq_partner_staff_partner_user')
     )
-    op.create_index(op.f('ix_partner_staff_partner_id'), 'partner_staff', ['partner_id'], unique=False)
-    op.create_index(op.f('ix_partner_staff_user_id'), 'partner_staff', ['user_id'], unique=False)
+    mg.safe_create_index('ix_partner_staff_partner_id', 'partner_staff', ['partner_id'], unique=False)
+    mg.safe_create_index('ix_partner_staff_user_id', 'partner_staff', ['user_id'], unique=False)
     op.create_table('user_anonymization_map',
     sa.Column('real_user_id', sa.String(length=36), nullable=False),
     sa.Column('anonymous_user_id', sa.String(length=20), nullable=False),
@@ -103,8 +104,8 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('anonymous_user_id')
     )
-    op.create_index(op.f('ix_user_anonymization_map_partner_id'), 'user_anonymization_map', ['partner_id'], unique=False)
-    op.create_index(op.f('ix_user_anonymization_map_real_user_id'), 'user_anonymization_map', ['real_user_id'], unique=False)
+    mg.safe_create_index('ix_user_anonymization_map_partner_id', 'user_anonymization_map', ['partner_id'], unique=False)
+    mg.safe_create_index('ix_user_anonymization_map_real_user_id', 'user_anonymization_map', ['real_user_id'], unique=False)
     op.create_table('compliance_logs',
     sa.Column('family_file_id', sa.String(length=36), nullable=False),
     sa.Column('agreement_id', sa.String(length=36), nullable=True),
@@ -123,47 +124,47 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['family_file_id'], ['family_files.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_compliance_logs_agreement_id'), 'compliance_logs', ['agreement_id'], unique=False)
-    op.create_index(op.f('ix_compliance_logs_family_file_id'), 'compliance_logs', ['family_file_id'], unique=False)
-    op.add_column('agreement_sections', sa.Column('smart_rules', sa.JSON(), nullable=True))
-    op.add_column('agreements', sa.Column('summary', sa.Text(), nullable=True))
-    op.alter_column('case_assignments', 'firm_id',
+    mg.safe_create_index('ix_compliance_logs_agreement_id', 'compliance_logs', ['agreement_id'], unique=False)
+    mg.safe_create_index('ix_compliance_logs_family_file_id', 'compliance_logs', ['family_file_id'], unique=False)
+    mg.safe_add_column('agreement_sections', sa.Column('smart_rules', sa.JSON(), nullable=True))
+    mg.safe_add_column('agreements', sa.Column('summary', sa.Text(), nullable=True))
+    mg.safe_alter_column('case_assignments', 'firm_id',
                existing_type=sa.VARCHAR(length=36),
                nullable=False)
-    op.create_index(op.f('ix_circle_call_rooms_family_file_id'), 'circle_call_rooms', ['family_file_id'], unique=False)
-    op.drop_index(op.f('ix_custody_day_records_child_date_range'), table_name='custody_day_records')
-    op.drop_index(op.f('ix_custody_day_records_family_date_range'), table_name='custody_day_records')
-    op.alter_column('family_files', 'smart_config',
+    mg.safe_create_index('ix_circle_call_rooms_family_file_id', 'circle_call_rooms', ['family_file_id'], unique=False)
+    mg.safe_drop_index('ix_custody_day_records_child_date_range', table_name='custody_day_records')
+    mg.safe_drop_index('ix_custody_day_records_family_date_range', table_name='custody_day_records')
+    mg.safe_alter_column('family_files', 'smart_config',
                existing_type=postgresql.JSONB(astext_type=sa.Text()),
                type_=sa.JSON(),
                existing_nullable=True)
-    op.alter_column('firm_memberships', 'professional_id',
+    mg.safe_alter_column('firm_memberships', 'professional_id',
                existing_type=sa.VARCHAR(length=36),
                nullable=False)
-    op.add_column('grant_codes', sa.Column('partner_id', sa.String(length=36), nullable=True))
-    op.create_index(op.f('ix_grant_codes_partner_id'), 'grant_codes', ['partner_id'], unique=False)
-    op.create_foreign_key(None, 'grant_codes', 'partners', ['partner_id'], ['id'], ondelete='SET NULL')
-    op.add_column('intake_sessions', sa.Column('client_name', sa.String(length=200), nullable=True))
-    op.add_column('intake_sessions', sa.Column('client_email', sa.String(length=200), nullable=True))
-    op.add_column('intake_sessions', sa.Column('client_phone', sa.String(length=50), nullable=True))
-    op.add_column('intake_sessions', sa.Column('client_notes', sa.Text(), nullable=True))
-    op.add_column('intake_sessions', sa.Column('firm_id', sa.String(length=36), nullable=True))
-    op.add_column('intake_sessions', sa.Column('case_assignment_id', sa.String(length=36), nullable=True))
-    op.add_column('intake_sessions', sa.Column('template_id', sa.String(length=50), nullable=True))
-    op.alter_column('intake_sessions', 'case_id',
+    mg.safe_add_column('grant_codes', sa.Column('partner_id', sa.String(length=36), nullable=True))
+    mg.safe_create_index('ix_grant_codes_partner_id', 'grant_codes', ['partner_id'], unique=False)
+    mg.safe_create_foreign_key(None, 'grant_codes', 'partners', ['partner_id'], ['id'], ondelete='SET NULL')
+    mg.safe_add_column('intake_sessions', sa.Column('client_name', sa.String(length=200), nullable=True))
+    mg.safe_add_column('intake_sessions', sa.Column('client_email', sa.String(length=200), nullable=True))
+    mg.safe_add_column('intake_sessions', sa.Column('client_phone', sa.String(length=50), nullable=True))
+    mg.safe_add_column('intake_sessions', sa.Column('client_notes', sa.Text(), nullable=True))
+    mg.safe_add_column('intake_sessions', sa.Column('firm_id', sa.String(length=36), nullable=True))
+    mg.safe_add_column('intake_sessions', sa.Column('case_assignment_id', sa.String(length=36), nullable=True))
+    mg.safe_add_column('intake_sessions', sa.Column('template_id', sa.String(length=50), nullable=True))
+    mg.safe_alter_column('intake_sessions', 'case_id',
                existing_type=sa.VARCHAR(length=36),
                nullable=True)
-    op.alter_column('intake_sessions', 'parent_id',
+    mg.safe_alter_column('intake_sessions', 'parent_id',
                existing_type=sa.VARCHAR(length=36),
                nullable=True)
-    op.create_index(op.f('ix_intake_sessions_case_assignment_id'), 'intake_sessions', ['case_assignment_id'], unique=False)
-    op.create_index(op.f('ix_intake_sessions_client_email'), 'intake_sessions', ['client_email'], unique=False)
-    op.create_index(op.f('ix_intake_sessions_firm_id'), 'intake_sessions', ['firm_id'], unique=False)
-    op.drop_constraint(op.f('intake_sessions_professional_id_fkey'), 'intake_sessions', type_='foreignkey')
-    op.create_foreign_key(None, 'intake_sessions', 'case_assignments', ['case_assignment_id'], ['id'])
-    op.create_foreign_key(None, 'intake_sessions', 'firms', ['firm_id'], ['id'])
-    op.add_column('professional_access_logs', sa.Column('logged_at', sa.DateTime(), nullable=False))
-    op.alter_column('subscription_plans', 'features',
+    mg.safe_create_index('ix_intake_sessions_case_assignment_id', 'intake_sessions', ['case_assignment_id'], unique=False)
+    mg.safe_create_index('ix_intake_sessions_client_email', 'intake_sessions', ['client_email'], unique=False)
+    mg.safe_create_index('ix_intake_sessions_firm_id', 'intake_sessions', ['firm_id'], unique=False)
+    mg.safe_drop_constraint('intake_sessions_professional_id_fkey', 'intake_sessions', type_='foreignkey')
+    mg.safe_create_foreign_key(None, 'intake_sessions', 'case_assignments', ['case_assignment_id'], ['id'])
+    mg.safe_create_foreign_key(None, 'intake_sessions', 'firms', ['firm_id'], ['id'])
+    mg.safe_add_column('professional_access_logs', sa.Column('logged_at', sa.DateTime(), nullable=False))
+    mg.safe_alter_column('subscription_plans', 'features',
                existing_type=postgresql.JSONB(astext_type=sa.Text()),
                type_=sa.JSON(),
                existing_nullable=False,

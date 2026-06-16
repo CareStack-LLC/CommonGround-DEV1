@@ -8,7 +8,6 @@ import {
   TrustBar,
   CtaBand,
   FaqJsonLd,
-  ImagePlaceholder,
 } from '@/components/marketing';
 import {
   ArrowRight,
@@ -143,31 +142,6 @@ const PRICING_TEASER_TIERS = [
   },
 ];
 
-function HomeDemoVideoSlot() {
-  const url = process.env.NEXT_PUBLIC_HOME_DEMO_VIDEO_URL;
-  if (url) {
-    return (
-      <div className="relative w-full overflow-hidden rounded-2xl shadow-lg" style={{ aspectRatio: '16/9' }}>
-        <iframe
-          src={url}
-          title="CommonGround 60-second product overview"
-          loading="lazy"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          className="absolute inset-0 h-full w-full border-0"
-        />
-      </div>
-    );
-  }
-  return (
-    <ImagePlaceholder
-      alt="CommonGround 60-second product overview"
-      prompt="Short product overview video placeholder — shows parent using the CommonGround app on a phone, calm interface, teal brand color, 16:9"
-      aspectRatio="16/9"
-    />
-  );
-}
-
 export default function HomePage() {
   return (
     <>
@@ -207,7 +181,7 @@ export default function HomePage() {
       {/* FAQPage structured data — paired with visual FAQSection below */}
       <FaqJsonLd items={HOME_FAQ_ITEMS} />
 
-      <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#E8F4F8]">
+      <div className="marketing-light min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#E8F4F8]">
         <MarketingHeader />
 
         {/* ═══════════════════════════════════════════════════════════════
@@ -220,52 +194,55 @@ export default function HomePage() {
           </div>
 
           <div className="max-w-6xl mx-auto px-6 relative">
-            <div className="max-w-4xl mx-auto text-center">
-              <h1 className="font-serif text-[#1E3A4A] text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight tracking-tight mb-6">
-                The calm way to
-                <br />
-                <span className="text-[#3DAA8A]">co-parent</span>
-              </h1>
+            <div className="grid items-center gap-10 lg:gap-14 lg:grid-cols-2">
+              {/* Copy column */}
+              <div className="text-center lg:text-left">
+                <h1 className="font-serif text-[#1E3A4A] text-4xl sm:text-5xl md:text-6xl leading-[1.08] tracking-tight mb-6">
+                  The calm way to{' '}
+                  <span className="text-[#3DAA8A]">co-parent</span>
+                </h1>
 
-              <p className="text-lg sm:text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed max-w-2xl mx-auto">
-                ARIA keeps conversations calm. Schedules run on autopilot. Your kids can video call you directly. Everything is documented
-                <br />
-                <span className="font-medium text-[var(--portal-primary)]">&mdash; so you have energy left to actually parent.</span>
-              </p>
+                <p className="text-lg sm:text-xl text-gray-600 mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">
+                  ARIA keeps messages calm. Schedules run on autopilot. Your kids can call you directly &mdash; and every word is documented,{' '}
+                  <span className="font-medium text-[var(--portal-primary)]">so you have energy left to actually parent.</span>
+                </p>
 
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
-                <Link
-                  href="/early-access"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-[var(--portal-primary)] text-white font-semibold rounded-full hover:bg-[#2D8A70] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 group"
-                >
-                  Start Free &mdash; Parents
-                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                </Link>
-                <Link
-                  href="/professionals"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-white text-[var(--portal-primary)] font-semibold rounded-full hover:bg-gray-50 transition-all border-2 border-[var(--portal-primary)]"
-                >
-                  For Professionals &mdash; Schedule a Demo
-                </Link>
+                <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-8">
+                  <Link
+                    href="/early-access"
+                    className="inline-flex items-center justify-center px-8 py-4 bg-[var(--portal-primary)] text-white font-semibold rounded-full hover:bg-[#2D8A70] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 group"
+                  >
+                    Start free &mdash; no card needed
+                    <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                  <Link
+                    href="/professionals"
+                    className="inline-flex items-center justify-center px-7 py-4 bg-white text-[var(--portal-primary)] font-semibold rounded-full hover:bg-gray-50 transition-all border-2 border-[var(--portal-primary)]"
+                  >
+                    For professionals
+                  </Link>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-5 gap-y-2 text-sm text-gray-600">
+                  {['Forever-free tier', 'No credit card', 'Court-ready records', 'Built with family-law pros'].map((p) => (
+                    <span key={p} className="flex items-center gap-1.5">
+                      <Check className="h-4 w-4 text-[var(--portal-primary)]" />
+                      {p}
+                    </span>
+                  ))}
+                </div>
               </div>
 
-              <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-600">
-                <span className="flex items-center gap-1.5">
-                  <Check className="h-4 w-4 text-[var(--portal-primary)]" />
-                  Forever free tier
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Check className="h-4 w-4 text-[var(--portal-primary)]" />
-                  No credit card
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Check className="h-4 w-4 text-[var(--portal-primary)]" />
-                  Court-ready documentation
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <Check className="h-4 w-4 text-[var(--portal-primary)]" />
-                  Designed with family law professionals
-                </span>
+              {/* Hero image */}
+              <div className="relative mx-auto w-full max-w-xl lg:max-w-none">
+                <Image
+                  src="/images/marketing/cg_home_hero.jpg"
+                  alt="A father and his young daughter sharing a calm, happy moment at home while he checks the CommonGround app"
+                  width={1200}
+                  height={800}
+                  priority
+                  className="w-full h-auto rounded-3xl shadow-xl object-cover"
+                />
               </div>
             </div>
           </div>
@@ -280,30 +257,10 @@ export default function HomePage() {
               variant="stats"
               items={[
                 { value: 'Built by', label: 'a co-parent' },
-                { value: 'HIPAA', label: 'aligned encryption' },
+                { value: 'Encrypted', label: '& private' },
                 { value: 'Attorney', label: 'reviewed workflows' },
               ]}
             />
-          </div>
-        </section>
-
-        {/* ═══════════════════════════════════════════════════════════════
-            PRODUCT OVERVIEW VIDEO — env-driven iframe or placeholder
-        ═══════════════════════════════════════════════════════════════ */}
-        <section className="py-16 sm:py-20 bg-white">
-          <div className="max-w-4xl mx-auto px-6">
-            <div className="text-center mb-8">
-              <h2
-                className="text-2xl sm:text-3xl md:text-4xl font-serif text-[#1E3A4A] mb-3"
-                style={{ fontFamily: 'var(--font-dm-serif-display), Georgia, serif' }}
-              >
-                See CommonGround in 60 seconds
-              </h2>
-              <p className="text-base sm:text-lg text-gray-600">
-                Parents get a quick tour of the tools that bring peace to high-conflict co-parenting.
-              </p>
-            </div>
-            <HomeDemoVideoSlot />
           </div>
         </section>
 

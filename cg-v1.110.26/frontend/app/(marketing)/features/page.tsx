@@ -1,7 +1,7 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { JsonLd } from '@/components/marketing/json-ld';
 import {
-  FeatureGrid,
   SectionHeading,
   FaqJsonLd,
 } from '@/components/marketing';
@@ -116,6 +116,70 @@ const COMPLIANCE_FEATURES: FeatureGridItem[] = [
   },
 ];
 
+/* ── Zig-zag category sections (image + features) ──────────────── */
+interface Category {
+  id: string;
+  eyebrow: string;
+  title: string;
+  description: string;
+  image: string;
+  alt: string;
+  features: FeatureGridItem[];
+}
+
+const CATEGORIES: Category[] = [
+  {
+    id: 'aria',
+    eyebrow: 'AI',
+    title: 'ARIA keeps conversations calm',
+    description:
+      'Parents and kids both benefit when tone is steady. ARIA helps you hear yourself before the other parent does.',
+    image: '/images/marketing/cg_howitworks_phone.jpg',
+    alt: 'A parent calmly composing a message in the CommonGround app',
+    features: AI_FEATURES,
+  },
+  {
+    id: 'kidspace',
+    eyebrow: 'Child-facing',
+    title: 'KidSpace puts kids first',
+    description:
+      'Children get a calm corner for video calls, stories, and movies — independent of grown-up conflict.',
+    image: '/images/marketing/cg_kidspace_call.jpg',
+    alt: 'A child happily video-calling a parent from KidSpace',
+    features: CHILD_FEATURES,
+  },
+  {
+    id: 'safe-handoff',
+    eyebrow: 'Compliance',
+    title: 'Silent Handoff and court-ready evidence',
+    description:
+      'Parents get verified proof of every exchange and tamper-proof bundles when the court asks.',
+    image: '/images/marketing/cg_parents_coparents.jpg',
+    alt: 'Co-parents calmly exchanging their child at a public location',
+    features: COMPLIANCE_FEATURES,
+  },
+  {
+    id: 'clearfund',
+    eyebrow: 'Money',
+    title: 'ClearFund makes dollars boring again',
+    description:
+      'Expenses get split, tracked, and documented — money stops being a weapon.',
+    image: '/images/marketing/cg_clearfund_money.jpg',
+    alt: 'A parent calmly reviewing shared expenses at home',
+    features: MONEY_FEATURES,
+  },
+  {
+    id: 'timebridge',
+    eyebrow: 'Scheduling',
+    title: "TimeBridge runs the calendar so parents don't have to",
+    description:
+      'Recurring pickups, holiday rotations, and reminders happen without anyone chasing anyone.',
+    image: '/images/marketing/cg_timebridge_calendar.jpg',
+    alt: 'A parent checking the shared family calendar',
+    features: SCHEDULING_FEATURES,
+  },
+];
+
 /* ── Hero trust pills ──────────────────────────────────────────── */
 const trustPoints = [
   { icon: Shield, text: 'Bank-level encryption' },
@@ -178,40 +242,71 @@ export default function FeaturesPage() {
       />
       <FaqJsonLd items={FEATURES_FAQ_ITEMS} />
 
-      {/* Hero */}
-      <section className="relative pt-16 pb-10 px-6 overflow-hidden">
-        <div className="absolute inset-0 opacity-5">
+      {/* Hero — two-column, light */}
+      <section className="relative pt-16 pb-12 sm:pt-20 sm:pb-16 px-6 overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.06] pointer-events-none">
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-[var(--portal-primary)] rounded-full blur-3xl" />
           <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#F5A623] rounded-full blur-3xl" />
         </div>
 
-        <div className="relative max-w-4xl mx-auto text-center">
-          <h1 className="font-serif text-[#1E3A4A] text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight tracking-tight mb-6">
-            Every feature solves
-            <br />
-            <span className="text-[var(--portal-primary)]">one problem</span>
-          </h1>
-
-          <p className="text-lg sm:text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed max-w-3xl mx-auto">
-            Parents get less coordination, more peace of mind, and more automation.{' '}
-            <span className="font-medium text-[#F5A623]">
-              No forced mediation. No relationship coaching. Just structured tools that bring calm.
+        <div className="relative max-w-6xl mx-auto grid items-center gap-10 lg:gap-14 lg:grid-cols-2">
+          <div className="text-center lg:text-left">
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-1.5 text-sm font-medium text-[var(--portal-primary)] mb-6">
+              <Sparkles className="h-4 w-4 text-[#F5A623]" />
+              Everything you need. Nothing you don&apos;t.
             </span>
-          </p>
+            <h1 className="font-serif text-[#1E3A4A] text-4xl sm:text-5xl md:text-6xl leading-[1.05] tracking-tight mb-6">
+              Every feature solves{' '}
+              <span className="text-[var(--portal-primary)]">one problem</span>
+            </h1>
+            <p className="text-lg sm:text-xl text-gray-600 mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">
+              Less coordination, more peace of mind.{' '}
+              <span className="font-medium text-[#1E3A4A]">
+                No forced mediation. No relationship coaching. Just structured tools that bring calm.
+              </span>
+            </p>
 
-          <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-600">
-            {trustPoints.map((point) => {
-              const Icon = point.icon;
-              return (
-                <div
-                  key={point.text}
-                  className="flex items-center gap-2 bg-white/60 px-4 py-2 rounded-full backdrop-blur-sm"
-                >
-                  <Icon className="w-4 h-4 text-[var(--portal-primary)]" />
-                  <span>{point.text}</span>
-                </div>
-              );
-            })}
+            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-7">
+              <Link
+                href="/early-access"
+                className="group inline-flex items-center justify-center px-8 py-4 bg-[var(--portal-primary)] text-white font-semibold rounded-full hover:bg-[#2D8A70] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+              >
+                Start free &mdash; no card needed
+                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <Link
+                href="/pricing"
+                className="inline-flex items-center justify-center px-7 py-4 bg-white text-[var(--portal-primary)] font-semibold rounded-full hover:bg-gray-50 transition-all border-2 border-[var(--portal-primary)]"
+              >
+                View pricing
+              </Link>
+            </div>
+
+            <div className="flex flex-wrap justify-center lg:justify-start gap-3 text-sm text-gray-600">
+              {trustPoints.map((point) => {
+                const Icon = point.icon;
+                return (
+                  <div
+                    key={point.text}
+                    className="flex items-center gap-2 bg-white/70 px-4 py-2 rounded-full"
+                  >
+                    <Icon className="w-4 h-4 text-[var(--portal-primary)]" />
+                    <span>{point.text}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="relative mx-auto w-full max-w-xl lg:max-w-none">
+            <Image
+              src="/images/marketing/cg_features_hero.jpg"
+              alt="A calm parent confidently managing co-parenting from the CommonGround app"
+              width={1200}
+              height={800}
+              priority
+              className="w-full h-auto rounded-3xl shadow-xl object-cover"
+            />
           </div>
         </div>
       </section>
@@ -237,65 +332,71 @@ export default function FeaturesPage() {
         </div>
       </nav>
 
-      {/* AI — ARIA */}
-      <section id="aria" className="scroll-mt-24 bg-white">
-        <div className="max-w-7xl mx-auto pt-12 pb-2 px-6">
-          <SectionHeading
-            eyebrow="AI"
-            title="ARIA keeps conversations calm"
-            description="Parents and kids both benefit when tone is steady. ARIA helps you hear yourself before the other parent does."
-          />
-        </div>
-        <FeatureGrid columns={2} features={AI_FEATURES} />
-      </section>
+      {/* Zig-zag category sections */}
+      {CATEGORIES.map((cat, i) => {
+        const imageLeft = i % 2 === 1;
+        return (
+          <section
+            key={cat.id}
+            id={cat.id}
+            className={`scroll-mt-28 py-16 sm:py-24 ${i % 2 === 0 ? 'bg-white' : 'bg-[#F4F8F7]'}`}
+          >
+            <div className="max-w-6xl mx-auto px-6 grid items-center gap-10 lg:gap-16 lg:grid-cols-2">
+              {/* Image */}
+              <div className={imageLeft ? 'lg:order-1' : 'lg:order-2'}>
+                <Image
+                  src={cat.image}
+                  alt={cat.alt}
+                  width={1000}
+                  height={667}
+                  className="w-full h-auto rounded-3xl shadow-xl object-cover"
+                />
+              </div>
 
-      {/* Child-facing — KidSpace */}
-      <section id="kidspace" className="scroll-mt-24 bg-[#F4F8F7]">
-        <div className="max-w-7xl mx-auto pt-12 pb-2 px-6">
-          <SectionHeading
-            eyebrow="Child-facing"
-            title="KidSpace puts kids first"
-            description="Children get a calm corner for video calls, stories, and movies — independent of grown-up conflict."
-          />
-        </div>
-        <FeatureGrid columns={2} features={CHILD_FEATURES} />
-      </section>
-
-      {/* Compliance — Silent Handoff */}
-      <section id="safe-handoff" className="scroll-mt-24 bg-white">
-        <div className="max-w-7xl mx-auto pt-12 pb-2 px-6">
-          <SectionHeading
-            eyebrow="Compliance"
-            title="Silent Handoff and court-ready evidence"
-            description="Parents get verified proof of every exchange and tamper-proof bundles when the court asks."
-          />
-        </div>
-        <FeatureGrid columns={3} features={COMPLIANCE_FEATURES} />
-      </section>
-
-      {/* Money — ClearFund */}
-      <section id="clearfund" className="scroll-mt-24 bg-[#F4F8F7]">
-        <div className="max-w-7xl mx-auto pt-12 pb-2 px-6">
-          <SectionHeading
-            eyebrow="Money"
-            title="ClearFund makes dollars boring again"
-            description="Expenses get split, tracked, and documented — money stops being a weapon."
-          />
-        </div>
-        <FeatureGrid columns={2} features={MONEY_FEATURES} />
-      </section>
-
-      {/* Scheduling — TimeBridge */}
-      <section id="timebridge" className="scroll-mt-24 bg-white">
-        <div className="max-w-7xl mx-auto pt-12 pb-2 px-6">
-          <SectionHeading
-            eyebrow="Scheduling"
-            title="TimeBridge runs the calendar so parents don't have to"
-            description="Recurring pickups, holiday rotations, and reminders happen without anyone chasing anyone."
-          />
-        </div>
-        <FeatureGrid columns={3} features={SCHEDULING_FEATURES} />
-      </section>
+              {/* Content */}
+              <div className={imageLeft ? 'lg:order-2' : 'lg:order-1'}>
+                <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.18em] text-[var(--portal-primary)] mb-3">
+                  {cat.eyebrow}
+                </p>
+                <h2 className="font-serif text-3xl sm:text-4xl text-[#1E3A4A] leading-tight tracking-tight mb-4">
+                  {cat.title}
+                </h2>
+                <p className="text-lg text-gray-600 leading-relaxed mb-8">
+                  {cat.description}
+                </p>
+                <ul className="space-y-6">
+                  {cat.features.map((f) => {
+                    const Icon = f.icon;
+                    const gold = f.accent === 'gold';
+                    return (
+                      <li key={f.title} className="flex gap-4">
+                        <span
+                          className={`flex-shrink-0 inline-flex h-11 w-11 items-center justify-center rounded-xl ${
+                            gold ? 'bg-cg-amber/10' : 'bg-cg-sage/10'
+                          }`}
+                        >
+                          <Icon
+                            className={`h-5 w-5 ${gold ? 'text-cg-amber' : 'text-cg-sage'}`}
+                            aria-hidden="true"
+                          />
+                        </span>
+                        <div>
+                          <h3 className="font-serif text-lg text-[#1E3A4A]">
+                            {f.title}
+                          </h3>
+                          <p className="mt-1 text-gray-600 leading-relaxed">
+                            {f.description}
+                          </p>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            </div>
+          </section>
+        );
+      })}
 
       {/* Philosophy */}
       <section className="py-20 px-6 bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] text-white relative overflow-hidden">
@@ -341,7 +442,7 @@ export default function FeaturesPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 px-6">
+      <section className="py-20 px-6 bg-[#F4F8F7]">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif text-[#1E3A4A] mb-6 leading-tight tracking-tight">
             Ready to find common ground?

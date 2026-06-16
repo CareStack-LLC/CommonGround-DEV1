@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import {
   Shield,
@@ -131,27 +132,25 @@ export function ParentsContent() {
         </div>
 
         <div className="relative max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 pt-20 pb-24 lg:pt-32 lg:pb-32">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div className="grid items-center gap-10 lg:gap-14 lg:grid-cols-2">
             {/* Left: Hero content */}
-            <div className="space-y-8">
+            <div className="space-y-8 text-center lg:text-left">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#3DAA8A]/5 border border-[#3DAA8A]/10">
                 <Sparkles className="w-4 h-4 text-[#3DAA8A]" />
                 <span className="text-sm font-medium text-[#3DAA8A]">Trusted by 10,000+ families</span>
               </div>
 
               <h1 className="font-serif text-[#1A1A1A] text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight tracking-tight">
-                Peaceful
+                Peaceful co-parenting,
                 <br />
-                <span className="text-[#3DAA8A]">Co-Parenting</span>
-                <br />
-                Made Simple
+                <span className="text-[#3DAA8A]">finally made simple</span>
               </h1>
 
-              <p className="text-lg sm:text-xl text-[#4A4A4A] leading-relaxed max-w-xl">
-                Your children deserve stability. Keep communication calm, document everything, split expenses fairly, and protect what matters most: your kids.
+              <p className="text-lg sm:text-xl text-[#4A4A4A] leading-relaxed max-w-xl mx-auto lg:mx-0">
+                Keep every message calm, every exchange documented, and every expense fair — so your kids get the stability they deserve.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4 pt-4">
+              <div className="flex flex-col sm:flex-row gap-4 pt-4 justify-center lg:justify-start">
                 <Link
                   href="/auth/register"
                   className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-[#3DAA8A] text-white text-lg font-semibold rounded-xl hover:bg-[#3D5A49] transition-all hover:scale-105 shadow-lg hover:shadow-xl"
@@ -172,29 +171,16 @@ export function ParentsContent() {
               </p>
             </div>
 
-            {/* Right: Stats grid */}
-            <div className="grid grid-cols-2 gap-6">
-              {[
-                { value: '87%', label: 'Calmer conversations reported' },
-                { value: '10K+', label: 'Families using CommonGround' },
-                { value: '99.4%', label: 'On-time exchange rate' },
-                { value: '4.9★', label: 'Average user rating' },
-              ].map((stat, i) => (
-                <div
-                  key={i}
-                  className="bg-white rounded-2xl p-8 border border-[#E8E5E0] hover:border-[#3DAA8A]/30 transition-all hover:shadow-lg"
-                  style={{
-                    animationDelay: `${i * 100}ms`,
-                  }}
-                >
-                  <div className="text-4xl font-serif font-bold text-[#3DAA8A] mb-2">
-                    {stat.value}
-                  </div>
-                  <div className="text-sm text-[#6A6A6A] leading-snug">
-                    {stat.label}
-                  </div>
-                </div>
-              ))}
+            {/* Right: Hero image */}
+            <div className="relative mx-auto w-full max-w-xl lg:max-w-none">
+              <Image
+                src="/images/marketing/cg_parents_coparents.jpg"
+                alt="Two co-parents standing together calmly with their child at a youth soccer field"
+                width={1200}
+                height={800}
+                priority
+                className="w-full h-auto rounded-3xl shadow-xl object-cover"
+              />
             </div>
           </div>
         </div>

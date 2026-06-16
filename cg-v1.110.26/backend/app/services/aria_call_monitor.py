@@ -932,6 +932,230 @@ Score:"""
 
         return "\n".join(lines)
 
+    # ------------------------------------------------------------------
+    # KidComs post-call analysis (reliability batch 1 — child-safety gap)
+    # ------------------------------------------------------------------
+
+    async def analyze_full_kidcoms_session(
+        self,
+        db: AsyncSession,
+        session_id: str,
+        force: bool = False,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Post-call comprehensive analysis of a KidComs session transcript.
+
+        Mirrors analyze_full_call_transcript (parent calls) but reads
+        KidComsSession + KidComsMessage rows — KidComs transcript chunks
+        are stored as KidComsMessage with per-chunk aria_* fields.
+
+        The report dict is persisted to kidcoms_sessions.aria_report and
+        the run is idempotent: an already-analyzed session returns its
+        stored report unless force=True.
+        """
+        from app.models.kidcoms import KidComsMessage, KidComsSession
+
+        result = await db.execute(
+            select(KidComsSession).where(KidComsSession.id == session_id)
+        )
+        session = result.scalar_one_or_none()
+        if not session:
+            raise ValueError(f"KidComs session {session_id} not found")
+
+        if session.aria_analyzed_at and not force:
+            return session.aria_report
+
+        messages_result = await db.execute(
+            select(KidComsMessage)
+            .where(KidComsMessage.session_id == session_id)
+            .order_by(KidComsMessage.sent_at)
+        )
+        messages = list(messages_result.scalars().all())
+
+        category_breakdown: Dict[str, int] = {}
+        severe_violations: List[Dict[str, Any]] = []
+        timeline: List[Dict[str, Any]] = []
+        total_score = 0.0
+        scored_count = 0
+        flagged_count = 0
+
+        for msg in messages:
+            if not (msg.content or "").strip():
+                continue
+
+            if msg.aria_analyzed and msg.aria_score is not None:
+                # Reuse the realtime per-chunk analysis
+                score = float(msg.aria_score)
+                flagged = bool(msg.aria_flagged)
+                categories = [msg.aria_category] if msg.aria_category else []
+                level = (
+                    "severe" if score >= 0.8
+                    else "high" if score >= 0.6
+                    else "medium" if score >= 0.4
+                    else "low" if score > 0.0
+                    else "none"
+                )
+            else:
+                analysis = self.aria_service.analyze_message(msg.content)
+                score = analysis.toxicity_score
+                flagged = analysis.is_flagged
+                categories = [c.value for c in analysis.categories]
+                level = analysis.toxicity_level.value
+                msg.aria_analyzed = True
+                msg.aria_flagged = flagged
+                msg.aria_score = score
+                if categories and not msg.aria_category:
+                    msg.aria_category = categories[0]
+
+            for cat in categories:
+                category_breakdown[cat] = category_breakdown.get(cat, 0) + 1
+
+            if level in ("high", "severe"):
+                severe_violations.append({
+                    "timestamp": msg.sent_at.isoformat() if msg.sent_at else None,
+                    "speaker_id": msg.sender_id,
+                    "speaker_name": msg.sender_name,
+                    "speaker_type": msg.sender_type,
+                    "content": msg.content,
+                    "score": score,
+                    "level": level,
+                    "categories": categories,
+                    "source": "audio",
+                })
+
+            timeline.append({
+                "time": msg.sent_at.isoformat() if msg.sent_at else None,
+                "speaker": msg.sender_name,
+                "speaker_type": msg.sender_type,
+                "flagged": flagged,
+                "score": score,
+                "source": "audio",
+            })
+
+            total_score += score
+            scored_count += 1
+            if flagged:
+                flagged_count += 1
+
+        overall_score = total_score / scored_count if scored_count else 0.0
+
+        intervention_summary = {
+            "warnings": flagged_count,
+            "mutes": 0,
+            "terminations": 0,
+        }
+        recommendations = self._generate_recommendations(
+            overall_score, category_breakdown, severe_violations,
+            intervention_summary, video_violations=None,
+        )
+
+        report = {
+            "session_id": session_id,
+            "session_type": session.session_type,
+            "child_id": session.child_id,
+            "duration_seconds": session.duration_seconds or 0,
+            "total_chunks": len(messages),
+            "flags_count": flagged_count,
+            "overall_toxicity_score": round(overall_score, 4),
+            "category_breakdown": category_breakdown,
+            "severe_violations": severe_violations,
+            "severe_violations_count": len(severe_violations),
+            "timeline": timeline,
+            "intervention_summary": intervention_summary,
+            "recommendations": recommendations,
+            "generated_at": datetime.utcnow().isoformat(),
+        }
+
+        session.aria_report = report
+        session.aria_analyzed_at = datetime.utcnow()
+        await db.commit()
+
+        logger.info(
+            "KidComs post-call analysis for session %s: %d chunks, %d flagged, "
+            "%d severe, overall=%.2f",
+            session_id, len(messages), flagged_count,
+            len(severe_violations), overall_score,
+        )
+        return report
+
+
+async def analyze_and_report_kidcoms_session(session_id: str) -> None:
+    """Background entry point: analyze a finished KidComs session and, when
+    severe violations are present, notify BOTH parents (websocket + durable
+    email). Opens its own DB session — callers schedule this via FastAPI
+    BackgroundTasks or call it from scheduler sweeps. Never raises.
+    """
+    from app.core.database import AsyncSessionLocal
+
+    try:
+        async with AsyncSessionLocal() as db:
+            report = await aria_call_monitor.analyze_full_kidcoms_session(db, session_id)
+            if not report or not report.get("severe_violations"):
+                return
+
+            # Severe content found — notify both parents (per product
+            # decision: severe-only; moderate flags stay report-only).
+            from app.models.family_file import FamilyFile
+            from app.models.kidcoms import KidComsSession
+            from app.models.user import User
+
+            session = (await db.execute(
+                select(KidComsSession).where(KidComsSession.id == session_id)
+            )).scalar_one()
+            family_file = (await db.execute(
+                select(FamilyFile).where(FamilyFile.id == session.family_file_id)
+            )).scalar_one_or_none()
+            if not family_file:
+                return
+
+            categories = sorted(report.get("category_breakdown", {}).keys())
+            payload = {
+                "type": "aria_kidcoms_call_report",
+                "session_id": session_id,
+                "severity": "severe",
+                "severe_violations_count": report.get("severe_violations_count", 0),
+                "categories": categories,
+                "message": (
+                    "ARIA flagged serious content in your child's recent call. "
+                    "Please review the call report."
+                ),
+            }
+
+            from app.core.websocket import manager
+            from app.services.email import email_service
+
+            for parent_id in (family_file.parent_a_id, family_file.parent_b_id):
+                if not parent_id:
+                    continue
+                try:
+                    await manager.send_personal_message(
+                        message=payload, user_id=str(parent_id)
+                    )
+                except Exception:
+                    pass
+                try:
+                    parent = (await db.execute(
+                        select(User).where(User.id == parent_id)
+                    )).scalar_one_or_none()
+                    if parent and parent.email:
+                        await email_service.send_aria_intervention(
+                            to_email=parent.email,
+                            to_name=getattr(parent, "first_name", None) or "there",
+                            category=", ".join(categories) or "severe content",
+                            suggestion=(
+                                "ARIA detected serious content during your child's "
+                                "call. Open the call report in CommonGround to review."
+                            ),
+                        )
+                except Exception as email_exc:
+                    logger.warning(
+                        "KidComs severe-call email to parent %s failed: %s",
+                        parent_id, email_exc,
+                    )
+    except Exception as exc:  # noqa: BLE001 — background task, never raise
+        logger.error("KidComs post-call analysis failed for %s: %s", session_id, exc)
+        capture_error(exc, tags={"service": "aria_kidcoms_postcall"})
+
 
 # Global instance for convenience
 aria_call_monitor = ARIACallMonitor()

@@ -44,7 +44,7 @@ export default function FAQSection() {
       <div className="max-w-3xl mx-auto px-6">
         <div className="text-center mb-12">
           <h2
-            className="text-3xl sm:text-4xl font-serif text-[#1E3A4A] mb-4"
+            className="text-3xl sm:text-4xl font-serif text-foreground mb-4"
             style={{ fontFamily: 'var(--font-dm-serif-display), Georgia, serif' }}
           >
             Questions parents ask
@@ -55,17 +55,17 @@ export default function FAQSection() {
           {faqItems.map((item, index) => (
             <div
               key={index}
-              className="bg-gradient-to-br from-[#F4F8F7] to-white rounded-2xl border-2 border-gray-100 hover:border-[var(--portal-primary)]/20 transition-all overflow-hidden"
+              className="bg-gradient-to-br from-cg-sand to-white rounded-2xl border-2 border-gray-100 hover:border-cg-sage/20 transition-all overflow-hidden"
             >
               <button
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
                 className="w-full flex items-center justify-between px-6 py-5 text-left group"
               >
-                <span className="text-lg font-semibold text-[#1E3A4A] group-hover:text-[var(--portal-primary)] transition-colors">
+                <span className="text-lg font-semibold text-foreground group-hover:text-cg-sage transition-colors">
                   {item.question}
                 </span>
                 <ChevronDown
-                  className={`h-5 w-5 text-gray-400 group-hover:text-[var(--portal-primary)] transition-transform duration-200 flex-shrink-0 ml-4 ${
+                  className={`h-5 w-5 text-gray-400 group-hover:text-cg-sage transition-transform duration-200 flex-shrink-0 ml-4 ${
                     openIndex === index ? 'rotate-180' : ''
                   }`}
                 />

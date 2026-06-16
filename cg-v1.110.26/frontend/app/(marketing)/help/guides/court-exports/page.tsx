@@ -60,14 +60,14 @@ export default function CourtExportsGuidePage() {
       {/* Hero */}
       <section className="pt-10 pb-8 lg:pt-14 lg:pb-10">
         <div className="max-w-3xl mx-auto px-6 text-center">
-          <div className="w-14 h-14 rounded-2xl bg-[#3DAA8A]/10 flex items-center justify-center mx-auto mb-5">
-            <Shield className="w-7 h-7 text-[#3DAA8A]" />
+          <div className="w-14 h-14 rounded-2xl bg-cg-sage/10 flex items-center justify-center mx-auto mb-5">
+            <Shield className="w-7 h-7 text-cg-sage" />
           </div>
           <h1
-            className="text-3xl sm:text-4xl text-[#1E3A4A] mb-3"
+            className="text-3xl sm:text-4xl text-foreground mb-3"
             style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
           >
-            Court <span className="text-[#3DAA8A]">Documentation</span>
+            Court <span className="text-cg-sage">Documentation</span>
           </h1>
           <p className="text-lg text-gray-600 max-w-xl mx-auto">
             Tamper-proof, court-ready exports with SHA-256 verification, professional access, and acceptance across all 50 states.
@@ -82,7 +82,7 @@ export default function CourtExportsGuidePage() {
           <ul className="grid sm:grid-cols-2 gap-x-6 gap-y-2">
             {tocItems.map((item) => (
               <li key={item.id}>
-                <a href={`#${item.id}`} className="text-[#1E3A4A] hover:text-[#3DAA8A] text-sm transition-colors">
+                <a href={`#${item.id}`} className="text-foreground hover:text-cg-sage text-sm transition-colors">
                   {item.label}
                 </a>
               </li>
@@ -93,9 +93,9 @@ export default function CourtExportsGuidePage() {
         {/* What Makes CommonGround Court-Ready */}
         <section id="court-ready" className="mb-12 scroll-mt-24">
           <div className="flex items-center gap-3 mb-4">
-            <Scale className="w-5 h-5 text-[#3DAA8A]" />
+            <Scale className="w-5 h-5 text-cg-sage" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               What makes CommonGround court-ready
@@ -113,7 +113,7 @@ export default function CourtExportsGuidePage() {
               'Professional-grade PDF exports formatted for legal proceedings.',
             ].map((item, i) => (
               <li key={i} className="flex gap-2 text-sm text-gray-600">
-                <CheckCircle2 className="w-4 h-4 text-[#3DAA8A] mt-0.5 flex-shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-cg-sage mt-0.5 flex-shrink-0" />
                 <span>{item}</span>
               </li>
             ))}
@@ -123,9 +123,9 @@ export default function CourtExportsGuidePage() {
         {/* SHA-256 Verification */}
         <section id="sha-256" className="mb-12 scroll-mt-24">
           <div className="flex items-center gap-3 mb-4">
-            <Fingerprint className="w-5 h-5 text-[#3DAA8A]" />
+            <Fingerprint className="w-5 h-5 text-cg-sage" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               SHA-256 verification explained
@@ -137,9 +137,9 @@ export default function CourtExportsGuidePage() {
           <p className="text-gray-600 leading-relaxed mb-4">
             This means that when you export your records for court, the judge, attorney, or guardian ad litem can independently verify that the documents are authentic and unmodified. It is the same technology used by banks and government agencies to protect sensitive data.
           </p>
-          <div className="bg-[#F5A623]/5 border-l-4 border-[#F5A623] rounded-lg px-5 py-4">
+          <div className="bg-cg-amber/5 border-l-4 border-cg-amber rounded-lg px-5 py-4">
             <div className="flex gap-2 items-start">
-              <Lightbulb className="w-4 h-4 text-[#F5A623] mt-0.5 flex-shrink-0" />
+              <Lightbulb className="w-4 h-4 text-cg-amber mt-0.5 flex-shrink-0" />
               <p className="text-sm text-gray-700">
                 <strong>Tip:</strong> You do not need to understand the technical details of SHA-256. The key point is that your records are cryptographically proven to be authentic, which gives them significant weight in legal proceedings.
               </p>
@@ -150,9 +150,9 @@ export default function CourtExportsGuidePage() {
         {/* 5 Export Types */}
         <section id="export-types" className="mb-12 scroll-mt-24">
           <div className="flex items-center gap-3 mb-4">
-            <FolderOpen className="w-5 h-5 text-[#3DAA8A]" />
+            <FolderOpen className="w-5 h-5 text-cg-sage" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               5 export types
@@ -165,10 +165,10 @@ export default function CourtExportsGuidePage() {
             {exportTypes.map((type, i) => (
               <div key={i} className="bg-white rounded-xl border border-gray-100 p-5">
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="flex-shrink-0 w-6 h-6 rounded-lg bg-[#3DAA8A]/10 text-[#3DAA8A] text-xs font-bold flex items-center justify-center">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-lg bg-cg-sage/10 text-cg-sage text-xs font-bold flex items-center justify-center">
                     {i + 1}
                   </span>
-                  <h3 className="text-sm font-semibold text-[#1E3A4A]">{type.name}</h3>
+                  <h3 className="text-sm font-semibold text-foreground">{type.name}</h3>
                 </div>
                 <p className="text-xs text-gray-500 leading-relaxed ml-8">{type.desc}</p>
               </div>
@@ -179,9 +179,9 @@ export default function CourtExportsGuidePage() {
         {/* How to Generate an Export */}
         <section id="generating-export" className="mb-12 scroll-mt-24">
           <div className="flex items-center gap-3 mb-4">
-            <Download className="w-5 h-5 text-[#3DAA8A]" />
+            <Download className="w-5 h-5 text-cg-sage" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               How to generate an export
@@ -200,16 +200,16 @@ export default function CourtExportsGuidePage() {
               'Download the PDF or share it directly with your attorney through the Professional Portal.',
             ].map((step, i) => (
               <li key={i} className="flex gap-3">
-                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#3DAA8A]/10 text-[#3DAA8A] text-sm font-semibold flex items-center justify-center">
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-cg-sage/10 text-cg-sage text-sm font-semibold flex items-center justify-center">
                   {i + 1}
                 </span>
                 <span className="text-gray-600 text-sm leading-relaxed">{step}</span>
               </li>
             ))}
           </ol>
-          <div className="bg-[#F5A623]/5 border-l-4 border-[#F5A623] rounded-lg px-5 py-4">
+          <div className="bg-cg-amber/5 border-l-4 border-cg-amber rounded-lg px-5 py-4">
             <div className="flex gap-2 items-start">
-              <Lightbulb className="w-4 h-4 text-[#F5A623] mt-0.5 flex-shrink-0" />
+              <Lightbulb className="w-4 h-4 text-cg-amber mt-0.5 flex-shrink-0" />
               <p className="text-sm text-gray-700">
                 <strong>Tip:</strong> Generate a test export before your court date so you know exactly what it includes and can discuss any adjustments with your attorney.
               </p>
@@ -220,9 +220,9 @@ export default function CourtExportsGuidePage() {
         {/* Working with Your Attorney */}
         <section id="working-with-attorney" className="mb-12 scroll-mt-24">
           <div className="flex items-center gap-3 mb-4">
-            <UserCheck className="w-5 h-5 text-[#3DAA8A]" />
+            <UserCheck className="w-5 h-5 text-cg-sage" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               Working with your attorney
@@ -240,7 +240,7 @@ export default function CourtExportsGuidePage() {
               'Revoke access at any time from your settings.',
             ].map((item, i) => (
               <li key={i} className="flex gap-2 text-sm text-gray-600">
-                <CheckCircle2 className="w-4 h-4 text-[#3DAA8A] mt-0.5 flex-shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-cg-sage mt-0.5 flex-shrink-0" />
                 <span>{item}</span>
               </li>
             ))}
@@ -250,9 +250,9 @@ export default function CourtExportsGuidePage() {
         {/* What Courts Accept */}
         <section id="court-acceptance" className="mb-12 scroll-mt-24">
           <div className="flex items-center gap-3 mb-4">
-            <Lock className="w-5 h-5 text-[#3DAA8A]" />
+            <Lock className="w-5 h-5 text-cg-sage" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               What courts accept
@@ -264,9 +264,9 @@ export default function CourtExportsGuidePage() {
           <p className="text-gray-600 leading-relaxed mb-4">
             That said, court requirements can vary by jurisdiction and judge. Always discuss your specific situation with your attorney to ensure CommonGround exports meet the requirements in your case.
           </p>
-          <div className="bg-[#F5A623]/5 border-l-4 border-[#F5A623] rounded-lg px-5 py-4">
+          <div className="bg-cg-amber/5 border-l-4 border-cg-amber rounded-lg px-5 py-4">
             <div className="flex gap-2 items-start">
-              <Lightbulb className="w-4 h-4 text-[#F5A623] mt-0.5 flex-shrink-0" />
+              <Lightbulb className="w-4 h-4 text-cg-amber mt-0.5 flex-shrink-0" />
               <p className="text-sm text-gray-700">
                 <strong>Tip:</strong> Ask your attorney to review a sample export early in your case. This ensures there are no surprises and gives your attorney time to request any additional documentation formats the court may require.
               </p>
@@ -277,9 +277,9 @@ export default function CourtExportsGuidePage() {
         {/* Tips for Strong Records */}
         <section id="tips" className="mb-12 scroll-mt-24">
           <div className="flex items-center gap-3 mb-4">
-            <ClipboardList className="w-5 h-5 text-[#3DAA8A]" />
+            <ClipboardList className="w-5 h-5 text-cg-sage" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               Tips for strong records
@@ -297,7 +297,7 @@ export default function CourtExportsGuidePage() {
               'Review your exports for completeness before submitting them to your attorney or the court.',
             ].map((step, i) => (
               <li key={i} className="flex gap-3">
-                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#3DAA8A]/10 text-[#3DAA8A] text-sm font-semibold flex items-center justify-center">
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-cg-sage/10 text-cg-sage text-sm font-semibold flex items-center justify-center">
                   {i + 1}
                 </span>
                 <span className="text-gray-600 text-sm leading-relaxed">{step}</span>
@@ -307,7 +307,7 @@ export default function CourtExportsGuidePage() {
         </section>
 
         {/* Video Placeholder */}
-        <div className="bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F] rounded-2xl p-8 text-center text-white mb-12">
+        <div className="bg-gradient-to-br from-foreground to-cg-slate rounded-2xl p-8 text-center text-white mb-12">
           <div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-4">
             <Play className="w-7 h-7 text-white" />
           </div>
@@ -323,7 +323,7 @@ export default function CourtExportsGuidePage() {
         {/* Related Guides */}
         <section className="mb-12">
           <h2
-            className="text-xl text-[#1E3A4A] mb-5"
+            className="text-xl text-foreground mb-5"
             style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
           >
             Related guides
@@ -340,7 +340,7 @@ export default function CourtExportsGuidePage() {
                 href={guide.href}
                 className="group bg-white rounded-xl border border-gray-100 p-4 hover:shadow-md transition-all"
               >
-                <h3 className="text-[#1E3A4A] font-medium text-sm mb-1 group-hover:text-[#3DAA8A] transition-colors">
+                <h3 className="text-foreground font-medium text-sm mb-1 group-hover:text-cg-sage transition-colors">
                   {guide.title}
                 </h3>
                 <p className="text-xs text-gray-500">{guide.desc}</p>
@@ -352,7 +352,7 @@ export default function CourtExportsGuidePage() {
         {/* Still Need Help CTA */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
           <h2
-            className="text-xl text-[#1E3A4A] mb-2"
+            className="text-xl text-foreground mb-2"
             style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
           >
             Still need help?
@@ -362,7 +362,7 @@ export default function CourtExportsGuidePage() {
           </p>
           <Link
             href="/help/contact"
-            className="inline-flex items-center gap-2 bg-[#3DAA8A] text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-[#35957A] transition-colors"
+            className="inline-flex items-center gap-2 bg-cg-sage text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-cg-sage-dark transition-colors"
           >
             Contact support
             <ArrowRight className="w-4 h-4" />

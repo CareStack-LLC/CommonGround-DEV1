@@ -8,6 +8,7 @@ Create Date: 2026-01-22 23:18:59.529367
 from typing import Sequence, Union
 
 from alembic import op
+import migration_guards as mg
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
@@ -37,8 +38,8 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['family_file_id'], ['family_files.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_parent_call_rooms_daily_room_name'), 'parent_call_rooms', ['daily_room_name'], unique=True)
-    op.create_index(op.f('ix_parent_call_rooms_family_file_id'), 'parent_call_rooms', ['family_file_id'], unique=True)
+    mg.safe_create_index('ix_parent_call_rooms_daily_room_name', 'parent_call_rooms', ['daily_room_name'], unique=True)
+    mg.safe_create_index('ix_parent_call_rooms_family_file_id', 'parent_call_rooms', ['family_file_id'], unique=True)
     op.create_table('parent_call_sessions',
     sa.Column('family_file_id', sa.String(length=36), nullable=False),
     sa.Column('room_id', sa.String(length=36), nullable=False),
@@ -77,15 +78,15 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['room_id'], ['parent_call_rooms.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_parent_call_sessions_daily_room_name'), 'parent_call_sessions', ['daily_room_name'], unique=False)
-    op.create_index(op.f('ix_parent_call_sessions_family_file_id'), 'parent_call_sessions', ['family_file_id'], unique=False)
-    op.create_index('ix_parent_call_sessions_family_status', 'parent_call_sessions', ['family_file_id', 'status'], unique=False)
-    op.create_index('ix_parent_call_sessions_parent_a_date', 'parent_call_sessions', ['parent_a_id', 'initiated_at'], unique=False)
-    op.create_index(op.f('ix_parent_call_sessions_parent_a_id'), 'parent_call_sessions', ['parent_a_id'], unique=False)
-    op.create_index('ix_parent_call_sessions_parent_b_date', 'parent_call_sessions', ['parent_b_id', 'initiated_at'], unique=False)
-    op.create_index(op.f('ix_parent_call_sessions_parent_b_id'), 'parent_call_sessions', ['parent_b_id'], unique=False)
-    op.create_index(op.f('ix_parent_call_sessions_room_id'), 'parent_call_sessions', ['room_id'], unique=False)
-    op.create_index(op.f('ix_parent_call_sessions_status'), 'parent_call_sessions', ['status'], unique=False)
+    mg.safe_create_index('ix_parent_call_sessions_daily_room_name', 'parent_call_sessions', ['daily_room_name'], unique=False)
+    mg.safe_create_index('ix_parent_call_sessions_family_file_id', 'parent_call_sessions', ['family_file_id'], unique=False)
+    mg.safe_create_index('ix_parent_call_sessions_family_status', 'parent_call_sessions', ['family_file_id', 'status'], unique=False)
+    mg.safe_create_index('ix_parent_call_sessions_parent_a_date', 'parent_call_sessions', ['parent_a_id', 'initiated_at'], unique=False)
+    mg.safe_create_index('ix_parent_call_sessions_parent_a_id', 'parent_call_sessions', ['parent_a_id'], unique=False)
+    mg.safe_create_index('ix_parent_call_sessions_parent_b_date', 'parent_call_sessions', ['parent_b_id', 'initiated_at'], unique=False)
+    mg.safe_create_index('ix_parent_call_sessions_parent_b_id', 'parent_call_sessions', ['parent_b_id'], unique=False)
+    mg.safe_create_index('ix_parent_call_sessions_room_id', 'parent_call_sessions', ['room_id'], unique=False)
+    mg.safe_create_index('ix_parent_call_sessions_status', 'parent_call_sessions', ['status'], unique=False)
     op.create_table('call_transcript_chunks',
     sa.Column('session_id', sa.String(length=36), nullable=False),
     sa.Column('speaker_id', sa.String(length=36), nullable=False),
@@ -102,10 +103,10 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['session_id'], ['parent_call_sessions.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_index('ix_call_transcript_chunks_flagged', 'call_transcript_chunks', ['session_id', 'flagged'], unique=False)
-    op.create_index(op.f('ix_call_transcript_chunks_session_id'), 'call_transcript_chunks', ['session_id'], unique=False)
-    op.create_index('ix_call_transcript_chunks_session_time', 'call_transcript_chunks', ['session_id', 'start_time'], unique=False)
-    op.create_index(op.f('ix_call_transcript_chunks_speaker_id'), 'call_transcript_chunks', ['speaker_id'], unique=False)
+    mg.safe_create_index('ix_call_transcript_chunks_flagged', 'call_transcript_chunks', ['session_id', 'flagged'], unique=False)
+    mg.safe_create_index('ix_call_transcript_chunks_session_id', 'call_transcript_chunks', ['session_id'], unique=False)
+    mg.safe_create_index('ix_call_transcript_chunks_session_time', 'call_transcript_chunks', ['session_id', 'start_time'], unique=False)
+    mg.safe_create_index('ix_call_transcript_chunks_speaker_id', 'call_transcript_chunks', ['speaker_id'], unique=False)
     op.create_table('call_flags',
     sa.Column('session_id', sa.String(length=36), nullable=False),
     sa.Column('transcript_chunk_id', sa.String(length=36), nullable=True),
@@ -126,12 +127,12 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['transcript_chunk_id'], ['call_transcript_chunks.id'], ondelete='SET NULL'),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_call_flags_flag_type'), 'call_flags', ['flag_type'], unique=False)
-    op.create_index(op.f('ix_call_flags_session_id'), 'call_flags', ['session_id'], unique=False)
-    op.create_index('ix_call_flags_session_severity', 'call_flags', ['session_id', 'severity'], unique=False)
-    op.create_index(op.f('ix_call_flags_severity'), 'call_flags', ['severity'], unique=False)
-    op.create_index(op.f('ix_call_flags_transcript_chunk_id'), 'call_flags', ['transcript_chunk_id'], unique=False)
-    op.create_index('ix_call_flags_type_flagged_at', 'call_flags', ['flag_type', 'flagged_at'], unique=False)
+    mg.safe_create_index('ix_call_flags_flag_type', 'call_flags', ['flag_type'], unique=False)
+    mg.safe_create_index('ix_call_flags_session_id', 'call_flags', ['session_id'], unique=False)
+    mg.safe_create_index('ix_call_flags_session_severity', 'call_flags', ['session_id', 'severity'], unique=False)
+    mg.safe_create_index('ix_call_flags_severity', 'call_flags', ['severity'], unique=False)
+    mg.safe_create_index('ix_call_flags_transcript_chunk_id', 'call_flags', ['transcript_chunk_id'], unique=False)
+    mg.safe_create_index('ix_call_flags_type_flagged_at', 'call_flags', ['flag_type', 'flagged_at'], unique=False)
     op.create_table('message_attachments',
     sa.Column('message_id', sa.String(length=36), nullable=False),
     sa.Column('family_file_id', sa.String(length=36), nullable=False),
@@ -153,205 +154,205 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['message_id'], ['messages.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_message_attachments_family_file_id'), 'message_attachments', ['family_file_id'], unique=False)
-    op.create_index(op.f('ix_message_attachments_message_id'), 'message_attachments', ['message_id'], unique=False)
-    op.create_index(op.f('ix_message_attachments_uploaded_by'), 'message_attachments', ['uploaded_by'], unique=False)
-    op.alter_column('agreement_conversations', 'messages',
+    mg.safe_create_index('ix_message_attachments_family_file_id', 'message_attachments', ['family_file_id'], unique=False)
+    mg.safe_create_index('ix_message_attachments_message_id', 'message_attachments', ['message_id'], unique=False)
+    mg.safe_create_index('ix_message_attachments_uploaded_by', 'message_attachments', ['uploaded_by'], unique=False)
+    mg.safe_alter_column('agreement_conversations', 'messages',
                existing_type=postgresql.JSON(astext_type=sa.Text()),
                nullable=False)
-    op.drop_index(op.f('ix_agreement_conversations_user_id'), table_name='agreement_conversations')
-    op.drop_constraint(op.f('attestations_obligation_id_key'), 'attestations', type_='unique')
-    op.create_index(op.f('ix_attestations_attesting_parent_id'), 'attestations', ['attesting_parent_id'], unique=False)
-    op.create_index(op.f('ix_attestations_obligation_id'), 'attestations', ['obligation_id'], unique=True)
-    op.alter_column('child_users', 'is_active',
+    mg.safe_drop_index('ix_agreement_conversations_user_id', table_name='agreement_conversations')
+    mg.safe_drop_constraint('attestations_obligation_id_key', 'attestations', type_='unique')
+    mg.safe_create_index('ix_attestations_attesting_parent_id', 'attestations', ['attesting_parent_id'], unique=False)
+    mg.safe_create_index('ix_attestations_obligation_id', 'attestations', ['obligation_id'], unique=True)
+    mg.safe_alter_column('child_users', 'is_active',
                existing_type=sa.BOOLEAN(),
                nullable=False)
-    op.alter_column('child_users', 'created_at',
+    mg.safe_alter_column('child_users', 'created_at',
                existing_type=postgresql.TIMESTAMP(),
                nullable=False,
                existing_server_default=sa.text('now()'))
-    op.alter_column('child_users', 'updated_at',
+    mg.safe_alter_column('child_users', 'updated_at',
                existing_type=postgresql.TIMESTAMP(),
                nullable=False,
                existing_server_default=sa.text('now()'))
-    op.drop_index(op.f('ix_child_users_child_id'), table_name='child_users')
-    op.drop_constraint(op.f('uq_child_users_family_username'), 'child_users', type_='unique')
-    op.create_index('ix_child_users_family_username', 'child_users', ['family_file_id', 'username'], unique=False)
-    op.alter_column('child_wallet_contributions', 'fee_amount',
+    mg.safe_drop_index('ix_child_users_child_id', table_name='child_users')
+    mg.safe_drop_constraint('uq_child_users_family_username', 'child_users', type_='unique')
+    mg.safe_create_index('ix_child_users_family_username', 'child_users', ['family_file_id', 'username'], unique=False)
+    mg.safe_alter_column('child_wallet_contributions', 'fee_amount',
                existing_type=sa.NUMERIC(precision=10, scale=2),
                nullable=False)
-    op.alter_column('child_wallet_contributions', 'net_amount',
+    mg.safe_alter_column('child_wallet_contributions', 'net_amount',
                existing_type=sa.NUMERIC(precision=10, scale=2),
                nullable=False)
-    op.alter_column('child_wallet_contributions', 'status',
+    mg.safe_alter_column('child_wallet_contributions', 'status',
                existing_type=sa.VARCHAR(length=20),
                nullable=False)
-    op.alter_column('circle_permissions', 'can_video_call',
+    mg.safe_alter_column('circle_permissions', 'can_video_call',
                existing_type=sa.BOOLEAN(),
                nullable=False)
-    op.alter_column('circle_permissions', 'can_voice_call',
+    mg.safe_alter_column('circle_permissions', 'can_voice_call',
                existing_type=sa.BOOLEAN(),
                nullable=False)
-    op.alter_column('circle_permissions', 'can_chat',
+    mg.safe_alter_column('circle_permissions', 'can_chat',
                existing_type=sa.BOOLEAN(),
                nullable=False)
-    op.alter_column('circle_permissions', 'can_theater',
+    mg.safe_alter_column('circle_permissions', 'can_theater',
                existing_type=sa.BOOLEAN(),
                nullable=False)
-    op.alter_column('circle_permissions', 'allowed_days',
+    mg.safe_alter_column('circle_permissions', 'allowed_days',
                existing_type=postgresql.ARRAY(sa.INTEGER()),
                type_=sa.JSON(),
                existing_nullable=True,
                postgresql_using='to_json(allowed_days)')
-    op.alter_column('circle_permissions', 'max_call_duration_minutes',
+    mg.safe_alter_column('circle_permissions', 'max_call_duration_minutes',
                existing_type=sa.INTEGER(),
                nullable=False)
-    op.alter_column('circle_permissions', 'require_parent_present',
+    mg.safe_alter_column('circle_permissions', 'require_parent_present',
                existing_type=sa.BOOLEAN(),
                nullable=False)
-    op.alter_column('circle_permissions', 'created_at',
+    mg.safe_alter_column('circle_permissions', 'created_at',
                existing_type=postgresql.TIMESTAMP(),
                nullable=False,
                existing_server_default=sa.text('now()'))
-    op.alter_column('circle_permissions', 'updated_at',
+    mg.safe_alter_column('circle_permissions', 'updated_at',
                existing_type=postgresql.TIMESTAMP(),
                nullable=False,
                existing_server_default=sa.text('now()'))
-    op.drop_index(op.f('ix_circle_permissions_child'), table_name='circle_permissions')
-    op.drop_index(op.f('ix_circle_permissions_contact'), table_name='circle_permissions')
-    op.drop_index(op.f('ix_circle_permissions_family'), table_name='circle_permissions')
-    op.drop_constraint(op.f('uq_circle_permissions_contact_child'), 'circle_permissions', type_='unique')
-    op.create_index(op.f('ix_circle_permissions_child_id'), 'circle_permissions', ['child_id'], unique=False)
-    op.create_index(op.f('ix_circle_permissions_circle_contact_id'), 'circle_permissions', ['circle_contact_id'], unique=False)
-    op.create_index('ix_circle_permissions_contact_child', 'circle_permissions', ['circle_contact_id', 'child_id'], unique=False)
-    op.create_index(op.f('ix_circle_permissions_family_file_id'), 'circle_permissions', ['family_file_id'], unique=False)
-    op.alter_column('circle_users', 'email_verified',
+    mg.safe_drop_index('ix_circle_permissions_child', table_name='circle_permissions')
+    mg.safe_drop_index('ix_circle_permissions_contact', table_name='circle_permissions')
+    mg.safe_drop_index('ix_circle_permissions_family', table_name='circle_permissions')
+    mg.safe_drop_constraint('uq_circle_permissions_contact_child', 'circle_permissions', type_='unique')
+    mg.safe_create_index('ix_circle_permissions_child_id', 'circle_permissions', ['child_id'], unique=False)
+    mg.safe_create_index('ix_circle_permissions_circle_contact_id', 'circle_permissions', ['circle_contact_id'], unique=False)
+    mg.safe_create_index('ix_circle_permissions_contact_child', 'circle_permissions', ['circle_contact_id', 'child_id'], unique=False)
+    mg.safe_create_index('ix_circle_permissions_family_file_id', 'circle_permissions', ['family_file_id'], unique=False)
+    mg.safe_alter_column('circle_users', 'email_verified',
                existing_type=sa.BOOLEAN(),
                nullable=False)
-    op.alter_column('circle_users', 'is_active',
+    mg.safe_alter_column('circle_users', 'is_active',
                existing_type=sa.BOOLEAN(),
                nullable=False)
-    op.alter_column('circle_users', 'created_at',
+    mg.safe_alter_column('circle_users', 'created_at',
                existing_type=postgresql.TIMESTAMP(),
                nullable=False,
                existing_server_default=sa.text('now()'))
-    op.alter_column('circle_users', 'updated_at',
+    mg.safe_alter_column('circle_users', 'updated_at',
                existing_type=postgresql.TIMESTAMP(),
                nullable=False,
                existing_server_default=sa.text('now()'))
-    op.drop_constraint(op.f('circle_users_email_key'), 'circle_users', type_='unique')
-    op.drop_constraint(op.f('circle_users_invite_token_key'), 'circle_users', type_='unique')
-    op.drop_index(op.f('ix_circle_users_email'), table_name='circle_users')
-    op.create_index(op.f('ix_circle_users_email'), 'circle_users', ['email'], unique=True)
-    op.drop_index(op.f('ix_circle_users_invite_token'), table_name='circle_users')
-    op.create_index(op.f('ix_circle_users_invite_token'), 'circle_users', ['invite_token'], unique=True)
-    op.alter_column('custody_exchanges', 'pickup_child_ids',
+    mg.safe_drop_constraint('circle_users_email_key', 'circle_users', type_='unique')
+    mg.safe_drop_constraint('circle_users_invite_token_key', 'circle_users', type_='unique')
+    mg.safe_drop_index('ix_circle_users_email', table_name='circle_users')
+    mg.safe_create_index('ix_circle_users_email', 'circle_users', ['email'], unique=True)
+    mg.safe_drop_index('ix_circle_users_invite_token', table_name='circle_users')
+    mg.safe_create_index('ix_circle_users_invite_token', 'circle_users', ['invite_token'], unique=True)
+    mg.safe_alter_column('custody_exchanges', 'pickup_child_ids',
                existing_type=postgresql.JSON(astext_type=sa.Text()),
                nullable=False)
-    op.alter_column('custody_exchanges', 'dropoff_child_ids',
+    mg.safe_alter_column('custody_exchanges', 'dropoff_child_ids',
                existing_type=postgresql.JSON(astext_type=sa.Text()),
                nullable=False)
-    op.drop_constraint(op.f('exchange_rules_custody_order_id_key'), 'exchange_rules', type_='unique')
-    op.alter_column('firms', 'practice_areas',
+    mg.safe_drop_constraint('exchange_rules_custody_order_id_key', 'exchange_rules', type_='unique')
+    mg.safe_alter_column('firms', 'practice_areas',
                existing_type=postgresql.JSONB(astext_type=sa.Text()),
                type_=sa.JSON(),
                existing_nullable=True)
-    op.drop_index(op.f('ix_intake_sessions_access_token'), table_name='intake_sessions')
-    op.drop_index(op.f('ix_intake_sessions_session_number'), table_name='intake_sessions')
-    op.alter_column('kidcoms_communication_logs', 'aria_flags',
+    mg.safe_drop_index('ix_intake_sessions_access_token', table_name='intake_sessions')
+    mg.safe_drop_index('ix_intake_sessions_session_number', table_name='intake_sessions')
+    mg.safe_alter_column('kidcoms_communication_logs', 'aria_flags',
                existing_type=postgresql.JSONB(astext_type=sa.Text()),
                type_=sa.JSON(),
                existing_nullable=True)
-    op.alter_column('kidcoms_communication_logs', 'total_messages',
+    mg.safe_alter_column('kidcoms_communication_logs', 'total_messages',
                existing_type=sa.INTEGER(),
                nullable=False)
-    op.alter_column('kidcoms_communication_logs', 'flagged_messages',
+    mg.safe_alter_column('kidcoms_communication_logs', 'flagged_messages',
                existing_type=sa.INTEGER(),
                nullable=False)
-    op.alter_column('kidcoms_communication_logs', 'created_at',
+    mg.safe_alter_column('kidcoms_communication_logs', 'created_at',
                existing_type=postgresql.TIMESTAMP(),
                nullable=False,
                existing_server_default=sa.text('now()'))
-    op.drop_index(op.f('ix_kidcoms_comm_logs_child'), table_name='kidcoms_communication_logs')
-    op.drop_index(op.f('ix_kidcoms_comm_logs_contact'), table_name='kidcoms_communication_logs')
-    op.drop_index(op.f('ix_kidcoms_comm_logs_family'), table_name='kidcoms_communication_logs')
-    op.drop_index(op.f('ix_kidcoms_comm_logs_started'), table_name='kidcoms_communication_logs')
-    op.create_index('ix_kidcoms_comm_logs_family_date', 'kidcoms_communication_logs', ['family_file_id', 'started_at'], unique=False)
-    op.create_index(op.f('ix_kidcoms_communication_logs_child_id'), 'kidcoms_communication_logs', ['child_id'], unique=False)
-    op.create_index(op.f('ix_kidcoms_communication_logs_contact_id'), 'kidcoms_communication_logs', ['contact_id'], unique=False)
-    op.create_index(op.f('ix_kidcoms_communication_logs_family_file_id'), 'kidcoms_communication_logs', ['family_file_id'], unique=False)
-    op.alter_column('kidcoms_rooms', 'is_active',
+    mg.safe_drop_index('ix_kidcoms_comm_logs_child', table_name='kidcoms_communication_logs')
+    mg.safe_drop_index('ix_kidcoms_comm_logs_contact', table_name='kidcoms_communication_logs')
+    mg.safe_drop_index('ix_kidcoms_comm_logs_family', table_name='kidcoms_communication_logs')
+    mg.safe_drop_index('ix_kidcoms_comm_logs_started', table_name='kidcoms_communication_logs')
+    mg.safe_create_index('ix_kidcoms_comm_logs_family_date', 'kidcoms_communication_logs', ['family_file_id', 'started_at'], unique=False)
+    mg.safe_create_index('ix_kidcoms_communication_logs_child_id', 'kidcoms_communication_logs', ['child_id'], unique=False)
+    mg.safe_create_index('ix_kidcoms_communication_logs_contact_id', 'kidcoms_communication_logs', ['contact_id'], unique=False)
+    mg.safe_create_index('ix_kidcoms_communication_logs_family_file_id', 'kidcoms_communication_logs', ['family_file_id'], unique=False)
+    mg.safe_alter_column('kidcoms_rooms', 'is_active',
                existing_type=sa.BOOLEAN(),
                nullable=False)
-    op.alter_column('kidcoms_rooms', 'created_at',
+    mg.safe_alter_column('kidcoms_rooms', 'created_at',
                existing_type=postgresql.TIMESTAMP(),
                nullable=False,
                existing_server_default=sa.text('now()'))
-    op.alter_column('kidcoms_rooms', 'updated_at',
+    mg.safe_alter_column('kidcoms_rooms', 'updated_at',
                existing_type=postgresql.TIMESTAMP(),
                nullable=False,
                existing_server_default=sa.text('now()'))
-    op.drop_index(op.f('ix_kidcoms_rooms_assigned_to'), table_name='kidcoms_rooms')
-    op.drop_constraint(op.f('uq_kidcoms_rooms_family_room'), 'kidcoms_rooms', type_='unique')
-    op.create_index(op.f('ix_kidcoms_rooms_assigned_to_id'), 'kidcoms_rooms', ['assigned_to_id'], unique=False)
-    op.create_index('ix_kidcoms_rooms_family_room', 'kidcoms_rooms', ['family_file_id', 'room_number'], unique=False)
-    op.drop_column('kidcoms_settings', 'circle_enabled')
-    op.drop_column('kidcoms_settings', 'default_call_duration')
-    op.drop_column('kidcoms_settings', 'child_pin_enabled')
-    op.alter_column('obligations', 'child_ids',
+    mg.safe_drop_index('ix_kidcoms_rooms_assigned_to', table_name='kidcoms_rooms')
+    mg.safe_drop_constraint('uq_kidcoms_rooms_family_room', 'kidcoms_rooms', type_='unique')
+    mg.safe_create_index('ix_kidcoms_rooms_assigned_to_id', 'kidcoms_rooms', ['assigned_to_id'], unique=False)
+    mg.safe_create_index('ix_kidcoms_rooms_family_room', 'kidcoms_rooms', ['family_file_id', 'room_number'], unique=False)
+    mg.safe_drop_column('kidcoms_settings', 'circle_enabled')
+    mg.safe_drop_column('kidcoms_settings', 'default_call_duration')
+    mg.safe_drop_column('kidcoms_settings', 'child_pin_enabled')
+    mg.safe_alter_column('obligations', 'child_ids',
                existing_type=postgresql.JSON(astext_type=sa.Text()),
                nullable=False)
-    op.drop_index(op.f('ix_obligations_created_by'), table_name='obligations')
-    op.drop_index(op.f('ix_obligations_due_date'), table_name='obligations')
-    op.drop_index(op.f('ix_obligations_status'), table_name='obligations')
-    op.drop_constraint(op.f('fk_obligations_quick_accord'), 'obligations', type_='foreignkey')
-    op.create_foreign_key(None, 'obligations', 'quick_accords', ['quick_accord_id'], ['id'])
-    op.alter_column('payouts', 'fee_amount',
+    mg.safe_drop_index('ix_obligations_created_by', table_name='obligations')
+    mg.safe_drop_index('ix_obligations_due_date', table_name='obligations')
+    mg.safe_drop_index('ix_obligations_status', table_name='obligations')
+    mg.safe_drop_constraint('fk_obligations_quick_accord', 'obligations', type_='foreignkey')
+    mg.safe_create_foreign_key(None, 'obligations', 'quick_accords', ['quick_accord_id'], ['id'])
+    mg.safe_alter_column('payouts', 'fee_amount',
                existing_type=sa.NUMERIC(precision=10, scale=2),
                nullable=False)
-    op.alter_column('payouts', 'status',
+    mg.safe_alter_column('payouts', 'status',
                existing_type=sa.VARCHAR(length=20),
                nullable=False)
-    op.alter_column('payouts', 'requires_approval',
+    mg.safe_alter_column('payouts', 'requires_approval',
                existing_type=sa.BOOLEAN(),
                nullable=False)
-    op.drop_column('professional_profiles', 'bio')
-    op.drop_column('professional_profiles', 'years_of_experience')
-    op.drop_column('professional_profiles', 'profile_photo_url')
-    op.drop_column('professional_profiles', 'languages')
-    op.drop_constraint(op.f('fk_schedule_events_professional_id'), 'schedule_events', type_='foreignkey')
-    op.drop_constraint(op.f('fk_schedule_events_quick_accord'), 'schedule_events', type_='foreignkey')
-    op.create_foreign_key(None, 'schedule_events', 'professional_profiles', ['professional_id'], ['id'])
-    op.create_foreign_key(None, 'schedule_events', 'quick_accords', ['quick_accord_id'], ['id'])
-    op.drop_constraint(op.f('supervised_visitations_custody_order_id_key'), 'supervised_visitations', type_='unique')
-    op.drop_constraint(op.f('user_profiles_active_grant_id_fkey'), 'user_profiles', type_='foreignkey')
-    op.drop_constraint(op.f('virtual_card_authorizations_obligation_id_key'), 'virtual_card_authorizations', type_='unique')
-    op.create_index(op.f('ix_virtual_card_authorizations_obligation_id'), 'virtual_card_authorizations', ['obligation_id'], unique=True)
-    op.alter_column('wallet_fundings', 'status',
+    mg.safe_drop_column('professional_profiles', 'bio')
+    mg.safe_drop_column('professional_profiles', 'years_of_experience')
+    mg.safe_drop_column('professional_profiles', 'profile_photo_url')
+    mg.safe_drop_column('professional_profiles', 'languages')
+    mg.safe_drop_constraint('fk_schedule_events_professional_id', 'schedule_events', type_='foreignkey')
+    mg.safe_drop_constraint('fk_schedule_events_quick_accord', 'schedule_events', type_='foreignkey')
+    mg.safe_create_foreign_key(None, 'schedule_events', 'professional_profiles', ['professional_id'], ['id'])
+    mg.safe_create_foreign_key(None, 'schedule_events', 'quick_accords', ['quick_accord_id'], ['id'])
+    mg.safe_drop_constraint('supervised_visitations_custody_order_id_key', 'supervised_visitations', type_='unique')
+    mg.safe_drop_constraint('user_profiles_active_grant_id_fkey', 'user_profiles', type_='foreignkey')
+    mg.safe_drop_constraint('virtual_card_authorizations_obligation_id_key', 'virtual_card_authorizations', type_='unique')
+    mg.safe_create_index('ix_virtual_card_authorizations_obligation_id', 'virtual_card_authorizations', ['obligation_id'], unique=True)
+    mg.safe_alter_column('wallet_fundings', 'status',
                existing_type=sa.VARCHAR(length=20),
                nullable=False)
-    op.alter_column('wallet_transactions', 'currency',
+    mg.safe_alter_column('wallet_transactions', 'currency',
                existing_type=sa.VARCHAR(length=3),
                nullable=False)
-    op.alter_column('wallet_transactions', 'status',
+    mg.safe_alter_column('wallet_transactions', 'status',
                existing_type=sa.VARCHAR(length=20),
                nullable=False)
-    op.alter_column('wallet_transactions', 'fee_amount',
+    mg.safe_alter_column('wallet_transactions', 'fee_amount',
                existing_type=sa.NUMERIC(precision=10, scale=2),
                nullable=False)
-    op.alter_column('wallet_transactions', 'net_amount',
+    mg.safe_alter_column('wallet_transactions', 'net_amount',
                existing_type=sa.NUMERIC(precision=10, scale=2),
                nullable=False)
-    op.alter_column('wallets', 'onboarding_completed',
+    mg.safe_alter_column('wallets', 'onboarding_completed',
                existing_type=sa.BOOLEAN(),
                nullable=False)
-    op.alter_column('wallets', 'charges_enabled',
+    mg.safe_alter_column('wallets', 'charges_enabled',
                existing_type=sa.BOOLEAN(),
                nullable=False)
-    op.alter_column('wallets', 'payouts_enabled',
+    mg.safe_alter_column('wallets', 'payouts_enabled',
                existing_type=sa.BOOLEAN(),
                nullable=False)
-    op.alter_column('wallets', 'is_active',
+    mg.safe_alter_column('wallets', 'is_active',
                existing_type=sa.BOOLEAN(),
                nullable=False)
     # ### end Alembic commands ###

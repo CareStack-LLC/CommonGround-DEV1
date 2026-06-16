@@ -97,7 +97,7 @@ export function VerifyResultContent() {
         <div className="max-w-2xl mx-auto">
           <Link
             href="/verify"
-            className="inline-flex items-center gap-1.5 text-sm text-[#4A6670] hover:text-[#1E3A4A] mb-8 print:hidden"
+            className="inline-flex items-center gap-1.5 text-sm text-[#4A6670] hover:text-foreground mb-8 print:hidden"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Verification
@@ -106,7 +106,7 @@ export function VerifyResultContent() {
           {/* Loading */}
           {loading && (
             <div className="text-center py-20">
-              <Loader2 className="w-10 h-10 text-[#3DAA8A] animate-spin mx-auto mb-4" />
+              <Loader2 className="w-10 h-10 text-cg-sage animate-spin mx-auto mb-4" />
               <p className="text-[#4A6670]">Verifying document...</p>
             </div>
           )}
@@ -118,7 +118,7 @@ export function VerifyResultContent() {
                 <ShieldX className="w-10 h-10 text-red-500" />
               </div>
               <h1
-                className="text-3xl font-serif text-[#1E3A4A] mb-3"
+                className="text-3xl font-serif text-foreground mb-3"
                 style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
               >
                 Not Verified
@@ -132,14 +132,14 @@ export function VerifyResultContent() {
 
           {/* Verified */}
           {!loading && result && (
-            <div className="bg-white rounded-2xl border border-[#3DAA8A]/30 shadow-lg overflow-hidden">
+            <div className="bg-white rounded-2xl border border-cg-sage/30 shadow-lg overflow-hidden">
               {/* Header */}
-              <div className="bg-gradient-to-r from-[#E8F4F0] to-[#E8F4F8] p-8 text-center border-b border-[#D1E0E5]">
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#3DAA8A]/10 mb-4">
-                  <ShieldCheck className="w-10 h-10 text-[#3DAA8A]" />
+              <div className="bg-gradient-to-r from-cg-sage-subtle to-cg-mist p-8 text-center border-b border-[#D1E0E5]">
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-cg-sage/10 mb-4">
+                  <ShieldCheck className="w-10 h-10 text-cg-sage" />
                 </div>
                 <h1
-                  className="text-3xl font-serif text-[#1E3A4A] mb-2"
+                  className="text-3xl font-serif text-foreground mb-2"
                   style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
                 >
                   Verified
@@ -203,16 +203,16 @@ export function VerifyResultContent() {
                         SHA-256 Hash
                       </p>
                       <div className="flex items-center gap-2">
-                        <p className="text-sm font-mono text-[#1E3A4A] break-all">
+                        <p className="text-sm font-mono text-foreground break-all">
                           {result.sha256_hash}
                         </p>
                         <button
                           onClick={copyHash}
-                          className="shrink-0 p-1.5 rounded-md hover:bg-[#E8F4F8] transition-colors print:hidden"
+                          className="shrink-0 p-1.5 rounded-md hover:bg-cg-mist transition-colors print:hidden"
                           title="Copy full hash"
                         >
                           {copied ? (
-                            <Check className="w-4 h-4 text-[#3DAA8A]" />
+                            <Check className="w-4 h-4 text-cg-sage" />
                           ) : (
                             <Copy className="w-4 h-4 text-[#8BA3AE]" />
                           )}
@@ -264,7 +264,7 @@ function DetailRow({
           {label}
         </p>
         <p
-          className={`text-[#1E3A4A] font-semibold ${mono ? 'font-mono text-sm' : ''}`}
+          className={`text-foreground font-semibold ${mono ? 'font-mono text-sm' : ''}`}
         >
           {value}
         </p>

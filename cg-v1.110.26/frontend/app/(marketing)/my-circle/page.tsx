@@ -131,22 +131,22 @@ export default function MyCirclePage() {
 
       {/* HERO */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#F4F8F7] via-[#F4F8F7] to-white" />
-        <div className="absolute top-0 left-0 w-[500px] h-[500px] rounded-full bg-[#F5A623]/[0.04] blur-3xl -translate-y-1/3 -translate-x-1/4" />
+        <div className="absolute inset-0 bg-gradient-to-b from-cg-sand via-cg-sand to-white" />
+        <div className="absolute top-0 left-0 w-[500px] h-[500px] rounded-full bg-cg-amber/[0.04] blur-3xl -translate-y-1/3 -translate-x-1/4" />
 
         <div className="relative max-w-6xl mx-auto px-6 pt-16 pb-20 lg:pt-24 lg:pb-28">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <div>
-              <p className="text-[#F5A623] font-medium mb-4 tracking-wide uppercase text-sm flex items-center gap-2">
+              <p className="text-cg-amber font-medium mb-4 tracking-wide uppercase text-sm flex items-center gap-2">
                 <Heart className="w-4 h-4" />
                 For grandparents, aunts, uncles & your village
               </p>
               <h1
-                className="text-4xl sm:text-5xl lg:text-[3.4rem] text-[#1E3A4A] mb-6 leading-[1.1] tracking-tight"
+                className="text-4xl sm:text-5xl lg:text-[3.4rem] text-foreground mb-6 leading-[1.1] tracking-tight"
                 style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
               >
                 Family Doesn&apos;t End at{' '}
-                <span className="text-[#3DAA8A]">the Front Door</span>
+                <span className="text-cg-sage">the Front Door</span>
               </h1>
               <p className="text-lg text-gray-600 leading-relaxed mb-8 max-w-xl">
                 When families separate, it&apos;s not just the parents who lose
@@ -156,7 +156,7 @@ export default function MyCirclePage() {
               </p>
               <a
                 href="#early-adopter"
-                className="inline-flex items-center gap-2 bg-[#3DAA8A] text-white font-semibold px-8 py-4 rounded-xl transition-all duration-200 hover:bg-[#2E9577] hover:shadow-lg hover:shadow-[#3DAA8A]/20 text-base"
+                className="inline-flex items-center gap-2 bg-cg-sage text-white font-semibold px-8 py-4 rounded-xl transition-all duration-200 hover:bg-cg-sage-dark hover:shadow-lg hover:shadow-cg-sage/20 text-base"
               >
                 Join the Early Adopter List
                 <ArrowDown className="w-4 h-4" />
@@ -164,9 +164,9 @@ export default function MyCirclePage() {
             </div>
 
             <div className="relative">
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-[#F5A623]/10">
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-cg-amber/10">
                 <Image
-                  src="/images/Website pictes/mycircle1.png"
+                  src="/images/website/mycircle1.png"
                   alt="Grandmother bonding with grandchild through KidSpace video call"
                   width={800}
                   height={533}
@@ -175,7 +175,7 @@ export default function MyCirclePage() {
                   sizes="(max-width: 768px) 100vw, 50vw"
                 />
               </div>
-              <div className="absolute -bottom-4 -right-4 w-24 h-24 rounded-full border-2 border-[#F5A623]/30 -z-10" />
+              <div className="absolute -bottom-4 -right-4 w-24 h-24 rounded-full border-2 border-cg-amber/30 -z-10" />
               <div className="absolute -top-4 -left-4 w-16 h-16 rounded-full bg-[#E85D75]/10 -z-10" />
             </div>
           </div>
@@ -187,7 +187,7 @@ export default function MyCirclePage() {
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-14">
             <h2
-              className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+              className="text-3xl sm:text-4xl text-foreground mb-4"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               Sound Familiar?
@@ -201,7 +201,7 @@ export default function MyCirclePage() {
             {painPoints.map((point, i) => (
               <div
                 key={i}
-                className="group relative bg-[#F4F8F7] rounded-2xl p-6 sm:p-8 border border-transparent hover:border-[#3DAA8A]/20 transition-colors duration-300"
+                className="group relative bg-cg-sand rounded-2xl p-6 sm:p-8 border border-transparent hover:border-cg-sage/20 transition-colors duration-300"
               >
                 <div className="flex flex-col sm:flex-row gap-4 sm:gap-8">
                   <div className="flex-1">
@@ -213,21 +213,21 @@ export default function MyCirclePage() {
                     </p>
                   </div>
                   <div className="hidden sm:flex items-center">
-                    <div className="w-8 h-px bg-[#3DAA8A]/40" />
-                    <CheckCircle className="w-5 h-5 text-[#3DAA8A] mx-1 flex-shrink-0" />
-                    <div className="w-8 h-px bg-[#3DAA8A]/40" />
+                    <div className="w-8 h-px bg-cg-sage/40" />
+                    <CheckCircle className="w-5 h-5 text-cg-sage mx-1 flex-shrink-0" />
+                    <div className="w-8 h-px bg-cg-sage/40" />
                   </div>
                   <div className="sm:hidden flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-[#3DAA8A]" />
-                    <span className="text-xs font-semibold uppercase tracking-wider text-[#3DAA8A]">
+                    <CheckCircle className="w-4 h-4 text-cg-sage" />
+                    <span className="text-xs font-semibold uppercase tracking-wider text-cg-sage">
                       With KidSpace
                     </span>
                   </div>
                   <div className="flex-1">
-                    <span className="hidden sm:block text-xs font-semibold uppercase tracking-wider text-[#3DAA8A] mb-2">
+                    <span className="hidden sm:block text-xs font-semibold uppercase tracking-wider text-cg-sage mb-2">
                       With KidSpace
                     </span>
-                    <p className="text-[#1E3A4A] font-medium">
+                    <p className="text-foreground font-medium">
                       {point.cg}
                     </p>
                   </div>
@@ -239,14 +239,14 @@ export default function MyCirclePage() {
       </section>
 
       {/* FEATURES */}
-      <section className="py-20 lg:py-28 bg-gradient-to-b from-white to-[#F4F8F7]">
+      <section className="py-20 lg:py-28 bg-gradient-to-b from-white to-cg-sand">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-14">
-            <p className="text-[#3DAA8A] font-medium mb-3 tracking-wide uppercase text-sm">
+            <p className="text-cg-sage font-medium mb-3 tracking-wide uppercase text-sm">
               Built for your village
             </p>
             <h2
-              className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+              className="text-3xl sm:text-4xl text-foreground mb-4"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               A Safe Space to Stay Connected
@@ -278,7 +278,7 @@ export default function MyCirclePage() {
                     {feature.name}
                   </span>
                   <h3
-                    className="text-xl text-[#1E3A4A] mb-3"
+                    className="text-xl text-foreground mb-3"
                     style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
                   >
                     {feature.tagline}
@@ -294,30 +294,30 @@ export default function MyCirclePage() {
       </section>
 
       {/* SOCIAL PROOF — Marcus (KidSpace movie nights) */}
-      <section className="py-20 lg:py-24 bg-[#F4F8F7]">
+      <section className="py-20 lg:py-24 bg-cg-sand">
         <div className="max-w-4xl mx-auto px-6">
           <div className="relative bg-white rounded-3xl p-8 sm:p-12 shadow-sm border border-gray-100">
-            <Quote className="w-10 h-10 text-[#3DAA8A]/20 mb-6" />
+            <Quote className="w-10 h-10 text-cg-sage/20 mb-6" />
             <blockquote
-              className="text-xl sm:text-2xl text-[#1E3A4A] leading-relaxed mb-8"
+              className="text-xl sm:text-2xl text-foreground leading-relaxed mb-8"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               Now we have a standing KidSpace movie night every Wednesday — even
               on weeks when we&apos;re apart. The kids light up when the call connects.
             </blockquote>
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-[#F5A623]/10 flex items-center justify-center">
-                <span className="text-[#F5A623] font-semibold text-lg">M</span>
+              <div className="w-12 h-12 rounded-full bg-cg-amber/10 flex items-center justify-center">
+                <span className="text-cg-amber font-semibold text-lg">M</span>
               </div>
               <div>
-                <p className="font-semibold text-[#1E3A4A]">Marcus</p>
+                <p className="font-semibold text-foreground">Marcus</p>
                 <p className="text-sm text-gray-600">
                   4Ever Forward Foundation Grant Program
                 </p>
               </div>
             </div>
             <div className="absolute top-0 right-0 w-32 h-32 overflow-hidden rounded-tr-3xl">
-              <div className="absolute -top-16 -right-16 w-32 h-32 rounded-full border-2 border-[#F5A623]/10" />
+              <div className="absolute -top-16 -right-16 w-32 h-32 rounded-full border-2 border-cg-amber/10" />
             </div>
           </div>
         </div>
@@ -327,11 +327,11 @@ export default function MyCirclePage() {
       <section id="early-adopter" className="py-20 lg:py-28 bg-white scroll-mt-20">
         <div className="max-w-2xl mx-auto px-6">
           <div className="text-center mb-10">
-            <p className="text-[#F5A623] font-medium mb-3 tracking-wide uppercase text-sm">
+            <p className="text-cg-amber font-medium mb-3 tracking-wide uppercase text-sm">
               Early Adopter Offer
             </p>
             <h2
-              className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+              className="text-3xl sm:text-4xl text-foreground mb-4"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               Stay Part of Their Story
@@ -346,10 +346,10 @@ export default function MyCirclePage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-20 lg:py-24 bg-[#F4F8F7]">
+      <section className="py-20 lg:py-24 bg-cg-sand">
         <div className="max-w-3xl mx-auto px-6">
           <h2
-            className="text-3xl sm:text-4xl text-[#1E3A4A] mb-12 text-center"
+            className="text-3xl sm:text-4xl text-foreground mb-12 text-center"
             style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
           >
             Questions You Might Have
@@ -361,7 +361,7 @@ export default function MyCirclePage() {
                 className="group bg-white rounded-xl border border-gray-100 overflow-hidden"
               >
                 <summary className="flex items-center justify-between gap-4 p-6 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
-                  <h3 className="font-semibold text-[#1E3A4A] text-left">{faq.q}</h3>
+                  <h3 className="font-semibold text-foreground text-left">{faq.q}</h3>
                   <ChevronDown className="w-5 h-5 text-gray-600 flex-shrink-0 transition-transform duration-200 group-open:rotate-180" />
                 </summary>
                 <div className="px-6 pb-6 -mt-1">
@@ -373,7 +373,7 @@ export default function MyCirclePage() {
           <div className="text-center mt-14">
             <a
               href="#early-adopter"
-              className="inline-flex items-center gap-2 text-[#3DAA8A] font-semibold hover:text-[#2E9577] transition-colors"
+              className="inline-flex items-center gap-2 text-cg-sage font-semibold hover:text-cg-sage-dark transition-colors"
             >
               <Heart className="w-4 h-4" />
               Claim your early adopter spot

@@ -14,6 +14,7 @@ Silent Handoff Feature:
 from typing import Sequence, Union
 
 from alembic import op
+import migration_guards as mg
 import sqlalchemy as sa
 
 
@@ -32,23 +33,23 @@ def upgrade() -> None:
     # ============================================================
 
     # Geofence location (lat/lng from geocoded address)
-    op.add_column('custody_exchanges',
+    mg.safe_add_column('custody_exchanges',
         sa.Column('location_lat', sa.Float(), nullable=True))
-    op.add_column('custody_exchanges',
+    mg.safe_add_column('custody_exchanges',
         sa.Column('location_lng', sa.Float(), nullable=True))
-    op.add_column('custody_exchanges',
+    mg.safe_add_column('custody_exchanges',
         sa.Column('geofence_radius_meters', sa.Integer(), server_default='100', nullable=False))
 
     # Exchange window settings
-    op.add_column('custody_exchanges',
+    mg.safe_add_column('custody_exchanges',
         sa.Column('check_in_window_before_minutes', sa.Integer(), server_default='30', nullable=False))
-    op.add_column('custody_exchanges',
+    mg.safe_add_column('custody_exchanges',
         sa.Column('check_in_window_after_minutes', sa.Integer(), server_default='30', nullable=False))
 
     # Silent Handoff mode toggles
-    op.add_column('custody_exchanges',
+    mg.safe_add_column('custody_exchanges',
         sa.Column('silent_handoff_enabled', sa.Boolean(), server_default='false', nullable=False))
-    op.add_column('custody_exchanges',
+    mg.safe_add_column('custody_exchanges',
         sa.Column('qr_confirmation_required', sa.Boolean(), server_default='false', nullable=False))
 
     # ============================================================
@@ -56,49 +57,49 @@ def upgrade() -> None:
     # ============================================================
 
     # From parent GPS check-in data
-    op.add_column('custody_exchange_instances',
+    mg.safe_add_column('custody_exchange_instances',
         sa.Column('from_parent_check_in_lat', sa.Float(), nullable=True))
-    op.add_column('custody_exchange_instances',
+    mg.safe_add_column('custody_exchange_instances',
         sa.Column('from_parent_check_in_lng', sa.Float(), nullable=True))
-    op.add_column('custody_exchange_instances',
+    mg.safe_add_column('custody_exchange_instances',
         sa.Column('from_parent_device_accuracy', sa.Float(), nullable=True))
-    op.add_column('custody_exchange_instances',
+    mg.safe_add_column('custody_exchange_instances',
         sa.Column('from_parent_distance_meters', sa.Float(), nullable=True))
-    op.add_column('custody_exchange_instances',
+    mg.safe_add_column('custody_exchange_instances',
         sa.Column('from_parent_in_geofence', sa.Boolean(), nullable=True))
 
     # To parent GPS check-in data
-    op.add_column('custody_exchange_instances',
+    mg.safe_add_column('custody_exchange_instances',
         sa.Column('to_parent_check_in_lat', sa.Float(), nullable=True))
-    op.add_column('custody_exchange_instances',
+    mg.safe_add_column('custody_exchange_instances',
         sa.Column('to_parent_check_in_lng', sa.Float(), nullable=True))
-    op.add_column('custody_exchange_instances',
+    mg.safe_add_column('custody_exchange_instances',
         sa.Column('to_parent_device_accuracy', sa.Float(), nullable=True))
-    op.add_column('custody_exchange_instances',
+    mg.safe_add_column('custody_exchange_instances',
         sa.Column('to_parent_distance_meters', sa.Float(), nullable=True))
-    op.add_column('custody_exchange_instances',
+    mg.safe_add_column('custody_exchange_instances',
         sa.Column('to_parent_in_geofence', sa.Boolean(), nullable=True))
 
     # QR confirmation (mutual verification)
-    op.add_column('custody_exchange_instances',
+    mg.safe_add_column('custody_exchange_instances',
         sa.Column('qr_confirmation_token', sa.String(64), nullable=True))
-    op.add_column('custody_exchange_instances',
+    mg.safe_add_column('custody_exchange_instances',
         sa.Column('qr_confirmed_at', sa.DateTime(), nullable=True))
-    op.add_column('custody_exchange_instances',
+    mg.safe_add_column('custody_exchange_instances',
         sa.Column('qr_confirmed_by', sa.String(36), nullable=True))
 
     # Handoff outcome tracking
-    op.add_column('custody_exchange_instances',
+    mg.safe_add_column('custody_exchange_instances',
         sa.Column('handoff_outcome', sa.String(30), nullable=True))
 
     # Exchange window tracking
-    op.add_column('custody_exchange_instances',
+    mg.safe_add_column('custody_exchange_instances',
         sa.Column('window_start', sa.DateTime(), nullable=True))
-    op.add_column('custody_exchange_instances',
+    mg.safe_add_column('custody_exchange_instances',
         sa.Column('window_end', sa.DateTime(), nullable=True))
-    op.add_column('custody_exchange_instances',
+    mg.safe_add_column('custody_exchange_instances',
         sa.Column('auto_closed', sa.Boolean(), server_default='false', nullable=False))
-    op.add_column('custody_exchange_instances',
+    mg.safe_add_column('custody_exchange_instances',
         sa.Column('auto_closed_at', sa.DateTime(), nullable=True))
 
 

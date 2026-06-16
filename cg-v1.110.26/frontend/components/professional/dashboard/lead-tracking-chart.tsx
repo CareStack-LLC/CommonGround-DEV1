@@ -130,8 +130,8 @@ export function LeadTrackingChart({ data }: LeadTrackingChartProps) {
                                     fontWeight: 600,
                                     marginBottom: "4px",
                                 }}
-                                formatter={(value: number | undefined) => [
-                                    `${value ?? 0} lead${(value ?? 0) !== 1 ? "s" : ""}`,
+                                formatter={(value) => [
+                                    `${Number(value ?? 0)} lead${Number(value ?? 0) !== 1 ? "s" : ""}`,
                                     "",
                                 ]}
                                 cursor={{ fill: "rgba(0,0,0,0.04)" }}

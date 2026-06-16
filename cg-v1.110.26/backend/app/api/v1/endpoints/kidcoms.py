@@ -8,7 +8,7 @@ play games, and use collaborative whiteboards with their approved circle.
 import logging
 from typing import List, Optional
 from datetime import datetime, timedelta
-from fastapi import APIRouter, Body, Depends, HTTPException, status, Query
+from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, status, Query
 from sqlalchemy import select, and_, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 import secrets
@@ -651,6 +651,7 @@ async def join_session(
 )
 async def end_session(
     session_id: str,
+    background_tasks: BackgroundTasks,
     end_data: Optional[KidComsEndSessionRequest] = None,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
@@ -685,7 +686,80 @@ async def end_session(
     await db.commit()
     await db.refresh(session)
 
+    # Post-call ARIA analysis of the full transcript (child safety).
+    # Runs after the response with its own DB session; severe findings
+    # notify both parents.
+    from app.services.aria_call_monitor import analyze_and_report_kidcoms_session
+    background_tasks.add_task(analyze_and_report_kidcoms_session, session.id)
+
     return _session_to_response(session)
+
+
+@router.get(
+    "/sessions/{session_id}/call-report",
+    summary="Get post-call ARIA report",
+    description="Court-ready ARIA analysis of a completed KidComs session."
+)
+async def get_kidcoms_call_report(
+    session_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """Get the post-call ARIA report for a KidComs session.
+
+    Access: family-file parents, or professionals with approved access
+    (same model as the parent-call report endpoint).
+    """
+    result = await db.execute(
+        select(KidComsSession).where(KidComsSession.id == session_id)
+    )
+    session = result.scalar_one_or_none()
+    if not session:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Session not found"
+        )
+
+    ff_result = await db.execute(
+        select(FamilyFile).where(FamilyFile.id == session.family_file_id)
+    )
+    family_file = ff_result.scalar_one_or_none()
+    if not family_file:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Family file not found"
+        )
+
+    is_parent = current_user.id in [family_file.parent_a_id, family_file.parent_b_id]
+    if not is_parent:
+        from app.models.professional import ProfessionalAccessRequest
+        pro_result = await db.execute(
+            select(ProfessionalAccessRequest).where(
+                ProfessionalAccessRequest.family_file_id == family_file.id,
+                ProfessionalAccessRequest.professional_user_id == current_user.id,
+                ProfessionalAccessRequest.status == "approved",
+            )
+        )
+        if not pro_result.scalar_one_or_none():
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You don't have access to this call report"
+            )
+
+    if session.aria_report:
+        return session.aria_report
+
+    # Not yet analyzed (e.g., legacy session) — analyze on demand.
+    try:
+        report = await aria_call_monitor.analyze_full_kidcoms_session(db, session_id)
+    except Exception as e:
+        logger.error(f"Failed to generate KidComs call report: {e}")
+        capture_error(e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to generate call report"
+        )
+    return report or {}
 
 
 # ============================================================

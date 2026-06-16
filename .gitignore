@@ -84,3 +84,6 @@ out/
 # Keep alembic/ folder but ignore specific generated files if needed
 .vercel
 .env*.local
+
+# Claude Code local worktrees (must not be committed)
+.claude/worktrees/

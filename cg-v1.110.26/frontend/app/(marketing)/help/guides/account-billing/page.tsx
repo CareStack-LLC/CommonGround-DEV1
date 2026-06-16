@@ -95,11 +95,11 @@ export default function AccountBillingGuidePage() {
       {/* Hero */}
       <section className="pt-12 pb-10 lg:pt-16 lg:pb-14">
         <div className="max-w-3xl mx-auto px-6 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-[#3DAA8A]/10 flex items-center justify-center mx-auto mb-6">
-            <CreditCard className="w-8 h-8 text-[#3DAA8A]" />
+          <div className="w-16 h-16 rounded-2xl bg-cg-sage/10 flex items-center justify-center mx-auto mb-6">
+            <CreditCard className="w-8 h-8 text-cg-sage" />
           </div>
           <h1
-            className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+            className="text-3xl sm:text-4xl text-foreground mb-4"
             style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
           >
             Account & Billing
@@ -122,9 +122,9 @@ export default function AccountBillingGuidePage() {
               <li key={item.id}>
                 <a
                   href={`#${item.id}`}
-                  className="flex items-center gap-2 text-sm text-[#1E3A4A] hover:text-[#3DAA8A] transition-colors py-1"
+                  className="flex items-center gap-2 text-sm text-foreground hover:text-cg-sage transition-colors py-1"
                 >
-                  <ChevronRight className="w-3.5 h-3.5 text-[#3DAA8A]" />
+                  <ChevronRight className="w-3.5 h-3.5 text-cg-sage" />
                   {item.label}
                 </a>
               </li>
@@ -135,9 +135,9 @@ export default function AccountBillingGuidePage() {
         {/* Plan Comparison */}
         <section id="plans" className="mb-14 scroll-mt-8">
           <div className="flex items-center gap-3 mb-4">
-            <CreditCard className="w-6 h-6 text-[#3DAA8A] flex-shrink-0" />
+            <CreditCard className="w-6 h-6 text-cg-sage flex-shrink-0" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               Plan comparison
@@ -154,26 +154,26 @@ export default function AccountBillingGuidePage() {
                 key={plan.name}
                 className={`bg-white rounded-xl border p-6 ${
                   plan.highlighted
-                    ? 'border-[#3DAA8A] shadow-md ring-1 ring-[#3DAA8A]/20'
+                    ? 'border-cg-sage shadow-md ring-1 ring-cg-sage/20'
                     : 'border-gray-100'
                 }`}
               >
                 <div className="flex items-baseline justify-between mb-4">
                   <div>
                     <h3
-                      className="text-lg text-[#1E3A4A]"
+                      className="text-lg text-foreground"
                       style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
                     >
                       {plan.name}
                     </h3>
                     {plan.highlighted && (
-                      <span className="text-xs font-medium text-[#3DAA8A] bg-[#3DAA8A]/10 px-2 py-0.5 rounded-full">
+                      <span className="text-xs font-medium text-cg-sage bg-cg-sage/10 px-2 py-0.5 rounded-full">
                         Most popular
                       </span>
                     )}
                   </div>
                   <div className="text-right">
-                    <span className="text-2xl font-bold text-[#1E3A4A]">{plan.price}</span>
+                    <span className="text-2xl font-bold text-foreground">{plan.price}</span>
                     {plan.period && (
                       <span className="text-sm text-gray-500">{plan.period}</span>
                     )}
@@ -182,7 +182,7 @@ export default function AccountBillingGuidePage() {
                 <ul className="space-y-2">
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-2.5 text-sm text-gray-700">
-                      <Check className="w-4 h-4 text-[#3DAA8A] mt-0.5 flex-shrink-0" />
+                      <Check className="w-4 h-4 text-cg-sage mt-0.5 flex-shrink-0" />
                       <span>{feature}</span>
                     </li>
                   ))}
@@ -195,9 +195,9 @@ export default function AccountBillingGuidePage() {
         {/* How to upgrade */}
         <section id="upgrade" className="mb-14 scroll-mt-8">
           <div className="flex items-center gap-3 mb-4">
-            <ArrowUpCircle className="w-6 h-6 text-[#3DAA8A] flex-shrink-0" />
+            <ArrowUpCircle className="w-6 h-6 text-cg-sage flex-shrink-0" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               How to upgrade
@@ -205,28 +205,28 @@ export default function AccountBillingGuidePage() {
           </div>
           <ol className="space-y-3 text-gray-700">
             <li className="flex items-start gap-3">
-              <span className="w-6 h-6 rounded-full bg-[#3DAA8A]/10 flex items-center justify-center text-xs font-bold text-[#3DAA8A] flex-shrink-0 mt-0.5">1</span>
+              <span className="w-6 h-6 rounded-full bg-cg-sage/10 flex items-center justify-center text-xs font-bold text-cg-sage flex-shrink-0 mt-0.5">1</span>
               <span>Go to <strong>Settings &gt; Billing</strong> in your dashboard</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="w-6 h-6 rounded-full bg-[#3DAA8A]/10 flex items-center justify-center text-xs font-bold text-[#3DAA8A] flex-shrink-0 mt-0.5">2</span>
+              <span className="w-6 h-6 rounded-full bg-cg-sage/10 flex items-center justify-center text-xs font-bold text-cg-sage flex-shrink-0 mt-0.5">2</span>
               <span>Select the plan you want to upgrade to</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="w-6 h-6 rounded-full bg-[#3DAA8A]/10 flex items-center justify-center text-xs font-bold text-[#3DAA8A] flex-shrink-0 mt-0.5">3</span>
+              <span className="w-6 h-6 rounded-full bg-cg-sage/10 flex items-center justify-center text-xs font-bold text-cg-sage flex-shrink-0 mt-0.5">3</span>
               <span>Enter your payment information (or use a saved card)</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="w-6 h-6 rounded-full bg-[#3DAA8A]/10 flex items-center justify-center text-xs font-bold text-[#3DAA8A] flex-shrink-0 mt-0.5">4</span>
+              <span className="w-6 h-6 rounded-full bg-cg-sage/10 flex items-center justify-center text-xs font-bold text-cg-sage flex-shrink-0 mt-0.5">4</span>
               <span>New features are available <strong>immediately</strong> after upgrading</span>
             </li>
           </ol>
 
-          <div className="bg-[#F5A623]/5 border-l-4 border-[#F5A623] rounded-lg px-5 py-4 mt-6">
+          <div className="bg-cg-amber/5 border-l-4 border-cg-amber rounded-lg px-5 py-4 mt-6">
             <div className="flex items-start gap-3">
-              <Lightbulb className="w-5 h-5 text-[#F5A623] mt-0.5 flex-shrink-0" />
+              <Lightbulb className="w-5 h-5 text-cg-amber mt-0.5 flex-shrink-0" />
               <div>
-                <p className="font-semibold text-[#1E3A4A] text-sm mb-1">Tip</p>
+                <p className="font-semibold text-foreground text-sm mb-1">Tip</p>
                 <p className="text-sm text-gray-600 leading-relaxed">
                   Choosing an annual plan saves you up to 18% compared to monthly billing.
                   You can switch from monthly to annual at any time.
@@ -239,9 +239,9 @@ export default function AccountBillingGuidePage() {
         {/* How to downgrade */}
         <section id="downgrade" className="mb-14 scroll-mt-8">
           <div className="flex items-center gap-3 mb-4">
-            <ArrowDownCircle className="w-6 h-6 text-[#3DAA8A] flex-shrink-0" />
+            <ArrowDownCircle className="w-6 h-6 text-cg-sage flex-shrink-0" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               How to downgrade
@@ -249,15 +249,15 @@ export default function AccountBillingGuidePage() {
           </div>
           <ol className="space-y-3 text-gray-700 mb-4">
             <li className="flex items-start gap-3">
-              <span className="w-6 h-6 rounded-full bg-[#3DAA8A]/10 flex items-center justify-center text-xs font-bold text-[#3DAA8A] flex-shrink-0 mt-0.5">1</span>
+              <span className="w-6 h-6 rounded-full bg-cg-sage/10 flex items-center justify-center text-xs font-bold text-cg-sage flex-shrink-0 mt-0.5">1</span>
               <span>Go to <strong>Settings &gt; Billing</strong></span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="w-6 h-6 rounded-full bg-[#3DAA8A]/10 flex items-center justify-center text-xs font-bold text-[#3DAA8A] flex-shrink-0 mt-0.5">2</span>
+              <span className="w-6 h-6 rounded-full bg-cg-sage/10 flex items-center justify-center text-xs font-bold text-cg-sage flex-shrink-0 mt-0.5">2</span>
               <span>Select the plan you want to switch to</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="w-6 h-6 rounded-full bg-[#3DAA8A]/10 flex items-center justify-center text-xs font-bold text-[#3DAA8A] flex-shrink-0 mt-0.5">3</span>
+              <span className="w-6 h-6 rounded-full bg-cg-sage/10 flex items-center justify-center text-xs font-bold text-cg-sage flex-shrink-0 mt-0.5">3</span>
               <span>Confirm the change</span>
             </li>
           </ol>
@@ -271,9 +271,9 @@ export default function AccountBillingGuidePage() {
         {/* How to cancel */}
         <section id="cancel" className="mb-14 scroll-mt-8">
           <div className="flex items-center gap-3 mb-4">
-            <XCircle className="w-6 h-6 text-[#3DAA8A] flex-shrink-0" />
+            <XCircle className="w-6 h-6 text-cg-sage flex-shrink-0" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               How to cancel
@@ -281,11 +281,11 @@ export default function AccountBillingGuidePage() {
           </div>
           <ol className="space-y-3 text-gray-700 mb-4">
             <li className="flex items-start gap-3">
-              <span className="w-6 h-6 rounded-full bg-[#3DAA8A]/10 flex items-center justify-center text-xs font-bold text-[#3DAA8A] flex-shrink-0 mt-0.5">1</span>
+              <span className="w-6 h-6 rounded-full bg-cg-sage/10 flex items-center justify-center text-xs font-bold text-cg-sage flex-shrink-0 mt-0.5">1</span>
               <span>Go to <strong>Settings &gt; Billing &gt; Cancel Subscription</strong></span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="w-6 h-6 rounded-full bg-[#3DAA8A]/10 flex items-center justify-center text-xs font-bold text-[#3DAA8A] flex-shrink-0 mt-0.5">2</span>
+              <span className="w-6 h-6 rounded-full bg-cg-sage/10 flex items-center justify-center text-xs font-bold text-cg-sage flex-shrink-0 mt-0.5">2</span>
               <span>Confirm your cancellation</span>
             </li>
           </ol>
@@ -297,7 +297,7 @@ export default function AccountBillingGuidePage() {
         </section>
 
         {/* Video placeholder */}
-        <div className="bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F] rounded-2xl p-8 text-center text-white mb-14">
+        <div className="bg-gradient-to-br from-foreground to-cg-slate rounded-2xl p-8 text-center text-white mb-14">
           <Play className="w-12 h-12 mx-auto mb-4 opacity-80" />
           <h3
             className="text-xl mb-2"
@@ -311,9 +311,9 @@ export default function AccountBillingGuidePage() {
         {/* Billing cycle */}
         <section id="billing-cycle" className="mb-14 scroll-mt-8">
           <div className="flex items-center gap-3 mb-4">
-            <CalendarClock className="w-6 h-6 text-[#3DAA8A] flex-shrink-0" />
+            <CalendarClock className="w-6 h-6 text-cg-sage flex-shrink-0" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               Billing cycle &amp; payment methods
@@ -325,19 +325,19 @@ export default function AccountBillingGuidePage() {
           </p>
           <ul className="space-y-2.5 text-gray-700">
             <li className="flex items-start gap-2.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#3DAA8A] mt-2 flex-shrink-0" />
+              <span className="w-1.5 h-1.5 rounded-full bg-cg-sage mt-2 flex-shrink-0" />
               <span><strong>Payment methods</strong> &mdash; credit card and debit card accepted, processed securely through Stripe</span>
             </li>
             <li className="flex items-start gap-2.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#3DAA8A] mt-2 flex-shrink-0" />
+              <span className="w-1.5 h-1.5 rounded-full bg-cg-sage mt-2 flex-shrink-0" />
               <span><strong>Billing date</strong> &mdash; charges occur on the same day each month (or year) as your original signup</span>
             </li>
             <li className="flex items-start gap-2.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#3DAA8A] mt-2 flex-shrink-0" />
+              <span className="w-1.5 h-1.5 rounded-full bg-cg-sage mt-2 flex-shrink-0" />
               <span><strong>Receipts</strong> &mdash; emailed automatically after each payment</span>
             </li>
             <li className="flex items-start gap-2.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#3DAA8A] mt-2 flex-shrink-0" />
+              <span className="w-1.5 h-1.5 rounded-full bg-cg-sage mt-2 flex-shrink-0" />
               <span><strong>Update payment method</strong> &mdash; go to Settings &gt; Billing &gt; Payment Method at any time</span>
             </li>
           </ul>
@@ -346,9 +346,9 @@ export default function AccountBillingGuidePage() {
         {/* Hardship pricing */}
         <section id="hardship" className="mb-14 scroll-mt-8">
           <div className="flex items-center gap-3 mb-4">
-            <Heart className="w-6 h-6 text-[#3DAA8A] flex-shrink-0" />
+            <Heart className="w-6 h-6 text-cg-sage flex-shrink-0" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               Hardship pricing
@@ -362,7 +362,7 @@ export default function AccountBillingGuidePage() {
             Contact us at{' '}
             <a
               href="mailto:support@find-commonground.com"
-              className="text-[#3DAA8A] font-medium hover:underline"
+              className="text-cg-sage font-medium hover:underline"
             >
               support@find-commonground.com
             </a>{' '}
@@ -370,11 +370,11 @@ export default function AccountBillingGuidePage() {
             conversations are always confidential.
           </p>
 
-          <div className="bg-[#F5A623]/5 border-l-4 border-[#F5A623] rounded-lg px-5 py-4">
+          <div className="bg-cg-amber/5 border-l-4 border-cg-amber rounded-lg px-5 py-4">
             <div className="flex items-start gap-3">
-              <Lightbulb className="w-5 h-5 text-[#F5A623] mt-0.5 flex-shrink-0" />
+              <Lightbulb className="w-5 h-5 text-cg-amber mt-0.5 flex-shrink-0" />
               <div>
-                <p className="font-semibold text-[#1E3A4A] text-sm mb-1">No proof required</p>
+                <p className="font-semibold text-foreground text-sm mb-1">No proof required</p>
                 <p className="text-sm text-gray-600 leading-relaxed">
                   We do not ask for financial documentation. A short email explaining your
                   situation is all we need to get started.
@@ -387,9 +387,9 @@ export default function AccountBillingGuidePage() {
         {/* Notifications */}
         <section id="notifications" className="mb-14 scroll-mt-8">
           <div className="flex items-center gap-3 mb-4">
-            <Bell className="w-6 h-6 text-[#3DAA8A] flex-shrink-0" />
+            <Bell className="w-6 h-6 text-cg-sage flex-shrink-0" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               Managing notifications
@@ -401,15 +401,15 @@ export default function AccountBillingGuidePage() {
           </p>
           <ol className="space-y-3 text-gray-700">
             <li className="flex items-start gap-3">
-              <span className="w-6 h-6 rounded-full bg-[#3DAA8A]/10 flex items-center justify-center text-xs font-bold text-[#3DAA8A] flex-shrink-0 mt-0.5">1</span>
+              <span className="w-6 h-6 rounded-full bg-cg-sage/10 flex items-center justify-center text-xs font-bold text-cg-sage flex-shrink-0 mt-0.5">1</span>
               <span>Go to <strong>Settings &gt; Notifications</strong></span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="w-6 h-6 rounded-full bg-[#3DAA8A]/10 flex items-center justify-center text-xs font-bold text-[#3DAA8A] flex-shrink-0 mt-0.5">2</span>
+              <span className="w-6 h-6 rounded-full bg-cg-sage/10 flex items-center justify-center text-xs font-bold text-cg-sage flex-shrink-0 mt-0.5">2</span>
               <span>Toggle individual notification types on or off (messages, calendar, expenses, exchanges)</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="w-6 h-6 rounded-full bg-[#3DAA8A]/10 flex items-center justify-center text-xs font-bold text-[#3DAA8A] flex-shrink-0 mt-0.5">3</span>
+              <span className="w-6 h-6 rounded-full bg-cg-sage/10 flex items-center justify-center text-xs font-bold text-cg-sage flex-shrink-0 mt-0.5">3</span>
               <span>Choose your preferred delivery method: push, email, or both</span>
             </li>
           </ol>
@@ -418,9 +418,9 @@ export default function AccountBillingGuidePage() {
         {/* Profile */}
         <section id="profile" className="mb-14 scroll-mt-8">
           <div className="flex items-center gap-3 mb-4">
-            <UserCog className="w-6 h-6 text-[#3DAA8A] flex-shrink-0" />
+            <UserCog className="w-6 h-6 text-cg-sage flex-shrink-0" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               Updating your profile
@@ -432,15 +432,15 @@ export default function AccountBillingGuidePage() {
           </p>
           <ol className="space-y-3 text-gray-700">
             <li className="flex items-start gap-3">
-              <span className="w-6 h-6 rounded-full bg-[#3DAA8A]/10 flex items-center justify-center text-xs font-bold text-[#3DAA8A] flex-shrink-0 mt-0.5">1</span>
+              <span className="w-6 h-6 rounded-full bg-cg-sage/10 flex items-center justify-center text-xs font-bold text-cg-sage flex-shrink-0 mt-0.5">1</span>
               <span>Go to <strong>Settings &gt; Profile</strong></span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="w-6 h-6 rounded-full bg-[#3DAA8A]/10 flex items-center justify-center text-xs font-bold text-[#3DAA8A] flex-shrink-0 mt-0.5">2</span>
+              <span className="w-6 h-6 rounded-full bg-cg-sage/10 flex items-center justify-center text-xs font-bold text-cg-sage flex-shrink-0 mt-0.5">2</span>
               <span>Update your display name, profile photo, or contact information</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="w-6 h-6 rounded-full bg-[#3DAA8A]/10 flex items-center justify-center text-xs font-bold text-[#3DAA8A] flex-shrink-0 mt-0.5">3</span>
+              <span className="w-6 h-6 rounded-full bg-cg-sage/10 flex items-center justify-center text-xs font-bold text-cg-sage flex-shrink-0 mt-0.5">3</span>
               <span>Save your changes &mdash; updates appear to your co-parent immediately</span>
             </li>
           </ol>
@@ -449,7 +449,7 @@ export default function AccountBillingGuidePage() {
         {/* Related Guides */}
         <section className="border-t border-gray-200 pt-12 mb-14">
           <h2
-            className="text-xl text-[#1E3A4A] mb-6"
+            className="text-xl text-foreground mb-6"
             style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
           >
             Related guides
@@ -463,13 +463,13 @@ export default function AccountBillingGuidePage() {
                   href={guide.href}
                   className="group flex items-center gap-3 bg-white rounded-xl border border-gray-100 p-4 hover:shadow-md transition-all"
                 >
-                  <div className="w-10 h-10 rounded-lg bg-[#3DAA8A]/10 flex items-center justify-center flex-shrink-0 group-hover:bg-[#3DAA8A] transition-colors">
-                    <Icon className="w-5 h-5 text-[#3DAA8A] group-hover:text-white transition-colors" />
+                  <div className="w-10 h-10 rounded-lg bg-cg-sage/10 flex items-center justify-center flex-shrink-0 group-hover:bg-cg-sage transition-colors">
+                    <Icon className="w-5 h-5 text-cg-sage group-hover:text-white transition-colors" />
                   </div>
-                  <span className="font-medium text-[#1E3A4A] text-sm group-hover:text-[#3DAA8A] transition-colors">
+                  <span className="font-medium text-foreground text-sm group-hover:text-cg-sage transition-colors">
                     {guide.title}
                   </span>
-                  <ArrowRight className="w-4 h-4 text-gray-300 ml-auto group-hover:text-[#3DAA8A] transition-colors" />
+                  <ArrowRight className="w-4 h-4 text-gray-300 ml-auto group-hover:text-cg-sage transition-colors" />
                 </Link>
               );
             })}
@@ -479,7 +479,7 @@ export default function AccountBillingGuidePage() {
         {/* Still need help CTA */}
         <section className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
           <h2
-            className="text-xl text-[#1E3A4A] mb-2"
+            className="text-xl text-foreground mb-2"
             style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
           >
             Still need help?
@@ -489,7 +489,7 @@ export default function AccountBillingGuidePage() {
           </p>
           <Link
             href="/help/contact"
-            className="inline-flex items-center gap-2 bg-[#3DAA8A] text-white px-6 py-3 rounded-xl font-medium text-sm hover:bg-[#2E9A7A] transition-colors"
+            className="inline-flex items-center gap-2 bg-cg-sage text-white px-6 py-3 rounded-xl font-medium text-sm hover:bg-[#2E9A7A] transition-colors"
           >
             Contact Support
             <ArrowRight className="w-4 h-4" />

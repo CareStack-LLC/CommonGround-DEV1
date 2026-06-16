@@ -144,8 +144,8 @@ export function BlogPostContent() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#F4F8F7] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-[#3DAA8A] animate-spin" />
+      <div className="min-h-screen bg-cg-sand flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-cg-sage animate-spin" />
       </div>
     );
   }
@@ -156,11 +156,11 @@ export function BlogPostContent() {
     const catColor = categoryToColor(apiPost.category);
 
     return (
-      <div className="bg-[#F4F8F7]">
+      <div className="bg-cg-sand">
         {/* Header */}
         <section className="py-16 bg-white border-b border-gray-200">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-            <Link href="/blog" className="inline-flex items-center gap-2 text-sm text-[#3DAA8A] hover:text-[#1E3A4A] font-medium transition-colors mb-8">
+            <Link href="/blog" className="inline-flex items-center gap-2 text-sm text-cg-sage hover:text-foreground font-medium transition-colors mb-8">
               <ArrowLeft className="w-4 h-4" /> Back to Blog
             </Link>
 
@@ -168,7 +168,7 @@ export function BlogPostContent() {
               {apiPost.category}
             </div>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-[2.75rem] font-serif font-semibold text-[#1E3A4A] mb-6 leading-tight">
+            <h1 className="text-3xl sm:text-4xl lg:text-[2.75rem] font-serif font-semibold text-foreground mb-6 leading-tight">
               {apiPost.title}
             </h1>
 
@@ -179,11 +179,11 @@ export function BlogPostContent() {
 
             {/* Author bar */}
             <div className="flex items-center gap-4 pt-6 border-t border-gray-100">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#3DAA8A] to-[#2D6A8F] flex items-center justify-center text-white text-sm font-bold">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cg-sage to-cg-slate flex items-center justify-center text-white text-sm font-bold">
                 {apiPost.author.split(' ').map(w => w[0]).join('').slice(0, 2)}
               </div>
               <div>
-                <p className="text-sm font-semibold text-[#1E3A4A]">{apiPost.author}</p>
+                <p className="text-sm font-semibold text-foreground">{apiPost.author}</p>
                 <div className="flex items-center gap-3 text-xs text-gray-500">
                   <span>{formatDate(apiPost.published_at || apiPost.created_at || '')}</span>
                   <span>·</span>
@@ -240,8 +240,8 @@ export function BlogPostContent() {
                     <span key={tag} className="px-3 py-1.5 text-xs bg-white border border-gray-200 rounded-full text-gray-600 font-medium">{tag}</span>
                   ))}
                 </div>
-                <button onClick={handleShare} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-gray-200 hover:border-[#3DAA8A]/30 hover:bg-[#F4F8F7] transition-all text-sm text-gray-600">
-                  {copied ? <><CheckCircle className="w-4 h-4 text-[#3DAA8A]" /> <span className="text-[#3DAA8A] font-medium">Link copied!</span></> : <><Share2 className="w-4 h-4" /> Share</>}
+                <button onClick={handleShare} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-gray-200 hover:border-cg-sage/30 hover:bg-cg-sand transition-all text-sm text-gray-600">
+                  {copied ? <><CheckCircle className="w-4 h-4 text-cg-sage" /> <span className="text-cg-sage font-medium">Link copied!</span></> : <><Share2 className="w-4 h-4" /> Share</>}
                 </button>
               </div>
             </div>
@@ -262,11 +262,11 @@ export function BlogPostContent() {
         {/* CTA */}
         <section className="py-16">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="relative overflow-hidden bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F] rounded-2xl p-10 text-center">
-              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#3DAA8A] via-[#D4AF37] to-[#3DAA8A]" />
+            <div className="relative overflow-hidden bg-gradient-to-br from-foreground to-cg-slate rounded-2xl p-10 text-center">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cg-sage via-[#D4AF37] to-cg-sage" />
               <h2 className="text-xl font-semibold text-white mb-3">Ready to improve your co-parenting journey?</h2>
               <p className="text-[#C8E6DC] mb-8 max-w-lg mx-auto">CommonGround gives you the tools to communicate better, track agreements, and co-parent more effectively.</p>
-              <Link href="/early-access" className="inline-flex items-center justify-center gap-2 bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white font-semibold px-8 py-3.5 rounded-full transition-all duration-200 shadow-lg hover:shadow-xl">
+              <Link href="/early-access" className="inline-flex items-center justify-center gap-2 bg-cg-sage hover:bg-cg-sage-dark text-white font-semibold px-8 py-3.5 rounded-full transition-all duration-200 shadow-lg hover:shadow-xl">
                 Get Started Free <ArrowRight className="w-5 h-5" />
               </Link>
             </div>
@@ -281,16 +281,16 @@ export function BlogPostContent() {
     const relatedPosts = getRelatedPosts(legacyPost.relatedPosts);
 
     return (
-      <div className="bg-[#F4F8F7]">
+      <div className="bg-cg-sand">
         <section className="py-12 bg-white border-b border-gray-200">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <Link href="/blog" className="inline-flex items-center gap-2 text-gray-600 hover:text-[#1E3A4A] transition-colors mb-6">
+            <Link href="/blog" className="inline-flex items-center gap-2 text-gray-600 hover:text-foreground transition-colors mb-6">
               <ArrowLeft className="w-4 h-4" /> Back to Blog
             </Link>
             <div className={`inline-block px-3 py-1 ${getCategoryStyles(legacyPost.categoryColor)} text-sm font-medium rounded-full mb-4`}>
               {legacyPost.category}
             </div>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-semibold text-[#1E3A4A] mb-6">{legacyPost.title}</h1>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-semibold text-foreground mb-6">{legacyPost.title}</h1>
             <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
               <span className="flex items-center gap-2"><User className="w-4 h-4" />{legacyPost.author}</span>
               <span className="flex items-center gap-2"><Calendar className="w-4 h-4" />{formatDate(legacyPost.date)}</span>
@@ -311,7 +311,7 @@ export function BlogPostContent() {
 
         <section className="py-12">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="prose prose-lg max-w-none prose-headings:text-[#1E3A4A] prose-headings:font-semibold prose-p:text-gray-700 prose-p:leading-relaxed prose-li:text-gray-700 prose-strong:text-[#1E3A4A] prose-a:text-[#3DAA8A] prose-a:no-underline hover:prose-a:underline prose-blockquote:border-l-[#3DAA8A] prose-blockquote:text-gray-600 prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4 prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3">
+            <div className="prose prose-lg max-w-none prose-headings:text-foreground prose-headings:font-semibold prose-p:text-gray-700 prose-p:leading-relaxed prose-li:text-gray-700 prose-strong:text-foreground prose-a:text-cg-sage prose-a:no-underline hover:prose-a:underline prose-blockquote:border-l-cg-sage prose-blockquote:text-gray-600 prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4 prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3">
               <BlogContent slug={slug} />
             </div>
 
@@ -319,8 +319,8 @@ export function BlogPostContent() {
               <div className="flex items-center gap-4">
                 <span className="text-sm text-gray-600">Share this article:</span>
                 <button onClick={handleShare} className="p-2 rounded-lg bg-white border border-gray-200 hover:border-cg-sage/30 transition-colors flex items-center gap-2">
-                  {copied ? <CheckCircle className="w-4 h-4 text-[#3DAA8A]" /> : <Share2 className="w-4 h-4 text-gray-600" />}
-                  {copied && <span className="text-xs text-[#3DAA8A]">Copied!</span>}
+                  {copied ? <CheckCircle className="w-4 h-4 text-cg-sage" /> : <Share2 className="w-4 h-4 text-gray-600" />}
+                  {copied && <span className="text-xs text-cg-sage">Copied!</span>}
                 </button>
               </div>
             </div>
@@ -341,11 +341,11 @@ export function BlogPostContent() {
         {relatedPosts.length > 0 && (
           <section className="py-12 bg-white border-t border-gray-200">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-              <h2 className="text-xl font-semibold text-[#1E3A4A] mb-6">Related Articles</h2>
+              <h2 className="text-xl font-semibold text-foreground mb-6">Related Articles</h2>
               <div className="grid sm:grid-cols-2 gap-6">
                 {relatedPosts.map((rp) => (
-                  <Link key={rp.slug} href={`/blog/${rp.slug}`} className="group p-4 rounded-xl bg-[#F4F8F7] border border-gray-200/50 hover:border-cg-sage/30 transition-all">
-                    <h3 className="font-semibold text-[#1E3A4A] group-hover:text-cg-sage transition-colors mb-2">{rp.title}</h3>
+                  <Link key={rp.slug} href={`/blog/${rp.slug}`} className="group p-4 rounded-xl bg-cg-sand border border-gray-200/50 hover:border-cg-sage/30 transition-all">
+                    <h3 className="font-semibold text-foreground group-hover:text-cg-sage transition-colors mb-2">{rp.title}</h3>
                     <p className="text-sm text-gray-600">{rp.excerpt}</p>
                   </Link>
                 ))}
@@ -357,7 +357,7 @@ export function BlogPostContent() {
         <section className="py-12">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className={`bg-gradient-to-br ${legacyPost.ctaGradient} rounded-2xl p-8 text-center`}>
-              <h2 className="text-xl font-semibold text-[#1E3A4A] mb-3">{legacyPost.ctaTitle}</h2>
+              <h2 className="text-xl font-semibold text-foreground mb-3">{legacyPost.ctaTitle}</h2>
               <p className="text-gray-600 mb-6">{legacyPost.ctaDescription}</p>
               <Link href={legacyPost.ctaLink} className="inline-flex items-center justify-center gap-2 bg-cg-sage text-white font-medium px-6 py-3 rounded-full transition-all duration-200 hover:bg-cg-sage-light hover:shadow-lg">
                 {legacyPost.ctaLinkText} <ArrowRight className="w-5 h-5" />
@@ -371,8 +371,8 @@ export function BlogPostContent() {
 
   // Not found
   return (
-    <div className="min-h-screen bg-[#F4F8F7] flex flex-col items-center justify-center py-20">
-      <h1 className="text-2xl font-semibold text-[#1E3A4A] mb-4">Post Not Found</h1>
+    <div className="min-h-screen bg-cg-sand flex flex-col items-center justify-center py-20">
+      <h1 className="text-2xl font-semibold text-foreground mb-4">Post Not Found</h1>
       <p className="text-gray-600 mb-6">This article doesn't exist or has been removed.</p>
       <Link href="/blog" className="inline-flex items-center gap-2 bg-cg-sage text-white px-6 py-3 rounded-full">
         <ArrowLeft className="w-4 h-4" /> Back to Blog

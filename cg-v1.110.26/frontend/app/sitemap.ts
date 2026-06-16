@@ -1,5 +1,19 @@
 import { MetadataRoute } from 'next';
 import { CASE_STUDIES } from '@/content/case-studies/case-studies';
+import { blogPosts } from '@/lib/blog-data';
+
+// State landing pages served by /lp/[slug]. Source of truth for the seeded
+// slugs is backend/scripts/seed_state_landings.py — keep in sync when new
+// states are added. Hardcoded (not fetched) on purpose: the sitemap runs at
+// build time on Vercel, and a fetch against the Render API could cold-start,
+// fail, and silently drop these URLs.
+const STATE_LANDING_SLUGS = [
+  'coparenting-in-california',
+  'coparenting-in-texas',
+  'coparenting-in-florida',
+  'coparenting-in-new-york',
+  'coparenting-in-georgia',
+];
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = 'https://www.find-commonground.com';
@@ -38,6 +52,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${baseUrl}/demo`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${baseUrl}/walkthrough`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${baseUrl}/case-studies`, lastModified: now, changeFrequency: 'monthly', priority: 0.7 },
+
   ];
 
   // — Dynamic case-study slugs ————————————————————————————————————
@@ -50,15 +65,22 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  // TODO: /blog/[slug] — blog posts are fetched from the API at request
-  // time (see app/(marketing)/blog/_content.tsx). Emitting them from a
-  // build-time sitemap would require a backend fetch we do not want to
-  // introduce here. Revisit when a static content layer lands.
+  // — Blog posts ——————————————————————————————————————————————————
+  // blogPosts is a compile-time constant in lib/blog-data.ts.
+  const blogRoutes: MetadataRoute.Sitemap = blogPosts.map((post) => ({
+    url: `${baseUrl}/blog/${post.slug}`,
+    lastModified: new Date(post.date),
+    changeFrequency: 'monthly' as const,
+    priority: 0.6,
+  }));
 
-  // TODO: /lp/[slug] — partner/state landing pages. The dynamic route
-  // already provides generateMetadata, but a static slug list lives
-  // outside this file; emit sitemap entries for them once that list is
-  // promoted to a shared content module.
+  // — State landing pages (/lp/[slug]) ————————————————————————————
+  const landingRoutes: MetadataRoute.Sitemap = STATE_LANDING_SLUGS.map((slug) => ({
+    url: `${baseUrl}/lp/${slug}`,
+    lastModified: now,
+    changeFrequency: 'monthly' as const,
+    priority: 0.7,
+  }));
 
-  return [...staticRoutes, ...caseStudyRoutes];
+  return [...staticRoutes, ...caseStudyRoutes, ...blogRoutes, ...landingRoutes];
 }

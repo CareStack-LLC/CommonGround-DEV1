@@ -144,6 +144,15 @@ async def cleanup_abandoned_sessions(db: AsyncSession) -> Dict[str, Any]:
     if in_batch > 0:
         await db.commit()
 
+    # Post-call ARIA analysis for sessions that ended without hitting the
+    # /end endpoint (covers the BackgroundTasks trigger gap). Best-effort;
+    # analyze_and_report_kidcoms_session never raises and opens its own
+    # session, so a failure here cannot affect the sweep result.
+    if candidates:
+        from app.services.aria_call_monitor import analyze_and_report_kidcoms_session
+        for session in candidates:
+            await analyze_and_report_kidcoms_session(session.id)
+
     duration_ms = round((time.perf_counter() - start) * 1000, 2)
 
     summary: Dict[str, Any] = {

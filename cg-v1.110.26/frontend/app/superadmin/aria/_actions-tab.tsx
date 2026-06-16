@@ -134,7 +134,7 @@ export default function ActionsTab({ data }: { data: AriaInsights }) {
               />
               <Tooltip
                 contentStyle={CustomTooltipStyle}
-                formatter={(value?: number) => [`${value ?? 0}%`, 'Acceptance Rate']}
+                formatter={(value) => [`${Number(value ?? 0)}%`, 'Acceptance Rate']}
               />
               <Line
                 type="monotone"

@@ -7,12 +7,14 @@ import os
 import sys
 import asyncio
 import json
-import time
-from datetime import datetime
+import logging
 from sqlalchemy import text
 
 # Add project root to path
 sys.path.append(os.path.join(os.getcwd(), 'backend'))
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
+logger = logging.getLogger("aria_worker")
 
 # Initialize Sentry for the worker process
 sentry_dsn = os.environ.get("SENTRY_DSN")
@@ -31,6 +33,14 @@ if sentry_dsn:
 # Import the inference service
 from app.services.aria_inference import analyze_message_with_llm
 
+
+def _max_retries() -> int:
+    try:
+        return int(os.environ.get("ARIA_JOB_MAX_RETRIES", "3"))
+    except ValueError:
+        return 3
+
+
 async def run_worker():
     # Load DB URL similar to schema script
     database_url = os.environ.get("DATABASE_URL")
@@ -42,60 +52,64 @@ async def run_worker():
                     if line.startswith('DATABASE_URL='):
                         database_url = line.split('=', 1)[1].strip().strip('"').strip("'")
                         break
-    
+
     if not database_url:
-        print("❌ DATABASE_URL missing. Worker cannot start.")
+        logger.error("DATABASE_URL missing. Worker cannot start.")
         return
 
     from app.core.database import create_app_engine
     engine = create_app_engine(database_url, app_name="commonground_aria_worker")
 
-    print("🚀 ARIA Worker Started. Polling for jobs...")
+    max_retries = _max_retries()
+    logger.info("ARIA Worker started. Polling for jobs (max_retries=%d)...", max_retries)
 
     while True:
         async with engine.begin() as conn:
-            # 1. Fetch pending job (FOR UPDATE SKIP LOCKED pattern is best, 
-            # but simple update returning is fine for this simulated MVP)
-            
-            # Find pending jobs OR failed jobs eligible for retry (max 3 attempts)
+            # Find pending jobs OR failed jobs whose backoff window has
+            # elapsed (next_attempt_at). FOR UPDATE SKIP LOCKED lets
+            # multiple workers partition the queue safely.
             result = await conn.execute(text("""
                 SELECT id, message_id, message_text, context,
                        COALESCE(retry_count, 0) as retry_count
                 FROM aria_jobs
                 WHERE status = 'pending'
-                   OR (status = 'failed' AND COALESCE(retry_count, 0) < 3)
+                   OR (
+                       status = 'failed'
+                       AND COALESCE(retry_count, 0) < :max_retries
+                       AND (next_attempt_at IS NULL OR next_attempt_at <= NOW())
+                   )
                 ORDER BY
                     CASE WHEN status = 'pending' THEN 0 ELSE 1 END,
                     created_at ASC
                 LIMIT 1
                 FOR UPDATE SKIP LOCKED
-            """))
+            """), {"max_retries": max_retries})
             job = result.first()
 
             if not job:
                 # No jobs, sleep and continue
-                await asyncio.sleep(2) 
+                await asyncio.sleep(2)
                 continue
 
-            print(f"⚡ Processing Job {job.id} (Msg: {job.message_id})...")
+            logger.info("Processing job %s (msg %s)...", job.id, job.message_id)
 
             try:
                 # Update status to processing
                 await conn.execute(text("""
                     UPDATE aria_jobs SET status = 'processing', updated_at = NOW() WHERE id = :id
                 """), {"id": job.id})
-                
-                # RUN INFERENCE (Synchronous LLM call wrapped in thread execution if needed, 
+
+                # RUN INFERENCE (Synchronous LLM call wrapped in thread execution if needed,
                 # but for this script blocking is acceptable as it's a dedicated worker)
                 # In production we'd use run_in_executor
-                
+
                 context_list = json.loads(job.context) if job.context else []
-                
+
                 # --- LLM CALL ---
                 if isinstance(context_list, dict) and context_list.get("type") == "image":
                     # Vision Analysis
                     from app.services.aria_inference import analyze_image_with_llm
-                    print(f"👁️ Analyzing Image for Job {job.id}...")
+                    logger.info("Analyzing image for job %s...", job.id)
                     analysis = analyze_image_with_llm(str(job.message_id), context_list.get("image_url"))
                     model_used = "gpt-4o"
                 else:
@@ -103,8 +117,7 @@ async def run_worker():
                     analysis = analyze_message_with_llm(str(job.message_id), job.message_text, context_list)
                     model_used = "gpt-4o-mini"
                 # ----------------
-                
-                # Insert Result into aria_events
+
                 # Insert Result into aria_events
                 await conn.execute(text("""
                     INSERT INTO aria_events (
@@ -139,8 +152,8 @@ async def run_worker():
                 await conn.execute(text("""
                     UPDATE aria_jobs SET status = 'completed', processed_at = NOW() WHERE id = :id
                 """), {"id": job.id})
-                
-                print(f"✅ Job {job.id} Completed. Action: {analysis.get('action')}")
+
+                logger.info("Job %s completed. Action: %s", job.id, analysis.get('action'))
 
             except Exception as e:
                 # Report to Sentry
@@ -153,20 +166,24 @@ async def run_worker():
 
                 retry_count = getattr(job, 'retry_count', 0) or 0
                 new_retry = retry_count + 1
-                if new_retry >= 3:
+                if new_retry >= max_retries:
                     # Max retries exceeded — move to dead letter
-                    print(f"Job {job.id} dead-lettered after {new_retry} attempts: {e}")
+                    logger.error("Job %s dead-lettered after %d attempts: %s", job.id, new_retry, e)
                     await conn.execute(text("""
                         UPDATE aria_jobs SET status = 'dead_letter', error_message = :err,
                                retry_count = :retry WHERE id = :id
                     """), {"id": job.id, "err": str(e), "retry": new_retry})
                 else:
-                    # Mark as failed with incremented retry count — will be picked up again
-                    print(f"❌ Job {job.id} Failed (attempt {new_retry}/3): {e}")
+                    # Mark as failed with exponential backoff: 30s, 60s, 120s...
+                    # so a degraded LLM provider isn't hammered with immediate
+                    # re-picks of the same job.
+                    logger.warning("Job %s failed (attempt %d/%d): %s", job.id, new_retry, max_retries, e)
                     await conn.execute(text("""
                         UPDATE aria_jobs SET status = 'failed', error_message = :err,
-                               retry_count = :retry WHERE id = :id
-                    """), {"id": job.id, "err": str(e), "retry": new_retry})
+                               retry_count = :retry,
+                               next_attempt_at = NOW() + (interval '30 seconds' * power(2, :backoff))
+                        WHERE id = :id
+                    """), {"id": job.id, "err": str(e), "retry": new_retry, "backoff": retry_count})
 
         # Small sleep between loops
         await asyncio.sleep(0.5)
@@ -175,4 +192,4 @@ if __name__ == "__main__":
     try:
         asyncio.run(run_worker())
     except KeyboardInterrupt:
-        print("\n🛑 Worker stopped.")
+        logger.info("Worker stopped.")

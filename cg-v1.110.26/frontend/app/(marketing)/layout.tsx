@@ -19,7 +19,7 @@ export default function MarketingLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="marketing-light min-h-screen bg-background flex flex-col">
       <MarketingHeader />
       <main className="flex-1 pt-16">
         <GlobalJsonLd />

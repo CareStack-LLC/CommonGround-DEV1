@@ -1,0 +1,165 @@
+COMMONGROUND BETA TEST
+======================
+
+You're Helping Build Something Special
+Your 3-week mission to make co-parenting easier for families everywhere.
+
+Welcome, Stephanie!
+
+
+YOUR ASSIGNMENT
+---------------
+  Family:           Johnson Family (Plus Plan)
+  Your Role:        Parent A -- Stephanie Johnson
+  Co-Parent Tester: Brandon Johnson (brandon.johnson+seed@email.com)
+  Children:         Diego (15, M), Isabella (7, F)
+
+You and Brandon Johnson are a team for this test. Many tasks need both
+parents to participate, so coordinate with each other. Your feedback
+directly shapes how real families will use CommonGround.
+
+
+YOUR LOGIN
+----------
+  URL:      https://find-commonground.com
+  Email:    stephanie.johnson+seed@email.com
+  Password: SeedPass2026!1
+
+
+HOW TO REPORT BUGS
+-------------------
+  1. Use the feedback widget (bottom-right of every page) -- click "Report a Bug"
+  2. Take a screenshot of the issue and upload it
+  3. Describe what happened vs. what you expected
+  4. Rate severity:
+       [CRITICAL] Can't use the app
+       [MAJOR]    Feature broken
+       [MINOR]    Cosmetic/UX issue
+  5. Report everything -- even small things like typos, slow loading, or confusing labels
+
+
+WEEK 1: CORE FEATURES (Days 1-7)
+---------------------------------
+Focus on daily-use features -- the things parents use most often.
+
+  #  | Task                              | Both? | What to Check
+  ---|-----------------------------------|-------|----------------------------------------------
+  1  | Login & explore dashboard         | Yes   | All widgets load. Note anything missing.
+  2  | View your family file             | Yes   | Verify names, children, agreement are correct.
+  3  | Send 3 messages to your co-parent | Yes   | Casual messages about the kids. ARIA intervene?
+  4  | Send 1 frustrated message         | One   | "You were late again picking up the kids."
+  5  | Accept/reject ARIA's suggestion   | One   | Try accepting one rewrite, then rejecting next.
+  6  | View your agreement               | Yes   | Open SharedCare Agreement. All sections readable?
+  7  | Check the calendar/schedule       | Yes   | Upcoming exchanges and holiday events.
+  8  | View a custody exchange           | Yes   | Is the location correct?
+  9  | Update your profile               | Yes   | Change avatar, address, timezone.
+  10 | Check subscription status         | Yes   | Settings/billing. Correct plan (Plus Plan)?
+
+
+WEEK 2: ADVANCED FEATURES (Days 8-14)
+--------------------------------------
+Dig into features used weekly or for specific situations.
+
+  #  | Task                              | Both? | What to Check
+  ---|-----------------------------------|-------|----------------------------------------------
+  11 | Create a ClearFund expense        | One   | E.g., "Soccer cleats -- $85."
+  12 | Respond to expense request        | Other | Approve or deny. Does split show correctly?
+  13 | Propose a schedule swap           | One   | Ask to swap a weekend.
+  14 | Create a Quick Accord             | One   | "Special sleepover this Saturday."
+  15 | Approve/deny the Quick Accord     | Other | Does the other parent get notified?
+  16 | Check custody time stats          | Yes   | Does percentage match your agreement?
+  17 | Try message search                | Yes   | Search for a word from a sent message.
+  18 | Send frustrated message (lvl 5)   | One   | "I'm tired of always handling homework..."
+  19 | Test notifications                | Yes   | Push/email notifications for new messages?
+  20 | View child profiles               | Yes   | Check birthday, gender, name for each child.
+
+
+WEEK 3: EDGE CASES & STRESS TESTING (Days 15-21)
+-------------------------------------------------
+Push the limits. Try to break things -- that's how we make it stronger.
+
+  #  | Task                              | Both? | What to Check
+  ---|-----------------------------------|-------|----------------------------------------------
+  21 | Send a very long message (500+)   | One   | Does it send and display correctly?
+  22 | Send messages rapidly (5 in 30s)  | One   | Any duplicates?
+  23 | Try the app on mobile browser     | Yes   | Does the layout work on your phone?
+  24 | Open app in 2 tabs simultaneously | Yes   | Does data stay in sync?
+  25 | Send hostile message (intensity 8)| One   | Does ARIA catch it?
+  26 | Try to edit your agreement        | One   | Does the other parent need to approve?
+  27 | Log out and log back in           | Yes   | Session persist? Any data lost?
+  28 | Access another family's data      | Yes   | Change URL to different family ID. Should block.
+  29 | Leave app idle 30 minutes         | Yes   | Session still active? Errors?
+  30 | Final walkthrough                 | Yes   | Every page. Note anything confusing or off.
+
+
+WHAT TO LOOK FOR
+-----------------
+
+  [CRITICAL] -- report immediately
+    - Can't log in
+    - Data showing for the wrong family
+    - Messages going to wrong person
+    - Security issues (seeing other families' data)
+    - App crashes / white screen
+    - Payment or financial data errors
+
+  [MAJOR]
+    - Features that don't work (buttons do nothing)
+    - ARIA not catching obvious hostile messages
+    - Agreement sections missing or blank
+    - Calendar showing wrong dates
+    - Notifications not arriving
+    - Profile changes not saving
+
+  [MINOR]
+    - Typos or grammar errors in the UI
+    - Slow loading (note which page and how long)
+    - Buttons in wrong position on mobile
+    - Colors or fonts that look off
+    - Confusing labels or instructions
+    - Inconsistent behavior
+
+  [UX FEEDBACK] -- not bugs, but just as valuable
+    - "I didn't know where to find X"
+    - "This took too many clicks"
+    - "I expected this to do something different"
+    - "The wording confused me"
+    - "I wish this feature existed"
+
+
+END-OF-TEST SURVEY (Day 21)
+----------------------------
+After 3 weeks, you'll complete a short survey covering:
+  - Overall experience -- rating (1-10), recommendation, ease of learning
+  - Feature ratings (1-5 stars) -- Dashboard, Messaging, ARIA, Agreement,
+    Calendar, Exchanges, ClearFund, Profile, Notifications
+  - Pros & Cons -- what you liked, what frustrated you, what's missing
+  - Suggestions -- what you'd change or add
+  - Bug summary -- how many reported, most serious, any showstoppers
+
+
+TESTING TIPS
+-------------
+  > Think of yourself as a real co-parent using this day-to-day.
+    The more realistic your usage, the better our testing.
+
+  > Test at different times -- morning, evening, weekends.
+    Some bugs only show up at certain times.
+
+  > Use different devices -- desktop, phone, tablet if you can.
+
+  > Don't fix it yourself. If something breaks, report it exactly
+    as it happened.
+
+  > Screenshot everything. A picture is worth a thousand words
+    in bug reports.
+
+  > Coordinate with Brandon Johnson! Many features need both
+    parents to test.
+
+
+---
+Questions? We're here.
+  TeeJay -- teejay@find-commonground.com
+
+Thank you for helping families find common ground.

@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CommonGround — Attorney-First GTM Playbook</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --navy:    #0D1B24;
+  --navy-2:  #162530;
+  --navy-3:  #1E3A4A;
+  --teal:    #3DAA8A;
+  --teal-lt: #5BC4A0;
+  --blue:    #2D6A8F;
+  --blue-lt: #4BA8C8;
+  --gold:    #F5A623;
+  --slate:   #3A5668;
+  --text:    #CBD8E0;
+  --text-dim:#7A9CAD;
+  --paper:   #F4F8F7;
+  --white:   #FFFFFF;
+  --red:     #E05353;
+  --orange:  #E08C2A;
+  --yellow:  #D4B84A;
+  --green:   #3DAA8A;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { background:var(--navy); color:var(--text); font-family:'DM Sans',sans-serif; font-size:14px; line-height:1.7; }
+
+/* COVER */
+.cover { min-height:85vh; display:flex; flex-direction:column; justify-content:center; padding:80px 72px; background:linear-gradient(140deg,#0D1B24 0%,#162530 60%,#1a2e3d 100%); border-bottom:1px solid rgba(45,106,143,0.2); position:relative; overflow:hidden; }
+.cover::before { content:''; position:absolute; top:-300px; right:-200px; width:700px; height:700px; background:radial-gradient(circle,rgba(45,106,143,0.08) 0%,transparent 60%); pointer-events:none; }
+.cover::after { content:''; position:absolute; bottom:-200px; left:200px; width:500px; height:500px; background:radial-gradient(circle,rgba(61,170,138,0.05) 0%,transparent 60%); pointer-events:none; }
+.eyebrow { font-size:10px; letter-spacing:4px; text-transform:uppercase; color:var(--blue-lt); margin-bottom:18px; }
+.cover h1 { font-family:'DM Serif Display',serif; font-size:58px; line-height:1.05; color:var(--white); margin-bottom:20px; max-width:780px; }
+.cover h1 em { color:var(--teal-lt); font-style:normal; }
+.cover p { font-size:17px; color:var(--text-dim); max-width:620px; margin-bottom:44px; line-height:1.85; }
+.meta-row { display:flex; gap:48px; flex-wrap:wrap; }
+.meta-item label { display:block; font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--slate); margin-bottom:5px; }
+.meta-item span { font-size:14px; color:var(--text); font-weight:500; }
+
+/* NAV */
+.toc { background:var(--navy-3); border-bottom:1px solid rgba(255,255,255,0.05); padding:22px 72px; display:flex; gap:0; flex-wrap:wrap; align-items:center; }
+.toc a { color:var(--text-dim); text-decoration:none; font-size:12px; padding:5px 18px 5px 0; border-right:1px solid rgba(255,255,255,0.05); margin-right:18px; letter-spacing:0.3px; transition:color 0.2s; }
+.toc a:hover { color:var(--teal); }
+.toc a:last-child { border-right:none; }
+
+/* SECTION */
+section { padding:64px 72px; border-bottom:1px solid rgba(255,255,255,0.04); }
+.sec-eye { font-size:9px; letter-spacing:4px; text-transform:uppercase; color:var(--blue-lt); margin-bottom:12px; }
+.sec-title { font-family:'DM Serif Display',serif; font-size:32px; color:var(--white); margin-bottom:10px; }
+.sec-intro { font-size:15px; color:var(--text-dim); max-width:720px; margin-bottom:36px; line-height:1.85; }
+
+/* PHASES */
+.phase-strip { display:grid; grid-template-columns:repeat(6,1fr); gap:0; border:1px solid rgba(255,255,255,0.08); border-radius:16px; overflow:hidden; margin-bottom:40px; }
+.phase-cell { padding:20px 18px; border-right:1px solid rgba(255,255,255,0.06); }
+.phase-cell:last-child { border-right:none; }
+.phase-num { font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--slate); margin-bottom:6px; }
+.phase-label { font-size:13px; font-weight:600; color:var(--white); margin-bottom:4px; }
+.phase-time { font-size:11px; color:var(--text-dim); }
+.phase-cell.active { background:rgba(45,106,143,0.12); }
+.phase-cell.done { background:rgba(61,170,138,0.08); }
+
+/* CARDS */
+.card { background:var(--navy-2); border:1px solid rgba(255,255,255,0.06); border-radius:16px; padding:24px 28px; }
+.card.teal { border-left:3px solid var(--teal); }
+.card.blue { border-left:3px solid var(--blue); }
+.card.gold { border-left:3px solid var(--gold); }
+.card.red  { border-left:3px solid var(--red); }
+.card.orange { border-left:3px solid var(--orange); }
+.card h3 { font-size:16px; font-weight:600; color:var(--white); margin-bottom:8px; }
+.card h4 { font-size:14px; font-weight:600; color:var(--white); margin-bottom:6px; }
+.card p { font-size:13.5px; color:var(--text-dim); line-height:1.7; }
+
+/* GRID */
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+.three-col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:16px; }
+.four-col { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px; margin-bottom:16px; }
+
+/* TAG */
+.tag { display:inline-flex; align-items:center; padding:3px 10px; border-radius:4px; font-size:10px; font-weight:600; letter-spacing:1px; text-transform:uppercase; margin-right:6px; }
+.tag.teal   { background:rgba(61,170,138,0.15); color:var(--teal); }
+.tag.blue   { background:rgba(45,106,143,0.2); color:var(--blue-lt); }
+.tag.gold   { background:rgba(245,166,35,0.15); color:var(--gold); }
+.tag.red    { background:rgba(224,83,83,0.15); color:var(--red); }
+.tag.orange { background:rgba(224,140,42,0.15); color:var(--orange); }
+.tag.slate  { background:rgba(58,86,104,0.3); color:var(--text-dim); }
+
+/* ALERT */
+.alert { padding:14px 20px; border-radius:12px; margin:14px 0; display:flex; gap:12px; align-items:flex-start; }
+.alert.teal { background:rgba(61,170,138,0.07); border:1px solid rgba(61,170,138,0.2); }
+.alert.blue { background:rgba(45,106,143,0.08); border:1px solid rgba(45,106,143,0.22); }
+.alert.gold { background:rgba(245,166,35,0.07); border:1px solid rgba(245,166,35,0.2); }
+.alert.red  { background:rgba(224,83,83,0.07); border:1px solid rgba(224,83,83,0.2); }
+.alert-icon { font-size:14px; flex-shrink:0; margin-top:2px; }
+.alert p { font-size:13px; line-height:1.65; }
+.alert.teal p { color:var(--teal-lt); }
+.alert.blue p { color:var(--blue-lt); }
+.alert.gold p { color:var(--gold); }
+.alert.red  p { color:var(--red); }
+
+/* EMAIL BLOCK */
+.email-block { background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.07); border-radius:12px; overflow:hidden; margin:14px 0; }
+.email-header { background:var(--navy-3); padding:12px 20px; display:flex; gap:16px; align-items:center; border-bottom:1px solid rgba(255,255,255,0.05); }
+.email-field { font-size:11px; color:var(--text-dim); }
+.email-field span { color:var(--text); }
+.email-body { padding:18px 20px; font-size:13px; color:var(--text-dim); line-height:1.8; white-space:pre-line; }
+.email-body strong { color:var(--white); }
+
+/* SCRIPT BLOCK */
+.script { background:rgba(45,106,143,0.06); border-left:3px solid var(--blue); border-radius:0 10px 10px 0; padding:14px 18px; margin:10px 0; }
+.script-label { font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--blue-lt); margin-bottom:8px; font-weight:600; }
+.script p { font-size:13px; color:var(--text); line-height:1.7; font-style:italic; }
+
+.listen { background:rgba(61,170,138,0.05); border-left:3px solid var(--teal); border-radius:0 10px 10px 0; padding:12px 16px; margin:8px 0; }
+.listen-label { font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--teal); margin-bottom:6px; font-weight:500; }
+.listen p { font-size:12.5px; color:var(--text-dim); line-height:1.6; }
+
+/* CHECKLIST */
+.checklist { list-style:none; }
+.checklist li { display:flex; gap:10px; font-size:13px; color:var(--text-dim); padding:7px 0; border-bottom:1px solid rgba(255,255,255,0.03); align-items:flex-start; line-height:1.5; }
+.checklist li:last-child { border-bottom:none; }
+.checklist li::before { flex-shrink:0; font-weight:700; margin-top:1px; }
+.checklist li.do::before   { content:'→'; color:var(--blue-lt); }
+.checklist li.fix::before  { content:'✗'; color:var(--red); }
+.checklist li.ok::before   { content:'✓'; color:var(--teal); }
+.checklist li.star::before { content:'★'; color:var(--gold); }
+
+/* FLOW */
+.flow { display:flex; gap:0; align-items:stretch; overflow-x:auto; padding-bottom:4px; }
+.flow-step { background:var(--navy-2); border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:16px 18px; min-width:170px; flex:1; position:relative; }
+.flow-step:not(:last-child)::after { content:'→'; position:absolute; right:-16px; top:50%; transform:translateY(-50%); color:var(--slate); font-size:15px; z-index:1; }
+.flow-num { font-size:9px; color:var(--teal); letter-spacing:2px; text-transform:uppercase; margin-bottom:6px; }
+.flow-title { font-size:13px; font-weight:600; color:var(--white); margin-bottom:4px; }
+.flow-desc { font-size:12px; color:var(--text-dim); line-height:1.5; }
+.flow-time { font-size:11px; color:var(--gold); margin-top:6px; }
+.flow-gap { width:32px; flex-shrink:0; }
+
+/* TABLE */
+table.main { width:100%; border-collapse:collapse; }
+table.main th { text-align:left; font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--slate); padding:10px 14px; border-bottom:1px solid rgba(255,255,255,0.07); }
+table.main td { padding:11px 14px; font-size:13px; color:var(--text-dim); border-bottom:1px solid rgba(255,255,255,0.03); vertical-align:top; }
+table.main td strong { color:var(--white); font-weight:500; }
+table.main tr:last-child td { border-bottom:none; }
+
+/* BIG STAT */
+.stat-row { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:rgba(255,255,255,0.05); border-radius:14px; overflow:hidden; }
+.stat-cell { background:var(--navy-2); padding:24px 20px; text-align:center; }
+.stat-num { font-family:'DM Serif Display',serif; font-size:42px; color:var(--teal); line-height:1; margin-bottom:6px; }
+.stat-label { font-size:11px; color:var(--text-dim); line-height:1.4; }
+.stat-vs { font-size:10px; color:var(--slate); margin-top:4px; }
+
+/* OBJECTION */
+.obj-card { background:var(--navy-2); border:1px solid rgba(255,255,255,0.06); border-radius:14px; overflow:hidden; margin-bottom:12px; }
+.obj-q { background:rgba(224,83,83,0.07); padding:12px 18px; font-size:13px; color:rgba(224,83,83,0.8); font-style:italic; border-bottom:1px solid rgba(255,255,255,0.04); }
+.obj-a { padding:14px 18px; font-size:13px; color:var(--text-dim); line-height:1.65; }
+
+/* CODE */
+code { font-family:'JetBrains Mono',monospace; font-size:12px; background:rgba(255,255,255,0.05); padding:2px 6px; border-radius:4px; color:var(--teal-lt); }
+
+/* HIGHLIGHT BOX */
+.highlight { background:linear-gradient(135deg,rgba(45,106,143,0.1),rgba(61,170,138,0.08)); border:1px solid rgba(61,170,138,0.15); border-radius:16px; padding:28px 32px; margin:24px 0; }
+.highlight h3 { font-family:'DM Serif Display',serif; font-size:22px; color:var(--white); margin-bottom:10px; }
+.highlight p { font-size:14px; color:var(--text-dim); line-height:1.8; }
+
+/* SCORE CARD */
+.scorecard { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.score-item { background:var(--navy-2); border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:16px 20px; display:flex; justify-content:space-between; align-items:center; }
+.score-item .label { font-size:13px; color:var(--text-dim); }
+.score-item .val { font-family:'DM Serif Display',serif; font-size:22px; }
+.val.teal { color:var(--teal); }
+.val.blue { color:var(--blue-lt); }
+.val.gold { color:var(--gold); }
+
+/* FOOTER */
+footer { padding:36px 72px; background:var(--navy-3); border-top:1px solid rgba(255,255,255,0.05); display:flex; justify-content:space-between; align-items:center; }
+footer p { font-size:12px; color:var(--slate); }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="eyebrow">Go-To-Market · Optimized Playbook</div>
+  <h1>The <em>Attorney-First</em><br>GTM Playbook</h1>
+  <p>Attorneys are the acquisition channel. Families follow their attorney's recommendation. Revenue starts on day one instead of month six. Here's every script, email, flow, and metric rewritten for this model.</p>
+  <div class="meta-row">
+    <div class="meta-item"><label>Primary Market</label><span>SoCal — South LA County</span></div>
+    <div class="meta-item"><label>Phase 1 Target</label><span>10 Anchor Attorneys (Months 1–2)</span></div>
+    <div class="meta-item"><label>Month 6 Target</label><span>10+ Paying Attorneys · 300+ Families</span></div>
+    <div class="meta-item"><label>Model</label><span>Attorney as Champion → Client Cascade</span></div>
+  </div>
+</div>
+
+<!-- TOC -->
+<nav class="toc">
+  <a href="#s1">01 · Why Attorney-First</a>
+  <a href="#s2">02 · The Champion Model</a>
+  <a href="#s3">03 · Target &amp; Qualify</a>
+  <a href="#s4">04 · Outreach Sequences</a>
+  <a href="#s5">05 · Discovery Script</a>
+  <a href="#s6">06 · Demo Playbook</a>
+  <a href="#s7">07 · Client Invitation Flow</a>
+  <a href="#s8">08 · Referral Engine</a>
+  <a href="#s9">09 · Nonprofit Layer</a>
+  <a href="#s10">10 · 6-Month Roadmap</a>
+  <a href="#s11">11 · Metrics</a>
+</nav>
+
+
+<!-- ═══════════════════ S1: WHY ATTORNEY-FIRST ═══════════════════ -->
+<section id="s1">
+  <div class="sec-eye">01 — The Strategic Shift</div>
+  <h2 class="sec-title">Why Attorneys First Changes Everything</h2>
+  <p class="sec-intro">The original plan — 10 nonprofits → 250 families → then pitch attorneys — is the right model but the wrong order. You're building the hard side of the marketplace with free users, then trying to monetize with the easy side. Flip it. Here's why the math changes completely.</p>
+
+  <div class="stat-row" style="margin-bottom:32px;">
+    <div class="stat-cell">
+      <div class="stat-num">$0</div>
+      <div class="stat-label">Revenue at month 6<br>with nonprofit-first</div>
+      <div class="stat-vs">families are on grant access</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num" style="color:var(--teal);">$2,990</div>
+      <div class="stat-label">Monthly revenue at month 1<br>with 10 attorneys on Small Firm</div>
+      <div class="stat-vs">before a single parent pays</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num" style="color:var(--blue-lt);">85%</div>
+      <div class="stat-label">Client activation rate<br>when attorney recommends</div>
+      <div class="stat-vs">vs. 60% for nonprofit codes</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num" style="color:var(--gold);">500</div>
+      <div class="stat-label">Potential parent users<br>from 10 Small Firm attorneys</div>
+      <div class="stat-vs">up to 50 cases × 2 parents each</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card red">
+      <h3>❌ Nonprofit-First Problems</h3>
+      <ul class="checklist" style="margin-top:12px;">
+        <li class="fix">6 months to first revenue — you're operating at zero ARR while building proof</li>
+        <li class="fix">60% activation on grant codes = 150 real families, not 250</li>
+        <li class="fix">Free users scattered across geographies — thin density per attorney market</li>
+        <li class="fix">Attorney pitch is "trust us, families are coming" not "here's the data"</li>
+        <li class="fix">Families don't have active legal need at nonprofit entry — lower attorney conversion</li>
+        <li class="fix">10 orgs takes 2-3 months just to sign and onboard — no shortcuts</li>
+      </ul>
+    </div>
+    <div class="card teal">
+      <h3>✓ Attorney-First Advantages</h3>
+      <ul class="checklist" style="margin-top:12px;">
+        <li class="ok">Revenue from month 1 — attorney subscription pays while clients onboard</li>
+        <li class="ok">85%+ activation — "your attorney recommends this" is the strongest referral possible</li>
+        <li class="ok">Attorney's client base is geographically concentrated — dense within your target market</li>
+        <li class="ok">Every client in active custody conflict — exactly who needs the platform most</li>
+        <li class="ok">Attorneys already have the trust relationship — zero cold start with families</li>
+        <li class="ok">10 attorneys is achievable in weeks, not months</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <h3>The Core Insight</h3>
+    <p>When a family law attorney says "use CommonGround," their client doesn't evaluate it. They use it. The trust transfer from attorney to platform is instantaneous. That's not true of any other referral source — not a nonprofit, not a Google ad, not a friend recommendation. Attorneys are your highest-trust, highest-activation, highest-LTV acquisition channel. Build around that reality.</p>
+  </div>
+</section>
+
+
+<!-- ═══════════════════ S2: THE CHAMPION MODEL ═══════════════════ -->
+<section id="s2">
+  <div class="sec-eye">02 — How the Model Works</div>
+  <h2 class="sec-title">Attorney as Champion — The Full Loop</h2>
+  <p class="sec-intro">The champion model has three moving parts: the attorney adopts the portal, the attorney invites clients, and those clients generate activity that makes the attorney more valuable to their next client. Each part reinforces the others.</p>
+
+  <div class="flow" style="margin-bottom:32px;">
+    <div class="flow-step">
+      <div class="flow-num">Step 1</div>
+      <div class="flow-title">Attorney Discovery</div>
+      <div class="flow-desc">Cold email, bar association, or referral. Attorney agrees to a 15-min discovery call.</div>
+      <div class="flow-time">Days 1–14</div>
+    </div>
+    <div class="flow-gap"></div>
+    <div class="flow-step">
+      <div class="flow-num">Step 2</div>
+      <div class="flow-title">45-Min Demo</div>
+      <div class="flow-desc">Lead with ARIA Pro Intake. Show the portal. Close with 60-day free pilot offer.</div>
+      <div class="flow-time">Day 7–21</div>
+    </div>
+    <div class="flow-gap"></div>
+    <div class="flow-step">
+      <div class="flow-num">Step 3</div>
+      <div class="flow-title">Pilot — 3 Cases</div>
+      <div class="flow-desc">Attorney adds 3 active cases. Sends client invite with one click. We handle all client onboarding.</div>
+      <div class="flow-time">Week 3–6</div>
+    </div>
+    <div class="flow-gap"></div>
+    <div class="flow-step">
+      <div class="flow-num">Step 4</div>
+      <div class="flow-title">Clients Activate</div>
+      <div class="flow-desc">Each invited client gets a frictionless onboarding. Both parents on the platform within 48 hrs.</div>
+      <div class="flow-time">Week 4–7</div>
+    </div>
+    <div class="flow-gap"></div>
+    <div class="flow-step">
+      <div class="flow-num">Step 5</div>
+      <div class="flow-title">30-Day Review</div>
+      <div class="flow-desc">Show attorney their compliance data, ARIA flag history, saved hours. Convert pilot → paid.</div>
+      <div class="flow-time">Day 30</div>
+    </div>
+    <div class="flow-gap"></div>
+    <div class="flow-step">
+      <div class="flow-num">Step 6</div>
+      <div class="flow-title">Attorney Refers</div>
+      <div class="flow-desc">Happy attorney mentions CommonGround at bar meeting. Referral engine activates.</div>
+      <div class="flow-time">Month 2+</div>
+    </div>
+  </div>
+
+  <div class="alert gold">
+    <div class="alert-icon">★</div>
+    <p><strong>The champion flywheel:</strong> One attorney with 15 active cases puts 30 parents on the platform. Those parents generate ARIA data, compliance reports, and KidComs usage. The attorney's next demo to a colleague includes real screenshots of real cases. Each attorney makes the next attorney easier to convert.</p>
+  </div>
+
+  <div class="three-col" style="margin-top:24px;">
+    <div class="card blue">
+      <h4>What the Attorney Gets</h4>
+      <ul class="checklist" style="margin-top:10px;">
+        <li class="ok">15-20 hrs/week reclaimed from client communication</li>
+        <li class="ok">One-click court-ready compliance reports</li>
+        <li class="ok">ARIA Pro Intake: full case summary before first meeting</li>
+        <li class="ok">Client communications organized automatically</li>
+        <li class="ok">SHA-256 verified evidence packages, no extra work</li>
+        <li class="ok">Directory listing — parents can find and contact them</li>
+      </ul>
+    </div>
+    <div class="card teal">
+      <h4>What the Client Gets</h4>
+      <ul class="checklist" style="margin-top:10px;">
+        <li class="ok">Free tier available — no cost barrier to joining</li>
+        <li class="ok">ARIA mediates every message before conflict starts</li>
+        <li class="ok">Their attorney can see their compliance data</li>
+        <li class="ok">Court-ready exports available on Complete ($34.99)</li>
+        <li class="ok">Onboarding handled by CommonGround — not the attorney</li>
+        <li class="ok">Platform their attorney already trusts and uses</li>
+      </ul>
+    </div>
+    <div class="card gold">
+      <h4>What CommonGround Gets</h4>
+      <ul class="checklist" style="margin-top:10px;">
+        <li class="ok">$99–$799/mo per attorney from month 1</li>
+        <li class="ok">2–30 parent users per attorney at 85%+ activation</li>
+        <li class="ok">High-intent families — in active legal proceedings</li>
+        <li class="ok">Geographic density — attorney's clients cluster together</li>
+        <li class="ok">Attorney referral network — each champion refers others</li>
+        <li class="ok">Real platform data to prove the model</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════ S3: TARGET & QUALIFY ═══════════════════ -->
+<section id="s3">
+  <div class="sec-eye">03 — Who to Target First</div>
+  <h2 class="sec-title">ICP, Scoring, and Where to Find Them</h2>
+  <p class="sec-intro">Not all family law attorneys are equal. Your ideal anchor attorney has a high-conflict caseload, is already frustrated with existing tools, and has the autonomy to make a buying decision without a partner vote. Here's how to find and score them.</p>
+
+  <div class="two-col" style="margin-bottom:24px;">
+    <div>
+      <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-bottom:16px;">The Ideal Anchor Attorney</div>
+      <div class="card" style="margin-bottom:12px;">
+        <h4 style="color:var(--teal-lt);">Profile</h4>
+        <ul class="checklist" style="margin-top:8px;">
+          <li class="star">3–12 attorney firm — big enough to matter, small enough to decide fast</li>
+          <li class="star">60%+ of caseload is family law / custody</li>
+          <li class="star">40%+ of cases involve moderate-to-high conflict</li>
+          <li class="star">Currently using OurFamilyWizard, Talking Parents, or nothing (all convertible)</li>
+          <li class="star">Tech-forward signals: modern website, active LinkedIn, uses Clio or MyCase</li>
+          <li class="star">Visible frustration with client management in reviews or online content</li>
+          <li class="do">Located in South LA County for Phase 1 (geographic density matters)</li>
+          <li class="do">5+ years in practice — they have a client base and a reputation</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:16px;">Updated Qualification Scorecard</div>
+      <div class="scorecard">
+        <div class="score-item"><span class="label">Family Law % (50%+ = 5pts)</span><span class="val teal">5</span></div>
+        <div class="score-item"><span class="label">Active Cases (15+ = 5pts)</span><span class="val teal">5</span></div>
+        <div class="score-item"><span class="label">High-Conflict % (40%+ = 5pts)</span><span class="val teal">5</span></div>
+        <div class="score-item"><span class="label">Decision Authority (sole = 5pts)</span><span class="val blue">5</span></div>
+        <div class="score-item"><span class="label">Tech Openness (CRM user = 5pts)</span><span class="val blue">5</span></div>
+        <div class="score-item"><span class="label">Pain Severity (verbal = 5pts)</span><span class="val gold">5</span></div>
+        <div class="score-item"><span class="label">Geography (SoCal = 5pts)</span><span class="val gold">5</span></div>
+        <div class="score-item"><span class="label">Timeline (now = 5pts)</span><span class="val teal">5</span></div>
+      </div>
+      <p style="font-size:12px;color:var(--text-dim);margin-top:12px;">32–40: HOT — Book demo immediately &nbsp;·&nbsp; 24–31: WARM — Nurture with content &nbsp;·&nbsp; &lt;24: Not a fit for Phase 1</p>
+    </div>
+  </div>
+
+  <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--blue-lt);margin-bottom:16px;">Where to Find Anchor Attorneys in SoCal</div>
+  <div class="three-col">
+    <div class="card">
+      <h4>Online Research</h4>
+      <ul class="checklist" style="margin-top:8px;">
+        <li class="do">Google: "family law attorney Compton CA" / "custody attorney South LA"</li>
+        <li class="do">Avvo.com — filter by family law + zip code</li>
+        <li class="do">CA State Bar directory: apps.calbar.ca.gov</li>
+        <li class="do">Martindale-Hubbell — rated family law attorneys</li>
+        <li class="do">LinkedIn: "family law" + "Los Angeles County"</li>
+        <li class="do">Yelp reviews for family law firms — look for volume + recent</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Events &amp; Associations</h4>
+      <ul class="checklist" style="margin-top:8px;">
+        <li class="star">LA County Bar Association — Family Law Section meetings</li>
+        <li class="star">California Family Law Trial Institute</li>
+        <li class="do">Compton Bar Association events</li>
+        <li class="do">South Bay Bar Association</li>
+        <li class="do">LACBA Family Law symposium</li>
+        <li class="do">Local CLE events — family law credits</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Warm Path (Best ROI)</h4>
+      <ul class="checklist" style="margin-top:8px;">
+        <li class="star">Ask pilot attorneys: "Who else deals with high-conflict cases like yours?"</li>
+        <li class="star">DV nonprofits know which attorneys serve their clients — ask for intros</li>
+        <li class="do">Court self-help centers refer families to attorneys — get in front of those attorneys</li>
+        <li class="do">Mediators and GALs work with attorneys — they can make warm intros</li>
+        <li class="do">Paralegal associations often attend same events as attorneys</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="alert teal" style="margin-top:16px;">
+    <div class="alert-icon">→</div>
+    <p><strong>Phase 1 targeting rule:</strong> All 10 anchor attorneys must be within LA County. Geographic density is what makes the pilot credible to the next attorney you pitch. "We have 8 attorneys and 180 active family cases all in LA County" is more persuasive than "we have 8 attorneys across 5 states."</p>
+  </div>
+</section>
+
+
+<!-- ═══════════════════ S4: OUTREACH SEQUENCES ═══════════════════ -->
+<section id="s4">
+  <div class="sec-eye">04 — Outreach Sequences</div>
+  <h2 class="sec-title">Rewritten for Attorney-as-Champion</h2>
+  <p class="sec-intro">The existing email sequences are solid but position CommonGround as a time-saving tool. For the champion model, we need to reframe around the attorney's role as the champion for their clients — and the competitive advantage that gives their practice. Here are the updated sequences.</p>
+
+  <!-- SEQUENCE 1 -->
+  <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-bottom:16px;">Sequence 1 — Cold Outreach (Primary, High-Conflict Angle)</div>
+  <div class="email-block">
+    <div class="email-header">
+      <div class="email-field">From: <span>[Your Name], CommonGround</span></div>
+      <div class="email-field">Subject: <span>"Your high-conflict clients — quick question"</span></div>
+      <div class="email-field">Day: <span>0</span></div>
+    </div>
+    <div class="email-body">Hi [First Name],
+
+Quick question for you: when a high-conflict custody client comes to you with a screenshot of hostile texts and says "this is all I have" — how much of your time goes into figuring out what actually happened?
+
+We built an AI platform specifically to solve this for family law attorneys. Your clients communicate through it. Every message, exchange, and expense creates a verified, timestamped record. When you need court-ready documentation, it's one click.
+
+<strong>The part that makes the biggest difference for attorneys:</strong> ARIA interviews your client before your first meeting and generates a full case summary — client goals, key concerns, current situation, recommended next steps. What normally takes 45 minutes of billable intake time takes your client 15 minutes with ARIA.
+
+Worth a 20-minute call to see it in action?
+
+[Calendar Link]
+
+[Your Name]
+CommonGround
+
+P.S. — We're specifically working with family law attorneys in LA County right now. No broad rollout — we want to get it right in this market first.</div>
+  </div>
+
+  <div class="email-block">
+    <div class="email-header">
+      <div class="email-field">Subject: <span>"Re: Your high-conflict clients"</span></div>
+      <div class="email-field">Day: <span>5 (if no reply)</span></div>
+    </div>
+    <div class="email-body">Hi [First Name],
+
+Following up — I spoke with [Attorney Name, if you have a referral / or "a family law attorney in [nearby city]"] last week and showed them the ARIA intake feature. First thing they said: "I want my paralegal to see this."
+
+If you're managing high-conflict clients who text you at 9pm about schedule changes — that's exactly the problem we eliminate.
+
+20 minutes? [Calendar Link]
+
+[Your Name]
+
+P.S. — If this genuinely isn't a fit for your practice, just let me know. One word reply is fine.</div>
+  </div>
+
+  <div class="email-block">
+    <div class="email-header">
+      <div class="email-field">Subject: <span>"3-minute demo video — [Attorney First Name]"</span></div>
+      <div class="email-field">Day: <span>12 (if still no reply)</span></div>
+    </div>
+    <div class="email-body">Hi [First Name],
+
+Last try. I recorded a 3-minute walkthrough of the ARIA intake feature specifically for family law attorneys dealing with high-conflict cases: [Loom link or demo video URL]
+
+If it's interesting, grab time here: [Calendar Link]
+If not — no hard feelings, and good luck with the practice.
+
+[Your Name]</div>
+  </div>
+
+  <!-- SEQUENCE 2 - OFW Users -->
+  <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--blue-lt);margin-bottom:16px;margin-top:32px;">Sequence 2 — OurFamilyWizard Users (Direct Competitor Conversion)</div>
+  <div class="email-block">
+    <div class="email-header">
+      <div class="email-field">Subject: <span>"OFW user — you'll want to see what's changed"</span></div>
+      <div class="email-field">Day: <span>0</span></div>
+    </div>
+    <div class="email-body">Hi [First Name],
+
+I saw you recommend OurFamilyWizard to your clients. Good instinct — structured communication and court-ready records are exactly what high-conflict cases need.
+
+Here's what's changed: we built CommonGround with everything OFW does, plus an AI layer that prevents conflicts before they happen. Clients still get verified records. You still get court-admissible exports. But now there's also an AI that intercepts hostile messages and rewrites them into something constructive — before the damage is done.
+
+<strong>The difference for your practice:</strong> fewer client calls because ARIA handles 80% of the drama. And instead of 45-minute intake meetings, your client spends 15 minutes with ARIA and you have a full case summary waiting when you sit down.
+
+OFW built the road. We built the better car.
+
+15 minutes to see the difference? [Calendar Link]
+
+[Your Name]
+CommonGround</div>
+  </div>
+
+  <!-- SEQUENCE 3 - Referral/Warm -->
+  <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;margin-top:32px;">Sequence 3 — Warm Referral from Another Attorney (Highest Priority)</div>
+  <div class="email-block">
+    <div class="email-header">
+      <div class="email-field">Subject: <span>"[Referring Attorney] suggested I reach out"</span></div>
+      <div class="email-field">Day: <span>0 — send within 24 hrs of referral</span></div>
+    </div>
+    <div class="email-body">Hi [First Name],
+
+[Referring Attorney Name] at [Firm] mentioned your name. They've been using CommonGround for [timeframe] on their high-conflict custody cases and said you deal with similar situations.
+
+They told me: "[Direct quote from referring attorney if you have one — e.g., 'I used to spend 3 hours on intake. Now I look at a summary.']"
+
+I'd love to show you what they're using. It's a 20-minute demo — I can walk you through the attorney portal and the ARIA intake feature that [Referring Attorney] specifically mentioned.
+
+Does [Day] at [Time] or [Day] at [Time] work?
+
+[Your Name]
+CommonGround
+
+P.S. — [Referring Attorney] said to mention they'd be happy to talk to you directly about their experience if that's helpful.</div>
+  </div>
+
+  <!-- SEQUENCE 4 - Bar Event -->
+  <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:16px;margin-top:32px;">Sequence 4 — Post Bar Association / Event Follow-Up</div>
+  <div class="email-block">
+    <div class="email-header">
+      <div class="email-field">Subject: <span>"Good to meet you at [Event] — quick follow-up"</span></div>
+      <div class="email-field">Day: <span>Next morning after event</span></div>
+    </div>
+    <div class="email-body">Hi [First Name],
+
+Really enjoyed our conversation at [Event] yesterday — especially what you said about [specific thing they mentioned, e.g., "managing the documentation burden in modification cases"].
+
+That's actually the exact problem CommonGround was built to solve. [1-2 sentences on how it addresses what they specifically mentioned.]
+
+I'd love to show you the attorney portal in a proper 20-minute demo. This week or next week work for you?
+
+[Calendar Link]
+
+[Your Name]
+CommonGround
+[Phone]
+
+P.S. — [Personal detail from the conversation — makes it real, not templated.]</div>
+  </div>
+
+  <div class="alert blue" style="margin-top:20px;">
+    <div class="alert-icon">→</div>
+    <p><strong>What changed from the original sequences:</strong> Lead-in now focuses on ARIA intake (the demo money shot) rather than time savings in the abstract. The "champion" framing is introduced in the P.S. of cold emails — you're building in LA County specifically. Referral emails now include instructions to get a direct quote from the referring attorney before sending. Warm emails go out within 24 hours of getting the referral, not days later.</p>
+  </div>
+</section>
+
+
+<!-- ═══════════════════ S5: DISCOVERY SCRIPT ═══════════════════ -->
+<section id="s5">
+  <div class="sec-eye">05 — Discovery Call Script</div>
+  <h2 class="sec-title">Updated for Champion Qualification</h2>
+  <p class="sec-intro">The original discovery script is good at qualifying pain but doesn't assess whether an attorney will actually champion the tool to their clients. Add these questions and listen for specific signals that tell you whether this attorney will actively recommend CommonGround — or just tolerate it.</p>
+
+  <div class="two-col" style="margin-bottom:24px;">
+    <div>
+      <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-bottom:14px;">Keep From Original Script</div>
+      <ul class="checklist">
+        <li class="ok">Q1: % of caseload that is family law</li>
+        <li class="ok">Q2: Number of active family law cases</li>
+        <li class="ok">Q3: % that are moderate-to-high conflict</li>
+        <li class="ok">Q4: What takes most of their time in a typical week</li>
+        <li class="ok">Q5: How clients currently communicate with co-parent</li>
+        <li class="ok">Q6: How they handle he-said/she-said disputes</li>
+        <li class="ok">Q8: Do they currently recommend any co-parenting tools</li>
+        <li class="ok">Q9: Satisfaction 1–10 with current systems</li>
+      </ul>
+    </div>
+    <div>
+      <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;">New Questions — Champion Assessment</div>
+      <ul class="checklist">
+        <li class="star">New Q-A: "How do you typically onboard a new client to tools you recommend?"</li>
+        <li class="star">New Q-B: "When you recommend something to a client — app, service, resource — how often do they actually use it?"</li>
+        <li class="star">New Q-C: "If a tool genuinely saved your clients money and reduced the drama they bring to you — would you make it a standard recommendation for every new custody case?"</li>
+        <li class="star">New Q-D: "Who else in your firm handles high-conflict cases? Would they be part of a pilot?"</li>
+        <li class="do">New Q-E: "What would need to be true for you to recommend this to every new client on day one?"</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Q-A DEEP DIVE -->
+  <div class="card blue" style="margin-bottom:16px;">
+    <h4>New Q-A: "How do you typically onboard a new client to tools you recommend?"</h4>
+    <div class="listen" style="margin-top:10px;">
+      <div class="listen-label">Champion Signal — What to Listen For</div>
+      <p><strong>Green light:</strong> "I send them a link and they figure it out" / "My paralegal handles that" / "I give them a quick overview in our first meeting." These attorneys are comfortable delegating client onboarding. They won't block adoption.<br><br>
+      <strong>Yellow flag:</strong> "I'd need to walk them through it myself." This attorney wants control — you'll need to show them how little effort is required.<br><br>
+      <strong>Red flag:</strong> "My clients are older and not tech-savvy" / "I don't use apps with clients." This attorney will not champion actively. Deprioritize.</p>
+    </div>
+  </div>
+
+  <div class="card blue" style="margin-bottom:16px;">
+    <h4>New Q-C: "If a tool reduced the drama clients bring to you — would you make it standard for every new custody case?"</h4>
+    <div class="listen" style="margin-top:10px;">
+      <div class="listen-label">This is the Champion Test</div>
+      <p><strong>Champion answer:</strong> "Absolutely — if it actually works, I'd tell every client to use it." This is who you want. Make them your pilot attorney.<br><br>
+      <strong>Passive user answer:</strong> "Maybe, it depends on the case." This attorney will use it reactively, not proactively. They'll bring in 3 clients over 6 months instead of 30.<br><br>
+      <strong>The difference in outcome:</strong> A champion attorney brings you 15–30 clients per year. A passive user brings you 3–5. Your entire model depends on finding the champions first.</p>
+    </div>
+  </div>
+
+  <div class="card blue" style="margin-bottom:24px;">
+    <h4>New Q-E: "What would need to be true for you to recommend this to every new client on day one?"</h4>
+    <div class="listen" style="margin-top:10px;">
+      <div class="listen-label">The Closing Condition — Write Down Exactly What They Say</div>
+      <p>This question does two things: it uncovers their specific adoption threshold (which you can then address in the demo), and it primes them to think of themselves as someone who could standardize this. Listen carefully. "It would need to be easy for clients to set up" → demo the 1-click invitation. "It would need court acceptance in LA County" → show the SHA-256 compliance section. "I'd need to see it work on a real case" → offer the pilot.</p>
+    </div>
+  </div>
+
+  <!-- UPDATED TRANSITION PITCH -->
+  <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-bottom:14px;">Updated Transition to Pitch — After Discovery Questions</div>
+  <div class="script">
+    <div class="script-label">Your Script</div>
+    <p>"Thanks — this is exactly the kind of practice CommonGround was built for. Here's what we built: an AI-powered co-parenting platform your clients use to communicate, manage schedules, and track expenses. Every interaction creates a court-admissible record with SHA-256 verification — no extra work from you.
+
+The part I want to show you specifically: ARIA Pro Intake. Before your first meeting, your client spends 15 minutes with our AI. You get a full case summary — current situation, client goals, key concerns, and recommended next steps. That's typically 45 minutes of intake that just happens automatically.
+
+We're working with [N] family law attorneys in LA County right now on a pilot. We want to get the product right in this market before expanding. Would a 45-minute demo this week be worth your time?"</p>
+  </div>
+
+  <div class="alert gold">
+    <div class="alert-icon">★</div>
+    <p><strong>Pilot offer framing:</strong> Do not call it a "free trial." Call it a <strong>pilot</strong>. Pilots have structure, success metrics, and a review date. Free trials get abandoned. Pilots get evaluated. An attorney who agrees to a pilot is mentally committed to assessing the outcome — which means they'll actually use it and bring clients in.</p>
+  </div>
+</section>
+
+
+<!-- ═══════════════════ S6: DEMO PLAYBOOK ═══════════════════ -->
+<section id="s6">
+  <div class="sec-eye">06 — The 45-Minute Demo</div>
+  <h2 class="sec-title">What to Show and When to Show It</h2>
+  <p class="sec-intro">The demo has one job: get the attorney to say "I want my clients using this." Every minute of the demo should build toward that conclusion. The original demo structure buries the best feature. Lead with the money shot.</p>
+
+  <div class="flow" style="margin-bottom:28px;">
+    <div class="flow-step">
+      <div class="flow-num">0–2 min</div>
+      <div class="flow-title">Recap Discovery</div>
+      <div class="flow-desc">"You mentioned [specific pain point]. I'm going to show you exactly how we address that."</div>
+    </div>
+    <div class="flow-gap"></div>
+    <div class="flow-step" style="background:rgba(45,106,143,0.12);border-color:rgba(45,106,143,0.3);">
+      <div class="flow-num">2–15 min ⭐</div>
+      <div class="flow-title">ARIA Pro Intake</div>
+      <div class="flow-desc">Show the AI case summary. "Your client did this. You get this. This normally takes you 45 minutes."</div>
+    </div>
+    <div class="flow-gap"></div>
+    <div class="flow-step">
+      <div class="flow-num">15–25 min</div>
+      <div class="flow-title">Case Dashboard</div>
+      <div class="flow-desc">Timeline, compliance sub-portal, SHA-256 report. Show the evidence package download.</div>
+    </div>
+    <div class="flow-gap"></div>
+    <div class="flow-step">
+      <div class="flow-num">25–33 min</div>
+      <div class="flow-title">Client Invitation</div>
+      <div class="flow-desc">Show the 1-click client invite. "You send this. They're active in under 5 minutes. We handle everything else."</div>
+    </div>
+    <div class="flow-gap"></div>
+    <div class="flow-step">
+      <div class="flow-num">33–40 min</div>
+      <div class="flow-title">Pricing + Pilot</div>
+      <div class="flow-desc">$99 Solo / $299 Small Firm. Offer 60-day pilot on 3 cases. Set success metrics together.</div>
+    </div>
+    <div class="flow-gap"></div>
+    <div class="flow-step">
+      <div class="flow-num">40–45 min</div>
+      <div class="flow-title">Q&amp;A + Close</div>
+      <div class="flow-desc">"What would need to happen in the next 60 days for this to become your standard recommendation?"</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div>
+      <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-bottom:14px;">The ARIA Intake Money Shot — What to Say</div>
+      <div class="script">
+        <div class="script-label">Your Script (Minutes 2–15)</div>
+        <p>"Before I show you the attorney portal, I want to show you the thing attorneys react to most. This is ARIA Pro Intake.
+
+Your client gets a link from you — we'll show you how that works in a minute. They spend 15 minutes answering questions with our AI. This is what you get.
+
+[Show the AI Summary screen]
+
+Case overview. Current situation. The children. Client goals. Key concerns. Recommended next steps. 80% confidence score.
+
+How long does your current intake process take?
+
+[Let them answer]
+
+That's now 15 minutes of your client's time before you sit down. The 45-minute meeting you used to spend on this becomes a 20-minute strategy session because you already know the case."</p>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:14px;">Demo Objections — What Attorneys Will Say</div>
+      <div class="obj-card">
+        <div class="obj-q">"My clients won't use another app."</div>
+        <div class="obj-a">When you recommend it, they use it. That's the data we see — 85%+ activation when the attorney sends the invite. It's not another app they found on Google. It's a tool their lawyer said to use. That changes the adoption rate completely.</div>
+      </div>
+      <div class="obj-card">
+        <div class="obj-q">"I already use OurFamilyWizard."</div>
+        <div class="obj-a">OFW gives you records. We give you records plus an AI that prevents the conflicts from happening in the first place, plus intake automation, plus a proper attorney portal. Your clients still pay less than OFW because only one parent needs to pay. Would you use a better version of the same thing at no extra cost to your clients?</div>
+      </div>
+      <div class="obj-card">
+        <div class="obj-q">"Will courts in LA County accept these records?"</div>
+        <div class="obj-a">Every export is SHA-256 hashed — that's the cryptographic standard under Federal Rule of Evidence 902(14). The chain of custody is built in. LA County family courts accept tamper-evident digital records under this standard. [Show the SHA-256 block in the demo.]</div>
+      </div>
+      <div class="obj-card">
+        <div class="obj-q">"$299/month is hard to justify right now."</div>
+        <div class="obj-a">Start with the Solo plan at $99 — 15 active cases. If after 60 days you haven't saved more than $99/month in intake time alone, we'll refund it. At your billing rate, that's less than 20 minutes. What does one prevented late-night client call save you?</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PILOT CLOSE -->
+  <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;margin-top:28px;">The Pilot Close — Set It Up Right</div>
+  <div class="script">
+    <div class="script-label">Your Script (Minutes 33–40)</div>
+    <p>"Here's what I'd recommend: a 60-day pilot on 3 of your active cases. We'll set it up together — you'll add the cases, send client invitations, and we'll check in with you at 30 days to look at the data together.
+
+Success for you would be [pull from their answers during discovery — e.g., 'fewer after-hours client calls' or 'court-ready documentation without prep time'].
+
+At day 60, if it's working, you're already set up. If it's not what we promised, we stop and you've lost nothing except 60 days of free access.
+
+The only thing I'd ask is that you actually send the invitations to those 3 clients in the first week. The pilot doesn't teach you anything if the clients aren't active. Deal?"</p>
+  </div>
+  <div class="alert gold">
+    <div class="alert-icon">★</div>
+    <p><strong>The most important sentence in the pilot close:</strong> "The only thing I'd ask is that you actually send the invitations to those 3 clients in the first week." This is where most pilots die — attorney agrees, portal sits empty. Set the expectation explicitly before the pilot starts. A pilot without active clients is not a pilot.</p>
+  </div>
+</section>
+
+
+<!-- ═══════════════════ S7: CLIENT INVITATION FLOW ═══════════════════ -->
+<section id="s7">
+  <div class="sec-eye">07 — The Most Important Product Feature</div>
+  <h2 class="sec-title">The 1-Click Client Invitation Flow</h2>
+  <p class="sec-intro">The entire attorney-as-champion model lives or dies on this one flow. If inviting a client requires the attorney to explain anything, set up anything, or follow up on anything — they will stop doing it. The invitation must be one action that triggers everything else. Here's exactly how it needs to work and what's at risk if it doesn't.</p>
+
+  <div class="alert red">
+    <div class="alert-icon">⚠</div>
+    <p><strong>This is the highest-priority product requirement in this entire playbook.</strong> Before you run your first attorney demo, verify that this flow exists and is frictionless end-to-end. If it isn't, the demo creates an expectation you can't fulfill.</p>
+  </div>
+
+  <div style="margin-top:24px;margin-bottom:24px;">
+    <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-bottom:16px;">What the Flow Must Look Like — Attorney Side</div>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-num">Attorney Action</div>
+        <div class="flow-title">Creates Case</div>
+        <div class="flow-desc">Types client's name + email. That's it. One screen, 30 seconds.</div>
+      </div>
+      <div class="flow-gap"></div>
+      <div class="flow-step">
+        <div class="flow-num">One Click</div>
+        <div class="flow-title">Sends Invitation</div>
+        <div class="flow-desc">"Invite Client" button. System sends a branded email on behalf of the attorney.</div>
+      </div>
+      <div class="flow-gap"></div>
+      <div class="flow-step">
+        <div class="flow-num">Automatic</div>
+        <div class="flow-title">Attorney Done</div>
+        <div class="flow-desc">Attorney does nothing else. CommonGround handles all client onboarding from here.</div>
+      </div>
+      <div class="flow-gap"></div>
+      <div class="flow-step">
+        <div class="flow-num">Portal Update</div>
+        <div class="flow-title">Status Updates</div>
+        <div class="flow-desc">Case shows "Invitation Sent → Client Activated → Co-Parent Invited." Attorney sees progress without doing anything.</div>
+      </div>
+      <div class="flow-gap"></div>
+      <div class="flow-step">
+        <div class="flow-num">Alert</div>
+        <div class="flow-title">Both Active</div>
+        <div class="flow-desc">Attorney gets a notification: "Both [Client] and [Co-Parent] are now active on CommonGround." Case data starts flowing.</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:24px;">
+    <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--blue-lt);margin-bottom:16px;">What the Client Receives — The Invitation Email</div>
+    <div class="email-block">
+      <div class="email-header">
+        <div class="email-field">From: <span>[Attorney Name] via CommonGround</span></div>
+        <div class="email-field">Subject: <span>"[Attorney Name] has set up CommonGround for your case"</span></div>
+      </div>
+      <div class="email-body">Hi [Client First Name],
+
+Your attorney, [Attorney Name] at [Firm Name], uses CommonGround to help manage your custody case — and they've set up an account for you.
+
+CommonGround is where you and your co-parent will communicate, manage your shared schedule, and track expenses for the kids. Everything is documented and court-ready.
+
+<strong>Getting started takes about 5 minutes:</strong>
+
+[Large Button: "Set Up My Account →"]
+
+You don't need a credit card. Your Web Starter account is free.
+
+If you want features like automated scheduling or court-ready evidence packages, you can upgrade anytime — your co-parent doesn't need to pay or even upgrade for you to benefit.
+
+Questions? Reply to this email and a real person will help.
+
+CommonGround
+"Co-Parenting, Reimagined"
+
+<em>This message was sent on behalf of [Attorney Name]. CommonGround is a secure, HIPAA-compliant platform. Your attorney has access to compliance data for your case.</em></div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card teal">
+      <h4>What Makes This Email Work</h4>
+      <ul class="checklist" style="margin-top:10px;">
+        <li class="ok">Sent FROM the attorney, not from a company they've never heard of — trust transfer is immediate</li>
+        <li class="ok">One action: click the button. No account setup before clicking, no password creation gatekeeping</li>
+        <li class="ok">Free tier explicitly stated — removes cost anxiety before they even get to the platform</li>
+        <li class="ok">Co-parent asymmetry explained upfront — clients won't spend the first 10 minutes worrying about whether their ex needs to pay</li>
+        <li class="ok">Human support offered — "reply to this email" signals this isn't an automated dead end</li>
+      </ul>
+    </div>
+    <div class="card red">
+      <h4>What Will Kill the Flow (Fix These First)</h4>
+      <ul class="checklist" style="margin-top:10px;">
+        <li class="fix">Invitation email from a generic "@commonground.com" address, not attorney-branded — clients won't recognize it and won't open it</li>
+        <li class="fix">Account creation requires email verification before accessing anything — every extra step loses 20% of users</li>
+        <li class="fix">Onboarding requires co-parent to also sign up before client can do anything — this is a deadlock, must be avoidable</li>
+        <li class="fix">No status update to attorney when client activates — attorney assumes nobody joined and gives up</li>
+        <li class="fix">Attorney has to follow up with client manually to confirm they received the invite — kills adoption rate immediately</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight" style="margin-top:20px;">
+    <h3>The 48-Hour Rule</h3>
+    <p>Your target: both parents active within 48 hours of the attorney sending one invitation. That's the benchmark that makes attorneys say "this actually worked." If it takes longer than 48 hours, or if either parent needs help from the attorney to get set up, the flow needs work before you run another demo. Test this end-to-end with a real case before your first pilot attorney sends their first invitation.</p>
+  </div>
+</section>
+
+
+<!-- ═══════════════════ S8: REFERRAL ENGINE ═══════════════════ -->
+<section id="s8">
+  <div class="sec-eye">08 — The Referral Engine</div>
+  <h2 class="sec-title">Turning Attorneys Into Your Sales Team</h2>
+  <p class="sec-intro">Attorneys are tight-knit within their local bar. When one attorney finds something that works, they talk about it. Your job is to make that conversation as easy as possible and give champions a reason to have it. A well-structured referral program turns 10 anchor attorneys into 30 without a single cold email.</p>
+
+  <div class="alert gold">
+    <div class="alert-icon">★</div>
+    <p><strong>The bar association moment:</strong> Your highest-ROI marketing activity is getting one satisfied anchor attorney to mention CommonGround at a bar association meeting or CLE event. That single mention, in front of 30–50 family law attorneys, is worth 6 months of cold email. Make it easy for them to do this by giving them something specific to say.</p>
+  </div>
+
+  <div class="two-col" style="margin-top:24px;margin-bottom:24px;">
+    <div>
+      <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-bottom:14px;">The Referral Program — Simple and Clear</div>
+      <div class="card">
+        <h4>Attorney Referral Incentive</h4>
+        <p style="margin-bottom:14px;">Keep it simple. One rule. One reward.</p>
+        <div class="script">
+          <div class="script-label">The Offer</div>
+          <p>"Refer another family law attorney. When they start a paid subscription, you get one month free. That's it. No tracking links, no forms — just tell us who referred you when you sign up."</p>
+        </div>
+        <ul class="checklist" style="margin-top:12px;">
+          <li class="ok">One month free = $99–$799 value depending on their plan</li>
+          <li class="ok">No complexity — attorney tells their colleague, colleague mentions their name when signing up</li>
+          <li class="ok">No cap on referrals — a champion with 10 colleagues can earn 10 free months</li>
+          <li class="do">Announce the program at the 30-day review — when they're already excited about results</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--blue-lt);margin-bottom:14px;">Give Them Something to Say</div>
+      <div class="card">
+        <h4>The 30-Second Bar Meeting Script</h4>
+        <p style="margin-bottom:12px;">Give your champion attorneys exact words they can use naturally:</p>
+        <div class="script">
+          <div class="script-label">What to Give Your Anchor Attorneys</div>
+          <p>"I've been using a platform called CommonGround for my high-conflict custody cases. Before my first meeting with a client, the AI interviews them and gives me a full case summary. I've cut my intake time in half. My clients actually communicate through it instead of texting each other at 2am. And the documentation is court-ready automatically. If any of you deal with high-conflict custody — talk to me after."</p>
+        </div>
+        <p style="font-size:12px;color:var(--text-dim);margin-top:10px;">Send this to anchor attorneys before any bar event. They don't need to pitch — they just need to describe their experience accurately.</p>
+      </div>
+    </div>
+  </div>
+
+  <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:14px;">The 30-Day Review — Where Champions Are Made</div>
+  <div class="card orange" style="margin-bottom:12px;">
+    <h4>The 30-Day Review Agenda (30 minutes)</h4>
+    <p style="margin-bottom:12px;">This is not a check-in call. It's a data presentation and a conversion moment. Come prepared.</p>
+    <table class="main" style="margin-top:12px;">
+      <tr><th style="width:20%">Agenda Item</th><th>What You Show / Say</th></tr>
+      <tr><td><strong>Minutes 0–5</strong></td><td>Show their dashboard: cases active, families joined, ARIA flags count, messages mediated. Make the numbers concrete even if they're small.</td></tr>
+      <tr><td><strong>Minutes 5–12</strong></td><td>Calculate their time saved: "You had [N] ARIA-mediated conversations. At [their hourly rate], if even 20% of those escalated without ARIA, that's [X] in billable time you didn't spend on crisis management."</td></tr>
+      <tr><td><strong>Minutes 12–18</strong></td><td>Show them a compliance report for one of their active cases — fully formatted, SHA-256 verified. "Is this what your case prep looks like now? How long would this have taken before?"</td></tr>
+      <tr><td><strong>Minutes 18–24</strong></td><td>Referral moment: "Have you mentioned CommonGround to anyone in your network? We have a simple referral program — one free month for every attorney you send our way who subscribes." Give them the talking points card.</td></tr>
+      <tr><td><strong>Minutes 24–30</strong></td><td>Convert: "Based on what you've seen — do you want to move to a paid subscription and add the rest of your high-conflict cases?" Handle objections or agree on month 2 pilot extension.</td></tr>
+    </table>
+  </div>
+</section>
+
+
+<!-- ═══════════════════ S9: NONPROFIT LAYER ═══════════════════ -->
+<section id="s9">
+  <div class="sec-eye">09 — Where Nonprofits Fit Now</div>
+  <h2 class="sec-title">Nonprofit as Impact Layer, Not Acquisition Engine</h2>
+  <p class="sec-intro">The nonprofit grant program doesn't disappear in this model — it shifts from being your primary acquisition channel to being your social impact story, your PR angle, and your inbound funnel for families who need attorneys. Here's how the two sides work together.</p>
+
+  <div class="two-col" style="margin-bottom:24px;">
+    <div class="card teal">
+      <h4>What Nonprofits Do in This Model</h4>
+      <ul class="checklist" style="margin-top:10px;">
+        <li class="ok">Generate high-conflict families who already need legal help — warm attorney leads from inside the platform</li>
+        <li class="ok">Provide your social impact story — "CommonGround serves DV survivors through 10 nonprofit partners" is a PR headline, a values signal, and a grant-writing asset</li>
+        <li class="ok">Give attorneys an inbound channel — families coming from nonprofits are pre-identified as needing legal help</li>
+        <li class="ok">Create the "request an attorney" moment — families on grant access who need legal help can be surfaced to your attorney directory</li>
+        <li class="do">Start nonprofit outreach in Month 3–4, not Month 1 — after you have attorney density to make the connection meaningful</li>
+      </ul>
+    </div>
+    <div class="card blue">
+      <h4>What You Say to Nonprofits Now</h4>
+      <div class="script" style="margin-top:10px;">
+        <div class="script-label">Updated Nonprofit Pitch</div>
+        <p>"We have [N] family law attorneys in LA County already on CommonGround. When your clients need legal help — and many of them will — those attorneys are in our directory and already know the platform. Your clients don't have to start from scratch with an attorney who's never heard of you.
+
+We'll provide 25 grant codes for your highest-need families. When they need an attorney, they can request one through the app and we'll connect them to someone in our network who already understands their case history."</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <h3>The Connection That Makes Both Sides More Valuable</h3>
+    <p>In Month 4+, the attorney-first and nonprofit paths converge: attorneys have active cases and are looking for qualified referrals. Nonprofits have families who need attorneys. CommonGround is the connector. A family on a grant code who triggers an ARIA flag and needs legal help sees "attorneys in your area" in the directory. The attorney gets a pre-documented lead with case history already built. Neither side gets this without the other — and neither side gets it without CommonGround in the middle.</p>
+  </div>
+</section>
+
+
+<!-- ═══════════════════ S10: 6-MONTH ROADMAP ═══════════════════ -->
+<section id="s10">
+  <div class="sec-eye">10 — Execution Calendar</div>
+  <h2 class="sec-title">The 6-Month Attorney-First Roadmap</h2>
+  <p class="sec-intro">Week-by-week priorities for the first 6 months. The nonprofit layer starts at month 3 — not month 1. Revenue starts at month 1.</p>
+
+  <div class="phase-strip" style="margin-bottom:32px;">
+    <div class="phase-cell done">
+      <div class="phase-num">Phase 0</div>
+      <div class="phase-label">Pre-Launch</div>
+      <div class="phase-time">Now → Week 2</div>
+    </div>
+    <div class="phase-cell active">
+      <div class="phase-num">Phase 1</div>
+      <div class="phase-label">Anchor Attorneys</div>
+      <div class="phase-time">Weeks 3–6</div>
+    </div>
+    <div class="phase-cell">
+      <div class="phase-num">Phase 2</div>
+      <div class="phase-label">Client Cascade</div>
+      <div class="phase-time">Weeks 5–10</div>
+    </div>
+    <div class="phase-cell">
+      <div class="phase-num">Phase 3</div>
+      <div class="phase-label">Nonprofit Layer</div>
+      <div class="phase-time">Month 3–4</div>
+    </div>
+    <div class="phase-cell">
+      <div class="phase-num">Phase 4</div>
+      <div class="phase-label">Referral Engine</div>
+      <div class="phase-time">Month 4–5</div>
+    </div>
+    <div class="phase-cell">
+      <div class="phase-num">Phase 5</div>
+      <div class="phase-label">Proof of Model</div>
+      <div class="phase-time">Month 6</div>
+    </div>
+  </div>
+
+  <div class="two-col" style="margin-bottom:16px;">
+    <div class="card" style="border-color:rgba(61,170,138,0.2);">
+      <h4 style="color:var(--teal-lt);">Phase 0 — Pre-Launch (Do Now)</h4>
+      <ul class="checklist" style="margin-top:10px;">
+        <li class="fix">Verify the 1-click client invitation flow works end-to-end — both parents active within 48 hrs</li>
+        <li class="fix">Build the populated demo account (2 cases, AI summaries, compliance reports)</li>
+        <li class="fix">Create the 3-minute Loom demo video of ARIA Pro Intake specifically</li>
+        <li class="fix">Create attorney one-pager PDF (ARIA intake, portal features, pricing, SHA-256 compliance)</li>
+        <li class="fix">Fix all critical app bugs from the App Audit (pricing, Milo/Pico, undefined fields)</li>
+        <li class="do">Build your target list: 50 LA County family law attorneys scored and prioritized</li>
+        <li class="do">Set up Calendly or similar for demo bookings</li>
+        <li class="do">Set up CRM (HubSpot free tier is fine) to track attorney pipeline</li>
+      </ul>
+    </div>
+    <div class="card" style="border-color:rgba(45,106,143,0.2);">
+      <h4 style="color:var(--blue-lt);">Phase 1 — Anchor Attorneys (Weeks 3–6)</h4>
+      <ul class="checklist" style="margin-top:10px;">
+        <li class="do">Send 50 cold emails — use Sequence 1 (high-conflict angle)</li>
+        <li class="do">Attend 1–2 bar association events — LA County Bar Family Law section</li>
+        <li class="do">Target: 15 discovery calls, 8 demos, 5 pilot agreements</li>
+        <li class="star">Each pilot: attorney adds 3 cases + sends client invitations in week 1</li>
+        <li class="do">Weekly check-in with each pilot attorney (15 min)</li>
+        <li class="do">Track: cases added, invitations sent, clients activated, ARIA flags generated</li>
+        <li class="do">Identify your 2–3 most enthusiastic pilots — these become your champions</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="two-col" style="margin-bottom:16px;">
+    <div class="card">
+      <h4>Phase 2 — Client Cascade (Weeks 5–10)</h4>
+      <ul class="checklist" style="margin-top:10px;">
+        <li class="do">5 pilot attorneys × 3 cases = 15 cases × 2 parents = up to 30 active families</li>
+        <li class="do">Each family gets onboarding email + 3-day follow-up from CommonGround (not the attorney)</li>
+        <li class="do">Target: 60%+ of families on Plus or Complete within 30 days</li>
+        <li class="star">30-day review with each pilot attorney — show them the data, close to paid</li>
+        <li class="do">Convert 3–5 attorneys to paid subscriptions by week 10</li>
+        <li class="do">Month 2: Open second cohort — 5 more pilot attorneys using referrals from cohort 1</li>
+        <li class="do">Start attorney referral program at 30-day review for all cohort 1 attorneys</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Phase 3–5 — Scale + Nonprofit (Months 3–6)</h4>
+      <ul class="checklist" style="margin-top:10px;">
+        <li class="do">Month 3: Approach 3 nonprofits in LA County with updated pitch (you now have attorneys to refer to)</li>
+        <li class="do">Month 4: Referral engine running — attorney champions actively referring colleagues</li>
+        <li class="do">Month 4: Bar association speaking opportunity — one champion attorney presents at a CLE</li>
+        <li class="star">Month 5: Case study published — "[Attorney Name] reduced intake time by 50% on high-conflict cases"</li>
+        <li class="do">Month 6: 10+ paying attorneys, 150–300 active families, 3+ nonprofit partners</li>
+        <li class="star">Month 6: Seed raise narrative: "proven B2B2C model, attorney-led acquisition, LA County density, path to scale"</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════ S11: METRICS ═══════════════════ -->
+<section id="s11">
+  <div class="sec-eye">11 — How You Know It's Working</div>
+  <h2 class="sec-title">The Metrics That Matter for This Model</h2>
+  <p class="sec-intro">Different model, different leading indicators. The nonprofit-first model was measured in codes issued. The attorney-first model is measured in attorney activation and client cascade rate. Here's what to track weekly.</p>
+
+  <div class="three-col" style="margin-bottom:24px;">
+    <div class="card teal">
+      <h4>Attorney Pipeline Metrics</h4>
+      <table class="main" style="margin-top:10px;">
+        <tr><th>Metric</th><th>Target</th></tr>
+        <tr><td>Cold emails sent</td><td>50/month</td></tr>
+        <tr><td>Discovery call rate</td><td>15–20%</td></tr>
+        <tr><td>Demo conversion</td><td>60%+ of calls</td></tr>
+        <tr><td>Pilot agreement rate</td><td>50%+ of demos</td></tr>
+        <tr><td>Pilot → paid conversion</td><td>70%+ at 30 days</td></tr>
+        <tr><td>Attorney referral rate</td><td>1 referral per 3 paying attorneys</td></tr>
+      </table>
+    </div>
+    <div class="card blue">
+      <h4>Client Cascade Metrics</h4>
+      <table class="main" style="margin-top:10px;">
+        <tr><th>Metric</th><th>Target</th></tr>
+        <tr><td>Client invitation sent within 1 week</td><td>100% of pilot attorneys</td></tr>
+        <tr><td>Client activation rate</td><td>85%+ within 48 hrs</td></tr>
+        <tr><td>Co-parent activation rate</td><td>65%+ within 7 days</td></tr>
+        <tr><td>Free → Plus upgrade</td><td>25%+ within 30 days</td></tr>
+        <tr><td>Plus → Complete upgrade</td><td>15%+ within 60 days</td></tr>
+        <tr><td>30-day retention</td><td>80%+ active families</td></tr>
+      </table>
+    </div>
+    <div class="card gold">
+      <h4>Revenue Milestones</h4>
+      <table class="main" style="margin-top:10px;">
+        <tr><th>Milestone</th><th>When</th></tr>
+        <tr><td>First paying attorney</td><td>Week 5–6</td></tr>
+        <tr><td>$1K MRR</td><td>Month 2</td></tr>
+        <tr><td>$3K MRR (10 attorneys)</td><td>Month 3</td></tr>
+        <tr><td>$5K MRR + consumer</td><td>Month 4</td></tr>
+        <tr><td>$10K MRR</td><td>Month 5–6</td></tr>
+        <tr><td>Seed raise ready</td><td>Month 6</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card orange">
+      <h4>Weekly Review Questions (Every Monday)</h4>
+      <ul class="checklist" style="margin-top:10px;">
+        <li class="do">How many attorney invitations went out this week?</li>
+        <li class="do">How many discovery calls did we hold?</li>
+        <li class="do">How many demos did we book?</li>
+        <li class="do">How many pilot clients were invited this week?</li>
+        <li class="do">How many pilot clients activated within 48 hrs?</li>
+        <li class="do">Which pilot attorneys have NOT sent client invitations yet? Follow up today.</li>
+        <li class="do">What is our current MRR and how does it compare to last week?</li>
+        <li class="do">Did any attorney refer another attorney this week? How did we handle it?</li>
+      </ul>
+    </div>
+    <div class="card red">
+      <h4>Warning Signs — When to Intervene</h4>
+      <ul class="checklist" style="margin-top:10px;">
+        <li class="fix">Pilot attorney hasn't sent a single client invitation after 7 days — call them today, not email</li>
+        <li class="fix">Client activation rate below 60% — the invitation email or onboarding has a problem</li>
+        <li class="fix">Attorney cancels 30-day review — they're about to churn, call immediately</li>
+        <li class="fix">Zero referrals after 10 paying attorneys — the referral program isn't being communicated, fix the 30-day review agenda</li>
+        <li class="fix">Demo-to-pilot rate below 30% — objection handling needs work, review and update the objection scripts</li>
+        <li class="fix">No co-parent activating on any cases — the co-parent invitation flow is broken, escalate to product</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight" style="margin-top:24px;">
+    <h3>What Success Looks Like at Month 6</h3>
+    <p>10–15 paying attorneys across LA County. 200–400 active families seeded by those attorneys. 3 nonprofit partners adding families who are being referred to attorneys in your directory. $8–12K MRR. One published case study. One attorney who has spoken about CommonGround at a bar event. A referral rate that means your next 10 attorneys come from within the network, not from cold email. That's not a platform anymore — that's a market position.</p>
+  </div>
+</section>
+
+<footer>
+  <p>CommonGround · Attorney-First GTM Playbook · March 2026</p>
+  <p style="color:var(--teal);">Sequences · Discovery · Demo · Invitation Flow · Referral Engine · 6-Month Roadmap</p>
+</footer>
+</body>
+</html>

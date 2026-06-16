@@ -32,6 +32,81 @@ _anthropic_sync: Optional["anthropic.Anthropic"] = None
 _anthropic_async: Optional["anthropic.AsyncAnthropic"] = None
 
 
+def _instrument_openai_sync(client) -> None:
+    """Wrap chat.completions.create to record token usage (alert-only)."""
+    original = client.chat.completions.create
+
+    def create_with_usage(*args, **kwargs):
+        response = original(*args, **kwargs)
+        try:
+            from app.core.ai_usage import extract_openai_usage, record_usage_threadsafe
+            tokens_in, tokens_out = extract_openai_usage(response)
+            if tokens_in or tokens_out:
+                model = kwargs.get("model", "unknown")
+                record_usage_threadsafe("openai", model, tokens_in, tokens_out)
+        except Exception:
+            pass
+        return response
+
+    client.chat.completions.create = create_with_usage
+
+
+def _instrument_openai_async(client) -> None:
+    original = client.chat.completions.create
+
+    async def create_with_usage(*args, **kwargs):
+        response = await original(*args, **kwargs)
+        try:
+            import asyncio
+            from app.core.ai_usage import extract_openai_usage, record_usage
+            tokens_in, tokens_out = extract_openai_usage(response)
+            if tokens_in or tokens_out:
+                model = kwargs.get("model", "unknown")
+                asyncio.create_task(record_usage("openai", model, tokens_in, tokens_out))
+        except Exception:
+            pass
+        return response
+
+    client.chat.completions.create = create_with_usage
+
+
+def _instrument_anthropic_sync(client) -> None:
+    original = client.messages.create
+
+    def create_with_usage(*args, **kwargs):
+        response = original(*args, **kwargs)
+        try:
+            from app.core.ai_usage import extract_anthropic_usage, record_usage_threadsafe
+            tokens_in, tokens_out = extract_anthropic_usage(response)
+            if tokens_in or tokens_out:
+                model = kwargs.get("model", "unknown")
+                record_usage_threadsafe("anthropic", model, tokens_in, tokens_out)
+        except Exception:
+            pass
+        return response
+
+    client.messages.create = create_with_usage
+
+
+def _instrument_anthropic_async(client) -> None:
+    original = client.messages.create
+
+    async def create_with_usage(*args, **kwargs):
+        response = await original(*args, **kwargs)
+        try:
+            import asyncio
+            from app.core.ai_usage import extract_anthropic_usage, record_usage
+            tokens_in, tokens_out = extract_anthropic_usage(response)
+            if tokens_in or tokens_out:
+                model = kwargs.get("model", "unknown")
+                asyncio.create_task(record_usage("anthropic", model, tokens_in, tokens_out))
+        except Exception:
+            pass
+        return response
+
+    client.messages.create = create_with_usage
+
+
 def get_openai() -> "openai.OpenAI":
     """Get the shared sync OpenAI client."""
     global _openai_sync
@@ -42,6 +117,7 @@ def get_openai() -> "openai.OpenAI":
             timeout=DEFAULT_TIMEOUT,
             max_retries=DEFAULT_MAX_RETRIES,
         )
+        _instrument_openai_sync(_openai_sync)
     return _openai_sync
 
 
@@ -55,6 +131,7 @@ def get_async_openai() -> "openai.AsyncOpenAI":
             timeout=DEFAULT_TIMEOUT,
             max_retries=DEFAULT_MAX_RETRIES,
         )
+        _instrument_openai_async(_openai_async)
     return _openai_async
 
 
@@ -68,6 +145,7 @@ def get_anthropic() -> "anthropic.Anthropic":
             timeout=DEFAULT_TIMEOUT,
             max_retries=DEFAULT_MAX_RETRIES,
         )
+        _instrument_anthropic_sync(_anthropic_sync)
     return _anthropic_sync
 
 
@@ -81,4 +159,5 @@ def get_async_anthropic() -> "anthropic.AsyncAnthropic":
             timeout=DEFAULT_TIMEOUT,
             max_retries=DEFAULT_MAX_RETRIES,
         )
+        _instrument_anthropic_async(_anthropic_async)
     return _anthropic_async

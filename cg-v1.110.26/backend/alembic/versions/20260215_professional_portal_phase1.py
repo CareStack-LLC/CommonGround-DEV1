@@ -170,42 +170,54 @@ def upgrade() -> None:
     # Note: RLS policies for new tables.
     # OCR documents: only the uploading professional or firm members can access
     # Field locks: professionals with case assignment can read; only lock creator can unlock
+    # Guarded: auth.uid() exists only on Supabase. On vanilla Postgres
+    # (local dev, CI) RLS is enforced at the ORM layer instead, so the
+    # policies are skipped and fresh-DB bootstrap still works.
     op.execute("""
-        -- Enable RLS on new tables
-        ALTER TABLE ocr_documents ENABLE ROW LEVEL SECURITY;
-        ALTER TABLE field_locks ENABLE ROW LEVEL SECURITY;
+        DO $mig$
+        BEGIN
+            -- Enable RLS on new tables (harmless everywhere)
+            ALTER TABLE ocr_documents ENABLE ROW LEVEL SECURITY;
+            ALTER TABLE field_locks ENABLE ROW LEVEL SECURITY;
 
-        -- OCR Documents: Professional who uploaded can manage
-        CREATE POLICY ocr_documents_professional_access ON ocr_documents
-            FOR ALL
-            USING (
-                uploaded_by_id IN (
-                    SELECT id FROM professional_profiles
-                    WHERE user_id = auth.uid()::text
-                )
-            );
+            IF to_regnamespace('auth') IS NULL THEN
+                RAISE NOTICE 'auth schema not present (not Supabase) - skipping RLS policies';
+                RETURN;
+            END IF;
 
-        -- Field Locks: Any professional with case assignment can read
-        CREATE POLICY field_locks_read_access ON field_locks
-            FOR SELECT
-            USING (
-                family_file_id IN (
-                    SELECT ca.family_file_id FROM case_assignments ca
-                    JOIN professional_profiles pp ON pp.id = ca.professional_id
-                    WHERE pp.user_id = auth.uid()::text
-                    AND ca.status = 'active'
-                )
-            );
+            -- OCR Documents: Professional who uploaded can manage
+            CREATE POLICY ocr_documents_professional_access ON ocr_documents
+                FOR ALL
+                USING (
+                    uploaded_by_id IN (
+                        SELECT id FROM professional_profiles
+                        WHERE user_id = auth.uid()::text
+                    )
+                );
 
-        -- Field Locks: Only lock creator can modify (unlock)
-        CREATE POLICY field_locks_modify_access ON field_locks
-            FOR UPDATE
-            USING (
-                locked_by_professional_id IN (
-                    SELECT id FROM professional_profiles
-                    WHERE user_id = auth.uid()::text
-                )
-            );
+            -- Field Locks: Any professional with case assignment can read
+            CREATE POLICY field_locks_read_access ON field_locks
+                FOR SELECT
+                USING (
+                    family_file_id IN (
+                        SELECT ca.family_file_id FROM case_assignments ca
+                        JOIN professional_profiles pp ON pp.id = ca.professional_id
+                        WHERE pp.user_id = auth.uid()::text
+                        AND ca.status = 'active'
+                    )
+                );
+
+            -- Field Locks: Only lock creator can modify (unlock)
+            CREATE POLICY field_locks_modify_access ON field_locks
+                FOR UPDATE
+                USING (
+                    locked_by_professional_id IN (
+                        SELECT id FROM professional_profiles
+                        WHERE user_id = auth.uid()::text
+                    )
+                );
+        END
+        $mig$;
     """)
 
 

@@ -310,6 +310,14 @@ api_router.include_router(
     tags=["SuperAdmin Ops (Alerts / Runbooks)"],
 )
 
+# Admin AI usage — daily token counters + budget state (reliability batch 1)
+from app.api.v1.endpoints import admin_ai_usage
+api_router.include_router(
+    admin_ai_usage.router,
+    prefix="/admin",
+    tags=["SuperAdmin AI Usage"],
+)
+
 # Admin geospatial — users/pros by state + exchange GPS points
 api_router.include_router(
     admin_geo.router,

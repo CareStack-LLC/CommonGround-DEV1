@@ -14,6 +14,7 @@ Revises: (latest)
 Create Date: 2026-03-14
 """
 from alembic import op
+import migration_guards as mg
 import sqlalchemy as sa
 
 
@@ -26,29 +27,29 @@ depends_on = None
 
 def upgrade() -> None:
     # FamilyFile: DV case flag and ARIA sensitivity
-    op.add_column("family_files", sa.Column("is_dv_case", sa.Boolean(), nullable=False, server_default="false"))
-    op.add_column("family_files", sa.Column(
+    mg.safe_add_column("family_files", sa.Column("is_dv_case", sa.Boolean(), nullable=False, server_default="false"))
+    mg.safe_add_column("family_files", sa.Column(
         "aria_sensitivity_level", sa.String(20), nullable=False, server_default="standard"
     ))  # standard | elevated | maximum
 
     # Obligation: dispute tracking
-    op.add_column("obligations", sa.Column(
+    mg.safe_add_column("obligations", sa.Column(
         "dispute_status", sa.String(20), nullable=False, server_default="none"
     ))  # none | disputed | resolved
-    op.add_column("obligations", sa.Column("dispute_reason", sa.Text(), nullable=True))
-    op.add_column("obligations", sa.Column("disputed_at", sa.DateTime(), nullable=True))
-    op.add_column("obligations", sa.Column("disputed_by", sa.String(36), nullable=True))
+    mg.safe_add_column("obligations", sa.Column("dispute_reason", sa.Text(), nullable=True))
+    mg.safe_add_column("obligations", sa.Column("disputed_at", sa.DateTime(), nullable=True))
+    mg.safe_add_column("obligations", sa.Column("disputed_by", sa.String(36), nullable=True))
 
     # CaseAssignment: GAL consent requirement
-    op.add_column("case_assignments", sa.Column(
+    mg.safe_add_column("case_assignments", sa.Column(
         "consent_both_parents", sa.Boolean(), nullable=False, server_default="false"
     ))
-    op.add_column("case_assignments", sa.Column("consent_parent_a_at", sa.DateTime(), nullable=True))
-    op.add_column("case_assignments", sa.Column("consent_parent_b_at", sa.DateTime(), nullable=True))
+    mg.safe_add_column("case_assignments", sa.Column("consent_parent_a_at", sa.DateTime(), nullable=True))
+    mg.safe_add_column("case_assignments", sa.Column("consent_parent_b_at", sa.DateTime(), nullable=True))
 
     # CaseInvitation: delayed send support
-    op.add_column("case_invitations", sa.Column("scheduled_send_at", sa.DateTime(), nullable=True))
-    op.add_column("case_invitations", sa.Column(
+    mg.safe_add_column("case_invitations", sa.Column("scheduled_send_at", sa.DateTime(), nullable=True))
+    mg.safe_add_column("case_invitations", sa.Column(
         "send_delayed", sa.Boolean(), nullable=False, server_default="false"
     ))
 

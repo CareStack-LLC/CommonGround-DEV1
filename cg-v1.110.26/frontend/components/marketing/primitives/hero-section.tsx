@@ -14,6 +14,8 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 
+import { ctaPrimaryClasses, ctaSecondaryClasses } from './cta-button';
+
 type CtaProp = { label: string; href: string };
 
 export interface HeroSectionProps {
@@ -38,7 +40,7 @@ function renderHeadline(headline: string, accent?: string) {
   return (
     <>
       {before}
-      <span className="text-[#F5A623]">{accent}</span>
+      <span className="text-cg-amber">{accent}</span>
       {after}
     </>
   );
@@ -62,11 +64,11 @@ export function HeroSection({
   const textBlock = (
     <div className={isCentered ? 'text-center mx-auto max-w-3xl' : ''}>
       {eyebrow && (
-        <p className="mb-4 text-xs sm:text-sm font-semibold uppercase tracking-[0.18em] text-[#3DAA8A]">
+        <p className="mb-4 text-xs sm:text-sm font-semibold uppercase tracking-[0.18em] text-cg-sage">
           {eyebrow}
         </p>
       )}
-      <h1 className="font-serif text-[#1E3A4A] text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight tracking-tight">
+      <h1 className="font-serif text-foreground text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight tracking-tight">
         {renderHeadline(headline, headlineAccent)}
       </h1>
       {subheadline && (
@@ -79,17 +81,11 @@ export function HeroSection({
           isCentered ? 'justify-center' : ''
         }`}
       >
-        <Link
-          href={primaryCta.href}
-          className="inline-flex items-center justify-center rounded-full bg-[#3DAA8A] px-6 py-3 text-sm sm:text-base font-semibold text-white shadow-sm transition-colors hover:bg-[#2F8C70] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3DAA8A] focus-visible:ring-offset-2"
-        >
+        <Link href={primaryCta.href} className={ctaPrimaryClasses}>
           {primaryCta.label}
         </Link>
         {secondaryCta && (
-          <Link
-            href={secondaryCta.href}
-            className="inline-flex items-center justify-center rounded-full border-2 border-[#1E3A4A]/10 bg-white px-6 py-3 text-sm sm:text-base font-semibold text-[#1E3A4A] transition-colors hover:border-[#3DAA8A] hover:text-[#3DAA8A]"
-          >
+          <Link href={secondaryCta.href} className={ctaSecondaryClasses}>
             {secondaryCta.label}
           </Link>
         )}
@@ -104,7 +100,7 @@ export function HeroSection({
             <li key={item} className="flex items-center gap-1.5">
               <span
                 aria-hidden="true"
-                className="inline-block h-1.5 w-1.5 rounded-full bg-[#3DAA8A]"
+                className="inline-block h-1.5 w-1.5 rounded-full bg-cg-sage"
               />
               {item}
             </li>

@@ -7,6 +7,7 @@ Revision ID: a1d2m3i4n5_admin
 Revises: p1r2o3_prof_plans
 """
 from alembic import op
+import migration_guards as mg
 import sqlalchemy as sa
 
 
@@ -19,11 +20,11 @@ depends_on = None
 
 def upgrade() -> None:
     # Add admin fields to users table
-    op.add_column(
+    mg.safe_add_column(
         "users",
         sa.Column("is_admin", sa.Boolean(), nullable=False, server_default="false"),
     )
-    op.add_column(
+    mg.safe_add_column(
         "users",
         sa.Column("admin_role", sa.String(30), nullable=True),
     )

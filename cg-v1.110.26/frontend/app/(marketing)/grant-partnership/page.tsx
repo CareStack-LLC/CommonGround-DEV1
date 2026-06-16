@@ -27,7 +27,7 @@ export const metadata = {
 
 export default function GrantPartnershipPage() {
   return (
-    <div className="font-sans text-[#1E3A4A] bg-[#F4F8F7]">
+    <div className="font-sans text-foreground bg-cg-sand">
       <SectionTracker page="grant-partnership" />
 
       {/* ── Hero ─────────────────────────────────────────────────── */}
@@ -35,22 +35,22 @@ export default function GrantPartnershipPage() {
         className="relative overflow-hidden pt-16 pb-24 lg:pt-24 lg:pb-32"
         data-section="hero"
       >
-        <div className="absolute top-10 left-1/4 w-72 h-72 bg-[#3DAA8A]/8 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#F5A623]/6 rounded-full blur-3xl" />
+        <div className="absolute top-10 left-1/4 w-72 h-72 bg-cg-sage/8 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-cg-amber/6 rounded-full blur-3xl" />
 
         <div className="relative max-w-4xl mx-auto px-6 text-center">
-          <p className="text-[#F5A623] font-medium mb-5 tracking-widest uppercase text-xs flex items-center justify-center gap-3">
-            <span className="w-8 h-px bg-[#F5A623]/40" />
+          <p className="text-cg-amber font-medium mb-5 tracking-widest uppercase text-xs flex items-center justify-center gap-3">
+            <span className="w-8 h-px bg-cg-amber/40" />
             Community Partnership
-            <span className="w-8 h-px bg-[#F5A623]/40" />
+            <span className="w-8 h-px bg-cg-amber/40" />
           </p>
 
           <h1
-            className="text-4xl sm:text-5xl lg:text-[3.5rem] text-[#1E3A4A] mb-6 leading-[1.15]"
+            className="text-4xl sm:text-5xl lg:text-[3.5rem] text-foreground mb-6 leading-[1.15]"
             style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
           >
             The families you serve deserve{' '}
-            <span className="text-[#3DAA8A]">calmer co-parenting.</span>
+            <span className="text-cg-sage">calmer co-parenting.</span>
           </h1>
 
           <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed mb-10">
@@ -63,14 +63,14 @@ export default function GrantPartnershipPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="#apply"
-              className="inline-flex items-center justify-center gap-2 bg-[#3DAA8A] text-white font-medium px-8 py-4 rounded-full text-lg transition-all duration-200 hover:bg-[#34967a] hover:shadow-xl hover:-translate-y-0.5"
+              className="inline-flex items-center justify-center gap-2 bg-cg-sage text-white font-medium px-8 py-4 rounded-full text-lg transition-all duration-200 hover:bg-cg-sage-dark hover:shadow-xl hover:-translate-y-0.5"
             >
               Become a Partner
               <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
               href="#how-it-works"
-              className="inline-flex items-center justify-center gap-2 border-2 border-[#3DAA8A] text-[#3DAA8A] font-medium px-8 py-4 rounded-full text-lg transition-all duration-200 hover:bg-[#3DAA8A] hover:text-white"
+              className="inline-flex items-center justify-center gap-2 border-2 border-cg-sage text-cg-sage font-medium px-8 py-4 rounded-full text-lg transition-all duration-200 hover:bg-cg-sage hover:text-white"
             >
               See How It Works
             </Link>
@@ -90,7 +90,7 @@ export default function GrantPartnershipPage() {
             ].map((stat) => (
               <div key={stat.label} className="text-center">
                 <div
-                  className="mb-1 text-4xl font-bold text-[#3DAA8A]"
+                  className="mb-1 text-4xl font-bold text-cg-sage"
                   style={{
                     fontFamily: "'DM Serif Display', Georgia, serif",
                   }}
@@ -111,11 +111,11 @@ export default function GrantPartnershipPage() {
         <div className="max-w-5xl mx-auto px-6">
           <div className="text-center mb-14">
             <h2
-              className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+              className="text-3xl sm:text-4xl text-foreground mb-4"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               You&rsquo;ve seen what happens{' '}
-              <span className="text-[#3DAA8A]">after families leave</span>
+              <span className="text-cg-sage">after families leave</span>
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto text-lg leading-relaxed">
               The families you work with make progress in your programs. But the
@@ -149,13 +149,13 @@ export default function GrantPartnershipPage() {
                   key={item.before}
                   className="bg-white rounded-2xl p-7 border border-gray-100 shadow-sm"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-[#3DAA8A]/10 flex items-center justify-center mb-5">
-                    <Icon className="w-6 h-6 text-[#3DAA8A]" />
+                  <div className="w-12 h-12 rounded-xl bg-cg-sage/10 flex items-center justify-center mb-5">
+                    <Icon className="w-6 h-6 text-cg-sage" />
                   </div>
                   <p className="text-gray-400 text-sm line-through mb-3">
                     {item.before}
                   </p>
-                  <p className="text-[#1E3A4A] font-medium leading-relaxed">
+                  <p className="text-foreground font-medium leading-relaxed">
                     {item.after}
                   </p>
                 </div>
@@ -170,11 +170,11 @@ export default function GrantPartnershipPage() {
         <div className="max-w-5xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2
-              className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+              className="text-3xl sm:text-4xl text-foreground mb-4"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               Organizations already{' '}
-              <span className="text-[#3DAA8A]">making it happen</span>
+              <span className="text-cg-sage">making it happen</span>
             </h2>
             <p className="text-gray-600 max-w-xl mx-auto">
               Community partners across Southern California are bringing
@@ -204,7 +204,7 @@ export default function GrantPartnershipPage() {
               <Link
                 key={partner.name}
                 href={partner.href}
-                className="group block bg-[#F4F8F7] rounded-2xl overflow-hidden border border-gray-200 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+                className="group block bg-cg-sand rounded-2xl overflow-hidden border border-gray-200 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
               >
                 <div className="relative h-44 overflow-hidden">
                   <Image
@@ -217,23 +217,23 @@ export default function GrantPartnershipPage() {
                 </div>
                 <div className="p-6">
                   <h3
-                    className="text-lg text-[#1E3A4A] mb-0.5"
+                    className="text-lg text-foreground mb-0.5"
                     style={{
                       fontFamily: "'DM Serif Display', Georgia, serif",
                     }}
                   >
                     {partner.name}
                   </h3>
-                  <p className="text-sm text-[#3DAA8A] font-medium mb-3">
+                  <p className="text-sm text-cg-sage font-medium mb-3">
                     {partner.tagline}
                   </p>
                   <div className="flex gap-2">
-                    <Quote className="w-4 h-4 text-[#3DAA8A]/40 flex-shrink-0 mt-0.5" />
+                    <Quote className="w-4 h-4 text-cg-sage/40 flex-shrink-0 mt-0.5" />
                     <p className="text-gray-600 text-sm italic leading-relaxed">
                       {partner.quote}
                     </p>
                   </div>
-                  <p className="mt-4 text-[#3DAA8A] text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
+                  <p className="mt-4 text-cg-sage text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
                     See their story
                     <ArrowRight className="w-4 h-4" />
                   </p>
@@ -249,11 +249,11 @@ export default function GrantPartnershipPage() {
         <div className="max-w-5xl mx-auto px-6">
           <div className="text-center mb-14">
             <h2
-              className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+              className="text-3xl sm:text-4xl text-foreground mb-4"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               What your families{' '}
-              <span className="text-[#3DAA8A]">get access to</span>
+              <span className="text-cg-sage">get access to</span>
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto text-lg">
               Every family receives our Complete tier — the same tools used by
@@ -307,12 +307,12 @@ export default function GrantPartnershipPage() {
               const Icon = item.icon;
               return (
                 <div key={item.title} className="flex gap-4">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white shadow-sm text-[#3DAA8A] border border-gray-100">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white shadow-sm text-cg-sage border border-gray-100">
                     <Icon className="h-6 w-6" />
                   </div>
                   <div>
                     <h4
-                      className="mb-1.5 text-lg font-semibold text-[#1E3A4A]"
+                      className="mb-1.5 text-lg font-semibold text-foreground"
                       style={{
                         fontFamily: "'DM Serif Display', Georgia, serif",
                       }}
@@ -329,7 +329,7 @@ export default function GrantPartnershipPage() {
           </div>
 
           {/* Value callout */}
-          <div className="mt-14 bg-gradient-to-r from-[#F5A623] to-[#E09520] rounded-2xl p-8 lg:p-10 text-center text-white shadow-lg">
+          <div className="mt-14 bg-gradient-to-r from-cg-amber to-cg-amber-dark rounded-2xl p-8 lg:p-10 text-center text-white shadow-lg">
             <p className="text-white/80 text-sm font-medium uppercase tracking-wider mb-2">
               Total Partnership Value
             </p>
@@ -355,11 +355,11 @@ export default function GrantPartnershipPage() {
         <div className="max-w-5xl mx-auto px-6">
           <div className="text-center mb-14">
             <h2
-              className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+              className="text-3xl sm:text-4xl text-foreground mb-4"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               What your organization{' '}
-              <span className="text-[#3DAA8A]">gets</span>
+              <span className="text-cg-sage">gets</span>
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto text-lg">
               This isn&rsquo;t just a tool for families. It&rsquo;s
@@ -404,13 +404,13 @@ export default function GrantPartnershipPage() {
               return (
                 <div
                   key={item.title}
-                  className="group bg-[#F4F8F7] rounded-2xl p-8 border border-gray-100 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:bg-white"
+                  className="group bg-cg-sand rounded-2xl p-8 border border-gray-100 transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:bg-white"
                 >
-                  <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-[#3DAA8A]/10 text-[#3DAA8A] group-hover:bg-[#3DAA8A] group-hover:text-white transition-all duration-300">
+                  <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-cg-sage/10 text-cg-sage group-hover:bg-cg-sage group-hover:text-white transition-all duration-300">
                     <Icon className="h-7 w-7" />
                   </div>
                   <h3
-                    className="mb-3 text-xl text-[#1E3A4A]"
+                    className="mb-3 text-xl text-foreground"
                     style={{
                       fontFamily: "'DM Serif Display', Georgia, serif",
                     }}
@@ -429,11 +429,11 @@ export default function GrantPartnershipPage() {
 
       {/* ── Measurable Outcomes ───────────────────────────────────── */}
       <section
-        className="py-20 lg:py-24 bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F] text-white relative overflow-hidden"
+        className="py-20 lg:py-24 bg-gradient-to-br from-foreground to-cg-slate text-white relative overflow-hidden"
         data-section="outcomes"
       >
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#F5A623]/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-cg-amber/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
 
         <div className="relative max-w-5xl mx-auto px-6">
           <div className="text-center mb-14">
@@ -481,7 +481,7 @@ export default function GrantPartnershipPage() {
                 className="rounded-2xl border border-white/10 bg-white/5 p-7 backdrop-blur-sm transition-all hover:bg-white/10"
               >
                 <h4
-                  className="mb-2 text-xl text-[#F5A623]"
+                  className="mb-2 text-xl text-cg-amber"
                   style={{
                     fontFamily: "'DM Serif Display', Georgia, serif",
                   }}
@@ -506,11 +506,11 @@ export default function GrantPartnershipPage() {
         <div className="max-w-5xl mx-auto px-6">
           <div className="text-center mb-14">
             <h2
-              className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+              className="text-3xl sm:text-4xl text-foreground mb-4"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               From inquiry to{' '}
-              <span className="text-[#3DAA8A]">active partnership</span>
+              <span className="text-cg-sage">active partnership</span>
             </h2>
             <p className="text-gray-600 max-w-xl mx-auto text-lg">
               Most partners are live within 3 weeks.
@@ -553,7 +553,7 @@ export default function GrantPartnershipPage() {
                 className="relative z-10 text-center bg-white md:bg-transparent p-6 md:p-0 rounded-xl border md:border-0 border-gray-100 shadow-sm md:shadow-none"
               >
                 <div
-                  className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#3DAA8A] to-[#2C5F5D] text-2xl font-bold text-white shadow-lg shadow-[#3DAA8A]/20"
+                  className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-cg-sage to-[#2C5F5D] text-2xl font-bold text-white shadow-lg shadow-cg-sage/20"
                   style={{
                     fontFamily: "'DM Serif Display', Georgia, serif",
                   }}
@@ -561,7 +561,7 @@ export default function GrantPartnershipPage() {
                   {step.num}
                 </div>
                 <h4
-                  className="mb-2 text-lg font-semibold text-[#3DAA8A]"
+                  className="mb-2 text-lg font-semibold text-cg-sage"
                   style={{
                     fontFamily: "'DM Serif Display', Georgia, serif",
                   }}
@@ -584,7 +584,7 @@ export default function GrantPartnershipPage() {
             {/* What we ask */}
             <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
               <h3
-                className="mb-6 pb-4 border-b-2 border-[#3DAA8A]/20 text-2xl text-[#1E3A4A]"
+                className="mb-6 pb-4 border-b-2 border-cg-sage/20 text-2xl text-foreground"
                 style={{
                   fontFamily: "'DM Serif Display', Georgia, serif",
                 }}
@@ -600,7 +600,7 @@ export default function GrantPartnershipPage() {
                   'Provide feedback so we can keep improving',
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-3">
-                    <div className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#3DAA8A]/10 text-[#3DAA8A]">
+                    <div className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-cg-sage/10 text-cg-sage">
                       <Check className="h-3.5 w-3.5" />
                     </div>
                     <span className="text-gray-700">{item}</span>
@@ -610,7 +610,7 @@ export default function GrantPartnershipPage() {
             </div>
 
             {/* What you get */}
-            <div className="bg-gradient-to-br from-[#3DAA8A] to-[#2C5F5D] rounded-2xl p-8 text-white shadow-lg relative overflow-hidden">
+            <div className="bg-gradient-to-br from-cg-sage to-[#2C5F5D] rounded-2xl p-8 text-white shadow-lg relative overflow-hidden">
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-bl-full" />
               <h3
                 className="relative mb-6 pb-4 border-b-2 border-white/20 text-2xl"
@@ -652,18 +652,18 @@ export default function GrantPartnershipPage() {
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
             {/* Left: Copy */}
             <div className="lg:sticky lg:top-24">
-              <p className="text-[#F5A623] font-medium mb-4 tracking-widest uppercase text-xs flex items-center gap-3">
-                <span className="w-8 h-px bg-[#F5A623]/40" />
+              <p className="text-cg-amber font-medium mb-4 tracking-widest uppercase text-xs flex items-center gap-3">
+                <span className="w-8 h-px bg-cg-amber/40" />
                 Get Started
               </p>
               <h2
-                className="text-3xl sm:text-4xl text-[#1E3A4A] mb-5 leading-tight"
+                className="text-3xl sm:text-4xl text-foreground mb-5 leading-tight"
                 style={{
                   fontFamily: "'DM Serif Display', Georgia, serif",
                 }}
               >
                 Start the conversation.{' '}
-                <span className="text-[#3DAA8A]">No commitment required.</span>
+                <span className="text-cg-sage">No commitment required.</span>
               </h2>
               <p className="text-gray-600 text-lg leading-relaxed mb-8">
                 Tell us about your organization and the families you serve.
@@ -674,11 +674,11 @@ export default function GrantPartnershipPage() {
 
               <div className="space-y-6">
                 <div className="flex gap-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#3DAA8A]/10">
-                    <Check className="h-5 w-5 text-[#3DAA8A]" />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-cg-sage/10">
+                    <Check className="h-5 w-5 text-cg-sage" />
                   </div>
                   <div>
-                    <p className="font-semibold text-[#1E3A4A]">
+                    <p className="font-semibold text-foreground">
                       Zero cost, zero risk
                     </p>
                     <p className="text-sm text-gray-500">
@@ -688,11 +688,11 @@ export default function GrantPartnershipPage() {
                   </div>
                 </div>
                 <div className="flex gap-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#3DAA8A]/10">
-                    <Check className="h-5 w-5 text-[#3DAA8A]" />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-cg-sage/10">
+                    <Check className="h-5 w-5 text-cg-sage" />
                   </div>
                   <div>
-                    <p className="font-semibold text-[#1E3A4A]">
+                    <p className="font-semibold text-foreground">
                       Live in 3 weeks
                     </p>
                     <p className="text-sm text-gray-500">
@@ -702,11 +702,11 @@ export default function GrantPartnershipPage() {
                   </div>
                 </div>
                 <div className="flex gap-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#3DAA8A]/10">
-                    <Check className="h-5 w-5 text-[#3DAA8A]" />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-cg-sage/10">
+                    <Check className="h-5 w-5 text-cg-sage" />
                   </div>
                   <div>
-                    <p className="font-semibold text-[#1E3A4A]">
+                    <p className="font-semibold text-foreground">
                       Impact you can prove
                     </p>
                     <p className="text-sm text-gray-500">
@@ -721,7 +721,7 @@ export default function GrantPartnershipPage() {
                 Prefer email?{' '}
                 <a
                   href="mailto:partnerships@find-commonground.com"
-                  className="text-[#3DAA8A] underline"
+                  className="text-cg-sage underline"
                 >
                   partnerships@find-commonground.com
                 </a>
@@ -729,7 +729,7 @@ export default function GrantPartnershipPage() {
             </div>
 
             {/* Right: Form */}
-            <div className="rounded-2xl border-2 border-[#3DAA8A]/20 bg-gradient-to-b from-[#3DAA8A]/[0.03] to-transparent p-6 sm:p-8">
+            <div className="rounded-2xl border-2 border-cg-sage/20 bg-gradient-to-b from-cg-sage/[0.03] to-transparent p-6 sm:p-8">
               <PartnershipInquiryForm source="grant_partnership_page" />
             </div>
           </div>
@@ -746,7 +746,7 @@ export default function GrantPartnershipPage() {
           </p>
           <Link
             href="#apply"
-            className="inline-flex items-center gap-2 text-[#3DAA8A] font-medium mt-4 hover:underline"
+            className="inline-flex items-center gap-2 text-cg-sage font-medium mt-4 hover:underline"
           >
             Become a partner
             <ArrowRight className="w-4 h-4" />

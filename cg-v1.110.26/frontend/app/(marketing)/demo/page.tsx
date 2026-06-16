@@ -73,7 +73,7 @@ export default function DemoPage() {
         secondaryCta={{ label: 'See our walkthrough', href: '/walkthrough' }}
       />
 
-      <section className="px-6 py-8 bg-[#F4F8F7]">
+      <section className="px-6 py-8 bg-cg-sand">
         <div className="max-w-6xl mx-auto">
           <TrustBar
             variant="stats"
@@ -89,10 +89,10 @@ export default function DemoPage() {
       <section id="book" className="px-6 py-16 sm:py-20">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14 items-start">
           <div>
-            <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.18em] text-[#3DAA8A] mb-3">
+            <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.18em] text-cg-sage mb-3">
               What you&rsquo;ll see
             </p>
-            <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl text-[#1E3A4A] leading-tight">
+            <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl text-foreground leading-tight">
               A live tour of the professional portal
             </h2>
             <p className="mt-4 text-base sm:text-lg text-gray-600 leading-relaxed">
@@ -103,7 +103,7 @@ export default function DemoPage() {
               <li className="flex gap-3">
                 <span
                   aria-hidden="true"
-                  className="mt-2 inline-block h-1.5 w-1.5 rounded-full bg-[#3DAA8A] flex-shrink-0"
+                  className="mt-2 inline-block h-1.5 w-1.5 rounded-full bg-cg-sage flex-shrink-0"
                 />
                 <span>
                   Client intake: guided onboarding that captures custody
@@ -113,7 +113,7 @@ export default function DemoPage() {
               <li className="flex gap-3">
                 <span
                   aria-hidden="true"
-                  className="mt-2 inline-block h-1.5 w-1.5 rounded-full bg-[#3DAA8A] flex-shrink-0"
+                  className="mt-2 inline-block h-1.5 w-1.5 rounded-full bg-cg-sage flex-shrink-0"
                 />
                 <span>
                   Case timeline: a chronological feed of messages, exchanges,
@@ -123,7 +123,7 @@ export default function DemoPage() {
               <li className="flex gap-3">
                 <span
                   aria-hidden="true"
-                  className="mt-2 inline-block h-1.5 w-1.5 rounded-full bg-[#3DAA8A] flex-shrink-0"
+                  className="mt-2 inline-block h-1.5 w-1.5 rounded-full bg-cg-sage flex-shrink-0"
                 />
                 <span>
                   ARIA controls: per-case sentiment thresholds and
@@ -133,7 +133,7 @@ export default function DemoPage() {
               <li className="flex gap-3">
                 <span
                   aria-hidden="true"
-                  className="mt-2 inline-block h-1.5 w-1.5 rounded-full bg-[#3DAA8A] flex-shrink-0"
+                  className="mt-2 inline-block h-1.5 w-1.5 rounded-full bg-cg-sage flex-shrink-0"
                 />
                 <span>
                   Court-ready exports: timestamped PDFs with SHA-256
@@ -143,7 +143,7 @@ export default function DemoPage() {
               <li className="flex gap-3">
                 <span
                   aria-hidden="true"
-                  className="mt-2 inline-block h-1.5 w-1.5 rounded-full bg-[#3DAA8A] flex-shrink-0"
+                  className="mt-2 inline-block h-1.5 w-1.5 rounded-full bg-cg-sage flex-shrink-0"
                 />
                 <span>
                   Firm billing and team roles: attorneys, paralegals, and
@@ -162,7 +162,7 @@ export default function DemoPage() {
               />
             ) : (
               <>
-                <h3 className="font-serif text-xl text-[#1E3A4A] mb-2">
+                <h3 className="font-serif text-xl text-foreground mb-2">
                   Tell us about your practice
                 </h3>
                 <p className="text-sm text-gray-600 mb-6">
@@ -176,7 +176,7 @@ export default function DemoPage() {
         </div>
       </section>
 
-      <section className="px-6 py-12 sm:py-16 bg-[#F4F8F7]">
+      <section className="px-6 py-12 sm:py-16 bg-cg-sand">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8" data-seed="placeholder">
           {/* TODO(marketing): replace with real quote */}
           <TestimonialCard

@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CommonGround — Super Admin Portal Specification</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --navy:    #0D1B24;
+  --navy-2:  #162530;
+  --navy-3:  #1E3A4A;
+  --teal:    #3DAA8A;
+  --teal-lt: #5BC4A0;
+  --blue:    #2D6A8F;
+  --blue-lt: #4BA8C8;
+  --gold:    #F5A623;
+  --slate:   #3A5668;
+  --text:    #CBD8E0;
+  --text-dim:#7A9CAD;
+  --white:   #FFFFFF;
+  --red:     #E05353;
+  --orange:  #E08C2A;
+  --yellow:  #D4B84A;
+  --purple:  #7B5EA7;
+  --admin:   #C084FC;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { background:var(--navy); color:var(--text); font-family:'DM Sans',sans-serif; font-size:14px; line-height:1.7; }
+
+.cover { min-height:78vh; display:flex; flex-direction:column; justify-content:center; padding:72px 72px; background:linear-gradient(148deg,#0D1B24 0%,#162530 50%,#1d2c3b 100%); border-bottom:1px solid rgba(192,132,252,0.15); position:relative; overflow:hidden; }
+.cover::after { content:''; position:absolute; top:-200px; right:-100px; width:550px; height:550px; background:radial-gradient(circle,rgba(192,132,252,0.05) 0%,transparent 60%); pointer-events:none; }
+.eyebrow { font-size:10px; letter-spacing:4px; text-transform:uppercase; color:var(--admin); margin-bottom:16px; }
+.cover h1 { font-family:'DM Serif Display',serif; font-size:52px; line-height:1.08; color:var(--white); margin-bottom:16px; max-width:760px; }
+.cover h1 em { color:var(--admin); font-style:normal; }
+.cover p { font-size:16px; color:var(--text-dim); max-width:640px; margin-bottom:36px; line-height:1.85; }
+.meta-row { display:flex; gap:44px; flex-wrap:wrap; }
+.meta-item label { display:block; font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--slate); margin-bottom:4px; }
+.meta-item span { font-size:13px; color:var(--text); font-weight:500; }
+
+.toc { background:var(--navy-3); border-bottom:1px solid rgba(255,255,255,0.05); padding:20px 72px; display:flex; gap:0; flex-wrap:wrap; }
+.toc a { color:var(--text-dim); text-decoration:none; font-size:11.5px; padding:4px 16px 4px 0; border-right:1px solid rgba(255,255,255,0.05); margin-right:16px; transition:color 0.2s; }
+.toc a:hover { color:var(--admin); }
+.toc a:last-child { border-right:none; }
+
+section { padding:60px 72px; border-bottom:1px solid rgba(255,255,255,0.04); }
+.sec-eye { font-size:9px; letter-spacing:4px; text-transform:uppercase; color:var(--admin); margin-bottom:11px; }
+.sec-title { font-family:'DM Serif Display',serif; font-size:30px; color:var(--white); margin-bottom:10px; }
+.sec-intro { font-size:15px; color:var(--text-dim); max-width:720px; margin-bottom:32px; line-height:1.85; }
+
+/* MODULE CARDS */
+.module { background:var(--navy-2); border:1px solid rgba(255,255,255,0.07); border-radius:18px; margin-bottom:24px; overflow:hidden; }
+.module-header { padding:18px 26px; border-bottom:1px solid rgba(255,255,255,0.06); display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
+.module-icon { font-size:24px; flex-shrink:0; }
+.module-title { font-family:'DM Serif Display',serif; font-size:20px; color:var(--white); margin-bottom:3px; }
+.module-subtitle { font-size:13px; color:var(--text-dim); }
+.module-tags { display:flex; gap:6px; flex-wrap:wrap; align-items:flex-start; justify-content:flex-end; }
+.module-body { display:grid; grid-template-columns:1fr 1fr; gap:0; }
+.module-col { padding:18px 22px; border-right:1px solid rgba(255,255,255,0.05); }
+.module-col:last-child { border-right:none; }
+.module-col-label { font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--slate); margin-bottom:10px; font-weight:600; }
+.module-col ul { list-style:none; }
+.module-col li { font-size:12.5px; color:var(--text-dim); padding:4px 0; display:flex; gap:8px; align-items:flex-start; border-bottom:1px solid rgba(255,255,255,0.03); line-height:1.45; }
+.module-col li:last-child { border-bottom:none; }
+.module-col li::before { flex-shrink:0; margin-top:2px; font-size:10px; }
+.module-col li.can::before  { content:'✓'; color:var(--teal); }
+.module-col li.cant::before { content:'✗'; color:var(--red); }
+.module-col li.note::before { content:'→'; color:var(--yellow); }
+.module-col li.action::before { content:'⚡'; color:var(--admin); font-size:9px; }
+
+.module-full { padding:18px 22px; }
+.module-full .module-col-label { margin-bottom:12px; }
+
+/* TAGS */
+.tag { display:inline-flex; align-items:center; padding:3px 9px; border-radius:5px; font-size:10px; font-weight:700; letter-spacing:0.8px; text-transform:uppercase; }
+.tag.admin  { background:rgba(192,132,252,0.15); color:var(--admin); border:1px solid rgba(192,132,252,0.25); }
+.tag.read   { background:rgba(61,170,138,0.12); color:var(--teal); }
+.tag.write  { background:rgba(45,106,143,0.15); color:var(--blue-lt); }
+.tag.danger { background:rgba(224,83,83,0.13); color:var(--red); }
+.tag.warn   { background:rgba(224,140,42,0.13); color:var(--orange); }
+.tag.never  { background:rgba(224,83,83,0.18); color:var(--red); border:1px solid rgba(224,83,83,0.3); }
+
+/* ALERT */
+.alert { padding:13px 18px; border-radius:10px; margin:12px 0; display:flex; gap:11px; align-items:flex-start; }
+.alert.admin  { background:rgba(192,132,252,0.07); border:1px solid rgba(192,132,252,0.2); }
+.alert.teal   { background:rgba(61,170,138,0.07); border:1px solid rgba(61,170,138,0.2); }
+.alert.gold   { background:rgba(245,166,35,0.07); border:1px solid rgba(245,166,35,0.2); }
+.alert.red    { background:rgba(224,83,83,0.07); border:1px solid rgba(224,83,83,0.2); }
+.alert-icon { font-size:13px; flex-shrink:0; margin-top:2px; }
+.alert p { font-size:13px; line-height:1.6; }
+.alert.admin p { color:var(--admin); }
+.alert.teal p  { color:var(--teal-lt); }
+.alert.gold p  { color:var(--gold); }
+.alert.red p   { color:var(--red); }
+
+/* SCREEN MOCK */
+.screen { background:#0a1520; border:1px solid rgba(255,255,255,0.08); border-radius:14px; overflow:hidden; margin:16px 0; }
+.screen-bar { background:var(--navy-3); padding:10px 16px; display:flex; align-items:center; gap:10px; border-bottom:1px solid rgba(255,255,255,0.05); }
+.screen-dots { display:flex; gap:5px; }
+.screen-dot { width:9px; height:9px; border-radius:50%; }
+.screen-title { font-size:11px; color:var(--text-dim); font-family:'JetBrains Mono',monospace; }
+.screen-body { padding:18px 20px; }
+
+/* STAT GRID */
+.stat-row { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin-bottom:12px; }
+.stat-box { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:10px 12px; text-align:center; }
+.stat-num { font-family:'DM Serif Display',serif; font-size:22px; line-height:1; margin-bottom:3px; }
+.stat-lbl { font-size:9px; color:var(--slate); text-transform:uppercase; letter-spacing:1px; }
+.stat-delta { font-size:9px; margin-top:2px; }
+
+/* USER ROW */
+.user-row { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.04); }
+.user-row:last-child { border-bottom:none; }
+.user-avatar { width:28px; height:28px; border-radius:8px; background:rgba(61,170,138,0.15); display:flex; align-items:center; justify-content:center; font-size:11px; color:var(--teal); font-weight:600; flex-shrink:0; }
+.user-avatar.pro { background:rgba(45,106,143,0.2); color:var(--blue-lt); }
+.user-avatar.child { background:rgba(245,166,35,0.15); color:var(--gold); }
+.user-avatar.circle { background:rgba(192,132,252,0.12); color:var(--admin); }
+.user-info { flex:1; min-width:0; }
+.user-name { font-size:12px; color:var(--white); font-weight:500; }
+.user-detail { font-size:10px; color:var(--slate); }
+.user-badges { display:flex; gap:5px; }
+.badge { padding:2px 6px; border-radius:4px; font-size:9px; font-weight:600; text-transform:uppercase; }
+.badge.active  { background:rgba(61,170,138,0.15); color:var(--teal); }
+.badge.warned  { background:rgba(224,140,42,0.15); color:var(--orange); }
+.badge.suspended { background:rgba(224,83,83,0.15); color:var(--red); }
+.badge.free    { background:rgba(58,86,104,0.3); color:var(--text-dim); }
+.badge.plus    { background:rgba(45,106,143,0.15); color:var(--blue-lt); }
+.badge.complete { background:rgba(245,166,35,0.12); color:var(--gold); }
+
+/* TICKET */
+.ticket { background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.06); border-radius:10px; padding:12px 14px; margin-bottom:8px; }
+.ticket-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px; }
+.ticket-id { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--slate); }
+.ticket-title { font-size:13px; color:var(--white); font-weight:500; margin-bottom:3px; }
+.ticket-meta { font-size:11px; color:var(--text-dim); }
+.ticket-priority { padding:2px 7px; border-radius:4px; font-size:9px; font-weight:700; text-transform:uppercase; }
+.priority-high   { background:rgba(224,83,83,0.15); color:var(--red); }
+.priority-medium { background:rgba(224,140,42,0.15); color:var(--orange); }
+.priority-low    { background:rgba(61,170,138,0.12); color:var(--teal); }
+
+/* TWO/THREE COL */
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
+.three-col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:14px; }
+
+/* CARD */
+.card { background:var(--navy-2); border:1px solid rgba(255,255,255,0.06); border-radius:14px; padding:18px 20px; }
+.card h4 { font-size:13px; font-weight:600; color:var(--white); margin-bottom:8px; }
+.card p { font-size:13px; color:var(--text-dim); line-height:1.65; }
+
+/* TABLE */
+table.main { width:100%; border-collapse:collapse; }
+table.main th { text-align:left; font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--slate); padding:9px 13px; border-bottom:1px solid rgba(255,255,255,0.07); }
+table.main td { padding:10px 13px; font-size:12.5px; color:var(--text-dim); border-bottom:1px solid rgba(255,255,255,0.03); vertical-align:top; line-height:1.5; }
+table.main td strong { color:var(--white); font-weight:500; }
+table.main tr:last-child td { border-bottom:none; }
+
+/* HIGHLIGHT */
+.highlight { background:linear-gradient(135deg,rgba(192,132,252,0.08),rgba(45,106,143,0.06)); border:1px solid rgba(192,132,252,0.15); border-radius:16px; padding:24px 28px; margin:20px 0; }
+.highlight h3 { font-family:'DM Serif Display',serif; font-size:20px; color:var(--white); margin-bottom:8px; }
+.highlight p { font-size:14px; color:var(--text-dim); line-height:1.8; }
+
+/* CODE */
+.code-block { background:#080f18; border:1px solid rgba(255,255,255,0.07); border-radius:10px; padding:14px 16px; margin:10px 0; font-family:'JetBrains Mono',monospace; font-size:11.5px; line-height:1.65; color:#a8c0cc; overflow-x:auto; }
+.code-block .kw  { color:var(--teal); }
+.code-block .str { color:var(--gold); }
+.code-block .cm  { color:var(--slate); }
+
+/* SRC CHIP */
+.src { display:inline-flex; background:rgba(45,106,143,0.1); border:1px solid rgba(45,106,143,0.2); border-radius:4px; padding:2px 7px; font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--blue-lt); margin:2px; }
+
+/* DIVIDER */
+.divider { display:flex; align-items:center; gap:16px; margin:24px 0 20px; }
+.divider-line { flex:1; height:1px; background:rgba(255,255,255,0.05); }
+.divider-label { font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--slate); white-space:nowrap; }
+
+footer { padding:32px 72px; background:var(--navy-3); border-top:1px solid rgba(255,255,255,0.05); display:flex; justify-content:space-between; align-items:center; }
+footer p { font-size:12px; color:var(--slate); }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="eyebrow">Super Admin Portal · Full Specification</div>
+  <h1>The <em>Command Center</em>.<br>Every user. Every issue. Every answer.</h1>
+  <p>A non-technical operations portal for customer success, support resolution, user management, billing verification, report auditing, and platform health monitoring. Everything you need to run CommonGround — nothing you don't need.</p>
+  <div class="meta-row">
+    <div class="meta-item"><label>Route</label><span>admin.find-commonground.com</span></div>
+    <div class="meta-item"><label>Access</label><span>Super Admin role only · TOTP MFA required</span></div>
+    <div class="meta-item"><label>Modules</label><span>9 sections · all non-technical</span></div>
+    <div class="meta-item"><label>Everything logged</label><span>Every admin action recorded in audit_logs</span></div>
+  </div>
+</div>
+
+<!-- TOC -->
+<nav class="toc">
+  <a href="#s0">00 · What You Can't See</a>
+  <a href="#s1">01 · Command Dashboard</a>
+  <a href="#s2">02 · User Management</a>
+  <a href="#s3">03 · Report Verification</a>
+  <a href="#s4">04 · Support Tickets</a>
+  <a href="#s5">05 · Billing + Subscriptions</a>
+  <a href="#s6">06 · KidComs Oversight</a>
+  <a href="#s7">07 · Grant + Partner Codes</a>
+  <a href="#s8">08 · Platform Operations</a>
+  <a href="#s9">09 · Admin Audit Log</a>
+</nav>
+
+
+<!-- ═══════════ S0: ACCESS PHILOSOPHY ═══════════ -->
+<section id="s0">
+  <div class="sec-eye">00 — Access Philosophy</div>
+  <h2 class="sec-title">What You Can and Cannot See — And Why</h2>
+  <p class="sec-intro">The Super Admin portal is a business operations tool, not a surveillance system. The line is drawn clearly: you can see everything about how the platform is being used and whether it's working correctly. You cannot see the content of what families are saying to each other. That content is protected, and your ability to resolve support issues doesn't require reading it.</p>
+
+  <div class="two-col">
+    <div>
+      <div class="module">
+        <div class="module-header">
+          <div>
+            <div class="module-title" style="color:var(--teal-lt);">✓ What You Can Access</div>
+            <div class="module-subtitle">Everything needed to run the business and resolve support issues</div>
+          </div>
+        </div>
+        <div class="module-full">
+          <ul>
+            <li class="can">User accounts — name, email, plan, signup date, last login, subscription status</li>
+            <li class="can">Payment history — charges, refunds, failed payments, Stripe transaction IDs</li>
+            <li class="can">Report metadata — which reports were generated, when, by whom, what was downloaded, SHA-256 hash of the output</li>
+            <li class="can">Platform activity counts — messages sent (count only), exchanges logged, expenses tracked, reports generated</li>
+            <li class="can">ARIA flag metadata — flag rate %, severity distribution, acceptance rate — per user, not per message</li>
+            <li class="can">KidComs call metadata — call log, duration, participants, flagged call count — not call content</li>
+            <li class="can">Support ticket history for any user</li>
+            <li class="can">Account status — active, suspended, warned, pending deletion</li>
+            <li class="can">Subscription and tier changes with timestamps</li>
+            <li class="can">Login history — timestamps and approximate location (city/state)</li>
+            <li class="can">Grant code status — issued, activated, expired, by whom (anonymized)</li>
+            <li class="can">Case existence — that a case exists between two users, case ID, plan tier, creation date</li>
+            <li class="can">Report generation audit — confirmed that a specific report was generated and downloaded</li>
+            <li class="can">Agreement completion status — what % of sections are signed (not the content)</li>
+            <li class="can">Exchange compliance % per case — not GPS coordinates in detail</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="module">
+        <div class="module-header">
+          <div>
+            <div class="module-title" style="color:var(--red);">✗ What You Cannot See</div>
+            <div class="module-subtitle">Protected regardless of support need — by design, not by accident</div>
+          </div>
+        </div>
+        <div class="module-full">
+          <ul>
+            <li class="cant">Message content between co-parents — any individual message, ever</li>
+            <li class="cant">ARIA rewrites — what ARIA suggested for a specific message</li>
+            <li class="cant">Attorney-client privileged communications (Professional Messaging)</li>
+            <li class="cant">KidComs call audio, video, or transcripts</li>
+            <li class="cant">SharedCare Agreement section content — what was written in any section</li>
+            <li class="cant">Individual GPS coordinates from custody exchanges</li>
+            <li class="cant">Individual expense amounts or descriptions — only totals and counts</li>
+            <li class="cant">Court document content uploaded by users</li>
+            <li class="cant">ARIA intake session content — what a client told ARIA before an attorney meeting</li>
+            <li class="cant">Children's profiles beyond name and age (no medical, school, or preference data)</li>
+            <li class="cant">The actual content of any generated PDF report — only confirmation it was generated</li>
+            <li class="cant">Specific flag reasons on individual messages — only aggregate flag category distributions</li>
+          </ul>
+          <div class="alert red" style="margin-top:14px;">
+            <div class="alert-icon">⚠</div>
+            <p><strong>If a support issue requires reading message content</strong> — it escalates to legal/compliance review, not admin access. The admin portal is designed so that 95%+ of support issues can be resolved without ever needing to see message content. The 5% that can't are handled through a formal escalation path with attorney review.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <h3>The Admin Action Rule</h3>
+    <p>Every single action taken in the Super Admin portal is written to <span class="src">audit_logs</span> with the admin's user ID, the action taken, the target user/case/record, and a timestamp. This cannot be disabled. If you look up a user's payment history, that lookup is logged. If you reset a password, it's logged with a required reason field. If you suspend an account, it's logged with a required note. The audit trail protects both the users and the admins.</p>
+  </div>
+</section>
+
+
+<!-- ═══════════ S1: COMMAND DASHBOARD ═══════════ -->
+<section id="s1">
+  <div class="sec-eye">01 — Command Dashboard</div>
+  <h2 class="sec-title">Platform Health at a Glance</h2>
+  <p class="sec-intro">The first thing you see when you log in. A live pulse of the entire platform — total users, revenue, platform health, active support issues, and anything that needs your attention today. Designed to answer "is everything working and is anything on fire?" in under 30 seconds.</p>
+
+  <div class="screen">
+    <div class="screen-bar">
+      <div class="screen-dots"><div class="screen-dot" style="background:#ff5f57;"></div><div class="screen-dot" style="background:#ffbd2e;"></div><div class="screen-dot" style="background:#28c840;"></div></div>
+      <span class="screen-title">admin.find-commonground.com/dashboard</span>
+    </div>
+    <div class="screen-body">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <div style="font-family:'DM Serif Display',serif;font-size:18px;color:var(--white);">Good morning. Here's what's happening.</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <div style="background:rgba(61,170,138,0.1);border:1px solid rgba(61,170,138,0.2);border-radius:6px;padding:5px 12px;font-size:11px;color:var(--teal);">● All systems operational</div>
+          <div style="background:rgba(255,255,255,0.05);border-radius:6px;padding:5px 12px;font-size:11px;color:var(--text-dim);">Mar 13, 2026 · 9:41 AM</div>
+        </div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-box">
+          <div class="stat-num" style="color:var(--teal);">284</div>
+          <div class="stat-lbl">Total Parents</div>
+          <div class="stat-delta" style="color:var(--teal);">+12 this week</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" style="color:var(--blue-lt);">31</div>
+          <div class="stat-lbl">Professionals</div>
+          <div class="stat-delta" style="color:var(--blue-lt);">+4 this week</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" style="color:var(--gold);">$8,240</div>
+          <div class="stat-lbl">MRR</div>
+          <div class="stat-delta" style="color:var(--teal);">↑ 14% vs last mo</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" style="color:var(--orange);">7</div>
+          <div class="stat-lbl">Open Tickets</div>
+          <div class="stat-delta" style="color:var(--orange);">2 need response</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" style="color:var(--admin);">142</div>
+          <div class="stat-lbl">Active Cases</div>
+          <div class="stat-delta" style="color:var(--text-dim);">Both parents active</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;">
+        <div style="background:rgba(224,83,83,0.07);border:1px solid rgba(224,83,83,0.15);border-radius:10px;padding:12px 14px;">
+          <div style="font-size:10px;color:var(--red);letter-spacing:2px;text-transform:uppercase;font-weight:600;margin-bottom:6px;">⚡ Needs Action</div>
+          <div style="font-size:12px;color:var(--text-dim);margin-bottom:4px;">• 2 support tickets unanswered 48+ hrs</div>
+          <div style="font-size:12px;color:var(--text-dim);margin-bottom:4px;">• 1 failed payment — user not notified yet</div>
+          <div style="font-size:12px;color:var(--text-dim);">• 3 KidComs flagged calls unreviewed</div>
+        </div>
+        <div style="background:rgba(245,166,35,0.07);border:1px solid rgba(245,166,35,0.15);border-radius:10px;padding:12px 14px;">
+          <div style="font-size:10px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;font-weight:600;margin-bottom:6px;">📊 Today's Activity</div>
+          <div style="font-size:12px;color:var(--text-dim);margin-bottom:4px;">• 18 new user signups</div>
+          <div style="font-size:12px;color:var(--text-dim);margin-bottom:4px;">• 34 reports generated</div>
+          <div style="font-size:12px;color:var(--text-dim);">• 6 new Professional portals activated</div>
+        </div>
+        <div style="background:rgba(61,170,138,0.07);border:1px solid rgba(61,170,138,0.15);border-radius:10px;padding:12px 14px;">
+          <div style="font-size:10px;color:var(--teal);letter-spacing:2px;text-transform:uppercase;font-weight:600;margin-bottom:6px;">📈 Platform Health</div>
+          <div style="font-size:12px;color:var(--text-dim);margin-bottom:4px;">• ARIA uptime: 99.8%</div>
+          <div style="font-size:12px;color:var(--text-dim);margin-bottom:4px;">• Avg report gen time: 8.2s</div>
+          <div style="font-size:12px;color:var(--text-dim);">• Support response avg: 18hrs</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:10px;">
+        <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:12px 14px;">
+          <div style="font-size:10px;color:var(--slate);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;">Recent User Signups</div>
+          <div class="user-row">
+            <div class="user-avatar">SM</div>
+            <div class="user-info"><div class="user-name">Sarah M.</div><div class="user-detail">Parent · Web Starter · 12 min ago</div></div>
+            <div class="user-badges"><span class="badge free">Free</span></div>
+          </div>
+          <div class="user-row">
+            <div class="user-avatar pro">MC</div>
+            <div class="user-info"><div class="user-name">Marcus Chen, Esq.</div><div class="user-detail">Attorney · Small Firm · 1 hr ago</div></div>
+            <div class="user-badges"><span class="badge plus">Pro</span></div>
+          </div>
+          <div class="user-row">
+            <div class="user-avatar">DW</div>
+            <div class="user-info"><div class="user-name">David W.</div><div class="user-detail">Parent · Complete · 2 hrs ago</div></div>
+            <div class="user-badges"><span class="badge complete">Complete</span></div>
+          </div>
+        </div>
+        <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:10px;padding:12px 14px;">
+          <div style="font-size:10px;color:var(--slate);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px;">Revenue Split</div>
+          <div style="font-size:12px;color:var(--text-dim);margin-bottom:4px;">Starter: 0% · $0</div>
+          <div style="height:5px;background:rgba(255,255,255,0.05);border-radius:3px;margin-bottom:8px;"></div>
+          <div style="font-size:12px;color:var(--text-dim);margin-bottom:4px;">Plus: 38% · $3,120</div>
+          <div style="height:5px;width:38%;background:var(--blue);border-radius:3px;margin-bottom:8px;"></div>
+          <div style="font-size:12px;color:var(--text-dim);margin-bottom:4px;">Complete: 26% · $2,120</div>
+          <div style="height:5px;width:26%;background:var(--gold);border-radius:3px;margin-bottom:8px;"></div>
+          <div style="font-size:12px;color:var(--text-dim);margin-bottom:4px;">Professional: 36% · $3,000</div>
+          <div style="height:5px;width:36%;background:var(--admin);border-radius:3px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="three-col" style="margin-top:20px;">
+    <div class="card">
+      <h4>Key Dashboard Metrics — All Fields</h4>
+      <ul style="list-style:none;font-size:12.5px;color:var(--text-dim);">
+        <li style="padding:3px 0;">Total users by type (parents, professionals, My Circle, children)</li>
+        <li style="padding:3px 0;">Active subscriptions by tier and MRR</li>
+        <li style="padding:3px 0;">New signups today / this week / this month</li>
+        <li style="padding:3px 0;">Churn this month (count + %)</li>
+        <li style="padding:3px 0;">Open support tickets by priority</li>
+        <li style="padding:3px 0;">Reports generated today (count by type)</li>
+        <li style="padding:3px 0;">KidComs flagged calls pending review</li>
+        <li style="padding:3px 0;">Failed payments pending resolution</li>
+        <li style="padding:3px 0;">ARIA system uptime %</li>
+        <li style="padding:3px 0;">Average support response time (rolling 7 days)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Quick Actions From Dashboard</h4>
+      <ul style="list-style:none;font-size:12.5px;color:var(--text-dim);">
+        <li style="padding:3px 0;">Search any user by name, email, or case ID</li>
+        <li style="padding:3px 0;">Create a new support ticket</li>
+        <li style="padding:3px 0;">View all open tickets sorted by priority</li>
+        <li style="padding:3px 0;">Jump to any flagged KidComs event</li>
+        <li style="padding:3px 0;">View failed payments needing follow-up</li>
+        <li style="padding:3px 0;">Generate a platform health report (PDF)</li>
+        <li style="padding:3px 0;">Send a platform-wide announcement</li>
+        <li style="padding:3px 0;">View today's new user signups</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Trend Charts (7/30/90 day)</h4>
+      <ul style="list-style:none;font-size:12.5px;color:var(--text-dim);">
+        <li style="padding:3px 0;">New user signups over time</li>
+        <li style="padding:3px 0;">MRR growth curve</li>
+        <li style="padding:3px 0;">Churn rate trend</li>
+        <li style="padding:3px 0;">Support ticket volume and resolution time</li>
+        <li style="padding:3px 0;">Reports generated per day</li>
+        <li style="padding:3px 0;">Free → paid conversion rate</li>
+        <li style="padding:3px 0;">Attorney portal activation rate</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ S2: USER MANAGEMENT ═══════════ -->
+<section id="s2">
+  <div class="sec-eye">02 — User Management</div>
+  <h2 class="sec-title">Every User Type — Parents, Professionals, My Circle, Children</h2>
+  <p class="sec-intro">One search bar finds any user across any role. Each user type has a dedicated profile view showing everything admin needs for support — account status, subscription, activity history, linked cases, and actions available. No two user types show the same fields.</p>
+
+  <!-- SEARCH -->
+  <div class="alert admin">
+    <div class="alert-icon">⚡</div>
+    <p><strong>Universal Search:</strong> One search field at the top of every admin page. Searches across name, email, phone, case ID, family file ID, ticket number, and transaction ID simultaneously. Returns results grouped by type. Designed to find anyone in under 3 seconds.</p>
+  </div>
+
+  <!-- PARENT -->
+  <div class="module" style="margin-top:20px;">
+    <div class="module-header">
+      <div style="display:flex;gap:14px;align-items:flex-start;">
+        <div class="module-icon">👤</div>
+        <div>
+          <div class="module-title">Parent User Profile</div>
+          <div class="module-subtitle">What you see when you look up a parent account</div>
+        </div>
+      </div>
+      <div class="module-tags">
+        <span class="tag read">View</span>
+        <span class="tag write">Edit Status</span>
+        <span class="tag warn">Suspend</span>
+      </div>
+    </div>
+    <div class="module-body">
+      <div class="module-col">
+        <div class="module-col-label">Account Information (Visible)</div>
+        <ul>
+          <li class="can">Full name, email, phone number</li>
+          <li class="can">Signup date, last login timestamp, login count (30 days)</li>
+          <li class="can">Current subscription tier and status (active/past_due/cancelled)</li>
+          <li class="can">Billing cycle (monthly/annual), next billing date</li>
+          <li class="can">Stripe customer ID and last 4 of payment method</li>
+          <li class="can">Payment history — every charge, refund, and failed payment with dates and amounts</li>
+          <li class="can">Account flags — if user has been warned, why, and by whom</li>
+          <li class="can">Co-parent linked to this account (name + email only)</li>
+          <li class="can">Case ID(s) this parent is on</li>
+          <li class="can">My Circle contacts linked to this parent (name + email only)</li>
+          <li class="can">Children in their case (name + age only)</li>
+          <li class="can">Grant code used (if any) — code and originating nonprofit</li>
+        </ul>
+      </div>
+      <div class="module-col">
+        <div class="module-col-label">Activity Summary (Visible)</div>
+        <ul>
+          <li class="can">Total messages sent (count only — no content)</li>
+          <li class="can">ARIA flag rate % — not individual flags</li>
+          <li class="can">Exchanges logged, on-time % (aggregate only)</li>
+          <li class="can">Expenses tracked (count and total amount)</li>
+          <li class="can">Reports generated — list of report types, dates, download status</li>
+          <li class="can">Agreement sections completed (count/18)</li>
+          <li class="can">KidComs calls (count, total duration, flagged count)</li>
+          <li class="can">Support tickets opened by or about this user</li>
+          <li class="can">Platform activity score (composite engagement 0–100)</li>
+          <li class="action">Actions: Reset password · Resend verification email · Send notification · Change plan (with reason) · Apply credit · Suspend account · Delete account (GDPR) · Create ticket on behalf of user · Impersonate (requires reason + logs)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFESSIONAL -->
+  <div class="module">
+    <div class="module-header">
+      <div style="display:flex;gap:14px;align-items:flex-start;">
+        <div class="module-icon">⚖️</div>
+        <div>
+          <div class="module-title">Professional User Profile</div>
+          <div class="module-subtitle">Attorney, mediator, GAL, paralegal, intake coordinator</div>
+        </div>
+      </div>
+      <div class="module-tags"><span class="tag read">View</span><span class="tag write">Edit Status</span></div>
+    </div>
+    <div class="module-body">
+      <div class="module-col">
+        <div class="module-col-label">Professional Account Fields</div>
+        <ul>
+          <li class="can">Full name, email, phone, bar number (if attorney)</li>
+          <li class="can">Firm name and firm ID (if part of a firm)</li>
+          <li class="can">Professional role on the platform</li>
+          <li class="can">Subscription tier: Solo / Small Firm / Mid-Size / Enterprise</li>
+          <li class="can">Active case count vs. plan limit</li>
+          <li class="can">Payment history same as parent profile</li>
+          <li class="can">Cases assigned (case IDs only — not case content)</li>
+          <li class="can">Intake sessions sent — count, completion rate, conversion to case rate</li>
+          <li class="can">Reports generated — type, date, downloaded Y/N</li>
+          <li class="can">Client invitations sent — count and activation rate</li>
+          <li class="can">Directory listing status (visible / not visible)</li>
+          <li class="can">Login history + last active</li>
+          <li class="cant">ARIA intake session content</li>
+          <li class="cant">Attorney-client messages in the professional portal</li>
+        </ul>
+      </div>
+      <div class="module-col">
+        <div class="module-col-label">Firm-Level View (Small Firm+)</div>
+        <ul>
+          <li class="can">Firm name, address, contact info</li>
+          <li class="can">All team members — name, role, cases assigned count</li>
+          <li class="can">Firm subscription tier and billing contact</li>
+          <li class="can">Total active cases across firm</li>
+          <li class="can">Firm-wide report generation count</li>
+          <li class="can">Intake completion rate for the firm</li>
+          <li class="can">Any firm members with account issues (payment, suspension)</li>
+          <li class="action">Actions: Reset password · Resend portal access · Add/remove firm team member · Change plan · Apply discount credit · Suspend account · Create ticket · Transfer cases to another attorney (emergency)</li>
+          <li class="cant">Which specific client is on which case</li>
+          <li class="cant">Any case content</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- MY CIRCLE + CHILDREN -->
+  <div class="two-col">
+    <div class="module">
+      <div class="module-header">
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div class="module-icon">👥</div>
+          <div>
+            <div class="module-title">My Circle Users</div>
+            <div class="module-subtitle">Trusted contacts — grandparents, caregivers</div>
+          </div>
+        </div>
+        <span class="tag read">View Only</span>
+      </div>
+      <div class="module-full">
+        <ul>
+          <li class="can">Name and email of the Circle contact</li>
+          <li class="can">Which parent added them and when</li>
+          <li class="can">Current access level (schedule only / KidComs approved)</li>
+          <li class="can">Account status (active/inactive)</li>
+          <li class="can">Last login date</li>
+          <li class="can">KidComs calls made from this account (count + duration)</li>
+          <li class="action">Actions: Remove Circle contact (emergency safety action) · Suspend Circle account access · Create ticket</li>
+          <li class="cant">What schedule data they can see</li>
+          <li class="cant">Any communications</li>
+        </ul>
+      </div>
+    </div>
+    <div class="module">
+      <div class="module-header">
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <div class="module-icon">⭐</div>
+          <div>
+            <div class="module-title">Children Profiles</div>
+            <div class="module-subtitle">Child records linked to a family file</div>
+          </div>
+        </div>
+        <span class="tag read">Very Limited</span>
+      </div>
+      <div class="module-full">
+        <ul>
+          <li class="can">First name and age (no last name displayed in admin)</li>
+          <li class="can">Which family file this child belongs to</li>
+          <li class="can">Whether KidComs is enabled for this child (Y/N)</li>
+          <li class="can">KidComs call count and flagged call count (no content)</li>
+          <li class="cant">Date of birth (not shown in admin — privacy)</li>
+          <li class="cant">Medical information</li>
+          <li class="cant">School information</li>
+          <li class="cant">Any preferences or notes entered by parents</li>
+          <li class="cant">Photo</li>
+          <li class="note">Children's data is the most protected. Admin can verify that KidComs is set up and whether there have been safety events — nothing else.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ S3: REPORT VERIFICATION ═══════════ -->
+<section id="s3">
+  <div class="sec-eye">03 — Report Verification</div>
+  <h2 class="sec-title">"They Said a Report Was Wrong" — How to Verify</h2>
+  <p class="sec-intro">The most common support scenario for reports: a parent or attorney says a report was generated, something was wrong, or they can't find their download. You don't need to see the report contents to resolve this. The audit trail tells you exactly what happened.</p>
+
+  <div class="alert teal">
+    <div class="alert-icon">✓</div>
+    <p><strong>The key principle:</strong> You can verify that a report was generated, when it was generated, what it contained in terms of metadata (date range, case ID, type, page count), whether it was downloaded, and what the SHA-256 hash was. You cannot open the report or read its contents. That's enough to resolve every common report support issue.</p>
+  </div>
+
+  <div class="module" style="margin-top:20px;">
+    <div class="module-header">
+      <div><div class="module-title">Report Audit View</div><div class="module-subtitle">Look up any report ever generated on the platform</div></div>
+      <span class="tag read">Metadata Only</span>
+    </div>
+    <div class="module-body">
+      <div class="module-col">
+        <div class="module-col-label">What You Can See Per Report</div>
+        <ul>
+          <li class="can">Report ID (system-generated UUID)</li>
+          <li class="can">Report type (e.g., "P-6 · Court Evidence Package")</li>
+          <li class="can">Generated by (user name + role)</li>
+          <li class="can">Generated at (exact timestamp)</li>
+          <li class="can">Family file / case ID this report covers</li>
+          <li class="can">Date range the report covers</li>
+          <li class="can">Format (PDF / Word / JSON)</li>
+          <li class="can">Page count</li>
+          <li class="can">SHA-256 hash of the output file</li>
+          <li class="can">First downloaded at (timestamp + IP city)</li>
+          <li class="can">Total download count</li>
+          <li class="can">Last downloaded at</li>
+          <li class="can">Signed URL expiry date (when the download link expires)</li>
+          <li class="can">Tier required vs. user's tier at time of generation (confirms they had access)</li>
+          <li class="can">Payment verified at time of generation (Y/N)</li>
+        </ul>
+      </div>
+      <div class="module-col">
+        <div class="module-col-label">Common Support Scenarios + Resolutions</div>
+        <ul>
+          <li class="note"><strong>"I ran the report but can't download it"</strong> — Look up report by user. Check signed URL expiry. If expired, generate a new download link (admin action, logged). If never downloaded, confirm report completed. Check job_status field.</li>
+          <li class="note"><strong>"The report was wrong / missing data"</strong> — Check report metadata: date range, sections included, case ID. Verify that the case had activity in the date range. If data was missing from the source (e.g., exchanges not logged), show user what data existed at time of generation. Cannot regenerate with different content — the hash proves what the report said.</li>
+          <li class="note"><strong>"I paid for Complete but the report said I need to upgrade"</strong> — Check user's subscription tier at report generation timestamp. Check payment status at that time. If the user was on Complete and the system still blocked them, escalate to engineering with the report ID and user ID.</li>
+          <li class="note"><strong>"The attorney says the SHA-256 doesn't verify"</strong> — Look up the report, copy the stored hash from the audit record, and provide it to the attorney to compare against the PDF. If they match, the PDF is authentic. If they don't, escalate immediately — this is a data integrity event.</li>
+          <li class="action">Actions: Generate new signed download URL · Confirm report metadata · Look up payment status at time of generation · Escalate to engineering with report ID · Create support ticket linked to report</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" style="margin-top:16px;">
+    <div class="screen-bar">
+      <div class="screen-dots"><div class="screen-dot" style="background:#ff5f57;"></div><div class="screen-dot" style="background:#ffbd2e;"></div><div class="screen-dot" style="background:#28c840;"></div></div>
+      <span class="screen-title">Report Audit — User: Sarah M. · admin.find-commonground.com/reports/audit?user=uuid</span>
+    </div>
+    <div class="screen-body">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div style="font-size:14px;color:var(--white);font-weight:500;">Sarah M. · 6 reports generated</div>
+        <div style="display:flex;gap:8px;">
+          <div style="background:rgba(255,255,255,0.05);border-radius:6px;padding:5px 12px;font-size:11px;color:var(--text-dim);">Filter: All Types ▾</div>
+          <div style="background:rgba(255,255,255,0.05);border-radius:6px;padding:5px 12px;font-size:11px;color:var(--text-dim);">Last 90 days ▾</div>
+        </div>
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.06);">
+          <th style="text-align:left;padding:6px 10px;color:var(--slate);font-size:9px;letter-spacing:2px;text-transform:uppercase;">Report Type</th>
+          <th style="text-align:left;padding:6px 10px;color:var(--slate);font-size:9px;letter-spacing:2px;text-transform:uppercase;">Generated</th>
+          <th style="text-align:left;padding:6px 10px;color:var(--slate);font-size:9px;letter-spacing:2px;text-transform:uppercase;">Date Range</th>
+          <th style="text-align:left;padding:6px 10px;color:var(--slate);font-size:9px;letter-spacing:2px;text-transform:uppercase;">SHA-256</th>
+          <th style="text-align:left;padding:6px 10px;color:var(--slate);font-size:9px;letter-spacing:2px;text-transform:uppercase;">Downloaded</th>
+          <th style="padding:6px 10px;"></th>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.03);">
+          <td style="padding:8px 10px;color:var(--text);">P-6 · Court Evidence Package</td>
+          <td style="padding:8px 10px;color:var(--text-dim);">Mar 10, 2026 2:14 PM</td>
+          <td style="padding:8px 10px;color:var(--text-dim);">Jan 1 – Mar 10</td>
+          <td style="padding:8px 10px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--yellow);">7f3a9c2b...</td>
+          <td style="padding:8px 10px;"><span style="color:var(--teal);font-size:11px;">✓ 3x · Last: Mar 11</span></td>
+          <td style="padding:8px 10px;"><span style="background:rgba(45,106,143,0.15);color:var(--blue-lt);padding:2px 8px;border-radius:4px;font-size:10px;cursor:pointer;">View Details</span></td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.03);">
+          <td style="padding:8px 10px;color:var(--text);">P-2 · Monthly Insight</td>
+          <td style="padding:8px 10px;color:var(--text-dim);">Mar 1, 2026 12:00 AM</td>
+          <td style="padding:8px 10px;color:var(--text-dim);">February 2026</td>
+          <td style="padding:8px 10px;color:var(--slate);font-size:11px;">N/A</td>
+          <td style="padding:8px 10px;"><span style="color:var(--teal);font-size:11px;">✓ 1x · Mar 1</span></td>
+          <td style="padding:8px 10px;"><span style="background:rgba(45,106,143,0.15);color:var(--blue-lt);padding:2px 8px;border-radius:4px;font-size:10px;cursor:pointer;">View Details</span></td>
+        </tr>
+        <tr>
+          <td style="padding:8px 10px;color:var(--text);">P-4 · Custody Analytics</td>
+          <td style="padding:8px 10px;color:var(--text-dim);">Feb 28, 2026 4:32 PM</td>
+          <td style="padding:8px 10px;color:var(--text-dim);">Dec 1 – Feb 28</td>
+          <td style="padding:8px 10px;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--yellow);">c2b9a1...</td>
+          <td style="padding:8px 10px;"><span style="color:var(--orange);font-size:11px;">✗ Never downloaded</span></td>
+          <td style="padding:8px 10px;"><span style="background:rgba(61,170,138,0.12);color:var(--teal);padding:2px 8px;border-radius:4px;font-size:10px;cursor:pointer;">Resend Link</span></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ S4: SUPPORT TICKETS ═══════════ -->
+<section id="s4">
+  <div class="sec-eye">04 — Support Tickets</div>
+  <h2 class="sec-title">Creating, Managing, and Resolving Issues</h2>
+  <p class="sec-intro">Every support interaction goes through a ticket. Tickets can be created by users (in-app), by you on behalf of a user, or auto-generated by platform alerts (e.g., failed payment, flagged KidComs call). Every ticket is linked to a user, has a priority level, and has a full internal conversation thread that's never visible to the user.</p>
+
+  <div class="two-col">
+    <div class="module">
+      <div class="module-header">
+        <div><div class="module-title">Ticket Fields</div><div class="module-subtitle">What every support ticket contains</div></div>
+      </div>
+      <div class="module-full">
+        <ul>
+          <li class="can"><strong>Ticket ID:</strong> Auto-generated (TKT-XXXXX) — referenceable</li>
+          <li class="can"><strong>Created by:</strong> User self-service / Admin on behalf / System auto-generated</li>
+          <li class="can"><strong>Created at:</strong> Timestamp</li>
+          <li class="can"><strong>User:</strong> Name, email, tier, role — linked to their full user profile</li>
+          <li class="can"><strong>Category:</strong> Billing · Report Issue · Account Access · KidComs · ARIA · General · Feature Request · Bug Report</li>
+          <li class="can"><strong>Priority:</strong> High (response SLA: 4hrs) · Medium (24hrs) · Low (48hrs)</li>
+          <li class="can"><strong>Status:</strong> Open · In Progress · Waiting on User · Escalated · Resolved · Closed</li>
+          <li class="can"><strong>Assigned to:</strong> Admin team member handling it</li>
+          <li class="can"><strong>User-facing thread:</strong> Messages visible to the user</li>
+          <li class="can"><strong>Internal notes:</strong> Admin-only notes — never shown to user</li>
+          <li class="can"><strong>Related records:</strong> Link to report ID, transaction ID, case ID, or event that prompted the ticket</li>
+          <li class="can"><strong>Resolution summary:</strong> What was done to resolve it (populated on close)</li>
+          <li class="can"><strong>Time to first response / Time to resolve:</strong> Auto-calculated</li>
+          <li class="action">Actions: Reply to user · Add internal note · Change priority · Change status · Escalate to engineering · Link to related record · Assign to team member · Close ticket</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="screen">
+        <div class="screen-bar">
+          <div class="screen-dots"><div class="screen-dot" style="background:#ff5f57;"></div><div class="screen-dot" style="background:#ffbd2e;"></div><div class="screen-dot" style="background:#28c840;"></div></div>
+          <span class="screen-title">Support Queue · admin.find-commonground.com/tickets</span>
+        </div>
+        <div class="screen-body">
+          <div class="ticket">
+            <div class="ticket-top">
+              <div>
+                <div class="ticket-id">TKT-00412</div>
+                <div class="ticket-title">Court report not showing GPS exchange data</div>
+              </div>
+              <span class="ticket-priority priority-high">High</span>
+            </div>
+            <div class="ticket-meta">Sarah M. · Complete Plan · Opened 2 hrs ago · Unassigned · <span style="color:var(--orange);">SLA: 2 hrs remaining</span></div>
+          </div>
+          <div class="ticket">
+            <div class="ticket-top">
+              <div>
+                <div class="ticket-id">TKT-00411</div>
+                <div class="ticket-title">Attorney portal showing 0% compliance for all cases</div>
+              </div>
+              <span class="ticket-priority priority-high">High</span>
+            </div>
+            <div class="ticket-meta">Marcus Chen, Esq. · Small Firm · Opened 5 hrs ago · Assigned: You · <span style="color:var(--red);">SLA: Breached</span></div>
+          </div>
+          <div class="ticket">
+            <div class="ticket-top">
+              <div>
+                <div class="ticket-id">TKT-00410</div>
+                <div class="ticket-title">How do I invite my co-parent to the platform?</div>
+              </div>
+              <span class="ticket-priority priority-low">Low</span>
+            </div>
+            <div class="ticket-meta">David W. · Plus Plan · Opened 1 day ago · Assigned: You · In Progress</div>
+          </div>
+          <div class="ticket">
+            <div class="ticket-top">
+              <div>
+                <div class="ticket-id">TKT-00409 · AUTO</div>
+                <div class="ticket-title">Payment failed — Visa ending 4242</div>
+              </div>
+              <span class="ticket-priority priority-medium">Medium</span>
+            </div>
+            <div class="ticket-meta">Jennifer R. · Complete Plan · Auto-generated · Waiting on User · 3 days open</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px;">
+        <h4>Auto-Generated Tickets (System Creates These)</h4>
+        <ul style="list-style:none;font-size:12.5px;color:var(--text-dim);">
+          <li style="padding:3px 0;">• Failed payment — after 1st failed charge attempt</li>
+          <li style="padding:3px 0;">• KidComs flagged call — needs admin review (metadata only)</li>
+          <li style="padding:3px 0;">• Report generation failed — job errored out</li>
+          <li style="padding:3px 0;">• Invitation bounced — bad email address</li>
+          <li style="padding:3px 0;">• Safety event logged — any audit_log safety_event type</li>
+          <li style="padding:3px 0;">• Subscription cancellation — trigger to offer retention</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ESCALATION PATHS -->
+  <div class="module" style="margin-top:20px;">
+    <div class="module-header">
+      <div><div class="module-title">Escalation Paths</div><div class="module-subtitle">When and how to escalate beyond the admin portal</div></div>
+    </div>
+    <div class="module-full">
+      <table class="main">
+        <tr>
+          <th>Scenario</th>
+          <th>Escalate To</th>
+          <th>What To Include</th>
+          <th>Timeline</th>
+        </tr>
+        <tr>
+          <td><strong>Report data integrity concern</strong> (SHA-256 mismatch)</td>
+          <td>Engineering + Legal immediately</td>
+          <td>Report ID, stored hash, user ID, timeline</td>
+          <td>Immediate — this is a P0</td>
+        </tr>
+        <tr>
+          <td><strong>Request to see message content</strong> for support</td>
+          <td>Legal / Compliance review</td>
+          <td>Ticket ID, user ID, specific legal reason</td>
+          <td>Do not access without legal approval</td>
+        </tr>
+        <tr>
+          <td><strong>Safety threat — user reported harm</strong></td>
+          <td>Legal + Safety team</td>
+          <td>User ID, ticket ID, exact report from user</td>
+          <td>Immediate — suspend account if risk clear</td>
+        </tr>
+        <tr>
+          <td><strong>ARIA outage or incorrect behavior</strong></td>
+          <td>Engineering</td>
+          <td>Affected user IDs, time window, behavior description</td>
+          <td>Same business day</td>
+        </tr>
+        <tr>
+          <td><strong>Stripe payment dispute / chargeback</strong></td>
+          <td>Finance + Stripe dashboard</td>
+          <td>Transaction ID, user ID, dispute reason</td>
+          <td>Within 24 hours (Stripe deadline)</td>
+        </tr>
+        <tr>
+          <td><strong>Court subpoena for user data</strong></td>
+          <td>Legal counsel — do not respond directly</td>
+          <td>Subpoena document, user ID if identifiable</td>
+          <td>Do not act without legal instruction</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ S5: BILLING ═══════════ -->
+<section id="s5">
+  <div class="sec-eye">05 — Billing + Subscriptions</div>
+  <h2 class="sec-title">Payments, Refunds, Plan Changes, and Disputes</h2>
+  <p class="sec-intro">The billing section surfaces Stripe data in plain-English format — no Stripe dashboard access needed for routine support. You can see every transaction, verify every charge, issue a refund, apply a credit, or change a user's plan from here.</p>
+
+  <div class="module">
+    <div class="module-header">
+      <div><div class="module-title">Billing Actions Available</div><div class="module-subtitle">All Stripe operations surfaced in plain language</div></div>
+      <span class="tag write">Write Access</span>
+    </div>
+    <div class="module-body">
+      <div class="module-col">
+        <div class="module-col-label">What You Can See</div>
+        <ul>
+          <li class="can">Current plan, billing cycle, next charge date and amount</li>
+          <li class="can">Full payment history — every successful charge with date, amount, card used</li>
+          <li class="can">Failed payments — date, amount, failure reason (card declined / insufficient funds / etc.)</li>
+          <li class="can">Refund history — who issued, when, amount, reason</li>
+          <li class="can">Active credits on account — amount and expiry</li>
+          <li class="can">Stripe customer ID (for Stripe dashboard cross-reference)</li>
+          <li class="can">Stripe subscription ID</li>
+          <li class="can">Trial status — active trial, trial end date, trial used (Y/N per account)</li>
+          <li class="can">Coupon / discount codes applied</li>
+          <li class="can">Grant code applied (nonprofit) — code, partner, expiry</li>
+          <li class="can">Annual vs. monthly billing indicator</li>
+          <li class="can">Churned — when they cancelled, which plan, how long they were a customer</li>
+        </ul>
+      </div>
+      <div class="module-col">
+        <div class="module-col-label">Actions (All Logged)</div>
+        <ul>
+          <li class="action"><strong>Issue refund</strong> — select amount (partial or full), require reason field, confirmation step. Triggers Stripe refund automatically. Logged with admin ID + reason.</li>
+          <li class="action"><strong>Apply credit</strong> — add dollar amount credit to account with expiry date and reason. Shows in user's billing view as "Account Credit."</li>
+          <li class="action"><strong>Change plan</strong> — upgrade or downgrade, effective immediately or next cycle. Requires reason. User receives an email notification.</li>
+          <li class="action"><strong>Cancel subscription</strong> — immediate or end-of-period. Requires reason + confirmation. Cannot be undone.</li>
+          <li class="action"><strong>Extend trial</strong> — add N days to a trial period. Logged with reason. Max 30 days extension per request.</li>
+          <li class="action"><strong>Waive failed payment fee</strong> — if a failed payment triggered a penalty, waive it. Requires reason.</li>
+          <li class="action"><strong>Apply grant code</strong> — manually apply a nonprofit grant code to an account. For cases where user lost their code.</li>
+          <li class="note">All billing actions send an email to the user automatically. The email says what changed and that it was done by CommonGround support at their request (or notes if admin-initiated).</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ S6: KIDCOMS OVERSIGHT ═══════════ -->
+<section id="s6">
+  <div class="sec-eye">06 — KidComs Oversight</div>
+  <h2 class="sec-title">Flagged Calls — Metadata Review Only</h2>
+  <p class="sec-intro">When the KidComs AI moderation flags a call, it creates a record in the system and generates an auto-ticket. Your job is to review the metadata of the flag — not the call content — and determine if any action is needed. If the flag indicates a genuine safety concern, you escalate to legal. You do not access call audio or video from the admin portal.</p>
+
+  <div class="alert red">
+    <div class="alert-icon">⚠</div>
+    <p><strong>Admin does NOT have access to KidComs call audio, video, or transcripts from this portal.</strong> Accessing call content requires a formal legal process (court subpoena or both parents' written consent). The metadata review described below is sufficient to determine whether an escalation is warranted without accessing the content itself.</p>
+  </div>
+
+  <div class="module" style="margin-top:16px;">
+    <div class="module-header">
+      <div><div class="module-title">KidComs Flagged Event Review</div><div class="module-subtitle">What you see and what you can do</div></div>
+      <span class="tag read">Metadata Only</span>
+    </div>
+    <div class="module-body">
+      <div class="module-col">
+        <div class="module-col-label">Flag Metadata (Visible)</div>
+        <ul>
+          <li class="can">Call date and time</li>
+          <li class="can">Call duration (total and duration of flagged segment)</li>
+          <li class="can">Participants: which child, which parent/Circle contact was on each end</li>
+          <li class="can">Flag type: inappropriate_content · hostile_language · third_party_interference · child_distress · safety_concern</li>
+          <li class="can">Flag severity: 1 (informational) · 2 (review needed) · 3 (urgent) · 4 (immediate action)</li>
+          <li class="can">AI confidence score on the flag (0–100%)</li>
+          <li class="can">Timestamp within the call where flag occurred (e.g., "4 min 22 sec into call")</li>
+          <li class="can">Whether parents were notified automatically (Y/N)</li>
+          <li class="can">Whether an evidence clip was extracted and SHA-256 hashed (Y/N)</li>
+          <li class="can">Review status: Pending · Admin Reviewed · Escalated · Cleared</li>
+        </ul>
+      </div>
+      <div class="module-col">
+        <div class="module-col-label">Review Actions</div>
+        <ul>
+          <li class="action"><strong>Mark as Reviewed — Cleared:</strong> Flag was reviewed based on metadata and context; no action needed. Add note explaining why. Both parents notified that the flag was reviewed and cleared.</li>
+          <li class="action"><strong>Mark as Reviewed — Action Needed:</strong> Flag warrants follow-up. Creates or links to a support ticket. Admin can contact the relevant parent directly.</li>
+          <li class="action"><strong>Escalate to Legal:</strong> Flag severity 3–4 or any flag involving child_distress or safety_concern. Triggers formal escalation. Admin cannot access the evidence clip — legal team coordinates with law enforcement if needed.</li>
+          <li class="action"><strong>Notify Parent(s):</strong> Send a notification to one or both parents about the flag. Use standardized language: "A KidComs session on [date] was flagged by our AI moderation system. Our team has reviewed the event and [action taken]."</li>
+          <li class="action"><strong>Suspend KidComs for this case:</strong> Emergency action — disables KidComs calls for the family file while investigation is in progress. Both parents are notified.</li>
+          <li class="cant">Access or play the evidence clip</li>
+          <li class="cant">See the content of what was said</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ S7: GRANT + PARTNER CODES ═══════════ -->
+<section id="s7">
+  <div class="sec-eye">07 — Grant + Partner Codes</div>
+  <h2 class="sec-title">Nonprofit Partner Management and Grant Code Operations</h2>
+  <p class="sec-intro">Manage the nonprofit grant program from here — create partner organizations, issue grant codes, track activation, and monitor the impact data that goes back to nonprofit partners. This is also where you manage any manual code issues (user lost their code, code expired prematurely, etc.).</p>
+
+  <div class="module">
+    <div class="module-header">
+      <div><div class="module-title">Partner + Grant Code Management</div></div>
+      <span class="tag write">Full Access</span>
+    </div>
+    <div class="module-body">
+      <div class="module-col">
+        <div class="module-col-label">What You Can Manage</div>
+        <ul>
+          <li class="can"><strong>Create new partner organization</strong> — name, contact, partner slug, branding, grant tier (Plus or Complete), number of codes allocated</li>
+          <li class="can"><strong>Issue grant code batch</strong> — generate N codes for a partner, set expiry date, set tier</li>
+          <li class="can"><strong>View all codes for a partner</strong> — each code: status (issued/activated/expired), activation date, anonymous user ID</li>
+          <li class="can"><strong>Manually apply a code</strong> — if a user lost their code, apply it directly to their account from the admin side. Logged.</li>
+          <li class="can"><strong>Extend a code</strong> — if a code expiry was set incorrectly or partner needs an extension, extend the duration</li>
+          <li class="can"><strong>Deactivate a partner</strong> — stops new code activations (doesn't revoke existing active codes)</li>
+          <li class="can"><strong>Export partner impact report</strong> — same as the nonprofit partner dashboard report, exportable as PDF for sending to the partner</li>
+          <li class="can"><strong>Partner contact management</strong> — update contact info, add staff members, adjust branding</li>
+        </ul>
+      </div>
+      <div class="module-col">
+        <div class="module-col-label">Grant Code Metrics per Partner</div>
+        <ul>
+          <li class="can">Total codes issued vs. activated vs. expired</li>
+          <li class="can">Activation rate %</li>
+          <li class="can">Active users (currently using the platform)</li>
+          <li class="can">Average days to activation (how long after code issue did users activate?)</li>
+          <li class="can">Platform engagement: messages sent (count), exchanges logged (count), expenses tracked (count) — aggregate, no individual data</li>
+          <li class="can">Conflict trend: ARIA flag rate change since activation (aggregate)</li>
+          <li class="can">Post-grant conversion: how many users converted to paid after grant expired</li>
+          <li class="cant">Individual user identities (all anonymous in partner view)</li>
+          <li class="cant">Message content</li>
+          <li class="cant">Individual financial information</li>
+          <li class="note">The anonymization map is accessible to admin for support purposes (e.g., looking up a specific user who contacted support and used a grant code) but the partner organization itself never sees real names</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ S8: PLATFORM OPERATIONS ═══════════ -->
+<section id="s8">
+  <div class="sec-eye">08 — Platform Operations</div>
+  <h2 class="sec-title">System-Level Controls for a Non-Technical Operator</h2>
+  <p class="sec-intro">The operational controls that don't require engineering to execute — maintenance notices, user communications, feature flags, and account-level overrides. These are the levers a customer success manager or operations lead would need day-to-day.</p>
+
+  <div class="three-col">
+    <div class="module">
+      <div class="module-header" style="flex-direction:column;gap:6px;">
+        <div class="module-title">Communications</div>
+        <div class="module-subtitle">Reach users on the platform</div>
+      </div>
+      <div class="module-full">
+        <ul>
+          <li class="action"><strong>Platform-wide announcement banner</strong> — appears at top of app for all users. Set text, duration, type (info/warning/maintenance). No engineering needed.</li>
+          <li class="action"><strong>Send in-app notification to a user</strong> — custom message to any user, logged with reason</li>
+          <li class="action"><strong>Send email to a user</strong> — uses SendGrid, from support@find-commonground.com, logged</li>
+          <li class="action"><strong>Send email to a user segment</strong> — "all Plus users in LA County" or "all attorneys who haven't activated an intake in 30 days"</li>
+          <li class="action"><strong>Maintenance window notice</strong> — schedule a downtime notice to appear in-app 24hrs before</li>
+          <li class="note">All communications sent from the admin portal are logged with the sending admin, recipient(s), and timestamp. Users can see their notification history in their account.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="module">
+      <div class="module-header" style="flex-direction:column;gap:6px;">
+        <div class="module-title">Account Controls</div>
+        <div class="module-subtitle">User-level overrides and safety actions</div>
+      </div>
+      <div class="module-full">
+        <ul>
+          <li class="action"><strong>Suspend account</strong> — blocks login immediately. User sees "Your account has been temporarily suspended. Contact support." Requires reason + confirmation. Reversible.</li>
+          <li class="action"><strong>Unsuspend account</strong> — restore access. Logged with reason.</li>
+          <li class="action"><strong>Force password reset</strong> — next login requires new password. Used when account compromise suspected.</li>
+          <li class="action"><strong>Revoke all active sessions</strong> — logs user out of all devices immediately. Used for security events.</li>
+          <li class="action"><strong>Delete account (GDPR)</strong> — permanent. Multi-step confirmation. Logs deletion in compliance record. Cannot be undone. Legal review required before execution.</li>
+          <li class="action"><strong>Add account flag / warning</strong> — internal note visible to all admins on this user's profile. Not visible to user. Example: "User has disputed 3 charges — require manager approval for future refunds."</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="module">
+      <div class="module-header" style="flex-direction:column;gap:6px;">
+        <div class="module-title">Feature Flags (Non-Technical)</div>
+        <div class="module-subtitle">Toggle features per user or tier</div>
+      </div>
+      <div class="module-full">
+        <ul>
+          <li class="action"><strong>Enable/disable KidComs for a family file</strong> — emergency toggle for safety situations</li>
+          <li class="action"><strong>Override tier feature access</strong> — grant a Free user temporary Plus features for support investigation or goodwill. Time-limited, logged.</li>
+          <li class="action"><strong>Enable/disable ARIA for a specific case</strong> — in the rare case ARIA is behaving incorrectly for a specific case, disable it while engineering investigates</li>
+          <li class="action"><strong>Unlock report generation</strong> — if a report failed due to a system error and user is on the correct tier, unlock manual regeneration</li>
+          <li class="note">Feature flag changes are time-limited (max 30 days) and require a reason and an associated ticket ID. They expire automatically and send an alert when they do.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ S9: ADMIN AUDIT LOG ═══════════ -->
+<section id="s9">
+  <div class="sec-eye">09 — Admin Audit Log</div>
+  <h2 class="sec-title">Every Admin Action is Recorded</h2>
+  <p class="sec-intro">The admin audit log is the record of everything done from this portal. It cannot be deleted, filtered out, or modified. Every admin sees their own log and superusers see all admin logs. This is what you'd produce if a user ever asked "why was my account suspended?" or "did anyone from CommonGround access my account?"</p>
+
+  <div class="module">
+    <div class="module-header">
+      <div><div class="module-title">Admin Audit Log — Fields + View</div></div>
+      <span class="tag never">Never Deletable</span>
+    </div>
+    <div class="module-body">
+      <div class="module-col">
+        <div class="module-col-label">Every Audit Entry Contains</div>
+        <ul>
+          <li class="can">Admin user ID and display name</li>
+          <li class="can">Action type (e.g., "issued_refund", "suspended_account", "viewed_user_profile", "generated_download_link")</li>
+          <li class="can">Target entity type and ID (user_id, case_id, ticket_id, report_id, etc.)</li>
+          <li class="can">Target entity display name (e.g., "Sarah M." — for human readability)</li>
+          <li class="can">Before state (for changes — e.g., previous plan tier)</li>
+          <li class="can">After state (e.g., new plan tier)</li>
+          <li class="can">Reason field (required for all write actions — free text, min 10 chars)</li>
+          <li class="can">Associated ticket ID (if action was taken in context of a support ticket)</li>
+          <li class="can">IP address of admin at time of action</li>
+          <li class="can">Timestamp (UTC)</li>
+          <li class="note">Read actions (viewing a user profile, looking up a report) are logged at the "info" level. Write actions (refunds, suspensions, plan changes) are logged at "action" level with before/after state. Destructive actions (deletions, permanent changes) are logged at "critical" level with a confirmation hash.</li>
+        </ul>
+      </div>
+      <div class="module-col">
+        <div class="module-col-label">Actions That Require a Reason Field</div>
+        <ul>
+          <li class="action">Issuing a refund</li>
+          <li class="action">Applying an account credit</li>
+          <li class="action">Changing a user's subscription plan</li>
+          <li class="action">Suspending an account</li>
+          <li class="action">Unsuspending an account</li>
+          <li class="action">Deleting an account</li>
+          <li class="action">Extending a trial period</li>
+          <li class="action">Impersonating a user session (requires reason + manager approval)</li>
+          <li class="action">Generating a new download link for a report</li>
+          <li class="action">Disabling KidComs for a case</li>
+          <li class="action">Applying a grant code manually</li>
+          <li class="action">Revoking all user sessions</li>
+          <li class="action">Sending a bulk email to a user segment</li>
+          <li class="note">Reason fields are permanent. They cannot be edited after submission. Think before typing.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="highlight" style="margin-top:20px;">
+    <h3>The One Rule That Governs This Entire Portal</h3>
+    <p>If you ever ask yourself "can I look at this to help a user?" — the answer is almost certainly yes, and the system is designed to let you do it. If you ever ask yourself "should I look at this?" — that's a different question. The audit log means you should never look at anything you wouldn't be comfortable explaining in a support ticket note, to a user, or to a regulator. The portal gives you significant access. The audit log ensures that access is always accountable.</p>
+  </div>
+
+  <!-- ADMIN ROLES -->
+  <div class="divider">
+    <div class="divider-line"></div>
+    <div class="divider-label">Admin Role Tiers</div>
+    <div class="divider-line"></div>
+  </div>
+
+  <table class="main">
+    <tr>
+      <th>Role</th>
+      <th>Access Level</th>
+      <th>Can Issue Refunds</th>
+      <th>Can Suspend Accounts</th>
+      <th>Can Delete Accounts</th>
+      <th>Can See All Admin Audit Logs</th>
+    </tr>
+    <tr>
+      <td><strong>Support Agent</strong></td>
+      <td>View user profiles, create/respond to tickets, view report metadata</td>
+      <td>Up to $50</td>
+      <td>No — must escalate</td>
+      <td>No</td>
+      <td>Own logs only</td>
+    </tr>
+    <tr>
+      <td><strong>Customer Success Manager</strong></td>
+      <td>All Support Agent access + billing changes, plan changes, grant codes</td>
+      <td>Up to $200</td>
+      <td>Yes — with reason</td>
+      <td>No</td>
+      <td>Own logs only</td>
+    </tr>
+    <tr>
+      <td><strong>Operations Lead</strong></td>
+      <td>All CSM access + feature flags, bulk communications, partner management</td>
+      <td>Unlimited</td>
+      <td>Yes</td>
+      <td>Requires co-approval</td>
+      <td>All admin logs</td>
+    </tr>
+    <tr>
+      <td><strong>Super Admin (Owner)</strong></td>
+      <td>Full access to all modules. Can create/remove admin users.</td>
+      <td>Unlimited</td>
+      <td>Yes</td>
+      <td>Yes — with legal confirmation</td>
+      <td>All logs including system logs</td>
+    </tr>
+  </table>
+
+  <div class="alert admin" style="margin-top:20px;">
+    <div class="alert-icon">⚡</div>
+    <p><strong>MFA is mandatory for all admin roles.</strong> TOTP (time-based one-time password) required on every login — no exceptions, no bypass. Admin sessions expire after 4 hours of inactivity. Admin accounts cannot be accessed via the mobile app — desktop browser only. Any admin login from a new IP triggers an email confirmation before the session is active.</p>
+  </div>
+</section>
+
+<footer>
+  <p>CommonGround · Super Admin Portal Specification · March 2026</p>
+  <p style="color:var(--admin);">9 Modules · Full Operations Access · Every Action Logged · Privacy Boundaries Enforced</p>
+</footer>
+</body>
+</html>

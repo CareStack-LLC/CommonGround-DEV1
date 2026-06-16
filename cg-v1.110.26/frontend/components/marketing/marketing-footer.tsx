@@ -59,7 +59,7 @@ function Logo() {
   return (
     <Link href="/" className="flex items-center">
       <span className="text-xl text-foreground" style={{ fontFamily: "var(--font-dm-serif-display), Georgia, serif" }}>
-        <span className="font-bold">Common</span><span className="font-normal text-[#3DAA8A]">Ground</span>
+        <span className="font-bold">Common</span><span className="font-normal text-cg-sage">Ground</span>
       </span>
     </Link>
   );

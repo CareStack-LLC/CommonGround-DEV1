@@ -15,6 +15,29 @@ depends_on = None
 
 
 def upgrade() -> None:
+    # blog_posts was historically created out-of-band (inline DDL on prod).
+    # Create it here when missing so fresh databases can satisfy the FK.
+    op.execute("""
+        CREATE TABLE IF NOT EXISTS blog_posts (
+            id VARCHAR(36) PRIMARY KEY,
+            created_at TIMESTAMP NOT NULL DEFAULT now(),
+            updated_at TIMESTAMP NOT NULL DEFAULT now(),
+            title VARCHAR(500) NOT NULL,
+            slug VARCHAR(500) NOT NULL UNIQUE,
+            content TEXT NOT NULL,
+            excerpt VARCHAR(1000) NOT NULL,
+            author VARCHAR(200) NOT NULL DEFAULT 'CommonGround Team',
+            category VARCHAR(100) NOT NULL,
+            tags JSON NOT NULL DEFAULT '[]',
+            featured_image_url VARCHAR(2048),
+            status VARCHAR(20) NOT NULL DEFAULT 'draft',
+            published_at TIMESTAMP,
+            seo_title VARCHAR(200),
+            seo_description VARCHAR(500)
+        )
+    """)
+    op.execute("CREATE INDEX IF NOT EXISTS ix_blog_posts_slug ON blog_posts (slug)")
+
     op.create_table(
         'blog_marketing_content',
         sa.Column('id', sa.String(36), primary_key=True),

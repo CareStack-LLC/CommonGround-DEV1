@@ -5,7 +5,7 @@ export { EarlyAdopterForm } from './early-adopter-form';
 export { InlineNewsletterCta } from './inline-newsletter-cta';
 export { ProfessionalInterestForm } from './professional-interest-form';
 export { ImagePlaceholder } from './image-placeholder';
-export { JsonLd } from './json-ld';
+export { JsonLd, BreadcrumbJsonLd } from './json-ld';
 
 // — Primitives
 export { SectionHeading } from './primitives/section-heading';
@@ -16,6 +16,8 @@ export { CtaBand } from './primitives/cta-band';
 export { TrustBar } from './primitives/trust-bar';
 export { ComparisonTable } from './primitives/comparison-table';
 export { StatCounter } from './primitives/stat-counter';
+export { DecorativeRules } from './primitives/decorative-rules';
+export { ctaPrimaryClasses, ctaSecondaryClasses } from './primitives/cta-button';
 
 // — Structured data
 export { FaqJsonLd } from './faq-json-ld';

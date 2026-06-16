@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CommonGround — KidSpace + ARIA Complete Architecture</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --navy:    #0D1B24;
+  --navy-2:  #162530;
+  --navy-3:  #1E3A4A;
+  --teal:    #3DAA8A;
+  --teal-lt: #5BC4A0;
+  --blue:    #2D6A8F;
+  --blue-lt: #4BA8C8;
+  --gold:    #F5A623;
+  --slate:   #3A5668;
+  --text:    #CBD8E0;
+  --text-dim:#7A9CAD;
+  --white:   #FFFFFF;
+  --red:     #E05353;
+  --orange:  #E08C2A;
+  --yellow:  #D4B84A;
+  --purple:  #7B5EA7;
+  --kids:    #F472B6;
+  --kids-2:  #A78BFA;
+  --kids-3:  #34D399;
+  --aria:    #F59E0B;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { background:var(--navy); color:var(--text); font-family:'DM Sans',sans-serif; font-size:14px; line-height:1.7; }
+
+/* COVER */
+.cover { min-height:82vh; display:flex; flex-direction:column; justify-content:center; padding:72px 72px; border-bottom:1px solid rgba(244,114,182,0.15); position:relative; overflow:hidden; background:linear-gradient(148deg,#0D1B24 0%,#162530 50%,#1c2535 100%); }
+.cover::after { content:''; position:absolute; top:-180px; right:-100px; width:600px; height:600px; background:radial-gradient(circle,rgba(167,139,250,0.07) 0%,transparent 60%); pointer-events:none; }
+.cover::before { content:''; position:absolute; bottom:-150px; left:100px; width:500px; height:500px; background:radial-gradient(circle,rgba(244,114,182,0.05) 0%,transparent 60%); pointer-events:none; }
+.eyebrow { font-size:10px; letter-spacing:4px; text-transform:uppercase; color:var(--kids); margin-bottom:16px; }
+.cover h1 { font-family:'DM Serif Display',serif; font-size:52px; line-height:1.08; color:var(--white); margin-bottom:16px; max-width:800px; }
+.cover h1 em { color:var(--kids); font-style:normal; }
+.cover h1 span { color:var(--aria); }
+.cover p { font-size:16px; color:var(--text-dim); max-width:660px; margin-bottom:36px; line-height:1.85; }
+.meta-row { display:flex; gap:44px; flex-wrap:wrap; }
+.meta-item label { display:block; font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--slate); margin-bottom:4px; }
+.meta-item span { font-size:13px; color:var(--text); font-weight:500; }
+
+/* TOC */
+.toc { background:var(--navy-3); border-bottom:1px solid rgba(255,255,255,0.05); padding:20px 72px; display:flex; gap:0; flex-wrap:wrap; }
+.toc a { color:var(--text-dim); text-decoration:none; font-size:11.5px; padding:4px 16px 4px 0; border-right:1px solid rgba(255,255,255,0.05); margin-right:16px; transition:color 0.2s; }
+.toc a:hover { color:var(--kids); }
+.toc a:last-child { border-right:none; }
+.toc-sep { color:var(--slate); font-size:11px; padding:4px 14px 4px 0; margin-right:14px; border-right:2px solid rgba(255,255,255,0.1); }
+
+section { padding:60px 72px; border-bottom:1px solid rgba(255,255,255,0.04); }
+.sec-eye { font-size:9px; letter-spacing:4px; text-transform:uppercase; margin-bottom:11px; }
+.sec-eye.kids  { color:var(--kids); }
+.sec-eye.aria  { color:var(--aria); }
+.sec-eye.blue  { color:var(--blue-lt); }
+.sec-title { font-family:'DM Serif Display',serif; font-size:30px; color:var(--white); margin-bottom:10px; }
+.sec-intro { font-size:15px; color:var(--text-dim); max-width:720px; margin-bottom:32px; line-height:1.85; }
+
+/* PART DIVIDER */
+.part-divider { padding:40px 72px; background:rgba(0,0,0,0.2); border-bottom:1px solid rgba(255,255,255,0.04); border-top:1px solid rgba(255,255,255,0.04); display:flex; align-items:center; gap:24px; }
+.part-num { font-family:'DM Serif Display',serif; font-size:64px; line-height:1; opacity:0.15; color:var(--white); }
+.part-info {}
+.part-label { font-size:10px; letter-spacing:4px; text-transform:uppercase; margin-bottom:4px; }
+.part-title { font-family:'DM Serif Display',serif; font-size:28px; color:var(--white); }
+.part-sub { font-size:14px; color:var(--text-dim); margin-top:4px; }
+
+/* MODULE CARDS */
+.feature-card { background:var(--navy-2); border:1px solid rgba(255,255,255,0.07); border-radius:18px; margin-bottom:20px; overflow:hidden; }
+.fc-header { padding:18px 24px; border-bottom:1px solid rgba(255,255,255,0.06); display:flex; align-items:flex-start; justify-content:space-between; gap:14px; }
+.fc-icon { font-size:28px; flex-shrink:0; }
+.fc-title { font-family:'DM Serif Display',serif; font-size:20px; color:var(--white); margin-bottom:3px; }
+.fc-sub { font-size:13px; color:var(--text-dim); max-width:500px; }
+.fc-body { padding:18px 24px; }
+.fc-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+.fc-grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
+
+/* FEATURE LIST */
+.flist { list-style:none; }
+.flist li { font-size:12.5px; color:var(--text-dim); padding:4px 0; display:flex; gap:8px; align-items:flex-start; border-bottom:1px solid rgba(255,255,255,0.03); line-height:1.45; }
+.flist li:last-child { border-bottom:none; }
+.flist li::before { flex-shrink:0; font-size:10px; margin-top:2px; }
+.flist li.yes::before    { content:'✓'; color:var(--teal); }
+.flist li.note::before   { content:'→'; color:var(--yellow); }
+.flist li.coppa::before  { content:'🔒'; font-size:9px; }
+.flist li.aria::before   { content:'⚡'; color:var(--aria); font-size:9px; }
+.flist li.rule::before   { content:'◆'; color:var(--kids); font-size:8px; margin-top:3px; }
+.flist li.model::before  { content:'◉'; color:var(--blue-lt); font-size:9px; }
+
+/* TAGS */
+.tag { display:inline-flex; align-items:center; padding:3px 9px; border-radius:5px; font-size:10px; font-weight:700; letter-spacing:0.8px; text-transform:uppercase; margin-right:5px; }
+.tag.kids    { background:rgba(244,114,182,0.15); color:var(--kids); border:1px solid rgba(244,114,182,0.25); }
+.tag.aria    { background:rgba(245,158,11,0.15); color:var(--aria); border:1px solid rgba(245,158,11,0.25); }
+.tag.coppa   { background:rgba(224,83,83,0.15); color:var(--red); border:1px solid rgba(224,83,83,0.25); }
+.tag.safe    { background:rgba(61,170,138,0.15); color:var(--teal); }
+.tag.complete{ background:rgba(245,166,35,0.15); color:var(--gold); }
+.tag.rules   { background:rgba(167,139,250,0.15); color:var(--kids-2); }
+.tag.model   { background:rgba(45,106,143,0.15); color:var(--blue-lt); }
+.tag.new     { background:rgba(244,114,182,0.2); color:var(--kids); }
+
+/* ALERT */
+.alert { padding:13px 18px; border-radius:10px; margin:12px 0; display:flex; gap:11px; align-items:flex-start; }
+.alert.kids   { background:rgba(244,114,182,0.07); border:1px solid rgba(244,114,182,0.2); }
+.alert.aria   { background:rgba(245,158,11,0.07); border:1px solid rgba(245,158,11,0.2); }
+.alert.teal   { background:rgba(61,170,138,0.07); border:1px solid rgba(61,170,138,0.2); }
+.alert.red    { background:rgba(224,83,83,0.07); border:1px solid rgba(224,83,83,0.2); }
+.alert.blue   { background:rgba(45,106,143,0.08); border:1px solid rgba(45,106,143,0.22); }
+.alert.rules  { background:rgba(167,139,250,0.07); border:1px solid rgba(167,139,250,0.2); }
+.alert-icon { font-size:13px; flex-shrink:0; margin-top:2px; }
+.alert p { font-size:13px; line-height:1.6; }
+.alert.kids p   { color:var(--kids); }
+.alert.aria p   { color:var(--aria); }
+.alert.teal p   { color:var(--teal-lt); }
+.alert.red p    { color:var(--red); }
+.alert.blue p   { color:var(--blue-lt); }
+.alert.rules p  { color:var(--kids-2); }
+
+/* ARCHITECTURE DIAGRAM */
+.arch-box { background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:20px 22px; margin:12px 0; }
+.arch-title { font-size:10px; letter-spacing:3px; text-transform:uppercase; margin-bottom:12px; font-weight:600; }
+.arch-layer { display:flex; gap:10px; margin-bottom:8px; align-items:stretch; }
+.arch-layer-label { writing-mode:vertical-rl; text-orientation:mixed; font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--slate); flex-shrink:0; display:flex; align-items:center; width:18px; }
+.arch-layer-content { flex:1; display:flex; gap:8px; }
+.arch-cell { flex:1; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:8px; padding:10px 12px; }
+.arch-cell.rules-cell { border-color:rgba(167,139,250,0.3); background:rgba(167,139,250,0.06); }
+.arch-cell.model-cell { border-color:rgba(45,106,143,0.3); background:rgba(45,106,143,0.06); }
+.arch-cell.action-cell { border-color:rgba(245,158,11,0.3); background:rgba(245,158,11,0.06); }
+.arch-cell.audit-cell  { border-color:rgba(61,170,138,0.3); background:rgba(61,170,138,0.06); }
+.arch-cell-name { font-size:11px; font-weight:600; color:var(--white); margin-bottom:3px; }
+.arch-cell-desc { font-size:10px; color:var(--text-dim); line-height:1.4; }
+.arch-arrow { display:flex; align-items:center; justify-content:center; font-size:16px; color:var(--slate); padding:4px 0; }
+
+/* CODE */
+.code-block { background:#080f18; border:1px solid rgba(255,255,255,0.07); border-radius:12px; overflow:hidden; margin:12px 0; }
+.code-header { background:rgba(255,255,255,0.04); padding:8px 16px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.05); }
+.code-lang { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--teal); font-weight:500; }
+.code-file { font-size:11px; color:var(--slate); font-family:'JetBrains Mono',monospace; }
+.code-body { padding:16px 18px; font-family:'JetBrains Mono',monospace; font-size:11.5px; line-height:1.7; color:#a8c0cc; overflow-x:auto; }
+.code-body .kw  { color:var(--teal); }
+.code-body .str { color:var(--gold); }
+.code-body .cm  { color:var(--slate); }
+.code-body .key { color:var(--blue-lt); }
+.code-body .num { color:var(--kids-2); }
+.code-body .cls { color:var(--kids); }
+
+/* TWO/THREE COL */
+.two-col   { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
+.three-col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; margin-bottom:14px; }
+
+/* CARD */
+.card { background:var(--navy-2); border:1px solid rgba(255,255,255,0.06); border-radius:14px; padding:18px 20px; }
+.card h4 { font-size:13px; font-weight:600; color:var(--white); margin-bottom:8px; }
+.card p { font-size:13px; color:var(--text-dim); line-height:1.65; }
+
+/* TABLE */
+table.main { width:100%; border-collapse:collapse; }
+table.main th { text-align:left; font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--slate); padding:9px 13px; border-bottom:1px solid rgba(255,255,255,0.07); }
+table.main td { padding:10px 13px; font-size:12.5px; color:var(--text-dim); border-bottom:1px solid rgba(255,255,255,0.03); vertical-align:top; line-height:1.5; }
+table.main td strong { color:var(--white); font-weight:500; }
+table.main tr:last-child td { border-bottom:none; }
+
+/* HIGHLIGHT */
+.highlight { border-radius:16px; padding:24px 28px; margin:20px 0; }
+.highlight.kids { background:linear-gradient(135deg,rgba(244,114,182,0.08),rgba(167,139,250,0.06)); border:1px solid rgba(244,114,182,0.18); }
+.highlight.aria { background:linear-gradient(135deg,rgba(245,158,11,0.08),rgba(45,106,143,0.06)); border:1px solid rgba(245,158,11,0.18); }
+.highlight h3 { font-family:'DM Serif Display',serif; font-size:20px; color:var(--white); margin-bottom:8px; }
+.highlight p { font-size:14px; color:var(--text-dim); line-height:1.8; }
+
+/* SRC CHIP */
+.src { display:inline-flex; background:rgba(45,106,143,0.1); border:1px solid rgba(45,106,143,0.2); border-radius:4px; padding:2px 7px; font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--blue-lt); margin:2px; }
+
+/* DIVIDER */
+.divider { display:flex; align-items:center; gap:16px; margin:28px 0 20px; }
+.divider-line { flex:1; height:1px; background:rgba(255,255,255,0.05); }
+.divider-label { font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--slate); white-space:nowrap; }
+
+/* FLOW */
+.flow { display:flex; gap:0; overflow-x:auto; padding-bottom:4px; }
+.flow-step { background:var(--navy-2); border:1px solid rgba(255,255,255,0.07); border-radius:10px; padding:12px 14px; min-width:140px; flex:1; position:relative; }
+.flow-step.highlight-step { background:rgba(245,158,11,0.08); border-color:rgba(245,158,11,0.25); }
+.flow-step.rules-step { background:rgba(167,139,250,0.07); border-color:rgba(167,139,250,0.25); }
+.flow-step:not(:last-child)::after { content:'→'; position:absolute; right:-16px; top:50%; transform:translateY(-50%); color:var(--slate); font-size:15px; z-index:1; }
+.flow-num { font-size:9px; color:var(--teal); letter-spacing:2px; text-transform:uppercase; margin-bottom:5px; }
+.flow-title { font-size:12px; font-weight:600; color:var(--white); margin-bottom:3px; }
+.flow-desc { font-size:11px; color:var(--text-dim); line-height:1.4; }
+.flow-gap { width:32px; flex-shrink:0; }
+
+footer { padding:32px 72px; background:var(--navy-3); border-top:1px solid rgba(255,255,255,0.05); display:flex; justify-content:space-between; align-items:center; }
+footer p { font-size:12px; color:var(--slate); }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="eyebrow">Platform Specification · KidSpace + ARIA Complete Architecture</div>
+  <h1><em>KidSpace</em> by CommonGround<br>+ <span>ARIA</span> Full Architecture</h1>
+  <p>The complete specification for the expanded children's platform — streaming, reading, games, homework help, communication, and calendar — plus the full ARIA architecture designed to be AI-model-agnostic with rules-first decision making.</p>
+  <div class="meta-row">
+    <div class="meta-item"><label>Rename</label><span>KidComs → KidSpace (internal: kidcoms — backward compatible)</span></div>
+    <div class="meta-item"><label>ARIA Design</label><span>Rules-first · Model-agnostic · Swap providers without breaking behavior</span></div>
+    <div class="meta-item"><label>Safety Standard</label><span>COPPA · CIPA · COPPA+ · Extra-sensitive mode throughout KidSpace</span></div>
+    <div class="meta-item"><label>Availability</label><span>Complete tier — parents · Kids use independently</span></div>
+  </div>
+</div>
+
+<!-- TOC -->
+<nav class="toc">
+  <span class="toc-sep">KIDSPACE</span>
+  <a href="#k1">Rename + Vision</a>
+  <a href="#k2">Communication</a>
+  <a href="#k3">Streaming</a>
+  <a href="#k4">Reading</a>
+  <a href="#k5">Games</a>
+  <a href="#k6">Calendar</a>
+  <a href="#k7">Kid Dashboard</a>
+  <span class="toc-sep">ARIA</span>
+  <a href="#a1">Architecture</a>
+  <a href="#a2">Model Contract</a>
+  <a href="#a3">All ARIA Modes</a>
+  <a href="#a4">KidSpace Guard</a>
+  <a href="#a5">Reports</a>
+  <a href="#a6">Swap Models</a>
+</nav>
+
+
+<!-- ═══════════════ PART 1: KIDSPACE ═══════════════ -->
+<div class="part-divider">
+  <div class="part-num">1</div>
+  <div class="part-info">
+    <div class="part-label" style="color:var(--kids);">Part One</div>
+    <div class="part-title">KidSpace by CommonGround</div>
+    <div class="part-sub">A full kids world — not just video calls. Built for connection, safety, and family continuity across two homes.</div>
+  </div>
+</div>
+
+
+<!-- ═══════ K1: RENAME + VISION ═══════ -->
+<section id="k1">
+  <div class="sec-eye kids">01 — The Rename</div>
+  <h2 class="sec-title">From KidComs to KidSpace</h2>
+  <p class="sec-intro">KidComs described what it did when it was just a video call feature. KidSpace describes what it is now — a world kids can live in, even when they're not on a call. The name change is marketing and product positioning only. Internally, the codebase can remain "kidcoms" for backward compatibility with all existing database tables, API endpoints, and references.</p>
+
+  <div class="highlight kids">
+    <h3>The Vision in One Sentence</h3>
+    <p>KidSpace is the place where children of separated parents stay connected to everyone they love — watching together, reading together, playing together, calling, messaging, doing homework — with the freedom of a real kids app and the safety rails that parents in high-conflict situations actually need.</p>
+  </div>
+
+  <div class="two-col" style="margin-top:24px;">
+    <div>
+      <div class="card">
+        <h4>What KidComs Was</h4>
+        <ul class="flist" style="margin-top:8px;">
+          <li class="yes">Video calls via Daily.co</li>
+          <li class="yes">Text chat with ARIA monitoring</li>
+          <li class="yes">Circle management for approved contacts</li>
+          <li class="yes">Parental controls and call logging</li>
+          <li class="yes">Age-appropriate interfaces</li>
+          <li class="yes">Child wallet system</li>
+        </ul>
+        <p style="font-size:12px;color:var(--slate);margin-top:10px;">Scope: a communication tool. Used during calls only.</p>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="border-color:rgba(244,114,182,0.2);">
+        <h4 style="color:var(--kids);">What KidSpace Is</h4>
+        <ul class="flist" style="margin-top:8px;">
+          <li class="yes">Everything KidComs had</li>
+          <li class="yes">Video streaming — Originals + family content</li>
+          <li class="yes">Watch Together (synchronized viewing with Circle)</li>
+          <li class="yes">Shorts — family-oriented short-form video</li>
+          <li class="yes">Reading — curated books + shared reading sessions</li>
+          <li class="yes">Co-op games with family members</li>
+          <li class="yes">Homework help via video + collaborative whiteboard</li>
+          <li class="yes">Kid calendar — view parent events, add own events</li>
+          <li class="yes">Communication stats + activity timeline</li>
+          <li class="yes">Standalone — kids can use without being in a call</li>
+        </ul>
+        <p style="font-size:12px;color:var(--kids);margin-top:10px;">Scope: a full kids world. Used anytime, anywhere.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="alert coppa" style="margin-top:16px;">
+    <div class="alert-icon">🔒</div>
+    <p><strong>COPPA + COPPA+ compliance governs all of KidSpace.</strong> Every feature in this document must satisfy: (1) Verifiable parental consent before any child account is created, (2) No behavioral advertising or third-party tracking of children, (3) Data minimization — only collect what's needed for the feature, (4) Parental review and deletion rights for all child data, (5) No direct contact between children and strangers — all contacts are Circle-approved adults only. The dual-parent consent requirement from KidComs carries forward to all KidSpace features.</p>
+  </div>
+</section>
+
+
+<!-- ═══════ K2: COMMUNICATION ═══════ -->
+<section id="k2">
+  <div class="sec-eye kids">02 — Communication</div>
+  <h2 class="sec-title">Video Calls, Voice, Messaging — With Homework Help</h2>
+  <p class="sec-intro">The original KidComs feature set, elevated. Every communication channel is monitored by ARIA in extra-sensitive mode. The key addition is the collaborative whiteboard integrated directly into video calls — making homework help a natural use case.</p>
+
+  <div class="feature-card">
+    <div class="fc-header">
+      <div class="fc-icon">📹</div>
+      <div>
+        <div class="fc-title">Video Calls + Collaborative Whiteboard</div>
+        <div class="fc-sub">Daily.co video with a shared canvas overlay for homework, drawing, and explaining things together</div>
+      </div>
+      <div><span class="tag aria">ARIA Active</span><span class="tag safe">Recorded</span></div>
+    </div>
+    <div class="fc-body">
+      <div class="fc-grid">
+        <div>
+          <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--slate);margin-bottom:10px;">Call Features</div>
+          <ul class="flist">
+            <li class="yes">Video call via Daily.co between child and any Circle-approved contact</li>
+            <li class="yes">Voice-only mode (child's choice or parent-locked)</li>
+            <li class="yes">Call must be within parent-set time windows (e.g., 6pm–8pm weeknights)</li>
+            <li class="yes">Both parents notified when a KidSpace call starts</li>
+            <li class="yes">Parent silent monitoring mode — parent can observe without child seeing a visual indicator</li>
+            <li class="aria">ARIA video monitoring: AWS Rekognition scanning for nudity, hate symbols, weapons, inappropriate content in real time</li>
+            <li class="aria">ARIA audio monitoring: AssemblyAI transcription + Claude/OpenAI classification for profanity, harmful language, grooming language patterns, distress signals</li>
+            <li class="yes">Auto-end call on severity-4 flag (configurable by parent)</li>
+            <li class="yes">Full call recording — 90 days standard retention, 7 years if flagged as evidence</li>
+          </ul>
+        </div>
+        <div>
+          <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--slate);margin-bottom:10px;">Collaborative Whiteboard</div>
+          <ul class="flist">
+            <li class="yes">Canvas overlay appears as a side panel during video call — doesn't replace video</li>
+            <li class="yes">Both child and adult can draw simultaneously — real-time sync via WebSocket</li>
+            <li class="yes">Tools: pen, eraser, shapes, text, color palette (age-appropriate, limited)</li>
+            <li class="yes">Math tools: equation input, number line, grid paper mode</li>
+            <li class="yes">Child can share their screen (parent-approved apps only) for homework review</li>
+            <li class="yes">Save whiteboard session as PDF — goes to parent's Documents tab for reference</li>
+            <li class="yes">Whiteboard content is monitored — screenshot analysis on save for inappropriate drawings</li>
+            <li class="note">Tech: Canvas API + Supabase Realtime for multi-user drawing. Not a third-party whiteboard service — all on-platform.</li>
+            <li class="note">The whiteboard is available in any KidSpace video call — it's built into Daily.co's custom UI wrapper</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="feature-card">
+    <div class="fc-header">
+      <div class="fc-icon">💬</div>
+      <div>
+        <div class="fc-title">Messaging + Voice Messages</div>
+        <div class="fc-sub">Text and audio messages between child and Circle contacts — all monitored, all logged</div>
+      </div>
+      <div><span class="tag aria">ARIA Active</span><span class="tag safe">All Logged</span></div>
+    </div>
+    <div class="fc-body">
+      <div class="fc-grid">
+        <div>
+          <ul class="flist">
+            <li class="yes">Text messages between child and Circle-approved contacts</li>
+            <li class="yes">Voice messages (recorded audio clips, not real-time)</li>
+            <li class="yes">Photo sharing — ARIA scans all photos before delivery for inappropriate content</li>
+            <li class="yes">Emoji reactions and sticker packs (curated, age-appropriate — no adult sticker packs)</li>
+            <li class="aria">Every text message analyzed by ARIA before delivery — same pipeline as parent messaging but with extra-sensitive thresholds</li>
+            <li class="aria">ARIA can hold a message pending if it detects a violation pattern — parent is notified before message is delivered or blocked</li>
+            <li class="yes">Parents receive a daily digest: "Emma sent 5 messages to grandma today" — counts only, not content, unless a flag occurred</li>
+            <li class="yes">Parent can review flagged messages at any time from the parent app</li>
+          </ul>
+        </div>
+        <div>
+          <ul class="flist">
+            <li class="yes">Message history visible to parents at all times — full content (this is a KidSpace feature, not a privacy concern: parents have full access per COPPA)</li>
+            <li class="yes">Child can see how often they've communicated: "You've talked to Grandma 8 times this month" — presented as a positive connection tracker, not a monitoring notice</li>
+            <li class="yes">Automatic "good night" reminder at parent-set time: "It's almost 9pm — time to sign off!"</li>
+            <li class="yes">No group messaging — only 1:1 between child and one Circle contact at a time (prevents coordination between multiple adults that could create grooming dynamics)</li>
+            <li class="coppa">No messages can be sent to children from anyone not on their approved Circle list — system-level enforcement, not just UI</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════ K3: STREAMING ═══════ -->
+<section id="k3">
+  <div class="sec-eye kids">03 — Streaming</div>
+  <h2 class="sec-title">Video Content — CommonGround Originals + Family Library</h2>
+  <p class="sec-intro">KidSpace includes a curated streaming library with a Disney+/Netflix-style interface, scaled for family content and specifically designed for children of separated families. Two types of content: CommonGround Originals (produced or commissioned by CommonGround) and licensed family-oriented third-party content. Watch Together allows synchronized viewing with Circle contacts across different homes.</p>
+
+  <div class="alert kids">
+    <div class="alert-icon">★</div>
+    <p><strong>CommonGround Originals</strong> are the strategic differentiator. Short animated series, family communication stories, books brought to life, and content specifically about kids navigating life in two homes — normalized and joyful, not sad. This content is exclusive to KidSpace and reinforces the platform's mission. Start with 5–10 short-form originals at launch.</p>
+  </div>
+
+  <div class="feature-card" style="margin-top:20px;">
+    <div class="fc-header">
+      <div class="fc-icon">🎬</div>
+      <div>
+        <div class="fc-title">Content Library</div>
+        <div class="fc-sub">Curated catalog of age-appropriate family content in organized genres</div>
+      </div>
+      <div><span class="tag kids">Originals</span><span class="tag complete">Complete Tier</span></div>
+    </div>
+    <div class="fc-body">
+      <div class="fc-grid-3">
+        <div>
+          <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--kids);margin-bottom:8px;">Content Categories</div>
+          <ul class="flist">
+            <li class="yes"><strong>CommonGround Originals</strong> — exclusive short series and specials</li>
+            <li class="yes"><strong>Family Movies</strong> — licensed G/PG content</li>
+            <li class="yes"><strong>Kids Series</strong> — episodic family-friendly shows</li>
+            <li class="yes"><strong>Shorts</strong> — 2–5 minute clips, high engagement for younger kids</li>
+            <li class="yes"><strong>Educational</strong> — science, nature, history content</li>
+            <li class="yes"><strong>Music &amp; Performances</strong> — concerts, dance, talent shows</li>
+            <li class="yes"><strong>Sports for Kids</strong> — youth sports, Olympics highlights</li>
+            <li class="yes"><strong>Together Series</strong> — content designed specifically for Watch Together</li>
+          </ul>
+        </div>
+        <div>
+          <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--slate);margin-bottom:8px;">Content Controls</div>
+          <ul class="flist">
+            <li class="yes">Age gate per child — parents set max age rating (G, PG, PG-13)</li>
+            <li class="yes">Parents can block specific titles or genres</li>
+            <li class="yes">Parents can curate a "Favorites" list — child sees only curated content if parent enables this mode</li>
+            <li class="yes">Watch history visible to parents in the parent app</li>
+            <li class="yes">Watch time limits — parent sets daily limit, KidSpace gives a 10-min warning, then prompts to stop</li>
+            <li class="yes">All content pre-screened by CommonGround editorial team before going live — no UGC</li>
+            <li class="coppa">Zero third-party tracking pixels, behavioral targeting, or ad serving in KidSpace content — ads are not shown to children, ever</li>
+          </ul>
+        </div>
+        <div>
+          <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--slate);margin-bottom:8px;">Tech + Delivery</div>
+          <ul class="flist">
+            <li class="note">Video stored in Supabase Storage or AWS S3 with CloudFront CDN</li>
+            <li class="note">HLS (HTTP Live Streaming) for adaptive bitrate — works on slow connections kids actually have</li>
+            <li class="note">Offline caching (mobile app) — parents can pre-load 3 titles for offline viewing</li>
+            <li class="note">Subtitles/closed captions on all content — accessibility and language learning</li>
+            <li class="note">Content metadata: title, age rating, duration, genre, language — stored in a <span class="src">kidspace_content</span> table</li>
+            <li class="note">CommonGround Originals: produced externally, delivered as MP4/HLS, same CDN delivery as licensed content</li>
+            <li class="note">Third-party content: licensing agreements required per title — start with public domain and COPPA-compliant distribution partners</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="feature-card">
+    <div class="fc-header">
+      <div class="fc-icon">🍿</div>
+      <div>
+        <div class="fc-title">Watch Together</div>
+        <div class="fc-sub">Synchronized viewing with Circle contacts — grandma in Florida watches the same movie at the same time</div>
+      </div>
+      <div><span class="tag aria">ARIA Monitored</span><span class="tag safe">Circle Only</span></div>
+    </div>
+    <div class="fc-body">
+      <div class="fc-grid">
+        <div>
+          <ul class="flist">
+            <li class="yes">Child invites a Circle-approved contact to Watch Together on any title in the library</li>
+            <li class="yes">Video playback synchronized within ±0.5 seconds via WebSocket sync events</li>
+            <li class="yes">Play/pause/seek controls shared — either person can control playback (configurable)</li>
+            <li class="yes">Side-panel chat during Watch Together — text only, ARIA monitored</li>
+            <li class="yes">Optional face-cam: small pip video of both faces in the corner — so you can see each other's reactions</li>
+            <li class="yes">Reactions bar: emoji reactions overlay on screen during key moments</li>
+            <li class="yes">Up to 3 participants per Watch Together session (child + 2 Circle contacts)</li>
+            <li class="yes">Session recorded (same retention as calls — 90 days standard)</li>
+          </ul>
+        </div>
+        <div>
+          <ul class="flist">
+            <li class="note"><strong>Tech:</strong> Supabase Realtime for playback sync events. Daily.co for the optional face-cam PIP. Chat via KidSpace messaging channel.</li>
+            <li class="note">Sync protocol: one participant is "host" (the child). Host player broadcasts seek/play/pause events. Guests receive and apply with a 0.5s debounce.</li>
+            <li class="note">CDN ensures both participants stream the same HLS version — no content divergence</li>
+            <li class="aria">ARIA monitors the chat side panel with the same rules as KidSpace messaging</li>
+            <li class="aria">ARIA monitors the face-cam (if enabled) with Rekognition — same video analysis pipeline as video calls</li>
+            <li class="coppa">Watch Together is only available between the child and Circle-approved contacts. No "public watch" or anonymous join links — ever.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════ K4: READING ═══════ -->
+<section id="k4">
+  <div class="sec-eye kids">04 — Reading</div>
+  <h2 class="sec-title">Books, Shared Reading, and Author Spotlights</h2>
+  <p class="sec-intro">Reading together is one of the most meaningful things a parent or grandparent can do with a child — even remotely. KidSpace makes it possible to read the same book at the same time, see the same page, and talk about it. Author spotlights give kids a sense of who creates the books they love.</p>
+
+  <div class="feature-card">
+    <div class="fc-header">
+      <div class="fc-icon">📚</div>
+      <div>
+        <div class="fc-title">Reading Library + Shared Reading</div>
+        <div class="fc-sub">Curated books for all ages — read solo or read together in real time</div>
+      </div>
+      <div><span class="tag kids">New Feature</span><span class="tag complete">Complete</span></div>
+    </div>
+    <div class="fc-body">
+      <div class="fc-grid">
+        <div>
+          <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--slate);margin-bottom:10px;">Library Features</div>
+          <ul class="flist">
+            <li class="yes">Age-graded book library: Picture Books (0–5) · Early Reader (5–8) · Middle Grade (8–12)</li>
+            <li class="yes">Read-aloud: narrated audio track synced to text highlight — professional narrators, not TTS</li>
+            <li class="yes">Interactive elements for younger books: tap words to hear pronunciation, tap illustrations for audio</li>
+            <li class="yes">Reading streak tracker — visible to child as a positive achievement, not a pressure metric</li>
+            <li class="yes">Bookmarks, progress tracking — where I left off on each book</li>
+            <li class="yes">CommonGround Reading Originals: books written and illustrated specifically for children in two-home families — normalize without pathologize</li>
+            <li class="yes">Genre shelves: Adventure · Animals · Science · Friendship · Magic · Sports · Family Stories</li>
+            <li class="yes">Parent can recommend books to their child: "Dad added 'Charlotte's Web' to your shelf"</li>
+          </ul>
+        </div>
+        <div>
+          <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--slate);margin-bottom:10px;">Shared Reading</div>
+          <ul class="flist">
+            <li class="yes">Child invites a Circle contact to read together — both see the same page in real time</li>
+            <li class="yes">Synchronized page turning — either person can turn, with a small animation so the other sees it</li>
+            <li class="yes">Voice call runs alongside the book — you talk about what you're reading</li>
+            <li class="yes">Annotation mode: draw or highlight on the page together (same canvas tech as whiteboard)</li>
+            <li class="yes">Parent can join shared reading sessions as an observer or active participant</li>
+            <li class="aria">ARIA monitors the voice conversation during shared reading — same audio analysis pipeline</li>
+            <li class="note">Tech: eBook pages rendered as standardized SVG/image assets. Page sync via Supabase Realtime. EPUB format for the book content layer.</li>
+          </ul>
+        </div>
+      </div>
+      <div style="margin-top:16px;">
+        <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--kids);margin-bottom:10px;">Author + Illustrator Spotlights</div>
+        <div class="three-col">
+          <div class="card">
+            <h4>Author Pages</h4>
+            <p style="font-size:12.5px;">Each author and illustrator in the library has a profile page: photo, short bio (kid-friendly language), their books in the library, a fun fact, and a short video message if available. Kids can "follow" authors and see when new books are added.</p>
+          </div>
+          <div class="card">
+            <h4>Parent + Child Highlights</h4>
+            <p style="font-size:12.5px;">Parents can tag books as "Dad's childhood favorite" or "Mom wants you to read this." These tags appear on the book cover as personal notes from parents — bridging the two homes through shared reading history.</p>
+          </div>
+          <div class="card">
+            <h4>Reading Together Reports</h4>
+            <p style="font-size:12.5px;">Monthly reading summary visible to both parents: books completed, shared reading sessions count, total reading time. No content of conversations — just the activity. A neutral positive data point for both families.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════ K5: GAMES ═══════ -->
+<section id="k5">
+  <div class="sec-eye kids">05 — Games</div>
+  <h2 class="sec-title">Co-op Games — Family Multiplayer, On-Platform</h2>
+  <p class="sec-intro">Simple, on-platform co-op games that kids can play with Circle-approved family members. No third-party game platforms, no external accounts, no random online players. All games are hosted and run by CommonGround — not embedded iframes or third-party SDKs. ARIA monitors all in-game chat.</p>
+
+  <div class="alert rules">
+    <div class="alert-icon">◆</div>
+    <p><strong>Games are built by CommonGround or licensed as HTML5/WebGL games with full source access.</strong> No third-party game SDKs that could introduce tracking, ads, or external network calls. Games are sandboxed — they cannot access device storage, camera, microphone, or contacts. All multiplayer is handled via CommonGround's WebSocket infrastructure, not external game servers.</p>
+  </div>
+
+  <div class="feature-card" style="margin-top:16px;">
+    <div class="fc-header">
+      <div class="fc-icon">🎮</div>
+      <div>
+        <div class="fc-title">Co-op Game Library</div>
+        <div class="fc-sub">Simple multiplayer games designed for family play between child and Circle contacts</div>
+      </div>
+      <div><span class="tag aria">Chat Monitored</span><span class="tag safe">Circle Only</span></div>
+    </div>
+    <div class="fc-body">
+      <div class="fc-grid">
+        <div>
+          <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--slate);margin-bottom:10px;">Launch Game Categories</div>
+          <ul class="flist">
+            <li class="yes"><strong>Puzzle Co-op:</strong> jigsaw puzzles both can work on simultaneously — pieces drag in real time for both players</li>
+            <li class="yes"><strong>Word Games:</strong> Pictionary-style drawing + guessing, word chain, spelling challenges with age adaptation</li>
+            <li class="yes"><strong>Card Games:</strong> Go Fish, Crazy Eights, Snap — classic card games with animated cards</li>
+            <li class="yes"><strong>Trivia:</strong> age-gated trivia packs by subject — science, animals, sports, movies, history</li>
+            <li class="yes"><strong>Board Games:</strong> virtual versions of simple board games — Snakes &amp; Ladders, simple checkers</li>
+            <li class="yes"><strong>Creative:</strong> collaborative drawing canvas (not a call — just a shared drawing space)</li>
+            <li class="yes"><strong>CommonGround Originals:</strong> simple games based on the CG Original characters from the streaming library</li>
+          </ul>
+        </div>
+        <div>
+          <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--slate);margin-bottom:10px;">Rules + Safety</div>
+          <ul class="flist">
+            <li class="yes">Games are only playable between child and Circle-approved contacts — no public lobbies, no random matchmaking</li>
+            <li class="yes">In-game chat (text) is monitored by ARIA — same pipeline as KidSpace messaging</li>
+            <li class="yes">Voice chat during games uses the same KidSpace voice monitoring pipeline</li>
+            <li class="yes">Parent can see game session history: who played, what game, how long</li>
+            <li class="yes">No in-game purchases, no virtual currencies, no loot boxes — games are included, no upsells to children</li>
+            <li class="yes">No score leaderboards that show outside the family circle — private scores only</li>
+            <li class="note">Tech: HTML5 Canvas + WebSocket for real-time multiplayer. Game state stored in Redis for active sessions, Postgres for history. All game code is CommonGround-owned or fully licensed.</li>
+            <li class="coppa">No game data shared with third parties. No behavioral game analytics sent to external services.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════ K6: CALENDAR ═══════ -->
+<section id="k6">
+  <div class="sec-eye kids">06 — Calendar</div>
+  <h2 class="sec-title">The Kid's View of Their Own Life</h2>
+  <p class="sec-intro">Kids deserve to know what's happening in their own life. The KidSpace calendar shows children their upcoming events — sports, school activities, exchanges, family plans — in a child-appropriate visual. Kids can also add their own events and share them with parents.</p>
+
+  <div class="feature-card">
+    <div class="fc-header">
+      <div class="fc-icon">📅</div>
+      <div>
+        <div class="fc-title">KidSpace Calendar</div>
+        <div class="fc-sub">Events from both parents, exchange schedule, and child-added events — all in one view</div>
+      </div>
+      <div><span class="tag kids">New Feature</span></div>
+    </div>
+    <div class="fc-body">
+      <div class="fc-grid">
+        <div>
+          <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--slate);margin-bottom:10px;">What Kids See</div>
+          <ul class="flist">
+            <li class="yes">Events created by Parent A — color-coded with a gentle color for "at Dad's"</li>
+            <li class="yes">Events created by Parent B — different color for "at Mom's"</li>
+            <li class="yes">Exchange schedule — shown as "move to Dad's house" or "move to Mom's house" in child-friendly language. No legal terminology.</li>
+            <li class="yes">School events (if parent entered them)</li>
+            <li class="yes">KidComs/KidSpace approved call windows — "You can call Grandma between 6pm and 8pm tonight"</li>
+            <li class="yes">Birthdays — for family members parents have added</li>
+            <li class="yes">Visual format: large colorful tiles, not a grid calendar — week view and day view optimized for kids</li>
+          </ul>
+        </div>
+        <div>
+          <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--slate);margin-bottom:10px;">What Kids Can Do</div>
+          <ul class="flist">
+            <li class="yes">Add their own events — "Soccer tryouts on Saturday"</li>
+            <li class="yes">Share a child-added event with one or both parents — tap "Share with Mom" or "Share with Dad" or both</li>
+            <li class="yes">Parent receives a notification: "Emma added 'Soccer tryouts on Saturday' to her calendar and shared it with you"</li>
+            <li class="yes">Set a reminder for their own events — "Remind me the night before"</li>
+            <li class="yes">Mark events as exciting (⭐), nervous (😬), or looking forward to (🎉) — visible to parents as a mood signal</li>
+            <li class="note">Child-added events are visible to both parents by default when shared. Parents cannot delete child-added events from the child's view — only the child can.</li>
+            <li class="note">Exchange-related events cannot be modified by the child — they're read-only in the kid view. Changes to custody schedule go through the parent app.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════ K7: KID DASHBOARD ═══════ -->
+<section id="k7">
+  <div class="sec-eye kids">07 — Kid Dashboard</div>
+  <h2 class="sec-title">The Home Screen — What Kids See When They Open KidSpace</h2>
+  <p class="sec-intro">The KidSpace home screen is designed to feel warm, personal, and like a world that belongs to the child — not to their parents' legal situation. Everything here is positive and forward-looking. ARIA operates completely in the background — kids never see monitoring language.</p>
+
+  <div class="feature-card">
+    <div class="fc-header">
+      <div class="fc-icon">🌟</div>
+      <div>
+        <div class="fc-title">Kid Home Screen</div>
+        <div class="fc-sub">Their world. Their content. Their people. Always age-appropriate, always their own.</div>
+      </div>
+    </div>
+    <div class="fc-body">
+      <div class="fc-grid-3">
+        <div>
+          <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--kids);margin-bottom:10px;">Connection Panel</div>
+          <ul class="flist">
+            <li class="yes">Circle contacts shown as large avatar buttons — tap to call, message, or invite to Watch Together</li>
+            <li class="yes">Green dot = contact is online/available</li>
+            <li class="yes">"Connection streak" — how many days in a row they've talked to a specific person. Shown as a small flame/star badge on their avatar. Purely positive.</li>
+            <li class="yes">"Last talked 2 days ago" gentle nudge to reach out</li>
+            <li class="yes">Unread messages shown as a count on the contact's avatar</li>
+          </ul>
+        </div>
+        <div>
+          <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--slate);margin-bottom:10px;">Content + Activity</div>
+          <ul class="flist">
+            <li class="yes">"Continue watching" — resume where they left off</li>
+            <li class="yes">"Your shelf" — books in progress and recently added by parents</li>
+            <li class="yes">"Play with [Name]" — quick launch game invite to a Circle contact who's online</li>
+            <li class="yes">Featured CommonGround Original content — rotating highlight</li>
+            <li class="yes">Reading streak — "You've read 5 days in a row! 🔥"</li>
+          </ul>
+        </div>
+        <div>
+          <div style="font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--slate);margin-bottom:10px;">My Day</div>
+          <ul class="flist">
+            <li class="yes">Today's calendar events in plain language: "You're at Dad's today" / "Soccer at 4pm"</li>
+            <li class="yes">Call windows: "You can call Grandma after 6pm"</li>
+            <li class="yes">Quick weather widget (optional, parent-enabled)</li>
+            <li class="yes">Personal message from a parent (parent-to-child note feature — read-only for child)</li>
+            <li class="yes">Achievement of the day: reading, talking, playing — small celebration moments</li>
+          </ul>
+        </div>
+      </div>
+      <div class="alert teal" style="margin-top:16px;">
+        <div class="alert-icon">→</div>
+        <p><strong>What kids NEVER see in KidSpace:</strong> The word "monitoring," "recording," "ARIA," "compliance," "custody," "court," or any indicator that their activity is being logged. The safety infrastructure is completely invisible to the child. Parents see it in the parent app. Kids experience a warm, friendly world that belongs to them.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════ PART 2: ARIA ═══════════════ -->
+<div class="part-divider">
+  <div class="part-num">2</div>
+  <div class="part-info">
+    <div class="part-label" style="color:var(--aria);">Part Two</div>
+    <div class="part-title">ARIA — Complete Architecture</div>
+    <div class="part-sub">Model-agnostic. Rules-first. AI provides outputs. ARIA decides actions. Swap models without breaking behavior.</div>
+  </div>
+</div>
+
+
+<!-- ═══════ A1: ARCHITECTURE ═══════ -->
+<section id="a1">
+  <div class="sec-eye aria">01 — The Core Architecture Principle</div>
+  <h2 class="sec-title">Rules-First. Model-Agnostic. Always.</h2>
+  <p class="sec-intro">The single most important architectural decision for ARIA: the AI model never decides what action to take. The AI model provides analysis and scored outputs — toxicity scores, classifications, rewrite suggestions. ARIA's rules engine reads those outputs and decides what to do. When you swap Claude for OpenAI or a future model, ARIA's behavior doesn't change. Only the quality of the analysis changes.</p>
+
+  <div class="highlight aria">
+    <h3>The Contract</h3>
+    <p>ARIA owns the decisions. The AI model owns the output quality. The AI model receives an input, returns a structured JSON response matching a defined schema, and has no further involvement. ARIA reads the JSON, applies its rules, and executes an action. A score of 0.82 from Claude and a score of 0.81 from OpenAI both trigger the same ARIA rule — only the number changes, not the decision logic.</p>
+  </div>
+
+  <div class="arch-box" style="margin-top:24px;">
+    <div class="arch-title" style="color:var(--aria);">ARIA Complete Architecture — Layered View</div>
+
+    <div class="arch-layer">
+      <div class="arch-layer-label" style="color:var(--text-dim);">INPUT</div>
+      <div class="arch-layer-content">
+        <div class="arch-cell"><div class="arch-cell-name">Text Message</div><div class="arch-cell-desc">Co-parent or child message about to be sent</div></div>
+        <div class="arch-cell"><div class="arch-cell-name">Video Frame</div><div class="arch-cell-desc">Frame from KidSpace video call or streaming</div></div>
+        <div class="arch-cell"><div class="arch-cell-name">Audio Stream</div><div class="arch-cell-desc">KidSpace call audio, continuous</div></div>
+        <div class="arch-cell"><div class="arch-cell-name">Document / Image</div><div class="arch-cell-desc">Photo, PDF, uploaded content</div></div>
+        <div class="arch-cell"><div class="arch-cell-name">Intake Conversation</div><div class="arch-cell-desc">Attorney client interview session</div></div>
+      </div>
+    </div>
+
+    <div class="arch-arrow">↓ all inputs normalized to typed payloads ↓</div>
+
+    <div class="arch-layer">
+      <div class="arch-layer-label" style="color:var(--blue-lt);">AI LAYER</div>
+      <div class="arch-layer-content">
+        <div class="arch-cell model-cell"><div class="arch-cell-name">Text Analysis Provider</div><div class="arch-cell-desc">Claude (primary) / OpenAI (fallback) — returns toxicity score, categories, rewrite suggestion as JSON</div></div>
+        <div class="arch-cell model-cell"><div class="arch-cell-name">Vision Provider</div><div class="arch-cell-desc">AWS Rekognition (primary) — returns label detections, moderation labels, confidence scores as JSON</div></div>
+        <div class="arch-cell model-cell"><div class="arch-cell-name">Audio Provider</div><div class="arch-cell-desc">AssemblyAI (transcription) + Claude/OpenAI (classification) — returns transcript + classification JSON</div></div>
+        <div class="arch-cell model-cell"><div class="arch-cell-name">Summarization Provider</div><div class="arch-cell-desc">Claude (primary) — returns structured summary JSON for intake, reports, compliance narratives</div></div>
+      </div>
+    </div>
+
+    <div class="arch-arrow">↓ all providers return standardized JSON — same schema, any model ↓</div>
+
+    <div class="arch-layer">
+      <div class="arch-layer-label" style="color:var(--kids-2);">RULES ENGINE</div>
+      <div class="arch-layer-content">
+        <div class="arch-cell rules-cell"><div class="arch-cell-name">Threshold Rules</div><div class="arch-cell-desc">If toxicity_score > 0.7 AND category = 'hostility' → flag. Deterministic code, no AI.</div></div>
+        <div class="arch-cell rules-cell"><div class="arch-cell-name">Context Rules</div><div class="arch-cell-desc">KidSpace mode = extra-sensitive thresholds. Attorney mode = different rules. Parent mode = standard rules.</div></div>
+        <div class="arch-cell rules-cell"><div class="arch-cell-name">Sequence Rules</div><div class="arch-cell-desc">3rd flag in 24hrs from same sender = escalate severity. Pattern detection across sessions.</div></div>
+        <div class="arch-cell rules-cell"><div class="arch-cell-name">Override Rules</div><div class="arch-cell-desc">Admin-configurable per-case rules. E.g., DV cases have stricter thresholds.</div></div>
+      </div>
+    </div>
+
+    <div class="arch-arrow">↓ rules engine produces an ARIADecision object ↓</div>
+
+    <div class="arch-layer">
+      <div class="arch-layer-label" style="color:var(--aria);">ACTIONS</div>
+      <div class="arch-layer-content">
+        <div class="arch-cell action-cell"><div class="arch-cell-name">Allow</div><div class="arch-cell-desc">Content passes. Log and continue.</div></div>
+        <div class="arch-cell action-cell"><div class="arch-cell-name">Suggest</div><div class="arch-cell-desc">Show rewrite to sender. They decide to send original or edited.</div></div>
+        <div class="arch-cell action-cell"><div class="arch-cell-name">Flag</div><div class="arch-cell-desc">Log event, notify parent/attorney. Content still delivered unless blocked.</div></div>
+        <div class="arch-cell action-cell"><div class="arch-cell-name">Hold</div><div class="arch-cell-desc">Delay delivery. Notify parent to review before message reaches recipient.</div></div>
+        <div class="arch-cell action-cell"><div class="arch-cell-name">Block</div><div class="arch-cell-desc">Prevent delivery. Sender sees: "This message cannot be sent." Logged.</div></div>
+        <div class="arch-cell action-cell"><div class="arch-cell-name">End Session</div><div class="arch-cell-desc">KidSpace only — terminate call/session immediately. Both parties notified.</div></div>
+      </div>
+    </div>
+
+    <div class="arch-arrow">↓ every decision logged regardless of outcome ↓</div>
+
+    <div class="arch-layer">
+      <div class="arch-layer-label" style="color:var(--teal);">AUDIT</div>
+      <div class="arch-layer-content">
+        <div class="arch-cell audit-cell"><div class="arch-cell-name">audit_logs (SHA-256 chained)</div><div class="arch-cell-desc">Every ARIA decision: input type, AI provider used, scores received, rule triggered, action taken, timestamp. Append-only. Court-admissible.</div></div>
+        <div class="arch-cell audit-cell"><div class="arch-cell-name">message_flags</div><div class="arch-cell-desc">Per-message flag record: severity, category, parent response, flagged metadata.</div></div>
+        <div class="arch-cell audit-cell"><div class="arch-cell-name">kidspace_events</div><div class="arch-cell-desc">KidSpace-specific events: call flags, video flags, game chat flags, session end events.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════ A2: MODEL CONTRACT ═══════ -->
+<section id="a2">
+  <div class="sec-eye aria">02 — The AI Model Contract</div>
+  <h2 class="sec-title">What ARIA Asks the AI — What It Must Return</h2>
+  <p class="sec-intro">Every AI provider ARIA works with must satisfy a defined contract: receive a standardized input, return a standardized JSON schema. ARIA never parses free-form AI responses — it only reads typed fields. This is how you swap models without breaking anything.</p>
+
+  <div class="two-col">
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">TypeScript</span><span class="code-file">aria/contracts/TextAnalysisContract.ts</span></div>
+      <div class="code-body"><span class="cm">// What ARIA sends to ANY text analysis provider</span>
+<span class="kw">interface</span> <span class="cls">TextAnalysisInput</span> {
+  text: <span class="kw">string</span>           <span class="cm">// the message to analyze</span>
+  mode: <span class="str">'parent'</span> | <span class="str">'kidspace'</span> | <span class="str">'professional'</span>
+  context?: <span class="kw">string</span>       <span class="cm">// recent conversation context (optional)</span>
+  language?: <span class="kw">string</span>      <span class="cm">// 'en' | 'es' etc. default 'en'</span>
+}
+
+<span class="cm">// What ARIA REQUIRES back from ANY provider</span>
+<span class="kw">interface</span> <span class="cls">TextAnalysisOutput</span> {
+  <span class="cm">// Scores — all 0.0 to 1.0</span>
+  toxicity_score: <span class="kw">number</span>
+  hostility_score: <span class="kw">number</span>
+  passive_aggressive_score: <span class="kw">number</span>
+  controlling_score: <span class="kw">number</span>
+  profanity_score: <span class="kw">number</span>
+  <span class="cm">// KidSpace extra fields (required when mode = 'kidspace')</span>
+  grooming_risk_score?: <span class="kw">number</span>
+  distress_signal_score?: <span class="kw">number</span>
+  <span class="cm">// Classification</span>
+  primary_category: <span class="cls">ARIACategory</span>   <span class="cm">// top category</span>
+  categories: <span class="cls">ARIACategory</span>[]       <span class="cm">// all triggered</span>
+  requires_action: <span class="kw">boolean</span>           <span class="cm">// quick flag</span>
+  <span class="cm">// Generated text (optional — AI can decline to produce)</span>
+  rewrite_suggestion?: <span class="kw">string</span>         <span class="cm">// only for parent mode</span>
+  rewrite_reasoning?: <span class="kw">string</span>          <span class="cm">// why it was rewritten</span>
+  <span class="cm">// Provider metadata (ARIA logs this, never acts on it)</span>
+  provider: <span class="str">'claude'</span> | <span class="str">'openai'</span> | <span class="str">'local'</span>
+  model_version: <span class="kw">string</span>
+  confidence: <span class="kw">number</span>                  <span class="cm">// 0.0 to 1.0</span>
+}
+
+<span class="kw">type</span> <span class="cls">ARIACategory</span> =
+  | <span class="str">'hostility'</span>
+  | <span class="str">'blame'</span>
+  | <span class="str">'passive_aggressive'</span>
+  | <span class="str">'controlling'</span>
+  | <span class="str">'profanity'</span>
+  | <span class="str">'dismissive'</span>
+  | <span class="str">'grooming_risk'</span>      <span class="cm">// kidspace only</span>
+  | <span class="str">'distress_signal'</span>    <span class="cm">// kidspace only</span>
+  | <span class="str">'clean'</span></div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Python</span><span class="code-file">aria/rules/decision_engine.py</span></div>
+      <div class="code-body"><span class="cm"># ARIA's rules engine — NO AI here.
+# This is deterministic Python code.
+# Changing the AI model never changes this file.</span>
+
+<span class="kw">from</span> aria.contracts <span class="kw">import</span> TextAnalysisOutput, ARIADecision
+
+<span class="cm"># Thresholds — configurable per mode</span>
+THRESHOLDS = {
+    <span class="str">'parent'</span>: {
+        <span class="str">'suggest'</span>: <span class="num">0.35</span>,
+        <span class="str">'flag'</span>:    <span class="num">0.60</span>,
+        <span class="str">'block'</span>:   <span class="num">0.85</span>,
+    },
+    <span class="str">'kidspace'</span>: {
+        <span class="str">'suggest'</span>: <span class="num">0.20</span>,  <span class="cm"># extra sensitive</span>
+        <span class="str">'flag'</span>:    <span class="num">0.40</span>,
+        <span class="str">'hold'</span>:    <span class="num">0.55</span>,  <span class="cm"># hold for parent review</span>
+        <span class="str">'block'</span>:   <span class="num">0.70</span>,
+        <span class="str">'end_session'</span>: <span class="num">0.80</span>,
+    }
+}
+
+<span class="kw">def</span> <span class="cls">decide</span>(
+    analysis: TextAnalysisOutput,
+    mode: str,
+    session_history: list[TextAnalysisOutput]
+) -> ARIADecision:
+
+    t = THRESHOLDS[mode]
+    score = analysis.toxicity_score
+
+    <span class="cm"># Rules are evaluated in order — first match wins</span>
+
+    <span class="cm"># KidSpace-specific rules</span>
+    <span class="kw">if</span> mode == <span class="str">'kidspace'</span>:
+        <span class="kw">if</span> analysis.grooming_risk_score <span class="kw">and</span> \
+           analysis.grooming_risk_score > <span class="num">0.50</span>:
+            <span class="kw">return</span> ARIADecision(
+                action=<span class="str">'end_session'</span>,
+                severity=<span class="num">4</span>,
+                reason=<span class="str">'grooming_risk_detected'</span>
+            )
+        <span class="kw">if</span> score >= t.get(<span class="str">'end_session'</span>, <span class="num">999</span>):
+            <span class="kw">return</span> ARIADecision(
+                action=<span class="str">'end_session'</span>, severity=<span class="num">4</span>
+            )
+        <span class="kw">if</span> score >= t[<span class="str">'block'</span>]:
+            <span class="kw">return</span> ARIADecision(
+                action=<span class="str">'block'</span>, severity=<span class="num">3</span>
+            )
+        <span class="kw">if</span> score >= t[<span class="str">'hold'</span>]:
+            <span class="kw">return</span> ARIADecision(
+                action=<span class="str">'hold'</span>, severity=<span class="num">2</span>
+            )
+
+    <span class="cm"># Standard rules (parent + kidspace)</span>
+    <span class="kw">if</span> score >= t[<span class="str">'block'</span>]:
+        <span class="kw">return</span> ARIADecision(action=<span class="str">'block'</span>, severity=<span class="num">3</span>)
+    <span class="kw">if</span> score >= t[<span class="str">'flag'</span>]:
+        <span class="kw">return</span> ARIADecision(action=<span class="str">'flag'</span>, severity=<span class="num">2</span>)
+    <span class="kw">if</span> score >= t[<span class="str">'suggest'</span>] <span class="kw">and</span> \
+       analysis.rewrite_suggestion:
+        <span class="kw">return</span> ARIADecision(action=<span class="str">'suggest'</span>, severity=<span class="num">1</span>)
+
+    <span class="kw">return</span> ARIADecision(action=<span class="str">'allow'</span>, severity=<span class="num">0</span>)</div>
+    </div>
+  </div>
+
+  <div class="alert rules" style="margin-top:16px;">
+    <div class="alert-icon">◆</div>
+    <p><strong>The key insight in this code:</strong> <code>decide()</code> is a pure Python function. It takes an <code>analysis</code> object (from any AI provider), applies hardcoded threshold rules, and returns an <code>ARIADecision</code>. It has zero API calls. It has no randomness. It always produces the same output for the same input. You can unit-test every possible ARIA decision without touching an AI model. When you upgrade Claude from claude-3-5 to claude-4, the <code>decide()</code> function doesn't change at all.</p>
+  </div>
+</section>
+
+
+<!-- ═══════ A3: ALL ARIA MODES ═══════ -->
+<section id="a3">
+  <div class="sec-eye aria">03 — All ARIA Operating Modes</div>
+  <h2 class="sec-title">Every Place ARIA Works Across CommonGround</h2>
+  <p class="sec-intro">ARIA isn't one thing — it's a family of analysis pipelines sharing the same rules engine and audit infrastructure. Each pipeline has its own input type, AI provider selection, threshold configuration, and allowed action set. The architecture is identical; the parameters differ.</p>
+
+  <table class="main">
+    <tr>
+      <th>Mode</th>
+      <th>Trigger</th>
+      <th>AI Providers Used</th>
+      <th>Available Actions</th>
+      <th>Threshold Profile</th>
+      <th>Who Sees Flags</th>
+    </tr>
+    <tr>
+      <td><strong>Parent Messaging</strong></td>
+      <td>Co-parent types a message before sending</td>
+      <td>Claude (primary), OpenAI (fallback)</td>
+      <td>Allow · Suggest rewrite · Flag · Block</td>
+      <td>Standard</td>
+      <td>Sending parent (suggestion), attorney (if linked), admin (if escalated)</td>
+    </tr>
+    <tr>
+      <td><strong>KidSpace Text — Child→Adult</strong></td>
+      <td>Child types to Circle contact</td>
+      <td>Claude / OpenAI</td>
+      <td>Allow · Hold for parent review · Flag · Block</td>
+      <td>Extra-sensitive</td>
+      <td>Parent(s), admin</td>
+    </tr>
+    <tr>
+      <td><strong>KidSpace Text — Adult→Child</strong></td>
+      <td>Circle contact types to child</td>
+      <td>Claude / OpenAI</td>
+      <td>Allow · Hold · Flag · Block</td>
+      <td>Extra-sensitive + grooming detection active</td>
+      <td>Parent(s), admin. Child never told their message was held.</td>
+    </tr>
+    <tr>
+      <td><strong>KidSpace Video Frame</strong></td>
+      <td>Every N frames during KidSpace video call (configurable, default every 5 seconds)</td>
+      <td>AWS Rekognition (primary)</td>
+      <td>Allow · Flag · End Session</td>
+      <td>Zero tolerance: nudity, weapons, hate symbols → immediate end session</td>
+      <td>Both parents, admin, attorney (if case active)</td>
+    </tr>
+    <tr>
+      <td><strong>KidSpace Audio</strong></td>
+      <td>Continuous during KidSpace calls — rolling 10-second windows transcribed</td>
+      <td>AssemblyAI (transcription) + Claude/OpenAI (classification)</td>
+      <td>Allow · Flag · End Session</td>
+      <td>Extra-sensitive. Profanity, harmful language, distress signals.</td>
+      <td>Both parents, admin</td>
+    </tr>
+    <tr>
+      <td><strong>KidSpace Streaming Content</strong></td>
+      <td>Pre-screening of all content before it enters the library (NOT real-time during viewing)</td>
+      <td>AWS Rekognition + Claude for content description analysis</td>
+      <td>Approve for library · Reject · Flag for human review</td>
+      <td>Content moderation, not behavior moderation</td>
+      <td>CommonGround content team</td>
+    </tr>
+    <tr>
+      <td><strong>KidSpace Game Chat</strong></td>
+      <td>In-game text messages during co-op game sessions</td>
+      <td>Claude / OpenAI</td>
+      <td>Allow · Flag · Block</td>
+      <td>Same as KidSpace Text — Adult→Child when adult is in game</td>
+      <td>Parent(s), admin</td>
+    </tr>
+    <tr>
+      <td><strong>ARIA Pro Intake (Attorney)</strong></td>
+      <td>Attorney-initiated client intake session — multi-turn conversation</td>
+      <td>Claude (only — quality critical)</td>
+      <td>Generate case summary · Extract structured data · Suggest next steps</td>
+      <td>N/A — no moderation. Generative mode only.</td>
+      <td>Attorney (summary), client (their own responses only)</td>
+    </tr>
+    <tr>
+      <td><strong>Report Narrative Generation</strong></td>
+      <td>When a parent or attorney triggers a report that includes AI-generated text</td>
+      <td>Claude (primary)</td>
+      <td>Generate narrative text for P-2 Monthly Insight, A-1 Compliance Report</td>
+      <td>N/A — generative only. Factual, not moderation.</td>
+      <td>Report recipient</td>
+    </tr>
+    <tr>
+      <td><strong>Image / Photo Upload</strong></td>
+      <td>Any photo upload in parent app or KidSpace before delivery to recipient</td>
+      <td>AWS Rekognition</td>
+      <td>Allow · Flag · Block (nude/explicit content)</td>
+      <td>Standard for parents, extra-sensitive for KidSpace</td>
+      <td>Sending user (block notification), admin (if flagged)</td>
+    </tr>
+  </table>
+</section>
+
+
+<!-- ═══════ A4: KIDSPACE GUARD ═══════ -->
+<section id="a4">
+  <div class="sec-eye aria">04 — ARIA KidSpace Guard Mode</div>
+  <h2 class="sec-title">Extra-Sensitive Mode — What's Different</h2>
+  <p class="sec-intro">KidSpace Guard Mode is ARIA operating at maximum sensitivity with two additional analysis categories not present in parent mode — grooming risk detection and child distress signal detection. Every threshold is tighter. Every action set includes session termination. Every event generates both a parent notification and an admin alert.</p>
+
+  <div class="two-col">
+    <div class="feature-card" style="margin-bottom:0;">
+      <div class="fc-header">
+        <div><div class="fc-title" style="font-size:17px;">Video Guard Pipeline</div><div class="fc-sub">Real-time frame analysis during KidSpace video calls</div></div>
+        <span class="tag aria">AWS Rekognition</span>
+      </div>
+      <div class="fc-body">
+        <ul class="flist">
+          <li class="rule"><strong>Frame rate:</strong> 1 frame analyzed every 5 seconds by default. Escalates to every 1 second if a prior flag occurred in the last 60 seconds.</li>
+          <li class="rule"><strong>Moderation labels checked:</strong> Nudity · Graphic Sexual Activity · Explicit Nudity · Suggestive · Violence · Visually Disturbing · Rude Gestures · Drugs · Hate Symbols (swastika, etc.) · Weapons</li>
+          <li class="rule"><strong>Confidence threshold:</strong> Any label with confidence ≥ 70% triggers evaluation. Any label ≥ 85% triggers an immediate action.</li>
+          <li class="rule"><strong>Action matrix:</strong><br>· Nudity ≥ 85% → End Session + Flag Evidence<br>· Violence ≥ 85% → End Session + Flag Evidence<br>· Hate Symbol ≥ 70% → End Session + Flag<br>· Drug-related ≥ 80% → Flag (don't end — may be educational context)</li>
+          <li class="rule"><strong>Evidence clip:</strong> When End Session is triggered by video, a 30-second clip (15s before + 15s after) is extracted, SHA-256 hashed, and stored as evidence. Neither parent can access this clip — only legal/admin.</li>
+          <li class="rule"><strong>Both parents notified within 60 seconds</strong> of any video-triggered session end</li>
+          <li class="rule"><strong>Attorney notified</strong> if the family file has an active attorney assignment</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="feature-card" style="margin-bottom:0;">
+      <div class="fc-header">
+        <div><div class="fc-title" style="font-size:17px;">Audio Guard Pipeline</div><div class="fc-sub">Continuous transcription + classification during KidSpace calls</div></div>
+        <span class="tag aria">AssemblyAI + Claude</span>
+      </div>
+      <div class="fc-body">
+        <ul class="flist">
+          <li class="rule"><strong>Transcription:</strong> AssemblyAI streaming transcription — 10-second rolling windows. Real-time, not post-call.</li>
+          <li class="rule"><strong>Classification:</strong> Each 10-second transcript sent to Claude with the KidSpace Guard prompt. Returns scored JSON per the TextAnalysisOutput contract.</li>
+          <li class="rule"><strong>Extra categories in KidSpace mode:</strong><br>· grooming_risk_score — language patterns consistent with adult trying to build inappropriate relationship with child (excessive compliments about appearance, requests for secrecy, attempts to isolate child from parents)<br>· distress_signal_score — child expressing fear, unsafe situation, asking for help indirectly</li>
+          <li class="rule"><strong>Grooming risk ≥ 0.50:</strong> Immediate End Session + Evidence extraction + Admin escalation. This threshold is intentionally low — false positives are better than missed detection.</li>
+          <li class="rule"><strong>Distress signal ≥ 0.60:</strong> Flag + notify both parents immediately with transcript excerpt of the flagged window. Do NOT end the call — child may need the connection. Parent can end it from their app.</li>
+          <li class="rule"><strong>Standard profanity/hostility:</strong> Flag at 0.40 (vs. 0.60 in parent mode). Parent notified.</li>
+          <li class="rule"><strong>Profanity from adult toward child ≥ 0.55:</strong> Session end + evidence + both parents notified.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="code-block" style="margin-top:20px;">
+    <div class="code-header"><span class="code-lang">Python</span><span class="code-file">aria/prompts/kidspace_guard_prompt.py — The Claude/OpenAI Prompt Contract</span></div>
+    <div class="code-body"><span class="cm">"""
+This prompt is sent to whatever AI model is currently configured.
+The prompt itself is version-controlled and tested independently of the model.
+When you swap models, this prompt may need tuning — but the rules engine
+that reads the response never changes.
+
+Note: The prompt REQUESTS structured JSON. The rules engine
+REQUIRES structured JSON. If the model returns anything other
+than valid JSON matching TextAnalysisOutput, ARIA falls back
+to a safe default: action = 'flag', severity = 2.
+"""</span>
+
+KIDSPACE_GUARD_PROMPT = <span class="str">"""
+You are a child safety analysis assistant. Analyze the following
+conversation transcript from a monitored children's communication platform.
+The participants are a child and an approved family contact.
+
+Return ONLY valid JSON matching this exact schema:
+{
+  "toxicity_score": 0.0-1.0,
+  "hostility_score": 0.0-1.0,
+  "passive_aggressive_score": 0.0-1.0,
+  "controlling_score": 0.0-1.0,
+  "profanity_score": 0.0-1.0,
+  "grooming_risk_score": 0.0-1.0,
+  "distress_signal_score": 0.0-1.0,
+  "primary_category": "clean|hostility|profanity|grooming_risk|distress_signal|...",
+  "categories": [],
+  "requires_action": true|false,
+  "confidence": 0.0-1.0
+}
+
+grooming_risk indicators: excessive focus on child's appearance/body,
+requests for secrecy from parents, attempts to isolate child,
+inappropriate personal questions, moving conversation to private channels.
+
+distress_signal indicators: child expressing fear, unsafe situation,
+indirect requests for help, statements suggesting they can't talk freely,
+expressions of sadness about living situation (monitor but don't overreact).
+
+Do not include rewrite_suggestion for KidSpace mode.
+Do not include any text outside the JSON object.
+
+Transcript (last 10 seconds):
+{transcript}
+"""</span>
+
+<span class="cm"># ARIA reads the JSON. ARIA decides the action.
+# The AI model has no role in the decision.</span></div>
+  </div>
+</section>
+
+
+<!-- ═══════ A5: ARIA REPORTS ═══════ -->
+<section id="a5">
+  <div class="sec-eye aria">05 — What ARIA Reports On</div>
+  <h2 class="sec-title">All ARIA-Generated Outputs Across the Platform</h2>
+  <p class="sec-intro">ARIA generates three types of outputs: real-time interventions (in-the-moment decisions), session summaries (after a communication session ends), and analytical reports (periodic structured analysis of patterns). Each type has a different purpose, audience, and retention policy.</p>
+
+  <table class="main">
+    <tr>
+      <th>Output</th>
+      <th>When Generated</th>
+      <th>What It Contains</th>
+      <th>Who Sees It</th>
+      <th>Retention</th>
+    </tr>
+    <tr>
+      <td><strong>Message Flag</strong></td>
+      <td>Every flagged message, real-time</td>
+      <td>Severity, category, score, parent action (accepted/declined), timestamp. No message content in the flag record — just the metadata.</td>
+      <td>Sending parent (suggestion shown in-app). Attorney (in compliance dashboard). Admin (if escalated).</td>
+      <td>Permanent in <span class="src">message_flags</span></td>
+    </tr>
+    <tr>
+      <td><strong>KidSpace Session Event</strong></td>
+      <td>End of each KidSpace call/game/Watch Together session</td>
+      <td>Session duration, participants, event count by type (video flags, audio flags, text flags), any session-end events and their trigger.</td>
+      <td>Both parents (in KidSpace activity view). Attorney. Admin.</td>
+      <td>90 days standard, 7 years if any flag occurred</td>
+    </tr>
+    <tr>
+      <td><strong>KidSpace Evidence Clip</strong></td>
+      <td>When video or audio triggers End Session action</td>
+      <td>30-second audio/video clip + transcript excerpt. SHA-256 hashed. Chain of custody metadata.</td>
+      <td>Admin (oversight). Legal team on escalation. Parents receive notification but NOT the clip — clip access requires formal legal process.</td>
+      <td>7 years minimum — potential legal evidence</td>
+    </tr>
+    <tr>
+      <td><strong>ARIA Intake Summary</strong></td>
+      <td>After attorney client intake session completes</td>
+      <td>Case overview narrative, children, client goals, key concerns, current situation, recommended next steps, 80% confidence score. AI-generated from intake conversation.</td>
+      <td>Attorney only (not shared with client by default)</td>
+      <td>Duration of case + 7 years after closure</td>
+    </tr>
+    <tr>
+      <td><strong>Communication Pattern Report</strong></td>
+      <td>Monthly auto-generation (P-5 ARIA Communication Report)</td>
+      <td>Flag rate trends, severity distribution, acceptance rate, pattern analysis. Metadata only — no message content.</td>
+      <td>Requesting parent (P-5). Attorney (A-3 version has both parents' data).</td>
+      <td>Permanent</td>
+    </tr>
+    <tr>
+      <td><strong>KidSpace Monthly Welfare Summary</strong></td>
+      <td>Monthly auto-generation per child</td>
+      <td>Connection frequency (calls/messages per Circle contact), content watched (titles and duration), reading progress, game sessions. No flag details unless flags occurred. Positive-framed.</td>
+      <td>Both parents (in parent app). Attorney (if case active). GAL (if assigned).</td>
+      <td>Permanent</td>
+    </tr>
+    <tr>
+      <td><strong>Compliance Report Narrative</strong></td>
+      <td>When A-1 Case Compliance Report is generated</td>
+      <td>3-paragraph plain-English summary of the case's compliance status. Written by ARIA from the underlying data. Attorney can edit before filing.</td>
+      <td>Attorney (in the report). Parent (if attorney shares the report).</td>
+      <td>Duration of report</td>
+    </tr>
+  </table>
+</section>
+
+
+<!-- ═══════ A6: SWAP MODELS ═══════ -->
+<section id="a6">
+  <div class="sec-eye aria">06 — Swapping AI Models</div>
+  <h2 class="sec-title">How to Change Providers Without Breaking Anything</h2>
+  <p class="sec-intro">The entire architecture was designed for this moment. You want to upgrade from Claude 3.5 to Claude 4, or try GPT-5, or run a local model for cost reasons. Here's exactly what changes and what doesn't.</p>
+
+  <div class="two-col">
+    <div>
+      <div class="card" style="border-color:rgba(61,170,138,0.2);">
+        <h4 style="color:var(--teal-lt);">What Does NOT Change (Protected by Architecture)</h4>
+        <ul class="flist" style="margin-top:8px;">
+          <li class="yes">The rules engine (<code>decide()</code>) — not touched</li>
+          <li class="yes">Threshold values in the config — not touched</li>
+          <li class="yes">All ARIA action types and their effects — not touched</li>
+          <li class="yes">The audit log structure — not touched</li>
+          <li class="yes">Database schema — not touched</li>
+          <li class="yes">All KidSpace safety behaviors — not touched</li>
+          <li class="yes">All parent-facing ARIA features — not touched</li>
+          <li class="yes">Compliance and legal posture — not touched</li>
+          <li class="yes">The JSON contract schema — not touched (only the prompt changes)</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <div class="card" style="border-color:rgba(245,158,11,0.2);">
+        <h4 style="color:var(--aria);">What DOES Change When You Swap Models</h4>
+        <ul class="flist" style="margin-top:8px;">
+          <li class="note">The <code>ARIA_TEXT_PROVIDER</code> env variable — from <code>'claude'</code> to <code>'openai'</code></li>
+          <li class="note">The prompt wrappers (system prompt format differs by provider API)</li>
+          <li class="note">The API client code in <code>aria/providers/{provider}.py</code></li>
+          <li class="note">Score quality — a better model produces more accurate toxicity scores</li>
+          <li class="note">Rewrite suggestion quality — better model = better rewrites</li>
+          <li class="note">Intake summary quality — better model = more useful summaries</li>
+          <li class="note">Cost — GPT-4o vs. Claude Sonnet have different pricing</li>
+          <li class="note">Latency — different models have different response times</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="code-block" style="margin-top:20px;">
+    <div class="code-header"><span class="code-lang">Python</span><span class="code-file">aria/providers/registry.py — The Provider Abstraction</span></div>
+    <div class="code-body"><span class="cm"># This is the only file that knows what AI model ARIA is using.
+# The rest of ARIA never imports from this file directly —
+# it only calls analyze_text(), analyze_video(), etc.</span>
+
+<span class="kw">import</span> os
+<span class="kw">from</span> aria.providers.claude <span class="kw">import</span> ClaudeTextProvider
+<span class="kw">from</span> aria.providers.openai <span class="kw">import</span> OpenAITextProvider
+<span class="kw">from</span> aria.providers.rekognition <span class="kw">import</span> RekognitionVideoProvider
+
+<span class="cm"># Set in environment — swap without code changes</span>
+TEXT_PROVIDER = os.getenv(<span class="str">'ARIA_TEXT_PROVIDER'</span>, <span class="str">'claude'</span>)
+VIDEO_PROVIDER = os.getenv(<span class="str">'ARIA_VIDEO_PROVIDER'</span>, <span class="str">'rekognition'</span>)
+
+<span class="cm"># Provider registry — add new models here</span>
+TEXT_PROVIDERS = {
+    <span class="str">'claude'</span>: ClaudeTextProvider,
+    <span class="str">'openai'</span>: OpenAITextProvider,
+    <span class="cm"># 'local': LocalModelProvider,  # future</span>
+}
+
+<span class="kw">def</span> <span class="cls">get_text_provider</span>():
+    provider_class = TEXT_PROVIDERS.get(TEXT_PROVIDER)
+    <span class="kw">if not</span> provider_class:
+        <span class="kw">raise</span> ValueError(<span class="str">f"Unknown ARIA provider: {TEXT_PROVIDER}"</span>)
+    <span class="kw">return</span> provider_class()
+
+<span class="cm"># Usage elsewhere in ARIA (provider-agnostic):</span>
+<span class="cm"># provider = get_text_provider()</span>
+<span class="cm"># analysis = await provider.analyze(input)  # returns TextAnalysisOutput</span>
+<span class="cm"># decision = decide(analysis, mode, history)  # rules engine</span>
+<span class="cm"># execute(decision, context)  # action executor</span></div>
+  </div>
+
+  <div class="highlight aria" style="margin-top:20px;">
+    <h3>Why This Architecture Matters Legally</h3>
+    <p>ARIA's decisions are determined by code you wrote and control — not by a third-party AI model. When an attorney asks "how does ARIA decide to flag a message?" the answer is "our rules engine checks if the toxicity score exceeds 0.60 and the category includes hostility." That's auditable, explainable, and defensible in court. If you used an AI model to make the actual decision, you'd have to explain why an opaque model decided to end a child's call — which is nearly impossible to defend. Rules-first means you can always explain every ARIA decision in plain English, with the exact threshold and rule that triggered it.</p>
+  </div>
+
+  <div class="divider">
+    <div class="divider-line"></div>
+    <div class="divider-label">Quick Reference — ARIA + KidSpace Tables</div>
+    <div class="divider-line"></div>
+  </div>
+
+  <table class="main">
+    <tr>
+      <th>Table</th>
+      <th>Purpose</th>
+      <th>Key Fields</th>
+      <th>Retention</th>
+    </tr>
+    <tr>
+      <td><span class="src">kidspace_content</span></td>
+      <td>KidSpace streaming library catalog</td>
+      <td>title, content_type, age_rating, genre, hls_url, duration, approved_at, provider</td>
+      <td>Permanent while licensed</td>
+    </tr>
+    <tr>
+      <td><span class="src">kidspace_sessions</span></td>
+      <td>All KidSpace activity sessions — calls, games, reading, watching</td>
+      <td>child_id, session_type, participants, duration, flag_count, ended_by, sha256_hash</td>
+      <td>90 days standard · 7 years if flagged</td>
+    </tr>
+    <tr>
+      <td><span class="src">kidspace_events</span></td>
+      <td>Per-event log within sessions — individual ARIA detections</td>
+      <td>session_id, event_type, severity, aria_action, timestamp_in_session, evidence_clip_id</td>
+      <td>Same as session</td>
+    </tr>
+    <tr>
+      <td><span class="src">kidspace_evidence_clips</span></td>
+      <td>Extracted evidence clips from flagged sessions</td>
+      <td>event_id, storage_url, sha256_hash, duration_seconds, transcript_excerpt, chain_of_custody_log</td>
+      <td>7 years minimum</td>
+    </tr>
+    <tr>
+      <td><span class="src">kidspace_watch_history</span></td>
+      <td>Content viewed by each child</td>
+      <td>child_id, content_id, watch_date, duration_watched, completed</td>
+      <td>90 days standard</td>
+    </tr>
+    <tr>
+      <td><span class="src">kidspace_reading_progress</span></td>
+      <td>Reading progress per child per book</td>
+      <td>child_id, book_id, current_page, completed, shared_reading_sessions_count</td>
+      <td>Permanent (reading record)</td>
+    </tr>
+    <tr>
+      <td><span class="src">aria_analysis_log</span></td>
+      <td>Every AI model call made by ARIA — for provider audit and cost tracking</td>
+      <td>provider, model_version, mode, input_type, scores_returned, decision_made, latency_ms, cost_usd</td>
+      <td>90 days (operational) · flag rows: permanent</td>
+    </tr>
+    <tr>
+      <td><span class="src">aria_provider_config</span></td>
+      <td>Current provider configuration — which model is active for each mode</td>
+      <td>mode, primary_provider, fallback_provider, threshold_profile, updated_at, updated_by</td>
+      <td>Version history permanent</td>
+    </tr>
+  </table>
+</section>
+
+<footer>
+  <p>CommonGround · KidSpace + ARIA Complete Architecture · March 2026</p>
+  <p style="color:var(--kids);">KidSpace: Streaming · Reading · Games · Homework Help · Calendar · Communication · &nbsp;·&nbsp; <span style="color:var(--aria);">ARIA: Rules-First · Model-Agnostic · Every Mode Documented</span></p>
+</footer>
+</body>
+</html>

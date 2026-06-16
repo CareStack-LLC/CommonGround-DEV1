@@ -27,6 +27,7 @@ from apscheduler.triggers.interval import IntervalTrigger
 
 from app.core.config import settings
 from app.core.database import AsyncSessionLocal
+from app.core.distributed_lock import redis_lock
 from app.services.daily_room_cleaner import cleanup_abandoned_sessions
 from app.services.aria_session_memory import cleanup_old_sessions as aria_cleanup_old_sessions
 from app.services.birthday_events import generate_birthday_events
@@ -49,12 +50,15 @@ def _interval_minutes() -> int:
 async def _run_birthday_event_generator() -> None:
     """Wave 3 C15: ensure upcoming birthday events exist for each active child."""
     try:
-        async with AsyncSessionLocal() as db:
-            try:
-                summary = await generate_birthday_events(db)
-            except Exception:
-                await db.rollback()
-                raise
+        async with redis_lock("sched:birthday_events", ttl_seconds=600) as acquired:
+            if not acquired:
+                return
+            async with AsyncSessionLocal() as db:
+                try:
+                    summary = await generate_birthday_events(db)
+                except Exception:
+                    await db.rollback()
+                    raise
         logger.info("scheduler: birthday_events result=%s", summary)
     except Exception as exc:  # noqa: BLE001
         logger.exception("scheduler: birthday_events failed: %s", exc)
@@ -86,12 +90,15 @@ async def _run_schedule_roller() -> None:
     Any exception is logged + reported; never re-raised.
     """
     try:
-        async with AsyncSessionLocal() as db:
-            try:
-                summary = await run_schedule_roller(db)
-            except Exception:
-                await db.rollback()
-                raise
+        async with redis_lock("sched:schedule_roller", ttl_seconds=1800) as acquired:
+            if not acquired:
+                return
+            async with AsyncSessionLocal() as db:
+                try:
+                    summary = await run_schedule_roller(db)
+                except Exception:
+                    await db.rollback()
+                    raise
         logger.info("scheduler: schedule_roller result=%s", summary)
     except Exception as exc:  # noqa: BLE001
         logger.exception("scheduler: schedule_roller failed: %s", exc)
@@ -114,13 +121,16 @@ async def _run_auto_close_expired_exchanges() -> None:
     audit breadcrumb instead of silently sliding to ``completed``.
     """
     try:
-        async with AsyncSessionLocal() as db:
-            try:
-                # auto_close_expired_windows commits internally.
-                closed = await CustodyExchangeService.auto_close_expired_windows(db)
-            except Exception:
-                await db.rollback()
-                raise
+        async with redis_lock("sched:auto_close", ttl_seconds=240) as acquired:
+            if not acquired:
+                return
+            async with AsyncSessionLocal() as db:
+                try:
+                    # auto_close_expired_windows commits internally.
+                    closed = await CustodyExchangeService.auto_close_expired_windows(db)
+                except Exception:
+                    await db.rollback()
+                    raise
         if closed:
             logger.info("scheduler: auto_close_expired_exchanges closed=%d", closed)
     except Exception as exc:  # noqa: BLE001 — never kill the scheduler
@@ -142,6 +152,31 @@ async def _run_alert_evaluator_tick() -> None:
             logger.info("scheduler: alert_evaluator result=%s", summary)
     except Exception as exc:  # noqa: BLE001
         logger.exception("scheduler: alert_evaluator failed: %s", exc)
+        sentry_sdk.capture_exception(exc)
+
+
+async def _run_email_outbox_dispatcher() -> None:
+    """Reliability batch 1: drain the email_outbox spillover queue.
+
+    Critical emails (invitations, security alerts, ARIA interventions) that
+    exhausted EmailService's in-process retries land in email_outbox; this
+    tick re-sends them with exponential backoff and dead-letters after 5
+    attempts. Rows are claimed FOR UPDATE SKIP LOCKED, so the redis_lock is
+    only a duplicate-work optimization, not a correctness requirement.
+    """
+    try:
+        async with redis_lock("sched:email_outbox", ttl_seconds=110) as acquired:
+            if not acquired:
+                return
+            from app.services.email_outbox_dispatcher import dispatch_pending_emails
+            async with AsyncSessionLocal() as db:
+                try:
+                    await dispatch_pending_emails(db)
+                except Exception:
+                    await db.rollback()
+                    raise
+    except Exception as exc:  # noqa: BLE001 — never kill the scheduler
+        logger.exception("scheduler: email_outbox_dispatcher failed: %s", exc)
         sentry_sdk.capture_exception(exc)
 
 
@@ -234,6 +269,17 @@ def start_scheduler(app) -> AsyncIOScheduler:  # noqa: ARG001 — FastAPI app ke
         trigger=IntervalTrigger(minutes=5),
         id="auto_close_expired_exchanges",
         name="Custody exchange window auto-closer",
+        replace_existing=True,
+        coalesce=True,
+        max_instances=1,
+    )
+    # Reliability batch 1: email outbox spillover dispatcher — every 2
+    # minutes, re-send critical emails that exhausted in-process retries.
+    _scheduler.add_job(
+        _run_email_outbox_dispatcher,
+        trigger=IntervalTrigger(minutes=2),
+        id="email_outbox_dispatcher",
+        name="Critical email outbox dispatcher",
         replace_existing=True,
         coalesce=True,
         max_instances=1,

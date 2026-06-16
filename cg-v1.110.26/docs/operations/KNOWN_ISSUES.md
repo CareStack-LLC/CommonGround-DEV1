@@ -3,6 +3,10 @@
 **Last Updated:** January 10, 2026
 **Version:** 1.0.0
 
+> **See also:** [IMPROVEMENT_ROADMAP.md](./IMPROVEMENT_ROADMAP.md) — the
+> prioritized reliability/safety improvement plan (June 2026 audit), including
+> Batch 1 fixes already shipped and the Batch 2 / Later backlog.
+
 ---
 
 ## Table of Contents

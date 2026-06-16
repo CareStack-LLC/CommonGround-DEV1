@@ -34,7 +34,7 @@ function CellContent({ value }: { value: Cell }) {
   if (value === true) {
     return (
       <Check
-        className="mx-auto h-5 w-5 text-[#3DAA8A]"
+        className="mx-auto h-5 w-5 text-cg-sage"
         aria-label="Included"
       />
     );
@@ -86,7 +86,7 @@ export function ComparisonTable({
                 key={row.feature}
                 className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}
               >
-                <td className="px-6 py-4 text-sm text-[#1E3A4A]">
+                <td className="px-6 py-4 text-sm text-foreground">
                   <div className="font-medium">{row.feature}</div>
                   {row.note && (
                     <div className="mt-0.5 text-xs text-gray-500">
@@ -117,7 +117,7 @@ export function ComparisonTable({
             className="rounded-xl border border-gray-200 bg-white p-4"
           >
             <div className="mb-3">
-              <div className="text-sm font-semibold text-[#1E3A4A]">
+              <div className="text-sm font-semibold text-foreground">
                 {row.feature}
               </div>
               {row.note && (

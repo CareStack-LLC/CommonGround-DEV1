@@ -95,6 +95,21 @@ def run_migrations_online() -> None:
     connectable = create_engine(_database_url, poolclass=pool.NullPool)
 
     with connectable.connect() as connection:
+        # Some revision ids in this chain exceed Alembic's default
+        # VARCHAR(32) version column (e.g. add_parent_child_messages_20260416,
+        # 35 chars). Pre-create/widen the version table so fresh databases
+        # can bootstrap; production was widened out-of-band long ago.
+        from sqlalchemy import text
+        connection.execute(text(
+            "CREATE TABLE IF NOT EXISTS alembic_version ("
+            "version_num VARCHAR(255) NOT NULL, "
+            "CONSTRAINT alembic_version_pkc PRIMARY KEY (version_num))"
+        ))
+        connection.execute(text(
+            "ALTER TABLE alembic_version ALTER COLUMN version_num TYPE VARCHAR(255)"
+        ))
+        connection.commit()
+
         context.configure(
             connection=connection, 
             target_metadata=target_metadata,

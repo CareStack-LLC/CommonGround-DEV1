@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CommonGround – Brand Identity System</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0D1B24;
+    font-family: 'DM Sans', 'Helvetica Neue', sans-serif;
+    color: #CBD8E0;
+    min-height: 100vh;
+    padding: 64px 48px;
+  }
+
+  /* ── Header ── */
+  .header {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 72px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding-bottom: 24px;
+  }
+  .header-brand { font-size: 13px; letter-spacing: 4px; text-transform: uppercase; color: #3DAA8A; font-weight: 500; }
+  .header-sub   { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #3A5668; }
+
+  /* ── Section layout ── */
+  .section { margin-bottom: 80px; }
+  .section-label {
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #3A5668;
+    margin-bottom: 24px;
+    font-weight: 500;
+  }
+
+  /* ── Cards ── */
+  .card-light {
+    background: #F4F8F7;
+    border-radius: 24px;
+    padding: 60px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .card-dark {
+    background: #162530;
+    border-radius: 24px;
+    padding: 60px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+  .card-mid {
+    background: #1E3A4A;
+    border-radius: 24px;
+    padding: 60px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ── Two-col grid ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+
+  /* ── Icon row ── */
+  .icon-row { display: flex; gap: 40px; align-items: flex-end; }
+  .icon-item { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .icon-item span {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #3A5668;
+  }
+
+  /* ── Palette ── */
+  .palette { display: flex; gap: 12px; flex-wrap: wrap; }
+  .swatch {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .swatch-box {
+    width: 88px;
+    height: 88px;
+    border-radius: 16px;
+  }
+  .swatch-name { font-size: 11px; color: #6B8A9A; letter-spacing: 1px; }
+  .swatch-hex  { font-size: 10px; color: #3A5668; font-family: monospace; letter-spacing: 1px; }
+
+  /* ── Divider ── */
+  .divider { height: 1px; background: rgba(255,255,255,0.05); margin: 80px 0; }
+
+  /* ── Rationale ── */
+  .rationale {
+    background: #111F28;
+    border-left: 3px solid #3DAA8A;
+    padding: 28px 32px;
+    border-radius: 0 16px 16px 0;
+    max-width: 680px;
+  }
+  .rationale p { font-size: 14px; line-height: 1.9; color: #7A9CAD; }
+  .rationale strong { color: #F5A623; font-weight: 500; }
+
+  /* ── Usage note ── */
+  .usage-note {
+    margin-top: 20px;
+    font-size: 11px;
+    color: #3A5668;
+    letter-spacing: 1px;
+    line-height: 1.8;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <span class="header-brand">CommonGround</span>
+  <span class="header-sub">Brand Identity System · 2026</span>
+</div>
+
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- 1. APP ICON                                   -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label">01 — App Icon</div>
+  <div class="three-col">
+
+    <!-- Dark bg (primary) -->
+    <div class="card-mid" style="flex-direction:column; gap:32px;">
+      <svg width="160" height="160" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="bg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1E3A4A"/><stop offset="100%" stop-color="#2D6A8F"/></linearGradient>
+          <linearGradient id="lf1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#5BC4A0"/><stop offset="100%" stop-color="#3DAA8A"/></linearGradient>
+          <linearGradient id="rf1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#4BA8C8"/><stop offset="100%" stop-color="#2D6A8F"/></linearGradient>
+          <filter id="gl1"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <rect width="512" height="512" rx="120" fill="url(#bg1)"/>
+        <!-- Left parent -->
+        <circle cx="168" cy="148" r="48" fill="url(#lf1)"/>
+        <path d="M118 218 Q168 258 218 218" stroke="url(#lf1)" stroke-width="16" stroke-linecap="round" fill="none"/>
+        <!-- Right parent -->
+        <circle cx="344" cy="148" r="48" fill="url(#rf1)"/>
+        <path d="M294 218 Q344 258 394 218" stroke="url(#rf1)" stroke-width="16" stroke-linecap="round" fill="none"/>
+        <!-- Golden arch — the smile of peace -->
+        <path d="M218 168 Q256 104 294 168" stroke="#F5A623" stroke-width="10" stroke-linecap="round" fill="none" filter="url(#gl1)" opacity="0.95"/>
+        <!-- Child -->
+        <circle cx="256" cy="330" r="38" fill="#F5A623"/>
+        <path d="M218 382 Q256 414 294 382" stroke="#F5A623" stroke-width="12" stroke-linecap="round" fill="none"/>
+      </svg>
+      <span style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#3A5668;">Primary Dark</span>
+    </div>
+
+    <!-- Light bg -->
+    <div class="card-light" style="flex-direction:column; gap:32px;">
+      <svg width="160" height="160" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#E8F4F8"/><stop offset="100%" stop-color="#D6ECE8"/></linearGradient>
+          <linearGradient id="lf2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#5BC4A0"/><stop offset="100%" stop-color="#3DAA8A"/></linearGradient>
+          <linearGradient id="rf2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#4BA8C8"/><stop offset="100%" stop-color="#2D6A8F"/></linearGradient>
+          <filter id="gl2"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <rect width="512" height="512" rx="120" fill="url(#bg2)"/>
+        <circle cx="168" cy="148" r="48" fill="url(#lf2)"/>
+        <path d="M118 218 Q168 258 218 218" stroke="url(#lf2)" stroke-width="16" stroke-linecap="round" fill="none"/>
+        <circle cx="344" cy="148" r="48" fill="url(#rf2)"/>
+        <path d="M294 218 Q344 258 394 218" stroke="url(#rf2)" stroke-width="16" stroke-linecap="round" fill="none"/>
+        <path d="M218 168 Q256 104 294 168" stroke="#F5A623" stroke-width="10" stroke-linecap="round" fill="none" filter="url(#gl2)" opacity="0.95"/>
+        <circle cx="256" cy="330" r="38" fill="#F5A623"/>
+        <path d="M218 382 Q256 414 294 382" stroke="#F5A623" stroke-width="12" stroke-linecap="round" fill="none"/>
+      </svg>
+      <span style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#9BBAC8;">Light Variant</span>
+    </div>
+
+    <!-- Size comparison -->
+    <div class="card-dark" style="flex-direction:column; gap:36px;">
+      <div class="icon-row" style="align-items:center;">
+        <!-- 96px -->
+        <div class="icon-item">
+          <svg width="96" height="96" viewBox="0 0 512 512" fill="none">
+            <defs>
+              <linearGradient id="bg3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1E3A4A"/><stop offset="100%" stop-color="#2D6A8F"/></linearGradient>
+              <linearGradient id="lf3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#5BC4A0"/><stop offset="100%" stop-color="#3DAA8A"/></linearGradient>
+              <linearGradient id="rf3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#4BA8C8"/><stop offset="100%" stop-color="#2D6A8F"/></linearGradient>
+            </defs>
+            <rect width="512" height="512" rx="120" fill="url(#bg3)"/>
+            <circle cx="168" cy="148" r="48" fill="url(#lf3)"/>
+            <path d="M118 218 Q168 258 218 218" stroke="url(#lf3)" stroke-width="16" stroke-linecap="round" fill="none"/>
+            <circle cx="344" cy="148" r="48" fill="url(#rf3)"/>
+            <path d="M294 218 Q344 258 394 218" stroke="url(#rf3)" stroke-width="16" stroke-linecap="round" fill="none"/>
+            <path d="M218 168 Q256 104 294 168" stroke="#F5A623" stroke-width="10" stroke-linecap="round" fill="none"/>
+            <circle cx="256" cy="330" r="38" fill="#F5A623"/>
+            <path d="M218 382 Q256 414 294 382" stroke="#F5A623" stroke-width="12" stroke-linecap="round" fill="none"/>
+          </svg>
+          <span>96px</span>
+        </div>
+        <!-- 56px -->
+        <div class="icon-item">
+          <svg width="56" height="56" viewBox="0 0 512 512" fill="none">
+            <rect width="512" height="512" rx="120" fill="#1E3A4A"/>
+            <circle cx="168" cy="148" r="52" fill="#3DAA8A"/>
+            <path d="M110 222 Q168 268 226 222" stroke="#3DAA8A" stroke-width="18" stroke-linecap="round" fill="none"/>
+            <circle cx="344" cy="148" r="52" fill="#2D6A8F"/>
+            <path d="M286 222 Q344 268 402 222" stroke="#2D6A8F" stroke-width="18" stroke-linecap="round" fill="none"/>
+            <path d="M226 170 Q256 110 286 170" stroke="#F5A623" stroke-width="12" stroke-linecap="round" fill="none"/>
+            <circle cx="256" cy="330" r="40" fill="#F5A623"/>
+            <path d="M216 382 Q256 416 296 382" stroke="#F5A623" stroke-width="14" stroke-linecap="round" fill="none"/>
+          </svg>
+          <span>56px</span>
+        </div>
+        <!-- 32px favicon -->
+        <div class="icon-item">
+          <svg width="32" height="32" viewBox="0 0 512 512" fill="none">
+            <rect width="512" height="512" rx="100" fill="#1E3A4A"/>
+            <circle cx="168" cy="148" r="60" fill="#3DAA8A"/>
+            <circle cx="344" cy="148" r="60" fill="#2D6A8F"/>
+            <path d="M226 170 Q256 110 286 170" stroke="#F5A623" stroke-width="16" stroke-linecap="round" fill="none"/>
+            <circle cx="256" cy="340" r="46" fill="#F5A623"/>
+          </svg>
+          <span>Favicon</span>
+        </div>
+      </div>
+      <span style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:#3A5668;">Size Variants</span>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- 2. STACKED LOGO (icon on top, text below)     -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label">02 — Stacked Logo</div>
+  <div class="two-col">
+
+    <!-- Light -->
+    <div class="card-light">
+      <svg width="280" height="300" viewBox="0 0 280 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="sbl" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#2D6A8F"/><stop offset="100%" stop-color="#3DAA8A"/></linearGradient>
+          <linearGradient id="slf" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#5BC4A0"/><stop offset="100%" stop-color="#3DAA8A"/></linearGradient>
+          <linearGradient id="srf" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#4BA8C8"/><stop offset="100%" stop-color="#2D6A8F"/></linearGradient>
+          <filter id="sgl"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <!-- Icon centered -->
+        <g transform="translate(60, 10)">
+          <circle cx="56" cy="48" r="28" fill="url(#slf)"/>
+          <path d="M28 82 Q56 102 84 82" stroke="url(#slf)" stroke-width="9" stroke-linecap="round" fill="none"/>
+          <circle cx="104" cy="48" r="28" fill="url(#srf)"/>
+          <path d="M76 82 Q104 102 132 82" stroke="url(#srf)" stroke-width="9" stroke-linecap="round" fill="none"/>
+          <path d="M84 60 Q80 36 76 60" stroke="#F5A623" stroke-width="6" stroke-linecap="round" fill="none" filter="url(#sgl)"/>
+          <path d="M84 60 Q94 36 104 60" stroke="#F5A623" stroke-width="6" stroke-linecap="round" fill="none" filter="url(#sgl)"/>
+          <circle cx="80" cy="118" r="22" fill="#F5A623"/>
+          <path d="M58 146 Q80 162 102 146" stroke="#F5A623" stroke-width="8" stroke-linecap="round" fill="none"/>
+        </g>
+        <!-- Stacked text -->
+        <text x="140" y="210" text-anchor="middle" font-family="Georgia, serif" font-size="46" font-weight="700" letter-spacing="-1" fill="#1E3A4A">Common</text>
+        <text x="140" y="258" text-anchor="middle" font-family="Georgia, serif" font-size="46" font-weight="400" letter-spacing="-1" fill="url(#sbl)">Ground</text>
+        <text x="140" y="284" text-anchor="middle" font-family="'Helvetica Neue', sans-serif" font-size="11" letter-spacing="3" fill="#6B8A9A">CO-PARENTING, REIMAGINED</text>
+      </svg>
+    </div>
+
+    <!-- Dark -->
+    <div class="card-dark">
+      <svg width="280" height="300" viewBox="0 0 280 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="sbd" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#4BA8C8"/><stop offset="100%" stop-color="#5BC4A0"/></linearGradient>
+          <linearGradient id="slfd" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#5BC4A0"/><stop offset="100%" stop-color="#3DAA8A"/></linearGradient>
+          <linearGradient id="srfd" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#4BA8C8"/><stop offset="100%" stop-color="#2D6A8F"/></linearGradient>
+          <filter id="sgld"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <g transform="translate(60, 10)">
+          <circle cx="56" cy="48" r="28" fill="url(#slfd)"/>
+          <path d="M28 82 Q56 102 84 82" stroke="url(#slfd)" stroke-width="9" stroke-linecap="round" fill="none"/>
+          <circle cx="104" cy="48" r="28" fill="url(#srfd)"/>
+          <path d="M76 82 Q104 102 132 82" stroke="url(#srfd)" stroke-width="9" stroke-linecap="round" fill="none"/>
+          <path d="M84 60 Q80 36 76 60" stroke="#F5A623" stroke-width="6" stroke-linecap="round" fill="none" filter="url(#sgld)"/>
+          <path d="M84 60 Q94 36 104 60" stroke="#F5A623" stroke-width="6" stroke-linecap="round" fill="none" filter="url(#sgld)"/>
+          <circle cx="80" cy="118" r="22" fill="#F5A623"/>
+          <path d="M58 146 Q80 162 102 146" stroke="#F5A623" stroke-width="8" stroke-linecap="round" fill="none"/>
+        </g>
+        <text x="140" y="210" text-anchor="middle" font-family="Georgia, serif" font-size="46" font-weight="700" letter-spacing="-1" fill="white">Common</text>
+        <text x="140" y="258" text-anchor="middle" font-family="Georgia, serif" font-size="46" font-weight="400" letter-spacing="-1" fill="url(#sbd)">Ground</text>
+        <text x="140" y="284" text-anchor="middle" font-family="'Helvetica Neue', sans-serif" font-size="11" letter-spacing="3" fill="#4A6A7A">CO-PARENTING, REIMAGINED</text>
+      </svg>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- 3. HORIZONTAL LOGO                            -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label">03 — Horizontal Logo</div>
+  <div class="two-col">
+
+    <!-- Light -->
+    <div class="card-light">
+      <svg width="520" height="120" viewBox="0 0 520 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="hbl" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#2D6A8F"/><stop offset="100%" stop-color="#3DAA8A"/></linearGradient>
+          <linearGradient id="hlf" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#5BC4A0"/><stop offset="100%" stop-color="#3DAA8A"/></linearGradient>
+          <linearGradient id="hrf" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#4BA8C8"/><stop offset="100%" stop-color="#2D6A8F"/></linearGradient>
+          <filter id="hgl"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <!-- Icon mark -->
+        <g transform="translate(8, 6)">
+          <circle cx="34" cy="26" r="16" fill="url(#hlf)"/>
+          <path d="M18 48 Q34 60 50 48" stroke="url(#hlf)" stroke-width="6" stroke-linecap="round" fill="none"/>
+          <circle cx="72" cy="26" r="16" fill="url(#hrf)"/>
+          <path d="M56 48 Q72 60 88 48" stroke="url(#hrf)" stroke-width="6" stroke-linecap="round" fill="none"/>
+          <path d="M50 34 Q53 18 56 34" stroke="#F5A623" stroke-width="4" stroke-linecap="round" fill="none" filter="url(#hgl)"/>
+          <path d="M50 34 Q56 18 62 34" stroke="#F5A623" stroke-width="4" stroke-linecap="round" fill="none" filter="url(#hgl)"/>
+          <circle cx="53" cy="74" r="13" fill="#F5A623"/>
+          <path d="M40 92 Q53 102 66 92" stroke="#F5A623" stroke-width="5" stroke-linecap="round" fill="none"/>
+        </g>
+        <!-- Wordmark -->
+        <text x="114" y="68" font-family="Georgia, serif" font-size="52" font-weight="700" letter-spacing="-1.5" fill="#1E3A4A">Common</text>
+        <text x="358" y="68" font-family="Georgia, serif" font-size="52" font-weight="400" letter-spacing="-1.5" fill="url(#hbl)">Ground</text>
+        <text x="116" y="92" font-family="'Helvetica Neue', sans-serif" font-size="10" letter-spacing="3" fill="#6B8A9A">CO-PARENTING, REIMAGINED</text>
+      </svg>
+    </div>
+
+    <!-- Dark -->
+    <div class="card-dark">
+      <svg width="520" height="120" viewBox="0 0 520 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="hbd" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#4BA8C8"/><stop offset="100%" stop-color="#5BC4A0"/></linearGradient>
+          <linearGradient id="hlfd" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#5BC4A0"/><stop offset="100%" stop-color="#3DAA8A"/></linearGradient>
+          <linearGradient id="hrfd" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#4BA8C8"/><stop offset="100%" stop-color="#2D6A8F"/></linearGradient>
+          <filter id="hgld"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <g transform="translate(8, 6)">
+          <circle cx="34" cy="26" r="16" fill="url(#hlfd)"/>
+          <path d="M18 48 Q34 60 50 48" stroke="url(#hlfd)" stroke-width="6" stroke-linecap="round" fill="none"/>
+          <circle cx="72" cy="26" r="16" fill="url(#hrfd)"/>
+          <path d="M56 48 Q72 60 88 48" stroke="url(#hrfd)" stroke-width="6" stroke-linecap="round" fill="none"/>
+          <path d="M50 34 Q53 18 56 34" stroke="#F5A623" stroke-width="4" stroke-linecap="round" fill="none" filter="url(#hgld)"/>
+          <path d="M50 34 Q56 18 62 34" stroke="#F5A623" stroke-width="4" stroke-linecap="round" fill="none" filter="url(#hgld)"/>
+          <circle cx="53" cy="74" r="13" fill="#F5A623"/>
+          <path d="M40 92 Q53 102 66 92" stroke="#F5A623" stroke-width="5" stroke-linecap="round" fill="none"/>
+        </g>
+        <text x="114" y="68" font-family="Georgia, serif" font-size="52" font-weight="700" letter-spacing="-1.5" fill="white">Common</text>
+        <text x="358" y="68" font-family="Georgia, serif" font-size="52" font-weight="400" letter-spacing="-1.5" fill="url(#hbd)">Ground</text>
+        <text x="116" y="92" font-family="'Helvetica Neue', sans-serif" font-size="10" letter-spacing="3" fill="#4A6A7A">CO-PARENTING, REIMAGINED</text>
+      </svg>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- 4. COLOR PALETTE                              -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label">04 — Color Palette</div>
+  <div class="palette">
+    <div class="swatch">
+      <div class="swatch-box" style="background:#1E3A4A;"></div>
+      <span class="swatch-name">Deep Navy</span>
+      <span class="swatch-hex">#1E3A4A</span>
+    </div>
+    <div class="swatch">
+      <div class="swatch-box" style="background:#2D6A8F;"></div>
+      <span class="swatch-name">Ocean Blue</span>
+      <span class="swatch-hex">#2D6A8F</span>
+    </div>
+    <div class="swatch">
+      <div class="swatch-box" style="background:#4BA8C8;"></div>
+      <span class="swatch-name">Sky Blue</span>
+      <span class="swatch-hex">#4BA8C8</span>
+    </div>
+    <div class="swatch">
+      <div class="swatch-box" style="background:#3DAA8A;"></div>
+      <span class="swatch-name">Calm Teal</span>
+      <span class="swatch-hex">#3DAA8A</span>
+    </div>
+    <div class="swatch">
+      <div class="swatch-box" style="background:#5BC4A0;"></div>
+      <span class="swatch-name">Soft Teal</span>
+      <span class="swatch-hex">#5BC4A0</span>
+    </div>
+    <div class="swatch">
+      <div class="swatch-box" style="background:#F5A623; box-shadow: 0 0 24px rgba(245,166,35,0.4);"></div>
+      <span class="swatch-name">Child Gold ✦</span>
+      <span class="swatch-hex">#F5A623</span>
+    </div>
+    <div class="swatch">
+      <div class="swatch-box" style="background:#F4F8F7; border:1px solid rgba(45,106,143,0.15);"></div>
+      <span class="swatch-name">Soft White</span>
+      <span class="swatch-hex">#F4F8F7</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════ -->
+<!-- 5. DESIGN RATIONALE                           -->
+<!-- ══════════════════════════════════════════════ -->
+<div class="section">
+  <div class="section-label">05 — Design Rationale</div>
+  <div class="rationale">
+    <p>
+      <strong>The Icon reads like a calm smile.</strong> Two parent figures (teal left, blue right) sit at the top — distinct, separate, but equal. Between them, a golden arch rises like a bridge of communication. Below it, a gold child figure anchors the composition, small but always the focal point. Together the shape forms a face at peace — the quiet relief families feel when conflict gives way to cooperation.<br><br>
+      <strong>Typography:</strong> Georgia serif for the wordmark signals authority and warmth simultaneously — trusted by attorneys in courtrooms and readable by parents under stress. <em>Common</em> in bold navy grounds the name; <em>Ground</em> in teal gradient lifts it.<br><br>
+      <strong>Gold (#F5A623)</strong> is used only for the child and the connecting arch — it always draws the eye to what matters most. Parents are teal and blue; the child is gold. Every time.
+    </p>
+  </div>
+  <p class="usage-note">
+    AI Image Prompt: "Minimal professional logo mark. Two adult figures in teal and blue, connected by a soft golden arch above a small gold child figure. The composition resembles a calm smiling face. Clean vector style, navy background, no text."
+  </p>
+</div>
+
+
+</body>
+</html>

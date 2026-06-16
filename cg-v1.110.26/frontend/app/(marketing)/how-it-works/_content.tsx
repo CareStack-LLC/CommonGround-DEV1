@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   UserPlus,
   Users,
@@ -74,30 +75,47 @@ export function HowItWorksContent() {
     <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9]">
       {/* Hero */}
       <section className="pt-24 pb-16 sm:pt-32 sm:pb-24">
-        <div className="max-w-5xl mx-auto px-6 text-center">
-          <h1
-            className="text-5xl sm:text-6xl lg:text-7xl font-serif text-[#1E3A4A] mb-6 leading-[1.05]"
-            style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
-          >
-            From setup to
-            <br />
-            <span className="text-[#F5A623]">family peace in 5 steps</span>
-          </h1>
-          <p className="text-xl sm:text-2xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Secure, structured, and simple. A system that
-            <span className="font-medium text-[var(--portal-primary)]"> handles coordination so you can focus on your children.</span>
-          </p>
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="grid items-center gap-10 lg:gap-14 lg:grid-cols-2">
+            {/* Text */}
+            <div className="text-center lg:text-left">
+              <h1
+                className="text-5xl sm:text-6xl lg:text-7xl font-serif text-[#1E3A4A] mb-6 leading-[1.05]"
+                style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
+              >
+                From setup to
+                <br />
+                <span className="text-[#F5A623]">peace in 5 steps</span>
+              </h1>
+              <p className="text-xl sm:text-2xl text-gray-600 mb-8 max-w-2xl mx-auto lg:mx-0">
+                Secure, structured, simple. CommonGround
+                <span className="font-medium text-[var(--portal-primary)]"> handles the coordination so you can focus on your children.</span>
+              </p>
 
-          <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-500">
-            {benefits.map((benefit) => {
-              const Icon = benefit.icon;
-              return (
-                <span key={benefit.text} className="flex items-center gap-1.5">
-                  <Icon className="h-4 w-4 text-[var(--portal-primary)]" />
-                  {benefit.text}
-                </span>
-              );
-            })}
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-6 text-sm text-gray-500">
+                {benefits.map((benefit) => {
+                  const Icon = benefit.icon;
+                  return (
+                    <span key={benefit.text} className="flex items-center gap-1.5">
+                      <Icon className="h-4 w-4 text-[var(--portal-primary)]" />
+                      {benefit.text}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Image */}
+            <div className="relative mx-auto w-full max-w-xl lg:max-w-none">
+              <Image
+                src="/images/marketing/cg_howitworks_phone.jpg"
+                alt="A parent using the CommonGround app on a phone at home"
+                width={1200}
+                height={800}
+                priority
+                className="w-full h-auto rounded-3xl shadow-xl object-cover"
+              />
+            </div>
           </div>
         </div>
       </section>

@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CommonGround — Accounts, Emails & API Keys Checklist</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --navy:    #0D1B24;
+  --navy-2:  #162530;
+  --navy-3:  #1E3A4A;
+  --teal:    #3DAA8A;
+  --teal-lt: #5BC4A0;
+  --blue:    #2D6A8F;
+  --blue-lt: #4BA8C8;
+  --gold:    #F5A623;
+  --slate:   #3A5668;
+  --text:    #CBD8E0;
+  --text-dim:#7A9CAD;
+  --white:   #FFFFFF;
+  --red:     #E05353;
+  --orange:  #E08C2A;
+  --yellow:  #D4B84A;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { background:var(--navy); color:var(--text); font-family:'DM Sans',sans-serif; font-size:14px; line-height:1.7; }
+
+/* PRINT */
+@media print {
+  body { background:#fff; color:#000; font-size:11px; }
+  .cover { background:#fff; border-bottom:2px solid #000; min-height:auto; padding:24px; }
+  .cover h1 { color:#000; font-size:28px; }
+  .cover p { color:#333; }
+  .meta-row .meta-item label { color:#666; }
+  .meta-row .meta-item span { color:#000; }
+  .toc { display:none; }
+  section { padding:20px 24px; }
+  .group { background:#f8f8f8; border:1px solid #ddd; break-inside:avoid; }
+  .group-header { background:#f0f0f0; border-bottom:1px solid #ddd; }
+  .group-title { color:#000; }
+  .group-sub { color:#333; }
+  .row { border-bottom:1px solid #eee; }
+  .row-name { color:#000; }
+  .row-desc { color:#333; }
+  .row-tier { color:#444; }
+  .row-url a { color:#0066cc; }
+  .check-box { border:2px solid #000; background:#fff !important; }
+  .check-box.done { background:#000 !important; }
+  .sec-title { color:#000; }
+  .sec-intro { color:#333; }
+  .sec-eye { color:#555; }
+  .alert { border:1px solid #999; background:#f9f9f9; }
+  .alert p { color:#333; }
+  .priority-badge { border:1px solid #666; background:#eee !important; color:#000 !important; }
+  footer { display:none; }
+}
+
+.cover { min-height:60vh; display:flex; flex-direction:column; justify-content:center; padding:60px 72px; border-bottom:1px solid rgba(45,106,143,0.2); position:relative; overflow:hidden; background:linear-gradient(148deg,#0D1B24 0%,#162530 55%,#1c2e3d 100%); }
+.cover::after { content:''; position:absolute; top:-200px; right:-100px; width:500px; height:500px; background:radial-gradient(circle,rgba(61,170,138,0.06) 0%,transparent 60%); pointer-events:none; }
+.eyebrow { font-size:10px; letter-spacing:4px; text-transform:uppercase; color:var(--blue-lt); margin-bottom:14px; }
+.cover h1 { font-family:'DM Serif Display',serif; font-size:46px; line-height:1.1; color:var(--white); margin-bottom:14px; max-width:700px; }
+.cover h1 em { color:var(--teal-lt); font-style:normal; }
+.cover p { font-size:15px; color:var(--text-dim); max-width:620px; margin-bottom:32px; line-height:1.85; }
+.meta-row { display:flex; gap:40px; flex-wrap:wrap; }
+.meta-item label { display:block; font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--slate); margin-bottom:3px; }
+.meta-item span { font-size:13px; color:var(--text); font-weight:500; }
+
+.toc { background:var(--navy-3); border-bottom:1px solid rgba(255,255,255,0.05); padding:18px 72px; display:flex; gap:0; flex-wrap:wrap; }
+.toc a { color:var(--text-dim); text-decoration:none; font-size:11.5px; padding:4px 14px 4px 0; border-right:1px solid rgba(255,255,255,0.05); margin-right:14px; transition:color 0.2s; }
+.toc a:hover { color:var(--teal); }
+.toc a:last-child { border-right:none; }
+
+section { padding:48px 72px; border-bottom:1px solid rgba(255,255,255,0.04); }
+.sec-eye { font-size:9px; letter-spacing:4px; text-transform:uppercase; color:var(--blue-lt); margin-bottom:10px; }
+.sec-title { font-family:'DM Serif Display',serif; font-size:26px; color:var(--white); margin-bottom:8px; }
+.sec-intro { font-size:14px; color:var(--text-dim); max-width:700px; margin-bottom:28px; line-height:1.85; }
+
+/* GROUP = one service provider section */
+.group { background:var(--navy-2); border:1px solid rgba(255,255,255,0.07); border-radius:16px; margin-bottom:16px; overflow:hidden; }
+.group-header { padding:14px 20px; border-bottom:1px solid rgba(255,255,255,0.06); display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.group-left { display:flex; align-items:center; gap:12px; }
+.group-icon { font-size:22px; }
+.group-title { font-size:16px; font-weight:600; color:var(--white); }
+.group-sub { font-size:12px; color:var(--text-dim); margin-top:1px; }
+.group-badges { display:flex; gap:6px; flex-wrap:wrap; }
+
+/* ROW = one item in a group */
+.row { display:grid; grid-template-columns:28px 1fr 160px 180px 120px; gap:0; align-items:start; border-bottom:1px solid rgba(255,255,255,0.03); padding:10px 16px; }
+.row:last-child { border-bottom:none; }
+.row:hover { background:rgba(255,255,255,0.02); }
+.check-box { width:20px; height:20px; border:1.5px solid var(--slate); border-radius:5px; margin-top:2px; cursor:pointer; flex-shrink:0; transition:all 0.15s; display:flex; align-items:center; justify-content:center; }
+.check-box:hover { border-color:var(--teal); }
+.check-box.done { background:var(--teal); border-color:var(--teal); }
+.check-box.done::after { content:'✓'; color:var(--navy); font-size:12px; font-weight:700; }
+.row-name { font-size:13px; font-weight:500; color:var(--white); padding-right:12px; }
+.row-name span { display:block; font-size:11px; color:var(--text-dim); font-weight:400; margin-top:2px; line-height:1.4; }
+.row-desc { font-size:12px; color:var(--text-dim); padding-right:12px; line-height:1.5; }
+.row-tier { font-size:12px; color:var(--text-dim); padding-right:12px; }
+.row-url { font-size:11px; }
+.row-url a { color:var(--blue-lt); text-decoration:none; font-family:'JetBrains Mono',monospace; }
+.row-url a:hover { color:var(--teal); text-decoration:underline; }
+
+/* ROW HEADERS */
+.row-header { display:grid; grid-template-columns:28px 1fr 160px 180px 120px; gap:0; padding:7px 16px; background:rgba(0,0,0,0.15); border-bottom:1px solid rgba(255,255,255,0.05); }
+.row-header span { font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--slate); font-weight:500; }
+
+/* EMAIL-SPECIFIC LAYOUT */
+.row.email-row { grid-template-columns:28px 1fr 1fr 1fr; }
+.row-header.email-header { grid-template-columns:28px 1fr 1fr 1fr; }
+
+/* TAGS */
+.tag { display:inline-flex; align-items:center; padding:2px 8px; border-radius:4px; font-size:10px; font-weight:700; letter-spacing:0.6px; text-transform:uppercase; white-space:nowrap; }
+.tag.required { background:rgba(224,83,83,0.15); color:var(--red); border:1px solid rgba(224,83,83,0.2); }
+.tag.recommended { background:rgba(245,166,35,0.15); color:var(--gold); border:1px solid rgba(245,166,35,0.2); }
+.tag.optional { background:rgba(58,86,104,0.3); color:var(--text-dim); }
+.tag.phase2 { background:rgba(123,94,167,0.15); color:#A885D8; border:1px solid rgba(123,94,167,0.2); }
+.tag.free { background:rgba(61,170,138,0.12); color:var(--teal-lt); }
+.tag.exists { background:rgba(45,106,143,0.15); color:var(--blue-lt); }
+
+/* PRIORITY BADGE */
+.priority-badge { padding:3px 10px; border-radius:5px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap; }
+.p1 { background:rgba(224,83,83,0.15); color:var(--red); }
+.p2 { background:rgba(245,166,35,0.15); color:var(--gold); }
+.p3 { background:rgba(58,86,104,0.3); color:var(--text-dim); }
+
+/* ALERT */
+.alert { padding:12px 18px; border-radius:10px; margin:12px 0; display:flex; gap:10px; align-items:flex-start; }
+.alert.gold { background:rgba(245,166,35,0.07); border:1px solid rgba(245,166,35,0.2); }
+.alert.red  { background:rgba(224,83,83,0.07); border:1px solid rgba(224,83,83,0.2); }
+.alert.teal { background:rgba(61,170,138,0.07); border:1px solid rgba(61,170,138,0.2); }
+.alert.blue { background:rgba(45,106,143,0.08); border:1px solid rgba(45,106,143,0.22); }
+.alert-icon { font-size:13px; flex-shrink:0; margin-top:1px; }
+.alert p { font-size:13px; line-height:1.6; }
+.alert.gold p { color:var(--gold); }
+.alert.red p  { color:var(--red); }
+.alert.teal p { color:var(--teal-lt); }
+.alert.blue p { color:var(--blue-lt); }
+
+/* INPUT FIELD for filling out */
+.fill-field { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:6px; padding:5px 10px; font-size:12px; color:var(--text-dim); font-family:'JetBrains Mono',monospace; min-height:28px; cursor:text; }
+.fill-field::placeholder { color:var(--slate); }
+
+/* PROGRESS BAR */
+.progress-section { background:var(--navy-3); padding:16px 72px; border-bottom:1px solid rgba(255,255,255,0.05); display:flex; align-items:center; gap:20px; }
+.progress-label { font-size:12px; color:var(--text-dim); white-space:nowrap; }
+.progress-bar { flex:1; height:6px; background:rgba(255,255,255,0.07); border-radius:3px; overflow:hidden; }
+.progress-fill { height:100%; background:var(--teal); border-radius:3px; width:0%; transition:width 0.3s; }
+.progress-count { font-size:12px; color:var(--teal); white-space:nowrap; font-family:'JetBrains Mono',monospace; }
+
+/* COST SUMMARY */
+.cost-table { width:100%; border-collapse:collapse; }
+.cost-table th { text-align:left; font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--slate); padding:8px 12px; border-bottom:1px solid rgba(255,255,255,0.07); }
+.cost-table td { padding:9px 12px; font-size:13px; color:var(--text-dim); border-bottom:1px solid rgba(255,255,255,0.03); }
+.cost-table td:first-child { color:var(--white); font-weight:500; }
+.cost-table td:last-child { color:var(--teal); font-family:'JetBrains Mono',monospace; text-align:right; }
+.cost-table tr.total td { border-top:1px solid rgba(255,255,255,0.1); color:var(--white); font-weight:600; font-size:14px; }
+.cost-table tr.total td:last-child { color:var(--gold); }
+
+footer { padding:28px 72px; background:var(--navy-3); border-top:1px solid rgba(255,255,255,0.05); display:flex; justify-content:space-between; align-items:center; }
+footer p { font-size:12px; color:var(--slate); }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="eyebrow">Infrastructure Checklist · All Services + Credentials</div>
+  <h1>Every Account.<br>Every Key.<br><em>Nothing Missed.</em></h1>
+  <p>A printable checklist of every email address, service account, API key, and third-party integration CommonGround needs — with the recommended starting tier for each, the priority level, and where to sign up.</p>
+  <div class="meta-row">
+    <div class="meta-item"><label>Total Services</label><span>42 items across 11 categories</span></div>
+    <div class="meta-item"><label>Must Have Before Demo</label><span>14 items marked Priority 1</span></div>
+    <div class="meta-item"><label>Must Have Before Launch</label><span>26 items marked Priority 1–2</span></div>
+    <div class="meta-item"><label>Phase 2 / Scale</label><span>16 items marked Priority 3</span></div>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-section" id="progress-section">
+  <span class="progress-label">Checklist progress:</span>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+  <span class="progress-count" id="progress-count">0 / 42 complete</span>
+</div>
+
+<!-- TOC -->
+<nav class="toc">
+  <a href="#s-email">Email Addresses</a>
+  <a href="#s-hosting">Hosting + Deploy</a>
+  <a href="#s-db">Database + Auth</a>
+  <a href="#s-ai">AI Providers</a>
+  <a href="#s-video">Video + Calling</a>
+  <a href="#s-payments">Payments</a>
+  <a href="#s-email-send">Email Sending</a>
+  <a href="#s-media">Media + Storage</a>
+  <a href="#s-monitor">Monitoring</a>
+  <a href="#s-legal">Legal + Compliance</a>
+  <a href="#s-tools">Business Tools</a>
+  <a href="#s-costs">Est. Monthly Cost</a>
+</nav>
+
+
+<!-- ═══════ EMAIL ADDRESSES ═══════ -->
+<section id="s-email">
+  <div class="sec-eye">01 — Email Addresses</div>
+  <h2 class="sec-title">Google Suite — find-commonground.com</h2>
+  <p class="sec-intro">All on your existing Google Workspace account on find-commonground.com. Create these as individual mailboxes or aliases. You already have this domain — just add the inboxes.</p>
+
+  <div class="alert blue">
+    <div class="alert-icon">→</div>
+    <p><strong>Google Workspace ($6/user/mo or $12/user/mo Business Standard)</strong> — You can create shared mailboxes/aliases that route to existing accounts at no extra cost per address. Only actual human users cost per-seat. Create most of these as routing aliases to your primary inbox to start.</p>
+  </div>
+
+  <div class="group">
+    <div class="group-header">
+      <div class="group-left">
+        <div class="group-icon">📧</div>
+        <div>
+          <div class="group-title">Google Workspace — find-commonground.com</div>
+          <div class="group-sub">Create in Google Admin Console → Directory → Users/Groups</div>
+        </div>
+      </div>
+      <span class="priority-badge p1">Priority 1</span>
+    </div>
+    <div class="row-header email-header">
+      <span></span>
+      <span>Email Address</span>
+      <span>Purpose</span>
+      <span>Routes To</span>
+    </div>
+    <div class="row email-row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">hello@find-commonground.com<span>General contact / landing page</span></div>
+      <div class="row-desc">Primary inbound from website contact form and press inquiries</div>
+      <div class="row-tier">Your personal inbox · You handle</div>
+    </div>
+    <div class="row email-row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">support@find-commonground.com<span>Customer support</span></div>
+      <div class="row-desc">All parent and attorney support tickets. Mentioned in all app notifications.</div>
+      <div class="row-tier">Your inbox or help desk tool (Intercom/Zendesk later)</div>
+    </div>
+    <div class="row email-row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">invitations@find-commonground.com<span>Client invitation emails</span></div>
+      <div class="row-desc">SendGrid sends attorney client invitations as this address. Reply-to goes to the attorney's real email.</div>
+      <div class="row-tier">Support inbox (replies from confused clients land here)</div>
+    </div>
+    <div class="row email-row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">cases@find-commonground.com<span>Case activity alerts</span></div>
+      <div class="row-desc">Attorney alert emails for case events, compliance notifications</div>
+      <div class="row-tier">Support inbox or auto-ticket</div>
+    </div>
+    <div class="row email-row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">intake@find-commonground.com<span>ARIA intake session links</span></div>
+      <div class="row-desc">Attorney sends ARIA intake links to clients — comes from this address</div>
+      <div class="row-tier">Support inbox</div>
+    </div>
+    <div class="row email-row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">noreply@find-commonground.com<span>System notifications</span></div>
+      <div class="row-desc">Automated receipts, password resets, subscription confirmations. Auto-reply: "Reply to support@ for help."</div>
+      <div class="row-tier">Auto-reply pointing to support@</div>
+    </div>
+    <div class="row email-row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">legal@find-commonground.com<span>Legal + compliance</span></div>
+      <div class="row-desc">GDPR deletion requests, subpoenas, legal correspondence, court consent requests</div>
+      <div class="row-tier">Your inbox · Review carefully before acting</div>
+    </div>
+    <div class="row email-row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">billing@find-commonground.com<span>Billing questions</span></div>
+      <div class="row-desc">Stripe sends receipts from this address. Payment dispute and refund inquiries.</div>
+      <div class="row-tier">Your inbox or support inbox</div>
+    </div>
+    <div class="row email-row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">partners@find-commonground.com<span>Nonprofit + attorney partnerships</span></div>
+      <div class="row-desc">Incoming partnership inquiries, nonprofit grant program correspondence</div>
+      <div class="row-tier">Your inbox</div>
+    </div>
+    <div class="row email-row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">dev@find-commonground.com<span>Developer / technical</span></div>
+      <div class="row-desc">Service account registrations, API provider alerts, GitHub notifications</div>
+      <div class="row-tier">Your inbox or developer's inbox</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════ HOSTING + DEPLOY ═══════ -->
+<section id="s-hosting">
+  <div class="sec-eye">02 — Hosting + Deployment</div>
+  <h2 class="sec-title">Frontend, Backend, CI/CD, Domain</h2>
+
+  <div class="group">
+    <div class="group-header">
+      <div class="group-left"><div class="group-icon">▲</div><div><div class="group-title">Vercel</div><div class="group-sub">Frontend hosting — find-commonground.com</div></div></div>
+      <div class="group-badges"><span class="tag exists">Already Have</span><span class="priority-badge p1">Priority 1</span></div>
+    </div>
+    <div class="row-header"><span></span><span>Item</span><span>Recommended Tier</span><span>Why / Notes</span><span>Status</span></div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">Vercel Account<span>vercel.com</span></div>
+      <div class="row-desc">Frontend deployed here already (common-ground-blue.vercel.app)</div>
+      <div class="row-tier"><strong>Pro — $20/mo</strong><br>Free tier has 100GB bandwidth. Hit that fast with a real product.</div>
+      <div class="row-url"><a href="https://vercel.com/pricing" target="_blank">vercel.com/pricing</a></div>
+    </div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">Custom Domain Connected<span>find-commonground.com → Vercel</span></div>
+      <div class="row-desc">Production domain must point to Vercel. Also: admin.find-commonground.com for Super Admin Portal</div>
+      <div class="row-tier">Included with Vercel Pro</div>
+      <div class="row-url"><a href="https://vercel.com/docs/domains" target="_blank">vercel.com/docs/domains</a></div>
+    </div>
+  </div>
+
+  <div class="group">
+    <div class="group-header">
+      <div class="group-left"><div class="group-icon">🔵</div><div><div class="group-title">Render</div><div class="group-sub">Backend API hosting — FastAPI</div></div></div>
+      <div class="group-badges"><span class="tag exists">Already Have</span><span class="priority-badge p1">Priority 1</span></div>
+    </div>
+    <div class="row-header"><span></span><span>Item</span><span>Recommended Tier</span><span>Why / Notes</span><span>Status</span></div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">Render Account<span>render.com</span></div>
+      <div class="row-desc">FastAPI backend deployed here (commonground-api-gdxg.onrender.com). Free tier spins down — upgrade before demos.</div>
+      <div class="row-tier"><strong>Starter — $7/mo per service</strong><br>Keeps service always-on. No spin-down. Essential before first attorney demo.</div>
+      <div class="row-url"><a href="https://render.com/pricing" target="_blank">render.com/pricing</a></div>
+    </div>
+  </div>
+
+  <div class="group">
+    <div class="group-header">
+      <div class="group-left"><div class="group-icon">🐙</div><div><div class="group-title">GitHub</div><div class="group-sub">Source control + CI/CD</div></div></div>
+      <div class="group-badges"><span class="tag exists">Already Have</span><span class="priority-badge p1">Priority 1</span></div>
+    </div>
+    <div class="row-header"><span></span><span>Item</span><span>Recommended Tier</span><span>Why / Notes</span><span>Status</span></div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">GitHub Account / Org<span>github.com/simpletech310/CommonGround</span></div>
+      <div class="row-desc">Repo exists. GitHub Actions for CI/CD is already configured per the project spec.</div>
+      <div class="row-tier"><strong>Free</strong> (public) or <strong>Team $4/user/mo</strong> for private repos + branch protection</div>
+      <div class="row-url"><a href="https://github.com/pricing" target="_blank">github.com/pricing</a></div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════ DATABASE + AUTH ═══════ -->
+<section id="s-db">
+  <div class="sec-eye">03 — Database + Auth + Cache</div>
+  <h2 class="sec-title">Supabase, Redis, Backups</h2>
+
+  <div class="group">
+    <div class="group-header">
+      <div class="group-left"><div class="group-icon">⚡</div><div><div class="group-title">Supabase</div><div class="group-sub">PostgreSQL + Auth + Realtime + Storage</div></div></div>
+      <div class="group-badges"><span class="tag exists">Already Have</span><span class="priority-badge p1">Priority 1</span></div>
+    </div>
+    <div class="row-header"><span></span><span>Item / Key Name</span><span>Recommended Tier</span><span>Why / Notes</span><span>URL</span></div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">Supabase Project<span>SUPABASE_URL</span></div>
+      <div class="row-desc">Main database, auth, realtime. Already in use.</div>
+      <div class="row-tier"><strong>Pro — $25/mo</strong><br>Free tier pauses after 1 week inactivity. Pro = always-on, daily backups, 8GB DB.</div>
+      <div class="row-url"><a href="https://supabase.com/pricing" target="_blank">supabase.com/pricing</a></div>
+    </div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">Supabase Anon Key<span>SUPABASE_ANON_KEY</span></div>
+      <div class="row-desc">Public key used in frontend. In dashboard → Settings → API</div>
+      <div class="row-tier">Included with project</div>
+      <div class="row-url"><a href="https://app.supabase.com" target="_blank">app.supabase.com</a></div>
+    </div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">Supabase Service Role Key<span>SUPABASE_SERVICE_ROLE_KEY</span></div>
+      <div class="row-desc">Server-only key for admin operations (generate magic links, bypass RLS). NEVER expose to frontend.</div>
+      <div class="row-tier">Included with project</div>
+      <div class="row-url"><a href="https://app.supabase.com" target="_blank">app.supabase.com</a></div>
+    </div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">Supabase Realtime enabled<span>For case_events + attorney notifications</span></div>
+      <div class="row-desc">Enable Realtime on tables: case_events, attorney_notifications, kidspace_sessions. Dashboard → Database → Replication.</div>
+      <div class="row-tier">Included with Pro plan</div>
+      <div class="row-url"><a href="https://app.supabase.com" target="_blank">app.supabase.com</a></div>
+    </div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">Supabase Storage buckets created<span>For reports, evidence clips, content</span></div>
+      <div class="row-desc">Buckets: partner-reports, evidence-clips (private), kidspace-content, user-uploads</div>
+      <div class="row-tier">100GB included in Pro · $0.021/GB over</div>
+      <div class="row-url"><a href="https://app.supabase.com" target="_blank">app.supabase.com</a></div>
+    </div>
+  </div>
+
+  <div class="group">
+    <div class="group-header">
+      <div class="group-left"><div class="group-icon">🔴</div><div><div class="group-title">Redis / Upstash</div><div class="group-sub">Caching + session state + ARIA rate limiting</div></div></div>
+      <div class="group-badges"><span class="priority-badge p1">Priority 1</span></div>
+    </div>
+    <div class="row-header"><span></span><span>Item / Key Name</span><span>Recommended Tier</span><span>Why / Notes</span><span>URL</span></div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">Upstash Redis<span>REDIS_URL</span></div>
+      <div class="row-desc">Serverless Redis. Used for ARIA rate limiting, game session state, call state. Upstash works with Render.</div>
+      <div class="row-tier"><strong>Pay-as-you-go</strong> — Free up to 10k commands/day. ~$0.20/100k requests after that.</div>
+      <div class="row-url"><a href="https://upstash.com" target="_blank">upstash.com</a></div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════ AI PROVIDERS ═══════ -->
+<section id="s-ai">
+  <div class="sec-eye">04 — AI Providers</div>
+  <h2 class="sec-title">Anthropic, OpenAI, AssemblyAI</h2>
+
+  <div class="alert gold">
+    <div class="alert-icon">★</div>
+    <p><strong>ARIA is model-agnostic by design.</strong> You need both Anthropic and OpenAI accounts — Anthropic is primary for text analysis and intake, OpenAI is the fallback. AssemblyAI handles all audio transcription for parent calls and KidSpace. All three are required before co-parent calling and KidSpace go live.</p>
+  </div>
+
+  <div class="group" style="margin-top:14px;">
+    <div class="group-header">
+      <div class="group-left"><div class="group-icon">🤖</div><div><div class="group-title">Anthropic (Claude)</div><div class="group-sub">Primary AI provider — ARIA text analysis + intake summaries</div></div></div>
+      <div class="group-badges"><span class="tag exists">Already Have</span><span class="priority-badge p1">Priority 1</span></div>
+    </div>
+    <div class="row-header"><span></span><span>Item / Key Name</span><span>Recommended Tier</span><span>Why / Notes</span><span>URL</span></div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">Anthropic API Account<span>ANTHROPIC_API_KEY</span></div>
+      <div class="row-desc">Claude Sonnet 4.6 for text analysis, intake summaries, report narratives, KidSpace Guard audio classification</div>
+      <div class="row-tier"><strong>Pay-as-you-go</strong><br>~$3/M input tokens · $15/M output. No monthly minimum. Set spend limits.</div>
+      <div class="row-url"><a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></div>
+    </div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">Anthropic Spend Limit Set<span>Prevent runaway costs</span></div>
+      <div class="row-desc">Set a monthly spend limit in the Anthropic console. Start at $100/mo, increase as needed. Without this, a bug in the ARIA loop could rack up thousands.</div>
+      <div class="row-tier">Required — set before going live</div>
+      <div class="row-url"><a href="https://console.anthropic.com/settings/billing" target="_blank">console.anthropic.com</a></div>
+    </div>
+  </div>
+
+  <div class="group">
+    <div class="group-header">
+      <div class="group-left"><div class="group-icon">🧠</div><div><div class="group-title">OpenAI</div><div class="group-sub">Fallback AI provider — ARIA failover</div></div></div>
+      <div class="group-badges"><span class="priority-badge p1">Priority 1</span></div>
+    </div>
+    <div class="row-header"><span></span><span>Item / Key Name</span><span>Recommended Tier</span><span>Why / Notes</span><span>URL</span></div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">OpenAI API Account<span>OPENAI_API_KEY</span></div>
+      <div class="row-desc">Fallback for Claude. ARIA automatically routes to OpenAI if Claude is unavailable. GPT-4o for analysis.</div>
+      <div class="row-tier"><strong>Pay-as-you-go</strong><br>~$2.50/M input · $10/M output (GPT-4o). Set spend limit here too.</div>
+      <div class="row-url"><a href="https://platform.openai.com" target="_blank">platform.openai.com</a></div>
+    </div>
+  </div>
+
+  <div class="group">
+    <div class="group-header">
+      <div class="group-left"><div class="group-icon">🎙️</div><div><div class="group-title">AssemblyAI</div><div class="group-sub">Real-time audio transcription — co-parent calls + KidSpace</div></div></div>
+      <div class="group-badges"><span class="priority-badge p1">Priority 1 — Before Calling Goes Live</span></div>
+    </div>
+    <div class="row-header"><span></span><span>Item / Key Name</span><span>Recommended Tier</span><span>Why / Notes</span><span>URL</span></div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">AssemblyAI Account<span>ASSEMBLYAI_API_KEY</span></div>
+      <div class="row-desc">Streaming transcription for KidSpace calls and co-parent calls. Real-time, 10s rolling windows.</div>
+      <div class="row-tier"><strong>Pay-as-you-go</strong><br>$0.65/hour of audio. 5 hours/mo free. A 14-min call = $0.15.</div>
+      <div class="row-url"><a href="https://www.assemblyai.com/pricing" target="_blank">assemblyai.com/pricing</a></div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════ VIDEO + CALLING ═══════ -->
+<section id="s-video">
+  <div class="sec-eye">05 — Video + Calling</div>
+  <h2 class="sec-title">Daily.co — KidSpace + Co-Parent Calls</h2>
+
+  <div class="group">
+    <div class="group-header">
+      <div class="group-left"><div class="group-icon">📹</div><div><div class="group-title">Daily.co</div><div class="group-sub">Video infrastructure — KidSpace + co-parent calling</div></div></div>
+      <div class="group-badges"><span class="tag exists">Already Have</span><span class="priority-badge p1">Priority 1</span></div>
+    </div>
+    <div class="row-header"><span></span><span>Item / Key Name</span><span>Recommended Tier</span><span>Why / Notes</span><span>URL</span></div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">Daily.co Account<span>DAILY_API_KEY</span></div>
+      <div class="row-desc">Video rooms for KidSpace calls, co-parent video calls. Cloud recording must be enabled for ARIA monitoring and evidence storage.</div>
+      <div class="row-tier"><strong>Scale plan — $0.00285/participant-minute</strong><br>Free plan: 10k min/mo. Enable cloud recording (required for ARIA) = additional $0.0035/min stored.</div>
+      <div class="row-url"><a href="https://www.daily.co/pricing" target="_blank">daily.co/pricing</a></div>
+    </div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">Daily.co Cloud Recording Enabled<span>For ARIA evidence extraction</span></div>
+      <div class="row-desc">Required for KidSpace evidence clips and co-parent call recordings. Enable in Daily.co dashboard → Settings → Recording.</div>
+      <div class="row-tier">Enabled on Scale plan</div>
+      <div class="row-url"><a href="https://docs.daily.co/reference/rest-api/recordings" target="_blank">docs.daily.co</a></div>
+    </div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">Daily.co Webhooks Configured<span>For call start/end events</span></div>
+      <div class="row-desc">Webhooks fire when calls start/end — triggers ARIA monitoring pipeline startup and post-call processing.</div>
+      <div class="row-tier">Included with account</div>
+      <div class="row-url"><a href="https://docs.daily.co/reference/webhooks" target="_blank">docs.daily.co</a></div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════ PAYMENTS ═══════ -->
+<section id="s-payments">
+  <div class="sec-eye">06 — Payments</div>
+  <h2 class="sec-title">Stripe — Subscriptions + Billing</h2>
+
+  <div class="group">
+    <div class="group-header">
+      <div class="group-left"><div class="group-icon">💳</div><div><div class="group-title">Stripe</div><div class="group-sub">All billing — consumer subscriptions + professional plans</div></div></div>
+      <div class="group-badges"><span class="tag exists">Already Have</span><span class="priority-badge p1">Priority 1</span></div>
+    </div>
+    <div class="row-header"><span></span><span>Item / Key Name</span><span>Recommended Tier</span><span>Why / Notes</span><span>URL</span></div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">Stripe Account<span>STRIPE_SECRET_KEY + STRIPE_PUBLISHABLE_KEY</span></div>
+      <div class="row-desc">Consumer subscriptions, professional plans, ClearFund payment processing. Both test and live keys needed.</div>
+      <div class="row-tier"><strong>Pay-as-you-go</strong><br>2.9% + $0.30 per transaction. No monthly fee.</div>
+      <div class="row-url"><a href="https://stripe.com" target="_blank">stripe.com</a></div>
+    </div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">Stripe Webhook Secret<span>STRIPE_WEBHOOK_SECRET</span></div>
+      <div class="row-desc">Required to verify Stripe webhook events (payment success, failure, subscription changes). Generate in Stripe dashboard → Developers → Webhooks.</div>
+      <div class="row-tier">Included with Stripe</div>
+      <div class="row-url"><a href="https://dashboard.stripe.com/webhooks" target="_blank">dashboard.stripe.com</a></div>
+    </div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">Stripe Products + Prices Created<span>All 7 plans configured</span></div>
+      <div class="row-desc">Create products: Web Starter (free), Plus ($17.99/mo), Complete ($34.99/mo), Solo ($99/mo), Small Firm ($299/mo), Mid-Size ($799/mo). Plus annual prices for Plus/Complete.</div>
+      <div class="row-tier">One-time setup in Stripe dashboard</div>
+      <div class="row-url"><a href="https://dashboard.stripe.com/products" target="_blank">dashboard.stripe.com</a></div>
+    </div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">Stripe Customer Portal Enabled<span>Self-serve billing for users</span></div>
+      <div class="row-desc">Allows users to manage subscriptions, update payment methods, and view invoices without contacting support.</div>
+      <div class="row-tier">Included with Stripe · Configure in Settings → Billing → Customer Portal</div>
+      <div class="row-url"><a href="https://dashboard.stripe.com/settings/billing/portal" target="_blank">dashboard.stripe.com</a></div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════ EMAIL SENDING ═══════ -->
+<section id="s-email-send">
+  <div class="sec-eye">07 — Transactional Email Sending</div>
+  <h2 class="sec-title">SendGrid — All Outbound Email</h2>
+
+  <div class="group">
+    <div class="group-header">
+      <div class="group-left"><div class="group-icon">📨</div><div><div class="group-title">SendGrid (Twilio)</div><div class="group-sub">All transactional email — invitations, alerts, notifications</div></div></div>
+      <div class="group-badges"><span class="priority-badge p1">Priority 1</span></div>
+    </div>
+    <div class="row-header"><span></span><span>Item / Key Name</span><span>Recommended Tier</span><span>Why / Notes</span><span>URL</span></div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">SendGrid Account<span>SENDGRID_API_KEY</span></div>
+      <div class="row-desc">Sends attorney client invitations, ARIA notifications, monthly reports, billing alerts. Attorney-branded invitation emails require SendGrid's From Name feature.</div>
+      <div class="row-tier"><strong>Essentials — $19.95/mo</strong><br>40k emails/mo. Free = 100/day (not enough). Essentials covers early growth.</div>
+      <div class="row-url"><a href="https://sendgrid.com/pricing" target="_blank">sendgrid.com/pricing</a></div>
+    </div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">SendGrid Domain Authentication<span>DNS records added to find-commonground.com</span></div>
+      <div class="row-desc">Add 3 CNAME records to your domain registrar. Without this, emails go to spam. Required before sending any production email.</div>
+      <div class="row-tier">One-time setup — 30 minutes</div>
+      <div class="row-url"><a href="https://docs.sendgrid.com/ui/account-and-settings/how-to-set-up-domain-authentication" target="_blank">docs.sendgrid.com</a></div>
+    </div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">SendGrid Event Webhook<span>For invitation tracking (open, click, bounce)</span></div>
+      <div class="row-desc">Required for the attorney invitation flow — tracks when clients open invitations. Configure to POST to your API endpoint.</div>
+      <div class="row-tier">Included with Essentials</div>
+      <div class="row-url"><a href="https://docs.sendgrid.com/for-developers/tracking-events/event" target="_blank">docs.sendgrid.com</a></div>
+    </div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">Email Templates Created<span>In SendGrid Template Editor</span></div>
+      <div class="row-desc">Build templates for: Client Invitation, Welcome Email, ARIA Notification, Report Ready, Payment Receipt, Password Reset. Dynamic templates support personalization.</div>
+      <div class="row-tier">Included · Design once, reuse forever</div>
+      <div class="row-url"><a href="https://mc.sendgrid.com/dynamic-templates" target="_blank">mc.sendgrid.com</a></div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════ MEDIA + STORAGE + VIDEO ═══════ -->
+<section id="s-media">
+  <div class="sec-eye">08 — Media, Storage, and Vision AI</div>
+  <h2 class="sec-title">AWS — Rekognition + S3 + CloudFront</h2>
+
+  <div class="alert blue">
+    <div class="alert-icon">→</div>
+    <p><strong>AWS is where the heavy lifting happens for KidSpace and co-parent call video monitoring.</strong> Rekognition = video frame analysis. S3 = KidSpace streaming content and evidence clips. CloudFront = CDN for HLS video delivery. You need one AWS account — the services are all under it.</p>
+  </div>
+
+  <div class="group" style="margin-top:14px;">
+    <div class="group-header">
+      <div class="group-left"><div class="group-icon">☁️</div><div><div class="group-title">Amazon Web Services (AWS)</div><div class="group-sub">Rekognition, S3, CloudFront</div></div></div>
+      <div class="group-badges"><span class="priority-badge p1">Priority 1 — Before KidSpace + Calling</span></div>
+    </div>
+    <div class="row-header"><span></span><span>Item / Key Name</span><span>Recommended Tier</span><span>Why / Notes</span><span>URL</span></div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">AWS Account<span>Root account — use IAM for app keys</span></div>
+      <div class="row-desc">One AWS account for all AWS services. Create an IAM user with limited permissions for the app — never use root credentials in code.</div>
+      <div class="row-tier"><strong>Pay-as-you-go</strong><br>No monthly minimum. Create with a credit card. Enable billing alerts immediately.</div>
+      <div class="row-url"><a href="https://aws.amazon.com" target="_blank">aws.amazon.com</a></div>
+    </div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">AWS IAM User + Access Keys<span>AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY</span></div>
+      <div class="row-desc">Create a dedicated IAM user for CommonGround with permissions: rekognition:DetectModerationLabels, s3:PutObject, s3:GetObject, cloudfront:CreateInvalidation</div>
+      <div class="row-tier">Free — IAM is always free</div>
+      <div class="row-url"><a href="https://console.aws.amazon.com/iam" target="_blank">console.aws.amazon.com/iam</a></div>
+    </div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">AWS Rekognition Enabled<span>AWS_REGION (us-east-1 or us-west-2)</span></div>
+      <div class="row-desc">Video frame moderation for KidSpace calls and co-parent video calls. No setup needed — it's an API. Just ensure IAM has rekognition permissions.</div>
+      <div class="row-tier"><strong>Pay-as-you-go</strong><br>$0.001 per image analyzed. A 30-min KidSpace call at 1 frame/5s = ~360 images = $0.36/call.</div>
+      <div class="row-url"><a href="https://aws.amazon.com/rekognition/pricing/" target="_blank">aws.amazon.com/rekognition</a></div>
+    </div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">AWS S3 Bucket<span>AWS_S3_BUCKET_NAME</span></div>
+      <div class="row-desc">Store: KidSpace streaming content (HLS), evidence clips (private), court evidence packages, report PDFs (backup). Create buckets: commonground-content, commonground-evidence (private), commonground-reports</div>
+      <div class="row-tier"><strong>Pay-as-you-go</strong><br>$0.023/GB/month. 100GB = $2.30/mo. Start here before considering Supabase Storage for large media.</div>
+      <div class="row-url"><a href="https://aws.amazon.com/s3/pricing/" target="_blank">aws.amazon.com/s3</a></div>
+    </div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">AWS CloudFront CDN<span>AWS_CLOUDFRONT_DISTRIBUTION_ID</span></div>
+      <div class="row-desc">CDN for KidSpace video streaming (HLS delivery). Ensures fast playback globally. Required for a good streaming experience.</div>
+      <div class="row-tier"><strong>Pay-as-you-go</strong><br>$0.0085/GB transferred. 100GB = $0.85. First 1TB/mo is $0.085/GB.</div>
+      <div class="row-url"><a href="https://aws.amazon.com/cloudfront/pricing/" target="_blank">aws.amazon.com/cloudfront</a></div>
+    </div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">AWS Billing Alert Set<span>Prevent surprise bills</span></div>
+      <div class="row-desc">Set a budget alert at $50/mo and $200/mo. Without this, a misconfigured S3 bucket or Rekognition loop can generate massive bills.</div>
+      <div class="row-tier">Required — set before any AWS service goes live</div>
+      <div class="row-url"><a href="https://console.aws.amazon.com/billing/home#/budgets" target="_blank">console.aws.amazon.com</a></div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════ MONITORING + LOGGING ═══════ -->
+<section id="s-monitor">
+  <div class="sec-eye">09 — Monitoring, Error Tracking, Analytics</div>
+  <h2 class="sec-title">Know When Something Breaks Before Your Users Do</h2>
+
+  <div class="group">
+    <div class="group-header">
+      <div class="group-left"><div class="group-icon">🐛</div><div><div class="group-title">Sentry</div><div class="group-sub">Error tracking — frontend + backend</div></div></div>
+      <div class="group-badges"><span class="priority-badge p2">Priority 2</span></div>
+    </div>
+    <div class="row-header"><span></span><span>Item / Key Name</span><span>Recommended Tier</span><span>Why / Notes</span><span>URL</span></div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">Sentry Account<span>SENTRY_DSN (backend + frontend separate)</span></div>
+      <div class="row-desc">Catches unhandled exceptions in FastAPI and Next.js. Tells you when ARIA errors out, when a report fails to generate, when a payment webhook fails.</div>
+      <div class="row-tier"><strong>Team — $26/mo</strong><br>Free = 5k errors/mo. Team = 50k. Essential for production.</div>
+      <div class="row-url"><a href="https://sentry.io/pricing/" target="_blank">sentry.io/pricing</a></div>
+    </div>
+  </div>
+
+  <div class="group">
+    <div class="group-header">
+      <div class="group-left"><div class="group-icon">📊</div><div><div class="group-title">PostHog or Mixpanel</div><div class="group-sub">Product analytics — user behavior tracking</div></div></div>
+      <div class="group-badges"><span class="priority-badge p2">Priority 2</span></div>
+    </div>
+    <div class="row-header"><span></span><span>Item / Key Name</span><span>Recommended Tier</span><span>Why / Notes</span><span>URL</span></div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">PostHog Account<span>POSTHOG_API_KEY</span></div>
+      <div class="row-desc">Track: Free→paid conversion, report generation rates, feature adoption, attorney invitation activation rates. COPPA note: do NOT enable PostHog in KidSpace — children cannot be tracked.</div>
+      <div class="row-tier"><strong>Free</strong> up to 1M events/mo. Start free.</div>
+      <div class="row-url"><a href="https://posthog.com/pricing" target="_blank">posthog.com/pricing</a></div>
+    </div>
+  </div>
+
+  <div class="group">
+    <div class="group-header">
+      <div class="group-left"><div class="group-icon">🟢</div><div><div class="group-title">UptimeRobot or Better Uptime</div><div class="group-sub">Uptime monitoring — know when the API goes down</div></div></div>
+      <div class="group-badges"><span class="priority-badge p2">Priority 2</span></div>
+    </div>
+    <div class="row-header"><span></span><span>Item / Key Name</span><span>Recommended Tier</span><span>Why / Notes</span><span>URL</span></div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">UptimeRobot Account<span>Monitor: API, frontend, admin portal</span></div>
+      <div class="row-desc">Pings your API every 5 minutes. Sends email/SMS when something goes down. Set up monitors for: commonground-api-gdxg.onrender.com, find-commonground.com, admin.find-commonground.com</div>
+      <div class="row-tier"><strong>Free</strong> — 50 monitors at 5-min interval</div>
+      <div class="row-url"><a href="https://uptimerobot.com" target="_blank">uptimerobot.com</a></div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════ LEGAL + COMPLIANCE ═══════ -->
+<section id="s-legal">
+  <div class="sec-eye">10 — Legal + Compliance</div>
+  <h2 class="sec-title">Privacy Policy, ToS, COPPA, Data Processing</h2>
+
+  <div class="alert red">
+    <div class="alert-icon">⚠</div>
+    <p><strong>Several of these are legally required before you can take a single paying user.</strong> Privacy Policy and Terms of Service are not optional. COPPA compliance is required before any child uses KidSpace. The recording consent for co-parent calling requires attorney review before that feature launches.</p>
+  </div>
+
+  <div class="group" style="margin-top:14px;">
+    <div class="group-header">
+      <div class="group-left"><div class="group-icon">⚖️</div><div><div class="group-title">Legal Documents + Services</div><div class="group-sub">Non-negotiable before any paid users</div></div></div>
+      <div class="group-badges"><span class="priority-badge p1">Priority 1</span></div>
+    </div>
+    <div class="row-header"><span></span><span>Item</span><span>How to Get It</span><span>Why / Notes</span><span>Status</span></div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">Privacy Policy (published on site)<span>/privacy-policy</span></div>
+      <div class="row-desc">Must cover: ARIA data storage, COPPA, attorney-client privilege, data retention, SHA-256 audit logs, third-party processors. Not a generic template — needs platform-specific language.</div>
+      <div class="row-tier">Termly.io or attorney review (~$500–2k)</div>
+      <div class="row-url"><a href="https://termly.io" target="_blank">termly.io</a></div>
+    </div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">Terms of Service (published on site)<span>/terms-of-service</span></div>
+      <div class="row-desc">Must include: recording consent for all calls, ARIA is not legal advice, platform neutrality, dispute resolution, attorney-client data boundaries.</div>
+      <div class="row-tier">Attorney review required (~$1k–3k)</div>
+      <div class="row-url"><a href="https://termly.io" target="_blank">termly.io</a></div>
+    </div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">COPPA Compliance Review<span>Before KidSpace launches</span></div>
+      <div class="row-desc">Children's Online Privacy Protection Act. Requires verifiable parental consent, data minimization, no behavioral advertising. Have an attorney review the KidSpace consent flow.</div>
+      <div class="row-tier">Attorney review required (~$2k–5k for COPPA specialist)</div>
+      <div class="row-url"><a href="https://www.ftc.gov/business-guidance/privacy-security/childrens-privacy" target="_blank">ftc.gov/coppa</a></div>
+    </div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">Two-Party Call Recording Consent Review<span>Before co-parent calling launches</span></div>
+      <div class="row-desc">CA, IL, FL, WA and others require all parties to consent to recording. The three-layer consent model in the spec needs attorney sign-off before this feature goes live.</div>
+      <div class="row-tier">Attorney review required · Time-sensitive before calling launch</div>
+      <div class="row-url"><a href="https://www.ncsl.org/research/telecommunications-and-information-technology/wiretapping-and-eavesdropping-overview.aspx" target="_blank">State law overview</a></div>
+    </div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">Data Processing Agreements (DPAs)<span>With Supabase, SendGrid, AssemblyAI, AWS</span></div>
+      <div class="row-desc">GDPR-required agreements with all processors handling personal data. Supabase, SendGrid, AssemblyAI, and AWS all offer standard DPAs — sign them.</div>
+      <div class="row-tier">Usually self-service — find DPA in each provider's legal docs</div>
+      <div class="row-url">Each provider's legal section</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════ BUSINESS TOOLS ═══════ -->
+<section id="s-tools">
+  <div class="sec-eye">11 — Business Operations Tools</div>
+  <h2 class="sec-title">CRM, Support, Scheduling, Docs</h2>
+
+  <div class="group">
+    <div class="group-header">
+      <div class="group-left"><div class="group-icon">🗂️</div><div><div class="group-title">HubSpot CRM</div><div class="group-sub">Attorney pipeline + deal tracking</div></div></div>
+      <div class="group-badges"><span class="priority-badge p1">Priority 1</span></div>
+    </div>
+    <div class="row-header"><span></span><span>Item</span><span>Recommended Tier</span><span>Why / Notes</span><span>URL</span></div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">HubSpot Free CRM<span>Track attorney prospects + demos</span></div>
+      <div class="row-desc">Track every attorney in the pilot pipeline — contact info, discovery call notes, demo scheduled, pilot status, conversion. Free tier is sufficient to start.</div>
+      <div class="row-tier"><strong>Free</strong> — unlimited contacts, deals, tasks. Upgrade to Starter ($50/mo) when team grows.</div>
+      <div class="row-url"><a href="https://www.hubspot.com/pricing/crm" target="_blank">hubspot.com/pricing</a></div>
+    </div>
+  </div>
+
+  <div class="group">
+    <div class="group-header">
+      <div class="group-left"><div class="group-icon">📅</div><div><div class="group-title">Calendly</div><div class="group-sub">Demo booking for attorneys</div></div></div>
+      <div class="group-badges"><span class="priority-badge p1">Priority 1</span></div>
+    </div>
+    <div class="row-header"><span></span><span>Item</span><span>Recommended Tier</span><span>Why / Notes</span><span>URL</span></div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">Calendly Account<span>Attorney demo booking + onboarding calls</span></div>
+      <div class="row-desc">Every attorney email includes a Calendly link for 15-min discovery and 45-min demo. Reduces back-and-forth. Connects to Google Calendar.</div>
+      <div class="row-tier"><strong>Standard — $10/mo</strong><br>Free = 1 event type. Standard = unlimited + team scheduling + Zoom integration.</div>
+      <div class="row-url"><a href="https://calendly.com/pricing" target="_blank">calendly.com/pricing</a></div>
+    </div>
+  </div>
+
+  <div class="group">
+    <div class="group-header">
+      <div class="group-left"><div class="group-icon">🎥</div><div><div class="group-title">Loom</div><div class="group-sub">Demo videos for attorney outreach</div></div></div>
+      <div class="group-badges"><span class="priority-badge p1">Priority 1</span></div>
+    </div>
+    <div class="row-header"><span></span><span>Item</span><span>Recommended Tier</span><span>Why / Notes</span><span>URL</span></div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">Loom Account<span>3-min ARIA intake demo video for cold outreach</span></div>
+      <div class="row-desc">The cold email follow-up sequence sends a Loom video of ARIA intake. "Last email — here's a 3-min video." Higher response rate than text description alone.</div>
+      <div class="row-tier"><strong>Starter — Free</strong> up to 25 videos. Upgrade to Business $15/mo when needed.</div>
+      <div class="row-url"><a href="https://www.loom.com/pricing" target="_blank">loom.com/pricing</a></div>
+    </div>
+  </div>
+
+  <div class="group">
+    <div class="group-header">
+      <div class="group-left"><div class="group-icon">💬</div><div><div class="group-title">Intercom or Crisp</div><div class="group-sub">In-app support chat</div></div></div>
+      <div class="group-badges"><span class="priority-badge p2">Priority 2</span></div>
+    </div>
+    <div class="row-header"><span></span><span>Item</span><span>Recommended Tier</span><span>Why / Notes</span><span>URL</span></div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">Crisp Chat (cheaper Intercom alternative)<span>In-app support widget</span></div>
+      <div class="row-desc">Live chat widget in the parent app and professional portal. Parents and attorneys can get support without leaving the app. Also handles automated FAQs.</div>
+      <div class="row-tier"><strong>Pro — $25/mo</strong><br>Intercom = $74/mo+ (too expensive for launch). Crisp is a solid alternative.</div>
+      <div class="row-url"><a href="https://crisp.chat/en/pricing/" target="_blank">crisp.chat/pricing</a></div>
+    </div>
+  </div>
+
+  <div class="group">
+    <div class="group-header">
+      <div class="group-left"><div class="group-icon">🎨</div><div><div class="group-title">Figma</div><div class="group-sub">Design — wireframes + UI design</div></div></div>
+      <div class="group-badges"><span class="priority-badge p2">Priority 2</span></div>
+    </div>
+    <div class="row-header"><span></span><span>Item</span><span>Recommended Tier</span><span>Why / Notes</span><span>URL</span></div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">Figma Account<span>UI design + brand assets + demos</span></div>
+      <div class="row-desc">Design new screens, create demo mockups, share brand assets. Free tier is fine for a solo designer. Starter needed for team collaboration.</div>
+      <div class="row-tier"><strong>Starter — $15/mo/editor</strong> or Free for solo</div>
+      <div class="row-url"><a href="https://www.figma.com/pricing/" target="_blank">figma.com/pricing</a></div>
+    </div>
+  </div>
+
+  <div class="group">
+    <div class="group-header">
+      <div class="group-left"><div class="group-icon">📱</div><div><div class="group-title">Buffer or Later</div><div class="group-sub">Social media scheduling</div></div></div>
+      <div class="group-badges"><span class="priority-badge p2">Priority 2</span></div>
+    </div>
+    <div class="row-header"><span></span><span>Item</span><span>Recommended Tier</span><span>Why / Notes</span><span>URL</span></div>
+    <div class="row">
+      <div class="check-box" onclick="toggle(this)"></div>
+      <div class="row-name">Buffer Account<span>Schedule Facebook, Instagram, TikTok, LinkedIn</span></div>
+      <div class="row-desc">Schedule a week of posts in one session on Mondays. Connects to all four platforms. Required for the weekly content calendar to be manageable.</div>
+      <div class="row-tier"><strong>Essentials — $6/mo</strong><br>Free = 3 channels. Essentials = 8 channels. Covers all 4 + extras.</div>
+      <div class="row-url"><a href="https://buffer.com/pricing" target="_blank">buffer.com/pricing</a></div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════ ESTIMATED MONTHLY COST ═══════ -->
+<section id="s-costs">
+  <div class="sec-eye">12 — Estimated Monthly Cost</div>
+  <h2 class="sec-title">What This All Costs to Run</h2>
+  <p class="sec-intro">These are the baseline operating costs before you have significant user traffic. Usage-based services (Rekognition, AssemblyAI, Claude, Daily.co) scale with usage — costs shown are estimates for ~50 active users.</p>
+
+  <div class="two-col">
+    <div>
+      <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-bottom:12px;">Fixed Monthly Costs</div>
+      <table class="cost-table">
+        <tr><th>Service</th><th>Tier</th><th>Cost/mo</th></tr>
+        <tr><td>Vercel</td><td>Pro</td><td>$20</td></tr>
+        <tr><td>Render</td><td>Starter (1 service)</td><td>$7</td></tr>
+        <tr><td>Supabase</td><td>Pro</td><td>$25</td></tr>
+        <tr><td>SendGrid</td><td>Essentials</td><td>$20</td></tr>
+        <tr><td>Sentry</td><td>Team</td><td>$26</td></tr>
+        <tr><td>Calendly</td><td>Standard</td><td>$10</td></tr>
+        <tr><td>Crisp</td><td>Pro</td><td>$25</td></tr>
+        <tr><td>Buffer</td><td>Essentials</td><td>$6</td></tr>
+        <tr><td>GitHub</td><td>Free / Team</td><td>$0–16</td></tr>
+        <tr><td>Loom</td><td>Free</td><td>$0</td></tr>
+        <tr><td>HubSpot</td><td>Free</td><td>$0</td></tr>
+        <tr><td>UptimeRobot</td><td>Free</td><td>$0</td></tr>
+        <tr><td>PostHog</td><td>Free</td><td>$0</td></tr>
+        <tr class="total"><td><strong>Fixed subtotal</strong></td><td></td><td>~$140/mo</td></tr>
+      </table>
+    </div>
+    <div>
+      <div style="font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:12px;">Variable Costs (est. ~50 active users)</div>
+      <table class="cost-table">
+        <tr><th>Service</th><th>Estimate Basis</th><th>Est./mo</th></tr>
+        <tr><td>Anthropic (Claude)</td><td>ARIA text analysis + intake</td><td>~$30</td></tr>
+        <tr><td>OpenAI (fallback)</td><td>Minimal at start</td><td>~$5</td></tr>
+        <tr><td>AssemblyAI</td><td>50 calls × 15min avg</td><td>~$8</td></tr>
+        <tr><td>AWS Rekognition</td><td>50 video calls × 180 frames</td><td>~$9</td></tr>
+        <tr><td>AWS S3 + CloudFront</td><td>Video content delivery</td><td>~$15</td></tr>
+        <tr><td>Daily.co</td><td>50 calls × 15min × 2 participants</td><td>~$4</td></tr>
+        <tr><td>Upstash Redis</td><td>Low usage at start</td><td>~$1</td></tr>
+        <tr><td>Stripe</td><td>Per transaction only</td><td>$0</td></tr>
+        <tr class="total"><td><strong>Variable subtotal</strong></td><td></td><td>~$72/mo</td></tr>
+      </table>
+      <div style="background:rgba(61,170,138,0.07);border:1px solid rgba(61,170,138,0.2);border-radius:10px;padding:12px 14px;margin-top:12px;">
+        <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:6px;">Total Estimated Baseline</div>
+        <div style="font-family:'DM Serif Display',serif;font-size:28px;color:var(--gold);">~$210/mo</div>
+        <div style="font-size:12px;color:var(--text-dim);margin-top:4px;">Before you have 100 paying users. At 100 users paying $17.99+, revenue ($1,800+) comfortably covers this.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="alert gold" style="margin-top:16px;">
+    <div class="alert-icon">★</div>
+    <p><strong>The highest uncontrolled risk is AWS and AI costs.</strong> A bug in the ARIA loop (calling the Claude API in an infinite loop) or misconfigured S3 permissions (public bucket getting scraped) can generate thousands of dollars in hours. Set billing alerts on AWS ($50 and $200/mo), Anthropic ($100/mo), and OpenAI ($50/mo) before any of these go live. This takes 10 minutes and has saved many startups from catastrophic surprise bills.</p>
+  </div>
+</section>
+
+<footer>
+  <p>CommonGround · Infrastructure Checklist · March 2026 · Print this page and check off as you go</p>
+  <p style="color:var(--teal);">42 items · 11 categories · ~$210/mo baseline to run the full platform</p>
+</footer>
+
+<script>
+// Checkbox toggle
+function toggle(el) {
+  el.classList.toggle('done');
+  updateProgress();
+}
+
+// Progress counter
+function updateProgress() {
+  const all = document.querySelectorAll('.check-box');
+  const done = document.querySelectorAll('.check-box.done');
+  const pct = Math.round((done.length / all.length) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-count').textContent = done.length + ' / ' + all.length + ' complete';
+}
+
+// Initialize count
+updateProgress();
+</script>
+
+</body>
+</html>

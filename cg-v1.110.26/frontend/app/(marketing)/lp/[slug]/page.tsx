@@ -157,10 +157,10 @@ export default async function DynamicLandingPage({ params }: Props) {
     <div className="min-h-screen bg-white">
       <LpAnalytics slug={slug} />
 
-      <section className="relative bg-gradient-to-b from-[#F4F8F7] to-white pt-20 pb-16 px-4">
+      <section className="relative bg-gradient-to-b from-cg-sand to-white pt-20 pb-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h1
-            className="text-4xl md:text-5xl text-[#1E3A4A] mb-4 leading-tight"
+            className="text-4xl md:text-5xl text-foreground mb-4 leading-tight"
             style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
           >
             {data.headline}
@@ -172,7 +172,7 @@ export default async function DynamicLandingPage({ params }: Props) {
           )}
           <a
             href={data.cta_url}
-            className="inline-flex items-center gap-2 px-8 py-4 bg-[#3DAA8A] hover:bg-[#2E9577] text-white font-semibold rounded-xl text-lg transition-colors shadow-lg shadow-[#3DAA8A]/25"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-cg-sage hover:bg-cg-sage-dark text-white font-semibold rounded-xl text-lg transition-colors shadow-lg shadow-cg-sage/25"
           >
             {data.cta_text}
           </a>
@@ -187,18 +187,18 @@ export default async function DynamicLandingPage({ params }: Props) {
 
       <section className="max-w-4xl mx-auto px-4 py-16">
         <div
-          className="prose prose-lg max-w-none prose-headings:text-[#1E3A4A] prose-p:text-gray-600"
+          className="prose prose-lg max-w-none prose-headings:text-foreground prose-p:text-gray-600"
           dangerouslySetInnerHTML={{ __html: sanitizeHtml(data.body_html) }}
         />
       </section>
 
-      <section className="bg-[#3DAA8A] py-16 px-4">
+      <section className="bg-cg-sage py-16 px-4">
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-3xl font-bold text-white mb-4">Ready to get started?</h2>
           <p className="text-white/80 mb-8">Join families using CommonGround for better co-parenting.</p>
           <Link
             href={data.cta_url}
-            className="inline-flex items-center gap-2 px-8 py-4 bg-white hover:bg-gray-50 text-[#3DAA8A] font-semibold rounded-xl text-lg transition-colors"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-white hover:bg-gray-50 text-cg-sage font-semibold rounded-xl text-lg transition-colors"
           >
             {data.cta_text}
           </Link>

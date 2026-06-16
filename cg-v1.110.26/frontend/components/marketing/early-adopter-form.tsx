@@ -56,7 +56,7 @@ export function EarlyAdopterForm({ source, className = '' }: EarlyAdopterFormPro
 
   if (isSubmitted) {
     return (
-      <div className={`text-center py-8 px-6 rounded-2xl bg-gradient-to-b from-[#F5A623]/10 to-transparent border border-[#F5A623]/30 ${className}`}>
+      <div className={`text-center py-8 px-6 rounded-2xl bg-gradient-to-b from-cg-amber/10 to-transparent border border-cg-amber/30 ${className}`}>
         <div className="text-4xl mb-3">🎉</div>
         <h3 className="text-xl font-semibold text-foreground font-serif mb-2">
           You&apos;re on the list!
@@ -69,9 +69,9 @@ export function EarlyAdopterForm({ source, className = '' }: EarlyAdopterFormPro
   }
 
   return (
-    <div className={`rounded-2xl border-2 border-[#F5A623]/40 bg-gradient-to-b from-[#F5A623]/5 to-transparent p-6 sm:p-8 ${className}`}>
+    <div className={`rounded-2xl border-2 border-cg-amber/40 bg-gradient-to-b from-cg-amber/5 to-transparent p-6 sm:p-8 ${className}`}>
       <div className="text-center mb-6">
-        <span className="inline-block px-3 py-1 text-xs font-semibold tracking-wider uppercase bg-[#F5A623]/15 text-[#C4861C] rounded-full mb-3">
+        <span className="inline-block px-3 py-1 text-xs font-semibold tracking-wider uppercase bg-cg-amber/15 text-[#C4861C] rounded-full mb-3">
           Limited Spots
         </span>
         <h3 className="text-xl sm:text-2xl font-semibold text-foreground font-serif mb-2">
@@ -88,7 +88,7 @@ export function EarlyAdopterForm({ source, className = '' }: EarlyAdopterFormPro
           value={firstName}
           onChange={(e) => setFirstName(e.target.value)}
           placeholder="First name (optional)"
-          className="w-full px-4 py-3 rounded-lg border border-[#3DAA8A]/20 bg-white text-[#1E3A4A] placeholder:text-[#6B8A9A] focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/40 focus:border-transparent"
+          className="w-full px-4 py-3 rounded-lg border border-cg-sage/20 bg-white text-foreground placeholder:text-[#6B8A9A] focus:outline-none focus:ring-2 focus:ring-cg-sage/40 focus:border-transparent"
         />
         <input
           type="email"
@@ -96,7 +96,7 @@ export function EarlyAdopterForm({ source, className = '' }: EarlyAdopterFormPro
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Your email address"
           required
-          className="w-full px-4 py-3 rounded-lg border border-[#3DAA8A]/20 bg-white text-[#1E3A4A] placeholder:text-[#6B8A9A] focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/40 focus:border-transparent"
+          className="w-full px-4 py-3 rounded-lg border border-cg-sage/20 bg-white text-foreground placeholder:text-[#6B8A9A] focus:outline-none focus:ring-2 focus:ring-cg-sage/40 focus:border-transparent"
         />
         <button
           type="submit"

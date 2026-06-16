@@ -1,9 +1,14 @@
 import type { Metadata } from 'next';
-import { getPostBySlug } from '@/lib/blog-data';
+import { getAllSlugs, getPostBySlug } from '@/lib/blog-data';
 import { BlogPostContent } from './_content';
 
 interface Props {
   params: Promise<{ slug: string }>;
+}
+
+// blogPosts is a compile-time constant — prerender every post statically.
+export function generateStaticParams() {
+  return getAllSlugs().map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

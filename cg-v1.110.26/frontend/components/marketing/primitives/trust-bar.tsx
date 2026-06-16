@@ -3,10 +3,13 @@
  *
  * Row of concrete numbers (or short labels) used under heroes to
  * establish credibility. Two visual variants:
- *   - stats: big value on top, small label beneath
+ *   - stats: value on top, small label beneath; centered row with hairline
+ *            dividers (balanced for 3 OR 4 items, unlike a fixed grid)
  *   - logos: smaller, horizontal, labels emphasized (for claim lists
- *            like "HIPAA-aligned | Attorney-reviewed | 256-bit AES")
+ *            like "Attorney-reviewed | 256-bit AES")
  */
+
+import { Fragment } from 'react';
 
 export interface TrustBarItem {
   value: string;
@@ -34,7 +37,7 @@ export function TrustBar({
             key={`${item.value}-${item.label}`}
             className="flex items-center gap-2"
           >
-            <span className="font-semibold text-[#1E3A4A]">{item.value}</span>
+            <span className="font-semibold text-foreground">{item.value}</span>
             <span>{item.label}</span>
             {idx < items.length - 1 && (
               <span
@@ -50,20 +53,25 @@ export function TrustBar({
 
   return (
     <div
-      className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 sm:gap-8 py-8 ${className}`.trim()}
+      className={`flex flex-wrap items-center justify-center gap-x-8 gap-y-6 py-8 sm:gap-x-12 lg:gap-x-16 ${className}`.trim()}
     >
-      {items.map((item) => (
-        <div
-          key={`${item.value}-${item.label}`}
-          className="text-center"
-        >
-          <div className="font-serif text-2xl sm:text-3xl md:text-4xl text-[#1E3A4A] leading-none">
-            {item.value}
+      {items.map((item, idx) => (
+        <Fragment key={`${item.value}-${item.label}`}>
+          <div className="text-center">
+            <div className="font-serif text-2xl sm:text-3xl md:text-[2.5rem] text-[#1E3A4A] leading-none">
+              {item.value}
+            </div>
+            <div className="mt-2 text-xs sm:text-sm font-medium uppercase tracking-wider text-gray-500">
+              {item.label}
+            </div>
           </div>
-          <div className="mt-2 text-xs sm:text-sm font-medium uppercase tracking-wider text-gray-500">
-            {item.label}
-          </div>
-        </div>
+          {idx < items.length - 1 && (
+            <span
+              aria-hidden="true"
+              className="hidden sm:block h-12 w-px bg-gray-200"
+            />
+          )}
+        </Fragment>
       ))}
     </div>
   );

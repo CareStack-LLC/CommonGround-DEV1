@@ -209,35 +209,35 @@ const partners: PartnerHighlight[] = [
 
 export default function StoriesPage() {
   return (
-    <div className="min-h-screen bg-[#F4F8F7]">
+    <div className="min-h-screen bg-cg-sand">
       {/* ── Section 1: Hero ──────────────────────────────────────── */}
       <section className="relative pt-16 pb-20 lg:pt-24 lg:pb-28 overflow-hidden">
         {/* Decorative blurred orbs */}
-        <div className="absolute top-10 left-1/4 w-72 h-72 bg-[#3DAA8A]/8 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#F5A623]/6 rounded-full blur-3xl" />
+        <div className="absolute top-10 left-1/4 w-72 h-72 bg-cg-sage/8 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-cg-amber/6 rounded-full blur-3xl" />
 
         <div className="relative max-w-3xl mx-auto px-6 text-center">
           {/* Decorative quote mark */}
           <div
-            className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4 text-[12rem] leading-none text-[#3DAA8A]/[0.07] pointer-events-none select-none"
+            className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4 text-[12rem] leading-none text-cg-sage/[0.07] pointer-events-none select-none"
             style={{ fontFamily: 'Georgia, serif' }}
             aria-hidden="true"
           >
             &ldquo;
           </div>
 
-          <p className="text-[#F5A623] font-medium mb-5 tracking-widest uppercase text-xs flex items-center justify-center gap-3">
-            <span className="w-8 h-px bg-[#F5A623]/40" />
+          <p className="text-cg-amber font-medium mb-5 tracking-widest uppercase text-xs flex items-center justify-center gap-3">
+            <span className="w-8 h-px bg-cg-amber/40" />
             Stories
-            <span className="w-8 h-px bg-[#F5A623]/40" />
+            <span className="w-8 h-px bg-cg-amber/40" />
           </p>
 
           <h1
-            className="text-4xl sm:text-5xl lg:text-[3.5rem] text-[#1E3A4A] mb-7 leading-[1.15]"
+            className="text-4xl sm:text-5xl lg:text-[3.5rem] text-foreground mb-7 leading-[1.15]"
             style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
           >
             When the fighting stopped,{' '}
-            <span className="text-[#3DAA8A]">the family began.</span>
+            <span className="text-cg-sage">the family began.</span>
           </h1>
 
           <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
@@ -254,11 +254,11 @@ export default function StoriesPage() {
         <div className="max-w-5xl mx-auto px-6">
           <div className="text-center mb-16 lg:mb-20">
             <h2
-              className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+              className="text-3xl sm:text-4xl text-foreground mb-4"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               Every family has a{' '}
-              <span className="text-[#3DAA8A]">turning point</span>
+              <span className="text-cg-sage">turning point</span>
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto leading-relaxed">
               Names have been changed, but these experiences are real — from
@@ -307,14 +307,14 @@ export default function StoriesPage() {
                   <div className="w-full md:w-7/12">
                     <div className="mb-1">
                       <h3
-                        className="text-2xl font-semibold text-[#1E3A4A]"
+                        className="text-2xl font-semibold text-foreground"
                         style={{
                           fontFamily: "'DM Serif Display', Georgia, serif",
                         }}
                       >
                         {story.name}
                       </h3>
-                      <p className="text-sm text-[#3DAA8A] font-medium">
+                      <p className="text-sm text-cg-sage font-medium">
                         {story.contextLine}
                       </p>
                     </div>
@@ -330,8 +330,8 @@ export default function StoriesPage() {
                       ))}
                     </div>
 
-                    <div className="mt-6 bg-[#3DAA8A]/5 rounded-lg px-5 py-3 border-l-4 border-[#3DAA8A]">
-                      <p className="text-[#1E3A4A] font-medium text-sm">
+                    <div className="mt-6 bg-cg-sage/5 rounded-lg px-5 py-3 border-l-4 border-cg-sage">
+                      <p className="text-foreground font-medium text-sm">
                         {story.highlight}
                       </p>
                     </div>
@@ -344,14 +344,14 @@ export default function StoriesPage() {
       </section>
 
       {/* ── Section 3: Before & After ────────────────────────────── */}
-      <section className="py-16 lg:py-24 bg-gradient-to-b from-[#F4F8F7] to-white">
+      <section className="py-16 lg:py-24 bg-gradient-to-b from-cg-sand to-white">
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2
-              className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+              className="text-3xl sm:text-4xl text-foreground mb-4"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
-              What <span className="text-[#3DAA8A]">changed</span>
+              What <span className="text-cg-sage">changed</span>
             </h2>
             <p className="text-gray-600 max-w-xl mx-auto">
               From families in community programs — in their words, not our
@@ -376,16 +376,16 @@ export default function StoriesPage() {
                 </div>
 
                 {/* Arrow */}
-                <div className="flex items-center justify-center sm:px-4 text-[#3DAA8A]">
+                <div className="flex items-center justify-center sm:px-4 text-cg-sage">
                   <ArrowRight className="w-5 h-5 rotate-90 sm:rotate-0" />
                 </div>
 
                 {/* After */}
-                <div className="flex-1 bg-[#3DAA8A]/5 border-l-4 border-[#3DAA8A] rounded-xl sm:rounded-l-none px-6 py-4">
-                  <p className="text-[#3DAA8A] text-xs font-medium uppercase tracking-wide mb-1">
+                <div className="flex-1 bg-cg-sage/5 border-l-4 border-cg-sage rounded-xl sm:rounded-l-none px-6 py-4">
+                  <p className="text-cg-sage text-xs font-medium uppercase tracking-wide mb-1">
                     After
                   </p>
-                  <p className="text-[#1E3A4A] font-semibold">{t.after}</p>
+                  <p className="text-foreground font-semibold">{t.after}</p>
                 </div>
               </div>
             ))}
@@ -398,11 +398,11 @@ export default function StoriesPage() {
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2
-              className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+              className="text-3xl sm:text-4xl text-foreground mb-4"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               The organizations{' '}
-              <span className="text-[#3DAA8A]">bringing this to families</span>
+              <span className="text-cg-sage">bringing this to families</span>
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
               CommonGround reaches families through the community organizations
@@ -415,7 +415,7 @@ export default function StoriesPage() {
               <Link
                 key={partner.name}
                 href={partner.href}
-                className="group block bg-[#F4F8F7] rounded-2xl overflow-hidden border border-gray-200 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+                className="group block bg-cg-sand rounded-2xl overflow-hidden border border-gray-200 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
               >
                 {/* Image */}
                 <div className="relative h-48 overflow-hidden">
@@ -431,7 +431,7 @@ export default function StoriesPage() {
                 {/* Content */}
                 <div className="p-6">
                   <h3
-                    className="text-xl text-[#1E3A4A] mb-1"
+                    className="text-xl text-foreground mb-1"
                     style={{
                       fontFamily: "'DM Serif Display', Georgia, serif",
                     }}
@@ -451,7 +451,7 @@ export default function StoriesPage() {
                   <p className="text-gray-600 text-sm leading-relaxed">
                     {partner.description}
                   </p>
-                  <p className="mt-4 text-[#3DAA8A] text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
+                  <p className="mt-4 text-cg-sage text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
                     Learn more
                     <ArrowRight className="w-4 h-4" />
                   </p>
@@ -470,15 +470,15 @@ export default function StoriesPage() {
       {/* ── Section 5: Community Invitation ───────────────────────── */}
       <section className="py-16 lg:py-24">
         <div className="max-w-3xl mx-auto px-6">
-          <div className="bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F] rounded-2xl p-8 lg:p-14 text-center relative overflow-hidden">
+          <div className="bg-gradient-to-br from-foreground to-cg-slate rounded-2xl p-8 lg:p-14 text-center relative overflow-hidden">
             {/* Decorative elements */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-white/[0.03] rounded-full -translate-y-1/2 translate-x-1/2" />
             <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/[0.03] rounded-full translate-y-1/2 -translate-x-1/2" />
 
             <div className="relative">
               <div className="flex items-center justify-center gap-2 mb-6">
-                <Heart className="w-5 h-5 text-[#F5A623]" />
-                <span className="text-[#F5A623] text-xs font-medium uppercase tracking-widest">
+                <Heart className="w-5 h-5 text-cg-amber" />
+                <span className="text-cg-amber text-xs font-medium uppercase tracking-widest">
                   Community Impact
                 </span>
               </div>
@@ -503,7 +503,7 @@ export default function StoriesPage() {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
                   href="/grant-partnership"
-                  className="inline-flex items-center justify-center gap-2 bg-white text-[#1E3A4A] font-medium px-8 py-3 rounded-full transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5"
+                  className="inline-flex items-center justify-center gap-2 bg-white text-foreground font-medium px-8 py-3 rounded-full transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5"
                 >
                   Explore Partnership
                   <ArrowRight className="w-4 h-4" />
@@ -524,7 +524,7 @@ export default function StoriesPage() {
       <section className="py-20 border-t border-gray-200 bg-white">
         <div className="max-w-2xl mx-auto px-6 text-center">
           <h2
-            className="text-3xl sm:text-4xl text-[#1E3A4A] mb-5"
+            className="text-3xl sm:text-4xl text-foreground mb-5"
             style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
           >
             Your turning point is waiting
@@ -536,14 +536,14 @@ export default function StoriesPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/early-access"
-              className="inline-flex items-center justify-center gap-2 bg-[#3DAA8A] text-white font-medium px-8 py-4 rounded-full text-lg transition-all duration-300 hover:bg-[#34967a] hover:shadow-xl hover:-translate-y-1"
+              className="inline-flex items-center justify-center gap-2 bg-cg-sage text-white font-medium px-8 py-4 rounded-full text-lg transition-all duration-300 hover:bg-cg-sage-dark hover:shadow-xl hover:-translate-y-1"
             >
               Get Started Free
               <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
               href="/how-it-works"
-              className="inline-flex items-center justify-center gap-2 border-2 border-[#3DAA8A] text-[#3DAA8A] font-medium px-8 py-4 rounded-full text-lg transition-all duration-300 hover:bg-[#3DAA8A] hover:text-white"
+              className="inline-flex items-center justify-center gap-2 border-2 border-cg-sage text-cg-sage font-medium px-8 py-4 rounded-full text-lg transition-all duration-300 hover:bg-cg-sage hover:text-white"
             >
               See How It Works
             </Link>

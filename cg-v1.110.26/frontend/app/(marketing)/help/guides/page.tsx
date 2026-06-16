@@ -112,10 +112,10 @@ export default function GuidesIndexPage() {
       <section className="pt-12 pb-8 lg:pt-16 lg:pb-12">
         <div className="max-w-5xl mx-auto px-6 text-center">
           <h1
-            className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+            className="text-3xl sm:text-4xl text-foreground mb-4"
             style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
           >
-            Step-by-step <span className="text-[#3DAA8A]">guides</span>
+            Step-by-step <span className="text-cg-sage">guides</span>
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Everything you need to know about using CommonGround, from your
@@ -137,15 +137,15 @@ export default function GuidesIndexPage() {
                   className="group bg-white rounded-2xl p-6 border border-gray-100 shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1 relative"
                 >
                   {'tag' in guide && guide.tag && (
-                    <span className="absolute top-4 right-4 text-xs font-medium bg-[#F5A623]/10 text-[#F5A623] px-2.5 py-1 rounded-full">
+                    <span className="absolute top-4 right-4 text-xs font-medium bg-cg-amber/10 text-cg-amber px-2.5 py-1 rounded-full">
                       {guide.tag}
                     </span>
                   )}
-                  <div className="w-11 h-11 rounded-xl bg-[#3DAA8A]/10 flex items-center justify-center mb-4 group-hover:bg-[#3DAA8A] transition-colors">
-                    <Icon className="w-5 h-5 text-[#3DAA8A] group-hover:text-white transition-colors" />
+                  <div className="w-11 h-11 rounded-xl bg-cg-sage/10 flex items-center justify-center mb-4 group-hover:bg-cg-sage transition-colors">
+                    <Icon className="w-5 h-5 text-cg-sage group-hover:text-white transition-colors" />
                   </div>
                   <h3
-                    className="text-lg text-[#1E3A4A] mb-1.5"
+                    className="text-lg text-foreground mb-1.5"
                     style={{
                       fontFamily: "'DM Serif Display', Georgia, serif",
                     }}
@@ -155,7 +155,7 @@ export default function GuidesIndexPage() {
                   <p className="text-sm text-gray-600 leading-relaxed mb-3">
                     {guide.description}
                   </p>
-                  <span className="text-[#3DAA8A] text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
+                  <span className="text-cg-sage text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
                     Read guide
                     <ArrowRight className="w-4 h-4" />
                   </span>

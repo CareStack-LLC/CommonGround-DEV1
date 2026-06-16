@@ -49,19 +49,19 @@ function estimateReadTime(content: string): string {
 
 function categoryToPillClasses(cat: string): string {
   const map: Record<string, string> = {
-    'Co-Parenting Tips': 'bg-[#E8F4F0] text-[#3DAA8A]',
-    'Communication': 'bg-[#FEF7ED] text-[#F5A623]',
-    'Agreements': 'bg-[#E8F4F0] text-[#3DAA8A]',
+    'Co-Parenting Tips': 'bg-cg-sage-subtle text-cg-sage',
+    'Communication': 'bg-cg-amber-subtle text-cg-amber',
+    'Agreements': 'bg-cg-sage-subtle text-cg-sage',
     'High-Conflict': 'bg-red-100 text-red-700',
-    'Parenting': 'bg-[#E8F4F0] text-[#3DAA8A]',
-    'Scheduling': 'bg-[#FEF7ED] text-[#F5A623]',
+    'Parenting': 'bg-cg-sage-subtle text-cg-sage',
+    'Scheduling': 'bg-cg-amber-subtle text-cg-amber',
     'Legal Insights': 'bg-gray-100 text-gray-700',
-    'Platform Updates': 'bg-[#FEF7ED] text-[#F5A623]',
+    'Platform Updates': 'bg-cg-amber-subtle text-cg-amber',
     'ARIA & Technology': 'bg-gray-100 text-gray-700',
-    'Family Wellness': 'bg-[#E8F4F0] text-[#3DAA8A]',
-    'KidSpace': 'bg-[#FEF7ED] text-[#F5A623]',
+    'Family Wellness': 'bg-cg-sage-subtle text-cg-sage',
+    'KidSpace': 'bg-cg-amber-subtle text-cg-amber',
   };
-  return map[cat] || 'bg-[#E8F4F0] text-[#3DAA8A]';
+  return map[cat] || 'bg-cg-sage-subtle text-cg-sage';
 }
 
 export function BlogContent() {
@@ -118,15 +118,15 @@ export function BlogContent() {
   const recentPosts = filteredPosts.filter(p => !p.featured);
 
   // Placeholder gradient for posts without images
-  const placeholderBg = 'bg-gradient-to-br from-[#E8F4F0] via-[#D6EEF5] to-[#E0E8ED]';
+  const placeholderBg = 'bg-gradient-to-br from-cg-sage-subtle via-[#D6EEF5] to-[#E0E8ED]';
 
   return (
-    <div className="bg-[#F4F8F7]">
+    <div className="bg-cg-sand">
       {/* Hero */}
-      <section className="relative py-16 lg:py-20 bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F] overflow-hidden">
+      <section className="relative py-16 lg:py-20 bg-gradient-to-br from-foreground to-cg-slate overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-10 right-[10%] w-64 h-64 rounded-full bg-[#3DAA8A]/10 blur-3xl" />
-          <div className="absolute bottom-10 left-[5%] w-48 h-48 rounded-full bg-[#F5A623]/10 blur-3xl" />
+          <div className="absolute top-10 right-[10%] w-64 h-64 rounded-full bg-cg-sage/10 blur-3xl" />
+          <div className="absolute bottom-10 left-[5%] w-48 h-48 rounded-full bg-cg-amber/10 blur-3xl" />
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
@@ -146,8 +146,8 @@ export function BlogContent() {
                 onClick={() => setActiveCategory(category)}
                 className={`px-4 py-2 text-sm rounded-full transition-all duration-300 ${
                   activeCategory === category
-                    ? 'bg-[#3DAA8A] text-white'
-                    : 'bg-[#F4F8F7] border border-gray-200 hover:border-[#3DAA8A]/30 text-[#1E3A4A]'
+                    ? 'bg-cg-sage text-white'
+                    : 'bg-cg-sand border border-gray-200 hover:border-cg-sage/30 text-foreground'
                 }`}
               >
                 {category}
@@ -160,7 +160,7 @@ export function BlogContent() {
       {/* Loading */}
       {isLoading ? (
         <div className="flex items-center justify-center py-32">
-          <Loader2 className="w-8 h-8 text-[#3DAA8A] animate-spin" />
+          <Loader2 className="w-8 h-8 text-cg-sage animate-spin" />
         </div>
       ) : (
         <>
@@ -168,7 +168,7 @@ export function BlogContent() {
           {featuredPosts.length > 0 && (
             <section className="py-16">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 className="text-2xl font-semibold text-[#1E3A4A] mb-8">Featured Articles</h2>
+                <h2 className="text-2xl font-semibold text-foreground mb-8">Featured Articles</h2>
                 <div className="grid lg:grid-cols-3 gap-8">
                   {/* Main Featured */}
                   <div className="lg:col-span-2">
@@ -185,7 +185,7 @@ export function BlogContent() {
                       <div className={`inline-block px-3 py-1 ${featuredPosts[0].pillClasses} text-sm font-medium rounded-full mb-3`}>
                         {featuredPosts[0].category}
                       </div>
-                      <h3 className="text-2xl font-semibold text-[#1E3A4A] group-hover:text-[#3DAA8A] transition-colors mb-3">{featuredPosts[0].title}</h3>
+                      <h3 className="text-2xl font-semibold text-foreground group-hover:text-cg-sage transition-colors mb-3">{featuredPosts[0].title}</h3>
                       <p className="text-gray-600 mb-4">{featuredPosts[0].excerpt}</p>
                       <div className="flex items-center gap-4 text-sm text-gray-600">
                         <span className="flex items-center gap-1"><Calendar className="w-4 h-4" />{formatDate(featuredPosts[0].date)}</span>
@@ -209,7 +209,7 @@ export function BlogContent() {
                         <div className={`inline-block px-2 py-0.5 ${post.pillClasses} text-xs font-medium rounded-full mb-2`}>
                           {post.category}
                         </div>
-                        <h3 className="font-semibold text-[#1E3A4A] group-hover:text-[#3DAA8A] transition-colors mb-2">{post.title}</h3>
+                        <h3 className="font-semibold text-foreground group-hover:text-cg-sage transition-colors mb-2">{post.title}</h3>
                         <div className="flex items-center gap-3 text-xs text-gray-600">
                           <span>{formatDate(post.date)}</span>
                           <span>{post.readTime}</span>
@@ -225,13 +225,13 @@ export function BlogContent() {
           {/* All/Recent Posts */}
           <section className="py-16 bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <h2 className="text-2xl font-semibold text-[#1E3A4A] mb-8">
+              <h2 className="text-2xl font-semibold text-foreground mb-8">
                 {activeCategory === 'All' ? 'Recent Articles' : activeCategory}
               </h2>
               {(recentPosts.length > 0 || (activeCategory !== 'All' && featuredPosts.length === 0)) ? (
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
                   {(activeCategory !== 'All' ? filteredPosts : recentPosts).map((post) => (
-                    <Link key={post.slug} href={`/blog/${post.slug}`} className="group bg-[#F4F8F7] rounded-xl border border-gray-200/50 overflow-hidden hover:shadow-lg transition-shadow">
+                    <Link key={post.slug} href={`/blog/${post.slug}`} className="group bg-cg-sand rounded-xl border border-gray-200/50 overflow-hidden hover:shadow-lg transition-shadow">
                       <div className={`aspect-[16/10] overflow-hidden ${!post.image ? placeholderBg : ''}`}>
                         {post.image ? (
                           <Image src={post.image} alt={post.title} width={1792} height={1024} sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
@@ -245,7 +245,7 @@ export function BlogContent() {
                         <div className={`inline-block px-2 py-0.5 ${post.pillClasses} text-xs font-medium rounded-full mb-3`}>
                           {post.category}
                         </div>
-                        <h3 className="font-semibold text-[#1E3A4A] group-hover:text-[#3DAA8A] transition-colors mb-2">{post.title}</h3>
+                        <h3 className="font-semibold text-foreground group-hover:text-cg-sage transition-colors mb-2">{post.title}</h3>
                         <p className="text-sm text-gray-600 mb-4 line-clamp-2">{post.excerpt}</p>
                         <div className="flex items-center gap-3 text-xs text-gray-600">
                           <span>{formatDate(post.date)}</span>
@@ -266,8 +266,8 @@ export function BlogContent() {
       {/* Newsletter */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-br from-[#E8F4F0] to-[#FEF7ED] rounded-2xl p-8 lg:p-12 text-center">
-            <h2 className="text-2xl sm:text-3xl font-semibold text-[#1E3A4A] mb-4">Get co-parenting tips in your inbox</h2>
+          <div className="bg-gradient-to-br from-cg-sage-subtle to-cg-amber-subtle rounded-2xl p-8 lg:p-12 text-center">
+            <h2 className="text-2xl sm:text-3xl font-semibold text-foreground mb-4">Get co-parenting tips in your inbox</h2>
             <p className="text-gray-600 mb-8 max-w-xl mx-auto">Join thousands of parents receiving weekly advice on communication, scheduling, and building a better co-parenting relationship.</p>
             <NewsletterForm />
             <p className="text-xs text-gray-500 mt-4">No spam. Unsubscribe anytime.</p>
@@ -278,9 +278,9 @@ export function BlogContent() {
       {/* CTA */}
       <section className="py-16 bg-white border-t border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl font-semibold text-[#1E3A4A] mb-4">Ready to put these tips into practice?</h2>
+          <h2 className="text-2xl font-semibold text-foreground mb-4">Ready to put these tips into practice?</h2>
           <p className="text-gray-600 mb-8 max-w-xl mx-auto">CommonGround gives you the tools to communicate better, track agreements, and co-parent more effectively.</p>
-          <Link href="/early-access" className="inline-flex items-center justify-center gap-2 bg-[#3DAA8A] text-white font-medium px-8 py-3 rounded-full transition-all duration-200 hover:bg-[#2D8A70] hover:shadow-lg">
+          <Link href="/early-access" className="inline-flex items-center justify-center gap-2 bg-cg-sage text-white font-medium px-8 py-3 rounded-full transition-all duration-200 hover:bg-cg-sage-dark hover:shadow-lg">
             Get Started Free <ArrowRight className="w-5 h-5" />
           </Link>
         </div>

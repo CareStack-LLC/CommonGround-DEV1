@@ -13,6 +13,7 @@ This migration adds:
 """
 
 from alembic import op
+import migration_guards as mg
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
@@ -40,8 +41,8 @@ def upgrade() -> None:
         sa.Column('updated_at', sa.DateTime, server_default=sa.func.now(), onupdate=sa.func.now()),
         sa.UniqueConstraint('family_file_id', 'room_number', name='uq_kidcoms_rooms_family_room')
     )
-    op.create_index('ix_kidcoms_rooms_family_file_id', 'kidcoms_rooms', ['family_file_id'])
-    op.create_index('ix_kidcoms_rooms_assigned_to', 'kidcoms_rooms', ['assigned_to_id'])
+    mg.safe_create_index('ix_kidcoms_rooms_family_file_id', 'kidcoms_rooms', ['family_file_id'])
+    mg.safe_create_index('ix_kidcoms_rooms_assigned_to', 'kidcoms_rooms', ['assigned_to_id'])
 
     # Create circle_users table (login for circle contacts)
     op.create_table(
@@ -59,8 +60,8 @@ def upgrade() -> None:
         sa.Column('created_at', sa.DateTime, server_default=sa.func.now()),
         sa.Column('updated_at', sa.DateTime, server_default=sa.func.now(), onupdate=sa.func.now()),
     )
-    op.create_index('ix_circle_users_email', 'circle_users', ['email'])
-    op.create_index('ix_circle_users_invite_token', 'circle_users', ['invite_token'])
+    mg.safe_create_index('ix_circle_users_email', 'circle_users', ['email'])
+    mg.safe_create_index('ix_circle_users_invite_token', 'circle_users', ['invite_token'])
 
     # Create child_users table (PIN login for children)
     op.create_table(
@@ -77,8 +78,8 @@ def upgrade() -> None:
         sa.Column('updated_at', sa.DateTime, server_default=sa.func.now(), onupdate=sa.func.now()),
         sa.UniqueConstraint('family_file_id', 'username', name='uq_child_users_family_username')
     )
-    op.create_index('ix_child_users_child_id', 'child_users', ['child_id'])
-    op.create_index('ix_child_users_family_file_id', 'child_users', ['family_file_id'])
+    mg.safe_create_index('ix_child_users_child_id', 'child_users', ['child_id'])
+    mg.safe_create_index('ix_child_users_family_file_id', 'child_users', ['family_file_id'])
 
     # Create circle_permissions table (granular permissions per contact/child)
     op.create_table(
@@ -110,9 +111,9 @@ def upgrade() -> None:
 
         sa.UniqueConstraint('circle_contact_id', 'child_id', name='uq_circle_permissions_contact_child')
     )
-    op.create_index('ix_circle_permissions_contact', 'circle_permissions', ['circle_contact_id'])
-    op.create_index('ix_circle_permissions_child', 'circle_permissions', ['child_id'])
-    op.create_index('ix_circle_permissions_family', 'circle_permissions', ['family_file_id'])
+    mg.safe_create_index('ix_circle_permissions_contact', 'circle_permissions', ['circle_contact_id'])
+    mg.safe_create_index('ix_circle_permissions_child', 'circle_permissions', ['child_id'])
+    mg.safe_create_index('ix_circle_permissions_family', 'circle_permissions', ['family_file_id'])
 
     # Create kidcoms_communication_logs table (activity logging)
     op.create_table(
@@ -144,19 +145,19 @@ def upgrade() -> None:
 
         sa.Column('created_at', sa.DateTime, server_default=sa.func.now()),
     )
-    op.create_index('ix_kidcoms_comm_logs_family', 'kidcoms_communication_logs', ['family_file_id'])
-    op.create_index('ix_kidcoms_comm_logs_child', 'kidcoms_communication_logs', ['child_id'])
-    op.create_index('ix_kidcoms_comm_logs_contact', 'kidcoms_communication_logs', ['contact_id'])
-    op.create_index('ix_kidcoms_comm_logs_started', 'kidcoms_communication_logs', ['started_at'])
+    mg.safe_create_index('ix_kidcoms_comm_logs_family', 'kidcoms_communication_logs', ['family_file_id'])
+    mg.safe_create_index('ix_kidcoms_comm_logs_child', 'kidcoms_communication_logs', ['child_id'])
+    mg.safe_create_index('ix_kidcoms_comm_logs_contact', 'kidcoms_communication_logs', ['contact_id'])
+    mg.safe_create_index('ix_kidcoms_comm_logs_started', 'kidcoms_communication_logs', ['started_at'])
 
     # Add columns to circle_contacts for room assignment
-    op.add_column('circle_contacts', sa.Column('room_number', sa.Integer, nullable=True))
-    op.add_column('circle_contacts', sa.Column('invite_sent_at', sa.DateTime, nullable=True))
+    mg.safe_add_column('circle_contacts', sa.Column('room_number', sa.Integer, nullable=True))
+    mg.safe_add_column('circle_contacts', sa.Column('invite_sent_at', sa.DateTime, nullable=True))
 
     # Add columns to kidcoms_settings for My Circle configuration
-    op.add_column('kidcoms_settings', sa.Column('child_pin_enabled', sa.Boolean, server_default='true'))
-    op.add_column('kidcoms_settings', sa.Column('circle_enabled', sa.Boolean, server_default='true'))
-    op.add_column('kidcoms_settings', sa.Column('default_call_duration', sa.Integer, server_default='60'))
+    mg.safe_add_column('kidcoms_settings', sa.Column('child_pin_enabled', sa.Boolean, server_default='true'))
+    mg.safe_add_column('kidcoms_settings', sa.Column('circle_enabled', sa.Boolean, server_default='true'))
+    mg.safe_add_column('kidcoms_settings', sa.Column('default_call_duration', sa.Integer, server_default='60'))
 
 
 def downgrade() -> None:

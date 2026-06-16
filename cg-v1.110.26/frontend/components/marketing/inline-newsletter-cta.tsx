@@ -58,8 +58,8 @@ export function InlineNewsletterCta({
 
   if (isSubmitted) {
     return (
-      <div className={`text-center py-6 px-6 rounded-2xl bg-[#3DAA8A]/5 border border-[#3DAA8A]/20 ${className}`}>
-        <p className="text-[#3DAA8A] font-semibold text-lg">You&apos;re subscribed!</p>
+      <div className={`text-center py-6 px-6 rounded-2xl bg-cg-sage/5 border border-cg-sage/20 ${className}`}>
+        <p className="text-cg-sage font-semibold text-lg">You&apos;re subscribed!</p>
         <p className="text-gray-600 text-sm mt-1">Check your inbox for a welcome email.</p>
       </div>
     );
@@ -67,10 +67,10 @@ export function InlineNewsletterCta({
 
   if (variant === 'compact') {
     return (
-      <div className={`rounded-xl bg-[#F4F8F7] border border-[#3DAA8A]/15 p-5 ${className}`}>
+      <div className={`rounded-xl bg-cg-sand border border-cg-sage/15 p-5 ${className}`}>
         <div className="flex items-center gap-2 mb-3">
-          <Mail className="w-4 h-4 text-[#3DAA8A]" />
-          <span className="font-semibold text-[#1E3A4A] text-sm">{headline}</span>
+          <Mail className="w-4 h-4 text-cg-sage" />
+          <span className="font-semibold text-foreground text-sm">{headline}</span>
         </div>
         <form onSubmit={handleSubmit} className="flex gap-2">
           <input
@@ -79,12 +79,12 @@ export function InlineNewsletterCta({
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@example.com"
             required
-            className="flex-1 px-3 py-2 rounded-lg border border-gray-200 bg-white text-sm text-[#1E3A4A] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/50 focus:border-transparent"
+            className="flex-1 px-3 py-2 rounded-lg border border-gray-200 bg-white text-sm text-foreground placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-cg-sage/50 focus:border-transparent"
           />
           <button
             type="submit"
             disabled={isSubmitting}
-            className="bg-[#3DAA8A] text-white font-medium px-4 py-2 rounded-lg text-sm hover:bg-[#2D8A6E] transition-colors disabled:opacity-50 whitespace-nowrap"
+            className="bg-cg-sage text-white font-medium px-4 py-2 rounded-lg text-sm hover:bg-cg-sage-dark transition-colors disabled:opacity-50 whitespace-nowrap"
           >
             {isSubmitting ? '...' : 'Subscribe'}
           </button>
@@ -96,9 +96,9 @@ export function InlineNewsletterCta({
 
   if (variant === 'banner') {
     return (
-      <div className={`rounded-2xl bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F] p-6 sm:p-8 text-center ${className}`}>
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#3DAA8A] via-[#F5A623] to-[#3DAA8A] rounded-t-2xl" />
-        <Mail className="w-8 h-8 text-[#F5A623] mx-auto mb-3" />
+      <div className={`rounded-2xl bg-gradient-to-br from-foreground to-cg-slate p-6 sm:p-8 text-center ${className}`}>
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cg-sage via-cg-amber to-cg-sage rounded-t-2xl" />
+        <Mail className="w-8 h-8 text-cg-amber mx-auto mb-3" />
         <h3 className="text-xl font-semibold text-white mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
           {headline}
         </h3>
@@ -110,12 +110,12 @@ export function InlineNewsletterCta({
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your email"
             required
-            className="flex-1 px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-[#F5A623]/50 focus:border-transparent"
+            className="flex-1 px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/50 focus:outline-none focus:ring-2 focus:ring-cg-amber/50 focus:border-transparent"
           />
           <button
             type="submit"
             disabled={isSubmitting}
-            className="bg-[#3DAA8A] text-white font-semibold px-6 py-3 rounded-lg hover:bg-[#2D8A6E] transition-colors disabled:opacity-50 whitespace-nowrap"
+            className="bg-cg-sage text-white font-semibold px-6 py-3 rounded-lg hover:bg-cg-sage-dark transition-colors disabled:opacity-50 whitespace-nowrap"
           >
             {isSubmitting ? 'Subscribing...' : 'Subscribe'}
           </button>
@@ -128,12 +128,12 @@ export function InlineNewsletterCta({
 
   // Default variant
   return (
-    <div className={`rounded-2xl bg-gradient-to-br from-[#F4F8F7] to-white border-2 border-[#3DAA8A]/15 p-6 sm:p-8 text-center ${className}`}>
-      <div className="w-12 h-12 bg-[#3DAA8A]/10 rounded-xl flex items-center justify-center mx-auto mb-4">
-        <Mail className="w-6 h-6 text-[#3DAA8A]" />
+    <div className={`rounded-2xl bg-gradient-to-br from-cg-sand to-white border-2 border-cg-sage/15 p-6 sm:p-8 text-center ${className}`}>
+      <div className="w-12 h-12 bg-cg-sage/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+        <Mail className="w-6 h-6 text-cg-sage" />
       </div>
       <h3
-        className="text-xl font-semibold text-[#1E3A4A] mb-2"
+        className="text-xl font-semibold text-foreground mb-2"
         style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
       >
         {headline}
@@ -146,12 +146,12 @@ export function InlineNewsletterCta({
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Enter your email"
           required
-          className="flex-1 px-4 py-3 rounded-lg border border-gray-200 bg-white text-[#1E3A4A] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/50 focus:border-transparent"
+          className="flex-1 px-4 py-3 rounded-lg border border-gray-200 bg-white text-foreground placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-cg-sage/50 focus:border-transparent"
         />
         <button
           type="submit"
           disabled={isSubmitting}
-          className="bg-[#3DAA8A] text-white font-semibold px-6 py-3 rounded-lg hover:bg-[#2D8A6E] transition-colors disabled:opacity-50 whitespace-nowrap"
+          className="bg-cg-sage text-white font-semibold px-6 py-3 rounded-lg hover:bg-cg-sage-dark transition-colors disabled:opacity-50 whitespace-nowrap"
         >
           {isSubmitting ? 'Subscribing...' : 'Subscribe'}
         </button>

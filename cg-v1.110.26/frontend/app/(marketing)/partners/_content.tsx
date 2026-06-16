@@ -81,18 +81,18 @@ function PartnerCard({ slug, name, description, website, contact, location, logo
 
                     <div className="space-y-4 text-sm text-gray-600">
                         <div className="flex items-center gap-3">
-                            <MapPin className="w-4 h-4 text-[var(--portal-primary)]" />
+                            <MapPin className="w-4 h-4 text-cg-sage" />
                             <span>{location}</span>
                         </div>
                         <div className="flex items-center gap-3">
-                            <Globe className="w-4 h-4 text-[var(--portal-primary)]" />
-                            <a href={`https://${website}`} target="_blank" rel="noopener noreferrer" className="hover:text-[var(--portal-primary)] hover:underline decoration-1 underline-offset-4 transition-colors">
+                            <Globe className="w-4 h-4 text-cg-sage" />
+                            <a href={`https://${website}`} target="_blank" rel="noopener noreferrer" className="hover:text-cg-sage hover:underline decoration-1 underline-offset-4 transition-colors">
                                 {website}
                             </a>
                         </div>
                         <div className="flex items-center gap-3">
-                            <Mail className="w-4 h-4 text-[var(--portal-primary)]" />
-                            <a href={`mailto:${contact}`} className="hover:text-[var(--portal-primary)] hover:underline decoration-1 underline-offset-4 transition-colors">
+                            <Mail className="w-4 h-4 text-cg-sage" />
+                            <a href={`mailto:${contact}`} className="hover:text-cg-sage hover:underline decoration-1 underline-offset-4 transition-colors">
                                 {contact}
                             </a>
                         </div>
@@ -102,7 +102,7 @@ function PartnerCard({ slug, name, description, website, contact, location, logo
                 {/* Content Section */}
                 <div className="flex-1">
                     <div className="mb-8">
-                        <h3 className="text-3xl font-serif font-bold text-[#1E3A4A] mb-3" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                        <h3 className="text-3xl font-serif font-bold text-foreground mb-3" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                             Mission & Impact
                         </h3>
                         <p className="text-lg text-gray-600 leading-relaxed font-light">
@@ -113,36 +113,36 @@ function PartnerCard({ slug, name, description, website, contact, location, logo
                     {/* Live Metrics Grid */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         {/* Metric 1: Families Served */}
-                        <div className="bg-[#F4F8F7] p-6 rounded-2xl border border-[var(--portal-primary)]/10">
-                            <div className="flex items-center gap-2 mb-2 text-[#F5A623]">
+                        <div className="bg-cg-sand p-6 rounded-2xl border border-cg-sage/10">
+                            <div className="flex items-center gap-2 mb-2 text-cg-amber">
                                 <Users className="w-5 h-5" />
                                 <span className="text-xs font-bold uppercase tracking-wider">Families Served</span>
                             </div>
-                            <div className="text-3xl font-serif font-bold text-[#1E3A4A]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                            <div className="text-3xl font-serif font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                                 {loading ? <Loader2 className="w-6 h-6 animate-spin text-gray-300" /> : (metrics?.active_users || metrics?.codes_activated || 0)}
                             </div>
                             <div className="text-xs text-gray-500 mt-1">Parents currently active</div>
                         </div>
 
                         {/* Metric 2: Conflict Reduction */}
-                        <div className="bg-[#F4F8F7] p-6 rounded-2xl border border-[var(--portal-primary)]/10">
-                            <div className="flex items-center gap-2 mb-2 text-[#F5A623]">
+                        <div className="bg-cg-sand p-6 rounded-2xl border border-cg-sage/10">
+                            <div className="flex items-center gap-2 mb-2 text-cg-amber">
                                 <TrendingDown className="w-5 h-5" />
                                 <span className="text-xs font-bold uppercase tracking-wider">Conflict Reduced</span>
                             </div>
-                            <div className="text-3xl font-serif font-bold text-[#1E3A4A]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                            <div className="text-3xl font-serif font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                                 {loading ? <Loader2 className="w-6 h-6 animate-spin text-gray-300" /> : (metrics?.conflict_reduction_pct ? `${metrics.conflict_reduction_pct}%` : 'N/A')}
                             </div>
                             <div className="text-xs text-gray-500 mt-1">Improvement in communication</div>
                         </div>
 
                         {/* Metric 3: Messages Improved (ARIA Interventions) */}
-                        <div className="bg-[#F4F8F7] p-6 rounded-2xl border border-[var(--portal-primary)]/10">
-                            <div className="flex items-center gap-2 mb-2 text-[#F5A623]">
+                        <div className="bg-cg-sand p-6 rounded-2xl border border-cg-sage/10">
+                            <div className="flex items-center gap-2 mb-2 text-cg-amber">
                                 <ShieldAlert className="w-5 h-5" />
                                 <span className="text-xs font-bold uppercase tracking-wider">Toxic Prevented</span>
                             </div>
-                            <div className="text-3xl font-serif font-bold text-[#1E3A4A]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                            <div className="text-3xl font-serif font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                                 {loading ? <Loader2 className="w-6 h-6 animate-spin text-gray-300" /> : (metrics?.aria_interventions || 0)}
                             </div>
                             <div className="text-xs text-gray-500 mt-1">Harmful threads blocked</div>
@@ -150,7 +150,7 @@ function PartnerCard({ slug, name, description, website, contact, location, logo
                     </div>
 
                     <div className="mt-8 flex justify-end">
-                        <Link href={`/${slug}`} className="inline-flex items-center font-medium text-[var(--portal-primary)] hover:text-[#F5A623] transition-colors group/link">
+                        <Link href={`/${slug}`} className="inline-flex items-center font-medium text-cg-sage hover:text-cg-amber transition-colors group/link">
                             View Partnership Page <ArrowRight className="w-4 h-4 ml-1 transform group-hover/link:translate-x-1 transition-transform" />
                         </Link>
                     </div>
@@ -162,16 +162,16 @@ function PartnerCard({ slug, name, description, website, contact, location, logo
 
 export function PartnersDirectoryContent() {
     return (
-        <div className="font-sans text-[#1E3A4A] bg-[#F4F8F7] min-h-screen">
+        <div className="font-sans text-foreground bg-cg-sand min-h-screen">
             {/* Hero Section */}
             <section className="relative pt-24 pb-16 px-6 overflow-hidden">
                 <div className="absolute inset-0 opacity-10 pointer-events-none">
-                    <div className="absolute top-0 left-1/4 w-96 h-96 bg-[var(--portal-primary)] rounded-full blur-3xl"></div>
-                    <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#F5A623] rounded-full blur-3xl"></div>
+                    <div className="absolute top-0 left-1/4 w-96 h-96 bg-cg-sage rounded-full blur-3xl"></div>
+                    <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-cg-amber rounded-full blur-3xl"></div>
                 </div>
 
                 <div className="relative max-w-4xl mx-auto text-center z-10">
-                    <h1 className="text-5xl sm:text-6xl lg:text-7xl font-serif text-[#1E3A4A] mb-6 leading-[1.05]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                    <h1 className="text-5xl sm:text-6xl lg:text-7xl font-serif text-foreground mb-6 leading-[1.05]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                         Our Partners
                     </h1>
                     <p className="text-xl sm:text-2xl text-gray-600 mb-8 leading-relaxed max-w-2xl mx-auto">
@@ -210,7 +210,7 @@ export function PartnersDirectoryContent() {
                         <p className="text-gray-500 mb-4">Are you a nonprofit supporting families?</p>
                         <Link
                             href="/grant-partnership"
-                            className="inline-flex h-12 items-center justify-center rounded-full bg-[var(--portal-primary)] px-8 text-sm font-medium text-white shadow transition-all hover:bg-[var(--portal-primary)]/90 hover:shadow-lg hover:-translate-y-0.5"
+                            className="inline-flex h-12 items-center justify-center rounded-full bg-cg-sage px-8 text-sm font-medium text-white shadow transition-all hover:bg-cg-sage/90 hover:shadow-lg hover:-translate-y-0.5"
                         >
                             Become a Partner
                         </Link>

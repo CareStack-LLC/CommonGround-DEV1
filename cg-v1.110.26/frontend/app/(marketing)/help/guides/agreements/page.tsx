@@ -59,14 +59,14 @@ export default function AgreementsGuidePage() {
       {/* Hero */}
       <section className="pt-10 pb-8 lg:pt-14 lg:pb-10">
         <div className="max-w-3xl mx-auto px-6 text-center">
-          <div className="w-14 h-14 rounded-2xl bg-[#3DAA8A]/10 flex items-center justify-center mx-auto mb-5">
-            <FileText className="w-7 h-7 text-[#3DAA8A]" />
+          <div className="w-14 h-14 rounded-2xl bg-cg-sage/10 flex items-center justify-center mx-auto mb-5">
+            <FileText className="w-7 h-7 text-cg-sage" />
           </div>
           <h1
-            className="text-3xl sm:text-4xl text-[#1E3A4A] mb-3"
+            className="text-3xl sm:text-4xl text-foreground mb-3"
             style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
           >
-            Agreement <span className="text-[#3DAA8A]">Builder</span>
+            Agreement <span className="text-cg-sage">Builder</span>
           </h1>
           <p className="text-lg text-gray-600 max-w-xl mx-auto">
             Create comprehensive SharedCare Agreements with guided wizards, ARIA assistance, and court-ready PDF exports.
@@ -81,7 +81,7 @@ export default function AgreementsGuidePage() {
           <ul className="grid sm:grid-cols-2 gap-x-6 gap-y-2">
             {tocItems.map((item) => (
               <li key={item.id}>
-                <a href={`#${item.id}`} className="text-[#1E3A4A] hover:text-[#3DAA8A] text-sm transition-colors">
+                <a href={`#${item.id}`} className="text-foreground hover:text-cg-sage text-sm transition-colors">
                   {item.label}
                 </a>
               </li>
@@ -92,9 +92,9 @@ export default function AgreementsGuidePage() {
         {/* What is the Agreement Builder? */}
         <section id="what-is-agreement-builder" className="mb-12 scroll-mt-24">
           <div className="flex items-center gap-3 mb-4">
-            <Layers className="w-5 h-5 text-[#3DAA8A]" />
+            <Layers className="w-5 h-5 text-cg-sage" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               What is the Agreement Builder?
@@ -111,9 +111,9 @@ export default function AgreementsGuidePage() {
         {/* Starting a New Agreement */}
         <section id="starting-agreement" className="mb-12 scroll-mt-24">
           <div className="flex items-center gap-3 mb-4">
-            <ListChecks className="w-5 h-5 text-[#3DAA8A]" />
+            <ListChecks className="w-5 h-5 text-cg-sage" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               Starting a new agreement
@@ -131,16 +131,16 @@ export default function AgreementsGuidePage() {
               'When all sections are complete, submit the agreement for your co-parent\'s review.',
             ].map((step, i) => (
               <li key={i} className="flex gap-3">
-                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#3DAA8A]/10 text-[#3DAA8A] text-sm font-semibold flex items-center justify-center">
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-cg-sage/10 text-cg-sage text-sm font-semibold flex items-center justify-center">
                   {i + 1}
                 </span>
                 <span className="text-gray-600 text-sm leading-relaxed">{step}</span>
               </li>
             ))}
           </ol>
-          <div className="bg-[#F5A623]/5 border-l-4 border-[#F5A623] rounded-lg px-5 py-4">
+          <div className="bg-cg-amber/5 border-l-4 border-cg-amber rounded-lg px-5 py-4">
             <div className="flex gap-2 items-start">
-              <Lightbulb className="w-4 h-4 text-[#F5A623] mt-0.5 flex-shrink-0" />
+              <Lightbulb className="w-4 h-4 text-cg-amber mt-0.5 flex-shrink-0" />
               <p className="text-sm text-gray-700">
                 <strong>Tip:</strong> You do not need to complete every section in one sitting. Your progress is automatically saved. Many parents take several days to work through all 18 sections thoughtfully.
               </p>
@@ -151,9 +151,9 @@ export default function AgreementsGuidePage() {
         {/* The 18 Sections */}
         <section id="the-18-sections" className="mb-12 scroll-mt-24">
           <div className="flex items-center gap-3 mb-4">
-            <FileText className="w-5 h-5 text-[#3DAA8A]" />
+            <FileText className="w-5 h-5 text-cg-sage" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               The 18 sections explained
@@ -165,11 +165,11 @@ export default function AgreementsGuidePage() {
           <div className="space-y-3">
             {agreementSections.map((section) => (
               <div key={section.num} className="flex gap-3 items-start">
-                <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-[#1E3A4A] text-white text-xs font-semibold flex items-center justify-center">
+                <span className="flex-shrink-0 w-7 h-7 rounded-lg bg-foreground text-white text-xs font-semibold flex items-center justify-center">
                   {section.num}
                 </span>
                 <div>
-                  <h3 className="text-sm font-semibold text-[#1E3A4A]">{section.name}</h3>
+                  <h3 className="text-sm font-semibold text-foreground">{section.name}</h3>
                   <p className="text-xs text-gray-500 leading-relaxed">{section.desc}</p>
                 </div>
               </div>
@@ -180,9 +180,9 @@ export default function AgreementsGuidePage() {
         {/* Using ARIA Guidance */}
         <section id="aria-guidance" className="mb-12 scroll-mt-24">
           <div className="flex items-center gap-3 mb-4">
-            <Brain className="w-5 h-5 text-[#3DAA8A]" />
+            <Brain className="w-5 h-5 text-cg-sage" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               Using ARIA guidance
@@ -200,14 +200,14 @@ export default function AgreementsGuidePage() {
               'All ARIA suggestions are recommendations. You always have final control over the content.',
             ].map((item, i) => (
               <li key={i} className="flex gap-2 text-sm text-gray-600">
-                <CheckCircle2 className="w-4 h-4 text-[#3DAA8A] mt-0.5 flex-shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-cg-sage mt-0.5 flex-shrink-0" />
                 <span>{item}</span>
               </li>
             ))}
           </ul>
-          <div className="bg-[#F5A623]/5 border-l-4 border-[#F5A623] rounded-lg px-5 py-4">
+          <div className="bg-cg-amber/5 border-l-4 border-cg-amber rounded-lg px-5 py-4">
             <div className="flex gap-2 items-start">
-              <Lightbulb className="w-4 h-4 text-[#F5A623] mt-0.5 flex-shrink-0" />
+              <Lightbulb className="w-4 h-4 text-cg-amber mt-0.5 flex-shrink-0" />
               <p className="text-sm text-gray-700">
                 <strong>Tip:</strong> ARIA is not a lawyer. While its suggestions are based on common custody best practices, always review your agreement with a family law attorney before filing it with the court.
               </p>
@@ -218,9 +218,9 @@ export default function AgreementsGuidePage() {
         {/* Quick Accords */}
         <section id="quick-accords" className="mb-12 scroll-mt-24">
           <div className="flex items-center gap-3 mb-4">
-            <Handshake className="w-5 h-5 text-[#3DAA8A]" />
+            <Handshake className="w-5 h-5 text-cg-sage" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               Quick Accords
@@ -238,7 +238,7 @@ export default function AgreementsGuidePage() {
               'All Quick Accords are stored alongside your main agreement for reference.',
             ].map((step, i) => (
               <li key={i} className="flex gap-3">
-                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#3DAA8A]/10 text-[#3DAA8A] text-sm font-semibold flex items-center justify-center">
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-cg-sage/10 text-cg-sage text-sm font-semibold flex items-center justify-center">
                   {i + 1}
                 </span>
                 <span className="text-gray-600 text-sm leading-relaxed">{step}</span>
@@ -250,9 +250,9 @@ export default function AgreementsGuidePage() {
         {/* Dual-Parent Approval */}
         <section id="dual-parent-approval" className="mb-12 scroll-mt-24">
           <div className="flex items-center gap-3 mb-4">
-            <Users className="w-5 h-5 text-[#3DAA8A]" />
+            <Users className="w-5 h-5 text-cg-sage" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               Dual-parent approval
@@ -269,9 +269,9 @@ export default function AgreementsGuidePage() {
         {/* Exporting as PDF */}
         <section id="exporting-pdf" className="mb-12 scroll-mt-24">
           <div className="flex items-center gap-3 mb-4">
-            <Download className="w-5 h-5 text-[#3DAA8A]" />
+            <Download className="w-5 h-5 text-cg-sage" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               Exporting as PDF
@@ -280,9 +280,9 @@ export default function AgreementsGuidePage() {
           <p className="text-gray-600 leading-relaxed mb-4">
             Once both parents approve the agreement, you can generate a professional, court-ready PDF that includes all 18 sections formatted for legal use. The PDF includes both parents&apos; approval timestamps and can be submitted to the court as part of your filing.
           </p>
-          <div className="bg-[#F5A623]/5 border-l-4 border-[#F5A623] rounded-lg px-5 py-4">
+          <div className="bg-cg-amber/5 border-l-4 border-cg-amber rounded-lg px-5 py-4">
             <div className="flex gap-2 items-start">
-              <Lightbulb className="w-4 h-4 text-[#F5A623] mt-0.5 flex-shrink-0" />
+              <Lightbulb className="w-4 h-4 text-cg-amber mt-0.5 flex-shrink-0" />
               <p className="text-sm text-gray-700">
                 <strong>Tip:</strong> Share the exported PDF with your attorney before filing. They can verify that the language meets your state&apos;s requirements and suggest any necessary adjustments.
               </p>
@@ -293,9 +293,9 @@ export default function AgreementsGuidePage() {
         {/* Version History */}
         <section id="version-history" className="mb-12 scroll-mt-24">
           <div className="flex items-center gap-3 mb-4">
-            <History className="w-5 h-5 text-[#3DAA8A]" />
+            <History className="w-5 h-5 text-cg-sage" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               Version history
@@ -312,7 +312,7 @@ export default function AgreementsGuidePage() {
               'Revert to a previous version if both parents agree.',
             ].map((item, i) => (
               <li key={i} className="flex gap-2 text-sm text-gray-600">
-                <CheckCircle2 className="w-4 h-4 text-[#3DAA8A] mt-0.5 flex-shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-cg-sage mt-0.5 flex-shrink-0" />
                 <span>{item}</span>
               </li>
             ))}
@@ -320,7 +320,7 @@ export default function AgreementsGuidePage() {
         </section>
 
         {/* Video Placeholder */}
-        <div className="bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F] rounded-2xl p-8 text-center text-white mb-12">
+        <div className="bg-gradient-to-br from-foreground to-cg-slate rounded-2xl p-8 text-center text-white mb-12">
           <div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-4">
             <Play className="w-7 h-7 text-white" />
           </div>
@@ -336,7 +336,7 @@ export default function AgreementsGuidePage() {
         {/* Related Guides */}
         <section className="mb-12">
           <h2
-            className="text-xl text-[#1E3A4A] mb-5"
+            className="text-xl text-foreground mb-5"
             style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
           >
             Related guides
@@ -353,7 +353,7 @@ export default function AgreementsGuidePage() {
                 href={guide.href}
                 className="group bg-white rounded-xl border border-gray-100 p-4 hover:shadow-md transition-all"
               >
-                <h3 className="text-[#1E3A4A] font-medium text-sm mb-1 group-hover:text-[#3DAA8A] transition-colors">
+                <h3 className="text-foreground font-medium text-sm mb-1 group-hover:text-cg-sage transition-colors">
                   {guide.title}
                 </h3>
                 <p className="text-xs text-gray-500">{guide.desc}</p>
@@ -365,7 +365,7 @@ export default function AgreementsGuidePage() {
         {/* Still Need Help CTA */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
           <h2
-            className="text-xl text-[#1E3A4A] mb-2"
+            className="text-xl text-foreground mb-2"
             style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
           >
             Still need help?
@@ -375,7 +375,7 @@ export default function AgreementsGuidePage() {
           </p>
           <Link
             href="/help/contact"
-            className="inline-flex items-center gap-2 bg-[#3DAA8A] text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-[#35957A] transition-colors"
+            className="inline-flex items-center gap-2 bg-cg-sage text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-cg-sage-dark transition-colors"
           >
             Contact support
             <ArrowRight className="w-4 h-4" />

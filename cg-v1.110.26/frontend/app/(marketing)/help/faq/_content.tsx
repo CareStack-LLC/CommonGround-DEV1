@@ -31,16 +31,16 @@ export function FAQContent() {
   const currentCategory = faqCategories.find((c) => c.id === activeCategory);
 
   return (
-    <div className="min-h-screen bg-[#F4F8F7]">
+    <div className="min-h-screen bg-cg-sand">
       {/* Hero */}
       <section className="pt-16 pb-8 lg:pt-24 lg:pb-12">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h1
-            className="text-4xl sm:text-5xl text-[#1E3A4A] mb-4 leading-[1.1]"
+            className="text-4xl sm:text-5xl text-foreground mb-4 leading-[1.1]"
             style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
           >
             Frequently Asked{' '}
-            <span className="text-[#F5A623]">Questions</span>
+            <span className="text-cg-amber">Questions</span>
           </h1>
           <p className="text-lg text-gray-600 max-w-xl mx-auto">
             Quick answers to common questions about CommonGround.
@@ -49,7 +49,7 @@ export function FAQContent() {
       </section>
 
       {/* Category Navigation */}
-      <section className="pb-6 sticky top-16 bg-[#F4F8F7] z-40 pt-3">
+      <section className="pb-6 sticky top-16 bg-cg-sand z-40 pt-3">
         <div className="max-w-5xl mx-auto px-6">
           <div className="flex flex-wrap justify-center gap-2">
             {faqCategories.map((category) => {
@@ -61,8 +61,8 @@ export function FAQContent() {
                   onClick={() => setActiveCategory(category.id)}
                   className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium transition-all ${
                     isActive
-                      ? 'bg-[#3DAA8A] text-white shadow-md'
-                      : 'bg-white text-gray-600 border border-gray-200 hover:border-[#3DAA8A]/30'
+                      ? 'bg-cg-sage text-white shadow-md'
+                      : 'bg-white text-gray-600 border border-gray-200 hover:border-cg-sage/30'
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
@@ -83,14 +83,14 @@ export function FAQContent() {
                 {(() => {
                   const Icon = currentCategory.icon;
                   return (
-                    <div className="w-11 h-11 rounded-xl bg-[#3DAA8A]/10 flex items-center justify-center">
-                      <Icon className="w-5 h-5 text-[#3DAA8A]" />
+                    <div className="w-11 h-11 rounded-xl bg-cg-sage/10 flex items-center justify-center">
+                      <Icon className="w-5 h-5 text-cg-sage" />
                     </div>
                   );
                 })()}
                 <div>
                   <h2
-                    className="text-2xl text-[#1E3A4A]"
+                    className="text-2xl text-foreground"
                     style={{
                       fontFamily: "'DM Serif Display', Georgia, serif",
                     }}
@@ -116,7 +116,7 @@ export function FAQContent() {
                         onClick={() => toggleQuestion(questionId)}
                         className="w-full flex items-center justify-between p-5 text-left hover:bg-gray-50/50 transition-colors"
                       >
-                        <span className="font-medium text-[#1E3A4A] pr-4 text-[15px]">
+                        <span className="font-medium text-foreground pr-4 text-[15px]">
                           {faq.question}
                         </span>
                         <ChevronDown
@@ -143,11 +143,11 @@ export function FAQContent() {
       <section className="py-8 lg:py-12">
         <div className="max-w-3xl mx-auto px-6">
           <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex flex-col sm:flex-row items-center gap-5">
-            <div className="w-12 h-12 rounded-xl bg-[#3DAA8A]/10 flex items-center justify-center flex-shrink-0">
-              <BookOpen className="w-6 h-6 text-[#3DAA8A]" />
+            <div className="w-12 h-12 rounded-xl bg-cg-sage/10 flex items-center justify-center flex-shrink-0">
+              <BookOpen className="w-6 h-6 text-cg-sage" />
             </div>
             <div className="text-center sm:text-left flex-1">
-              <h3 className="font-semibold text-[#1E3A4A] mb-1">
+              <h3 className="font-semibold text-foreground mb-1">
                 Need more detail?
               </h3>
               <p className="text-sm text-gray-600">
@@ -156,7 +156,7 @@ export function FAQContent() {
             </div>
             <Link
               href="/help/guides"
-              className="inline-flex items-center gap-2 bg-[#3DAA8A] text-white font-medium px-6 py-2.5 rounded-full text-sm transition-all hover:bg-[#34967a] hover:shadow-md"
+              className="inline-flex items-center gap-2 bg-cg-sage text-white font-medium px-6 py-2.5 rounded-full text-sm transition-all hover:bg-cg-sage-dark hover:shadow-md"
             >
               Browse Guides
               <ArrowRight className="w-4 h-4" />
@@ -168,8 +168,8 @@ export function FAQContent() {
       {/* Contact CTA */}
       <section className="py-12 lg:py-16">
         <div className="max-w-3xl mx-auto px-6">
-          <div className="bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F] rounded-2xl p-8 text-white text-center">
-            <MessageSquare className="w-10 h-10 mx-auto mb-5 text-[#F5A623]" />
+          <div className="bg-gradient-to-br from-foreground to-cg-slate rounded-2xl p-8 text-white text-center">
+            <MessageSquare className="w-10 h-10 mx-auto mb-5 text-cg-amber" />
             <h2
               className="text-2xl sm:text-3xl mb-4"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
@@ -182,7 +182,7 @@ export function FAQContent() {
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link
                 href="/help/contact"
-                className="inline-flex items-center justify-center gap-2 bg-[#F5A623] text-white font-medium px-6 py-3 rounded-full transition-all hover:bg-[#E09520] hover:shadow-lg"
+                className="inline-flex items-center justify-center gap-2 bg-cg-amber text-white font-medium px-6 py-3 rounded-full transition-all hover:bg-cg-amber-dark hover:shadow-lg"
               >
                 Contact Support
                 <ArrowRight className="w-4 h-4" />

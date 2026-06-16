@@ -39,14 +39,14 @@ export default function ExpensesGuidePage() {
       {/* Hero */}
       <section className="pt-10 pb-8 lg:pt-14 lg:pb-10">
         <div className="max-w-3xl mx-auto px-6 text-center">
-          <div className="w-14 h-14 rounded-2xl bg-[#3DAA8A]/10 flex items-center justify-center mx-auto mb-5">
-            <Wallet className="w-7 h-7 text-[#3DAA8A]" />
+          <div className="w-14 h-14 rounded-2xl bg-cg-sage/10 flex items-center justify-center mx-auto mb-5">
+            <Wallet className="w-7 h-7 text-cg-sage" />
           </div>
           <h1
-            className="text-3xl sm:text-4xl text-[#1E3A4A] mb-3"
+            className="text-3xl sm:text-4xl text-foreground mb-3"
             style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
           >
-            Expenses & <span className="text-[#3DAA8A]">ClearFund</span>
+            Expenses & <span className="text-cg-sage">ClearFund</span>
           </h1>
           <p className="text-lg text-gray-600 max-w-xl mx-auto">
             Transparent expense tracking, automatic cost splitting, and court-ready financial records for child-related costs.
@@ -61,7 +61,7 @@ export default function ExpensesGuidePage() {
           <ul className="grid sm:grid-cols-2 gap-x-6 gap-y-2">
             {tocItems.map((item) => (
               <li key={item.id}>
-                <a href={`#${item.id}`} className="text-[#1E3A4A] hover:text-[#3DAA8A] text-sm transition-colors">
+                <a href={`#${item.id}`} className="text-foreground hover:text-cg-sage text-sm transition-colors">
                   {item.label}
                 </a>
               </li>
@@ -72,9 +72,9 @@ export default function ExpensesGuidePage() {
         {/* What is ClearFund? */}
         <section id="what-is-clearfund" className="mb-12 scroll-mt-24">
           <div className="flex items-center gap-3 mb-4">
-            <DollarSign className="w-5 h-5 text-[#3DAA8A]" />
+            <DollarSign className="w-5 h-5 text-cg-sage" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               What is ClearFund?
@@ -91,9 +91,9 @@ export default function ExpensesGuidePage() {
         {/* Logging an Expense */}
         <section id="logging-expense" className="mb-12 scroll-mt-24">
           <div className="flex items-center gap-3 mb-4">
-            <Receipt className="w-5 h-5 text-[#3DAA8A]" />
+            <Receipt className="w-5 h-5 text-cg-sage" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               Logging an expense
@@ -113,16 +113,16 @@ export default function ExpensesGuidePage() {
               'Tap "Submit" to log the expense and notify your co-parent.',
             ].map((step, i) => (
               <li key={i} className="flex gap-3">
-                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#3DAA8A]/10 text-[#3DAA8A] text-sm font-semibold flex items-center justify-center">
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-cg-sage/10 text-cg-sage text-sm font-semibold flex items-center justify-center">
                   {i + 1}
                 </span>
                 <span className="text-gray-600 text-sm leading-relaxed">{step}</span>
               </li>
             ))}
           </ol>
-          <div className="bg-[#F5A623]/5 border-l-4 border-[#F5A623] rounded-lg px-5 py-4">
+          <div className="bg-cg-amber/5 border-l-4 border-cg-amber rounded-lg px-5 py-4">
             <div className="flex gap-2 items-start">
-              <Lightbulb className="w-4 h-4 text-[#F5A623] mt-0.5 flex-shrink-0" />
+              <Lightbulb className="w-4 h-4 text-cg-amber mt-0.5 flex-shrink-0" />
               <p className="text-sm text-gray-700">
                 <strong>Tip:</strong> Be specific in your descriptions. Instead of &quot;doctor,&quot; write &quot;Pediatric checkup with Dr. Martinez on 3/15.&quot; Detailed descriptions prevent misunderstandings and look better in court records.
               </p>
@@ -133,9 +133,9 @@ export default function ExpensesGuidePage() {
         {/* Uploading Receipts */}
         <section id="uploading-receipts" className="mb-12 scroll-mt-24">
           <div className="flex items-center gap-3 mb-4">
-            <Upload className="w-5 h-5 text-[#3DAA8A]" />
+            <Upload className="w-5 h-5 text-cg-sage" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               Uploading receipts
@@ -152,14 +152,14 @@ export default function ExpensesGuidePage() {
               'Receipts are stored securely and included in financial exports.',
             ].map((item, i) => (
               <li key={i} className="flex gap-2 text-sm text-gray-600">
-                <CheckCircle2 className="w-4 h-4 text-[#3DAA8A] mt-0.5 flex-shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-cg-sage mt-0.5 flex-shrink-0" />
                 <span>{item}</span>
               </li>
             ))}
           </ul>
-          <div className="bg-[#F5A623]/5 border-l-4 border-[#F5A623] rounded-lg px-5 py-4">
+          <div className="bg-cg-amber/5 border-l-4 border-cg-amber rounded-lg px-5 py-4">
             <div className="flex gap-2 items-start">
-              <Lightbulb className="w-4 h-4 text-[#F5A623] mt-0.5 flex-shrink-0" />
+              <Lightbulb className="w-4 h-4 text-cg-amber mt-0.5 flex-shrink-0" />
               <p className="text-sm text-gray-700">
                 <strong>Tip:</strong> Upload receipts at the time of purchase while they are fresh. Faded or crumpled receipts are harder to photograph later.
               </p>
@@ -170,9 +170,9 @@ export default function ExpensesGuidePage() {
         {/* How Splits Are Calculated */}
         <section id="how-splits-work" className="mb-12 scroll-mt-24">
           <div className="flex items-center gap-3 mb-4">
-            <PieChart className="w-5 h-5 text-[#3DAA8A]" />
+            <PieChart className="w-5 h-5 text-cg-sage" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               How splits are calculated
@@ -192,9 +192,9 @@ export default function ExpensesGuidePage() {
         {/* Requesting Reimbursement */}
         <section id="requesting-reimbursement" className="mb-12 scroll-mt-24">
           <div className="flex items-center gap-3 mb-4">
-            <ArrowRight className="w-5 h-5 text-[#3DAA8A]" />
+            <ArrowRight className="w-5 h-5 text-cg-sage" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               Requesting reimbursement
@@ -212,16 +212,16 @@ export default function ExpensesGuidePage() {
               'Once approved, payment can be made directly through the platform.',
             ].map((step, i) => (
               <li key={i} className="flex gap-3">
-                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#3DAA8A]/10 text-[#3DAA8A] text-sm font-semibold flex items-center justify-center">
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-cg-sage/10 text-cg-sage text-sm font-semibold flex items-center justify-center">
                   {i + 1}
                 </span>
                 <span className="text-gray-600 text-sm leading-relaxed">{step}</span>
               </li>
             ))}
           </ol>
-          <div className="bg-[#F5A623]/5 border-l-4 border-[#F5A623] rounded-lg px-5 py-4">
+          <div className="bg-cg-amber/5 border-l-4 border-cg-amber rounded-lg px-5 py-4">
             <div className="flex gap-2 items-start">
-              <Lightbulb className="w-4 h-4 text-[#F5A623] mt-0.5 flex-shrink-0" />
+              <Lightbulb className="w-4 h-4 text-cg-amber mt-0.5 flex-shrink-0" />
               <p className="text-sm text-gray-700">
                 <strong>Tip:</strong> Submit reimbursement requests promptly. Timely submissions are easier for your co-parent to verify and demonstrate good-faith financial cooperation.
               </p>
@@ -232,9 +232,9 @@ export default function ExpensesGuidePage() {
         {/* Tracking Payments */}
         <section id="tracking-payments" className="mb-12 scroll-mt-24">
           <div className="flex items-center gap-3 mb-4">
-            <CreditCard className="w-5 h-5 text-[#3DAA8A]" />
+            <CreditCard className="w-5 h-5 text-cg-sage" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               Tracking payments
@@ -252,7 +252,7 @@ export default function ExpensesGuidePage() {
               'Download monthly or custom-range financial summaries.',
             ].map((item, i) => (
               <li key={i} className="flex gap-2 text-sm text-gray-600">
-                <CheckCircle2 className="w-4 h-4 text-[#3DAA8A] mt-0.5 flex-shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-cg-sage mt-0.5 flex-shrink-0" />
                 <span>{item}</span>
               </li>
             ))}
@@ -262,9 +262,9 @@ export default function ExpensesGuidePage() {
         {/* Court-Ordered Obligations */}
         <section id="court-ordered-obligations" className="mb-12 scroll-mt-24">
           <div className="flex items-center gap-3 mb-4">
-            <Scale className="w-5 h-5 text-[#3DAA8A]" />
+            <Scale className="w-5 h-5 text-cg-sage" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               Court-ordered obligations
@@ -276,9 +276,9 @@ export default function ExpensesGuidePage() {
           <p className="text-gray-600 leading-relaxed mb-4">
             Set up each obligation with its amount, frequency, and due date. ClearFund sends reminders before payments are due and tracks compliance automatically. Late or missed payments are documented with timestamps for your records.
           </p>
-          <div className="bg-[#F5A623]/5 border-l-4 border-[#F5A623] rounded-lg px-5 py-4">
+          <div className="bg-cg-amber/5 border-l-4 border-cg-amber rounded-lg px-5 py-4">
             <div className="flex gap-2 items-start">
-              <Lightbulb className="w-4 h-4 text-[#F5A623] mt-0.5 flex-shrink-0" />
+              <Lightbulb className="w-4 h-4 text-cg-amber mt-0.5 flex-shrink-0" />
               <p className="text-sm text-gray-700">
                 <strong>Tip:</strong> Even if you make payments outside CommonGround, log them here to maintain a complete financial record for court purposes.
               </p>
@@ -289,9 +289,9 @@ export default function ExpensesGuidePage() {
         {/* Financial Compliance */}
         <section id="financial-compliance" className="mb-12 scroll-mt-24">
           <div className="flex items-center gap-3 mb-4">
-            <BarChart3 className="w-5 h-5 text-[#3DAA8A]" />
+            <BarChart3 className="w-5 h-5 text-cg-sage" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               Financial compliance for court
@@ -309,7 +309,7 @@ export default function ExpensesGuidePage() {
               'Share exports directly with your attorney through the Professional Portal.',
             ].map((item, i) => (
               <li key={i} className="flex gap-2 text-sm text-gray-600">
-                <Shield className="w-4 h-4 text-[#3DAA8A] mt-0.5 flex-shrink-0" />
+                <Shield className="w-4 h-4 text-cg-sage mt-0.5 flex-shrink-0" />
                 <span>{item}</span>
               </li>
             ))}
@@ -317,7 +317,7 @@ export default function ExpensesGuidePage() {
         </section>
 
         {/* Video Placeholder */}
-        <div className="bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F] rounded-2xl p-8 text-center text-white mb-12">
+        <div className="bg-gradient-to-br from-foreground to-cg-slate rounded-2xl p-8 text-center text-white mb-12">
           <div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-4">
             <Play className="w-7 h-7 text-white" />
           </div>
@@ -333,7 +333,7 @@ export default function ExpensesGuidePage() {
         {/* Related Guides */}
         <section className="mb-12">
           <h2
-            className="text-xl text-[#1E3A4A] mb-5"
+            className="text-xl text-foreground mb-5"
             style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
           >
             Related guides
@@ -350,7 +350,7 @@ export default function ExpensesGuidePage() {
                 href={guide.href}
                 className="group bg-white rounded-xl border border-gray-100 p-4 hover:shadow-md transition-all"
               >
-                <h3 className="text-[#1E3A4A] font-medium text-sm mb-1 group-hover:text-[#3DAA8A] transition-colors">
+                <h3 className="text-foreground font-medium text-sm mb-1 group-hover:text-cg-sage transition-colors">
                   {guide.title}
                 </h3>
                 <p className="text-xs text-gray-500">{guide.desc}</p>
@@ -362,7 +362,7 @@ export default function ExpensesGuidePage() {
         {/* Still Need Help CTA */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
           <h2
-            className="text-xl text-[#1E3A4A] mb-2"
+            className="text-xl text-foreground mb-2"
             style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
           >
             Still need help?
@@ -372,7 +372,7 @@ export default function ExpensesGuidePage() {
           </p>
           <Link
             href="/help/contact"
-            className="inline-flex items-center gap-2 bg-[#3DAA8A] text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-[#35957A] transition-colors"
+            className="inline-flex items-center gap-2 bg-cg-sage text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-cg-sage-dark transition-colors"
           >
             Contact support
             <ArrowRight className="w-4 h-4" />

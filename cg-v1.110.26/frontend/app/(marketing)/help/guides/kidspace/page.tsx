@@ -40,14 +40,14 @@ export default function KidSpaceGuidePage() {
       {/* Hero */}
       <section className="pt-10 pb-8 lg:pt-14 lg:pb-10">
         <div className="max-w-3xl mx-auto px-6 text-center">
-          <div className="w-14 h-14 rounded-2xl bg-[#3DAA8A]/10 flex items-center justify-center mx-auto mb-5">
-            <Heart className="w-7 h-7 text-[#3DAA8A]" />
+          <div className="w-14 h-14 rounded-2xl bg-cg-sage/10 flex items-center justify-center mx-auto mb-5">
+            <Heart className="w-7 h-7 text-cg-sage" />
           </div>
           <h1
-            className="text-3xl sm:text-4xl text-[#1E3A4A] mb-3"
+            className="text-3xl sm:text-4xl text-foreground mb-3"
             style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
           >
-            <span className="text-[#3DAA8A]">KidSpace</span>
+            <span className="text-cg-sage">KidSpace</span>
           </h1>
           <p className="text-lg text-gray-600 max-w-xl mx-auto">
             A safe, monitored space for children ages 3 to 12 to connect with their other parent through video calls, stories, movies, and games.
@@ -62,7 +62,7 @@ export default function KidSpaceGuidePage() {
           <ul className="grid sm:grid-cols-2 gap-x-6 gap-y-2">
             {tocItems.map((item) => (
               <li key={item.id}>
-                <a href={`#${item.id}`} className="text-[#1E3A4A] hover:text-[#3DAA8A] text-sm transition-colors">
+                <a href={`#${item.id}`} className="text-foreground hover:text-cg-sage text-sm transition-colors">
                   {item.label}
                 </a>
               </li>
@@ -73,9 +73,9 @@ export default function KidSpaceGuidePage() {
         {/* What is KidSpace? */}
         <section id="what-is-kidspace" className="mb-12 scroll-mt-24">
           <div className="flex items-center gap-3 mb-4">
-            <Sparkles className="w-5 h-5 text-[#3DAA8A]" />
+            <Sparkles className="w-5 h-5 text-cg-sage" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               What is KidSpace?
@@ -92,9 +92,9 @@ export default function KidSpaceGuidePage() {
         {/* Setting Up */}
         <section id="setting-up" className="mb-12 scroll-mt-24">
           <div className="flex items-center gap-3 mb-4">
-            <Settings className="w-5 h-5 text-[#3DAA8A]" />
+            <Settings className="w-5 h-5 text-cg-sage" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               Setting up for your child
@@ -113,16 +113,16 @@ export default function KidSpaceGuidePage() {
               'Both parents must confirm the settings before KidSpace is activated.',
             ].map((step, i) => (
               <li key={i} className="flex gap-3">
-                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[#3DAA8A]/10 text-[#3DAA8A] text-sm font-semibold flex items-center justify-center">
+                <span className="flex-shrink-0 w-6 h-6 rounded-full bg-cg-sage/10 text-cg-sage text-sm font-semibold flex items-center justify-center">
                   {i + 1}
                 </span>
                 <span className="text-gray-600 text-sm leading-relaxed">{step}</span>
               </li>
             ))}
           </ol>
-          <div className="bg-[#F5A623]/5 border-l-4 border-[#F5A623] rounded-lg px-5 py-4">
+          <div className="bg-cg-amber/5 border-l-4 border-cg-amber rounded-lg px-5 py-4">
             <div className="flex gap-2 items-start">
-              <Lightbulb className="w-4 h-4 text-[#F5A623] mt-0.5 flex-shrink-0" />
+              <Lightbulb className="w-4 h-4 text-cg-amber mt-0.5 flex-shrink-0" />
               <p className="text-sm text-gray-700">
                 <strong>Tip:</strong> Involve your child in choosing their avatar. It helps them feel ownership over their space and makes them more excited to use it.
               </p>
@@ -133,9 +133,9 @@ export default function KidSpaceGuidePage() {
         {/* Video Calls */}
         <section id="video-calls" className="mb-12 scroll-mt-24">
           <div className="flex items-center gap-3 mb-4">
-            <Video className="w-5 h-5 text-[#3DAA8A]" />
+            <Video className="w-5 h-5 text-cg-sage" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               Video calls
@@ -153,14 +153,14 @@ export default function KidSpaceGuidePage() {
               'Call history is available to both parents for transparency.',
             ].map((item, i) => (
               <li key={i} className="flex gap-2 text-sm text-gray-600">
-                <CheckCircle2 className="w-4 h-4 text-[#3DAA8A] mt-0.5 flex-shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-cg-sage mt-0.5 flex-shrink-0" />
                 <span>{item}</span>
               </li>
             ))}
           </ul>
-          <div className="bg-[#F5A623]/5 border-l-4 border-[#F5A623] rounded-lg px-5 py-4">
+          <div className="bg-cg-amber/5 border-l-4 border-cg-amber rounded-lg px-5 py-4">
             <div className="flex gap-2 items-start">
-              <Lightbulb className="w-4 h-4 text-[#F5A623] mt-0.5 flex-shrink-0" />
+              <Lightbulb className="w-4 h-4 text-cg-amber mt-0.5 flex-shrink-0" />
               <p className="text-sm text-gray-700">
                 <strong>Tip:</strong> Consistent call schedules help children feel secure. Try to keep video call times predictable, even if the duration varies.
               </p>
@@ -171,9 +171,9 @@ export default function KidSpaceGuidePage() {
         {/* Read Together */}
         <section id="read-together" className="mb-12 scroll-mt-24">
           <div className="flex items-center gap-3 mb-4">
-            <BookOpen className="w-5 h-5 text-[#3DAA8A]" />
+            <BookOpen className="w-5 h-5 text-cg-sage" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               Read Together
@@ -190,9 +190,9 @@ export default function KidSpaceGuidePage() {
         {/* Watch Together */}
         <section id="watch-together" className="mb-12 scroll-mt-24">
           <div className="flex items-center gap-3 mb-4">
-            <Tv className="w-5 h-5 text-[#3DAA8A]" />
+            <Tv className="w-5 h-5 text-cg-sage" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               Watch Together
@@ -209,9 +209,9 @@ export default function KidSpaceGuidePage() {
         {/* Play Together */}
         <section id="play-together" className="mb-12 scroll-mt-24">
           <div className="flex items-center gap-3 mb-4">
-            <Gamepad2 className="w-5 h-5 text-[#3DAA8A]" />
+            <Gamepad2 className="w-5 h-5 text-cg-sage" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               Play Together
@@ -228,9 +228,9 @@ export default function KidSpaceGuidePage() {
         {/* My Circle */}
         <section id="my-circle" className="mb-12 scroll-mt-24">
           <div className="flex items-center gap-3 mb-4">
-            <UserPlus className="w-5 h-5 text-[#3DAA8A]" />
+            <UserPlus className="w-5 h-5 text-cg-sage" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               My Circle
@@ -240,22 +240,22 @@ export default function KidSpaceGuidePage() {
             My Circle lets you add trusted family members, like grandparents, aunts, and uncles, as approved contacts who can interact with your child through KidSpace. Both parents must approve every contact added to the circle.
           </p>
           <div className="bg-white rounded-xl border border-gray-100 p-5 mb-4">
-            <h3 className="text-sm font-semibold text-[#1E3A4A] mb-3">Circle limits by plan</h3>
+            <h3 className="text-sm font-semibold text-foreground mb-3">Circle limits by plan</h3>
             <div className="space-y-2">
               <div className="flex justify-between items-center text-sm">
                 <span className="text-gray-600">Plus plan ($17.99/mo)</span>
-                <span className="font-medium text-[#1E3A4A]">1 trusted contact</span>
+                <span className="font-medium text-foreground">1 trusted contact</span>
               </div>
               <div className="border-t border-gray-50" />
               <div className="flex justify-between items-center text-sm">
                 <span className="text-gray-600">Complete plan ($34.99/mo)</span>
-                <span className="font-medium text-[#1E3A4A]">3 trusted contacts</span>
+                <span className="font-medium text-foreground">3 trusted contacts</span>
               </div>
             </div>
           </div>
-          <div className="bg-[#F5A623]/5 border-l-4 border-[#F5A623] rounded-lg px-5 py-4">
+          <div className="bg-cg-amber/5 border-l-4 border-cg-amber rounded-lg px-5 py-4">
             <div className="flex gap-2 items-start">
-              <Lightbulb className="w-4 h-4 text-[#F5A623] mt-0.5 flex-shrink-0" />
+              <Lightbulb className="w-4 h-4 text-cg-amber mt-0.5 flex-shrink-0" />
               <p className="text-sm text-gray-700">
                 <strong>Tip:</strong> Adding grandparents to My Circle can provide your child with additional emotional support and help maintain important family bonds during the transition.
               </p>
@@ -266,9 +266,9 @@ export default function KidSpaceGuidePage() {
         {/* ARIA Safety Monitoring */}
         <section id="aria-safety" className="mb-12 scroll-mt-24">
           <div className="flex items-center gap-3 mb-4">
-            <Shield className="w-5 h-5 text-[#3DAA8A]" />
+            <Shield className="w-5 h-5 text-cg-sage" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               ARIA safety monitoring
@@ -286,7 +286,7 @@ export default function KidSpaceGuidePage() {
               'ARIA never records or stores video call content, only metadata like duration and participants.',
             ].map((item, i) => (
               <li key={i} className="flex gap-2 text-sm text-gray-600">
-                <CheckCircle2 className="w-4 h-4 text-[#3DAA8A] mt-0.5 flex-shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-cg-sage mt-0.5 flex-shrink-0" />
                 <span>{item}</span>
               </li>
             ))}
@@ -296,9 +296,9 @@ export default function KidSpaceGuidePage() {
         {/* Plans & Availability */}
         <section id="plans-pricing" className="mb-12 scroll-mt-24">
           <div className="flex items-center gap-3 mb-4">
-            <Users className="w-5 h-5 text-[#3DAA8A]" />
+            <Users className="w-5 h-5 text-cg-sage" />
             <h2
-              className="text-2xl text-[#1E3A4A]"
+              className="text-2xl text-foreground"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               Plans & availability
@@ -310,19 +310,19 @@ export default function KidSpaceGuidePage() {
           <div className="bg-white rounded-xl border border-gray-100 p-5 mb-4">
             <div className="space-y-4">
               <div>
-                <h3 className="text-sm font-semibold text-[#1E3A4A] mb-1">Plus &mdash; $17.99/month</h3>
+                <h3 className="text-sm font-semibold text-foreground mb-1">Plus &mdash; $17.99/month</h3>
                 <p className="text-xs text-gray-500">Video calls, Read Together, Watch Together, Play Together, and 1 My Circle contact.</p>
               </div>
               <div className="border-t border-gray-50" />
               <div>
-                <h3 className="text-sm font-semibold text-[#1E3A4A] mb-1">Complete &mdash; $34.99/month</h3>
+                <h3 className="text-sm font-semibold text-foreground mb-1">Complete &mdash; $34.99/month</h3>
                 <p className="text-xs text-gray-500">Everything in Plus, up to 3 My Circle contacts, priority ARIA monitoring, and advanced activity reports.</p>
               </div>
             </div>
           </div>
-          <div className="bg-[#F5A623]/5 border-l-4 border-[#F5A623] rounded-lg px-5 py-4">
+          <div className="bg-cg-amber/5 border-l-4 border-cg-amber rounded-lg px-5 py-4">
             <div className="flex gap-2 items-start">
-              <Lightbulb className="w-4 h-4 text-[#F5A623] mt-0.5 flex-shrink-0" />
+              <Lightbulb className="w-4 h-4 text-cg-amber mt-0.5 flex-shrink-0" />
               <p className="text-sm text-gray-700">
                 <strong>Tip:</strong> Not sure which plan is right? Start with Plus and upgrade to Complete if you need more My Circle contacts or advanced reporting.
               </p>
@@ -331,7 +331,7 @@ export default function KidSpaceGuidePage() {
         </section>
 
         {/* Video Placeholder */}
-        <div className="bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F] rounded-2xl p-8 text-center text-white mb-12">
+        <div className="bg-gradient-to-br from-foreground to-cg-slate rounded-2xl p-8 text-center text-white mb-12">
           <div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-4">
             <Play className="w-7 h-7 text-white" />
           </div>
@@ -347,7 +347,7 @@ export default function KidSpaceGuidePage() {
         {/* Related Guides */}
         <section className="mb-12">
           <h2
-            className="text-xl text-[#1E3A4A] mb-5"
+            className="text-xl text-foreground mb-5"
             style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
           >
             Related guides
@@ -364,7 +364,7 @@ export default function KidSpaceGuidePage() {
                 href={guide.href}
                 className="group bg-white rounded-xl border border-gray-100 p-4 hover:shadow-md transition-all"
               >
-                <h3 className="text-[#1E3A4A] font-medium text-sm mb-1 group-hover:text-[#3DAA8A] transition-colors">
+                <h3 className="text-foreground font-medium text-sm mb-1 group-hover:text-cg-sage transition-colors">
                   {guide.title}
                 </h3>
                 <p className="text-xs text-gray-500">{guide.desc}</p>
@@ -376,7 +376,7 @@ export default function KidSpaceGuidePage() {
         {/* Still Need Help CTA */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
           <h2
-            className="text-xl text-[#1E3A4A] mb-2"
+            className="text-xl text-foreground mb-2"
             style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
           >
             Still need help?
@@ -386,7 +386,7 @@ export default function KidSpaceGuidePage() {
           </p>
           <Link
             href="/help/contact"
-            className="inline-flex items-center gap-2 bg-[#3DAA8A] text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-[#35957A] transition-colors"
+            className="inline-flex items-center gap-2 bg-cg-sage text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-cg-sage-dark transition-colors"
           >
             Contact support
             <ArrowRight className="w-4 h-4" />

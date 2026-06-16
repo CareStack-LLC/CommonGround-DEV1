@@ -171,15 +171,15 @@ export default function HighConflictPage() {
       {/* Hero Section */}
       <section className="relative py-20 lg:py-28 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-20 right-[10%] w-64 h-64 rounded-full bg-[#F5A623]/5 blur-3xl" />
+          <div className="absolute top-20 right-[10%] w-64 h-64 rounded-full bg-cg-amber/5 blur-3xl" />
           <div className="absolute bottom-20 left-[5%] w-48 h-48 rounded-full bg-cg-sage/5 blur-3xl" />
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#F5A623]/10 rounded-full mb-6">
-              <Shield className="w-4 h-4 text-[#F5A623]" />
-              <span className="text-sm font-medium text-[#F5A623]">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-cg-amber/10 rounded-full mb-6">
+              <Shield className="w-4 h-4 text-cg-amber" />
+              <span className="text-sm font-medium text-cg-amber">
                 Extra Support for Your Family
               </span>
             </div>
@@ -215,7 +215,7 @@ export default function HighConflictPage() {
       </section>
 
       {/* Signs You Could Benefit */}
-      <section className="py-16 bg-[#FEF7ED] border-y border-[#F5A623]/20">
+      <section className="py-16 bg-cg-amber-subtle border-y border-cg-amber/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
             <h2 className="text-2xl font-semibold text-foreground mb-2">
@@ -228,7 +228,7 @@ export default function HighConflictPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-5xl mx-auto">
             {signsYouCouldBenefit.map((sign, index) => (
               <div key={index} className="flex items-start gap-3 p-4 bg-background rounded-lg border border-border/50">
-                <Heart className="w-5 h-5 text-[#F5A623] flex-shrink-0 mt-0.5" />
+                <Heart className="w-5 h-5 text-cg-amber flex-shrink-0 mt-0.5" />
                 <span className="text-sm text-foreground">{sign}</span>
               </div>
             ))}
@@ -322,10 +322,10 @@ export default function HighConflictPage() {
                 <div className="p-4 bg-muted/30 rounded-lg">
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-sm text-muted-foreground">Co-parent average response</span>
-                    <span className="font-semibold text-[#F5A623]">18.7 hours</span>
+                    <span className="font-semibold text-cg-amber">18.7 hours</span>
                   </div>
                   <div className="h-2 bg-muted rounded-full">
-                    <div className="h-2 bg-[#F5A623] rounded-full" style={{ width: '22%' }} />
+                    <div className="h-2 bg-cg-amber rounded-full" style={{ width: '22%' }} />
                   </div>
                 </div>
                 <p className="text-xs text-muted-foreground">
@@ -341,9 +341,9 @@ export default function HighConflictPage() {
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#F5A623]/10 rounded-full mb-6">
-              <Gavel className="w-4 h-4 text-[#F5A623]" />
-              <span className="text-sm font-medium text-[#F5A623]">Court-Ready</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-cg-amber/10 rounded-full mb-6">
+              <Gavel className="w-4 h-4 text-cg-amber" />
+              <span className="text-sm font-medium text-cg-amber">Court-Ready</span>
             </div>
             <h2 className="text-3xl sm:text-4xl font-semibold text-foreground mb-4">
               Documentation you can trust

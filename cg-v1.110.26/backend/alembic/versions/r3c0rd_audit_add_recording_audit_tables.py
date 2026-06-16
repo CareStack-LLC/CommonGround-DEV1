@@ -10,6 +10,7 @@ Adds:
 - recording_export_logs table for court export tracking
 """
 from alembic import op
+import migration_guards as mg
 import sqlalchemy as sa
 
 
@@ -22,16 +23,16 @@ depends_on = None
 
 def upgrade():
     # Add new columns to recordings table for integrity verification
-    op.add_column('recordings', sa.Column('file_hash', sa.String(64), nullable=True, index=True))
-    op.add_column('recordings', sa.Column('file_hash_algorithm', sa.String(20), nullable=False, server_default='sha256'))
-    op.add_column('recordings', sa.Column('integrity_verified_at', sa.DateTime(), nullable=True))
-    op.add_column('recordings', sa.Column('integrity_status', sa.String(20), nullable=True))
+    mg.safe_add_column('recordings', sa.Column('file_hash', sa.String(64), nullable=True, index=True))
+    mg.safe_add_column('recordings', sa.Column('file_hash_algorithm', sa.String(20), nullable=False, server_default='sha256'))
+    mg.safe_add_column('recordings', sa.Column('integrity_verified_at', sa.DateTime(), nullable=True))
+    mg.safe_add_column('recordings', sa.Column('integrity_status', sa.String(20), nullable=True))
 
     # Add legal hold management columns
-    op.add_column('recordings', sa.Column('legal_hold_set_by', sa.String(36), nullable=True))
-    op.add_column('recordings', sa.Column('legal_hold_set_at', sa.DateTime(), nullable=True))
-    op.add_column('recordings', sa.Column('legal_hold_reason', sa.Text(), nullable=True))
-    op.add_column('recordings', sa.Column('legal_hold_case_number', sa.String(100), nullable=True))
+    mg.safe_add_column('recordings', sa.Column('legal_hold_set_by', sa.String(36), nullable=True))
+    mg.safe_add_column('recordings', sa.Column('legal_hold_set_at', sa.DateTime(), nullable=True))
+    mg.safe_add_column('recordings', sa.Column('legal_hold_reason', sa.Text(), nullable=True))
+    mg.safe_add_column('recordings', sa.Column('legal_hold_case_number', sa.String(100), nullable=True))
 
     # Create recording_access_logs table
     op.create_table(
@@ -80,10 +81,10 @@ def upgrade():
     )
 
     # Create indexes for recording_access_logs
-    op.create_index('ix_recording_access_user_date', 'recording_access_logs', ['user_id', 'accessed_at'])
-    op.create_index('ix_recording_access_recording_date', 'recording_access_logs', ['recording_id', 'accessed_at'])
-    op.create_index('ix_recording_access_family_date', 'recording_access_logs', ['family_file_id', 'accessed_at'])
-    op.create_index('ix_recording_access_action', 'recording_access_logs', ['action', 'accessed_at'])
+    mg.safe_create_index('ix_recording_access_user_date', 'recording_access_logs', ['user_id', 'accessed_at'])
+    mg.safe_create_index('ix_recording_access_recording_date', 'recording_access_logs', ['recording_id', 'accessed_at'])
+    mg.safe_create_index('ix_recording_access_family_date', 'recording_access_logs', ['family_file_id', 'accessed_at'])
+    mg.safe_create_index('ix_recording_access_action', 'recording_access_logs', ['action', 'accessed_at'])
 
     # Create recording_export_logs table
     op.create_table(
@@ -132,9 +133,9 @@ def upgrade():
     )
 
     # Create indexes for recording_export_logs
-    op.create_index('ix_export_log_export_id', 'recording_export_logs', ['export_id'])
-    op.create_index('ix_export_log_case', 'recording_export_logs', ['case_number'])
-    op.create_index('ix_export_log_certificate', 'recording_export_logs', ['certificate_number'])
+    mg.safe_create_index('ix_export_log_export_id', 'recording_export_logs', ['export_id'])
+    mg.safe_create_index('ix_export_log_case', 'recording_export_logs', ['case_number'])
+    mg.safe_create_index('ix_export_log_certificate', 'recording_export_logs', ['certificate_number'])
 
 
 def downgrade():

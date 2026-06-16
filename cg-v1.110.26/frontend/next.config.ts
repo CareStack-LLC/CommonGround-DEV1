@@ -60,6 +60,10 @@ const nextConfig: NextConfig = {
         destination: '/walkthrough',
         permanent: true,
       },
+      // /team and /press were placeholder pages removed 2026-06; both were
+      // in the sitemap, so redirect permanently until real content exists.
+      { source: '/team', destination: '/about', permanent: true },
+      { source: '/press', destination: '/about', permanent: true },
     ];
   },
   async headers() {

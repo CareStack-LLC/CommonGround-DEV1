@@ -393,22 +393,22 @@ export default function ARIADemoPage() {
   // -------------------------------------------------------------------------
 
   return (
-    <div className="min-h-screen bg-[#F4F8F7]">
+    <div className="min-h-screen bg-cg-sand">
       {/* ======================== HERO SECTION ======================== */}
       <section className="pt-16 pb-12 lg:pt-24 lg:pb-16">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <p className="text-[#F5A623] font-medium mb-5 tracking-widest uppercase text-xs flex items-center justify-center gap-3">
-            <span className="w-8 h-px bg-[#F5A623]/40" />
+          <p className="text-cg-amber font-medium mb-5 tracking-widest uppercase text-xs flex items-center justify-center gap-3">
+            <span className="w-8 h-px bg-cg-amber/40" />
             The ARIA Challenge
-            <span className="w-8 h-px bg-[#F5A623]/40" />
+            <span className="w-8 h-px bg-cg-amber/40" />
           </p>
 
           <h1
-            className="text-4xl sm:text-5xl lg:text-[3.5rem] text-[#1E3A4A] mb-6 leading-[1.15]"
+            className="text-4xl sm:text-5xl lg:text-[3.5rem] text-foreground mb-6 leading-[1.15]"
             style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
           >
             Think you can get past{' '}
-            <span className="text-[#3DAA8A]">ARIA</span>?
+            <span className="text-cg-sage">ARIA</span>?
           </h1>
 
           <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed mb-4">
@@ -427,13 +427,13 @@ export default function ARIADemoPage() {
               { value: '3-Tier', label: 'AI Analysis', icon: Brain },
               { value: '127K+', label: 'Messages Trained', icon: Zap },
             ].map((stat, i) => (
-              <div key={i} className="bg-white rounded-2xl border border-[#D6ECE8] p-4">
+              <div key={i} className="bg-white rounded-2xl border border-cg-sand-dark p-4">
                 <div className="flex items-center justify-center mb-2">
-                  <div className="w-8 h-8 bg-[#3DAA8A]/10 rounded-lg flex items-center justify-center">
-                    <stat.icon className="w-4 h-4 text-[#3DAA8A]" />
+                  <div className="w-8 h-8 bg-cg-sage/10 rounded-lg flex items-center justify-center">
+                    <stat.icon className="w-4 h-4 text-cg-sage" />
                   </div>
                 </div>
-                <p className="text-xl font-bold text-[#1E3A4A]">{stat.value}</p>
+                <p className="text-xl font-bold text-foreground">{stat.value}</p>
                 <p className="text-xs text-gray-500">{stat.label}</p>
               </div>
             ))}
@@ -441,7 +441,7 @@ export default function ARIADemoPage() {
 
           <button
             onClick={scrollToSimulator}
-            className="inline-flex items-center gap-2 bg-[#3DAA8A] hover:bg-[#2D8A70] text-white font-semibold rounded-full px-8 py-4 text-lg transition-all hover:scale-105 shadow-lg"
+            className="inline-flex items-center gap-2 bg-cg-sage hover:bg-cg-sage-dark text-white font-semibold rounded-full px-8 py-4 text-lg transition-all hover:scale-105 shadow-lg"
           >
             Take the Challenge
             <ChevronDown className="w-5 h-5 animate-bounce" />
@@ -453,10 +453,10 @@ export default function ARIADemoPage() {
       <section ref={simulatorRef} className="max-w-6xl mx-auto px-6 py-16 md:py-24">
         <div className="text-center mb-12">
           <h2
-            className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+            className="text-3xl sm:text-4xl text-foreground mb-4"
             style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
           >
-            Choose Your <span className="text-[#3DAA8A]">Battle</span>
+            Choose Your <span className="text-cg-sage">Battle</span>
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Pick a co-parenting scenario and try to outsmart ARIA. Go ahead — be difficult.
@@ -475,20 +475,20 @@ export default function ARIADemoPage() {
                 className={`
                   relative rounded-2xl p-5 text-left transition-all border-2
                   ${isSelected
-                    ? 'border-[#3DAA8A] bg-[#3DAA8A]/5 shadow-md'
-                    : 'border-[#D6ECE8] bg-white hover:border-[#3DAA8A]/40 hover:shadow-sm'
+                    ? 'border-cg-sage bg-cg-sage/5 shadow-md'
+                    : 'border-cg-sand-dark bg-white hover:border-cg-sage/40 hover:shadow-sm'
                   }
                 `}
               >
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${isSelected ? 'bg-[#3DAA8A]/20' : 'bg-[#3DAA8A]/5'}`}>
-                  <Icon className={`w-5 h-5 ${isSelected ? 'text-[#3DAA8A]' : 'text-[#3DAA8A]/60'}`} />
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${isSelected ? 'bg-cg-sage/20' : 'bg-cg-sage/5'}`}>
+                  <Icon className={`w-5 h-5 ${isSelected ? 'text-cg-sage' : 'text-cg-sage/60'}`} />
                 </div>
-                <h3 className={`font-semibold text-sm mb-1 ${isSelected ? 'text-[#3DAA8A]' : 'text-[#1E3A4A]'}`}>
+                <h3 className={`font-semibold text-sm mb-1 ${isSelected ? 'text-cg-sage' : 'text-foreground'}`}>
                   {s.label}
                 </h3>
                 <p className="text-xs text-gray-500">{s.description}</p>
                 {isSelected && (
-                  <div className="absolute top-3 right-3 w-3 h-3 bg-[#3DAA8A] rounded-full" />
+                  <div className="absolute top-3 right-3 w-3 h-3 bg-cg-sage rounded-full" />
                 )}
               </button>
             );
@@ -497,15 +497,15 @@ export default function ARIADemoPage() {
 
         {/* Chat Interface */}
         {scenario && (
-          <div className="bg-white rounded-3xl shadow-xl border border-[#D6ECE8] overflow-hidden">
+          <div className="bg-white rounded-3xl shadow-xl border border-cg-sand-dark overflow-hidden">
             {/* Chat Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-[#2D6A8F]/10 rounded-full flex items-center justify-center">
-                  <MessageSquare className="w-5 h-5 text-[#2D6A8F]" />
+                <div className="w-10 h-10 bg-cg-slate/10 rounded-full flex items-center justify-center">
+                  <MessageSquare className="w-5 h-5 text-cg-slate" />
                 </div>
                 <div>
-                  <p className="font-semibold text-[#1E3A4A] text-sm">Co-Parent (AI Simulation)</p>
+                  <p className="font-semibold text-foreground text-sm">Co-Parent (AI Simulation)</p>
                   <p className="text-xs text-gray-500">
                     {SCENARIOS.find(s => s.key === scenario)?.label}
                   </p>
@@ -515,10 +515,10 @@ export default function ARIADemoPage() {
               <div className="flex items-center gap-4">
                 {/* Petty Score */}
                 {(ariaScore > 0 || userScore > 0) && (
-                  <div className="hidden sm:flex items-center gap-2 bg-[#1E3A4A]/5 rounded-full px-3 py-1.5 text-xs font-medium">
-                    <span className="text-[#3DAA8A]">ARIA: {ariaScore}</span>
+                  <div className="hidden sm:flex items-center gap-2 bg-foreground/5 rounded-full px-3 py-1.5 text-xs font-medium">
+                    <span className="text-cg-sage">ARIA: {ariaScore}</span>
                     <span className="text-gray-300">|</span>
-                    <span className="text-[#F5A623]">You: {userScore}</span>
+                    <span className="text-cg-amber">You: {userScore}</span>
                   </div>
                 )}
 
@@ -528,7 +528,7 @@ export default function ARIADemoPage() {
                   className={`
                     flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all
                     ${ariaEnabled
-                      ? 'bg-[#3DAA8A]/10 text-[#3DAA8A] border border-[#3DAA8A]/30'
+                      ? 'bg-cg-sage/10 text-cg-sage border border-cg-sage/30'
                       : 'bg-gray-100 text-gray-500 border border-gray-200'
                     }
                   `}
@@ -562,16 +562,16 @@ export default function ARIADemoPage() {
                     <div className={`
                       px-4 py-3 rounded-2xl text-sm leading-relaxed
                       ${msg.role === 'user'
-                        ? 'bg-[#3DAA8A] text-white rounded-br-md'
-                        : 'bg-white text-[#1E3A4A] border border-gray-200 rounded-bl-md shadow-sm'
+                        ? 'bg-cg-sage text-white rounded-br-md'
+                        : 'bg-white text-foreground border border-gray-200 rounded-bl-md shadow-sm'
                       }
                     `}>
                       {msg.text}
                     </div>
                     {msg.original && (
                       <div className={`flex items-center gap-1 text-xs ${msg.role === 'user' ? 'justify-end' : ''}`}>
-                        <Shield className="w-3 h-3 text-[#3DAA8A]" />
-                        <span className="text-[#3DAA8A] font-medium">Rewritten by ARIA</span>
+                        <Shield className="w-3 h-3 text-cg-sage" />
+                        <span className="text-cg-sage font-medium">Rewritten by ARIA</span>
                       </div>
                     )}
                     {msg.role === 'coparent' && msg.ariaAnalysis?.is_flagged && !msg.original && !ariaEnabled && (
@@ -603,13 +603,13 @@ export default function ARIADemoPage() {
 
             {/* ARIA Intervention Panel */}
             {pendingIntervention && (
-              <div className="border-t-2 border-[#3DAA8A] bg-[#3DAA8A]/5 px-6 py-5">
+              <div className="border-t-2 border-cg-sage bg-cg-sage/5 px-6 py-5">
                 <div className="flex items-start gap-3 mb-4">
-                  <div className="w-10 h-10 bg-[#3DAA8A]/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Shield className="w-5 h-5 text-[#3DAA8A]" />
+                  <div className="w-10 h-10 bg-cg-sage/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Shield className="w-5 h-5 text-cg-sage" />
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-semibold text-[#1E3A4A] text-sm mb-1">
+                    <h4 className="font-semibold text-foreground text-sm mb-1">
                       {currentTaunt || "ARIA caught this one!"}
                     </h4>
                     <p className="text-xs text-gray-600 mb-3">{pendingIntervention.analysis.explanation}</p>
@@ -636,9 +636,9 @@ export default function ARIADemoPage() {
                         <p className="text-xs text-red-500 font-medium mb-1">Your message</p>
                         <p className="text-sm text-red-700">{pendingIntervention.originalText}</p>
                       </div>
-                      <div className="bg-white border border-[#3DAA8A]/20 rounded-xl px-4 py-2.5">
-                        <p className="text-xs text-[#3DAA8A] font-medium mb-1">ARIA&apos;s suggestion</p>
-                        <p className="text-sm text-[#1E3A4A]">{pendingIntervention.analysis.suggestion}</p>
+                      <div className="bg-white border border-cg-sage/20 rounded-xl px-4 py-2.5">
+                        <p className="text-xs text-cg-sage font-medium mb-1">ARIA&apos;s suggestion</p>
+                        <p className="text-sm text-foreground">{pendingIntervention.analysis.suggestion}</p>
                       </div>
                     </div>
 
@@ -646,7 +646,7 @@ export default function ARIADemoPage() {
                     <div className="flex gap-3">
                       <button
                         onClick={handleAcceptSuggestion}
-                        className="flex items-center gap-2 bg-[#3DAA8A] hover:bg-[#2D8A70] text-white text-sm font-medium rounded-full px-5 py-2 transition-colors"
+                        className="flex items-center gap-2 bg-cg-sage hover:bg-cg-sage-dark text-white text-sm font-medium rounded-full px-5 py-2 transition-colors"
                       >
                         <CheckCircle2 className="w-4 h-4" />
                         Use Suggestion
@@ -681,12 +681,12 @@ export default function ARIADemoPage() {
                     onKeyDown={handleKeyDown}
                     placeholder={isLoading ? 'Waiting for reply...' : 'Try your pettiest message...'}
                     disabled={isLoading}
-                    className="flex-1 bg-gray-50 border border-gray-200 rounded-full px-5 py-3 text-sm text-[#1E3A4A] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/30 focus:border-[#3DAA8A] disabled:opacity-50 transition-all"
+                    className="flex-1 bg-gray-50 border border-gray-200 rounded-full px-5 py-3 text-sm text-foreground placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-cg-sage/30 focus:border-cg-sage disabled:opacity-50 transition-all"
                   />
                   <button
                     onClick={handleSend}
                     disabled={!inputText.trim() || isLoading}
-                    className="w-11 h-11 bg-[#3DAA8A] hover:bg-[#2D8A70] text-white rounded-full flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0"
+                    className="w-11 h-11 bg-cg-sage hover:bg-cg-sage-dark text-white rounded-full flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0"
                   >
                     <Send className="w-5 h-5" />
                   </button>
@@ -708,7 +708,7 @@ export default function ARIADemoPage() {
           <div className="text-center mt-8">
             <button
               onClick={() => setShowReport(true)}
-              className="inline-flex items-center gap-2 bg-[#2D6A8F] hover:bg-[#1E3A4A] text-white font-semibold rounded-full px-8 py-4 transition-all hover:scale-105 shadow-lg"
+              className="inline-flex items-center gap-2 bg-cg-slate hover:bg-foreground text-white font-semibold rounded-full px-8 py-4 transition-all hover:scale-105 shadow-lg"
             >
               <BarChart3 className="w-5 h-5" />
               Generate Communication Report
@@ -722,10 +722,10 @@ export default function ARIADemoPage() {
         <div className="max-w-5xl mx-auto px-6">
           <div className="text-center mb-10">
             <h2
-              className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+              className="text-3xl sm:text-4xl text-foreground mb-4"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
-              This is the <span className="text-[#3DAA8A]">real ARIA</span>
+              This is the <span className="text-cg-sage">real ARIA</span>
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
               Everything you just experienced runs on the exact same detection engine that protects
@@ -752,11 +752,11 @@ export default function ARIADemoPage() {
                 desc: 'In the real platform, ARIA logs every intervention — creating court-ready documentation automatically.',
               },
             ].map((card, i) => (
-              <div key={i} className="bg-white rounded-2xl border border-[#D6ECE8] p-6 hover:shadow-md transition-shadow">
-                <div className="w-12 h-12 bg-[#3DAA8A]/10 rounded-xl flex items-center justify-center mb-4">
-                  <card.icon className="w-6 h-6 text-[#3DAA8A]" />
+              <div key={i} className="bg-white rounded-2xl border border-cg-sand-dark p-6 hover:shadow-md transition-shadow">
+                <div className="w-12 h-12 bg-cg-sage/10 rounded-xl flex items-center justify-center mb-4">
+                  <card.icon className="w-6 h-6 text-cg-sage" />
                 </div>
-                <h3 className="font-semibold text-[#1E3A4A] mb-2">{card.title}</h3>
+                <h3 className="font-semibold text-foreground mb-2">{card.title}</h3>
                 <p className="text-sm text-gray-500 leading-relaxed">{card.desc}</p>
               </div>
             ))}
@@ -767,9 +767,9 @@ export default function ARIADemoPage() {
       {/* ======================== REPORT SECTION ======================== */}
       {showReport && (
         <section className="max-w-6xl mx-auto px-6 pb-16">
-          <div className="bg-white rounded-3xl shadow-xl border border-[#D6ECE8] overflow-hidden">
+          <div className="bg-white rounded-3xl shadow-xl border border-cg-sand-dark overflow-hidden">
             {/* Report Header */}
-            <div className="bg-gradient-to-r from-[#1E3A4A] to-[#2D6A8F] text-white px-8 py-6">
+            <div className="bg-gradient-to-r from-foreground to-cg-slate text-white px-8 py-6">
               <div className="flex items-center gap-3 mb-2">
                 <BarChart3 className="w-6 h-6" />
                 <h2
@@ -804,16 +804,16 @@ export default function ARIADemoPage() {
 
               {/* Petty Score Summary */}
               {(ariaScore > 0 || userScore > 0) && (
-                <div className="bg-[#1E3A4A]/5 rounded-2xl p-6 mb-10 text-center">
-                  <h3 className="font-semibold text-[#1E3A4A] mb-3">Challenge Score</h3>
+                <div className="bg-foreground/5 rounded-2xl p-6 mb-10 text-center">
+                  <h3 className="font-semibold text-foreground mb-3">Challenge Score</h3>
                   <div className="flex items-center justify-center gap-8">
                     <div>
-                      <p className="text-3xl font-bold text-[#3DAA8A]">{ariaScore}</p>
+                      <p className="text-3xl font-bold text-cg-sage">{ariaScore}</p>
                       <p className="text-xs text-gray-500 font-medium">ARIA caught</p>
                     </div>
                     <div className="text-2xl text-gray-300 font-light">vs</div>
                     <div>
-                      <p className="text-3xl font-bold text-[#F5A623]">{userScore}</p>
+                      <p className="text-3xl font-bold text-cg-amber">{userScore}</p>
                       <p className="text-xs text-gray-500 font-medium">Got through</p>
                     </div>
                   </div>
@@ -831,7 +831,7 @@ export default function ARIADemoPage() {
               {/* Category Breakdown Chart */}
               {chartData.length > 0 && (
                 <div className="mb-10">
-                  <h3 className="font-semibold text-[#1E3A4A] mb-4">Intervention Categories</h3>
+                  <h3 className="font-semibold text-foreground mb-4">Intervention Categories</h3>
                   <div className="h-64">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={chartData} layout="vertical" margin={{ left: 120, right: 20 }}>
@@ -853,7 +853,7 @@ export default function ARIADemoPage() {
               {/* Toxicity Timeline */}
               {scoreTimeline.length > 1 && (
                 <div className="mb-10">
-                  <h3 className="font-semibold text-[#1E3A4A] mb-4">Co-Parent Toxicity Over Time</h3>
+                  <h3 className="font-semibold text-foreground mb-4">Co-Parent Toxicity Over Time</h3>
                   <div className="h-48">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={scoreTimeline}>
@@ -871,7 +871,7 @@ export default function ARIADemoPage() {
               {/* Sample Before/After */}
               {interventions.length > 0 && (
                 <div className="mb-10">
-                  <h3 className="font-semibold text-[#1E3A4A] mb-4">Sample Interventions</h3>
+                  <h3 className="font-semibold text-foreground mb-4">Sample Interventions</h3>
                   <div className="space-y-4">
                     {interventions.slice(0, 3).map((intervention, i) => (
                       <div key={i} className="grid md:grid-cols-2 gap-3">
@@ -882,14 +882,14 @@ export default function ARIADemoPage() {
                           </div>
                           <p className="text-sm text-red-700">{intervention.original}</p>
                         </div>
-                        <div className="bg-[#3DAA8A]/5 border border-[#3DAA8A]/20 rounded-xl px-4 py-3">
+                        <div className="bg-cg-sage/5 border border-cg-sage/20 rounded-xl px-4 py-3">
                           <div className="flex items-center gap-1.5 mb-1.5">
-                            <CheckCircle2 className="w-3.5 h-3.5 text-[#3DAA8A]" />
-                            <span className="text-xs text-[#3DAA8A] font-medium">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-cg-sage" />
+                            <span className="text-xs text-cg-sage font-medium">
                               {intervention.accepted ? 'Accepted' : 'Suggested'}
                             </span>
                           </div>
-                          <p className="text-sm text-[#1E3A4A]">{intervention.suggestion}</p>
+                          <p className="text-sm text-foreground">{intervention.suggestion}</p>
                         </div>
                       </div>
                     ))}
@@ -898,14 +898,14 @@ export default function ARIADemoPage() {
               )}
 
               {/* CTA with Early Adopter Form */}
-              <div className="bg-gradient-to-b from-[#F5A623]/5 to-transparent rounded-2xl border border-[#F5A623]/20 p-8">
+              <div className="bg-gradient-to-b from-cg-amber/5 to-transparent rounded-2xl border border-cg-amber/20 p-8">
                 <div className="text-center mb-6">
-                  <Sparkles className="w-8 h-8 text-[#F5A623] mx-auto mb-3" />
+                  <Sparkles className="w-8 h-8 text-cg-amber mx-auto mb-3" />
                   <h3
-                    className="text-xl sm:text-2xl text-[#1E3A4A] mb-2"
+                    className="text-xl sm:text-2xl text-foreground mb-2"
                     style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
                   >
-                    Ready to protect your <span className="text-[#3DAA8A]">family</span>?
+                    Ready to protect your <span className="text-cg-sage">family</span>?
                   </h3>
                   <p className="text-gray-600 max-w-lg mx-auto">
                     Join the first 50 early adopters and get 30% off for life. ARIA is waiting.
@@ -927,11 +927,11 @@ export default function ARIADemoPage() {
             {/* Left: Benefits */}
             <div>
               <h2
-                className="text-2xl sm:text-3xl text-[#1E3A4A] mb-4"
+                className="text-2xl sm:text-3xl text-foreground mb-4"
                 style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
               >
                 Join families who communicate{' '}
-                <span className="text-[#3DAA8A]">better</span>
+                <span className="text-cg-sage">better</span>
               </h2>
               <p className="text-gray-600 mb-8 leading-relaxed">
                 ARIA is just one part of CommonGround — the complete co-parenting platform
@@ -948,8 +948,8 @@ export default function ARIADemoPage() {
                   'No credit card required',
                 ].map((feature, i) => (
                   <div key={i} className="flex items-center gap-3">
-                    <div className="w-5 h-5 rounded-full bg-[#3DAA8A]/10 flex items-center justify-center flex-shrink-0">
-                      <Check className="w-3 h-3 text-[#3DAA8A]" />
+                    <div className="w-5 h-5 rounded-full bg-cg-sage/10 flex items-center justify-center flex-shrink-0">
+                      <Check className="w-3 h-3 text-cg-sage" />
                     </div>
                     <span className="text-sm text-gray-600">{feature}</span>
                   </div>

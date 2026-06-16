@@ -77,13 +77,13 @@ export function ProfessionalInterestForm({
   if (isSubmitted) {
     return (
       <div
-        className={`text-center py-10 px-6 rounded-2xl bg-gradient-to-b from-[#3DAA8A]/10 to-transparent border-2 border-[#3DAA8A]/20 ${className}`}
+        className={`text-center py-10 px-6 rounded-2xl bg-gradient-to-b from-cg-sage/10 to-transparent border-2 border-cg-sage/20 ${className}`}
       >
-        <div className="w-14 h-14 bg-[#3DAA8A]/15 rounded-full flex items-center justify-center mx-auto mb-4">
-          <Check className="w-7 h-7 text-[#3DAA8A]" />
+        <div className="w-14 h-14 bg-cg-sage/15 rounded-full flex items-center justify-center mx-auto mb-4">
+          <Check className="w-7 h-7 text-cg-sage" />
         </div>
         <h3
-          className="text-xl font-semibold text-[#1E3A4A] mb-2"
+          className="text-xl font-semibold text-foreground mb-2"
           style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
         >
           We&apos;ll be in touch!
@@ -97,11 +97,11 @@ export function ProfessionalInterestForm({
 
   return (
     <div
-      className={`rounded-2xl border-2 border-[#2D6A8F]/20 bg-gradient-to-b from-[#1E3A4A]/5 to-transparent p-6 sm:p-8 ${className}`}
+      className={`rounded-2xl border-2 border-cg-slate/20 bg-gradient-to-b from-foreground/5 to-transparent p-6 sm:p-8 ${className}`}
     >
       <div className="text-center mb-6">
         <h3
-          className="text-xl sm:text-2xl font-semibold text-[#1E3A4A] mb-2"
+          className="text-xl sm:text-2xl font-semibold text-foreground mb-2"
           style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
         >
           Request a Demo
@@ -114,7 +114,7 @@ export function ProfessionalInterestForm({
       <form onSubmit={handleSubmit} className="space-y-4 max-w-lg mx-auto">
         {/* Role Selection */}
         <div>
-          <label className="block text-sm font-medium text-[#1E3A4A] mb-2">
+          <label className="block text-sm font-medium text-foreground mb-2">
             Your Role
           </label>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -128,8 +128,8 @@ export function ProfessionalInterestForm({
                   onClick={() => setFormState({ ...formState, role: role.id })}
                   className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border-2 text-sm font-medium transition-all ${
                     isSelected
-                      ? 'border-[#3DAA8A] bg-[#3DAA8A]/5 text-[#3DAA8A]'
-                      : 'border-gray-200 text-gray-600 hover:border-[#3DAA8A]/30'
+                      ? 'border-cg-sage bg-cg-sage/5 text-cg-sage'
+                      : 'border-gray-200 text-gray-600 hover:border-cg-sage/30'
                   }`}
                 >
                   <Icon className="w-4 h-4 flex-shrink-0" />
@@ -147,14 +147,14 @@ export function ProfessionalInterestForm({
             value={formState.first_name}
             onChange={(e) => setFormState({ ...formState, first_name: e.target.value })}
             placeholder="First name"
-            className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white text-[#1E3A4A] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/50 focus:border-transparent"
+            className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white text-foreground placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-cg-sage/50 focus:border-transparent"
           />
           <input
             type="text"
             value={formState.last_name}
             onChange={(e) => setFormState({ ...formState, last_name: e.target.value })}
             placeholder="Last name"
-            className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white text-[#1E3A4A] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/50 focus:border-transparent"
+            className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white text-foreground placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-cg-sage/50 focus:border-transparent"
           />
         </div>
 
@@ -165,7 +165,7 @@ export function ProfessionalInterestForm({
           onChange={(e) => setFormState({ ...formState, email: e.target.value })}
           placeholder="Work email"
           required
-          className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white text-[#1E3A4A] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/50 focus:border-transparent"
+          className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white text-foreground placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-cg-sage/50 focus:border-transparent"
         />
 
         {/* Firm */}
@@ -174,14 +174,14 @@ export function ProfessionalInterestForm({
           value={formState.firm_name}
           onChange={(e) => setFormState({ ...formState, firm_name: e.target.value })}
           placeholder="Firm / Organization (optional)"
-          className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white text-[#1E3A4A] placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/50 focus:border-transparent"
+          className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white text-foreground placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-cg-sage/50 focus:border-transparent"
         />
 
         {/* Submit */}
         <button
           type="submit"
           disabled={isSubmitting}
-          className="w-full bg-[#F5A623] text-white font-semibold px-6 py-3.5 rounded-lg transition-all duration-200 hover:bg-[#E09520] hover:shadow-lg disabled:opacity-50 text-base"
+          className="w-full bg-cg-amber text-white font-semibold px-6 py-3.5 rounded-lg transition-all duration-200 hover:bg-cg-amber-dark hover:shadow-lg disabled:opacity-50 text-base"
         >
           {isSubmitting ? 'Submitting...' : 'Request a Demo'}
         </button>

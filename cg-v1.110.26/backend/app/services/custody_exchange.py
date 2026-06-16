@@ -1474,9 +1474,12 @@ class CustodyExchangeService:
         """
         now = datetime.utcnow()
 
-        result = await db.execute(
-            select(CustodyExchangeInstance)
-            .options(selectinload(CustodyExchangeInstance.exchange))
+        # Snapshot candidate ids without locks, then lock + process one at a
+        # time. FOR UPDATE SKIP LOCKED lets concurrent schedulers (one per web
+        # instance) partition the work instead of double-closing, and
+        # per-instance commits keep notification I/O from holding row locks.
+        id_result = await db.execute(
+            select(CustodyExchangeInstance.id)
             .where(
                 and_(
                     CustodyExchangeInstance.status == "scheduled",
@@ -1485,11 +1488,33 @@ class CustodyExchangeService:
                 )
             )
         )
-        instances = result.scalars().all()
+        candidate_ids = [row[0] for row in id_result.all()]
 
         closed_count = 0
-        for instance in instances:
-            exchange = instance.exchange
+        for instance_id in candidate_ids:
+            locked = await db.execute(
+                select(CustodyExchangeInstance)
+                .where(
+                    and_(
+                        CustodyExchangeInstance.id == instance_id,
+                        CustodyExchangeInstance.status == "scheduled",
+                        CustodyExchangeInstance.auto_closed == False,
+                    )
+                )
+                .with_for_update(skip_locked=True)
+            )
+            instance = locked.scalar_one_or_none()
+            if instance is None:
+                # Another scheduler holds/closed it.
+                continue
+
+            exchange = (
+                await db.execute(
+                    select(CustodyExchange).where(
+                        CustodyExchange.id == instance.exchange_id
+                    )
+                )
+            ).scalar_one()
 
             # Determine final outcome. Promotion to 'completed' is guarded —
             # if the evidence chain is incomplete, fall through to 'disputed'
@@ -1521,6 +1546,9 @@ class CustodyExchangeService:
             instance.updated_at = now
             closed_count += 1
 
+            # Release the row lock before any notification I/O.
+            await db.commit()
+
             # Notify attorneys on missed exchanges
             if instance.handoff_outcome in ("missed", "one_party_present"):
                 try:
@@ -1542,7 +1570,6 @@ class CustodyExchangeService:
                 except Exception:
                     pass  # Best-effort notification
 
-        await db.commit()
         return closed_count
 
     @staticmethod

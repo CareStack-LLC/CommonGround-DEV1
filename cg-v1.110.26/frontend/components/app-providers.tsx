@@ -20,6 +20,7 @@ import { ServiceWorkerRegister } from '@/components/service-worker-register';
 import { PortalWrapper } from '@/components/portal-wrapper';
 import { IncomingCallNotification } from '@/components/incoming-call-notification';
 import { ImpersonationBanner } from '@/components/impersonation-banner';
+import { Toaster } from '@/components/ui/toaster';
 import dynamic from 'next/dynamic';
 
 const ChatbotWidget = dynamic(
@@ -37,6 +38,7 @@ export default function AppProviders({ children }: { children: React.ReactNode }
             <IncomingCallNotification />
             <ChatbotWidget />
             <ImpersonationBanner />
+            <Toaster />
             <PortalWrapper>
               {children}
             </PortalWrapper>

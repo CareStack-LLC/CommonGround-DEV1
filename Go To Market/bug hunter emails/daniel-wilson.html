@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CommonGround Beta Test — Daniel Wilson</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #1a1a1a; line-height: 1.6; max-width: 720px; margin: 0 auto; padding: 24px; background: #f8f8f8; }
+  .card { background: #fff; border-radius: 12px; padding: 32px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .hero { background: linear-gradient(135deg, #2d6a4f, #40916c); color: #fff; border-radius: 12px; padding: 36px 32px; margin-bottom: 24px; }
+  .hero h1 { margin: 0 0 8px; font-size: 26px; }
+  .hero p { margin: 0; opacity: 0.9; font-size: 15px; }
+  h2 { color: #2d6a4f; margin-top: 0; font-size: 20px; border-bottom: 2px solid #e8f0eb; padding-bottom: 8px; }
+  h3 { color: #333; font-size: 17px; margin-top: 24px; }
+  .login-box { background: #f0f7f3; border: 1px solid #c5e1d0; border-radius: 8px; padding: 20px; margin: 16px 0; }
+  .login-box code { background: #2d6a4f; color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 14px; }
+  .assignment { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 20px; margin: 16px 0; }
+  .assignment strong { color: #92400e; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
+  th { background: #2d6a4f; color: #fff; text-align: left; padding: 10px 12px; font-weight: 600; }
+  td { padding: 10px 12px; border-bottom: 1px solid #e5e7eb; }
+  tr:nth-child(even) td { background: #f9fafb; }
+  .severity-critical { color: #dc2626; font-weight: 700; }
+  .severity-major { color: #d97706; font-weight: 700; }
+  .severity-minor { color: #2563eb; font-weight: 600; }
+  .tip { background: #eff6ff; border-left: 4px solid #3b82f6; padding: 12px 16px; margin: 12px 0; border-radius: 0 8px 8px 0; font-size: 14px; }
+  .footer { text-align: center; color: #6b7280; font-size: 13px; margin-top: 32px; padding-top: 16px; border-top: 1px solid #e5e7eb; }
+  ul, ol { padding-left: 20px; }
+  li { margin-bottom: 6px; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Welcome to the CommonGround Beta Test!</h1>
+  <p>3-Week Field Testing Program &mdash; You&rsquo;re in, Daniel!</p>
+</div>
+
+<div class="card">
+  <h2>Your Assignment</h2>
+  <div class="assignment">
+    <p><strong>Family:</strong> Wilson Family (Complete Plan)</p>
+    <p><strong>Your Role:</strong> Parent B &mdash; Daniel Wilson</p>
+    <p><strong>Your Coparent Tester:</strong> Jennifer Wilson (jennifer.wilson+seed@email.com)</p>
+    <p><strong>Children:</strong> Emma (5, F), Jade (3, F)</p>
+  </div>
+  <p>You and <strong>Jennifer</strong> are testing together. Coordinate with each other &mdash; many tasks require both parents to participate.</p>
+</div>
+
+<div class="card">
+  <h2>Your Login</h2>
+  <div class="login-box">
+    <p><strong>URL:</strong> <a href="https://find-commonground.com">https://find-commonground.com</a></p>
+    <p><strong>Email:</strong> <code>daniel.wilson+seed@email.com</code></p>
+    <p><strong>Password:</strong> <code>SeedPass2026!1</code></p>
+  </div>
+</div>
+
+<div class="card">
+  <h2>How to Report Bugs</h2>
+  <ol>
+    <li>Use the <strong>feedback widget</strong> (bottom-right of every page) &mdash; click &ldquo;Report a Bug&rdquo;</li>
+    <li>Take a <strong>screenshot</strong> of the issue and upload it</li>
+    <li>Describe <strong>what happened</strong> vs. what you expected</li>
+    <li>Rate severity: <span class="severity-critical">Critical</span> (can&rsquo;t use the app), <span class="severity-major">Major</span> (feature broken), <span class="severity-minor">Minor</span> (cosmetic/UX)</li>
+    <li>Report <strong>everything</strong> &mdash; even small things like typos, slow loading, or confusing labels</li>
+  </ol>
+</div>
+
+<div class="card">
+  <h2>Week 1: Core Features (Days 1&ndash;7)</h2>
+  <p>Focus on daily-use features &mdash; the things parents would do most often.</p>
+  <table>
+    <tr><th>#</th><th>Task</th><th>Both?</th><th>Notes</th></tr>
+    <tr><td>1</td><td>Login &amp; explore dashboard</td><td>Yes</td><td>Check all widgets load. Note anything missing or broken.</td></tr>
+    <tr><td>2</td><td>View your family file</td><td>Yes</td><td>Verify names, children, and agreement are correct.</td></tr>
+    <tr><td>3</td><td>Send 3 messages to your coparent</td><td>Yes</td><td>Casual messages about the kids. Does ARIA intervene? Shows for both?</td></tr>
+    <tr><td>4</td><td>Send 1 frustrated message</td><td>One</td><td>E.g., &ldquo;You were late again picking up the kids.&rdquo; See if ARIA flags it.</td></tr>
+    <tr><td>5</td><td>Accept or reject ARIA&rsquo;s suggestion</td><td>One</td><td>Try accepting one rewrite, then rejecting the next.</td></tr>
+    <tr><td>6</td><td>View your agreement</td><td>Yes</td><td>Open the SharedCare Agreement. Can you read all sections?</td></tr>
+    <tr><td>7</td><td>Check the calendar/schedule</td><td>Yes</td><td>Look at upcoming exchanges and holiday events.</td></tr>
+    <tr><td>8</td><td>View a custody exchange</td><td>Yes</td><td>Is the location correct?</td></tr>
+    <tr><td>9</td><td>Update your profile</td><td>Yes</td><td>Change avatar, address, timezone.</td></tr>
+    <tr><td>10</td><td>Check subscription status</td><td>Yes</td><td>Go to settings/billing. Correct plan (Complete)?</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <h2>Week 2: Advanced Features (Days 8&ndash;14)</h2>
+  <p>Dig into features used weekly or for specific situations.</p>
+  <table>
+    <tr><th>#</th><th>Task</th><th>Both?</th><th>Notes</th></tr>
+    <tr><td>11</td><td>Create a ClearFund expense request</td><td>One</td><td>E.g., &ldquo;Soccer cleats &mdash; $85.&rdquo;</td></tr>
+    <tr><td>12</td><td>Respond to an expense request</td><td>Other</td><td>Approve or deny. Does the split show correctly?</td></tr>
+    <tr><td>13</td><td>Propose a schedule swap</td><td>One</td><td>Ask to swap a weekend.</td></tr>
+    <tr><td>14</td><td>Create a Quick Accord</td><td>One</td><td>E.g., &ldquo;Special sleepover this Saturday.&rdquo;</td></tr>
+    <tr><td>15</td><td>Approve/deny the Quick Accord</td><td>Other</td><td>Does the other parent get notified? Can they approve?</td></tr>
+    <tr><td>16</td><td>Check custody time stats</td><td>Yes</td><td>Does the percentage match your agreement?</td></tr>
+    <tr><td>17</td><td>Try message search</td><td>Yes</td><td>Search for a word from a sent message.</td></tr>
+    <tr><td>18</td><td>Send a frustrated message (intensity 5)</td><td>One</td><td>&ldquo;I&rsquo;m tired of always handling homework. You need to step up.&rdquo;</td></tr>
+    <tr><td>19</td><td>Test notifications</td><td>Yes</td><td>Getting push/email notifications for new messages?</td></tr>
+    <tr><td>20</td><td>View child profiles</td><td>Yes</td><td>Check birthday, gender, name for each child.</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <h2>Week 3: Edge Cases &amp; Stress Testing (Days 15&ndash;21)</h2>
+  <p>Push the limits. Try to break things.</p>
+  <table>
+    <tr><th>#</th><th>Task</th><th>Both?</th><th>Notes</th></tr>
+    <tr><td>21</td><td>Send a very long message (500+ chars)</td><td>One</td><td>Does it send and display correctly?</td></tr>
+    <tr><td>22</td><td>Send messages rapidly (5 in 30 sec)</td><td>One</td><td>Any duplicates?</td></tr>
+    <tr><td>23</td><td>Try the app on mobile browser</td><td>Yes</td><td>Does the layout work on your phone?</td></tr>
+    <tr><td>24</td><td>Open app in 2 tabs simultaneously</td><td>Yes</td><td>Does data stay in sync?</td></tr>
+    <tr><td>25</td><td>Send a hostile message (intensity 8+)</td><td>One</td><td>Does ARIA catch it?</td></tr>
+    <tr><td>26</td><td>Try to edit your agreement</td><td>One</td><td>Does the other parent need to approve?</td></tr>
+    <tr><td>27</td><td>Log out and log back in</td><td>Yes</td><td>Session persist? Any data lost?</td></tr>
+    <tr><td>28</td><td>Try accessing another family&rsquo;s data</td><td>Yes</td><td>Change URL to different family file ID. Should be blocked.</td></tr>
+    <tr><td>29</td><td>Leave app idle 30 minutes</td><td>Yes</td><td>Session still active? Errors?</td></tr>
+    <tr><td>30</td><td>Final walkthrough</td><td>Yes</td><td>Every page. Note anything confusing, slow, or ugly.</td></tr>
+  </table>
+</div>
+
+<div class="card">
+  <h2>What to Look For</h2>
+  <h3><span class="severity-critical">Critical Bugs</span> (report immediately)</h3>
+  <ul>
+    <li>Can&rsquo;t log in</li>
+    <li>Data showing for the wrong family</li>
+    <li>Messages going to wrong person</li>
+    <li>Security issues (seeing other families&rsquo; data)</li>
+    <li>App crashes / white screen</li>
+    <li>Payment or financial data errors</li>
+  </ul>
+  <h3><span class="severity-major">Major Bugs</span></h3>
+  <ul>
+    <li>Features that don&rsquo;t work (buttons do nothing)</li>
+    <li>ARIA not catching obvious hostile messages</li>
+    <li>Agreement sections missing or blank</li>
+    <li>Calendar showing wrong dates</li>
+    <li>Notifications not arriving</li>
+    <li>Profile changes not saving</li>
+  </ul>
+  <h3><span class="severity-minor">Minor Bugs</span></h3>
+  <ul>
+    <li>Typos or grammar errors in the UI</li>
+    <li>Slow loading (note which page and how long)</li>
+    <li>Buttons in wrong position on mobile</li>
+    <li>Colors or fonts that look off</li>
+    <li>Confusing labels or instructions</li>
+    <li>Inconsistent behavior</li>
+  </ul>
+  <h3>UX Feedback (not bugs, but valuable)</h3>
+  <ul>
+    <li>&ldquo;I didn&rsquo;t know where to find X&rdquo;</li>
+    <li>&ldquo;This took too many clicks&rdquo;</li>
+    <li>&ldquo;I expected this to do something different&rdquo;</li>
+    <li>&ldquo;The wording confused me&rdquo;</li>
+    <li>&ldquo;I wish this feature existed&rdquo;</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>End-of-Test Survey (Day 21)</h2>
+  <p>After 3 weeks, you&rsquo;ll complete a survey covering:</p>
+  <ul>
+    <li><strong>Overall experience</strong> &mdash; rating (1&ndash;10), recommendation, ease of learning</li>
+    <li><strong>Feature ratings</strong> (1&ndash;5 stars) &mdash; Dashboard, Messaging, ARIA, Agreement, Calendar, Exchanges, ClearFund, Profile, Notifications</li>
+    <li><strong>Pros &amp; Cons</strong> &mdash; what you liked, what frustrated you, what&rsquo;s missing</li>
+    <li><strong>Suggestions</strong> &mdash; what you&rsquo;d change or add</li>
+    <li><strong>Bug summary</strong> &mdash; how many reported, most serious, any showstoppers</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h2>Testing Tips</h2>
+  <div class="tip">Test as if this is real. Pretend you&rsquo;re actually coparenting. The more realistic your usage, the better the testing.</div>
+  <div class="tip">Test at different times &mdash; morning, evening, weekends. Bugs can be time-dependent.</div>
+  <div class="tip">Use different devices &mdash; desktop, phone, tablet if you can.</div>
+  <div class="tip">Don&rsquo;t fix it yourself. If something breaks, report it exactly as it happened.</div>
+  <div class="tip">Screenshot everything. A picture is worth 1,000 words in bug reports.</div>
+  <div class="tip">Coordinate with Jennifer! Many features need both parents to test.</div>
+</div>
+
+<div class="footer">
+  <p>Questions? Reach out to <strong>TeeJay</strong> (<a href="mailto:teejay@find-commonground.com">teejay@find-commonground.com</a>) or <strong>Thomas</strong> (<a href="mailto:thomas.wilform@gmail.com">thomas.wilform@gmail.com</a>)</p>
+  <p>Thank you for helping us build a better coparenting platform!</p>
+</div>
+
+</body>
+</html>

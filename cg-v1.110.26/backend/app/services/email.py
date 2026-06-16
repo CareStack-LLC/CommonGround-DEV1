@@ -173,7 +173,7 @@ class EmailService:
             'expiry_days': 7
         })
 
-        result = await self._send_email(to_email, subject, html_body)
+        result = await self._send_email(to_email, subject, html_body, outbox_category="case_invitation")
 
         # Track invitee in SendGrid for pipeline visibility
         try:
@@ -232,7 +232,7 @@ class EmailService:
             'expiry_days': 7
         })
 
-        result = await self._send_email(to_email, subject, html_body)
+        result = await self._send_email(to_email, subject, html_body, outbox_category="professional_invitation")
 
         # Track professional invitee in SendGrid
         try:
@@ -290,7 +290,7 @@ class EmailService:
             'expiry_days': 7
         })
 
-        result = await self._send_email(to_email, subject, html_body)
+        result = await self._send_email(to_email, subject, html_body, outbox_category="circle_invitation")
 
         # Track circle invitee in SendGrid
         try:
@@ -512,7 +512,7 @@ class EmailService:
             'caller_relationship': caller_relationship
         })
 
-        return await self._send_email(to_email, subject, html_body)
+        return await self._send_email(to_email, subject, html_body, outbox_category="kidcoms_call")
 
     # ==================== Report Emails ====================
 
@@ -735,7 +735,7 @@ class EmailService:
             'deadline': deadline
         })
 
-        return await self._send_email(to_email, subject, html_body)
+        return await self._send_email(to_email, subject, html_body, outbox_category="expense_request")
 
     async def send_expense_approved(
         self,
@@ -902,6 +902,7 @@ class EmailService:
             subject,
             html_body,
             from_name_override=from_name_override,
+            outbox_category="attorney_case_invitation",
         )
 
         # Track attorney-invited parent in SendGrid
@@ -972,7 +973,7 @@ class EmailService:
             'alert_description': alert_description
         })
 
-        return await self._send_email(to_email, subject, html_body)
+        return await self._send_email(to_email, subject, html_body, outbox_category="security_alert")
 
     async def send_password_reset(
         self,
@@ -1263,7 +1264,7 @@ class EmailService:
             'review_url': conversation_url or f"{self.frontend_url}/messages",
             'conversation_url': conversation_url or f"{self.frontend_url}/messages",
         })
-        return await self._send_email(to_email, subject, html_body)
+        return await self._send_email(to_email, subject, html_body, outbox_category="aria_intervention")
 
     async def send_event_created(
         self,
@@ -1342,6 +1343,7 @@ class EmailService:
         text_body: Optional[str] = None,
         from_name_override: Optional[str] = None,
         _retry_count: int = 0,
+        outbox_category: Optional[str] = None,
     ) -> Optional[str]:
         """
         Send email via SendGrid or log in development mode.
@@ -1355,6 +1357,9 @@ class EmailService:
             html_body: HTML email body
             text_body: Plain text fallback (auto-generated if not provided)
             from_name_override: Custom From Name (e.g., "Jane Smith via CommonGround")
+            outbox_category: When set, the email is critical — on final
+                failure it is persisted to email_outbox and re-sent by the
+                scheduler dispatcher instead of being silently dropped.
 
         Returns:
             SendGrid message ID for tracking, or None on failure
@@ -1400,8 +1405,13 @@ class EmailService:
                     await asyncio.sleep(2 ** (_retry_count + 1))  # 2s, 4s backoff
                     return await self._send_email(
                         to_email, subject, html_body, text_body,
-                        from_name_override, _retry_count + 1
+                        from_name_override, _retry_count + 1,
+                        outbox_category=outbox_category,
                     )
+                await self._spill_to_outbox(
+                    to_email, subject, html_body, from_name_override,
+                    outbox_category, f"SendGrid status {response.status_code}",
+                )
                 return None
 
         except ImportError:
@@ -1426,9 +1436,56 @@ class EmailService:
                 await asyncio.sleep(2 ** (_retry_count + 1))
                 return await self._send_email(
                     to_email, subject, html_body, text_body,
-                    from_name_override, _retry_count + 1
+                    from_name_override, _retry_count + 1,
+                    outbox_category=outbox_category,
                 )
+            await self._spill_to_outbox(
+                to_email, subject, html_body, from_name_override,
+                outbox_category, str(e),
+            )
             return None
+
+    async def _spill_to_outbox(
+        self,
+        to_email: str,
+        subject: str,
+        html_body: str,
+        from_name_override: Optional[str],
+        category: Optional[str],
+        error: str,
+    ) -> None:
+        """Persist a critical email that exhausted in-process retries.
+
+        No-op for un-tagged (non-critical) emails. Opens its own session —
+        callers may be outside any request/transaction context.
+        """
+        if not category:
+            return
+        try:
+            from datetime import timedelta
+
+            from app.core.database import AsyncSessionLocal
+            from app.models.email_outbox import EmailOutbox
+
+            async with AsyncSessionLocal() as db:
+                db.add(EmailOutbox(
+                    to_email=to_email,
+                    subject=subject,
+                    html_body=html_body,
+                    from_name_override=from_name_override,
+                    category=category,
+                    status="pending",
+                    attempts=0,
+                    next_attempt_at=datetime.utcnow() + timedelta(minutes=5),
+                    last_error=error[:2000] if error else None,
+                ))
+                await db.commit()
+            logger.warning(
+                "Email to %s (%s) spilled to outbox after send failure", to_email, category
+            )
+        except Exception as outbox_exc:
+            logger.error("Failed to spill email to outbox for %s: %s", to_email, outbox_exc)
+            capture_error(outbox_exc)
 
 
     # ==================== Bug Hunt Tester Emails ====================

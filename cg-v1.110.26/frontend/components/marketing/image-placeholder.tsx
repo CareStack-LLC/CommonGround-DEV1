@@ -18,7 +18,7 @@ export function ImagePlaceholder({
 }) {
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#E8F4F8] via-[#F4F8F7] to-[#FEF7ED] border-2 border-dashed border-gray-200 ${className}`}
+      className={`relative overflow-hidden rounded-2xl bg-gradient-to-br from-cg-mist via-cg-sand to-cg-amber-subtle border-2 border-dashed border-gray-200 ${className}`}
       style={{ aspectRatio }}
       data-ai-prompt={prompt}
       role="img"

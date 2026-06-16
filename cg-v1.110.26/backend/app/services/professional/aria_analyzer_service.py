@@ -48,7 +48,9 @@ class ARIAAnalyzerService:
                 "lags": {},
                 "facts": [],
                 "resolution_score": 0,
-                "tone_analysis": "N/A"
+                "tone_analysis": "N/A",
+                "message_count": 0,
+                "analyzed_at": datetime.utcnow().isoformat(),
             }
 
         lags = self._calculate_lags(messages)

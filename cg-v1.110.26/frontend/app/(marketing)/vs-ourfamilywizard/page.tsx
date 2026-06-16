@@ -148,7 +148,7 @@ export default function VsOurFamilyWizardPage() {
         </div>
       </section>
 
-      <section className="px-6 py-12 sm:py-16 bg-[#F4F8F7]">
+      <section className="px-6 py-12 sm:py-16 bg-cg-sand">
         <div className="max-w-6xl mx-auto" data-seed="placeholder">
           {/* TODO(marketing): replace with real quote */}
           <TestimonialCard

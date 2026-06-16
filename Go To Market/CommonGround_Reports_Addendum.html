@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CommonGround — Reports Addendum: 3 Gap Reports + Endpoints</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --navy:    #0D1B24;
+  --navy-2:  #162530;
+  --navy-3:  #1E3A4A;
+  --teal:    #3DAA8A;
+  --teal-lt: #5BC4A0;
+  --blue:    #2D6A8F;
+  --blue-lt: #4BA8C8;
+  --gold:    #F5A623;
+  --slate:   #3A5668;
+  --text:    #CBD8E0;
+  --text-dim:#7A9CAD;
+  --white:   #FFFFFF;
+  --red:     #E05353;
+  --orange:  #E08C2A;
+  --yellow:  #D4B84A;
+  --purple:  #7B5EA7;
+  --green-lt:#5BC4A0;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { background:var(--navy); color:var(--text); font-family:'DM Sans',sans-serif; font-size:14px; line-height:1.7; }
+
+.cover { min-height:72vh; display:flex; flex-direction:column; justify-content:center; padding:72px 72px; background:linear-gradient(148deg,#0D1B24 0%,#162530 55%,#1c2e3d 100%); border-bottom:1px solid rgba(45,106,143,0.18); position:relative; overflow:hidden; }
+.cover::after { content:''; position:absolute; bottom:-180px; right:-80px; width:500px; height:500px; background:radial-gradient(circle,rgba(61,170,138,0.06) 0%,transparent 60%); pointer-events:none; }
+.eyebrow { font-size:10px; letter-spacing:4px; text-transform:uppercase; color:var(--blue-lt); margin-bottom:16px; }
+.cover h1 { font-family:'DM Serif Display',serif; font-size:50px; line-height:1.08; color:var(--white); margin-bottom:16px; max-width:740px; }
+.cover h1 em { color:var(--teal-lt); font-style:normal; }
+.cover p { font-size:16px; color:var(--text-dim); max-width:620px; margin-bottom:36px; line-height:1.85; }
+.meta-row { display:flex; gap:44px; flex-wrap:wrap; }
+.meta-item label { display:block; font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--slate); margin-bottom:4px; }
+.meta-item span { font-size:13px; color:var(--text); font-weight:500; }
+
+.toc { background:var(--navy-3); border-bottom:1px solid rgba(255,255,255,0.05); padding:20px 72px; display:flex; gap:0; flex-wrap:wrap; }
+.toc a { color:var(--text-dim); text-decoration:none; font-size:11.5px; padding:4px 16px 4px 0; border-right:1px solid rgba(255,255,255,0.05); margin-right:16px; transition:color 0.2s; }
+.toc a:hover { color:var(--teal); }
+.toc a:last-child { border-right:none; }
+
+section { padding:60px 72px; border-bottom:1px solid rgba(255,255,255,0.04); }
+.sec-eye { font-size:9px; letter-spacing:4px; text-transform:uppercase; color:var(--blue-lt); margin-bottom:11px; }
+.sec-title { font-family:'DM Serif Display',serif; font-size:30px; color:var(--white); margin-bottom:10px; }
+.sec-intro { font-size:15px; color:var(--text-dim); max-width:720px; margin-bottom:32px; line-height:1.85; }
+
+/* REPORT CARD — matches original guide */
+.report-card { background:var(--navy-2); border:1px solid rgba(255,255,255,0.07); border-radius:20px; margin-bottom:28px; overflow:hidden; }
+.report-header { padding:20px 28px; border-bottom:1px solid rgba(255,255,255,0.06); display:flex; align-items:flex-start; justify-content:space-between; gap:20px; }
+.report-header-left { flex:1; }
+.report-id { font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--slate); letter-spacing:2px; margin-bottom:5px; }
+.report-name { font-family:'DM Serif Display',serif; font-size:22px; color:var(--white); margin-bottom:4px; }
+.report-desc { font-size:13px; color:var(--text-dim); line-height:1.6; max-width:540px; }
+.report-meta { display:flex; flex-direction:column; gap:8px; align-items:flex-end; flex-shrink:0; }
+.report-body { display:grid; grid-template-columns:1fr 1fr 1fr; gap:0; }
+.report-section { padding:20px 24px; border-right:1px solid rgba(255,255,255,0.05); }
+.report-section:last-child { border-right:none; }
+.report-section-label { font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--slate); margin-bottom:12px; font-weight:600; }
+.report-section ul { list-style:none; }
+.report-section li { font-size:12.5px; color:var(--text-dim); padding:4px 0; display:flex; gap:8px; align-items:flex-start; border-bottom:1px solid rgba(255,255,255,0.03); line-height:1.45; }
+.report-section li:last-child { border-bottom:none; }
+.report-section li::before { flex-shrink:0; font-size:10px; margin-top:2px; }
+.report-section li.field::before  { content:'›'; color:var(--teal); }
+.report-section li.source::before { content:'⬡'; color:var(--blue-lt); }
+.report-section li.note::before   { content:'→'; color:var(--yellow); }
+.report-section li.ep::before     { content:'⚡'; color:var(--purple); font-size:9px; }
+
+/* TAGS */
+.tag { display:inline-flex; align-items:center; padding:3px 9px; border-radius:5px; font-size:10px; font-weight:700; letter-spacing:0.8px; text-transform:uppercase; }
+.tag.free     { background:rgba(61,170,138,0.15); color:var(--teal); border:1px solid rgba(61,170,138,0.2); }
+.tag.plus     { background:rgba(45,106,143,0.18); color:var(--blue-lt); border:1px solid rgba(45,106,143,0.25); }
+.tag.complete { background:rgba(245,166,35,0.15); color:var(--gold); border:1px solid rgba(245,166,35,0.2); }
+.tag.solo     { background:rgba(45,106,143,0.15); color:var(--blue-lt); border:1px solid rgba(45,106,143,0.2); }
+.tag.firm     { background:rgba(123,94,167,0.15); color:#A885D8; border:1px solid rgba(123,94,167,0.25); }
+.tag.gal      { background:rgba(224,83,83,0.12); color:#E88; border:1px solid rgba(224,83,83,0.2); }
+.tag.auto     { background:rgba(61,170,138,0.1); color:var(--teal-lt); }
+.tag.ondemand { background:rgba(58,86,104,0.3); color:var(--text-dim); }
+.tag.sha      { background:rgba(224,140,42,0.1); color:var(--orange); }
+.tag.new      { background:rgba(61,170,138,0.2); color:var(--teal); border:1px solid rgba(61,170,138,0.35); }
+
+/* ALERT */
+.alert { padding:13px 18px; border-radius:10px; margin:12px 0; display:flex; gap:11px; align-items:flex-start; }
+.alert.teal { background:rgba(61,170,138,0.07); border:1px solid rgba(61,170,138,0.2); }
+.alert.gold { background:rgba(245,166,35,0.07); border:1px solid rgba(245,166,35,0.2); }
+.alert.blue { background:rgba(45,106,143,0.08); border:1px solid rgba(45,106,143,0.22); }
+.alert.red  { background:rgba(224,83,83,0.07); border:1px solid rgba(224,83,83,0.2); }
+.alert.purple { background:rgba(123,94,167,0.08); border:1px solid rgba(123,94,167,0.25); }
+.alert-icon { font-size:13px; flex-shrink:0; margin-top:2px; }
+.alert p { font-size:13px; line-height:1.6; }
+.alert.teal p   { color:var(--teal-lt); }
+.alert.gold p   { color:var(--gold); }
+.alert.blue p   { color:var(--blue-lt); }
+.alert.red p    { color:var(--red); }
+.alert.purple p { color:#A885D8; }
+
+/* CODE BLOCK */
+.code-block { background:#080f18; border:1px solid rgba(255,255,255,0.07); border-radius:12px; overflow:hidden; margin:12px 0; }
+.code-header { background:rgba(255,255,255,0.04); padding:8px 16px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.05); flex-wrap:wrap; gap:8px; }
+.code-method { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; font-family:'JetBrains Mono',monospace; }
+.method-get  { background:rgba(61,170,138,0.2); color:var(--teal); }
+.method-post { background:rgba(45,106,143,0.2); color:var(--blue-lt); }
+.code-path { font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text); }
+.code-auth { font-size:10px; color:var(--slate); }
+.code-body { padding:16px 18px; font-family:'JetBrains Mono',monospace; font-size:12px; line-height:1.7; color:#a8c0cc; overflow-x:auto; }
+.code-body .kw   { color:var(--teal); }
+.code-body .str  { color:var(--gold); }
+.code-body .cm   { color:var(--slate); }
+.code-body .key  { color:var(--blue-lt); }
+.code-body .val  { color:#CBD8E0; }
+.code-body .type { color:#A885D8; }
+.code-body .req  { color:var(--orange); }
+.code-body .opt  { color:var(--text-dim); }
+
+/* ENDPOINT SECTION */
+.endpoint-group { margin-bottom:32px; }
+.endpoint-group-title { font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--slate); margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.05); }
+
+/* PARAM TABLE */
+.param-table { width:100%; border-collapse:collapse; margin:8px 0; }
+.param-table th { text-align:left; font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--slate); padding:7px 12px; border-bottom:1px solid rgba(255,255,255,0.07); }
+.param-table td { padding:8px 12px; font-size:12px; color:var(--text-dim); border-bottom:1px solid rgba(255,255,255,0.03); vertical-align:top; }
+.param-table td:first-child { font-family:'JetBrains Mono',monospace; color:var(--blue-lt); font-size:11px; }
+.param-table td.req-cell { color:var(--orange); font-size:10px; font-weight:600; letter-spacing:1px; }
+.param-table td.opt-cell { color:var(--slate); font-size:10px; }
+.param-table tr:last-child td { border-bottom:none; }
+
+/* RESPONSE BLOCK */
+.response-block { background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.05); border-radius:8px; padding:14px 16px; margin:10px 0; }
+.response-label { font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--teal); margin-bottom:8px; font-weight:600; }
+
+/* LAYOUT PREVIEW */
+.layout-preview { background:#0a1520; border:1px solid rgba(255,255,255,0.07); border-radius:12px; padding:16px 18px; }
+.lp-label { font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--slate); margin-bottom:10px; }
+.lp-page { background:#111d27; border:1px solid rgba(255,255,255,0.06); border-radius:8px; padding:14px 16px; }
+.lp-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; padding-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.06); }
+.lp-logo-line { height:5px; border-radius:3px; background:var(--teal); width:55px; }
+.lp-report-title { font-size:9px; color:var(--text); font-weight:600; }
+.lp-report-sub { font-size:8px; color:var(--slate); margin-top:2px; }
+.lp-section { background:rgba(255,255,255,0.03); border-radius:6px; padding:8px 10px; margin-bottom:7px; }
+.lp-section-title { font-size:8px; color:var(--text-dim); font-weight:600; margin-bottom:5px; text-transform:uppercase; letter-spacing:1px; }
+.lp-row { display:flex; justify-content:space-between; font-size:8px; color:var(--slate); margin-bottom:2px; }
+.lp-stat-box { flex:1; background:rgba(255,255,255,0.04); border-radius:5px; padding:7px 9px; text-align:center; }
+.lp-stat-num { font-family:'DM Serif Display',serif; font-size:17px; color:var(--teal); line-height:1; }
+.lp-stat-lbl { font-size:8px; color:var(--slate); margin-top:2px; }
+.lp-bar { height:5px; border-radius:3px; margin-bottom:3px; }
+.lp-bar-full  { background:var(--teal); }
+.lp-bar-part  { background:var(--blue); }
+.lp-bar-warn  { background:var(--orange); }
+.lp-pill { display:inline-block; padding:2px 6px; border-radius:10px; font-size:8px; margin:2px; }
+.lp-pill.green  { background:rgba(61,170,138,0.2); color:var(--teal); }
+.lp-pill.yellow { background:rgba(212,184,74,0.2); color:var(--yellow); }
+.lp-pill.red    { background:rgba(224,83,83,0.2); color:var(--red); }
+.lp-sha { display:flex; align-items:center; gap:5px; background:rgba(245,166,35,0.07); border:1px solid rgba(245,166,35,0.15); border-radius:4px; padding:5px 7px; margin-top:7px; }
+.lp-sha-text { font-family:'JetBrains Mono',monospace; font-size:7px; color:var(--yellow); }
+
+/* SOURCE CHIP */
+.src { display:inline-flex; align-items:center; background:rgba(45,106,143,0.1); border:1px solid rgba(45,106,143,0.2); border-radius:4px; padding:2px 7px; font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--blue-lt); margin:2px; }
+
+/* TWO COL */
+.two-col { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
+
+/* HIGHLIGHT */
+.highlight { background:linear-gradient(135deg,rgba(45,106,143,0.1),rgba(61,170,138,0.07)); border:1px solid rgba(61,170,138,0.15); border-radius:16px; padding:24px 28px; margin:20px 0; }
+.highlight h3 { font-family:'DM Serif Display',serif; font-size:20px; color:var(--white); margin-bottom:8px; }
+.highlight p { font-size:14px; color:var(--text-dim); line-height:1.8; }
+
+/* DIVIDER */
+.divider { display:flex; align-items:center; gap:16px; margin:20px 0 28px; }
+.divider-line { flex:1; height:1px; background:rgba(255,255,255,0.05); }
+.divider-label { font-size:10px; letter-spacing:3px; text-transform:uppercase; color:var(--slate); white-space:nowrap; }
+
+/* MASTER TABLE */
+table.main { width:100%; border-collapse:collapse; }
+table.main th { text-align:left; font-size:9px; letter-spacing:3px; text-transform:uppercase; color:var(--slate); padding:9px 13px; border-bottom:1px solid rgba(255,255,255,0.07); }
+table.main td { padding:10px 13px; font-size:13px; color:var(--text-dim); border-bottom:1px solid rgba(255,255,255,0.03); vertical-align:top; }
+table.main td strong { color:var(--white); font-weight:500; }
+table.main tr:last-child td { border-bottom:none; }
+
+footer { padding:32px 72px; background:var(--navy-3); border-top:1px solid rgba(255,255,255,0.05); display:flex; justify-content:space-between; align-items:center; }
+footer p { font-size:12px; color:var(--slate); }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="eyebrow">Reports Reference · Addendum — 3 Gap Reports</div>
+  <h1>Reports <em>P-7, A-7, A-8</em><br>+ All API Endpoints</h1>
+  <p>The three reports identified as genuine gaps — Agreement Status (parent), Client-Facing Progress Summary (attorney), and GAL Child Welfare View — fully specced with every field, data source, layout, and the complete API endpoint definitions for every report in the system.</p>
+  <div class="meta-row">
+    <div class="meta-item"><label>New Reports</label><span>P-7 · A-7 · A-8</span></div>
+    <div class="meta-item"><label>Endpoints Defined</label><span>15 total — all 12 original + 3 new</span></div>
+    <div class="meta-item"><label>Auth Model</label><span>Supabase JWT + RBAC case-level</span></div>
+    <div class="meta-item"><label>Companion To</label><span>CommonGround Reports Reference Guide</span></div>
+  </div>
+</div>
+
+<!-- TOC -->
+<nav class="toc">
+  <a href="#p7">P-7 · Agreement Status</a>
+  <a href="#a7">A-7 · Client Progress Summary</a>
+  <a href="#a8">A-8 · GAL Child Welfare</a>
+  <a href="#endpoints">All Endpoints</a>
+  <a href="#auth">Auth + RBAC</a>
+  <a href="#updated-table">Updated Master Table</a>
+</nav>
+
+
+<!-- ═══════════ P-7: AGREEMENT STATUS ═══════════ -->
+<section id="p7">
+  <div class="sec-eye">Gap Report 1 · Parent · Report P-7</div>
+  <h2 class="sec-title">Agreement Status Report</h2>
+  <p class="sec-intro">The one report that was clearly missing: a parent-facing document that shows where their SharedCare Agreement actually stands. Which sections are complete, which are pending co-parent approval, which have changed since last version, and whether they're living by it. Available on Plus. The single most-asked question in co-parenting disputes — "what does our agreement actually say?" — answered in one document.</p>
+
+  <div class="report-card">
+    <div class="report-header">
+      <div class="report-header-left">
+        <div class="report-id">REPORT P-7 · AGREEMENT STATUS REPORT</div>
+        <div class="report-name">Parenting Agreement Status Report</div>
+        <div class="report-desc">Shows the current state of the SharedCare Agreement — section completion, approval status, version history, and a side-by-side comparison of ordered terms vs. actual practice. On-demand. Shareable with attorneys without being a full court package.</div>
+      </div>
+      <div class="report-meta">
+        <span class="tag plus">Plus — $17.99/mo</span>
+        <span class="tag new">NEW</span>
+        <span class="tag ondemand">On-Demand</span>
+        <div style="font-size:11px;color:var(--slate);margin-top:4px;text-align:right;">PDF export · No SHA-256 on Plus<br>SHA-256 optional on Complete</div>
+      </div>
+    </div>
+    <div class="report-body">
+      <div class="report-section">
+        <div class="report-section-label">What's In It — All Fields</div>
+        <ul>
+          <li class="field"><strong>Cover:</strong> Both parent names, family file ID, report date, active agreement version number, agreement creation date, last signature date</li>
+          <li class="field"><strong>Section Completion Table:</strong> All 18 SharedCare Agreement sections listed with status badge — Complete · Pending Co-Parent Approval · Draft (unsigned) · Not Started · Expired/Due for Review</li>
+          <li class="field"><strong>Overall completion %:</strong> How many of 18 sections have dual-parent approval</li>
+          <li class="field"><strong>Version history table:</strong> Every agreement version — version number, date created, who initiated the change, what changed (section name), current vs. prior parent approval status</li>
+          <li class="field"><strong>Unsigned sections alert:</strong> Any section with single-parent signature but missing co-parent approval — highlighted with days pending</li>
+          <li class="field"><strong>Key terms summary:</strong> From the signed sections — custody %, primary residence, exchange location, holiday rotation current year, child support amount</li>
+          <li class="field"><strong>Ordered vs. actual comparison:</strong> For completed sections only — custody % ordered vs. actual last 90 days (pulls from P-4 data), exchange location ordered vs. GPS check-in location, holiday schedule ordered vs. calendar</li>
+          <li class="field"><strong>Review due dates:</strong> Any sections with a scheduled review date within the next 60 days — flagged</li>
+          <li class="field"><strong>Quick Accords log:</strong> Any temporary agreements created in the last 90 days — date, topic, both parent signatures, status</li>
+        </ul>
+      </div>
+      <div class="report-section">
+        <div class="report-section-label">Data Sources (by field)</div>
+        <ul>
+          <li class="source"><span class="src">agreements</span> — active agreement ID, version number, creation date, overall status</li>
+          <li class="source"><span class="src">agreement_versions</span> — full version history, initiating parent, change delta between versions, signature timestamps per parent per version</li>
+          <li class="source"><span class="src">agreement_sections</span> (implied from Agreement Builder) — individual section content, completion status, dual-approval flag, review date field</li>
+          <li class="source"><span class="src">custody_periods</span> — actual custody % last 90 days for ordered vs. actual comparison</li>
+          <li class="source"><span class="src">custody_exchange_instances</span> — GPS coordinates for exchange location comparison</li>
+          <li class="source"><span class="src">schedule_events</span> — holiday calendar events vs. agreement-ordered holiday schedule</li>
+          <li class="source"><span class="src">quick_accords</span> / <span class="src">agreements</span> where type = 'quick_accord' — temporary agreement log</li>
+          <li class="note">Key terms summary only appears for sections with status = 'complete' (dual-signed). Draft/pending sections show "Awaiting co-parent approval" placeholder.</li>
+          <li class="note">Ordered vs. actual comparison requires ≥30 days of GPS exchange data. If insufficient data: "Not enough data yet — check back after 30 days of logged exchanges."</li>
+        </ul>
+      </div>
+      <div class="report-section">
+        <div class="report-section-label">Format + Layout</div>
+        <div class="layout-preview">
+          <div class="lp-label">Report Preview — 3 Pages</div>
+          <div class="lp-page">
+            <div class="lp-top">
+              <div><div class="lp-logo-line"></div></div>
+              <div>
+                <div class="lp-report-title">Agreement Status Report</div>
+                <div class="lp-report-sub">Smith-Torres · v3 · Mar 13, 2026</div>
+              </div>
+            </div>
+            <div class="lp-section">
+              <div class="lp-section-title">Agreement Completion</div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+                <div style="font-family:'DM Serif Display',serif;font-size:22px;color:var(--teal);">14/18</div>
+                <div style="font-size:8px;color:var(--slate);">sections complete<br>78% dual-approved</div>
+              </div>
+              <div class="lp-bar lp-bar-full" style="width:78%;"></div>
+            </div>
+            <div class="lp-section">
+              <div class="lp-section-title">Section Status</div>
+              <div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:4px;">
+                <span class="lp-pill green">Physical Custody ✓</span>
+                <span class="lp-pill green">Parenting Schedule ✓</span>
+                <span class="lp-pill yellow">Holidays ⏳</span>
+                <span class="lp-pill red">Relocation ✗</span>
+                <span class="lp-pill green">Exchanges ✓</span>
+                <span class="lp-pill yellow">Medical ⏳</span>
+              </div>
+            </div>
+            <div class="lp-section">
+              <div class="lp-section-title">Key Terms (Signed Sections)</div>
+              <div class="lp-row"><span>Custody split</span><span>50/50</span></div>
+              <div class="lp-row"><span>Exchange</span><span>School / 3pm Fri</span></div>
+              <div class="lp-row"><span>Holiday (even yr)</span><span>Parent A</span></div>
+            </div>
+          </div>
+        </div>
+        <ul style="margin-top:12px;">
+          <li class="note">Page 1: Agreement completion gauge + section status grid</li>
+          <li class="note">Page 2: Key terms summary + ordered vs. actual comparison table</li>
+          <li class="note">Page 3: Version history + Quick Accords log + review due dates</li>
+          <li class="note">Section status uses clear badges — no legal language. "Waiting for [Co-Parent Name] to sign" not "pending respondent approval"</li>
+          <li class="note">On Complete tier: SHA-256 option makes the ordered vs. actual comparison court-submittable for modification filings</li>
+          <li class="note">Attorney-readable: explicitly designed so a parent can email this to their attorney before a modification hearing</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ A-7: CLIENT PROGRESS SUMMARY ═══════════ -->
+<section id="a7">
+  <div class="sec-eye">Gap Report 2 · Professional · Report A-7</div>
+  <h2 class="sec-title">Client-Facing Progress Summary</h2>
+  <p class="sec-intro">The attorney-initiated report sent back to their client. Not a court document — a communication tool. Firm-branded, one page, shows the client how they're doing on the platform. Builds client trust in both CommonGround and the attorney recommending it. The equivalent of a monthly bank statement: same data the client already has access to, arriving from the relationship that matters.</p>
+
+  <div class="report-card">
+    <div class="report-header">
+      <div class="report-header-left">
+        <div class="report-id">REPORT A-7 · CLIENT PROGRESS SUMMARY</div>
+        <div class="report-name">Client Progress Summary</div>
+        <div class="report-desc">Attorney-generated one-page summary sent directly to the client. Firm-branded. Shows co-parenting health score, three key metrics, and a brief note from the attorney. Builds platform adoption and client confidence. Distinct from P-2 (parent self-generated) — this arrives from counsel.</div>
+      </div>
+      <div class="report-meta">
+        <span class="tag solo">Solo+ — $99/mo</span>
+        <span class="tag new">NEW</span>
+        <span class="tag ondemand">On-Demand</span>
+        <div style="font-size:11px;color:var(--slate);margin-top:4px;text-align:right;">PDF · No SHA-256<br>Attorney-branded</div>
+      </div>
+    </div>
+    <div class="report-body">
+      <div class="report-section">
+        <div class="report-section-label">What's In It</div>
+        <ul>
+          <li class="field"><strong>Firm header:</strong> Attorney name, firm name, firm logo (if uploaded), date, client name, period covered</li>
+          <li class="field"><strong>Co-Parenting Health Score:</strong> The same 0–100 composite from P-2 — one large number, trend indicator vs. prior period (↑ improving / → stable / ↓ declining)</li>
+          <li class="field"><strong>Three Key Metrics block:</strong> (1) Exchange compliance % for the period · (2) ARIA constructive communication rate % · (3) Outstanding financial obligations count</li>
+          <li class="field"><strong>What's working:</strong> 2–3 auto-generated bullet points based on data — e.g., "You completed all 8 scheduled exchanges on time this month" or "Your ARIA acceptance rate improved by 12% vs. last period"</li>
+          <li class="field"><strong>Areas to watch:</strong> 1–2 auto-generated bullets for any metric in yellow/red territory — e.g., "2 expense requests have been in dispute for over 14 days — consider resolving before your next hearing"</li>
+          <li class="field"><strong>Attorney note field:</strong> Free-text block the attorney fills in before generating — 3–5 sentences. If left blank, a default: "Your CommonGround activity is being monitored for your case. Please keep the platform updated."</li>
+          <li class="field"><strong>Next step CTA:</strong> One action the client should take — pre-populated from system context (e.g., "Sign the pending Holiday Schedule section in your agreement" or "Log your last 2 exchanges to maintain your GPS record")</li>
+          <li class="field"><strong>Footer:</strong> "This summary was prepared by [Attorney Name] using CommonGround. It is for informational purposes and does not constitute legal advice."</li>
+        </ul>
+      </div>
+      <div class="report-section">
+        <div class="report-section-label">Data Sources (by field)</div>
+        <ul>
+          <li class="source">Health Score: same formula as P-2 — (exchange_on_time_rate × 0.40) + (financial_obligation_rate × 0.35) + (aria_constructive_rate × 0.25) — queried from <span class="src">custody_exchange_instances</span>, <span class="src">obligations</span>, <span class="src">message_flags</span></li>
+          <li class="source">Exchange compliance %: <span class="src">custody_exchange_instances</span> — on_time_status count for the period</li>
+          <li class="source">ARIA constructive rate: <span class="src">message_flags</span> — (total_messages - flagged_messages) / total_messages for the requesting parent only</li>
+          <li class="source">Outstanding obligations: <span class="src">obligations</span> where status = 'outstanding' or 'overdue' and due_date ≤ today</li>
+          <li class="source">"What's working" bullets: rules engine evaluating metric thresholds. Exchange ≥90% → "completed all exchanges on time." ARIA rate ↑ &gt;10% → "communication improving." Zero disputes → "no expense disputes this period."</li>
+          <li class="source">"Areas to watch" bullets: rules engine for yellow/red metrics. Dispute age &gt;14 days → flag. Exchange on-time &lt;75% → flag. Health score ↓ &gt;10 pts → flag.</li>
+          <li class="source">Next step CTA: priority queue — (1) unsigned agreement sections, (2) unlogged exchanges, (3) overdue obligations, (4) pending Quick Accords. First item in queue becomes the CTA.</li>
+          <li class="source">Attorney note: manually entered in portal — stored in <span class="src">professional_cases</span> attorney_notes field, cleared after report generation</li>
+          <li class="note">The attorney only sees their client's data — not the co-parent's individual metrics. Co-parent data appears only in aggregate percentages.</li>
+        </ul>
+      </div>
+      <div class="report-section">
+        <div class="report-section-label">Format + Layout</div>
+        <div class="layout-preview">
+          <div class="lp-label">Report Preview — 1 Page</div>
+          <div class="lp-page">
+            <div class="lp-top">
+              <div>
+                <div style="font-size:8px;color:var(--text);font-weight:600;">Marcus Chen, Esq.</div>
+                <div style="font-size:7px;color:var(--slate);">Chen Family Law · Los Angeles</div>
+              </div>
+              <div>
+                <div class="lp-report-title">Client Progress Summary</div>
+                <div class="lp-report-sub">Sarah M. · February 2026</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:7px;margin-bottom:7px;">
+              <div style="flex:1;background:rgba(61,170,138,0.08);border-radius:6px;padding:8px;text-align:center;">
+                <div style="font-family:'DM Serif Display',serif;font-size:26px;color:var(--teal);line-height:1;">74</div>
+                <div style="font-size:7px;color:var(--teal);margin-top:2px;">↑ +6 · Improving</div>
+                <div style="font-size:7px;color:var(--slate);">Co-Parenting Health</div>
+              </div>
+              <div style="flex:2;display:flex;flex-direction:column;gap:4px;">
+                <div style="background:rgba(255,255,255,0.03);border-radius:4px;padding:5px 7px;">
+                  <div class="lp-row"><span>Exchanges on time</span><span style="color:var(--teal);">88%</span></div>
+                </div>
+                <div style="background:rgba(255,255,255,0.03);border-radius:4px;padding:5px 7px;">
+                  <div class="lp-row"><span>Constructive comms</span><span style="color:var(--teal);">91%</span></div>
+                </div>
+                <div style="background:rgba(255,255,255,0.03);border-radius:4px;padding:5px 7px;">
+                  <div class="lp-row"><span>Outstanding obligations</span><span style="color:var(--yellow);">1</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="lp-section">
+              <div class="lp-section-title">What's Working</div>
+              <div style="font-size:8px;color:var(--text-dim);">• All 8 exchanges completed on time this month<br>• ARIA acceptance rate up 12% vs. January</div>
+            </div>
+            <div class="lp-section">
+              <div class="lp-section-title">Attorney Note</div>
+              <div style="font-size:8px;color:var(--text-dim);">Good progress this month. Please sign the Holiday Schedule section before our March 20 hearing.</div>
+            </div>
+          </div>
+        </div>
+        <ul style="margin-top:12px;">
+          <li class="note">Strictly 1 page — designed for email attachment and quick client scan</li>
+          <li class="note">Firm logo appears top-left if uploaded in attorney profile</li>
+          <li class="note">Attorney fills in note in portal, previews the PDF, then clicks "Send to Client" — delivers via email from <span class="src">cases@find-commonground.com</span> with attorney in reply-to</li>
+          <li class="note">Alternatively: attorney downloads PDF and emails manually through their own system</li>
+          <li class="note">Generation logged in <span class="src">case_events</span> — "Attorney generated Client Progress Summary" with timestamp</li>
+          <li class="note">Client receives it alongside their own P-2 auto-report — different framing: "from my lawyer" vs. "from the app"</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ A-8: GAL CHILD WELFARE VIEW ═══════════ -->
+<section id="a8">
+  <div class="sec-eye">Gap Report 3 · Professional · Report A-8</div>
+  <h2 class="sec-title">GAL Child Welfare View</h2>
+  <p class="sec-intro">The report the platform has always been able to generate but never assembled into a child-focused lens. GALs, parenting coordinators, and child welfare advocates need a completely different view than attorneys — not parental compliance metrics, but child welfare indicators. Conflict exposure, connection maintenance, safety events. Available only to users with GAL or Parenting Coordinator access role on a case.</p>
+
+  <div class="alert purple">
+    <div class="alert-icon">★</div>
+    <p><strong>Access control is critical here.</strong> This report is only available to users with role = 'gal' or 'parenting_coordinator' on a <span class="src">case_assignment</span> record. Neither parent, nor standard attorneys without GAL designation, can generate or view this report. The GAL access role requires dual-parent consent to grant. This must be enforced at the API layer, not just the UI.</p>
+  </div>
+
+  <div class="report-card">
+    <div class="report-header">
+      <div class="report-header-left">
+        <div class="report-id">REPORT A-8 · GAL CHILD WELFARE VIEW</div>
+        <div class="report-name">Child Welfare Report (GAL / Parenting Coordinator)</div>
+        <div class="report-desc">Child-centered welfare indicators for Guardian ad Litem filing. Focuses on conflict exposure, child-parent connection health, KidComs engagement, and any platform-detected safety events. SHA-256 verified. Structured for direct court submission in child welfare proceedings.</div>
+      </div>
+      <div class="report-meta">
+        <span class="tag gal">GAL Role — Solo+</span>
+        <span class="tag new">NEW</span>
+        <span class="tag ondemand">On-Demand Only</span>
+        <span class="tag sha">SHA-256 Verified</span>
+        <div style="font-size:11px;color:var(--slate);margin-top:4px;text-align:right;">Dual-parent consent required<br>FRE 902(14) · Child-welfare focus</div>
+      </div>
+    </div>
+    <div class="report-body">
+      <div class="report-section">
+        <div class="report-section-label">What's In It — All Fields</div>
+        <ul>
+          <li class="field"><strong>Cover:</strong> GAL name, case number, children listed by name and DOB, report period, both parent names, date generated</li>
+          <li class="field"><strong>Conflict Exposure Score (per child):</strong> A 0–100 score representing how much platform-recorded high-conflict activity occurred during or proximate to the child's custody time. Lower = better. Calculated per child based on their custody schedule.</li>
+          <li class="field"><strong>High-Conflict Events Near Exchanges:</strong> Any ARIA red or orange flag within ±2 hours of a scheduled custody exchange — timestamp, severity, which parent sent it. Message content not shown.</li>
+          <li class="field"><strong>KidComs Connection Health (per child):</strong> Total calls in period, call duration trend, which parent initiated, any calls that were declined or cut short, flagged call count</li>
+          <li class="field"><strong>Flagged KidComs Events:</strong> Any call where AI moderation triggered — type of flag (inappropriate content / hostile language / third-party interference), timestamp, duration of flagged segment, evidence clip reference (SHA-256 hashed)</li>
+          <li class="field"><strong>Child-Parent Contact Compliance:</strong> Per SharedCare Agreement communication section — ordered contact frequency vs. actual KidComs call frequency, per parent</li>
+          <li class="field"><strong>Exchange Environment Notes:</strong> Any exchange where GPS check-in showed non-approved location, exchange marked as "high conflict handoff" in the app, any QR scan refusal</li>
+          <li class="field"><strong>Platform Safety Events:</strong> Any event in the audit log tagged as a safety concern — blocked messages, emergency contact activations, any parent-reported safety incidents logged through the app</li>
+          <li class="field"><strong>Agreement Sections Relevant to Child:</strong> Status of sections directly affecting the child — Children (section 2), Communication (section 12), Child Contact (section 13), Medical (section 10), Education (section 11)</li>
+          <li class="field"><strong>GAL Notes field:</strong> Free-text block for the GAL to add their own observations before generating the final PDF</li>
+          <li class="field"><strong>Platform Attestation:</strong> CommonGround certification that all data represents unmodified platform records, with SHA-256 master hash</li>
+        </ul>
+      </div>
+      <div class="report-section">
+        <div class="report-section-label">Data Sources (by field)</div>
+        <ul>
+          <li class="source"><span class="src">message_flags</span> — severity ≥ 3 (orange/red) with timestamp comparison to <span class="src">custody_exchange_instances</span>.scheduled_time ± 120 min</li>
+          <li class="source"><span class="src">custody_periods</span> — which parent had custody during each flagged message event (to calculate conflict exposure during child's time)</li>
+          <li class="source"><span class="src">kidcoms_calls</span> — all call records: initiating_parent, recipient, duration_seconds, ended_by, flag_count, flagged_clips array</li>
+          <li class="source"><span class="src">kidcoms_calls</span>.flagged_clips — evidence clip references with SHA-256 hash, flag_type, timestamp_in_call, duration</li>
+          <li class="source"><span class="src">custody_exchange_instances</span> — gps_coordinates compared to <span class="src">agreements</span> exchange_location. exchange_type flag for "high_conflict" mode exchanges</li>
+          <li class="source"><span class="src">audit_logs</span> where event_type IN ('safety_event', 'emergency_contact', 'message_blocked', 'parent_reported_incident')</li>
+          <li class="source"><span class="src">agreements</span>.sections where section_id IN (2, 10, 11, 12, 13) — child-specific sections only</li>
+          <li class="source">Conflict Exposure Score formula: sum of weighted_severity_scores for all flags during child's custody time ÷ total_custody_hours × normalization_factor. Weights: red_flag = 3, orange = 2, yellow = 0.5. Normalized to 0–100 where 100 = maximum recorded exposure.</li>
+          <li class="source">Child-Parent Contact Compliance: count of <span class="src">kidcoms_calls</span> per parent grouped by child_id in the period vs. contact_frequency value in <span class="src">agreements</span> communication section</li>
+          <li class="source"><span class="src">audit_logs</span> — SHA-256 chain for the entire report</li>
+          <li class="note">Per-child scoping: all metrics calculated per child_id, not per family_file. A family with two children gets two sets of conflict exposure scores.</li>
+          <li class="note">GAL can only access data for cases where they hold an active case_assignment with role = 'gal' or 'parenting_coordinator'. Query is RBAC-gated at the database level via RLS policy.</li>
+        </ul>
+      </div>
+      <div class="report-section">
+        <div class="report-section-label">Format + Layout</div>
+        <div class="layout-preview">
+          <div class="lp-label">Report Preview — 5-7 Pages</div>
+          <div class="lp-page">
+            <div class="lp-top">
+              <div><div class="lp-logo-line"></div></div>
+              <div>
+                <div class="lp-report-title">Child Welfare Report</div>
+                <div class="lp-report-sub">GAL: J. Williams · Emma S., Age 8</div>
+              </div>
+            </div>
+            <div class="lp-section">
+              <div class="lp-section-title">Conflict Exposure — Emma</div>
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+                <div style="font-family:'DM Serif Display',serif;font-size:22px;color:var(--yellow);">28</div>
+                <div style="font-size:7px;color:var(--slate);">/ 100 · Moderate<br>↓ improving vs. prior period</div>
+              </div>
+              <div class="lp-bar" style="width:28%;background:var(--yellow);"></div>
+            </div>
+            <div class="lp-section">
+              <div class="lp-section-title">KidComs — Emma</div>
+              <div class="lp-row"><span>Calls with Parent A</span><span style="color:var(--teal);">8 calls</span></div>
+              <div class="lp-row"><span>Calls with Parent B</span><span style="color:var(--teal);">6 calls</span></div>
+              <div class="lp-row"><span>Flagged events</span><span style="color:var(--red);">1</span></div>
+            </div>
+            <div class="lp-section">
+              <div class="lp-section-title">High-Conflict Near Exchanges</div>
+              <div style="font-size:8px;color:var(--orange);">2 events — within 60 min of exchange<br>Feb 14 · Feb 28 · Both: orange severity</div>
+            </div>
+            <div class="lp-sha">
+              <span>🔐</span><span class="lp-sha-text">SHA-256: c2b9a1... FRE 902(14)</span>
+            </div>
+          </div>
+        </div>
+        <ul style="margin-top:12px;">
+          <li class="note">5–7 pages: Cover · Per-Child Summary · Conflict Events · KidComs Detail · Exchange Environment · Safety Events · Agreement Status · GAL Notes</li>
+          <li class="note">Per-child sections are tabbed — each child gets their own section set</li>
+          <li class="note">Child-first language throughout: "Emma's conflict exposure" not "parental compliance"</li>
+          <li class="note">SHA-256 on every page footer — self-authenticating for court filing</li>
+          <li class="note">Flagged KidComs evidence clips referenced by hash — GAL can request the actual clip through CommonGround support with court subpoena or dual-parent consent</li>
+          <li class="note">GAL note field is clearly demarcated as "GAL Observations — Not Platform Data"</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ ENDPOINTS ═══════════ -->
+<section id="endpoints">
+  <div class="sec-eye">API Endpoints</div>
+  <h2 class="sec-title">All 15 Report Endpoints</h2>
+  <p class="sec-intro">Every report in the system — original 12 plus the 3 new — has a defined API endpoint. All endpoints require a valid Supabase JWT in the Authorization header. Role and tier checks are enforced server-side. Responses return either a signed PDF URL or a structured JSON data payload depending on the <code>format</code> parameter.</p>
+
+  <div class="alert blue">
+    <div class="alert-icon">→</div>
+    <p><strong>Base URL:</strong> <code>https://commonground-api-gdxg.onrender.com/api/v1</code> — All endpoints below are relative to this base. All report generation endpoints use <code>POST</code> (creates a report artifact). All report retrieval endpoints use <code>GET</code>.</p>
+  </div>
+
+  <!-- ─── PARENT ENDPOINTS ─── -->
+  <div class="divider">
+    <div class="divider-line"></div>
+    <div class="divider-label">Parent Report Endpoints — P-1 through P-7</div>
+    <div class="divider-line"></div>
+  </div>
+
+  <div class="endpoint-group">
+    <div class="endpoint-group-title">P-1 · 30-Day Activity Snapshot</div>
+    <div class="code-block">
+      <div class="code-header">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="code-method method-post">POST</span>
+          <span class="code-path">/reports/parent/snapshot</span>
+        </div>
+        <span class="code-auth">Auth: JWT · Role: parent · Tier: all (free+)</span>
+      </div>
+      <div class="code-body"><span class="cm">// Request body</span>
+{
+  <span class="key">"family_file_id"</span>: <span class="str">"uuid"</span>,             <span class="req">// REQUIRED</span>
+  <span class="key">"period_days"</span>: <span class="type">30</span>,                 <span class="opt">// optional · default: 30 · max: 90</span>
+  <span class="key">"format"</span>: <span class="str">"json"</span>                    <span class="opt">// optional · "json" | "pdf" (pdf = Plus+)</span>
+}
+
+<span class="cm">// Response</span>
+{
+  <span class="key">"report_id"</span>: <span class="str">"rpt_uuid"</span>,
+  <span class="key">"generated_at"</span>: <span class="str">"2026-03-13T..."</span>,
+  <span class="key">"period"</span>: { <span class="key">"start"</span>: <span class="str">"..."</span>, <span class="key">"end"</span>: <span class="str">"..."</span> },
+  <span class="key">"data"</span>: {
+    <span class="key">"messages_total"</span>: <span class="type">47</span>,
+    <span class="key">"aria_flags"</span>: <span class="type">8</span>,
+    <span class="key">"aria_flag_rate_pct"</span>: <span class="type">17.0</span>,
+    <span class="key">"aria_acceptance_rate_pct"</span>: <span class="type">75.0</span>,
+    <span class="key">"exchanges_scheduled"</span>: <span class="type">6</span>,
+    <span class="key">"exchanges_on_time"</span>: <span class="type">5</span>,
+    <span class="key">"exchanges_on_time_pct"</span>: <span class="type">83.3</span>,
+    <span class="key">"expenses_count"</span>: <span class="type">4</span>,
+    <span class="key">"expenses_total_usd"</span>: <span class="type">240.00</span>,
+    <span class="key">"expenses_approved"</span>: <span class="type">3</span>,
+    <span class="key">"expenses_pending"</span>: <span class="type">1</span>,
+    <span class="key">"expenses_disputed"</span>: <span class="type">0</span>,
+    <span class="key">"coparent_active"</span>: <span class="type">true</span>,
+    <span class="key">"activity_streak_days"</span>: <span class="type">22</span>,
+    <span class="key">"aria_narrative"</span>: <span class="str">"February showed improvement in communication..."</span>
+  },
+  <span class="key">"pdf_url"</span>: <span class="type">null</span>  <span class="cm">// populated if format=pdf and tier=Plus+</span>
+}</div>
+    </div>
+  </div>
+
+  <div class="endpoint-group">
+    <div class="endpoint-group-title">P-2 · Monthly Parent Insight Report</div>
+    <div class="code-block">
+      <div class="code-header">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="code-method method-post">POST</span>
+          <span class="code-path">/reports/parent/monthly-insight</span>
+        </div>
+        <span class="code-auth">Auth: JWT · Role: parent · Tier: Plus+</span>
+      </div>
+      <div class="code-body"><span class="cm">// Request body</span>
+{
+  <span class="key">"family_file_id"</span>: <span class="str">"uuid"</span>,             <span class="req">// REQUIRED</span>
+  <span class="key">"year"</span>: <span class="type">2026</span>,                        <span class="req">// REQUIRED</span>
+  <span class="key">"month"</span>: <span class="type">2</span>,                          <span class="req">// REQUIRED · 1–12</span>
+  <span class="key">"format"</span>: <span class="str">"pdf"</span>                    <span class="opt">// optional · "json" | "pdf" · default: "pdf"</span>
+}
+
+<span class="cm">// Response</span>
+{
+  <span class="key">"report_id"</span>: <span class="str">"rpt_uuid"</span>,
+  <span class="key">"generated_at"</span>: <span class="str">"..."</span>,
+  <span class="key">"health_score"</span>: <span class="type">74</span>,
+  <span class="key">"health_score_delta"</span>: <span class="type">+6</span>,          <span class="cm">// vs. prior month · null if first month</span>
+  <span class="key">"trend_data"</span>: [                        <span class="cm">// last 3 months for charts</span>
+    { <span class="key">"month"</span>: <span class="str">"2025-12"</span>, <span class="key">"health_score"</span>: <span class="type">62</span>, <span class="key">"exchange_pct"</span>: <span class="type">71</span> },
+    { <span class="key">"month"</span>: <span class="str">"2026-01"</span>, <span class="key">"health_score"</span>: <span class="type">68</span>, <span class="key">"exchange_pct"</span>: <span class="type">82</span> },
+    { <span class="key">"month"</span>: <span class="str">"2026-02"</span>, <span class="key">"health_score"</span>: <span class="type">74</span>, <span class="key">"exchange_pct"</span>: <span class="type">88</span> }
+  ],
+  <span class="key">"pdf_url"</span>: <span class="str">"https://storage.supabase.../reports/rpt_uuid.pdf"</span>,
+  <span class="key">"pdf_expires_at"</span>: <span class="str">"2026-03-20T..."</span>  <span class="cm">// signed URL expires 7 days</span>
+}</div>
+    </div>
+  </div>
+
+  <div class="endpoint-group">
+    <div class="endpoint-group-title">P-3 · Expense Summary · P-4 · Custody Analytics · P-5 · ARIA Communication</div>
+    <div class="code-block">
+      <div class="code-header">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="code-method method-post">POST</span>
+          <span class="code-path">/reports/parent/expense-summary</span>
+        </div>
+        <span class="code-auth">Auth: JWT · Role: parent · Tier: Plus+</span>
+      </div>
+      <div class="code-body"><span class="cm">// Standard date-range pattern used for P-3, P-4, P-5</span>
+{
+  <span class="key">"family_file_id"</span>: <span class="str">"uuid"</span>,             <span class="req">// REQUIRED · all three</span>
+  <span class="key">"date_from"</span>: <span class="str">"2026-02-01"</span>,           <span class="req">// REQUIRED</span>
+  <span class="key">"date_to"</span>: <span class="str">"2026-02-28"</span>,             <span class="req">// REQUIRED</span>
+  <span class="key">"format"</span>: <span class="str">"pdf"</span>,                    <span class="opt">// "json" | "pdf"</span>
+  <span class="key">"include_sha256"</span>: <span class="type">false</span>             <span class="opt">// P-4/P-5 only · Complete tier required if true</span>
+}
+
+<span class="cm">// P-4 additional params</span>
+<span class="key">"child_ids"</span>: [<span class="str">"uuid1"</span>, <span class="str">"uuid2"</span>],    <span class="opt">// optional · filter to specific children</span>
+
+<span class="cm">// Paths:</span>
+<span class="cm">// POST /reports/parent/expense-summary  → P-3 (Plus+)</span>
+<span class="cm">// POST /reports/parent/custody-analytics  → P-4 (Complete)</span>
+<span class="cm">// POST /reports/parent/aria-communication  → P-5 (Complete)</span></div>
+    </div>
+  </div>
+
+  <div class="endpoint-group">
+    <div class="endpoint-group-title">P-6 · Court Evidence Package</div>
+    <div class="code-block">
+      <div class="code-header">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="code-method method-post">POST</span>
+          <span class="code-path">/reports/parent/court-evidence-package</span>
+        </div>
+        <span class="code-auth">Auth: JWT · Role: parent · Tier: Complete only</span>
+      </div>
+      <div class="code-body">{
+  <span class="key">"family_file_id"</span>: <span class="str">"uuid"</span>,             <span class="req">// REQUIRED</span>
+  <span class="key">"date_from"</span>: <span class="str">"2026-01-01"</span>,           <span class="req">// REQUIRED</span>
+  <span class="key">"date_to"</span>: <span class="str">"2026-03-13"</span>,             <span class="req">// REQUIRED</span>
+  <span class="key">"sections"</span>: [<span class="str">"messages"</span>, <span class="str">"exchanges"</span>, <span class="str">"financials"</span>, <span class="str">"aria_log"</span>, <span class="str">"agreements"</span>, <span class="str">"kidcoms"</span>],
+  <span class="cm">// optional · omit to include all sections</span>
+  <span class="key">"purpose"</span>: <span class="str">"hearing"</span>               <span class="opt">// "hearing" | "mediation" | "personal" · for audit log</span>
+}
+
+<span class="cm">// Response — async generation (can take 10–30 seconds for large cases)</span>
+{
+  <span class="key">"job_id"</span>: <span class="str">"job_uuid"</span>,               <span class="cm">// poll GET /reports/jobs/{job_id} for status</span>
+  <span class="key">"estimated_seconds"</span>: <span class="type">15</span>,
+  <span class="key">"status"</span>: <span class="str">"queued"</span>
+}
+
+<span class="cm">// GET /reports/jobs/{job_id}  → { status: "complete", pdf_url: "...", sha256_hash: "...", pages: 42 }</span></div>
+    </div>
+  </div>
+
+  <div class="endpoint-group">
+    <div class="endpoint-group-title">P-7 · Agreement Status Report (NEW)</div>
+    <div class="code-block">
+      <div class="code-header">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="code-method method-post">POST</span>
+          <span class="code-path">/reports/parent/agreement-status</span>
+        </div>
+        <span class="code-auth">Auth: JWT · Role: parent · Tier: Plus+</span>
+      </div>
+      <div class="code-body">{
+  <span class="key">"family_file_id"</span>: <span class="str">"uuid"</span>,             <span class="req">// REQUIRED</span>
+  <span class="key">"agreement_id"</span>: <span class="str">"uuid"</span>,              <span class="opt">// optional · defaults to active agreement</span>
+  <span class="key">"include_version_history"</span>: <span class="type">true</span>,    <span class="opt">// default: true</span>
+  <span class="key">"include_compliance_comparison"</span>: <span class="type">true</span>, <span class="opt">// default: true · requires 30+ days GPS data</span>
+  <span class="key">"include_sha256"</span>: <span class="type">false</span>,            <span class="opt">// Complete tier only if true</span>
+  <span class="key">"format"</span>: <span class="str">"pdf"</span>
+}
+
+<span class="cm">// Response</span>
+{
+  <span class="key">"report_id"</span>: <span class="str">"rpt_uuid"</span>,
+  <span class="key">"agreement_version"</span>: <span class="type">3</span>,
+  <span class="key">"last_signed_at"</span>: <span class="str">"2026-01-15T..."</span>,
+  <span class="key">"sections_complete"</span>: <span class="type">14</span>,
+  <span class="key">"sections_total"</span>: <span class="type">18</span>,
+  <span class="key">"sections_pending_coparent"</span>: <span class="type">2</span>,
+  <span class="key">"sections_review_due_within_60d"</span>: <span class="type">1</span>,
+  <span class="key">"quick_accords_count"</span>: <span class="type">3</span>,
+  <span class="key">"compliance_comparison_available"</span>: <span class="type">true</span>,
+  <span class="key">"pdf_url"</span>: <span class="str">"..."</span>
+}</div>
+    </div>
+  </div>
+
+  <!-- ─── PROFESSIONAL ENDPOINTS ─── -->
+  <div class="divider">
+    <div class="divider-line"></div>
+    <div class="divider-label">Professional Report Endpoints — A-1 through A-8</div>
+    <div class="divider-line"></div>
+  </div>
+
+  <div class="endpoint-group">
+    <div class="endpoint-group-title">A-1 · Case Compliance · A-2 · Exchange Verification · A-3 · ARIA Intervention Log</div>
+    <div class="code-block">
+      <div class="code-header">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="code-method method-post">POST</span>
+          <span class="code-path">/reports/professional/case-compliance</span>
+        </div>
+        <span class="code-auth">Auth: JWT · Role: professional · Tier: Solo+ · Must be assigned to case</span>
+      </div>
+      <div class="code-body"><span class="cm">// Standard professional report pattern (A-1, A-2, A-3)</span>
+{
+  <span class="key">"case_id"</span>: <span class="str">"uuid"</span>,                   <span class="req">// REQUIRED · attorney must be assigned</span>
+  <span class="key">"date_from"</span>: <span class="str">"2026-01-01"</span>,           <span class="req">// REQUIRED</span>
+  <span class="key">"date_to"</span>: <span class="str">"2026-03-13"</span>,             <span class="req">// REQUIRED</span>
+  <span class="key">"format"</span>: <span class="str">"pdf"</span>,                    <span class="opt">// "pdf" | "word" · word = Small Firm+ for A-1</span>
+  <span class="key">"include_court_header"</span>: <span class="type">true</span>,       <span class="opt">// A-1 only · adds counsel block to first page</span>
+  <span class="key">"exhibit_labels"</span>: [<span class="str">"A"</span>, <span class="str">"B"</span>, <span class="str">"C"</span>]   <span class="opt">// A-1 only · custom exhibit labels</span>
+}
+
+<span class="cm">// Paths:</span>
+<span class="cm">// POST /reports/professional/case-compliance       → A-1</span>
+<span class="cm">// POST /reports/professional/exchange-verification → A-2</span>
+<span class="cm">// POST /reports/professional/aria-intervention-log → A-3</span>
+
+<span class="cm">// All return:</span>
+{
+  <span class="key">"report_id"</span>: <span class="str">"rpt_uuid"</span>,
+  <span class="key">"case_id"</span>: <span class="str">"uuid"</span>,
+  <span class="key">"sha256_hash"</span>: <span class="str">"7f3a9c2b..."</span>,        <span class="cm">// always included on professional reports</span>
+  <span class="key">"pdf_url"</span>: <span class="str">"..."</span>,
+  <span class="key">"word_url"</span>: <span class="str">"..."</span>,                   <span class="cm">// null if not requested or tier doesn't allow</span>
+  <span class="key">"pages"</span>: <span class="type">7</span>,
+  <span class="key">"generated_by"</span>: <span class="str">"attorney_uuid"</span>,
+  <span class="key">"audit_entry_id"</span>: <span class="str">"uuid"</span>             <span class="cm">// reference to the audit_logs entry for this generation</span>
+}</div>
+    </div>
+  </div>
+
+  <div class="endpoint-group">
+    <div class="endpoint-group-title">A-4 · Firm Analytics · A-5 · Risk Assessment</div>
+    <div class="code-block">
+      <div class="code-header">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="code-method method-post">POST</span>
+          <span class="code-path">/reports/professional/firm-analytics</span>
+        </div>
+        <span class="code-auth">Auth: JWT · Role: professional · Tier: Small Firm+ · Role within firm: admin or above</span>
+      </div>
+      <div class="code-body"><span class="cm">// A-4 · Firm Analytics</span>
+{
+  <span class="key">"firm_id"</span>: <span class="str">"uuid"</span>,                  <span class="req">// REQUIRED</span>
+  <span class="key">"year"</span>: <span class="type">2026</span>,                        <span class="req">// REQUIRED</span>
+  <span class="key">"month"</span>: <span class="type">2</span>,                          <span class="req">// REQUIRED</span>
+  <span class="key">"attorney_ids"</span>: [<span class="str">"uuid1"</span>],           <span class="opt">// optional · filter to specific attorneys</span>
+  <span class="key">"format"</span>: <span class="str">"pdf"</span>
+}
+
+<span class="cm">// A-5 · Risk Assessment (also available as live GET)</span>
+
+<span class="cm">// GET /reports/professional/risk-assessment?firm_id={uuid}</span>
+<span class="cm">// Returns live JSON — no PDF version</span>
+{
+  <span class="key">"generated_at"</span>: <span class="str">"..."</span>,
+  <span class="key">"high_risk_cases"</span>: [
+    {
+      <span class="key">"case_id"</span>: <span class="str">"uuid"</span>,
+      <span class="key">"risk_score"</span>: <span class="type">8</span>,
+      <span class="key">"primary_risk_factor"</span>: <span class="str">"missed_exchange"</span>,
+      <span class="key">"factors"</span>: [<span class="str">"missed_exchange"</span>, <span class="str">"compliance_drop_gt10"</span>],
+      <span class="key">"last_attorney_action_days"</span>: <span class="type">5</span>,
+      <span class="key">"court_hearing_in_days"</span>: <span class="type">null</span>
+    }
+  ],
+  <span class="key">"total_cases"</span>: <span class="type">12</span>,
+  <span class="key">"high_risk_count"</span>: <span class="type">2</span>,
+  <span class="key">"medium_risk_count"</span>: <span class="type">4</span>
+}</div>
+    </div>
+  </div>
+
+  <div class="endpoint-group">
+    <div class="endpoint-group-title">A-6 · Court Submission Package</div>
+    <div class="code-block">
+      <div class="code-header">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="code-method method-post">POST</span>
+          <span class="code-path">/reports/professional/court-submission-package</span>
+        </div>
+        <span class="code-auth">Auth: JWT · Role: professional · Tier: Solo+ · Must be assigned to case</span>
+      </div>
+      <div class="code-body">{
+  <span class="key">"case_id"</span>: <span class="str">"uuid"</span>,                   <span class="req">// REQUIRED</span>
+  <span class="key">"date_from"</span>: <span class="str">"2026-01-01"</span>,           <span class="req">// REQUIRED</span>
+  <span class="key">"date_to"</span>: <span class="str">"2026-03-13"</span>,             <span class="req">// REQUIRED</span>
+  <span class="key">"counsel_bar_number"</span>: <span class="str">"SBN123456"</span>,   <span class="opt">// optional · pulled from profile if not set</span>
+  <span class="key">"exhibit_labels"</span>: {                   <span class="opt">// optional · defaults to A, B, C...</span>
+    <span class="key">"messages"</span>: <span class="str">"A"</span>,
+    <span class="key">"exchanges"</span>: <span class="str">"B"</span>,
+    <span class="key">"financials"</span>: <span class="str">"C"</span>,
+    <span class="key">"aria_log"</span>: <span class="str">"D"</span>,
+    <span class="key">"agreements"</span>: <span class="str">"E"</span>,
+    <span class="key">"kidcoms"</span>: <span class="str">"F"</span>,
+    <span class="key">"intake"</span>: <span class="str">"G"</span>
+  },
+  <span class="key">"redacted_message_ids"</span>: [<span class="str">"msg_uuid"</span>],  <span class="opt">// optional · messages to exclude (logged)</span>
+  <span class="key">"include_intake_summary"</span>: <span class="type">true</span>,       <span class="opt">// include ARIA Pro Intake if available</span>
+  <span class="key">"generate_word_copy"</span>: <span class="type">true</span>            <span class="opt">// Small Firm+ · attorney annotation copy</span>
+}
+
+<span class="cm">// Async — returns job_id · poll GET /reports/jobs/{job_id}</span>
+<span class="cm">// Completed job includes: pdf_url (locked), word_url (editable), sha256_hash, exhibit_index, pages</span></div>
+    </div>
+  </div>
+
+  <div class="endpoint-group">
+    <div class="endpoint-group-title">A-7 · Client Progress Summary (NEW)</div>
+    <div class="code-block">
+      <div class="code-header">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="code-method method-post">POST</span>
+          <span class="code-path">/reports/professional/client-progress-summary</span>
+        </div>
+        <span class="code-auth">Auth: JWT · Role: professional · Tier: Solo+ · Must be assigned to case</span>
+      </div>
+      <div class="code-body">{
+  <span class="key">"case_id"</span>: <span class="str">"uuid"</span>,                   <span class="req">// REQUIRED</span>
+  <span class="key">"client_parent_id"</span>: <span class="str">"uuid"</span>,          <span class="req">// REQUIRED · which parent this is sent to</span>
+  <span class="key">"year"</span>: <span class="type">2026</span>,                        <span class="req">// REQUIRED</span>
+  <span class="key">"month"</span>: <span class="type">2</span>,                          <span class="req">// REQUIRED · 1–12</span>
+  <span class="key">"attorney_note"</span>: <span class="str">"Good progress this month..."</span>,  <span class="opt">// optional · max 500 chars</span>
+  <span class="key">"delivery"</span>: <span class="str">"email"</span>                  <span class="opt">// "email" | "pdf_only" · email sends to client</span>
+}
+
+<span class="cm">// Response</span>
+{
+  <span class="key">"report_id"</span>: <span class="str">"rpt_uuid"</span>,
+  <span class="key">"health_score"</span>: <span class="type">74</span>,
+  <span class="key">"health_score_delta"</span>: <span class="type">+6</span>,
+  <span class="key">"metrics"</span>: {
+    <span class="key">"exchange_compliance_pct"</span>: <span class="type">88.0</span>,
+    <span class="key">"aria_constructive_rate_pct"</span>: <span class="type">91.0</span>,
+    <span class="key">"outstanding_obligations"</span>: <span class="type">1</span>
+  },
+  <span class="key">"auto_bullets_positive"</span>: [<span class="str">"All 8 exchanges completed on time"</span>],
+  <span class="key">"auto_bullets_watch"</span>: [<span class="str">"1 expense obligation outstanding"</span>],
+  <span class="key">"next_step_cta"</span>: <span class="str">"Sign pending Holiday Schedule section"</span>,
+  <span class="key">"pdf_url"</span>: <span class="str">"..."</span>,
+  <span class="key">"email_sent"</span>: <span class="type">true</span>,
+  <span class="key">"email_sent_to"</span>: <span class="str">"client@email.com"</span>
+}</div>
+    </div>
+  </div>
+
+  <div class="endpoint-group">
+    <div class="endpoint-group-title">A-8 · GAL Child Welfare View (NEW)</div>
+    <div class="code-block">
+      <div class="code-header">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="code-method method-post">POST</span>
+          <span class="code-path">/reports/professional/gal-child-welfare</span>
+        </div>
+        <span class="code-auth">Auth: JWT · Role: gal OR parenting_coordinator on case_assignment · Tier: Solo+<br>Dual-parent consent required (case_assignment.consent_both_parents = true)</span>
+      </div>
+      <div class="code-body">{
+  <span class="key">"case_id"</span>: <span class="str">"uuid"</span>,                   <span class="req">// REQUIRED</span>
+  <span class="key">"child_ids"</span>: [<span class="str">"uuid1"</span>, <span class="str">"uuid2"</span>],    <span class="opt">// optional · defaults to all children in case</span>
+  <span class="key">"date_from"</span>: <span class="str">"2026-01-01"</span>,           <span class="req">// REQUIRED</span>
+  <span class="key">"date_to"</span>: <span class="str">"2026-03-13"</span>,             <span class="req">// REQUIRED</span>
+  <span class="key">"gal_notes"</span>: <span class="str">"Observer notes from..."</span>, <span class="opt">// optional · max 2000 chars</span>
+  <span class="key">"include_conflict_proximity"</span>: <span class="type">true</span>,  <span class="opt">// default true · ARIA flags near exchanges</span>
+  <span class="key">"include_kidcoms_detail"</span>: <span class="type">true</span>,     <span class="opt">// default true · requires Complete on at least 1 parent</span>
+  <span class="key">"conflict_proximity_window_minutes"</span>: <span class="type">120</span>  <span class="opt">// default 120 · range of minutes around exchange</span>
+}
+
+<span class="cm">// Server-side pre-flight checks before generating:</span>
+<span class="cm">// 1. Verify case_assignment.role IN ('gal', 'parenting_coordinator')</span>
+<span class="cm">// 2. Verify case_assignment.consent_both_parents = true</span>
+<span class="cm">// 3. Verify case_assignment.access_expires_at > NOW() (if set)</span>
+<span class="cm">// 4. Log generation attempt in audit_logs regardless of outcome</span>
+
+<span class="cm">// Response</span>
+{
+  <span class="key">"report_id"</span>: <span class="str">"rpt_uuid"</span>,
+  <span class="key">"children"</span>: [
+    {
+      <span class="key">"child_id"</span>: <span class="str">"uuid"</span>,
+      <span class="key">"child_name"</span>: <span class="str">"Emma"</span>,
+      <span class="key">"conflict_exposure_score"</span>: <span class="type">28</span>,    <span class="cm">// 0-100 · lower = better</span>
+      <span class="key">"conflict_exposure_trend"</span>: <span class="str">"improving"</span>, <span class="cm">// "improving" | "stable" | "worsening"</span>
+      <span class="key">"kidcoms_calls_parent_a"</span>: <span class="type">8</span>,
+      <span class="key">"kidcoms_calls_parent_b"</span>: <span class="type">6</span>,
+      <span class="key">"kidcoms_flagged_events"</span>: <span class="type">1</span>,
+      <span class="key">"high_conflict_near_exchange_count"</span>: <span class="type">2</span>
+    }
+  ],
+  <span class="key">"safety_events_count"</span>: <span class="type">0</span>,
+  <span class="key">"sha256_hash"</span>: <span class="str">"c2b9a1..."</span>,
+  <span class="key">"pdf_url"</span>: <span class="str">"..."</span>,
+  <span class="key">"audit_entry_id"</span>: <span class="str">"uuid"</span>
+}</div>
+    </div>
+  </div>
+
+  <!-- ─── SHARED UTILITY ENDPOINTS ─── -->
+  <div class="divider">
+    <div class="divider-line"></div>
+    <div class="divider-label">Shared Utility Endpoints</div>
+    <div class="divider-line"></div>
+  </div>
+
+  <div class="endpoint-group">
+    <div class="endpoint-group-title">Report Job Status · Report History · Report Download</div>
+    <div class="code-block">
+      <div class="code-header">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="code-method method-get">GET</span>
+          <span class="code-path">/reports/jobs/{job_id}</span>
+        </div>
+        <span class="code-auth">Auth: JWT · Role: any · Must own the job</span>
+      </div>
+      <div class="code-body"><span class="cm">// Poll this for async reports (P-6, A-6)</span>
+<span class="cm">// GET /reports/jobs/{job_id}</span>
+{
+  <span class="key">"job_id"</span>: <span class="str">"uuid"</span>,
+  <span class="key">"status"</span>: <span class="str">"complete"</span>,             <span class="cm">// "queued" | "processing" | "complete" | "failed"</span>
+  <span class="key">"progress_pct"</span>: <span class="type">100</span>,
+  <span class="key">"report_id"</span>: <span class="str">"rpt_uuid"</span>,
+  <span class="key">"pdf_url"</span>: <span class="str">"signed_url"</span>,
+  <span class="key">"word_url"</span>: <span class="str">"signed_url"</span>,          <span class="cm">// null if not requested</span>
+  <span class="key">"sha256_hash"</span>: <span class="str">"7f3a9c2b..."</span>,
+  <span class="key">"pages"</span>: <span class="type">42</span>,
+  <span class="key">"error"</span>: <span class="type">null</span>
+}
+
+<span class="cm">// GET /reports/history?family_file_id={uuid}&amp;limit=20&amp;offset=0</span>
+<span class="cm">// Returns paginated list of all reports generated for a case</span>
+<span class="cm">// Available to: parent (own reports only) · attorney (case reports) · GAL (GAL reports only)</span>
+
+<span class="cm">// GET /reports/{report_id}/download?format=pdf</span>
+<span class="cm">// Returns a fresh signed URL (1 hour expiry) for an existing report</span>
+<span class="cm">// Logs download in audit_logs</span></div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ AUTH + RBAC ═══════════ -->
+<section id="auth">
+  <div class="sec-eye">Auth + Access Control</div>
+  <h2 class="sec-title">How Report Access is Enforced</h2>
+  <p class="sec-intro">Every report endpoint enforces access at three layers: JWT authentication, role check, and tier check. The GAL report adds a fourth layer: dual-parent consent verification. All three checks must pass — a valid JWT alone is never sufficient.</p>
+
+  <div class="two-col">
+    <div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--teal);">Python</span>
+          <span style="font-size:11px;color:var(--slate);">backend/app/services/report_access.py</span>
+        </div>
+        <div class="code-body"><span class="kw">async def</span> <span class="fn">verify_report_access</span>(
+    report_type: <span class="type">str</span>,
+    user: User,
+    family_file_id: UUID,
+    db: AsyncSession
+) -> <span class="type">bool</span>:
+
+    <span class="cm"># Layer 1: JWT already validated by Depends(get_current_user)</span>
+
+    <span class="cm"># Layer 2: Role check</span>
+    ROLE_REQUIREMENTS = {
+        <span class="str">"parent/snapshot"</span>: [<span class="str">"parent"</span>],
+        <span class="str">"parent/monthly-insight"</span>: [<span class="str">"parent"</span>],
+        <span class="str">"parent/agreement-status"</span>: [<span class="str">"parent"</span>],
+        <span class="str">"professional/case-compliance"</span>: [<span class="str">"attorney"</span>, <span class="str">"mediator"</span>, <span class="str">"paralegal"</span>],
+        <span class="str">"professional/gal-child-welfare"</span>: [<span class="str">"gal"</span>, <span class="str">"parenting_coordinator"</span>],
+        <span class="str">"professional/firm-analytics"</span>: [<span class="str">"attorney"</span>, <span class="str">"firm_admin"</span>],
+    }
+    required_roles = ROLE_REQUIREMENTS.get(report_type, [])
+    <span class="kw">if</span> user.role <span class="kw">not in</span> required_roles:
+        <span class="kw">raise</span> HTTPException(<span class="type">403</span>, <span class="str">"Insufficient role for this report type"</span>)
+
+    <span class="cm"># Layer 3: Tier check</span>
+    TIER_REQUIREMENTS = {
+        <span class="str">"parent/snapshot"</span>: <span class="str">"free"</span>,
+        <span class="str">"parent/monthly-insight"</span>: <span class="str">"plus"</span>,
+        <span class="str">"parent/agreement-status"</span>: <span class="str">"plus"</span>,
+        <span class="str">"parent/custody-analytics"</span>: <span class="str">"complete"</span>,
+        <span class="str">"parent/court-evidence-package"</span>: <span class="str">"complete"</span>,
+        <span class="str">"professional/case-compliance"</span>: <span class="str">"solo"</span>,
+        <span class="str">"professional/gal-child-welfare"</span>: <span class="str">"solo"</span>,
+        <span class="str">"professional/firm-analytics"</span>: <span class="str">"small_firm"</span>,
+    }
+    required_tier = TIER_REQUIREMENTS.get(report_type)
+    <span class="kw">if not</span> <span class="fn">user_meets_tier</span>(user, required_tier):
+        <span class="kw">raise</span> HTTPException(<span class="type">402</span>, <span class="str">"Upgrade required for this report"</span>)
+
+    <span class="cm"># Layer 4: Case assignment check (professional reports)</span>
+    <span class="kw">if</span> report_type.startswith(<span class="str">"professional/"</span>):
+        assignment = <span class="kw">await</span> <span class="fn">get_case_assignment</span>(user.id, family_file_id, db)
+        <span class="kw">if not</span> assignment:
+            <span class="kw">raise</span> HTTPException(<span class="type">403</span>, <span class="str">"Not assigned to this case"</span>)
+
+        <span class="cm"># Layer 4b: GAL consent check</span>
+        <span class="kw">if</span> report_type == <span class="str">"professional/gal-child-welfare"</span>:
+            <span class="kw">if not</span> assignment.consent_both_parents:
+                <span class="kw">raise</span> HTTPException(<span class="type">403</span>, <span class="str">"Dual-parent consent required for GAL report"</span>)
+
+    <span class="kw">return</span> <span class="type">True</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--teal);">SQL</span>
+          <span style="font-size:11px;color:var(--slate);">RLS Policy — reports table</span>
+        </div>
+        <div class="code-body"><span class="cm">-- Parents can only see their own reports</span>
+CREATE POLICY <span class="str">"parent_own_reports"</span>
+ON reports FOR SELECT
+TO authenticated
+USING (
+  requesting_user_id = auth.uid()
+  AND user_role = <span class="str">'parent'</span>
+);
+
+<span class="cm">-- Attorneys see reports for their assigned cases only</span>
+CREATE POLICY <span class="str">"attorney_case_reports"</span>
+ON reports FOR SELECT
+TO authenticated
+USING (
+  case_id IN (
+    SELECT family_file_id
+    FROM case_assignments
+    WHERE professional_id = auth.uid()
+    AND status = <span class="str">'active'</span>
+  )
+  AND user_role IN (<span class="str">'attorney'</span>, <span class="str">'paralegal'</span>, <span class="str">'mediator'</span>)
+);
+
+<span class="cm">-- GAL reports: only the generating GAL can see them</span>
+CREATE POLICY <span class="str">"gal_own_reports"</span>
+ON reports FOR SELECT
+TO authenticated
+USING (
+  report_type = <span class="str">'gal_child_welfare'</span>
+  AND requesting_user_id = auth.uid()
+  AND requesting_user_id IN (
+    SELECT professional_id
+    FROM case_assignments
+    WHERE role IN (<span class="str">'gal'</span>, <span class="str">'parenting_coordinator'</span>)
+    AND consent_both_parents = TRUE
+  )
+);</div>
+      </div>
+
+      <div class="alert red" style="margin-top:14px;">
+        <div class="alert-icon">⚠</div>
+        <p><strong>HTTP 402 on tier mismatch.</strong> When a parent on Web Starter hits a Plus-tier endpoint, return <code>402 Payment Required</code> — not <code>403 Forbidden</code>. The frontend should intercept 402 and route to the upgrade flow. 403 implies they're blocked from something they should have access to. 402 means "this requires payment" — which is the correct framing for a paywall.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ UPDATED MASTER TABLE ═══════════ -->
+<section id="updated-table">
+  <div class="sec-eye">Updated Master Reference</div>
+  <h2 class="sec-title">All 15 Reports — Complete Quick Reference</h2>
+
+  <table class="main">
+    <tr>
+      <th>Report</th>
+      <th>Audience</th>
+      <th>Tier</th>
+      <th>Endpoint</th>
+      <th>SHA-256</th>
+      <th>Export</th>
+    </tr>
+    <tr>
+      <td><strong>P-1 · Snapshot</strong></td>
+      <td>Parent</td>
+      <td><span class="tag free">Free</span></td>
+      <td><code>POST /reports/parent/snapshot</code></td>
+      <td>No</td>
+      <td>JSON · In-app</td>
+    </tr>
+    <tr>
+      <td><strong>P-2 · Monthly Insight</strong></td>
+      <td>Parent</td>
+      <td><span class="tag plus">Plus</span></td>
+      <td><code>POST /reports/parent/monthly-insight</code></td>
+      <td>No</td>
+      <td>PDF</td>
+    </tr>
+    <tr>
+      <td><strong>P-3 · Expense Summary</strong></td>
+      <td>Parent</td>
+      <td><span class="tag plus">Plus</span></td>
+      <td><code>POST /reports/parent/expense-summary</code></td>
+      <td>No (SHA on Complete)</td>
+      <td>PDF</td>
+    </tr>
+    <tr>
+      <td><strong>P-4 · Custody Analytics</strong></td>
+      <td>Parent</td>
+      <td><span class="tag complete">Complete</span></td>
+      <td><code>POST /reports/parent/custody-analytics</code></td>
+      <td>Optional</td>
+      <td>PDF</td>
+    </tr>
+    <tr>
+      <td><strong>P-5 · ARIA Comm Report</strong></td>
+      <td>Parent</td>
+      <td><span class="tag complete">Complete</span></td>
+      <td><code>POST /reports/parent/aria-communication</code></td>
+      <td>Yes</td>
+      <td>PDF</td>
+    </tr>
+    <tr>
+      <td><strong>P-6 · Court Package</strong></td>
+      <td>Parent</td>
+      <td><span class="tag complete">Complete</span></td>
+      <td><code>POST /reports/parent/court-evidence-package</code></td>
+      <td>Yes · FRE 902(14)</td>
+      <td>PDF (async)</td>
+    </tr>
+    <tr style="background:rgba(61,170,138,0.04);">
+      <td><strong>P-7 · Agreement Status</strong> <span class="tag new">NEW</span></td>
+      <td>Parent</td>
+      <td><span class="tag plus">Plus</span></td>
+      <td><code>POST /reports/parent/agreement-status</code></td>
+      <td>Optional (Complete)</td>
+      <td>PDF</td>
+    </tr>
+    <tr>
+      <td><strong>A-1 · Case Compliance</strong></td>
+      <td>Attorney</td>
+      <td><span class="tag solo">Solo+</span></td>
+      <td><code>POST /reports/professional/case-compliance</code></td>
+      <td>Yes</td>
+      <td>PDF + Word</td>
+    </tr>
+    <tr>
+      <td><strong>A-2 · Exchange Verification</strong></td>
+      <td>Attorney</td>
+      <td><span class="tag solo">Solo+</span></td>
+      <td><code>POST /reports/professional/exchange-verification</code></td>
+      <td>Yes · per record</td>
+      <td>PDF</td>
+    </tr>
+    <tr>
+      <td><strong>A-3 · ARIA Intervention Log</strong></td>
+      <td>Attorney</td>
+      <td><span class="tag solo">Solo+</span></td>
+      <td><code>POST /reports/professional/aria-intervention-log</code></td>
+      <td>Yes</td>
+      <td>PDF</td>
+    </tr>
+    <tr>
+      <td><strong>A-4 · Firm Analytics</strong></td>
+      <td>Firm Admin</td>
+      <td><span class="tag firm">Small Firm+</span></td>
+      <td><code>POST /reports/professional/firm-analytics</code></td>
+      <td>No</td>
+      <td>PDF</td>
+    </tr>
+    <tr>
+      <td><strong>A-5 · Risk Assessment</strong></td>
+      <td>Attorney</td>
+      <td><span class="tag firm">Small Firm+</span></td>
+      <td><code>GET /reports/professional/risk-assessment</code></td>
+      <td>No</td>
+      <td>JSON live</td>
+    </tr>
+    <tr>
+      <td><strong>A-6 · Court Submission</strong></td>
+      <td>Attorney</td>
+      <td><span class="tag solo">Solo+</span></td>
+      <td><code>POST /reports/professional/court-submission-package</code></td>
+      <td>Yes · FRE 902(14)</td>
+      <td>PDF + Word (async)</td>
+    </tr>
+    <tr style="background:rgba(61,170,138,0.04);">
+      <td><strong>A-7 · Client Progress</strong> <span class="tag new">NEW</span></td>
+      <td>Attorney → Client</td>
+      <td><span class="tag solo">Solo+</span></td>
+      <td><code>POST /reports/professional/client-progress-summary</code></td>
+      <td>No</td>
+      <td>PDF · Email delivery</td>
+    </tr>
+    <tr style="background:rgba(61,170,138,0.04);">
+      <td><strong>A-8 · GAL Child Welfare</strong> <span class="tag new">NEW</span></td>
+      <td>GAL / PC</td>
+      <td><span class="tag gal">GAL Role · Solo+</span></td>
+      <td><code>POST /reports/professional/gal-child-welfare</code></td>
+      <td>Yes · FRE 902(14)</td>
+      <td>PDF (async)</td>
+    </tr>
+  </table>
+
+  <div class="highlight" style="margin-top:24px;">
+    <h3>One Note on Async vs. Sync</h3>
+    <p>Reports that generate large PDFs — P-6 (Court Package), A-6 (Court Submission), and A-8 (GAL Report) — use async job generation: the POST returns a <code>job_id</code> immediately, and the client polls <code>GET /reports/jobs/{job_id}</code> until status = "complete". All other reports are synchronous and return the PDF URL directly in the response. For the three async reports, the polling interval should be 2 seconds with a 60-second timeout before showing a "taking longer than expected" message. These reports are typically done in 8–20 seconds depending on case size.</p>
+  </div>
+</section>
+
+<footer>
+  <p>CommonGround · Reports Addendum: P-7 · A-7 · A-8 + All Endpoints · March 2026</p>
+  <p style="color:var(--teal);">15 Reports Total · Full API Coverage · RBAC Enforced · SHA-256 Throughout</p>
+</footer>
+</body>
+</html>

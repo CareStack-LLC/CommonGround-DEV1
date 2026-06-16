@@ -11,6 +11,7 @@ This migration adds:
 from typing import Sequence, Union
 
 from alembic import op
+import migration_guards as mg
 import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
@@ -53,8 +54,8 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(['added_by'], ['users.id'], ),
         sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_cubbie_items_child_id'), 'cubbie_items', ['child_id'], unique=False)
-    op.create_index(op.f('ix_cubbie_items_case_id'), 'cubbie_items', ['case_id'], unique=False)
+    mg.safe_create_index('ix_cubbie_items_child_id', 'cubbie_items', ['child_id'], unique=False)
+    mg.safe_create_index('ix_cubbie_items_case_id', 'cubbie_items', ['case_id'], unique=False)
 
     # Create child_photos table
     op.create_table('child_photos',
@@ -73,7 +74,7 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(['uploaded_by'], ['users.id'], ),
         sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_child_photos_child_id'), 'child_photos', ['child_id'], unique=False)
+    mg.safe_create_index('ix_child_photos_child_id', 'child_photos', ['child_id'], unique=False)
 
     # Create cubbie_exchange_items table
     op.create_table('cubbie_exchange_items',
@@ -101,67 +102,67 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(['acknowledged_by'], ['users.id'], ),
         sa.PrimaryKeyConstraint('id')
     )
-    op.create_index(op.f('ix_cubbie_exchange_items_exchange_id'), 'cubbie_exchange_items', ['exchange_id'], unique=False)
-    op.create_index(op.f('ix_cubbie_exchange_items_cubbie_item_id'), 'cubbie_exchange_items', ['cubbie_item_id'], unique=False)
+    mg.safe_create_index('ix_cubbie_exchange_items_exchange_id', 'cubbie_exchange_items', ['exchange_id'], unique=False)
+    mg.safe_create_index('ix_cubbie_exchange_items_cubbie_item_id', 'cubbie_exchange_items', ['cubbie_item_id'], unique=False)
 
     # === ADD COLUMNS TO CHILDREN TABLE ===
 
     # Approval workflow columns
-    op.add_column('children', sa.Column('status', sa.String(length=50), nullable=True))
-    op.add_column('children', sa.Column('created_by', sa.String(length=36), nullable=True))
-    op.add_column('children', sa.Column('approved_by_a', sa.String(length=36), nullable=True))
-    op.add_column('children', sa.Column('approved_by_b', sa.String(length=36), nullable=True))
-    op.add_column('children', sa.Column('approved_at_a', sa.DateTime(), nullable=True))
-    op.add_column('children', sa.Column('approved_at_b', sa.DateTime(), nullable=True))
+    mg.safe_add_column('children', sa.Column('status', sa.String(length=50), nullable=True))
+    mg.safe_add_column('children', sa.Column('created_by', sa.String(length=36), nullable=True))
+    mg.safe_add_column('children', sa.Column('approved_by_a', sa.String(length=36), nullable=True))
+    mg.safe_add_column('children', sa.Column('approved_by_b', sa.String(length=36), nullable=True))
+    mg.safe_add_column('children', sa.Column('approved_at_a', sa.DateTime(), nullable=True))
+    mg.safe_add_column('children', sa.Column('approved_at_b', sa.DateTime(), nullable=True))
 
     # Extended medical columns
-    op.add_column('children', sa.Column('blood_type', sa.String(length=10), nullable=True))
-    op.add_column('children', sa.Column('dentist_name', sa.String(length=200), nullable=True))
-    op.add_column('children', sa.Column('dentist_phone', sa.String(length=20), nullable=True))
-    op.add_column('children', sa.Column('therapist_name', sa.String(length=200), nullable=True))
-    op.add_column('children', sa.Column('therapist_phone', sa.String(length=20), nullable=True))
+    mg.safe_add_column('children', sa.Column('blood_type', sa.String(length=10), nullable=True))
+    mg.safe_add_column('children', sa.Column('dentist_name', sa.String(length=200), nullable=True))
+    mg.safe_add_column('children', sa.Column('dentist_phone', sa.String(length=20), nullable=True))
+    mg.safe_add_column('children', sa.Column('therapist_name', sa.String(length=200), nullable=True))
+    mg.safe_add_column('children', sa.Column('therapist_phone', sa.String(length=20), nullable=True))
 
     # Extended education columns
-    op.add_column('children', sa.Column('school_address', sa.String(length=500), nullable=True))
-    op.add_column('children', sa.Column('teacher_email', sa.String(length=255), nullable=True))
+    mg.safe_add_column('children', sa.Column('school_address', sa.String(length=500), nullable=True))
+    mg.safe_add_column('children', sa.Column('teacher_email', sa.String(length=255), nullable=True))
 
     # Preferences columns
-    op.add_column('children', sa.Column('favorite_foods', sa.Text(), nullable=True))
-    op.add_column('children', sa.Column('food_dislikes', sa.Text(), nullable=True))
-    op.add_column('children', sa.Column('favorite_activities', sa.Text(), nullable=True))
-    op.add_column('children', sa.Column('comfort_items', sa.Text(), nullable=True))
-    op.add_column('children', sa.Column('bedtime_routine', sa.Text(), nullable=True))
+    mg.safe_add_column('children', sa.Column('favorite_foods', sa.Text(), nullable=True))
+    mg.safe_add_column('children', sa.Column('food_dislikes', sa.Text(), nullable=True))
+    mg.safe_add_column('children', sa.Column('favorite_activities', sa.Text(), nullable=True))
+    mg.safe_add_column('children', sa.Column('comfort_items', sa.Text(), nullable=True))
+    mg.safe_add_column('children', sa.Column('bedtime_routine', sa.Text(), nullable=True))
 
     # Size columns
-    op.add_column('children', sa.Column('clothing_size', sa.String(length=20), nullable=True))
-    op.add_column('children', sa.Column('shoe_size', sa.String(length=20), nullable=True))
-    op.add_column('children', sa.Column('sizes_updated_at', sa.DateTime(), nullable=True))
+    mg.safe_add_column('children', sa.Column('clothing_size', sa.String(length=20), nullable=True))
+    mg.safe_add_column('children', sa.Column('shoe_size', sa.String(length=20), nullable=True))
+    mg.safe_add_column('children', sa.Column('sizes_updated_at', sa.DateTime(), nullable=True))
 
     # Personality columns
-    op.add_column('children', sa.Column('temperament_notes', sa.Text(), nullable=True))
-    op.add_column('children', sa.Column('fears_anxieties', sa.Text(), nullable=True))
-    op.add_column('children', sa.Column('calming_strategies', sa.Text(), nullable=True))
+    mg.safe_add_column('children', sa.Column('temperament_notes', sa.Text(), nullable=True))
+    mg.safe_add_column('children', sa.Column('fears_anxieties', sa.Text(), nullable=True))
+    mg.safe_add_column('children', sa.Column('calming_strategies', sa.Text(), nullable=True))
 
     # Emergency and attribution columns
-    op.add_column('children', sa.Column('emergency_contacts', sa.Text(), nullable=True))
-    op.add_column('children', sa.Column('field_contributors', sa.Text(), nullable=True))
+    mg.safe_add_column('children', sa.Column('emergency_contacts', sa.Text(), nullable=True))
+    mg.safe_add_column('children', sa.Column('field_contributors', sa.Text(), nullable=True))
 
     # Court access control columns
-    op.add_column('children', sa.Column('court_restricted_fields', sa.Text(), nullable=True))
-    op.add_column('children', sa.Column('restricted_parent_id', sa.String(length=36), nullable=True))
+    mg.safe_add_column('children', sa.Column('court_restricted_fields', sa.Text(), nullable=True))
+    mg.safe_add_column('children', sa.Column('restricted_parent_id', sa.String(length=36), nullable=True))
 
     # Create indexes and foreign keys for children
-    op.create_index('ix_children_status', 'children', ['status'], unique=False)
-    op.create_foreign_key('fk_children_created_by', 'children', 'users', ['created_by'], ['id'])
-    op.create_foreign_key('fk_children_approved_by_a', 'children', 'users', ['approved_by_a'], ['id'])
-    op.create_foreign_key('fk_children_approved_by_b', 'children', 'users', ['approved_by_b'], ['id'])
-    op.create_foreign_key('fk_children_restricted_parent_id', 'children', 'users', ['restricted_parent_id'], ['id'])
+    mg.safe_create_index('ix_children_status', 'children', ['status'], unique=False)
+    mg.safe_create_foreign_key('fk_children_created_by', 'children', 'users', ['created_by'], ['id'])
+    mg.safe_create_foreign_key('fk_children_approved_by_a', 'children', 'users', ['approved_by_a'], ['id'])
+    mg.safe_create_foreign_key('fk_children_approved_by_b', 'children', 'users', ['approved_by_b'], ['id'])
+    mg.safe_create_foreign_key('fk_children_restricted_parent_id', 'children', 'users', ['restricted_parent_id'], ['id'])
 
     # Set default status for existing children to 'active'
     op.execute("UPDATE children SET status = 'active' WHERE status IS NULL")
 
     # Make status not nullable after setting defaults
-    op.alter_column('children', 'status', nullable=False)
+    mg.safe_alter_column('children', 'status', nullable=False)
 
 
 def downgrade() -> None:

@@ -44,6 +44,25 @@ export class APIError extends Error {
   }
 }
 
+/** Default per-request timeout. Callers can pass their own `signal`. */
+const REQUEST_TIMEOUT_MS = 30000;
+
+export interface FetchAPIOptions extends RequestInit {
+  /** Suppress the global error toast for this request. */
+  silent?: boolean;
+}
+
+/** Combine the caller's signal (if any) with the default timeout. */
+function buildRequestSignal(callerSignal: AbortSignal | null | undefined): AbortSignal | undefined {
+  if (typeof AbortSignal === 'undefined') return callerSignal ?? undefined;
+  const timeoutSignal =
+    typeof AbortSignal.timeout === 'function' ? AbortSignal.timeout(REQUEST_TIMEOUT_MS) : undefined;
+  if (callerSignal && timeoutSignal && typeof AbortSignal.any === 'function') {
+    return AbortSignal.any([callerSignal, timeoutSignal]);
+  }
+  return callerSignal ?? timeoutSignal;
+}
+
 /**
  * Base fetch wrapper with error handling
  */
@@ -53,9 +72,10 @@ export class APIError extends Error {
 // for anything that has one.
 export async function fetchAPI<T>(
   endpoint: string,
-  options: RequestInit = {}
+  options: FetchAPIOptions = {}
 ): Promise<T> {
   const url = `${API_URL}${endpoint}`;
+  const { silent, ...fetchOptions } = options;
 
   const defaultHeaders: HeadersInit = {
     'Content-Type': 'application/json',
@@ -68,10 +88,11 @@ export async function fetchAPI<T>(
   }
 
   const config: RequestInit = {
-    ...options,
+    ...fetchOptions,
+    signal: buildRequestSignal(fetchOptions.signal),
     headers: {
       ...defaultHeaders,
-      ...options.headers,
+      ...fetchOptions.headers,
     },
   };
 
@@ -138,6 +159,15 @@ export async function fetchAPI<T>(
         }
       }
 
+      // Surface server-side failures users would otherwise never see.
+      // 4xx stays silent — forms/feature code own those.
+      if (response.status >= 500 && !silent) {
+        try {
+          const { notifyApiError } = await import('./api-error-notify');
+          notifyApiError(endpoint, 'server');
+        } catch { /* never block the error path on the notifier */ }
+      }
+
       throw new APIError(
         errorData?.detail || `HTTP ${response.status}: ${response.statusText}`,
         response.status,
@@ -156,8 +186,28 @@ export async function fetchAPI<T>(
       throw error;
     }
 
-    // Network or other errors
+    const isTimeout =
+      error instanceof DOMException
+        ? error.name === 'TimeoutError'
+        : (error as Error)?.name === 'TimeoutError';
+    const isCallerAbort =
+      !isTimeout &&
+      ((error instanceof DOMException && error.name === 'AbortError') ||
+        (error as Error)?.name === 'AbortError');
+
+    if (isCallerAbort) {
+      // Component unmounted / navigation — rethrow quietly, no toast.
+      throw new APIError('Request aborted', 0, { aborted: true });
+    }
+
+    // Network or timeout errors
     console.error('Network Error:', error);
+    if (!silent) {
+      try {
+        const { notifyApiError } = await import('./api-error-notify');
+        notifyApiError(endpoint, isTimeout ? 'timeout' : 'network');
+      } catch { /* never block the error path on the notifier */ }
+    }
     throw new APIError(
       error instanceof Error ? error.message : 'Network error',
       0

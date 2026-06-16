@@ -319,6 +319,85 @@
 }
 
 /* ============================================================================
+   MARKETING LIGHT-LOCK
+   ----------------------------------------------------------------------------
+   Public marketing/landing pages are LIGHT-ONLY by design (calm brand, fixed
+   teal/gold/white sections). The app supports dark mode, but when a visitor's
+   system prefers dark the root <html> gets `.dark`, flipping shared tokens
+   (--foreground, --card, --cg-sand, …) and washing out marketing sections that
+   sit on fixed light backgrounds. Re-declaring the light token values on a
+   `.marketing-light` wrapper overrides `.dark` for that subtree (custom
+   properties resolve to the nearest ancestor), forcing the marketing surface
+   to render in the light brand regardless of system theme. Bulletproof here
+   because marketing components use semantic tokens, not `dark:` utilities.
+   ============================================================================ */
+.marketing-light {
+  color-scheme: light;
+  --background: #F4F8F7;
+  --foreground: #1E3A4A;
+  --card: #FFFFFF;
+  --card-foreground: #1E3A4A;
+  --popover: #FFFFFF;
+  --popover-foreground: #1E3A4A;
+  --primary: #3DAA8A;
+  --primary-foreground: #FFFFFF;
+  --secondary: #2D6A8F;
+  --secondary-foreground: #FFFFFF;
+  --muted: #E8F4F8;
+  --muted-foreground: #6B8A9A;
+  --accent: #E8F4F8;
+  --accent-foreground: #3DAA8A;
+  --destructive: #C53030;
+  --destructive-foreground: #FFFFFF;
+  --border: #D6ECE8;
+  --input: #E8F4F8;
+  --ring: #3DAA8A;
+  --chart-1: #3DAA8A;
+  --chart-2: #2D6A8F;
+  --chart-3: #F5A623;
+  --chart-4: #5BC4A0;
+  --chart-5: #4BA8C8;
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #1E3A4A;
+  --sidebar-primary: #3DAA8A;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #E8F4F0;
+  --sidebar-accent-foreground: #3DAA8A;
+  --sidebar-border: #D6ECE8;
+  --sidebar-ring: #3DAA8A;
+  --cg-sage: #3DAA8A;
+  --cg-sage-dark: #2D8A70;
+  --cg-sage-light: #5BC4A0;
+  --cg-sage-subtle: #E8F4F0;
+  --cg-slate: #2D6A8F;
+  --cg-slate-light: #4BA8C8;
+  --cg-slate-subtle: #E0EFF8;
+  --cg-sand: #F4F8F7;
+  --cg-sand-dark: #D6ECE8;
+  --cg-cream: #FFFFFF;
+  --cg-mist: #E8F4F8;
+  --cg-amber: #F5A623;
+  --cg-amber-subtle: #FEF7ED;
+  --cg-success: #3DAA8A;
+  --cg-success-subtle: #E8F4F0;
+  --cg-warning: #F5A623;
+  --cg-warning-subtle: #FEF7ED;
+  --cg-error: #C53030;
+  --cg-error-subtle: #FEE2E2;
+  --cg-heat: #F5A623;
+  --cg-heat-high: #C53030;
+  --cg-heat-subtle: #FEF7ED;
+  --cg-coaching: #2D6A8F;
+  --cg-coaching-subtle: #EBF5FB;
+  --cg-legal: #C53030;
+  --cg-legal-subtle: #FEE2E2;
+  --cg-pattern: #F5A623;
+  --cg-pattern-subtle: #FEF7ED;
+  --cg-time-signal: #2D6A8F;
+  --cg-time-signal-subtle: #EBF5FB;
+}
+
+/* ============================================================================
    PORTAL-SPECIFIC THEMING
    ============================================================================ */
 

@@ -336,6 +336,33 @@ class ClearFundService:
         )
         return result.scalar_one_or_none()
 
+    async def _lock_obligation(self, obligation_id: str) -> Obligation:
+        """Acquire a FOR UPDATE row lock on the obligation and return its
+        current state.
+
+        Call after get_obligation() has done the access check. Concurrent
+        mutations (e.g., two parents funding at once) serialize on this lock,
+        preventing lost updates on amount_funded/amount_verified and duplicate
+        status transitions. Status guards MUST be (re-)checked against the
+        returned row — the pre-lock snapshot may be stale.
+
+        populate_existing refreshes the identity-mapped instance loaded by
+        get_obligation() with the locked row's values.
+        """
+        result = await self.db.execute(
+            select(Obligation)
+            .where(Obligation.id == obligation_id)
+            .with_for_update()
+            .execution_options(populate_existing=True)
+        )
+        obligation = result.scalar_one_or_none()
+        if not obligation:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Obligation not found"
+            )
+        return obligation
+
     async def get_obligation(
         self,
         obligation_id: str,
@@ -533,6 +560,7 @@ class ClearFundService:
     ) -> Obligation:
         """Cancel an obligation."""
         obligation = await self.get_obligation(obligation_id, user)
+        obligation = await self._lock_obligation(obligation_id)
 
         # Only allow cancellation for open/partially funded obligations
         if obligation.status not in ["open", "partially_funded"]:
@@ -585,6 +613,7 @@ class ClearFundService:
     ) -> Obligation:
         """Dispute an obligation. Either parent can dispute."""
         obligation = await self.get_obligation(obligation_id, user)
+        obligation = await self._lock_obligation(obligation_id)
 
         if obligation.status in ["completed", "cancelled", "expired"]:
             raise HTTPException(
@@ -639,6 +668,7 @@ class ClearFundService:
     ) -> Obligation:
         """Resolve a dispute on an obligation."""
         obligation = await self.get_obligation(obligation_id, user)
+        obligation = await self._lock_obligation(obligation_id)
 
         if obligation.dispute_status != "disputed":
             raise HTTPException(
@@ -686,6 +716,7 @@ class ClearFundService:
     ) -> ObligationFunding:
         """Record a funding payment from a parent."""
         obligation = await self.get_obligation(obligation_id, user)
+        obligation = await self._lock_obligation(obligation_id)
 
         if obligation.status in ["completed", "cancelled", "expired"]:
             raise HTTPException(
@@ -693,14 +724,19 @@ class ClearFundService:
                 detail=f"Cannot fund obligation in status: {obligation.status}"
             )
 
-        # Find user's funding record
+        # Track the pre-transition status so side effects (virtual card
+        # issuance) only fire on the actual non-funded -> funded transition.
+        prev_status = obligation.status
+
+        # Find user's funding record (locked — serializes concurrent
+        # fundings from the same parent)
         result = await self.db.execute(
             select(ObligationFunding).where(
                 and_(
                     ObligationFunding.obligation_id == obligation_id,
                     ObligationFunding.parent_id == user.id
                 )
-            )
+            ).with_for_update()
         )
         funding = result.scalar_one_or_none()
 
@@ -790,7 +826,7 @@ class ClearFundService:
             # to auto-issue a virtual card. Non-fatal if Issuing is not yet
             # configured — the obligation still goes to `funded` and can be
             # retried via an admin endpoint once the account is approved.
-            if obligation.status == "funded":
+            if obligation.status == "funded" and prev_status != "funded":
                 try:
                     await issue_virtual_card_on_funding(self.db, str(obligation.id))
                 except Exception as issuing_exc:  # pragma: no cover — best-effort
@@ -913,6 +949,7 @@ class ClearFundService:
     ) -> VerificationArtifact:
         """Record a verification artifact."""
         obligation = await self.get_obligation(obligation_id, user)
+        obligation = await self._lock_obligation(obligation_id)
 
         if obligation.status not in ["funded", "pending_verification"]:
             raise HTTPException(
@@ -968,6 +1005,7 @@ class ClearFundService:
     ) -> VerificationArtifact:
         """Upload a receipt as verification."""
         obligation = await self.get_obligation(obligation_id, user)
+        obligation = await self._lock_obligation(obligation_id)
 
         try:
             artifact = VerificationArtifact(
@@ -1008,6 +1046,7 @@ class ClearFundService:
     ) -> Obligation:
         """Mark an obligation as completed."""
         obligation = await self.get_obligation(obligation_id, user)
+        obligation = await self._lock_obligation(obligation_id)
 
         if obligation.status not in ["verified", "funded"]:
             raise HTTPException(

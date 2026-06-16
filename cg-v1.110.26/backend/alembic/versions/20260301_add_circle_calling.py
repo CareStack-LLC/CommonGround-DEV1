@@ -8,6 +8,7 @@ Create Date: 2026-03-01 00:00:00.000000
 from typing import Sequence, Union
 
 from alembic import op
+import migration_guards as mg
 import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
@@ -42,11 +43,11 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(['circle_contact_id'], ['circle_contacts.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id')
     )
-    op.create_index('ix_circle_call_rooms_contact_child', 'circle_call_rooms', ['circle_contact_id', 'child_id'], unique=True)
-    op.create_index('ix_circle_call_rooms_daily_room_name', 'circle_call_rooms', ['daily_room_name'], unique=True)
-    op.create_index('ix_circle_call_rooms_family', 'circle_call_rooms', ['family_file_id'], unique=False)
-    op.create_index('ix_circle_call_rooms_child_id', 'circle_call_rooms', ['child_id'], unique=False)
-    op.create_index('ix_circle_call_rooms_circle_contact_id', 'circle_call_rooms', ['circle_contact_id'], unique=False)
+    mg.safe_create_index('ix_circle_call_rooms_contact_child', 'circle_call_rooms', ['circle_contact_id', 'child_id'], unique=True)
+    mg.safe_create_index('ix_circle_call_rooms_daily_room_name', 'circle_call_rooms', ['daily_room_name'], unique=True)
+    mg.safe_create_index('ix_circle_call_rooms_family', 'circle_call_rooms', ['family_file_id'], unique=False)
+    mg.safe_create_index('ix_circle_call_rooms_child_id', 'circle_call_rooms', ['child_id'], unique=False)
+    mg.safe_create_index('ix_circle_call_rooms_circle_contact_id', 'circle_call_rooms', ['circle_contact_id'], unique=False)
 
     # Create circle_call_sessions table
     op.create_table(
@@ -88,16 +89,16 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(['circle_contact_id'], ['circle_contacts.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id')
     )
-    op.create_index('ix_circle_call_sessions_family_file_id', 'circle_call_sessions', ['family_file_id'], unique=False)
-    op.create_index('ix_circle_call_sessions_room_id', 'circle_call_sessions', ['room_id'], unique=False)
-    op.create_index('ix_circle_call_sessions_child_id', 'circle_call_sessions', ['child_id'], unique=False)
-    op.create_index('ix_circle_call_sessions_circle_contact_id', 'circle_call_sessions', ['circle_contact_id'], unique=False)
-    op.create_index('ix_circle_call_sessions_status', 'circle_call_sessions', ['status'], unique=False)
-    op.create_index('ix_circle_call_sessions_initiated_by_id', 'circle_call_sessions', ['initiated_by_id'], unique=False)
-    op.create_index('ix_circle_call_sessions_daily_room_name', 'circle_call_sessions', ['daily_room_name'], unique=False)
-    op.create_index('ix_circle_call_sessions_family_status', 'circle_call_sessions', ['family_file_id', 'status'], unique=False)
-    op.create_index('ix_circle_call_sessions_child_date', 'circle_call_sessions', ['child_id', 'initiated_at'], unique=False)
-    op.create_index('ix_circle_call_sessions_contact_date', 'circle_call_sessions', ['circle_contact_id', 'initiated_at'], unique=False)
+    mg.safe_create_index('ix_circle_call_sessions_family_file_id', 'circle_call_sessions', ['family_file_id'], unique=False)
+    mg.safe_create_index('ix_circle_call_sessions_room_id', 'circle_call_sessions', ['room_id'], unique=False)
+    mg.safe_create_index('ix_circle_call_sessions_child_id', 'circle_call_sessions', ['child_id'], unique=False)
+    mg.safe_create_index('ix_circle_call_sessions_circle_contact_id', 'circle_call_sessions', ['circle_contact_id'], unique=False)
+    mg.safe_create_index('ix_circle_call_sessions_status', 'circle_call_sessions', ['status'], unique=False)
+    mg.safe_create_index('ix_circle_call_sessions_initiated_by_id', 'circle_call_sessions', ['initiated_by_id'], unique=False)
+    mg.safe_create_index('ix_circle_call_sessions_daily_room_name', 'circle_call_sessions', ['daily_room_name'], unique=False)
+    mg.safe_create_index('ix_circle_call_sessions_family_status', 'circle_call_sessions', ['family_file_id', 'status'], unique=False)
+    mg.safe_create_index('ix_circle_call_sessions_child_date', 'circle_call_sessions', ['child_id', 'initiated_at'], unique=False)
+    mg.safe_create_index('ix_circle_call_sessions_contact_date', 'circle_call_sessions', ['circle_contact_id', 'initiated_at'], unique=False)
 
     # Create circle_call_transcript_chunks table
     op.create_table(
@@ -118,10 +119,10 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(['session_id'], ['circle_call_sessions.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id')
     )
-    op.create_index('ix_circle_call_transcript_chunks_session_id', 'circle_call_transcript_chunks', ['session_id'], unique=False)
-    op.create_index('ix_circle_call_transcript_chunks_speaker_id', 'circle_call_transcript_chunks', ['speaker_id'], unique=False)
-    op.create_index('ix_circle_call_transcript_chunks_session_time', 'circle_call_transcript_chunks', ['session_id', 'start_time'], unique=False)
-    op.create_index('ix_circle_call_transcript_chunks_flagged', 'circle_call_transcript_chunks', ['session_id', 'flagged'], unique=False)
+    mg.safe_create_index('ix_circle_call_transcript_chunks_session_id', 'circle_call_transcript_chunks', ['session_id'], unique=False)
+    mg.safe_create_index('ix_circle_call_transcript_chunks_speaker_id', 'circle_call_transcript_chunks', ['speaker_id'], unique=False)
+    mg.safe_create_index('ix_circle_call_transcript_chunks_session_time', 'circle_call_transcript_chunks', ['session_id', 'start_time'], unique=False)
+    mg.safe_create_index('ix_circle_call_transcript_chunks_flagged', 'circle_call_transcript_chunks', ['session_id', 'flagged'], unique=False)
 
     # Create circle_call_flags table
     op.create_table(
@@ -147,13 +148,13 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(['transcript_chunk_id'], ['circle_call_transcript_chunks.id'], ondelete='SET NULL'),
         sa.PrimaryKeyConstraint('id')
     )
-    op.create_index('ix_circle_call_flags_session_id', 'circle_call_flags', ['session_id'], unique=False)
-    op.create_index('ix_circle_call_flags_transcript_chunk_id', 'circle_call_flags', ['transcript_chunk_id'], unique=False)
-    op.create_index('ix_circle_call_flags_flag_type', 'circle_call_flags', ['flag_type'], unique=False)
-    op.create_index('ix_circle_call_flags_severity', 'circle_call_flags', ['severity'], unique=False)
-    op.create_index('ix_circle_call_flags_offending_speaker_id', 'circle_call_flags', ['offending_speaker_id'], unique=False)
-    op.create_index('ix_circle_call_flags_session_severity', 'circle_call_flags', ['session_id', 'severity'], unique=False)
-    op.create_index('ix_circle_call_flags_type_flagged_at', 'circle_call_flags', ['flag_type', 'flagged_at'], unique=False)
+    mg.safe_create_index('ix_circle_call_flags_session_id', 'circle_call_flags', ['session_id'], unique=False)
+    mg.safe_create_index('ix_circle_call_flags_transcript_chunk_id', 'circle_call_flags', ['transcript_chunk_id'], unique=False)
+    mg.safe_create_index('ix_circle_call_flags_flag_type', 'circle_call_flags', ['flag_type'], unique=False)
+    mg.safe_create_index('ix_circle_call_flags_severity', 'circle_call_flags', ['severity'], unique=False)
+    mg.safe_create_index('ix_circle_call_flags_offending_speaker_id', 'circle_call_flags', ['offending_speaker_id'], unique=False)
+    mg.safe_create_index('ix_circle_call_flags_session_severity', 'circle_call_flags', ['session_id', 'severity'], unique=False)
+    mg.safe_create_index('ix_circle_call_flags_type_flagged_at', 'circle_call_flags', ['flag_type', 'flagged_at'], unique=False)
 
 
 def downgrade() -> None:
