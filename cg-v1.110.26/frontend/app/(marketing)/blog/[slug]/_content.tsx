@@ -176,13 +176,13 @@ export function BlogPostContent() {
               {apiPost.category}
             </div>
 
-            <h1 className="text-3xl sm:text-4xl lg:text-[2.75rem] font-serif font-semibold text-foreground mb-6 leading-tight">
+            <h1 className="text-3xl sm:text-4xl lg:text-[2.75rem] font-serif text-foreground mb-6 leading-[1.15]">
               {apiPost.title}
             </h1>
 
             {/* Excerpt */}
             {apiPost.excerpt && (
-              <p className="text-lg text-gray-500 mb-8 leading-relaxed">{apiPost.excerpt}</p>
+              <p className="text-lg sm:text-xl text-gray-500 mb-8 leading-relaxed">{apiPost.excerpt}</p>
             )}
 
             {/* Author bar */}
@@ -219,8 +219,9 @@ export function BlogPostContent() {
             {/* Scoped blog content styles */}
             <style>{`
               .blog-content { color: #374151; font-size: 1.125rem; line-height: 1.8; }
-              .blog-content h2 { color: #1E3A4A; font-size: 1.75rem; font-weight: 700; margin-top: 2.5rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #E8F4F0; }
-              .blog-content h3 { color: #1E3A4A; font-size: 1.35rem; font-weight: 600; margin-top: 2rem; margin-bottom: 0.75rem; }
+              .blog-content > p:first-of-type { font-size: 1.25rem; line-height: 1.7; color: #4B5563; }
+              .blog-content h2 { font-family: var(--font-dm-serif-display), Georgia, serif; color: #1E3A4A; font-size: 1.9rem; font-weight: 400; line-height: 1.25; margin-top: 2.75rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #E8F4F0; }
+              .blog-content h3 { font-family: var(--font-dm-serif-display), Georgia, serif; color: #1E3A4A; font-size: 1.45rem; font-weight: 400; line-height: 1.3; margin-top: 2rem; margin-bottom: 0.75rem; }
               .blog-content p { margin-bottom: 1.25rem; }
               .blog-content ul, .blog-content ol { margin: 1.25rem 0; padding-left: 1.5rem; }
               .blog-content ul { list-style-type: disc; }
@@ -298,7 +299,7 @@ export function BlogPostContent() {
             <div className={`inline-block px-3 py-1 ${getCategoryStyles(legacyPost.categoryColor)} text-sm font-medium rounded-full mb-4`}>
               {legacyPost.category}
             </div>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-semibold text-foreground mb-6">{legacyPost.title}</h1>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif text-foreground mb-6 leading-[1.15]">{legacyPost.title}</h1>
             <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
               <span className="flex items-center gap-2"><User className="w-4 h-4" />{legacyPost.author}</span>
               <span className="flex items-center gap-2"><Calendar className="w-4 h-4" />{formatDate(legacyPost.date)}</span>
@@ -319,7 +320,26 @@ export function BlogPostContent() {
 
         <section className="py-12">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="prose prose-lg max-w-none prose-headings:text-foreground prose-headings:font-semibold prose-p:text-gray-700 prose-p:leading-relaxed prose-li:text-gray-700 prose-strong:text-foreground prose-a:text-cg-sage prose-a:no-underline hover:prose-a:underline prose-blockquote:border-l-cg-sage prose-blockquote:text-gray-600 prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4 prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3">
+            {/* Scoped reading styles — DM Serif Display section headings + lead
+                paragraph, matching the landing pages and the CMS post layout.
+                Tailwind `prose-*` element modifiers don't take effect on the
+                nested <article> here, so these are applied directly. */}
+            <style>{`
+              .legacy-prose { color: #374151; font-size: 1.125rem; line-height: 1.8; }
+              .legacy-prose p { margin-bottom: 1.25rem; }
+              .legacy-prose .lead { font-size: 1.25rem; line-height: 1.7; color: #4B5563; margin-bottom: 1.75rem; }
+              .legacy-prose h2 { font-family: var(--font-dm-serif-display), Georgia, serif; color: #1E3A4A; font-size: 1.9rem; font-weight: 400; line-height: 1.25; margin-top: 2.75rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #E8F4F0; }
+              .legacy-prose h2:first-child { margin-top: 0; }
+              .legacy-prose ul, .legacy-prose ol { margin: 1.25rem 0; padding-left: 1.5rem; }
+              .legacy-prose ul { list-style-type: disc; }
+              .legacy-prose ol { list-style-type: decimal; }
+              .legacy-prose li { margin-bottom: 0.5rem; padding-left: 0.25rem; }
+              .legacy-prose li::marker { color: #3DAA8A; }
+              .legacy-prose strong { color: #1E3A4A; font-weight: 600; }
+              .legacy-prose a { color: #3DAA8A; text-decoration: none; font-weight: 500; }
+              .legacy-prose a:hover { text-decoration: underline; }
+            `}</style>
+            <div className="legacy-prose max-w-none">
               <BlogContent slug={slug} />
             </div>
 

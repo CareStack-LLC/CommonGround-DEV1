@@ -170,14 +170,17 @@ export function BlogContent() {
         <>
           {/* Featured Posts */}
           {featuredPosts.length > 0 && (
-            <section className="py-16">
+            <section className="py-20 lg:py-24">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 className="text-2xl font-semibold text-foreground mb-8">Featured Articles</h2>
+                <div className="mb-10">
+                  <p className="text-cg-sage font-medium mb-2 tracking-wide uppercase text-sm">Fresh from the blog</p>
+                  <h2 className="text-3xl sm:text-4xl font-serif text-foreground">Featured Articles</h2>
+                </div>
                 <div className="grid lg:grid-cols-3 gap-8">
                   {/* Main Featured */}
                   <div className="lg:col-span-2">
                     <Link href={`/blog/${featuredPosts[0].slug}`} className="group block">
-                      <div className={`aspect-[16/9] rounded-2xl mb-6 overflow-hidden ${!featuredPosts[0].image ? placeholderBg : ''}`}>
+                      <div className={`aspect-[16/9] rounded-2xl mb-6 overflow-hidden shadow-sm group-hover:shadow-md transition-shadow ${!featuredPosts[0].image ? placeholderBg : ''}`}>
                         {featuredPosts[0].image ? (
                           <Image src={featuredPosts[0].image} alt={featuredPosts[0].title} width={1792} height={1024} sizes="(max-width: 768px) 100vw, 66vw" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" priority />
                         ) : (
@@ -189,8 +192,8 @@ export function BlogContent() {
                       <div className={`inline-block px-3 py-1 ${featuredPosts[0].pillClasses} text-sm font-medium rounded-full mb-3`}>
                         {featuredPosts[0].category}
                       </div>
-                      <h3 className="text-2xl font-semibold text-foreground group-hover:text-cg-sage transition-colors mb-3">{featuredPosts[0].title}</h3>
-                      <p className="text-gray-600 mb-4">{featuredPosts[0].excerpt}</p>
+                      <h3 className="text-2xl sm:text-3xl font-serif text-foreground group-hover:text-cg-sage transition-colors mb-3 leading-tight">{featuredPosts[0].title}</h3>
+                      <p className="text-gray-600 mb-4 leading-relaxed">{featuredPosts[0].excerpt}</p>
                       <div className="flex items-center gap-4 text-sm text-gray-600">
                         <span className="flex items-center gap-1"><Calendar className="w-4 h-4" />{formatDate(featuredPosts[0].date)}</span>
                         <span className="flex items-center gap-1"><Clock className="w-4 h-4" />{featuredPosts[0].readTime}</span>
@@ -201,7 +204,7 @@ export function BlogContent() {
                   <div className="space-y-8">
                     {featuredPosts.slice(1, 3).map((post) => (
                       <Link key={post.slug} href={`/blog/${post.slug}`} className="group block">
-                        <div className={`aspect-[16/9] rounded-xl mb-4 overflow-hidden ${!post.image ? placeholderBg : ''}`}>
+                        <div className={`aspect-[16/9] rounded-xl mb-4 overflow-hidden shadow-sm group-hover:shadow-md transition-shadow ${!post.image ? placeholderBg : ''}`}>
                           {post.image ? (
                             <Image src={post.image} alt={post.title} width={1792} height={1024} sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                           ) : (
@@ -213,7 +216,7 @@ export function BlogContent() {
                         <div className={`inline-block px-2 py-0.5 ${post.pillClasses} text-xs font-medium rounded-full mb-2`}>
                           {post.category}
                         </div>
-                        <h3 className="font-semibold text-foreground group-hover:text-cg-sage transition-colors mb-2">{post.title}</h3>
+                        <h3 className="font-serif text-lg leading-snug text-foreground group-hover:text-cg-sage transition-colors mb-2">{post.title}</h3>
                         <div className="flex items-center gap-3 text-xs text-gray-600">
                           <span>{formatDate(post.date)}</span>
                           <span>{post.readTime}</span>
@@ -227,15 +230,20 @@ export function BlogContent() {
           )}
 
           {/* All/Recent Posts */}
-          <section className="py-16 bg-white">
+          <section className="py-20 lg:py-24 bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <h2 className="text-2xl font-semibold text-foreground mb-8">
-                {activeCategory === 'All' ? 'Recent Articles' : activeCategory}
-              </h2>
+              <div className="mb-10">
+                <p className="text-cg-amber font-medium mb-2 tracking-wide uppercase text-sm">
+                  {activeCategory === 'All' ? 'Keep reading' : 'Browsing'}
+                </p>
+                <h2 className="text-3xl sm:text-4xl font-serif text-foreground">
+                  {activeCategory === 'All' ? 'Recent Articles' : activeCategory}
+                </h2>
+              </div>
               {(recentPosts.length > 0 || (activeCategory !== 'All' && featuredPosts.length === 0)) ? (
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
                   {(activeCategory !== 'All' ? filteredPosts : recentPosts).map((post) => (
-                    <Link key={post.slug} href={`/blog/${post.slug}`} className="group bg-cg-sand rounded-xl border border-gray-200/50 overflow-hidden hover:shadow-lg transition-shadow">
+                    <Link key={post.slug} href={`/blog/${post.slug}`} className="group bg-cg-sand rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300">
                       <div className={`aspect-[16/10] overflow-hidden ${!post.image ? placeholderBg : ''}`}>
                         {post.image ? (
                           <Image src={post.image} alt={post.title} width={1792} height={1024} sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
@@ -249,8 +257,8 @@ export function BlogContent() {
                         <div className={`inline-block px-2 py-0.5 ${post.pillClasses} text-xs font-medium rounded-full mb-3`}>
                           {post.category}
                         </div>
-                        <h3 className="font-semibold text-foreground group-hover:text-cg-sage transition-colors mb-2">{post.title}</h3>
-                        <p className="text-sm text-gray-600 mb-4 line-clamp-2">{post.excerpt}</p>
+                        <h3 className="font-serif text-lg leading-snug text-foreground group-hover:text-cg-sage transition-colors mb-2">{post.title}</h3>
+                        <p className="text-sm text-gray-600 mb-4 line-clamp-2 leading-relaxed">{post.excerpt}</p>
                         <div className="flex items-center gap-3 text-xs text-gray-600">
                           <span>{formatDate(post.date)}</span>
                           <span>{post.readTime}</span>
@@ -271,7 +279,7 @@ export function BlogContent() {
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-gradient-to-br from-cg-sage-subtle to-cg-amber-subtle rounded-2xl p-8 lg:p-12 text-center">
-            <h2 className="text-2xl sm:text-3xl font-semibold text-foreground mb-4">Get co-parenting tips in your inbox</h2>
+            <h2 className="text-2xl sm:text-3xl font-serif text-foreground mb-4">Get co-parenting tips in your inbox</h2>
             <p className="text-gray-600 mb-8 max-w-xl mx-auto">Join thousands of parents receiving weekly advice on communication, scheduling, and building a better co-parenting relationship.</p>
             <NewsletterForm />
             <p className="text-xs text-gray-500 mt-4">No spam. Unsubscribe anytime.</p>
@@ -282,7 +290,7 @@ export function BlogContent() {
       {/* CTA */}
       <section className="py-16 bg-white border-t border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl font-semibold text-foreground mb-4">Ready to put these tips into practice?</h2>
+          <h2 className="text-2xl sm:text-3xl font-serif text-foreground mb-4">Ready to put these tips into practice?</h2>
           <p className="text-gray-600 mb-8 max-w-xl mx-auto">CommonGround gives you the tools to communicate better, track agreements, and co-parent more effectively.</p>
           <Link href="/early-access" className="inline-flex items-center justify-center gap-2 bg-cg-sage text-white font-medium px-8 py-3 rounded-full transition-all duration-200 hover:bg-cg-sage-dark hover:shadow-lg">
             Get Started Free <ArrowRight className="w-5 h-5" />
