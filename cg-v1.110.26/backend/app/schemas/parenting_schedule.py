@@ -313,6 +313,7 @@ class ActivationResult(BaseModel):
     activity_events_created: int = 0
     communication_prefs_set: bool = False
     errors: List[str] = Field(default_factory=list)
+    warnings: List[str] = Field(default_factory=list)
 
 
 # =============================================================================

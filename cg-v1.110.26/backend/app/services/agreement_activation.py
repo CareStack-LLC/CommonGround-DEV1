@@ -115,6 +115,36 @@ class AgreementActivationService:
             f"child_support={child_support_data is not None}"
         )
 
+        # Warn loudly when sections are missing the structured_data the
+        # automation depends on. Without it the relevant records are silently
+        # skipped, so surface that to the caller instead of failing quietly.
+        if not parenting_data:
+            result.warnings.append(
+                "No parenting-time schedule was found in the agreement, so no custody "
+                "exchanges or calendar events were created. Complete the parenting-time "
+                "section (with structured data) and re-activate."
+            )
+        elif not child_ids:
+            result.warnings.append(
+                "A parenting schedule exists but the family file has no active children, "
+                "so no custody exchanges or events were created."
+            )
+        if not expense_data:
+            result.warnings.append(
+                "No expense/financial details were found, so the expense split ratio was "
+                "not set for ClearFund."
+            )
+        if not child_support_data or not getattr(child_support_data, "has_support", False):
+            result.warnings.append(
+                "No child-support amount was found, so no recurring ClearFund payments "
+                "were scheduled."
+            )
+        if result.warnings:
+            logger.warning(
+                f"Agreement {agreement.id} activation produced "
+                f"{len(result.warnings)} warning(s): {result.warnings}"
+            )
+
         # Create custody exchanges from parenting schedule
         if parenting_data and child_ids:
             try:

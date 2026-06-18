@@ -429,14 +429,68 @@ async def approve_agreement(
         user_agent=user_agent
     )
 
-    return {
+    response = {
         "id": agreement.id,
         "status": agreement.status,
         "petitioner_approved": agreement.petitioner_approved,
         "respondent_approved": agreement.respondent_approved,
         "effective_date": agreement.effective_date,
-        "message": "Agreement fully approved! You can now activate it to make it the active agreement." if agreement.status == "approved" else "Approval recorded. Waiting for other parent."
+        "auto_activated": False,
+        "activation_details": None,
     }
+
+    # Only the second approval flips status to "approved" (both parents signed).
+    if agreement.status != "approved":
+        response["message"] = "Approval recorded. Waiting for other parent."
+        return response
+
+    # Default / good-faith agreements never trigger activation side effects.
+    if getattr(agreement, "is_default", False) or agreement.agreement_version == "good_faith":
+        response["message"] = "Agreement fully approved."
+        return response
+
+    # Both parents approved a real agreement — activate automatically so the
+    # schedule, exchanges, and ClearFund payments are created without an extra
+    # manual step. If activation fails, approval still stands and the agreement
+    # can be activated manually.
+    try:
+        activation_service = AgreementActivationService(db)
+        activated = await agreement_service.activate_agreement(agreement.id, current_user)
+        activation_result = await activation_service.activate_agreement(
+            agreement=activated,
+            activated_by=str(current_user.id),
+        )
+        response["status"] = activated.status
+        response["effective_date"] = activated.effective_date
+        response["auto_activated"] = True
+        response["activation_details"] = {
+            "exchanges_created": activation_result.exchanges_created,
+            "split_ratio_set": activation_result.split_ratio_set,
+            "exchange_location_set": activation_result.exchange_location_set,
+            "schedule_events_created": activation_result.schedule_events_created,
+            "holiday_events_created": activation_result.holiday_events_created,
+            "activity_events_created": activation_result.activity_events_created,
+            "communication_prefs_set": activation_result.communication_prefs_set,
+            "recurring_obligations_created": activation_result.recurring_obligations_created,
+            "obligation_instances_created": activation_result.obligation_instances_created,
+            "errors": activation_result.errors or None,
+            "warnings": activation_result.warnings or None,
+        }
+        issues = len(activation_result.errors) + len(activation_result.warnings)
+        response["message"] = (
+            "Agreement approved and activated. Schedule, exchanges, and payments are set up."
+            if issues == 0
+            else f"Agreement approved and activated, but {issues} item(s) need your attention."
+        )
+    except Exception as exc:
+        logger.error(f"Auto-activation failed for agreement {agreement.id}: {exc}")
+        capture_error(exc)
+        response["message"] = (
+            "Agreement fully approved, but automatic setup did not complete. "
+            "You can activate it manually to create the schedule and payments."
+        )
+
+    return response
 
 
 @router.get("/{agreement_id}/activation-preview")
@@ -511,11 +565,16 @@ async def activate_agreement(
         activated_by=str(current_user.id)
     )
 
+    issues = len(activation_result.errors) + len(activation_result.warnings)
     return {
         "id": agreement.id,
         "status": agreement.status,
         "effective_date": agreement.effective_date,
-        "message": "Agreement activated successfully!",
+        "message": (
+            "Agreement activated successfully!"
+            if issues == 0
+            else f"Agreement activated, but {issues} item(s) need your attention."
+        ),
         "activation_details": {
             "exchanges_created": activation_result.exchanges_created,
             "split_ratio_set": activation_result.split_ratio_set,
@@ -526,7 +585,8 @@ async def activate_agreement(
             "communication_prefs_set": activation_result.communication_prefs_set,
             "recurring_obligations_created": activation_result.recurring_obligations_created,
             "obligation_instances_created": activation_result.obligation_instances_created,
-            "errors": activation_result.errors if activation_result.errors else None
+            "errors": activation_result.errors if activation_result.errors else None,
+            "warnings": activation_result.warnings if activation_result.warnings else None,
         }
     }
 
