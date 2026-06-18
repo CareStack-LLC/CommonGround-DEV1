@@ -27,6 +27,14 @@ export function BlogContent({ slug }: BlogContentProps) {
       return <ChildrenFirst />;
     case 'holiday-custody-planning':
       return <HolidayPlanning />;
+    case 'custody-schedule-types-guide':
+      return <CustodyScheduleGuide />;
+    case 'splitting-child-expenses-fairly':
+      return <SplittingExpenses />;
+    case 'coparenting-with-a-difficult-ex':
+      return <DifficultEx />;
+    case 'helping-kids-thrive-two-homes':
+      return <TwoHomes />;
     default:
       return null;
   }
@@ -1379,6 +1387,543 @@ function HolidayPlanning() {
           That&apos;s the best gift you can give them.
         </p>
       </div>
+    </article>
+  );
+}
+
+function CustodyScheduleGuide() {
+  return (
+    <article className="max-w-none">
+      <p className="lead text-xl text-gray-600">
+        When parents separate, the question that keeps everyone up at night is rarely about lawyers or paperwork. It&apos;s simpler and harder than that: when will I see my child, and when will they be with the other parent? The answer lives in your parenting-time schedule, and getting it right is one of the most loving things you can do.
+      </p>
+
+      <h2>Why the schedule is the backbone of everything</h2>
+      <p>
+        A clear, predictable schedule does more than divide days on a calendar. It tells your child exactly what to expect, and children feel safest when they know what comes next. It also removes the single biggest source of co-parenting conflict: the constant back-and-forth over who has the kids and when. When the plan is written down and both parents follow it, there&apos;s nothing left to argue about.
+      </p>
+      <p>
+        Think of the schedule as the floor everyone stands on. Once it&apos;s solid, you can be flexible from a place of calm rather than scrambling week to week. The goal isn&apos;t a perfect split of hours. It&apos;s a rhythm your child can count on and that both parents can actually live with.
+      </p>
+
+      <h2>Common 50/50 schedules</h2>
+      <p>
+        A 50/50 schedule means your child spends roughly equal time with each parent. There are several ways to arrange that equal time, and they feel very different in daily life. Here are the most common ones.
+      </p>
+      <ul>
+        <li>
+          <strong>Week-on/week-off.</strong> Your child spends one full week with you, then one full week with the other parent. It has the fewest transitions, which suits older kids and teens who value stability and have busy schedules. The downside: younger children can find a whole week away from one parent too long.
+        </li>
+        <li>
+          <strong>2-2-3.</strong> Over two weeks, your child spends two days with one parent, two days with the other, then three days back with the first, and the pattern flips the next week. Both parents see the child every few days, which helps younger children who don&apos;t do well with long gaps. The trade-off is more frequent transitions.
+        </li>
+        <li>
+          <strong>2-2-5-5.</strong> Two days with one parent, two with the other, then a five-day stretch with each. It gives steady mid-week contact while offering longer blocks than 2-2-3, and the weekday pattern stays the same each week, which is easy to remember.
+        </li>
+        <li>
+          <strong>3-4-4-3.</strong> One parent has three days, the other four, then it reverses. Time is split as evenly as possible while keeping a consistent weekly rhythm. It works well when both parents live close and want near-equal time without a full week apart.
+        </li>
+        <li>
+          <strong>Alternating weeks with a mid-week visit.</strong> A softer version of week-on/week-off. The child spends the week with one parent but has a dinner or overnight with the other in the middle. This keeps the simplicity of weekly blocks while shortening the time away from each parent.
+        </li>
+      </ul>
+
+      <h2>Common majority-time schedules</h2>
+      <p>
+        Equal time isn&apos;t right for every family. Sometimes one parent has the child most of the time and the other has regular, meaningful contact. These arrangements are common when parents live far apart, work demanding hours, or when a child is very young. Majority time is not a measure of how much a parent loves their child. It&apos;s a practical fit for the family&apos;s life.
+      </p>
+      <ul>
+        <li>
+          <strong>Every other weekend.</strong> The child lives mainly with one parent and stays with the other every second weekend, often Friday evening through Sunday. It&apos;s predictable and easy to plan around school and work.
+        </li>
+        <li>
+          <strong>Extended every other weekend.</strong> The same pattern, stretched to include a Friday or Monday, or a mid-week dinner. The extra hours add up and give the other parent more relaxed, unhurried time rather than just a quick weekend.
+        </li>
+        <li>
+          <strong>80/20.</strong> The child spends about 80 percent of nights with one parent and 20 percent with the other, often one weeknight and alternating weekends. This can be a good starting point that grows into more equal time as a child gets older or as both homes settle into a routine.
+        </li>
+      </ul>
+
+      <div className="bg-cg-sage-subtle rounded-xl p-6 my-8 not-prose">
+        <h3 className="text-lg font-semibold text-foreground mb-2">How to choose your schedule: a quick checklist</h3>
+        <p className="text-gray-600">
+          Run your options through these questions before you decide. There are no wrong answers, only better and worse fits for your child.
+        </p>
+        <ul className="text-gray-600 mt-3 list-disc pl-5 space-y-1">
+          <li>How old is my child, and how do they handle time apart from each of us?</li>
+          <li>How far apart do we live, and how long is the drive at pickup and drop-off times?</li>
+          <li>What do both of our work schedules actually allow on weekdays and weekends?</li>
+          <li>How well do we communicate right now, and how many handoffs can we handle calmly?</li>
+          <li>Does the plan keep school, activities, and friendships steady and easy to reach?</li>
+        </ul>
+      </div>
+
+      <h2>How to actually choose</h2>
+      <p>
+        The best schedule on paper is the one your real life can support. A few factors matter more than the rest.
+      </p>
+      <ul>
+        <li>
+          <strong>Your child&apos;s age and temperament.</strong> Babies and toddlers usually need frequent contact with both parents and shorter gaps, which favors schedules like 2-2-3. School-age kids and teens often prefer fewer transitions and longer blocks, like alternating weeks. A sensitive child who needs time to settle may do better with fewer changes, whatever their age.
+        </li>
+        <li>
+          <strong>Distance between homes.</strong> If you live a few minutes apart, frequent transitions are easy. If you&apos;re an hour away or in different school zones, longer blocks reduce hours lost in the car and keep your child near school and friends.
+        </li>
+        <li>
+          <strong>Both parents&apos; work schedules.</strong> Be honest about who can do the morning rush, after-school pickup, and evening routine. A schedule built around the parent who is actually available beats one built around how things feel fair.
+        </li>
+        <li>
+          <strong>Level of conflict.</strong> If handoffs are tense, fewer transitions mean fewer chances for friction in front of your child. Lower-contact schedules and neutral exchange spots, like school, can protect kids from being caught in the middle.
+        </li>
+        <li>
+          <strong>School and activities.</strong> A good schedule keeps homework, sports, and friendships running smoothly from both homes. If a plan means your child constantly misses practice or forgets gear, it isn&apos;t working no matter how even the split looks.
+        </li>
+      </ul>
+
+      <h2>Making transition days smooth</h2>
+      <p>
+        Transitions are where even a great schedule can wobble. The handoff is often the only time co-parents are face to face, so it carries a lot of emotion. A little structure goes a long way toward keeping those moments calm for your child.
+      </p>
+      <ul>
+        <li>
+          <strong>Keep exchanges brief and friendly.</strong> A warm goodbye and a simple &quot;have a great few days&quot; tells your child it&apos;s okay to enjoy time with the other parent. Save any adult conversation for another channel.
+        </li>
+        <li>
+          <strong>Use a neutral spot when things are tense.</strong> School drop-off or a public place can ease pressure, because the child simply goes from one parent&apos;s morning to the other parent&apos;s afternoon.
+        </li>
+        <li>
+          <strong>Build a packing routine.</strong> A short checklist of clothes, chargers, homework, and a comfort item prevents the last-minute scramble and the &quot;you forgot my stuff&quot; tension.
+        </li>
+        <li>
+          <strong>Protect re-entry time.</strong> Kids often need a quiet hour to settle after a switch. Skip the grilling about the other house and let them land.
+        </li>
+      </ul>
+      <p>
+        Consistency between homes matters as much as the schedule itself. You don&apos;t have to run identical households, but similar bedtimes, homework habits, and house rules help your child feel like one whole life rather than two separate worlds. Shared reminders help too: CommonGround&apos;s TimeBridge sends both parents the same automated schedule and pickup and drop-off alerts, so neither parent can &quot;forget&quot; whose day it is or show up late.
+      </p>
+
+      <div className="bg-cg-amber-subtle rounded-xl p-6 my-8 not-prose">
+        <h3 className="text-lg font-semibold text-foreground mb-2">Remember: schedules can grow with your child</h3>
+        <p className="text-gray-600">
+          The plan you choose today doesn&apos;t have to last forever. A toddler&apos;s schedule will look different from a ten-year-old&apos;s, and that&apos;s exactly how it should be. Revisit the arrangement as your child grows, as homes move, and as routines settle. Adjusting the plan isn&apos;t failure. It&apos;s good parenting.
+        </p>
+      </div>
+
+      <h2>A hopeful note to end on</h2>
+      <p>
+        Choosing a custody schedule can feel overwhelming, like you&apos;re deciding your child&apos;s whole future in a single chart. You&apos;re not. You&apos;re building a starting point, and starting points can be improved. Children are remarkably resilient when they feel loved by both parents and safe in a routine they can count on. Pick the schedule that fits your child&apos;s real life today, give it an honest try, and adjust with kindness as you go. The fact that you&apos;re thinking this carefully already tells your child everything they need to know.
+      </p>
+    </article>
+  );
+}
+
+function SplittingExpenses() {
+  return (
+    <article className="max-w-none">
+      <p className="lead text-xl text-gray-600">
+        Few things can turn a calm co-parenting relationship tense faster than a text that starts with &quot;You owe me for...&quot; Money is emotional, and when it involves your kids, the stakes feel even higher. The good news: with a few clear agreements made ahead of time, splitting child expenses can become a quiet routine instead of a recurring fight.
+      </p>
+
+      <h2>Why money is the number-one flashpoint</h2>
+      <p>
+        Almost every co-parenting conflict eventually circles back to money. It is rarely just about the dollars. A surprise bill can feel like a lack of respect. A late reimbursement can feel like being taken for granted. And because expenses come up constantly &mdash; new shoes, a field trip, a dentist visit &mdash; there are endless small chances for misunderstanding.
+      </p>
+      <p>
+        The pattern usually looks the same. One parent spends, assumes the other will pay their share, and feels resentful when the money does not arrive. The other parent feels ambushed by a cost they never agreed to. Both end up frustrated, and the child is the one who absorbs the tension. The fix is not to spend less on your kids. It is to remove the guesswork.
+      </p>
+
+      <h2>Know the difference: support versus shared expenses</h2>
+      <p>
+        A lot of arguments come from blurring two very different things. <strong>Base child support</strong> is the regular, court-ordered or agreed amount one parent pays the other. It is meant to cover everyday basics like housing, food, and routine clothing. It is predictable, and it usually does not change month to month.
+      </p>
+      <p>
+        <strong>Shared or extra expenses</strong> are the costs that fall outside that base amount. These are the ones that need their own plan, because they vary and can add up quickly. They typically include:
+      </p>
+      <ul>
+        <li><strong>Medical and dental:</strong> co-pays, braces, prescriptions, therapy, glasses, and anything insurance does not cover.</li>
+        <li><strong>Extracurriculars:</strong> sports fees, music lessons, club dues, uniforms, and equipment.</li>
+        <li><strong>School costs:</strong> registration, supplies, field trips, tutoring, technology, and activity fees.</li>
+        <li><strong>Clothing beyond the basics:</strong> winter coats, growth spurts, special-occasion outfits.</li>
+        <li><strong>Childcare:</strong> daycare, after-school programs, and babysitting tied to work.</li>
+      </ul>
+      <p>
+        When everyone understands which bucket a cost falls into, you stop arguing about whether support &quot;should have covered that&quot; and start talking about how to split the extras fairly.
+      </p>
+
+      <h2>Two fair ways to split costs</h2>
+      <p>
+        There is no single right answer, but most families land on one of two approaches.
+      </p>
+      <p>
+        <strong>The 50/50 split</strong> is simple: each parent pays half of every shared expense. It works best when both parents earn roughly the same income, because it feels balanced and is easy to track. Nobody has to do math beyond dividing by two, and there is little room to argue about fairness.
+      </p>
+      <p>
+        <strong>The income-proportional split</strong> divides costs based on what each parent earns. If one parent brings home 60 percent of the combined income, they cover 60 percent of the shared expenses. This makes more sense when there is a real gap in earnings, so the lower-earning parent is not stretched thin by costs they cannot absorb. It takes a little more setup, but it often feels more genuinely fair, and many court guidelines already use this model.
+      </p>
+      <p>
+        Whichever you choose, write the percentages down. A split you both agreed to in calm moments is much easier to honor when a big bill lands.
+      </p>
+
+      <h2>Agree on pre-approval and spending limits first</h2>
+      <p>
+        Most blowups happen when one parent spends and the other never agreed to it. You can prevent almost all of these by setting two rules in advance.
+      </p>
+      <p>
+        First, decide <strong>what needs pre-approval</strong>. Routine, low-cost items usually do not. But anything large &mdash; a sport that costs hundreds of dollars, an elective medical procedure, a school trip &mdash; should be discussed before either parent commits. Pre-approval is not about control. It is about making sure both of you have a say before money is owed.
+      </p>
+      <p>
+        Second, set a <strong>spending limit</strong>. Pick a dollar amount &mdash; many families use something like 50 or 100 dollars &mdash; under which either parent can spend without checking in. Anything above that line needs a quick conversation first. This single rule prevents the most common complaint in co-parenting: &quot;I never agreed to pay for that.&quot;
+      </p>
+
+      <div className="bg-cg-sage-subtle rounded-xl p-6 my-8 not-prose">
+        <h3 className="text-lg font-semibold text-foreground mb-2">Sample expense-sharing ground rules</h3>
+        <p className="text-gray-600">
+          1. We split shared expenses 60/40 based on income, reviewed each January. 2. Either parent may spend up to 75 dollars on a shared item without pre-approval. 3. Anything over 75 dollars needs a yes in writing before it is purchased. 4. Reimbursement requests include a receipt and are sent within 14 days of the expense. 5. The other parent pays their share within 21 days of receiving the request. 6. We keep all requests in one place so nothing gets lost.
+        </p>
+      </div>
+
+      <h2>Documentation that protects everyone</h2>
+      <p>
+        Good records are not about distrust. They are about clarity, so neither parent has to rely on memory. A few simple habits cover almost every situation:
+      </p>
+      <ul>
+        <li><strong>Keep receipts.</strong> Snap a photo as soon as you pay, before it disappears into a bag or a glove box.</li>
+        <li><strong>Request in writing.</strong> A text or message with the amount, the date, and the receipt beats a verbal &quot;you owe me.&quot; Writing it down protects both of you.</li>
+        <li><strong>Set a reasonable timeline.</strong> Agree on a window for reimbursement &mdash; somewhere between 14 and 30 days is fair. It gives people time to manage cash flow without letting balances pile up.</li>
+      </ul>
+      <p>
+        This is exactly the kind of grind that software can quietly handle: CommonGround&apos;s ClearFund logs each expense, splits it by your agreed percentages, sends the reminders, and keeps a clean record so neither of you has to chase the other.
+      </p>
+
+      <h2>Avoiding the nickel-and-dime trap</h2>
+      <p>
+        There is a difference between sharing real costs and tracking every last dollar. Asking your co-parent to chip in for a 90-cent juice box at a soccer game is technically fair and almost always not worth it. The goodwill you spend is worth more than the change you recover.
+      </p>
+      <p>
+        A simple guardrail helps: only formally split expenses above your agreed limit, and let the small stuff wash out over time. Both parents end up buying snacks, socks, and last-minute supplies. If you trust that it roughly balances, you protect the relationship from a thousand tiny resentments. Save your energy for the costs that actually matter.
+      </p>
+
+      <h2>When the other parent will not pay</h2>
+      <p>
+        Sometimes you do everything right and the reimbursement still does not come. It is frustrating, but how you respond matters &mdash; for your stress level and for your child.
+      </p>
+      <ul>
+        <li><strong>Document calmly.</strong> Keep your receipts and your written requests. A clear record speaks for itself and keeps you out of a he-said-she-said.</li>
+        <li><strong>Send a neutral reminder.</strong> Skip the blame. A short &quot;Hi, following up on the 80 dollars from the dentist visit on the 3rd&quot; is harder to ignore and easier to resolve.</li>
+        <li><strong>Stay child-focused.</strong> Do not withhold time, swap insults, or vent to your child. The unpaid bill is a logistics problem, not a reason to escalate the whole relationship.</li>
+        <li><strong>Escalate appropriately.</strong> If a pattern forms, a mediator can often reset expectations. For ongoing or large amounts, your documentation gives a lawyer or the court exactly what they need.</li>
+      </ul>
+      <p>
+        Most of the time, a clear record and a calm tone solve the problem before it ever needs to go further.
+      </p>
+
+      <h2>A calmer way forward</h2>
+      <p>
+        Splitting child expenses will never be the most fun part of co-parenting, but it does not have to be a battleground. When you agree on the rules early, write things down, and let the small stuff go, money becomes one more thing you simply handle &mdash; together, on behalf of a kid who is counting on you both. That steadiness is a quiet gift, and your child will feel it for years.
+      </p>
+    </article>
+  );
+}
+
+function DifficultEx() {
+  return (
+    <article className="max-w-none">
+      <p className="lead text-xl text-gray-600">
+        Some co-parenting relationships hum along with a little goodwill and a shared calendar. Others feel like walking through a minefield where every text could go off. If your ex seems to thrive on conflict, this playbook is for you &mdash; not to win the fight, but to step out of it.
+      </p>
+
+      <h2>Start with what you can actually control</h2>
+      <p>
+        When you are dealing with a difficult ex, the most exhausting part is often the fantasy that you can manage their behavior. You cannot. You cannot make them reasonable, punctual, or kind. What you <em>can</em> control is your own side of the fence: your tone, your boundaries, your reliability, and how much of their chaos you let into your home.
+      </p>
+      <p>
+        This is not about giving up or accepting bad behavior. It is about pouring your energy where it actually works. Every minute spent trying to change them is a minute stolen from the one thing that matters most: building a calm, steady life for your child. Trade the goal of &quot;getting them to understand&quot; for the goal of &quot;keeping my side clean and steady.&quot; That shift alone can give you back hours of sleep.
+      </p>
+
+      <div className="bg-cg-sage-subtle rounded-xl p-6 my-8 not-prose">
+        <h3 className="text-lg font-semibold text-foreground mb-2">A quick gut-check before you reply</h3>
+        <p className="text-gray-600">
+          Before you respond to anything that stings, ask yourself one question: <strong>&quot;Does this message serve my child, or does it just feed the conflict?&quot;</strong> If it only feeds the conflict, it can wait &mdash; or it may not need a reply at all.
+        </p>
+      </div>
+
+      <h2>Grey rock: become unrewarding to provoke</h2>
+      <p>
+        Some people are fueled by your reaction. A big emotional response &mdash; anger, tears, a long defensive paragraph &mdash; is the payoff they are fishing for. The grey rock method is exactly what it sounds like: you become as interesting to provoke as a plain grey rock.
+      </p>
+      <p>
+        In practice, this means keeping your replies short, factual, and flat. No emotional fuel. No taking the bait. When a message is designed to wound, you answer only the part that involves logistics and let the rest fall to the floor unanswered.
+      </p>
+      <ul>
+        <li><strong>They write:</strong> a paragraph about how you are selfish and a bad parent, ending with a question about the weekend pickup.</li>
+        <li><strong>You answer:</strong> only the pickup. &quot;Saturday at 5pm works. I&apos;ll be there.&quot;</li>
+      </ul>
+      <p>
+        It feels strange at first, almost like you are letting them win by not defending yourself. You are not. You are simply refusing to hand over the reaction they were hoping for. Over time, a person who gets no reward for poking often pokes less.
+      </p>
+
+      <h2>Parallel parenting: two calm households, not one battlefield</h2>
+      <p>
+        Co-parenting in the warm, collaborative sense &mdash; joint birthday parties, easy phone calls, flexible swaps &mdash; only works when both adults can stay regulated. When one cannot, forcing that closeness keeps the wound open. This is where <strong>parallel parenting</strong> comes in.
+      </p>
+      <p>
+        In parallel parenting, you disengage from each other and run two largely separate households around the children. You each parent your own way, on your own time, with minimal direct contact. Communication shrinks to the essentials and moves to writing. The handoffs become brief and businesslike. The goal is not friendship; it is two stable homes with as little friction between them as possible.
+      </p>
+      <p>
+        Choosing parallel parenting is not a failure. For many families it is the most loving, sustainable choice available &mdash; because a child does far better with two peaceful homes than with two parents locked in a constant, draining tug-of-war.
+      </p>
+
+      <h2>BIFF: the four-word formula for hard messages</h2>
+      <p>
+        When you do have to respond to something hostile, the <strong>BIFF</strong> method gives you a reliable structure: <strong>Brief, Informative, Friendly, Firm.</strong>
+      </p>
+      <ul>
+        <li><strong>Brief</strong> &mdash; a few sentences, not a wall of text. Length invites argument.</li>
+        <li><strong>Informative</strong> &mdash; stick to facts and logistics, not opinions or feelings.</li>
+        <li><strong>Friendly</strong> &mdash; a neutral, civil tone, even if theirs was not.</li>
+        <li><strong>Firm</strong> &mdash; close the loop so there is nothing to keep arguing about.</li>
+      </ul>
+      <p>
+        A BIFF reply does not defend, explain at length, or fire back. It calmly states what will happen and ends. Here is the same provoking message answered two ways.
+      </p>
+
+      <div className="my-8 not-prose">
+        <p className="text-sm font-semibold uppercase tracking-wide text-cg-sage mb-4">
+          BIFF in Action
+        </p>
+        <div className="mx-auto max-w-sm rounded-[2rem] border border-gray-200 bg-white shadow-xl overflow-hidden">
+          <div className="flex items-center gap-3 px-5 py-3 bg-gradient-to-b from-[#F4F8F7] to-white border-b border-gray-100">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-cg-sage to-cg-slate flex items-center justify-center text-white text-xs font-bold">
+              CP
+            </div>
+            <div className="leading-tight">
+              <p className="text-sm font-semibold text-foreground">Co-Parent</p>
+              <p className="text-[11px] text-gray-400">Text Message</p>
+            </div>
+          </div>
+          <div className="px-4 py-5 space-y-6 bg-[#FBFCFC]">
+            <div>
+              <div className="flex justify-end">
+                <div className="max-w-[85%] bg-red-500 text-white rounded-2xl rounded-br-md px-4 py-2.5 text-[15px] leading-snug shadow-sm">
+                  You&apos;re always late and clearly don&apos;t care about the kids. Don&apos;t even bother showing up Friday if you can&apos;t be on time for once.
+                </div>
+              </div>
+              <p className="flex items-center justify-end gap-1 text-right text-[11px] font-medium text-red-500 mt-1.5 pr-1">
+                <XCircle className="w-3.5 h-3.5" /> Reactive &mdash; takes the bait
+              </p>
+            </div>
+            <div>
+              <div className="flex justify-end">
+                <div className="max-w-[85%]">
+                  <div className="bg-cg-sage text-white rounded-2xl rounded-br-md px-4 py-2.5 text-[15px] leading-snug shadow-sm">
+                    Thanks for the note. I&apos;ll be there Friday at 5pm as scheduled. If anything changes, I&apos;ll let you know right away.
+                  </div>
+                  <p className="text-right text-[11px] text-gray-400 mt-1 pr-1">Delivered</p>
+                </div>
+              </div>
+              <p className="flex items-center justify-end gap-1 text-right text-[11px] font-medium text-cg-sage mt-0.5 pr-1">
+                <CheckCircle className="w-3.5 h-3.5" /> BIFF &mdash; brief, informative, friendly, firm
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p>
+        Notice what the calm reply does <em>not</em> do: it does not argue about whether you are always late, it does not defend your character, and it does not match the heat. It acknowledges, states the plan, and closes. Crafting these in the moment is hard when you are upset, which is why CommonGround&apos;s ARIA can flag a hostile or manipulative message, suggest a calmer rewrite, and keep a timestamped record of what was actually said.
+      </p>
+
+      <h2>Boundaries are for you, not for them</h2>
+      <p>
+        A boundary is not a rule you impose on your ex &mdash; you cannot control whether they follow it. A boundary is a decision about what <em>you</em> will do. &quot;I will respond to scheduling messages within 24 hours&quot; is a boundary. &quot;I will not discuss our breakup over text&quot; is a boundary. You hold it by your own actions, not by demanding their cooperation.
+      </p>
+      <p>
+        The hardest part is holding steady when they push. A provoking message is often a test: will you engage this time? Each time you decline the bait calmly, the boundary gets a little more solid. You do not need to announce it, justify it, or win an argument about it. You just quietly keep to it.
+      </p>
+
+      <div className="bg-cg-amber-subtle rounded-xl p-6 my-8 not-prose">
+        <h3 className="text-lg font-semibold text-foreground mb-2">Signs you are taking the bait</h3>
+        <ul className="text-gray-600 list-disc pl-5 space-y-2">
+          <li>You are drafting a reply at midnight, heart pounding.</li>
+          <li>Your message is three paragraphs long and full of &quot;you always&quot; and &quot;you never.&quot;</li>
+          <li>You are trying to prove you are right rather than solve a logistics problem.</li>
+        </ul>
+        <p className="text-gray-600 mt-3">
+          When you notice these, step back. Draft it, but do not send it tonight. Almost nothing in co-parenting truly needs an instant reply.
+        </p>
+      </div>
+
+      <h2>Documentation: calm, factual, and timestamped</h2>
+      <p>
+        Keeping a clear record is not about building a case to attack your ex. It is protection &mdash; for you and for your child. When communication is in writing, calm, and factual, you have an honest account of what was agreed, what was missed, and what was said. Memory fades and stories shift; a timestamped record does not.
+      </p>
+      <p>
+        Aim for the same tone you would use if a judge or a parenting coordinator might read every word someday, because one might. Stick to facts: dates, times, what happened, what was agreed. Skip the insults, the sarcasm, and the score-keeping. A consistent paper trail of your own steady, reasonable behavior is one of the most powerful things you can have.
+      </p>
+
+      <h2>Protecting your kids from the adult conflict</h2>
+      <p>
+        Children are not built to carry adult conflict, and they should never be asked to. The research is clear and consistent: it is not divorce itself that harms kids most, but ongoing conflict between their parents. Shielding them from that conflict is the single most protective thing you can do.
+      </p>
+      <ul>
+        <li>Do not vent about your ex to your child, even when you are right and they would agree.</li>
+        <li>Do not use your child as a messenger, a spy, or a go-between for grown-up disputes.</li>
+        <li>Let your child love their other parent freely, without guilt or pressure from you.</li>
+        <li>Keep handoffs calm and brief &mdash; your child reads your face and your tone.</li>
+      </ul>
+      <p>
+        Your child does not need both parents to be friends. They need to feel free to love both homes without being caught in the middle. When you stay calm and refuse to put them in that position, you give them permission to simply be a kid.
+      </p>
+
+      <h2>When to bring in professionals</h2>
+      <p>
+        You do not have to do this alone, and some situations genuinely need more support than two people can provide. Consider bringing in help when communication keeps breaking down, when agreements are not being honored, or when the conflict is wearing your child down.
+      </p>
+      <ul>
+        <li><strong>A mediator</strong> can help you reach agreements without going to court, in a structured, neutral setting.</li>
+        <li><strong>A parenting coordinator</strong> can manage ongoing high-conflict logistics and help resolve day-to-day disputes.</li>
+        <li><strong>A family lawyer</strong> can clarify your rights and help formalize a parenting plan that protects everyone.</li>
+        <li><strong>A therapist or counselor</strong> can support you and your child in processing the stress.</li>
+      </ul>
+
+      <div className="bg-white rounded-xl p-6 my-8 border border-gray-200 not-prose">
+        <div className="flex items-start gap-3">
+          <Shield className="w-5 h-5 text-cg-sage mt-0.5 flex-shrink-0" />
+          <div>
+            <h3 className="text-lg font-semibold text-foreground mb-2">An important safety note</h3>
+            <p className="text-gray-600">
+              This playbook assumes a difficult but safe situation. If there is abuse, threats, or you ever fear for your own or your child&apos;s safety, that comes first. Grey rock and BIFF are not substitutes for protection. Prioritize a safety plan and reach out to a domestic violence hotline, a lawyer, or local authorities for support tailored to your circumstances.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <p>
+        Co-parenting with a difficult ex is genuinely hard, and feeling worn down by it does not make you weak &mdash; it makes you human. But you have more power than it feels like on the bad days. You cannot control them, yet you can control the calm, steady, reliable parent your child gets to come home to. Keep your side clean, protect your child from the storm, and lean on support when you need it. One steady choice at a time, you are building exactly the safe harbor your child needs.
+      </p>
+    </article>
+  );
+}
+
+function TwoHomes() {
+  return (
+    <article className="max-w-none">
+      <p className="lead text-xl text-gray-600">
+        When kids split their time between two homes, parents often worry that the back-and-forth will leave a mark. Here&apos;s the reassuring truth: children don&apos;t need two identical houses to feel safe. They need to know they&apos;re loved, that the grown-ups have things handled, and that home is wherever they are.
+      </p>
+
+      <h2>Security beats sameness</h2>
+      <p>
+        It&apos;s tempting to think you and your co-parent must match every rule, every meal, every bedtime down to the minute. But kids are more flexible than we give them credit for. What actually keeps them steady isn&apos;t perfect consistency between homes &mdash; it&apos;s feeling secure <em>within</em> each one.
+      </p>
+      <p>
+        Children thrive when the important things are predictable: they know who is picking them up, when they&apos;ll see each parent next, and that both grown-ups are glad to have them. The dishes can be different. The house rules can have their own flavor. What matters is that each home feels calm, warm, and dependable.
+      </p>
+
+      <h2>Make transition days gentle</h2>
+      <p>
+        Moving between homes can be the hardest part of the week for a child, even when they love both parents. The change itself takes energy. A few small habits can soften it:
+      </p>
+      <ul>
+        <li><strong>Keep a predictable rhythm.</strong> The same pickup spot, a familiar song in the car, or a snack waiting at the door tells a child what to expect.</li>
+        <li><strong>Let a comfort item travel.</strong> A favorite stuffed animal, blanket, or worn-out hoodie can be a bridge between two places.</li>
+        <li><strong>Keep reunions low-key.</strong> A warm but relaxed welcome is easier to handle than big, intense emotions. Save the fireworks for the soccer goal.</li>
+        <li><strong>Skip the interrogation.</strong> Resist asking a stream of questions about the other home the moment they walk in. Let them settle first. They&apos;ll share when they&apos;re ready.</li>
+      </ul>
+      <p>
+        If your child is quiet, cranky, or clingy right after a switch, that&apos;s normal. They&apos;re not upset with you &mdash; they&apos;re just resetting. Give them space and a little extra patience.
+      </p>
+
+      <h2>Align the big rules, relax the small ones</h2>
+      <p>
+        Kids do best when the major guideposts are roughly the same in both homes. You don&apos;t need a shared spreadsheet, but a loose agreement on the big stuff helps:
+      </p>
+      <ul>
+        <li><strong>Bedtimes</strong> that land in the same ballpark, so a child isn&apos;t exhausted on Mondays.</li>
+        <li><strong>Screen time</strong> limits that don&apos;t swing wildly from one house to the other.</li>
+        <li><strong>Homework</strong> expectations, so school doesn&apos;t fall through the cracks between homes.</li>
+      </ul>
+      <p>
+        Beyond those anchors, it&apos;s okay for homes to differ. Maybe one parent does pancakes on Sundays and the other does movie nights. Maybe one house is tidier and the other is cozier. Small differences aren&apos;t failures &mdash; they&apos;re just two people loving the same child in their own way. Kids learn quickly that &quot;at Dad&apos;s we do this, at Mom&apos;s we do that,&quot; and they adapt without harm.
+      </p>
+
+      <h2>Help both homes feel like home</h2>
+      <p>
+        A child shouldn&apos;t feel like a guest in either house. Belongings matter more than we realize &mdash; having their own things in both places sends a quiet message: <em>you live here too.</em>
+      </p>
+      <ul>
+        <li>A drawer or shelf that&apos;s truly theirs.</li>
+        <li>A toothbrush, pajamas, and a few clothes they don&apos;t have to pack.</li>
+        <li>A spot on the wall for their drawings or photos.</li>
+      </ul>
+      <p>
+        When kids can leave a book half-read or a project half-built and come back to it, both homes start to feel like solid ground rather than a suitcase they live out of.
+      </p>
+
+      <h2>Don&apos;t put grown-up weight on small shoulders</h2>
+      <p>
+        This one is hard, but it&apos;s one of the most protective things you can do. Children should never be pulled into the adult side of a separation. That means:
+      </p>
+      <ul>
+        <li><strong>Not using them as messengers.</strong> &quot;Tell your mother she&apos;s late again&quot; puts a child in the middle of a conflict that isn&apos;t theirs. Talk to your co-parent directly.</li>
+        <li><strong>Not turning them into spies.</strong> Asking who the other parent is dating or how they spend money teaches kids that loving one parent means betraying the other.</li>
+        <li><strong>Not leaning on them for emotional support.</strong> Your child is not your confidant about adult hurts. They need to be the kid, not the comforter.</li>
+      </ul>
+      <p>
+        When kids are kept out of the crossfire, they&apos;re free to simply love both parents &mdash; which is exactly what they need to do.
+      </p>
+
+      <div className="bg-cg-sage-subtle rounded-xl p-6 my-8 not-prose">
+        <h3 className="text-lg font-semibold text-foreground mb-2">What kids need to hear from you</h3>
+        <p className="text-gray-600">
+          &quot;This is not your fault.&quot; &quot;Both of us love you, and that will never change.&quot; &quot;You don&apos;t have to choose between us.&quot; &quot;It&apos;s okay to have fun and love your time at your other home.&quot; &quot;You can talk to me about anything.&quot; Said often and meant fully, these few sentences carry a child a long way.
+        </p>
+      </div>
+
+      <h2>Keep the other parent close, even on your time</h2>
+      <p>
+        It can sting to encourage your child&apos;s bond with someone you&apos;re no longer with. But a child&apos;s love for their other parent is not a threat &mdash; it&apos;s a strength worth protecting. When kids feel free to miss and reach the parent who isn&apos;t in the room, they relax into both homes.
+      </p>
+      <p>
+        Let your child call, text, or share a goodnight with the other parent without making it feel like a betrayal. CommonGround&apos;s KidSpace makes this easy and safe, letting kids video-call the other parent &mdash; and approved grandparents &mdash; during the other household&apos;s time, so connection never has to wait for the calendar. Whatever tools you use, the goal is the same: your child never has to choose whose love to hold.
+      </p>
+
+      <h2>What helps at each age</h2>
+      <p>
+        Kids handle two homes differently as they grow. A few notes for each stage:
+      </p>
+      <ul>
+        <li><strong>Toddlers and preschoolers</strong> live in the present and can struggle when a parent is &quot;gone.&quot; Keep handoffs short and routines steady. A photo of the other parent, a comfort object, and simple words like &quot;Mama comes back after two sleeps&quot; help them feel safe.</li>
+        <li><strong>School-age kids</strong> notice fairness and worry about logistics &mdash; lost homework, forgotten gear, missed events. A shared calendar they can see, and reassurance that the adults are coordinating, takes that load off their shoulders.</li>
+        <li><strong>Teens</strong> crave independence and a social life that doesn&apos;t bend around the custody schedule. Give them a real voice in plans, flex when you can for friends and activities, and don&apos;t take their pulling-away personally. They still need both parents, even when they act like they don&apos;t.</li>
+      </ul>
+
+      <h2>When to reach for more support</h2>
+      <p>
+        Most kids adjust to two homes with time, patience, and steady love. But it&apos;s wise to watch for signs that a child is carrying more than they can hold:
+      </p>
+      <ul>
+        <li>Big changes in sleep, appetite, or mood that don&apos;t pass.</li>
+        <li>Slipping grades or pulling away from friends and activities they used to enjoy.</li>
+        <li>New aggression, frequent meltdowns, or a return to younger behaviors.</li>
+        <li>Stomachaches or headaches with no medical cause, often around transitions.</li>
+        <li>Saying things like &quot;everything is my fault&quot; or seeming to feel responsible for the adults.</li>
+      </ul>
+      <p>
+        If these stick around for weeks, it&apos;s not a sign you&apos;ve failed &mdash; it&apos;s a sign your child could use another caring adult. A school counselor or a family therapist can give kids a safe place to sort out feelings they can&apos;t put into words. Asking for help is one of the most loving moves a parent can make.
+      </p>
+
+      <div className="bg-cg-amber-subtle rounded-xl p-6 my-8 not-prose">
+        <h3 className="text-lg font-semibold text-foreground mb-2">A quick gut-check</h3>
+        <p className="text-gray-600">
+          Before each handoff, ask yourself one question: &quot;Am I making this easier or harder for my child?&quot; You won&apos;t get it perfect, and you don&apos;t need to. Aiming in the right direction, most of the time, is what kids remember.
+        </p>
+      </div>
+
+      <h2>Two homes, one steady childhood</h2>
+      <p>
+        Raising a child across two homes asks a lot of you &mdash; patience, grace, and a willingness to put your child&apos;s peace ahead of old hurts. But children are remarkably resilient when the adults around them are kind, predictable, and on their side. Your home doesn&apos;t have to match the other one. It just has to be a place where your child feels safe, known, and loved. Build that, day after ordinary day, and your child can do more than cope with two homes. They can truly thrive in both.
+      </p>
     </article>
   );
 }
