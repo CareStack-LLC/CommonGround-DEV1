@@ -1969,6 +1969,32 @@ async def send_message(
             detail="Can only send messages in active sessions"
         )
 
+    # If this session is with a circle contact, keep enforcing access for the
+    # life of the conversation — not just at session start. Blocking the contact
+    # or messaging outside their allowed window freezes the thread.
+    if session.circle_contact_id:
+        contact_result = await db.execute(
+            select(CircleContact).where(CircleContact.id == session.circle_contact_id)
+        )
+        contact = contact_result.scalar_one_or_none()
+        if contact is not None and not contact.is_active:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="This contact is blocked. Messaging is disabled.",
+            )
+        perm_result = await db.execute(
+            select(CirclePermission).where(
+                CirclePermission.circle_contact_id == session.circle_contact_id,
+                CirclePermission.child_id == session.child_id,
+            )
+        )
+        permission = perm_result.scalar_one_or_none()
+        if permission is not None and not permission.is_within_allowed_time():
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Messaging is outside the allowed time window for this contact.",
+            )
+
     # Run ARIA analysis on the message
     from app.services.aria_child_chat import aria_child_chat_monitor
 
