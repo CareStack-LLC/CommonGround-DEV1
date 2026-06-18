@@ -193,7 +193,7 @@ export default function HighConflictPage() {
                   Built for high-conflict situations
                 </span>
               </div>
-              <h1 className="text-4xl sm:text-5xl lg:text-[3.4rem] font-semibold text-foreground mb-6 leading-[1.1]">
+              <h1 className="text-4xl sm:text-5xl lg:text-[3.4rem] font-serif text-foreground mb-6 leading-[1.1]">
                 When every exchange feels like a battle,{' '}
                 <span className="text-cg-sage">put the facts on your side.</span>
               </h1>
@@ -246,7 +246,7 @@ export default function HighConflictPage() {
       <section className="py-16 bg-cg-amber-subtle border-y border-cg-amber/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
-            <h2 className="text-2xl font-semibold text-foreground mb-2">
+            <h2 className="text-2xl font-serif text-foreground mb-2">
               Could your family benefit from more structure?
             </h2>
             <p className="text-muted-foreground">
@@ -333,7 +333,7 @@ export default function HighConflictPage() {
       <section id="how-it-works" className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-semibold text-foreground mb-4">
+            <h2 className="text-3xl sm:text-4xl font-serif text-foreground mb-4">
               Tools that protect your family
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -352,7 +352,7 @@ export default function HighConflictPage() {
                   <div className="w-12 h-12 bg-cg-sage-subtle rounded-xl flex items-center justify-center mb-4">
                     <Icon className="w-6 h-6 text-cg-sage" />
                   </div>
-                  <h3 className="font-semibold text-foreground mb-2">{feature.title}</h3>
+                  <h3 className="font-serif text-foreground mb-2">{feature.title}</h3>
                   <p className="text-sm text-muted-foreground">{feature.description}</p>
                 </div>
               );
@@ -370,7 +370,7 @@ export default function HighConflictPage() {
                 <Brain className="w-4 h-4 text-cg-sage" />
                 <span className="text-sm font-medium text-cg-sage">Structured Co-Parenting</span>
               </div>
-              <h2 className="text-3xl sm:text-4xl font-semibold text-foreground mb-6">
+              <h2 className="text-3xl sm:text-4xl font-serif text-foreground mb-6">
                 Clear boundaries, calmer families
               </h2>
               <p className="text-lg text-muted-foreground mb-6">
@@ -398,7 +398,7 @@ export default function HighConflictPage() {
               </div>
             </div>
             <div className="bg-background rounded-2xl p-8 border border-border">
-              <h3 className="font-semibold text-foreground mb-6 flex items-center gap-2">
+              <h3 className="font-serif text-foreground mb-6 flex items-center gap-2">
                 <Clock className="w-5 h-5 text-muted-foreground" />
                 Response Time Tracking
               </h3>
@@ -438,7 +438,7 @@ export default function HighConflictPage() {
               <Gavel className="w-4 h-4 text-cg-amber" />
               <span className="text-sm font-medium text-cg-amber">Court-Ready</span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-semibold text-foreground mb-4">
+            <h2 className="text-3xl sm:text-4xl font-serif text-foreground mb-4">
               Documentation you can trust
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -450,7 +450,7 @@ export default function HighConflictPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {courtExportFeatures.map((feature) => (
               <div key={feature.title} className="p-6 bg-card rounded-xl border border-border/50">
-                <h3 className="font-semibold text-foreground mb-2">{feature.title}</h3>
+                <h3 className="font-serif text-foreground mb-2">{feature.title}</h3>
                 <p className="text-sm text-muted-foreground">{feature.description}</p>
               </div>
             ))}
@@ -472,7 +472,7 @@ export default function HighConflictPage() {
       <section className="py-20 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-semibold text-foreground mb-4">
+            <h2 className="text-3xl sm:text-4xl font-serif text-foreground mb-4">
               Families finding peace
             </h2>
             <p className="text-lg text-muted-foreground">
@@ -499,7 +499,7 @@ export default function HighConflictPage() {
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-semibold text-foreground mb-4">
+            <h2 className="text-3xl font-serif text-foreground mb-4">
               Common Questions
             </h2>
           </div>
@@ -529,7 +529,7 @@ export default function HighConflictPage() {
       <section className="py-20 bg-gradient-to-br from-cg-sage-subtle to-cg-slate-subtle">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <Heart className="w-12 h-12 text-cg-sage mx-auto mb-6" />
-          <h2 className="text-3xl sm:text-4xl font-semibold text-foreground mb-6">
+          <h2 className="text-3xl sm:text-4xl font-serif text-foreground mb-6">
             Your children deserve calm.
           </h2>
           <p className="text-lg text-muted-foreground mb-10 max-w-xl mx-auto">

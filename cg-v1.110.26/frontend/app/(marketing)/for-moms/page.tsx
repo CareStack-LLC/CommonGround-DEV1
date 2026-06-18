@@ -46,25 +46,6 @@ const heroTrust = [
   'Court-ready records',
 ];
 
-const painPoints = [
-  {
-    old: 'You text a simple question about the kids — and somehow it turns into a fight about you',
-    cg: 'ARIA keeps every conversation on the kids, so you can answer what matters and let the rest go',
-  },
-  {
-    old: 'Standing in the school parking lot for 45 minutes... again... no text, no warning',
-    cg: 'TimeBridge sends both of you the reminders — so "I forgot" stops being your problem to carry',
-  },
-  {
-    old: 'Asking for his half of the soccer fees for the third time this month',
-    cg: 'ClearFund tracks every expense and sends the reminders for you — no more awkward asking',
-  },
-  {
-    old: 'Screenshots that somehow remember the conversation differently than you do',
-    cg: 'Every message is timestamped and saved — quietly, so the truth is never up for debate',
-  },
-];
-
 const outcomes = [
   {
     title: 'No more chasing payments',
@@ -288,67 +269,6 @@ export default function ForMomsPage() {
                 <source src="/videos/marketing/cg_formoms_hero.mp4" type="video/mp4" />
               </video>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════
-          PAIN POINTS — "Sound Familiar?"
-      ═══════════════════════════════════════════════════ */}
-      <section className="py-20 lg:py-28 bg-white">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="text-center mb-14">
-            <h2
-              className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
-              style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
-            >
-              Sound Familiar?
-            </h2>
-            <p className="text-gray-600 text-lg">
-              You&apos;re not alone. These are the moments CommonGround was built for.
-            </p>
-          </div>
-
-          <div className="space-y-6">
-            {painPoints.map((point, i) => (
-              <div
-                key={i}
-                className="group relative bg-[#F4F8F7] rounded-2xl p-6 sm:p-8 border border-transparent hover:border-[#3DAA8A]/20 transition-colors duration-300"
-              >
-                <div className="flex flex-col sm:flex-row gap-4 sm:gap-8">
-                  {/* Old way */}
-                  <div className="flex-1">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-gray-600 mb-2 block">
-                      The cycle
-                    </span>
-                    <p className="text-gray-600 line-through decoration-[#E85D75]/40 decoration-2">
-                      {point.old}
-                    </p>
-                  </div>
-                  {/* Divider */}
-                  <div className="hidden sm:flex items-center">
-                    <div className="w-8 h-px bg-[#3DAA8A]/40" />
-                    <CheckCircle className="w-5 h-5 text-[#3DAA8A] mx-1 flex-shrink-0" />
-                    <div className="w-8 h-px bg-[#3DAA8A]/40" />
-                  </div>
-                  <div className="sm:hidden flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-[#3DAA8A]" />
-                    <span className="text-xs font-semibold uppercase tracking-wider text-[#3DAA8A]">
-                      With CommonGround
-                    </span>
-                  </div>
-                  {/* CG way */}
-                  <div className="flex-1">
-                    <span className="hidden sm:block text-xs font-semibold uppercase tracking-wider text-[#3DAA8A] mb-2">
-                      With CommonGround
-                    </span>
-                    <p className="text-[#1E3A4A] font-medium">
-                      {point.cg}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </section>

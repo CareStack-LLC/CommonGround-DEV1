@@ -40,25 +40,6 @@ export const metadata: Metadata = {
   },
 };
 
-const painPoints = [
-  {
-    old: 'Every message you send gets twisted and thrown back at you in court',
-    cg: 'ARIA flags manipulative patterns and time-stamps every exchange — the facts stay on your side',
-  },
-  {
-    old: 'Walking on eggshells just to ask about your own kid\'s school play',
-    cg: 'Structured messaging keeps it child-focused and on the record — no openings for games',
-  },
-  {
-    old: 'Missing bedtime stories because she won\'t hand over the phone',
-    cg: 'KidSpace lets you video call, watch movies, and read together — on your own terms',
-  },
-  {
-    old: '“That’s not what we agreed” — and you’ve got nothing to prove otherwise',
-    cg: 'Every agreement, message, and schedule change is logged and export-ready for your attorney',
-  },
-];
-
 const outcomes = [
   {
     icon: Video,
@@ -240,62 +221,6 @@ export default function ForDadsPage() {
                 <source src="/videos/marketing/cg_fordads_hero.mp4" type="video/mp4" />
               </video>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* PAIN POINTS */}
-      <section className="py-20 lg:py-28 bg-white">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="text-center mb-14">
-            <h2
-              className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
-              style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
-            >
-              Sound Familiar?
-            </h2>
-            <p className="text-gray-600 text-lg">
-              You&apos;re not imagining it. And you don&apos;t have to keep tolerating it.
-            </p>
-          </div>
-
-          <div className="space-y-6">
-            {painPoints.map((point, i) => (
-              <div
-                key={i}
-                className="group relative bg-[#F4F8F7] rounded-2xl p-6 sm:p-8 border border-transparent hover:border-[#3DAA8A]/20 transition-colors duration-300"
-              >
-                <div className="flex flex-col sm:flex-row gap-4 sm:gap-8">
-                  <div className="flex-1">
-                    <span className="text-xs font-semibold uppercase tracking-wider text-gray-600 mb-2 block">
-                      The reality
-                    </span>
-                    <p className="text-gray-600 line-through decoration-[#E85D75]/40 decoration-2">
-                      {point.old}
-                    </p>
-                  </div>
-                  <div className="hidden sm:flex items-center">
-                    <div className="w-8 h-px bg-[#3DAA8A]/40" />
-                    <CheckCircle className="w-5 h-5 text-[#3DAA8A] mx-1 flex-shrink-0" />
-                    <div className="w-8 h-px bg-[#3DAA8A]/40" />
-                  </div>
-                  <div className="sm:hidden flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-[#3DAA8A]" />
-                    <span className="text-xs font-semibold uppercase tracking-wider text-[#3DAA8A]">
-                      With CommonGround
-                    </span>
-                  </div>
-                  <div className="flex-1">
-                    <span className="hidden sm:block text-xs font-semibold uppercase tracking-wider text-[#3DAA8A] mb-2">
-                      With CommonGround
-                    </span>
-                    <p className="text-[#1E3A4A] font-medium">
-                      {point.cg}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </section>
