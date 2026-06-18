@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Calendar, Clock, ArrowRight, Loader2 } from 'lucide-react';
 import { NewsletterForm } from '@/components/marketing/newsletter-form';
-import { blogPosts as legacyPosts, formatDate, type BlogPost as LegacyPost } from '@/lib/blog-data';
+import { blogPosts as legacyPosts, formatDate, HIDDEN_BLOG_SLUGS, type BlogPost as LegacyPost } from '@/lib/blog-data';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -107,6 +107,7 @@ export function BlogContent() {
       }));
       const apiSlugs = new Set(apiPosts.map(p => p.slug));
       const merged = [...apiPosts, ...legacyMapped.filter(p => !apiSlugs.has(p.slug))]
+        .filter(p => !HIDDEN_BLOG_SLUGS.has(p.slug))
         .sort((a, b) => (b.date || '').localeCompare(a.date || ''))
         .map((p, i) => ({ ...p, featured: i < 3 }));
       setPosts(merged);

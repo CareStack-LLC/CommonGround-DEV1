@@ -11,6 +11,7 @@ import {
   getRelatedPosts,
   formatDate,
   getCategoryStyles,
+  HIDDEN_BLOG_SLUGS,
 } from '@/lib/blog-data';
 import { BlogContent } from '@/components/marketing/blog-content';
 import { InlineNewsletterCta } from '@/components/marketing/inline-newsletter-cta';
@@ -58,10 +59,17 @@ export function BlogPostContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [copied, setCopied] = useState(false);
 
+  // Hidden posts are treated as not-found, even via a direct link.
+  const isHidden = HIDDEN_BLOG_SLUGS.has(slug);
+
   // Try API first, fall back to legacy
-  const legacyPost = getPostBySlug(slug);
+  const legacyPost = isHidden ? undefined : getPostBySlug(slug);
 
   useEffect(() => {
+    if (isHidden) {
+      setIsLoading(false);
+      return;
+    }
     const fetchPost = async () => {
       try {
         const res = await fetch(`${API_BASE}/api/v1/blog/posts/${slug}`);
@@ -74,7 +82,7 @@ export function BlogPostContent() {
       setIsLoading(false);
     };
     fetchPost();
-  }, [slug]);
+  }, [slug, isHidden]);
 
   // Track blog read with source attribution (UTM params)
   useEffect(() => {

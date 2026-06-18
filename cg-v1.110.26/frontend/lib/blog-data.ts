@@ -5,6 +5,16 @@
  * for static generation and metadata.
  */
 
+/**
+ * Slugs hidden from the blog. These are CMS-published posts we don't want to
+ * surface on the site — filtered out of the listing and treated as not-found
+ * on the detail route. (They still exist in the CMS until deleted by an admin.)
+ */
+export const HIDDEN_BLOG_SLUGS = new Set<string>([
+  'starting-your-co-parenting-journey-a-guide-for-new-beginnings',
+  'managing-co-parenting-stress-tips-for-stress-awareness-month',
+]);
+
 export interface BlogPost {
   slug: string;
   title: string;
