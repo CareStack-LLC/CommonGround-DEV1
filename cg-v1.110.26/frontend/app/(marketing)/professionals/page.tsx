@@ -154,6 +154,14 @@ const objections = [
   },
 ];
 
+const story = [
+  { time: 'Intake day', tone: 'before', text: 'David’s new case folder was the usual: a shoebox of screenshots, contradictory calendars, and two clients who remembered every event differently.' },
+  { time: 'Week after week', tone: 'before', text: 'Half his billable hours went to reconstructing a timeline nobody could agree on — before he could even start advocating for his client.' },
+  { time: 'This case', tone: 'turn', text: 'His client’s family was on CommonGround. One export: every message, exchange, and payment — timestamped and tamper-evident.' },
+  { time: 'Now', tone: 'after', text: 'He opens a case to a clean record. ARIA had already kept the communication civil. The facts weren’t in dispute, so he could focus on the outcome.' },
+  { time: 'At the hearing', tone: 'after', kicker: true, text: 'It took half as long. The judge had everything she needed on page one.' },
+];
+
 export default function ProfessionalsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9]">
@@ -324,6 +332,71 @@ export default function ProfessionalsPage() {
             </div>
             <ProfessionalInterestForm source="professionals_page" />
           </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════
+          STORY — A short narrative that captivates
+      ═══════════════════════════════════════════════════ */}
+      <section className="relative overflow-hidden py-20 lg:py-28 bg-gradient-to-b from-[#F4F8F7] to-white">
+        <div className="max-w-3xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <p className="font-medium mb-3 tracking-wide uppercase text-sm" style={{ color: '#2D6A8F' }}>
+              From the case file
+            </p>
+            <h2
+              className="text-3xl sm:text-4xl lg:text-[2.75rem] text-[#1E3A4A] leading-[1.15]"
+              style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
+            >
+              The custody case that
+              <br className="hidden sm:block" /> finally made sense
+            </h2>
+          </div>
+          <div className="relative">
+            <div className="absolute left-[19px] top-3 bottom-3 w-px bg-gradient-to-b from-[#E85D75]/40 via-[#F5A623]/40 to-[#3DAA8A]/50" />
+            <div className="space-y-10">
+              {story.map((beat, i) => {
+                const dot =
+                  beat.tone === 'before'
+                    ? '#E85D75'
+                    : beat.tone === 'turn'
+                    ? '#F5A623'
+                    : '#3DAA8A';
+                return (
+                  <div key={i} className="relative pl-14">
+                    <div className="absolute left-0 top-0.5">
+                      <div
+                        className="w-10 h-10 rounded-full bg-white border-2 flex items-center justify-center shadow-sm"
+                        style={{ borderColor: dot }}
+                      >
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: dot }} />
+                      </div>
+                    </div>
+                    <span
+                      className="block text-xs font-semibold uppercase tracking-wider mb-2"
+                      style={{ color: dot }}
+                    >
+                      {beat.time}
+                    </span>
+                    {beat.kicker ? (
+                      <p
+                        className="text-xl sm:text-2xl text-[#1E3A4A] leading-relaxed"
+                        style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
+                      >
+                        {beat.text}
+                      </p>
+                    ) : (
+                      <p className="text-gray-600 leading-relaxed text-[17px]">{beat.text}</p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <p className="text-center text-gray-600 text-lg mt-16 max-w-2xl mx-auto">
+            CommonGround doesn’t replace your judgment. It hands you the clean record
+            your case has always needed. Here’s what it puts in front of you.
+          </p>
         </div>
       </section>
 

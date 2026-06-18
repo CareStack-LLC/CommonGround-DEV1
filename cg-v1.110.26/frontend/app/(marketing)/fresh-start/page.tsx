@@ -54,6 +54,14 @@ const painPoints = [
   },
 ];
 
+const story = [
+  { time: 'For a year', tone: 'before', text: 'Sam’s phone was a tripwire. Every buzz could be a fight, a guilt trip, or a plan changed at the last minute.' },
+  { time: 'Trying to move on', tone: 'before', text: 'It felt impossible when the past kept texting. The old conflict followed Sam into every new morning.' },
+  { time: 'The first week', tone: 'turn', text: 'A fresh start needed a clean system. Sam set the schedule once, switched ARIA on, and let the old patterns hit a wall.' },
+  { time: 'Now', tone: 'after', text: 'The logistics run themselves. Messages stay civil or they don’t get sent. The past is documented and set down — not carried.' },
+  { time: 'One quiet morning', tone: 'after', kicker: true, text: 'Sam made coffee, looked at a phone that wasn’t buzzing, and realized the new chapter had actually started.' },
+];
+
 const features = [
   {
     icon: FileCheck,
@@ -241,6 +249,71 @@ export default function FreshStartPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════
+          STORY — A short narrative that captivates
+      ═══════════════════════════════════════════════════ */}
+      <section className="relative overflow-hidden py-20 lg:py-28 bg-gradient-to-b from-[#F4F8F7] to-white">
+        <div className="max-w-3xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <p className="font-medium mb-3 tracking-wide uppercase text-sm" style={{ color: '#E85D75' }}>
+              A day in the life
+            </p>
+            <h2
+              className="text-3xl sm:text-4xl lg:text-[2.75rem] text-[#1E3A4A] leading-[1.15]"
+              style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
+            >
+              The first week that
+              <br className="hidden sm:block" /> felt like a fresh start
+            </h2>
+          </div>
+          <div className="relative">
+            <div className="absolute left-[19px] top-3 bottom-3 w-px bg-gradient-to-b from-[#E85D75]/40 via-[#F5A623]/40 to-[#3DAA8A]/50" />
+            <div className="space-y-10">
+              {story.map((beat, i) => {
+                const dot =
+                  beat.tone === 'before'
+                    ? '#E85D75'
+                    : beat.tone === 'turn'
+                    ? '#F5A623'
+                    : '#3DAA8A';
+                return (
+                  <div key={i} className="relative pl-14">
+                    <div className="absolute left-0 top-0.5">
+                      <div
+                        className="w-10 h-10 rounded-full bg-white border-2 flex items-center justify-center shadow-sm"
+                        style={{ borderColor: dot }}
+                      >
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: dot }} />
+                      </div>
+                    </div>
+                    <span
+                      className="block text-xs font-semibold uppercase tracking-wider mb-2"
+                      style={{ color: dot }}
+                    >
+                      {beat.time}
+                    </span>
+                    {beat.kicker ? (
+                      <p
+                        className="text-xl sm:text-2xl text-[#1E3A4A] leading-relaxed"
+                        style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
+                      >
+                        {beat.text}
+                      </p>
+                    ) : (
+                      <p className="text-gray-600 leading-relaxed text-[17px]">{beat.text}</p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <p className="text-center text-gray-600 text-lg mt-16 max-w-2xl mx-auto">
+            A fresh start isn’t forgetting what happened. It’s making sure it can’t
+            keep happening. Here’s what drew the line.
+          </p>
         </div>
       </section>
 

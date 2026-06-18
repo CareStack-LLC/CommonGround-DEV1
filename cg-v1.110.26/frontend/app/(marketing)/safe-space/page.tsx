@@ -54,6 +54,14 @@ const painPoints = [
   },
 ];
 
+const story = [
+  { time: 'Every Sunday', tone: 'before', text: 'For Maria, the parking lot was the scariest part of the week — face to face, every exchange, with the person she had worked so hard to get away from.' },
+  { time: 'For a long time', tone: 'before', text: 'She documented what she could on scraps and screenshots, never sure it would be enough, never quite feeling safe.' },
+  { time: 'The week it changed', tone: 'turn', text: 'Silent Handoff rewrote the rules — GPS-verified exchanges with no contact required, and every message and handoff logged automatically.' },
+  { time: 'Now', tone: 'after', text: 'The kids move between homes without a confrontation. There’s a clear, timestamped record of everything — boundaries that hold without a fight.' },
+  { time: 'This Sunday', tone: 'after', kicker: true, text: 'For the first time in a long time, the exchange came and went, and Maria felt safe.' },
+];
+
 const features = [
   {
     icon: MapPin,
@@ -242,6 +250,71 @@ export default function SafeSpacePage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════
+          STORY — A short narrative that captivates
+      ═══════════════════════════════════════════════════ */}
+      <section className="relative overflow-hidden py-20 lg:py-28 bg-gradient-to-b from-[#F4F8F7] to-white">
+        <div className="max-w-3xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <p className="font-medium mb-3 tracking-wide uppercase text-sm" style={{ color: '#2D6A8F' }}>
+              A day in the life
+            </p>
+            <h2
+              className="text-3xl sm:text-4xl lg:text-[2.75rem] text-[#1E3A4A] leading-[1.15]"
+              style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
+            >
+              The exchange where she
+              <br className="hidden sm:block" /> didn’t have to see him
+            </h2>
+          </div>
+          <div className="relative">
+            <div className="absolute left-[19px] top-3 bottom-3 w-px bg-gradient-to-b from-[#E85D75]/40 via-[#F5A623]/40 to-[#3DAA8A]/50" />
+            <div className="space-y-10">
+              {story.map((beat, i) => {
+                const dot =
+                  beat.tone === 'before'
+                    ? '#E85D75'
+                    : beat.tone === 'turn'
+                    ? '#F5A623'
+                    : '#3DAA8A';
+                return (
+                  <div key={i} className="relative pl-14">
+                    <div className="absolute left-0 top-0.5">
+                      <div
+                        className="w-10 h-10 rounded-full bg-white border-2 flex items-center justify-center shadow-sm"
+                        style={{ borderColor: dot }}
+                      >
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: dot }} />
+                      </div>
+                    </div>
+                    <span
+                      className="block text-xs font-semibold uppercase tracking-wider mb-2"
+                      style={{ color: dot }}
+                    >
+                      {beat.time}
+                    </span>
+                    {beat.kicker ? (
+                      <p
+                        className="text-xl sm:text-2xl text-[#1E3A4A] leading-relaxed"
+                        style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
+                      >
+                        {beat.text}
+                      </p>
+                    ) : (
+                      <p className="text-gray-600 leading-relaxed text-[17px]">{beat.text}</p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <p className="text-center text-gray-600 text-lg mt-16 max-w-2xl mx-auto">
+            Safety isn’t a feature you switch on. It’s what’s left when contact, chaos,
+            and doubt are designed out. Here’s how.
+          </p>
         </div>
       </section>
 

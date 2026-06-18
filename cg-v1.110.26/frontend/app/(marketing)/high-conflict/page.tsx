@@ -137,6 +137,14 @@ const testimonials = [
   },
 ];
 
+const story = [
+  { time: '11:47 PM', tone: 'before', text: 'The message arrives late. Three paragraphs, engineered to land. By the third line Renee’s hands are shaking.' },
+  { time: 'For two years', tone: 'before', text: 'She knew the pattern: react, regret, get baited into a reply that would show up in court out of context. She had lived it over and over.' },
+  { time: 'This time', tone: 'turn', text: 'ARIA caught it first — flagged the manipulation, narrowed her reply to the one logistical fact that mattered, and saved every word, timestamped.' },
+  { time: 'The same night', tone: 'after', text: 'The message built to provoke her got a calm, two-sentence answer about pickup time. Documented. Done. She put the phone down and actually slept.' },
+  { time: 'When it counted', tone: 'after', kicker: true, text: 'In court, the record spoke for itself. Renee didn’t have to.' },
+];
+
 const faqs = [
   {
     question: 'How is this different from just texting?',
@@ -253,6 +261,71 @@ export default function HighConflictPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════
+          STORY — A short narrative that captivates
+      ═══════════════════════════════════════════════════ */}
+      <section className="relative overflow-hidden py-20 lg:py-28 bg-gradient-to-b from-[#F4F8F7] to-white">
+        <div className="max-w-3xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <p className="font-medium mb-3 tracking-wide uppercase text-sm" style={{ color: '#E85D75' }}>
+              A day in the life
+            </p>
+            <h2
+              className="text-3xl sm:text-4xl lg:text-[2.75rem] text-[#1E3A4A] leading-[1.15]"
+              style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
+            >
+              The message that
+              <br className="hidden sm:block" /> didn’t ruin her week
+            </h2>
+          </div>
+          <div className="relative">
+            <div className="absolute left-[19px] top-3 bottom-3 w-px bg-gradient-to-b from-[#E85D75]/40 via-[#F5A623]/40 to-[#3DAA8A]/50" />
+            <div className="space-y-10">
+              {story.map((beat, i) => {
+                const dot =
+                  beat.tone === 'before'
+                    ? '#E85D75'
+                    : beat.tone === 'turn'
+                    ? '#F5A623'
+                    : '#3DAA8A';
+                return (
+                  <div key={i} className="relative pl-14">
+                    <div className="absolute left-0 top-0.5">
+                      <div
+                        className="w-10 h-10 rounded-full bg-white border-2 flex items-center justify-center shadow-sm"
+                        style={{ borderColor: dot }}
+                      >
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: dot }} />
+                      </div>
+                    </div>
+                    <span
+                      className="block text-xs font-semibold uppercase tracking-wider mb-2"
+                      style={{ color: dot }}
+                    >
+                      {beat.time}
+                    </span>
+                    {beat.kicker ? (
+                      <p
+                        className="text-xl sm:text-2xl text-[#1E3A4A] leading-relaxed"
+                        style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
+                      >
+                        {beat.text}
+                      </p>
+                    ) : (
+                      <p className="text-gray-600 leading-relaxed text-[17px]">{beat.text}</p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <p className="text-center text-gray-600 text-lg mt-16 max-w-2xl mx-auto">
+            High-conflict doesn’t end because you want it to. It loses its grip when
+            every message is calm, logged, and out of your head. Here’s what does that.
+          </p>
         </div>
       </section>
 

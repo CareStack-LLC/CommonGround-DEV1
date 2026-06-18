@@ -146,6 +146,14 @@ const faqs = [
   },
 ];
 
+const story = [
+  { time: 'Championship week', tone: 'before', text: 'The group text about the big game lands. Marcus offers to drive. The reply is a list of everything he’s done wrong since March.' },
+  { time: 'Every time before', tone: 'before', text: 'He used to just let it go — skip the game rather than start a fight, and tell himself the kids knew he tried, even when he wasn’t there to see it.' },
+  { time: 'The week it shifted', tone: 'turn', text: 'Then he put the schedule into CommonGround, switched ARIA on, and started logging every exchange — not to win anything, just to show up clearly.' },
+  { time: 'This season', tone: 'after', text: 'Now his parenting time is on the record. The game is on both calendars. ARIA kept his messages short and about his son — no fight to dodge, no point to prove.' },
+  { time: 'Game night', tone: 'after', kicker: true, text: 'He was in the third row when his son looked up into the stands. Marcus was already there.' },
+];
+
 export default function ForDadsPage() {
   return (
     <div className="min-h-screen">
@@ -289,6 +297,71 @@ export default function ForDadsPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════
+          STORY — A short narrative that captivates
+      ═══════════════════════════════════════════════════ */}
+      <section className="relative overflow-hidden py-20 lg:py-28 bg-gradient-to-b from-[#F4F8F7] to-white">
+        <div className="max-w-3xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <p className="font-medium mb-3 tracking-wide uppercase text-sm" style={{ color: '#2D6A8F' }}>
+              A day in the life
+            </p>
+            <h2
+              className="text-3xl sm:text-4xl lg:text-[2.75rem] text-[#1E3A4A] leading-[1.15]"
+              style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
+            >
+              The season Marcus stopped
+              <br className="hidden sm:block" /> feeling like a visitor
+            </h2>
+          </div>
+          <div className="relative">
+            <div className="absolute left-[19px] top-3 bottom-3 w-px bg-gradient-to-b from-[#E85D75]/40 via-[#F5A623]/40 to-[#3DAA8A]/50" />
+            <div className="space-y-10">
+              {story.map((beat, i) => {
+                const dot =
+                  beat.tone === 'before'
+                    ? '#E85D75'
+                    : beat.tone === 'turn'
+                    ? '#F5A623'
+                    : '#3DAA8A';
+                return (
+                  <div key={i} className="relative pl-14">
+                    <div className="absolute left-0 top-0.5">
+                      <div
+                        className="w-10 h-10 rounded-full bg-white border-2 flex items-center justify-center shadow-sm"
+                        style={{ borderColor: dot }}
+                      >
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: dot }} />
+                      </div>
+                    </div>
+                    <span
+                      className="block text-xs font-semibold uppercase tracking-wider mb-2"
+                      style={{ color: dot }}
+                    >
+                      {beat.time}
+                    </span>
+                    {beat.kicker ? (
+                      <p
+                        className="text-xl sm:text-2xl text-[#1E3A4A] leading-relaxed"
+                        style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
+                      >
+                        {beat.text}
+                      </p>
+                    ) : (
+                      <p className="text-gray-600 leading-relaxed text-[17px]">{beat.text}</p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+          <p className="text-center text-gray-600 text-lg mt-16 max-w-2xl mx-auto">
+            Marcus didn’t argue his way back into his kids’ lives. He just made it
+            impossible to be left out. Here’s what did the showing up for him.
+          </p>
         </div>
       </section>
 
