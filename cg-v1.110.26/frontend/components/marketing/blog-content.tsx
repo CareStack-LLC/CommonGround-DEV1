@@ -231,25 +231,55 @@ function CommunicationProgress() {
         <li><strong>Firm:</strong> End the conversation clearly. Don&apos;t leave openings for debate.</li>
       </ul>
 
-      <div className="bg-white rounded-xl p-6 my-8 border border-gray-200 not-prose">
-        <h3 className="text-lg font-semibold text-foreground mb-4">Example: BIFF in Action</h3>
-        <div className="space-y-4">
-          <div className="bg-red-50 dark:bg-red-950/20 rounded-lg p-4">
-            <p className="text-sm font-medium text-red-700 dark:text-red-400 mb-2">Before (reactive):</p>
-            <p className="text-red-700 dark:text-red-300 italic">
-              &quot;You ALWAYS change plans at the last minute! I&apos;m so sick of you never
-              thinking about anyone but yourself. The kids were looking forward to this
-              all week. But of course, your schedule is more important than theirs.
-              This is exactly why we got divorced.&quot;
-            </p>
+      <div className="my-8 not-prose">
+        <p className="text-sm font-semibold uppercase tracking-wide text-cg-sage mb-4">
+          Example: BIFF in Action
+        </p>
+        <div className="mx-auto max-w-sm rounded-[2rem] border border-gray-200 bg-white shadow-xl overflow-hidden">
+          {/* Phone header */}
+          <div className="flex items-center gap-3 px-5 py-3 bg-gradient-to-b from-[#F4F8F7] to-white border-b border-gray-100">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-cg-sage to-cg-slate flex items-center justify-center text-white text-xs font-bold">
+              CP
+            </div>
+            <div className="leading-tight">
+              <p className="text-sm font-semibold text-foreground">Co-Parent</p>
+              <p className="text-[11px] text-gray-400">Text Message</p>
+            </div>
           </div>
-          <div className="bg-green-50 dark:bg-green-950/20 rounded-lg p-4">
-            <p className="text-sm font-medium text-green-700 dark:text-green-400 mb-2">After (BIFF):</p>
-            <p className="text-green-700 dark:text-green-300 italic">
-              &quot;I understand you need to change Saturday&apos;s pickup to 2pm instead of 10am.
-              I can make that work this time. In the future, please let me know schedule
-              changes by Wednesday so we can prepare the kids. Thanks.&quot;
-            </p>
+
+          {/* Chat thread */}
+          <div className="px-4 py-5 space-y-6 bg-[#FBFCFC]">
+            {/* Reactive message — don't send */}
+            <div>
+              <div className="flex justify-end">
+                <div className="max-w-[85%] bg-red-500 text-white rounded-2xl rounded-br-md px-4 py-2.5 text-[15px] leading-snug shadow-sm">
+                  You ALWAYS change plans at the last minute! I&apos;m so sick of you never
+                  thinking about anyone but yourself. The kids were looking forward to this
+                  all week. But of course, your schedule is more important than theirs. This
+                  is exactly why we got divorced.
+                </div>
+              </div>
+              <p className="flex items-center justify-end gap-1 text-right text-[11px] font-medium text-red-500 mt-1.5 pr-1">
+                <XCircle className="w-3.5 h-3.5" /> Reactive — invites a fight
+              </p>
+            </div>
+
+            {/* BIFF message — send this */}
+            <div>
+              <div className="flex justify-end">
+                <div className="max-w-[85%]">
+                  <div className="bg-cg-sage text-white rounded-2xl rounded-br-md px-4 py-2.5 text-[15px] leading-snug shadow-sm">
+                    I understand you need to change Saturday&apos;s pickup to 2pm instead of 10am.
+                    I can make that work this time. In the future, please let me know schedule
+                    changes by Wednesday so we can prepare the kids. Thanks.
+                  </div>
+                  <p className="text-right text-[11px] text-gray-400 mt-1 pr-1">Delivered</p>
+                </div>
+              </div>
+              <p className="flex items-center justify-end gap-1 text-right text-[11px] font-medium text-cg-sage mt-0.5 pr-1">
+                <CheckCircle className="w-3.5 h-3.5" /> BIFF — brief, informative, friendly, firm
+              </p>
+            </div>
           </div>
         </div>
       </div>
