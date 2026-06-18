@@ -35,6 +35,10 @@ export function BlogContent({ slug }: BlogContentProps) {
       return <DifficultEx />;
     case 'helping-kids-thrive-two-homes':
       return <TwoHomes />;
+    case 'fathers-mental-health-awareness-month':
+      return <FathersMentalHealthAwareness />;
+    case 'fathers-mental-health-self-care':
+      return <FatherMentalHealthSelfCare />;
     default:
       return null;
   }
@@ -1923,6 +1927,228 @@ function TwoHomes() {
       <h2>Two homes, one steady childhood</h2>
       <p>
         Raising a child across two homes asks a lot of you &mdash; patience, grace, and a willingness to put your child&apos;s peace ahead of old hurts. But children are remarkably resilient when the adults around them are kind, predictable, and on their side. Your home doesn&apos;t have to match the other one. It just has to be a place where your child feels safe, known, and loved. Build that, day after ordinary day, and your child can do more than cope with two homes. They can truly thrive in both.
+      </p>
+    </article>
+  );
+}
+
+function FathersMentalHealthAwareness() {
+  return (
+    <article className="max-w-none">
+      <p className="lead text-xl text-gray-600">
+        June is Men&apos;s Mental Health Awareness Month &mdash; and if you&apos;re a dad, there&apos;s a good chance you&apos;ve been carrying more than you&apos;ve let on. You show up, you keep things running, and you tell everyone you&apos;re fine. This one&apos;s for you.
+      </p>
+
+      <h2>The fathers who never ask</h2>
+      <p>
+        Here&apos;s something that doesn&apos;t get said enough: fathers are often the last people in the house to ask for help. We notice when our kids are off. We notice when our co-parent is stretched thin. But our own struggles? Those get pushed to the bottom of the list, again and again, until they stop feeling like something we&apos;re even allowed to name.
+      </p>
+      <p>
+        That silence isn&apos;t weakness. It&apos;s training. Most of us were raised on a quiet rulebook that said a man &mdash; especially a dad &mdash; is supposed to provide and protect, never flinch, and never need anything for himself. So we learn to swallow it. We call it &quot;just stress&quot; or &quot;a rough patch&quot; and keep moving. The problem is that what gets buried doesn&apos;t disappear. It leaks out sideways, and the people closest to us feel it first.
+      </p>
+
+      <h2>Why men hide it</h2>
+      <p>
+        The pressure to be the strong one is real, and it&apos;s heavy. A lot of dads believe that admitting they&apos;re struggling means letting everyone down &mdash; their kids, their family, themselves. So they don&apos;t say anything. They tough it out. And the longer they stay quiet, the harder it gets to start the conversation at all.
+      </p>
+      <p>
+        There&apos;s also the simple fact that nobody taught us the words. We can describe a problem at work or fix something in the garage, but ask a man how he actually feels and you often get a shrug. That&apos;s not a character flaw. It&apos;s a gap, and gaps can be filled. The first step is just knowing what to look for.
+      </p>
+
+      <h2>What it actually looks like in men</h2>
+      <p>
+        Depression and anxiety don&apos;t always show up as sadness or tears. In men, they often wear a different mask &mdash; one that&apos;s easy to mistake for a personality, a bad mood, or just &quot;being busy.&quot; That&apos;s a big reason so many dads go undiagnosed for years.
+      </p>
+      <ul>
+        <li><strong>Irritability and anger</strong> &mdash; a short fuse over small things, snapping at people you love</li>
+        <li><strong>Withdrawal</strong> &mdash; pulling back from friends, family, and the things you used to enjoy</li>
+        <li><strong>Overworking</strong> &mdash; burying yourself in the job so you never have to sit still with how you feel</li>
+        <li><strong>Numbness</strong> &mdash; feeling flat, empty, or like you&apos;re just going through the motions</li>
+        <li><strong>Physical symptoms</strong> &mdash; headaches, gut problems, trouble sleeping, constant fatigue</li>
+        <li><strong>Drinking more</strong> &mdash; or leaning harder on anything that takes the edge off</li>
+      </ul>
+      <p>
+        If you read that list and recognized yourself, you&apos;re not broken and you&apos;re not alone. These are some of the most common signals of depression, anxiety, and burnout in men. They&apos;re also signals you can do something about.
+      </p>
+
+      <div className="bg-cg-amber-subtle rounded-xl p-6 my-8 not-prose">
+        <h3 className="text-lg font-semibold text-foreground mb-2">Warning signs worth taking seriously</h3>
+        <p className="text-gray-600">
+          Reach out sooner rather than later if you notice: anger or irritability that keeps escalating; pulling away from your kids or friends; relying on alcohol or substances to cope; sleep that&apos;s wrecked for weeks; a heavy numbness that won&apos;t lift; or any thought that your family would be better off without you. That last one is never true, and it always deserves a phone call &mdash; today.
+        </p>
+      </div>
+
+      <h2>Your kids feel what you feel</h2>
+      <p>
+        Children are emotional sponges. Long before they understand words like &quot;stress&quot; or &quot;depression,&quot; they pick up on tone, tension, and the mood in the room. When a dad is running on empty, kids absorb it &mdash; even when he thinks he&apos;s hiding it well. They may not know what&apos;s wrong, but they feel that something is.
+      </p>
+      <p>
+        The flip side is the good news. A steady dad raises steadier kids. When you take care of your own mental health, you&apos;re not being selfish &mdash; you&apos;re giving your children a calmer home and a model of what it looks like to handle hard things in a healthy way. Looking after yourself <em>is</em> looking after them.
+      </p>
+
+      <h2>The extra weight separated dads carry</h2>
+      <p>
+        If you&apos;re a separated or divorced dad, you already know this season can hit differently. On top of everything else, you may be carrying a load that married dads don&apos;t always see.
+      </p>
+      <ul>
+        <li><strong>Less time with your kids</strong> &mdash; the ache of empty days and a quiet house between visits</li>
+        <li><strong>Conflict with a co-parent</strong> &mdash; tense messages and arguments that can hang over your whole week</li>
+        <li><strong>Financial strain</strong> &mdash; support, two households, legal costs, all at once</li>
+        <li><strong>Feeling sidelined</strong> &mdash; the sense of being unseen, second-guessed, or pushed to the edge of your own kids&apos; lives</li>
+      </ul>
+      <p>
+        That&apos;s a lot to hold, and it&apos;s okay to admit it&apos;s heavy. Naming the weight is not complaining. It&apos;s the first honest step toward setting some of it down.
+      </p>
+
+      <h2>How to actually ask for help</h2>
+      <p>
+        Asking for help doesn&apos;t have to be a dramatic, life-changing moment. It can start small. Here are some first steps that real men take every day:
+      </p>
+      <ol>
+        <li><strong>Tell one person.</strong> A friend, a sibling, your co-parent if you&apos;re on good terms &mdash; just saying &quot;I&apos;ve been struggling&quot; out loud breaks the spell of silence.</li>
+        <li><strong>Talk to your doctor.</strong> Mention how you&apos;ve been feeling at your next visit. They&apos;ve heard it before, and they can rule out physical causes and point you somewhere useful.</li>
+        <li><strong>See a therapist.</strong> You don&apos;t need to be in crisis to go. A good one is like a coach for the parts of life nobody trained you for.</li>
+        <li><strong>Find peer support.</strong> Other dads who get it &mdash; a divorced-dads group, a men&apos;s circle, even an online community &mdash; can remind you that you&apos;re not the only one.</li>
+      </ol>
+      <p>
+        Any one of these is a win. You don&apos;t have to do them all at once. You just have to start.
+      </p>
+
+      <div className="bg-cg-sage-subtle rounded-xl p-6 my-8 not-prose">
+        <h3 className="text-lg font-semibold text-foreground mb-2">If you&apos;re in crisis right now</h3>
+        <p className="text-gray-600">
+          If you&apos;re having thoughts of suicide or you feel like you can&apos;t hang on, please reach out immediately. In the US, call or text <strong>988</strong> to reach the Suicide and Crisis Lifeline, any time, day or night. It&apos;s free, it&apos;s confidential, and your kids need you here. Making that call is one of the strongest things a father can do.
+        </p>
+      </div>
+
+      <h2>How CommonGround can help</h2>
+      <p>
+        Here&apos;s a source of stress that gets badly underrated: the day-to-day grind of co-parenting after a split. The tense messages, the schedule mix-ups, the arguments over money &mdash; that friction doesn&apos;t just ruin a Tuesday. It sits on your chest and drains the bandwidth you need for your own wellbeing and your kids. We built CommonGround to take some of that weight off your back.
+      </p>
+      <ul>
+        <li><strong>ARIA</strong> helps keep messages calm and takes the heat out of exchanges, so a quick logistics text doesn&apos;t spiral into a fight.</li>
+        <li><strong>TimeBridge</strong> handles the schedule and reminders, so pickups, drop-offs, and plans aren&apos;t one more thing to argue about.</li>
+        <li><strong>ClearFund</strong> removes the friction around shared expenses, so money stays organized instead of personal.</li>
+        <li><strong>A clear record</strong> of agreements and conversations means less anxiety and fewer ambushes &mdash; you always know where things stand.</li>
+      </ul>
+      <p>
+        Less conflict and less mental load won&apos;t fix everything. But it frees up real room &mdash; the kind of room you can spend on rest, on healing, and on actually being present with your kids instead of bracing for the next clash.
+      </p>
+
+      <h2>You don&apos;t have to carry it alone</h2>
+      <p>
+        Reaching out is not the end of being strong &mdash; it&apos;s what real strength looks like up close. The dads your kids remember aren&apos;t the ones who never struggled. They&apos;re the ones who kept showing up, asked for help when they needed it, and got back up. This month, let that be the example you set. Take the one small step. You&apos;re worth it, and the people who love you are glad you&apos;re still here.
+      </p>
+    </article>
+  );
+}
+
+function FatherMentalHealthSelfCare() {
+  return (
+    <article className="max-w-none">
+      <p className="lead text-xl text-gray-600">
+        June is Men&apos;s Mental Health Awareness Month, and if you&apos;re a dad, this one&apos;s for you. Being a father is one of the best things you&apos;ll ever do &mdash; and one of the hardest. Taking care of your own mind isn&apos;t selfish or soft; it&apos;s how you keep showing up for the people who count on you.
+      </p>
+
+      <h2>Start with the basics that actually move the needle</h2>
+      <p>
+        Before you reach for anything fancy, get the foundation right. The boring stuff is boring because it works. When your body is running on fumes, everything feels heavier &mdash; the traffic, the texts, the toddler meltdown at bedtime. Small, steady habits give you a buffer.
+      </p>
+      <ul>
+        <li><strong>Sleep.</strong> Aim for a consistent bedtime, even on the nights the kids aren&apos;t with you. Seven hours changes how you handle stress more than almost anything else.</li>
+        <li><strong>Move your body.</strong> You don&apos;t need a gym membership or a six-day plan. A brisk twenty-minute walk most days lifts your mood and burns off tension.</li>
+        <li><strong>Eat real food.</strong> You don&apos;t have to be perfect. Just trade some of the drive-thru and late-night snacking for meals that don&apos;t leave you crashing an hour later.</li>
+        <li><strong>Go easy on alcohol.</strong> A drink to unwind is one thing, but using it to numb a hard day tends to make the next day harder. Notice if it&apos;s creeping up.</li>
+      </ul>
+      <p>
+        You won&apos;t nail all four overnight. Pick the one that&apos;s most broken right now and start there.
+      </p>
+
+      <h2>Protect time for yourself &mdash; without the guilt</h2>
+      <p>
+        You cannot pour from an empty cup. That phrase gets repeated so often it stops meaning anything, so let&apos;s be plain: if you never get a minute to yourself, you will run dry, and your kids feel that long before you do.
+      </p>
+      <p>
+        Protecting your own time isn&apos;t taking something away from your children. It&apos;s what lets you come back patient instead of fried. Block out an hour for the thing that recharges you &mdash; a workout, a hobby, a quiet coffee, fishing, music, whatever it is. Put it on the calendar like any other commitment, and don&apos;t apologize for it.
+      </p>
+
+      <h2>Stay connected &mdash; isolation is the real risk</h2>
+      <p>
+        Here&apos;s a hard truth: a lot of men, especially after a separation or divorce, quietly drift away from their friends. The group chat goes silent, the standing plans fade, and one day you realize you haven&apos;t had a real conversation with another guy in weeks. Isolation feeds anxiety and depression, and it sneaks up slowly.
+      </p>
+      <p>
+        Fight it on purpose. You don&apos;t need a big social life &mdash; you need a few real connections you keep up with.
+      </p>
+      <ul>
+        <li>Text one friend today and put something on the calendar, even if it&apos;s just a walk or a game.</li>
+        <li>Find a peer group &mdash; a men&apos;s group, a divorced-dads meetup, a sports league, a faith community.</li>
+        <li>Set up a regular check-in with one person who actually asks how you&apos;re doing and means it.</li>
+      </ul>
+
+      <h2>Manage stress in the moment</h2>
+      <p>
+        Some days the stress shows up all at once &mdash; a heated handoff, a brutal email, a kid pushing every button you have. You can&apos;t always change what happens, but you can change what you do in the next sixty seconds.
+      </p>
+      <ul>
+        <li><strong>Breathe.</strong> Slow your exhale. Breathe in for four counts, out for six, a few times. It tells your body the threat has passed.</li>
+        <li><strong>Get outside.</strong> Step out the door, feel the air, look at something farther than your phone. A few minutes of daylight resets your head.</li>
+        <li><strong>Build a daily reset.</strong> Pick one small ritual &mdash; the first coffee, the drive home, ten minutes before bed &mdash; and use it to let the day go.</li>
+      </ul>
+
+      <div className="bg-cg-sage-subtle rounded-xl p-6 my-8 not-prose">
+        <h3 className="text-lg font-semibold text-foreground mb-2">A simple daily reset</h3>
+        <p className="text-gray-600">
+          Try this for one week and see how you feel. It takes five minutes: 1) Step outside and take ten slow breaths. 2) Drink a glass of water before your coffee. 3) Send one text to a friend. 4) Name one thing that went okay today, even a small one. 5) Set a bedtime and stick to it. Don&apos;t aim for perfect &mdash; just aim for most days.
+        </p>
+      </div>
+
+      <h2>Talk about it &mdash; out loud, to a real person</h2>
+      <p>
+        A lot of us were raised to handle things by going quiet and toughing it out. But carrying everything alone isn&apos;t strength &mdash; it&apos;s just heavy. Talking about what you&apos;re going through is one of the most useful things you can do for your mental health, and it doesn&apos;t make you any less of a man or a father.
+      </p>
+      <p>
+        That might mean opening up to a friend, your brother, or someone you trust. It might mean seeing a therapist or counselor. Therapy isn&apos;t only for crisis &mdash; plenty of guys use it the way they&apos;d use a coach, to get an outside read and a few better tools. If money is tight, look into sliding-scale clinics, community mental health centers, or your employer&apos;s assistance program. The first conversation is the hardest. It gets easier from there.
+      </p>
+
+      <h2>Set boundaries &mdash; and don&apos;t take the bait</h2>
+      <p>
+        If you&apos;re co-parenting with someone who runs hot, you already know how one message can hijack a whole day. A big part of protecting your mental health is learning what to engage with and what to let slide.
+      </p>
+      <ul>
+        <li>You don&apos;t have to reply to a hostile text the second it lands. Give it an hour. Reply to the logistics, skip the jab.</li>
+        <li>Keep your messages short, calm, and about the kids. Don&apos;t defend, don&apos;t escalate, don&apos;t get pulled into old arguments.</li>
+        <li>Decide ahead of time what you will and won&apos;t discuss. A boundary isn&apos;t a punishment &mdash; it&apos;s how you keep the peace for everyone.</li>
+      </ul>
+      <p>
+        Not taking the bait is a skill, and you get better at it with practice. Every time you don&apos;t fire back, you keep your own day intact.
+      </p>
+
+      <h2>Being present with your kids is its own medicine</h2>
+      <p>
+        Here&apos;s the part that surprises a lot of dads: time with your kids, when you&apos;re really in it, is good for <em>you</em>, not just them. Building a fort, shooting hoops, reading a bedtime story, cooking dinner together &mdash; those moments pull you out of your own head and remind you what all of this is for.
+      </p>
+      <p>
+        You&apos;re also teaching them. When your kids see you take a walk to cool off, talk about a hard feeling, or own a bad day instead of stuffing it, they learn that coping is something healthy people do. You don&apos;t have to be perfect for them. You just have to show them what it looks like to keep trying.
+      </p>
+
+      <h2>How CommonGround can help</h2>
+      <p>
+        Let&apos;s be honest about where a lot of a separated dad&apos;s daily stress actually comes from. It&apos;s not usually the big stuff &mdash; it&apos;s the steady drip of co-parenting friction. The cutting text, the schedule mix-up, the argument over who owes what. That weight follows you to work, to the gym, into your time with your kids.
+      </p>
+      <p>
+        That&apos;s the load CommonGround is built to lift. ARIA helps keep messages calm and on-topic, so a single text doesn&apos;t blow up your whole afternoon. TimeBridge automates the parenting schedule and reminders, so you&apos;re not living in fear of a missed handoff. ClearFund takes the fight out of shared expenses by keeping it all clear and on the record. And KidSpace keeps you connected to your kids even on the other parent&apos;s days. Fewer fires to fight means more energy left over &mdash; for your health, and for them.
+      </p>
+
+      <div className="bg-cg-amber-subtle rounded-xl p-6 my-8 not-prose">
+        <h3 className="text-lg font-semibold text-foreground mb-2">If you&apos;re really struggling, reach out</h3>
+        <p className="text-gray-600">
+          Self-care habits help, but they&apos;re not a substitute for real support when things get dark. If you&apos;re struggling badly, feeling hopeless, or having thoughts of hurting yourself, please reach out to a doctor, a therapist, or a crisis line. In the US, you can call or text 988 anytime to reach the Suicide and Crisis Lifeline. Asking for help is one of the strongest things a father can do.
+        </p>
+      </div>
+
+      <h2>You don&apos;t have to do it all at once</h2>
+      <p>
+        Reading a list like this can feel like one more thing to fail at. It isn&apos;t. You don&apos;t have to overhaul your life this month. Pick one thing &mdash; one walk, one honest conversation, one earlier bedtime &mdash; and start there. Your kids don&apos;t need a perfect dad. They need a present one who&apos;s taking care of himself, too. This month, that can start with a single small step. You&apos;ve got this.
       </p>
     </article>
   );
