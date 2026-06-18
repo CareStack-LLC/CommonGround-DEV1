@@ -18,7 +18,7 @@ Key differences from parent calls:
 import logging
 from datetime import datetime
 from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks, File, UploadFile, Form
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks, File, UploadFile, Form, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_, or_
 
@@ -53,6 +53,7 @@ from app.services.aria_circle_monitor import aria_circle_monitor
 from app.services.aria_vision_monitor import aria_vision_monitor
 from app.services.aria_violation_tracker import ARIAViolationTrackerService
 from app.services.daily_video import daily_service
+from app.services.recording import recording_service
 from app.services.storage import storage_service, StorageBucket
 from app.core.config import settings
 from app.core.websocket import manager
@@ -199,13 +200,16 @@ async def initiate_circle_call(
                     )
                 )
             )
-            # If no parent is supervising, we still allow the call but log it
-            # The setting serves as a reminder — full enforcement would require
-            # real-time presence detection which depends on WebSocket state
+            # Enforce: a parent must already be supervising an active session
+            # for this family before a child's call may start.
             if not active_parent_session.scalar_one_or_none():
                 logger.info(
                     f"require_parent_in_call is enabled for family {child.family_file_id} "
-                    f"but no parent supervisor found — call proceeding with ARIA monitoring"
+                    f"but no parent supervisor present — blocking call initiation"
+                )
+                raise HTTPException(
+                    status_code=status.HTTP_403_FORBIDDEN,
+                    detail="A parent must be present to start this call.",
                 )
 
     # Create call session (permission validation happens inside)
@@ -895,6 +899,7 @@ async def terminate_circle_call(
 async def process_circle_call_transcript_chunk(
     session_id: str,
     chunk_data: CircleCallTranscriptChunkCreate,
+    request: Request,
     db: AsyncSession = Depends(get_db)
 ):
     """
@@ -911,8 +916,17 @@ async def process_circle_call_transcript_chunk(
         Processing result
 
     Note:
-        This endpoint is called by Daily.co webhook (no auth required)
+        Called by the Daily.co webhook. The request is authenticated via the
+        Daily webhook signature so transcript chunks cannot be forged/spammed.
     """
+    # Verify the webhook signature so only Daily.co can submit transcript chunks
+    # (same protection the recording webhooks already use).
+    body = await request.body()
+    signature = request.headers.get("x-daily-signature", "")
+    if not recording_service.verify_daily_webhook_signature(body, signature):
+        logger.warning(f"Invalid Daily.co signature on transcript-chunk for session {session_id}")
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid signature")
+
     # Get session
     result = await db.execute(
         select(CircleCallSession).where(CircleCallSession.id == session_id)

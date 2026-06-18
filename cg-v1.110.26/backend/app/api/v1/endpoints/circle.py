@@ -23,6 +23,8 @@ from app.models.family_file import FamilyFile
 from app.models.child import Child
 from app.models.circle import CircleContact, ApprovalMode
 from app.models.kidcoms import KidComsSettings
+from app.models.circle_call import CircleCallSession, CircleCallStatus
+from app.services.aria_circle_monitor import aria_circle_monitor
 from app.models.audit import EventLog
 from app.models.case import Case
 from app.models.activity import ActivityType
@@ -155,6 +157,30 @@ async def get_approval_mode(db: AsyncSession, family_file_id: str) -> ApprovalMo
 def is_parent_a(family_file: FamilyFile, user_id: str) -> bool:
     """Check if user is parent A in the family file."""
     return family_file.parent_a_id == user_id
+
+
+async def _end_active_calls_for_contact(
+    db: AsyncSession, contact_id: str, reason: str
+) -> int:
+    """
+    End any IN-PROGRESS circle calls with a contact (used when a parent blocks
+    the contact mid-call). Reuses the shared ARIA teardown so the Daily room is
+    torn down and participants are disconnected server-side.
+    """
+    result = await db.execute(
+        select(CircleCallSession).where(
+            CircleCallSession.circle_contact_id == contact_id,
+            CircleCallSession.status == CircleCallStatus.ACTIVE.value,
+        )
+    )
+    sessions = result.scalars().all()
+    for session in sessions:
+        try:
+            await aria_circle_monitor.terminate_session_for_safety(db, session, reason)
+        except Exception as e:
+            logger.error(f"Failed to end active call {session.id} on contact block: {e}")
+            capture_error(e)
+    return len(sessions)
 
 
 @router.post(
@@ -394,6 +420,11 @@ async def delete_circle_contact(
     # Soft delete
     contact.is_active = False
 
+    # End any in-progress calls with this contact immediately.
+    await _end_active_calls_for_contact(
+        db, contact.id, "Contact was blocked by a parent during the call."
+    )
+
     # Court-evidence EventLog entry
     await _create_event_log(
         db=db,
@@ -600,6 +631,10 @@ async def report_circle_contact(
     auto_blocked = severity == "critical"
     if auto_blocked:
         contact.is_active = False
+        # Critical report auto-blocks — end any in-progress call with this contact.
+        await _end_active_calls_for_contact(
+            db, contact.id, "Contact was blocked after a critical safety report."
+        )
 
     await _create_event_log(
         db=db,
