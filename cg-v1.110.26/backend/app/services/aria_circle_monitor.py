@@ -48,9 +48,15 @@ from app.services.aria_violation_tracker import (
     ViolationResult,
     InterventionDecision,
 )
+from app.services.daily_video import daily_service
+from app.core.websocket import manager
 
 from app.utils.sentry_helpers import capture_error
 logger = logging.getLogger(__name__)
+
+# Consecutive real-time analysis failures tolerated before we treat the call as
+# unmonitorable and terminate it for safety (fail-closed, not fail-open).
+MAX_CONSECUTIVE_ANALYSIS_FAILURES = 3
 
 
 @dataclass
@@ -133,7 +139,38 @@ class ARIACircleMonitor:
         chunk.analyzed = True
 
         try:
+            # Load the session up front so we can enforce window/failure rules.
+            session_result = await db.execute(
+                select(CircleCallSession).where(CircleCallSession.id == chunk.session_id)
+            )
+            session = session_result.scalar_one_or_none()
+            if session is None or session.status in ("ended", "completed", "terminated", "terminated_by_parent"):
+                # Call already over — nothing to enforce.
+                return None
+
+            # H4: end calls that have run past the allowed time window.
+            past_window = await self._is_past_allowed_window(db, session)
+            if past_window:
+                await self.terminate_session_for_safety(
+                    db, session, "Call ended — past the allowed time window."
+                )
+                return CircleRealtimeFlag(
+                    chunk_id=chunk.id, is_severe=True, toxicity_score=0.0,
+                    categories=["time_window"], intervention_needed=True,
+                    intervention_type="terminate",
+                    warning_message="This call has ended because it ran past the allowed time window.",
+                    speaker_id=chunk.speaker_id, speaker_type=chunk.speaker_type,
+                )
+
             analysis = await self._analyze_with_claude(chunk.content, chunk.speaker_type)
+
+            # H2: fail-safe. A failed analysis means we are blind for this chunk.
+            if analysis.get("analysis_failed"):
+                return await self._handle_analysis_failure(db, session, chunk)
+
+            # Successful analysis — reset the consecutive-failure counter.
+            if session.aria_failure_count:
+                session.aria_failure_count = 0
 
             chunk.toxicity_score = analysis.get("toxicity_score", 0.0)
             chunk.flagged = analysis["toxicity_score"] > self.CHILD_SAFETY_THRESHOLD
@@ -183,6 +220,7 @@ class ARIACircleMonitor:
         if not self.anthropic_api_key:
             logger.error("CRITICAL: ANTHROPIC_API_KEY not set — ARIA child safety monitoring is DISABLED")
             return {
+                "analysis_failed": True,
                 "toxicity_score": 0.0,
                 "severity": "safe",
                 "categories": [],
@@ -225,9 +263,9 @@ Be very sensitive to child safety but avoid false positives on normal family con
             client = get_anthropic()
 
             from app.utils.sentry_helpers import ai_span
-            with ai_span("child_safety_analysis", "claude-sonnet-4-5-20250514") as span:
+            with ai_span("child_safety_analysis", "claude-haiku-4-5-20251001") as span:
                 response = client.messages.create(
-                    model="claude-sonnet-4-5-20250514",
+                    model="claude-haiku-4-5-20251001",
                     max_tokens=500,
                     system=[{"type": "text", "text": system_prompt, "cache_control": {"type": "ephemeral"}}],
                     messages=[{"role": "user", "content": user_prompt}],
@@ -254,6 +292,7 @@ Be very sensitive to child safety but avoid false positives on normal family con
             logger.error(f"Claude API call failed: {e}")
             capture_error(e)
             return {
+                "analysis_failed": True,
                 "toxicity_score": 0.0,
                 "severity": "safe",
                 "categories": [],
@@ -319,6 +358,7 @@ Be very sensitive to child safety but avoid false positives on normal family con
             circle_session_id=chunk.session_id,
         )
 
+        strict = await self._get_call_strict(db, session)
         violation_result = await self.violation_tracker.record_violation(
             db=db,
             tracker=tracker,
@@ -326,6 +366,7 @@ Be very sensitive to child safety but avoid false positives on normal family con
             severity=severity,
             categories=analysis.get("categories", []),
             flag_id=flag.id,
+            strict=strict,
         )
 
         # Update flag with intervention from tracker
@@ -482,12 +523,172 @@ Be very sensitive to child safety but avoid false positives on normal family con
         session: CircleCallSession,
         reason: str,
     ) -> None:
-        """Immediately terminate call for severe child safety violation."""
+        """Backwards-compatible alias for terminate_session_for_safety."""
+        await self.terminate_session_for_safety(db, session, reason)
+
+    async def terminate_session_for_safety(
+        self,
+        db: AsyncSession,
+        session: CircleCallSession,
+        reason: str,
+    ) -> None:
+        """
+        Hard-terminate a circle call for safety.
+
+        Unlike a DB-only status change, this:
+        1. Marks the session terminated (aria_terminated_call=True),
+        2. Tears down the Daily.co room server-side (stop recording +
+           transcription + end the meeting so participants are ejected), and
+        3. Broadcasts a WebSocket disconnect to parents and participants.
+
+        Shared by ARIA violations, past-window, degraded-monitoring, and
+        parent-block enforcement so every path tears the call down the same way.
+        Idempotent: a no-op if the session is already ARIA-terminated.
+        """
+        if session.aria_terminated_call:
+            return
+
         session.end(terminated_by_aria=True, reason=f"Child safety: {reason}")
         await db.flush()
 
+        # Hard teardown of the live Daily.co room. Each call is independent so a
+        # single Daily hiccup never reverts the DB termination above.
+        room = session.daily_room_name
+        if room:
+            for label, fn in (
+                ("stop_recording", daily_service.stop_recording),
+                ("stop_transcription", daily_service.stop_transcription),
+                ("end_session", daily_service.end_session),
+            ):
+                try:
+                    await fn(room)
+                except Exception as e:
+                    logger.error(f"ARIA teardown {label} failed for room {room}: {e}")
+                    capture_error(e)
+
+        await self._broadcast_termination(db, session, reason)
+
         logger.critical(
             f"ARIA TERMINATED circle call {session.id} for child safety: {reason}"
+        )
+
+    async def _broadcast_termination(
+        self, db: AsyncSession, session: CircleCallSession, reason: str
+    ) -> None:
+        """Tell every participant's client the call was ended for safety."""
+        try:
+            from app.models.family_file import FamilyFile
+
+            payload = {
+                "type": "circle_call_terminated_by_aria",
+                "session_id": str(session.id),
+                "reason": reason,
+                "call_terminated": True,
+                "message": "This call was ended by ARIA for child safety.",
+            }
+            recipients = {
+                session.child_id,
+                session.circle_contact_id,
+                getattr(session, "parent_supervisor_id", None),
+            }
+            ff = (
+                await db.execute(
+                    select(FamilyFile).where(FamilyFile.id == session.family_file_id)
+                )
+            ).scalar_one_or_none()
+            if ff:
+                recipients.update([ff.parent_a_id, ff.parent_b_id])
+
+            for uid in recipients:
+                if uid:
+                    await manager.send_personal_message(
+                        message=payload, user_id=str(uid)
+                    )
+        except Exception as e:
+            logger.error(f"Failed to broadcast ARIA termination: {e}")
+            capture_error(e)
+
+    async def _get_call_strict(
+        self, db: AsyncSession, session: CircleCallSession
+    ) -> bool:
+        """True unless the family explicitly chose the 'standard' 3-strike mode."""
+        from app.models.kidcoms import KidComsSettings
+
+        result = await db.execute(
+            select(KidComsSettings).where(
+                KidComsSettings.family_file_id == session.family_file_id
+            )
+        )
+        kidcoms_settings = result.scalar_one_or_none()
+        strictness = getattr(kidcoms_settings, "aria_call_strictness", "strict") or "strict"
+        return strictness != "standard"
+
+    async def _is_past_allowed_window(
+        self, db: AsyncSession, session: CircleCallSession
+    ) -> bool:
+        """
+        True if the call is now outside the contact's allowed time window.
+
+        Reuses CirclePermission.is_within_allowed_time() (string-time +
+        day-of-week + timezone aware) rather than re-implementing the comparison.
+        Only enforces when a window is actually configured.
+        """
+        from app.models.kidcoms import CirclePermission
+
+        result = await db.execute(
+            select(CirclePermission).where(
+                CirclePermission.circle_contact_id == session.circle_contact_id,
+                CirclePermission.child_id == session.child_id,
+            )
+        )
+        permission = result.scalar_one_or_none()
+        if not permission:
+            return False
+        has_window = (
+            permission.allowed_start_time
+            or permission.allowed_end_time
+            or permission.allowed_days
+        )
+        if not has_window:
+            return False
+        return not permission.is_within_allowed_time()
+
+    async def _handle_analysis_failure(
+        self,
+        db: AsyncSession,
+        session: CircleCallSession,
+        chunk: CircleCallTranscriptChunk,
+    ) -> Optional[CircleRealtimeFlag]:
+        """
+        Fail-safe: a failed analysis means we are blind for this chunk. Warn the
+        parents, and after MAX_CONSECUTIVE_ANALYSIS_FAILURES blind chunks in a
+        row, end the call rather than let it run unmonitored.
+        """
+        session.aria_failure_count = (session.aria_failure_count or 0) + 1
+        await db.flush()
+        logger.error(
+            f"ARIA analysis FAILED for circle session {session.id} "
+            f"(consecutive={session.aria_failure_count})"
+        )
+
+        if session.aria_failure_count >= MAX_CONSECUTIVE_ANALYSIS_FAILURES:
+            await self.terminate_session_for_safety(
+                db, session, "Safety monitoring unavailable — ending call."
+            )
+            return CircleRealtimeFlag(
+                chunk_id=chunk.id, is_severe=True, toxicity_score=0.0,
+                categories=["monitoring_unavailable"], intervention_needed=True,
+                intervention_type="terminate",
+                warning_message="This call was ended because safety monitoring became unavailable.",
+                speaker_id=chunk.speaker_id, speaker_type=chunk.speaker_type,
+            )
+
+        return CircleRealtimeFlag(
+            chunk_id=chunk.id, is_severe=False, toxicity_score=0.0,
+            categories=["monitoring_degraded"], intervention_needed=True,
+            intervention_type="warning",
+            warning_message="Safety monitoring is temporarily degraded on this call.",
+            speaker_id=chunk.speaker_id, speaker_type=chunk.speaker_type,
         )
 
     async def get_session_safety_summary(

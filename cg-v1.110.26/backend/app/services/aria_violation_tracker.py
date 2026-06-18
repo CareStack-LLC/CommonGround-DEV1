@@ -35,6 +35,16 @@ SEVERE_CATEGORIES = {
     "nudity", "hate_symbol", "violence",
 }
 
+# Additional categories that trigger immediate termination when a call is run
+# in "strict" / zero-tolerance mode (used for child My Circle calls by default).
+# Includes both the circle-monitor child-safety vocabulary
+# (inappropriate_content, bullying) and generic toxicity labels so the set
+# matches regardless of which analyzer produced the categories.
+STRICT_TERMINATE_CATEGORIES = {
+    "inappropriate_content", "bullying",
+    "profanity", "hostility", "insult", "harassment", "abuse",
+}
+
 
 class InterventionDecision(str, Enum):
     """What action the system should take after a violation."""
@@ -119,6 +129,7 @@ class ARIAViolationTrackerService:
         severity: str,  # low, medium, high, severe
         categories: list,
         flag_id: str,
+        strict: bool = False,
     ) -> ViolationResult:
         """
         Record a violation and determine the appropriate intervention.
@@ -130,13 +141,20 @@ class ARIAViolationTrackerService:
             severity: Violation severity level
             categories: List of violation categories
             flag_id: ID of the CallFlag or CircleCallFlag
+            strict: When True (zero-tolerance, used for child My Circle calls by
+                default), profanity/hostility/bullying categories also trigger
+                immediate termination instead of the 3-strike escalation.
 
         Returns:
             ViolationResult with intervention decision
         """
-        # Check if this is a severe category (immediate termination)
+        # Check if this is a severe category (immediate termination). In strict
+        # mode the zero-tolerance category set is added.
+        effective_severe = SEVERE_CATEGORIES | (
+            STRICT_TERMINATE_CATEGORIES if strict else set()
+        )
         is_severe = severity == "severe" or any(
-            cat in SEVERE_CATEGORIES for cat in categories
+            cat in effective_severe for cat in categories
         )
 
         # Update counts

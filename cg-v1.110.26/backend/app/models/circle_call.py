@@ -202,6 +202,9 @@ class CircleCallSession(Base, UUIDMixin, TimestampMixin):
     aria_intervention_count: Mapped[int] = mapped_column(Integer, default=0)
     aria_terminated_call: Mapped[bool] = mapped_column(Boolean, default=False)
     aria_termination_reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    # Consecutive real-time analysis failures (fail-safe: terminate if monitoring
+    # goes blind for too long instead of silently continuing unmonitored).
+    aria_failure_count: Mapped[int] = mapped_column(Integer, default=0)
 
     # ARIA threshold (stricter for child safety: 0.3 vs 0.5 for parent calls)
     aria_threshold: Mapped[float] = mapped_column(Float, default=0.3)

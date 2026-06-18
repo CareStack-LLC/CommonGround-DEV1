@@ -97,6 +97,13 @@ class KidComsSettings(Base, UUIDMixin, TimestampMixin):
     allow_child_to_initiate: Mapped[bool] = mapped_column(Boolean, default=True)
     record_sessions: Mapped[bool] = mapped_column(Boolean, default=False)
 
+    # ARIA call strictness for child My Circle calls:
+    #   "strict"   -> zero tolerance: profanity/hostility/bullying ends the call
+    #                 immediately (default).
+    #   "standard" -> 3-strike escalation (warn -> mute -> end) for non-severe
+    #                 categories.
+    aria_call_strictness: Mapped[str] = mapped_column(String(20), default="strict")
+
     # Relationships
     family_file = relationship("FamilyFile", back_populates="kidcoms_settings")
 
