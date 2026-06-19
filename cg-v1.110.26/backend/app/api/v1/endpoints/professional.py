@@ -1826,6 +1826,7 @@ async def list_cases(
             created_at=a.created_at,
             updated_at=a.updated_at,
             family_file_number=a.family_file.family_file_number if a.family_file else None,
+            family_file_title=a.family_file.title if a.family_file else None,
             firm_name=a.firm.name if a.firm else None,
         ))
 
@@ -1880,6 +1881,7 @@ async def get_case(
         created_at=assignment.created_at,
         updated_at=assignment.updated_at,
         family_file_number=assignment.family_file.family_file_number if assignment.family_file else None,
+        family_file_title=assignment.family_file.title if assignment.family_file else None,
         firm_name=assignment.firm.name if assignment.firm else None,
     )
 

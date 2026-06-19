@@ -62,6 +62,7 @@ interface CaseAssignment {
   status: string;
   assigned_at: string;
   family_file_number?: string;
+  family_file_title?: string;
   firm_name?: string;
   urgency?: "urgent" | "high" | "medium" | "low";
   aria_risk?: "high" | "medium" | "low";
@@ -162,6 +163,7 @@ export default function CasesListPage() {
     let result = cases.filter((c) => {
       const matchesSearch =
         !searchQuery ||
+        c.family_file_title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         c.family_file_number?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         c.firm_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         c.assignment_role.toLowerCase().includes(searchQuery.toLowerCase());
@@ -533,9 +535,15 @@ function CaseRow({
         </div>
         <div className="flex-1 min-w-0">
           <p className="serif font-bold text-slate-900 text-lg truncate leading-tight">
-            {caseItem.family_file_number || `File ${caseItem.family_file_id.slice(0, 8).toUpperCase()}`}
+            {caseItem.family_file_title || caseItem.family_file_number || `File ${caseItem.family_file_id.slice(0, 8).toUpperCase()}`}
           </p>
           <div className="flex items-center gap-2.5 mt-1 sans text-xs text-slate-600">
+            {caseItem.family_file_title && caseItem.family_file_number && (
+              <>
+                <span className="font-mono text-slate-500">{caseItem.family_file_number}</span>
+                <span className="text-slate-300">•</span>
+              </>
+            )}
             <span className="font-medium">{representingLabels[caseItem.representing] || caseItem.representing}</span>
             {caseItem.firm_name && (
               <>

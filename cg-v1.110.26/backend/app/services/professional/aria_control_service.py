@@ -276,7 +276,14 @@ class ARIAControlService:
             select(Message).where(
                 and_(
                     Message.id == message_id,
-                    Message.case_id == case_id,
+                    # Scope to this family file or its linked case (legacy
+                    # messages may carry only one). Both identifiers derive from
+                    # this family file, so an intervention can never resolve to
+                    # another client's message.
+                    or_(
+                        Message.family_file_id == family_file_id,
+                        Message.case_id == case_id,
+                    ),
                 )
             )
         )

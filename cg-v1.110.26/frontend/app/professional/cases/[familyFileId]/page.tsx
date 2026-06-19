@@ -51,6 +51,7 @@ interface CaseAssignment {
   status: string;
   assigned_at: string;
   family_file_number?: string;
+  family_file_title?: string;
   firm_name?: string;
 }
 
@@ -249,12 +250,14 @@ export default function CaseDetailPage() {
                 <div>
                   <div className="flex items-baseline gap-3 mb-2">
                     <span className="text-xs sans font-semibold text-[#1E3A4A]/60 tracking-widest uppercase">
-                      Case No.
+                      {caseData.family_file_number
+                        ? `Case No. ${caseData.family_file_number}`
+                        : "Case No."}
                     </span>
                     <div className="h-px w-8 bg-[#1E3A4A]/20"></div>
                   </div>
                   <h1 className="text-4xl lg:text-5xl serif font-bold text-slate-900 mb-3 leading-tight tracking-tight">
-                    {caseData.family_file_number || `${familyFileId.slice(0, 8).toUpperCase()}`}
+                    {caseData.family_file_title || caseData.family_file_number || `${familyFileId.slice(0, 8).toUpperCase()}`}
                   </h1>
                   <div className="flex flex-wrap items-center gap-3">
                     <Badge className="bg-[#1E3A4A] text-[#F4F8F7] hover:bg-[#1E3A4A] sans font-medium px-3 py-1 text-xs rounded-sm">
