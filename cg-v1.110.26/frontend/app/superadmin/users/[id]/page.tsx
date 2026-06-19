@@ -261,6 +261,48 @@ export default function UserDetailPage() {
                 {user.is_active ? 'Deactivate Account' : 'Activate Account'}
               </button>
             )}
+
+            {/* Admin lifecycle actions */}
+            <div className="mt-4 pt-4 border-t border-zinc-800/60">
+              <p className="text-xs font-semibold text-zinc-400 mb-2">Admin actions</p>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={async () => {
+                    if (!confirm('Reset MFA for this user? They will be able to sign in without their current authenticator.')) return;
+                    try { await adminAPI.resetUserMfa(userId); alert('MFA reset.'); fetchUser(); }
+                    catch (e) { alert(e instanceof Error ? e.message : 'Failed'); }
+                  }}
+                  className="px-3 py-1.5 rounded-lg text-xs bg-zinc-800/60 text-zinc-200 hover:bg-zinc-700 border border-zinc-700/60"
+                >Reset MFA</button>
+                <button
+                  onClick={async () => {
+                    if (!confirm('Send this user a password reset email?')) return;
+                    try { const r = await adminAPI.resetUserPassword(userId); alert(r.reset_email_sent ? 'Reset email sent.' : 'Could not send reset email.'); }
+                    catch (e) { alert(e instanceof Error ? e.message : 'Failed'); }
+                  }}
+                  className="px-3 py-1.5 rounded-lg text-xs bg-zinc-800/60 text-zinc-200 hover:bg-zinc-700 border border-zinc-700/60"
+                >Reset Password</button>
+                <button
+                  onClick={async () => {
+                    const tier = prompt('Grant subscription tier (e.g. web_starter, web_pro, professional):');
+                    if (!tier) return;
+                    try { await adminAPI.grantSubscription(userId, tier.trim(), 'active', 'admin grant'); alert('Tier granted.'); fetchUser(); }
+                    catch (e) { alert(e instanceof Error ? e.message : 'Failed'); }
+                  }}
+                  className="px-3 py-1.5 rounded-lg text-xs bg-zinc-800/60 text-zinc-200 hover:bg-zinc-700 border border-zinc-700/60"
+                >Grant Tier</button>
+                <button
+                  onClick={async () => {
+                    const reason = prompt('Reason for deleting this user (required, kept in the audit log):');
+                    if (!reason || reason.trim().length < 3) return;
+                    if (!confirm('Soft-delete this user? Their PII will be redacted and access revoked. This cannot be undone.')) return;
+                    try { await adminAPI.deleteUser(userId, reason.trim()); alert('User deleted.'); router.push('/superadmin/users'); }
+                    catch (e) { alert(e instanceof Error ? e.message : 'Failed'); }
+                  }}
+                  className="px-3 py-1.5 rounded-lg text-xs bg-red-500/15 text-red-400 hover:bg-red-500/25 border border-red-500/20"
+                >Delete User</button>
+              </div>
+            </div>
           </div>
         </div>
       )}

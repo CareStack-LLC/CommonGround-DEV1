@@ -710,6 +710,48 @@ export const adminAPI = {
       { method: 'PATCH' }
     ),
 
+  // ── Platform actions (child-safety, user lifecycle, grants, flags, comms) ──
+  getSafetyIncidents: (params: { days?: number; minSeverity?: string; category?: string; limit?: number } = {}) => {
+    const q = new URLSearchParams();
+    if (params.days) q.set('days', String(params.days));
+    if (params.minSeverity) q.set('min_severity', params.minSeverity);
+    if (params.category) q.set('category', params.category);
+    if (params.limit) q.set('limit', String(params.limit));
+    return adminFetch<SafetyIncidents>(`/admin/safety/incidents?${q.toString()}`);
+  },
+  resetUserMfa: (userId: string) =>
+    adminFetch<{ id: string; mfa_enabled: boolean }>(`/admin/users/${userId}/reset-mfa`, { method: 'POST' }),
+  resetUserPassword: (userId: string) =>
+    adminFetch<{ id: string; reset_email_sent: boolean }>(`/admin/users/${userId}/reset-password`, { method: 'POST' }),
+  deleteUser: (userId: string, reason: string) =>
+    adminFetch<{ id: string; is_deleted: boolean }>(
+      `/admin/users/${userId}?reason=${encodeURIComponent(reason)}`,
+      { method: 'DELETE' }
+    ),
+  reactivateUser: (userId: string) =>
+    adminFetch<{ id: string; is_active: boolean }>(`/admin/users/${userId}/reactivate`, { method: 'POST' }),
+  grantSubscription: (userId: string, tier: string, status?: string, note?: string) =>
+    adminFetch<{ id: string; subscription_tier: string; subscription_status: string }>(
+      `/admin/users/${userId}/subscription`,
+      { method: 'PATCH', body: JSON.stringify({ tier, status, note }) }
+    ),
+  notifyUser: (userId: string, title: string, body: string, url?: string) =>
+    adminFetch<{ id: string; push_sent: number }>(
+      `/admin/users/${userId}/notify`,
+      { method: 'POST', body: JSON.stringify({ title, body, url }) }
+    ),
+  listFeatureFlags: () => adminFetch<{ flags: FeatureFlag[] }>('/admin/feature-flags'),
+  setFeatureFlag: (key: string, value: boolean) =>
+    adminFetch<{ key: string; value: boolean }>(`/admin/feature-flags/${key}`, {
+      method: 'PUT',
+      body: JSON.stringify({ value }),
+    }),
+  listAnnouncements: () => adminFetch<{ announcements: Announcement[] }>('/admin/announcements'),
+  createAnnouncement: (body: AnnouncementInput) =>
+    adminFetch<Announcement>('/admin/announcements', { method: 'POST', body: JSON.stringify(body) }),
+  updateAnnouncement: (id: string, body: AnnouncementInput) =>
+    adminFetch<Announcement>(`/admin/announcements/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
+
   getBillingOverview: () => adminFetch<BillingOverview>('/admin/billing/overview'),
 
   getAuditLog: (params: { action?: string; admin_email?: string; limit?: number; offset?: number }) => {
@@ -1660,4 +1702,79 @@ export interface SystemStatusResponse {
   operational: number;
   degraded: number;
   down: number;
+}
+
+// ── Platform actions types ──────────────────────────────────────────────
+export interface SafetyMessageIncident {
+  id: string;
+  family_file_id: string;
+  child_id: string;
+  sender_name: string;
+  sender_type: string;
+  sender_id: string;
+  category: string | null;
+  reason: string | null;
+  score: number | null;
+  severity: string;
+  is_hidden: boolean;
+  occurred_at: string | null;
+}
+export interface SafetyCallIncident {
+  id: string;
+  family_file_id: string;
+  child_id: string;
+  circle_contact_id: string;
+  status: string;
+  aria_terminated: boolean;
+  termination_reason: string | null;
+  intervention_count: number;
+  overall_safety_score: number | null;
+  occurred_at: string | null;
+  has_recording: boolean;
+  flags: Array<{ severity: string; categories: string[]; triggers: string[]; intervention_type: string | null; flagged_at: string | null }>;
+}
+export interface SafetyRepeatContact {
+  circle_contact_id: string;
+  contact_name: string;
+  families_count: number;
+  incident_count: number;
+  terminated_count: number;
+}
+export interface SafetyIncidents {
+  window_days: number;
+  flagged_message_count: number;
+  flagged_call_count: number;
+  terminated_call_count: number;
+  repeat_contact_count: number;
+  message_incidents: SafetyMessageIncident[];
+  call_incidents: SafetyCallIncident[];
+  repeat_contacts: SafetyRepeatContact[];
+}
+export interface FeatureFlag {
+  key: string;
+  value: boolean;
+  default: boolean;
+  description: string;
+  is_set: boolean;
+}
+export interface Announcement {
+  id: string;
+  title: string;
+  body: string;
+  level: string;
+  audience: string;
+  is_active: boolean;
+  starts_at: string | null;
+  ends_at: string | null;
+  created_by_email: string | null;
+  created_at: string | null;
+}
+export interface AnnouncementInput {
+  title: string;
+  body: string;
+  level?: string;
+  audience?: string;
+  is_active?: boolean;
+  starts_at?: string | null;
+  ends_at?: string | null;
 }

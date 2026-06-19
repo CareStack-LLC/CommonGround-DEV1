@@ -27,6 +27,8 @@ import {
   DollarSign,
   BarChart3,
   Shield,
+  ShieldAlert,
+  SlidersHorizontal,
   BookOpen,
   MapPin,
 } from 'lucide-react';
@@ -50,6 +52,13 @@ export const navSections: NavSection[] = [
       { href: '/superadmin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
       { href: '/superadmin/users', label: 'Users & Activity', icon: Users },
       { href: '/superadmin/audit/impersonation', label: 'Impersonation Audit', icon: Shield },
+    ],
+  },
+  {
+    label: 'Trust & Safety',
+    items: [
+      { href: '/superadmin/safety', label: 'Child Safety', icon: ShieldAlert },
+      { href: '/superadmin/platform', label: 'Platform Controls', icon: SlidersHorizontal },
     ],
   },
   {
