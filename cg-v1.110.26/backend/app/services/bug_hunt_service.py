@@ -265,6 +265,17 @@ async def _seed_professional(
         consent_parent_a_at=datetime.utcnow(), consent_parent_b_at=datetime.utcnow(),
     ))
 
+    # KidSpace incidents — a flagged child message + a terminated call with a
+    # recording, so the professional's "circle" incidents view and the
+    # recording-request workflow have real data to exercise.
+    kidspace_seeded = False
+    try:
+        kidspace_seeded = await _seed_kidspace_incidents(
+            db, ff_id, ff.parent_a_id if ff else None, short_id
+        )
+    except Exception as e:
+        logger.warning("Bug hunt: KidSpace incident seeding failed: %s", e)
+
     frontend = (getattr(settings, "FRONTEND_URL", "") or "").rstrip("/")
     return {
         "email": pro_email,
@@ -279,8 +290,116 @@ async def _seed_professional(
             "agreement", "schedule", "checkins", "messages", "financials",
             "compliance", "interventions", "circle",
         ],
+        "kidspace_incidents_seeded": kidspace_seeded,
         "login_works": supabase_ok,
     }
+
+
+async def _seed_kidspace_incidents(
+    db: AsyncSession,
+    family_file_id: str,
+    added_by: Optional[str],
+    short_id: str,
+) -> bool:
+    """Seed KidSpace/circle safety data for a family: an approved circle contact,
+    a flagged child message, and a terminated call with flags + a recording.
+
+    Gives the professional's circle-incidents view and the recording-request
+    workflow something real to test. Returns True if seeded.
+    """
+    from app.models.child import Child
+    from app.models.circle import CircleContact
+    from app.models.circle_call import CircleCallRoom, CircleCallSession, CircleCallFlag
+    from app.models.circle_message import CircleMessage
+
+    child_id = (
+        await db.execute(
+            select(Child.id).where(Child.family_file_id == family_file_id).limit(1)
+        )
+    ).scalar_one_or_none()
+    if not child_id or not added_by:
+        return False
+
+    # Approved circle contact (the flagged party).
+    contact_id = str(uuid4())
+    db.add(CircleContact(
+        id=contact_id,
+        family_file_id=family_file_id,
+        contact_name="Uncle Rob (Bug Hunt)",
+        relationship_type="relative",
+        added_by=added_by,
+        is_active=True,
+        is_verified=True,
+    ))
+
+    # Flagged + hidden child message.
+    db.add(CircleMessage(
+        id=str(uuid4()),
+        family_file_id=family_file_id,
+        child_id=child_id,
+        sender_id=contact_id,
+        sender_type="circle_contact",
+        sender_name="Uncle Rob",
+        recipient_id=child_id,
+        recipient_type="child",
+        content="[hidden by ARIA]",
+        original_content="hey, don't tell your mom but let's meet up alone after school",
+        aria_analyzed=True,
+        aria_flagged=True,
+        aria_category="stranger_danger",
+        aria_reason="Solicitation to meet alone + secrecy from parent",
+        aria_score=0.94,
+        aria_intervention_level=4,
+        is_hidden=True,
+        sent_at=datetime.utcnow(),
+    ))
+
+    # Call room + a terminated call with a recording and safety flags.
+    room_id = str(uuid4())
+    db.add(CircleCallRoom(
+        id=room_id,
+        family_file_id=family_file_id,
+        child_id=child_id,
+        circle_contact_id=contact_id,
+        daily_room_name=f"bh-{short_id}-room",
+        daily_room_url=f"https://daily.co/bh-{short_id}-room",
+    ))
+    session_id = str(uuid4())
+    db.add(CircleCallSession(
+        id=session_id,
+        family_file_id=family_file_id,
+        room_id=room_id,
+        child_id=child_id,
+        circle_contact_id=contact_id,
+        call_type="video",
+        status="terminated",
+        initiated_by_id=contact_id,
+        initiated_by_type="circle_contact",
+        daily_room_name=f"bh-{short_id}-sess",
+        daily_room_url=f"https://daily.co/bh-{short_id}-sess",
+        aria_terminated_call=True,
+        aria_termination_reason="Grooming language detected — call ended for child safety.",
+        aria_intervention_count=2,
+        overall_safety_score=0.2,
+        recording_storage_path=f"circle-call-recordings/{family_file_id}/{session_id}/recording.webm",
+        recording_url=f"circle-call-recordings/{family_file_id}/{session_id}/recording.webm",
+        initiated_at=datetime.utcnow(),
+    ))
+    db.add(CircleCallFlag(
+        id=str(uuid4()),
+        session_id=session_id,
+        flag_type="real_time",
+        toxicity_score=0.92,
+        severity="severe",
+        categories=["grooming", "stranger_danger"],
+        triggers=["meet alone", "don't tell your mom"],
+        intervention_taken=True,
+        intervention_type="terminate",
+        intervention_message="This call was ended to keep you safe.",
+        offending_speaker_id=contact_id,
+        offending_speaker_type="circle_contact",
+    ))
+    return True
 
 
 async def generate_seed_families(

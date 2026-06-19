@@ -697,6 +697,9 @@ export default function BugHuntDetailPage() {
                 <p className="text-xs text-[#6B8A9A] mb-3">
                   {pro.name} (attorney) has the case for <span className="text-[#D0E4EC]">{pro.assigned_family}</span> assigned with full access.
                   Log in below and open the Professional portal to test it.
+                  {pro.kidspace_incidents_seeded && (
+                    <span className="text-[#3DAA8A]"> Includes seeded KidSpace incidents (a flagged child message + a terminated call with a recording) to test the Circle incidents view and recording requests.</span>
+                  )}
                   {pro.login_works === false && (
                     <span className="text-yellow-400"> ⚠ Supabase auth wasn&apos;t created for this account — login may not work.</span>
                   )}
