@@ -196,12 +196,27 @@ class ProfessionalProfileService:
 
         profile.license_number = license_number
         profile.license_state = license_state.upper()
+        # Consult the provider seam; the default ManualReviewProvider never
+        # auto-verifies, so the submission lands in the human review queue.
+        from app.services.professional.credential_verification import default_provider
+        result = await default_provider.lookup(license_number, profile.license_state)
+        now = datetime.utcnow()
+        if result.auto_verified:
+            profile.verification_status = "verified"
+            profile.license_verified = True
+            profile.license_verified_at = now
+            profile.license_verified_by = result.source
+        else:
+            profile.verification_status = "pending_review"
+        profile.verification_submitted_at = now
+        profile.verification_rejected_reason = None
         profile.credentials = {
             **(profile.credentials or {}),
-            "verification_submitted_at": datetime.utcnow().isoformat(),
+            "verification_submitted_at": now.isoformat(),
             "verification_data": verification_data,
+            "verification_source": result.source,
         }
-        profile.updated_at = datetime.utcnow()
+        profile.updated_at = now
 
         await self.db.commit()
         await self.db.refresh(profile)
@@ -214,14 +229,17 @@ class ProfessionalProfileService:
         verification_method: str = "manual",
     ) -> Optional[ProfessionalProfile]:
         """
-        Mark a license as verified (admin action or automated).
+        Mark a license as verified (admin/firm-owner review action).
         """
         profile = await self.get_profile(profile_id)
         if not profile:
             return None
 
+        profile.verification_status = "verified"
         profile.license_verified = True
         profile.license_verified_at = datetime.utcnow()
+        profile.license_verified_by = verified_by
+        profile.verification_rejected_reason = None
         profile.credentials = {
             **(profile.credentials or {}),
             "verified_by": verified_by,
@@ -232,6 +250,36 @@ class ProfessionalProfileService:
         await self.db.commit()
         await self.db.refresh(profile)
         return profile
+
+    async def reject_license(
+        self,
+        profile_id: str,
+        reason: str,
+        reviewed_by: Optional[str] = None,
+    ) -> Optional[ProfessionalProfile]:
+        """Reject a submitted license verification with a reason."""
+        profile = await self.get_profile(profile_id)
+        if not profile:
+            return None
+
+        profile.verification_status = "rejected"
+        profile.license_verified = False
+        profile.verification_rejected_reason = reason
+        profile.license_verified_by = reviewed_by
+        profile.updated_at = datetime.utcnow()
+
+        await self.db.commit()
+        await self.db.refresh(profile)
+        return profile
+
+    async def list_pending_verifications(self) -> list[ProfessionalProfile]:
+        """Review queue: profiles awaiting credential verification."""
+        result = await self.db.execute(
+            select(ProfessionalProfile)
+            .where(ProfessionalProfile.verification_status == "pending_review")
+            .order_by(ProfessionalProfile.verification_submitted_at.asc())
+        )
+        return list(result.scalars().all())
 
     # -------------------------------------------------------------------------
     # Profile Lookup

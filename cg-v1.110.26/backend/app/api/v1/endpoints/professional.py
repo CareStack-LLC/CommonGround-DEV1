@@ -150,14 +150,15 @@ async def _audit_report_action(
     report_id: str,
     case_id: str,
     user_id: str,
+    resource_type: str = "compliance_report",
 ) -> None:
-    """Court-evidence audit trail for report generate/download/verify actions."""
+    """Audit trail for sensitive professional actions (reports, credentials)."""
     from app.services.audit_service import log_audit_event, get_client_ip
     try:
         await log_audit_event(
             db,
             action=action,
-            resource_type="compliance_report",
+            resource_type=resource_type,
             resource_id=report_id,
             case_id=case_id,
             user_id=user_id,
@@ -208,6 +209,8 @@ def _profile_to_response(
         license_state=profile.license_state,
         license_verified=profile.license_verified,
         license_verified_at=profile.license_verified_at,
+        verification_status=getattr(profile, "verification_status", "unsubmitted"),
+        verification_rejected_reason=getattr(profile, "verification_rejected_reason", None),
         credentials=profile.credentials,
         practice_areas=profile.practice_areas,
         professional_email=profile.professional_email,
@@ -457,6 +460,81 @@ async def verify_license(
         license_state,
     )
     return _profile_to_response(updated, current_user)
+
+
+# --- Credential verification review (platform admin) -------------------------
+
+def _require_admin(current_user: User) -> None:
+    if not getattr(current_user, "is_admin", False):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Administrator access required.",
+        )
+
+
+@router.get("/admin/verifications", summary="List pending credential reviews (admin)")
+async def list_pending_verifications(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Review queue of professionals awaiting credential verification."""
+    _require_admin(current_user)
+    profiles = await ProfessionalProfileService(db).list_pending_verifications()
+    return [
+        {
+            "profile_id": p.id,
+            "user_id": p.user_id,
+            "professional_type": p.professional_type,
+            "license_number": p.license_number,
+            "license_state": p.license_state,
+            "verification_status": p.verification_status,
+            "submitted_at": p.verification_submitted_at.isoformat() if p.verification_submitted_at else None,
+        }
+        for p in profiles
+    ]
+
+
+@router.post("/admin/verifications/{profile_id}/approve", summary="Approve a credential (admin)")
+async def approve_verification(
+    profile_id: str,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Mark a professional's license as verified."""
+    _require_admin(current_user)
+    updated = await ProfessionalProfileService(db).verify_license(
+        profile_id, verified_by=str(current_user.id), verification_method="manual_review"
+    )
+    if not updated:
+        raise HTTPException(status_code=404, detail="Professional profile not found")
+    await _audit_report_action(db, request, "credential.verify.approve", profile_id, "", str(current_user.id), resource_type="professional_profile")
+    await db.commit()
+    return {"profile_id": updated.id, "verification_status": updated.verification_status}
+
+
+@router.post("/admin/verifications/{profile_id}/reject", summary="Reject a credential (admin)")
+async def reject_verification(
+    profile_id: str,
+    request: Request,
+    reason: str = Body(..., embed=True),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Reject a professional's license verification with a reason."""
+    _require_admin(current_user)
+    updated = await ProfessionalProfileService(db).reject_license(
+        profile_id, reason=reason, reviewed_by=str(current_user.id)
+    )
+    if not updated:
+        raise HTTPException(status_code=404, detail="Professional profile not found")
+    await _audit_report_action(db, request, "credential.verify.reject", profile_id, "", str(current_user.id), resource_type="professional_profile")
+    await db.commit()
+    return {
+        "profile_id": updated.id,
+        "verification_status": updated.verification_status,
+        "reason": updated.verification_rejected_reason,
+    }
 
 
 @router.get(

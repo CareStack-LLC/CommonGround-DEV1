@@ -93,6 +93,8 @@ class ProfessionalProfileResponse(ProfessionalProfileBase):
     user_id: str
     license_verified: bool = False
     license_verified_at: Optional[datetime] = None
+    verification_status: str = "unsubmitted"
+    verification_rejected_reason: Optional[str] = None
     default_intake_template: Optional[str] = None
     notification_preferences: Optional[dict] = None
     is_active: bool = True

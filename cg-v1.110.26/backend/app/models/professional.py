@@ -229,6 +229,11 @@ class ProfessionalProfile(Base, UUIDMixin, TimestampMixin):
     license_verified: Mapped[bool] = mapped_column(Boolean, default=False)
     license_verified_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     license_verified_by: Mapped[Optional[str]] = mapped_column(String(36), nullable=True)
+    # Reviewable verification workflow:
+    #   unsubmitted -> pending_review -> verified | rejected
+    verification_status: Mapped[str] = mapped_column(String(20), default="unsubmitted")
+    verification_submitted_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    verification_rejected_reason: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
 
     # Additional credentials (JSON for flexibility)
     credentials: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
