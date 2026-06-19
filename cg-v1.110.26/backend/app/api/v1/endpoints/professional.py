@@ -4429,11 +4429,24 @@ async def verify_report_public(
             "is_valid": False,
             "message": "No certified report found for this verification number.",
         }
+    # Cryptographically confirm WE signed this exact data hash with our key.
+    from app.services.signing_service import signing_service
+    from app.core.config import settings
+    signature_valid = bool(
+        report.signature_b64
+        and signing_service.verify(
+            report.sha256_hash.encode(), report.signature_b64, report.signature_key_id
+        )
+    )
     return {
         "verification_number": report.verification_number,
         "is_valid": True,
         "sha256_hash": report.sha256_hash,
         "hash_type": "deterministic data hash (reproducible from the report data)",
+        "signature_valid": signature_valid,
+        "signature_key_id": report.signature_key_id,
+        "signature_alg": "Ed25519",
+        "public_key_url": f"{settings.FRONTEND_URL.replace('www.', 'api.')}/api/v1/professional/signing-key",
         "chain_verified": report.chain_verified,
         "chain_hash": report.chain_hash,
         "report_type": report.report_type,
@@ -4442,6 +4455,20 @@ async def verify_report_public(
         "download_count": report.download_count,
         "verification_timestamp": datetime.utcnow().isoformat(),
         "message": "This verification number corresponds to a certified CommonGround report.",
+    }
+
+
+@router.get("/signing-key", summary="Public Ed25519 signing key (no auth)")
+async def get_signing_public_key():
+    """
+    PUBLIC: the Ed25519 public key (PEM) used to sign CommonGround reports and
+    agreement approvals, so a court can independently verify any signature.
+    """
+    from app.services.signing_service import signing_service
+    return {
+        "alg": "Ed25519",
+        "key_id": signing_service.key_id,
+        "public_key_pem": signing_service.public_key_pem(),
     }
 
 
@@ -4531,12 +4558,16 @@ async def download_report(
         filename = f"Compliance_Report_{report.family_file_id}.pdf"
 
     # Certify with the DETERMINISTIC data hash (reproducible from /data, unlike
-    # non-deterministic PDF bytes) + the EventLog chain result.
+    # non-deterministic PDF bytes) + the EventLog chain result + a cryptographic
+    # signature over the data hash (verifiable against our published public key).
     data_hash = service.compute_data_hash(data)
     chain_verified, chain_hash = await service.verify_event_chain(report)
+    from app.services.signing_service import signing_service
+    sig = signing_service.sign(data_hash.encode())
     await service.finalize_report(
         report_id, report.file_url, len(file_bytes), data_hash,
         chain_verified=chain_verified, chain_hash=chain_hash,
+        signature_b64=sig["signature"], signature_key_id=sig["key_id"],
     )
     await service.track_download(report_id)
     await db.commit()

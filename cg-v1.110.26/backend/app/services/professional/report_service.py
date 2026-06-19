@@ -159,6 +159,8 @@ class ComplianceReportService:
         sha256_hash: str,
         chain_verified: Optional[bool] = None,
         chain_hash: Optional[str] = None,
+        signature_b64: Optional[str] = None,
+        signature_key_id: Optional[str] = None,
     ) -> Optional[ComplianceReport]:
         """
         Mark a report completed and record the court-verification fields.
@@ -180,6 +182,9 @@ class ComplianceReportService:
         if chain_verified is not None:
             report.chain_verified = chain_verified
             report.chain_hash = chain_hash
+        if signature_b64 is not None:
+            report.signature_b64 = signature_b64
+            report.signature_key_id = signature_key_id
         report.certified_at = datetime.utcnow()
 
         await self.db.commit()

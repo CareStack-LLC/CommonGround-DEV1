@@ -853,6 +853,41 @@ class AgreementService:
                 # Change status to "approved" (not active yet - requires manual activation)
                 agreement.status = "approved"
 
+                # Cryptographically sign the dual-approval. The canonical payload
+                # binds the agreement content (rules_hash) to both parents'
+                # approval metadata; any later edit changes the hash and
+                # invalidates the signature (tamper-evidence + non-repudiation).
+                try:
+                    from app.services.signing_service import signing_service
+                    canonical = json.dumps(
+                        {
+                            "agreement_id": agreement.id,
+                            "version": agreement.version,
+                            "rules_hash": hashlib.sha256(
+                                json.dumps(agreement.rules or {}, sort_keys=True, default=str).encode()
+                            ).hexdigest(),
+                            "petitioner": {
+                                "approved_at": agreement.petitioner_approved_at.isoformat() if agreement.petitioner_approved_at else None,
+                                "ip": agreement.petitioner_approval_ip,
+                                "ua": agreement.petitioner_approval_user_agent,
+                            },
+                            "respondent": {
+                                "approved_at": agreement.respondent_approved_at.isoformat() if agreement.respondent_approved_at else None,
+                                "ip": agreement.respondent_approval_ip,
+                                "ua": agreement.respondent_approval_user_agent,
+                            },
+                        },
+                        sort_keys=True,
+                        default=str,
+                    )
+                    agreement.signed_payload_hash = hashlib.sha256(canonical.encode()).hexdigest()
+                    sig = signing_service.sign(canonical.encode())
+                    agreement.signature_b64 = sig["signature"]
+                    agreement.signature_key_id = sig["key_id"]
+                    agreement.signed_at = datetime.utcnow()
+                except Exception as e:
+                    logger.error(f"Failed to sign agreement {agreement.id} approval: {e}")
+
                 # Create version snapshot
                 version = AgreementVersion(
                     agreement_id=agreement.id,

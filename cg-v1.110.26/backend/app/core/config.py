@@ -37,6 +37,12 @@ class Settings(BaseSettings):
     # Frontend URL (used for generating invite links, etc.)
     FRONTEND_URL: str = "https://www.find-commonground.com"
 
+    # Ed25519 private key (PEM) for cryptographically signing agreements and
+    # court reports. Set in production secrets. If empty, the signing service
+    # generates an ephemeral key at startup (dev only — signatures won't verify
+    # across restarts).
+    SIGNING_PRIVATE_KEY_PEM: str = ""
+
     # CORS
     ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:3001,https://www.find-commonground.com,https://find-commonground.com,https://common-ground-blue.vercel.app,https://common-ground-git-main-teejays-projects-caad17d8.vercel.app"
     # Allow only CommonGround Vercel preview/branch URLs and production custom domain

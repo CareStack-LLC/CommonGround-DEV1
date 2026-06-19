@@ -128,6 +128,14 @@ class Agreement(Base, UUIDMixin, TimestampMixin):
     pdf_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     pdf_hash: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)  # SHA-256
 
+    # Cryptographic e-signature over the canonical dual-approval payload
+    # (Ed25519). signed_payload_hash is the SHA-256 of the canonical payload;
+    # any later edit changes it and invalidates the signature (tamper-evidence).
+    signed_payload_hash: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    signature_b64: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
+    signature_key_id: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    signed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
     # Relationships
     case: Mapped[Optional["Case"]] = relationship("Case", back_populates="agreements")
     family_file: Mapped[Optional["FamilyFile"]] = relationship(
