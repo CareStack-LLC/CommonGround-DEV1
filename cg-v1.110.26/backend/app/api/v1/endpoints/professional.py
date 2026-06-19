@@ -118,6 +118,9 @@ from app.schemas.professional import (
     ARIASettings,
     ARIAInterventionResponse,
     ARIAMetrics,
+    # KidSpace / recordings
+    RecordingRequestCreate,
+    RecordingRequestDeny,
     # Messaging
     ProfessionalMessageCreate,
     ProfessionalMessageResponse,
@@ -2213,13 +2216,15 @@ async def get_aria_settings(
     db: AsyncSession = Depends(get_db),
     profile: ProfessionalProfile = Depends(get_current_professional),
 ):
-    """Get ARIA settings for a case."""
-    # Verify ARIA control permission
+    """Get ARIA settings for a case (read-only for professionals)."""
+    # Any assigned professional may VIEW the ARIA configuration. Changing it is
+    # not permitted (see PATCH below) — ARIA, including child-safety monitoring,
+    # is controlled only by the parents and by court order.
     assignment_service = CaseAssignmentService(db)
-    if not await assignment_service.can_control_aria(profile.id, family_file_id):
+    if not await assignment_service.can_access_case(profile.id, family_file_id):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not authorized to control ARIA for this case.",
+            detail="Not authorized to access this case.",
         )
 
     aria_service = ARIAControlService(db)
@@ -2229,7 +2234,8 @@ async def get_aria_settings(
 @router.patch(
     "/cases/{family_file_id}/aria",
     response_model=ARIASettings,
-    summary="Update ARIA settings",
+    summary="Update ARIA settings (disabled — read-only for professionals)",
+    deprecated=True,
 )
 async def update_aria_settings(
     family_file_id: str,
@@ -2237,28 +2243,22 @@ async def update_aria_settings(
     db: AsyncSession = Depends(get_db),
     profile: ProfessionalProfile = Depends(get_current_professional),
 ):
-    """Update ARIA settings for a case."""
-    # Verify ARIA control permission
-    assignment_service = CaseAssignmentService(db)
-    if not await assignment_service.can_control_aria(profile.id, family_file_id):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not authorized to control ARIA for this case.",
-        )
+    """ARIA settings are read-only for professionals.
 
-    # Log action
-    await assignment_service.log_access(
-        professional_id=profile.id,
-        family_file_id=family_file_id,
-        action="control_aria",
-        details={"changes": data.model_dump(exclude_unset=True)},
-    )
-
-    aria_service = ARIAControlService(db)
-    return await aria_service.update_aria_settings(
-        family_file_id=family_file_id,
-        professional_id=profile.id,
-        data=data,
+    Professionals can view ARIA configuration and analytics but cannot change
+    it. ARIA governs both parent-message moderation AND KidSpace/Circle
+    child-safety monitoring from a single switch, so allowing a professional to
+    disable or weaken it would reduce protection for children and parents.
+    Control of ARIA rests with the parents and with court order only.
+    """
+    raise HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail=(
+            "ARIA settings are read-only for professionals. ARIA — including "
+            "child-safety monitoring — is controlled by the parents and by "
+            "court order. Please direct any requested changes to the family "
+            "or the court."
+        ),
     )
 
 
@@ -2381,6 +2381,138 @@ async def get_aria_metrics(
         professional_id=profile.id,
         days=days,
     )
+
+
+# =============================================================================
+# KIDSPACE (MY CIRCLE) — SAFETY INCIDENTS + RECORDING REQUESTS
+# =============================================================================
+
+@router.get(
+    "/cases/{family_file_id}/circle/incidents",
+    summary="Get KidSpace safety incidents",
+)
+async def get_circle_incidents(
+    family_file_id: str,
+    request: Request,
+    limit: int = Query(100, ge=1, le=500),
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """Flagged child messages and flagged/terminated calls for a case.
+
+    Requires the ``circle`` access scope. Does not expose recordings — only a
+    ``has_recording`` flag per call; use the recording-request workflow to view
+    a specific video.
+    """
+    assignment_service = CaseAssignmentService(db)
+    if not await assignment_service.has_scope(profile.id, family_file_id, "circle"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized to view KidSpace data for this case (requires 'circle' scope).",
+        )
+
+    from app.services.professional.circle_incidents_service import CircleIncidentsService
+    from app.services.audit_service import get_client_ip
+
+    await assignment_service.log_access(
+        professional_id=profile.id,
+        family_file_id=family_file_id,
+        action="view_circle_incidents",
+        resource_type="circle",
+        ip_address=get_client_ip(request),
+        user_agent=request.headers.get("user-agent"),
+    )
+
+    service = CircleIncidentsService(db)
+    return await service.get_incidents(family_file_id, limit=limit)
+
+
+@router.post(
+    "/cases/{family_file_id}/recording-requests",
+    summary="Request access to a KidSpace call recording",
+)
+async def create_recording_request(
+    family_file_id: str,
+    data: RecordingRequestCreate,
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """Request ONE specific Circle call recording. Requires both parents to
+    approve before a time-limited link is issued. Requires ``circle`` scope."""
+    assignment_service = CaseAssignmentService(db)
+    if not await assignment_service.has_scope(profile.id, family_file_id, "circle"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized to request recordings for this case (requires 'circle' scope).",
+        )
+
+    from app.services.professional.recording_request_service import RecordingRequestService
+
+    service = RecordingRequestService(db)
+    try:
+        req = await service.create_request(
+            professional_id=profile.id,
+            family_file_id=family_file_id,
+            session_id=data.session_id,
+            reason=data.reason,
+            requested_by_user_id=profile.user_id,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    return RecordingRequestService.serialize(req)
+
+
+@router.get(
+    "/recording-requests",
+    summary="List my recording-access requests",
+)
+async def list_recording_requests(
+    family_file_id: Optional[str] = Query(None),
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """List the current professional's recording-access requests."""
+    from app.services.professional.recording_request_service import RecordingRequestService
+
+    service = RecordingRequestService(db)
+    reqs = await service.list_for_professional(profile.id, family_file_id)
+    return [RecordingRequestService.serialize(r) for r in reqs]
+
+
+@router.get(
+    "/recording-requests/{request_id}",
+    summary="Get a recording request (with download link if approved)",
+)
+async def get_recording_request(
+    request_id: str,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """Return request status; if approved and within the access window, also a
+    time-limited signed download URL for the recording. Access is audit-logged."""
+    from app.services.professional.recording_request_service import RecordingRequestService
+    from app.services.audit_service import get_client_ip
+
+    service = RecordingRequestService(db)
+    try:
+        payload = await service.get_grant(profile.id, request_id)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+
+    if payload.get("download_url"):
+        assignment_service = CaseAssignmentService(db)
+        await assignment_service.log_access(
+            professional_id=profile.id,
+            family_file_id=payload["family_file_id"],
+            action="recording.access",
+            resource_type="circle_recording",
+            resource_id=payload["session_id"],
+            details={"request_id": request_id},
+            ip_address=get_client_ip(request),
+            user_agent=request.headers.get("user-agent"),
+        )
+    return payload
 
 
 # =============================================================================

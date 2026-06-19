@@ -728,6 +728,17 @@ class ARIASettingsUpdate(BaseModel):
     cool_down_minutes: Optional[int] = None
 
 
+class RecordingRequestCreate(BaseModel):
+    """Schema for a professional requesting access to one Circle call recording."""
+    session_id: str
+    reason: str
+
+
+class RecordingRequestDeny(BaseModel):
+    """Schema for a parent denying a recording-access request."""
+    reason: Optional[str] = None
+
+
 class ARIAMetrics(BaseModel):
     """Schema for ARIA good faith metrics."""
     parent_a: "ParentARIAMetrics"

@@ -16,6 +16,7 @@ import {
   Minus,
   MessageSquare,
   RefreshCw,
+  Lock,
   ChevronDown,
   ChevronUp,
   Info,
@@ -175,8 +176,6 @@ export default function ARIAControlPage() {
   const [analysis, setAnalysis] = useState<ARIAAnalysis | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [hasChanges, setHasChanges] = useState(false);
 
   useEffect(() => {
     fetchARIAData();
@@ -284,39 +283,6 @@ export default function ARIAControlPage() {
     }
   };
 
-  const updateSettings = (updates: Partial<ARIASettings>) => {
-    if (!settings) return;
-    setSettings({ ...settings, ...updates });
-    setHasChanges(true);
-  };
-
-  const saveSettings = async () => {
-    if (!token || !familyFileId || !settings) return;
-
-    setIsSaving(true);
-    try {
-      const response = await fetch(
-        `${API_BASE}/api/v1/professional/cases/${familyFileId}/aria`,
-        {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(settings),
-        }
-      );
-
-      if (response.ok) {
-        setHasChanges(false);
-      }
-    } catch (error) {
-      console.error("Error saving ARIA settings:", error);
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
   const getTrendIcon = (trend: string) => {
     if (trend === "improving") return <TrendingDown className="h-4 w-4 text-emerald-500" />;
     if (trend === "declining") return <TrendingUp className="h-4 w-4 text-red-500" />;
@@ -363,22 +329,13 @@ export default function ARIAControlPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          {hasChanges && (
-            <Badge variant="warning" className="mr-2">
-              Unsaved changes
-            </Badge>
-          )}
+          <Badge variant="outline" className="mr-2 gap-1">
+            <Lock className="h-3 w-3" />
+            Read-only
+          </Badge>
           <Button variant="outline" size="sm" onClick={fetchARIAData}>
             <RefreshCw className="h-4 w-4 mr-2" />
             Refresh
-          </Button>
-          <Button
-            size="sm"
-            onClick={saveSettings}
-            disabled={!hasChanges || isSaving}
-            className="bg-emerald-600 hover:bg-emerald-700"
-          >
-            {isSaving ? "Saving..." : "Save Changes"}
           </Button>
         </div>
       </div>
@@ -498,6 +455,18 @@ export default function ARIAControlPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
+                {/* Read-only notice: ARIA (incl. child-safety monitoring) is
+                    controlled only by the parents and by court order. */}
+                <div className="flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+                  <Lock className="h-4 w-4 mt-0.5 shrink-0" />
+                  <p>
+                    These settings are <span className="font-semibold">read-only</span> for
+                    professionals. ARIA — including child-safety monitoring — is controlled
+                    by the parents and by court order. To request a change, contact the
+                    family or the court.
+                  </p>
+                </div>
+
                 {/* Enable/Disable */}
                 <div className="flex items-center justify-between">
                   <div className="space-y-0.5">
@@ -511,7 +480,7 @@ export default function ARIAControlPage() {
                   <Switch
                     id="aria-enabled"
                     checked={settings.is_enabled}
-                    onCheckedChange={(checked) => updateSettings({ is_enabled: checked })}
+                    disabled
                   />
                 </div>
 
@@ -520,10 +489,7 @@ export default function ARIAControlPage() {
                     {/* Sensitivity Level */}
                     <div className="space-y-3">
                       <Label className="font-medium">Sensitivity Level</Label>
-                      <Select
-                        value={settings.sensitivity_level}
-                        onValueChange={(value) => updateSettings({ sensitivity_level: value })}
-                      >
+                      <Select value={settings.sensitivity_level} disabled>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
@@ -555,7 +521,7 @@ export default function ARIAControlPage() {
                       <Switch
                         id="auto-rewrite"
                         checked={settings.auto_rewrite}
-                        onCheckedChange={(checked) => updateSettings({ auto_rewrite: checked })}
+                        disabled
                       />
                     </div>
 
@@ -572,7 +538,7 @@ export default function ARIAControlPage() {
                       <Switch
                         id="notify-flag"
                         checked={settings.notify_on_flag}
-                        onCheckedChange={(checked) => updateSettings({ notify_on_flag: checked })}
+                        disabled
                       />
                     </div>
                   </>

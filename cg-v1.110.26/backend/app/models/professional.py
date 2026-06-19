@@ -723,6 +723,85 @@ class ProfessionalAccessRequest(Base, UUIDMixin, TimestampMixin):
         return self.status == AccessRequestStatus.PENDING.value and not self.is_expired
 
 
+class RecordingAccessRequest(Base, UUIDMixin, TimestampMixin):
+    """Professional request to view ONE specific KidSpace/Circle call recording.
+
+    Professionals never get blanket access to children's call recordings. They
+    may request a single recording with a stated reason; the parent(s) must
+    approve before a time-limited, audit-logged download link is issued. This
+    mirrors :class:`ProfessionalAccessRequest` but is scoped to one recording.
+    """
+
+    __tablename__ = "recording_access_requests"
+
+    # Case + the specific call recording being requested
+    family_file_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("family_files.id"), index=True
+    )
+    session_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("circle_call_sessions.id"), index=True
+    )
+
+    # Requesting professional
+    professional_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("professional_profiles.id"), index=True
+    )
+    requested_by_user_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("users.id"), index=True
+    )
+
+    # Why the professional needs this recording (required, for the parent's
+    # decision and the audit trail)
+    reason: Mapped[str] = mapped_column(Text)
+
+    # Status: pending, approved, denied, expired
+    status: Mapped[str] = mapped_column(String(20), default="pending", index=True)
+
+    # Parent approvals — BOTH parents on the file must approve (guardian consent)
+    parent_a_approved: Mapped[bool] = mapped_column(Boolean, default=False)
+    parent_b_approved: Mapped[bool] = mapped_column(Boolean, default=False)
+    parent_a_approved_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    parent_b_approved_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+    # Resolution
+    approved_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    declined_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    decline_reason: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    # The request itself expires if not actioned; once approved, granted access
+    # to the recording link is time-limited via access_expires_at.
+    expires_at: Mapped[datetime] = mapped_column(
+        DateTime, default=lambda: datetime.utcnow() + timedelta(days=14)
+    )
+    access_expires_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+
+    # Relationships
+    professional: Mapped["ProfessionalProfile"] = relationship(
+        "ProfessionalProfile", backref="recording_access_requests"
+    )
+    family_file: Mapped["FamilyFile"] = relationship("FamilyFile")
+
+    def __repr__(self) -> str:
+        return f"<RecordingAccessRequest {self.id[:8]} ({self.status})>"
+
+    @property
+    def is_expired(self) -> bool:
+        return datetime.utcnow() > self.expires_at
+
+    @property
+    def is_pending(self) -> bool:
+        return self.status == "pending" and not self.is_expired
+
+    @property
+    def access_active(self) -> bool:
+        """True if approved and the time-limited access window is still open."""
+        if self.status != "approved":
+            return False
+        if self.access_expires_at is None:
+            return False
+        return datetime.utcnow() <= self.access_expires_at
+
+
 class ProfessionalMessage(Base, UUIDMixin, TimestampMixin):
     """
     Secure messages between professionals and their clients.

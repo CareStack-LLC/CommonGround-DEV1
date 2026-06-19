@@ -6,7 +6,7 @@ housing parents, children, agreements (SharedCare and QuickAccord),
 and optionally a Court Custody Case.
 """
 
-from typing import List
+from typing import List, Optional
 from fastapi import APIRouter, Depends, Body, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -917,6 +917,76 @@ async def approve_professional_access_request(
         "case_assignment_id": request.case_assignment_id,
         "message": "Request approved" if request.status != "approved" else "Access granted - case assignment created"
     }
+
+
+# ---------------------------------------------------------------------------
+# KidSpace recording-access requests (parent side)
+# ---------------------------------------------------------------------------
+
+@router.get("/{family_file_id}/recording-requests")
+async def list_recording_requests_for_parent(
+    family_file_id: str,
+    status_filter: Optional[str] = "pending",
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """List recording-access requests on this case (parents only)."""
+    ff_service = FamilyFileService(db)
+    # Raises if current_user is not a participant on this family file.
+    await ff_service.get_family_file(family_file_id, current_user)
+
+    from app.services.professional.recording_request_service import RecordingRequestService
+
+    service = RecordingRequestService(db)
+    reqs = await service.list_for_parent(family_file_id, status=status_filter)
+    return [RecordingRequestService.serialize(r) for r in reqs]
+
+
+@router.post("/{family_file_id}/recording-requests/{request_id}/approve")
+async def approve_recording_request(
+    family_file_id: str,
+    request_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Approve a professional's request to view a specific KidSpace recording.
+
+    Both parents must approve before a time-limited link is issued.
+    """
+    ff_service = FamilyFileService(db)
+    await ff_service.get_family_file(family_file_id, current_user)
+
+    from app.services.professional.recording_request_service import RecordingRequestService
+
+    service = RecordingRequestService(db)
+    try:
+        req = await service.approve(request_id, current_user.id)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    return RecordingRequestService.serialize(req)
+
+
+@router.post("/{family_file_id}/recording-requests/{request_id}/deny")
+async def deny_recording_request(
+    family_file_id: str,
+    request_id: str,
+    payload: Optional[dict] = Body(default=None),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Deny a professional's request to view a KidSpace recording."""
+    ff_service = FamilyFileService(db)
+    await ff_service.get_family_file(family_file_id, current_user)
+
+    from app.services.professional.recording_request_service import RecordingRequestService
+
+    reason = (payload or {}).get("reason") if isinstance(payload, dict) else None
+    service = RecordingRequestService(db)
+    try:
+        req = await service.deny(request_id, current_user.id, reason=reason)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    return RecordingRequestService.serialize(req)
 
 
 @router.post("/{family_file_id}/professional-access-requests/{request_id}/decline")

@@ -88,14 +88,20 @@ class ARIAControlService:
         settings: dict,
     ) -> dict:
         """
-        Update ARIA settings for a case.
+        DISABLED: ARIA settings are read-only for professionals.
 
-        Only professionals with can_control_aria permission can modify.
+        ARIA governs both parent-message moderation and KidSpace/Circle
+        child-safety monitoring from one switch, so professionals are not
+        permitted to change it — control rests with the parents and with court
+        order. This method is retained only to fail loudly if any caller tries
+        to mutate ARIA via the professional path; the HTTP endpoint already
+        returns 403 before reaching here.
         """
-        assignment = await self._verify_aria_access(professional_id, family_file_id)
-
-        if not assignment.can_control_aria:
-            raise ValueError("Professional does not have permission to control ARIA for this case")
+        raise PermissionError(
+            "ARIA settings are read-only for professionals. ARIA, including "
+            "child-safety monitoring, is controlled by the parents and by "
+            "court order."
+        )
 
         # Get family file
         family_file = await self._get_family_file(family_file_id)
