@@ -516,7 +516,7 @@ Return ONLY the JSON object, no other text."""
         if self.anthropic:
             try:
                 response = self.anthropic.messages.create(
-                    model="claude-3-sonnet-20240229",
+                    model="claude-haiku-4-5-20251001",
                     max_tokens=1024,
                     system=system_prompt,
                     messages=messages + [{"role": "user", "content": user_message}]
@@ -552,7 +552,7 @@ Return ONLY the JSON object, no other text."""
                 formatted_messages.append({"role": msg["role"], "content": msg["content"]})
 
             response = self.openai.chat.completions.create(
-                model="gpt-4",
+                model="gpt-4o",
                 messages=formatted_messages,
                 max_tokens=1024
             )
@@ -574,7 +574,7 @@ Return ONLY the JSON object, no other text."""
         if self.anthropic:
             try:
                 response = self.anthropic.messages.create(
-                    model="claude-3-sonnet-20240229",
+                    model="claude-haiku-4-5-20251001",
                     max_tokens=1024,
                     system="You are a data extraction assistant. Extract structured data from conversations.",
                     messages=[
@@ -589,7 +589,7 @@ Return ONLY the JSON object, no other text."""
         if json_str is None and self.openai:
             try:
                 response = self.openai.chat.completions.create(
-                    model="gpt-4",
+                    model="gpt-4o",
                     messages=[
                         {"role": "system", "content": "You are a data extraction assistant. Return only valid JSON."},
                         {"role": "user", "content": f"Conversation:\n{json.dumps(messages)}\n\n{extraction_prompt}"}

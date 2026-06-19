@@ -3598,9 +3598,9 @@ For children, extract all children listed in the forms.
             "text": extraction_prompt
         })
 
-        # Call Claude
+        # Call Claude (vision-capable model for reading the scanned form)
         response = client.messages.create(
-            model="claude-3-5-sonnet-20240620",
+            model="claude-sonnet-4-6",
             max_tokens=4096,
             messages=[
                 {

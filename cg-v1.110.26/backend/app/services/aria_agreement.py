@@ -109,7 +109,7 @@ class AriaAgreementService:
                 messages = [messages[0]] + messages[-15:]
 
             response = self._openai_client.chat.completions.create(
-                model=model or "gpt-4-turbo",
+                model=model or "gpt-4o",
                 max_tokens=max_tokens,
                 messages=messages,
             )

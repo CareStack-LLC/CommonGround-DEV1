@@ -129,6 +129,36 @@ async def lifespan(app: FastAPI):
     logger.debug(f"CORS Origin Regex: {settings.CORS_ORIGIN_REGEX}")
     if settings.SENDGRID_API_KEY and not settings.EMAIL_ENABLED:
         logger.warning("SENDGRID_API_KEY is set but EMAIL_ENABLED is False — all emails will be silently suppressed")
+
+    # Loudly surface any production-critical secret that is unset, so a feature
+    # doesn't silently no-op (payments, recording+safety monitoring, signatures,
+    # notifications). Warn-only — we don't hard-fail the deploy.
+    if settings.is_production:
+        prod_checks = [
+            (bool(settings.SIGNING_PRIVATE_KEY_PEM), "SIGNING_PRIVATE_KEY_PEM",
+             "e-signatures use an EPHEMERAL key and won't verify across restarts"),
+            (bool(getattr(settings, "DAILY_API_KEY", None)), "DAILY_API_KEY",
+             "KidSpace call recording AND ARIA call safety-monitoring are DISABLED"),
+            (bool(getattr(settings, "DAILY_WEBHOOK_SECRET", None)), "DAILY_WEBHOOK_SECRET",
+             "Daily recording/transcription webhooks are rejected"),
+            (bool(getattr(settings, "STRIPE_SECRET_KEY", None)), "STRIPE_SECRET_KEY",
+             "payments are a no-op (no money moves)"),
+            (bool(getattr(settings, "STRIPE_WEBHOOK_SECRET", None)), "STRIPE_WEBHOOK_SECRET",
+             "Stripe webhooks can't be verified (subscription state goes stale)"),
+            (settings.EMAIL_ENABLED and bool(settings.SENDGRID_API_KEY), "EMAIL (EMAIL_ENABLED + SENDGRID_API_KEY)",
+             "transactional emails (resets, invites, reminders) are NOT delivered"),
+            (bool(getattr(settings, "VAPID_PRIVATE_KEY", None)) and bool(getattr(settings, "VAPID_PUBLIC_KEY", None)),
+             "VAPID_PUBLIC_KEY/VAPID_PRIVATE_KEY", "web push notifications silently no-op"),
+        ]
+        missing = [(name, impact) for ok, name, impact in prod_checks if not ok]
+        if missing:
+            logger.critical(
+                "PROD CONFIG: %d production secret(s) unset — affected features will "
+                "silently degrade:", len(missing)
+            )
+            for name, impact in missing:
+                logger.critical("  • %s missing → %s", name, impact)
+
     if settings.is_development:
         await init_db()  # Auto-create tables in dev
         logger.info("Database tables created")
