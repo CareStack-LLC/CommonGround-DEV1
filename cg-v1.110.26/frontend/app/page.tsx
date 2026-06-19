@@ -280,11 +280,75 @@ export default function HomePage() {
         </section>
 
         {/* ═══════════════════════════════════════════════════════════════
-            ARIA LIVE DEMO — moved high: most interactive, top-of-funnel hook
+            WHAT WE FIX — quick, captivating problem → solution explainer
         ═══════════════════════════════════════════════════════════════ */}
-        <section className="py-16 sm:py-24 bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F] text-white">
+        <section className="py-16 sm:py-24 bg-white">
           <div className="max-w-6xl mx-auto px-6">
-            <HomeARIADemo />
+            <div className="text-center mb-12 sm:mb-14">
+              <h2
+                className="text-3xl sm:text-5xl font-serif text-[#1E3A4A] mb-4"
+                style={{ fontFamily: 'var(--font-dm-serif-display), Georgia, serif' }}
+              >
+                Co-parenting is hard. <span className="text-[#3DAA8A]">CommonGround makes it calm.</span>
+              </h2>
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                The same four fights happen in almost every household. Here&rsquo;s how we quietly end each one.
+              </p>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-5 sm:gap-6 max-w-4xl mx-auto">
+              {[
+                {
+                  Icon: MessageCircle,
+                  color: '#E07A5F',
+                  problem: 'Every message turns into a fight.',
+                  solution:
+                    'ARIA rewrites the heat out of a text before it sends — so the conversation stays about your kids, not the past.',
+                },
+                {
+                  Icon: Calendar,
+                  color: '#3DAA8A',
+                  problem: '“Wait — who has them Friday?”',
+                  solution:
+                    'TimeBridge runs the schedule and custody exchanges on autopilot. One shared calendar, no more guessing.',
+                },
+                {
+                  Icon: DollarSign,
+                  color: '#2D6A8F',
+                  problem: 'Money becomes a standoff.',
+                  solution:
+                    'ClearFund splits shared costs by your agreement and tracks every receipt — no chasing, no arguing.',
+                },
+                {
+                  Icon: Video,
+                  color: '#C9802E',
+                  problem: 'Kids get stuck passing messages.',
+                  solution:
+                    'KidSpace lets your kids call and text you directly — safe, supervised, and entirely theirs.',
+                },
+              ].map(({ Icon, color, problem, solution }) => (
+                <div
+                  key={problem}
+                  className="flex gap-4 rounded-2xl border border-gray-100 bg-white p-5 sm:p-6 shadow-sm"
+                >
+                  <span
+                    className="grid h-11 w-11 shrink-0 place-items-center rounded-xl"
+                    style={{ backgroundColor: `${color}1a` }}
+                  >
+                    <Icon className="h-5 w-5" style={{ color }} strokeWidth={2.25} />
+                  </span>
+                  <div>
+                    <p className="font-serif text-lg text-[#1E3A4A] leading-snug">{problem}</p>
+                    <p className="mt-1.5 text-[15px] text-gray-600 leading-relaxed">{solution}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <p className="mt-10 text-center text-base sm:text-lg text-gray-700 max-w-2xl mx-auto">
+              And every message, handoff, and payment is logged automatically —{' '}
+              <span className="font-semibold text-[#1E3A4A]">court-ready the day you ever need it.</span>
+            </p>
           </div>
         </section>
 
@@ -435,6 +499,15 @@ export default function HomePage() {
                 <p className="text-sm font-medium text-[var(--portal-primary)]">Silent Handoff &mdash; GPS-verified exchanges</p>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════════════
+            ARIA LIVE DEMO — interactive closer, right before pricing
+        ═══════════════════════════════════════════════════════════════ */}
+        <section className="py-16 sm:py-24 bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F] text-white">
+          <div className="max-w-6xl mx-auto px-6">
+            <HomeARIADemo />
           </div>
         </section>
 
