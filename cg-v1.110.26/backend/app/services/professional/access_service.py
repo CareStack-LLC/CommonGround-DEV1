@@ -580,6 +580,14 @@ class ProfessionalAccessService:
             request.parent_a_approved and request.parent_b_approved
         )
 
+        # Gate: a consent-required (GAL/court) assignment cannot be created until
+        # BOTH parents have approved — enforced here, not only at report time.
+        if needs_dual_consent and not has_dual_consent:
+            raise ValueError(
+                "This assignment requires consent from both parents before it "
+                "can be created. Both parents must approve the access request."
+            )
+
         # Create new assignment with inherited settings
         assignment = CaseAssignment(
             id=str(uuid4()),
@@ -726,12 +734,31 @@ class ProfessionalAccessService:
         )
         return result.scalar_one_or_none()
 
+    async def expire_stale_requests(self) -> int:
+        """
+        Bulk-expire pending access requests past their expires_at. Idempotent;
+        invoked lazily before listing so stale invitations don't linger as
+        actionable. Returns the number expired.
+        """
+        from sqlalchemy import update as sa_update
+        result = await self.db.execute(
+            sa_update(ProfessionalAccessRequest)
+            .where(
+                ProfessionalAccessRequest.status == AccessRequestStatus.PENDING.value,
+                ProfessionalAccessRequest.expires_at < datetime.utcnow(),
+            )
+            .values(status=AccessRequestStatus.EXPIRED.value)
+        )
+        await self.db.commit()
+        return result.rowcount or 0
+
     async def list_requests_for_professional(
         self,
         professional_id: str,
         status: Optional[AccessRequestStatus] = None,
     ) -> list[ProfessionalAccessRequest]:
         """List access requests for a professional."""
+        await self.expire_stale_requests()
         query = (
             select(ProfessionalAccessRequest)
             .options(selectinload(ProfessionalAccessRequest.family_file))
@@ -751,6 +778,7 @@ class ProfessionalAccessService:
         status: Optional[AccessRequestStatus] = None,
     ) -> list[ProfessionalAccessRequest]:
         """List access requests for a family file."""
+        await self.expire_stale_requests()
         query = (
             select(ProfessionalAccessRequest)
             .options(

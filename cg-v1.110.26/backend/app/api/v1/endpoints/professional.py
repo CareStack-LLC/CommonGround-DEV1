@@ -797,6 +797,11 @@ async def invite_firm_member(
             detail="You don't have permission to invite members to this firm.",
         )
 
+    # Enforce the subscription tier's team-size limit (raises 403 with an
+    # upgrade prompt when the firm is at capacity).
+    member_count = await service.get_firm_member_count(firm_id)
+    await enforce_team_limit(profile, member_count)
+
     try:
         membership = await service.invite_member(firm_id, current_user.id, data)
     except ValueError as e:

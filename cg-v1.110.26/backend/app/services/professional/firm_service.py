@@ -596,6 +596,25 @@ class FirmService:
 
         membership.status = MembershipStatus.REMOVED.value
         membership.updated_at = datetime.utcnow()
+
+        # Revoke this member's active case access in the firm — a removed member
+        # must immediately lose access to family cases.
+        from app.models.professional import CaseAssignment, AssignmentStatus
+        assignments = (
+            await self.db.execute(
+                select(CaseAssignment).where(
+                    CaseAssignment.professional_id == membership.professional_id,
+                    CaseAssignment.firm_id == membership.firm_id,
+                    CaseAssignment.status == AssignmentStatus.ACTIVE.value,
+                )
+            )
+        ).scalars().all()
+        for assignment in assignments:
+            assignment.status = AssignmentStatus.WITHDRAWN.value
+            assignment.internal_notes = (
+                f"{assignment.internal_notes or ''}\nWithdrawn: firm membership removed"
+            ).strip()
+
         await self.db.commit()
         await self.db.refresh(membership)
         return membership
