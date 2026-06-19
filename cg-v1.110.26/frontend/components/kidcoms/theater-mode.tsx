@@ -82,10 +82,22 @@ export function TheaterMode({
     currentTime: 0,
   });
   const [presenterDisconnected, setPresenterDisconnected] = useState(false);
+  // The presenter is whoever started the current content. Only the presenter
+  // broadcasts the periodic clock, so the two players never drift-fight by
+  // echoing each other's timestamps.
+  const [isPresenter, setIsPresenter] = useState(false);
 
-  const lastActionRef = useRef<string>('');
-  const syncIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const presenterIdRef = useRef<string | null>(null);
+  // Live mirrors so the periodic-sync interval and sync replies can read the
+  // latest state without being torn down on every timeupdate.
+  const theaterStateRef = useRef(theaterState);
+  useEffect(() => {
+    theaterStateRef.current = theaterState;
+  }, [theaterState]);
+  const contentRef = useRef(content);
+  useEffect(() => {
+    contentRef.current = content;
+  }, [content]);
 
   // Server-side audit trail (Wave 2 B5). Non-blocking — localStorage and
   // peer-to-peer sync remain the source of truth for live playback; the
@@ -150,11 +162,13 @@ export function TheaterMode({
           });
           // Remember the presenter so we can detect when they drop (B6).
           presenterIdRef.current = message.data.senderId;
+          setIsPresenter(false); // content came from the peer — we follow
           setPresenterDisconnected(false);
           break;
 
         case 'stop':
           setContent(null);
+          setIsPresenter(false);
           setTheaterState({ isPlaying: false, currentTime: 0 });
           break;
 
@@ -191,25 +205,28 @@ export function TheaterMode({
           }));
           break;
 
-        case 'sync_request':
-          if (content && callRef.current) {
-            console.log('Theater: Responding to sync_request with current content');
+        case 'sync_request': {
+          // Only the presenter answers, with the latest snapshot from refs.
+          const c = contentRef.current;
+          const st = theaterStateRef.current;
+          if (c && callRef.current) {
             const syncMessage = createTheaterMessage(
               'start',
-              content.type,
-              content.url,
+              c.type,
+              c.url,
               userId,
               {
-                contentTitle: content.title,
-                currentTime: theaterState.currentTime,
-                currentPage: theaterState.currentPage,
-                isPlaying: theaterState.isPlaying,
+                contentTitle: c.title,
+                currentTime: st.currentTime,
+                currentPage: st.currentPage,
+                isPlaying: st.isPlaying,
                 senderName: userName,
               }
             );
             callRef.current.sendAppMessage(syncMessage, '*');
           }
           break;
+        }
       }
     };
 
@@ -238,64 +255,63 @@ export function TheaterMode({
     };
   }, [callRef, userId, content, reportTheaterEvent]);
 
-  // Request sync when entering theater mode
+  // Request current state on entry, retrying until content arrives. This fixes
+  // the "joined late / first request dropped" case where a follower would never
+  // catch up with a single 500ms one-shot request.
   useEffect(() => {
-    if (isActive && callRef.current) {
-      setTimeout(() => {
-        const syncRequest = createTheaterMessage(
-          'sync_request',
-          'video',
-          '',
-          userId,
-          { senderName: userName }
-        );
-        callRef.current?.sendAppMessage(syncRequest, '*');
-      }, 500);
-    }
-  }, [isActive, userId, userName, callRef]);
-
-  // Broadcast current state
-  const broadcastState = useCallback((action: TheaterSyncMessage['data']['action']) => {
-    const call = callRef.current;
-    if (!call || !content) return;
-
-    const message = createTheaterMessage(
-      action,
-      content.type,
-      content.url,
-      userId,
-      {
-        contentTitle: content.title,
-        currentTime: theaterState.currentTime,
-        currentPage: theaterState.currentPage,
-        isPlaying: theaterState.isPlaying,
-        senderName: userName,
+    if (!isActive || content) return;
+    const send = () =>
+      callRef.current?.sendAppMessage(
+        createTheaterMessage('sync_request', 'video', '', userId, { senderName: userName }),
+        '*',
+      );
+    const first = setTimeout(send, 400);
+    let tries = 0;
+    const id = setInterval(() => {
+      tries += 1;
+      if (contentRef.current || tries > 5) {
+        clearInterval(id);
+        return;
       }
-    );
-
-    call.sendAppMessage(message, '*');
-  }, [callRef, content, userId, userName, theaterState]);
-
-  // Periodic sync while playing (every 2 seconds for smoother sync)
-  useEffect(() => {
-    if (content && theaterState.isPlaying) {
-      syncIntervalRef.current = setInterval(() => {
-        broadcastState('seek');
-      }, 2000);
-    }
-
+      send();
+    }, 1200);
     return () => {
-      if (syncIntervalRef.current) {
-        clearInterval(syncIntervalRef.current);
-      }
+      clearTimeout(first);
+      clearInterval(id);
     };
-  }, [content, theaterState.isPlaying, broadcastState]);
+  }, [isActive, content, userId, userName, callRef]);
+
+  // Periodic clock sync — ONLY the presenter broadcasts, so the two players
+  // can't drift-fight by echoing each other's times. Reads from refs with a
+  // stable interval (not recreated on every timeupdate, which is the bug that
+  // previously kept the 2s interval from ever firing).
+  useEffect(() => {
+    if (!isPresenter || !content || !theaterState.isPlaying) return;
+    const id = setInterval(() => {
+      const call = callRef.current;
+      const c = contentRef.current;
+      const st = theaterStateRef.current;
+      if (!call || !c) return;
+      call.sendAppMessage(
+        createTheaterMessage('seek', c.type, c.url, userId, {
+          contentTitle: c.title,
+          currentTime: st.currentTime,
+          currentPage: st.currentPage,
+          isPlaying: st.isPlaying,
+          senderName: userName,
+        }),
+        '*',
+      );
+    }, 2000);
+    return () => clearInterval(id);
+  }, [isPresenter, content, theaterState.isPlaying, callRef, userId, userName]);
 
   const handleContentSelect = (selected: { type: ContentType; url: string; title: string }) => {
     setContent(selected);
     setShowLibrary(false);
     setTheaterState({ isPlaying: false, currentTime: 0, currentPage: 1 });
     presenterIdRef.current = userId; // we are now the presenter
+    setIsPresenter(true);
     setPresenterDisconnected(false);
 
     if (callRef.current) {
@@ -413,6 +429,7 @@ export function TheaterMode({
     }
     reportTheaterEvent('stop');
     presenterIdRef.current = null;
+    setIsPresenter(false);
     setPresenterDisconnected(false);
     setContent(null);
     setTheaterState({ isPlaying: false, currentTime: 0 });
