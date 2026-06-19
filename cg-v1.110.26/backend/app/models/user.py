@@ -144,6 +144,13 @@ class UserProfile(Base, UUIDMixin, TimestampMixin):
     terms_accepted_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
     terms_version: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
     privacy_policy_accepted_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    # Consent for assigned legal professionals to view this parent's messages.
+    # Captured as part of accepting the platform Terms of Service (see auth
+    # registration + POST /users/accept-terms). Gates professional access to
+    # the co-parent communication thread.
+    professional_message_consent_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime, nullable=True
+    )
 
     # Privacy Settings
     privacy_read_receipts: Mapped[bool] = mapped_column(Boolean, default=True)

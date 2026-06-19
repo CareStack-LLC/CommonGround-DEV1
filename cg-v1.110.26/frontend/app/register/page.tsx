@@ -460,6 +460,8 @@ function RegisterContent() {
                     <Link href="/legal/privacy" className="text-cg-sage hover:underline">
                       Privacy Policy
                     </Link>
+                    , including that legal professionals you authorize on a case
+                    may view your communications for that case.
                   </p>
 
                   {/* Submit Button */}

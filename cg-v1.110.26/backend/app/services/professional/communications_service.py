@@ -21,7 +21,7 @@ from app.models.professional import (
 )
 from app.models.family_file import FamilyFile
 from app.models.message import Message, MessageThread, MessageFlag
-from app.models.user import User
+from app.models.user import User, UserProfile
 from app.core.config import settings
 from app.services.storage import StorageBucket
 from supabase import create_client, Client
@@ -415,7 +415,47 @@ class CommunicationsService:
         if "messages" not in (assignment.access_scopes or []):
             raise ValueError("Professional does not have access to view messages")
 
+        # Consent gate: both parents must have consented (as part of accepting
+        # the platform Terms) to assigned professionals viewing their messages.
+        await self._require_parent_message_consent(family_file_id)
+
         return assignment
+
+    async def _require_parent_message_consent(self, family_file_id: str) -> None:
+        """Raise unless both parents on the case have consented to professional
+        message viewing.
+
+        Consent is captured when a parent accepts the platform Terms of Service.
+        We treat an explicit ``professional_message_consent_at`` OR a recorded
+        ``terms_accepted_at`` (which now includes this consent) as valid, so
+        existing accounts that accepted terms are not retroactively blocked.
+        """
+        family_file = await self._get_family_file(family_file_id)
+        if not family_file:
+            raise ValueError("Family file not found")
+
+        parent_ids = [
+            pid for pid in (family_file.parent_a_id, family_file.parent_b_id) if pid
+        ]
+        if not parent_ids:
+            return
+
+        result = await self.db.execute(
+            select(UserProfile).where(UserProfile.user_id.in_(parent_ids))
+        )
+        profiles = {p.user_id: p for p in result.scalars().all()}
+
+        for pid in parent_ids:
+            profile = profiles.get(pid)
+            consented = profile is not None and (
+                profile.professional_message_consent_at is not None
+                or profile.terms_accepted_at is not None
+            )
+            if not consented:
+                raise ValueError(
+                    "Cannot view messages: a parent on this case has not yet "
+                    "consented to professional access to their communications."
+                )
 
     async def _get_family_file(self, family_file_id: str) -> Optional[FamilyFile]:
         result = await self.db.execute(

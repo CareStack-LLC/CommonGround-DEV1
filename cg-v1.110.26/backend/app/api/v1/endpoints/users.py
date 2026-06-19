@@ -539,6 +539,9 @@ async def accept_terms(
     user.profile.terms_accepted_at = now
     user.profile.terms_version = request.terms_version
     user.profile.privacy_policy_accepted_at = now
+    # Accepting the platform Terms includes consent for assigned legal
+    # professionals to view this parent's messages.
+    user.profile.professional_message_consent_at = now
 
     await db.commit()
 

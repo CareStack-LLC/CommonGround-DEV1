@@ -127,6 +127,9 @@ class AuthService:
                 terms_accepted_at=datetime.utcnow(),
                 terms_version="1.0",
                 privacy_policy_accepted_at=datetime.utcnow(),
+                # Accepting the platform Terms includes consent for assigned
+                # legal professionals to view this parent's messages.
+                professional_message_consent_at=datetime.utcnow(),
             )
             self.db.add(profile)
             logger.info(f"Local database records prepared for {user.id}")
