@@ -31,6 +31,8 @@ import {
   DollarSign,
   CalendarDays,
   Gavel,
+  CheckSquare,
+  Square,
 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
@@ -90,6 +92,15 @@ export default function AccessRequestsPage() {
   const [showDeclineDialog, setShowDeclineDialog] = useState(false);
   const [declineReason, setDeclineReason] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
 
   useEffect(() => {
     if (token) {
@@ -142,6 +153,53 @@ export default function AccessRequestsPage() {
       });
     } finally {
       setIsProcessing(false);
+    }
+  };
+
+  const handleBulkAccept = async (ids: string[]) => {
+    if (ids.length === 0) return;
+    setIsProcessing(true);
+    let accepted = 0;
+    const failures: string[] = [];
+    // Accept sequentially so per-case checks (tier case-limit, consent) run
+    // independently and one failure never blocks the rest.
+    for (const id of ids) {
+      try {
+        const res = await fetch(
+          `${API_BASE}/api/v1/professional/access-requests/${id}/accept`,
+          { method: "POST", headers: { Authorization: `Bearer ${token}` } }
+        );
+        if (res.ok) {
+          accepted++;
+        } else {
+          const e = await res.json().catch(() => ({}));
+          const msg =
+            typeof e.detail === "string"
+              ? e.detail
+              : e.detail?.message || "Failed to accept";
+          failures.push(msg);
+        }
+      } catch {
+        failures.push("Network error");
+      }
+    }
+    setSelectedIds(new Set());
+    await fetchRequests();
+    setIsProcessing(false);
+
+    if (failures.length === 0) {
+      toast({
+        title: `Accepted ${accepted} invitation${accepted !== 1 ? "s" : ""}`,
+        description: "You now have access to these cases.",
+      });
+    } else {
+      // Surface distinct reasons (e.g. case-limit) rather than a silent partial.
+      const uniqueReasons = Array.from(new Set(failures)).slice(0, 2).join("; ");
+      toast({
+        title: `Accepted ${accepted}, ${failures.length} could not be accepted`,
+        description: uniqueReasons,
+        variant: accepted > 0 ? "default" : "destructive",
+      });
     }
   };
 
@@ -255,6 +313,37 @@ export default function AccessRequestsPage() {
           )}
         </h2>
 
+        {/* Bulk actions — accept several clients at once */}
+        {pendingRequests.length > 1 && (
+          <div className="flex flex-wrap items-center gap-3 mb-4">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={isProcessing}
+              onClick={() =>
+                setSelectedIds(
+                  selectedIds.size === pendingRequests.length
+                    ? new Set()
+                    : new Set(pendingRequests.map((r) => r.id))
+                )
+              }
+            >
+              {selectedIds.size === pendingRequests.length ? "Clear selection" : "Select all"}
+            </Button>
+            <Button
+              size="sm"
+              disabled={isProcessing || selectedIds.size === 0}
+              onClick={() => handleBulkAccept(Array.from(selectedIds))}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              <Check className="h-4 w-4 mr-2" />
+              {isProcessing
+                ? "Accepting…"
+                : `Accept selected${selectedIds.size ? ` (${selectedIds.size})` : ""}`}
+            </Button>
+          </div>
+        )}
+
         {pendingRequests.length === 0 ? (
           <Card className="border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/20 to-white shadow-sm relative">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A4A] via-[#3DAA8A] to-[#1E3A4A]"></div>
@@ -280,6 +369,18 @@ export default function AccessRequestsPage() {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
+                        <button
+                          type="button"
+                          onClick={() => toggleSelect(request.id)}
+                          className="shrink-0"
+                          aria-label={selectedIds.has(request.id) ? "Deselect" : "Select"}
+                        >
+                          {selectedIds.has(request.id) ? (
+                            <CheckSquare className="h-5 w-5 text-[#1E3A4A]" strokeWidth={2} />
+                          ) : (
+                            <Square className="h-5 w-5 text-slate-300 hover:text-[#1E3A4A]" strokeWidth={2} />
+                          )}
+                        </button>
                         <h3 className="serif font-bold text-lg text-slate-900">
                           {request.family_name || "Family Case"}
                         </h3>
