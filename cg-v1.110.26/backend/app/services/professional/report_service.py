@@ -12,11 +12,14 @@ Phase 1 enhancements:
 """
 
 import hashlib
+import logging
 from datetime import datetime
 from typing import Optional
 
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
+
+logger = logging.getLogger(__name__)
 
 from app.models.professional import ComplianceReport, ReportExportFormat
 from app.schemas.professional import ComplianceReportCreate
@@ -53,6 +56,9 @@ class ComplianceReportService:
             date_range_end=data.date_range_end,
             parameters=data.parameters or {},
             status="pending",
+            # Public court-verification number, assigned up front so it can be
+            # printed on the PDF itself.
+            verification_number=self._generate_verification_number(),
             # Phase 1 fields
             title=title,
             export_format=export_format,
@@ -101,6 +107,17 @@ class ComplianceReportService:
         )
         return result.scalar_one_or_none()
 
+    async def get_report_by_verification_number(
+        self, verification_number: str
+    ) -> Optional[ComplianceReport]:
+        """Public lookup of a report by its court-verification number."""
+        result = await self.db.execute(
+            select(ComplianceReport).where(
+                ComplianceReport.verification_number == verification_number
+            )
+        )
+        return result.scalar_one_or_none()
+
     async def track_download(self, report_id: str) -> Optional[ComplianceReport]:
         """
         Increment download count and update last_downloaded_at timestamp.
@@ -116,17 +133,39 @@ class ComplianceReportService:
         await self.db.flush()
         return report
 
+    @staticmethod
+    def _generate_verification_number() -> str:
+        """Public, court-lookup-able verification number, e.g. CG-RPT-AB12CD34EF."""
+        import uuid
+        return f"CG-RPT-{uuid.uuid4().hex[:10].upper()}"
+
+    @staticmethod
+    def compute_data_hash(report_data: dict) -> str:
+        """
+        Deterministic SHA-256 over the canonical report data. Unlike a PDF-bytes
+        hash (reportlab embeds timestamps, so it is non-reproducible), this hash
+        is reproducible from GET /reports/{id}/data, so a court can independently
+        recompute and verify it.
+        """
+        import json
+        canonical = json.dumps(report_data, sort_keys=True, default=str)
+        return hashlib.sha256(canonical.encode()).hexdigest()
+
     async def finalize_report(
         self,
         report_id: str,
-        file_url: str,
+        file_url: Optional[str],
         file_size_bytes: int,
+        sha256_hash: str,
+        chain_verified: Optional[bool] = None,
+        chain_hash: Optional[str] = None,
     ) -> Optional[ComplianceReport]:
         """
-        Mark a report as completed after generation.
+        Mark a report completed and record the court-verification fields.
 
-        Computes SHA-256 hash from file URL for tamper-proof verification.
-        In production, hash would be computed from actual file bytes.
+        `sha256_hash` MUST be the SHA-256 of the ACTUAL generated file bytes
+        (from generate_pdf_bytes / generate_excel_bytes) so that the public
+        verification endpoint matches the exact document the court received.
         """
         report = await self.get_report(report_id)
         if not report:
@@ -135,15 +174,51 @@ class ComplianceReportService:
         report.file_url = file_url
         report.file_size_bytes = file_size_bytes
         report.status = "completed"
-
-        # Compute SHA-256 hash for verification
-        # In production: hash actual file bytes from storage
-        hash_input = f"{report.id}:{file_url}:{file_size_bytes}:{report.created_at}"
-        report.sha256_hash = hashlib.sha256(hash_input.encode()).hexdigest()
+        report.sha256_hash = sha256_hash
+        if not report.verification_number:
+            report.verification_number = self._generate_verification_number()
+        if chain_verified is not None:
+            report.chain_verified = chain_verified
+            report.chain_hash = chain_hash
+        report.certified_at = datetime.utcnow()
 
         await self.db.commit()
         await self.db.refresh(report)
         return report
+
+    async def verify_event_chain(
+        self, report: ComplianceReport
+    ) -> tuple[Optional[bool], Optional[str]]:
+        """
+        Validate the EventLog hash-chain for this case + date range, returning
+        (is_valid, chain_hash). Mirrors ChainOfCustodyGenerator's linear
+        previous_hash->content_hash check, inlined to avoid importing the heavy
+        export package on this hot path. Best-effort: (None, None) if no events.
+        """
+        try:
+            from app.models.audit import EventLog
+
+            query = select(EventLog).where(EventLog.case_id == report.family_file_id)
+            if report.date_range_start:
+                query = query.where(EventLog.created_at >= report.date_range_start)
+            if report.date_range_end:
+                query = query.where(EventLog.created_at <= report.date_range_end)
+            query = query.order_by(EventLog.created_at)
+            events = list((await self.db.execute(query)).scalars().all())
+            if not events:
+                return None, None
+
+            is_valid = True
+            for i in range(1, len(events)):
+                if events[i].previous_hash != events[i - 1].content_hash:
+                    is_valid = False
+                    break
+            combined = "".join(e.content_hash or "" for e in events)
+            chain_hash = hashlib.sha256(combined.encode()).hexdigest()
+            return is_valid, chain_hash
+        except Exception as e:
+            logger.warning(f"EventLog chain verification failed for report {report.id}: {e}")
+            return None, None
 
     async def generate_report_data_by_type(
         self,

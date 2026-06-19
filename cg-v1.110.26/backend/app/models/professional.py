@@ -1002,6 +1002,18 @@ class ComplianceReport(Base, UUIDMixin, TimestampMixin):
     # SHA-256 verification code for authenticity (required by spec)
     sha256_hash: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
 
+    # Court-ready verification: public number a court can look up + EventLog
+    # chain-of-custody result captured at certification time.
+    verification_number: Mapped[Optional[str]] = mapped_column(
+        String(40), unique=True, index=True, nullable=True
+    )
+    chain_verified: Mapped[Optional[bool]] = mapped_column(Boolean, nullable=True)
+    chain_hash: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    certified_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    # Detached cryptographic signature over the PDF bytes (Phase 5).
+    signature_b64: Mapped[Optional[str]] = mapped_column(String(200), nullable=True)
+    signature_key_id: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+
     # Attorney signature line (for court-ready documents)
     signature_line: Mapped[Optional[str]] = mapped_column(String(300), nullable=True)
 

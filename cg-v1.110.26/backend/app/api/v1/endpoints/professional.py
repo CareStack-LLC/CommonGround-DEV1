@@ -13,7 +13,7 @@ from typing import Optional, List
 
 logger = logging.getLogger(__name__)
 
-from fastapi import APIRouter, Body, Depends, HTTPException, status, Query, File, UploadFile
+from fastapi import APIRouter, Body, Depends, HTTPException, status, Query, File, UploadFile, Request
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -141,6 +141,33 @@ from app.schemas.professional import (
 
 
 router = APIRouter()
+
+
+async def _audit_report_action(
+    db: AsyncSession,
+    request: Optional[Request],
+    action: str,
+    report_id: str,
+    case_id: str,
+    user_id: str,
+) -> None:
+    """Court-evidence audit trail for report generate/download/verify actions."""
+    from app.services.audit_service import log_audit_event, get_client_ip
+    try:
+        await log_audit_event(
+            db,
+            action=action,
+            resource_type="compliance_report",
+            resource_id=report_id,
+            case_id=case_id,
+            user_id=user_id,
+            ip_address=get_client_ip(request) if request else None,
+            user_agent=request.headers.get("user-agent") if request else None,
+            method=request.method if request else "POST",
+            endpoint=str(request.url.path) if request else None,
+        )
+    except Exception as e:  # never let auditing break the request
+        logger.error(f"Audit logging failed for {action} on report {report_id}: {e}")
 
 
 # =============================================================================
@@ -3223,7 +3250,11 @@ async def log_call(
     Log a voice/video call for a case.
     """
     # Ensure professional has access to the case
-    await CaseAssignmentService(db).get_assignment(profile.id, family_file_id)
+    if not await CaseAssignmentService(db).can_access_case(profile.id, family_file_id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have access to this case",
+        )
     
     # Force the family_file_id to match the path
     data.family_file_id = family_file_id
@@ -3246,7 +3277,11 @@ async def list_case_calls(
     List all recorded calls for a specific case.
     """
     # Ensure professional has access to the case
-    await CaseAssignmentService(db).get_assignment(profile.id, family_file_id)
+    if not await CaseAssignmentService(db).can_access_case(profile.id, family_file_id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have access to this case",
+        )
     
     logs, total = await ProfessionalCallLogService(db).get_call_logs(
         professional_id=profile.id,
@@ -3269,6 +3304,7 @@ async def list_case_calls(
 async def generate_compliance_report(
     family_file_id: str,
     data: ComplianceReportCreate,
+    request: Request,
     db: AsyncSession = Depends(get_db),
     profile: ProfessionalProfile = Depends(get_current_professional),
 ):
@@ -3277,7 +3313,14 @@ async def generate_compliance_report(
     Initially creates a pending report record.
     """
     # Ensure professional has access to the case
-    assignment = await CaseAssignmentService(db).get_assignment(profile.id, family_file_id)
+    assignment = await CaseAssignmentService(db).get_assignment_for_professional(
+        profile.id, family_file_id
+    )
+    if not assignment or not assignment.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have access to this case",
+        )
 
     # Enforce dual-parent consent for reports that require it (e.g. GAL welfare)
     from app.services.reports.report_registry import get_report_by_code
@@ -3304,7 +3347,13 @@ async def generate_compliance_report(
     # Force the family_file_id to match the path
     data.family_file_id = family_file_id
 
-    return await ComplianceReportService(db).create_report(profile.id, data)
+    report = await ComplianceReportService(db).create_report(profile.id, data)
+    await _audit_report_action(
+        db, request, "report.generate", report.id,
+        family_file_id, str(profile.user_id),
+    )
+    await db.commit()
+    return report
 
 
 @router.get(
@@ -3322,7 +3371,11 @@ async def list_case_reports(
     List all generated reports for a specific case.
     """
     # Ensure professional has access to the case
-    await CaseAssignmentService(db).get_assignment(profile.id, family_file_id)
+    if not await CaseAssignmentService(db).can_access_case(profile.id, family_file_id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have access to this case",
+        )
     
     reports, total = await ComplianceReportService(db).get_reports(
         professional_id=profile.id,
@@ -4223,28 +4276,89 @@ async def track_report_download(
 )
 async def verify_report_integrity(
     report_id: str,
+    request: Request,
     db: AsyncSession = Depends(get_db),
     profile: ProfessionalProfile = Depends(get_current_professional),
 ):
     """
-    Verify a report's SHA-256 hash for tamper-proof verification.
-
-    Returns the hash and metadata for court submission.
+    Verify a report's integrity by RECOMPUTING the deterministic data hash and
+    comparing it to the certified hash (returns match: true/false), plus the
+    EventLog chain-of-custody result.
     """
     service = ComplianceReportService(db)
     report = await service.get_report(report_id)
     if not report:
         raise HTTPException(status_code=404, detail="Report not found")
 
+    match = None
+    if report.sha256_hash:
+        try:
+            data = await service.generate_report_data_by_type(
+                report_id=report_id, professional_id=profile.id
+            )
+            match = service.compute_data_hash(data) == report.sha256_hash
+        except Exception as e:
+            logger.error(f"Re-verification failed for report {report_id}: {e}")
+            match = None
+
+    await _audit_report_action(
+        db, request, "report.verify", report_id,
+        report.family_file_id, str(profile.user_id),
+    )
+    await db.commit()
+
     return {
         "report_id": report.id,
+        "verification_number": report.verification_number,
         "title": report.title,
         "sha256_hash": report.sha256_hash,
+        "match": match,
+        "chain_verified": report.chain_verified,
+        "chain_hash": report.chain_hash,
         "export_format": report.export_format,
         "signature_line": report.signature_line,
         "generated_at": report.created_at.isoformat() if report.created_at else None,
+        "certified_at": report.certified_at.isoformat() if report.certified_at else None,
         "download_count": report.download_count,
         "status": report.status,
+    }
+
+
+@router.get(
+    "/verify/report/{verification_number}",
+    summary="Public report verification (no auth)",
+)
+async def verify_report_public(
+    verification_number: str,
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    PUBLIC endpoint: a court or opposing counsel enters the verification number
+    printed on a CommonGround report and gets back the certified hash + the
+    chain-of-custody result, so they can independently confirm the document.
+    No authentication required (read-only, by opaque number).
+    """
+    service = ComplianceReportService(db)
+    report = await service.get_report_by_verification_number(verification_number)
+    if not report or report.status != "completed" or not report.sha256_hash:
+        return {
+            "verification_number": verification_number,
+            "is_valid": False,
+            "message": "No certified report found for this verification number.",
+        }
+    return {
+        "verification_number": report.verification_number,
+        "is_valid": True,
+        "sha256_hash": report.sha256_hash,
+        "hash_type": "deterministic data hash (reproducible from the report data)",
+        "chain_verified": report.chain_verified,
+        "chain_hash": report.chain_hash,
+        "report_type": report.report_type,
+        "generated_at": report.created_at.isoformat() if report.created_at else None,
+        "certified_at": report.certified_at.isoformat() if report.certified_at else None,
+        "download_count": report.download_count,
+        "verification_timestamp": datetime.utcnow().isoformat(),
+        "message": "This verification number corresponds to a certified CommonGround report.",
     }
 
 
@@ -4274,7 +4388,11 @@ async def get_report_data(
         raise HTTPException(status_code=404, detail="Report not found")
 
     # Ensure professional has access to the case
-    await CaseAssignmentService(db).get_assignment(profile.id, report.family_file_id)
+    if not await CaseAssignmentService(db).can_access_case(profile.id, report.family_file_id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have access to this case",
+        )
 
     # Generate data using specialized templates
     try:
@@ -4295,6 +4413,7 @@ async def get_report_data(
 )
 async def download_report(
     report_id: str,
+    request: Request,
     db: AsyncSession = Depends(get_db),
     profile: ProfessionalProfile = Depends(get_current_professional),
 ):
@@ -4307,7 +4426,11 @@ async def download_report(
         raise HTTPException(status_code=404, detail="Report not found")
 
     # Ensure professional has access
-    await CaseAssignmentService(db).get_assignment(profile.id, report.family_file_id)
+    if not await CaseAssignmentService(db).can_access_case(profile.id, report.family_file_id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have access to this case",
+        )
 
     # Generate data using specialized templates
     data = await service.generate_report_data_by_type(
@@ -4318,15 +4441,28 @@ async def download_report(
     if report.export_format == "excel":
         file_bytes, sha = await service.generate_excel_bytes(report, data)
         media_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        filename = f"Compliance_Report_{report.family_file_id}.csv" 
+        filename = f"Compliance_Report_{report.family_file_id}.csv"
     else:
         file_bytes, sha = await service.generate_pdf_bytes(report, data)
         media_type = "application/pdf"
         filename = f"Compliance_Report_{report.family_file_id}.pdf"
 
-    # Update hash/status if needed
+    # Certify with the DETERMINISTIC data hash (reproducible from /data, unlike
+    # non-deterministic PDF bytes) + the EventLog chain result.
+    data_hash = service.compute_data_hash(data)
+    chain_verified, chain_hash = await service.verify_event_chain(report)
+    await service.finalize_report(
+        report_id, report.file_url, len(file_bytes), data_hash,
+        chain_verified=chain_verified, chain_hash=chain_hash,
+    )
     await service.track_download(report_id)
     await db.commit()
+
+    # Court-evidence audit trail: who downloaded what, when, from where.
+    await _audit_report_action(
+        db, request, "report.download", report_id,
+        report.family_file_id, str(profile.user_id),
+    )
 
     return StreamingResponse(
         io.BytesIO(file_bytes),
