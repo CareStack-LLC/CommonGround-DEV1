@@ -17,6 +17,7 @@ import { NotificationProvider } from '@/contexts/notification-context';
 import { WebSocketProvider } from '@/contexts/websocket-context';
 import { RealtimeProvider } from '@/contexts/realtime-context';
 import { ServiceWorkerRegister } from '@/components/service-worker-register';
+import { OfflineIndicator } from '@/components/offline-indicator';
 import { PortalWrapper } from '@/components/portal-wrapper';
 import { IncomingCallNotification } from '@/components/incoming-call-notification';
 import { ImpersonationBanner } from '@/components/impersonation-banner';
@@ -35,6 +36,7 @@ export default function AppProviders({ children }: { children: React.ReactNode }
         <RealtimeProvider>
           <NotificationProvider>
             <ServiceWorkerRegister />
+            <OfflineIndicator />
             <IncomingCallNotification />
             <ChatbotWidget />
             <ImpersonationBanner />

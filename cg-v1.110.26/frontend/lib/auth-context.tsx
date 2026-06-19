@@ -108,6 +108,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await authAPI.logout();
     setUser(null);
     setProfile(null);
+    // Wipe any per-user offline caches (calendar/schedule data + authed page
+    // shells) so nothing leaks to the next account on a shared device.
+    try {
+      navigator.serviceWorker?.controller?.postMessage({ type: 'CLEAR_OFFLINE_CACHE' });
+    } catch {
+      /* no SW / not controlled yet — nothing to clear */
+    }
   };
 
   const refreshUser = async () => {
