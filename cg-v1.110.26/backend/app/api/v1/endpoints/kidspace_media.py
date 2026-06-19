@@ -10,14 +10,15 @@ from datetime import datetime
 from typing import Optional
 from uuid import uuid4
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, Request, UploadFile, status
 from pydantic import BaseModel, Field
 from sqlalchemy import select, desc
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.core.security import get_current_admin_user
+from app.core.security import get_current_admin_user, decode_token
 from app.models.user import User
+from app.models.child import Child
 from app.models.kidspace_media import KidSpaceGenre, KidSpaceAuthor, KidSpaceMovie, KidSpaceBook
 from app.services.storage import SupabaseStorageService
 
@@ -25,6 +26,38 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 KIDSPACE_MEDIA_BUCKET = "kidspace-media"
+
+
+async def _optional_child_age(
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+) -> Optional[int]:
+    """If the caller is an authenticated child, return their actual age.
+
+    Used to ENFORCE age-appropriate media for children: when present, this
+    overrides the client-supplied ``age`` filter so a child can't request older
+    content. Returns None for public/marketing (non-child) callers, leaving the
+    optional ``age`` query param in effect.
+    """
+    auth = request.headers.get("authorization") or ""
+    if not auth.lower().startswith("bearer "):
+        return None
+    token = auth.split(" ", 1)[1].strip()
+    try:
+        payload = decode_token(token)
+        if payload.get("type") != "child_user":
+            return None
+        child_id = payload.get("child_id")
+        if not child_id:
+            return None
+        child = (
+            await db.execute(select(Child).where(Child.id == child_id))
+        ).scalar_one_or_none()
+        if child and child.date_of_birth:
+            return child.age
+    except Exception:
+        return None
+    return None
 
 
 # =============================================================================
@@ -122,6 +155,7 @@ async def list_visible_movies(
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
     db: AsyncSession = Depends(get_db),
+    child_age: Optional[int] = Depends(_optional_child_age),
 ) -> dict:
     """List visible and approved movies for the KidSpace theater."""
     query = select(KidSpaceMovie).where(
@@ -131,10 +165,13 @@ async def list_visible_movies(
 
     if genre_id:
         query = query.where(KidSpaceMovie.genre_id == genre_id)
-    if age is not None:
+    # A child's real age (from their profile) overrides any client-supplied age,
+    # so children only ever see age-appropriate content.
+    effective_age = child_age if child_age is not None else age
+    if effective_age is not None:
         query = query.where(
-            KidSpaceMovie.age_min <= age,
-            KidSpaceMovie.age_max >= age,
+            KidSpaceMovie.age_min <= effective_age,
+            KidSpaceMovie.age_max >= effective_age,
         )
 
     query = query.order_by(desc(KidSpaceMovie.is_featured), desc(KidSpaceMovie.created_at))
@@ -156,6 +193,7 @@ async def list_visible_books(
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
     db: AsyncSession = Depends(get_db),
+    child_age: Optional[int] = Depends(_optional_child_age),
 ) -> dict:
     """List visible and approved books for the KidSpace reading section."""
     query = select(KidSpaceBook).where(
@@ -165,10 +203,12 @@ async def list_visible_books(
 
     if genre_id:
         query = query.where(KidSpaceBook.genre_id == genre_id)
-    if age is not None:
+    # A child's real age (from their profile) overrides any client-supplied age.
+    effective_age = child_age if child_age is not None else age
+    if effective_age is not None:
         query = query.where(
-            KidSpaceBook.age_min <= age,
-            KidSpaceBook.age_max >= age,
+            KidSpaceBook.age_min <= effective_age,
+            KidSpaceBook.age_max >= effective_age,
         )
 
     query = query.order_by(desc(KidSpaceBook.is_featured), desc(KidSpaceBook.created_at))

@@ -671,21 +671,46 @@ async def child_pin_login(
     """
     from datetime import datetime
 
-    # Build scoped query to avoid scanning all child users
+    # A PIN is only a few digits — require a username or family scope so a login
+    # can never become a full-table PIN scan (brute-force surface).
+    if not login_data.username and not login_data.family_file_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="A username or family code is required to sign in.",
+        )
+
+    # Lockout: throttle repeated failed PIN attempts from the same client+scope.
+    ip = request.client.host if request.client else "unknown"
+    scope_key = login_data.username or login_data.family_file_id or "none"
+    lock_key = f"childpin:fail:{ip}:{scope_key}"
+    MAX_FAILS = 8
+    LOCK_WINDOW = 15 * 60
+    _redis = None
+    try:
+        from app.core.redis_client import get_redis
+        _redis = await get_redis()
+        if _redis is not None:
+            fails = await _redis.get(lock_key)
+            if fails is not None and int(fails) >= MAX_FAILS:
+                raise HTTPException(
+                    status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                    detail="Too many incorrect PIN attempts. Please try again later or ask a parent for help.",
+                )
+    except HTTPException:
+        raise
+    except Exception:
+        _redis = None  # fail-open: never block a child on a cache outage
+
+    # Build scoped query (never scans all child users)
     query = select(ChildUser).where(
         ChildUser.is_active == True,
         ChildUser.pin_hash.isnot(None),
     )
-
     if login_data.username:
         query = query.where(ChildUser.username == login_data.username)
-    elif login_data.family_file_id:
-        query = query.where(ChildUser.family_file_id == login_data.family_file_id)
     else:
-        # Fallback: still allow PIN-only for backward compatibility but log warning
-        logger.warning("Child PIN login without username or family_file_id — scanning all users")
+        query = query.where(ChildUser.family_file_id == login_data.family_file_id)
 
-    logger.debug("Child PIN login attempt")
     result = await db.execute(query)
     child_users = result.scalars().all()
 
@@ -697,10 +722,25 @@ async def child_pin_login(
             break
 
     if not matched_child_user:
+        # Count the failed attempt toward the lockout.
+        if _redis is not None:
+            try:
+                new_count = await _redis.incr(lock_key)
+                if new_count == 1:
+                    await _redis.expire(lock_key, LOCK_WINDOW)
+            except Exception:
+                pass
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid PIN"
         )
+
+    # Successful login — clear the failure counter.
+    if _redis is not None:
+        try:
+            await _redis.delete(lock_key)
+        except Exception:
+            pass
 
     # Get the child profile
     child_result = await db.execute(

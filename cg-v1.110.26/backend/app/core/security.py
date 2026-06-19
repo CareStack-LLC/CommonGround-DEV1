@@ -306,6 +306,29 @@ async def get_current_active_user(
     return current_user
 
 
+async def _token_revoked(token: str, subject_id: str) -> bool:
+    """Best-effort revocation check for child/circle tokens.
+
+    Mirrors the parent path: honors the per-token logout blacklist and the
+    per-subject ``user_revoked`` sentinel. Fail-open (returns False) if Redis is
+    unavailable so auth isn't taken down by a cache outage.
+    """
+    try:
+        import hashlib
+        from app.core.redis_client import get_redis
+        r = await get_redis()
+        if r is None:
+            return False
+        token_hash = hashlib.sha256(token.encode()).hexdigest()
+        if await r.get(f"blacklist:{token_hash}"):
+            return True
+        if await r.get(f"user_revoked:{subject_id}"):
+            return True
+    except Exception as e:
+        logger.error("SECURITY: child/circle revocation check failed: %s", e)
+    return False
+
+
 async def get_current_child_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
     db: AsyncSession = Depends(get_db),
@@ -345,6 +368,13 @@ async def get_current_child_user(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    if await _token_revoked(token, child_user_id):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token has been revoked",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -411,6 +441,13 @@ async def get_current_circle_user(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    if await _token_revoked(token, circle_user_id):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token has been revoked",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
