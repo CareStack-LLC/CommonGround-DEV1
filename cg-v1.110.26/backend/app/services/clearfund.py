@@ -746,6 +746,56 @@ class ClearFundService:
                 detail="Funding record not found for this user"
             )
 
+        # Money-path hardening: when a Stripe PaymentIntent is supplied, verify
+        # it actually succeeded for (at least) this amount before recording, and
+        # claim it atomically so the same payment can never fund twice.
+        pi_id = getattr(data, "stripe_payment_intent_id", None)
+        _idem_key = f"cf_pi:{pi_id}" if pi_id else None
+        _redis = None
+        if pi_id:
+            from app.core.config import settings as _settings
+            if _settings.STRIPE_SECRET_KEY:
+                try:
+                    import stripe
+                    stripe.api_key = _settings.STRIPE_SECRET_KEY
+                    pi = stripe.PaymentIntent.retrieve(pi_id)
+                except Exception as e:
+                    logger.warning("record_funding: cannot retrieve PaymentIntent %s: %s", pi_id, e)
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail="Could not verify the payment. Please try again.",
+                    )
+                if getattr(pi, "status", None) != "succeeded":
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail=f"Payment not completed (status: {getattr(pi, 'status', 'unknown')}).",
+                    )
+                try:
+                    expected_cents = int((Decimal(str(data.amount)) * 100).to_integral_value())
+                except Exception:
+                    expected_cents = 0
+                paid_cents = int(getattr(pi, "amount_received", 0) or getattr(pi, "amount", 0) or 0)
+                if paid_cents < expected_cents:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail="Payment amount is less than the funding amount.",
+                    )
+            # Atomic idempotency claim — a PaymentIntent funds at most once.
+            try:
+                from app.core.redis_client import get_redis
+                _redis = await get_redis()
+                if _redis is not None:
+                    claimed = await _redis.set(_idem_key, "1", ex=7 * 24 * 3600, nx=True)
+                    if not claimed:
+                        raise HTTPException(
+                            status_code=status.HTTP_409_CONFLICT,
+                            detail="This payment has already been recorded.",
+                        )
+            except HTTPException:
+                raise
+            except Exception:
+                _redis = None  # fail-open on cache outage; PI verification still applied
+
         try:
             # Update funding amount
             new_funded = funding.amount_funded + data.amount
@@ -841,6 +891,12 @@ class ClearFundService:
             raise
         except Exception as e:
             await self.db.rollback()
+            # Release the idempotency claim so a legitimate retry isn't blocked.
+            if _idem_key and _redis is not None:
+                try:
+                    await _redis.delete(_idem_key)
+                except Exception:
+                    pass
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Failed to record funding: {str(e)}"

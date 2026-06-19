@@ -42,7 +42,12 @@ _DEDUP_TTL_SECONDS = 86400  # 24 hours
 
 
 def _is_duplicate_event(event_id: str) -> bool:
-    """Check if event was already processed. Returns True if duplicate."""
+    """Check (WITHOUT recording) whether an event was already processed.
+
+    Recording is done separately via :func:`_mark_event_processed`, and only
+    AFTER a handler succeeds — so a failed handler never dedupes away Stripe's
+    retry of the same event.
+    """
     now = time.time()
     with _processed_events_lock:
         # Periodic cleanup of expired entries
@@ -51,11 +56,13 @@ def _is_duplicate_event(event_id: str) -> bool:
             expired = [k for k, v in _processed_events.items() if v < cutoff]
             for k in expired:
                 del _processed_events[k]
+        return event_id in _processed_events
 
-        if event_id in _processed_events:
-            return True
-        _processed_events[event_id] = now
-        return False
+
+def _mark_event_processed(event_id: str) -> None:
+    """Record an event id as successfully processed (for dedup)."""
+    with _processed_events_lock:
+        _processed_events[event_id] = time.time()
 
 
 router = APIRouter()
@@ -115,6 +122,11 @@ async def handle_stripe_webhook(
             message = f"Ignored unhandled event type: {event_type}"
             logger.debug(message)
 
+        # Record as processed ONLY after success, so a failed handler doesn't
+        # permanently dedupe away Stripe's retry.
+        if event_id:
+            _mark_event_processed(event_id)
+
         return WebhookHandlerResponse(
             success=True,
             event_type=event_type,
@@ -132,13 +144,16 @@ async def handle_stripe_webhook(
     except Exception as e:
         logger.error(f"Webhook handler error: {e}")
         capture_error(e)
-        # Return 200 to prevent Stripe retries for application errors
-        # Log the error for investigation
-        return WebhookHandlerResponse(
-            success=False,
-            event_type=event_data.get("event_type", "unknown") if "event_data" in locals() else "unknown",
-            message=f"Error processing event: {str(e)}",
-            processed_at=datetime.utcnow(),
+        # Roll back any partial work and return 5xx so Stripe RETRIES. The event
+        # was not marked processed, so the retry will be handled cleanly rather
+        # than silently lost (the old code returned 200 and dropped the event).
+        try:
+            await db.rollback()
+        except Exception:
+            pass
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error processing event; Stripe will retry.",
         )
 
 
