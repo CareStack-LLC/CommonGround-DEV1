@@ -17,7 +17,7 @@ import {
   type BugHuntNote,
   type BugHuntTester,
 } from '@/lib/admin-api';
-import { UserPlus, Mail, XCircle } from 'lucide-react';
+import { UserPlus, Mail, XCircle, Scale } from 'lucide-react';
 
 const SEVERITY_COLORS: Record<string, string> = {
   critical: 'bg-red-500/15 text-red-400 border border-red-500/20',
@@ -684,6 +684,52 @@ export default function BugHuntDetailPage() {
               </table>
             </div>
           )}
+
+          {/* Seeded professional / firm — log in here to test the pro portal */}
+          {data?.cohort?.seed_config?.professional && (() => {
+            const pro = data.cohort.seed_config.professional;
+            return (
+              <div className="mt-6 rounded-lg border border-[#3DAA8A]/30 bg-[#1E3A4A]/40 p-4">
+                <div className="flex items-center gap-2 mb-1">
+                  <Scale className="w-4 h-4 text-[#3DAA8A]" />
+                  <h4 className="text-white font-semibold text-sm">Professional portal — {pro.firm_name}</h4>
+                </div>
+                <p className="text-xs text-[#6B8A9A] mb-3">
+                  {pro.name} (attorney) has the case for <span className="text-[#D0E4EC]">{pro.assigned_family}</span> assigned with full access.
+                  Log in below and open the Professional portal to test it.
+                  {pro.login_works === false && (
+                    <span className="text-yellow-400"> ⚠ Supabase auth wasn&apos;t created for this account — login may not work.</span>
+                  )}
+                </p>
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <div>
+                    <div className="text-[10px] uppercase text-[#6B8A9A] mb-1">Email</div>
+                    <div className="flex items-center gap-1">
+                      <span className="text-[#D0E4EC] font-mono text-xs">{pro.email}</span>
+                      <CopyButton text={pro.email} />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-[10px] uppercase text-[#6B8A9A] mb-1">Password</div>
+                    <div className="flex items-center gap-1">
+                      <span className="text-[#D0E4EC] font-mono text-xs">{pro.password}</span>
+                      <CopyButton text={pro.password} />
+                    </div>
+                  </div>
+                </div>
+                {pro.portal_url && (
+                  <a
+                    href={pro.portal_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 mt-3 text-xs text-[#3DAA8A] hover:text-[#5BC4A0]"
+                  >
+                    Open Professional portal →
+                  </a>
+                )}
+              </div>
+            );
+          })()}
         </div>
       )}
 

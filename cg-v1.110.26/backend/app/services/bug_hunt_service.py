@@ -153,6 +153,136 @@ async def create_cohort(
     return cohort
 
 
+async def _seed_professional(
+    db: AsyncSession,
+    short_id: str,
+    families: list,
+    admin_client,
+    settings,
+) -> Optional[dict]:
+    """Seed a verified professional + firm and SEND the first seeded family's
+    case to them (active CaseAssignment with full scopes), so the professional
+    portal can be tested end-to-end. Returns the professional's login info.
+
+    Best-effort: any failure is logged and returns None rather than aborting the
+    whole bug-hunt seed.
+    """
+    from app.models.professional import (
+        ProfessionalProfile, Firm, FirmMembership, CaseAssignment,
+        ProfessionalType, ProfessionalTier, FirmRole, FirmType,
+        MembershipStatus, AssignmentRole, AssignmentStatus,
+    )
+    from app.models.user import User, UserProfile
+    from app.models.family_file import FamilyFile
+
+    if not families:
+        return None
+    target = families[0]
+    ff_id = target.family_file_id
+
+    pro_email = f"bh-{short_id}-pro@cg-qa.com"
+    pro_password = "BugHuntPro!2026"
+    pro_first, pro_last = "Jordan", "Avery"
+    firm_name = f"Avery Family Law (Bug Hunt {short_id})"
+
+    # Supabase auth user so the tester can actually log into the portal.
+    supabase_ok = True
+    try:
+        pro_auth = admin_client.auth.admin.create_user({
+            "email": pro_email,
+            "password": pro_password,
+            "email_confirm": True,
+            "user_metadata": {"first_name": pro_first, "last_name": pro_last},
+        })
+        pro_supabase_id = pro_auth.user.id
+    except Exception as e:
+        logger.warning("Bug hunt: professional Supabase auth failed: %s", e)
+        pro_supabase_id = str(uuid4())
+        supabase_ok = False
+
+    pro_user_id = str(uuid4())
+    db.add(User(
+        id=pro_user_id, supabase_id=pro_supabase_id, email=pro_email,
+        first_name=pro_first, last_name=pro_last, is_active=True, email_verified=True,
+    ))
+    db.add(UserProfile(
+        id=str(uuid4()), user_id=pro_user_id, first_name=pro_first, last_name=pro_last,
+        subscription_tier="web_starter", subscription_status="active",
+    ))
+
+    firm_id = str(uuid4())
+    db.add(Firm(
+        id=firm_id, name=firm_name, slug=f"bh-{short_id}-firm",
+        firm_type=FirmType.LAW_FIRM.value, email=pro_email, state="CA",
+        is_public=True, is_active=True, created_by=pro_user_id,
+        practice_areas=["Family Law", "Custody", "Mediation"],
+    ))
+
+    prof_id = str(uuid4())
+    db.add(ProfessionalProfile(
+        id=prof_id, user_id=pro_user_id,
+        professional_type=ProfessionalType.ATTORNEY.value,
+        license_number="CA-BH-001", license_state="CA",
+        license_verified=True, license_verified_at=datetime.utcnow(),
+        verification_status="verified", verification_submitted_at=datetime.utcnow(),
+        subscription_tier=ProfessionalTier.SOLO.value,
+        max_active_cases=15, active_case_count=1,
+        subscription_status="active", is_public=True,
+        practice_areas=["custody", "mediation"],
+    ))
+
+    db.add(FirmMembership(
+        id=str(uuid4()), professional_id=prof_id, firm_id=firm_id,
+        role=FirmRole.OWNER.value, status=MembershipStatus.ACTIVE.value,
+        joined_at=datetime.utcnow(),
+    ))
+
+    # Make sure both parents on the case have consented to professional message
+    # viewing, so the communications view actually works for the tester.
+    ff = await db.get(FamilyFile, ff_id)
+    if ff:
+        for pid in (ff.parent_a_id, ff.parent_b_id):
+            if not pid:
+                continue
+            prof = (
+                await db.execute(select(UserProfile).where(UserProfile.user_id == pid))
+            ).scalar_one_or_none()
+            if prof and getattr(prof, "professional_message_consent_at", None) is None:
+                prof.professional_message_consent_at = datetime.utcnow()
+
+    # Active assignment — the case is "sent" to the firm with full access.
+    db.add(CaseAssignment(
+        id=str(uuid4()), professional_id=prof_id, firm_id=firm_id,
+        family_file_id=ff_id, assignment_role=AssignmentRole.LEAD_ATTORNEY.value,
+        representing="parent_a",
+        access_scopes=[
+            "agreement", "schedule", "checkins", "messages", "financials",
+            "compliance", "interventions", "circle",
+        ],
+        can_control_aria=False, can_message_client=True,
+        status=AssignmentStatus.ACTIVE.value, assigned_at=datetime.utcnow(),
+        consent_both_parents=True,
+        consent_parent_a_at=datetime.utcnow(), consent_parent_b_at=datetime.utcnow(),
+    ))
+
+    frontend = (getattr(settings, "FRONTEND_URL", "") or "").rstrip("/")
+    return {
+        "email": pro_email,
+        "password": pro_password,
+        "name": f"{pro_first} {pro_last}",
+        "firm_name": firm_name,
+        "professional_type": "attorney",
+        "portal_url": f"{frontend}/professional/dashboard" if frontend else "/professional/dashboard",
+        "assigned_family_file_id": ff_id,
+        "assigned_family": f"{target.parent_a_name} & {target.parent_b_name}",
+        "access_scopes": [
+            "agreement", "schedule", "checkins", "messages", "financials",
+            "compliance", "interventions", "circle",
+        ],
+        "login_works": supabase_ok,
+    }
+
+
 async def generate_seed_families(
     db: AsyncSession,
     cohort_id: str,
@@ -694,6 +824,18 @@ async def generate_seed_families(
             cohort_id, len(synthetic_id_families), len(created_families), synthetic_id_families,
         )
 
+    # Send the first family's case to a seeded firm/professional so the
+    # professional portal can be tested end-to-end. Done for the "professional"
+    # and "general" cohorts; best-effort (never aborts the family seed).
+    professional_info = None
+    if cohort.target_feature in ("professional", "general") and created_families:
+        try:
+            professional_info = await _seed_professional(
+                db, short_id, created_families, admin_client, settings
+            )
+        except Exception as e:
+            logger.error("Bug hunt: professional seeding failed: %s", e)
+
     # Update cohort status
     cohort.status = "active"
     cohort.started_at = datetime.utcnow()
@@ -703,6 +845,7 @@ async def generate_seed_families(
         "generated_at": datetime.utcnow().isoformat(),
         "synthetic_id_families": synthetic_id_families,
         "families": family_configs,
+        "professional": professional_info,
     }
 
     await db.flush()
@@ -1532,6 +1675,16 @@ async def delete_cohort(db: AsyncSession, cohort_id: str) -> bool:
                         admin_client.auth.admin.delete_user(user.supabase_id)
                     except Exception:
                         pass  # Best effort cleanup
+
+        # Clean up the seeded professional's Supabase user too.
+        pro = (cohort.seed_config or {}).get("professional") if isinstance(cohort.seed_config, dict) else None
+        if pro and pro.get("email"):
+            pu = (await db.execute(select(User).where(User.email == pro["email"]))).scalar_one_or_none()
+            if pu and pu.supabase_id:
+                try:
+                    admin_client.auth.admin.delete_user(pu.supabase_id)
+                except Exception:
+                    pass
     except Exception as e:
         logger.warning("Failed to cleanup Supabase users: %s", e)
 

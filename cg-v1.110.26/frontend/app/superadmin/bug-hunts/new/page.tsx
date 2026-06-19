@@ -11,7 +11,8 @@ const FEATURES = [
   { value: 'agreement', label: 'Agreements', desc: 'Test SharedCare Agreement builder, approval flow' },
   { value: 'custody_tracking', label: 'Custody Tracking', desc: 'Test calendar, custody day records, MyTime' },
   { value: 'clearfund', label: 'ClearFund', desc: 'Test expense tracking, obligations, payments' },
-  { value: 'general', label: 'General / Full Test', desc: 'Create complete families with all features' },
+  { value: 'professional', label: 'Professional Portal', desc: 'Seed a firm + attorney and send a case to them to test the pro portal' },
+  { value: 'general', label: 'General / Full Test', desc: 'Create complete families + a firm/attorney with a case sent to them' },
 ];
 
 export default function NewBugHuntPage() {
