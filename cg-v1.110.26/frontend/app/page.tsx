@@ -5,7 +5,6 @@ import type { Metadata } from 'next';
 import { MarketingHeader } from '@/components/marketing';
 import { JsonLd } from '@/components/marketing/json-ld';
 import {
-  TrustBar,
   CtaBand,
   FaqJsonLd,
 } from '@/components/marketing';
@@ -25,6 +24,8 @@ import {
   Heart,
   Quote,
   Phone,
+  Lock,
+  Scale,
 } from 'lucide-react';
 
 /* ── Per-page metadata (home = canonical "/") ────────────────────── */
@@ -249,18 +250,41 @@ export default function HomePage() {
         </section>
 
         {/* ═══════════════════════════════════════════════════════════════
-            TRUST BAR — Concrete credibility directly under the hero
+            TRUST BAR — colorful credibility strip directly under the hero
         ═══════════════════════════════════════════════════════════════ */}
-        <section className="bg-white border-y border-gray-100">
+        <section className="bg-gradient-to-r from-[#F4F8F7] via-white to-[#E8F4F0] border-y border-[#3DAA8A]/15">
+          <div className="max-w-6xl mx-auto px-6 py-7 sm:py-8">
+            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-5">
+              {[
+                { Icon: Heart, color: '#E07A5F', label: 'Built by a co-parent' },
+                { Icon: Lock, color: '#3DAA8A', label: 'Encrypted & private' },
+                { Icon: Scale, color: '#2D6A8F', label: 'Attorney-reviewed workflows' },
+              ].map(({ Icon, color, label }) => (
+                <div
+                  key={label}
+                  className="flex items-center gap-3 rounded-full bg-white px-5 py-3 shadow-sm ring-1 ring-black/5"
+                >
+                  <span
+                    className="grid h-9 w-9 shrink-0 place-items-center rounded-full"
+                    style={{ backgroundColor: `${color}1a` }}
+                  >
+                    <Icon className="h-5 w-5" style={{ color }} strokeWidth={2.25} />
+                  </span>
+                  <span className="font-serif text-base sm:text-lg font-semibold tracking-tight text-[#1E3A4A]">
+                    {label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════════════
+            ARIA LIVE DEMO — moved high: most interactive, top-of-funnel hook
+        ═══════════════════════════════════════════════════════════════ */}
+        <section className="py-16 sm:py-24 bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F] text-white">
           <div className="max-w-6xl mx-auto px-6">
-            <TrustBar
-              variant="stats"
-              items={[
-                { value: 'Built by', label: 'a co-parent' },
-                { value: 'Encrypted', label: '& private' },
-                { value: 'Attorney', label: 'reviewed workflows' },
-              ]}
-            />
+            <HomeARIADemo />
           </div>
         </section>
 
@@ -481,15 +505,6 @@ export default function HomePage() {
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
-          </div>
-        </section>
-
-        {/* ═══════════════════════════════════════════════════════════════
-            ARIA LIVE DEMO — Interactive chat
-        ═══════════════════════════════════════════════════════════════ */}
-        <section className="py-16 sm:py-24 bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F] text-white">
-          <div className="max-w-6xl mx-auto px-6">
-            <HomeARIADemo />
           </div>
         </section>
 
