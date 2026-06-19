@@ -1464,3 +1464,71 @@ body.child-portal.portal-transition * {
   font-family: var(--font-mono);
   margin-right: 0.5rem;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Native PWA / iOS feel — for parents, kids, and circle contacts.
+   Makes the installed (Add to Home Screen) and mobile-browser experience
+   feel like a real iPhone app: no tap flash, no rubber-band on the page,
+   momentum scrolling, snappy taps, and safe-area awareness around the
+   notch / home indicator.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+html {
+  /* Don't auto-zoom text on orientation change. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  -webkit-tap-highlight-color: transparent;
+  /* Kill the whole-page rubber-band / pull-to-refresh for a native feel. */
+  overscroll-behavior-y: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Momentum scrolling on overflow containers (iOS). */
+* {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Interactive chrome shouldn't show the iOS text-callout/selection or the
+   300ms double-tap delay — feels much more like a native control. */
+button,
+a,
+[role="button"],
+.no-callout {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+/* …but real content and inputs stay selectable. */
+input,
+textarea,
+[contenteditable="true"],
+.selectable {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* Safe-area helpers (used with viewport-fit=cover). */
+.safe-top { padding-top: env(safe-area-inset-top, 0px); }
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom, 0px); }
+.safe-x {
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+}
+.min-h-screen-safe { min-height: 100svh; }
+
+/* Tweaks that only apply once installed to the home screen. */
+@media (display-mode: standalone) {
+  /* Use the small-viewport unit so the app fills the screen without the
+     browser chrome jumping the layout. */
+  html, body { min-height: 100svh; }
+  /* Hide any "install / open in app" web-only affordances. */
+  .hide-in-standalone { display: none !important; }
+}
+

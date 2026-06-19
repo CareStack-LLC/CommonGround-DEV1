@@ -1,35 +1,108 @@
 /**
- * Service Worker for CommonGround Push Notifications
+ * Service Worker for CommonGround.
  *
- * Handles push events from Web Push API and notification clicks.
+ * Two jobs:
+ *  1. Web Push notifications (push / notificationclick / notificationclose).
+ *  2. A conservative offline/caching layer for a native-app feel:
+ *       - static assets (JS/CSS/fonts/images) are served cache-first for fast
+ *         repeat launches,
+ *       - failed navigations fall back to a branded offline page.
+ *     We deliberately DO NOT cache API responses or authenticated HTML, so
+ *     auth/realtime state never goes stale.
  */
 
-// Version for cache management
-const SW_VERSION = '1.0.0';
+const SW_VERSION = '2.0.0';
+const STATIC_CACHE = `cg-static-${SW_VERSION}`;
+const SHELL_CACHE = `cg-shell-${SW_VERSION}`;
+const OFFLINE_URL = '/offline.html';
 
-/**
- * Handle incoming push notifications
- */
+const STATIC_ASSET_RE = /\.(?:css|js|mjs|woff2?|ttf|otf|png|jpg|jpeg|gif|svg|webp|avif|ico)$/i;
+
+// ── Install: precache the offline fallback ──────────────────────────────────
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(SHELL_CACHE).then((cache) => cache.addAll([OFFLINE_URL])).catch(() => {})
+  );
+  self.skipWaiting();
+});
+
+// ── Activate: drop old caches, take control ─────────────────────────────────
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    (async () => {
+      const keys = await caches.keys();
+      await Promise.all(
+        keys
+          .filter((k) => k.startsWith('cg-') && ![STATIC_CACHE, SHELL_CACHE].includes(k))
+          .map((k) => caches.delete(k))
+      );
+      await self.clients.claim();
+    })()
+  );
+});
+
+// ── Fetch: cache-first for static, network-first-with-offline for navigations ─
+self.addEventListener('fetch', (event) => {
+  const req = event.request;
+  if (req.method !== 'GET') return;
+
+  let url;
+  try {
+    url = new URL(req.url);
+  } catch {
+    return;
+  }
+
+  // Only handle our own origin; never touch Supabase / Daily / Stripe / etc.
+  if (url.origin !== self.location.origin) return;
+  // Never cache the API — auth + realtime must always hit the network.
+  if (url.pathname.startsWith('/api/')) return;
+
+  // Static assets → cache-first (fast repeat loads, no auth risk).
+  if (url.pathname.startsWith('/_next/static/') || STATIC_ASSET_RE.test(url.pathname)) {
+    event.respondWith(
+      caches.open(STATIC_CACHE).then(async (cache) => {
+        const cached = await cache.match(req);
+        if (cached) return cached;
+        try {
+          const res = await fetch(req);
+          if (res && res.status === 200) cache.put(req, res.clone());
+          return res;
+        } catch {
+          return cached || Response.error();
+        }
+      })
+    );
+    return;
+  }
+
+  // Navigations → network, fall back to the offline page when offline.
+  if (req.mode === 'navigate') {
+    event.respondWith(
+      fetch(req).catch(async () => {
+        const cache = await caches.open(SHELL_CACHE);
+        return (await cache.match(OFFLINE_URL)) || Response.error();
+      })
+    );
+  }
+});
+
+// ── Web Push ────────────────────────────────────────────────────────────────
 self.addEventListener('push', (event) => {
-  console.log('[SW] Push received:', event);
-
   let data = {
     title: 'CommonGround',
     body: 'You have a new notification',
-    icon: '/assets/icon-192.png',
-    badge: '/assets/badge-72.png',
+    icon: '/apple-icon.png',
+    badge: '/apple-icon.png',
     url: '/',
     tag: 'default',
-    data: {}
+    data: {},
   };
 
-  // Parse push data if available
   if (event.data) {
     try {
-      const payload = event.data.json();
-      data = { ...data, ...payload };
-    } catch (e) {
-      console.error('[SW] Error parsing push data:', e);
+      data = { ...data, ...event.data.json() };
+    } catch {
       data.body = event.data.text();
     }
   }
@@ -41,91 +114,34 @@ self.addEventListener('push', (event) => {
     tag: data.tag,
     renotify: true,
     requireInteraction: data.requireInteraction || false,
-    data: {
-      url: data.url,
-      ...data.data
-    },
+    data: { url: data.url, ...data.data },
     actions: data.actions || [],
-    vibrate: [200, 100, 200]
+    vibrate: [200, 100, 200],
   };
 
-  event.waitUntil(
-    self.registration.showNotification(data.title, options)
-  );
+  event.waitUntil(self.registration.showNotification(data.title, options));
 });
 
-/**
- * Handle notification click
- */
 self.addEventListener('notificationclick', (event) => {
-  console.log('[SW] Notification clicked:', event);
-
   event.notification.close();
-
   const url = event.notification.data?.url || '/';
-  const action = event.action;
+  if (event.action === 'dismiss') return;
 
-  // Handle action buttons if present
-  if (action === 'view') {
-    // View action - open the URL
-  } else if (action === 'dismiss') {
-    // Dismiss action - just close
-    return;
-  }
-
-  // Open or focus the app window
   event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true })
-      .then((windowClients) => {
-        // Check if there's already a window open
-        for (const client of windowClients) {
-          if (client.url.includes(self.location.origin) && 'focus' in client) {
-            // Navigate to the notification URL and focus
-            client.navigate(url);
-            return client.focus();
-          }
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+      for (const client of windowClients) {
+        if (client.url.includes(self.location.origin) && 'focus' in client) {
+          client.navigate(url);
+          return client.focus();
         }
-        // No window open, open a new one
-        if (clients.openWindow) {
-          return clients.openWindow(url);
-        }
-      })
+      }
+      if (clients.openWindow) return clients.openWindow(url);
+    })
   );
 });
 
-/**
- * Handle notification close
- */
-self.addEventListener('notificationclose', (event) => {
-  console.log('[SW] Notification closed:', event);
-  // Could track analytics here
-});
+self.addEventListener('notificationclose', () => {});
 
-/**
- * Handle service worker installation
- */
-self.addEventListener('install', (event) => {
-  console.log('[SW] Installing service worker v' + SW_VERSION);
-  // Skip waiting to activate immediately
-  self.skipWaiting();
-});
-
-/**
- * Handle service worker activation
- */
-self.addEventListener('activate', (event) => {
-  console.log('[SW] Activating service worker v' + SW_VERSION);
-  // Claim all clients immediately
-  event.waitUntil(clients.claim());
-});
-
-/**
- * Handle messages from the main thread
- */
 self.addEventListener('message', (event) => {
-  console.log('[SW] Message received:', event.data);
-
-  if (event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
+  if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
 });

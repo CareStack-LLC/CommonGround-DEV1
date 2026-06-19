@@ -71,6 +71,9 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
+  // Extend under the notch / home indicator so env(safe-area-inset-*) works and
+  // the installed app feels edge-to-edge native.
+  viewportFit: "cover",
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#F4F8F7" },
     { media: "(prefers-color-scheme: dark)", color: "#1E3A4A" },
@@ -83,6 +86,20 @@ export const metadata: Metadata = {
   keywords: ["co-parenting", "co-parenting app", "free co-parenting app", "custody calendar", "co-parenting communication", "child custody app", "shared parenting", "court-ready records", "ARIA", "family law", "expense tracking"],
   authors: [{ name: "CommonGround" }],
   metadataBase: new URL("https://www.find-commonground.com"),
+  applicationName: "CommonGround",
+  // PWA: links the web app manifest and configures the iOS standalone shell so
+  // "Add to Home Screen" launches full-screen with the right title + status bar.
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: "CommonGround",
+    statusBarStyle: "default",
+  },
+  // Next emits the modern `mobile-web-app-capable`, but iOS Safari still needs
+  // the legacy apple meta to launch full-screen from the home screen.
+  other: {
+    "apple-mobile-web-app-capable": "yes",
+  },
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
