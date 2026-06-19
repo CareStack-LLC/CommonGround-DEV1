@@ -424,6 +424,15 @@ export default function HomePage() {
         </section>
 
         {/* ═══════════════════════════════════════════════════════════════
+            ARIA LIVE DEMO — interactive hook above the benefits
+        ═══════════════════════════════════════════════════════════════ */}
+        <section className="py-16 sm:py-24 bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F] text-white">
+          <div className="max-w-6xl mx-auto px-6">
+            <HomeARIADemo />
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════════════
             CORE BENEFITS — outcome-first headline
         ═══════════════════════════════════════════════════════════════ */}
         <section className="py-16 sm:py-24 bg-gradient-to-br from-[#F4F8F7] to-white">
@@ -499,15 +508,6 @@ export default function HomePage() {
                 <p className="text-sm font-medium text-[var(--portal-primary)]">Silent Handoff &mdash; GPS-verified exchanges</p>
               </div>
             </div>
-          </div>
-        </section>
-
-        {/* ═══════════════════════════════════════════════════════════════
-            ARIA LIVE DEMO — interactive closer, right before pricing
-        ═══════════════════════════════════════════════════════════════ */}
-        <section className="py-16 sm:py-24 bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F] text-white">
-          <div className="max-w-6xl mx-auto px-6">
-            <HomeARIADemo />
           </div>
         </section>
 
