@@ -785,6 +785,14 @@ async def create_child_session(
     - Creates a session and returns join info
     - Notifies the target contact of incoming call
     """
+    # Global kill-switch: admins can disable new KidSpace calls platform-wide.
+    from app.services import feature_flags
+    if not await feature_flags.is_enabled(db, "kidcoms_calls_enabled", default=True):
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="KidSpace calling is temporarily unavailable. Please try again later.",
+        )
+
     # Get child info
     child_result = await db.execute(
         select(Child).where(Child.id == current_child.child_id)

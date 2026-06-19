@@ -74,6 +74,7 @@ from app.models.impersonation import ImpersonationSession
 from app.models.alert_rule import AlertRule, AlertHistory
 from app.models.runbook import Runbook
 from app.models.admin_kv import AdminKV
+from app.models.announcement import Announcement
 from app.models.email_outbox import EmailOutbox, OutboxStatus
 from app.models.activity import (
     Activity,

@@ -296,6 +296,15 @@ api_router.include_router(admin_ga4.router, prefix="/admin", tags=["Admin GA4 An
 # SuperAdmin Portal - Platform administration
 api_router.include_router(admin.router, prefix="/admin", tags=["SuperAdmin Portal"])
 
+# SuperAdmin platform actions — child-safety oversight, user lifecycle,
+# subscription grants, feature flags, announcements, notifications.
+from app.api.v1.endpoints import admin_platform
+api_router.include_router(
+    admin_platform.router, prefix="/admin", tags=["SuperAdmin Platform Actions"]
+)
+# Public active-announcements feed (any authenticated user).
+api_router.include_router(admin_platform.public_router, tags=["Announcements"])
+
 # Admin impersonation + bulk actions + CSV exports (Wave 6 Phase B)
 api_router.include_router(
     admin_impersonation.router,
