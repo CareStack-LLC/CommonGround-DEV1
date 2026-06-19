@@ -23,7 +23,6 @@ import {
   CheckCircle2,
   Briefcase,
   Scale,
-  FileText,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -45,7 +44,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useProfessionalAuth } from "../layout";
 import { SavedViews } from "@/components/professional/cases/SavedViews";
-import { CourtOrderUpload } from "@/components/professional/court-order-upload";
 import { useToast } from "@/hooks/use-toast";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -97,23 +95,15 @@ const RISK_ICONS: Record<string, React.JSX.Element> = {
   low: <CheckCircle2 className="h-4 w-4 text-emerald-700" strokeWidth={2} />,
 };
 
+// Bulk case operations (select + assign/tag/export/archive) are not wired to a
+// backend yet — gate the selection UI off so the page has no dead controls.
+const ENABLE_BULK = false;
+
 export default function CasesListPage() {
   const { token, activeFirm } = useProfessionalAuth();
   const { toast } = useToast();
-  const [showCourtOrderUpload, setShowCourtOrderUpload] = useState(false);
   const [cases, setCases] = useState<CaseAssignment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  const handleCourtOrderComplete = async (data: any) => {
-    // Handle extracted court order data - create case with pre-filled data
-    toast({
-      title: "Court Order Processed",
-      description: "Case data extracted successfully. Redirecting to case creation...",
-    });
-    setShowCourtOrderUpload(false);
-    // TODO: Navigate to case creation with pre-filled data
-    // TODO: Use extracted court order data for case creation
-  };
 
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("active");
@@ -273,20 +263,14 @@ export default function CasesListPage() {
               </p>
             </div>
             <div className="flex gap-2">
-              <Link href="/professional/cases/new">
+              {/* Professionals don't create family cases — they request access
+                  to a family's case (with dual-parent consent). */}
+              <Link href="/professional/access-requests">
                 <Button className="bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white font-semibold px-5 h-10 rounded-xl shadow-sm">
                   <FolderOpen className="h-4 w-4 mr-2" />
-                  New Case
+                  Request Case Access
                 </Button>
               </Link>
-              <Button
-                onClick={() => setShowCourtOrderUpload(true)}
-                variant="outline"
-                className="font-semibold px-5 h-10 rounded-xl border-slate-200 text-slate-700 hover:bg-[#F4F8F7] gap-2"
-              >
-                <FileText className="h-4 w-4" />
-                Import Order
-              </Button>
             </div>
           </div>
 
@@ -381,7 +365,7 @@ export default function CasesListPage() {
           </Card>
 
           {/* Bulk Actions Bar */}
-          {selectedIds.size > 0 && (
+          {ENABLE_BULK && selectedIds.size > 0 && (
             <div className="flex items-center gap-3 px-5 py-4 bg-[#E8F4F0] border-2 border-[#1E3A4A]/30 rounded-sm shadow-md">
               <span className="sans text-sm font-bold text-[#1E3A4A]">
                 {selectedIds.size} file{selectedIds.size !== 1 ? "s" : ""} selected
@@ -412,11 +396,13 @@ export default function CasesListPage() {
           {/* Table Header */}
           {!isLoading && pagedCases.length > 0 && (
             <div className="flex items-center gap-4 px-3 py-2 text-xs sans font-bold text-slate-500 uppercase tracking-[0.15em]">
-              <button onClick={toggleAll} className="shrink-0">
-                {allSelected
-                  ? <CheckSquare className="h-4.5 w-4.5 text-[#1E3A4A]" strokeWidth={2} />
-                  : <Square className="h-4.5 w-4.5 text-slate-400" strokeWidth={2} />}
-              </button>
+              {ENABLE_BULK && (
+                <button onClick={toggleAll} className="shrink-0">
+                  {allSelected
+                    ? <CheckSquare className="h-4.5 w-4.5 text-[#1E3A4A]" strokeWidth={2} />
+                    : <Square className="h-4.5 w-4.5 text-slate-400" strokeWidth={2} />}
+                </button>
+              )}
               <span className="flex-1">Case File</span>
               <span className="hidden md:block w-32 text-center">Role</span>
               <span className="hidden lg:block w-28 text-center">Urgency</span>
@@ -498,14 +484,6 @@ export default function CasesListPage() {
           )}
         </div>
       </div>
-
-      {/* Court Order Upload Dialog */}
-      <CourtOrderUpload
-        open={showCourtOrderUpload}
-        onClose={() => setShowCourtOrderUpload(false)}
-        onComplete={handleCourtOrderComplete}
-        token={token || ""}
-      />
     </div>
   );
 }
@@ -538,14 +516,16 @@ function CaseRow({
       className={`group flex items-center gap-4 p-5 bg-white rounded-sm border-2 border-slate-300 border-l-4 transition-all hover:shadow-xl ${statusAccent[caseItem.status] || "border-l-slate-300"
         } ${selected ? "ring-2 ring-[#1E3A4A]/30 border-[#1E3A4A]/40" : ""}`}
     >
-      <button
-        onClick={(e) => { e.stopPropagation(); e.preventDefault(); onToggleSelect(); }}
-        className="shrink-0 transition-colors"
-      >
-        {selected
-          ? <CheckSquare className="h-5 w-5 text-[#1E3A4A]" strokeWidth={2} />
-          : <Square className="h-5 w-5 text-slate-300 hover:text-[#1E3A4A]" strokeWidth={2} />}
-      </button>
+      {ENABLE_BULK && (
+        <button
+          onClick={(e) => { e.stopPropagation(); e.preventDefault(); onToggleSelect(); }}
+          className="shrink-0 transition-colors"
+        >
+          {selected
+            ? <CheckSquare className="h-5 w-5 text-[#1E3A4A]" strokeWidth={2} />
+            : <Square className="h-5 w-5 text-slate-300 hover:text-[#1E3A4A]" strokeWidth={2} />}
+        </button>
+      )}
 
       <Link href={`/professional/cases/${caseItem.family_file_id}`} className="flex-1 min-w-0 flex items-center gap-4">
         <div className="p-3 bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F] text-[#F4F8F7] rounded-sm shadow-md border border-[#1E3A4A]/40 shrink-0">
