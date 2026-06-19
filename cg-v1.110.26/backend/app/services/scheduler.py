@@ -138,6 +138,89 @@ async def _run_auto_close_expired_exchanges() -> None:
         sentry_sdk.capture_exception(exc)
 
 
+async def _run_exchange_reminders() -> None:
+    """Notify both parents ~24h before an upcoming custody exchange.
+
+    Runs hourly over a 23–25h window so each exchange is caught at least once;
+    a Redis sentinel per instance prevents duplicate reminders (no schema
+    change needed).
+    """
+    try:
+        async with redis_lock("sched:exchange_reminders", ttl_seconds=600) as acquired:
+            if not acquired:
+                return
+            from datetime import datetime, timedelta
+            from sqlalchemy import select, and_
+            from app.models.custody_exchange import CustodyExchange, CustodyExchangeInstance
+            from app.services.notification_service import notification_service
+            from app.models.notification import NotificationType
+            from app.core.redis_client import get_redis
+
+            now = datetime.utcnow()
+            lo, hi = now + timedelta(hours=23), now + timedelta(hours=25)
+            sent = 0
+            async with AsyncSessionLocal() as db:
+                rows = (
+                    await db.execute(
+                        select(CustodyExchangeInstance, CustodyExchange)
+                        .join(
+                            CustodyExchange,
+                            CustodyExchangeInstance.exchange_id == CustodyExchange.id,
+                        )
+                        .where(
+                            and_(
+                                CustodyExchangeInstance.scheduled_time >= lo,
+                                CustodyExchangeInstance.scheduled_time <= hi,
+                                CustodyExchangeInstance.status == "scheduled",
+                            )
+                        )
+                    )
+                ).all()
+                r = await get_redis()
+                for inst, tmpl in rows:
+                    sentinel = f"exch_remind:{inst.id}"
+                    if r is not None:
+                        try:
+                            if await r.get(sentinel):
+                                continue
+                        except Exception:
+                            pass
+                    when = (
+                        inst.scheduled_time.strftime("%a %b %d at %I:%M %p")
+                        if inst.scheduled_time else "soon"
+                    )
+                    loc = f" at {tmpl.location}" if getattr(tmpl, "location", None) else ""
+                    title = tmpl.title or "Custody exchange"
+                    for pid in {tmpl.from_parent_id, tmpl.to_parent_id}:
+                        if not pid:
+                            continue
+                        try:
+                            await notification_service.create(
+                                db=db,
+                                user_id=str(pid),
+                                notification_type=NotificationType.EXCHANGE_REMINDER.value,
+                                title="Exchange tomorrow",
+                                body=f'"{title}" is scheduled for {when}{loc}.',
+                                action_url="/schedule",
+                                family_file_id=(
+                                    str(tmpl.family_file_id) if tmpl.family_file_id else None
+                                ),
+                            )
+                            sent += 1
+                        except Exception as e:
+                            logger.warning("exchange reminder notify failed: %s", e)
+                    if r is not None:
+                        try:
+                            await r.setex(sentinel, 26 * 3600, "1")
+                        except Exception:
+                            pass
+        if sent:
+            logger.info("scheduler: exchange_reminders sent=%d", sent)
+    except Exception as exc:  # noqa: BLE001 — never kill the scheduler
+        logger.exception("scheduler: exchange_reminders failed: %s", exc)
+        sentry_sdk.capture_exception(exc)
+
+
 async def _run_alert_evaluator_tick() -> None:
     """Wave 6 Phase C: evaluate all enabled AlertRules every 5 minutes.
 
@@ -269,6 +352,16 @@ def start_scheduler(app) -> AsyncIOScheduler:  # noqa: ARG001 — FastAPI app ke
         trigger=IntervalTrigger(minutes=5),
         id="auto_close_expired_exchanges",
         name="Custody exchange window auto-closer",
+        replace_existing=True,
+        coalesce=True,
+        max_instances=1,
+    )
+    # 24h-ahead custody exchange reminders — hourly, dedup via Redis sentinel.
+    _scheduler.add_job(
+        _run_exchange_reminders,
+        trigger=CronTrigger(minute=0),
+        id="exchange_reminders",
+        name="24h custody exchange reminders",
         replace_existing=True,
         coalesce=True,
         max_instances=1,

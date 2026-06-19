@@ -439,6 +439,45 @@ async def approve_agreement(
         "activation_details": None,
     }
 
+    # Notify the other parent that their action is needed / the agreement is
+    # now in effect. Best-effort — never block approval on a notification error.
+    try:
+        from sqlalchemy import select as _select
+        from app.models.family_file import FamilyFile
+        from app.services.notification_service import notification_service
+        from app.models.notification import NotificationType
+        ff = None
+        if getattr(agreement, "family_file_id", None):
+            ff = (
+                await db.execute(
+                    _select(FamilyFile).where(FamilyFile.id == agreement.family_file_id)
+                )
+            ).scalar_one_or_none()
+        if ff:
+            other_id = (
+                ff.parent_b_id if str(ff.parent_a_id) == str(current_user.id) else ff.parent_a_id
+            )
+            if other_id:
+                approver = (current_user.first_name or "").strip() or "Your co-parent"
+                title_txt = getattr(agreement, "title", None) or "your agreement"
+                if agreement.status == "approved":
+                    n_title = "Agreement fully approved"
+                    n_body = f'Both parents have approved "{title_txt}". It is now in effect.'
+                else:
+                    n_title = "Agreement needs your approval"
+                    n_body = f'{approver} approved "{title_txt}". Review and approve to finalize it.'
+                await notification_service.create(
+                    db=db,
+                    user_id=str(other_id),
+                    notification_type=NotificationType.AGREEMENT_CHANGE.value,
+                    title=n_title,
+                    body=n_body,
+                    action_url=f"/agreements/{agreement.id}",
+                    family_file_id=str(ff.id),
+                )
+    except Exception as e:
+        logger.warning("approve_agreement: notification failed: %s", e)
+
     # Only the second approval flips status to "approved" (both parents signed).
     if agreement.status != "approved":
         response["message"] = "Approval recorded. Waiting for other parent."
