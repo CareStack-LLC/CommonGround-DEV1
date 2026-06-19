@@ -93,8 +93,14 @@ export default function AccessRequestsPage() {
   const [declineReason, setDeclineReason] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [conflicts, setConflicts] = useState<
+    Record<string, { has_blocking_conflict: boolean; conflicts: any[] }>
+  >({});
+
+  const isBlocked = (id: string) => conflicts[id]?.has_blocking_conflict === true;
 
   const toggleSelect = (id: string) => {
+    if (isBlocked(id)) return; // cannot select a conflicted invite
     setSelectedIds((prev) => {
       const next = new Set(prev);
       next.has(id) ? next.delete(id) : next.add(id);
@@ -117,12 +123,38 @@ export default function AccessRequestsPage() {
       if (response.ok) {
         const data = await response.json();
         setRequests(data);
+        loadConflicts(data.filter((r: AccessRequest) => r.status === "pending"));
       }
     } catch (err) {
       console.error("Error fetching access requests:", err);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Check each pending invite for conflicts of interest so we can warn (and
+  // block) before the professional accepts.
+  const loadConflicts = async (pending: AccessRequest[]) => {
+    const entries = await Promise.all(
+      pending.map(async (r) => {
+        try {
+          const res = await fetch(
+            `${API_BASE}/api/v1/professional/access-requests/${r.id}/conflicts`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          if (res.ok) return [r.id, await res.json()] as const;
+        } catch {
+          /* ignore — absence of data just means no warning shown */
+        }
+        return [r.id, null] as const;
+      })
+    );
+    setConflicts(
+      Object.fromEntries(entries.filter(([, v]) => v)) as Record<
+        string,
+        { has_blocking_conflict: boolean; conflicts: any[] }
+      >
+    );
   };
 
   const handleAccept = async (requestId: string) => {
@@ -320,15 +352,18 @@ export default function AccessRequestsPage() {
               variant="outline"
               size="sm"
               disabled={isProcessing}
-              onClick={() =>
+              onClick={() => {
+                const selectable = pendingRequests
+                  .filter((r) => !isBlocked(r.id))
+                  .map((r) => r.id);
                 setSelectedIds(
-                  selectedIds.size === pendingRequests.length
+                  selectedIds.size === selectable.length
                     ? new Set()
-                    : new Set(pendingRequests.map((r) => r.id))
-                )
-              }
+                    : new Set(selectable)
+                );
+              }}
             >
-              {selectedIds.size === pendingRequests.length ? "Clear selection" : "Select all"}
+              {selectedIds.size > 0 ? "Clear selection" : "Select all"}
             </Button>
             <Button
               size="sm"
@@ -372,7 +407,8 @@ export default function AccessRequestsPage() {
                         <button
                           type="button"
                           onClick={() => toggleSelect(request.id)}
-                          className="shrink-0"
+                          disabled={isBlocked(request.id)}
+                          className="shrink-0 disabled:opacity-30 disabled:cursor-not-allowed"
                           aria-label={selectedIds.has(request.id) ? "Deselect" : "Select"}
                         >
                           {selectedIds.has(request.id) ? (
@@ -391,6 +427,29 @@ export default function AccessRequestsPage() {
                           </Badge>
                         )}
                       </div>
+
+                      {/* Conflict of interest — block accept, or warn (firm imputed) */}
+                      {conflicts[request.id]?.conflicts?.length > 0 && (
+                        <div
+                          className={`mb-4 rounded-md border p-3 text-sm ${
+                            isBlocked(request.id)
+                              ? "border-red-300 bg-red-50 text-red-900"
+                              : "border-amber-300 bg-amber-50 text-amber-900"
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 font-semibold mb-1">
+                            <AlertCircle className="h-4 w-4 shrink-0" />
+                            {isBlocked(request.id)
+                              ? "Conflict of interest — cannot accept"
+                              : "Possible conflict of interest"}
+                          </div>
+                          <ul className="list-disc pl-5 space-y-0.5">
+                            {conflicts[request.id].conflicts.map((c: any, i: number) => (
+                              <li key={i}>{c.message}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
 
                       <div className="grid grid-cols-2 gap-4 mb-4">
                         <div className="flex items-center gap-2 text-sm text-gray-600">
@@ -464,7 +523,8 @@ export default function AccessRequestsPage() {
                     <div className="flex flex-col gap-2 ml-4">
                       <Button
                         onClick={() => handleAccept(request.id)}
-                        disabled={isProcessing}
+                        disabled={isProcessing || isBlocked(request.id)}
+                        title={isBlocked(request.id) ? "Blocked by a conflict of interest" : undefined}
                         className="bg-green-600 hover:bg-green-700"
                       >
                         <Check className="h-4 w-4 mr-2" />

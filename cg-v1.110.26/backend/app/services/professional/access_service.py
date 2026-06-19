@@ -588,6 +588,16 @@ class ProfessionalAccessService:
                 "can be created. Both parents must approve the access request."
             )
 
+        # Block conflicts of interest before creating the assignment.
+        from app.services.professional.conflict_service import ConflictCheckService
+        await ConflictCheckService(self.db).assert_no_blocking_conflicts(
+            professional_id=request.professional_id,
+            family_file_id=request.family_file_id,
+            representing=representing,
+            assignment_role=assignment_role.value,
+            firm_id=request.firm_id,
+        )
+
         # Create new assignment with inherited settings
         assignment = CaseAssignment(
             id=str(uuid4()),
@@ -1079,6 +1089,16 @@ class ProfessionalAccessService:
         can_message = assignment_role.value != AssignmentRole.PARALEGAL.value
         if "can_message_by_default" in firm_settings:
             can_message = firm_settings["can_message_by_default"]
+
+        # Block conflicts of interest before creating the assignment.
+        from app.services.professional.conflict_service import ConflictCheckService
+        await ConflictCheckService(self.db).assert_no_blocking_conflicts(
+            professional_id=request.professional_id,
+            family_file_id=request.family_file_id,
+            representing=representing,
+            assignment_role=assignment_role.value,
+            firm_id=request.firm_id,
+        )
 
         # Create new assignment
         assignment = CaseAssignment(

@@ -82,6 +82,17 @@ class CaseAssignmentService:
         # Get professional's firm if applicable
         firm_id = await self._get_professional_primary_firm(professional_id)
 
+        # Block conflicts of interest (e.g. adverse to a party this professional
+        # already represents in another active matter).
+        from app.services.professional.conflict_service import ConflictCheckService
+        await ConflictCheckService(self.db).assert_no_blocking_conflicts(
+            professional_id=professional_id,
+            family_file_id=family_file_id,
+            representing=data.representing,
+            assignment_role=data.assignment_role.value,
+            firm_id=firm_id,
+        )
+
         assignment = CaseAssignment(
             id=str(uuid4()),
             professional_id=professional_id,

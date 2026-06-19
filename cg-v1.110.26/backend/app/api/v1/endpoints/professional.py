@@ -1646,8 +1646,12 @@ async def accept_case_invitation(
 
     service = ProfessionalAccessService(db)
 
+    from app.services.professional.conflict_service import ConflictError
     try:
         request = await service.professional_accept_invitation(request_id, profile.id)
+    except ConflictError as e:
+        # Surface the specific conflict so the professional understands why.
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
     except ValueError as e:
         logger.error(f"Failed to accept case invitation: {e}")
         capture_error(e)
@@ -1657,6 +1661,46 @@ async def accept_case_invitation(
         )
 
     return _access_request_to_response(request)
+
+
+@router.get(
+    "/access-requests/{request_id}/conflicts",
+    summary="Preview conflicts of interest for a case invitation",
+)
+async def get_access_request_conflicts(
+    request_id: str,
+    db: AsyncSession = Depends(get_db),
+    profile: ProfessionalProfile = Depends(get_current_professional),
+):
+    """Return any conflicts of interest for accepting this invitation.
+
+    Includes blocking professional-level conflicts and non-blocking firm-level
+    (imputed) warnings, so the UI can warn before the professional accepts.
+    """
+    service = ProfessionalAccessService(db)
+    request = await service.get_request(request_id)
+    if not request or (
+        request.professional_id and request.professional_id != profile.id
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Request not found"
+        )
+
+    from app.services.professional.conflict_service import ConflictCheckService
+
+    conflicts = await ConflictCheckService(db).check(
+        professional_id=profile.id,
+        family_file_id=request.family_file_id,
+        representing=request.representing,
+        assignment_role=request.requested_role,
+        firm_id=request.firm_id,
+        include_firm=True,
+    )
+    return {
+        "request_id": request_id,
+        "has_blocking_conflict": any(c["severity"] == "block" for c in conflicts),
+        "conflicts": conflicts,
+    }
 
 
 @router.post(
