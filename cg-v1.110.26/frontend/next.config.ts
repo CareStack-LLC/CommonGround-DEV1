@@ -64,6 +64,9 @@ const nextConfig: NextConfig = {
       // in the sitemap, so redirect permanently until real content exists.
       { source: '/team', destination: '/about', permanent: true },
       { source: '/press', destination: '/about', permanent: true },
+      // /testimonials hidden 2026-06 — temporary redirect so it's easy to
+      // restore (page content is kept in the repo, just unreachable).
+      { source: '/testimonials', destination: '/', permanent: false },
     ];
   },
   async headers() {

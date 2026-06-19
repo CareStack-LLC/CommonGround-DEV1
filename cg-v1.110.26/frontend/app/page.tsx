@@ -729,15 +729,6 @@ export default function HomePage() {
               })}
             </div>
 
-            <div className="text-center">
-              <Link
-                href="/testimonials"
-                className="inline-flex items-center gap-2 text-[var(--portal-primary)] font-medium hover:underline"
-              >
-                Read their full stories
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
           </div>
         </section>
 
