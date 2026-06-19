@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { DailyCall } from '@daily-co/daily-js';
 import { RotateCcw, Trophy, X as XIcon, Circle, Users, Cpu, User as UserIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -20,12 +20,16 @@ interface ArcadeMoveMessage {
   type: 'arcade_move';
   data: {
     gameId: 'tic-tac-toe';
-    action: 'move' | 'reset' | 'invite' | 'accept';
+    // hello: announce presence (mount/reconnect) so peers exchange full state.
+    // state: authoritative full-board snapshot from the player who just moved
+    //        (or in reply to a hello). reset: start a new round.
+    action: 'hello' | 'state' | 'reset';
     senderId: string;
     senderName?: string;
-    cellIndex?: number;
-    playedAs?: 'X' | 'O';
-    boardSig?: string;
+    board?: Mark[];
+    turn?: 'X' | 'O';
+    winner?: Mark | 'draw' | null;
+    line?: number[];
   };
 }
 
@@ -33,6 +37,10 @@ function isArcadeTicTacToeMessage(msg: unknown): msg is ArcadeMoveMessage {
   if (!msg || typeof msg !== 'object') return false;
   const m = msg as ArcadeMoveMessage;
   return m.type === 'arcade_move' && m?.data?.gameId === 'tic-tac-toe';
+}
+
+function filledCount(b: Board): number {
+  return b.reduce((n, c) => (c !== null ? n + 1 : n), 0);
 }
 
 function checkWinner(board: Board): { winner: Mark | 'draw'; line: number[] } {
@@ -72,10 +80,6 @@ function pickAiMove(board: Board, aiMark: 'X' | 'O'): number {
   return available[Math.floor(Math.random() * available.length)];
 }
 
-function boardSignature(b: Board): string {
-  return b.map((c) => c ?? '.').join('');
-}
-
 interface InlineTicTacToeProps {
   userId: string;
   userName: string;
@@ -109,14 +113,23 @@ export function InlineTicTacToe({
   opponentName,
   onExit,
 }: InlineTicTacToeProps) {
-  // Local player's mark. For vs-computer we are always X.
-  const localMark: 'X' | 'O' =
-    opponent === 'computer'
-      ? 'X'
-      : opponentId && userId < opponentId
-        ? 'X'
-        : 'O';
-  const remoteMark: 'X' | 'O' = localMark === 'X' ? 'O' : 'X';
+  // Resolve the opponent's Daily id dynamically. It can be unknown at mount
+  // (opponentId is optional), so we learn it from the first peer message —
+  // making mark assignment deterministic and identical on both sides instead
+  // of both defaulting to 'O' and deadlocking.
+  const [resolvedOpponentId, setResolvedOpponentId] = useState<string | null>(
+    opponentId ?? null,
+  );
+  const [remoteName, setRemoteName] = useState<string | undefined>(opponentName);
+
+  // Stable mark: the lower user id is always 'X'. For vs-computer we are 'X'.
+  const localMark: 'X' | 'O' | null = useMemo(() => {
+    if (opponent === 'computer') return 'X';
+    if (!resolvedOpponentId) return null; // undetermined until handshake
+    return userId < resolvedOpponentId ? 'X' : 'O';
+  }, [opponent, resolvedOpponentId, userId]);
+  const remoteMark: 'X' | 'O' | null =
+    localMark === 'X' ? 'O' : localMark === 'O' ? 'X' : null;
 
   const [board, setBoard] = useState<Board>(Array(9).fill(null));
   const [turn, setTurn] = useState<'X' | 'O'>('X');
@@ -125,58 +138,54 @@ export function InlineTicTacToe({
   const [localScore, setLocalScore] = useState(0);
   const [remoteScore, setRemoteScore] = useState(0);
 
-  const lastMoveSentRef = useRef<string>('');
+  // Mirror current game state in a ref so the message handler can answer a
+  // peer's `hello` with the latest snapshot without re-subscribing.
+  const gameRef = useRef({ board, turn, winner, line: winningLine });
+  useEffect(() => {
+    gameRef.current = { board, turn, winner, line: winningLine };
+  }, [board, turn, winner, winningLine]);
 
-  const broadcastMove = useCallback(
-    (cellIndex: number, playedAs: 'X' | 'O', sig: string) => {
+  const sendMsg = useCallback(
+    (data: ArcadeMoveMessage['data']) => {
       if (opponent !== 'participant') return;
       const call = callRef.current;
       if (!call) return;
-      const key = `${cellIndex}:${playedAs}:${sig}`;
-      if (lastMoveSentRef.current === key) return;
-      lastMoveSentRef.current = key;
-      const msg: ArcadeMoveMessage = {
-        type: 'arcade_move',
-        data: {
-          gameId: 'tic-tac-toe',
-          action: 'move',
-          senderId: userId,
-          senderName: userName,
-          cellIndex,
-          playedAs,
-          boardSig: sig,
-        },
-      };
       try {
-        call.sendAppMessage(msg, '*');
+        call.sendAppMessage({ type: 'arcade_move', data } as ArcadeMoveMessage, '*');
       } catch {
-        // ignore
+        // best effort — state self-heals on the next snapshot
       }
     },
-    [callRef, opponent, userId, userName],
+    [callRef, opponent],
+  );
+
+  const broadcastState = useCallback(
+    (b: Board, t: 'X' | 'O', w: Mark | 'draw', line: number[]) => {
+      sendMsg({
+        gameId: 'tic-tac-toe',
+        action: 'state',
+        senderId: userId,
+        senderName: userName,
+        board: b,
+        turn: t,
+        winner: w,
+        line,
+      });
+    },
+    [sendMsg, userId, userName],
   );
 
   const broadcastReset = useCallback(() => {
-    if (opponent !== 'participant') return;
-    const call = callRef.current;
-    if (!call) return;
-    const msg: ArcadeMoveMessage = {
-      type: 'arcade_move',
-      data: {
-        gameId: 'tic-tac-toe',
-        action: 'reset',
-        senderId: userId,
-        senderName: userName,
-      },
-    };
-    try {
-      call.sendAppMessage(msg, '*');
-    } catch {
-      // ignore
-    }
-  }, [callRef, opponent, userId, userName]);
+    sendMsg({ gameId: 'tic-tac-toe', action: 'reset', senderId: userId, senderName: userName });
+  }, [sendMsg, userId, userName]);
 
-  // Apply remote moves
+  // Announce presence on mount / reconnect; the peer replies with its state.
+  useEffect(() => {
+    if (opponent !== 'participant') return;
+    sendMsg({ gameId: 'tic-tac-toe', action: 'hello', senderId: userId, senderName: userName });
+  }, [opponent, sendMsg, userId, userName]);
+
+  // Apply remote messages (hello / state / reset)
   useEffect(() => {
     if (opponent !== 'participant') return;
     const call = callRef.current;
@@ -186,37 +195,42 @@ export function InlineTicTacToe({
       if (!isArcadeTicTacToeMessage(event.data)) return;
       const d = event.data.data;
       if (d.senderId === userId) return;
-      // If we know the opponent id, drop messages from other participants.
-      if (opponentId && d.senderId !== opponentId) return;
+      // Once locked onto an opponent, ignore any third participant.
+      if (resolvedOpponentId && d.senderId !== resolvedOpponentId) return;
+      if (!resolvedOpponentId) setResolvedOpponentId(d.senderId);
+      if (d.senderName) setRemoteName(d.senderName);
 
       if (d.action === 'reset') {
         setBoard(Array(9).fill(null));
         setWinner(null);
         setWinningLine([]);
         setTurn('X');
-        lastMoveSentRef.current = '';
         return;
       }
 
-      if (
-        d.action === 'move' &&
-        typeof d.cellIndex === 'number' &&
-        d.playedAs === remoteMark
-      ) {
-        setBoard((prev) => {
-          if (prev[d.cellIndex!] !== null) return prev; // collision — ignore
-          const next = [...prev];
-          next[d.cellIndex!] = d.playedAs!;
-          const { winner: w, line } = checkWinner(next);
-          if (w) {
-            setWinner(w);
-            setWinningLine(line);
-            if (w === remoteMark) setRemoteScore((s) => s + 1);
-          } else {
-            setTurn(localMark);
-          }
-          return next;
-        });
+      if (d.action === 'hello') {
+        // A peer (re)joined — reply with our authoritative snapshot so they
+        // catch up to the current board, turn and result.
+        const g = gameRef.current;
+        broadcastState(g.board, g.turn, g.winner, g.line);
+        return;
+      }
+
+      if (d.action === 'state' && Array.isArray(d.board) && d.board.length === 9) {
+        const incoming = d.board as Board;
+        // Adopt a snapshot at least as advanced as ours. Full snapshots make
+        // the game self-healing: one dropped message is corrected by the next
+        // move, and a reconnecting player is restored from the hello reply.
+        if (filledCount(incoming) < filledCount(gameRef.current.board)) return;
+        const prevWinner = gameRef.current.winner;
+        setBoard(incoming);
+        setTurn(d.turn ?? 'X');
+        setWinner(d.winner ?? null);
+        setWinningLine(d.line ?? []);
+        // Credit the opponent's win exactly once, on the null→winner edge.
+        if (!prevWinner && d.winner && d.winner !== 'draw' && d.winner === remoteMark) {
+          setRemoteScore((s) => s + 1);
+        }
       }
     };
 
@@ -224,7 +238,7 @@ export function InlineTicTacToe({
     return () => {
       call.off('app-message', handler);
     };
-  }, [callRef, opponent, userId, opponentId, remoteMark, localMark]);
+  }, [callRef, opponent, userId, resolvedOpponentId, remoteMark, broadcastState]);
 
   // AI move when it's the computer's turn
   useEffect(() => {
@@ -254,20 +268,23 @@ export function InlineTicTacToe({
   const handleCellClick = (index: number) => {
     if (winner) return;
     if (board[index] !== null) return;
+    if (localMark === null) return; // handshake not complete yet
     if (turn !== localMark) return;
 
     const next = [...board];
     next[index] = localMark;
     const { winner: w, line } = checkWinner(next);
+    const nextTurn: 'X' | 'O' = localMark === 'X' ? 'O' : 'X';
     setBoard(next);
     if (w) {
       setWinner(w);
       setWinningLine(line);
       if (w === localMark) setLocalScore((s) => s + 1);
     } else {
-      setTurn(localMark === 'X' ? 'O' : 'X');
+      setTurn(nextTurn);
     }
-    broadcastMove(index, localMark, boardSignature(next));
+    // Broadcast the full resulting board so the peer can never diverge.
+    broadcastState(next, w ? turn : nextTurn, w ?? null, line);
   };
 
   const handleReset = () => {
@@ -275,13 +292,13 @@ export function InlineTicTacToe({
     setWinner(null);
     setWinningLine([]);
     setTurn('X');
-    lastMoveSentRef.current = '';
     broadcastReset();
   };
 
-  const isLocalTurn = !winner && turn === localMark;
+  const isLocalTurn = !winner && localMark !== null && turn === localMark;
+  const connecting = opponent === 'participant' && localMark === null;
   const opponentLabel =
-    opponent === 'computer' ? 'Computer' : opponentName || 'Your partner';
+    opponent === 'computer' ? 'Computer' : remoteName || 'Your partner';
   const OpponentIcon = opponent === 'computer' ? Cpu : UserIcon;
 
   return (
@@ -296,15 +313,17 @@ export function InlineTicTacToe({
                 <Cpu className="h-4 w-4 text-[#3DAA8A]" />
               )}
               <span>
-                {winner
-                  ? winner === 'draw'
-                    ? "It's a draw!"
-                    : winner === localMark
-                      ? 'You win!'
-                      : `${opponentLabel} wins!`
-                  : isLocalTurn
-                    ? `Your turn (${localMark})`
-                    : `${opponentLabel}'s turn (${remoteMark})`}
+                {connecting
+                  ? 'Connecting…'
+                  : winner
+                    ? winner === 'draw'
+                      ? "It's a draw!"
+                      : winner === localMark
+                        ? 'You win!'
+                        : `${opponentLabel} wins!`
+                    : isLocalTurn
+                      ? `Your turn (${localMark})`
+                      : `${opponentLabel}'s turn (${remoteMark})`}
               </span>
             </div>
             <button
