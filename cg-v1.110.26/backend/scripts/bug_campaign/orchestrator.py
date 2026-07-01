@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 
 from .admin_client import AdminClient
 from .ai.anthropic_client import AnthropicClient
@@ -199,6 +199,56 @@ class CampaignOrchestrator:
             all_results += await self._run_family(fam, todays, day=day, idempotent=True)
         await self._finalize(admin, setup["cohort_id"], day=day, results=all_results)
         return all_results
+
+    # ---- 3-day custody-accuracy soak (dedicated FRESH cohort) --------------
+    async def _ensure_custody_family(self, admin: AdminClient) -> dict:
+        state = load_state()
+        cid = state.get("custody_cohort_id")
+        if not cid:
+            cohort = await admin.create_cohort(
+                name="Custody Accuracy — Multi-Day Soak", target_feature="exchange", family_count=1,
+                description="Real-time multi-day custody-tracker accuracy check via daily exchanges.",
+                test_instructions="Automated daily exchanges; harness verifies cumulative custody accuracy.",
+            )
+            cid = cohort["id"]
+            await admin.generate_families(cid)
+            state = load_state()
+            state["custody_cohort_id"] = cid
+            state["custody_soak_start"] = date.today().isoformat()
+            save_state(state)
+        dash = await admin.get_cohort(cid)
+        fams: list[dict] = []
+        for fam in dash.get("families", []):
+            if not fam.get("family_file_id"):
+                continue
+            token = await self._ensure_token(admin, cid, fam)
+            fams.append({
+                "id": fam["id"], "family_file_id": fam["family_file_id"],
+                "parent_a_email": fam["parent_a_email"], "parent_a_password": fam["parent_a_password"],
+                "parent_a_name": fam.get("parent_a_name", "Parent A"),
+                "parent_b_email": fam["parent_b_email"], "parent_b_password": fam["parent_b_password"],
+                "parent_b_name": fam.get("parent_b_name", "Parent B"), "token": token,
+            })
+        return {"cohort_id": cid, "families": fams}
+
+    async def custody_soak(self, admin: AdminClient, day: int | None = None) -> list[ScenarioResult]:
+        from .scenarios.soak_custody import SCENARIOS as CUSTODY_SCENARIOS
+
+        setup = await self._ensure_custody_family(admin)
+        if day is None:
+            start = (load_state() or {}).get("custody_soak_start")
+            try:
+                day = (date.today() - date.fromisoformat(start)).days + 1
+            except Exception:
+                day = 1
+        print(f"\n▶ CUSTODY SOAK day {day}  ({self.cfg.summary()})")
+        if not setup["families"]:
+            raise SystemExit("Custody soak aborted: no usable seeded family.")
+        results: list[ScenarioResult] = []
+        for fam in setup["families"]:
+            results += await self._run_family(fam, CUSTODY_SCENARIOS, day=day, idempotent=True)
+        await self._finalize(admin, setup["cohort_id"], day=day, results=results)
+        return results
 
     async def _finalize(self, admin: AdminClient, cohort_id: str, *, day: int, results: list[ScenarioResult]) -> None:
         digest = await rollup(self.ai, day, results)

@@ -64,6 +64,8 @@ async def _run(args) -> None:
             await orch.fast(admin)
         elif args.mode == "soak":
             await orch.soak(admin, _derive_day(args.day))
+        elif args.mode == "custody-soak":
+            await orch.custody_soak(admin, args.day)
         else:
             raise SystemExit(f"unknown mode {args.mode!r}")
 
@@ -80,7 +82,7 @@ def _check() -> None:
 
 def main() -> None:
     p = argparse.ArgumentParser(description="CommonGround AI-agent bug campaign")
-    p.add_argument("--mode", choices=["smoke", "fast", "soak"])
+    p.add_argument("--mode", choices=["smoke", "fast", "soak", "custody-soak"])
     p.add_argument("--day", type=int, default=None, help="soak day override (else derived from start_date)")
     p.add_argument("--confirm-production", action="store_true", help="required prod opt-in gate")
     p.add_argument("--dry-run", action="store_true", help="run scenarios+oracle, post nothing to the dashboard")
