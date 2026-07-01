@@ -4694,6 +4694,11 @@ async def assign_bug_hunt_tester(
             "id": tester.id, "cohort_id": tester.cohort_id,
             "family_id": tester.family_id, "tester_name": tester.tester_name,
             "tester_email": tester.tester_email, "status": tester.status,
+            # Returned so automated/QA harnesses can retrieve the token without
+            # relying on the emailed magic link. Superadmin-only endpoint.
+            "access_token": tester.access_token,
+            "magic_link": magic_link,
+            "token_expires_at": tester.token_expires_at.isoformat() if tester.token_expires_at else None,
             "email_sent_at": tester.email_sent_at.isoformat() if tester.email_sent_at else None,
             "created_at": tester.created_at.isoformat(),
         }
@@ -4853,7 +4858,13 @@ async def resend_bug_hunt_tester_invite(
 
         await _log_admin_action(db, admin_user, "bug_hunt_resend_tester", "bug_hunt", target_id=tester_id)
         await db.commit()
-        return {"id": tester.id, "status": tester.status, "resent": True}
+        return {
+            "id": tester.id, "status": tester.status, "resent": True,
+            # Superadmin-only: expose the freshly-regenerated token for QA harnesses.
+            "access_token": tester.access_token,
+            "magic_link": magic_link,
+            "token_expires_at": tester.token_expires_at.isoformat() if tester.token_expires_at else None,
+        }
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc))
 
