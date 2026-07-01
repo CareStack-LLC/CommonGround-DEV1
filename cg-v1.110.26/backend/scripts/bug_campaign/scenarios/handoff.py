@@ -116,9 +116,16 @@ async def geo_05_way_outside(ctx: FamilyContext) -> ScenarioOutcome:
 
 
 async def geo_06_one_party(ctx: FamilyContext) -> ScenarioOutcome:
-    """Only the from-parent checks in; must NOT complete or transfer custody."""
+    """Only the from-parent checks in; must NOT complete or CHANGE custody.
+
+    Scenarios share family state, so we capture the custodian BEFORE the check-in
+    and assert it is UNCHANGED afterward (not merely 'not parent B')."""
     clat, clng = CENTER
     radius = 100
+    cs_before = await ctx.parent_a.custody_status(ctx.family_file_id)
+    child_before = next((c for c in cs_before.get("children", []) if c.get("child_id") == ctx.child_ids[0]), {})
+    custodian_before = child_before.get("current_parent_id")
+
     exchange, inst = await create_handoff(ctx, radius_m=radius, title="S-GEO-06 one party only")
     iid = inst["id"]
     a: list[Assertion] = []
@@ -131,12 +138,12 @@ async def geo_06_one_party(ctx: FamilyContext) -> ScenarioOutcome:
     cs = await ctx.parent_a.custody_status(ctx.family_file_id)
     child = next((c for c in cs.get("children", []) if c.get("child_id") == ctx.child_ids[0]), {})
     a.append(Assertion(
-        "custody.not_transferred", child.get("current_parent_id") != ctx.parent_b.user_id,
-        f"!= {ctx.parent_b.user_id}", child.get("current_parent_id"),
-        "an unfinished handoff must not transfer custody", "high",
+        "custody.unchanged", child.get("current_parent_id") == custodian_before,
+        custodian_before, child.get("current_parent_id"),
+        "a single-party (incomplete) handoff must not change the custodian", "high",
     ))
-    summary = "Only one parent showed up and checked in. The exchange stayed open and custody did not move."
-    return ScenarioOutcome(a, {"from": r1, "custody_status": cs}, summary)
+    summary = "Only one parent showed up and checked in. The exchange stayed open and custody did not change."
+    return ScenarioOutcome(a, {"from": r1, "custody_before": cs_before, "custody_status": cs}, summary)
 
 
 async def geo_08_mixed_sources(ctx: FamilyContext) -> ScenarioOutcome:
@@ -152,7 +159,8 @@ async def geo_08_mixed_sources(ctx: FamilyContext) -> ScenarioOutcome:
         sub_lat=clat, sub_lng=clng, sub_acc=5,
     )
     r2 = await ctx.parent_b.check_in_manual(iid, notes="Tapped to confirm at the door")
-    a += oracle.completion_assertions(r2)
+    # The manual check-in endpoint does not return handoff_outcome, so don't require it.
+    a += oracle.completion_assertions(r2, require_outcome=False)
     cs = await ctx.parent_a.custody_status(ctx.family_file_id)
     a.append(oracle.custody_flip_assertion(cs, ctx.child_ids[0], ctx.parent_b.user_id))
     summary = "One parent used a silent GPS check-in and the other tapped to confirm; the exchange still completed cleanly."

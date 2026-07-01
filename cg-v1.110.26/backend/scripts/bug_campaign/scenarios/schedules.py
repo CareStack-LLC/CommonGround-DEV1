@@ -104,11 +104,15 @@ def _stats_consistency(stats: dict) -> list[Assertion]:
     a_pct = _num(pa.get("percentage"))
     b_pct = _num(pb.get("percentage"))
     out: list[Assertion] = []
-    if stats.get("recorded_days", 0) and a_pct is not None and b_pct is not None:
-        out.append(Assertion(
-            "stats.pcts_sum_100", abs((a_pct + b_pct) - 100) <= 1.0, "~100",
-            round(a_pct + b_pct, 1), "parent percentages should sum to ~100 over recorded days", "high",
-        ))
+    # NOTE: percentages are computed over the WHOLE period (including unknown/
+    # untracked days), so they intentionally do NOT sum to 100. We only assert
+    # they are individually within a sane 0..100 range.
+    for label, pct in (("a", a_pct), ("b", b_pct)):
+        if pct is not None:
+            out.append(Assertion(
+                f"stats.parent_{label}_pct_range", 0.0 <= pct <= 100.0, "0..100", pct,
+                "custody percentage must be a valid 0-100 value", "high",
+            ))
     agreed = (stats.get("agreed_schedule") or {})
     var = (stats.get("variance") or {})
     agreed_a, var_a = _num(agreed.get("parent_a_percentage")), _num(var.get("parent_a"))

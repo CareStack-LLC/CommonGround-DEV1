@@ -89,9 +89,10 @@ def one_party_assertions(resp: dict) -> list[Assertion]:
     ]
 
 
-def completion_assertions(resp: dict) -> list[Assertion]:
-    """After both check-ins: completed + completed_at + outcome completed."""
-    return [
+def completion_assertions(resp: dict, *, require_outcome: bool = True) -> list[Assertion]:
+    """After both check-ins: completed + completed_at (+ outcome when the
+    responding endpoint returns it — the manual check-in endpoint does not)."""
+    out = [
         Assertion(
             name="both.status_completed", ok=resp.get("status") == "completed",
             expected="completed", actual=resp.get("status"),
@@ -102,11 +103,13 @@ def completion_assertions(resp: dict) -> list[Assertion]:
             expected="not null", actual=resp.get("completed_at"),
             detail="completed_at recorded", severity="high",
         ),
-        Assertion(
+    ]
+    if require_outcome:
+        out.append(Assertion(
             name="both.handoff_outcome", ok=resp.get("handoff_outcome") == "completed",
             expected="completed", actual=resp.get("handoff_outcome"), severity="high",
-        ),
-    ]
+        ))
+    return out
 
 
 def custody_flip_assertion(custody_status: dict, child_id: str, expected_parent_id: str) -> Assertion:

@@ -128,7 +128,10 @@ class ParentAgentClient:
         return await self._raw_request("GET", "/family-files/")
 
     async def get_children(self, family_file_id: str) -> list:
-        return await self._raw_request("GET", "/children/", params={"family_file_id": family_file_id})
+        data = await self._raw_request("GET", f"/family-files/{family_file_id}/children")
+        if isinstance(data, dict):
+            return data.get("items", data.get("children", []))
+        return data or []
 
     # ---- exchanges ---------------------------------------------------------
     async def create_exchange(self, payload: dict) -> dict:
