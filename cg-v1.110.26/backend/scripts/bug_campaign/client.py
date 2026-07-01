@@ -308,6 +308,70 @@ class ParentAgentClient:
         resp = await self._http.request("POST", f"/wallets/child/{child_id}/contribute", json=payload, headers=self._headers())
         return resp.status_code, _safe_json(resp)
 
+    # ---- onboarding (register + family lifecycle) --------------------------
+    async def register(self, first_name: str = "QA", last_name: str = "User") -> str:
+        data = await self._raw_request(
+            "POST", "/auth/register", auth=False,
+            json={"email": self.email, "password": self.password,
+                  "first_name": first_name, "last_name": last_name},
+        )
+        self.access_token = data["access_token"]
+        self.refresh_token = data.get("refresh_token")
+        self.user_id = (data.get("user") or {}).get("id")
+        return self.access_token
+
+    async def create_family_file(self, payload: dict) -> dict:
+        return await self._raw_request("POST", "/family-files/", json=payload)
+
+    async def get_family_file(self, family_file_id: str) -> dict:
+        return await self._raw_request("GET", f"/family-files/{family_file_id}")
+
+    async def invite_coparent(self, family_file_id: str, email: str, role: str = "father") -> dict:
+        return await self._raw_request(
+            "POST", f"/family-files/{family_file_id}/invite", json={"email": email, "role": role}
+        )
+
+    async def accept_invitation(self, family_file_id: str) -> dict:
+        return await self._raw_request("POST", f"/family-files/{family_file_id}/accept", json={})
+
+    # ---- notifications -----------------------------------------------------
+    async def list_notifications(self, unread_only: bool = False, limit: int = 50) -> dict:
+        return await self._raw_request(
+            "GET", "/notifications", params={"unread_only": unread_only, "limit": limit}
+        )
+
+    async def notifications_unread_count(self) -> dict:
+        return await self._raw_request("GET", "/notifications/unread-count")
+
+    async def mark_notifications_read(self, ids: list[str] | None = None) -> dict:
+        return await self._raw_request("POST", "/notifications/mark-read", json={"notification_ids": ids or []})
+
+    # ---- schedule events ---------------------------------------------------
+    async def create_event(self, payload: dict) -> dict:
+        return await self._raw_request("POST", "/schedule/events", json=payload)
+
+    async def list_events(self, case_id: str) -> Any:
+        return await self._raw_request("GET", f"/schedule/cases/{case_id}/events")
+
+    # ---- ClearFund funding -------------------------------------------------
+    async def fund_obligation(self, obligation_id: str, payload: dict) -> tuple[int, dict]:
+        if self.cfg.request_delay_ms:
+            await asyncio.sleep(self.cfg.request_delay_ms / 1000)
+        resp = await self._http.request(
+            "POST", f"/clearfund/obligations/{obligation_id}/fund", json=payload, headers=self._headers()
+        )
+        return resp.status_code, _safe_json(resp)
+
+    async def get_funding(self, obligation_id: str) -> dict:
+        return await self._raw_request("GET", f"/clearfund/obligations/{obligation_id}/funding")
+
+    # ---- a raw GET returning (status, body) for permission checks ----------
+    async def try_get(self, path: str) -> tuple[int, Any]:
+        if self.cfg.request_delay_ms:
+            await asyncio.sleep(self.cfg.request_delay_ms / 1000)
+        resp = await self._http.request("GET", path, headers=self._headers())
+        return resp.status_code, _safe_json(resp)
+
 
 def _safe_json(resp: httpx.Response) -> Any:
     try:

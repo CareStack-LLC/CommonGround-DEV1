@@ -34,6 +34,7 @@ async def rollup(ai: AnthropicClient, day: int, results: list[ScenarioResult]) -
         f"Day {day}: {counts['scenarios_passed']}/{counts['scenarios_run']} scenarios passed, "
         f"{counts['bugs_filed']} bug(s) filed {counts['bugs_by_severity'] or ''}."
     )
+    passed_ids = [r.scenario_id for r in results if r.passed]
     failures = [
         {"scenario": r.scenario_id, "failed": [a.name for a in r.failed_assertions],
          "findings": [f.title for f in r.findings]}
@@ -41,9 +42,12 @@ async def rollup(ai: AnthropicClient, day: int, results: list[ScenarioResult]) -
     ][:20]
     prompt = (
         f"Day {day} results:\n{json.dumps(counts)}\n\n"
-        f"Failures/findings:\n{json.dumps(failures, default=str)[:5000]}\n\n"
-        "Write a 3-5 sentence digest: overall health of custody tracking and GPS handoff, "
-        "the most important issues, and what to look at next."
+        f"PASSED scenarios (these features WERE exercised and are working — do NOT call them "
+        f"unverified or a coverage gap):\n{json.dumps(passed_ids)}\n\n"
+        f"Failed scenarios (only these have issues):\n{json.dumps(failures, default=str)[:5000]}\n\n"
+        "Write a 3-5 sentence digest grounded ONLY in the data above. Note what passed, then the "
+        "real issues among the failures, then what to look at next. Do not speculate about coverage "
+        "that the passed list already covers."
     )
     text = await ai.complete(model=ai.cfg.judge_model, system=SYSTEM, prompt=prompt, max_tokens=500)
     return text or fallback

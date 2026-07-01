@@ -66,7 +66,26 @@ async def aria_02_send_calm(ctx: FamilyContext) -> ScenarioOutcome:
                            "Sent a normal, friendly message to the co-parent — it went through immediately.")
 
 
+async def aria_03_threat_not_sent_clean(ctx: FamilyContext) -> ScenarioOutcome:
+    """Safety invariant: a threatening message must be intercepted — flagged (202)
+    or blocked (400) — and NEVER delivered as-is (201)."""
+    status, body = await ctx.parent_a.send_message({
+        "family_file_id": ctx.family_file_id,
+        "recipient_id": ctx.parent_b.user_id,
+        "content": TOXIC,
+        "message_type": "text",
+    })
+    a = [Assertion(
+        "aria.threat_intercepted", status in (202, 400), "202 (flagged) or 400 (blocked)", status,
+        "a threatening message must never be sent through unchanged", "critical",
+    )]
+    summary = ("Tried to send an outright threat: ARIA intercepted it instead of delivering it — "
+               f"the app responded {status} (not a clean send).")
+    return ScenarioOutcome(a, {"status": status, "body": body}, summary)
+
+
 SCENARIOS = [
     Scenario("S-ARIA-01", "ARIA tone triage (calm/hostile/threat)", "messaging", aria_01_tone_triage),
     Scenario("S-ARIA-02", "Send a calm message", "messaging", aria_02_send_calm),
+    Scenario("S-ARIA-03", "Threat is intercepted on send", "messaging", aria_03_threat_not_sent_clean),
 ]

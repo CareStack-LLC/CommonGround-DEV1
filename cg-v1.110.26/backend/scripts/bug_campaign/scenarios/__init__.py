@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from .base import FamilyContext, Scenario, ScenarioOutcome
 from . import (
-    agreements, clearfund, court_export, dashboard, geocode, handoff,
-    kidcoms, messaging, onboarding, schedules,
+    agreements, calendar, clearfund, court_export, dashboard, geocode, handoff,
+    kidcoms, messaging, notifications, onboarding, schedules, security,
 )
 
 ALL_SCENARIOS: list[Scenario] = [
@@ -18,6 +18,9 @@ ALL_SCENARIOS: list[Scenario] = [
     *court_export.SCENARIOS,
     *kidcoms.SCENARIOS,
     *dashboard.SCENARIOS,
+    *notifications.SCENARIOS,
+    *calendar.SCENARIOS,
+    *security.SCENARIOS,
     *geocode.SCENARIOS,
 ]
 
