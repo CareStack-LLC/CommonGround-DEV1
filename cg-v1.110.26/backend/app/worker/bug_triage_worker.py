@@ -60,8 +60,11 @@ async def run_bug_triage():
         try:
             from app.services.sentry_triage_service import (
                 fetch_sentry_issues,
+                categorize_issues,
                 ai_triage,
                 generate_sprint_plan,
+                auto_resolve_issues,
+                recent_critical_issues,
                 save_sprint,
             )
 
@@ -75,29 +78,32 @@ async def run_bug_triage():
                 await engine.dispose()
                 return
 
-            # Step 2 -- Run AI triage on each issue
-            logger.info("Running AI triage on issues...")
-            triaged_issues = await ai_triage(issues)
-            logger.info(f"AI triage complete: {len(triaged_issues)} issues triaged")
+            # Step 2 -- Categorize by severity/platform (drives counts + alerts)
+            categorized = categorize_issues(issues)
 
-            # Step 3 -- Generate a sprint plan from triaged issues
-            logger.info("Generating sprint plan...")
-            sprint_plan = await generate_sprint_plan(triaged_issues)
+            # Step 3 -- Run AI triage (summary + per-issue action recommendations)
+            logger.info("Running AI triage on issues...")
+            triaged = await ai_triage(issues)
+
+            # Step 4 -- Auto-resolve: mute known-noise + AI-'ignore' issues in
+            #           Sentry (dry-run unless SENTRY_AUTO_RESOLVE_ENABLED).
+            auto = await auto_resolve_issues(issues, triaged)
             logger.info(
-                f"Sprint plan generated with {len(sprint_plan.get('tasks', []))} tasks"
+                "Auto-resolve %s: %d candidate(s), %d applied",
+                "DRY-RUN" if auto["dry_run"] else "LIVE",
+                auto["candidate_count"], auto["applied_count"],
             )
 
-            # Step 4 -- Persist the sprint plan to the database
-            logger.info("Saving sprint plan to database...")
-            sprint_record = await save_sprint(db, sprint_plan)
+            # Step 5 -- Generate + persist the sprint plan
+            sprint_plan = await generate_sprint_plan(triaged)
+            combined = {**categorized, **triaged}  # counts + AI summary for storage
+            sprint_id = await save_sprint(db, sprint_plan, combined)
             await db.commit()
-            logger.info(f"Sprint plan saved (id={getattr(sprint_record, 'id', 'N/A')})")
+            logger.info("Sprint plan saved (id=%s)", sprint_id)
 
-            # Step 5 -- Send summary email with top issues
-            logger.info("Sending bug triage summary email...")
-            await _send_triage_summary_email(triaged_issues, sprint_plan)
-            logger.info("Bug triage summary email sent successfully")
-
+            # Step 6 -- Email summary (highlights newly-seen critical/high issues)
+            new_criticals = recent_critical_issues(categorized, hours=48)
+            await _send_triage_summary_email(categorized, sprint_plan, auto, new_criticals)
             logger.info("Bug triage worker completed successfully")
 
         except Exception as e:
@@ -113,35 +119,46 @@ async def run_bug_triage():
     await engine.dispose()
 
 
-async def _send_triage_summary_email(triaged_issues: list, sprint_plan: dict):
-    """Send a summary email with top triaged issues and sprint plan overview."""
-    from app.services.sentry_triage_service import generate_sprint_plan  # noqa: F811
-
-    # Build a concise summary of the top issues (up to 10)
-    top_issues = sorted(
-        triaged_issues,
-        key=lambda i: i.get("priority", 999),
-    )[:10]
-
+async def _send_triage_summary_email(
+    categorized: dict, sprint_plan: dict, auto: dict, new_criticals: list
+):
+    """Summary email: counts, newly-seen criticals, auto-mute actions, sprint plan."""
+    today = datetime.utcnow().strftime('%Y-%m-%d')
     subject = (
-        f"Bug Triage Report - {datetime.utcnow().strftime('%Y-%m-%d')} | "
-        f"{len(triaged_issues)} issues triaged"
+        f"Bug Triage - {today} | {categorized.get('total', 0)} open"
+        f"{f' | {len(new_criticals)} NEW critical/high' if new_criticals else ''}"
     )
 
     body_lines = [
-        f"Bug Triage Report - {datetime.utcnow().strftime('%Y-%m-%d')}",
-        f"Total issues triaged: {len(triaged_issues)}",
-        f"Sprint tasks generated: {len(sprint_plan.get('tasks', []))}",
+        f"Bug Triage Report - {today}",
+        f"Open issues: {categorized.get('total', 0)}  "
+        f"(critical {categorized.get('critical', 0)}, high {categorized.get('high', 0)}, "
+        f"medium {categorized.get('medium', 0)}, low {categorized.get('low', 0)})",
+        f"User-reported: {categorized.get('user_reported', 0)}  |  "
+        f"frontend {categorized.get('frontend', 0)} / backend {categorized.get('backend', 0)}",
         "",
-        "Top Issues:",
-        "-" * 40,
     ]
-    for idx, issue in enumerate(top_issues, 1):
-        body_lines.append(
-            f"  {idx}. [{issue.get('severity', 'unknown').upper()}] "
-            f"{issue.get('title', 'Untitled')} "
-            f"(events: {issue.get('event_count', 'N/A')})"
-        )
+
+    if new_criticals:
+        body_lines += [f"⚠ NEW critical/high in last 48h ({len(new_criticals)}):", "-" * 40]
+        for i, issue in enumerate(new_criticals[:10], 1):
+            body_lines.append(
+                f"  {i}. [{issue.get('_bucket', '').upper()}] {issue.get('title', 'Untitled')} "
+                f"(events {issue.get('count', 0)}, users {issue.get('user_count', 0)})"
+            )
+        body_lines.append("")
+
+    mode = "APPLIED" if not auto.get("dry_run") else "would mute (dry-run)"
+    muted_note = f", {auto.get('applied_count', 0)} muted" if not auto.get("dry_run") else ""
+    body_lines += [
+        f"Auto-resolve: {auto.get('candidate_count', 0)} noise/ignore issue(s) {mode}{muted_note}.",
+        "",
+        f"Sprint plan: {sprint_plan.get('total_items', 0)} to fix, "
+        f"{len(sprint_plan.get('deferred', []))} deferred, "
+        f"{len(sprint_plan.get('investigate', []))} to investigate.",
+        "",
+        "Top 3: " + "; ".join(sprint_plan.get("top_3", [])[:3]),
+    ]
 
     body = "\n".join(body_lines)
 

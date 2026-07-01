@@ -559,6 +559,135 @@ async def fetch_performance_data(days: int = 7) -> dict:
     return result
 
 
+# ---------------------------------------------------------------------------
+# Automatic resolution (write-back to Sentry)
+#
+# SAFETY MODEL: we only ever AUTO-IGNORE (mute) — never auto-"resolve" — because
+# "resolved" implies a code fix shipped. Muting is reversible and only applied to
+# (a) known-noise fingerprints and (b) issues the AI explicitly classified as
+# action="ignore" at low/medium severity. Gated by SENTRY_AUTO_RESOLVE_ENABLED
+# (default off → dry-run only) and capped per run.
+# ---------------------------------------------------------------------------
+
+# Control-flow "errors" and browser/extension noise that are safe to auto-mute.
+NOISE_PATTERNS = [
+    "resizeobserver loop",
+    "non-error promise rejection",
+    "script error",
+    "network error",
+    "failed to fetch",
+    "load failed",
+    "aborterror",
+    "the operation was aborted",
+    "next_redirect",
+    "next_not_found",
+    "chrome-extension://",
+    "moz-extension://",
+    "cancelled",
+]
+
+
+def is_noise(issue: dict) -> bool:
+    """True if the issue title/value matches a known-noise pattern."""
+    hay = f"{issue.get('title', '')} {issue.get('metadata', {}).get('value', '')}".lower()
+    return any(p in hay for p in NOISE_PATTERNS)
+
+
+async def update_sentry_issue(issue_id: str, status: str, substatus: Optional[str] = None) -> bool:
+    """Set a Sentry issue's status (resolved | ignored | unresolved). Returns success."""
+    if not settings.SENTRY_AUTH_TOKEN:
+        return False
+    org = settings.SENTRY_ORG_SLUG
+    payload: dict = {"status": status}
+    if substatus:
+        payload["substatus"] = substatus
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.put(
+                f"{SENTRY_API_BASE}/organizations/{org}/issues/{issue_id}/",
+                headers={"Authorization": f"Bearer {settings.SENTRY_AUTH_TOKEN}"},
+                json=payload,
+            )
+        if resp.status_code in (200, 202):
+            return True
+        logger.warning("Sentry issue update failed (HTTP %s): %s", resp.status_code, resp.text[:200])
+        return False
+    except Exception as exc:  # never let write-back crash the worker
+        logger.warning("Sentry issue update error for %s: %s", issue_id, exc)
+        return False
+
+
+async def auto_resolve_issues(issues: list[dict], triaged_data: dict, dry_run: Optional[bool] = None) -> dict:
+    """Auto-MUTE noise + AI-'ignore' issues in Sentry. Returns an audit dict.
+
+    When dry_run (default = NOT SENTRY_AUTO_RESOLVE_ENABLED) it changes nothing —
+    it only reports what it WOULD mute, so you can review before enabling.
+    """
+    if dry_run is None:
+        dry_run = not settings.SENTRY_AUTO_RESOLVE_ENABLED
+
+    ai_by_id = {str(r.get("issue_id")): r for r in triaged_data.get("recommendations", [])}
+    candidates: list[dict] = []
+    for issue in issues:
+        iid = str(issue["id"])
+        rec = ai_by_id.get(iid, {})
+        action = str(rec.get("action", "")).lower()
+        severity = str(rec.get("severity", "")).lower()
+        reason = None
+        if is_noise(issue):
+            reason = "known-noise pattern"
+        elif action == "ignore" and severity in ("low", "medium"):
+            reason = f"AI classified as ignore: {str(rec.get('reason', ''))[:120]}"
+        if reason:
+            candidates.append({
+                "issue_id": iid, "title": issue.get("title", ""),
+                "short_id": issue.get("short_id", ""), "permalink": issue.get("permalink", ""),
+                "reason": reason,
+            })
+
+    cap = max(0, int(settings.SENTRY_AUTO_RESOLVE_MAX_PER_RUN))
+    to_act = candidates[:cap]
+    applied: list[dict] = []
+    if not dry_run:
+        for c in to_act:
+            ok = await update_sentry_issue(c["issue_id"], status="ignored")
+            if ok:
+                applied.append(c)
+        if applied:
+            logger.info("Auto-muted %d noise/ignore Sentry issues", len(applied))
+
+    result = {
+        "enabled": settings.SENTRY_AUTO_RESOLVE_ENABLED,
+        "dry_run": dry_run,
+        "candidate_count": len(candidates),
+        "capped_to": len(to_act),
+        "applied_count": len(applied),
+        "candidates": candidates,
+        "applied": applied,
+    }
+    logger.info(
+        "auto_resolve_issues: %s — %d candidate(s), %d applied",
+        "DRY-RUN" if dry_run else "LIVE", len(candidates), len(applied),
+    )
+    return result
+
+
+def recent_critical_issues(categorized: dict, hours: int = 48) -> list[dict]:
+    """Critical/high issues first seen within the last `hours` — for alerting."""
+    cutoff = datetime.utcnow() - timedelta(hours=hours)
+    out: list[dict] = []
+    for bucket in ("critical", "high"):
+        for issue in categorized.get("issues", {}).get(bucket, []):
+            first = issue.get("first_seen")
+            try:
+                seen = datetime.fromisoformat(str(first).replace("Z", "+00:00")).replace(tzinfo=None)
+            except Exception:
+                seen = None
+            if seen is None or seen >= cutoff:
+                out.append({**issue, "_bucket": bucket})
+    return out
+
+
 async def save_sprint(
     db: AsyncSession,
     sprint_plan: dict,

@@ -162,6 +162,12 @@ class Settings(BaseSettings):
     SENTRY_ORG_SLUG: str = "commonground"
     SENTRY_PROJECT_SLUG: str = "commonground-frontend"
 
+    # Sentry auto-resolution (guarded). When disabled, the triage worker only
+    # LOGS the actions it would take (dry-run) — it never mutates Sentry. Turn on
+    # deliberately once you trust the noise list + AI 'ignore' classifications.
+    SENTRY_AUTO_RESOLVE_ENABLED: bool = False
+    SENTRY_AUTO_RESOLVE_MAX_PER_RUN: int = 25  # safety cap on auto-actions per run
+
     # Google OAuth (for email monitor)
     GOOGLE_OAUTH_CLIENT_ID: Optional[str] = None
     GOOGLE_OAUTH_CLIENT_SECRET: Optional[str] = None

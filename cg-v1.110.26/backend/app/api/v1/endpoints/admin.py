@@ -3716,6 +3716,41 @@ async def run_bug_triage(
 
 
 @router.post(
+    "/bugs/auto-resolve",
+    summary="Auto-mute known-noise + AI-'ignore' Sentry issues",
+)
+async def auto_resolve_bugs(
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+    days: int = Query(7, description="Look-back window in days"),
+    dry_run: bool = Query(True, description="Preview only (default). Set false to actually mute in Sentry."),
+) -> dict:
+    """Preview (or, with dry_run=false, apply) auto-muting of noise/ignore issues.
+
+    Only MUTES (never resolves) — safe, reversible, and audited. Applies to
+    known-noise fingerprints and issues the AI classified as action='ignore'.
+    """
+    from app.services.sentry_triage_service import fetch_sentry_issues, ai_triage, auto_resolve_issues
+
+    try:
+        issues = await fetch_sentry_issues(days=days)
+        triaged = await ai_triage(issues)
+        result = await auto_resolve_issues(issues, triaged, dry_run=dry_run)
+        await _log_admin_action(
+            db, admin_user, "bug_auto_resolve", "bugs",
+            details=f"dry_run={dry_run} candidates={result['candidate_count']} applied={result['applied_count']}",
+        )
+        await db.commit()
+        return result
+    except ValueError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
+    except Exception as exc:
+        logger.error("Auto-resolve failed: %s", exc)
+        capture_error(exc)
+        raise HTTPException(status_code=502, detail=f"Auto-resolve failed: {type(exc).__name__}")
+
+
+@router.post(
     "/bugs/sprints",
     summary="Generate and save a sprint plan from AI triage",
 )
