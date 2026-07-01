@@ -184,11 +184,11 @@ function CaseComplianceRow({
 
 function TimelineItem({ event }: { event: TimelineEvent }) {
   const typeConfig = {
-    exchange: { icon: <MapPin className="h-4 w-4" />, color: 'bg-blue-100 text-blue-600' },
-    message: { icon: <MessageSquare className="h-4 w-4" />, color: 'bg-purple-100 text-purple-600' },
-    payment: { icon: <DollarSign className="h-4 w-4" />, color: 'bg-emerald-100 text-emerald-600' },
+    exchange: { icon: <MapPin className="h-4 w-4" />, color: 'bg-[#E0EFF8] text-[#2D6A8F]' },
+    message: { icon: <MessageSquare className="h-4 w-4" />, color: 'bg-[#E0EFF8] text-[#2D6A8F]' },
+    payment: { icon: <DollarSign className="h-4 w-4" />, color: 'bg-[#E8F4F0] text-[#2D8A70]' },
     event: { icon: <Calendar className="h-4 w-4" />, color: 'bg-[var(--portal-primary)]/10 text-[var(--portal-primary)]' },
-    alert: { icon: <AlertTriangle className="h-4 w-4" />, color: 'bg-amber-100 text-amber-600' },
+    alert: { icon: <AlertTriangle className="h-4 w-4" />, color: 'bg-[#FEF7ED] text-[#E09520]' },
   };
 
   const statusColors = {
@@ -251,7 +251,7 @@ function QuickAction({
           <div className="flex items-center gap-2">
             <h4 className="text-sm font-medium text-foreground">{title}</h4>
             {badge && (
-              <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-red-500 text-white rounded-full">
+              <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-[#C53030] text-white rounded-full">
                 {badge}
               </span>
             )}
@@ -528,27 +528,27 @@ export default function CourtDashboardPage() {
 
           {/* Alerts Section */}
           <div className="bg-card border border-border rounded-xl overflow-hidden">
-            <div className="p-4 border-b border-border bg-amber-50/50">
+            <div className="p-4 border-b border-border bg-[#FEF7ED]/50">
               <h2 className="font-semibold text-foreground flex items-center gap-2">
-                <Bell className="h-4 w-4 text-amber-600" />
+                <Bell className="h-4 w-4 text-[#E09520]" />
                 Alerts & Flags
               </h2>
             </div>
             <div className="p-4 space-y-3">
               {stats.access_expiring_soon > 0 && (
-                <div className="flex items-center gap-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                  <Clock className="h-4 w-4 text-amber-600" />
+                <div className="flex items-center gap-3 p-3 bg-[#FEF7ED] border border-[#FEF7ED] rounded-lg">
+                  <Clock className="h-4 w-4 text-[#E09520]" />
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-amber-900">Access Expiring</p>
-                    <p className="text-xs text-amber-700">{stats.access_expiring_soon} case(s) expiring within 7 days</p>
+                    <p className="text-sm font-medium text-[#1E3A4A]">Access Expiring</p>
+                    <p className="text-xs text-[#E09520]">{stats.access_expiring_soon} case(s) expiring within 7 days</p>
                   </div>
                 </div>
               )}
-              <div className="flex items-center gap-3 p-3 bg-red-50 border border-red-200 rounded-lg">
-                <XCircle className="h-4 w-4 text-red-600" />
+              <div className="flex items-center gap-3 p-3 bg-[#FEE2E2] border border-[#FEE2E2] rounded-lg">
+                <XCircle className="h-4 w-4 text-[#C53030]" />
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-red-900">Missed Exchange</p>
-                  <p className="text-xs text-red-700">Thompson v. Thompson - No check-in recorded</p>
+                  <p className="text-sm font-medium text-[#7A2222]">Missed Exchange</p>
+                  <p className="text-xs text-[#9B2C2C]">Thompson v. Thompson - No check-in recorded</p>
                 </div>
               </div>
               <div className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-lg">

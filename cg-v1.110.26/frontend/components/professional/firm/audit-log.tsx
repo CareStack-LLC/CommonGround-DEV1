@@ -43,27 +43,27 @@ interface AuditEvent {
 const EVENT_CONFIG: Record<string, { icon: React.ReactNode; color: string; label: string }> = {
     member_invited: {
         icon: <UserPlus className="h-4 w-4" />,
-        color: "text-blue-600 bg-blue-50",
+        color: "text-[#2D6A8F] bg-[#E0EFF8]",
         label: "Member Invited",
     },
     member_joined: {
         icon: <UserPlus className="h-4 w-4" />,
-        color: "text-green-600 bg-green-50",
+        color: "text-[#2D8A70] bg-[#E8F4F0]",
         label: "Member Joined",
     },
     member_removed: {
         icon: <UserMinus className="h-4 w-4" />,
-        color: "text-red-600 bg-red-50",
+        color: "text-[#C53030] bg-[#FEE2E2]",
         label: "Member Removed",
     },
     role_changed: {
         icon: <Shield className="h-4 w-4" />,
-        color: "text-amber-600 bg-amber-50",
+        color: "text-[#E09520] bg-[#FEF7ED]",
         label: "Role Changed",
     },
     case_assigned: {
         icon: <FileText className="h-4 w-4" />,
-        color: "text-indigo-600 bg-indigo-50",
+        color: "text-[#2D6A8F] bg-[#F0F7FC]",
         label: "Case Assigned",
     },
     case_unassigned: {
@@ -73,7 +73,7 @@ const EVENT_CONFIG: Record<string, { icon: React.ReactNode; color: string; label
     },
     settings_updated: {
         icon: <Settings className="h-4 w-4" />,
-        color: "text-purple-600 bg-purple-50",
+        color: "text-[#2D6A8F] bg-[#F0F7FC]",
         label: "Settings Updated",
     },
     template_created: {

@@ -96,7 +96,7 @@ function LibraryContent() {
         </header>
 
         {!childId && (
-          <div className="mb-4 p-4 rounded-xl bg-amber-50 border border-amber-200 text-sm text-amber-900 flex items-center gap-2">
+          <div className="mb-4 p-4 rounded-xl bg-[#FEF7ED] border border-[#FEF7ED] text-sm text-[#1E3A4A] flex items-center gap-2">
             <Users className="h-4 w-4" />
             No child selected — opening a book here will read solo. Use the
             family file page to start a co-read with a specific child.
@@ -104,7 +104,7 @@ function LibraryContent() {
         )}
 
         {error ? (
-          <div className="p-6 rounded-xl bg-red-50 border border-red-200 text-red-700">
+          <div className="p-6 rounded-xl bg-[#FEE2E2] border border-[#FEE2E2] text-[#9B2C2C]">
             {error}
           </div>
         ) : books === null ? (
@@ -137,7 +137,7 @@ function LibraryContent() {
                     </div>
                   )}
                   {book.is_featured && (
-                    <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white">
+                    <div className="absolute top-2 left-2 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#F5A623] text-white">
                       FEATURED
                     </div>
                   )}

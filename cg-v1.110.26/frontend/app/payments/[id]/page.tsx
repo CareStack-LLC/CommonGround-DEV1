@@ -60,7 +60,7 @@ const statusColors: Record<string, string> = {
   open: 'bg-cg-warning-subtle text-cg-warning',
   partially_funded: 'bg-cg-amber-subtle text-cg-amber',
   funded: 'bg-cg-sage-subtle text-cg-sage',
-  pending_verification: 'bg-purple-100 text-purple-700',
+  pending_verification: 'bg-[#E0EFF8] text-[#1E4E6B]',
   verified: 'bg-cg-success-subtle text-cg-success',
   completed: 'bg-cg-success-subtle text-cg-success',
   expired: 'bg-muted text-muted-foreground',
@@ -334,7 +334,7 @@ function ObligationDetailContent() {
         {/* Transaction Ledger */}
         <div className="cg-card p-6">
           <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-            <Receipt className="h-5 w-5 text-purple-600" />
+            <Receipt className="h-5 w-5 text-[#2D6A8F]" />
             Transaction Ledger
           </h2>
 
@@ -492,14 +492,14 @@ function ObligationDetailContent() {
         {attestation && (
           <div className="cg-card p-6">
             <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-              <Shield className="h-5 w-5 text-purple-600" />
+              <Shield className="h-5 w-5 text-[#2D6A8F]" />
               Attestation
             </h2>
 
-            <div className="bg-purple-50 rounded-xl p-4 border border-purple-200">
-              <p className="text-sm text-purple-800 font-medium mb-2">Sworn Statement</p>
-              <p className="text-purple-900">{attestation.attestation_text}</p>
-              <p className="text-sm text-purple-600 mt-2">
+            <div className="bg-[#E0EFF8] rounded-xl p-4 border border-[#E0EFF8]">
+              <p className="text-sm text-[#1E4E6B] font-medium mb-2">Sworn Statement</p>
+              <p className="text-[#1E3A4A]">{attestation.attestation_text}</p>
+              <p className="text-sm text-[#2D6A8F] mt-2">
                 Attested on {formatDate(attestation.attested_at)}
               </p>
             </div>
@@ -519,10 +519,10 @@ function ObligationDetailContent() {
                 const isUploader = artifact.verified_by === user?.id;
                 const canReview = !isUploader && (!artifact.review_status || artifact.review_status === 'pending');
                 const reviewStatusBadge = artifact.review_status === 'acknowledged'
-                  ? { label: 'Acknowledged', bg: 'bg-emerald-50 text-emerald-700 border-emerald-200' }
+                  ? { label: 'Acknowledged', bg: 'bg-[#E8F4F0] text-[#2D8A70] border-[#E8F4F0]' }
                   : artifact.review_status === 'disputed'
-                  ? { label: 'Disputed', bg: 'bg-red-50 text-red-700 border-red-200' }
-                  : { label: 'Pending Review', bg: 'bg-amber-50 text-amber-700 border-amber-200' };
+                  ? { label: 'Disputed', bg: 'bg-[#FEE2E2] text-[#9B2C2C] border-[#FEE2E2]' }
+                  : { label: 'Pending Review', bg: 'bg-[#FEF7ED] text-[#E09520] border-[#FEF7ED]' };
 
                 return (
                   <div key={artifact.id} className="p-4 bg-muted/30 rounded-xl border border-border">
@@ -585,7 +585,7 @@ function ObligationDetailContent() {
                               setReviewingArtifact(null);
                             }
                           }}
-                          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-all duration-200"
+                          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-bold text-[#2D8A70] bg-[#E8F4F0] border border-[#E8F4F0] rounded-lg hover:bg-[#E8F4F0] transition-all duration-200"
                         >
                           <CheckCircle className="h-3.5 w-3.5" />
                           Looks Good
@@ -611,7 +611,7 @@ function ObligationDetailContent() {
                               setReviewingArtifact(null);
                             }
                           }}
-                          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-bold text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-all duration-200"
+                          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-bold text-[#9B2C2C] bg-[#FEE2E2] border border-[#FEE2E2] rounded-lg hover:bg-[#FEE2E2] transition-all duration-200"
                         >
                           <AlertTriangle className="h-3.5 w-3.5" />
                           Dispute

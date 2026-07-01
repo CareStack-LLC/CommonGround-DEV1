@@ -249,8 +249,8 @@ function FindProfessionalsContent() {
         </button>
         <div>
           <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 flex items-center justify-center shadow-md">
-              <Building2 className="h-5 w-5 text-emerald-600" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#3DAA8A]/10 to-[#2D8A70]/5 flex items-center justify-center shadow-md">
+              <Building2 className="h-5 w-5 text-[#2D8A70]" />
             </div>
             Find Professionals
           </h1>
@@ -316,18 +316,18 @@ function FindProfessionalsContent() {
 
       {/* Results */}
       {error ? (
-        <div className="bg-white border-2 border-red-200 rounded-2xl shadow-lg p-6">
+        <div className="bg-white border-2 border-[#FEE2E2] rounded-2xl shadow-lg p-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500/10 to-red-600/5 flex items-center justify-center shadow-md">
-              <AlertCircle className="h-5 w-5 text-red-500" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#C53030]/10 to-[#C53030]/5 flex items-center justify-center shadow-md">
+              <AlertCircle className="h-5 w-5 text-[#C53030]" />
             </div>
-            <p className="text-red-600 font-bold">{error}</p>
+            <p className="text-[#C53030] font-bold">{error}</p>
           </div>
         </div>
       ) : firms.length === 0 ? (
         <div className="bg-white border-2 border-slate-200 rounded-2xl shadow-lg p-12 text-center">
-          <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 flex items-center justify-center shadow-md">
-            <Building2 className="h-10 w-10 text-emerald-600" />
+          <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-[#3DAA8A]/10 to-[#2D8A70]/5 flex items-center justify-center shadow-md">
+            <Building2 className="h-10 w-10 text-[#2D8A70]" />
           </div>
           <h3 className="text-xl font-bold text-slate-900 mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>No firms found</h3>
           <p className="text-slate-600 font-medium">Try adjusting your search filters or check back later</p>
@@ -387,7 +387,7 @@ function FindProfessionalsContent() {
                   </p>
 
                   {familyFileId && hasExistingFirm && (
-                    <div className="mt-3 flex items-start gap-3 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
+                    <div className="mt-3 flex items-start gap-3 p-3 bg-[#FEF7ED] border border-[#FEF7ED] rounded-lg text-sm text-[#E09520]">
                       <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
                       <p><strong>Note:</strong> You already have a professional assigned. They will be replaced only if you confirm removal in settings later.</p>
                     </div>
@@ -396,23 +396,23 @@ function FindProfessionalsContent() {
 
                 {/* Invite Feedback */}
                 {inviteError && (
-                  <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-4">
+                  <div className="bg-[#FEE2E2] border-2 border-[#FEE2E2] rounded-2xl p-4">
                     <div className="flex items-start gap-3">
-                      <AlertCircle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
+                      <AlertCircle className="h-5 w-5 text-[#C53030] shrink-0 mt-0.5" />
                       <div>
-                        <h4 className="font-bold text-red-900 text-sm">Invitation Failed</h4>
-                        <p className="text-xs text-red-700">{inviteError}</p>
+                        <h4 className="font-bold text-[#7A2222] text-sm">Invitation Failed</h4>
+                        <p className="text-xs text-[#9B2C2C]">{inviteError}</p>
                       </div>
                     </div>
                   </div>
                 )}
                 {inviteSuccess && (
-                  <div className="bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-4">
+                  <div className="bg-[#E8F4F0] border-2 border-[#E8F4F0] rounded-2xl p-4">
                     <div className="flex items-start gap-3">
-                      <CheckCircle className="h-5 w-5 text-emerald-600 shrink-0 mt-0.5" />
+                      <CheckCircle className="h-5 w-5 text-[#2D8A70] shrink-0 mt-0.5" />
                       <div>
-                        <h4 className="font-bold text-emerald-900 text-sm">Success!</h4>
-                        <p className="text-xs text-emerald-700">{inviteSuccess}</p>
+                        <h4 className="font-bold text-[#1E3A4A] text-sm">Success!</h4>
+                        <p className="text-xs text-[#2D8A70]">{inviteSuccess}</p>
                       </div>
                     </div>
                   </div>
@@ -446,12 +446,12 @@ function FindProfessionalsContent() {
 
                 {/* No Family File Warning - show when user has no family files */}
                 {!familyFileId && familyFiles.length === 0 && !isLoadingFamilyFiles && (
-                  <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-4">
+                  <div className="bg-[#FEF7ED] border-2 border-[#FEF7ED] rounded-2xl p-4">
                     <div className="flex items-start gap-3">
-                      <AlertCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+                      <AlertCircle className="h-5 w-5 text-[#E09520] shrink-0 mt-0.5" />
                       <div>
-                        <h4 className="font-bold text-amber-900 text-sm">Family File Required</h4>
-                        <p className="text-xs text-amber-700">
+                        <h4 className="font-bold text-[#1E3A4A] text-sm">Family File Required</h4>
+                        <p className="text-xs text-[#E09520]">
                           Please create a Family File first or go to your existing Family File and click "Invite Professional".
                         </p>
                       </div>

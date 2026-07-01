@@ -9,8 +9,8 @@ import {
   TestimonialCard,
   FaqJsonLd,
 } from '@/components/marketing';
+import { BrandIcon, type BrandIconName } from '@/components/brand/brand-icon';
 import {
-  Scale,
   Users,
   Building2,
   FileText,
@@ -19,19 +19,21 @@ import {
   ArrowRight,
   Check,
   BarChart3,
-  Download,
-  MessageSquare,
-  Calendar,
   DollarSign,
   ClipboardCheck,
-  Brain,
   HelpCircle,
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
-const whoItsFor = [
+type IconCard = {
+  brandIcon?: BrandIconName;
+  icon?: LucideIcon;
+} & Record<string, unknown>;
+
+const whoItsFor: (IconCard & { role: string; description: string; benefit: string })[] = [
   {
     role: 'Family Law Attorneys',
-    icon: Scale,
+    brandIcon: 'court',
     description: 'Access verified evidence for custody and support cases',
     benefit: 'Court-ready exports in one click',
   },
@@ -61,15 +63,15 @@ const whoItsFor = [
   },
 ];
 
-const dataAccess = [
+const dataAccess: (IconCard & { title: string; description: string })[] = [
   {
-    icon: MessageSquare,
+    brandIcon: 'messages',
     title: 'Communications',
     description:
       'Verified, timestamped messages between co-parents with tone and sentiment context from ARIA.',
   },
   {
-    icon: Calendar,
+    brandIcon: 'exchange',
     title: 'Custody Exchanges',
     description:
       'Check-in/check-out logs, schedule adherence, and any documented disruptions or modifications.',
@@ -81,19 +83,19 @@ const dataAccess = [
       'Agreement adherence tracking, schedule compliance rates, and behavioral pattern analysis.',
   },
   {
-    icon: DollarSign,
+    brandIcon: 'clearfund',
     title: 'Financial Records',
     description:
       'Shared expense submissions, payment history, and verified financial documentation.',
   },
   {
-    icon: Brain,
+    brandIcon: 'aria',
     title: 'ARIA Analysis',
     description:
       'AI-powered insights on communication quality, co-parenting dynamics, and areas of concern.',
   },
   {
-    icon: Download,
+    brandIcon: 'export',
     title: 'Court-Ready Exports',
     description:
       'Professional PDF reports with SHA-256 verification, neutral formatting, and complete audit trails.',
@@ -190,13 +192,13 @@ export default function ProfessionalsPage() {
                 className="text-4xl sm:text-5xl lg:text-6xl text-[#1E3A4A] mb-6 leading-[1.1]"
                 style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
               >
-                Access verified family data
+                Open a clean case file,
                 <br />
-                <span className="text-[#3DAA8A]">in minutes, not months</span>
+                <span className="text-[#3DAA8A]">not a box of screenshots</span>
               </h1>
               <p className="text-lg sm:text-xl text-gray-600 mb-6 leading-relaxed">
-                CommonGround gives professionals a window into verified co-parenting activity — messages,
-                custody exchanges, finances, and compliance — without managing the case yourself.
+                CommonGround hands you verified, timestamped co-parenting activity — messages,
+                exchanges, finances, and compliance — with one-click SHA-256 exports built for the courtroom.
               </p>
               <p className="text-base text-[var(--portal-primary)] font-medium mb-8">
                 Free for professionals. Your clients pay for their own plans.
@@ -213,15 +215,18 @@ export default function ProfessionalsPage() {
                   href="/features"
                   className="inline-flex items-center justify-center px-8 py-4 bg-white text-[#1E3A4A] font-semibold rounded-full border-2 border-[#1E3A4A]/20 hover:border-[#1E3A4A]/40 hover:bg-[#1E3A4A]/5 transition-all"
                 >
-                  See All Features
+                  See what your clients get
                 </Link>
               </div>
+              <p className="mt-5 text-sm text-gray-500">
+                Free for professionals &middot; No install &middot; 15-minute setup
+              </p>
             </div>
 
             <div>
               <Image
-                src="/images/marketing/pro1.png"
-                alt="Professional dashboard showing case overview with timeline and compliance metrics"
+                src="/images/marketing/pro1.jpg"
+                alt="A family law attorney reviewing a case at her desk"
                 width={640}
                 height={480}
                 className="rounded-2xl object-cover w-full"
@@ -272,7 +277,11 @@ export default function ProfessionalsPage() {
                 >
                   <div className="flex items-start gap-4 mb-3">
                     <div className="w-12 h-12 rounded-xl bg-[#3DAA8A]/10 flex items-center justify-center flex-shrink-0">
-                      <Icon className="w-6 h-6 text-[#3DAA8A]" />
+                      {item.brandIcon ? (
+                        <BrandIcon name={item.brandIcon} size={24} />
+                      ) : Icon ? (
+                        <Icon className="w-6 h-6 text-[#3DAA8A]" />
+                      ) : null}
                     </div>
                     <div>
                       <h3 className="font-semibold text-[#1E3A4A] mb-1">{item.role}</h3>
@@ -429,7 +438,11 @@ export default function ProfessionalsPage() {
                   className="bg-white rounded-2xl p-6 border-2 border-gray-100 hover:border-[#3DAA8A]/30 hover:shadow-lg transition-all group"
                 >
                   <div className="h-12 w-12 rounded-xl bg-[#1E3A4A]/8 flex items-center justify-center mb-4 group-hover:bg-[#3DAA8A]/10 transition-colors">
-                    <Icon className="h-6 w-6 text-[#1E3A4A] group-hover:text-[#3DAA8A] transition-colors" />
+                    {item.brandIcon ? (
+                      <BrandIcon name={item.brandIcon} size={24} />
+                    ) : Icon ? (
+                      <Icon className="h-6 w-6 text-[#1E3A4A] group-hover:text-[#3DAA8A] transition-colors" />
+                    ) : null}
                   </div>
                   <h3
                     className="text-lg font-semibold text-[#1E3A4A] mb-2"
@@ -445,15 +458,15 @@ export default function ProfessionalsPage() {
 
           <div className="grid md:grid-cols-2 gap-6">
             <Image
-              src="/images/marketing/pro2.png"
-              alt="Professional portal communications timeline view"
+              src="/images/marketing/pro2.jpg"
+              alt="A mediator facilitating a calm conversation between co-parents"
               width={640}
               height={400}
               className="rounded-2xl object-cover w-full"
             />
             <Image
-              src="/images/marketing/pro3.png"
-              alt="Professional portal compliance dashboard"
+              src="/images/marketing/pro3.jpg"
+              alt="A family law attorney reviewing case documents"
               width={640}
               height={400}
               className="rounded-2xl object-cover w-full"

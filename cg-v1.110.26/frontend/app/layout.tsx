@@ -7,7 +7,7 @@ import {
   DM_Serif_Display,
   Inter,
   Space_Grotesk,
-  JetBrains_Mono,
+  DM_Mono,
 } from "next/font/google";
 
 /* ── Lazy-loaded client components ─────────────────────────────────
@@ -58,11 +58,11 @@ const spaceGrotesk = Space_Grotesk({
   preload: false,
 });
 
-const jetbrainsMono = JetBrains_Mono({
+const dmMono = DM_Mono({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["400", "500"],
   display: "swap",
-  variable: "--font-jetbrains-mono",
+  variable: "--font-dm-mono",
   preload: false,
 });
 
@@ -133,7 +133,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${dmSans.variable} ${dmSerifDisplay.variable} ${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable}`}
+      className={`${dmSans.variable} ${dmSerifDisplay.variable} ${inter.variable} ${spaceGrotesk.variable} ${dmMono.variable}`}
     >
       <head>
         {/* Google Analytics (gtag.js) — G-Y3BC0JNN56 */}

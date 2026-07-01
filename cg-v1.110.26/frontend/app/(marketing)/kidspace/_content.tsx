@@ -7,7 +7,6 @@ import {
     Gamepad2,
     Film,
     BookOpen,
-    Video,
     CalendarDays,
     Check,
     ArrowRight,
@@ -21,6 +20,8 @@ import {
     Cake,
     Wallet,
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { BrandIcon, type BrandIconName } from '@/components/brand/brand-icon';
 import {
     Accordion,
     AccordionContent,
@@ -38,7 +39,16 @@ import {
  */
 
 /* Zig-zag "things you can do together" rows */
-const DO_TOGETHER = [
+const DO_TOGETHER: {
+    eyebrow: string;
+    icon?: LucideIcon;
+    brandIcon?: BrandIconName;
+    title: string;
+    body: string;
+    image: string;
+    alt: string;
+    accent: 'sage' | 'amber';
+}[] = [
     {
         eyebrow: 'Play',
         icon: Gamepad2,
@@ -46,7 +56,7 @@ const DO_TOGETHER = [
         body: "Cooperative games, two-player Tic-Tac-Toe, and a shared whiteboard where moves and doodles sync live. Beat Grandma at a game from two homes away. It's connection that feels like fun, not a scheduled “call.”",
         image: '/images/marketing/cg_kidspace_play.jpg',
         alt: 'Two siblings laughing while playing a game together in KidSpace',
-        accent: 'sage' as const,
+        accent: 'sage',
     },
     {
         eyebrow: 'Watch',
@@ -55,11 +65,11 @@ const DO_TOGETHER = [
         body: 'Start an age-appropriate movie or show with one tap and watch it together in sync. No scheduling fights, no “whose night is it” — just press play and share the moment across both homes.',
         image: '/images/marketing/cg_kidspace_movie.jpg',
         alt: 'A child cozy under a blanket watching a family movie in KidSpace',
-        accent: 'amber' as const,
+        accent: 'amber',
     },
     {
         eyebrow: 'Connect',
-        icon: Video,
+        brandIcon: 'kidspace',
         title: 'Call, text, and stay close every day',
         body: 'Kids get their own safe space to video call, voice call, and text the parents and family members you approve — so a quick “goodnight” is always one tap away, even on the other parent’s week.',
         image: '/images/marketing/cg_kidspace_call.jpg',
@@ -70,12 +80,12 @@ const DO_TOGETHER = [
 
 /* Smaller "more to love" feature cards */
 const MORE_FEATURES = [
-    { icon: BookOpen, title: 'Read together', body: 'Bedtime stories across two homes — kids pick the book, both parents can co-read.', color: 'bg-orange-100 text-orange-600' },
-    { icon: PencilRuler, title: 'Shared whiteboard', body: 'Draw in real time — homework help or silly doodles on the same canvas.', color: 'bg-indigo-100 text-indigo-600' },
-    { icon: CalendarDays, title: "Their own calendar", body: 'Kids see their week, school events, and which parent they’re with — less anxiety, more confidence.', color: 'bg-blue-100 text-blue-600' },
-    { icon: Cake, title: 'Birthdays built in', body: 'Family birthdays show up automatically so no one ever misses the big day.', color: 'bg-pink-100 text-pink-600' },
-    { icon: Wallet, title: 'Chores & rewards', body: 'Assign chores with an optional allowance; kids earn a wallet balance for a reward you curate.', color: 'bg-emerald-100 text-emerald-600' },
-    { icon: Gift, title: 'Rewards store', body: 'Kids spend earned balance on rewards you set — an ice-cream trip, a new book, your call.', color: 'bg-amber-100 text-amber-600' },
+    { icon: BookOpen, title: 'Read together', body: 'Bedtime stories across two homes — kids pick the book, both parents can co-read.', color: 'bg-[#FEF7ED] text-[#F5A623]' },
+    { icon: PencilRuler, title: 'Shared whiteboard', body: 'Draw in real time — homework help or silly doodles on the same canvas.', color: 'bg-[#E0EFF8] text-[#2D6A8F]' },
+    { icon: CalendarDays, title: "Their own calendar", body: 'Kids see their week, school events, and which parent they’re with — less anxiety, more confidence.', color: 'bg-[#E0EFF8] text-[#2D6A8F]' },
+    { icon: Cake, title: 'Birthdays built in', body: 'Family birthdays show up automatically so no one ever misses the big day.', color: 'bg-[#FEF7ED] text-[#F5A623]' },
+    { icon: Wallet, title: 'Chores & rewards', body: 'Assign chores with an optional allowance; kids earn a wallet balance for a reward you curate.', color: 'bg-[#E8F4F0] text-[#2D8A70]' },
+    { icon: Gift, title: 'Rewards store', body: 'Kids spend earned balance on rewards you set — an ice-cream trip, a new book, your call.', color: 'bg-[#FEF7ED] text-[#F5A623]' },
 ];
 
 /* ARIA safety guarantees */
@@ -95,13 +105,13 @@ export function KidSpaceContent() {
                 <div className="max-w-6xl mx-auto px-6 grid items-center gap-10 lg:gap-14 lg:grid-cols-2">
                     <div className="text-center lg:text-left">
                         <div className="flex flex-wrap justify-center lg:justify-start gap-2.5 mb-6">
-                            <span className="inline-flex items-center gap-1.5 bg-emerald-100 text-emerald-800 px-3 py-1 text-sm font-medium rounded-full">
+                            <span className="inline-flex items-center gap-1.5 bg-[#E8F4F0] text-[#2D8A70] px-3 py-1 text-sm font-medium rounded-full">
                                 <Shield className="w-3.5 h-3.5" /> COPPA compliant
                             </span>
-                            <span className="inline-flex items-center gap-1.5 bg-amber-100 text-amber-800 px-3 py-1 text-sm font-medium rounded-full">
+                            <span className="inline-flex items-center gap-1.5 bg-[#FEF7ED] text-[#B26A00] px-3 py-1 text-sm font-medium rounded-full">
                                 Ages 3–12
                             </span>
-                            <span className="inline-flex items-center gap-1.5 bg-indigo-100 text-indigo-800 px-3 py-1 text-sm font-medium rounded-full">
+                            <span className="inline-flex items-center gap-1.5 bg-[#E0EFF8] text-[#2D6A8F] px-3 py-1 text-sm font-medium rounded-full">
                                 <Eye className="w-3.5 h-3.5" /> Parent-controlled
                             </span>
                         </div>
@@ -115,7 +125,7 @@ export function KidSpaceContent() {
                         </h1>
 
                         <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-                            In KidSpace, kids play games, watch movies, and read <em>together</em> with you — plus call, text, and keep their own calendar. Every call is protected by ARIA, so you stay close without hovering over every conversation.
+                            Stay close to your kids on the other parent&apos;s week. In KidSpace they play games, watch movies, and read <em>together</em> with you &mdash; plus call, text, and keep their own calendar. Every call and message is protected by ARIA, so you stay close without hovering.
                         </p>
 
                         <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
@@ -130,7 +140,7 @@ export function KidSpaceContent() {
                                 href="/pricing"
                                 className="inline-flex items-center justify-center px-8 py-4 bg-white text-foreground font-semibold rounded-full border-2 border-gray-200 hover:border-cg-sage/40 transition-all text-lg"
                             >
-                                View plans
+                                See plans &amp; pricing
                             </Link>
                         </div>
 
@@ -187,7 +197,11 @@ export function KidSpaceContent() {
                                 </div>
                                 <div className={imageLeft ? 'lg:order-2' : 'lg:order-1'}>
                                     <div className={`inline-flex h-12 w-12 items-center justify-center rounded-2xl mb-5 ${gold ? 'bg-cg-amber/15' : 'bg-cg-sage/15'}`}>
-                                        <Icon className={`h-6 w-6 ${gold ? 'text-cg-amber' : 'text-cg-sage'}`} />
+                                        {row.brandIcon ? (
+                                            <BrandIcon name={row.brandIcon} size={24} />
+                                        ) : Icon ? (
+                                            <Icon className={`h-6 w-6 ${gold ? 'text-cg-amber' : 'text-cg-sage'}`} />
+                                        ) : null}
                                     </div>
                                     <p className={`text-xs font-bold uppercase tracking-[0.18em] mb-3 ${gold ? 'text-cg-amber' : 'text-cg-sage'}`}>
                                         {row.eyebrow}

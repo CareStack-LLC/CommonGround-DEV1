@@ -134,7 +134,7 @@ export default function PartnerLandingPage() {
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-900 to-gray-800">
-                <Loader2 className="h-8 w-8 animate-spin text-amber-400" />
+                <Loader2 className="h-8 w-8 animate-spin text-[#F5A623]" />
             </div>
         );
     }
@@ -194,7 +194,7 @@ export default function PartnerLandingPage() {
             {/* Hero Section */}
             <section className="py-16 px-6 text-center">
                 <div className="max-w-3xl mx-auto">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/20 text-amber-400 text-sm font-medium mb-6">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#F5A623]/20 text-[#F5A623] text-sm font-medium mb-6">
                         <Sparkles className="h-4 w-4" />
                         FREE Complete Tier Access • 6 Months • $209.94 Value
                     </div>
@@ -232,7 +232,7 @@ export default function PartnerLandingPage() {
                                 <Button
                                     onClick={handleValidateCode}
                                     disabled={validating || codeValid}
-                                    className="bg-amber-500 hover:bg-amber-600 text-gray-900 font-semibold"
+                                    className="bg-[#F5A623] hover:bg-[#E09520] text-gray-900 font-semibold"
                                 >
                                     {validating ? (
                                         <Loader2 className="h-4 w-4 animate-spin" />
@@ -244,10 +244,10 @@ export default function PartnerLandingPage() {
                                 </Button>
                             </div>
                             {codeError && (
-                                <p className="text-red-400 text-sm mt-2">{codeError}</p>
+                                <p className="text-[#E06B6B] text-sm mt-2">{codeError}</p>
                             )}
                             {codeValid && (
-                                <p className="text-green-400 text-sm mt-2 flex items-center gap-1">
+                                <p className="text-[#5BC4A0] text-sm mt-2 flex items-center gap-1">
                                     <CheckCircle className="h-4 w-4" />
                                     Code verified! Redirecting to create your account...
                                 </p>
@@ -295,7 +295,7 @@ export default function PartnerLandingPage() {
                             { step: "3", title: "Start Co-Parenting", desc: "Invite your co-parent. Build your schedule. Communicate safely." }
                         ].map((item, idx) => (
                             <div key={idx} className="flex flex-col items-center">
-                                <div className="w-12 h-12 rounded-full bg-amber-500 text-gray-900 font-bold text-xl flex items-center justify-center mb-4">
+                                <div className="w-12 h-12 rounded-full bg-[#F5A623] text-gray-900 font-bold text-xl flex items-center justify-center mb-4">
                                     {item.step}
                                 </div>
                                 <h3 className="text-white font-semibold mb-2">{item.title}</h3>

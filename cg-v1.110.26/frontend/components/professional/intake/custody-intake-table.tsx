@@ -61,22 +61,22 @@ interface CustodyIntakeTableProps {
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
     pending: {
         label: "Pending",
-        color: "bg-amber-50 text-amber-700 border-amber-200",
+        color: "bg-[#FEF7ED] text-[#B8791A] border-[#FBE3BF]",
         icon: <Clock className="h-3.5 w-3.5" />,
     },
     active: {
         label: "In Progress",
-        color: "bg-blue-50 text-blue-700 border-blue-200",
+        color: "bg-[#E0EFF8] text-[#1E4E6B] border-[#E0EFF8]",
         icon: <Eye className="h-3.5 w-3.5" />,
     },
     completed: {
         label: "Completed",
-        color: "bg-green-50 text-green-700 border-green-200",
+        color: "bg-[#E8F4F0] text-[#2D8A70] border-[#C5E5DB]",
         icon: <CheckCircle2 className="h-3.5 w-3.5" />,
     },
     reviewed: {
         label: "Reviewed",
-        color: "bg-emerald-50 text-emerald-700 border-emerald-200",
+        color: "bg-[#E8F4F0] text-[#2D8A70] border-[#C5E5DB]",
         icon: <CheckCircle2 className="h-3.5 w-3.5" />,
     },
     cancelled: {
@@ -86,7 +86,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.
     },
     expired: {
         label: "Expired",
-        color: "bg-red-50 text-red-600 border-red-200",
+        color: "bg-[#FEE2E2] text-[#C53030] border-[#FEE2E2]",
         icon: <AlertCircle className="h-3.5 w-3.5" />,
     },
 };
@@ -194,7 +194,7 @@ export function CustodyIntakeTable({ data, isLoading, onRefresh }: CustodyIntake
                                     <span className="text-sm text-muted-foreground">{formatDate(row.created_at)}</span>
                                 </TableCell>
                                 <TableCell>
-                                    <span className={`text-sm ${expired ? "text-red-500 font-medium" : "text-muted-foreground"}`}>
+                                    <span className={`text-sm ${expired ? "text-[#C53030] font-medium" : "text-muted-foreground"}`}>
                                         {row.expires_at ? formatDate(row.expires_at) : "Never"}
                                     </span>
                                 </TableCell>
@@ -208,7 +208,7 @@ export function CustodyIntakeTable({ data, isLoading, onRefresh }: CustodyIntake
                                             title="Copy Link"
                                         >
                                             {copiedId === row.id ? (
-                                                <CheckCircle2 className="h-4 w-4 text-green-600" />
+                                                <CheckCircle2 className="h-4 w-4 text-[#2D8A70]" />
                                             ) : (
                                                 <Copy className="h-4 w-4" />
                                             )}
@@ -235,7 +235,7 @@ export function CustodyIntakeTable({ data, isLoading, onRefresh }: CustodyIntake
                                                 </DropdownMenuItem>
                                                 <DropdownMenuSeparator />
                                                 <DropdownMenuItem
-                                                    className="text-red-600"
+                                                    className="text-[#C53030]"
                                                     disabled={row.status === 'completed' || row.status === 'cancelled'}
                                                 >
                                                     <Trash2 className="mr-2 h-4 w-4" />

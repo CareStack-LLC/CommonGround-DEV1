@@ -104,7 +104,7 @@ export function CalendarWidget({ events, onEventClick, className }: CalendarWidg
                   <div className="text-xs font-medium text-slate-500 uppercase" style={{ fontFamily: 'Inter, sans-serif' }}>
                     {event.date.toLocaleDateString('en-US', { month: 'short' })}
                   </div>
-                  <div className="text-2xl font-bold text-slate-800" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+                  <div className="text-2xl font-bold text-slate-800" style={{ fontFamily: 'var(--font-mono)' }}>
                     {event.date.getDate()}
                   </div>
                   {isToday(event.date) && (

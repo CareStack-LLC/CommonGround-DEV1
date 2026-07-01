@@ -3,10 +3,8 @@ import Image from 'next/image';
 import { EarlyAdopterForm } from '@/components/marketing/early-adopter-form';
 import { JsonLd } from '@/components/marketing/json-ld';
 import { FaqJsonLd } from '@/components/marketing';
+import { BrandIcon, type BrandIconName } from '@/components/brand/brand-icon';
 import {
-  FileCheck,
-  Calendar,
-  DollarSign,
   ArrowDown,
   CheckCircle,
   ChevronDown,
@@ -62,9 +60,15 @@ const story = [
   { time: 'One quiet morning', tone: 'after', kicker: true, text: 'Sam made coffee, looked at a phone that wasn’t buzzing, and realized the new chapter had actually started.' },
 ];
 
-const features = [
+const features: {
+  brandIcon: BrandIconName;
+  name: string;
+  tagline: string;
+  description: string;
+  accent: string;
+}[] = [
   {
-    icon: FileCheck,
+    brandIcon: 'agreement',
     name: 'Quick Accords',
     tagline: 'Agreements that stick',
     description:
@@ -72,7 +76,7 @@ const features = [
     accent: '#F5A623',
   },
   {
-    icon: Calendar,
+    brandIcon: 'timebridge',
     name: 'TimeBridge',
     tagline: 'Autopilot for your schedule',
     description:
@@ -80,12 +84,12 @@ const features = [
     accent: '#3DAA8A',
   },
   {
-    icon: DollarSign,
+    brandIcon: 'clearfund',
     name: 'ClearFund',
     tagline: 'Expenses on autopilot',
     description:
       'Set percentage splits for shared costs. Upload receipts. ClearFund calculates who owes what and sends reminders. No awkward money conversations. No chasing payments. Just clear, documented records.',
-    accent: '#E85D75',
+    accent: '#F5A623',
   },
 ];
 
@@ -103,7 +107,7 @@ const faqs = [
     a: 'CommonGround helps you follow your existing court order more easily. Enter your ordered schedule into TimeBridge, document compliance, and keep records that show you\'re meeting your obligations.',
   },
   {
-    q: 'What does "30% off for life" actually mean?',
+    q: 'What does "30% off for 3 years" actually mean?',
     a: 'As one of our first 50 early adopters, your subscription rate is locked at 30% below the standard price for 36 months on any paid plan. The discount stays with your account regardless of future price changes.',
   },
 ];
@@ -129,7 +133,7 @@ export default function FreshStartPage() {
           },
           offers: {
             '@type': 'Offer',
-            name: 'Early Adopter — 30% Off for Life',
+            name: 'Early Adopter — 30% Off for 3 Years',
             description: 'First 50 members get 30% off all subscriptions, locked for 36 months.',
             eligibleQuantity: { '@type': 'QuantitativeValue', value: 50 },
           },
@@ -155,16 +159,16 @@ export default function FreshStartPage() {
                 <span className="text-cg-sage">Don&apos;t Let Co-Parenting Undo It.</span>
               </h1>
               <p className="text-lg text-gray-600 leading-relaxed mb-8 max-w-xl">
-                You got through the divorce. You set boundaries. Things are running
-                smoothly — for now. CommonGround locks in that progress with
-                structure, automation, and documentation so a bad week doesn&apos;t
+                Keep the calm you fought for. TimeBridge runs the schedule,
+                ClearFund tracks the money, and ARIA keeps messages civil before
+                they send — everything documented, so a bad week doesn&apos;t
                 become a bad year.
               </p>
               <a
                 href="#early-adopter"
                 className="inline-flex items-center gap-2 bg-cg-sage text-white font-semibold px-8 py-4 rounded-xl transition-all duration-200 hover:bg-cg-sage-dark hover:shadow-lg hover:shadow-cg-sage/20 text-base"
               >
-                Join the Early Adopter List
+                Start free — no card needed
                 <ArrowDown className="w-4 h-4" />
               </a>
               <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-gray-600">
@@ -337,7 +341,6 @@ export default function FreshStartPage() {
 
           <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
             {features.map((feature) => {
-              const Icon = feature.icon;
               return (
                 <div
                   key={feature.name}
@@ -347,7 +350,7 @@ export default function FreshStartPage() {
                     className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
                     style={{ backgroundColor: `${feature.accent}15` }}
                   >
-                    <Icon className="w-6 h-6" style={{ color: feature.accent }} />
+                    <BrandIcon name={feature.brandIcon} size={24} />
                   </div>
                   <span
                     className="inline-block text-xs font-bold uppercase tracking-widest mb-2"
@@ -412,10 +415,10 @@ export default function FreshStartPage() {
               className="text-3xl sm:text-4xl text-foreground mb-4"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
-              Protect Your Fresh Start
+              Lock in the calm — in minutes
             </h2>
             <p className="text-gray-600 text-lg">
-              Join the first 50 members and lock in 30% off for life.
+              Join the first 50 members and lock in 30% off for 3 years.
               No credit card required. Just your email.
             </p>
           </div>

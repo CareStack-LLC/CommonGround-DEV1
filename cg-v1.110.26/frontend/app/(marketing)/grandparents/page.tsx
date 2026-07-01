@@ -158,16 +158,16 @@ export default function GrandparentsPage() {
                 <span className="text-[#3DAA8A]">even from miles away.</span>
               </h1>
               <p className="text-lg text-gray-600 leading-relaxed mb-8 max-w-xl mx-auto lg:mx-0">
-                When families live apart — or grow apart — the grandkids shouldn&apos;t
-                feel the distance. KidSpace gives the whole family a safe, simple way to
-                call, read, watch, and play together. You don&apos;t miss the little
-                moments. You&apos;re just there.
+                Don&apos;t let distance or a separation quietly cost you the grandkids.
+                Once parents approve you through My Circle, KidSpace gives the whole
+                family a safe, simple way to call, read, watch, and play together &mdash;
+                so you don&apos;t miss the little moments. You&apos;re just there.
               </p>
               <a
                 href="#early-adopter"
                 className="inline-flex items-center gap-2 bg-[#3DAA8A] text-white font-semibold px-8 py-4 rounded-xl transition-all duration-200 hover:bg-[#2E9577] hover:shadow-lg hover:shadow-[#3DAA8A]/20 text-base"
               >
-                Start staying close
+                Start staying close &mdash; free to try
               </a>
               <div className="mt-6 flex flex-wrap items-center justify-center lg:justify-start gap-x-5 gap-y-2 text-sm text-gray-600">
                 {heroTrust.map((t) => (
@@ -426,8 +426,8 @@ export default function GrandparentsPage() {
               Don&apos;t miss another bedtime story
             </h2>
             <p className="text-gray-600 text-lg">
-              Join the early list and be first to keep your family close with KidSpace.
-              No credit card required — just your email.
+              Join the early list and be first to start weekly calls, stories, and
+              movie nights in KidSpace. No credit card required &mdash; just your email.
             </p>
           </div>
           <EarlyAdopterForm source="grandparents" />

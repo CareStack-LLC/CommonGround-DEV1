@@ -129,7 +129,7 @@ export function MovieDetailModal({
               <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
               <span
                 className="text-sm font-bold"
-                style={{ fontFamily: 'JetBrains Mono, monospace', color: 'var(--portal-text-heading)' }}
+                style={{ fontFamily: 'var(--font-mono)', color: 'var(--portal-text-heading)' }}
               >
                 {rating.toFixed(1)}
               </span>
@@ -142,7 +142,7 @@ export function MovieDetailModal({
             {video.duration && (
               <div className="flex items-center gap-1 px-2.5 py-1 rounded-full" style={{ background: 'var(--portal-background)' }}>
                 <Clock className="w-3.5 h-3.5" style={{ color: 'var(--portal-muted)' }} />
-                <span className="text-xs font-semibold" style={{ fontFamily: 'JetBrains Mono, monospace', color: 'var(--portal-text)' }}>
+                <span className="text-xs font-semibold" style={{ fontFamily: 'var(--font-mono)', color: 'var(--portal-text)' }}>
                   {video.duration}
                 </span>
               </div>
@@ -188,7 +188,7 @@ export function MovieDetailModal({
                   }}
                 />
               </div>
-              <span className="text-xs font-semibold" style={{ fontFamily: 'JetBrains Mono, monospace', color: 'var(--portal-muted)' }}>
+              <span className="text-xs font-semibold" style={{ fontFamily: 'var(--font-mono)', color: 'var(--portal-muted)' }}>
                 {progressPercent}%
               </span>
             </div>

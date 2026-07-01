@@ -97,11 +97,11 @@ export default function CircleCallsHistoryPage() {
   }
 
   function getStatusColor(status: string, hasFlags: boolean): string {
-    if (hasFlags) return 'text-amber-600 bg-amber-50 border-amber-200';
-    if (status === 'completed') return 'text-green-600 bg-green-50 border-green-200';
+    if (hasFlags) return 'text-[#E09520] bg-[#FEF7ED] border-[#FEF7ED]';
+    if (status === 'completed') return 'text-[#2D8A70] bg-[#E8F4F0] border-[#E8F4F0]';
     if (status === 'missed') return 'text-gray-500 bg-gray-100 border-gray-200';
-    if (status === 'terminated') return 'text-red-600 bg-red-50 border-red-200';
-    return 'text-blue-600 bg-blue-50 border-blue-200';
+    if (status === 'terminated') return 'text-[#C53030] bg-[#FEE2E2] border-[#FEE2E2]';
+    return 'text-[#2D6A8F] bg-[#E0EFF8] border-[#E0EFF8]';
   }
 
   // Get unique children and contacts for filters
@@ -146,12 +146,12 @@ export default function CircleCallsHistoryPage() {
       <div className="min-h-screen bg-gray-50 p-6">
         <div className="max-w-5xl mx-auto">
           <div className="bg-white rounded-2xl border border-gray-200 p-8 text-center">
-            <AlertTriangle className="h-12 w-12 text-red-400 mx-auto mb-4" />
+            <AlertTriangle className="h-12 w-12 text-[#E06B6B] mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-foreground mb-2">Unable to Load Calls</h2>
             <p className="text-muted-foreground">{error}</p>
             <button
               onClick={loadCallHistory}
-              className="mt-6 px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+              className="mt-6 px-6 py-2 bg-[#2D6A8F] text-white rounded-lg hover:bg-[#1E4E6B]"
             >
               Try Again
             </button>
@@ -175,7 +175,7 @@ export default function CircleCallsHistoryPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-                <Phone className="h-6 w-6 text-purple-500" />
+                <Phone className="h-6 w-6 text-[#2D6A8F]" />
                 Circle Calls History
               </h1>
               <p className="text-sm text-muted-foreground mt-1">
@@ -189,7 +189,7 @@ export default function CircleCallsHistoryPage() {
               <Filter className="h-4 w-4" />
               Filters
               {(filterStatus !== 'all' || filterChild !== 'all' || filterContact !== 'all') && (
-                <span className="w-2 h-2 bg-purple-600 rounded-full" />
+                <span className="w-2 h-2 bg-[#2D6A8F] rounded-full" />
               )}
             </button>
           </div>
@@ -208,7 +208,7 @@ export default function CircleCallsHistoryPage() {
                   setFilterChild('all');
                   setFilterContact('all');
                 }}
-                className="text-sm text-purple-600 hover:text-purple-700"
+                className="text-sm text-[#2D6A8F] hover:text-[#1E4E6B]"
               >
                 Clear All
               </button>
@@ -222,7 +222,7 @@ export default function CircleCallsHistoryPage() {
                 <select
                   value={filterStatus}
                   onChange={(e) => setFilterStatus(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2D6A8F] focus:border-transparent"
                 >
                   <option value="all">All Statuses</option>
                   <option value="completed">Completed</option>
@@ -239,7 +239,7 @@ export default function CircleCallsHistoryPage() {
                 <select
                   value={filterChild}
                   onChange={(e) => setFilterChild(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2D6A8F] focus:border-transparent"
                 >
                   <option value="all">All Children</option>
                   {uniqueChildren.map((child) => (
@@ -258,7 +258,7 @@ export default function CircleCallsHistoryPage() {
                 <select
                   value={filterContact}
                   onChange={(e) => setFilterContact(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#2D6A8F] focus:border-transparent"
                 >
                   <option value="all">All Contacts</option>
                   {uniqueContacts.map((contact) => (
@@ -274,13 +274,13 @@ export default function CircleCallsHistoryPage() {
 
         {/* Safety Notice */}
         {flaggedCalls > 0 && (
-          <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3">
-            <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
+          <div className="mb-6 p-4 bg-[#FEF7ED] border border-[#FEF7ED] rounded-xl flex items-start gap-3">
+            <AlertTriangle className="h-5 w-5 text-[#E09520] mt-0.5 flex-shrink-0" />
             <div>
-              <p className="font-medium text-amber-900">
+              <p className="font-medium text-[#1E3A4A]">
                 {flaggedCalls} {flaggedCalls === 1 ? 'call has' : 'calls have'} safety notices
               </p>
-              <p className="text-sm text-amber-700 mt-1">
+              <p className="text-sm text-[#E09520] mt-1">
                 ARIA detected potentially concerning content during {flaggedCalls === 1 ? 'this call' : 'these calls'}.
                 Review the details below.
               </p>
@@ -312,10 +312,10 @@ export default function CircleCallsHistoryPage() {
                     {/* Icon */}
                     <div className={cn(
                       'w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0',
-                      call.call_type === 'video' ? 'bg-purple-100' : 'bg-slate-100'
+                      call.call_type === 'video' ? 'bg-[#E0EFF8]' : 'bg-slate-100'
                     )}>
                       {call.call_type === 'video' ? (
-                        <Video className="h-6 w-6 text-purple-600" />
+                        <Video className="h-6 w-6 text-[#2D6A8F]" />
                       ) : (
                         <Phone className="h-6 w-6 text-slate-600" />
                       )}
@@ -328,9 +328,9 @@ export default function CircleCallsHistoryPage() {
                           {call.circle_contact_name} → {call.child_name}
                         </p>
                         {call.aria_intervention_count > 0 && (
-                          <div className="flex items-center gap-1 px-2 py-0.5 bg-amber-100 rounded-full">
-                            <Shield className="h-3 w-3 text-amber-600" />
-                            <span className="text-xs font-medium text-amber-700">
+                          <div className="flex items-center gap-1 px-2 py-0.5 bg-[#FEF7ED] rounded-full">
+                            <Shield className="h-3 w-3 text-[#E09520]" />
+                            <span className="text-xs font-medium text-[#E09520]">
                               {call.aria_intervention_count} {call.aria_intervention_count === 1 ? 'flag' : 'flags'}
                             </span>
                           </div>
@@ -371,7 +371,7 @@ export default function CircleCallsHistoryPage() {
                   <div className="border-t border-gray-200 p-4 bg-gray-50">
                     {loadingReport ? (
                       <div className="text-center py-8">
-                        <div className="animate-spin w-8 h-8 border-4 border-purple-600 border-t-transparent rounded-full mx-auto" />
+                        <div className="animate-spin w-8 h-8 border-4 border-[#2D6A8F] border-t-transparent rounded-full mx-auto" />
                         <p className="text-sm text-muted-foreground mt-3">Loading details...</p>
                       </div>
                     ) : callReport ? (
@@ -398,7 +398,7 @@ export default function CircleCallsHistoryPage() {
                           </div>
                           <div className="bg-white rounded-lg p-3 border border-gray-200">
                             <p className="text-xs text-muted-foreground mb-1">Recording</p>
-                            <p className="text-sm font-medium text-purple-600">
+                            <p className="text-sm font-medium text-[#2D6A8F]">
                               {call.has_recording ? 'Available' : 'Processing'}
                             </p>
                           </div>
@@ -408,7 +408,7 @@ export default function CircleCallsHistoryPage() {
                         {Object.keys(callReport.category_counts).length > 0 && (
                           <div className="bg-white rounded-lg p-4 border border-gray-200">
                             <h4 className="font-medium text-foreground mb-3 flex items-center gap-2">
-                              <Shield className="h-4 w-4 text-amber-600" />
+                              <Shield className="h-4 w-4 text-[#E09520]" />
                               Safety Categories
                             </h4>
                             <div className="space-y-2">
@@ -430,7 +430,7 @@ export default function CircleCallsHistoryPage() {
                         <div className="flex gap-3">
                           <button
                             onClick={() => alert('Court report generation coming soon')}
-                            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-[#2D6A8F] text-white rounded-lg hover:bg-[#1E4E6B]"
                           >
                             <FileText className="h-4 w-4" />
                             View Full Report

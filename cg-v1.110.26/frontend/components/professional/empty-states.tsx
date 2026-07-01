@@ -158,7 +158,7 @@ export function ComingSoonEmpty({
 }) {
   return (
     <EmptyState
-      icon={<Sparkles className="h-12 w-12 text-purple-300" />}
+      icon={<Sparkles className="h-12 w-12 text-[#9BCADF]" />}
       title={title}
       description={description}
       variant="dashed"

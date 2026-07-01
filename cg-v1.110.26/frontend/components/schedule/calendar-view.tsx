@@ -439,8 +439,8 @@ export default function CalendarView({
                           {isProfessional && <span className="flex-shrink-0">⚖</span>}
                           {rsvpIndicator && (
                             <span className={`flex-shrink-0 ${
-                              rsvpStatus === 'going' ? 'text-green-200' :
-                              rsvpStatus === 'not_going' ? 'text-red-200' : 'text-yellow-200'
+                              rsvpStatus === 'going' ? 'text-[#E8F4F0]' :
+                              rsvpStatus === 'not_going' ? 'text-[#FEE2E2]' : 'text-[#FEF7ED]'
                             }`}>{rsvpIndicator}</span>
                           )}
                           <span className="truncate">
@@ -484,8 +484,8 @@ export default function CalendarView({
                           <Gavel className="h-2.5 w-2.5 sm:h-3 sm:w-3 flex-shrink-0" />
                           {RsvpIcon && (
                             <RsvpIcon className={`h-2.5 w-2.5 sm:h-3 sm:w-3 flex-shrink-0 ${
-                              rsvpStatus === 'attending' ? 'text-green-300' :
-                              rsvpStatus === 'not_attending' ? 'text-red-300' : 'text-yellow-300'
+                              rsvpStatus === 'attending' ? 'text-[#5BC4A0]' :
+                              rsvpStatus === 'not_attending' ? 'text-[#FCA5A5]' : 'text-[#F5A623]'
                             }`} />
                           )}
                           <span className="truncate">

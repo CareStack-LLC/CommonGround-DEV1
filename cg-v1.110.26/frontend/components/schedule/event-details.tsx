@@ -129,11 +129,11 @@ export default function EventDetails({
   const getRsvpBadgeColor = (status: string) => {
     switch (status) {
       case 'going':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+        return 'bg-[#E8F4F0] text-[#1E3A4A] dark:bg-[#1E3A4A]/30 dark:text-[#5BC4A0]';
       case 'not_going':
-        return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+        return 'bg-[#FEE2E2] text-[#9B2C2C] dark:bg-[#7A2222]/30 dark:text-[#E06B6B]';
       case 'maybe':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400';
+        return 'bg-[#FEF7ED] text-[#E09520] dark:bg-[#1E3A4A]/30 dark:text-[#F5A623]';
       default:
         return 'bg-muted text-muted-foreground';
     }
@@ -250,7 +250,7 @@ export default function EventDetails({
             <div className="flex items-center gap-2">
               <span className={`text-xs px-2 py-1 rounded-full ${event.visibility === 'private'
                 ? 'bg-muted text-muted-foreground'
-                : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                : 'bg-[#E8F4F0] text-[#2D8A70] dark:bg-[#1E3A4A]/30 dark:text-[#5BC4A0]'
                 }`}>
                 {event.visibility === 'private' ? 'Private' : 'Shared with Co-parent'}
               </span>
@@ -258,10 +258,10 @@ export default function EventDetails({
 
             {/* Category-specific details */}
             {event.event_category && event.event_category !== 'general' && event.category_data && (
-              <div className={`p-3 rounded-lg border ${event.event_category === 'medical' ? 'bg-blue-50 border-blue-200 dark:bg-blue-950/20 dark:border-blue-900/40' :
-                event.event_category === 'school' ? 'bg-green-50 border-green-200 dark:bg-green-950/20 dark:border-green-900/40' :
-                  event.event_category === 'sports' ? 'bg-orange-50 border-orange-200 dark:bg-orange-950/20 dark:border-orange-900/40' :
-                    'bg-purple-50 border-purple-200 dark:bg-purple-950/20 dark:border-purple-900/40'
+              <div className={`p-3 rounded-lg border ${event.event_category === 'medical' ? 'bg-[#E0EFF8] border-[#E0EFF8] dark:bg-[#1E3A4A]/20 dark:border-[#1E3A4A]/40' :
+                event.event_category === 'school' ? 'bg-[#E8F4F0] border-[#E8F4F0] dark:bg-[#1E3A4A]/20 dark:border-[#1E3A4A]/40' :
+                  event.event_category === 'sports' ? 'bg-[#FEF7ED] border-[#FEF7ED] dark:bg-[#1E3A4A]/20 dark:border-[#1E3A4A]/40' :
+                    'bg-[#E0EFF8] border-[#E0EFF8] dark:bg-[#1E3A4A]/20 dark:border-[#1E3A4A]/40'
                 }`}>
                 <div className="flex items-center gap-2 mb-2">
                   {event.event_category === 'medical' && <Stethoscope className="h-4 w-4" />}
@@ -285,7 +285,7 @@ export default function EventDetails({
                         {data.appointment_reason && <p><span className="text-muted-foreground">Reason:</span> {data.appointment_reason}</p>}
                         {data.address && <p><span className="text-muted-foreground">Address:</span> {data.address}</p>}
                         {data.phone && <p><span className="text-muted-foreground">Phone:</span> {data.phone}</p>}
-                        {data.follow_up_needed && <p className="text-blue-700 dark:text-blue-400">Follow-up needed</p>}
+                        {data.follow_up_needed && <p className="text-[#1E4E6B] dark:text-[#4BA8C8]">Follow-up needed</p>}
                       </>
                     );
                   })()}
@@ -297,7 +297,7 @@ export default function EventDetails({
                         {data.activity_type && <p><span className="text-muted-foreground">Activity:</span> {data.activity_type}</p>}
                         {data.teacher_name && <p><span className="text-muted-foreground">Teacher:</span> {data.teacher_name}</p>}
                         {data.teacher_contact && <p><span className="text-muted-foreground">Contact:</span> {data.teacher_contact}</p>}
-                        {data.is_required && <p className="text-green-700 dark:text-green-400">Required attendance</p>}
+                        {data.is_required && <p className="text-[#2D8A70] dark:text-[#5BC4A0]">Required attendance</p>}
                       </>
                     );
                   })()}
@@ -336,11 +336,11 @@ export default function EventDetails({
               <div className="mt-4 p-3 bg-muted border border-border rounded-lg">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <Smartphone className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                    <Smartphone className="h-4 w-4 text-[#2D6A8F] dark:text-[#4BA8C8]" />
                     <h3 className="font-semibold text-sm text-foreground">Check-in Required</h3>
                   </div>
                   {myCheckIn && (
-                    <span className="text-xs bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 px-2 py-0.5 rounded-full flex items-center">
+                    <span className="text-xs bg-[#E8F4F0] text-[#1E3A4A] dark:bg-[#1E3A4A]/30 dark:text-[#5BC4A0] px-2 py-0.5 rounded-full flex items-center">
                       <Check className="h-3 w-3 mr-1" />
                       Checked In
                     </span>
@@ -359,7 +359,7 @@ export default function EventDetails({
                     </p>
                     <Button
                       size="sm"
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                      className="w-full bg-[#2D6A8F] hover:bg-[#1E4E6B] text-white"
                       onClick={() => setShowCheckInModal(true)}
                     >
                       <MapPin className="h-4 w-4 mr-2" />
@@ -411,7 +411,7 @@ export default function EventDetails({
                     <Button
                       onClick={() => handleSwapResponse(true)}
                       disabled={isUpdating || event.status !== 'pending'}
-                      className="flex-1 bg-green-600 hover:bg-green-700"
+                      className="flex-1 bg-[#2D8A70] hover:bg-[#2D8A70]"
                     >
                       <Check className="h-4 w-4 mr-1" />
                       Approve Swap
@@ -419,7 +419,7 @@ export default function EventDetails({
                     <Button
                       onClick={() => handleSwapResponse(false)}
                       disabled={isUpdating || event.status !== 'pending'}
-                      className="flex-1 bg-red-600 hover:bg-red-700"
+                      className="flex-1 bg-[#C53030] hover:bg-[#9B2C2C]"
                     >
                       <XIcon className="h-4 w-4 mr-1" />
                       Deny Request
@@ -432,7 +432,7 @@ export default function EventDetails({
                       onClick={() => handleRsvp('going')}
                       disabled={isUpdating}
                       className={`flex-1 ${currentRsvp === 'going'
-                        ? 'bg-green-600 hover:bg-green-700'
+                        ? 'bg-[#2D8A70] hover:bg-[#2D8A70]'
                         : ''
                         }`}
                       variant={currentRsvp === 'going' ? 'default' : 'outline'}
@@ -444,7 +444,7 @@ export default function EventDetails({
                       onClick={() => handleRsvp('maybe')}
                       disabled={isUpdating}
                       className={`flex-1 ${currentRsvp === 'maybe'
-                        ? 'bg-yellow-600 hover:bg-yellow-700'
+                        ? 'bg-[#E09520] hover:bg-[#E09520]'
                         : ''
                         }`}
                       variant={currentRsvp === 'maybe' ? 'default' : 'outline'}
@@ -456,7 +456,7 @@ export default function EventDetails({
                       onClick={() => handleRsvp('not_going')}
                       disabled={isUpdating}
                       className={`flex-1 ${currentRsvp === 'not_going'
-                        ? 'bg-red-600 hover:bg-red-700'
+                        ? 'bg-[#C53030] hover:bg-[#9B2C2C]'
                         : ''
                         }`}
                       variant={currentRsvp === 'not_going' ? 'default' : 'outline'}

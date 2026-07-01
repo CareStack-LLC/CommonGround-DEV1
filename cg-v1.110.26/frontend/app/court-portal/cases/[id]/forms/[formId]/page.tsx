@@ -584,7 +584,7 @@ export default function CourtPortalFormDetailPage() {
           }
           .header {
             text-align: center;
-            border-bottom: 2px solid #1e40af;
+            border-bottom: 2px solid #1E4E6B;
             padding-bottom: 20px;
             margin-bottom: 30px;
           }
@@ -592,7 +592,7 @@ export default function CourtPortalFormDetailPage() {
             font-size: 14px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            color: #1e40af;
+            color: #1E4E6B;
             margin-bottom: 10px;
           }
           .form-type {
@@ -610,7 +610,7 @@ export default function CourtPortalFormDetailPage() {
           .section-title {
             font-size: 16px;
             font-weight: bold;
-            color: #1e40af;
+            color: #1E4E6B;
             border-bottom: 1px solid #e5e7eb;
             padding-bottom: 5px;
             margin-bottom: 15px;
@@ -638,11 +638,11 @@ export default function CourtPortalFormDetailPage() {
             font-weight: 600;
             text-transform: uppercase;
           }
-          .status-approved { background: #d1fae5; color: #065f46; }
-          .status-submitted { background: #dbeafe; color: #1e40af; }
+          .status-approved { background: #E8F4F0; color: #1E3A4A; }
+          .status-submitted { background: #E0EFF8; color: #1E4E6B; }
           .status-draft { background: #f3f4f6; color: #374151; }
-          .status-rejected { background: #fee2e2; color: #991b1b; }
-          .status-under_court_review { background: #fef3c7; color: #92400e; }
+          .status-rejected { background: #fee2e2; color: #9B2C2C; }
+          .status-under_court_review { background: #FEF7ED; color: #E09520; }
           .data-table {
             width: 100%;
             border-collapse: collapse;
@@ -670,15 +670,15 @@ export default function CourtPortalFormDetailPage() {
             font-style: italic;
           }
           .court-notes {
-            background: #eff6ff;
-            border: 1px solid #bfdbfe;
+            background: #E0EFF8;
+            border: 1px solid #E0EFF8;
             border-radius: 8px;
             padding: 15px;
             margin-top: 10px;
           }
           .court-notes-label {
             font-weight: 600;
-            color: #1e40af;
+            color: #1E4E6B;
             margin-bottom: 5px;
           }
         </style>
@@ -790,7 +790,7 @@ export default function CourtPortalFormDetailPage() {
   if (isLoading || !professional) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-10 w-10 border-2 border-indigo-600 border-t-transparent" />
+        <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#2D6A8F] border-t-transparent" />
       </div>
     );
   }
@@ -799,7 +799,7 @@ export default function CourtPortalFormDetailPage() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-2 border-indigo-600 border-t-transparent mx-auto" />
+          <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#2D6A8F] border-t-transparent mx-auto" />
           <p className="mt-4 text-muted-foreground">Loading form...</p>
         </div>
       </div>
@@ -858,7 +858,7 @@ export default function CourtPortalFormDetailPage() {
             <>
               <Button
                 variant="outline"
-                className="text-amber-600 hover:bg-amber-50 border-amber-200"
+                className="text-[#E09520] hover:bg-[#FEF7ED] border-[#FEF7ED]"
                 onClick={() => setShowResubmitModal(true)}
               >
                 <Edit className="h-4 w-4 mr-2" />
@@ -866,7 +866,7 @@ export default function CourtPortalFormDetailPage() {
               </Button>
               <Button
                 variant="outline"
-                className="text-red-600 hover:bg-red-50"
+                className="text-[#C53030] hover:bg-[#FEE2E2]"
                 onClick={() => setShowRejectModal(true)}
               >
                 <XCircle className="h-4 w-4 mr-2" />
@@ -903,9 +903,9 @@ export default function CourtPortalFormDetailPage() {
       )}
 
       {success && (
-        <Alert className="bg-green-50 border-green-200">
-          <CheckCircle className="h-4 w-4 text-green-600" />
-          <AlertDescription className="text-green-700">{success}</AlertDescription>
+        <Alert className="bg-[#E8F4F0] border-[#E8F4F0]">
+          <CheckCircle className="h-4 w-4 text-[#2D8A70]" />
+          <AlertDescription className="text-[#2D8A70]">{success}</AlertDescription>
         </Alert>
       )}
 
@@ -953,30 +953,30 @@ export default function CourtPortalFormDetailPage() {
 
       {/* Court Notes */}
       {form.court_notes && (
-        <Card className="bg-indigo-50 border-indigo-200">
+        <Card className="bg-[#E0EFF8] border-[#E0EFF8]">
           <CardHeader>
-            <CardTitle className="text-indigo-900 flex items-center gap-2">
+            <CardTitle className="text-[#1E3A4A] flex items-center gap-2">
               <MessageSquare className="h-5 w-5" />
               Court Notes
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-indigo-800">{form.court_notes}</p>
+            <p className="text-[#1E4E6B]">{form.court_notes}</p>
           </CardContent>
         </Card>
       )}
 
       {/* Resubmission Issues */}
       {form.resubmission_issues && form.resubmission_issues.length > 0 && (
-        <Card className="bg-red-50 border-red-200">
+        <Card className="bg-[#FEE2E2] border-[#FEE2E2]">
           <CardHeader>
-            <CardTitle className="text-red-900 flex items-center gap-2">
+            <CardTitle className="text-[#7A2222] flex items-center gap-2">
               <AlertCircle className="h-5 w-5" />
               Issues Requiring Resubmission
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ul className="list-disc list-inside space-y-1 text-red-800">
+            <ul className="list-disc list-inside space-y-1 text-[#9B2C2C]">
               {form.resubmission_issues.map((issue, idx) => (
                 <li key={idx}>{issue}</li>
               ))}
@@ -987,32 +987,32 @@ export default function CourtPortalFormDetailPage() {
 
       {/* Edits Allowed Indicator */}
       {form.edits_allowed && (
-        <Card className="bg-amber-50 border-amber-200">
+        <Card className="bg-[#FEF7ED] border-[#FEF7ED]">
           <CardHeader>
-            <CardTitle className="text-amber-900 flex items-center gap-2">
+            <CardTitle className="text-[#1E3A4A] flex items-center gap-2">
               <Edit className="h-5 w-5" />
               Parent Edits Allowed
             </CardTitle>
-            <CardDescription className="text-amber-700">
+            <CardDescription className="text-[#E09520]">
               The parent has been granted permission to make corrections to this form.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
             {form.edits_allowed_notes && (
               <div>
-                <span className="font-medium text-amber-800">Notes to parent: </span>
-                <span className="text-amber-700">{form.edits_allowed_notes}</span>
+                <span className="font-medium text-[#E09520]">Notes to parent: </span>
+                <span className="text-[#E09520]">{form.edits_allowed_notes}</span>
               </div>
             )}
             {form.edits_allowed_at && (
-              <div className="text-sm text-amber-600">
+              <div className="text-sm text-[#E09520]">
                 Granted on {formatDate(form.edits_allowed_at)}
               </div>
             )}
             {form.edits_allowed_sections && form.edits_allowed_sections.length > 0 && (
               <div className="text-sm">
-                <span className="font-medium text-amber-800">Sections allowed: </span>
-                <span className="text-amber-700">
+                <span className="font-medium text-[#E09520]">Sections allowed: </span>
+                <span className="text-[#E09520]">
                   {form.edits_allowed_sections.map((s: string) => {
                     const section = (FORM_SECTIONS[form.form_type] || []).find((fs) => fs.id === s);
                     return section ? section.label : s;
@@ -1024,7 +1024,7 @@ export default function CourtPortalFormDetailPage() {
               <Button
                 variant="outline"
                 size="sm"
-                className="text-amber-700 border-amber-300 hover:bg-amber-100"
+                className="text-[#E09520] border-[#F5A623] hover:bg-[#FEF7ED]"
                 onClick={handleRevokeEdits}
                 disabled={isSubmitting}
               >
@@ -1041,7 +1041,7 @@ export default function CourtPortalFormDetailPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-blue-600" />
+              <FileText className="h-5 w-5 text-[#2D6A8F]" />
               Court Document PDF
             </CardTitle>
             <CardDescription>
@@ -1175,9 +1175,9 @@ export default function CourtPortalFormDetailPage() {
       {showResubmitModal && (
         <Modal onClose={() => { setShowResubmitModal(false); setSelectedSections([]); }} size="large">
           <h2 className="text-xl font-bold mb-4">Request Changes</h2>
-          <Alert className="mb-4 bg-amber-50 border-amber-200">
-            <AlertCircle className="h-4 w-4 text-amber-600" />
-            <AlertDescription className="text-amber-800">
+          <Alert className="mb-4 bg-[#FEF7ED] border-[#FEF7ED]">
+            <AlertCircle className="h-4 w-4 text-[#E09520]" />
+            <AlertDescription className="text-[#E09520]">
               This will allow the parent to edit <strong>only</strong> the sections you select below.
               You cannot edit the form directly - only request corrections from the parent.
             </AlertDescription>
@@ -1205,14 +1205,14 @@ export default function CourtPortalFormDetailPage() {
                         setSelectedSections(selectedSections.filter((s) => s !== section.id));
                       }
                     }}
-                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                    className="h-4 w-4 rounded border-gray-300 text-[#2D6A8F] focus:ring-[#2D6A8F]"
                   />
                   <span className="text-sm">{section.label}</span>
                 </label>
               ))}
             </div>
             {selectedSections.length > 0 && (
-              <p className="text-xs text-indigo-600 mt-2">
+              <p className="text-xs text-[#2D6A8F] mt-2">
                 {selectedSections.length} section(s) selected
               </p>
             )}
@@ -1255,7 +1255,7 @@ export default function CourtPortalFormDetailPage() {
             <Button
               onClick={handleRequestResubmission}
               disabled={isSubmitting || !resubmitIssues.trim() || selectedSections.length === 0}
-              className="bg-amber-600 hover:bg-amber-700"
+              className="bg-[#E09520] hover:bg-[#E09520]"
             >
               {isSubmitting ? "Requesting..." : "Request Changes"}
             </Button>
@@ -1525,9 +1525,9 @@ function FormDataDisplay({ data, formType }: { data: Record<string, any>; formTy
     }
     if (typeof value === 'boolean') {
       return value ? (
-        <span className="text-green-600">Yes</span>
+        <span className="text-[#2D8A70]">Yes</span>
       ) : (
-        <span className="text-red-600">No</span>
+        <span className="text-[#C53030]">No</span>
       );
     }
     if (Array.isArray(value)) {
@@ -1572,12 +1572,12 @@ function FormDataDisplay({ data, formType }: { data: Record<string, any>; formTy
   return (
     <div className="space-y-6">
       {/* AI-style Summary */}
-      <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg p-4 border border-indigo-100">
+      <div className="bg-gradient-to-r from-[#E0EFF8] to-[#E0EFF8] rounded-lg p-4 border border-[#E0EFF8]">
         <div className="flex items-center gap-2 mb-3">
-          <Sparkles className="h-5 w-5 text-indigo-600" />
-          <h4 className="font-semibold text-indigo-900">Form Summary</h4>
+          <Sparkles className="h-5 w-5 text-[#2D6A8F]" />
+          <h4 className="font-semibold text-[#1E3A4A]">Form Summary</h4>
         </div>
-        <div className="prose prose-sm max-w-none text-indigo-800">
+        <div className="prose prose-sm max-w-none text-[#1E4E6B]">
           {summary.split('\n\n').map((paragraph, idx) => (
             <p key={idx} className="mb-2 last:mb-0" dangerouslySetInnerHTML={{
               __html: sanitizeHtml(paragraph.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'))

@@ -189,7 +189,7 @@ export default function IntakeTranscriptPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2D8A70]" />
       </div>
     );
   }
@@ -208,7 +208,7 @@ export default function IntakeTranscriptPage() {
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 print:block">
         <div className="flex items-center gap-4">
-          <div className="p-3 bg-purple-100 text-purple-600 rounded-xl print:hidden">
+          <div className="p-3 bg-[#E0EFF8] text-[#2D6A8F] rounded-xl print:hidden">
             <MessageSquare className="h-8 w-8" />
           </div>
           <div>
@@ -306,7 +306,7 @@ export default function IntakeTranscriptPage() {
         <Card>
           <CardContent className="pt-4">
             <p className="text-xs text-muted-foreground">ARIA Messages</p>
-            <p className="text-2xl font-bold text-purple-600">
+            <p className="text-2xl font-bold text-[#2D6A8F]">
               {messages.filter((m) => m.role === "assistant").length}
             </p>
           </CardContent>
@@ -351,7 +351,7 @@ export default function IntakeTranscriptPage() {
                       <AvatarFallback
                         className={
                           message.role === "assistant"
-                            ? "bg-purple-100 text-purple-600"
+                            ? "bg-[#E0EFF8] text-[#2D6A8F]"
                             : "bg-blue-100 text-blue-600"
                         }
                       >
@@ -447,7 +447,7 @@ export default function IntakeTranscriptPage() {
                 >
                   <div
                     className={`w-3 h-3 rounded-full ${
-                      message.role === "assistant" ? "bg-purple-500" : "bg-blue-500"
+                      message.role === "assistant" ? "bg-[#3D8DB0]" : "bg-blue-500"
                     }`}
                   />
                   {index < messages.length - 1 && (

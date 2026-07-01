@@ -2,12 +2,11 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { BrandIcon, type BrandIconName } from '@/components/brand/brand-icon';
+import type { LucideIcon } from 'lucide-react';
 import {
   UserPlus,
   Users,
-  FileText,
-  MessageSquare,
-  Calendar,
   ArrowRight,
   Check,
   Zap,
@@ -21,7 +20,15 @@ import {
  * Matches homepage design: DM Serif Display serif, warm colors, compelling copy
  */
 
-const steps = [
+const steps: {
+  number: string;
+  brandIcon?: BrandIconName;
+  icon?: LucideIcon;
+  title: string;
+  description: string;
+  color: string;
+  iconColor: string;
+}[] = [
   {
     number: '01',
     icon: UserPlus,
@@ -40,7 +47,7 @@ const steps = [
   },
   {
     number: '03',
-    icon: FileText,
+    brandIcon: 'agreement',
     title: 'Build your agreement',
     description: 'Our guided wizard covers everything—custody, holidays, expenses, communication.',
     color: 'from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5',
@@ -48,7 +55,7 @@ const steps = [
   },
   {
     number: '04',
-    icon: MessageSquare,
+    brandIcon: 'aria',
     title: 'Communicate through ARIA',
     description: 'AI supports clarity and calm in every message. Communicate with confidence.',
     color: 'from-[#F5A623]/10 to-[#F5A623]/5',
@@ -56,7 +63,7 @@ const steps = [
   },
   {
     number: '05',
-    icon: Calendar,
+    brandIcon: 'timebridge',
     title: 'Let automation do the rest',
     description: 'Schedules, reminders, expenses—all tracked. No more "who owes what" confusion.',
     color: 'from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5',
@@ -88,9 +95,19 @@ export function HowItWorksContent() {
                 <span className="text-[#F5A623]">peace in 5 steps</span>
               </h1>
               <p className="text-xl sm:text-2xl text-gray-600 mb-8 max-w-2xl mx-auto lg:mx-0">
-                Secure, structured, simple. CommonGround
-                <span className="font-medium text-[var(--portal-primary)]"> handles the coordination so you can focus on your children.</span>
+                Sign up, invite your co-parent, and let CommonGround
+                <span className="font-medium text-[var(--portal-primary)]"> handle the coordination so you can focus on your children.</span>
               </p>
+
+              <div className="mb-8 flex justify-center lg:justify-start">
+                <Link
+                  href="/early-access"
+                  className="group inline-flex items-center justify-center px-8 py-4 bg-[var(--portal-primary)] text-white font-semibold rounded-full hover:bg-[#2D6A8F] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                >
+                  Start free &mdash; no card needed
+                  <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </div>
 
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-6 text-sm text-gray-500">
                 {benefits.map((benefit) => {
@@ -141,7 +158,11 @@ export function HowItWorksContent() {
                         {step.number}
                       </span>
                       <div className={`h-16 w-16 rounded-2xl bg-gradient-to-br ${step.color} flex items-center justify-center shadow-md group-hover:scale-110 transition-transform`}>
-                        <Icon className={`h-8 w-8 ${step.iconColor}`} />
+                        {step.brandIcon ? (
+                          <BrandIcon name={step.brandIcon} size={32} />
+                        ) : Icon ? (
+                          <Icon className={`h-8 w-8 ${step.iconColor}`} />
+                        ) : null}
                       </div>
                     </div>
 
@@ -180,18 +201,17 @@ export function HowItWorksContent() {
             Ready to find common ground?
           </h2>
           <p className="text-xl text-white/80 mb-10 max-w-2xl mx-auto">
-            Most parents see calmer communication in the first week.
-            Join thousands of families who found a better way forward.
+            Take the first step now. Create your account, invite your co-parent when you&apos;re ready, and let the coordination run itself.
           </p>
           <Link
             href="/early-access"
             className="inline-flex items-center justify-center px-10 py-5 bg-[#F5A623] text-white font-bold text-lg rounded-full hover:bg-[#E0951A] transition-all shadow-2xl hover:-translate-y-1 group"
           >
-            Start Free Today
+            Start free &mdash; no card needed
             <ArrowRight className="ml-2 h-6 w-6 group-hover:translate-x-2 transition-transform" />
           </Link>
           <p className="text-sm text-white/60 mt-6">
-            Forever free tier. No credit card required.
+            Free forever &middot; No credit card &middot; 2-minute setup &middot; Cancel anytime
           </p>
         </div>
       </section>

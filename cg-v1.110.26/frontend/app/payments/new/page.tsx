@@ -323,7 +323,7 @@ function NewExpenseContent() {
 
       <div className="max-w-2xl mx-auto px-6 py-6 pb-32">
         {error && (
-          <div className="mb-4 bg-red-50 border-2 border-red-200 text-red-700 px-4 py-3 rounded-2xl flex items-center gap-2 shadow-lg">
+          <div className="mb-4 bg-[#FEE2E2] border-2 border-[#FEE2E2] text-[#9B2C2C] px-4 py-3 rounded-2xl flex items-center gap-2 shadow-lg">
             <AlertCircle className="h-5 w-5 flex-shrink-0" />
             <span className="font-medium">{error}</span>
           </div>
@@ -332,7 +332,7 @@ function NewExpenseContent() {
         {/* Quick Create Templates */}
         <div className="mb-6">
           <p className="text-sm font-bold text-muted-foreground mb-2 flex items-center gap-1.5">
-            <Zap className="h-4 w-4 text-amber-500" />
+            <Zap className="h-4 w-4 text-[#F5A623]" />
             Quick Create
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -420,7 +420,7 @@ function NewExpenseContent() {
                         <p className={`font-bold text-sm ${category === cat.value ? 'text-[var(--portal-primary)]' : 'text-foreground'}`}>{cat.label}</p>
                         <p className="text-xs text-muted-foreground mt-0.5 font-medium">{cat.description}</p>
                         {hasCategorySplit && (
-                          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full" title="Custom split from agreement" />
+                          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#3DAA8A] rounded-full" title="Custom split from agreement" />
                         )}
                       </button>
                     );
@@ -455,14 +455,14 @@ function NewExpenseContent() {
                     Cost Split
                   </label>
                   {splitFromAgreement && (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-lg border border-emerald-200">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#E8F4F0] text-[#2D8A70] text-xs font-bold rounded-lg border border-[#E8F4F0]">
                       <Lock className="h-3 w-3" />
                       From Agreement
                     </span>
                   )}
                 </div>
                 {splitFromAgreement && categorySplits && (
-                  <p className="text-xs text-emerald-600 mb-2 font-medium">
+                  <p className="text-xs text-[#2D8A70] mb-2 font-medium">
                     Your agreement specifies {petitionerPercentage}/{100 - petitionerPercentage} for {categories.find(c => c.value === category)?.label} expenses
                   </p>
                 )}

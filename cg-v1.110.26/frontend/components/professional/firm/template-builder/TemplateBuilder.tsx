@@ -66,8 +66,8 @@ const blankQuestion = (): Question => ({
 function ValidationErrors({ errors }: { errors: string[] }) {
     if (!errors.length) return null;
     return (
-        <div className="flex items-start gap-3 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">
-            <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0 text-red-500" />
+        <div className="flex items-start gap-3 p-4 bg-[#FEE2E2] border border-[#FEE2E2] rounded-xl text-sm text-[#9B2C2C]">
+            <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0 text-[#C53030]" />
             <ul className="space-y-1 list-disc list-inside">
                 {errors.map((e, i) => <li key={i}>{e}</li>)}
             </ul>
@@ -87,14 +87,14 @@ function LivePreview({ template }: { template: TemplateData }) {
         <div className="h-full flex flex-col bg-slate-50 rounded-xl border border-slate-200 overflow-hidden">
             {/* Preview header */}
             <div className="flex items-center gap-2 px-4 py-3 bg-white border-b border-slate-200">
-                <div className="p-1.5 bg-purple-100 rounded-lg">
-                    <Bot className="h-4 w-4 text-purple-600" />
+                <div className="p-1.5 bg-[#E0EFF8] rounded-lg">
+                    <Bot className="h-4 w-4 text-[#2D6A8F]" />
                 </div>
                 <div className="flex-1 min-w-0">
                     <p className="text-xs font-semibold text-slate-700 truncate">ARIA — {template.name || "Untitled Template"}</p>
                     <p className="text-xs text-slate-400">{template.estimated_minutes} min estimated</p>
                 </div>
-                <Badge variant="outline" className="text-xs text-purple-600 border-purple-200 bg-purple-50">Preview</Badge>
+                <Badge variant="outline" className="text-xs text-[#2D6A8F] border-[#C2DEF0] bg-[#F0F7FC]">Preview</Badge>
             </div>
 
             {/* Section picker */}
@@ -105,7 +105,7 @@ function LivePreview({ template }: { template: TemplateData }) {
                             key={s.id}
                             onClick={() => setActiveSection(i)}
                             className={`px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all ${i === activeSection
-                                    ? "bg-purple-600 text-white"
+                                    ? "bg-[#2D6A8F] text-white"
                                     : "bg-slate-100 text-slate-500 hover:bg-slate-200"
                                 }`}
                         >
@@ -119,8 +119,8 @@ function LivePreview({ template }: { template: TemplateData }) {
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {/* ARIA greeting */}
                 <div className="flex items-start gap-2">
-                    <div className="p-1.5 bg-purple-100 rounded-full shrink-0">
-                        <Bot className="h-3.5 w-3.5 text-purple-600" />
+                    <div className="p-1.5 bg-[#E0EFF8] rounded-full shrink-0">
+                        <Bot className="h-3.5 w-3.5 text-[#2D6A8F]" />
                     </div>
                     <div className="bg-white rounded-xl rounded-tl-sm px-3 py-2 shadow-sm border border-slate-100 max-w-[85%]">
                         <p className="text-xs text-slate-700">
@@ -136,28 +136,28 @@ function LivePreview({ template }: { template: TemplateData }) {
                     <div key={q.id} className="space-y-2">
                         {/* ARIA asks */}
                         <div className="flex items-start gap-2">
-                            <div className="p-1.5 bg-purple-100 rounded-full shrink-0">
-                                <Bot className="h-3.5 w-3.5 text-purple-600" />
+                            <div className="p-1.5 bg-[#E0EFF8] rounded-full shrink-0">
+                                <Bot className="h-3.5 w-3.5 text-[#2D6A8F]" />
                             </div>
                             <div className="bg-white rounded-xl rounded-tl-sm px-3 py-2 shadow-sm border border-slate-100 max-w-[85%]">
                                 <p className="text-xs text-slate-700">
                                     {q.text || `Question ${qi + 1}`}
-                                    {q.required && <span className="text-red-400 ml-1">*</span>}
+                                    {q.required && <span className="text-[#E06B6B] ml-1">*</span>}
                                 </p>
                             </div>
                         </div>
                         {/* Client response placeholder */}
                         <div className="flex justify-end">
-                            <div className="bg-purple-600 text-white rounded-xl rounded-tr-sm px-3 py-2 max-w-[70%]">
+                            <div className="bg-[#2D6A8F] text-white rounded-xl rounded-tr-sm px-3 py-2 max-w-[70%]">
                                 {q.type === "yes_no" ? (
                                     <div className="flex gap-2">
                                         <span className="text-xs px-2 py-0.5 bg-white/20 rounded-full">Yes</span>
                                         <span className="text-xs px-2 py-0.5 bg-white/20 rounded-full">No</span>
                                     </div>
                                 ) : q.type === "select" && q.options?.length ? (
-                                    <p className="text-xs text-purple-200 italic">{q.options[0]}</p>
+                                    <p className="text-xs text-[#C2DEF0] italic">{q.options[0]}</p>
                                 ) : (
-                                    <p className="text-xs text-purple-200 italic">{q.placeholder || "Client's response..."}</p>
+                                    <p className="text-xs text-[#C2DEF0] italic">{q.placeholder || "Client's response..."}</p>
                                 )}
                             </div>
                         </div>
@@ -186,7 +186,7 @@ function LivePreview({ template }: { template: TemplateData }) {
                         placeholder="Client types response here..."
                         className="flex-1 text-xs bg-transparent outline-none text-slate-400"
                     />
-                    <div className="p-1 bg-purple-600 rounded-md opacity-50">
+                    <div className="p-1 bg-[#2D6A8F] rounded-md opacity-50">
                         <ChevronRight className="h-3 w-3 text-white" />
                     </div>
                 </div>
@@ -227,7 +227,7 @@ function QuestionEditor({
             onDragStart={() => onDragStart(question.id)}
             onDragOver={(e) => { e.preventDefault(); onDragOver(e); }}
             onDrop={() => onDrop(question.id)}
-            className={`group flex items-start gap-2 p-3 bg-white rounded-lg border transition-all ${isDragging ? "opacity-40 border-purple-400 shadow-inner" : "border-slate-100 hover:border-slate-200 hover:shadow-sm"
+            className={`group flex items-start gap-2 p-3 bg-white rounded-lg border transition-all ${isDragging ? "opacity-40 border-[#4BA8C8] shadow-inner" : "border-slate-100 hover:border-slate-200 hover:shadow-sm"
                 }`}
         >
             {/* Drag handle */}
@@ -290,7 +290,7 @@ function QuestionEditor({
                         id={`req-${question.id}`}
                         checked={question.required}
                         onChange={(e) => update({ required: e.target.checked })}
-                        className="w-3.5 h-3.5 accent-purple-600"
+                        className="w-3.5 h-3.5 accent-[#2D6A8F]"
                     />
                     <label htmlFor={`req-${question.id}`} className="text-xs text-slate-500 cursor-pointer">Required</label>
                 </div>
@@ -299,7 +299,7 @@ function QuestionEditor({
             {/* Delete */}
             <button
                 onClick={onDelete}
-                className="mt-1 text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                className="mt-1 text-slate-300 hover:text-[#C53030] transition-colors opacity-0 group-hover:opacity-100"
             >
                 <Trash2 className="h-4 w-4" />
             </button>
@@ -373,7 +373,7 @@ function SectionEditor({
             onDragStart={() => onDragStart(section.id)}
             onDragOver={(e) => { e.preventDefault(); onDragOver(e); }}
             onDrop={() => onDrop(section.id)}
-            className={`border rounded-xl transition-all ${isDragging ? "opacity-40 border-purple-400 shadow-inner bg-purple-50/20" : "border-slate-200 bg-white hover:shadow-sm"
+            className={`border rounded-xl transition-all ${isDragging ? "opacity-40 border-[#4BA8C8] shadow-inner bg-[#F0F7FC]/20" : "border-slate-200 bg-white hover:shadow-sm"
                 }`}
         >
             {/* Section header */}
@@ -405,7 +405,7 @@ function SectionEditor({
                 </button>
 
                 {total > 1 && (
-                    <button onClick={onDelete} className="text-slate-300 hover:text-red-500 transition-colors">
+                    <button onClick={onDelete} className="text-slate-300 hover:text-[#C53030] transition-colors">
                         <Trash2 className="h-4 w-4" />
                     </button>
                 )}
@@ -441,7 +441,7 @@ function SectionEditor({
                     {/* Add question */}
                     <button
                         onClick={addQuestion}
-                        className="w-full flex items-center justify-center gap-2 py-2.5 text-xs text-slate-400 hover:text-purple-600 border border-dashed border-slate-200 hover:border-purple-300 rounded-lg transition-all hover:bg-purple-50/30"
+                        className="w-full flex items-center justify-center gap-2 py-2.5 text-xs text-slate-400 hover:text-[#2D6A8F] border border-dashed border-slate-200 hover:border-[#9BCADF] rounded-lg transition-all hover:bg-[#F0F7FC]/30"
                     >
                         <Plus className="h-3.5 w-3.5" />
                         Add Question
@@ -541,7 +541,7 @@ export function TemplateBuilder({
                         placeholder="Template name..."
                         value={template.name}
                         onChange={(e) => updateMeta({ name: e.target.value })}
-                        className="max-w-xs h-9 font-semibold text-slate-800 border-slate-200 focus:border-purple-400"
+                        className="max-w-xs h-9 font-semibold text-slate-800 border-slate-200 focus:border-[#4BA8C8]"
                     />
                     <div className="hidden sm:flex items-center gap-1 text-xs text-slate-400">
                         <span>{template.sections.length} section{template.sections.length !== 1 ? "s" : ""}</span>
@@ -593,7 +593,7 @@ export function TemplateBuilder({
                         size="sm"
                         onClick={handlePublish}
                         disabled={isSaving}
-                        className="gap-1.5 text-xs bg-purple-600 hover:bg-purple-700 text-white"
+                        className="gap-1.5 text-xs bg-[#2D6A8F] hover:bg-[#1E4E6B] text-white"
                     >
                         <Rocket className="h-3.5 w-3.5" />
                         Publish
@@ -642,7 +642,7 @@ export function TemplateBuilder({
                     {/* Add section */}
                     <button
                         onClick={addSection}
-                        className="w-full flex items-center justify-center gap-2 py-4 text-sm text-slate-400 hover:text-purple-600 border-2 border-dashed border-slate-200 hover:border-purple-300 rounded-xl transition-all hover:bg-purple-50/20"
+                        className="w-full flex items-center justify-center gap-2 py-4 text-sm text-slate-400 hover:text-[#2D6A8F] border-2 border-dashed border-slate-200 hover:border-[#9BCADF] rounded-xl transition-all hover:bg-[#F0F7FC]/20"
                     >
                         <Plus className="h-4 w-4" />
                         Add Section

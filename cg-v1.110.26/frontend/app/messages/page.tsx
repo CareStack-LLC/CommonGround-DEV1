@@ -132,13 +132,13 @@ interface FamilyFileWithAgreements {
 // ARIA Guardian indicator component
 function ARIAGuardianBadge() {
   return (
-    <div className="flex items-center gap-1.5 sm:gap-2 px-2 py-1.5 sm:px-3 sm:py-2 bg-gradient-to-r from-amber-500/10 to-amber-600/5 border border-amber-500/20 rounded-xl shadow-md">
+    <div className="flex items-center gap-1.5 sm:gap-2 px-2 py-1.5 sm:px-3 sm:py-2 bg-gradient-to-r from-[#F5A623]/10 to-[#E09520]/5 border border-[#F5A623]/20 rounded-xl shadow-md">
       <div className="relative">
-        <div className="w-2 h-2 bg-amber-500 rounded-full" />
-        <div className="absolute inset-0 w-2 h-2 bg-amber-500 rounded-full animate-ping opacity-50" />
+        <div className="w-2 h-2 bg-[#F5A623] rounded-full" />
+        <div className="absolute inset-0 w-2 h-2 bg-[#F5A623] rounded-full animate-ping opacity-50" />
       </div>
-      <span className="text-xs font-bold text-amber-600 hidden sm:inline">ARIA Protected</span>
-      <span className="text-xs font-bold text-amber-600 sm:hidden">ARIA</span>
+      <span className="text-xs font-bold text-[#E09520] hidden sm:inline">ARIA Protected</span>
+      <span className="text-xs font-bold text-[#E09520] sm:hidden">ARIA</span>
     </div>
   );
 }
@@ -287,14 +287,14 @@ function MessageBubble({
           }`}>
           <span>{formatTime(message.sent_at)}</span>
           {isOwn && message.acknowledged_at && (
-            <div className="flex items-center gap-1 text-emerald-600">
+            <div className="flex items-center gap-1 text-[#2D8A70]">
               <ThumbsUp className="h-3 w-3" />
               <span className="text-xs font-medium">Acknowledged</span>
             </div>
           )}
           {isOwn && !message.acknowledged_at && <CheckCheck className="h-3 w-3 text-[var(--portal-primary)]" />}
           {!isOwn && message.acknowledged_at && (
-            <div className="flex items-center gap-1 text-emerald-600">
+            <div className="flex items-center gap-1 text-[#2D8A70]">
               <ThumbsUp className="h-3 w-3" />
               <span className="text-xs font-medium">Acknowledged</span>
             </div>
@@ -378,7 +378,7 @@ function ChatHeader({
               <div className="flex items-center gap-2">
                 <h2 className="text-base sm:text-lg font-bold text-foreground truncate" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{familyFileName}</h2>
                 {isCoParentOnline && (
-                  <span className="text-xs text-emerald-600 font-medium hidden sm:inline">Online</span>
+                  <span className="text-xs text-[#2D8A70] font-medium hidden sm:inline">Online</span>
                 )}
               </div>
               <div className="flex items-center gap-1">
@@ -634,10 +634,10 @@ function ChildThreadsShortcut() {
         href="/messages/child"
         className="flex items-center gap-3 p-4 hover:bg-[var(--portal-primary)]/5 transition-colors"
       >
-        <div className="relative w-12 h-12 rounded-full bg-gradient-to-br from-amber-500/20 to-amber-600/10 flex items-center justify-center flex-shrink-0 shadow-sm">
-          <Heart className="h-5 w-5 text-amber-600" />
+        <div className="relative w-12 h-12 rounded-full bg-gradient-to-br from-[#F5A623]/20 to-[#E09520]/10 flex items-center justify-center flex-shrink-0 shadow-sm">
+          <Heart className="h-5 w-5 text-[#E09520]" />
           {totalUnread > 0 && (
-            <span className="absolute -top-1 -right-1 min-w-[22px] h-[22px] px-1.5 rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center shadow-md">
+            <span className="absolute -top-1 -right-1 min-w-[22px] h-[22px] px-1.5 rounded-full bg-[#C53030] text-white text-xs font-bold flex items-center justify-center shadow-md">
               {totalUnread > 99 ? '99+' : totalUnread}
             </span>
           )}
@@ -1072,9 +1072,9 @@ function MessagesContent() {
                     <>
                       {/* ARIA Welcome Message */}
                       <div className="flex justify-center mb-4 sm:mb-6">
-                        <div className="bg-gradient-to-r from-amber-500/10 to-amber-600/5 border-2 border-amber-500/20 rounded-2xl px-3 py-3 sm:px-5 sm:py-4 flex items-center gap-2 sm:gap-3 max-w-md shadow-lg">
-                          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-amber-500/20 to-amber-600/10 flex items-center justify-center flex-shrink-0 shadow-md">
-                            <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600" />
+                        <div className="bg-gradient-to-r from-[#F5A623]/10 to-[#E09520]/5 border-2 border-[#F5A623]/20 rounded-2xl px-3 py-3 sm:px-5 sm:py-4 flex items-center gap-2 sm:gap-3 max-w-md shadow-lg">
+                          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#F5A623]/20 to-[#E09520]/10 flex items-center justify-center flex-shrink-0 shadow-md">
+                            <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-[#E09520]" />
                           </div>
                           <p className="text-xs sm:text-sm font-bold text-foreground leading-relaxed">
                             ARIA Guardian is monitoring this conversation to help maintain a constructive tone.
@@ -1150,8 +1150,8 @@ function MessagesContent() {
                         onStopTyping={stopTyping}
                       />
                     ) : (
-                      <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-3 sm:p-4 flex items-center gap-2 sm:gap-3 shadow-md">
-                        <AlertTriangle className="h-5 w-5 text-amber-600 flex-shrink-0" />
+                      <div className="bg-[#FEF7ED] border-2 border-[#FEF7ED] rounded-2xl p-3 sm:p-4 flex items-center gap-2 sm:gap-3 shadow-md">
+                        <AlertTriangle className="h-5 w-5 text-[#E09520] flex-shrink-0" />
                         <div>
                           <p className="font-bold text-foreground text-sm sm:text-base">Waiting for co-parent</p>
                           <p className="text-xs sm:text-sm text-muted-foreground font-medium">

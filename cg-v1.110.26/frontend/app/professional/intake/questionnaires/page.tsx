@@ -454,7 +454,7 @@ export default function QuestionnaireBuilderPage() {
                                                 variant={q.is_active ? "default" : "outline"}
                                                 className={
                                                     q.is_active
-                                                        ? "bg-emerald-50 text-emerald-900 border-2 border-emerald-200 sans"
+                                                        ? "bg-[#E8F4F0] text-[#1B5544] border-2 border-[#C5E5DB] sans"
                                                         : "border-2 border-slate-300 text-slate-600 sans"
                                                 }
                                             >
@@ -513,10 +513,10 @@ export default function QuestionnaireBuilderPage() {
                         <div className="space-y-6">
                             {/* ARIA greeting */}
                             <div className="flex gap-3">
-                                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
+                                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#3D8DB0] to-[#2D6A8F] flex items-center justify-center flex-shrink-0">
                                     <Sparkles className="h-4 w-4 text-white" />
                                 </div>
-                                <div className="bg-purple-50 rounded-2xl rounded-tl-sm px-4 py-3 max-w-[85%]">
+                                <div className="bg-[#F0F7FC] rounded-2xl rounded-tl-sm px-4 py-3 max-w-[85%]">
                                     <p className="text-sm">
                                         Hi there! I&apos;m ARIA, your intake assistant. I&apos;ll be asking you some
                                         questions to help your attorney understand your situation better.
@@ -529,13 +529,13 @@ export default function QuestionnaireBuilderPage() {
                                 <div key={section.id} className="space-y-4">
                                     {/* Section header */}
                                     <div className="flex gap-3">
-                                        <div className="h-8 w-8 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
+                                        <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#3D8DB0] to-[#2D6A8F] flex items-center justify-center flex-shrink-0">
                                             <Sparkles className="h-4 w-4 text-white" />
                                         </div>
-                                        <div className="bg-purple-50 rounded-2xl rounded-tl-sm px-4 py-3 max-w-[85%]">
+                                        <div className="bg-[#F0F7FC] rounded-2xl rounded-tl-sm px-4 py-3 max-w-[85%]">
                                             <p className="text-sm font-medium">{section.title || "Untitled Section"}</p>
                                             {section.description && (
-                                                <p className="text-xs text-purple-600 mt-1">{section.description}</p>
+                                                <p className="text-xs text-[#2D6A8F] mt-1">{section.description}</p>
                                             )}
                                         </div>
                                     </div>
@@ -544,10 +544,10 @@ export default function QuestionnaireBuilderPage() {
                                     {section.fields.map((field) => (
                                         <div key={field.id} className="space-y-2">
                                             <div className="flex gap-3">
-                                                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
+                                                <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#3D8DB0] to-[#2D6A8F] flex items-center justify-center flex-shrink-0">
                                                     <Sparkles className="h-4 w-4 text-white" />
                                                 </div>
-                                                <div className="bg-purple-50 rounded-2xl rounded-tl-sm px-4 py-3 max-w-[85%]">
+                                                <div className="bg-[#F0F7FC] rounded-2xl rounded-tl-sm px-4 py-3 max-w-[85%]">
                                                     <p className="text-sm">
                                                         {field.label || "Untitled question"}
                                                         {field.required && (
@@ -560,7 +560,7 @@ export default function QuestionnaireBuilderPage() {
                                                                 <Badge
                                                                     key={i}
                                                                     variant="outline"
-                                                                    className="text-xs cursor-pointer hover:bg-purple-100"
+                                                                    className="text-xs cursor-pointer hover:bg-[#E0EFF8]"
                                                                 >
                                                                     {opt}
                                                                 </Badge>
@@ -568,7 +568,7 @@ export default function QuestionnaireBuilderPage() {
                                                         </div>
                                                     ) : field.type === "yes_no" ? (
                                                         <div className="mt-2 flex gap-2">
-                                                            <Badge variant="outline" className="cursor-pointer hover:bg-green-50">
+                                                            <Badge variant="outline" className="cursor-pointer hover:bg-[#E8F4F0]">
                                                                 Yes
                                                             </Badge>
                                                             <Badge variant="outline" className="cursor-pointer hover:bg-red-50">
@@ -583,7 +583,7 @@ export default function QuestionnaireBuilderPage() {
                                                                     <Badge
                                                                         key={i}
                                                                         variant="outline"
-                                                                        className="text-xs cursor-pointer hover:bg-purple-100 w-7 justify-center"
+                                                                        className="text-xs cursor-pointer hover:bg-[#E0EFF8] w-7 justify-center"
                                                                     >
                                                                         {(field.scaleMin || 1) + i}
                                                                     </Badge>
@@ -703,7 +703,7 @@ export default function QuestionnaireBuilderPage() {
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => setIsPublished(!isPublished)}
-                                    className={isPublished ? "text-green-600" : "text-slate-500"}
+                                    className={isPublished ? "text-[#2D8A70]" : "text-slate-500"}
                                 >
                                     {isPublished ? (
                                         <ToggleRight className="h-6 w-6 mr-1.5" />

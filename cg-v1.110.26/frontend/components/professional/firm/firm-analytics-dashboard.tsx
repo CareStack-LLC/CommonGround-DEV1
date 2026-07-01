@@ -44,10 +44,10 @@ interface FirmAnalyticsDashboardProps {
 
 function ActivityTypIcon({ type }: { type: string }) {
     if (type?.includes("case")) return <FolderOpen className="h-3.5 w-3.5 text-teal-500" />;
-    if (type?.includes("intake")) return <Bot className="h-3.5 w-3.5 text-purple-500" />;
-    if (type?.includes("report")) return <FileText className="h-3.5 w-3.5 text-blue-500" />;
-    if (type?.includes("member")) return <Users className="h-3.5 w-3.5 text-indigo-500" />;
-    if (type?.includes("flag") || type?.includes("aria")) return <Zap className="h-3.5 w-3.5 text-amber-500" />;
+    if (type?.includes("intake")) return <Bot className="h-3.5 w-3.5 text-[#3D8DB0]" />;
+    if (type?.includes("report")) return <FileText className="h-3.5 w-3.5 text-[#2D6A8F]" />;
+    if (type?.includes("member")) return <Users className="h-3.5 w-3.5 text-[#3D8DB0]" />;
+    if (type?.includes("flag") || type?.includes("aria")) return <Zap className="h-3.5 w-3.5 text-[#F5A623]" />;
     return <Activity className="h-3.5 w-3.5 text-slate-400" />;
 }
 
@@ -109,7 +109,7 @@ export function FirmAnalyticsDashboard({ firmId, token }: FirmAnalyticsDashboard
         : 0;
 
     const complianceScore = analytics.avg_compliance_score ?? 0;
-    const complianceColor = complianceScore >= 80 ? "text-emerald-600" : complianceScore >= 60 ? "text-amber-600" : "text-red-600";
+    const complianceColor = complianceScore >= 80 ? "text-[#2D8A70]" : complianceScore >= 60 ? "text-[#E09520]" : "text-[#C53030]";
 
     return (
         <div className="space-y-6">
@@ -128,11 +128,11 @@ export function FirmAnalyticsDashboard({ firmId, token }: FirmAnalyticsDashboard
                     </CardContent>
                 </Card>
 
-                <Card className="bg-gradient-to-br from-blue-50 to-white border-blue-100">
+                <Card className="bg-gradient-to-br from-[#E0EFF8] to-white border-[#E0EFF8]">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-semibold text-slate-600">Team</CardTitle>
-                        <div className="p-1.5 bg-blue-100 rounded-lg">
-                            <Users className="h-4 w-4 text-blue-600" />
+                        <div className="p-1.5 bg-[#E0EFF8] rounded-lg">
+                            <Users className="h-4 w-4 text-[#2D6A8F]" />
                         </div>
                     </CardHeader>
                     <CardContent>
@@ -141,28 +141,28 @@ export function FirmAnalyticsDashboard({ firmId, token }: FirmAnalyticsDashboard
                     </CardContent>
                 </Card>
 
-                <Card className="bg-gradient-to-br from-orange-50 to-white border-orange-100">
+                <Card className="bg-gradient-to-br from-[#FEF7ED] to-white border-[#FEF7ED]">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-semibold text-slate-600">High Conflict</CardTitle>
-                        <div className="p-1.5 bg-orange-100 rounded-lg">
-                            <AlertTriangle className="h-4 w-4 text-orange-600" />
+                        <div className="p-1.5 bg-[#FEF7ED] rounded-lg">
+                            <AlertTriangle className="h-4 w-4 text-[#E09520]" />
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-black text-orange-600">{analytics.high_conflict_cases}</div>
+                        <div className="text-3xl font-black text-[#E09520]">{analytics.high_conflict_cases}</div>
                         <p className="text-xs text-slate-500 mt-1">Require attention</p>
                     </CardContent>
                 </Card>
 
-                <Card className="bg-gradient-to-br from-purple-50 to-white border-purple-100">
+                <Card className="bg-gradient-to-br from-[#F0F7FC] to-white border-[#E0EFF8]">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-semibold text-slate-600">ARIA Rate (30d)</CardTitle>
-                        <div className="p-1.5 bg-purple-100 rounded-lg">
-                            <ShieldAlert className="h-4 w-4 text-purple-600" />
+                        <div className="p-1.5 bg-[#E0EFF8] rounded-lg">
+                            <ShieldAlert className="h-4 w-4 text-[#2D6A8F]" />
                         </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-black text-purple-600">{analytics.aria_intervention_rate_30d}%</div>
+                        <div className="text-3xl font-black text-[#2D6A8F]">{analytics.aria_intervention_rate_30d}%</div>
                         <p className="text-xs text-slate-500 mt-1">{analytics.total_aria_flags_30d} flags this month</p>
                     </CardContent>
                 </Card>
@@ -174,7 +174,7 @@ export function FirmAnalyticsDashboard({ firmId, token }: FirmAnalyticsDashboard
                 <Card>
                     <CardHeader className="pb-3">
                         <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                            <Shield className="h-4 w-4 text-indigo-500" />
+                            <Shield className="h-4 w-4 text-[#3D8DB0]" />
                             Avg Compliance Score
                         </CardTitle>
                     </CardHeader>
@@ -191,12 +191,12 @@ export function FirmAnalyticsDashboard({ firmId, token }: FirmAnalyticsDashboard
                 <Card>
                     <CardHeader className="pb-3">
                         <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                            <Bot className="h-4 w-4 text-emerald-500" />
+                            <Bot className="h-4 w-4 text-[#3DAA8A]" />
                             Intake Conversion (30d)
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-4xl font-black text-emerald-600 mb-2">{conversionRate}%</div>
+                        <div className="text-4xl font-black text-[#2D8A70] mb-2">{conversionRate}%</div>
                         <Progress value={conversionRate} className="h-2" />
                         <p className="text-xs text-slate-500 mt-2">
                             {analytics.intakes_converted_30d ?? 0} of {analytics.total_intakes_30d ?? 0} converted
@@ -208,17 +208,17 @@ export function FirmAnalyticsDashboard({ firmId, token }: FirmAnalyticsDashboard
                 <Card>
                     <CardHeader className="pb-3">
                         <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                            <FileText className="h-4 w-4 text-blue-500" />
+                            <FileText className="h-4 w-4 text-[#2D6A8F]" />
                             Reports Generated (30d)
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-4xl font-black text-blue-600 mb-2">
+                        <div className="text-4xl font-black text-[#2D6A8F] mb-2">
                             {analytics.reports_generated_30d ?? 0}
                         </div>
                         <p className="text-xs text-slate-500">SHA-256 verified court documents</p>
                         <Link href="/professional/reports">
-                            <Button variant="link" size="sm" className="text-blue-600 px-0 mt-1 h-auto text-xs gap-1">
+                            <Button variant="link" size="sm" className="text-[#2D6A8F] px-0 mt-1 h-auto text-xs gap-1">
                                 View all reports <ArrowRight className="h-3 w-3" />
                             </Button>
                         </Link>
@@ -283,11 +283,11 @@ export function FirmAnalyticsDashboard({ firmId, token }: FirmAnalyticsDashboard
                     <CardContent>
                         <div className="space-y-2">
                             {[
-                                { href: "/professional/firm/team", label: "Team Members", icon: <Users className="h-4 w-4 text-blue-500" />, desc: "Manage roles & invitations" },
+                                { href: "/professional/firm/team", label: "Team Members", icon: <Users className="h-4 w-4 text-[#2D6A8F]" />, desc: "Manage roles & invitations" },
                                 { href: "/professional/firm/queue", label: "Case Queue", icon: <FolderOpen className="h-4 w-4 text-teal-500" />, desc: "Unassigned cases waiting" },
-                                { href: "/professional/firm/templates", label: "Templates", icon: <FileText className="h-4 w-4 text-indigo-500" />, desc: "Firm document templates" },
+                                { href: "/professional/firm/templates", label: "Templates", icon: <FileText className="h-4 w-4 text-[#3D8DB0]" />, desc: "Firm document templates" },
                                 { href: "/professional/firm/audit", label: "Audit Log", icon: <Shield className="h-4 w-4 text-slate-500" />, desc: "Full activity trail" },
-                                { href: "/professional/reports", label: "Compliance Reports", icon: <CheckCircle2 className="h-4 w-4 text-emerald-500" />, desc: "SHA-256 verified PDFs" },
+                                { href: "/professional/reports", label: "Compliance Reports", icon: <CheckCircle2 className="h-4 w-4 text-[#3DAA8A]" />, desc: "SHA-256 verified PDFs" },
                             ].map((link) => (
                                 <Link
                                     key={link.href}

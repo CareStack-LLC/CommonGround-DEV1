@@ -16,14 +16,14 @@ interface ARIACategoryChartProps {
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
-  hostility: "#ef4444",
-  blame: "#f97316",
-  "passive-aggressive": "#f59e0b",
-  profanity: "#dc2626",
-  dismissive: "#fb923c",
-  controlling: "#ea580c",
-  threatening: "#b91c1c",
-  sarcasm: "#fbbf24",
+  hostility: "#C53030",
+  blame: "#F5A623",
+  "passive-aggressive": "#F5A623",
+  profanity: "#C53030",
+  dismissive: "#F5A623",
+  controlling: "#E09520",
+  threatening: "#9B2C2C",
+  sarcasm: "#F7B84D",
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -54,7 +54,7 @@ export function ARIACategoryChart({ data, totalMessages = 0 }: ARIACategoryChart
       <div className="p-6">
         <div className="flex items-start justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-gradient-to-br from-amber-500 to-orange-600 text-white rounded-xl shadow-lg shadow-amber-500/20">
+            <div className="p-3 bg-gradient-to-br from-[#F5A623] to-[#E09520] text-white rounded-xl shadow-lg shadow-[#F5A623]/20">
               <AlertTriangle className="h-5 w-5" />
             </div>
             <div>
@@ -63,7 +63,7 @@ export function ARIACategoryChart({ data, totalMessages = 0 }: ARIACategoryChart
             </div>
           </div>
           <div className="text-right">
-            <div className="text-3xl font-bold text-amber-600">{totalInterventions}</div>
+            <div className="text-3xl font-bold text-[#E09520]">{totalInterventions}</div>
             <p className="text-xs text-slate-500 mt-1">Total Flags</p>
           </div>
         </div>

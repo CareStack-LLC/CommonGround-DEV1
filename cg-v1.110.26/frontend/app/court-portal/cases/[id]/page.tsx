@@ -219,7 +219,7 @@ function ComplianceCategory({
 function ControlBadge({ label, enabled, icon }: { label: string; enabled: boolean; icon: React.ReactNode }) {
   return (
     <div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium ${
-      enabled ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-500'
+      enabled ? 'bg-[#E0EFF8] text-[#1E4E6B]' : 'bg-slate-100 text-slate-500'
     }`}>
       {icon}
       <span>{label}</span>
@@ -230,11 +230,11 @@ function ControlBadge({ label, enabled, icon }: { label: string; enabled: boolea
 
 function TimelineItem({ event }: { event: TimelineEvent }) {
   const typeConfig = {
-    exchange: { icon: <MapPin className="h-3.5 w-3.5" />, color: 'bg-blue-100 text-blue-600' },
-    message: { icon: <MessageSquare className="h-3.5 w-3.5" />, color: 'bg-purple-100 text-purple-600' },
-    payment: { icon: <DollarSign className="h-3.5 w-3.5" />, color: 'bg-emerald-100 text-emerald-600' },
-    event: { icon: <Calendar className="h-3.5 w-3.5" />, color: 'bg-indigo-100 text-indigo-600' },
-    alert: { icon: <AlertTriangle className="h-3.5 w-3.5" />, color: 'bg-amber-100 text-amber-600' },
+    exchange: { icon: <MapPin className="h-3.5 w-3.5" />, color: 'bg-[#E0EFF8] text-[#2D6A8F]' },
+    message: { icon: <MessageSquare className="h-3.5 w-3.5" />, color: 'bg-[#E0EFF8] text-[#2D6A8F]' },
+    payment: { icon: <DollarSign className="h-3.5 w-3.5" />, color: 'bg-[#E8F4F0] text-[#2D8A70]' },
+    event: { icon: <Calendar className="h-3.5 w-3.5" />, color: 'bg-[#E0EFF8] text-[#2D6A8F]' },
+    alert: { icon: <AlertTriangle className="h-3.5 w-3.5" />, color: 'bg-[#FEF7ED] text-[#E09520]' },
   };
 
   const statusColors = {
@@ -270,7 +270,7 @@ function NavPill({ href, active, icon, children }: { href: string; active?: bool
       href={href}
       className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors whitespace-nowrap ${
         active
-          ? 'bg-indigo-600 text-white'
+          ? 'bg-[#2D6A8F] text-white'
           : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
       }`}
     >
@@ -284,7 +284,7 @@ function ActionCard({ title, description, href, icon }: { title: string; descrip
   return (
     <Link href={href}>
       <div className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-slate-50 hover:border-slate-300 transition-all cursor-pointer group">
-        <div className="p-2 bg-indigo-100 text-indigo-600 rounded-lg group-hover:bg-indigo-200 transition-colors">
+        <div className="p-2 bg-[#E0EFF8] text-[#2D6A8F] rounded-lg group-hover:bg-[#E0EFF8] transition-colors">
           {icon}
         </div>
         <div className="flex-1 min-w-0">
@@ -381,7 +381,7 @@ export default function CaseDetailPage() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-2 border-indigo-600 border-t-transparent mx-auto" />
+          <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#2D6A8F] border-t-transparent mx-auto" />
           <p className="mt-4 text-muted-foreground">Loading...</p>
         </div>
       </div>
@@ -392,7 +392,7 @@ export default function CaseDetailPage() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-2 border-indigo-600 border-t-transparent mx-auto" />
+          <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#2D6A8F] border-t-transparent mx-auto" />
           <p className="mt-4 text-muted-foreground">Loading case data...</p>
         </div>
       </div>
@@ -439,7 +439,7 @@ export default function CaseDetailPage() {
           <div className="flex flex-wrap items-center gap-3 mb-1">
             <h1 className="text-2xl font-bold text-foreground">{displayName}</h1>
             {displayNumber && (
-              <span className="px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs font-mono rounded">
+              <span className="px-2 py-0.5 bg-[#E0EFF8] text-[#1E4E6B] text-xs font-mono rounded">
                 #{displayNumber}
               </span>
             )}
@@ -461,7 +461,7 @@ export default function CaseDetailPage() {
           </button>
           <Link
             href={`/court-portal/cases/${caseId}/reports`}
-            className="flex items-center gap-2 px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-sm bg-[#2D6A8F] text-white rounded-lg hover:bg-[#1E4E6B] transition-colors"
           >
             <FileBarChart className="h-4 w-4" />
             Generate Report
@@ -490,7 +490,7 @@ export default function CaseDetailPage() {
           <div className="bg-card border border-border rounded-xl overflow-hidden">
             <div className="p-4 border-b border-border bg-slate-50/50">
               <div className="flex items-center gap-2">
-                <Activity className="h-4 w-4 text-indigo-600" />
+                <Activity className="h-4 w-4 text-[#2D6A8F]" />
                 <h2 className="font-semibold text-foreground">Compliance Snapshot</h2>
               </div>
               {compliance && (
@@ -576,12 +576,12 @@ export default function CaseDetailPage() {
             <div className="p-4 border-b border-border bg-slate-50/50">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Zap className="h-4 w-4 text-indigo-600" />
+                  <Zap className="h-4 w-4 text-[#2D6A8F]" />
                   <h2 className="font-semibold text-foreground">Reality Ledger</h2>
                 </div>
                 <Link
                   href={`/court-portal/cases/${caseId}/reports`}
-                  className="text-xs text-indigo-600 hover:underline flex items-center gap-1"
+                  className="text-xs text-[#2D6A8F] hover:underline flex items-center gap-1"
                 >
                   View Full History
                   <ExternalLink className="h-3 w-3" />
@@ -602,7 +602,7 @@ export default function CaseDetailPage() {
           <div className="bg-card border border-border rounded-xl overflow-hidden">
             <div className="p-4 border-b border-border bg-slate-50/50">
               <div className="flex items-center gap-2">
-                <Shield className="h-4 w-4 text-indigo-600" />
+                <Shield className="h-4 w-4 text-[#2D6A8F]" />
                 <h2 className="font-semibold text-foreground">Court Controls</h2>
               </div>
             </div>
@@ -615,7 +615,7 @@ export default function CaseDetailPage() {
               <div className="pt-2">
                 <Link
                   href={`/court-portal/cases/${caseId}/settings`}
-                  className="text-xs text-indigo-600 hover:underline flex items-center gap-1"
+                  className="text-xs text-[#2D6A8F] hover:underline flex items-center gap-1"
                 >
                   Manage Settings
                   <ChevronRight className="h-3 w-3" />
@@ -658,12 +658,12 @@ export default function CaseDetailPage() {
           </div>
 
           {/* Info Notice */}
-          <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4">
+          <div className="bg-[#E0EFF8] border border-[#E0EFF8] rounded-xl p-4">
             <div className="flex items-start gap-3">
-              <Info className="h-4 w-4 text-indigo-600 mt-0.5 flex-shrink-0" />
+              <Info className="h-4 w-4 text-[#2D6A8F] mt-0.5 flex-shrink-0" />
               <div>
-                <p className="text-xs text-indigo-900 font-medium">Detailed Metrics</p>
-                <p className="text-xs text-indigo-700 mt-1">
+                <p className="text-xs text-[#1E3A4A] font-medium">Detailed Metrics</p>
+                <p className="text-xs text-[#1E4E6B] mt-1">
                   Navigate to specific sections for full compliance details, message history, and ARIA analytics.
                 </p>
               </div>

@@ -175,7 +175,7 @@ export function PartnersDirectoryContent() {
                         Our Partners
                     </h1>
                     <p className="text-xl sm:text-2xl text-gray-600 mb-8 leading-relaxed max-w-2xl mx-auto">
-                        Organizations dedicated to building peace for the families they serve.
+                        Nonprofits and foundations putting CommonGround in the hands of the families who need it most — and the impact they&apos;re making together.
                     </p>
                 </div>
             </section>
@@ -207,12 +207,12 @@ export function PartnersDirectoryContent() {
 
                     {/* Call to Action for new partners */}
                     <div className="mt-16 text-center">
-                        <p className="text-gray-500 mb-4">Are you a nonprofit supporting families?</p>
+                        <p className="text-gray-500 mb-4">Run a nonprofit supporting families? Bring CommonGround to the parents you serve — free grant codes included.</p>
                         <Link
                             href="/grant-partnership"
                             className="inline-flex h-12 items-center justify-center rounded-full bg-cg-sage px-8 text-sm font-medium text-white shadow transition-all hover:bg-cg-sage/90 hover:shadow-lg hover:-translate-y-0.5"
                         >
-                            Become a Partner
+                            Apply for a grant partnership
                         </Link>
                     </div>
                 </div>

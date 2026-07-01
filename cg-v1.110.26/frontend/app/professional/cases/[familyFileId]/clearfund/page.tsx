@@ -163,11 +163,11 @@ export default function CaseClearFundPage() {
   const getStatusBadge = (status: string) => {
     const statusConfig: Record<string, { color: string; icon: typeof CheckCircle2 }> = {
       open: { color: "bg-blue-100 text-blue-800", icon: Clock },
-      partially_funded: { color: "bg-amber-100 text-amber-800", icon: TrendingUp },
-      funded: { color: "bg-emerald-100 text-emerald-800", icon: CheckCircle2 },
-      authorized: { color: "bg-purple-100 text-purple-800", icon: CreditCard },
-      pending_verification: { color: "bg-orange-100 text-orange-800", icon: Receipt },
-      verified: { color: "bg-green-100 text-green-800", icon: CheckCircle2 },
+      partially_funded: { color: "bg-[#FEF7ED] text-[#8F5E14]", icon: TrendingUp },
+      funded: { color: "bg-[#E8F4F0] text-[#236E59]", icon: CheckCircle2 },
+      authorized: { color: "bg-[#E0EFF8] text-[#1E4E6B]", icon: CreditCard },
+      pending_verification: { color: "bg-[#FEF7ED] text-[#8F5E14]", icon: Receipt },
+      verified: { color: "bg-[#E8F4F0] text-[#236E59]", icon: CheckCircle2 },
       completed: { color: "bg-slate-100 text-slate-800", icon: CheckCircle2 },
       expired: { color: "bg-red-100 text-red-800", icon: AlertCircle },
       cancelled: { color: "bg-gray-100 text-gray-800", icon: XCircle },
@@ -203,7 +203,7 @@ export default function CaseClearFundPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2D8A70]" />
       </div>
     );
   }
@@ -222,7 +222,7 @@ export default function CaseClearFundPage() {
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="p-4 bg-emerald-100 text-emerald-600 rounded-xl">
+          <div className="p-4 bg-[#E8F4F0] text-[#2D8A70] rounded-xl">
             <DollarSign className="h-8 w-8" />
           </div>
           <div>
@@ -257,7 +257,7 @@ export default function CaseClearFundPage() {
                   <p className="text-xs text-muted-foreground">Amount Funded</p>
                   <p className="text-xl font-bold mt-1">{formatCurrency(stats.amount_funded)}</p>
                 </div>
-                <div className="p-2 bg-emerald-50 text-emerald-600 rounded-lg">
+                <div className="p-2 bg-[#E8F4F0] text-[#2D8A70] rounded-lg">
                   <CheckCircle2 className="h-5 w-5" />
                 </div>
               </div>
@@ -270,7 +270,7 @@ export default function CaseClearFundPage() {
                   <p className="text-xs text-muted-foreground">Verified</p>
                   <p className="text-xl font-bold mt-1">{formatCurrency(stats.amount_verified)}</p>
                 </div>
-                <div className="p-2 bg-purple-50 text-purple-600 rounded-lg">
+                <div className="p-2 bg-[#F0F7FC] text-[#2D6A8F] rounded-lg">
                   <Receipt className="h-5 w-5" />
                 </div>
               </div>
@@ -283,7 +283,7 @@ export default function CaseClearFundPage() {
                   <p className="text-xs text-muted-foreground">Pending</p>
                   <p className="text-xl font-bold mt-1">{stats.pending_count}</p>
                 </div>
-                <div className="p-2 bg-amber-50 text-amber-600 rounded-lg">
+                <div className="p-2 bg-[#FEF7ED] text-[#E09520] rounded-lg">
                   <Clock className="h-5 w-5" />
                 </div>
               </div>
@@ -303,7 +303,7 @@ export default function CaseClearFundPage() {
                   {(stats.top_category || "None").replace("_", " ")}
                 </p>
               </div>
-              <div className="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
+              <div className="p-2 bg-[#F0F7FC] text-[#2D6A8F] rounded-lg">
                 <TrendingUp className="h-5 w-5" />
               </div>
             </CardContent>
@@ -474,7 +474,7 @@ function ObligationCard({
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           {/* Left: Info */}
           <div className="flex items-start gap-4 flex-1">
-            <div className="p-3 bg-emerald-100 text-emerald-600 rounded-lg">
+            <div className="p-3 bg-[#E8F4F0] text-[#2D8A70] rounded-lg">
               <DollarSign className="h-5 w-5" />
             </div>
             <div className="flex-1">
@@ -484,7 +484,7 @@ function ObligationCard({
                   {getCategoryLabel(obligation.purpose_category)}
                 </Badge>
                 {obligation.verification_required && (
-                  <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200">
+                  <Badge variant="outline" className="text-xs bg-[#F0F7FC] text-[#1E4E6B] border-[#C2DEF0]">
                     <Receipt className="h-3 w-3 mr-1" />
                     Receipt Required
                   </Badge>
@@ -583,15 +583,15 @@ function ObligationDetailModal({
               <p className="text-sm text-muted-foreground">Total Amount</p>
               <p className="text-2xl font-bold">{formatCurrency(obligation.total_amount)}</p>
             </div>
-            <div className="p-4 bg-emerald-50 rounded-lg text-center">
-              <p className="text-sm text-emerald-600">Amount Funded</p>
-              <p className="text-2xl font-bold text-emerald-700">
+            <div className="p-4 bg-[#E8F4F0] rounded-lg text-center">
+              <p className="text-sm text-[#2D8A70]">Amount Funded</p>
+              <p className="text-2xl font-bold text-[#2D8A70]">
                 {formatCurrency(obligation.amount_funded)}
               </p>
             </div>
-            <div className="p-4 bg-purple-50 rounded-lg text-center">
-              <p className="text-sm text-purple-600">Amount Verified</p>
-              <p className="text-2xl font-bold text-purple-700">
+            <div className="p-4 bg-[#F0F7FC] rounded-lg text-center">
+              <p className="text-sm text-[#2D6A8F]">Amount Verified</p>
+              <p className="text-2xl font-bold text-[#1E4E6B]">
                 {formatCurrency(obligation.amount_verified)}
               </p>
             </div>
@@ -613,12 +613,12 @@ function ObligationDetailModal({
                   </span>
                 </div>
               </div>
-              <div className="p-4 bg-emerald-50 rounded-lg">
+              <div className="p-4 bg-[#E8F4F0] rounded-lg">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="font-medium text-emerald-800">
+                  <span className="font-medium text-[#236E59]">
                     Respondent ({Math.round(100 - obligation.petitioner_percentage)}%)
                   </span>
-                  <span className="font-bold text-emerald-800">
+                  <span className="font-bold text-[#236E59]">
                     {formatCurrency(obligation.respondent_share)}
                   </span>
                 </div>
@@ -640,9 +640,9 @@ function ObligationDetailModal({
                   >
                     <div className="flex items-center gap-2">
                       {record.is_fully_funded ? (
-                        <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                        <CheckCircle2 className="h-4 w-4 text-[#3DAA8A]" />
                       ) : (
-                        <Clock className="h-4 w-4 text-amber-500" />
+                        <Clock className="h-4 w-4 text-[#F5A623]" />
                       )}
                       <span className="text-sm">{record.parent_name || "Parent"}</span>
                     </div>
@@ -672,10 +672,10 @@ function ObligationDetailModal({
                 {obligation.verification_artifacts.map((artifact) => (
                   <div
                     key={artifact.id}
-                    className="flex items-center justify-between p-3 bg-purple-50 rounded-lg"
+                    className="flex items-center justify-between p-3 bg-[#F0F7FC] rounded-lg"
                   >
                     <div className="flex items-center gap-3">
-                      <Receipt className="h-5 w-5 text-purple-600" />
+                      <Receipt className="h-5 w-5 text-[#2D6A8F]" />
                       <div>
                         <p className="text-sm font-medium">{artifact.vendor_name || "Receipt"}</p>
                         <p className="text-xs text-muted-foreground capitalize">

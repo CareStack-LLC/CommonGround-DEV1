@@ -331,10 +331,10 @@ export default function IntakePage() {
                             <p className="text-2xl font-bold text-slate-900 mt-1">{stats.total}</p>
                         </CardContent>
                     </Card>
-                    <Card className="border border-amber-200 bg-amber-50/50 shadow-sm rounded-2xl">
+                    <Card className="border border-[#FBE3BF] bg-[#FEF7ED]/50 shadow-sm rounded-2xl">
                         <CardContent className="pt-4">
-                            <p className="text-xs font-semibold text-amber-600/70 uppercase tracking-wide">Pending</p>
-                            <p className="text-2xl font-bold text-amber-700 mt-1">{stats.pending}</p>
+                            <p className="text-xs font-semibold text-[#E09520]/70 uppercase tracking-wide">Pending</p>
+                            <p className="text-2xl font-bold text-[#B8791A] mt-1">{stats.pending}</p>
                         </CardContent>
                     </Card>
                     <Card className="border border-blue-200 bg-blue-50/50 shadow-sm rounded-2xl">
@@ -343,10 +343,10 @@ export default function IntakePage() {
                             <p className="text-2xl font-bold text-blue-700 mt-1">{stats.active}</p>
                         </CardContent>
                     </Card>
-                    <Card className="border border-emerald-200 bg-emerald-50/50 shadow-sm rounded-2xl">
+                    <Card className="border border-[#C5E5DB] bg-[#E8F4F0]/50 shadow-sm rounded-2xl">
                         <CardContent className="pt-4">
-                            <p className="text-xs font-semibold text-emerald-600/70 uppercase tracking-wide">Completed</p>
-                            <p className="text-2xl font-bold text-emerald-700 mt-1">{stats.completed}</p>
+                            <p className="text-xs font-semibold text-[#2D8A70]/70 uppercase tracking-wide">Completed</p>
+                            <p className="text-2xl font-bold text-[#2D8A70] mt-1">{stats.completed}</p>
                         </CardContent>
                     </Card>
                     <Card className="border border-[#3DAA8A]/20 bg-[#F4F8F7]/50 shadow-sm rounded-2xl">

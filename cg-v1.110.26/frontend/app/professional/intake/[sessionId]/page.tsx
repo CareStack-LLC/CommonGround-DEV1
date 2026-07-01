@@ -96,10 +96,10 @@ interface ExtractedData {
 }
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
-  pending: { label: "Pending", color: "bg-amber-100 text-amber-800" },
+  pending: { label: "Pending", color: "bg-[#FEF7ED] text-[#8F5E14]" },
   in_progress: { label: "In Progress", color: "bg-blue-100 text-blue-800" },
-  completed: { label: "Completed", color: "bg-emerald-100 text-emerald-800" },
-  reviewed: { label: "Reviewed", color: "bg-purple-100 text-purple-800" },
+  completed: { label: "Completed", color: "bg-[#E8F4F0] text-[#236E59]" },
+  reviewed: { label: "Reviewed", color: "bg-[#E0EFF8] text-[#1E4E6B]" },
   cancelled: { label: "Cancelled", color: "bg-gray-100 text-gray-800" },
 };
 
@@ -238,7 +238,7 @@ export default function IntakeDetailPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2D8A70]" />
       </div>
     );
   }
@@ -334,14 +334,14 @@ export default function IntakeDetailPage() {
               variant="outline"
               size="sm"
               onClick={markAsReviewed}
-              className="border-2 border-emerald-900/20 hover:bg-emerald-50 text-emerald-900 sans"
+              className="border-2 border-[#1B5544]/20 hover:bg-[#E8F4F0] text-[#1B5544] sans"
             >
               <CheckCircle2 className="h-4 w-4 mr-2" />
               Mark Reviewed
             </Button>
           )}
           {session.status === "reviewed" && (
-            <div className="flex items-center gap-1.5 text-sm text-emerald-900 font-medium bg-emerald-50 border-2 border-emerald-200 rounded-sm px-3 py-1.5 sans">
+            <div className="flex items-center gap-1.5 text-sm text-[#1B5544] font-medium bg-[#E8F4F0] border-2 border-[#C5E5DB] rounded-sm px-3 py-1.5 sans">
               <CheckCircle2 className="h-4 w-4" />
               Review Complete
             </div>
@@ -477,16 +477,16 @@ export default function IntakeDetailPage() {
               )}
 
               {/* Goals */}
-              <Card className="border-2 border-emerald-900/30 bg-gradient-to-br from-white via-emerald-50/30 to-white shadow-lg">
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-900 via-emerald-600 to-emerald-900"></div>
+              <Card className="border-2 border-[#1B5544]/30 bg-gradient-to-br from-white via-[#E8F4F0]/30 to-white shadow-lg">
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1B5544] via-[#2D8A70] to-[#1B5544]"></div>
                 <CardHeader>
-                  <CardTitle className="serif text-lg font-bold text-emerald-900">Client Goals</CardTitle>
+                  <CardTitle className="serif text-lg font-bold text-[#1B5544]">Client Goals</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2">
                     {summary.goals.map((goal, index) => (
                       <li key={index} className="flex items-start gap-2 sans text-sm text-slate-700">
-                        <CheckCircle2 className="h-4 w-4 text-emerald-600 mt-0.5 shrink-0" strokeWidth={2} />
+                        <CheckCircle2 className="h-4 w-4 text-[#2D8A70] mt-0.5 shrink-0" strokeWidth={2} />
                         {goal}
                       </li>
                     ))}
@@ -504,7 +504,7 @@ export default function IntakeDetailPage() {
                   <ul className="space-y-2">
                     {summary.concerns.map((concern, index) => (
                       <li key={index} className="flex items-start gap-2 sans text-sm text-slate-700">
-                        <AlertCircle className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" strokeWidth={2} />
+                        <AlertCircle className="h-4 w-4 text-[#E09520] mt-0.5 shrink-0" strokeWidth={2} />
                         {concern}
                       </li>
                     ))}
@@ -599,7 +599,7 @@ export default function IntakeDetailPage() {
                           <AvatarFallback
                             className={
                               message.role === "assistant"
-                                ? "bg-purple-100 text-purple-600"
+                                ? "bg-[#E0EFF8] text-[#2D6A8F]"
                                 : "bg-blue-100 text-blue-600"
                             }
                           >
@@ -721,7 +721,7 @@ export default function IntakeDetailPage() {
                             key={index}
                             className="flex items-start gap-2 sans text-sm p-3 bg-[#F4F8F7]border border-[#1E3A4A]/20 rounded-sm"
                           >
-                            <AlertCircle className="h-4 w-4 text-amber-600 mt-0.5" strokeWidth={2} />
+                            <AlertCircle className="h-4 w-4 text-[#E09520] mt-0.5" strokeWidth={2} />
                             {item}
                           </li>
                         ))}

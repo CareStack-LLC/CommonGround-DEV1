@@ -179,7 +179,7 @@ export default function CaseQueuePage() {
         normal: { label: "Normal", color: "bg-slate-100 text-slate-600", icon: null },
         high: {
             label: "High",
-            color: "bg-amber-100 text-amber-700",
+            color: "bg-[#FEF7ED] text-[#B8791A]",
             icon: <Clock className="h-3.5 w-3.5" />,
         },
         urgent: {
@@ -224,16 +224,16 @@ export default function CaseQueuePage() {
                     </Link>
                     <h1 className="text-2xl font-bold">Case Queue</h1>
                 </div>
-                <Card className="border-amber-200 bg-gradient-to-br from-amber-50/50 to-orange-50/50">
+                <Card className="border-[#FBE3BF] bg-gradient-to-br from-[#FEF7ED]/50 to-[#FEF7ED]/50">
                     <CardContent className="py-12 text-center">
-                        <Lock className="h-12 w-12 mx-auto text-amber-500 mb-4" />
+                        <Lock className="h-12 w-12 mx-auto text-[#F5A623] mb-4" />
                         <h3 className="text-lg font-semibold mb-2">Firm Required</h3>
                         <p className="text-muted-foreground mb-4 max-w-md mx-auto">
                             The Case Queue & Dispatcher is available for Small Firm tier and above.
                             Create or join a firm to access this feature.
                         </p>
                         <Link href="/professional/firm">
-                            <Button className="bg-gradient-to-r from-amber-500 to-orange-500 text-white">
+                            <Button className="bg-gradient-to-r from-[#F5A623] to-[#F5A623] text-white">
                                 Go to Firm Settings
                             </Button>
                         </Link>
@@ -294,8 +294,8 @@ export default function CaseQueuePage() {
                 </Card>
                 <Card>
                     <CardContent className="pt-4 flex items-center gap-3">
-                        <div className="p-2 bg-green-100 rounded-lg">
-                            <Users className="h-5 w-5 text-green-600" />
+                        <div className="p-2 bg-[#E8F4F0] rounded-lg">
+                            <Users className="h-5 w-5 text-[#2D8A70]" />
                         </div>
                         <div>
                             <p className="text-xs text-muted-foreground">Available Team</p>
@@ -338,7 +338,7 @@ export default function CaseQueuePage() {
             ) : filteredQueue.length === 0 ? (
                 <Card>
                     <CardContent className="py-12 text-center">
-                        <CheckCircle2 className="h-12 w-12 mx-auto text-green-500 mb-4" />
+                        <CheckCircle2 className="h-12 w-12 mx-auto text-[#3DAA8A] mb-4" />
                         <h3 className="text-lg font-medium mb-2">Queue is clear</h3>
                         <p className="text-muted-foreground">
                             {queue.length === 0
@@ -369,7 +369,7 @@ export default function CaseQueuePage() {
                                     className={`border-l-4 ${item.urgency === "urgent"
                                         ? "border-l-red-500"
                                         : item.urgency === "high"
-                                            ? "border-l-amber-400"
+                                            ? "border-l-[#F7B84D]"
                                             : "border-l-slate-200"
                                         }`}
                                 >
@@ -418,7 +418,7 @@ export default function CaseQueuePage() {
                                                                 daysLeft <= 1
                                                                     ? "text-red-600 font-medium"
                                                                     : daysLeft <= 3
-                                                                        ? "text-amber-600"
+                                                                        ? "text-[#E09520]"
                                                                         : ""
                                                             }
                                                         >

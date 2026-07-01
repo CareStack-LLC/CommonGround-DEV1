@@ -136,7 +136,7 @@ export function StreamingMovieCard({
               {video.duration && (
                 <div className="flex items-center justify-center gap-1.5 text-white/90 text-xs">
                   <Clock className="w-3 h-3" />
-                  <span style={{ fontFamily: 'JetBrains Mono, monospace' }}>{video.duration}</span>
+                  <span style={{ fontFamily: 'var(--font-mono)' }}>{video.duration}</span>
                 </div>
               )}
             </div>

@@ -63,7 +63,7 @@ export function KidBookCard({ book, onClick, className, progress }: KidBookCardP
           <div className="absolute top-2 right-2 bg-white/90 dark:bg-black/50 backdrop-blur-sm rounded-lg px-2 py-1 shadow-sm">
             <div className="flex items-center gap-1">
               <BookOpen className="w-3 h-3 text-amber-500" />
-              <span className="text-xs font-medium text-slate-700 dark:text-slate-300" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+              <span className="text-xs font-medium text-slate-700 dark:text-slate-300" style={{ fontFamily: 'var(--font-mono)' }}>
                 {book.pages}
               </span>
             </div>
@@ -78,7 +78,7 @@ export function KidBookCard({ book, onClick, className, progress }: KidBookCardP
                 <span className="text-xs text-slate-600 dark:text-slate-300" style={{ fontFamily: 'Inter, sans-serif' }}>
                   Page {progress.currentPage}
                 </span>
-                <span className="text-xs font-medium text-amber-600 dark:text-amber-400" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+                <span className="text-xs font-medium text-amber-600 dark:text-amber-400" style={{ fontFamily: 'var(--font-mono)' }}>
                   {Math.round(progressPercentage)}%
                 </span>
               </div>

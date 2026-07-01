@@ -88,11 +88,11 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
-  hostility: '#ef4444', blame: '#f97316', passive_aggressive: '#f59e0b',
-  manipulation: '#8b5cf6', dismissive: '#6b7280', threatening: '#dc2626',
-  profanity: '#e11d48', custody_weaponization: '#b91c1c', financial_coercion: '#d97706',
-  hate_speech: '#7f1d1d', sexual_harassment: '#9f1239', insult: '#ea580c',
-  sarcasm: '#a3a3a3', all_caps: '#fbbf24',
+  hostility: '#C53030', blame: '#F5A623', passive_aggressive: '#F5A623',
+  manipulation: '#4BA8C8', dismissive: '#6b7280', threatening: '#C53030',
+  profanity: '#C53030', custody_weaponization: '#9B2C2C', financial_coercion: '#E09520',
+  hate_speech: '#7A2222', sexual_harassment: '#9B2C2C', insult: '#E09520',
+  sarcasm: '#a3a3a3', all_caps: '#F5A623',
 };
 
 const TAUNTS = [
@@ -276,7 +276,7 @@ export function HomeARIADemo() {
               className={`
                 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all
                 ${ariaEnabled
-                  ? 'bg-cg-sage/30 text-[#7DDFB8] border border-cg-sage/40'
+                  ? 'bg-cg-sage/30 text-[#5BC4A0] border border-cg-sage/40'
                   : 'bg-white/10 text-white/50 border border-white/20'
                 }
               `}
@@ -292,14 +292,14 @@ export function HomeARIADemo() {
               <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className="max-w-[85%] space-y-1">
                   {msg.original && (
-                    <div className={`text-[11px] px-2.5 py-1.5 rounded-lg mb-0.5 bg-red-500/20 text-red-300 line-through ${msg.role === 'user' ? 'text-right' : ''}`}>
+                    <div className={`text-[11px] px-2.5 py-1.5 rounded-lg mb-0.5 bg-[#C53030]/20 text-[#FCA5A5] line-through ${msg.role === 'user' ? 'text-right' : ''}`}>
                       {msg.original}
                     </div>
                   )}
                   <div className={`
                     px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed
                     ${msg.role === 'user'
-                      ? 'bg-[#005c4b] text-white rounded-br-md'
+                      ? 'bg-[#2D8A70] text-white rounded-br-md'
                       : 'bg-white/10 text-white/90 rounded-bl-md border border-white/10'
                     }
                   `}>
@@ -359,9 +359,9 @@ export function HomeARIADemo() {
 
                   {/* Before/After compact */}
                   <div className="space-y-1.5 mb-3">
-                    <div className="bg-red-500/15 rounded-lg px-3 py-2 border border-red-500/20">
-                      <p className="text-[10px] text-red-400 font-medium mb-0.5">Your message</p>
-                      <p className="text-xs text-red-300 line-clamp-2">{pendingIntervention.originalText}</p>
+                    <div className="bg-[#C53030]/15 rounded-lg px-3 py-2 border border-[#C53030]/20">
+                      <p className="text-[10px] text-[#E06B6B] font-medium mb-0.5">Your message</p>
+                      <p className="text-xs text-[#FCA5A5] line-clamp-2">{pendingIntervention.originalText}</p>
                     </div>
                     <div className="bg-white/10 rounded-lg px-3 py-2 border border-cg-sage/20">
                       <p className="text-[10px] text-cg-sage font-medium mb-0.5">ARIA&apos;s suggestion</p>
@@ -428,7 +428,7 @@ export function HomeARIADemo() {
                     <Shield className="w-2.5 h-2.5" /> ARIA is rewriting all messages to be civil and child-focused
                   </p>
                   <p className="text-[10px] text-white/20 italic">
-                    The <span className="text-red-400/60 line-through">crossed-out text</span> is shown here so you can see what ARIA blocked — in the real app, only the rewritten message is sent.
+                    The <span className="text-[#E06B6B]/60 line-through">crossed-out text</span> is shown here so you can see what ARIA blocked — in the real app, only the rewritten message is sent.
                   </p>
                 </div>
               )}

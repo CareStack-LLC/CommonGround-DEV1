@@ -140,7 +140,7 @@ function CourtFormsPageContent() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2D6A8F]" />
       </div>
     );
   }
@@ -148,9 +148,9 @@ function CourtFormsPageContent() {
   if (error || !caseData) {
     return (
       <div className="min-h-screen bg-gray-50 p-8">
-        <Card className="max-w-lg mx-auto bg-red-50 border-red-200">
+        <Card className="max-w-lg mx-auto bg-[#FEE2E2] border-[#FEE2E2]">
           <CardContent className="pt-6">
-            <p className="text-red-700">{error || 'Case not found'}</p>
+            <p className="text-[#9B2C2C]">{error || 'Case not found'}</p>
             <Button variant="outline" onClick={() => router.push('/cases')} className="mt-4">
               Back to Cases
             </Button>
@@ -166,11 +166,11 @@ function CourtFormsPageContent() {
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
-            <Link href="/cases" className="hover:text-blue-600">
+            <Link href="/cases" className="hover:text-[#2D6A8F]">
               Cases
             </Link>
             <span>/</span>
-            <Link href={`/cases/${caseId}`} className="hover:text-blue-600">
+            <Link href={`/cases/${caseId}`} className="hover:text-[#2D6A8F]">
               {caseData.case_name}
             </Link>
             <span>/</span>
@@ -195,9 +195,9 @@ function CourtFormsPageContent() {
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
         {/* Progress Overview */}
         {progress && (
-          <Card className="bg-gradient-to-r from-indigo-50 to-purple-50 border-indigo-200">
+          <Card className="bg-gradient-to-r from-[#E0EFF8] to-[#E0EFF8] border-[#E0EFF8]">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-indigo-900">
+              <CardTitle className="flex items-center gap-2 text-[#1E3A4A]">
                 <Scale className="h-5 w-5" />
                 Case Progress
               </CardTitle>
@@ -205,19 +205,19 @@ function CourtFormsPageContent() {
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="bg-white/50 rounded-lg p-3 text-center">
-                  <p className="text-2xl font-bold text-indigo-600">
+                  <p className="text-2xl font-bold text-[#2D6A8F]">
                     {progress.total_forms}
                   </p>
                   <p className="text-sm text-gray-600">Total Forms</p>
                 </div>
                 <div className="bg-white/50 rounded-lg p-3 text-center">
-                  <p className="text-2xl font-bold text-green-600">
+                  <p className="text-2xl font-bold text-[#2D8A70]">
                     {progress.approved_forms}
                   </p>
                   <p className="text-sm text-gray-600">Approved</p>
                 </div>
                 <div className="bg-white/50 rounded-lg p-3 text-center">
-                  <p className="text-2xl font-bold text-amber-600">
+                  <p className="text-2xl font-bold text-[#E09520]">
                     {progress.pending_forms}
                   </p>
                   <p className="text-sm text-gray-600">Pending</p>
@@ -233,8 +233,8 @@ function CourtFormsPageContent() {
               {/* Next Steps */}
               {progress.next_action && (
                 <Alert className="mt-4 bg-white/70">
-                  <AlertCircle className="h-4 w-4 text-indigo-600" />
-                  <AlertDescription className="text-indigo-800">
+                  <AlertCircle className="h-4 w-4 text-[#2D6A8F]" />
+                  <AlertDescription className="text-[#1E4E6B]">
                     <strong>Next Step:</strong> {progress.next_action}
                   </AlertDescription>
                 </Alert>
@@ -244,17 +244,17 @@ function CourtFormsPageContent() {
         )}
 
         {/* Info Card */}
-        <Card className="bg-blue-50 border-blue-200">
+        <Card className="bg-[#E0EFF8] border-[#E0EFF8]">
           <CardContent className="pt-6">
-            <h3 className="font-medium text-blue-900 mb-2">
+            <h3 className="font-medium text-[#1E3A4A] mb-2">
               California Family Court Forms
             </h3>
-            <p className="text-sm text-blue-800 mb-3">
+            <p className="text-sm text-[#1E4E6B] mb-3">
               This workflow guides you through the California family court process.
               Forms are submitted electronically and tracked throughout the hearing
               process.
             </p>
-            <div className="grid md:grid-cols-2 gap-4 text-sm text-blue-800">
+            <div className="grid md:grid-cols-2 gap-4 text-sm text-[#1E4E6B]">
               <div>
                 <p className="font-medium mb-1">Petitioner Forms:</p>
                 <ul className="space-y-1 ml-4">
@@ -306,8 +306,8 @@ function CourtFormsPageContent() {
                       onClick={() => router.push(`/cases/${caseId}/court-forms/${form.id}`)}
                     >
                       <div className="flex items-center gap-4">
-                        <div className="h-12 w-12 bg-indigo-100 rounded-lg flex items-center justify-center">
-                          <Icon className="h-6 w-6 text-indigo-600" />
+                        <div className="h-12 w-12 bg-[#E0EFF8] rounded-lg flex items-center justify-center">
+                          <Icon className="h-6 w-6 text-[#2D6A8F]" />
                         </div>
                         <div>
                           <div className="flex items-center gap-2">

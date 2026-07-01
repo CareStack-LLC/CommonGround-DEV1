@@ -50,10 +50,10 @@ export function ComplianceLogCard({ agreementId }: ComplianceLogCardProps) {
     }
 
     function getIcon(type: string, severity: string) {
-        if (severity === 'violation') return <XCircle className="h-4 w-4 text-red-500" />;
-        if (severity === 'warning') return <AlertTriangle className="h-4 w-4 text-orange-500" />;
-        if (type === 'check_in') return <CheckCircle2 className="h-4 w-4 text-green-500" />;
-        return <Info className="h-4 w-4 text-blue-500" />;
+        if (severity === 'violation') return <XCircle className="h-4 w-4 text-[#C53030]" />;
+        if (severity === 'warning') return <AlertTriangle className="h-4 w-4 text-[#F5A623]" />;
+        if (type === 'check_in') return <CheckCircle2 className="h-4 w-4 text-[#3DAA8A]" />;
+        return <Info className="h-4 w-4 text-[#2D6A8F]" />;
     }
 
     return (
@@ -74,7 +74,7 @@ export function ComplianceLogCard({ agreementId }: ComplianceLogCardProps) {
                                     <p className="text-sm font-medium leading-none">
                                         {log.description}
                                         {log.is_verified && (
-                                            <Badge variant="outline" className="ml-2 text-[10px] h-4 px-1 text-green-600 border-green-200">
+                                            <Badge variant="outline" className="ml-2 text-[10px] h-4 px-1 text-[#2D8A70] border-[#E8F4F0]">
                                                 Verified
                                             </Badge>
                                         )}

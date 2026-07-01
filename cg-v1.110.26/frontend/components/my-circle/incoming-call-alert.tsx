@@ -94,9 +94,9 @@ export default function IncomingCallAlert({
         <div className="text-center mb-8">
           {/* Animated ring indicator */}
           <div className="relative mx-auto w-24 h-24 mb-6">
-            <div className="absolute inset-0 rounded-full bg-green-100 animate-ping opacity-75" />
-            <div className="absolute inset-0 rounded-full bg-green-200 animate-pulse" />
-            <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center shadow-lg">
+            <div className="absolute inset-0 rounded-full bg-[#E8F4F0] animate-ping opacity-75" />
+            <div className="absolute inset-0 rounded-full bg-[#E8F4F0] animate-pulse" />
+            <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-[#5BC4A0] to-[#3DAA8A] flex items-center justify-center shadow-lg">
               <CallIcon className="h-10 w-10 text-white" />
             </div>
           </div>
@@ -122,32 +122,32 @@ export default function IncomingCallAlert({
           <button
             onClick={handleReject}
             disabled={isAccepting || isRejecting}
-            className="flex flex-col items-center gap-2 p-4 bg-red-100 hover:bg-red-200 rounded-2xl transition-all hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
+            className="flex flex-col items-center gap-2 p-4 bg-[#FEE2E2] hover:bg-[#FEE2E2] rounded-2xl transition-all hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
           >
             {isRejecting ? (
-              <Loader2 className="h-8 w-8 text-red-600 animate-spin" />
+              <Loader2 className="h-8 w-8 text-[#C53030] animate-spin" />
             ) : (
-              <div className="w-14 h-14 rounded-full bg-red-500 flex items-center justify-center shadow-md">
+              <div className="w-14 h-14 rounded-full bg-[#C53030] flex items-center justify-center shadow-md">
                 <Phone className="h-6 w-6 text-white rotate-[135deg]" />
               </div>
             )}
-            <span className="font-semibold text-red-700">Decline</span>
+            <span className="font-semibold text-[#9B2C2C]">Decline</span>
           </button>
 
           {/* Accept Button */}
           <button
             onClick={handleAccept}
             disabled={isAccepting || isRejecting}
-            className="flex flex-col items-center gap-2 p-4 bg-green-100 hover:bg-green-200 rounded-2xl transition-all hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
+            className="flex flex-col items-center gap-2 p-4 bg-[#E8F4F0] hover:bg-[#E8F4F0] rounded-2xl transition-all hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
           >
             {isAccepting ? (
-              <Loader2 className="h-8 w-8 text-green-600 animate-spin" />
+              <Loader2 className="h-8 w-8 text-[#2D8A70] animate-spin" />
             ) : (
-              <div className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center shadow-md">
+              <div className="w-14 h-14 rounded-full bg-[#3DAA8A] flex items-center justify-center shadow-md">
                 <CallIcon className="h-6 w-6 text-white" />
               </div>
             )}
-            <span className="font-semibold text-green-700">Accept</span>
+            <span className="font-semibold text-[#2D8A70]">Accept</span>
           </button>
         </div>
 

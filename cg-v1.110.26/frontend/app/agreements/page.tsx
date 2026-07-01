@@ -96,7 +96,7 @@ function FamilyFileCard({
           </div>
         </div>
         {familyFile.has_court_case && (
-          <span className="px-2 py-1 bg-amber-100 text-amber-700 text-xs font-semibold rounded-full flex items-center gap-1">
+          <span className="px-2 py-1 bg-[#FEF7ED] text-[#E09520] text-xs font-semibold rounded-full flex items-center gap-1">
             <Scale className="h-3 w-3" />
             Court
           </span>
@@ -110,17 +110,17 @@ function StatusBadge({ status }: { status: string }) {
   const config: Record<string, { icon: React.ReactNode; className: string; label: string }> = {
     active: {
       icon: <CheckCircle className="h-3.5 w-3.5" />,
-      className: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+      className: 'bg-[#E8F4F0] text-[#2D8A70] border-[#E8F4F0]',
       label: 'Active',
     },
     approved: {
       icon: <CheckCircle className="h-3.5 w-3.5" />,
-      className: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+      className: 'bg-[#E8F4F0] text-[#2D8A70] border-[#E8F4F0]',
       label: 'Approved',
     },
     pending_approval: {
       icon: <Clock className="h-3.5 w-3.5" />,
-      className: 'bg-amber-100 text-amber-700 border-amber-200',
+      className: 'bg-[#FEF7ED] text-[#E09520] border-[#FEF7ED]',
       label: 'Pending Approval',
     },
     draft: {
@@ -130,12 +130,12 @@ function StatusBadge({ status }: { status: string }) {
     },
     rejected: {
       icon: <AlertCircle className="h-3.5 w-3.5" />,
-      className: 'bg-red-100 text-red-700 border-red-200',
+      className: 'bg-[#FEE2E2] text-[#9B2C2C] border-[#FEE2E2]',
       label: 'Rejected',
     },
     expired: {
       icon: <AlertCircle className="h-3.5 w-3.5" />,
-      className: 'bg-orange-100 text-orange-700 border-orange-200',
+      className: 'bg-[#FEF7ED] text-[#E09520] border-[#FEF7ED]',
       label: 'Expired',
     },
   };
@@ -198,12 +198,12 @@ function AgreementCard({
 
         {/* Pending Approval Status */}
         {agreement.status === 'pending_approval' && (
-          <div className="mt-3 p-3 bg-amber-50 rounded-xl border-2 border-amber-200">
-            <p className="text-xs font-bold text-amber-800 mb-2">Awaiting Approvals</p>
-            <div className="flex gap-4 text-xs text-amber-700">
+          <div className="mt-3 p-3 bg-[#FEF7ED] rounded-xl border-2 border-[#FEF7ED]">
+            <p className="text-xs font-bold text-[#E09520] mb-2">Awaiting Approvals</p>
+            <div className="flex gap-4 text-xs text-[#E09520]">
               <span className="flex items-center gap-1.5 font-medium">
                 {agreement.petitioner_approved ? (
-                  <CheckCircle className="h-3.5 w-3.5 text-emerald-600" />
+                  <CheckCircle className="h-3.5 w-3.5 text-[#2D8A70]" />
                 ) : (
                   <div className="h-3.5 w-3.5 rounded-full border-2 border-current" />
                 )}
@@ -211,7 +211,7 @@ function AgreementCard({
               </span>
               <span className="flex items-center gap-1.5 font-medium">
                 {agreement.respondent_approved ? (
-                  <CheckCircle className="h-3.5 w-3.5 text-emerald-600" />
+                  <CheckCircle className="h-3.5 w-3.5 text-[#2D8A70]" />
                 ) : (
                   <div className="h-3.5 w-3.5 rounded-full border-2 border-current" />
                 )}
@@ -224,8 +224,8 @@ function AgreementCard({
         {/* Active/Approved Status */}
         {(agreement.status === 'approved' || agreement.status === 'active') &&
           agreement.effective_date && (
-            <div className="mt-3 p-3 bg-emerald-50 rounded-xl border-2 border-emerald-200">
-              <p className="text-xs text-emerald-700">
+            <div className="mt-3 p-3 bg-[#E8F4F0] rounded-xl border-2 border-[#E8F4F0]">
+              <p className="text-xs text-[#2D8A70]">
                 <span className="font-bold">Effective:</span>{' '}
                 {new Date(agreement.effective_date).toLocaleDateString('en-US', {
                   month: 'long',
@@ -299,11 +299,11 @@ function QuickAccordCard({
   };
 
   const categoryColors: Record<string, string> = {
-    travel: 'bg-blue-100 text-blue-700 border-blue-200',
-    schedule_swap: 'bg-purple-100 text-purple-700 border-purple-200',
-    special_event: 'bg-pink-100 text-pink-700 border-pink-200',
-    overnight: 'bg-indigo-100 text-indigo-700 border-indigo-200',
-    expense: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+    travel: 'bg-[#E0EFF8] text-[#1E4E6B] border-[#E0EFF8]',
+    schedule_swap: 'bg-[#E0EFF8] text-[#1E4E6B] border-[#E0EFF8]',
+    special_event: 'bg-[#FEF7ED] text-[#E09520] border-[#FEF7ED]',
+    overnight: 'bg-[#E0EFF8] text-[#1E4E6B] border-[#E0EFF8]',
+    expense: 'bg-[#E8F4F0] text-[#2D8A70] border-[#E8F4F0]',
     other: 'bg-muted text-foreground border-border',
   };
 
@@ -312,17 +312,17 @@ function QuickAccordCard({
       onClick={onClick}
       className="
         w-full text-left bg-card border-2 border-border rounded-2xl p-5 shadow-lg
-        hover:shadow-xl hover:border-amber-300 transition-all duration-300
+        hover:shadow-xl hover:border-[#F5A623] transition-all duration-300
         group
       "
     >
       <div className="flex items-start justify-between gap-4 mb-3">
         <div className="flex items-start gap-3 flex-1 min-w-0">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-100 to-amber-50 flex items-center justify-center flex-shrink-0 shadow-md">
-            <Handshake className="h-5 w-5 text-amber-600" />
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#FEF7ED] to-[#FEF7ED] flex items-center justify-center flex-shrink-0 shadow-md">
+            <Handshake className="h-5 w-5 text-[#E09520]" />
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="font-bold text-foreground truncate group-hover:text-amber-700 transition-colors" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+            <h3 className="font-bold text-foreground truncate group-hover:text-[#E09520] transition-colors" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               {quickAccord.title}
             </h3>
             <p className="text-xs text-muted-foreground mt-0.5 font-medium">
@@ -344,7 +344,7 @@ function QuickAccordCard({
             </span>
           )}
           {quickAccord.has_shared_expense && (
-            <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 text-xs font-semibold rounded-full border border-emerald-200">
+            <span className="px-2 py-0.5 bg-[#E8F4F0] text-[#2D8A70] text-xs font-semibold rounded-full border border-[#E8F4F0]">
               $ Expense
             </span>
           )}
@@ -356,7 +356,7 @@ function QuickAccordCard({
 
       <div className="mt-4 pt-3 border-t-2 border-border flex items-center justify-between">
         <span className="text-xs text-muted-foreground font-medium">Click to view details</span>
-        <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-amber-600 group-hover:translate-x-1 transition-all duration-300" />
+        <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-[#E09520] group-hover:translate-x-1 transition-all duration-300" />
       </div>
     </button>
   );
@@ -393,7 +393,7 @@ function BuilderChoiceModal({
       icon: Handshake,
       description: 'A simple mutual agreement. Both parents acknowledge their commitment to co-parent cooperatively. No detailed sections to complete.',
       tag: 'Quick Start',
-      tagClass: 'bg-blue-100 text-blue-700',
+      tagClass: 'bg-[#E0EFF8] text-[#1E4E6B]',
     },
     {
       id: 'co-operative',
@@ -410,7 +410,7 @@ function BuilderChoiceModal({
       icon: FileText,
       description: '18 detailed sections for high-conflict or court-ordered situations. Covers holidays, birthdays, vacations, school breaks, healthcare, and more.',
       tag: 'Most Detailed',
-      tagClass: 'bg-purple-100 text-purple-700',
+      tagClass: 'bg-[#E0EFF8] text-[#1E4E6B]',
     },
   ];
 
@@ -481,8 +481,8 @@ function BuilderChoiceModal({
                       tier.recommended
                         ? 'bg-gradient-to-br from-[#3DAA8A] to-[#2D8A6A]'
                         : tier.id === 'good_faith'
-                          ? 'bg-gradient-to-br from-blue-500 to-blue-600'
-                          : 'bg-gradient-to-br from-purple-500 to-purple-600'
+                          ? 'bg-gradient-to-br from-[#2D6A8F] to-[#2D6A8F]'
+                          : 'bg-gradient-to-br from-[#2D6A8F] to-[#2D6A8F]'
                     }`}>
                       <Icon className="h-7 w-7" />
                     </div>
@@ -515,22 +515,22 @@ function BuilderChoiceModal({
               onClick={() => onSelectBuilder(selectedType!, 'aria')}
               disabled={isCreating}
               className="
-                w-full text-left p-5 border-2 border-amber-200 rounded-2xl
-                hover:border-amber-400 hover:bg-amber-50
+                w-full text-left p-5 border-2 border-[#FEF7ED] rounded-2xl
+                hover:border-[#F5A623] hover:bg-[#FEF7ED]
                 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed
                 group shadow-lg hover:shadow-xl
               "
             >
               <div className="flex items-start gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center text-white flex-shrink-0 shadow-md group-hover:scale-105 transition-transform duration-300">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#F5A623] to-[#E09520] flex items-center justify-center text-white flex-shrink-0 shadow-md group-hover:scale-105 transition-transform duration-300">
                   <Sparkles className="h-7 w-7" />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-bold text-foreground group-hover:text-amber-700 transition-colors" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                    <h3 className="font-bold text-foreground group-hover:text-[#E09520] transition-colors" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                       Talk with ARIA
                     </h3>
-                    <span className="px-2.5 py-0.5 bg-amber-100 text-amber-700 text-xs font-bold rounded-full shadow-sm">
+                    <span className="px-2.5 py-0.5 bg-[#FEF7ED] text-[#E09520] text-xs font-bold rounded-full shadow-sm">
                       Recommended
                     </span>
                   </div>
@@ -538,13 +538,13 @@ function BuilderChoiceModal({
                     Describe your custody arrangement in your own words. ARIA will ask the right questions and build your agreement from the conversation.
                   </p>
                   <div className="flex flex-wrap gap-2 mt-3">
-                    <span className="px-2.5 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-full">
+                    <span className="px-2.5 py-1 bg-[#FEF7ED] text-[#E09520] text-xs font-bold rounded-full">
                       Conversational
                     </span>
-                    <span className="px-2.5 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-full">
+                    <span className="px-2.5 py-1 bg-[#FEF7ED] text-[#E09520] text-xs font-bold rounded-full">
                       Guided
                     </span>
-                    <span className="px-2.5 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-full">
+                    <span className="px-2.5 py-1 bg-[#FEF7ED] text-[#E09520] text-xs font-bold rounded-full">
                       AI-Powered
                     </span>
                   </div>
@@ -836,9 +836,9 @@ function AgreementsListContent() {
               <div className="space-y-6">
                 {/* Court Case Notice */}
                 {selectedFamilyFile.has_court_case && (
-                  <div className="bg-card rounded-2xl border-2 border-amber-200 shadow-lg p-5 bg-gradient-to-r from-amber-50 to-transparent">
+                  <div className="bg-card rounded-2xl border-2 border-[#FEF7ED] shadow-lg p-5 bg-gradient-to-r from-[#FEF7ED] to-transparent">
                     <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center flex-shrink-0 shadow-md">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#F5A623] to-[#E09520] flex items-center justify-center flex-shrink-0 shadow-md">
                         <Scale className="h-5 w-5 text-white" />
                       </div>
                       <div>
@@ -892,7 +892,7 @@ function AgreementsListContent() {
                         onClick={() => router.push(`/family-files/${selectedFamilyFile.id}/quick-accord/new`)}
                         className="
                           inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold
-                          bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md hover:shadow-lg
+                          bg-gradient-to-r from-[#F5A623] to-[#E09520] text-white shadow-md hover:shadow-lg
                           transition-all duration-300
                         "
                       >
@@ -935,7 +935,7 @@ function AgreementsListContent() {
                       <Handshake className="h-4 w-4" />
                       QuickAccords
                       {quickAccords.length > 0 && (
-                        <span className="px-2 py-0.5 bg-amber-100 text-amber-700 text-xs font-bold rounded-full">
+                        <span className="px-2 py-0.5 bg-[#FEF7ED] text-[#E09520] text-xs font-bold rounded-full">
                           {quickAccords.length}
                         </span>
                       )}
@@ -958,17 +958,17 @@ function AgreementsListContent() {
 
                     {/* Error State */}
                     {error && (
-                      <div className="bg-card rounded-2xl border-2 border-red-200 shadow-lg p-5 bg-gradient-to-r from-red-50 to-transparent">
+                      <div className="bg-card rounded-2xl border-2 border-[#FEE2E2] shadow-lg p-5 bg-gradient-to-r from-[#FEE2E2] to-transparent">
                         <div className="flex items-start gap-3">
-                          <div className="p-2 bg-gradient-to-br from-red-500/10 to-red-600/5 rounded-xl shadow-md">
-                            <AlertCircle className="h-5 w-5 text-red-600" />
+                          <div className="p-2 bg-gradient-to-br from-[#C53030]/10 to-[#C53030]/5 rounded-xl shadow-md">
+                            <AlertCircle className="h-5 w-5 text-[#C53030]" />
                           </div>
                           <div className="flex-1">
-                            <p className="font-bold text-red-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Failed to load agreements</p>
-                            <p className="text-sm text-red-700 font-medium mt-1">{error}</p>
+                            <p className="font-bold text-[#7A2222]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Failed to load agreements</p>
+                            <p className="text-sm text-[#9B2C2C] font-medium mt-1">{error}</p>
                             <button
                               onClick={() => loadAgreements(selectedFamilyFile.id)}
-                              className="mt-3 px-4 py-2 bg-card border-2 border-red-300 text-red-700 rounded-xl text-sm font-bold hover:bg-red-50 transition-all duration-300"
+                              className="mt-3 px-4 py-2 bg-card border-2 border-[#FCA5A5] text-[#9B2C2C] rounded-xl text-sm font-bold hover:bg-[#FEE2E2] transition-all duration-300"
                             >
                               Try Again
                             </button>
@@ -1013,7 +1013,7 @@ function AgreementsListContent() {
                     {isLoadingQuickAccords && (
                       <div className="flex items-center justify-center py-16">
                         <div className="text-center">
-                          <div className="w-14 h-14 border-3 border-amber-200 border-t-amber-500 rounded-full animate-spin mx-auto" />
+                          <div className="w-14 h-14 border-3 border-[#FEF7ED] border-t-[#F5A623] rounded-full animate-spin mx-auto" />
                           <p className="mt-4 text-muted-foreground font-medium">Loading QuickAccords...</p>
                         </div>
                       </div>
@@ -1022,8 +1022,8 @@ function AgreementsListContent() {
                     {!isLoadingQuickAccords && quickAccords.length === 0 && (
                       <div className="bg-card rounded-2xl border-2 border-border shadow-lg">
                         <div className="text-center py-16 px-6">
-                          <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-amber-100 to-amber-50 flex items-center justify-center shadow-md">
-                            <Handshake className="h-10 w-10 text-amber-500" />
+                          <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-[#FEF7ED] to-[#FEF7ED] flex items-center justify-center shadow-md">
+                            <Handshake className="h-10 w-10 text-[#F5A623]" />
                           </div>
                           <h3 className="text-xl font-bold text-foreground mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                             No QuickAccords Yet
@@ -1035,7 +1035,7 @@ function AgreementsListContent() {
                             onClick={() => router.push(`/family-files/${selectedFamilyFile.id}/quick-accord/new`)}
                             className="
                               inline-flex items-center gap-2 px-6 py-3
-                              bg-gradient-to-r from-amber-500 to-amber-600 text-white
+                              bg-gradient-to-r from-[#F5A623] to-[#E09520] text-white
                               rounded-xl font-bold shadow-md hover:shadow-lg
                               transition-all duration-300
                             "

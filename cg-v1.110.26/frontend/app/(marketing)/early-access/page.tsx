@@ -5,7 +5,7 @@ import { EarlyAdopterForm } from '@/components/marketing/early-adopter-form';
 export const metadata = {
   title: 'Join Early Access | CommonGround',
   description:
-    'Be one of the first families to experience calmer co-parenting with CommonGround. Early adopters get 30% off for life.',
+    'Be one of the first families to experience calmer co-parenting with CommonGround. Early adopters get 30% off for 3 years.',
 };
 
 export default function EarlyAccessPage() {
@@ -29,8 +29,8 @@ export default function EarlyAccessPage() {
           </h1>
 
           <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed mb-10">
-            CommonGround is launching soon. Join our early adopter list to get
-            first access, exclusive pricing, and help shape the platform.
+            CommonGround is launching soon. Join the early adopter list for first
+            access and 30% off any paid plan, locked in for 3 years. No card to join.
           </p>
         </div>
       </section>
@@ -56,7 +56,7 @@ export default function EarlyAccessPage() {
                   </div>
                   <div>
                     <p className="font-semibold text-foreground">
-                      30% off for life
+                      30% off for 3 years
                     </p>
                     <p className="text-sm text-gray-500">
                       Locked in for 36 months on any paid plan. The best price
@@ -125,7 +125,7 @@ export default function EarlyAccessPage() {
                   href="/features"
                   className="inline-flex items-center gap-1 text-cg-sage text-sm font-medium mt-4 hover:underline"
                 >
-                  See all features
+                  See everything you get
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>

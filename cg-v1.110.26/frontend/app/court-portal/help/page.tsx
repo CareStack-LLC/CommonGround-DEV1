@@ -161,7 +161,7 @@ export default function CourtHelpPage() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-2 border-indigo-600 border-t-transparent mx-auto" />
+          <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#2D6A8F] border-t-transparent mx-auto" />
           <p className="mt-4 text-muted-foreground">Loading...</p>
         </div>
       </div>
@@ -182,8 +182,8 @@ export default function CourtHelpPage() {
     <div className="space-y-6 max-w-4xl">
       {/* Header */}
       <div className="text-center">
-        <div className="inline-flex p-3 bg-indigo-100 rounded-full mb-4">
-          <HelpCircle className="h-8 w-8 text-indigo-600" />
+        <div className="inline-flex p-3 bg-[#E0EFF8] rounded-full mb-4">
+          <HelpCircle className="h-8 w-8 text-[#2D6A8F]" />
         </div>
         <h1 className="text-2xl font-bold text-foreground">Help Center</h1>
         <p className="text-muted-foreground">
@@ -232,7 +232,7 @@ export default function CourtHelpPage() {
           variant={selectedCategory === null ? "default" : "outline"}
           size="sm"
           onClick={() => setSelectedCategory(null)}
-          className={selectedCategory === null ? "bg-indigo-600 hover:bg-indigo-700" : ""}
+          className={selectedCategory === null ? "bg-[#2D6A8F] hover:bg-[#1E4E6B]" : ""}
         >
           All Topics
         </Button>
@@ -242,7 +242,7 @@ export default function CourtHelpPage() {
             variant={selectedCategory === category ? "default" : "outline"}
             size="sm"
             onClick={() => setSelectedCategory(category)}
-            className={selectedCategory === category ? "bg-indigo-600 hover:bg-indigo-700" : ""}
+            className={selectedCategory === category ? "bg-[#2D6A8F] hover:bg-[#1E4E6B]" : ""}
           >
             {category}
           </Button>
@@ -282,7 +282,7 @@ export default function CourtHelpPage() {
                   />
                 </button>
                 {expandedFaq === index && (
-                  <div className="mt-3 text-sm text-muted-foreground pl-0 border-l-2 border-indigo-200 ml-0 pl-4">
+                  <div className="mt-3 text-sm text-muted-foreground pl-0 border-l-2 border-[#E0EFF8] ml-0 pl-4">
                     {faq.answer}
                   </div>
                 )}
@@ -296,7 +296,7 @@ export default function CourtHelpPage() {
       <Card id="access">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Shield className="h-5 w-5 text-indigo-600" />
+            <Shield className="h-5 w-5 text-[#2D6A8F]" />
             Access Guidelines
           </CardTitle>
         </CardHeader>
@@ -330,7 +330,7 @@ export default function CourtHelpPage() {
       <Card id="contact">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <MessageCircle className="h-5 w-5 text-indigo-600" />
+            <MessageCircle className="h-5 w-5 text-[#2D6A8F]" />
             Contact Support
           </CardTitle>
           <CardDescription>
@@ -340,19 +340,19 @@ export default function CourtHelpPage() {
         <CardContent>
           <div className="grid md:grid-cols-2 gap-4">
             <div className="flex items-center gap-3 p-4 bg-secondary/50 rounded-lg">
-              <Mail className="h-5 w-5 text-indigo-600" />
+              <Mail className="h-5 w-5 text-[#2D6A8F]" />
               <div>
                 <div className="font-medium">Email Support</div>
                 <a
                   href="mailto:court-support@find-commonground.com"
-                  className="text-sm text-indigo-600 hover:underline"
+                  className="text-sm text-[#2D6A8F] hover:underline"
                 >
                   court-support@find-commonground.com
                 </a>
               </div>
             </div>
             <div className="flex items-center gap-3 p-4 bg-secondary/50 rounded-lg">
-              <Phone className="h-5 w-5 text-indigo-600" />
+              <Phone className="h-5 w-5 text-[#2D6A8F]" />
               <div>
                 <div className="font-medium">Phone Support</div>
                 <div className="text-sm text-muted-foreground">
@@ -384,9 +384,9 @@ function QuickLink({
   return (
     <a
       href={href}
-      className="flex items-center gap-2 p-3 rounded-lg border border-border hover:bg-indigo-50 hover:border-indigo-200 transition-colors text-sm font-medium"
+      className="flex items-center gap-2 p-3 rounded-lg border border-border hover:bg-[#E0EFF8] hover:border-[#E0EFF8] transition-colors text-sm font-medium"
     >
-      <div className="text-indigo-600">{icon}</div>
+      <div className="text-[#2D6A8F]">{icon}</div>
       <span>{label}</span>
     </a>
   );
@@ -403,8 +403,8 @@ function GuidelineCard({
   icon: React.ReactNode;
 }) {
   return (
-    <div className="flex items-start gap-3 p-4 bg-indigo-50/50 rounded-lg border border-indigo-100">
-      <div className="p-2 bg-indigo-100 rounded-lg text-indigo-600 flex-shrink-0">
+    <div className="flex items-start gap-3 p-4 bg-[#E0EFF8]/50 rounded-lg border border-[#E0EFF8]">
+      <div className="p-2 bg-[#E0EFF8] rounded-lg text-[#2D6A8F] flex-shrink-0">
         {icon}
       </div>
       <div>

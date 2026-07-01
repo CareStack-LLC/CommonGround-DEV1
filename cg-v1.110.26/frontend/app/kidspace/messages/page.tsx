@@ -47,7 +47,7 @@ function Bubble({
           className={`px-5 py-3 rounded-3xl shadow-md ${
             mine
               ? 'bg-gradient-to-br from-[#4BA8C8] to-[#2D6A8F] text-white'
-              : 'bg-white text-slate-900 border-4 border-amber-200'
+              : 'bg-white text-slate-900 border-4 border-[#FEF7ED]'
           }`}
         >
           {message.aria_hidden ? (
@@ -185,15 +185,15 @@ export default function KidSpaceMessagesPage() {
 
   if (!userData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-sky-100 via-amber-50 to-emerald-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-[#E0EFF8] via-[#FEF7ED] to-[#E8F4F0] flex items-center justify-center">
         <div className="w-12 h-12 border-4 border-[#4BA8C8]/30 border-t-[#4BA8C8] rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="h-[100dvh] bg-gradient-to-br from-sky-100 via-amber-50 to-emerald-100 flex flex-col overflow-hidden">
-      <header className="flex items-center gap-3 p-4 bg-white/80 backdrop-blur-sm border-b-4 border-amber-200 shadow-md flex-shrink-0">
+    <div className="h-[100dvh] bg-gradient-to-br from-[#E0EFF8] via-[#FEF7ED] to-[#E8F4F0] flex flex-col overflow-hidden">
+      <header className="flex items-center gap-3 p-4 bg-white/80 backdrop-blur-sm border-b-4 border-[#FEF7ED] shadow-md flex-shrink-0">
         <button
           onClick={() => router.push('/my-circle/child/dashboard')}
           className="p-2 rounded-2xl bg-gradient-to-br from-[#4BA8C8] to-[#2D6A8F] text-white shadow-md hover:shadow-lg transition-all"
@@ -220,7 +220,7 @@ export default function KidSpaceMessagesPage() {
             <div className="w-12 h-12 border-4 border-[#4BA8C8]/30 border-t-[#4BA8C8] rounded-full animate-spin" />
           </div>
         ) : error ? (
-          <div className="p-4 rounded-2xl bg-red-100 border-4 border-red-200 text-base text-red-700 font-semibold">
+          <div className="p-4 rounded-2xl bg-[#FEE2E2] border-4 border-[#FEE2E2] text-base text-[#9B2C2C] font-semibold">
             {error}
           </div>
         ) : messages.length === 0 ? (
@@ -248,7 +248,7 @@ export default function KidSpaceMessagesPage() {
         <div ref={bottomRef} />
       </div>
 
-      <div className="border-t-4 border-amber-200 p-3 bg-white/80 backdrop-blur-sm flex-shrink-0 shadow-inner">
+      <div className="border-t-4 border-[#FEF7ED] p-3 bg-white/80 backdrop-blur-sm flex-shrink-0 shadow-inner">
         <div className="flex items-end gap-2">
           <textarea
             value={draft}
@@ -262,7 +262,7 @@ export default function KidSpaceMessagesPage() {
             placeholder="Type a message..."
             rows={1}
             maxLength={2000}
-            className="flex-1 resize-none rounded-2xl border-4 border-amber-200 bg-white px-4 py-3 text-lg focus:border-[#4BA8C8] focus:outline-none transition-all max-h-32 font-medium"
+            className="flex-1 resize-none rounded-2xl border-4 border-[#FEF7ED] bg-white px-4 py-3 text-lg focus:border-[#4BA8C8] focus:outline-none transition-all max-h-32 font-medium"
             disabled={sending}
           />
           <button

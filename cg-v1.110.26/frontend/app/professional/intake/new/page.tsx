@@ -90,7 +90,7 @@ function TemplateCard({
     >
       {isLocked && (
         <div className="absolute top-3 right-3">
-          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-700 bg-amber-50 border border-amber-200/60 rounded-full px-2 py-0.5">
+          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#B8791A] bg-[#FEF7ED] border border-[#FBE3BF]/60 rounded-full px-2 py-0.5">
             <Crown className="h-2.5 w-2.5" /> Pro
           </span>
         </div>
@@ -338,7 +338,7 @@ export default function NewIntakePage() {
               <Crown className="h-4 w-4 text-[#D4AF37]" />
               <h2 className="text-sm font-semibold text-slate-900">Professional Templates</h2>
               {!isPaid && (
-                <Badge className="text-[10px] bg-amber-50 text-amber-700 border border-amber-200/60 font-semibold">
+                <Badge className="text-[10px] bg-[#FEF7ED] text-[#B8791A] border border-[#FBE3BF]/60 font-semibold">
                   Upgrade Required
                 </Badge>
               )}

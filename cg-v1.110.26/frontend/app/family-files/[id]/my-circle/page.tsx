@@ -39,16 +39,16 @@ interface PageParams {
 }
 
 const ROOM_COLORS = [
-  'bg-red-100 dark:bg-red-900/30 border-red-300 dark:border-red-700 text-red-700 dark:text-red-300',
-  'bg-orange-100 dark:bg-orange-900/30 border-orange-300 dark:border-orange-700 text-orange-700 dark:text-orange-300',
-  'bg-amber-100 dark:bg-amber-900/30 border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300',
-  'bg-yellow-100 dark:bg-yellow-900/30 border-yellow-300 dark:border-yellow-700 text-yellow-700 dark:text-yellow-300',
+  'bg-[#FEE2E2] dark:bg-[#7A2222]/30 border-[#FCA5A5] dark:border-[#9B2C2C] text-[#9B2C2C] dark:text-[#FCA5A5]',
+  'bg-[#FEF7ED] dark:bg-[#1E3A4A]/30 border-[#F5A623] dark:border-[#E09520] text-[#E09520] dark:text-[#F5A623]',
+  'bg-[#FEF7ED] dark:bg-[#1E3A4A]/30 border-[#F5A623] dark:border-[#E09520] text-[#E09520] dark:text-[#F5A623]',
+  'bg-[#FEF7ED] dark:bg-[#1E3A4A]/30 border-[#F5A623] dark:border-[#E09520] text-[#E09520] dark:text-[#F5A623]',
   'bg-lime-100 dark:bg-lime-900/30 border-lime-300 dark:border-lime-700 text-lime-700 dark:text-lime-300',
-  'bg-green-100 dark:bg-green-900/30 border-green-300 dark:border-green-700 text-green-700 dark:text-green-300',
+  'bg-[#E8F4F0] dark:bg-[#1E3A4A]/30 border-[#5BC4A0] dark:border-[#2D8A70] text-[#2D8A70] dark:text-[#5BC4A0]',
   'bg-teal-100 dark:bg-teal-900/30 border-teal-300 dark:border-teal-700 text-teal-700 dark:text-teal-300',
-  'bg-cyan-100 dark:bg-cyan-900/30 border-cyan-300 dark:border-cyan-700 text-cyan-700 dark:text-cyan-300',
-  'bg-blue-100 dark:bg-blue-900/30 border-blue-300 dark:border-blue-700 text-blue-700 dark:text-blue-300',
-  'bg-amber-100 dark:bg-amber-900/30 border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300',
+  'bg-[#E0EFF8] dark:bg-[#1E3A4A]/30 border-[#4BA8C8] dark:border-[#1E4E6B] text-[#1E4E6B] dark:text-[#4BA8C8]',
+  'bg-[#E0EFF8] dark:bg-[#1E3A4A]/30 border-[#4BA8C8] dark:border-[#1E4E6B] text-[#1E4E6B] dark:text-[#4BA8C8]',
+  'bg-[#FEF7ED] dark:bg-[#1E3A4A]/30 border-[#F5A623] dark:border-[#E09520] text-[#E09520] dark:text-[#F5A623]',
 ];
 
 const RELATIONSHIP_OPTIONS = [
@@ -421,15 +421,15 @@ function MyCircleContent({ params }: PageParams) {
             </div>
 
             {error && (
-              <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-4">
+              <div className="bg-[#FEE2E2] border-2 border-[#FEE2E2] rounded-2xl p-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
-                    <X className="h-5 w-5 text-red-600" />
+                  <div className="w-10 h-10 rounded-lg bg-[#FEE2E2] flex items-center justify-center flex-shrink-0">
+                    <X className="h-5 w-5 text-[#C53030]" />
                   </div>
-                  <p className="text-red-700 font-medium flex-1">{error}</p>
+                  <p className="text-[#9B2C2C] font-medium flex-1">{error}</p>
                   <button
                     onClick={() => setError(null)}
-                    className="text-red-600 hover:text-red-700"
+                    className="text-[#C53030] hover:text-[#9B2C2C]"
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -653,7 +653,7 @@ function MyCircleContent({ params }: PageParams) {
                               contact.can_communicate
                                 ? 'bg-cg-success-subtle text-cg-success'
                                 : contact.is_partially_approved
-                                  ? 'bg-amber-100 text-amber-700'
+                                  ? 'bg-[#FEF7ED] text-[#E09520]'
                                   : 'bg-muted text-muted-foreground'
                             }`}>
                               {contact.can_communicate
@@ -672,7 +672,7 @@ function MyCircleContent({ params }: PageParams) {
                               disabled={!contact.can_communicate}
                               className={`p-2 rounded-lg transition-colors ${
                                 contact.can_communicate
-                                  ? 'bg-blue-100 text-blue-600 hover:bg-blue-200'
+                                  ? 'bg-[#E0EFF8] text-[#2D6A8F] hover:bg-[#E0EFF8]'
                                   : 'bg-muted text-muted-foreground cursor-not-allowed'
                               }`}
                               title="Voice Call"
@@ -699,7 +699,7 @@ function MyCircleContent({ params }: PageParams) {
                             {/* Edit Contact Details */}
                             <button
                               onClick={() => openEditContactModal(contact)}
-                              className="p-2 text-[#D4AF37] bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 rounded-lg transition-colors"
+                              className="p-2 text-[#F5A623] bg-[#F5A623]/10 hover:bg-[#F5A623]/20 rounded-lg transition-colors"
                               title="Edit contact name & photo"
                             >
                               <Edit2 className="h-4 w-4" />

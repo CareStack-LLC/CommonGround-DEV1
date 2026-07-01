@@ -63,8 +63,8 @@ function QuickActionCard({
       iconColor: 'text-[var(--portal-primary)]',
     },
     purple: {
-      iconBg: 'bg-purple-100',
-      iconColor: 'text-purple-600',
+      iconBg: 'bg-[#E0EFF8]',
+      iconColor: 'text-[#2D6A8F]',
     },
     amber: {
       iconBg: 'bg-cg-amber-subtle',
@@ -105,15 +105,15 @@ function CustodyLegend() {
         <span className="text-foreground font-semibold whitespace-nowrap">Their Events</span>
       </div>
       <div className="flex items-center gap-1.5 flex-shrink-0">
-        <div className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-sm" />
+        <div className="w-2.5 h-2.5 rounded-full bg-[#F5A623] shadow-sm" />
         <span className="text-foreground font-semibold whitespace-nowrap">(Kids) Events</span>
       </div>
       <div className="flex items-center gap-1.5 flex-shrink-0">
-        <div className="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-sm" />
+        <div className="w-2.5 h-2.5 rounded-full bg-[#2D6A8F] shadow-sm" />
         <span className="text-foreground font-semibold whitespace-nowrap">Professional Events</span>
       </div>
       <div className="flex items-center gap-1.5 flex-shrink-0">
-        <div className="w-2.5 h-2.5 rounded-full bg-purple-500 shadow-sm" />
+        <div className="w-2.5 h-2.5 rounded-full bg-[#2D6A8F] shadow-sm" />
         <span className="text-foreground font-semibold whitespace-nowrap">Exchanges/Swaps</span>
       </div>
     </div>

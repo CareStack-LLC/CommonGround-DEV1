@@ -236,7 +236,7 @@ export default function CommunicationsPage() {
     switch (trend) {
       case "improving":
       case "increasing":
-        return <TrendingUp className="h-4 w-4 text-green-500" />;
+        return <TrendingUp className="h-4 w-4 text-[#3DAA8A]" />;
       case "declining":
       case "decreasing":
         return <TrendingDown className="h-4 w-4 text-red-500" />;
@@ -260,7 +260,7 @@ export default function CommunicationsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-3">
-            <div className="p-2 bg-purple-100 text-purple-600 rounded-lg">
+            <div className="p-2 bg-[#E0EFF8] text-[#2D6A8F] rounded-lg">
               <MessageSquare className="h-6 w-6" />
             </div>
             Parent Communications
@@ -277,7 +277,7 @@ export default function CommunicationsPage() {
 
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2D8A70]" />
         </div>
       ) : (
         <>
@@ -379,7 +379,7 @@ export default function CommunicationsPage() {
                             </div>
                             <div className="h-2 bg-muted rounded-full overflow-hidden">
                               <div
-                                className="h-full bg-purple-500 rounded-full"
+                                className="h-full bg-[#3D8DB0] rounded-full"
                                 style={{
                                   width: `${stats.total_messages > 0 ? ((stats.messages_by_parent.parent_b ?? 0) / stats.total_messages) * 100 : 0}%`,
                                 }}
@@ -397,7 +397,7 @@ export default function CommunicationsPage() {
                               </div>
                               <div className="h-2 bg-muted rounded-full overflow-hidden">
                                 <div
-                                  className={`h-full rounded-full ${index === 0 ? 'bg-blue-500' : 'bg-purple-500'}`}
+                                  className={`h-full rounded-full ${index === 0 ? 'bg-blue-500' : 'bg-[#3D8DB0]'}`}
                                   style={{
                                     width: `${stats.total_messages > 0 ? (count / stats.total_messages) * 100 : 0}%`,
                                   }}
@@ -461,16 +461,16 @@ export default function CommunicationsPage() {
                       <div>
                         <div className="flex justify-between text-sm mb-1">
                           <span>Parent A</span>
-                          <span className={`font-medium ${stats.good_faith_scores.parent_a >= 0.7 ? "text-emerald-600" :
-                            stats.good_faith_scores.parent_a >= 0.4 ? "text-amber-600" : "text-red-600"
+                          <span className={`font-medium ${stats.good_faith_scores.parent_a >= 0.7 ? "text-[#2D8A70]" :
+                            stats.good_faith_scores.parent_a >= 0.4 ? "text-[#E09520]" : "text-red-600"
                             }`}>
                             {Math.round(stats.good_faith_scores.parent_a * 100)}%
                           </span>
                         </div>
                         <div className="h-2 bg-muted rounded-full overflow-hidden">
                           <div
-                            className={`h-full rounded-full ${stats.good_faith_scores.parent_a >= 0.7 ? "bg-emerald-500" :
-                              stats.good_faith_scores.parent_a >= 0.4 ? "bg-amber-500" : "bg-red-500"
+                            className={`h-full rounded-full ${stats.good_faith_scores.parent_a >= 0.7 ? "bg-[#3DAA8A]" :
+                              stats.good_faith_scores.parent_a >= 0.4 ? "bg-[#F5A623]" : "bg-red-500"
                               }`}
                             style={{ width: `${stats.good_faith_scores.parent_a * 100}%` }}
                           />
@@ -479,16 +479,16 @@ export default function CommunicationsPage() {
                       <div>
                         <div className="flex justify-between text-sm mb-1">
                           <span>Parent B</span>
-                          <span className={`font-medium ${stats.good_faith_scores.parent_b >= 0.7 ? "text-emerald-600" :
-                            stats.good_faith_scores.parent_b >= 0.4 ? "text-amber-600" : "text-red-600"
+                          <span className={`font-medium ${stats.good_faith_scores.parent_b >= 0.7 ? "text-[#2D8A70]" :
+                            stats.good_faith_scores.parent_b >= 0.4 ? "text-[#E09520]" : "text-red-600"
                             }`}>
                             {Math.round(stats.good_faith_scores.parent_b * 100)}%
                           </span>
                         </div>
                         <div className="h-2 bg-muted rounded-full overflow-hidden">
                           <div
-                            className={`h-full rounded-full ${stats.good_faith_scores.parent_b >= 0.7 ? "bg-emerald-500" :
-                              stats.good_faith_scores.parent_b >= 0.4 ? "bg-amber-500" : "bg-red-500"
+                            className={`h-full rounded-full ${stats.good_faith_scores.parent_b >= 0.7 ? "bg-[#3DAA8A]" :
+                              stats.good_faith_scores.parent_b >= 0.4 ? "bg-[#F5A623]" : "bg-red-500"
                               }`}
                             style={{ width: `${stats.good_faith_scores.parent_b * 100}%` }}
                           />
@@ -554,11 +554,11 @@ export default function CommunicationsPage() {
                           <div key={index} className="flex-1 flex flex-col items-center">
                             <div className="w-full flex flex-col justify-end h-20 relative">
                               <div
-                                className="w-full bg-purple-200 rounded-t transition-all"
+                                className="w-full bg-[#C2DEF0] rounded-t transition-all"
                                 style={{ height: `${height}%` }}
                               >
                                 <div
-                                  className="w-full bg-amber-400 rounded-t absolute bottom-0"
+                                  className="w-full bg-[#F7B84D] rounded-t absolute bottom-0"
                                   style={{ height: `${flaggedHeight}%` }}
                                 />
                               </div>
@@ -572,11 +572,11 @@ export default function CommunicationsPage() {
                     </div>
                     <div className="flex items-center justify-center gap-4 mt-3 text-xs">
                       <div className="flex items-center gap-1">
-                        <div className="w-3 h-3 bg-purple-200 rounded" />
+                        <div className="w-3 h-3 bg-[#C2DEF0] rounded" />
                         <span className="text-muted-foreground">Total</span>
                       </div>
                       <div className="flex items-center gap-1">
-                        <div className="w-3 h-3 bg-amber-400 rounded" />
+                        <div className="w-3 h-3 bg-[#F7B84D] rounded" />
                         <span className="text-muted-foreground">Flagged</span>
                       </div>
                     </div>
@@ -606,7 +606,7 @@ export default function CommunicationsPage() {
                           key={thread.id}
                           onClick={() => setSelectedThread(thread.id)}
                           className={`w-full p-3 rounded-lg text-left transition-colors ${selectedThread === thread.id
-                            ? "bg-purple-50 border border-purple-200"
+                            ? "bg-[#F0F7FC] border border-[#C2DEF0]"
                             : "hover:bg-muted/50"
                             }`}
                         >
@@ -615,7 +615,7 @@ export default function CommunicationsPage() {
                               {thread.subject || "General"}
                             </span>
                             {thread.has_interventions && (
-                              <Bot className="h-3.5 w-3.5 text-amber-500" />
+                              <Bot className="h-3.5 w-3.5 text-[#F5A623]" />
                             )}
                           </div>
                           <div className="flex items-center justify-between">
@@ -674,7 +674,7 @@ export default function CommunicationsPage() {
                           key={message.id}
                           className={`p-4 rounded-lg border ${message.sender_role === "parent_a"
                             ? "border-l-4 border-l-blue-500 bg-blue-50/50"
-                            : "border-l-4 border-l-purple-500 bg-purple-50/50"
+                            : "border-l-4 border-l-[#3D8DB0] bg-[#F0F7FC]/50"
                             }`}
                         >
                           <div className="flex items-start justify-between mb-2">
@@ -684,19 +684,19 @@ export default function CommunicationsPage() {
                                 className={
                                   message.sender_role === "parent_a"
                                     ? "border-blue-300 text-blue-700"
-                                    : "border-purple-300 text-purple-700"
+                                    : "border-[#9BCADF] text-[#1E4E6B]"
                                 }
                               >
                                 {message.sender_name}
                               </Badge>
                               {message.was_flagged && (
-                                <Badge className="bg-amber-100 text-amber-800">
+                                <Badge className="bg-[#FEF7ED] text-[#8F5E14]">
                                   <AlertTriangle className="h-3 w-3 mr-1" />
                                   {message.flag_category || "Flagged"}
                                 </Badge>
                               )}
                               {message.was_rewritten && (
-                                <Badge className="bg-purple-100 text-purple-800">
+                                <Badge className="bg-[#E0EFF8] text-[#1E4E6B]">
                                   <Bot className="h-3 w-3 mr-1" />
                                   ARIA Rewritten
                                 </Badge>

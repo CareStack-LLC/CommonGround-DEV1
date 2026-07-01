@@ -91,9 +91,9 @@ export function ARIAInterventionAlert({
       <div
         className={cn(
           'rounded-xl shadow-2xl border-2 p-4',
-          isWarning && 'bg-amber-50 border-amber-400',
-          isMute && 'bg-orange-50 border-orange-500',
-          isTerminate && 'bg-red-50 border-red-600'
+          isWarning && 'bg-[#FEF7ED] border-[#F5A623]',
+          isMute && 'bg-[#FEF7ED] border-[#F5A623]',
+          isTerminate && 'bg-[#FEE2E2] border-[#C53030]'
         )}
       >
         {/* Header */}
@@ -101,14 +101,14 @@ export function ARIAInterventionAlert({
           <div
             className={cn(
               'p-2 rounded-full',
-              isWarning && 'bg-amber-100',
-              isMute && 'bg-orange-100',
-              isTerminate && 'bg-red-100'
+              isWarning && 'bg-[#FEF7ED]',
+              isMute && 'bg-[#FEF7ED]',
+              isTerminate && 'bg-[#FEE2E2]'
             )}
           >
-            {isWarning && <AlertTriangle className="w-6 h-6 text-amber-600" />}
-            {isMute && <MicOff className="w-6 h-6 text-orange-600" />}
-            {isTerminate && <PhoneOff className="w-6 h-6 text-red-600" />}
+            {isWarning && <AlertTriangle className="w-6 h-6 text-[#E09520]" />}
+            {isMute && <MicOff className="w-6 h-6 text-[#E09520]" />}
+            {isTerminate && <PhoneOff className="w-6 h-6 text-[#C53030]" />}
           </div>
 
           <div className="flex-1">
@@ -116,9 +116,9 @@ export function ARIAInterventionAlert({
               <h3
                 className={cn(
                   'font-semibold text-lg',
-                  isWarning && 'text-amber-800',
-                  isMute && 'text-orange-800',
-                  isTerminate && 'text-red-800'
+                  isWarning && 'text-[#E09520]',
+                  isMute && 'text-[#E09520]',
+                  isTerminate && 'text-[#9B2C2C]'
                 )}
               >
                 {isWarning && 'ARIA Warning'}
@@ -129,9 +129,9 @@ export function ARIAInterventionAlert({
               {isWarning && (
                 <button
                   onClick={onDismiss}
-                  className="p-1 rounded-full hover:bg-amber-200 transition-colors"
+                  className="p-1 rounded-full hover:bg-[#FEF7ED] transition-colors"
                 >
-                  <X className="w-4 h-4 text-amber-600" />
+                  <X className="w-4 h-4 text-[#E09520]" />
                 </button>
               )}
             </div>
@@ -139,9 +139,9 @@ export function ARIAInterventionAlert({
             <p
               className={cn(
                 'mt-1 text-sm',
-                isWarning && 'text-amber-700',
-                isMute && 'text-orange-700',
-                isTerminate && 'text-red-700'
+                isWarning && 'text-[#E09520]',
+                isMute && 'text-[#E09520]',
+                isTerminate && 'text-[#9B2C2C]'
               )}
             >
               {intervention.warning_message}
@@ -150,21 +150,21 @@ export function ARIAInterventionAlert({
             {/* Termination countdown */}
             {isTerminate && terminationCountdown !== null && (
               <div className="mt-3 flex items-center gap-2">
-                <div className="flex-1 bg-red-200 rounded-full h-2 overflow-hidden">
+                <div className="flex-1 bg-[#FEE2E2] rounded-full h-2 overflow-hidden">
                   <div
-                    className="bg-red-600 h-full transition-all duration-1000 ease-linear"
+                    className="bg-[#C53030] h-full transition-all duration-1000 ease-linear"
                     style={{
                       width: `${(terminationCountdown / (intervention.termination_delay || 10)) * 100}%`,
                     }}
                   />
                 </div>
-                <span className="text-red-800 font-bold text-lg">{terminationCountdown}s</span>
+                <span className="text-[#9B2C2C] font-bold text-lg">{terminationCountdown}s</span>
               </div>
             )}
 
             {/* Mute countdown */}
             {isMute && muteCountdown !== null && (
-              <div className="mt-2 text-sm text-orange-600 font-medium">
+              <div className="mt-2 text-sm text-[#E09520] font-medium">
                 Unmuting in {muteCountdown} seconds...
               </div>
             )}

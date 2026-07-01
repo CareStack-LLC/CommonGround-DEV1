@@ -58,7 +58,7 @@ export function LeadTrackingChart({ data }: LeadTrackingChartProps) {
             <div className="p-6">
                 <div className="flex items-start justify-between mb-6">
                     <div className="flex items-center gap-3">
-                        <div className="p-3 bg-gradient-to-br from-amber-500 to-orange-600 text-white rounded-xl shadow-lg shadow-amber-500/20">
+                        <div className="p-3 bg-gradient-to-br from-[#F5A623] to-[#E09520] text-white rounded-xl shadow-lg shadow-[#F5A623]/20">
                             <UserPlus className="h-5 w-5" />
                         </div>
                         <div>
@@ -75,12 +75,12 @@ export function LeadTrackingChart({ data }: LeadTrackingChartProps) {
                     <div className="text-right shrink-0">
                         <div className="flex items-center justify-end gap-2">
                             {weekDelta >= 0 ? (
-                                <TrendingUp className="h-4 w-4 text-emerald-600" />
+                                <TrendingUp className="h-4 w-4 text-[#2D8A70]" />
                             ) : (
-                                <TrendingDown className="h-4 w-4 text-red-500" />
+                                <TrendingDown className="h-4 w-4 text-[#C53030]" />
                             )}
                             <span
-                                className={`text-2xl font-bold ${weekDelta >= 0 ? "text-emerald-600" : "text-red-500"
+                                className={`text-2xl font-bold ${weekDelta >= 0 ? "text-[#2D8A70]" : "text-[#C53030]"
                                     }`}
                             >
                                 {weekDelta >= 0 ? "+" : ""}
@@ -142,10 +142,10 @@ export function LeadTrackingChart({ data }: LeadTrackingChartProps) {
                                         key={index}
                                         fill={
                                             index === maxIndex
-                                                ? "#f59e0b"
+                                                ? "#F5A623"
                                                 : index >= chartData.length - 4
-                                                    ? "#fb923c"
-                                                    : "#fed7aa"
+                                                    ? "#F5A623"
+                                                    : "#FEF7ED"
                                         }
                                     />
                                 ))}
@@ -160,7 +160,7 @@ export function LeadTrackingChart({ data }: LeadTrackingChartProps) {
                         <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
                             This Week
                         </p>
-                        <p className="text-xl font-bold text-amber-600">{lastWeek}</p>
+                        <p className="text-xl font-bold text-[#E09520]">{lastWeek}</p>
                     </div>
                     <div className="text-center">
                         <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">

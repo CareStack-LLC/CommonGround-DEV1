@@ -55,11 +55,11 @@ export default function ImpactBoard({ partner, metrics, isStaff = false }: Impac
     const conflictReduction = metrics.conflict_reduction_pct || 0;
 
     return (
-        <div className="min-h-screen bg-gray-900 text-white font-sans selection:bg-amber-500/30">
+        <div className="min-h-screen bg-gray-900 text-white font-sans selection:bg-[#F5A623]/30">
             {/* Ambient Background */}
             <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-amber-500/10 rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2" />
-                <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px] translate-x-1/2 translate-y-1/2" />
+                <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-[#F5A623]/10 rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2" />
+                <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-[#2D6A8F]/10 rounded-full blur-[120px] translate-x-1/2 translate-y-1/2" />
             </div>
 
             <div className="relative z-10 max-w-7xl mx-auto px-6 py-12">
@@ -67,20 +67,20 @@ export default function ImpactBoard({ partner, metrics, isStaff = false }: Impac
                 <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16 animate-in fade-in slide-in-from-top-4 duration-700">
                     <div>
                         <div className="flex items-center gap-3 mb-4">
-                            <span className="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium tracking-wider uppercase">
+                            <span className="px-3 py-1 rounded-full bg-[#F5A623]/10 border border-[#F5A623]/20 text-[#F5A623] text-xs font-medium tracking-wider uppercase">
                                 Impact Report
                             </span>
                             <span className="text-gray-500 text-sm flex items-center gap-2">
                                 <span className="relative flex h-2 w-2">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#5BC4A0] opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#3DAA8A]"></span>
                                 </span>
                                 Updated Live
                             </span>
                         </div>
                         <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
                             Proof that calm support <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-500">
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F5A623] to-[#F5A623]">
                                 changes families.
                             </span>
                         </h1>
@@ -98,7 +98,7 @@ export default function ImpactBoard({ partner, metrics, isStaff = false }: Impac
                                     Export to CSV
                                 </Button>
                                 <Link href={`/dashboard/partners/${partner.partner_slug}/codes`} className="w-full sm:w-auto">
-                                    <Button className="w-full bg-white text-gray-900 font-bold hover:bg-amber-400 transition-colors">
+                                    <Button className="w-full bg-white text-gray-900 font-bold hover:bg-[#F5A623] transition-colors">
                                         <Settings className="mr-2 h-4 w-4" />
                                         Manage Codes
                                     </Button>
@@ -122,8 +122,8 @@ export default function ImpactBoard({ partner, metrics, isStaff = false }: Impac
                     <Card className="bg-gray-800/40 border-gray-700/50 hover:bg-gray-800/60 transition-colors group">
                         <CardContent className="p-6">
                             <div className="flex items-center justify-between mb-4">
-                                <div className="h-10 w-10 rounded-lg bg-amber-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                    <Users className="h-5 w-5 text-amber-500" />
+                                <div className="h-10 w-10 rounded-lg bg-[#F5A623]/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <Users className="h-5 w-5 text-[#F5A623]" />
                                 </div>
                                 <span className="text-xs font-mono text-gray-500">Goal: 100/Q2</span>
                             </div>
@@ -139,8 +139,8 @@ export default function ImpactBoard({ partner, metrics, isStaff = false }: Impac
                     <Card className="bg-gray-800/40 border-gray-700/50 hover:bg-gray-800/60 transition-colors group">
                         <CardContent className="p-6">
                             <div className="flex items-center justify-between mb-4">
-                                <div className="h-10 w-10 rounded-lg bg-blue-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                    <Zap className="h-5 w-5 text-blue-400" />
+                                <div className="h-10 w-10 rounded-lg bg-[#2D6A8F]/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <Zap className="h-5 w-5 text-[#4BA8C8]" />
                                 </div>
                                 <span className="text-xs font-mono text-gray-500">Active</span>
                             </div>
@@ -156,8 +156,8 @@ export default function ImpactBoard({ partner, metrics, isStaff = false }: Impac
                     <Card className="bg-gray-800/40 border-gray-700/50 hover:bg-gray-800/60 transition-colors group">
                         <CardContent className="p-6">
                             <div className="flex items-center justify-between mb-4">
-                                <div className="h-10 w-10 rounded-lg bg-emerald-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                    <Calendar className="h-5 w-5 text-emerald-400" />
+                                <div className="h-10 w-10 rounded-lg bg-[#3DAA8A]/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <Calendar className="h-5 w-5 text-[#5BC4A0]" />
                                 </div>
                                 <span className="text-xs font-mono text-gray-500">Logistics</span>
                             </div>
@@ -173,8 +173,8 @@ export default function ImpactBoard({ partner, metrics, isStaff = false }: Impac
                     <Card className="bg-gray-800/40 border-gray-700/50 hover:bg-gray-800/60 transition-colors group">
                         <CardContent className="p-6">
                             <div className="flex items-center justify-between mb-4">
-                                <div className="h-10 w-10 rounded-lg bg-green-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                    <MessageSquare className="h-5 w-5 text-green-400" />
+                                <div className="h-10 w-10 rounded-lg bg-[#3DAA8A]/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <MessageSquare className="h-5 w-5 text-[#5BC4A0]" />
                                 </div>
                                 <span className="text-xs font-mono text-gray-500">Goal: 80%</span>
                             </div>
@@ -190,8 +190,8 @@ export default function ImpactBoard({ partner, metrics, isStaff = false }: Impac
                     <Card className="bg-gray-800/40 border-gray-700/50 hover:bg-gray-800/60 transition-colors group">
                         <CardContent className="p-6">
                             <div className="flex items-center justify-between mb-4">
-                                <div className="h-10 w-10 rounded-lg bg-indigo-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                    <TrendingUp className="h-5 w-5 text-indigo-400" />
+                                <div className="h-10 w-10 rounded-lg bg-[#2D6A8F]/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <TrendingUp className="h-5 w-5 text-[#4BA8C8]" />
                                 </div>
                                 <span className="text-xs font-mono text-gray-500">Target: 25%</span>
                             </div>
@@ -217,31 +217,31 @@ export default function ImpactBoard({ partner, metrics, isStaff = false }: Impac
                             </p>
                             <ul className="space-y-4">
                                 <li className="flex gap-3">
-                                    <div className="h-6 w-6 rounded-full bg-amber-500/10 flex items-center justify-center shrink-0 mt-0.5">
-                                        <span className="text-amber-500 text-xs font-bold">1</span>
+                                    <div className="h-6 w-6 rounded-full bg-[#F5A623]/10 flex items-center justify-center shrink-0 mt-0.5">
+                                        <span className="text-[#F5A623] text-xs font-bold">1</span>
                                     </div>
                                     <span className="text-gray-300"><strong className="text-white">Fathers Enrolled:</strong> Are fathers enrolling and staying engaged?</span>
                                 </li>
                                 <li className="flex gap-3">
-                                    <div className="h-6 w-6 rounded-full bg-blue-500/10 flex items-center justify-center shrink-0 mt-0.5">
-                                        <span className="text-blue-500 text-xs font-bold">2</span>
+                                    <div className="h-6 w-6 rounded-full bg-[#2D6A8F]/10 flex items-center justify-center shrink-0 mt-0.5">
+                                        <span className="text-[#2D6A8F] text-xs font-bold">2</span>
                                     </div>
                                     <span className="text-gray-300"><strong className="text-white">Grant Codes:</strong> Are we delivering support quickly and fairly?</span>
                                 </li>
                                 <li className="flex gap-3">
-                                    <div className="h-6 w-6 rounded-full bg-green-500/10 flex items-center justify-center shrink-0 mt-0.5">
-                                        <span className="text-green-500 text-xs font-bold">3</span>
+                                    <div className="h-6 w-6 rounded-full bg-[#3DAA8A]/10 flex items-center justify-center shrink-0 mt-0.5">
+                                        <span className="text-[#3DAA8A] text-xs font-bold">3</span>
                                     </div>
                                     <span className="text-gray-300"><strong className="text-white">Respectful Messages:</strong> Are families communicating in a healthier way day-to-day?</span>
                                 </li>
                                 <li className="flex gap-3">
-                                    <div className="h-6 w-6 rounded-full bg-indigo-500/10 flex items-center justify-center shrink-0 mt-0.5">
-                                        <span className="text-indigo-500 text-xs font-bold">4</span>
+                                    <div className="h-6 w-6 rounded-full bg-[#2D6A8F]/10 flex items-center justify-center shrink-0 mt-0.5">
+                                        <span className="text-[#2D6A8F] text-xs font-bold">4</span>
                                     </div>
                                     <span className="text-gray-300"><strong className="text-white">Conflict Reduction:</strong> Is conflict behavior decreasing over time — not just “today”?</span>
                                 </li>
                             </ul>
-                            <div className="mt-8 p-4 border-l-2 border-amber-500 bg-gray-800/30">
+                            <div className="mt-8 p-4 border-l-2 border-[#F5A623] bg-gray-800/30">
                                 <p className="text-lg font-medium text-white italic">"This is what stability looks like when you can measure it."</p>
                             </div>
                         </div>
@@ -260,7 +260,7 @@ export default function ImpactBoard({ partner, metrics, isStaff = false }: Impac
                                 </div>
                                 <div className="flex items-start gap-4">
                                     <div className="p-2 bg-gray-900 rounded-lg border border-gray-700">
-                                        <Zap className="h-5 w-5 text-amber-500" />
+                                        <Zap className="h-5 w-5 text-[#F5A623]" />
                                     </div>
                                     <div>
                                         <p className="text-white font-medium">2. Grant Codes Distributed</p>
@@ -269,7 +269,7 @@ export default function ImpactBoard({ partner, metrics, isStaff = false }: Impac
                                 </div>
                                 <div className="flex items-start gap-4">
                                     <div className="p-2 bg-gray-900 rounded-lg border border-gray-700">
-                                        <TrendingUp className="h-5 w-5 text-green-500" />
+                                        <TrendingUp className="h-5 w-5 text-[#3DAA8A]" />
                                     </div>
                                     <div>
                                         <p className="text-white font-medium">3. Patterns Improve</p>
@@ -299,8 +299,8 @@ export default function ImpactBoard({ partner, metrics, isStaff = false }: Impac
                         </div>
 
                         {/* Bridge Line */}
-                        <div className="flex items-center gap-4 py-4 px-6 bg-gradient-to-r from-amber-500/10 to-transparent rounded-xl border-l-4 border-amber-500">
-                            <p className="text-lg font-bold text-amber-100">
+                        <div className="flex items-center gap-4 py-4 px-6 bg-gradient-to-r from-[#F5A623]/10 to-transparent rounded-xl border-l-4 border-[#F5A623]">
+                            <p className="text-lg font-bold text-[#FEF7ED]">
                                 Support builds the father. Structure protects the family system.
                             </p>
                         </div>
@@ -331,7 +331,7 @@ export default function ImpactBoard({ partner, metrics, isStaff = false }: Impac
                             If you serve fathers, families, or community stability programs, this partnership model is built to scale. Funding turns into grant codes. Grant codes turn into real usage. Usage turns into measurable reductions in conflict patterns.
                         </p>
                         <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
-                            <Button className="bg-amber-500 hover:bg-amber-600 text-gray-900 font-bold h-12 px-8">
+                            <Button className="bg-[#F5A623] hover:bg-[#E09520] text-gray-900 font-bold h-12 px-8">
                                 Become a Partner
                             </Button>
                             <Button variant="secondary" className="bg-white text-gray-900 hover:bg-gray-100 h-12 px-8 font-bold">
@@ -341,7 +341,7 @@ export default function ImpactBoard({ partner, metrics, isStaff = false }: Impac
                                 Request Partnership Info
                             </Button>
                         </div>
-                        <p className="text-sm font-medium text-amber-500/80 uppercase tracking-widest">
+                        <p className="text-sm font-medium text-[#F5A623]/80 uppercase tracking-widest">
                             More dads supported. More calm in homes. Better outcomes for kids.
                         </p>
                     </div>

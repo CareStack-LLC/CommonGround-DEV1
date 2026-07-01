@@ -62,7 +62,7 @@ function CheckInPill({
                 disabled
                     ? 'bg-[var(--portal-primary)] opacity-40 cursor-not-allowed'
                     : pulse
-                        ? 'bg-gradient-to-r from-cg-amber to-orange-500 animate-pulse hover:shadow-md'
+                        ? 'bg-gradient-to-r from-cg-amber to-[#F5A623] animate-pulse hover:shadow-md'
                         : 'bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] hover:shadow-md hover:scale-105'
             } ${loading ? 'opacity-80 cursor-wait' : ''}`}
         >

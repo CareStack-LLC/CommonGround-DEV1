@@ -61,11 +61,11 @@ function statusBadgeClass(status: Chore['status']) {
     case 'pending':
       return 'bg-[#3DAA8A]/10 text-[#2F8569] border border-[#3DAA8A]/30';
     case 'completed':
-      return 'bg-amber-50 text-amber-700 border border-amber-200';
+      return 'bg-[#FEF7ED] text-[#E09520] border border-[#FEF7ED]';
     case 'approved':
-      return 'bg-emerald-50 text-emerald-700 border border-emerald-200';
+      return 'bg-[#E8F4F0] text-[#2D8A70] border border-[#E8F4F0]';
     case 'rejected':
-      return 'bg-orange-50 text-orange-700 border border-orange-200';
+      return 'bg-[#FEF7ED] text-[#E09520] border border-[#FEF7ED]';
     case 'cancelled':
       return 'bg-muted text-muted-foreground border border-border';
   }
@@ -216,10 +216,10 @@ export default function ParentChoresPage() {
           </div>
 
           {error && (
-            <div className="mb-6 bg-red-50 border-2 border-red-200 rounded-2xl p-4">
+            <div className="mb-6 bg-[#FEE2E2] border-2 border-[#FEE2E2] rounded-2xl p-4">
               <div className="flex items-center gap-3">
-                <XCircle className="h-5 w-5 text-red-600" />
-                <p className="text-red-700 font-medium">{error}</p>
+                <XCircle className="h-5 w-5 text-[#C53030]" />
+                <p className="text-[#9B2C2C] font-medium">{error}</p>
               </div>
             </div>
           )}
@@ -252,10 +252,10 @@ export default function ParentChoresPage() {
                   className="text-lg font-bold text-foreground mb-4 flex items-center gap-2"
                   style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
                 >
-                  <CheckCircle2 className="h-5 w-5 text-amber-600" />
+                  <CheckCircle2 className="h-5 w-5 text-[#E09520]" />
                   Needs your review
                   {reviewQueue.length > 0 && (
-                    <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200">
+                    <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-[#FEF7ED] text-[#E09520] border border-[#FEF7ED]">
                       {reviewQueue.length}
                     </span>
                   )}
@@ -272,7 +272,7 @@ export default function ParentChoresPage() {
                       return (
                         <li
                           key={chore.id}
-                          className="rounded-xl border-2 border-amber-200 bg-amber-50/50 p-4"
+                          className="rounded-xl border-2 border-[#FEF7ED] bg-[#FEF7ED]/50 p-4"
                         >
                           <div className="flex items-start justify-between gap-3 mb-2">
                             <div className="min-w-0">
@@ -309,7 +309,7 @@ export default function ParentChoresPage() {
                                       title: chore.title,
                                     })
                                   }
-                                  className="relative group rounded-lg overflow-hidden border-2 border-amber-200 flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/40"
+                                  className="relative group rounded-lg overflow-hidden border-2 border-[#FEF7ED] flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/40"
                                   aria-label="View full photo"
                                 >
                                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -344,7 +344,7 @@ export default function ParentChoresPage() {
                                 <button
                                   onClick={() => submitReject(chore)}
                                   disabled={busy}
-                                  className="flex-1 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold py-2 rounded-lg disabled:opacity-50"
+                                  className="flex-1 bg-[#F5A623] hover:bg-[#E09520] text-white text-sm font-semibold py-2 rounded-lg disabled:opacity-50"
                                 >
                                   {busy ? 'Sending...' : 'Send back'}
                                 </button>
@@ -364,7 +364,7 @@ export default function ParentChoresPage() {
                               <button
                                 onClick={() => handleApprove(chore)}
                                 disabled={busy}
-                                className="flex-1 flex items-center justify-center gap-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold py-2 rounded-lg disabled:opacity-50"
+                                className="flex-1 flex items-center justify-center gap-1.5 bg-[#3DAA8A] hover:bg-[#2D8A70] text-white text-sm font-semibold py-2 rounded-lg disabled:opacity-50"
                               >
                                 {busy ? (
                                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -379,7 +379,7 @@ export default function ParentChoresPage() {
                                   setRejectReason('');
                                 }}
                                 disabled={busy}
-                                className="flex-1 flex items-center justify-center gap-1.5 border-2 border-orange-300 bg-white hover:bg-orange-50 text-orange-700 text-sm font-semibold py-2 rounded-lg disabled:opacity-50"
+                                className="flex-1 flex items-center justify-center gap-1.5 border-2 border-[#F5A623] bg-white hover:bg-[#FEF7ED] text-[#E09520] text-sm font-semibold py-2 rounded-lg disabled:opacity-50"
                               >
                                 <X className="h-4 w-4" />
                                 Reject
@@ -611,7 +611,7 @@ function ChoreRow({
           placeholder="Reward (optional)"
           className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/40"
         />
-        {err && <p className="text-xs text-red-600">{err}</p>}
+        {err && <p className="text-xs text-[#C53030]">{err}</p>}
         <div className="flex gap-2">
           <button
             onClick={save}
@@ -652,7 +652,7 @@ function ChoreRow({
             <p className="text-sm text-foreground/80 mt-1">{chore.description}</p>
           )}
           {chore.status === 'rejected' && chore.rejection_reason && (
-            <p className="mt-1 text-xs text-orange-700 bg-orange-50 border border-orange-200 rounded-md px-2 py-1 inline-block">
+            <p className="mt-1 text-xs text-[#E09520] bg-[#FEF7ED] border border-[#FEF7ED] rounded-md px-2 py-1 inline-block">
               Sent back: {chore.rejection_reason}
             </p>
           )}
@@ -675,7 +675,7 @@ function ChoreRow({
             <button
               onClick={onCancel}
               disabled={busy}
-              className="p-1.5 rounded-md hover:bg-red-50 text-red-600"
+              className="p-1.5 rounded-md hover:bg-[#FEE2E2] text-[#C53030]"
               aria-label="Cancel chore"
             >
               {busy ? (
@@ -837,7 +837,7 @@ function CreateChoreModal({
           </div>
 
           {err && (
-            <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg px-3 py-2 text-sm">
+            <div className="bg-[#FEE2E2] border border-[#FEE2E2] text-[#9B2C2C] rounded-lg px-3 py-2 text-sm">
               {err}
             </div>
           )}

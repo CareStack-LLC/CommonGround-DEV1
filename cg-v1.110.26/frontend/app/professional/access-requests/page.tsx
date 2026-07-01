@@ -369,7 +369,7 @@ export default function AccessRequestsPage() {
               size="sm"
               disabled={isProcessing || selectedIds.size === 0}
               onClick={() => handleBulkAccept(Array.from(selectedIds))}
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-[#2D8A70] hover:bg-[#2D8A70]"
             >
               <Check className="h-4 w-4 mr-2" />
               {isProcessing
@@ -383,7 +383,7 @@ export default function AccessRequestsPage() {
           <Card className="border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/20 to-white shadow-sm relative">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A4A] via-[#3DAA8A] to-[#1E3A4A]"></div>
             <CardContent className="p-8 text-center">
-              <Check className="h-12 w-12 mx-auto text-emerald-900 mb-4" />
+              <Check className="h-12 w-12 mx-auto text-[#1B5544] mb-4" />
               <h3 className="serif text-lg font-bold mb-2 text-slate-900">All Caught Up</h3>
               <p className="sans text-slate-600">You have no pending invitations to review.</p>
             </CardContent>
@@ -395,7 +395,7 @@ export default function AccessRequestsPage() {
                 key={request.id}
                 className={`border-2 border-l-4 bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white shadow-lg relative ${
                   isExpiringSoon(request.expires_at)
-                    ? "border-l-amber-500 border-[#1E3A4A]/40"
+                    ? "border-l-[#F5A623] border-[#1E3A4A]/40"
                     : "border-l-blue-500 border-[#1E3A4A]/30"
                 }`}
               >
@@ -421,7 +421,7 @@ export default function AccessRequestsPage() {
                           {request.family_name || "Family Case"}
                         </h3>
                         {isExpiringSoon(request.expires_at) && (
-                          <Badge className="bg-amber-50 text-amber-900 border-2 border-amber-900/30 sans">
+                          <Badge className="bg-[#FEF7ED] text-[#6B460F] border-2 border-[#6B460F]/30 sans">
                             <AlertCircle className="h-3 w-3 mr-1" />
                             Expires soon
                           </Badge>
@@ -434,7 +434,7 @@ export default function AccessRequestsPage() {
                           className={`mb-4 rounded-md border p-3 text-sm ${
                             isBlocked(request.id)
                               ? "border-red-300 bg-red-50 text-red-900"
-                              : "border-amber-300 bg-amber-50 text-amber-900"
+                              : "border-[#F8CE8A] bg-[#FEF7ED] text-[#6B460F]"
                           }`}
                         >
                           <div className="flex items-center gap-2 font-semibold mb-1">
@@ -498,21 +498,21 @@ export default function AccessRequestsPage() {
                       <div className="flex items-center gap-4 text-sm">
                         <div className="flex items-center gap-1">
                           {request.parent_a_approved ? (
-                            <Check className="h-4 w-4 text-green-500" />
+                            <Check className="h-4 w-4 text-[#3DAA8A]" />
                           ) : (
                             <Clock className="h-4 w-4 text-gray-400" />
                           )}
-                          <span className={request.parent_a_approved ? "text-green-700" : "text-gray-500"}>
+                          <span className={request.parent_a_approved ? "text-[#2D8A70]" : "text-gray-500"}>
                             Parent A {request.parent_a_approved ? "approved" : "pending"}
                           </span>
                         </div>
                         <div className="flex items-center gap-1">
                           {request.parent_b_approved ? (
-                            <Check className="h-4 w-4 text-green-500" />
+                            <Check className="h-4 w-4 text-[#3DAA8A]" />
                           ) : (
                             <Clock className="h-4 w-4 text-gray-400" />
                           )}
-                          <span className={request.parent_b_approved ? "text-green-700" : "text-gray-500"}>
+                          <span className={request.parent_b_approved ? "text-[#2D8A70]" : "text-gray-500"}>
                             Parent B {request.parent_b_approved ? "approved" : "pending"}
                           </span>
                         </div>
@@ -525,7 +525,7 @@ export default function AccessRequestsPage() {
                         onClick={() => handleAccept(request.id)}
                         disabled={isProcessing || isBlocked(request.id)}
                         title={isBlocked(request.id) ? "Blocked by a conflict of interest" : undefined}
-                        className="bg-green-600 hover:bg-green-700"
+                        className="bg-[#2D8A70] hover:bg-[#2D8A70]"
                       >
                         <Check className="h-4 w-4 mr-2" />
                         Accept
@@ -575,7 +575,7 @@ export default function AccessRequestsPage() {
                     <Badge
                       className={
                         request.status === "approved"
-                          ? "bg-green-100 text-green-800"
+                          ? "bg-[#E8F4F0] text-[#236E59]"
                           : request.status === "declined"
                           ? "bg-red-100 text-red-800"
                           : "bg-gray-100 text-gray-800"

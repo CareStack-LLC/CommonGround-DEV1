@@ -1,0 +1,408 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<title>CommonGround Brand Book</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+@page { size: Letter; margin: 0; }
+* { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+html,body { margin:0; padding:0; font-family:'DM Sans',system-ui,sans-serif; color:#1E3A4A; }
+.page { width:8.5in; height:11in; padding:0.75in 0.85in; page-break-after:always;
+  position:relative; overflow:hidden; background:#F4F8F7; }
+.page:last-child { page-break-after:auto; }
+.serif { font-family:'DM Serif Display',Georgia,serif; font-weight:400; }
+.eyebrow { font-size:11px; font-weight:600; letter-spacing:.18em; text-transform:uppercase;
+  color:#3DAA8A; margin:0 0 6px; }
+h2.title { font-family:'DM Serif Display',Georgia,serif; font-size:34px; margin:0 0 26px;
+  font-weight:400; line-height:1.1; }
+h4 { font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:#6B8A9A;
+  margin:22px 0 12px; }
+.footer { position:absolute; bottom:0.5in; left:0.85in; right:0.85in; display:flex;
+  justify-content:space-between; font-size:10px; color:#8FA6B2;
+  border-top:1px solid #D6ECE8; padding-top:8px; }
+
+/* Cover */
+.cover { display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; height:11in; padding:0; background:#F4F8F7; }
+.cover .logobox { width:150px; height:150px; border-radius:34px; background:#fff;
+  box-shadow:0 2px 10px rgba(0,0,0,.06); display:flex; align-items:center; justify-content:center;
+  margin-bottom:38px; }
+.cover .logobox svg { width:118px; height:118px; }
+.cover h1 { font-family:'DM Serif Display',Georgia,serif; font-weight:400; font-size:52px;
+  margin:0 0 18px; line-height:1.05; }
+.cover p { max-width:5in; font-size:16px; line-height:1.6; color:#4A4A47; margin:0 0 30px; }
+.pills { display:flex; gap:10px; }
+.pill { font-size:12px; font-weight:600; padding:6px 15px; border-radius:99px; }
+
+/* Logo page */
+.markbig { display:flex; align-items:center; justify-content:center; height:2.4in;
+  background:#fff; border:1px solid #D6ECE8; border-radius:20px; margin-bottom:22px; }
+.markbig svg { width:170px; height:170px; }
+.cols { display:flex; gap:18px; }
+.card { flex:1; background:#fff; border:1px solid #D6ECE8; border-radius:16px; padding:20px; }
+.card b.h { display:block; font-size:14px; margin-bottom:10px; }
+.card ul { margin:0; padding-left:16px; }
+.card li { font-size:12.5px; line-height:1.7; color:#4A4A47; }
+.dot { display:inline-block; width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:middle; }
+
+/* Color */
+.swatchgrid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+.swatch { border:1px solid #D6ECE8; border-radius:14px; overflow:hidden; background:#fff; }
+.chip { height:74px; display:flex; align-items:flex-end; padding:8px; }
+.meta { padding:8px 10px; }
+.meta b { font-size:13px; } .meta .tokv { display:block; font-size:10px; color:#6B8A9A; }
+.meta .note { display:block; font-size:11px; color:#4A4A47; margin-top:2px; }
+.mono { font-family:'DM Mono',ui-monospace,monospace; font-size:11px; }
+.lower { display:flex; gap:22px; margin-top:22px; }
+.lower > div { flex:1; }
+.minis { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.mini { border:1px solid #D6ECE8; border-radius:12px; padding:8px; background:#fff; }
+.minichip { height:34px; border-radius:8px; } .mini b { font-size:11.5px; display:block; margin-top:6px; }
+.mini .mono { font-size:10px; color:#6B8A9A; }
+.statuschips { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+.statuschip { display:flex; justify-content:space-between; align-items:center; padding:11px 14px;
+  border-radius:12px; font-size:13px; font-weight:600; }
+
+/* Type */
+.typecard { background:#fff; border:1px solid #D6ECE8; border-radius:16px; padding:24px; margin-bottom:18px; }
+.typecard .disp { font-family:'DM Serif Display',Georgia,serif; font-size:40px; line-height:1.1; margin:6px 0 18px; }
+.typecard .body { font-size:17px; line-height:1.6; color:#4A4A47; }
+.typecard .money { font-family:'DM Mono',monospace; font-size:15px; color:#2D6A8F; margin-top:14px; }
+.scalerow { display:flex; align-items:baseline; gap:16px; padding:5px 0; border-bottom:1px solid #EEF6F4; }
+.scalerow .tok { width:40px; color:#6B8A9A; } .scalerow .px { width:44px; color:#6B8A9A; }
+.scalerow .spec { line-height:1.15; }
+
+/* Icons */
+.igroup { margin-bottom:6px; }
+.igrid { display:grid; grid-template-columns:repeat(6,1fr); gap:9px; }
+.icell { border:1px solid #D6ECE8; border-radius:14px; background:#fff; padding:12px 6px;
+  display:flex; flex-direction:column; align-items:center; gap:7px; }
+.icell svg { width:32px; height:32px; }
+.icell span { font-size:9.5px; color:#4A4A47; text-align:center; line-height:1.1; }
+
+/* Imagery */
+.principles li { font-size:13px; line-height:1.7; color:#4A4A47; margin-bottom:6px; }
+.suffix { background:#fff; border:1px solid #D6ECE8; border-radius:16px; padding:18px; }
+.suffix .q { font-style:italic; font-size:12.5px; line-height:1.6; color:#4A4A47;
+  background:#F4F8F7; border-radius:10px; padding:14px; }
+.dodont { display:flex; gap:16px; margin-top:16px; }
+.dodont > div { flex:1; background:#fff; border:1px solid #D6ECE8; border-radius:14px; padding:14px; }
+.dodont h5 { margin:0 0 8px; font-size:12px; } .do h5 { color:#3DAA8A; } .dont h5 { color:#C53030; }
+.dodont li { font-size:11.5px; line-height:1.6; color:#4A4A47; }
+</style></head><body>
+
+<!-- COVER -->
+<section class="page cover">
+  <div class="logobox"><svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="120" fill="#F4F8F7"/>
+  <!-- Left parent (teal) -->
+  <circle cx="168" cy="148" r="48" fill="#3DAA8A"/>
+  <path d="M118 218 Q168 258 218 218" stroke="#3DAA8A" stroke-width="16" stroke-linecap="round" fill="none"/>
+  <!-- Right parent (blue) -->
+  <circle cx="344" cy="148" r="48" fill="#2D6A8F"/>
+  <path d="M294 218 Q344 258 394 218" stroke="#2D6A8F" stroke-width="16" stroke-linecap="round" fill="none"/>
+  <!-- Golden arch -->
+  <path d="M218 168 Q256 104 294 168" stroke="#F5A623" stroke-width="10" stroke-linecap="round" fill="none" opacity="0.95"/>
+  <!-- Child (gold) -->
+  <circle cx="256" cy="330" r="38" fill="#F5A623"/>
+  <path d="M218 382 Q256 414 294 382" stroke="#F5A623" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg></div>
+  <h1>CommonGround<br>Brand Book</h1>
+  <p>Quietly modern. Emotionally safe. Court-credible. Every color, image, and
+  icon exists to lower the temperature for families in conflict.</p>
+  <div class="pills">
+    <span class="pill" style="background:#E8F4F0;color:#2D8A70">Version 1.0</span>
+    <span class="pill" style="background:#E0EFF8;color:#2D6A8F">June 2026</span>
+    <span class="pill" style="background:#FEF7ED;color:#B8791A">Light-locked</span>
+  </div>
+</section>
+
+<!-- LOGO -->
+<section class="page">
+  <p class="eyebrow">Identity</p><h2 class="title">The logo is a family</h2>
+  <div class="markbig"><svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="120" fill="#F4F8F7"/>
+  <!-- Left parent (teal) -->
+  <circle cx="168" cy="148" r="48" fill="#3DAA8A"/>
+  <path d="M118 218 Q168 258 218 218" stroke="#3DAA8A" stroke-width="16" stroke-linecap="round" fill="none"/>
+  <!-- Right parent (blue) -->
+  <circle cx="344" cy="148" r="48" fill="#2D6A8F"/>
+  <path d="M294 218 Q344 258 394 218" stroke="#2D6A8F" stroke-width="16" stroke-linecap="round" fill="none"/>
+  <!-- Golden arch -->
+  <path d="M218 168 Q256 104 294 168" stroke="#F5A623" stroke-width="10" stroke-linecap="round" fill="none" opacity="0.95"/>
+  <!-- Child (gold) -->
+  <circle cx="256" cy="330" r="38" fill="#F5A623"/>
+  <path d="M218 382 Q256 414 294 382" stroke="#F5A623" stroke-width="12" stroke-linecap="round" fill="none"/>
+</svg></div>
+  <div class="cols">
+    <div class="card"><b class="h">Anatomy</b>
+      <p style="font-size:12.5px;line-height:1.7;color:#4A4A47;margin:0">
+      <span class="dot" style="background:#3DAA8A"></span>Parent A (teal) &amp;
+      <span class="dot" style="background:#2D6A8F"></span>Parent B (ocean blue),
+      each a head with a soft smile. Held together by a
+      <span class="dot" style="background:#F5A623"></span>gold arch above their
+      <span class="dot" style="background:#F5A623"></span>child. The two-tone <i>is</i>
+      the meaning — two people, held together by what they're raising.</p></div>
+    <div class="card"><b class="h">Clear space &amp; size</b>
+      <ul><li>Keep ¼-mark clear space on all sides</li>
+      <li>Min 24px glyph · 32px full icon</li>
+      <li>Rounded-square on Soft White #F4F8F7</li>
+      <li>Scale uniformly only</li></ul></div>
+    <div class="card"><b class="h" style="color:#C53030">Don't</b>
+      <ul><li>Recolor the parents to one hue</li>
+      <li>Make the arch/child anything but gold</li>
+      <li>Add gradients, bevels, glassmorphism</li>
+      <li>Rotate, skew, or stretch</li></ul></div>
+  </div>
+  <div class="footer"><span>CommonGround Brand Book</span><span>01 · Logo</span></div>
+</section>
+
+<!-- COLOR -->
+<section class="page">
+  <p class="eyebrow">Color</p><h2 class="title">Semantic, never decorative</h2>
+  <div class="swatchgrid"><div class="swatch"><div class="chip" style="background:#3DAA8A;color:#fff">
+        <span class="mono">#3DAA8A</span></div><div class="meta"><b>Calm Teal</b>
+        <span class="mono tokv">--primary</span><span class="note">Trust · primary · Parent A</span></div></div><div class="swatch"><div class="chip" style="background:#2D6A8F;color:#fff">
+        <span class="mono">#2D6A8F</span></div><div class="meta"><b>Ocean Blue</b>
+        <span class="mono tokv">--secondary</span><span class="note">Stability · Parent B · pro</span></div></div><div class="swatch"><div class="chip" style="background:#F5A623;color:#1E3A4A">
+        <span class="mono">#F5A623</span></div><div class="meta"><b>Child Gold</b>
+        <span class="mono tokv">--cg-amber</span><span class="note">The child · warmth · arch</span></div></div><div class="swatch"><div class="chip" style="background:#1E3A4A;color:#fff">
+        <span class="mono">#1E3A4A</span></div><div class="meta"><b>Deep Navy</b>
+        <span class="mono tokv">--foreground</span><span class="note">Headings · authority</span></div></div><div class="swatch"><div class="chip" style="background:#F4F8F7;color:#1E3A4A">
+        <span class="mono">#F4F8F7</span></div><div class="meta"><b>Soft White</b>
+        <span class="mono tokv">--background</span><span class="note">App background</span></div></div><div class="swatch"><div class="chip" style="background:#FFFFFF;color:#1E3A4A">
+        <span class="mono">#FFFFFF</span></div><div class="meta"><b>Pure White</b>
+        <span class="mono tokv">--card</span><span class="note">Cards · surfaces</span></div></div></div>
+  <div class="lower">
+    <div><h4>Supporting &amp; tints</h4><div class="minis"><div class="mini"><div class="minichip" style="background:#5BC4A0"></div>
+        <b>Soft Teal</b><span class="mono">#5BC4A0</span></div><div class="mini"><div class="minichip" style="background:#4BA8C8"></div>
+        <b>Sky Blue</b><span class="mono">#4BA8C8</span></div><div class="mini"><div class="minichip" style="background:#E8F4F0"></div>
+        <b>Teal wash</b><span class="mono">#E8F4F0</span></div><div class="mini"><div class="minichip" style="background:#E0EFF8"></div>
+        <b>Blue wash</b><span class="mono">#E0EFF8</span></div><div class="mini"><div class="minichip" style="background:#FEF7ED"></div>
+        <b>Gold wash</b><span class="mono">#FEF7ED</span></div><div class="mini"><div class="minichip" style="background:#D6ECE8"></div>
+        <b>Border</b><span class="mono">#D6ECE8</span></div></div></div>
+    <div><h4>Status — earned, never emotional</h4><div class="statuschips"><div class="statuschip" style="background:#3DAA8A;color:#fff">
+        <span>Success</span><span class="mono">#3DAA8A</span></div><div class="statuschip" style="background:#F5A623;color:#1E3A4A">
+        <span>Warning</span><span class="mono">#F5A623</span></div><div class="statuschip" style="background:#C53030;color:#fff">
+        <span>Error</span><span class="mono">#C53030</span></div><div class="statuschip" style="background:#0284C7;color:#fff">
+        <span>Info</span><span class="mono">#0284C7</span></div></div>
+      <p style="font-size:11px;color:#4A4A47;margin-top:10px">Red means <i>missed / failed /
+      overdue</i> — a fact, never a judgment.</p></div>
+  </div>
+  <div class="footer"><span>CommonGround Brand Book</span><span>02 · Color</span></div>
+</section>
+
+<!-- TYPE -->
+<section class="page">
+  <p class="eyebrow">Typography</p><h2 class="title">Readable under stress</h2>
+  <div class="typecard">
+    <p class="eyebrow" style="color:#6B8A9A">DM Serif Display · headings</p>
+    <div class="disp">A calmer way to co-parent</div>
+    <p class="eyebrow" style="color:#6B8A9A">DM Sans · body — 17px base, 1.6 line-height</p>
+    <p class="body">We use larger sizes and generous spacing because our readers are often
+    tired and anxious. Short sentences. Plain language. Warmth over cleverness.</p>
+    <p class="money">DM Mono · $1,240.00 · custody 57% / 43%</p>
+  </div>
+  <h4>Type scale</h4><div class="scalerow"><span class="mono tok">4xl</span>
+        <span class="mono px">40px</span>
+        <span class="spec" style="font-size:40px">Hero</span></div><div class="scalerow"><span class="mono tok">3xl</span>
+        <span class="mono px">32px</span>
+        <span class="spec" style="font-size:32px">Page heading</span></div><div class="scalerow"><span class="mono tok">2xl</span>
+        <span class="mono px">26px</span>
+        <span class="spec" style="font-size:26px">Section</span></div><div class="scalerow"><span class="mono tok">xl</span>
+        <span class="mono px">22px</span>
+        <span class="spec" style="font-size:22px">Subhead</span></div><div class="scalerow"><span class="mono tok">lg</span>
+        <span class="mono px">19px</span>
+        <span class="spec" style="font-size:19px">Lead</span></div><div class="scalerow"><span class="mono tok">base</span>
+        <span class="mono px">17px</span>
+        <span class="spec" style="font-size:17px">Body</span></div><div class="scalerow"><span class="mono tok">sm</span>
+        <span class="mono px">15px</span>
+        <span class="spec" style="font-size:15px">Secondary</span></div><div class="scalerow"><span class="mono tok">xs</span>
+        <span class="mono px">13px</span>
+        <span class="spec" style="font-size:13px">Caption</span></div>
+  <div class="footer"><span>CommonGround Brand Book</span><span>03 · Typography</span></div>
+</section>
+
+<!-- ICONS -->
+<section class="page">
+  <p class="eyebrow">Iconography</p><h2 class="title">A set drawn from the mark</h2>
+  <p style="font-size:12.5px;line-height:1.6;color:#4A4A47;margin:-14px 0 4px;max-width:5.6in">
+  Duotone, brand-colored icons in the logo's rounded-line + gold-arch language — for features,
+  portals, and hero moments. Keep Lucide for generic UI.</p>
+  <div class="igroup"><h4>Brand</h4><div class="igrid"><div class="icell"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="10.5" cy="9.5" r="3" fill="#3DAA8A"/>
+  <path d="M7.5 13.8 Q10.5 16.3 13.5 13.8" stroke="#3DAA8A" stroke-width="1.6"/>
+  <circle cx="21.5" cy="9.5" r="3" fill="#2D6A8F"/>
+  <path d="M18.5 13.8 Q21.5 16.3 24.5 13.8" stroke="#2D6A8F" stroke-width="1.6"/>
+  <path d="M13.6 10.6 Q16 6.6 18.4 10.6" stroke="#F5A623" stroke-width="1.4"/>
+  <circle cx="16" cy="20.6" r="2.5" fill="#F5A623"/>
+  <path d="M13.4 24.2 Q16 26.2 18.6 24.2" stroke="#F5A623" stroke-width="1.4"/>
+</svg><span>Mark</span></div><div class="icell"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="10" cy="11" r="4" stroke="#3DAA8A"/>
+  <path d="M4 26 a6 6 0 0 1 12 0" stroke="#3DAA8A"/>
+  <circle cx="22" cy="11" r="4" stroke="#2D6A8F"/>
+  <path d="M16 26 a6 6 0 0 1 12 0" stroke="#2D6A8F"/>
+  <path d="M12 7 Q16 2.2 20 7" stroke="#F5A623" stroke-width="1.8"/>
+</svg><span>Parents</span></div><div class="icell"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="16" cy="10" r="4.5" stroke="#F5A623" stroke-width="2"/>
+  <path d="M13.6 10.2 Q16 12.4 18.4 10.2" stroke="#F5A623" stroke-width="1.5"/>
+  <path d="M8 26 a8 8 0 0 1 16 0" stroke="#F5A623" stroke-width="2"/>
+</svg><span>Child</span></div><div class="icell"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="16" cy="16" r="10.5" stroke="#3DAA8A" stroke-width="1.2" opacity="0.45"/>
+  <circle cx="16" cy="16" r="2.4" fill="#F5A623"/>
+  <circle cx="16" cy="5.8" r="2" fill="#3DAA8A"/>
+  <circle cx="24.8" cy="11" r="2" fill="#2D6A8F"/>
+  <circle cx="24.8" cy="21" r="2" fill="#3DAA8A"/>
+  <circle cx="16" cy="26.2" r="2" fill="#2D6A8F"/>
+  <circle cx="7.2" cy="21" r="2" fill="#3DAA8A"/>
+  <circle cx="7.2" cy="11" r="2" fill="#2D6A8F"/>
+</svg><span>My Circle</span></div><div class="icell"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M16 26 c-6-4-10-7.6-10-12.4 a5 5 0 0 1 10 -1.6 a5 5 0 0 1 10 1.6 c0 4.8 -4 8.4 -10 12.4 z" stroke="#3DAA8A"/>
+  <path d="M16 22 c-3.4-2.4-5.6-4.4-5.6-7.2 a2.8 2.8 0 0 1 5.6 -0.9 a2.8 2.8 0 0 1 5.6 0.9 c0 2.8 -2.2 4.8 -5.6 7.2 z" fill="#F5A623"/>
+</svg><span>Care</span></div><div class="icell"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M16 12.5 c-1.6-1.6-4.6-1.6-4.6 1 c0 2.4 4.6 5.6 4.6 5.6 s4.6-3.2 4.6-5.6 c0-2.6-3-2.6-4.6-1 z" fill="#F5A623"/>
+  <path d="M5.5 20 q3 4 8.2 3.2" stroke="#3DAA8A" stroke-width="1.9"/>
+  <path d="M26.5 20 q-3 4 -8.2 3.2" stroke="#2D6A8F" stroke-width="1.9"/>
+  <circle cx="6" cy="20" r="1.5" fill="#3DAA8A"/>
+  <circle cx="26" cy="20" r="1.5" fill="#2D6A8F"/>
+</svg><span>Collaboration</span></div></div></div><div class="igroup"><h4>Features</h4><div class="igrid"><div class="icell"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M16 3.5 L26 7.5 V15 C26 21.6 21.4 25.7 16 28 C10.6 25.7 6 21.6 6 15 V7.5 Z" stroke="#3DAA8A"/>
+  <path d="M9.5 16 H12.5 L14 12.5 L17 19.5 L18.5 16 H22.5" stroke="#F5A623" stroke-width="1.9"/>
+</svg><span>ARIA</span></div><div class="icell"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="4" y="8" width="24" height="20" rx="3" stroke="#3DAA8A"/>
+  <path d="M4 14 H28" stroke="#3DAA8A"/>
+  <circle cx="10" cy="21" r="1.4" fill="#3DAA8A"/>
+  <circle cx="16" cy="21" r="1.4" fill="#3DAA8A"/>
+  <circle cx="22" cy="21" r="1.4" fill="#3DAA8A"/>
+  <path d="M9 8 Q16 1.6 23 8" stroke="#F5A623" stroke-width="1.9"/>
+</svg><span>TimeBridge</span></div><div class="icell"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="16" cy="16" r="11" stroke="#3DAA8A"/>
+  <path d="M19.2 12 c-1-1.4-6-1.4-6 1 s5 1.4 5 3.8 c0 2.4-5 2.4-6 1" stroke="#F5A623" stroke-width="1.9"/>
+  <path d="M16 8.5 V23.5" stroke="#F5A623" stroke-width="1.9"/>
+</svg><span>ClearFund</span></div><div class="icell"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M4 7 h15 a3 3 0 0 1 3 3 v5 a3 3 0 0 1 -3 3 h-7 l-5 4 v-4 h-3 a3 3 0 0 1 -3 -3 v-5 a3 3 0 0 1 3 -3 z" stroke="#3DAA8A"/>
+  <path d="M11 10.6 L15.6 13 L11 15.4 Z" fill="#F5A623"/>
+</svg><span>KidComs</span></div><div class="icell"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="4" y="6" width="24" height="17" rx="3" stroke="#3DAA8A"/>
+  <path d="M12 27 H20 M16 23 V27" stroke="#3DAA8A"/>
+  <path d="M13.5 11 L19 14.5 L13.5 18 Z" fill="#F5A623"/>
+</svg><span>KidSpace</span></div><div class="icell"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M16 3.5 L26 7.5 V15 C26 21.6 21.4 25.7 16 28 C10.6 25.7 6 21.6 6 15 V7.5 Z" stroke="#3DAA8A"/>
+  <path d="M16 21.5 c-3-2-5-3.8-5-6.3 a2.6 2.6 0 0 1 5-1 a2.6 2.6 0 0 1 5 1 c0 2.5-2 4.3-5 6.3 z" fill="#F5A623"/>
+</svg><span>SafeSpace</span></div><div class="icell"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M4 22 H28" stroke="#3DAA8A"/>
+  <path d="M9 22 a7 7 0 0 1 14 0" stroke="#F5A623" stroke-width="1.9"/>
+  <path d="M16 5.5 V8.5 M7.8 8.8 L9.9 10.9 M24.2 8.8 L22.1 10.9 M3.5 16.5 H6 M26 16.5 H28.5" stroke="#F5A623" stroke-width="1.7"/>
+</svg><span>FreshStart</span></div><div class="icell"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M8 4 h9 l7 7 v16 a1.5 1.5 0 0 1 -1.5 1.5 h-14 a1.5 1.5 0 0 1 -1.5 -1.5 v-21.5 a1.5 1.5 0 0 1 1.5 -1.5 z" stroke="#3DAA8A"/>
+  <path d="M17 4 v7 h7" stroke="#3DAA8A"/>
+  <path d="M11 20.5 l3 3 l6 -7" stroke="#F5A623" stroke-width="2"/>
+</svg><span>Agreement</span></div><div class="icell"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M4 26 v-6 l4 -3 l4 3 v6 z" stroke="#3DAA8A"/>
+  <path d="M20 26 v-6 l4 -3 l4 3 v6 z" stroke="#3DAA8A"/>
+  <path d="M10 15 Q16 6.5 22 15" stroke="#F5A623" stroke-width="1.9"/>
+  <circle cx="16" cy="10" r="1.9" fill="#F5A623"/>
+</svg><span>Exchange</span></div><div class="icell"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M4 9 a2 2 0 0 1 2 -2 h6 l2.5 3 h11.5 a2 2 0 0 1 2 2 v11 a2 2 0 0 1 -2 2 h-20 a2 2 0 0 1 -2 -2 z" stroke="#3DAA8A"/>
+  <circle cx="12" cy="17.5" r="1.8" fill="#3DAA8A"/>
+  <circle cx="20" cy="17.5" r="1.8" fill="#2D6A8F"/>
+  <circle cx="16" cy="21" r="1.6" fill="#F5A623"/>
+</svg><span>Family Files</span></div><div class="icell"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="4" y="7" width="24" height="21" rx="3" stroke="#3DAA8A"/>
+  <path d="M4 13 H28 M10 4 V9 M22 4 V9" stroke="#3DAA8A"/>
+  <circle cx="16" cy="20" r="4.5" fill="#F4F8F7" stroke="#F5A623" stroke-width="1.8"/>
+  <path d="M16 17.6 V20 L18 21.6" stroke="#F5A623" stroke-width="1.6"/>
+</svg><span>Schedule</span></div><div class="icell"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M5 15 L16 5 L27 15" stroke="#3DAA8A"/>
+  <path d="M8 12.5 V26 H24 V12.5" stroke="#3DAA8A"/>
+  <path d="M16 23 c-2.5-1.6-4-3-4-5 a2 2 0 0 1 4 -0.8 a2 2 0 0 1 4 0.8 c0 2 -1.5 3.4 -4 5 z" fill="#F5A623"/>
+</svg><span>Custody</span></div><div class="icell"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="4" y="8" width="24" height="17" rx="3" stroke="#3DAA8A"/>
+  <path d="M20 14.5 h8 v5 h-8 a2.5 2.5 0 0 1 0 -5 z" stroke="#3DAA8A"/>
+  <circle cx="22.6" cy="17" r="1.3" fill="#F5A623"/>
+</svg><span>Child Wallet</span></div></div></div><div class="igroup"><h4>Portals</h4><div class="igrid"><div class="icell"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="4" y="10" width="24" height="16" rx="2.5" stroke="#3DAA8A"/>
+  <path d="M12 10 v-2 a2 2 0 0 1 2 -2 h4 a2 2 0 0 1 2 2 v2" stroke="#3DAA8A"/>
+  <path d="M11 18 l3 3 l6 -6" stroke="#F5A623" stroke-width="2"/>
+</svg><span>Professional</span></div><div class="icell"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M16 6.5 V26 M9 26 H23 M8 9.5 H24" stroke="#3DAA8A"/>
+  <circle cx="16" cy="6" r="1.6" fill="#F5A623"/>
+  <path d="M8 9.5 L5 15.5 a3 3 0 0 0 6 0 Z" stroke="#3DAA8A"/>
+  <path d="M24 9.5 L21 15.5 a3 3 0 0 0 6 0 Z" stroke="#3DAA8A"/>
+</svg><span>Court</span></div><div class="icell"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="16" cy="13" r="8" stroke="#3DAA8A"/>
+  <path d="M12 13 l3 3 l6 -6" stroke="#F5A623" stroke-width="2"/>
+  <path d="M11 20 L9 29 L16 25 L23 29 L21 20" stroke="#3DAA8A"/>
+</svg><span>Compliance</span></div><div class="icell"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M8 4 h9 l7 7 v16 a1.5 1.5 0 0 1 -1.5 1.5 h-14 a1.5 1.5 0 0 1 -1.5 -1.5 v-21.5 a1.5 1.5 0 0 1 1.5 -1.5 z" stroke="#3DAA8A"/>
+  <path d="M17 4 v7 h7" stroke="#3DAA8A"/>
+  <path d="M16 25 V15.5 M12.5 19 L16 15.5 L19.5 19" stroke="#F5A623" stroke-width="1.9"/>
+</svg><span>Court Export</span></div></div></div><div class="igroup"><h4>UI</h4><div class="igrid"><div class="icell"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M4 7 h24 a2 2 0 0 1 2 2 v11 a2 2 0 0 1 -2 2 h-14 l-6 5 v-5 h-4 a2 2 0 0 1 -2 -2 v-11 a2 2 0 0 1 2 -2 z" stroke="#3DAA8A"/>
+  <path d="M9 12.5 H23 M9 16.5 H19" stroke="#F5A623" stroke-width="1.7"/>
+</svg><span>Messages</span></div><div class="icell"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="4" y="9" width="16" height="14" rx="3" stroke="#3DAA8A"/>
+  <path d="M20 14 L28 10 V22 L20 18 Z" stroke="#3DAA8A"/>
+  <circle cx="9.5" cy="13" r="1.2" fill="#F5A623"/>
+</svg><span>Video Call</span></div><div class="icell"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M16 28 C10 21 7 16.5 7 12 a9 9 0 0 1 18 0 C25 16.5 22 21 16 28 Z" stroke="#3DAA8A"/>
+  <path d="M12 12 l2.5 2.5 l5 -5" stroke="#F5A623" stroke-width="2"/>
+</svg><span>GPS Check-in</span></div><div class="icell"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M16 6 a6.5 6.5 0 0 1 6.5 6.5 c0 5.5 2 7.5 2 7.5 H7.5 s2 -2 2 -7.5 A6.5 6.5 0 0 1 16 6 z" stroke="#3DAA8A"/>
+  <path d="M13 24 a3 3 0 0 0 6 0" stroke="#3DAA8A"/>
+  <circle cx="23" cy="9" r="2.4" fill="#F5A623"/>
+</svg><span>Notifications</span></div><div class="icell"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="16" cy="16" r="5" stroke="#3DAA8A"/>
+  <circle cx="16" cy="16" r="1.8" fill="#F5A623"/>
+  <path d="M16 4 V8 M16 24 V28 M4 16 H8 M24 16 H28 M7.5 7.5 L10.3 10.3 M21.7 21.7 L24.5 24.5 M24.5 7.5 L21.7 10.3 M10.3 21.7 L7.5 24.5" stroke="#3DAA8A" stroke-width="1.8"/>
+</svg><span>Settings</span></div><div class="icell"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="6" y="14" width="20" height="14" rx="3" stroke="#3DAA8A"/>
+  <path d="M10 14 v-3 a6 6 0 0 1 12 0 v3" stroke="#3DAA8A"/>
+  <circle cx="16" cy="20" r="1.8" fill="#F5A623"/>
+  <path d="M16 21.6 V24" stroke="#F5A623" stroke-width="1.8"/>
+</svg><span>Security</span></div><div class="icell"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M3 16 C7 9.5 25 9.5 29 16 C25 22.5 7 22.5 3 16 Z" stroke="#3DAA8A"/>
+  <circle cx="16" cy="16" r="3.3" fill="#F5A623"/>
+  <circle cx="16" cy="16" r="1.1" fill="#F4F8F7"/>
+</svg><span>Privacy</span></div></div></div>
+  <div class="footer"><span>CommonGround Brand Book</span><span>04 · Iconography</span></div>
+</section>
+
+<!-- IMAGERY -->
+<section class="page">
+  <p class="eyebrow">Imagery &amp; voice</p><h2 class="title">Real, diverse families — okay</h2>
+  <div class="cols">
+    <div style="flex:1">
+      <ul class="principles" style="margin:0;padding-left:16px">
+        <li><b>Real &amp; multicultural.</b> Diverse ages, ethnicities, family shapes — never tokenized.</li>
+        <li><b>Warm natural light.</b> Soft daylight, golden hour, teal-green shadows.</li>
+        <li><b>Candid, not stock-posed.</b> A laugh, a piggyback, a relieved exhale.</li>
+        <li><b>Show the calm after.</b> No conflict, courtrooms, or tears.</li>
+        <li><b>Light-locked &amp; clean.</b> No dark/glass, no baked-in text or logos.</li>
+      </ul>
+      <h4>Voice</h4>
+      <ul class="principles" style="margin:0;padding-left:16px">
+        <li>Child-first · Neutral (Parent A/B) · Empathetic</li>
+        <li>Plain language (~8th grade) · Gender-neutral</li>
+      </ul>
+    </div>
+    <div class="suffix" style="flex:1">
+      <p class="eyebrow" style="color:#6B8A9A">Higgsfield style suffix</p>
+      <p class="q">Natural candid lifestyle photography, warm soft natural daylight, gentle
+      film-like color grading with calm teal-green and warm golden tones, shallow depth of field,
+      authentic and emotionally warm, hopeful reassuring mood, real diverse multicultural people,
+      clean and airy, no text, no watermark, no logos, photorealistic.</p>
+    </div>
+  </div>
+  <div class="dodont">
+    <div class="do"><h5>Do</h5><ul style="margin:0;padding-left:15px">
+      <li>Diverse real families, candid warmth</li><li>Soft daylight, teal/gold grade</li>
+      <li>Show the calm "after"</li></ul></div>
+    <div class="dont"><h5>Don't</h5><ul style="margin:0;padding-left:15px">
+      <li>Generic all-one-demographic stock</li><li>Cold blue, harsh flash</li>
+      <li>Fake a product UI with AI</li></ul></div>
+  </div>
+  <div class="footer"><span>CommonGround Brand Book · find-commonground.com</span><span>05 · Imagery</span></div>
+</section>
+
+</body></html>

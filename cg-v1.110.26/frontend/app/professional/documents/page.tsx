@@ -30,9 +30,9 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const DOC_TYPES = [
     { value: "all", label: "All Documents", icon: <FolderOpen className="h-4 w-4" /> },
     { value: "court_order", label: "Court Orders", icon: <Scale className="h-4 w-4 text-blue-500" /> },
-    { value: "parenting_plan", label: "Parenting Plans", icon: <FileCheck className="h-4 w-4 text-emerald-500" /> },
-    { value: "agreement", label: "Agreements", icon: <FileText className="h-4 w-4 text-indigo-500" /> },
-    { value: "evidence", label: "Evidence", icon: <FileText className="h-4 w-4 text-amber-500" /> },
+    { value: "parenting_plan", label: "Parenting Plans", icon: <FileCheck className="h-4 w-4 text-[#3DAA8A]" /> },
+    { value: "agreement", label: "Agreements", icon: <FileText className="h-4 w-4 text-[#3D8DB0]" /> },
+    { value: "evidence", label: "Evidence", icon: <FileText className="h-4 w-4 text-[#F5A623]" /> },
     { value: "financial", label: "Financial", icon: <FileText className="h-4 w-4 text-teal-500" /> },
     { value: "other", label: "Other", icon: <FileText className="h-4 w-4 text-slate-400" /> },
 ];
@@ -294,7 +294,7 @@ export default function ProfessionalDocumentsPage() {
                                         {doc.family_file_id ? (
                                             <Link
                                                 href={`/professional/cases/${doc.family_file_id}`}
-                                                className="text-indigo-600 hover:underline text-xs"
+                                                className="text-[#2D6A8F] hover:underline text-xs"
                                             >
                                                 {doc.family_file_number || doc.family_file_id.slice(0, 8)}
                                             </Link>
@@ -365,7 +365,7 @@ export default function ProfessionalDocumentsPage() {
                 <DialogContent className="sm:max-w-md">
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
-                            <Upload className="h-5 w-5 text-indigo-500" />
+                            <Upload className="h-5 w-5 text-[#3D8DB0]" />
                             Upload Document
                         </DialogTitle>
                         <DialogDescription>
@@ -400,15 +400,15 @@ export default function ProfessionalDocumentsPage() {
                         <div className="space-y-1.5">
                             <Label>File *</Label>
                             <div
-                                className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors ${uploadFile ? "border-indigo-300 bg-indigo-50" : "border-slate-200 hover:border-slate-300"
+                                className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors ${uploadFile ? "border-[#9BCADF] bg-[#F0F7FC]" : "border-slate-200 hover:border-slate-300"
                                     }`}
                                 onClick={() => fileRef.current?.click()}
                             >
                                 {uploadFile ? (
-                                    <div className="flex items-center justify-center gap-2 text-indigo-700">
+                                    <div className="flex items-center justify-center gap-2 text-[#1E4E6B]">
                                         <FileText className="h-5 w-5" />
                                         <span className="font-medium">{uploadFile.name}</span>
-                                        <span className="text-sm text-indigo-500">({formatBytes(uploadFile.size)})</span>
+                                        <span className="text-sm text-[#3D8DB0]">({formatBytes(uploadFile.size)})</span>
                                     </div>
                                 ) : (
                                     <div className="text-slate-400">
@@ -434,7 +434,7 @@ export default function ProfessionalDocumentsPage() {
                         <Button
                             onClick={handleUpload}
                             disabled={!uploadFile || uploading}
-                            className="bg-indigo-600 hover:bg-indigo-700 text-white gap-2"
+                            className="bg-[#2D6A8F] hover:bg-[#1E4E6B] text-white gap-2"
                         >
                             {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
                             {uploading ? "Uploading..." : "Upload"}

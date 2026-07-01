@@ -53,7 +53,7 @@ function FloatingShapes() {
     <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
       {/* Animated gradient orbs */}
       <motion.div
-        className="absolute w-96 h-96 rounded-full bg-gradient-to-br from-yellow-300/30 to-orange-300/20 blur-3xl"
+        className="absolute w-96 h-96 rounded-full bg-gradient-to-br from-[#F5A623]/30 to-[#F5A623]/20 blur-3xl"
         animate={{
           x: [0, 100, 0],
           y: [0, -50, 0],
@@ -63,7 +63,7 @@ function FloatingShapes() {
         style={{ top: '-10%', right: '-10%' }}
       />
       <motion.div
-        className="absolute w-80 h-80 rounded-full bg-gradient-to-br from-purple-400/20 to-pink-300/20 blur-3xl"
+        className="absolute w-80 h-80 rounded-full bg-gradient-to-br from-[#4BA8C8]/20 to-[#F5A623]/20 blur-3xl"
         animate={{
           x: [0, -80, 0],
           y: [0, 80, 0],
@@ -94,7 +94,7 @@ function FloatingShapes() {
             delay: Math.random() * 5,
           }}
         >
-          <Star className={`w-${3 + Math.floor(Math.random() * 3)} h-${3 + Math.floor(Math.random() * 3)} text-yellow-400/40`} fill="currentColor" />
+          <Star className={`w-${3 + Math.floor(Math.random() * 3)} h-${3 + Math.floor(Math.random() * 3)} text-[#F5A623]/40`} fill="currentColor" />
         </motion.div>
       ))}
     </div>
@@ -119,7 +119,7 @@ function EmojiAvatar({ emoji, size = 'lg', online = false }: { emoji: string; si
       <span role="img" aria-label="avatar">{emoji}</span>
       {online && (
         <motion.div
-          className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-400 rounded-full border-3 border-white"
+          className="absolute -bottom-1 -right-1 w-5 h-5 bg-[#5BC4A0] rounded-full border-3 border-white"
           animate={{ scale: [1, 1.2, 1] }}
           transition={{ duration: 2, repeat: Infinity }}
         />
@@ -190,7 +190,7 @@ function FeatureButton({
       {/* Badge */}
       {badge && (
         <motion.div
-          className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg"
+          className="absolute -top-2 -right-2 bg-[#C53030] text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg"
           animate={{ scale: [1, 1.1, 1] }}
           transition={{ duration: 2, repeat: Infinity }}
         >
@@ -249,12 +249,12 @@ function ContactCard({
 
   // Pick card color based on index
   const colors = [
-    { bg: 'bg-gradient-to-br from-teal-400 to-cyan-500', shadow: '#0d9488' },
-    { bg: 'bg-gradient-to-br from-emerald-400 to-green-500', shadow: '#059669' },
-    { bg: 'bg-gradient-to-br from-blue-400 to-indigo-500', shadow: '#4f46e5' },
-    { bg: 'bg-gradient-to-br from-pink-400 to-rose-500', shadow: '#e11d48' },
-    { bg: 'bg-gradient-to-br from-amber-400 to-orange-500', shadow: '#ea580c' },
-    { bg: 'bg-gradient-to-br from-purple-400 to-violet-500', shadow: '#7c3aed' },
+    { bg: 'bg-gradient-to-br from-teal-400 to-[#2D6A8F]', shadow: '#2D8A70' },
+    { bg: 'bg-gradient-to-br from-[#5BC4A0] to-[#3DAA8A]', shadow: '#2D8A70' },
+    { bg: 'bg-gradient-to-br from-[#4BA8C8] to-[#2D6A8F]', shadow: '#2D6A8F' },
+    { bg: 'bg-gradient-to-br from-[#F5A623] to-[#F5A623]', shadow: '#C53030' },
+    { bg: 'bg-gradient-to-br from-[#F5A623] to-[#F5A623]', shadow: '#E09520' },
+    { bg: 'bg-gradient-to-br from-[#4BA8C8] to-[#2D6A8F]', shadow: '#2D6A8F' },
   ];
   const colorIndex = contact.contact_name.charCodeAt(0) % colors.length;
   const { bg, shadow } = colors[colorIndex];
@@ -282,7 +282,7 @@ function ContactCard({
       {/* Online indicator */}
       {contact.can_communicate && (
         <motion.div
-          className="absolute top-3 right-3 w-4 h-4 bg-green-400 rounded-full border-2 border-white"
+          className="absolute top-3 right-3 w-4 h-4 bg-[#5BC4A0] rounded-full border-2 border-white"
           animate={{ scale: [1, 1.3, 1], opacity: [1, 0.8, 1] }}
           transition={{ duration: 2, repeat: Infinity }}
         />
@@ -304,7 +304,7 @@ function ContactCard({
       {/* Pending badge */}
       {!contact.can_communicate && (
         <div className="absolute inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center rounded-2xl">
-          <span className="bg-amber-400 text-amber-900 text-xs font-bold px-3 py-1 rounded-full">
+          <span className="bg-[#F5A623] text-[#1E3A4A] text-xs font-bold px-3 py-1 rounded-full">
             Pending
           </span>
         </div>
@@ -316,7 +316,7 @@ function ContactCard({
 // Loading fallback for Suspense
 function KidsHubLoading() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-teal-400 via-cyan-400 to-emerald-400 flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-b from-teal-400 via-[#4BA8C8] to-[#5BC4A0] flex items-center justify-center">
       <motion.div
         animate={{ rotate: 360 }}
         transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
@@ -412,7 +412,7 @@ function KidsHubPageContent() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-teal-400 via-cyan-400 to-emerald-400 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-teal-400 via-[#4BA8C8] to-[#5BC4A0] flex items-center justify-center">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
@@ -425,7 +425,7 @@ function KidsHubPageContent() {
 
   if (!familyFileId) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-teal-400 via-cyan-400 to-emerald-400 flex flex-col items-center justify-center p-6">
+      <div className="min-h-screen bg-gradient-to-b from-teal-400 via-[#4BA8C8] to-[#5BC4A0] flex flex-col items-center justify-center p-6">
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
@@ -453,7 +453,7 @@ function KidsHubPageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-teal-400 via-cyan-400 to-emerald-400 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-b from-teal-400 via-[#4BA8C8] to-[#5BC4A0] relative overflow-hidden">
       <FloatingShapes />
 
       {/* Header */}
@@ -521,8 +521,8 @@ function KidsHubPageContent() {
                   subtitle="Video & Voice"
                   icon={Phone}
                   emoji="📞"
-                  color="bg-gradient-to-br from-pink-400 to-rose-500"
-                  shadowColor="#be123c"
+                  color="bg-gradient-to-br from-[#F5A623] to-[#F5A623]"
+                  shadowColor="#9B2C2C"
                   onClick={() => handleFeatureClick('call')}
                   delay={0.1}
                 />
@@ -531,8 +531,8 @@ function KidsHubPageContent() {
                   subtitle="Read with ARIA"
                   icon={BookOpen}
                   emoji="📚"
-                  color="bg-gradient-to-br from-purple-400 to-violet-500"
-                  shadowColor="#6d28d9"
+                  color="bg-gradient-to-br from-[#4BA8C8] to-[#2D6A8F]"
+                  shadowColor="#1E4E6B"
                   onClick={() => handleFeatureClick('stories')}
                   badge="NEW"
                   delay={0.2}
@@ -542,8 +542,8 @@ function KidsHubPageContent() {
                   subtitle="Watch Together"
                   icon={Film}
                   emoji="🎬"
-                  color="bg-gradient-to-br from-amber-400 to-orange-500"
-                  shadowColor="#c2410c"
+                  color="bg-gradient-to-br from-[#F5A623] to-[#F5A623]"
+                  shadowColor="#E09520"
                   onClick={() => handleFeatureClick('theater')}
                   delay={0.3}
                 />
@@ -552,8 +552,8 @@ function KidsHubPageContent() {
                   subtitle="Play Games"
                   icon={Gamepad2}
                   emoji="🕹️"
-                  color="bg-gradient-to-br from-emerald-400 to-green-500"
-                  shadowColor="#15803d"
+                  color="bg-gradient-to-br from-[#5BC4A0] to-[#3DAA8A]"
+                  shadowColor="#2D8A70"
                   onClick={() => handleFeatureClick('arcade')}
                   delay={0.4}
                 />
@@ -631,11 +631,11 @@ function KidsHubPageContent() {
                         {featuredMovie.poster_url ? (
                           <img src={featuredMovie.poster_url} alt={featuredMovie.title} className="w-full h-full object-cover" />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-4xl bg-gradient-to-br from-amber-400 to-orange-500">🎬</div>
+                          <div className="w-full h-full flex items-center justify-center text-4xl bg-gradient-to-br from-[#F5A623] to-[#F5A623]">🎬</div>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-yellow-300 uppercase tracking-wider bg-yellow-500/20 px-2 py-0.5 rounded-full">⭐ Featured Movie</span>
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#F5A623] uppercase tracking-wider bg-[#F5A623]/20 px-2 py-0.5 rounded-full">⭐ Featured Movie</span>
                         <h3 className="text-white font-bold text-lg truncate mt-1">{featuredMovie.title}</h3>
                         <p className="text-white/70 text-sm">{featuredMovie.genre_name || 'Movie'} • {featuredMovie.duration_minutes || '?'}min</p>
                       </div>
@@ -649,17 +649,17 @@ function KidsHubPageContent() {
                       whileHover={{ scale: 1.02, y: -2 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => handleFeatureClick('stories')}
-                      className="w-full bg-white/20 backdrop-blur-sm rounded-3xl p-4 flex items-center gap-4 text-left border-l-4 border-purple-400 shadow-lg transition-transform"
+                      className="w-full bg-white/20 backdrop-blur-sm rounded-3xl p-4 flex items-center gap-4 text-left border-l-4 border-[#4BA8C8] shadow-lg transition-transform"
                     >
-                      <div className="w-14 h-14 rounded-full overflow-hidden bg-white/30 flex-shrink-0 shadow-md ring-2 ring-purple-300/50">
+                      <div className="w-14 h-14 rounded-full overflow-hidden bg-white/30 flex-shrink-0 shadow-md ring-2 ring-[#4BA8C8]/50">
                         {featuredAuthor.photo_url ? (
                           <img src={featuredAuthor.photo_url} alt={featuredAuthor.name} className="w-full h-full object-cover" />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center text-2xl bg-gradient-to-br from-purple-400 to-violet-500">✍️</div>
+                          <div className="w-full h-full flex items-center justify-center text-2xl bg-gradient-to-br from-[#4BA8C8] to-[#2D6A8F]">✍️</div>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-purple-200 uppercase tracking-wider bg-purple-500/20 px-2 py-0.5 rounded-full">✨ Author Spotlight</span>
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#E0EFF8] uppercase tracking-wider bg-[#2D6A8F]/20 px-2 py-0.5 rounded-full">✨ Author Spotlight</span>
                         <h3 className="text-white font-bold truncate mt-1">{featuredAuthor.name}</h3>
                         {featuredAuthor.showcase_book_title && (
                           <p className="text-white/70 text-sm truncate">📖 {featuredAuthor.showcase_book_title}</p>

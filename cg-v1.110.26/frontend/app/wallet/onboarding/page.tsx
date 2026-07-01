@@ -19,8 +19,8 @@ function OnboardingInner() {
   return (
     <div className="min-h-screen bg-background text-foreground flex items-center justify-center p-4">
       <div className="max-w-md text-center space-y-6">
-        <div className="inline-flex w-14 h-14 rounded-2xl bg-emerald-100 items-center justify-center mx-auto">
-          <Sparkles className="h-7 w-7 text-emerald-700" />
+        <div className="inline-flex w-14 h-14 rounded-2xl bg-[#E8F4F0] items-center justify-center mx-auto">
+          <Sparkles className="h-7 w-7 text-[#2D8A70]" />
         </div>
         <div className="space-y-2">
           <h1 className="text-2xl font-bold">Good news — no onboarding needed</h1>
@@ -34,7 +34,7 @@ function OnboardingInner() {
           </p>
         </div>
         <div className="rounded-xl border border-border bg-muted/30 p-4 text-left text-sm text-muted-foreground flex items-start gap-3">
-          <CreditCard className="h-5 w-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+          <CreditCard className="h-5 w-5 text-[#2D8A70] flex-shrink-0 mt-0.5" />
           <div>
             <p className="font-medium text-foreground">How funding works now</p>
             <p className="mt-1">

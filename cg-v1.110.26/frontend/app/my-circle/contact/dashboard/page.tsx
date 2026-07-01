@@ -820,7 +820,7 @@ export default function CircleContactDashboardPage() {
                           status.allowed
                             ? 'bg-[#3DAA8A]/10 text-[#3DAA8A] dark:bg-[#3DAA8A]/20 dark:text-[#5BC4A0]'
                             : 'bg-muted text-muted-foreground'
-                        )} style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                        )} style={{ fontFamily: "var(--font-mono)" }}>
                           {status.allowed ? 'Online' : 'Offline'}
                         </span>
                       </div>
@@ -853,7 +853,7 @@ export default function CircleContactDashboardPage() {
                             <Film className="h-3.5 w-3.5 text-[#1E3A4A] dark:text-[#4BA8C8]" />
                           </div>
                         )}
-                        <span className="text-[10px] text-muted-foreground self-center ml-1" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                        <span className="text-[10px] text-muted-foreground self-center ml-1" style={{ fontFamily: "var(--font-mono)" }}>
                           {permCount} {permCount === 1 ? 'mode' : 'modes'}
                         </span>
                       </div>
@@ -864,7 +864,7 @@ export default function CircleContactDashboardPage() {
                           {child.permissions.allowed_start_time && (
                             <div className="flex items-center gap-1.5 text-xs text-muted-foreground" style={{ fontFamily: "'Inter', sans-serif" }}>
                               <Clock className="h-3 w-3" />
-                              <span style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                              <span style={{ fontFamily: "var(--font-mono)" }}>
                                 {formatTime(child.permissions.allowed_start_time)} – {formatTime(child.permissions.allowed_end_time)}
                               </span>
                             </div>
@@ -1007,7 +1007,7 @@ export default function CircleContactDashboardPage() {
                   )}
                 </div>
                 <div className="absolute -bottom-2 left-1/2 -translate-x-1/2">
-                  <span className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full bg-[#3DAA8A]/10 text-[#3DAA8A] dark:bg-[#3DAA8A]/20 dark:text-[#5BC4A0] border border-[#3DAA8A]/20 shadow-sm" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                  <span className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full bg-[#3DAA8A]/10 text-[#3DAA8A] dark:bg-[#3DAA8A]/20 dark:text-[#5BC4A0] border border-[#3DAA8A]/20 shadow-sm" style={{ fontFamily: "var(--font-mono)" }}>
                     Ready to Connect
                   </span>
                 </div>

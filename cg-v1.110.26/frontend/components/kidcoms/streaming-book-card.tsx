@@ -99,7 +99,7 @@ export function StreamingBookCard({
           {/* Star Rating — top left */}
           <div className="absolute top-2 left-2 z-20 bg-black/50 backdrop-blur-sm rounded-full px-2 py-0.5 flex items-center gap-1">
             <span className="text-yellow-400 text-xs">★</span>
-            <span className="text-white text-xs font-bold" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+            <span className="text-white text-xs font-bold" style={{ fontFamily: 'var(--font-mono)' }}>
               {rating.toFixed(1)}
             </span>
           </div>
@@ -133,7 +133,7 @@ export function StreamingBookCard({
               <BookOpen className="w-7 h-7 text-white" strokeWidth={2.5} />
             </div>
             {book.pages && (
-              <div className="text-white/90 text-xs font-medium" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+              <div className="text-white/90 text-xs font-medium" style={{ fontFamily: 'var(--font-mono)' }}>
                 {book.pages} pages
               </div>
             )}

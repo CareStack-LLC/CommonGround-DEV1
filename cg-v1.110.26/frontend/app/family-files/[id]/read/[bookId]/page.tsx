@@ -120,10 +120,10 @@ function ReaderContent() {
           className={cn(
             'w-full text-center py-2 text-sm font-medium border-b',
             togetherStatus === 'connected'
-              ? 'bg-gradient-to-r from-amber-400 to-orange-400 text-white border-transparent'
+              ? 'bg-gradient-to-r from-[#F5A623] to-[#F5A623] text-white border-transparent'
               : togetherStatus === 'error'
-                ? 'bg-red-50 text-red-700 border-red-200'
-                : 'bg-amber-50 text-amber-700 border-amber-200',
+                ? 'bg-[#FEE2E2] text-[#9B2C2C] border-[#FEE2E2]'
+                : 'bg-[#FEF7ED] text-[#E09520] border-[#FEF7ED]',
           )}
         >
           <span className="inline-flex items-center gap-2">
@@ -182,7 +182,7 @@ function ReaderContent() {
         <div className="rounded-2xl shadow-xl bg-card border-2 border-border p-4 min-h-[600px]">
           {error ? (
             <div className="flex items-center justify-center h-[600px]">
-              <p className="text-red-500 font-semibold">{error}</p>
+              <p className="text-[#C53030] font-semibold">{error}</p>
             </div>
           ) : !book?.pdf_url ? (
             <div className="flex items-center justify-center h-[600px]">

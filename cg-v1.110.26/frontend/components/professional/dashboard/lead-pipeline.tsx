@@ -59,9 +59,9 @@ const STATUS_CONFIG: Record<
     },
     intake: {
         label: "Intake",
-        color: "bg-blue-50 text-blue-700 border-blue-200",
-        dotColor: "bg-blue-400",
-        barColor: "bg-blue-400",
+        color: "bg-[#E0EFF8] text-[#1E4E6B] border-[#E0EFF8]",
+        dotColor: "bg-[#4BA8C8]",
+        barColor: "bg-[#4BA8C8]",
         icon: <UserCheck className="h-3.5 w-3.5" />,
     },
     active: {
@@ -73,9 +73,9 @@ const STATUS_CONFIG: Record<
     },
     court_prep: {
         label: "Court Prep",
-        color: "bg-purple-50 text-purple-700 border-purple-200",
-        dotColor: "bg-purple-400",
-        barColor: "bg-purple-500",
+        color: "bg-[#F0F7FC] text-[#1E4E6B] border-[#C2DEF0]",
+        dotColor: "bg-[#4BA8C8]",
+        barColor: "bg-[#3D8DB0]",
         icon: <Gavel className="h-3.5 w-3.5" />,
     },
     closed: {
@@ -98,9 +98,9 @@ function getDaysOpen(createdAt?: string): number {
 }
 
 function getComplianceColor(score: number) {
-    if (score >= 80) return "text-emerald-700 bg-emerald-50 border-emerald-200";
-    if (score >= 60) return "text-amber-700 bg-amber-50 border-amber-200";
-    return "text-red-700 bg-red-50 border-red-200";
+    if (score >= 80) return "text-[#2D8A70] bg-[#E8F4F0] border-[#C5E5DB]";
+    if (score >= 60) return "text-[#B8791A] bg-[#FEF7ED] border-[#FBE3BF]";
+    return "text-[#9B2C2C] bg-[#FEE2E2] border-[#FEE2E2]";
 }
 
 function getCaseName(c: CaseData): string {
@@ -189,7 +189,7 @@ export function LeadPipeline({ cases }: LeadPipelineProps) {
                                                 {config.label}
                                             </Badge>
                                             {(c.unread_messages ?? 0) > 0 && (
-                                                <span className="flex items-center gap-1 text-[10px] font-bold text-purple-700 bg-purple-50 border border-purple-200 px-1.5 py-0.5 rounded-full">
+                                                <span className="flex items-center gap-1 text-[10px] font-bold text-[#1E4E6B] bg-[#F0F7FC] border border-[#C2DEF0] px-1.5 py-0.5 rounded-full">
                                                     <MessageSquare className="h-2.5 w-2.5" />
                                                     {c.unread_messages}
                                                 </span>
@@ -231,7 +231,7 @@ export function LeadPipeline({ cases }: LeadPipelineProps) {
                                         </span>
                                     )}
                                     {nextEventLabel && (
-                                        <span className="flex items-center gap-1 text-[10px] font-semibold text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded-full">
+                                        <span className="flex items-center gap-1 text-[10px] font-semibold text-[#2D6A8F] bg-[#F0F7FC] px-1.5 py-0.5 rounded-full">
                                             <Calendar className="h-2.5 w-2.5" />
                                             {nextEventLabel}
                                         </span>

@@ -110,9 +110,9 @@ export default function IntegrationsPage() {
 
   const categoryColors: Record<string, string> = {
     "Practice Management": "bg-blue-100 text-blue-700 border-blue-200",
-    Billing: "bg-emerald-100 text-emerald-700 border-emerald-200",
-    Communication: "bg-purple-100 text-purple-700 border-purple-200",
-    "Document Management": "bg-amber-100 text-amber-700 border-amber-200",
+    Billing: "bg-[#E8F4F0] text-[#2D8A70] border-[#C5E5DB]",
+    Communication: "bg-[#E0EFF8] text-[#1E4E6B] border-[#C2DEF0]",
+    "Document Management": "bg-[#FEF7ED] text-[#B8791A] border-[#FBE3BF]",
   };
 
   return (
@@ -226,7 +226,7 @@ export default function IntegrationsPage() {
                   disabled={notifyRequests.has(integration.id)}
                   className={
                     notifyRequests.has(integration.id)
-                      ? "border-emerald-200 text-emerald-700"
+                      ? "border-[#C5E5DB] text-[#2D8A70]"
                       : "bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white ml-auto"
                   }
                 >

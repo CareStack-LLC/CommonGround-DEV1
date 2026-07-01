@@ -108,7 +108,7 @@ export function CaseTimelineTab({ familyFileId, token }: { familyFileId: string,
                             variant={selectedTypes.includes(type.value) ? "default" : "outline"}
                             size="sm"
                             onClick={() => toggleEventType(type.value)}
-                            className={selectedTypes.includes(type.value) ? "bg-indigo-600 hover:bg-indigo-700" : "h-8"}
+                            className={selectedTypes.includes(type.value) ? "bg-[#2D6A8F] hover:bg-[#1E4E6B]" : "h-8"}
                         >
                             <type.icon className="h-3.5 w-3.5 mr-1.5" />
                             {type.label}
@@ -167,11 +167,11 @@ function TimelineItem({ event }: { event: TimelineEvent }) {
 
     const getEventColor = (type: string) => {
         const colorMap: Record<string, string> = {
-            message: "bg-purple-50 text-purple-600 border-purple-100",
-            exchange: "bg-amber-50 text-amber-600 border-amber-100",
+            message: "bg-[#F0F7FC] text-[#2D6A8F] border-[#E0EFF8]",
+            exchange: "bg-[#FEF7ED] text-[#E09520] border-[#FEF7ED]",
             agreement: "bg-slate-50 text-slate-600 border-slate-100",
-            court: "bg-blue-50 text-blue-600 border-blue-100",
-            aria: "bg-emerald-50 text-emerald-600 border-emerald-100",
+            court: "bg-[#E0EFF8] text-[#2D6A8F] border-[#E0EFF8]",
+            aria: "bg-[#E8F4F0] text-[#2D8A70] border-[#E8F4F0]",
         };
         return colorMap[type] || "bg-slate-50 text-slate-600 border-slate-100";
     };
@@ -179,7 +179,7 @@ function TimelineItem({ event }: { event: TimelineEvent }) {
     return (
         <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
             {/* Dot */}
-            <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-slate-200 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 transition-colors group-hover:bg-indigo-500 group-hover:text-white group-hover:scale-110 duration-300">
+            <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-slate-200 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 transition-colors group-hover:bg-[#3D8DB0] group-hover:text-white group-hover:scale-110 duration-300">
                 <div className="group-hover:hidden">
                     {getEventIcon(event.event_type)}
                 </div>
@@ -189,9 +189,9 @@ function TimelineItem({ event }: { event: TimelineEvent }) {
             </div>
 
             {/* Content */}
-            <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl border border-slate-100 bg-white shadow-sm transition-all group-hover:shadow-md group-hover:border-indigo-100 duration-300">
+            <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl border border-slate-100 bg-white shadow-sm transition-all group-hover:shadow-md group-hover:border-[#E0EFF8] duration-300">
                 <div className="flex items-center justify-between mb-1">
-                    <time className="text-xs font-bold text-indigo-500">
+                    <time className="text-xs font-bold text-[#3D8DB0]">
                         {new Date(event.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </time>
                     <Badge variant="outline" className={`text-[10px] capitalize ${getEventColor(event.event_type)}`}>

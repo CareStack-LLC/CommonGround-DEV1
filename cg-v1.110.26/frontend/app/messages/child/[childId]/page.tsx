@@ -83,7 +83,7 @@ function Bubble({
               className={`mt-2 pt-2 border-t flex items-center gap-1.5 text-xs ${
                 mine
                   ? 'border-white/20 text-white/80'
-                  : 'border-amber-200 text-amber-700'
+                  : 'border-[#FEF7ED] text-[#E09520]'
               }`}
             >
               {message.aria_hidden ? (
@@ -219,7 +219,7 @@ function ThreadDetailContent() {
               <div className="w-10 h-10 border-3 border-[var(--portal-primary)]/20 border-t-[var(--portal-primary)] rounded-full animate-spin" />
             </div>
           ) : error ? (
-            <div className="p-4 rounded-xl bg-red-50 border-2 border-red-200 text-sm text-red-700">
+            <div className="p-4 rounded-xl bg-[#FEE2E2] border-2 border-[#FEE2E2] text-sm text-[#9B2C2C]">
               {error}
             </div>
           ) : messages.length === 0 ? (

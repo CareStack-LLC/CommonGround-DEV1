@@ -171,7 +171,7 @@ function DashboardInner() {
       </header>
 
       {error && (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 text-amber-900 px-4 py-3 text-sm flex items-start gap-2">
+        <div className="rounded-xl border border-[#FEF7ED] bg-[#FEF7ED] text-[#1E3A4A] px-4 py-3 text-sm flex items-start gap-2">
           <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
           <span>{error}</span>
         </div>

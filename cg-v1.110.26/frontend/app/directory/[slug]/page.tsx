@@ -173,7 +173,7 @@ export default function ProfessionalProfilePage() {
                             <div className="flex items-center gap-3 mb-2">
                                 <h1 className="text-3xl md:text-5xl font-bold tracking-tight" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{firm.name}</h1>
                                 {firm.safety_vetted && (
-                                    <Badge className="bg-emerald-500 text-white border-0">
+                                    <Badge className="bg-[#3DAA8A] text-white border-0">
                                         <ShieldCheck className="w-3 h-3 mr-1" /> Vetted
                                     </Badge>
                                 )}
@@ -319,7 +319,7 @@ export default function ProfessionalProfilePage() {
                                                         </AvatarFallback>
                                                     </Avatar>
                                                     {pro.license_verified && (
-                                                        <Badge variant="outline" className="bg-white text-emerald-600 border-emerald-200 text-[10px] gap-1 px-2">
+                                                        <Badge variant="outline" className="bg-white text-[#2D8A70] border-[#E8F4F0] text-[10px] gap-1 px-2">
                                                             <CheckCircle2 className="w-3 h-3" /> Licensed
                                                         </Badge>
                                                     )}
@@ -359,7 +359,7 @@ export default function ProfessionalProfilePage() {
                                                         )}
                                                         {pro.awards && pro.awards.length > 0 && (
                                                             <div className="flex items-center gap-1.5">
-                                                                <Award className="w-4 h-4 text-amber-500" />
+                                                                <Award className="w-4 h-4 text-[#F5A623]" />
                                                                 {pro.awards.length} Awards
                                                             </div>
                                                         )}

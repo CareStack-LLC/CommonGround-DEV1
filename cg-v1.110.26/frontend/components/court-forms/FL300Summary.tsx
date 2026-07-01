@@ -603,10 +603,10 @@ export default function FL300Summary({ formData, canEdit, onEditSection }: FL300
   return (
     <div className="space-y-6">
       {/* Progress Card */}
-      <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-white">
+      <Card className="border-[#E0EFF8] bg-gradient-to-br from-[#E0EFF8] to-white">
         <CardHeader>
           <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-blue-600" />
+            <Sparkles className="h-5 w-5 text-[#2D6A8F]" />
             <CardTitle className="text-lg">FL-300 Summary</CardTitle>
           </div>
           <CardDescription>Request for Order - California Family Court</CardDescription>
@@ -622,7 +622,7 @@ export default function FL300Summary({ formData, canEdit, onEditSection }: FL300
             </div>
             <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
               <div
-                className="h-full bg-blue-600 rounded-full transition-all duration-500"
+                className="h-full bg-[#2D6A8F] rounded-full transition-all duration-500"
                 style={{ width: `${completionPercentage}%` }}
               />
             </div>
@@ -676,7 +676,7 @@ export default function FL300Summary({ formData, canEdit, onEditSection }: FL300
                     !isApplicable
                       ? 'bg-gray-50/30 border-gray-100 opacity-60'
                       : isComplete
-                      ? 'bg-green-50/50 border-green-200'
+                      ? 'bg-[#E8F4F0]/50 border-[#E8F4F0]'
                       : 'bg-gray-50/50 border-gray-200'
                   }`}
                 >
@@ -688,7 +688,7 @@ export default function FL300Summary({ formData, canEdit, onEditSection }: FL300
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         {isComplete ? (
-                          <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0" />
+                          <CheckCircle className="h-4 w-4 text-[#2D8A70] flex-shrink-0" />
                         ) : (
                           <div className="h-4 w-4 rounded-full border-2 border-gray-300 flex-shrink-0" />
                         )}
@@ -720,7 +720,7 @@ export default function FL300Summary({ formData, canEdit, onEditSection }: FL300
                         Item {section.formItems.join(', ')}
                       </Badge>
                       {isComplete && isApplicable && (
-                        <Badge variant="default" className="bg-green-100 text-green-700">
+                        <Badge variant="default" className="bg-[#E8F4F0] text-[#2D8A70]">
                           Complete
                         </Badge>
                       )}
@@ -737,7 +737,7 @@ export default function FL300Summary({ formData, canEdit, onEditSection }: FL300
                             e.stopPropagation();
                             toggleSection(section.id);
                           }}
-                          className="text-blue-600 hover:text-blue-700"
+                          className="text-[#2D6A8F] hover:text-[#1E4E6B]"
                         >
                           <Eye className="h-3.5 w-3.5 mr-1" />
                           {isExpanded ? 'Hide' : 'View'}

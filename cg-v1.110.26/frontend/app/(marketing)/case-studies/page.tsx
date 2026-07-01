@@ -31,10 +31,10 @@ export default function CaseStudiesIndexPage() {
       <HeroSection
         variant="centered"
         eyebrow="Real families, real outcomes"
-        headline="Case studies"
+        headline="How families and firms found calmer ground"
         subheadline="See how firms, mediators, and pro se parents use CommonGround to lower conflict, cut court motions, and keep kids at the center."
-        primaryCta={{ label: 'Start free', href: '/signup' }}
-        secondaryCta={{ label: 'Book a demo', href: '/demo' }}
+        primaryCta={{ label: 'Start free — no card needed', href: '/signup' }}
+        secondaryCta={{ label: 'Book a 15-min demo', href: '/demo' }}
       />
 
       <section className="px-6 py-12 sm:py-16">
@@ -81,9 +81,9 @@ export default function CaseStudiesIndexPage() {
       <CtaBand
         background="teal"
         headline="Ready to write your own story?"
-        subheadline="Start free — no credit card, no trial clock."
-        primaryCta={{ label: 'Start free', href: '/signup' }}
-        secondaryCta={{ label: 'Book a demo', href: '/demo' }}
+        subheadline="Start free — no credit card, no trial clock, and your data stays yours."
+        primaryCta={{ label: 'Start free — no card needed', href: '/signup' }}
+        secondaryCta={{ label: 'Book a 15-min demo', href: '/demo' }}
       />
     </>
   );

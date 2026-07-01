@@ -170,9 +170,9 @@ export default function ItemsPage() {
 
   const getLocationBadge = (location: string) => {
     const colors: Record<string, string> = {
-      parent_a: "bg-blue-100 text-blue-700",
-      parent_b: "bg-purple-100 text-purple-700",
-      child_traveling: "bg-green-100 text-green-700",
+      parent_a: "bg-[#E0EFF8] text-[#1E4E6B]",
+      parent_b: "bg-[#E0EFF8] text-[#1E4E6B]",
+      child_traveling: "bg-[#E8F4F0] text-[#2D8A70]",
     };
     return (
       <span className={`px-2 py-1 text-xs font-medium rounded ${colors[location] || "bg-gray-100 text-gray-700"}`}>
@@ -183,11 +183,11 @@ export default function ItemsPage() {
 
   const getConditionBadge = (condition: string) => {
     const colors: Record<string, string> = {
-      excellent: "bg-green-100 text-green-700",
-      good: "bg-blue-100 text-blue-700",
-      fair: "bg-yellow-100 text-yellow-700",
-      poor: "bg-orange-100 text-orange-700",
-      damaged: "bg-red-100 text-red-700",
+      excellent: "bg-[#E8F4F0] text-[#2D8A70]",
+      good: "bg-[#E0EFF8] text-[#1E4E6B]",
+      fair: "bg-[#FEF7ED] text-[#E09520]",
+      poor: "bg-[#FEF7ED] text-[#E09520]",
+      damaged: "bg-[#FEE2E2] text-[#9B2C2C]",
     };
     return (
       <span className={`px-2 py-1 text-xs font-medium rounded ${colors[condition] || "bg-gray-100 text-gray-700"}`}>
@@ -246,7 +246,7 @@ export default function ItemsPage() {
           onClick={() => setActiveTab("overview")}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
             activeTab === "overview"
-              ? "bg-indigo-600 text-white"
+              ? "bg-[#2D6A8F] text-white"
               : "bg-secondary text-muted-foreground hover:bg-secondary/80"
           }`}
         >
@@ -256,7 +256,7 @@ export default function ItemsPage() {
           onClick={() => setActiveTab("items")}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
             activeTab === "items"
-              ? "bg-indigo-600 text-white"
+              ? "bg-[#2D6A8F] text-white"
               : "bg-secondary text-muted-foreground hover:bg-secondary/80"
           }`}
         >
@@ -266,7 +266,7 @@ export default function ItemsPage() {
           onClick={() => setActiveTab("transfers")}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
             activeTab === "transfers"
-              ? "bg-indigo-600 text-white"
+              ? "bg-[#2D6A8F] text-white"
               : "bg-secondary text-muted-foreground hover:bg-secondary/80"
           }`}
         >
@@ -276,7 +276,7 @@ export default function ItemsPage() {
           onClick={() => setActiveTab("disputes")}
           className={`px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2 ${
             activeTab === "disputes"
-              ? "bg-indigo-600 text-white"
+              ? "bg-[#2D6A8F] text-white"
               : "bg-secondary text-muted-foreground hover:bg-secondary/80"
           }`}
         >
@@ -303,13 +303,13 @@ export default function ItemsPage() {
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-green-600">{formatCurrency(summary?.total_value || "0")}</div>
+                <div className="text-2xl font-bold text-[#2D8A70]">{formatCurrency(summary?.total_value || "0")}</div>
                 <div className="text-xs text-muted-foreground">Total Value</div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-blue-600">{exchangesData?.total_transfers || 0}</div>
+                <div className="text-2xl font-bold text-[#2D6A8F]">{exchangesData?.total_transfers || 0}</div>
                 <div className="text-xs text-muted-foreground flex items-center justify-center gap-1 mt-1">
                   <ArrowLeftRight className="h-3.5 w-3.5" />
                   Transfers
@@ -355,7 +355,7 @@ export default function ItemsPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <MapPin className="h-5 w-5 text-indigo-600" />
+                  <MapPin className="h-5 w-5 text-[#2D6A8F]" />
                   Current Locations
                 </CardTitle>
                 <CardDescription>Where items are currently located</CardDescription>
@@ -503,7 +503,7 @@ export default function ItemsPage() {
                         {item.photo_url && (
                           <div className="mt-3 pt-3 border-t flex items-center gap-2 text-sm text-muted-foreground">
                             <Camera className="h-4 w-4" />
-                            <a href={item.photo_url} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">
+                            <a href={item.photo_url} target="_blank" rel="noopener noreferrer" className="text-[#2D6A8F] hover:underline">
                               View Photo
                             </a>
                           </div>
@@ -535,7 +535,7 @@ export default function ItemsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <ArrowLeftRight className="h-5 w-5 text-indigo-600" />
+              <ArrowLeftRight className="h-5 w-5 text-[#2D6A8F]" />
               Transfer History
             </CardTitle>
             <CardDescription>Record of all item transfers between parents</CardDescription>
@@ -616,12 +616,12 @@ export default function ItemsPage() {
                       <div className="mt-3 pt-3 border-t flex items-center gap-4 text-sm text-muted-foreground">
                         <Camera className="h-4 w-4" />
                         {transfer.photo_sent_url && (
-                          <a href={transfer.photo_sent_url} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">
+                          <a href={transfer.photo_sent_url} target="_blank" rel="noopener noreferrer" className="text-[#2D6A8F] hover:underline">
                             Photo (Sent)
                           </a>
                         )}
                         {transfer.photo_received_url && (
-                          <a href={transfer.photo_received_url} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">
+                          <a href={transfer.photo_received_url} target="_blank" rel="noopener noreferrer" className="text-[#2D6A8F] hover:underline">
                             Photo (Received)
                           </a>
                         )}
@@ -712,12 +712,12 @@ export default function ItemsPage() {
                         <Camera className="h-4 w-4 text-muted-foreground" />
                         <span className="font-medium">Evidence Photos:</span>
                         {transfer.photo_sent_url && (
-                          <a href={transfer.photo_sent_url} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">
+                          <a href={transfer.photo_sent_url} target="_blank" rel="noopener noreferrer" className="text-[#2D6A8F] hover:underline">
                             Before Transfer
                           </a>
                         )}
                         {transfer.photo_received_url && (
-                          <a href={transfer.photo_received_url} target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">
+                          <a href={transfer.photo_received_url} target="_blank" rel="noopener noreferrer" className="text-[#2D6A8F] hover:underline">
                             After Transfer
                           </a>
                         )}

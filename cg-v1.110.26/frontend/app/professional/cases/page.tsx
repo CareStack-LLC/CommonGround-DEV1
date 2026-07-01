@@ -85,15 +85,15 @@ const SYSTEM_VIEWS: SavedView[] = [
 
 const URGENCY_COLORS: Record<string, string> = {
   urgent: "text-red-900 bg-red-50 border-2 border-red-900/30",
-  high: "text-orange-900 bg-orange-50 border-2 border-orange-900/30",
+  high: "text-[#6B460F] bg-[#FEF7ED] border-2 border-[#6B460F]/30",
   medium: "text-blue-900 bg-blue-50 border-2 border-blue-900/30",
   low: "text-slate-600 bg-slate-50 border-2 border-slate-300",
 };
 
 const RISK_ICONS: Record<string, React.JSX.Element> = {
   high: <AlertCircle className="h-4 w-4 text-red-700" strokeWidth={2} />,
-  medium: <Zap className="h-4 w-4 text-amber-700" strokeWidth={2} />,
-  low: <CheckCircle2 className="h-4 w-4 text-emerald-700" strokeWidth={2} />,
+  medium: <Zap className="h-4 w-4 text-[#B8791A]" strokeWidth={2} />,
+  low: <CheckCircle2 className="h-4 w-4 text-[#2D8A70]" strokeWidth={2} />,
 };
 
 // Bulk case operations (select + assign/tag/export/archive) are not wired to a
@@ -233,7 +233,7 @@ export default function CasesListPage() {
 
   const statusColors: Record<string, string> = {
     active: "bg-[#F4F8F7] text-[#1E3A4A] border border-[#3DAA8A]/20",
-    on_hold: "bg-amber-50 text-amber-700 border border-amber-200",
+    on_hold: "bg-[#FEF7ED] text-[#B8791A] border border-[#FBE3BF]",
     completed: "bg-blue-50 text-blue-700 border border-blue-200",
     withdrawn: "bg-slate-50 text-slate-500 border border-slate-200",
   };
@@ -507,8 +507,8 @@ function CaseRow({
   statusColors: Record<string, string>;
 }) {
   const statusAccent: Record<string, string> = {
-    active: "border-l-emerald-700",
-    on_hold: "border-l-amber-700",
+    active: "border-l-[#2D8A70]",
+    on_hold: "border-l-[#B8791A]",
     completed: "border-l-blue-700",
     withdrawn: "border-l-slate-400",
   };
@@ -592,7 +592,7 @@ function CaseRow({
           </div>
         )}
         {caseItem.access_scopes?.includes("schedule") && (
-          <div className="p-1.5 bg-amber-50 text-amber-600 rounded-sm border border-amber-200" title="Schedule Access">
+          <div className="p-1.5 bg-[#FEF7ED] text-[#E09520] rounded-sm border border-[#FBE3BF]" title="Schedule Access">
             <Calendar className="h-3.5 w-3.5" strokeWidth={2} />
           </div>
         )}

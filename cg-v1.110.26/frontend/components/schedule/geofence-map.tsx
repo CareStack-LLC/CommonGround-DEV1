@@ -72,7 +72,7 @@ const geofenceFillStyle: FillLayer = {
   type: 'fill',
   source: 'geofence',
   paint: {
-    'fill-color': '#22c55e',
+    'fill-color': '#3DAA8A',
     'fill-opacity': 0.1,
   },
 };
@@ -82,7 +82,7 @@ const geofenceLineStyle: LineLayer = {
   type: 'line',
   source: 'geofence',
   paint: {
-    'line-color': '#22c55e',
+    'line-color': '#3DAA8A',
     'line-width': 2,
     'line-dasharray': [3, 2],
   },
@@ -141,7 +141,7 @@ export default function GeofenceMap({
         {/* Center marker (exchange location) */}
         <Marker longitude={center.lng} latitude={center.lat} anchor="center">
           <div className="flex items-center justify-center w-6 h-6">
-            <div className="w-3 h-3 bg-blue-600 rounded-full border-2 border-white shadow-md" />
+            <div className="w-3 h-3 bg-[#2D6A8F] rounded-full border-2 border-white shadow-md" />
           </div>
         </Marker>
 
@@ -152,8 +152,8 @@ export default function GeofenceMap({
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg ${
                   parent.inGeofence
-                    ? 'bg-green-500 border-2 border-green-300'
-                    : 'bg-amber-500 border-2 border-amber-300'
+                    ? 'bg-[#3DAA8A] border-2 border-[#5BC4A0]'
+                    : 'bg-[#F5A623] border-2 border-[#F5A623]'
                 }`}
               >
                 {parent.name.charAt(0).toUpperCase()}
@@ -161,8 +161,8 @@ export default function GeofenceMap({
               <div
                 className={`mt-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium whitespace-nowrap shadow-sm ${
                   parent.inGeofence
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-amber-100 text-amber-800'
+                    ? 'bg-[#E8F4F0] text-[#1E3A4A]'
+                    : 'bg-[#FEF7ED] text-[#E09520]'
                 }`}
               >
                 {parent.name.split(' ')[0]}

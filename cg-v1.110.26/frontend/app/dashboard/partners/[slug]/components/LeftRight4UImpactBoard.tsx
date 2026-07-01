@@ -56,11 +56,11 @@ export default function LeftRight4UImpactBoard({ partner, metrics, isStaff = fal
     const conflictReduction = metrics.conflict_reduction_pct || 0;
 
     return (
-        <div className="min-h-screen bg-[#FDF8F5] text-gray-900 font-sans selection:bg-[#FF6B6B]/30">
+        <div className="min-h-screen bg-[#FDF8F5] text-gray-900 font-sans selection:bg-[#C53030]/30">
             {/* Ambient Background */}
             <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#4ECDC4]/10 rounded-full blur-[120px] translate-x-1/2 -translate-y-1/2" />
-                <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#FF6B6B]/10 rounded-full blur-[120px] -translate-x-1/2 translate-y-1/2" />
+                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#5BC4A0]/10 rounded-full blur-[120px] translate-x-1/2 -translate-y-1/2" />
+                <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-[#C53030]/10 rounded-full blur-[120px] -translate-x-1/2 translate-y-1/2" />
             </div>
 
             <div className="relative z-10 max-w-7xl mx-auto px-6 py-12">
@@ -68,20 +68,20 @@ export default function LeftRight4UImpactBoard({ partner, metrics, isStaff = fal
                 <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16 animate-in fade-in slide-in-from-top-4 duration-700">
                     <div>
                         <div className="flex items-center gap-3 mb-4">
-                            <span className="px-3 py-1 rounded-full bg-[#FF6B6B]/10 border border-[#FF6B6B]/20 text-[#FF6B6B] text-xs font-bold tracking-wider uppercase">
+                            <span className="px-3 py-1 rounded-full bg-[#C53030]/10 border border-[#C53030]/20 text-[#C53030] text-xs font-bold tracking-wider uppercase">
                                 Impact Report
                             </span>
                             <span className="text-gray-500 text-sm flex items-center gap-2 font-medium">
                                 <span className="relative flex h-2 w-2">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#4ECDC4] opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#4ECDC4]"></span>
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#5BC4A0] opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#5BC4A0]"></span>
                                 </span>
                                 Updated Live
                             </span>
                         </div>
                         <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-4 text-[#2D3436]">
                             Protecting peace while <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B6B] to-[#4ECDC4]">
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#C53030] to-[#5BC4A0]">
                                 families heal.
                             </span>
                         </h1>
@@ -100,7 +100,7 @@ export default function LeftRight4UImpactBoard({ partner, metrics, isStaff = fal
                                     Export to CSV
                                 </Button>
                                 <Link href={`/dashboard/partners/${partner.partner_slug}/codes`} className="w-full sm:w-auto">
-                                    <Button className="w-full bg-[#FF6B6B] text-white font-bold hover:bg-[#ff5252] transition-colors shadow-lg shadow-[#FF6B6B]/20">
+                                    <Button className="w-full bg-[#C53030] text-white font-bold hover:bg-[#C53030] transition-colors shadow-lg shadow-[#C53030]/20">
                                         <Settings className="mr-2 h-4 w-4" />
                                         Manage Codes
                                     </Button>
@@ -121,11 +121,11 @@ export default function LeftRight4UImpactBoard({ partner, metrics, isStaff = fal
                 {/* Metrics Grid (5 Cards) */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-24">
                     {/* Card 1: Mothers Supported */}
-                    <Card className="bg-white border-transparent shadow-sm hover:shadow-xl hover:border-[#FF6B6B]/20 transition-all duration-300 group rounded-3xl">
+                    <Card className="bg-white border-transparent shadow-sm hover:shadow-xl hover:border-[#C53030]/20 transition-all duration-300 group rounded-3xl">
                         <CardContent className="p-6">
                             <div className="flex items-center justify-between mb-4">
-                                <div className="h-10 w-10 rounded-xl bg-[#FF6B6B]/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                    <HeartPulse className="h-5 w-5 text-[#FF6B6B]" />
+                                <div className="h-10 w-10 rounded-xl bg-[#C53030]/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <HeartPulse className="h-5 w-5 text-[#C53030]" />
                                 </div>
                                 <span className="text-xs font-medium text-gray-400">Goal: 50/Q3</span>
                             </div>
@@ -138,11 +138,11 @@ export default function LeftRight4UImpactBoard({ partner, metrics, isStaff = fal
                     </Card>
 
                     {/* Card 2: Grant Codes Distributed */}
-                    <Card className="bg-white border-transparent shadow-sm hover:shadow-xl hover:border-[#4ECDC4]/20 transition-all duration-300 group rounded-3xl">
+                    <Card className="bg-white border-transparent shadow-sm hover:shadow-xl hover:border-[#5BC4A0]/20 transition-all duration-300 group rounded-3xl">
                         <CardContent className="p-6">
                             <div className="flex items-center justify-between mb-4">
-                                <div className="h-10 w-10 rounded-xl bg-[#4ECDC4]/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                    <Zap className="h-5 w-5 text-[#4ECDC4]" />
+                                <div className="h-10 w-10 rounded-xl bg-[#5BC4A0]/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <Zap className="h-5 w-5 text-[#5BC4A0]" />
                                 </div>
                                 <span className="text-xs font-medium text-gray-400">Active</span>
                             </div>
@@ -155,11 +155,11 @@ export default function LeftRight4UImpactBoard({ partner, metrics, isStaff = fal
                     </Card>
 
                     {/* Card 3: Schedules Created */}
-                    <Card className="bg-white border-transparent shadow-sm hover:shadow-xl hover:border-[#FFE66D]/40 transition-all duration-300 group rounded-3xl">
+                    <Card className="bg-white border-transparent shadow-sm hover:shadow-xl hover:border-[#F5A623]/40 transition-all duration-300 group rounded-3xl">
                         <CardContent className="p-6">
                             <div className="flex items-center justify-between mb-4">
-                                <div className="h-10 w-10 rounded-xl bg-[#FFE66D]/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                    <Calendar className="h-5 w-5 text-[#e6cf62]" />
+                                <div className="h-10 w-10 rounded-xl bg-[#F5A623]/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                    <Calendar className="h-5 w-5 text-[#F5A623]" />
                                 </div>
                                 <span className="text-xs font-medium text-gray-400">Logistics</span>
                             </div>
@@ -219,14 +219,14 @@ export default function LeftRight4UImpactBoard({ partner, metrics, isStaff = fal
                             </p>
                             <ul className="space-y-4">
                                 <li className="flex gap-4 p-4 bg-white rounded-2xl shadow-sm border border-gray-50">
-                                    <div className="h-8 w-8 rounded-full bg-[#FF6B6B]/10 flex items-center justify-center shrink-0">
-                                        <HeartPulse className="h-4 w-4 text-[#FF6B6B]" />
+                                    <div className="h-8 w-8 rounded-full bg-[#C53030]/10 flex items-center justify-center shrink-0">
+                                        <HeartPulse className="h-4 w-4 text-[#C53030]" />
                                     </div>
                                     <span className="text-gray-600 font-light"><strong className="text-[#2D3436]">Mothers Supported:</strong> Removing the financial burden of premium security tools during a crisis.</span>
                                 </li>
                                 <li className="flex gap-4 p-4 bg-white rounded-2xl shadow-sm border border-gray-50">
-                                    <div className="h-8 w-8 rounded-full bg-[#4ECDC4]/10 flex items-center justify-center shrink-0">
-                                        <Zap className="h-4 w-4 text-[#4ECDC4]" />
+                                    <div className="h-8 w-8 rounded-full bg-[#5BC4A0]/10 flex items-center justify-center shrink-0">
+                                        <Zap className="h-4 w-4 text-[#5BC4A0]" />
                                     </div>
                                     <span className="text-gray-600 font-light"><strong className="text-[#2D3436]">Grants Deployed:</strong> Ensuring help reaches those who need it rapidly and securely.</span>
                                 </li>
@@ -237,7 +237,7 @@ export default function LeftRight4UImpactBoard({ partner, metrics, isStaff = fal
                                     <span className="text-gray-600 font-light"><strong className="text-[#2D3436]">Safe Exchanges:</strong> Validating that the environment remains free from toxicity and manipulation.</span>
                                 </li>
                             </ul>
-                            <div className="mt-8 p-6 rounded-2xl bg-[#FFE66D]/10 border border-[#FFE66D]/20">
+                            <div className="mt-8 p-6 rounded-2xl bg-[#F5A623]/10 border border-[#F5A623]/20">
                                 <p className="text-lg font-medium text-[#2D3436] italic">"Every notification should be an update, not an anxiety trigger."</p>
                             </div>
                         </div>
@@ -262,7 +262,7 @@ export default function LeftRight4UImpactBoard({ partner, metrics, isStaff = fal
                         </div>
 
                         {/* Bridge Line */}
-                        <div className="flex items-center gap-4 py-5 px-8 bg-white rounded-2xl border-l-4 border-[#FF6B6B] shadow-sm">
+                        <div className="flex items-center gap-4 py-5 px-8 bg-white rounded-2xl border-l-4 border-[#C53030] shadow-sm">
                             <p className="text-lg font-bold text-[#2D3436]">
                                 Support heals the individual. <br /> Boundaries protect the environment.
                             </p>
@@ -270,18 +270,18 @@ export default function LeftRight4UImpactBoard({ partner, metrics, isStaff = fal
 
                         {/* Trust Block */}
                         <div className="bg-[#2D3436] rounded-3xl p-8 border border-gray-800 shadow-xl relative overflow-hidden">
-                            <div className="absolute top-0 right-0 w-48 h-48 bg-[#4ECDC4]/10 rounded-full blur-[60px] translate-x-1/2 -translate-y-1/2" />
+                            <div className="absolute top-0 right-0 w-48 h-48 bg-[#5BC4A0]/10 rounded-full blur-[60px] translate-x-1/2 -translate-y-1/2" />
                             <div className="relative z-10">
                                 <div className="flex items-center gap-3 mb-4">
-                                    <Shield className="h-6 w-6 text-[#4ECDC4]" />
+                                    <Shield className="h-6 w-6 text-[#5BC4A0]" />
                                     <h3 className="text-xl font-bold text-white">Aggregated for privacy.</h3>
                                 </div>
                                 <p className="text-gray-400 leading-relaxed mb-6 font-light">
                                     We report impact using aggregate signals and trends—never exposing private family details or communications. The goal is to prove what works while keeping mothers absolutely protected.
                                 </p>
                                 <div className="flex gap-3">
-                                    <div className="px-4 py-1.5 rounded-lg bg-gray-800 border border-gray-700 text-xs text-[#4ECDC4] font-medium tracking-wide">ZERO DATA SELLING</div>
-                                    <div className="px-4 py-1.5 rounded-lg bg-gray-800 border border-gray-700 text-xs text-[#FFE66D] font-medium tracking-wide">END-TO-END ENCRYPTED DRAFTS</div>
+                                    <div className="px-4 py-1.5 rounded-lg bg-gray-800 border border-gray-700 text-xs text-[#5BC4A0] font-medium tracking-wide">ZERO DATA SELLING</div>
+                                    <div className="px-4 py-1.5 rounded-lg bg-gray-800 border border-gray-700 text-xs text-[#F5A623] font-medium tracking-wide">END-TO-END ENCRYPTED DRAFTS</div>
                                 </div>
                             </div>
                         </div>
@@ -290,21 +290,21 @@ export default function LeftRight4UImpactBoard({ partner, metrics, isStaff = fal
 
                 {/* Closing CTA */}
                 <div className="rounded-[2.5rem] bg-white border border-gray-100 p-12 text-center relative overflow-hidden shadow-sm">
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#FF6B6B]/5 via-transparent to-transparent pointer-events-none" />
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-3xl h-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#C53030]/5 via-transparent to-transparent pointer-events-none" />
                     <div className="relative z-10 max-w-3xl mx-auto">
                         <h2 className="text-3xl md:text-4xl font-black text-[#2D3436] mb-4">Help us protect more families.</h2>
                         <p className="text-lg text-gray-600 mb-10 leading-relaxed font-light">
                             If your organization supports survivors of domestic violence or patients undergoing intense medical treatments, our secure communication infrastructure is designed for your clients.
                         </p>
                         <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
-                            <Button className="bg-[#FF6B6B] hover:bg-[#ff5252] text-white font-bold h-14 px-8 rounded-xl shadow-lg shadow-[#FF6B6B]/20 transition-transform hover:-translate-y-0.5" onClick={() => window.open('https://www.leftright4u.org/give', '_blank')}>
+                            <Button className="bg-[#C53030] hover:bg-[#C53030] text-white font-bold h-14 px-8 rounded-xl shadow-lg shadow-[#C53030]/20 transition-transform hover:-translate-y-0.5" onClick={() => window.open('https://www.leftright4u.org/give', '_blank')}>
                                 Donate to Left Right 4 U
                             </Button>
                             <Button variant="outline" className="border-gray-200 text-gray-600 hover:text-gray-900 hover:bg-gray-50 h-14 px-8 rounded-xl font-bold transition-colors">
                                 Learn About Partnering
                             </Button>
                         </div>
-                        <p className="text-sm font-bold text-[#4ECDC4] uppercase tracking-widest">
+                        <p className="text-sm font-bold text-[#5BC4A0] uppercase tracking-widest">
                             Healing Starts With Safe Boundaries.
                         </p>
                     </div>

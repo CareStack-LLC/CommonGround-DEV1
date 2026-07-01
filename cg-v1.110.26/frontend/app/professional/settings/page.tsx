@@ -544,7 +544,7 @@ function SubscriptionTab({
 
       {/* Usage */}
       <div className="grid sm:grid-cols-2 gap-4">
-        <Card className={`rounded-2xl border ${isNearLimit ? "border-amber-200" : "border-slate-200"}`}>
+        <Card className={`rounded-2xl border ${isNearLimit ? "border-[#FBE3BF]" : "border-slate-200"}`}>
           <CardContent className="pt-5 pb-4">
             <div className="flex items-center justify-between mb-3">
               <span className="text-sm font-medium text-slate-700 flex items-center gap-2">
@@ -552,7 +552,7 @@ function SubscriptionTab({
               </span>
               <span className="text-sm font-semibold">{usage.cases.active} / {usage.cases.max >= 999999 ? "\u221E" : usage.cases.max}</span>
             </div>
-            <Progress value={casePercent} className={`h-2 ${isNearLimit ? "[&>div]:bg-amber-500" : ""}`} />
+            <Progress value={casePercent} className={`h-2 ${isNearLimit ? "[&>div]:bg-[#F5A623]" : ""}`} />
             <p className="text-xs text-slate-500 mt-2">{usage.cases.remaining >= 999999 ? "Unlimited" : `${usage.cases.remaining} remaining`}</p>
           </CardContent>
         </Card>
@@ -840,7 +840,7 @@ function FirmTab({
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge className={`text-[10px] ${m.status === "active" ? "bg-green-50 text-green-700" : m.status === "invited" ? "bg-blue-50 text-blue-700" : "bg-slate-100 text-slate-600"}`}>
+                    <Badge className={`text-[10px] ${m.status === "active" ? "bg-[#E8F4F0] text-[#2D8A70]" : m.status === "invited" ? "bg-blue-50 text-blue-700" : "bg-slate-100 text-slate-600"}`}>
                       {m.status}
                     </Badge>
                     <Badge className="text-[10px] bg-slate-100 text-slate-600 border-0">

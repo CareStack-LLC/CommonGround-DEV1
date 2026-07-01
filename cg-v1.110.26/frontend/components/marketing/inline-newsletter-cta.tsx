@@ -89,7 +89,7 @@ export function InlineNewsletterCta({
             {isSubmitting ? '...' : 'Subscribe'}
           </button>
         </form>
-        {error && <p className="text-xs text-red-600 mt-2">{error}</p>}
+        {error && <p className="text-xs text-[#C53030] mt-2">{error}</p>}
       </div>
     );
   }
@@ -120,7 +120,7 @@ export function InlineNewsletterCta({
             {isSubmitting ? 'Subscribing...' : 'Subscribe'}
           </button>
         </form>
-        {error && <p className="text-xs text-red-300 mt-2">{error}</p>}
+        {error && <p className="text-xs text-[#FCA5A5] mt-2">{error}</p>}
         <p className="text-white/40 text-xs mt-3">No spam. Unsubscribe anytime.</p>
       </div>
     );
@@ -156,7 +156,7 @@ export function InlineNewsletterCta({
           {isSubmitting ? 'Subscribing...' : 'Subscribe'}
         </button>
       </form>
-      {error && <p className="text-sm text-red-600 mt-3">{error}</p>}
+      {error && <p className="text-sm text-[#C53030] mt-3">{error}</p>}
       <p className="text-gray-400 text-xs mt-3">No spam. Unsubscribe anytime.</p>
     </div>
   );

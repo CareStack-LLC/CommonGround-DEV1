@@ -160,7 +160,7 @@ export function SavedViews({ token, activeFilters, onApplyView, activeViewId }: 
                                         Set as Default
                                     </DropdownMenuItem>
                                     <DropdownMenuSeparator />
-                                    <DropdownMenuItem className="text-red-600" onClick={() => handleDelete(view.id)}>
+                                    <DropdownMenuItem className="text-[#C53030]" onClick={() => handleDelete(view.id)}>
                                         <Trash2 className="h-3.5 w-3.5 mr-2" />
                                         Delete
                                     </DropdownMenuItem>

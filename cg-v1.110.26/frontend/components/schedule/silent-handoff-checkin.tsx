@@ -193,8 +193,8 @@ export default function SilentHandoffCheckIn({
         <Card className="w-full max-w-md max-h-[90vh] bg-background flex flex-col">
           <CardContent className="p-6 overflow-y-auto">
             <div className="text-center">
-              <div className="mx-auto w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4">
-                <CheckCircle className="h-8 w-8 text-green-600" />
+              <div className="mx-auto w-16 h-16 rounded-full bg-[#E8F4F0] dark:bg-[#1E3A4A]/30 flex items-center justify-center mb-4">
+                <CheckCircle className="h-8 w-8 text-[#2D8A70]" />
               </div>
 
               <h2 className="text-xl font-bold text-foreground mb-2">Check-in Successful</h2>
@@ -202,11 +202,11 @@ export default function SilentHandoffCheckIn({
               {hasGeofence && (
                 <div className="mb-4 space-y-3">
                   {isInGeofence ? (
-                    <Badge variant="default" className="bg-green-600">
+                    <Badge variant="default" className="bg-[#2D8A70]">
                       Within geofence ({formatDistance(distance)})
                     </Badge>
                   ) : (
-                    <Badge variant="secondary" className="bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">
+                    <Badge variant="secondary" className="bg-[#FEF7ED] text-[#E09520] dark:bg-[#1E3A4A]/30 dark:text-[#F5A623]">
                       Outside geofence ({formatDistance(distance)})
                     </Badge>
                   )}
@@ -357,32 +357,32 @@ export default function SilentHandoffCheckIn({
           {windowStatus && (
             <div className="mb-6 space-y-3">
               {windowStatus.is_within_window ? (
-                <div className="bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 rounded-lg p-3">
-                  <p className="text-green-800 dark:text-green-300 font-medium">
+                <div className="bg-[#E8F4F0] dark:bg-[#1E3A4A]/30 border border-[#5BC4A0] dark:border-[#2D8A70] rounded-lg p-3">
+                  <p className="text-[#1E3A4A] dark:text-[#5BC4A0] font-medium">
                     Check-in window is open
                   </p>
-                  <p className="text-sm text-green-700 dark:text-green-400">
+                  <p className="text-sm text-[#2D8A70] dark:text-[#5BC4A0]">
                     {formatMinutesHumanReadable(windowStatus.minutes_remaining)} remaining
                   </p>
-                  <p className="text-xs text-green-700/80 dark:text-green-400/80 mt-1">
+                  <p className="text-xs text-[#2D8A70]/80 dark:text-[#5BC4A0]/80 mt-1">
                     You can check in now to confirm your arrival at the exchange location.
                   </p>
                 </div>
               ) : windowStatus.is_before_window ? (
-                <div className="bg-amber-100 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-700 rounded-lg p-3">
-                  <p className="text-amber-800 dark:text-amber-300 font-medium">
+                <div className="bg-[#FEF7ED] dark:bg-[#1E3A4A]/30 border border-[#F5A623] dark:border-[#E09520] rounded-lg p-3">
+                  <p className="text-[#E09520] dark:text-[#F5A623] font-medium">
                     Check-in window opens in {formatMinutesHumanReadable(windowStatus.minutes_until_window)}
                   </p>
-                  <p className="text-xs text-amber-700/80 dark:text-amber-400/80 mt-1">
+                  <p className="text-xs text-[#E09520]/80 dark:text-[#F5A623]/80 mt-1">
                     The check-in window is a set time frame around your scheduled exchange when GPS check-in becomes available. You&apos;ll be able to confirm your arrival once the window opens.
                   </p>
                 </div>
               ) : (
-                <div className="bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 rounded-lg p-3">
-                  <p className="text-red-800 dark:text-red-300 font-medium">
+                <div className="bg-[#FEE2E2] dark:bg-[#7A2222]/30 border border-[#FCA5A5] dark:border-[#9B2C2C] rounded-lg p-3">
+                  <p className="text-[#9B2C2C] dark:text-[#FCA5A5] font-medium">
                     Check-in window has closed
                   </p>
-                  <p className="text-xs text-red-700/80 dark:text-red-400/80 mt-1">
+                  <p className="text-xs text-[#9B2C2C]/80 dark:text-[#E06B6B]/80 mt-1">
                     The GPS check-in window has passed. You can still record this exchange using the &quot;Child is With Me&quot; button below.
                   </p>
                   {familyFileId && !withMeSuccess && (
@@ -391,7 +391,7 @@ export default function SilentHandoffCheckIn({
                       disabled={isWithMe}
                       variant="outline"
                       size="sm"
-                      className="mt-2 w-full border-red-300 text-red-700 hover:bg-red-50 dark:border-red-700 dark:text-red-400 dark:hover:bg-red-900/20"
+                      className="mt-2 w-full border-[#FCA5A5] text-[#9B2C2C] hover:bg-[#FEE2E2] dark:border-[#9B2C2C] dark:text-[#E06B6B] dark:hover:bg-[#7A2222]/20"
                     >
                       {isWithMe ? (
                         <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Recording...</>
@@ -401,7 +401,7 @@ export default function SilentHandoffCheckIn({
                     </Button>
                   )}
                   {withMeSuccess && (
-                    <div className="mt-2 flex items-center gap-1.5 text-green-700 dark:text-green-400">
+                    <div className="mt-2 flex items-center gap-1.5 text-[#2D8A70] dark:text-[#5BC4A0]">
                       <CheckCircle className="h-4 w-4" />
                       <span className="text-sm font-medium">Recorded! The other parent has been notified.</span>
                     </div>
@@ -423,8 +423,8 @@ export default function SilentHandoffCheckIn({
 
           {/* Geolocation Support */}
           {!isSupported && (
-            <div className="bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 rounded-lg p-3 mb-6">
-              <p className="text-red-800 dark:text-red-300">
+            <div className="bg-[#FEE2E2] dark:bg-[#7A2222]/30 border border-[#FCA5A5] dark:border-[#9B2C2C] rounded-lg p-3 mb-6">
+              <p className="text-[#9B2C2C] dark:text-[#FCA5A5]">
                 GPS location is not supported in your browser.
               </p>
             </div>
@@ -432,15 +432,15 @@ export default function SilentHandoffCheckIn({
 
           {/* GPS Error */}
           {geoError && (
-            <div className="bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 rounded-lg p-3 mb-6">
-              <p className="text-red-800 dark:text-red-300">{geoError.message}</p>
+            <div className="bg-[#FEE2E2] dark:bg-[#7A2222]/30 border border-[#FCA5A5] dark:border-[#9B2C2C] rounded-lg p-3 mb-6">
+              <p className="text-[#9B2C2C] dark:text-[#FCA5A5]">{geoError.message}</p>
             </div>
           )}
 
           {/* Check-in Error */}
           {checkInError && (
-            <div className="bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 rounded-lg p-3 mb-6">
-              <p className="text-red-800 dark:text-red-300">{checkInError}</p>
+            <div className="bg-[#FEE2E2] dark:bg-[#7A2222]/30 border border-[#FCA5A5] dark:border-[#9B2C2C] rounded-lg p-3 mb-6">
+              <p className="text-[#9B2C2C] dark:text-[#FCA5A5]">{checkInError}</p>
             </div>
           )}
 
@@ -511,9 +511,9 @@ export default function SilentHandoffCheckIn({
               </Button>
             )}
             {withMeSuccess && (
-              <div className="flex items-center justify-center gap-2 p-2 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-                <CheckCircle className="h-4 w-4 text-green-600" />
-                <span className="text-sm font-medium text-green-700 dark:text-green-400">Custody override recorded. Other parent notified.</span>
+              <div className="flex items-center justify-center gap-2 p-2 bg-[#E8F4F0] dark:bg-[#1E3A4A]/20 rounded-lg border border-[#E8F4F0] dark:border-[#1E3A4A]">
+                <CheckCircle className="h-4 w-4 text-[#2D8A70]" />
+                <span className="text-sm font-medium text-[#2D8A70] dark:text-[#5BC4A0]">Custody override recorded. Other parent notified.</span>
               </div>
             )}
 
@@ -541,7 +541,7 @@ export default function SilentHandoffCheckIn({
                 }}
                 disabled={isCheckingIn || (windowStatus !== null && !windowStatus.is_within_window)}
                 variant="outline"
-                className="w-full border-amber-300 text-amber-700 hover:bg-amber-50 dark:border-amber-700 dark:text-amber-400 dark:hover:bg-amber-900/20"
+                className="w-full border-[#F5A623] text-[#E09520] hover:bg-[#FEF7ED] dark:border-[#E09520] dark:text-[#F5A623] dark:hover:bg-[#1E3A4A]/20"
               >
                 🧪 Test: Check In at Exchange Location
               </Button>

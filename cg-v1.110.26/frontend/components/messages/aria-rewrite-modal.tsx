@@ -100,35 +100,35 @@ function getSeverityConfig(severity?: string) {
     switch (severity) {
         case 'severe':
             return {
-                gradient: 'from-red-600 to-rose-700 dark:from-red-800 dark:to-rose-900',
-                headerBg: 'bg-gradient-to-r from-red-50 to-rose-50 dark:from-red-950/50 dark:to-rose-950/40',
-                border: 'border-red-200/80 dark:border-red-900/60',
+                gradient: 'from-[#C53030] to-[#E09520] dark:from-[#9B2C2C] dark:to-[#1E3A4A]',
+                headerBg: 'bg-gradient-to-r from-[#FEE2E2] to-[#FEF7ED] dark:from-[#7A2222]/50 dark:to-[#1E3A4A]/40',
+                border: 'border-[#FEE2E2]/80 dark:border-[#7A2222]/60',
                 icon: ShieldX,
                 title: 'Message Blocked',
-                iconColor: 'text-red-600 dark:text-red-400',
-                iconBg: 'bg-red-100 dark:bg-red-950/50',
+                iconColor: 'text-[#C53030] dark:text-[#E06B6B]',
+                iconBg: 'bg-[#FEE2E2] dark:bg-[#7A2222]/50',
                 pulse: true,
             };
         case 'moderate':
             return {
-                gradient: 'from-orange-500 to-amber-600 dark:from-orange-800 dark:to-amber-900',
-                headerBg: 'bg-gradient-to-r from-orange-50 to-amber-50 dark:from-orange-950/40 dark:to-amber-950/30',
-                border: 'border-orange-200/80 dark:border-orange-900/60',
+                gradient: 'from-[#F5A623] to-[#E09520] dark:from-[#E09520] dark:to-[#1E3A4A]',
+                headerBg: 'bg-gradient-to-r from-[#FEF7ED] to-[#FEF7ED] dark:from-[#1E3A4A]/40 dark:to-[#1E3A4A]/30',
+                border: 'border-[#FEF7ED]/80 dark:border-[#1E3A4A]/60',
                 icon: ShieldAlert,
                 title: 'Court Risk Warning',
-                iconColor: 'text-orange-600 dark:text-orange-400',
-                iconBg: 'bg-orange-100 dark:bg-orange-950/50',
+                iconColor: 'text-[#E09520] dark:text-[#F5A623]',
+                iconBg: 'bg-[#FEF7ED] dark:bg-[#1E3A4A]/50',
                 pulse: false,
             };
         default: // mild or safe
             return {
-                gradient: 'from-amber-400 to-yellow-500 dark:from-amber-700 dark:to-yellow-800',
-                headerBg: 'bg-gradient-to-r from-amber-50/80 to-yellow-50/60 dark:from-amber-950/30 dark:to-yellow-950/20',
-                border: 'border-amber-200/60 dark:border-amber-900/40',
+                gradient: 'from-[#F5A623] to-[#F5A623] dark:from-[#E09520] dark:to-[#E09520]',
+                headerBg: 'bg-gradient-to-r from-[#FEF7ED]/80 to-[#FEF7ED]/60 dark:from-[#1E3A4A]/30 dark:to-[#1E3A4A]/20',
+                border: 'border-[#FEF7ED]/60 dark:border-[#1E3A4A]/40',
                 icon: Shield,
                 title: 'Tone Check',
-                iconColor: 'text-amber-600 dark:text-amber-400',
-                iconBg: 'bg-amber-100 dark:bg-amber-950/50',
+                iconColor: 'text-[#E09520] dark:text-[#F5A623]',
+                iconBg: 'bg-[#FEF7ED] dark:bg-[#1E3A4A]/50',
                 pulse: false,
             };
     }
@@ -189,7 +189,7 @@ export function ARIARewriteModal({
         return (
             <div className="relative rounded-2xl border border-teal-200/60 dark:border-teal-900/60 bg-gradient-to-b from-teal-50 to-white dark:from-teal-950/30 dark:to-card shadow-lg overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
                 {/* Kid-friendly header */}
-                <div className="flex items-center gap-3 px-5 py-4 bg-gradient-to-r from-teal-100/70 to-emerald-50/50 dark:from-teal-950/50 dark:to-emerald-950/30 border-b border-teal-200/60 dark:border-teal-900/40">
+                <div className="flex items-center gap-3 px-5 py-4 bg-gradient-to-r from-teal-100/70 to-[#E8F4F0]/50 dark:from-teal-950/50 dark:to-[#1E3A4A]/30 border-b border-teal-200/60 dark:border-teal-900/40">
                     <div className="p-2.5 bg-teal-500/15 rounded-2xl">
                         <Sparkles className="h-6 w-6 text-teal-500 dark:text-teal-400" />
                     </div>
@@ -212,7 +212,7 @@ export function ARIARewriteModal({
                 <div className="grid grid-cols-2 gap-3 p-5">
                     <div className="space-y-1.5">
                         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">What you wrote</p>
-                        <div className="rounded-xl bg-rose-50 dark:bg-rose-950/20 border border-rose-200/60 dark:border-rose-900/40 p-3 min-h-[80px]">
+                        <div className="rounded-xl bg-[#FEF7ED] dark:bg-[#1E3A4A]/20 border border-[#FEF7ED]/60 dark:border-[#1E3A4A]/40 p-3 min-h-[80px]">
                             <p className="text-sm text-foreground leading-relaxed">{payload.original_message}</p>
                         </div>
                     </div>
@@ -482,14 +482,14 @@ export function ARIARewriteModal({
                 {/* Original */}
                 <div className="space-y-1.5">
                     <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Your message</p>
-                    <div className="rounded-xl bg-red-50/80 dark:bg-red-950/15 border border-red-200/50 dark:border-red-900/30 p-3 min-h-[80px]">
+                    <div className="rounded-xl bg-[#FEE2E2]/80 dark:bg-[#7A2222]/15 border border-[#FEE2E2]/50 dark:border-[#7A2222]/30 p-3 min-h-[80px]">
                         <p className="text-sm text-foreground leading-relaxed">{payload.original_message}</p>
                     </div>
                 </div>
 
                 {/* ARIA Suggestion */}
                 <div className="space-y-1.5">
-                    <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide flex items-center gap-1">
+                    <p className="text-xs font-semibold text-[#2D8A70] dark:text-[#5BC4A0] uppercase tracking-wide flex items-center gap-1">
                         <RotateCcw className="h-3 w-3" />
                         ARIA's suggestion
                     </p>
@@ -497,11 +497,11 @@ export function ARIARewriteModal({
                         <textarea
                             value={editedContent}
                             onChange={(e) => setEditedContent(e.target.value)}
-                            className="w-full rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-300 dark:border-emerald-800 p-3 text-sm text-foreground leading-relaxed resize-none min-h-[80px] focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                            className="w-full rounded-xl bg-[#E8F4F0] dark:bg-[#1E3A4A]/20 border border-[#5BC4A0] dark:border-[#1E3A4A] p-3 text-sm text-foreground leading-relaxed resize-none min-h-[80px] focus:outline-none focus:ring-2 focus:ring-[#5BC4A0]"
                             autoFocus
                         />
                     ) : (
-                        <div className="rounded-xl bg-emerald-50/80 dark:bg-emerald-950/15 border border-emerald-200/50 dark:border-emerald-900/30 p-3 min-h-[80px]">
+                        <div className="rounded-xl bg-[#E8F4F0]/80 dark:bg-[#1E3A4A]/15 border border-[#E8F4F0]/50 dark:border-[#1E3A4A]/30 p-3 min-h-[80px]">
                             {payload.suggested_rewrite ? (
                                 <p className="text-sm text-foreground leading-relaxed">{payload.suggested_rewrite}</p>
                             ) : (
@@ -529,7 +529,7 @@ export function ARIARewriteModal({
                     <button
                         onClick={handleUseRewrite}
                         disabled={isSending}
-                        className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition-colors disabled:opacity-50 shadow-sm"
+                        className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#2D8A70] text-white text-sm font-medium hover:bg-[#2D8A70] transition-colors disabled:opacity-50 shadow-sm"
                     >
                         <Send className="h-4 w-4" />
                         Use ARIA's version
@@ -550,7 +550,7 @@ export function ARIARewriteModal({
                     <button
                         onClick={handleConfirmEdit}
                         disabled={isSending || !editedContent.trim()}
-                        className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition-colors disabled:opacity-50 shadow-sm"
+                        className="flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-[#2D8A70] text-white text-sm font-medium hover:bg-[#2D8A70] transition-colors disabled:opacity-50 shadow-sm"
                     >
                         <Send className="h-4 w-4" />
                         Send edited version

@@ -135,7 +135,7 @@ export default function RequestAccessPage() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-2 border-indigo-600 border-t-transparent mx-auto" />
+          <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#2D6A8F] border-t-transparent mx-auto" />
           <p className="mt-4 text-muted-foreground">Loading...</p>
         </div>
       </div>
@@ -167,7 +167,7 @@ export default function RequestAccessPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-          <FileSearch className="h-6 w-6 text-indigo-600" />
+          <FileSearch className="h-6 w-6 text-[#2D6A8F]" />
           Request Case Access
         </h1>
         <p className="text-muted-foreground mt-1">
@@ -243,8 +243,8 @@ export default function RequestAccessPage() {
                           onClick={() => setSelectedCase(caseItem)}
                           className={`w-full text-left p-4 border rounded-lg transition-all ${
                             selectedCase?.id === caseItem.id
-                              ? "border-indigo-500 bg-indigo-50"
-                              : "border-border hover:border-indigo-300 hover:bg-secondary/50"
+                              ? "border-[#2D6A8F] bg-[#E0EFF8]"
+                              : "border-border hover:border-[#4BA8C8] hover:bg-secondary/50"
                           }`}
                         >
                           <div className="flex items-center justify-between">
@@ -270,10 +270,10 @@ export default function RequestAccessPage() {
 
           {/* Request Form - Only show when case is selected */}
           {selectedCase && (
-            <Card className="border-indigo-200">
+            <Card className="border-[#E0EFF8]">
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
-                  <Shield className="h-5 w-5 text-indigo-600" />
+                  <Shield className="h-5 w-5 text-[#2D6A8F]" />
                   Request Access to {selectedCase.case_name}
                 </CardTitle>
                 <CardDescription>
@@ -348,12 +348,12 @@ export default function RequestAccessPage() {
                   )}
 
                   {/* Info box */}
-                  <div className="p-3 bg-indigo-50 rounded-lg text-sm text-indigo-800">
+                  <div className="p-3 bg-[#E0EFF8] rounded-lg text-sm text-[#1E4E6B]">
                     <div className="flex items-start gap-2">
                       <Clock className="h-4 w-4 mt-0.5 flex-shrink-0" />
                       <div>
                         <p className="font-medium">What happens next?</p>
-                        <ul className="mt-1 text-indigo-700 text-xs space-y-1">
+                        <ul className="mt-1 text-[#1E4E6B] text-xs space-y-1">
                           <li>• Your request will be sent to the case participants</li>
                           <li>• For GAL/Mediator roles, both parents must approve</li>
                           <li>• Attorney roles need approval from the represented party</li>
@@ -374,7 +374,7 @@ export default function RequestAccessPage() {
                     <Button
                       type="submit"
                       disabled={isSubmitting}
-                      className="bg-indigo-600 hover:bg-indigo-700"
+                      className="bg-[#2D6A8F] hover:bg-[#1E4E6B]"
                     >
                       {isSubmitting ? (
                         <>
@@ -398,7 +398,7 @@ export default function RequestAccessPage() {
           <Card className="bg-secondary/30">
             <CardContent className="p-4">
               <div className="flex items-start gap-3">
-                <Shield className="h-5 w-5 text-indigo-600 mt-0.5" />
+                <Shield className="h-5 w-5 text-[#2D6A8F] mt-0.5" />
                 <div className="text-sm text-muted-foreground">
                   <p className="font-medium text-foreground">About Access Requests</p>
                   <ul className="mt-2 space-y-1.5">

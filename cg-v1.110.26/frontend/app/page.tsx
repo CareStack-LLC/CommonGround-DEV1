@@ -3,6 +3,7 @@ import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import type { Metadata } from 'next';
 import { MarketingHeader } from '@/components/marketing';
+import { BrandIcon } from '@/components/brand/brand-icon';
 import { JsonLd } from '@/components/marketing/json-ld';
 import {
   CtaBand,
@@ -182,7 +183,7 @@ export default function HomePage() {
       {/* FAQPage structured data — paired with visual FAQSection below */}
       <FaqJsonLd items={HOME_FAQ_ITEMS} />
 
-      <div className="marketing-light min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#E8F4F8]">
+      <div className="marketing-light min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#E0EFF8]">
         <MarketingHeader />
 
         {/* ═══════════════════════════════════════════════════════════════
@@ -204,8 +205,8 @@ export default function HomePage() {
                 </h1>
 
                 <p className="text-lg sm:text-xl text-gray-600 mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">
-                  ARIA keeps messages calm. Schedules run on autopilot. Your kids can call you directly &mdash; and every word is documented,{' '}
-                  <span className="font-medium text-[var(--portal-primary)]">so you have energy left to actually parent.</span>
+                  Put your energy into your kids, not the conflict. ARIA keeps messages calm, TimeBridge runs the schedule, and your kids can reach you directly &mdash; with every word quietly documented and{' '}
+                  <span className="font-medium text-[var(--portal-primary)]">court-ready the day you ever need it.</span>
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-8">
@@ -299,43 +300,43 @@ export default function HomePage() {
             <div className="grid sm:grid-cols-2 gap-5 sm:gap-6 max-w-4xl mx-auto">
               {[
                 {
-                  Icon: MessageCircle,
-                  color: '#E07A5F',
+                  icon: 'aria' as const,
+                  tint: '#E8F4F0',
                   problem: 'Every message turns into a fight.',
                   solution:
                     'ARIA rewrites the heat out of a text before it sends — so the conversation stays about your kids, not the past.',
                 },
                 {
-                  Icon: Calendar,
-                  color: '#3DAA8A',
+                  icon: 'timebridge' as const,
+                  tint: '#E8F4F0',
                   problem: '“Wait — who has them Friday?”',
                   solution:
                     'TimeBridge runs the schedule and custody exchanges on autopilot. One shared calendar, no more guessing.',
                 },
                 {
-                  Icon: DollarSign,
-                  color: '#2D6A8F',
+                  icon: 'clearfund' as const,
+                  tint: '#E0EFF8',
                   problem: 'Money becomes a standoff.',
                   solution:
                     'ClearFund splits shared costs by your agreement and tracks every receipt — no chasing, no arguing.',
                 },
                 {
-                  Icon: Video,
-                  color: '#C9802E',
+                  icon: 'kidspace' as const,
+                  tint: '#FEF7ED',
                   problem: 'Kids get stuck passing messages.',
                   solution:
                     'KidSpace lets your kids call and text you directly — safe, supervised, and entirely theirs.',
                 },
-              ].map(({ Icon, color, problem, solution }) => (
+              ].map(({ icon, tint, problem, solution }) => (
                 <div
                   key={problem}
                   className="flex gap-4 rounded-2xl border border-gray-100 bg-white p-5 sm:p-6 shadow-sm"
                 >
                   <span
                     className="grid h-11 w-11 shrink-0 place-items-center rounded-xl"
-                    style={{ backgroundColor: `${color}1a` }}
+                    style={{ backgroundColor: tint }}
                   >
-                    <Icon className="h-5 w-5" style={{ color }} strokeWidth={2.25} />
+                    <BrandIcon name={icon} size={24} />
                   </span>
                   <div>
                     <p className="font-serif text-lg text-[#1E3A4A] leading-snug">{problem}</p>
@@ -377,7 +378,7 @@ export default function HomePage() {
                   title: 'Sign up free',
                   description:
                     'Create your account in 2 minutes. Invite your co-parent when you\'re ready — or start on your own.',
-                  image: { alt: 'Parent signing up on phone', src: '/images/marketing/home1.png' },
+                  image: { alt: 'Parent signing up on their phone at home', src: '/images/marketing/home1.jpg' },
                 },
                 {
                   step: '02',
@@ -385,7 +386,7 @@ export default function HomePage() {
                   title: 'Set it and forget it',
                   description:
                     'ARIA handles messaging tone. TimeBridge automates your schedule. ClearFund tracks expenses. Everything runs itself.',
-                  image: { alt: 'Automated calendar with checkmarks', src: '/images/marketing/home2.png' },
+                  image: { alt: 'Relaxed parent at home with coordination handled', src: '/images/marketing/home2.jpg' },
                 },
                 {
                   step: '03',
@@ -393,7 +394,7 @@ export default function HomePage() {
                   title: 'Live your life',
                   description:
                     'Spend your energy on your kids, not on coordination. Everything is documented and court-ready if you ever need it.',
-                  image: { alt: 'Parent relaxing with child', src: '/images/marketing/home3.png' },
+                  image: { alt: 'Parent and child laughing together outdoors', src: '/images/marketing/home3.jpg' },
                 },
               ].map((item) => {
                 const Icon = item.icon;
@@ -453,7 +454,7 @@ export default function HomePage() {
               {/* Benefit 1: Schedules */}
               <div className="bg-white rounded-3xl p-8 border-2 border-[var(--portal-primary)]/10 hover:border-[var(--portal-primary)]/30 transition-all hover:shadow-lg group">
                 <div className="h-16 w-16 rounded-2xl bg-[var(--portal-primary)]/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <Calendar className="h-8 w-8 text-[var(--portal-primary)]" />
+                  <BrandIcon name="timebridge" size={34} />
                 </div>
                 <h3 className="text-2xl font-semibold text-[#1E3A4A] mb-3">Schedules that run themselves</h3>
                 <p className="text-gray-600 leading-relaxed mb-4">
@@ -465,7 +466,7 @@ export default function HomePage() {
               {/* Benefit 2: Finances */}
               <div className="bg-white rounded-3xl p-8 border-2 border-[#F5A623]/10 hover:border-[#F5A623]/30 transition-all hover:shadow-lg group">
                 <div className="h-16 w-16 rounded-2xl bg-[#F5A623]/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <DollarSign className="h-8 w-8 text-[#F5A623]" />
+                  <BrandIcon name="clearfund" size={34} />
                 </div>
                 <h3 className="text-2xl font-semibold text-[#1E3A4A] mb-3">Money tracked, not argued</h3>
                 <p className="text-gray-600 leading-relaxed mb-4">
@@ -482,7 +483,7 @@ export default function HomePage() {
                   </span>
                 </div>
                 <div className="h-16 w-16 rounded-2xl bg-[var(--portal-primary)]/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <Video className="h-8 w-8 text-[var(--portal-primary)]" />
+                  <BrandIcon name="kidspace" size={34} />
                 </div>
                 <h3 className="text-2xl font-semibold text-[#1E3A4A] mb-3">Call your kids directly</h3>
                 <p className="text-gray-600 leading-relaxed mb-4">
@@ -499,7 +500,7 @@ export default function HomePage() {
                   </span>
                 </div>
                 <div className="h-16 w-16 rounded-2xl bg-[var(--portal-primary)]/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <MapPin className="h-8 w-8 text-[var(--portal-primary)]" />
+                  <BrandIcon name="exchange" size={34} />
                 </div>
                 <h3 className="text-2xl font-semibold text-[#1E3A4A] mb-3">Exchanges without conflict</h3>
                 <p className="text-gray-600 leading-relaxed mb-4">
@@ -735,7 +736,7 @@ export default function HomePage() {
         {/* ═══════════════════════════════════════════════════════════════
             TRUST & SECURITY
         ═══════════════════════════════════════════════════════════════ */}
-        <section className="py-16 bg-gradient-to-br from-[#E8F4F8] to-white">
+        <section className="py-16 bg-gradient-to-br from-[#E0EFF8] to-white">
           <div className="max-w-6xl mx-auto px-6">
             <div className="text-center mb-12">
               <h2
@@ -755,7 +756,7 @@ export default function HomePage() {
                   <Shield className="h-7 w-7 text-[var(--portal-primary)]" />
                 </div>
                 <h3 className="font-semibold text-gray-900 mb-2">Encrypted &amp; Private</h3>
-                <p className="text-sm text-gray-600">Bank-level security for all communications</p>
+                <p className="text-sm text-gray-600">End-to-end encryption on every message and file &mdash; never sold, never shared</p>
               </div>
 
               <div className="bg-white rounded-2xl p-6 border-2 border-gray-100 text-center">
@@ -789,8 +790,8 @@ export default function HomePage() {
         ═══════════════════════════════════════════════════════════════ */}
         <section className="grid md:grid-cols-2">
           <CtaBand
-            headline="Parents — start your family file"
-            subheadline="Two minutes to sign up. Forever free to stay."
+            headline="Parents — start free today"
+            subheadline="Two minutes to set up. No credit card, forever-free tier, and your data stays yours."
             primaryCta={{ label: 'Start free', href: '/parents' }}
             background="teal"
           />

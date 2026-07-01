@@ -232,7 +232,7 @@ function CreateCaseContent() {
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold ${step >= 1 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold ${step >= 1 ? 'bg-[#2D6A8F] text-white' : 'bg-gray-200 text-gray-600'}`}>
                 1
               </div>
               <div className="ml-3">
@@ -241,9 +241,9 @@ function CreateCaseContent() {
                 </p>
               </div>
             </div>
-            <div className={`flex-1 h-1 mx-4 ${step >= 2 ? 'bg-blue-600' : 'bg-gray-200'}`} />
+            <div className={`flex-1 h-1 mx-4 ${step >= 2 ? 'bg-[#2D6A8F]' : 'bg-gray-200'}`} />
             <div className="flex items-center">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold ${step >= 2 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold ${step >= 2 ? 'bg-[#2D6A8F] text-white' : 'bg-gray-200 text-gray-600'}`}>
                 2
               </div>
               <div className="ml-3">
@@ -257,13 +257,13 @@ function CreateCaseContent() {
 
         {/* Error Alert */}
         {error && (
-          <Card className="mb-6 border-red-200 bg-red-50">
+          <Card className="mb-6 border-[#FEE2E2] bg-[#FEE2E2]">
             <CardContent className="pt-6">
               <div className="flex items-center gap-3">
-                <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-[#C53030]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <p className="text-sm text-red-700">{error}</p>
+                <p className="text-sm text-[#9B2C2C]">{error}</p>
               </div>
             </CardContent>
           </Card>
@@ -299,7 +299,7 @@ function CreateCaseContent() {
                   id="state"
                   value={state}
                   onChange={(e) => setState(e.target.value)}
-                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#2D6A8F]"
                 >
                   <option value="">Select a state</option>
                   {US_STATES.map((st) => (
@@ -405,7 +405,7 @@ function CreateCaseContent() {
                           id={`gender-${index}`}
                           value={child.gender}
                           onChange={(e) => updateChild(index, 'gender', e.target.value)}
-                          className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#2D6A8F]"
                         >
                           <option value="male">Male</option>
                           <option value="female">Female</option>
@@ -458,15 +458,15 @@ function CreateCaseContent() {
         )}
 
         {/* Help Text */}
-        <Card className="mt-6 bg-blue-50 border-blue-200">
+        <Card className="mt-6 bg-[#E0EFF8] border-[#E0EFF8]">
           <CardContent className="pt-6">
             <div className="flex gap-3">
-              <svg className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-[#2D6A8F] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <div className="text-sm text-blue-900">
+              <div className="text-sm text-[#1E3A4A]">
                 <p className="font-medium mb-1">What happens next?</p>
-                <ul className="list-disc list-inside space-y-1 text-blue-800">
+                <ul className="list-disc list-inside space-y-1 text-[#1E4E6B]">
                   <li>An invitation email will be sent to the other parent</li>
                   <li>They'll create an account and accept the invitation</li>
                   <li>Once accepted, the case becomes active</li>

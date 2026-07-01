@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import { BrandIcon, type BrandIconName } from '@/components/brand/brand-icon';
+import type { LucideIcon } from 'lucide-react';
 import {
   Shield,
-  MapPin,
   Clock,
-  FileText,
   Lock,
   Heart,
   Phone,
@@ -13,7 +13,6 @@ import {
   Users,
   AlertTriangle,
   Eye,
-  MessageSquare,
 } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -29,14 +28,19 @@ export const metadata: Metadata = {
  * zero-contact workflows, and nonprofit partnership program.
  */
 
-const safetyFeatures = [
+const safetyFeatures: {
+  brandIcon?: BrandIconName;
+  icon?: LucideIcon;
+  title: string;
+  description: string;
+}[] = [
   {
-    icon: MapPin,
+    brandIcon: 'exchange',
     title: 'GPS Verification',
     description: 'Silent, automatic location logging at every exchange. Build a timestamped, verifiable record without any interaction.',
   },
   {
-    icon: MessageSquare,
+    brandIcon: 'aria',
     title: 'Zero Direct Contact',
     description: 'All communication runs through ARIA\'s AI filter. No phone calls, no texts, no face-to-face conversation required.',
   },
@@ -46,7 +50,7 @@ const safetyFeatures = [
     description: 'Invite trusted contacts from your Circle to receive real-time exchange notifications and logs.',
   },
   {
-    icon: FileText,
+    brandIcon: 'export',
     title: 'Court-Ready Documentation',
     description: 'Every exchange creates an immutable, timestamped record with location data ready for legal proceedings.',
   },
@@ -151,20 +155,21 @@ export default function SafeHandoffPage() {
                 <span className="text-cg-sage">Zero contact.</span>
               </h1>
               <p className="text-xl text-muted-foreground mb-6">
-                You shouldn't have to see, speak to, or interact with your co-parent to
-                raise your children safely. CommonGround handles everything.
+                Hand off the kids without seeing, speaking to, or texting your
+                co-parent. Silent Handoff logs every exchange with GPS
+                verification and QR check-in — no contact required.
               </p>
               <p className="text-muted-foreground mb-8">
-                Built in partnership with domestic violence organizations, Safe Handoff
-                provides GPS-verified custody exchanges with complete documentation
-                for court proceedings.
+                Built in partnership with domestic violence organizations, Safe
+                Handoff timestamps every exchange with location data — a clean,
+                court-ready record instead of a shoebox of screenshots.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
                   href="/early-access"
                   className="inline-flex items-center justify-center gap-2 bg-cg-sage text-white font-medium px-8 py-4 rounded-full text-lg transition-all duration-300 hover:bg-cg-sage-light hover:shadow-xl hover:-translate-y-1"
                 >
-                  Get Started Free
+                  Start free — no card needed
                   <ArrowRight className="w-5 h-5" />
                 </Link>
                 <Link
@@ -214,8 +219,8 @@ export default function SafeHandoffPage() {
               Safety Built Into Every Feature
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              CommonGround was designed with survivors in mind. Every feature prioritizes
-              your safety and minimizes contact with your co-parent.
+              GPS-verified handoffs, ARIA-filtered messaging, and timestamped
+              records — every feature cuts contact and builds your case.
             </p>
           </div>
 
@@ -228,7 +233,11 @@ export default function SafeHandoffPage() {
                   className="bg-background rounded-xl p-6 border border-border/50 hover:border-cg-sage/30 transition-colors"
                 >
                   <div className="w-12 h-12 bg-cg-sage-subtle rounded-xl flex items-center justify-center mb-4">
-                    <Icon className="w-6 h-6 text-cg-sage" />
+                    {feature.brandIcon ? (
+                      <BrandIcon name={feature.brandIcon} size={24} />
+                    ) : Icon ? (
+                      <Icon className="w-6 h-6 text-cg-sage" />
+                    ) : null}
                   </div>
                   <h3 className="font-semibold text-foreground mb-2">{feature.title}</h3>
                   <p className="text-sm text-muted-foreground">{feature.description}</p>
@@ -244,10 +253,10 @@ export default function SafeHandoffPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl sm:text-4xl font-semibold text-foreground mb-4">
-              How Safe Handoff Works
+              How Silent Handoff Works
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Simple, silent, and fully documented.
+              Four steps, zero contact, every exchange documented.
             </p>
           </div>
 
@@ -398,22 +407,22 @@ export default function SafeHandoffPage() {
             You deserve to feel safe
           </h2>
           <p className="text-lg text-muted-foreground mb-10 max-w-xl mx-auto">
-            Start documenting your custody exchanges today. No credit card required.
-            Your safety is our priority.
+            Document your first GPS-verified exchange today. Free forever tier,
+            no credit card, about two minutes to set up.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/early-access"
               className="inline-flex items-center justify-center gap-2 bg-cg-sage text-white font-medium px-8 py-4 rounded-full text-lg transition-all duration-300 hover:bg-cg-sage-light hover:shadow-xl hover:-translate-y-1"
             >
-              Create Free Account
+              Start free — no card needed
               <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
               href="/pricing"
               className="inline-flex items-center justify-center gap-2 border-2 border-border text-foreground font-medium px-8 py-4 rounded-full text-lg transition-all hover:bg-muted"
             >
-              View All Features
+              See plans &amp; pricing
             </Link>
           </div>
         </div>

@@ -262,7 +262,7 @@ function RegisterContent() {
           <svg className="w-[52px] h-[52px] sm:w-[40px] sm:h-[40px]" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <linearGradient id="reg-bg" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#E8F4F8" />
+                <stop offset="0%" stopColor="#E0EFF8" />
                 <stop offset="100%" stopColor="#D6ECE8" />
               </linearGradient>
               <linearGradient id="reg-lf" x1="0" y1="0" x2="1" y2="1">

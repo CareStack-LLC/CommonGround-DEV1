@@ -119,7 +119,7 @@ export default async function DynamicLandingPage({ params }: Props) {
             },
             offers: {
               '@type': 'Offer',
-              name: 'Early Adopter — 30% Off for Life',
+              name: 'Early Adopter — 30% Off for 3 Years',
               description: 'First 50 members get 30% off all subscriptions, locked for 36 months.',
               eligibleQuantity: { '@type': 'QuantitativeValue', value: 50 },
             },
@@ -144,7 +144,7 @@ export default async function DynamicLandingPage({ params }: Props) {
           testimonial={sections.testimonial || { quote: '', name: '', title: '', initial: '' }}
           earlyAdopterLabel={sections.early_adopter_label || 'Early Adopter Offer'}
           earlyAdopterHeading={sections.early_adopter_heading || 'Your Kids Need You Present'}
-          earlyAdopterSubheading={sections.early_adopter_subheading || 'Join the first 50 members and lock in 30% off for life.'}
+          earlyAdopterSubheading={sections.early_adopter_subheading || 'Join the first 50 members and lock in 30% off for 3 years.'}
           faqHeading={sections.faq_heading || 'Questions You Might Have'}
           faqs={sections.faqs || []}
         />

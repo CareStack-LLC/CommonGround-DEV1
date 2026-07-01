@@ -10,12 +10,12 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 // Predefined tag color palette cycling
 const TAG_COLORS = [
-    "bg-blue-100 text-blue-700 border-blue-200",
-    "bg-purple-100 text-purple-700 border-purple-200",
-    "bg-emerald-100 text-emerald-700 border-emerald-200",
-    "bg-amber-100 text-amber-700 border-amber-200",
-    "bg-rose-100 text-rose-700 border-rose-200",
-    "bg-cyan-100 text-cyan-700 border-cyan-200",
+    "bg-[#E0EFF8] text-[#1E4E6B] border-[#E0EFF8]",
+    "bg-[#E0EFF8] text-[#1E4E6B] border-[#C2DEF0]",
+    "bg-[#E8F4F0] text-[#2D8A70] border-[#C5E5DB]",
+    "bg-[#FEF7ED] text-[#B8791A] border-[#FBE3BF]",
+    "bg-[#FEF7ED] text-[#E09520] border-[#FEF7ED]",
+    "bg-[#E0EFF8] text-[#1E4E6B] border-[#C2DEF0]",
 ];
 
 function tagColor(tag: string) {
@@ -155,7 +155,7 @@ export function CaseTagInput({ caseId, token, allTags = [], onChange, compact = 
                         {!compact && (
                             <button
                                 onClick={(e) => { e.stopPropagation(); removeTag(tag); }}
-                                className="hover:text-red-600 transition-colors"
+                                className="hover:text-[#C53030] transition-colors"
                             >
                                 <X className="h-2.5 w-2.5" />
                             </button>

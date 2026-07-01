@@ -69,13 +69,13 @@ export function ExportList({ caseId, onCreateNew }: ExportListProps) {
   const getStatusColor = (status: ExportStatus) => {
     switch (status) {
       case 'completed':
-        return 'text-green-600 bg-green-100';
+        return 'text-[#2D8A70] bg-[#E8F4F0]';
       case 'downloaded':
-        return 'text-blue-600 bg-blue-100';
+        return 'text-[#2D6A8F] bg-[#E0EFF8]';
       case 'generating':
-        return 'text-yellow-600 bg-yellow-100';
+        return 'text-[#E09520] bg-[#FEF7ED]';
       case 'failed':
-        return 'text-red-600 bg-red-100';
+        return 'text-[#C53030] bg-[#FEE2E2]';
       default:
         return 'text-gray-600 bg-gray-100';
     }
@@ -99,16 +99,16 @@ export function ExportList({ caseId, onCreateNew }: ExportListProps) {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2D6A8F]" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <Card className="bg-red-50 border-red-200">
+      <Card className="bg-[#FEE2E2] border-[#FEE2E2]">
         <CardContent className="pt-6">
-          <p className="text-red-700">{error}</p>
+          <p className="text-[#9B2C2C]">{error}</p>
           <Button variant="outline" onClick={loadExports} className="mt-4">
             Retry
           </Button>
@@ -191,7 +191,7 @@ export function ExportList({ caseId, onCreateNew }: ExportListProps) {
                   )}
 
                   {exportItem.error_message && (
-                    <p className="mt-2 text-sm text-red-600">
+                    <p className="mt-2 text-sm text-[#C53030]">
                       Error: {exportItem.error_message}
                     </p>
                   )}
@@ -216,7 +216,7 @@ export function ExportList({ caseId, onCreateNew }: ExportListProps) {
                     size="sm"
                     variant="outline"
                     onClick={() => handleDelete(exportItem)}
-                    className="text-red-600 hover:text-red-700"
+                    className="text-[#C53030] hover:text-[#9B2C2C]"
                   >
                     Delete
                   </Button>

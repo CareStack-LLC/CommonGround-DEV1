@@ -105,11 +105,11 @@ export function useProfessionalAuth() {
 
 // Professional type display info
 const PROFESSIONAL_TYPE_INFO: Record<string, { label: string; color: string }> = {
-  attorney: { label: "Attorney", color: "bg-emerald-100 text-emerald-800" },
+  attorney: { label: "Attorney", color: "bg-[#E8F4F0] text-[#236E59]" },
   paralegal: { label: "Paralegal", color: "bg-blue-100 text-blue-800" },
-  mediator: { label: "Mediator", color: "bg-purple-100 text-purple-800" },
-  parenting_coordinator: { label: "Parenting Coordinator", color: "bg-amber-100 text-amber-800" },
-  intake_coordinator: { label: "Intake Coordinator", color: "bg-cyan-100 text-cyan-800" },
+  mediator: { label: "Mediator", color: "bg-[#E0EFF8] text-[#1E4E6B]" },
+  parenting_coordinator: { label: "Parenting Coordinator", color: "bg-[#FEF7ED] text-[#8F5E14]" },
+  intake_coordinator: { label: "Intake Coordinator", color: "bg-[#E0EFF8] text-[#1E4E6B]" },
   practice_admin: { label: "Practice Admin", color: "bg-slate-100 text-slate-800" },
 };
 
@@ -534,7 +534,7 @@ function ProfessionalNavigation({
             <div className="flex items-center gap-2.5">
               {dashboardData?.pending_firm_invitations > 0 && (
                 <Link href="/professional/intake?tab=invitations">
-                  <Badge className="text-xs bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100 cursor-pointer transition-colors font-medium">
+                  <Badge className="text-xs bg-[#FEF7ED] text-[#B8791A] border border-[#FBE3BF] hover:bg-[#FEF7ED] cursor-pointer transition-colors font-medium">
                     {dashboardData.pending_firm_invitations} case invitation{dashboardData.pending_firm_invitations !== 1 ? "s" : ""}
                   </Badge>
                 </Link>

@@ -103,7 +103,7 @@ export default function GrantCodeManagementPage() {
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-950">
-                <Loader2 className="h-8 w-8 animate-spin text-amber-500" />
+                <Loader2 className="h-8 w-8 animate-spin text-[#F5A623]" />
             </div>
         );
     }
@@ -111,7 +111,7 @@ export default function GrantCodeManagementPage() {
     if (error || !data) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-gray-950 p-6 text-center">
-                <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
+                <AlertCircle className="h-12 w-12 text-[#C53030] mb-4" />
                 <h1 className="text-xl font-semibold text-white mb-2">Access Restricted</h1>
                 <p className="text-gray-400 mb-6">{error || 'Partner admin authentication required.'}</p>
                 <Link href={`/dashboard/partners/${partnerSlug}`}>
@@ -173,7 +173,7 @@ export default function GrantCodeManagementPage() {
                                         <input
                                             type="text"
                                             placeholder="Search code or user..."
-                                            className="bg-gray-800 border-none rounded-lg py-2 pl-10 pr-4 text-sm focus:ring-1 focus:ring-amber-500/50 outline-none w-64"
+                                            className="bg-gray-800 border-none rounded-lg py-2 pl-10 pr-4 text-sm focus:ring-1 focus:ring-[#F5A623]/50 outline-none w-64"
                                             value={searchTerm}
                                             onChange={(e) => setSearchTerm(e.target.value)}
                                         />
@@ -186,12 +186,12 @@ export default function GrantCodeManagementPage() {
                                         <div
                                             key={code.code}
                                             className={`group flex items-center justify-between p-4 rounded-xl border transition-all ${code.is_activated
-                                                ? 'bg-amber-500/5 border-amber-500/10'
+                                                ? 'bg-[#F5A623]/5 border-[#F5A623]/10'
                                                 : 'bg-gray-800/30 border-gray-800 hover:border-gray-700'
                                                 }`}
                                         >
                                             <div className="flex items-center gap-4">
-                                                <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${code.is_activated ? 'bg-amber-500/20 text-amber-500' : 'bg-gray-700/50 text-gray-500'
+                                                <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${code.is_activated ? 'bg-[#F5A623]/20 text-[#F5A623]' : 'bg-gray-700/50 text-gray-500'
                                                     }`}>
                                                     <Shield className="h-5 w-5" />
                                                 </div>
@@ -201,7 +201,7 @@ export default function GrantCodeManagementPage() {
                                                             {code.code}
                                                         </code>
                                                         {code.is_activated ? (
-                                                            <span className="text-[10px] bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
+                                                            <span className="text-[10px] bg-[#3DAA8A]/20 text-[#5BC4A0] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">
                                                                 Activated
                                                             </span>
                                                         ) : (
@@ -227,7 +227,7 @@ export default function GrantCodeManagementPage() {
                                                         className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
                                                     >
                                                         {copiedCode === code.code ? (
-                                                            <CheckCircle className="h-4 w-4 text-amber-500" />
+                                                            <CheckCircle className="h-4 w-4 text-[#F5A623]" />
                                                         ) : (
                                                             <Copy className="h-4 w-4 text-gray-500" />
                                                         )}
@@ -265,8 +265,8 @@ export default function GrantCodeManagementPage() {
                                             <div key={user.anonymous_user_id} className="p-4 rounded-2xl bg-gray-800/50 border border-gray-800">
                                                 <div className="flex items-center justify-between mb-4">
                                                     <div className="flex items-center gap-3">
-                                                        <div className="h-10 w-10 rounded-full bg-amber-500/20 flex items-center justify-center">
-                                                            <span className="text-xs font-bold text-amber-500">
+                                                        <div className="h-10 w-10 rounded-full bg-[#F5A623]/20 flex items-center justify-center">
+                                                            <span className="text-xs font-bold text-[#F5A623]">
                                                                 {user.anonymous_user_id.slice(-2)}
                                                             </span>
                                                         </div>
@@ -275,7 +275,7 @@ export default function GrantCodeManagementPage() {
                                                             <p className="text-[10px] text-gray-500">Joined {new Date(user.activated_at).toLocaleDateString()}</p>
                                                         </div>
                                                     </div>
-                                                    <div className={`h-1.5 w-1.5 rounded-full ${user.is_active ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-gray-600'}`} />
+                                                    <div className={`h-1.5 w-1.5 rounded-full ${user.is_active ? 'bg-[#3DAA8A] shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-gray-600'}`} />
                                                 </div>
                                                 <div className="grid grid-cols-2 gap-4">
                                                     <div className="bg-black/20 rounded-lg p-2 border border-white/5">
@@ -284,7 +284,7 @@ export default function GrantCodeManagementPage() {
                                                     </div>
                                                     <div className="bg-black/20 rounded-lg p-2 border border-white/5">
                                                         <p className="text-[10px] text-gray-500 uppercase tracking-wider font-bold">Health Status</p>
-                                                        <p className="text-sm font-bold text-amber-500">Normal</p>
+                                                        <p className="text-sm font-bold text-[#F5A623]">Normal</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -294,8 +294,8 @@ export default function GrantCodeManagementPage() {
                             </CardContent>
                         </Card>
 
-                        <div className="p-6 rounded-3xl bg-amber-500/10 border border-amber-500/20">
-                            <h4 className="flex items-center gap-2 text-amber-500 font-bold text-sm mb-2">
+                        <div className="p-6 rounded-3xl bg-[#F5A623]/10 border border-[#F5A623]/20">
+                            <h4 className="flex items-center gap-2 text-[#F5A623] font-bold text-sm mb-2">
                                 <Lock className="h-4 w-4" />
                                 Privacy First
                             </h4>

@@ -221,7 +221,7 @@ export default function PricingPage() {
           </h1>
 
           <p className="text-xl sm:text-2xl text-gray-600 mb-4 leading-relaxed max-w-2xl mx-auto">
-            No credit card. No pressure. Just see if automation works better than coordination.
+            Start on the free forever plan &mdash; ARIA messaging, shared calendar, and ClearFund included. No credit card, upgrade only when automation earns it.
           </p>
           <p className="text-base text-gray-600 mb-8 max-w-xl mx-auto">
             Less than the cost of one missed exchange or one heated text that ends up in court.
@@ -624,15 +624,15 @@ export default function PricingPage() {
             Ready to find common ground?
           </h2>
           <p className="text-xl text-white/80 mb-10 max-w-2xl mx-auto">
-            Join the families who&apos;ve found a calmer way.
+            Start free today. Add automation the week you need it &mdash; not before.
           </p>
           <button
             onClick={() => router.push('/early-access')}
             className="px-8 py-4 bg-white text-[var(--portal-primary)] rounded-xl font-medium text-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5"
           >
-            Start Free Today
+            Start free &mdash; no card needed
           </button>
-          <p className="mt-6 text-sm text-white/60">No credit card required. Start in 2 minutes.</p>
+          <p className="mt-6 text-sm text-white/60">Free forever &middot; No credit card &middot; 2-minute setup &middot; Cancel anytime</p>
         </div>
       </section>
     </div>

@@ -89,11 +89,11 @@ export default function CourtEventDetails({
   const getRsvpStatusDisplay = (status?: string) => {
     switch (status) {
       case 'attending':
-        return { label: 'Attending', color: 'bg-green-100 text-green-800', icon: Check };
+        return { label: 'Attending', color: 'bg-[#E8F4F0] text-[#1E3A4A]', icon: Check };
       case 'not_attending':
-        return { label: 'Not Attending', color: 'bg-red-100 text-red-800', icon: XCircle };
+        return { label: 'Not Attending', color: 'bg-[#FEE2E2] text-[#9B2C2C]', icon: XCircle };
       case 'maybe':
-        return { label: 'Maybe', color: 'bg-yellow-100 text-yellow-800', icon: HelpCircle };
+        return { label: 'Maybe', color: 'bg-[#FEF7ED] text-[#E09520]', icon: HelpCircle };
       default:
         return { label: 'No Response', color: 'bg-gray-100 text-gray-600', icon: User };
     }
@@ -107,8 +107,8 @@ export default function CourtEventDetails({
       <Card className="w-full max-w-lg max-h-[90vh] overflow-y-auto">
         <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-4">
           <div className="flex items-start gap-3">
-            <div className="p-2 bg-red-100 rounded-lg">
-              <Gavel className="h-6 w-6 text-red-600" />
+            <div className="p-2 bg-[#FEE2E2] rounded-lg">
+              <Gavel className="h-6 w-6 text-[#C53030]" />
             </div>
             <div>
               <CardTitle className="text-xl">{event.title}</CardTitle>
@@ -125,9 +125,9 @@ export default function CourtEventDetails({
         <CardContent className="space-y-6">
           {/* Mandatory Badge */}
           {event.is_mandatory && (
-            <Alert className="border-red-200 bg-red-50">
-              <AlertTriangle className="h-4 w-4 text-red-600" />
-              <AlertDescription className="text-red-800">
+            <Alert className="border-[#FEE2E2] bg-[#FEE2E2]">
+              <AlertTriangle className="h-4 w-4 text-[#C53030]" />
+              <AlertDescription className="text-[#9B2C2C]">
                 This is a mandatory court event. Your attendance is required.
               </AlertDescription>
             </Alert>
@@ -166,7 +166,7 @@ export default function CourtEventDetails({
                     href={event.virtual_link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline"
+                    className="text-[#2D6A8F] hover:underline"
                   >
                     Join Virtual Meeting
                   </a>
@@ -185,9 +185,9 @@ export default function CourtEventDetails({
 
           {/* Shared Notes from Court */}
           {event.shared_notes && (
-            <div className="p-3 bg-blue-50 rounded-lg">
-              <h4 className="font-medium text-blue-900 mb-1">Notes from Court</h4>
-              <p className="text-blue-800 text-sm">{event.shared_notes}</p>
+            <div className="p-3 bg-[#E0EFF8] rounded-lg">
+              <h4 className="font-medium text-[#1E3A4A] mb-1">Notes from Court</h4>
+              <p className="text-[#1E4E6B] text-sm">{event.shared_notes}</p>
             </div>
           )}
 
@@ -229,7 +229,7 @@ export default function CourtEventDetails({
                 <textarea
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#2D6A8F] focus:ring-[#2D6A8F]"
                   rows={3}
                   placeholder="Enter your reason..."
                 />
@@ -266,8 +266,8 @@ export default function CourtEventDetails({
                   disabled={isSubmitting}
                   className={`flex items-center gap-2 ${
                     event.my_rsvp_status === 'attending'
-                      ? 'bg-green-600 hover:bg-green-700'
-                      : 'bg-green-100 text-green-800 hover:bg-green-200'
+                      ? 'bg-[#2D8A70] hover:bg-[#2D8A70]'
+                      : 'bg-[#E8F4F0] text-[#1E3A4A] hover:bg-[#E8F4F0]'
                   }`}
                   variant={event.my_rsvp_status === 'attending' ? 'default' : 'outline'}
                 >
@@ -279,8 +279,8 @@ export default function CourtEventDetails({
                   disabled={isSubmitting}
                   className={`flex items-center gap-2 ${
                     event.my_rsvp_status === 'maybe'
-                      ? 'bg-yellow-600 hover:bg-yellow-700'
-                      : 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
+                      ? 'bg-[#E09520] hover:bg-[#E09520]'
+                      : 'bg-[#FEF7ED] text-[#E09520] hover:bg-[#FEF7ED]'
                   }`}
                   variant={event.my_rsvp_status === 'maybe' ? 'default' : 'outline'}
                 >
@@ -292,8 +292,8 @@ export default function CourtEventDetails({
                   disabled={isSubmitting}
                   className={`flex items-center gap-2 ${
                     event.my_rsvp_status === 'not_attending'
-                      ? 'bg-red-600 hover:bg-red-700'
-                      : 'bg-red-100 text-red-800 hover:bg-red-200'
+                      ? 'bg-[#C53030] hover:bg-[#9B2C2C]'
+                      : 'bg-[#FEE2E2] text-[#9B2C2C] hover:bg-[#FEE2E2]'
                   }`}
                   variant={event.my_rsvp_status === 'not_attending' ? 'default' : 'outline'}
                 >

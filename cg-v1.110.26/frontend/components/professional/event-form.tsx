@@ -93,12 +93,12 @@ const REMINDER_OPTIONS = [
 ];
 
 const COLOR_OPTIONS = [
-  { value: "#3B82F6", label: "Blue" },
-  { value: "#DC2626", label: "Red" },
-  { value: "#10B981", label: "Green" },
-  { value: "#F59E0B", label: "Amber" },
-  { value: "#8B5CF6", label: "Purple" },
-  { value: "#EC4899", label: "Pink" },
+  { value: "#2D6A8F", label: "Blue" },
+  { value: "#C53030", label: "Red" },
+  { value: "#3DAA8A", label: "Green" },
+  { value: "#F5A623", label: "Amber" },
+  { value: "#2D6A8F", label: "Purple" },
+  { value: "#F5A623", label: "Pink" },
   { value: "#6B7280", label: "Gray" },
 ];
 
@@ -116,7 +116,7 @@ const defaultFormData: EventFormData = {
   parent_visibility: "none",
   reminder_minutes: 30,
   notes: "",
-  color: "#3B82F6",
+  color: "#2D6A8F",
   attendee_ids: [],
   attendee_emails: [],
 };
@@ -243,7 +243,7 @@ export function EventForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
-        <div className="flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-lg">
+        <div className="flex items-center gap-2 text-[#C53030] bg-[#FEE2E2] p-3 rounded-lg">
           <AlertTriangle className="h-4 w-4" />
           <span className="text-sm">{error}</span>
         </div>
@@ -443,16 +443,16 @@ export function EventForm({
                 type="button"
                 onClick={() => toggleAttendee(parent.id)}
                 className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs transition-all ${formData.attendee_ids.includes(parent.id)
-                  ? "bg-indigo-50 border-indigo-200 text-indigo-700 font-bold shadow-sm"
+                  ? "bg-[#F0F7FC] border-[#C2DEF0] text-[#1E4E6B] font-bold shadow-sm"
                   : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
                   }`}
               >
-                <div className="h-4 w-4 rounded-full bg-indigo-100 flex items-center justify-center text-[10px]">
+                <div className="h-4 w-4 rounded-full bg-[#E0EFF8] flex items-center justify-center text-[10px]">
                   {parent.name[0]}
                 </div>
                 {parent.name}
                 {formData.attendee_ids.includes(parent.id) && (
-                  <div className="h-3 w-3 bg-indigo-600 rounded-full flex items-center justify-center">
+                  <div className="h-3 w-3 bg-[#2D6A8F] rounded-full flex items-center justify-center">
                     <CheckCircle2 className="h-2 w-2 text-white" />
                   </div>
                 )}

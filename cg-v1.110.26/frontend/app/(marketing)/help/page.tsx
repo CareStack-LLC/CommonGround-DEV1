@@ -117,7 +117,7 @@ export default function HelpCenterPage() {
             How can we <span className="text-cg-sage">help?</span>
           </h1>
           <p className="text-lg text-gray-600 mb-8 max-w-lg mx-auto">
-            Guides, answers, and resources for everything CommonGround.
+            Ask ARIA a question below, or browse guides and answers for every CommonGround feature.
           </p>
 
           {/* Inline ARIA Chat */}

@@ -230,7 +230,7 @@ function ChildCubbiePageContent() {
                     </span>
                     <span
                       className={`text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded-full ${item.current_location === 'child_traveling'
-                        ? 'bg-amber-100 text-amber-700'
+                        ? 'bg-[#FEF7ED] text-[#E09520]'
                         : 'bg-muted text-muted-foreground'
                         }`}
                     >

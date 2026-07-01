@@ -36,14 +36,14 @@ const FIRM_ROLES = [
 const ROLE_COLORS: Record<string, string> = {
   owner: "bg-[#3DAA8A]/10 text-[#1E3A4A] border-0",
   admin: "bg-blue-50 text-blue-700 border-0",
-  attorney: "bg-emerald-50 text-emerald-700 border-0",
-  paralegal: "bg-cyan-50 text-cyan-700 border-0",
-  intake: "bg-amber-50 text-amber-700 border-0",
+  attorney: "bg-[#E8F4F0] text-[#2D8A70] border-0",
+  paralegal: "bg-[#F0F7FC] text-[#1E4E6B] border-0",
+  intake: "bg-[#FEF7ED] text-[#B8791A] border-0",
   readonly: "bg-slate-100 text-slate-600 border-0",
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  active: "bg-green-50 text-green-700 border-0",
+  active: "bg-[#E8F4F0] text-[#2D8A70] border-0",
   invited: "bg-blue-50 text-blue-700 border-0",
   suspended: "bg-red-50 text-red-700 border-0",
   removed: "bg-slate-100 text-slate-500 border-0",

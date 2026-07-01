@@ -199,18 +199,18 @@ export default function IntakeOutputsPage() {
       case "urgent":
         return "bg-red-100 text-red-800";
       case "high":
-        return "bg-orange-100 text-orange-800";
+        return "bg-[#FEF7ED] text-[#8F5E14]";
       case "medium":
-        return "bg-amber-100 text-amber-800";
+        return "bg-[#FEF7ED] text-[#8F5E14]";
       default:
-        return "bg-green-100 text-green-800";
+        return "bg-[#E8F4F0] text-[#236E59]";
     }
   };
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2D8A70]" />
       </div>
     );
   }
@@ -259,7 +259,7 @@ export default function IntakeOutputsPage() {
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="p-3 bg-purple-100 text-purple-600 rounded-xl">
+          <div className="p-3 bg-[#E0EFF8] text-[#2D6A8F] rounded-xl">
             <Sparkles className="h-8 w-8" />
           </div>
           <div>
@@ -284,11 +284,11 @@ export default function IntakeOutputsPage() {
 
       {/* Confidence Score */}
       {summary && (
-        <Card className="bg-gradient-to-r from-purple-50 to-indigo-50 border-purple-200">
+        <Card className="bg-gradient-to-r from-[#F0F7FC] to-[#F0F7FC] border-[#C2DEF0]">
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <Sparkles className="h-5 w-5 text-purple-500" />
+                <Sparkles className="h-5 w-5 text-[#3D8DB0]" />
                 <div>
                   <p className="font-medium">AI Confidence Score</p>
                   <p className="text-sm text-muted-foreground">
@@ -298,7 +298,7 @@ export default function IntakeOutputsPage() {
               </div>
               <div className="flex items-center gap-3">
                 <Progress value={summary.confidence_score * 100} className="w-32 h-2" />
-                <span className="text-lg font-bold text-purple-600">
+                <span className="text-lg font-bold text-[#2D6A8F]">
                   {Math.round(summary.confidence_score * 100)}%
                 </span>
               </div>
@@ -450,7 +450,7 @@ export default function IntakeOutputsPage() {
                             </div>
                           </div>
                           {child.special_needs && (
-                            <Badge variant="outline" className="bg-amber-50 text-amber-700">
+                            <Badge variant="outline" className="bg-[#FEF7ED] text-[#B8791A]">
                               Special Needs
                             </Badge>
                           )}
@@ -465,13 +465,13 @@ export default function IntakeOutputsPage() {
               <div className="grid md:grid-cols-2 gap-4">
                 <Card>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-base text-emerald-600">Client Goals</CardTitle>
+                    <CardTitle className="text-base text-[#2D8A70]">Client Goals</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-2">
                       {summary.goals.map((goal, index) => (
                         <li key={index} className="flex items-start gap-2 text-sm">
-                          <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
+                          <CheckCircle2 className="h-4 w-4 text-[#3DAA8A] mt-0.5 shrink-0" />
                           {goal}
                         </li>
                       ))}
@@ -481,13 +481,13 @@ export default function IntakeOutputsPage() {
 
                 <Card>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-base text-amber-600">Key Concerns</CardTitle>
+                    <CardTitle className="text-base text-[#E09520]">Key Concerns</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-2">
                       {summary.concerns.map((concern, index) => (
                         <li key={index} className="flex items-start gap-2 text-sm">
-                          <AlertCircle className="h-4 w-4 text-amber-500 mt-0.5 shrink-0" />
+                          <AlertCircle className="h-4 w-4 text-[#F5A623] mt-0.5 shrink-0" />
                           {concern}
                         </li>
                       ))}
@@ -705,9 +705,9 @@ export default function IntakeOutputsPage() {
                         {extractedData.special_considerations.map((item, index) => (
                           <li
                             key={index}
-                            className="flex items-start gap-2 p-2 bg-amber-50 rounded-lg text-sm"
+                            className="flex items-start gap-2 p-2 bg-[#FEF7ED] rounded-lg text-sm"
                           >
-                            <AlertCircle className="h-4 w-4 text-amber-500 mt-0.5" />
+                            <AlertCircle className="h-4 w-4 text-[#F5A623] mt-0.5" />
                             {item}
                           </li>
                         ))}
@@ -725,7 +725,7 @@ export default function IntakeOutputsPage() {
             <>
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-base text-purple-600">
+                  <CardTitle className="text-base text-[#2D6A8F]">
                     Recommended Next Steps
                   </CardTitle>
                   <CardDescription>
@@ -737,9 +737,9 @@ export default function IntakeOutputsPage() {
                     {summary.recommended_actions.map((action, index) => (
                       <div
                         key={index}
-                        className="flex items-start gap-3 p-3 bg-purple-50 rounded-lg"
+                        className="flex items-start gap-3 p-3 bg-[#F0F7FC] rounded-lg"
                       >
-                        <div className="flex items-center justify-center w-6 h-6 rounded-full bg-purple-200 text-purple-700 text-sm font-medium shrink-0">
+                        <div className="flex items-center justify-center w-6 h-6 rounded-full bg-[#C2DEF0] text-[#1E4E6B] text-sm font-medium shrink-0">
                           {index + 1}
                         </div>
                         <p className="text-sm">{action}</p>

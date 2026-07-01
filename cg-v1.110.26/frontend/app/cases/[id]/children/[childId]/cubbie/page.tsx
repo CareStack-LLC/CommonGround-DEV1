@@ -90,7 +90,7 @@ export default function ChildCubbiePage() {
       <div className="container mx-auto py-8">
         <Card>
           <CardContent className="pt-6">
-            <div className="text-center text-red-600">
+            <div className="text-center text-[#C53030]">
               <p>{error}</p>
               <Button onClick={loadData} className="mt-4">
                 Try Again
@@ -191,7 +191,7 @@ export default function ChildCubbiePage() {
                   <span
                     className={`text-xs px-2 py-1 rounded-full ${
                       item.current_location === 'child_traveling'
-                        ? 'bg-yellow-100 text-yellow-800'
+                        ? 'bg-[#FEF7ED] text-[#E09520]'
                         : 'bg-gray-100 text-gray-800'
                     }`}
                   >

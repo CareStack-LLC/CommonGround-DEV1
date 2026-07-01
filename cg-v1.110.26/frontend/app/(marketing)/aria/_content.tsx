@@ -8,11 +8,9 @@ import {
   Check,
   CheckCircle2,
   ChevronDown,
-  DollarSign,
   FileText,
   Gift,
   Heart,
-  Calendar,
   Lock,
   MessageCircle,
   MessageSquare,
@@ -45,6 +43,7 @@ import {
   Line,
 } from 'recharts';
 import { EarlyAdopterForm } from '@/components/marketing/early-adopter-form';
+import { BrandIcon, type BrandIconName } from '@/components/brand/brand-icon';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -88,12 +87,12 @@ if (_apiUrl.endsWith('/')) _apiUrl = _apiUrl.slice(0, -1);
 if (!_apiUrl.endsWith('/api/v1')) _apiUrl += '/api/v1';
 const API_URL = _apiUrl;
 
-const SCENARIOS: { key: Scenario; label: string; description: string; icon: React.ElementType; opener: string }[] = [
-  { key: 'schedule', label: 'Schedule Dispute', description: 'Pickup, drop-off, last-minute changes', icon: Calendar, opener: "We need to talk about the schedule. You keep messing it up and honestly the kids are done with it. Get it together." },
+const SCENARIOS: { key: Scenario; label: string; description: string; icon?: React.ElementType; brandIcon?: BrandIconName; opener: string }[] = [
+  { key: 'schedule', label: 'Schedule Dispute', description: 'Pickup, drop-off, last-minute changes', brandIcon: 'timebridge', opener: "We need to talk about the schedule. You keep messing it up and honestly the kids are done with it. Get it together." },
   { key: 'medical', label: 'Medical Decisions', description: 'Doctor visits, meds, insurance', icon: Stethoscope, opener: "I took the kids to the doctor today. I'm making the decisions since you clearly can't be bothered to show up." },
-  { key: 'financial', label: 'Money & Expenses', description: 'Support, shared costs', icon: DollarSign, opener: "Where's this month's payment?? You're always late. The kids need things and you can't even handle basic responsibilities." },
+  { key: 'financial', label: 'Money & Expenses', description: 'Support, shared costs', brandIcon: 'clearfund', opener: "Where's this month's payment?? You're always late. The kids need things and you can't even handle basic responsibilities." },
   { key: 'holiday', label: 'Holiday Planning', description: 'Who gets the kids, vacations', icon: Gift, opener: "I'm keeping the kids for Thanksgiving. They already told me they'd rather be here. Don't make this into a thing." },
-  { key: 'communication', label: 'Boundaries', description: 'Response times, contact rules', icon: MessageCircle, opener: "Stop texting me every 5 minutes. I'll respond when I feel like it. You're not that important." },
+  { key: 'communication', label: 'Boundaries', description: 'Response times, contact rules', brandIcon: 'aria', opener: "Stop texting me every 5 minutes. I'll respond when I feel like it. You're not that important." },
   { key: 'new_partner', label: 'New Partner', description: 'Introducing someone new', icon: Heart, opener: "I heard you have someone new around MY kids. We need to talk about that right now. This is not okay." },
 ];
 
@@ -119,7 +118,7 @@ const ARIA_TAUNTS = [
   "That was textbook. Try something creative!",
   "ARIA: 1 point. Your move.",
   "Not bad, but ARIA's seen pettier.",
-  "ARIA's trained on 127K+ messages.",
+  "ARIA's trained on real co-parenting messages.",
   "Good effort! Try again.",
   "You'll have to do better than that!",
   "ARIA's pattern library says hi.",
@@ -222,8 +221,6 @@ export function ARIAContent() {
 
   // Animated counters
   const patterns = useCountUp(1800, 2000);
-  const messages127k = useCountUp(127, 2000);
-  const categories14 = useCountUp(14, 1200);
 
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -428,10 +425,14 @@ export function ARIAContent() {
               href="/early-access"
               className="inline-flex items-center justify-center gap-2 bg-white text-[#1E3A4A] font-medium px-8 py-4 rounded-full text-lg transition-all duration-200 border border-[#D6ECE8] hover:border-[#3DAA8A] hover:shadow-md"
             >
-              Get Early Access
+              Start free &mdash; no card needed
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
+
+          <p className="mt-5 text-sm text-gray-400" style={{ fontFamily: "var(--font-dm-sans), sans-serif" }}>
+            Free forever &middot; No credit card &middot; You always choose what sends
+          </p>
         </div>
       </section>
 
@@ -457,7 +458,7 @@ export function ARIAContent() {
                 title: 'You type what you feel',
                 desc: 'Write exactly what you\'re thinking — no filter needed. ARIA works in the background.',
                 icon: MessageCircle,
-                color: '#ef4444',
+                color: '#C53030',
               },
               {
                 step: '02',
@@ -527,10 +528,10 @@ export function ARIAContent() {
                 {/* Without ARIA — visible by default */}
                 <div className={`p-6 transition-all duration-500 ${hoveredBA === index ? 'opacity-0 scale-95 absolute inset-0' : 'opacity-100'}`}>
                   <div className="flex items-center gap-2 mb-3">
-                    <div className="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center">
-                      <EyeOff className="w-3 h-3 text-red-400" />
+                    <div className="w-6 h-6 rounded-full bg-[#FEE2E2] flex items-center justify-center">
+                      <EyeOff className="w-3 h-3 text-[#C53030]" />
                     </div>
-                    <span className="text-xs font-semibold uppercase tracking-wider text-red-400">Without ARIA</span>
+                    <span className="text-xs font-semibold uppercase tracking-wider text-[#C53030]">Without ARIA</span>
                   </div>
                   <p className="text-[#1E3A4A] font-medium leading-relaxed">&ldquo;{item.before}&rdquo;</p>
                   <p className="text-xs text-gray-400 mt-3 flex items-center gap-1">
@@ -619,7 +620,11 @@ export function ARIAContent() {
                       }
                     `}
                   >
-                    <Icon className={`w-5 h-5 mb-2 ${isSelected ? 'text-[#F5A623]' : 'text-white/40'}`} />
+                    {s.brandIcon ? (
+                      <BrandIcon name={s.brandIcon} size={20} className={`mb-2 ${isSelected ? '' : 'opacity-40'}`} />
+                    ) : Icon ? (
+                      <Icon className={`w-5 h-5 mb-2 ${isSelected ? 'text-[#F5A623]' : 'text-white/40'}`} />
+                    ) : null}
                     <h3 className={`font-semibold text-xs mb-0.5 ${isSelected ? 'text-white' : 'text-white/70'}`}>
                       {s.label}
                     </h3>
@@ -676,7 +681,7 @@ export function ARIAContent() {
                   <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                     <div className="max-w-[80%] space-y-1">
                       {msg.original && (
-                        <div className={`text-[11px] px-3 py-1.5 rounded-lg mb-0.5 bg-red-500/15 text-red-400/80 line-through ${msg.role === 'user' ? 'text-right' : ''}`}>
+                        <div className={`text-[11px] px-3 py-1.5 rounded-lg mb-0.5 bg-[#C53030]/15 text-[#C53030]/80 line-through ${msg.role === 'user' ? 'text-right' : ''}`}>
                           {msg.original}
                         </div>
                       )}
@@ -742,9 +747,9 @@ export function ARIAContent() {
                       </div>
 
                       <div className="space-y-1.5 mb-3">
-                        <div className="bg-red-500/10 rounded-lg px-3 py-2">
-                          <p className="text-[10px] text-red-400 font-medium mb-0.5">Your message</p>
-                          <p className="text-xs text-red-300">{pendingIntervention.originalText}</p>
+                        <div className="bg-[#C53030]/10 rounded-lg px-3 py-2">
+                          <p className="text-[10px] text-[#C53030] font-medium mb-0.5">Your message</p>
+                          <p className="text-xs text-[#C53030]/70">{pendingIntervention.originalText}</p>
                         </div>
                         <div className="bg-white/[0.06] rounded-lg px-3 py-2 border border-[#3DAA8A]/20">
                           <p className="text-[10px] text-[#3DAA8A] font-medium mb-0.5">ARIA&apos;s suggestion</p>
@@ -796,7 +801,7 @@ export function ARIAContent() {
                         <Shield className="w-2.5 h-2.5" /> ARIA is rewriting all messages to be civil and child-focused
                       </p>
                       <p className="text-[10px] text-white/20 italic">
-                        The <span className="text-red-400/50 line-through">crossed-out text</span> is for this demo only — in the real app, only the rewritten message is sent.
+                        The <span className="text-[#C53030]/50 line-through">crossed-out text</span> is for this demo only — in the real app, only the rewritten message is sent.
                       </p>
                     </div>
                   )}
@@ -856,7 +861,7 @@ export function ARIAContent() {
                   { label: 'Messages', value: totalMessages, color: '#2D6A8F' },
                   { label: 'Interventions', value: totalInterventions, color: '#F5A623' },
                   { label: 'Accepted', value: acceptedInterventions, color: '#3DAA8A' },
-                  { label: 'Accept Rate', value: `${acceptanceRate}%`, color: acceptanceRate >= 50 ? '#3DAA8A' : '#ef4444' },
+                  { label: 'Accept Rate', value: `${acceptanceRate}%`, color: acceptanceRate >= 50 ? '#3DAA8A' : '#C53030' },
                 ].map((stat, i) => (
                   <div key={i} className="bg-gray-50 rounded-xl p-4 text-center">
                     <p className="text-2xl font-bold mb-0.5" style={{ color: stat.color }}>{stat.value}</p>
@@ -921,7 +926,7 @@ export function ARIAContent() {
                         <XAxis dataKey="message" tick={{ fontSize: 11 }} />
                         <YAxis tick={{ fontSize: 11 }} domain={[0, 100]} />
                         <Tooltip formatter={(value) => [`${value}%`, 'Toxicity']} />
-                        <Line type="monotone" dataKey="score" stroke="#ef4444" strokeWidth={2} dot={{ fill: '#ef4444', r: 3 }} />
+                        <Line type="monotone" dataKey="score" stroke="#C53030" strokeWidth={2} dot={{ fill: '#C53030', r: 3 }} />
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
@@ -935,12 +940,12 @@ export function ARIAContent() {
                   <div className="space-y-3">
                     {interventions.slice(0, 3).map((intervention, i) => (
                       <div key={i} className="grid md:grid-cols-2 gap-3">
-                        <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+                        <div className="bg-[#FEE2E2] border border-[#C53030]/20 rounded-xl px-4 py-3">
                           <div className="flex items-center gap-1.5 mb-1">
-                            <X className="w-3 h-3 text-red-500" />
-                            <span className="text-[11px] text-red-500 font-medium">Original</span>
+                            <X className="w-3 h-3 text-[#C53030]" />
+                            <span className="text-[11px] text-[#C53030] font-medium">Original</span>
                           </div>
-                          <p className="text-sm text-red-700">{intervention.original}</p>
+                          <p className="text-sm text-[#C53030]">{intervention.original}</p>
                         </div>
                         <div className="bg-[#3DAA8A]/5 border border-[#3DAA8A]/20 rounded-xl px-4 py-3">
                           <div className="flex items-center gap-1.5 mb-1">
@@ -961,7 +966,7 @@ export function ARIAContent() {
                   <h3 className="text-lg text-[#1E3A4A] mb-1" style={{ fontFamily: "var(--font-dm-serif-display), Georgia, serif" }}>
                     Protect your family with ARIA
                   </h3>
-                  <p className="text-sm text-gray-500">Join the first 50 early adopters — 30% off for life.</p>
+                  <p className="text-sm text-gray-500">Join the first 50 early adopters — 30% off for 3 years.</p>
                 </div>
                 <div className="max-w-sm mx-auto">
                   <EarlyAdopterForm source="aria_demo_report" />
@@ -997,9 +1002,9 @@ export function ARIAContent() {
           {/* Stats with animated counters */}
           <div className="grid grid-cols-3 gap-6 mb-16" ref={patterns.ref}>
             {[
-              { value: `${patterns.count.toLocaleString()}+`, label: 'Detection Patterns', sublabel: 'Regex + AI combined', color: '#3DAA8A' },
-              { value: `${messages127k.count}K+`, label: 'Training Messages', sublabel: 'Real co-parenting data', color: '#F5A623' },
-              { value: categories14.count.toString(), label: 'Toxicity Categories', sublabel: 'From profanity to gaslighting', color: '#2D6A8F' },
+              { value: '3-tier', label: 'Detection', sublabel: 'Regex + AI, layered', color: '#3DAA8A' },
+              { value: 'Real-time', label: 'Tone coaching', sublabel: 'Before you hit send', color: '#F5A623' },
+              { value: 'Court-ready', label: 'Good-faith record', sublabel: 'Every suggestion timestamped', color: '#2D6A8F' },
             ].map((stat, i) => (
               <div key={i} className="text-center">
                 <p className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-1" style={{ color: stat.color, fontFamily: "var(--font-space-grotesk), sans-serif" }}>
@@ -1018,7 +1023,7 @@ export function ARIAContent() {
                 icon: Shield,
                 tier: 'Tier 1',
                 title: 'Pattern Detection',
-                desc: '1,800+ regex patterns catch known hostile phrases instantly — profanity, threats, manipulation, and more.',
+                desc: 'Regex patterns catch known hostile phrases instantly — profanity, threats, manipulation, and more.',
                 color: '#3DAA8A',
                 speed: '< 50ms',
               },
@@ -1192,7 +1197,7 @@ export function ARIAContent() {
                 Every calm message is a better day for your kids
               </h2>
               <p className="text-lg text-white/70 mb-8 leading-relaxed">
-                ARIA is just one part of CommonGround — the complete co-parenting platform built with family law professionals.
+                ARIA comes free with CommonGround &mdash; messaging, schedules, expenses, and court-ready records, built with family-law professionals. Start free, no card needed.
               </p>
 
               <div className="grid grid-cols-2 gap-3">

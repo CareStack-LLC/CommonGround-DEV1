@@ -198,8 +198,8 @@ export default function AccountSettingsPage() {
     <div className="space-y-6">
       {/* Page Header - matches app design system */}
       <div className="flex items-center gap-3">
-        <div className="w-12 h-12 bg-gradient-to-br from-blue-500/10 to-blue-600/5 rounded-2xl flex items-center justify-center shadow-md">
-          <User className="w-6 h-6 text-blue-600" />
+        <div className="w-12 h-12 bg-gradient-to-br from-[#2D6A8F]/10 to-[#2D6A8F]/5 rounded-2xl flex items-center justify-center shadow-md">
+          <User className="w-6 h-6 text-[#2D6A8F]" />
         </div>
         <div>
           <h2 className="text-xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
@@ -213,9 +213,9 @@ export default function AccountSettingsPage() {
 
       {/* Success Alert */}
       {showSuccess && (
-        <Alert className="bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/40 rounded-2xl shadow-lg">
-          <CheckCircle className="h-4 w-4 text-emerald-600" />
-          <AlertDescription className="text-emerald-600 font-medium">
+        <Alert className="bg-[#E8F4F0] dark:bg-[#1E3A4A]/20 border-[#E8F4F0] dark:border-[#1E3A4A]/40 rounded-2xl shadow-lg">
+          <CheckCircle className="h-4 w-4 text-[#2D8A70]" />
+          <AlertDescription className="text-[#2D8A70] font-medium">
             Your changes have been saved successfully.
           </AlertDescription>
         </Alert>
@@ -233,8 +233,8 @@ export default function AccountSettingsPage() {
         <Card className="border-2 border-border rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-              <div className="p-2 bg-gradient-to-br from-blue-500/10 to-blue-600/5 rounded-xl shadow-md">
-                <User className="h-5 w-5 text-blue-600" />
+              <div className="p-2 bg-gradient-to-br from-[#2D6A8F]/10 to-[#2D6A8F]/5 rounded-xl shadow-md">
+                <User className="h-5 w-5 text-[#2D6A8F]" />
               </div>
               Profile Information
             </CardTitle>
@@ -291,8 +291,8 @@ export default function AccountSettingsPage() {
         <Card className="border-2 border-border rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-              <div className="p-2 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 rounded-xl shadow-md">
-                <Mail className="h-5 w-5 text-emerald-600" />
+              <div className="p-2 bg-gradient-to-br from-[#3DAA8A]/10 to-[#2D8A70]/5 rounded-xl shadow-md">
+                <Mail className="h-5 w-5 text-[#2D8A70]" />
               </div>
               Contact Information
             </CardTitle>
@@ -366,8 +366,8 @@ export default function AccountSettingsPage() {
         <Card className="border-2 border-border rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-              <div className="p-2 bg-gradient-to-br from-amber-500/10 to-amber-600/5 rounded-xl shadow-md">
-                <MapPin className="h-5 w-5 text-amber-600" />
+              <div className="p-2 bg-gradient-to-br from-[#F5A623]/10 to-[#E09520]/5 rounded-xl shadow-md">
+                <MapPin className="h-5 w-5 text-[#E09520]" />
               </div>
               Address
             </CardTitle>
@@ -519,12 +519,12 @@ export default function AccountSettingsPage() {
                 Get a JSON file with your profile, agreements, messages, schedules, and financial records.
               </p>
               {exportStatus === 'done' && (
-                <p className="text-xs text-emerald-600 font-semibold mt-1.5">
+                <p className="text-xs text-[#2D8A70] font-semibold mt-1.5">
                   Download started — check your browser's downloads folder.
                 </p>
               )}
               {exportStatus === 'error' && exportError && (
-                <p className="text-xs text-rose-600 font-semibold mt-1.5">{exportError}</p>
+                <p className="text-xs text-[#E09520] font-semibold mt-1.5">{exportError}</p>
               )}
             </div>
             <button
@@ -548,10 +548,10 @@ export default function AccountSettingsPage() {
           </div>
 
           {/* Delete */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl border-2 border-rose-200 bg-rose-50/40">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl border-2 border-[#FEF7ED] bg-[#FEF7ED]/40">
             <div className="flex-1">
-              <p className="font-bold text-rose-900">Delete my account</p>
-              <p className="text-sm text-rose-800/80 font-medium">
+              <p className="font-bold text-[#1E3A4A]">Delete my account</p>
+              <p className="text-sm text-[#E09520]/80 font-medium">
                 Schedules your account for deletion in 30 days. You can cancel by contacting
                 support before then. This is permanent once the grace period ends.
               </p>
@@ -564,7 +564,7 @@ export default function AccountSettingsPage() {
                 setDeleteConfirmText('');
                 setDeleteError(null);
               }}
-              className="shrink-0 inline-flex items-center gap-2 px-4 py-2.5 bg-white border-2 border-rose-300 text-rose-700 rounded-xl font-bold hover:bg-rose-50 hover:border-rose-400 transition-all"
+              className="shrink-0 inline-flex items-center gap-2 px-4 py-2.5 bg-white border-2 border-[#F5A623] text-[#E09520] rounded-xl font-bold hover:bg-[#FEF7ED] hover:border-[#F5A623] transition-all"
             >
               <Trash2 className="h-4 w-4" />
               Delete account
@@ -585,15 +585,15 @@ export default function AccountSettingsPage() {
             onClick={(e) => e.stopPropagation()}
             className="bg-card rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border-2 border-border"
           >
-            <div className="bg-rose-50 border-b-2 border-rose-200 p-5 flex items-start gap-3">
-              <div className="p-2 bg-rose-100 rounded-xl">
-                <AlertTriangle className="h-6 w-6 text-rose-600" />
+            <div className="bg-[#FEF7ED] border-b-2 border-[#FEF7ED] p-5 flex items-start gap-3">
+              <div className="p-2 bg-[#FEF7ED] rounded-xl">
+                <AlertTriangle className="h-6 w-6 text-[#E09520]" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-rose-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                <h3 className="text-lg font-bold text-[#1E3A4A]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   Delete your CommonGround account?
                 </h3>
-                <p className="text-sm text-rose-800/90 mt-1 font-medium">
+                <p className="text-sm text-[#E09520]/90 mt-1 font-medium">
                   Your account will be scheduled for deletion on a 30-day timer.
                 </p>
               </div>
@@ -602,7 +602,7 @@ export default function AccountSettingsPage() {
             <div className="p-5 space-y-4">
               {deleteStatus === 'done' ? (
                 <div className="flex flex-col items-center gap-3 py-4">
-                  <CheckCircle className="h-12 w-12 text-emerald-500" />
+                  <CheckCircle className="h-12 w-12 text-[#3DAA8A]" />
                   <p className="font-bold text-foreground text-center">Deletion scheduled</p>
                   <p className="text-sm text-muted-foreground text-center">
                     We've sent a confirmation email. Your data will be removed in 30 days
@@ -629,7 +629,7 @@ export default function AccountSettingsPage() {
 
                   <label className="block">
                     <span className="text-sm font-semibold text-foreground">
-                      Type <span className="font-mono text-rose-700">DELETE</span> to confirm
+                      Type <span className="font-mono text-[#E09520]">DELETE</span> to confirm
                     </span>
                     <Input
                       value={deleteConfirmText}
@@ -642,7 +642,7 @@ export default function AccountSettingsPage() {
                   </label>
 
                   {deleteError && (
-                    <p className="text-sm text-rose-600 font-medium">{deleteError}</p>
+                    <p className="text-sm text-[#E09520] font-medium">{deleteError}</p>
                   )}
 
                   <div className="flex justify-end gap-2 pt-2">
@@ -656,7 +656,7 @@ export default function AccountSettingsPage() {
                     <button
                       onClick={handleRequestDeletion}
                       disabled={deleteConfirmText !== 'DELETE' || deleteStatus === 'working'}
-                      className="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold transition disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
+                      className="px-4 py-2.5 bg-[#E09520] hover:bg-[#E09520] text-white rounded-xl font-bold transition disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
                     >
                       {deleteStatus === 'working' ? (
                         <>

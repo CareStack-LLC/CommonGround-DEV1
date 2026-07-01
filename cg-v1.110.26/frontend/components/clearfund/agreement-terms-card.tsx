@@ -260,7 +260,7 @@ export function AgreementTermsCard({ familyFileId, agreementId }: AgreementTerms
           {data.special_provisions.length > 0 && (
             <div className="p-3 bg-muted/50 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
-                <AlertCircle className="w-4 h-4 text-amber-500" />
+                <AlertCircle className="w-4 h-4 text-[#F5A623]" />
                 <span className="text-sm font-medium text-foreground">
                   Special Provisions
                 </span>

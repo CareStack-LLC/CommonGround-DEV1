@@ -131,11 +131,11 @@ export default function VsOurFamilyWizardPage() {
       <HeroSection
         variant="centered"
         eyebrow="Compare"
-        headline="The simpler alternative to OurFamilyWizard"
+        headline="Everything OurFamilyWizard does — calmer, and for less"
         headlineAccent="OurFamilyWizard"
-        subheadline="AI rewrite coaching, a free child-facing app, and flat $17.99/mo — no $174/yr-per-parent fees, no per-child charges, no court add-ons."
-        primaryCta={{ label: 'Start free', href: '/signup' }}
-        secondaryCta={{ label: 'See pricing', href: '/pricing' }}
+        subheadline="ARIA rewrites the heat out of messages, KidSpace lets your kids reach you directly, and Silent Handoff ends driveway standoffs — all at a flat $17.99/mo that covers both parents. No per-parent fees, no per-child charges, no court add-ons."
+        primaryCta={{ label: 'Start free — no card needed', href: '/signup' }}
+        secondaryCta={{ label: 'See plans & pricing', href: '/pricing' }}
       />
 
       <section className="px-6 py-12 sm:py-16">
@@ -169,8 +169,9 @@ export default function VsOurFamilyWizardPage() {
 
       <CtaBand
         background="teal"
-        headline="Ready to switch?"
-        primaryCta={{ label: 'Start free', href: '/signup' }}
+        headline="Switch in minutes — keep your OFW record for court"
+        subheadline="Start a clean, timestamped record on CommonGround. No credit card, forever-free tier, and your data stays yours."
+        primaryCta={{ label: 'Start free — no card needed', href: '/signup' }}
       />
 
       <footer className="px-6 py-8 bg-white">

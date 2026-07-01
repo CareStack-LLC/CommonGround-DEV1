@@ -135,7 +135,7 @@ export function BlogContent() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <h1 className="text-4xl sm:text-5xl font-serif font-semibold text-white mb-4">The CommonGround Blog</h1>
-            <p className="text-lg text-white/70">Expert advice, practical tips, and insights for co-parents navigating the journey of raising children together, apart.</p>
+            <p className="text-lg text-white/70">Practical, judgment-free guidance for co-parenting apart — calmer messages, custody schedules, high-conflict tactics, and keeping kids at the center.</p>
           </div>
         </div>
       </section>
@@ -280,7 +280,7 @@ export function BlogContent() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-gradient-to-br from-cg-sage-subtle to-cg-amber-subtle rounded-2xl p-8 lg:p-12 text-center">
             <h2 className="text-2xl sm:text-3xl font-serif text-foreground mb-4">Get co-parenting tips in your inbox</h2>
-            <p className="text-gray-600 mb-8 max-w-xl mx-auto">Join thousands of parents receiving weekly advice on communication, scheduling, and building a better co-parenting relationship.</p>
+            <p className="text-gray-600 mb-8 max-w-xl mx-auto">One practical email a week on communication, scheduling, and building a calmer co-parenting relationship. No spam, unsubscribe anytime.</p>
             <NewsletterForm />
             <p className="text-xs text-gray-500 mt-4">No spam. Unsubscribe anytime.</p>
           </div>
@@ -291,9 +291,9 @@ export function BlogContent() {
       <section className="py-16 bg-white border-t border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-2xl sm:text-3xl font-serif text-foreground mb-4">Ready to put these tips into practice?</h2>
-          <p className="text-gray-600 mb-8 max-w-xl mx-auto">CommonGround gives you the tools to communicate better, track agreements, and co-parent more effectively.</p>
+          <p className="text-gray-600 mb-8 max-w-xl mx-auto">CommonGround steadies your messages, runs the schedule, and keeps every record court-ready. Start free — no credit card, and your data stays yours.</p>
           <Link href="/early-access" className="inline-flex items-center justify-center gap-2 bg-cg-sage text-white font-medium px-8 py-3 rounded-full transition-all duration-200 hover:bg-cg-sage-dark hover:shadow-lg">
-            Get Started Free <ArrowRight className="w-5 h-5" />
+            Start free — no card needed <ArrowRight className="w-5 h-5" />
           </Link>
         </div>
       </section>

@@ -44,10 +44,10 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 
 // Map categories to colors
 const categoryColors: Record<string, { bg: string; text: string; gradient: string }> = {
-  communication: { bg: 'bg-blue-100 dark:bg-blue-900/30', text: 'text-blue-600 dark:text-blue-400', gradient: 'from-blue-100 to-blue-50 dark:from-blue-900/30 dark:to-blue-900/10' },
-  custody: { bg: 'bg-emerald-100 dark:bg-emerald-900/30', text: 'text-emerald-600 dark:text-emerald-400', gradient: 'from-emerald-100 to-emerald-50 dark:from-emerald-900/30 dark:to-emerald-900/10' },
-  schedule: { bg: 'bg-amber-100 dark:bg-amber-900/30', text: 'text-amber-600 dark:text-amber-400', gradient: 'from-amber-100 to-amber-50 dark:from-amber-900/30 dark:to-amber-900/10' },
-  financial: { bg: 'bg-purple-100 dark:bg-purple-900/30', text: 'text-purple-600 dark:text-purple-400', gradient: 'from-purple-100 to-purple-50 dark:from-purple-900/30 dark:to-purple-900/10' },
+  communication: { bg: 'bg-[#E0EFF8] dark:bg-[#1E3A4A]/30', text: 'text-[#2D6A8F] dark:text-[#4BA8C8]', gradient: 'from-[#E0EFF8] to-[#E0EFF8] dark:from-[#1E3A4A]/30 dark:to-[#1E3A4A]/10' },
+  custody: { bg: 'bg-[#E8F4F0] dark:bg-[#1E3A4A]/30', text: 'text-[#2D8A70] dark:text-[#5BC4A0]', gradient: 'from-[#E8F4F0] to-[#E8F4F0] dark:from-[#1E3A4A]/30 dark:to-[#1E3A4A]/10' },
+  schedule: { bg: 'bg-[#FEF7ED] dark:bg-[#1E3A4A]/30', text: 'text-[#E09520] dark:text-[#F5A623]', gradient: 'from-[#FEF7ED] to-[#FEF7ED] dark:from-[#1E3A4A]/30 dark:to-[#1E3A4A]/10' },
+  financial: { bg: 'bg-[#E0EFF8] dark:bg-[#1E3A4A]/30', text: 'text-[#2D6A8F] dark:text-[#4BA8C8]', gradient: 'from-[#E0EFF8] to-[#E0EFF8] dark:from-[#1E3A4A]/30 dark:to-[#1E3A4A]/10' },
   system: { bg: 'bg-slate-100 dark:bg-slate-800/50', text: 'text-slate-500 dark:text-slate-400', gradient: 'from-slate-100 to-slate-50 dark:from-slate-800/50 dark:to-slate-800/30' },
 };
 

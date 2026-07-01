@@ -131,11 +131,11 @@ export default function VsTalkingParentsPage() {
       <HeroSection
         variant="centered"
         eyebrow="Compare"
-        headline="The modern alternative to TalkingParents"
+        headline="Calmer messages and GPS handoffs TalkingParents can't match"
         headlineAccent="TalkingParents"
-        subheadline="Calmer messages, GPS-verified handoffs, and a child-facing app — features TalkingParents doesn't ship. Flat $17.99/mo, no per-child fees."
-        primaryCta={{ label: 'Start free', href: '/signup' }}
-        secondaryCta={{ label: 'See pricing', href: '/pricing' }}
+        subheadline="ARIA rewrites the heat out of messages, Silent Handoff verifies exchanges by GPS, and KidSpace lets your kids reach you directly. Flat $17.99/mo covers both parents — no per-child fees."
+        primaryCta={{ label: 'Start free — no card needed', href: '/signup' }}
+        secondaryCta={{ label: 'See plans & pricing', href: '/pricing' }}
       />
 
       <section className="px-6 py-12 sm:py-16">
@@ -169,8 +169,9 @@ export default function VsTalkingParentsPage() {
 
       <CtaBand
         background="teal"
-        headline="Ready to switch?"
-        primaryCta={{ label: 'Start free', href: '/signup' }}
+        headline="Switch in minutes — start a clean record for court"
+        subheadline="Keep your TalkingParents history for reference and begin fresh. No credit card, forever-free tier, and your data stays yours."
+        primaryCta={{ label: 'Start free — no card needed', href: '/signup' }}
       />
 
       <footer className="px-6 py-8 bg-white">

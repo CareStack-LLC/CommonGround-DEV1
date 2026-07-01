@@ -139,21 +139,21 @@ export function AriaTab({ familyFileId, token }: { familyFileId: string, token: 
     };
 
     const getTrendIcon = (trend: string) => {
-        if (trend === "improving") return <TrendingDown className="h-4 w-4 text-emerald-500" />;
-        if (trend === "declining") return <TrendingUp className="h-4 w-4 text-red-500" />;
+        if (trend === "improving") return <TrendingDown className="h-4 w-4 text-[#3DAA8A]" />;
+        if (trend === "declining") return <TrendingUp className="h-4 w-4 text-[#C53030]" />;
         return <Minus className="h-4 w-4 text-muted-foreground" />;
     };
 
     const getGoodFaithColor = (score: number) => {
-        if (score >= 80) return "text-emerald-600";
-        if (score >= 60) return "text-amber-600";
-        return "text-red-600";
+        if (score >= 80) return "text-[#2D8A70]";
+        if (score >= 60) return "text-[#E09520]";
+        return "text-[#C53030]";
     };
 
     if (isLoading) {
         return (
             <div className="flex items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2D8A70]" />
             </div>
         );
     }
@@ -164,7 +164,7 @@ export function AriaTab({ familyFileId, token }: { familyFileId: string, token: 
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
-                        <Bot className="h-5 w-5 text-emerald-600" />
+                        <Bot className="h-5 w-5 text-[#2D8A70]" />
                         ARIA Control Panel
                     </h1>
                     <p className="text-sm text-muted-foreground">
@@ -216,9 +216,9 @@ export function AriaTab({ familyFileId, token }: { familyFileId: string, token: 
                         icon={getTrendIcon(metrics.sentiment_trend)}
                         valueColor={
                             metrics.sentiment_trend === "improving"
-                                ? "text-emerald-600"
+                                ? "text-[#2D8A70]"
                                 : metrics.sentiment_trend === "declining"
-                                    ? "text-red-600"
+                                    ? "text-[#C53030]"
                                     : "text-muted-foreground"
                         }
                     />
@@ -233,7 +233,7 @@ export function AriaTab({ familyFileId, token }: { familyFileId: string, token: 
                 <Card>
                     <CardHeader>
                         <CardTitle className="text-base flex items-center gap-2">
-                            <Shield className="h-5 w-5 text-emerald-600" />
+                            <Shield className="h-5 w-5 text-[#2D8A70]" />
                             Good Faith Score
                         </CardTitle>
                         <CardDescription>
@@ -252,10 +252,10 @@ export function AriaTab({ familyFileId, token }: { familyFileId: string, token: 
                                 <div
                                     className={`h-full rounded-full transition-all ${
                                         metrics.good_faith_score >= 80
-                                            ? "bg-emerald-500"
+                                            ? "bg-[#3DAA8A]"
                                             : metrics.good_faith_score >= 60
-                                                ? "bg-amber-500"
-                                                : "bg-red-500"
+                                                ? "bg-[#F5A623]"
+                                                : "bg-[#C53030]"
                                     }`}
                                     style={{ width: `${metrics.good_faith_score}%` }}
                                 />
@@ -280,7 +280,7 @@ export function AriaTab({ familyFileId, token }: { familyFileId: string, token: 
                     <CardContent className="space-y-6">
                         {/* Read-only notice: ARIA (incl. child-safety monitoring)
                             is controlled only by the parents and by court order. */}
-                        <div className="flex items-start gap-2 rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+                        <div className="flex items-start gap-2 rounded-md border border-[#FBE3BF] bg-[#FEF7ED] p-3 text-sm text-[#6B460F]">
                             <Lock className="h-4 w-4 mt-0.5 shrink-0" />
                             <p>
                                 These settings are <span className="font-semibold">read-only</span> for
@@ -378,7 +378,7 @@ export function AriaTab({ familyFileId, token }: { familyFileId: string, token: 
             <Card>
                 <CardHeader>
                     <CardTitle className="text-base flex items-center gap-2">
-                        <AlertTriangle className="h-5 w-5 text-amber-500" />
+                        <AlertTriangle className="h-5 w-5 text-[#F5A623]" />
                         Recent Interventions
                     </CardTitle>
                     <CardDescription>Latest ARIA flags and suggestions</CardDescription>
@@ -419,13 +419,13 @@ export function AriaTab({ familyFileId, token }: { familyFileId: string, token: 
                                     </AccordionTrigger>
                                     <AccordionContent className="pb-4">
                                         <div className="space-y-3 pt-2">
-                                            <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                                                <p className="text-xs font-medium text-red-600 mb-1">Original Text</p>
+                                            <div className="p-3 bg-[#FEE2E2] border border-[#FEE2E2] rounded-lg">
+                                                <p className="text-xs font-medium text-[#C53030] mb-1">Original Text</p>
                                                 <p className="text-sm">{intervention.original_text}</p>
                                             </div>
                                             {intervention.suggested_text && (
-                                                <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
-                                                    <p className="text-xs font-medium text-emerald-600 mb-1">
+                                                <div className="p-3 bg-[#E8F4F0] border border-[#C5E5DB] rounded-lg">
+                                                    <p className="text-xs font-medium text-[#2D8A70] mb-1">
                                                         Suggested Rewrite
                                                     </p>
                                                     <p className="text-sm">{intervention.suggested_text}</p>
@@ -442,7 +442,7 @@ export function AriaTab({ familyFileId, token }: { familyFileId: string, token: 
                         </Accordion>
                     ) : (
                         <div className="text-center py-8 text-muted-foreground">
-                            <CheckCircle2 className="h-12 w-12 mx-auto mb-3 text-emerald-500" />
+                            <CheckCircle2 className="h-12 w-12 mx-auto mb-3 text-[#3DAA8A]" />
                             <p>No recent interventions</p>
                         </div>
                     )}

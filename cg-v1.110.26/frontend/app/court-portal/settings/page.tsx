@@ -72,7 +72,7 @@ export default function CourtSettingsPage() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-2 border-indigo-600 border-t-transparent mx-auto" />
+          <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#2D6A8F] border-t-transparent mx-auto" />
           <p className="mt-4 text-muted-foreground">Loading...</p>
         </div>
       </div>
@@ -109,9 +109,9 @@ export default function CourtSettingsPage() {
 
       {/* Success Alert */}
       {showSuccess && (
-        <Alert className="bg-green-50 border-green-200">
-          <CheckCircle className="h-4 w-4 text-green-600" />
-          <AlertDescription className="text-green-800">
+        <Alert className="bg-[#E8F4F0] border-[#E8F4F0]">
+          <CheckCircle className="h-4 w-4 text-[#2D8A70]" />
+          <AlertDescription className="text-[#1E3A4A]">
             Settings saved successfully.
           </AlertDescription>
         </Alert>
@@ -121,7 +121,7 @@ export default function CourtSettingsPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <User className="h-5 w-5 text-indigo-600" />
+            <User className="h-5 w-5 text-[#2D6A8F]" />
             Profile Information
           </CardTitle>
           <CardDescription>
@@ -185,7 +185,7 @@ export default function CourtSettingsPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Mail className="h-5 w-5 text-indigo-600" />
+            <Mail className="h-5 w-5 text-[#2D6A8F]" />
             Account Information
           </CardTitle>
           <CardDescription>
@@ -241,7 +241,7 @@ export default function CourtSettingsPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Bell className="h-5 w-5 text-indigo-600" />
+            <Bell className="h-5 w-5 text-[#2D6A8F]" />
             Notification Preferences
           </CardTitle>
           <CardDescription>
@@ -288,7 +288,7 @@ export default function CourtSettingsPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Clock className="h-5 w-5 text-indigo-600" />
+            <Clock className="h-5 w-5 text-[#2D6A8F]" />
             Recent Access History
           </CardTitle>
           <CardDescription>
@@ -318,7 +318,7 @@ export default function CourtSettingsPage() {
               timestamp="Yesterday, 4:10 PM"
             />
           </div>
-          <Button variant="ghost" className="w-full mt-4 text-indigo-600">
+          <Button variant="ghost" className="w-full mt-4 text-[#2D6A8F]">
             View Full Access Log
           </Button>
         </CardContent>
@@ -332,7 +332,7 @@ export default function CourtSettingsPage() {
         <Button
           onClick={handleSave}
           disabled={isSaving}
-          className="bg-indigo-600 hover:bg-indigo-700"
+          className="bg-[#2D6A8F] hover:bg-[#1E4E6B]"
         >
           {isSaving ? (
             <>
@@ -375,7 +375,7 @@ function NotificationToggle({
         onClick={() => onChange(!checked)}
         className={`
           relative inline-flex h-6 w-11 items-center rounded-full transition-colors
-          ${checked ? "bg-indigo-600" : "bg-muted"}
+          ${checked ? "bg-[#2D6A8F]" : "bg-muted"}
         `}
       >
         <span

@@ -116,10 +116,10 @@ function formatSchedulePattern(pattern: string | null): string {
 
 function outcomeColor(outcome: string | null): string {
   switch (outcome) {
-    case 'completed': return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400';
-    case 'missed': return 'bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400';
-    case 'one_party_present': return 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400';
-    case 'disputed': return 'bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400';
+    case 'completed': return 'bg-[#E8F4F0] text-[#2D8A70] dark:bg-[#1E3A4A]/30 dark:text-[#5BC4A0]';
+    case 'missed': return 'bg-[#FEE2E2] text-[#9B2C2C] dark:bg-[#7A2222]/30 dark:text-[#E06B6B]';
+    case 'one_party_present': return 'bg-[#FEF7ED] text-[#E09520] dark:bg-[#1E3A4A]/30 dark:text-[#F5A623]';
+    case 'disputed': return 'bg-[#FEE2E2] text-[#9B2C2C] dark:bg-[#7A2222]/30 dark:text-[#E06B6B]';
     default: return 'bg-muted text-muted-foreground';
   }
 }
@@ -285,21 +285,21 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
           knows whether to trust the numbers below it. */}
       {qualityScore != null && qualityBand && (
         <div className={`flex items-center justify-between p-3 rounded-xl border ${
-          qualityBand.color === 'emerald' ? 'bg-emerald-50 border-emerald-200 dark:bg-emerald-950/20 dark:border-emerald-800' :
-          qualityBand.color === 'amber' ? 'bg-amber-50 border-amber-200 dark:bg-amber-950/20 dark:border-amber-800' :
-          'bg-red-50 border-red-200 dark:bg-red-950/20 dark:border-red-800'
+          qualityBand.color === 'emerald' ? 'bg-[#E8F4F0] border-[#E8F4F0] dark:bg-[#1E3A4A]/20 dark:border-[#1E3A4A]' :
+          qualityBand.color === 'amber' ? 'bg-[#FEF7ED] border-[#FEF7ED] dark:bg-[#1E3A4A]/20 dark:border-[#E09520]' :
+          'bg-[#FEE2E2] border-[#FEE2E2] dark:bg-[#7A2222]/20 dark:border-[#9B2C2C]'
         }`}>
           <div className="flex items-center gap-3">
             <Shield className={`h-5 w-5 ${
-              qualityBand.color === 'emerald' ? 'text-emerald-600 dark:text-emerald-400' :
-              qualityBand.color === 'amber' ? 'text-amber-600 dark:text-amber-400' :
-              'text-red-600 dark:text-red-400'
+              qualityBand.color === 'emerald' ? 'text-[#2D8A70] dark:text-[#5BC4A0]' :
+              qualityBand.color === 'amber' ? 'text-[#E09520] dark:text-[#F5A623]' :
+              'text-[#C53030] dark:text-[#E06B6B]'
             }`} />
             <div>
               <p className={`text-sm font-semibold ${
-                qualityBand.color === 'emerald' ? 'text-emerald-800 dark:text-emerald-300' :
-                qualityBand.color === 'amber' ? 'text-amber-800 dark:text-amber-300' :
-                'text-red-800 dark:text-red-300'
+                qualityBand.color === 'emerald' ? 'text-[#1E3A4A] dark:text-[#5BC4A0]' :
+                qualityBand.color === 'amber' ? 'text-[#E09520] dark:text-[#F5A623]' :
+                'text-[#9B2C2C] dark:text-[#FCA5A5]'
               }`}>
                 Data Quality: {qualityBand.label}
               </p>
@@ -307,9 +307,9 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
             </div>
           </div>
           <span className={`px-3 py-1 rounded-full text-sm font-bold ${
-            qualityBand.color === 'emerald' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300' :
-            qualityBand.color === 'amber' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300' :
-            'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300'
+            qualityBand.color === 'emerald' ? 'bg-[#E8F4F0] text-[#2D8A70] dark:bg-[#1E3A4A]/50 dark:text-[#5BC4A0]' :
+            qualityBand.color === 'amber' ? 'bg-[#FEF7ED] text-[#E09520] dark:bg-[#1E3A4A]/50 dark:text-[#F5A623]' :
+            'bg-[#FEE2E2] text-[#9B2C2C] dark:bg-[#7A2222]/50 dark:text-[#FCA5A5]'
           }`}>{qualityScore}/100</span>
         </div>
       )}
@@ -333,12 +333,12 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
 
       {/* Error Banner */}
       {errors.length > 0 && (
-        <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-xl p-3">
+        <div className="bg-[#FEF7ED] dark:bg-[#1E3A4A]/20 border border-[#FEF7ED] dark:border-[#E09520] rounded-xl p-3">
           <div className="flex items-start gap-2">
-            <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+            <AlertCircle className="h-4 w-4 text-[#E09520] dark:text-[#F5A623] mt-0.5 flex-shrink-0" />
             <div>
-              <p className="text-sm font-medium text-amber-800 dark:text-amber-300">Some data could not be loaded</p>
-              <ul className="text-xs text-amber-700 dark:text-amber-400 mt-1 space-y-0.5">
+              <p className="text-sm font-medium text-[#E09520] dark:text-[#F5A623]">Some data could not be loaded</p>
+              <ul className="text-xs text-[#E09520] dark:text-[#F5A623] mt-1 space-y-0.5">
                 {errors.map((err) => (
                   <li key={err}>{err}</li>
                 ))}
@@ -351,29 +351,29 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
       {/* Compliance Status Badge */}
       {complianceStatus && (
         <div className={`flex items-center justify-between p-3 rounded-xl border ${
-          complianceStatus.color === 'emerald' ? 'bg-emerald-50 border-emerald-200 dark:bg-emerald-950/20 dark:border-emerald-800' :
-          complianceStatus.color === 'amber' ? 'bg-amber-50 border-amber-200 dark:bg-amber-950/20 dark:border-amber-800' :
-          'bg-red-50 border-red-200 dark:bg-red-950/20 dark:border-red-800'
+          complianceStatus.color === 'emerald' ? 'bg-[#E8F4F0] border-[#E8F4F0] dark:bg-[#1E3A4A]/20 dark:border-[#1E3A4A]' :
+          complianceStatus.color === 'amber' ? 'bg-[#FEF7ED] border-[#FEF7ED] dark:bg-[#1E3A4A]/20 dark:border-[#E09520]' :
+          'bg-[#FEE2E2] border-[#FEE2E2] dark:bg-[#7A2222]/20 dark:border-[#9B2C2C]'
         }`}>
           <div className="flex items-center gap-2">
             {complianceStatus.color === 'emerald' ? (
-              <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+              <CheckCircle2 className="h-4 w-4 text-[#2D8A70] dark:text-[#5BC4A0]" />
             ) : (
-              <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+              <AlertCircle className="h-4 w-4 text-[#E09520] dark:text-[#F5A623]" />
             )}
             <div>
               <span className={`text-sm font-semibold ${
-                complianceStatus.color === 'emerald' ? 'text-emerald-800 dark:text-emerald-300' :
-                complianceStatus.color === 'amber' ? 'text-amber-800 dark:text-amber-300' :
-                'text-red-800 dark:text-red-300'
+                complianceStatus.color === 'emerald' ? 'text-[#1E3A4A] dark:text-[#5BC4A0]' :
+                complianceStatus.color === 'amber' ? 'text-[#E09520] dark:text-[#F5A623]' :
+                'text-[#9B2C2C] dark:text-[#FCA5A5]'
               }`}>{complianceStatus.label}</span>
               <p className="text-xs text-muted-foreground">{complianceStatus.desc}</p>
             </div>
           </div>
           <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-            complianceStatus.color === 'emerald' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300' :
-            complianceStatus.color === 'amber' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300' :
-            'bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300'
+            complianceStatus.color === 'emerald' ? 'bg-[#E8F4F0] text-[#2D8A70] dark:bg-[#1E3A4A]/50 dark:text-[#5BC4A0]' :
+            complianceStatus.color === 'amber' ? 'bg-[#FEF7ED] text-[#E09520] dark:bg-[#1E3A4A]/50 dark:text-[#F5A623]' :
+            'bg-[#FEE2E2] text-[#9B2C2C] dark:bg-[#7A2222]/50 dark:text-[#FCA5A5]'
           }`}>Agreement Check</span>
         </div>
       )}
@@ -382,14 +382,14 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
           with a concrete explanation. Uses timeline.data_gaps so the user
           sees WHY the timeline has gaps, not just that gaps exist. */}
       {timelineData?.data_gaps && timelineData.data_gaps.length > 0 && (
-        <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-xl p-3">
+        <div className="bg-[#FEF7ED] dark:bg-[#1E3A4A]/20 border border-[#FEF7ED] dark:border-[#E09520] rounded-xl p-3">
           <div className="flex items-start gap-2">
-            <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+            <AlertCircle className="h-4 w-4 text-[#E09520] dark:text-[#F5A623] mt-0.5 flex-shrink-0" />
             <div className="flex-1">
-              <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
+              <p className="text-sm font-medium text-[#E09520] dark:text-[#F5A623]">
                 {timelineData.data_gaps.length} day{timelineData.data_gaps.length !== 1 ? 's' : ''} without signal in this period
               </p>
-              <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
+              <p className="text-xs text-[#E09520] dark:text-[#F5A623] mt-0.5">
                 No check-in, completed exchange, or schedule projection on{' '}
                 {timelineData.data_gaps.length <= 3
                   ? timelineData.data_gaps.map(g => format(parseISO(g.date), 'MMM d')).join(', ')
@@ -407,8 +407,8 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
         <div className="bg-muted p-4 rounded-xl border border-border">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Current Session</span>
-            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-bold bg-[#E8F4F0] text-[#2D8A70] dark:bg-[#1E3A4A]/30 dark:text-[#5BC4A0]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#3DAA8A] animate-pulse" />
               Live
             </span>
           </div>
@@ -453,7 +453,7 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
                 <div className="text-xl font-bold text-foreground leading-tight">
                   {childStats.parent_a.percentage}%
                 </div>
-                <div className={`text-[11px] font-medium ${childStats.variance.parent_a >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+                <div className={`text-[11px] font-medium ${childStats.variance.parent_a >= 0 ? 'text-[#2D8A70] dark:text-[#5BC4A0]' : 'text-[#C53030] dark:text-[#E06B6B]'}`}>
                   {childStats.variance.parent_a >= 0 ? '+' : ''}{childStats.variance.parent_a}% vs target
                 </div>
               </div>
@@ -462,7 +462,7 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
                 <div className="text-xl font-bold text-foreground leading-tight">
                   {childStats.parent_b.percentage}%
                 </div>
-                <div className={`text-[11px] font-medium ${childStats.variance.parent_b >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}>
+                <div className={`text-[11px] font-medium ${childStats.variance.parent_b >= 0 ? 'text-[#2D8A70] dark:text-[#5BC4A0]' : 'text-[#C53030] dark:text-[#E06B6B]'}`}>
                   {childStats.variance.parent_b >= 0 ? '+' : ''}{childStats.variance.parent_b}% vs target
                 </div>
               </div>
@@ -470,11 +470,11 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
 
             <div className="h-3 w-full bg-muted rounded-full overflow-hidden flex">
               <div
-                className="bg-indigo-500 dark:bg-indigo-400 h-full transition-all duration-700"
+                className="bg-[#2D6A8F] dark:bg-[#4BA8C8] h-full transition-all duration-700"
                 style={{ width: `${childStats.parent_a.percentage}%` }}
               />
               <div
-                className="bg-sky-400 dark:bg-sky-300 h-full transition-all duration-700"
+                className="bg-[#4BA8C8] dark:bg-[#4BA8C8] h-full transition-all duration-700"
                 style={{ width: `${childStats.parent_b.percentage}%` }}
               />
             </div>
@@ -522,11 +522,11 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
                 backfilled: 'Backfilled',
               };
               const colors: Record<string, string> = {
-                check_in: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400',
-                exchange_completed: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400',
-                scheduled: 'bg-sky-100 text-sky-700 dark:bg-sky-950/30 dark:text-sky-400',
-                backfilled: 'bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400',
-                manual_override: 'bg-purple-100 text-purple-700 dark:bg-purple-950/30 dark:text-purple-400',
+                check_in: 'bg-[#E8F4F0] text-[#2D8A70] dark:bg-[#1E3A4A]/30 dark:text-[#5BC4A0]',
+                exchange_completed: 'bg-[#E8F4F0] text-[#2D8A70] dark:bg-[#1E3A4A]/30 dark:text-[#5BC4A0]',
+                scheduled: 'bg-[#E0EFF8] text-[#1E4E6B] dark:bg-[#1E3A4A]/30 dark:text-[#4BA8C8]',
+                backfilled: 'bg-[#FEF7ED] text-[#E09520] dark:bg-[#1E3A4A]/30 dark:text-[#F5A623]',
+                manual_override: 'bg-[#E0EFF8] text-[#1E4E6B] dark:bg-[#1E3A4A]/30 dark:text-[#4BA8C8]',
               };
               return (
                 <span key={method} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${colors[method] || 'bg-muted text-muted-foreground'}`}>
@@ -568,17 +568,17 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
               Total: {swapCounts.total}
             </Badge>
             {swapCounts.approved > 0 && (
-              <Badge className="text-xs bg-emerald-100 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400 border-0">
+              <Badge className="text-xs bg-[#E8F4F0] text-[#2D8A70] dark:bg-[#1E3A4A]/30 dark:text-[#5BC4A0] border-0">
                 Approved: {swapCounts.approved}
               </Badge>
             )}
             {swapCounts.denied > 0 && (
-              <Badge className="text-xs bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400 border-0">
+              <Badge className="text-xs bg-[#FEE2E2] text-[#9B2C2C] dark:bg-[#7A2222]/30 dark:text-[#E06B6B] border-0">
                 Denied: {swapCounts.denied}
               </Badge>
             )}
             {swapCounts.pending > 0 && (
-              <Badge className="text-xs bg-amber-100 text-amber-700 dark:bg-amber-950/30 dark:text-amber-400 border-0">
+              <Badge className="text-xs bg-[#FEF7ED] text-[#E09520] dark:bg-[#1E3A4A]/30 dark:text-[#F5A623] border-0">
                 Pending: {swapCounts.pending}
               </Badge>
             )}
@@ -592,30 +592,30 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
       {exchangeDataGaps.length > 0 && (
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-            <span className="text-sm font-semibold text-amber-800 dark:text-amber-300">
+            <AlertCircle className="h-4 w-4 text-[#E09520] dark:text-[#F5A623]" />
+            <span className="text-sm font-semibold text-[#E09520] dark:text-[#F5A623]">
               {exchangeDataGaps.length} exchange{exchangeDataGaps.length !== 1 ? 's' : ''} excluded from totals
             </span>
           </div>
-          <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/40 rounded-xl p-3 space-y-2">
-            <p className="text-xs text-amber-800 dark:text-amber-300">
+          <div className="bg-[#FEF7ED] dark:bg-[#1E3A4A]/20 border border-[#FEF7ED] dark:border-[#1E3A4A]/40 rounded-xl p-3 space-y-2">
+            <p className="text-xs text-[#E09520] dark:text-[#F5A623]">
               These exchanges couldn&apos;t be counted toward compliance because they&apos;re missing required evidence. Fixing them improves the data quality of your court record.
             </p>
             {exchangeDataGaps.slice(0, 5).map((gap) => (
               <div
                 key={gap.instance_id}
-                className="text-xs flex items-start gap-2 pt-2 border-t border-amber-200/70 dark:border-amber-900/40 first:border-t-0 first:pt-0"
+                className="text-xs flex items-start gap-2 pt-2 border-t border-[#FEF7ED]/70 dark:border-[#1E3A4A]/40 first:border-t-0 first:pt-0"
               >
                 <span className="text-muted-foreground whitespace-nowrap">
                   {format(parseISO(gap.scheduled_time), 'MMM d')}
                 </span>
-                <span className="text-amber-800 dark:text-amber-300">
+                <span className="text-[#E09520] dark:text-[#F5A623]">
                   {gap.description}
                 </span>
               </div>
             ))}
             {exchangeDataGaps.length > 5 && (
-              <p className="text-xs text-muted-foreground pt-2 border-t border-amber-200/70 dark:border-amber-900/40">
+              <p className="text-xs text-muted-foreground pt-2 border-t border-[#FEF7ED]/70 dark:border-[#1E3A4A]/40">
                 +{exchangeDataGaps.length - 5} more — see court export for the full list.
               </p>
             )}
@@ -675,11 +675,11 @@ function MetricCard({
   color?: 'emerald' | 'red' | 'amber';
 }) {
   const colorClass = color === 'emerald'
-    ? 'text-emerald-600 dark:text-emerald-400'
+    ? 'text-[#2D8A70] dark:text-[#5BC4A0]'
     : color === 'red'
-      ? 'text-red-600 dark:text-red-400'
+      ? 'text-[#C53030] dark:text-[#E06B6B]'
       : color === 'amber'
-        ? 'text-amber-600 dark:text-amber-400'
+        ? 'text-[#E09520] dark:text-[#F5A623]'
         : 'text-foreground';
 
   return (
@@ -771,13 +771,13 @@ function ExchangeRow({
           </span>
         )}
         {exchange.silent_handoff_enabled && anyGpsData && (
-          <span className={`flex items-center gap-1 ${bothGpsVerified ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'}`}>
+          <span className={`flex items-center gap-1 ${bothGpsVerified ? 'text-[#2D8A70] dark:text-[#5BC4A0]' : 'text-[#E09520] dark:text-[#F5A623]'}`}>
             <Navigation className="h-3 w-3" />
             {bothGpsVerified ? 'GPS Verified' : 'GPS Partial'}
           </span>
         )}
         {exchange.qr_confirmation.required && exchange.qr_confirmation.confirmed_at && (
-          <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+          <span className="flex items-center gap-1 text-[#2D8A70] dark:text-[#5BC4A0]">
             <CheckCircle2 className="h-3 w-3" />
             QR Confirmed
           </span>

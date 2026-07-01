@@ -62,7 +62,7 @@ function activityIcon(type: string) {
       return <ArrowRight className="h-4 w-4 text-[#3DAA8A]" />;
     case "aria_flag":
     case "compliance_change":
-      return <AlertCircle className="h-4 w-4 text-amber-500" />;
+      return <AlertCircle className="h-4 w-4 text-[#F5A623]" />;
     case "document":
     case "intake_completed":
     case "intake_updated":
@@ -88,7 +88,7 @@ function eventTypeBadge(type: string) {
   }
   if (t.includes("filing") || t.includes("deadline")) {
     return (
-      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#FEF7ED] text-[#B8791A] border border-[#FBE3BF]">
         Filing
       </span>
     );
@@ -225,8 +225,8 @@ export default function ProfessionalDashboardPage() {
 
           {/* Unread Messages */}
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex items-center gap-4">
-            <div className="w-11 h-11 rounded-full bg-amber-50 flex items-center justify-center shrink-0">
-              <MessageSquare className="h-5 w-5 text-amber-600" />
+            <div className="w-11 h-11 rounded-full bg-[#FEF7ED] flex items-center justify-center shrink-0">
+              <MessageSquare className="h-5 w-5 text-[#E09520]" />
             </div>
             <div>
               <p className="text-2xl font-bold text-[#1E3A4A]">{unreadMessages}</p>
@@ -360,7 +360,7 @@ export default function ProfessionalDashboardPage() {
             {/* Pending Actions */}
             <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
               <h2 className="text-lg font-semibold text-[#1E3A4A] flex items-center gap-2 mb-5">
-                <Bell className="h-5 w-5 text-amber-500" />
+                <Bell className="h-5 w-5 text-[#F5A623]" />
                 Pending Actions
               </h2>
 
@@ -369,11 +369,11 @@ export default function ProfessionalDashboardPage() {
                   <Link href="/professional/messages?filter=unread">
                     <div className="flex items-center justify-between py-3 px-3 -mx-3 rounded-lg hover:bg-[#F4F8F7] transition-colors cursor-pointer">
                       <div className="flex items-center gap-3">
-                        <MessageSquare className="h-4 w-4 text-amber-500" />
+                        <MessageSquare className="h-4 w-4 text-[#F5A623]" />
                         <span className="text-sm text-slate-700 font-medium">Unread messages</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-semibold bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full">
+                        <span className="text-xs font-semibold bg-[#FEF7ED] text-[#B8791A] px-2 py-0.5 rounded-full">
                           {unreadMessages}
                         </span>
                         <ArrowRight className="h-3.5 w-3.5 text-slate-300" />

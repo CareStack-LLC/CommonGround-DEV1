@@ -229,18 +229,18 @@ function WalletContent() {
 
       {/* Onboarding Success Banner */}
       {showOnboardingSuccess && (
-        <div className="bg-emerald-50 dark:bg-emerald-950/30 border-b-2 border-emerald-200 dark:border-emerald-800">
+        <div className="bg-[#E8F4F0] dark:bg-[#1E3A4A]/30 border-b-2 border-[#E8F4F0] dark:border-[#1E3A4A]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <CheckCircle className="h-5 w-5 text-emerald-600" />
-                <p className="text-sm font-bold text-emerald-700">
+                <CheckCircle className="h-5 w-5 text-[#2D8A70]" />
+                <p className="text-sm font-bold text-[#2D8A70]">
                   Wallet setup complete! You can now receive payments and manage funds.
                 </p>
               </div>
               <button
                 onClick={() => setShowOnboardingSuccess(false)}
-                className="text-emerald-600 hover:text-emerald-800 transition-colors"
+                className="text-[#2D8A70] hover:text-[#1E3A4A] transition-colors"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -279,11 +279,11 @@ function WalletContent() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {/* Error Alert */}
         {error && (
-          <div className="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-950/30 border-2 border-red-200 dark:border-red-800 rounded-2xl shadow-lg">
-            <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0" />
-            <p className="text-sm text-red-700 dark:text-red-300 flex-1 font-medium">{error}</p>
-            <button onClick={() => setError(null)} className="hover:bg-red-100 dark:hover:bg-red-900/30 p-1 rounded-lg transition-colors">
-              <X className="h-4 w-4 text-red-600 dark:text-red-400" />
+          <div className="flex items-center gap-3 p-4 bg-[#FEE2E2] dark:bg-[#7A2222]/30 border-2 border-[#FEE2E2] dark:border-[#9B2C2C] rounded-2xl shadow-lg">
+            <AlertCircle className="h-5 w-5 text-[#C53030] dark:text-[#E06B6B] flex-shrink-0" />
+            <p className="text-sm text-[#9B2C2C] dark:text-[#FCA5A5] flex-1 font-medium">{error}</p>
+            <button onClick={() => setError(null)} className="hover:bg-[#FEE2E2] dark:hover:bg-[#7A2222]/30 p-1 rounded-lg transition-colors">
+              <X className="h-4 w-4 text-[#C53030] dark:text-[#E06B6B]" />
             </button>
           </div>
         )}
@@ -326,15 +326,15 @@ function WalletContent() {
               onClick={() => setActiveTab('children')}
               className={`group flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 whitespace-nowrap ${
                 activeTab === 'children'
-                  ? 'bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-md'
-                  : 'bg-card border-2 border-border text-muted-foreground hover:text-foreground hover:border-purple-300 hover:shadow-lg'
+                  ? 'bg-gradient-to-r from-[#2D6A8F] to-[#1E4E6B] text-white shadow-md'
+                  : 'bg-card border-2 border-border text-muted-foreground hover:text-foreground hover:border-[#4BA8C8] hover:shadow-lg'
               }`}
             >
               <PiggyBank className={`h-4 w-4 transition-transform duration-200 ${activeTab !== 'children' ? 'group-hover:scale-110' : ''}`} />
               <span style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Child Savings</span>
               {childWallets.length > 0 && (
                 <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
-                  activeTab === 'children' ? 'bg-white/20' : 'bg-purple-100 text-purple-600'
+                  activeTab === 'children' ? 'bg-white/20' : 'bg-[#E0EFF8] text-[#2D6A8F]'
                 }`}>
                   {childWallets.length}
                 </span>
@@ -344,8 +344,8 @@ function WalletContent() {
               onClick={() => setActiveTab('payouts')}
               className={`group flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 whitespace-nowrap ${
                 activeTab === 'payouts'
-                  ? 'bg-gradient-to-r from-emerald-600 to-emerald-700 text-white shadow-md'
-                  : 'bg-card border-2 border-border text-muted-foreground hover:text-foreground hover:border-emerald-300 hover:shadow-lg'
+                  ? 'bg-gradient-to-r from-[#2D8A70] to-[#2D8A70] text-white shadow-md'
+                  : 'bg-card border-2 border-border text-muted-foreground hover:text-foreground hover:border-[#5BC4A0] hover:shadow-lg'
               }`}
             >
               <ArrowDownLeft className={`h-4 w-4 transition-transform duration-200 ${activeTab !== 'payouts' ? 'group-hover:scale-110' : ''}`} />
@@ -397,20 +397,20 @@ function WalletContent() {
                         const targetId = familyFileId || familyFiles[0]?.id;
                         if (targetId) router.push(`/family-files/${targetId}/child-support`);
                       }}
-                      className="p-5 bg-gradient-to-br from-amber-50 to-card rounded-2xl border-2 border-amber-200 hover:border-amber-400 hover:shadow-xl transition-all duration-300 hover:scale-[1.01] text-left group relative overflow-hidden"
+                      className="p-5 bg-gradient-to-br from-[#FEF7ED] to-card rounded-2xl border-2 border-[#FEF7ED] hover:border-[#F5A623] hover:shadow-xl transition-all duration-300 hover:scale-[1.01] text-left group relative overflow-hidden"
                     >
                       <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 bg-gradient-to-br from-amber-500/15 to-yellow-600/10 rounded-2xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
-                          <Scale className="h-6 w-6 text-amber-700" />
+                        <div className="w-14 h-14 bg-gradient-to-br from-[#F5A623]/15 to-[#E09520]/10 rounded-2xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
+                          <Scale className="h-6 w-6 text-[#E09520]" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="font-bold text-foreground flex items-center gap-1.5" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                             Child Support
-                            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 uppercase tracking-wide">SDU</span>
+                            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-[#FEF7ED] text-[#E09520] uppercase tracking-wide">SDU</span>
                           </p>
                           <p className="text-sm text-muted-foreground font-medium">Log state disbursement payments</p>
                         </div>
-                        <ChevronRight className="h-5 w-5 text-amber-600 group-hover:text-amber-700 group-hover:translate-x-1 transition-all duration-300" />
+                        <ChevronRight className="h-5 w-5 text-[#E09520] group-hover:text-[#E09520] group-hover:translate-x-1 transition-all duration-300" />
                       </div>
                     </button>
                   )}
@@ -451,8 +451,8 @@ function WalletContent() {
             <div>
               {childWallets.length === 0 ? (
                 <div className="text-center py-12">
-                  <div className="w-14 h-14 bg-gradient-to-br from-purple-100 to-purple-50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md">
-                    <PiggyBank className="h-7 w-7 text-purple-600" />
+                  <div className="w-14 h-14 bg-gradient-to-br from-[#E0EFF8] to-[#E0EFF8] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md">
+                    <PiggyBank className="h-7 w-7 text-[#2D6A8F]" />
                   </div>
                   <h3 className="font-semibold text-foreground mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Child Savings</h3>
                   <p className="text-muted-foreground mb-4 max-w-md mx-auto font-medium">
@@ -479,8 +479,8 @@ function WalletContent() {
             <div>
               {payouts.length === 0 ? (
                 <div className="text-center py-12">
-                  <div className="w-14 h-14 bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md">
-                    <ArrowDownLeft className="h-7 w-7 text-emerald-600" />
+                  <div className="w-14 h-14 bg-gradient-to-br from-[#E8F4F0] to-[#E8F4F0] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md">
+                    <ArrowDownLeft className="h-7 w-7 text-[#2D8A70]" />
                   </div>
                   <h3 className="font-semibold text-foreground mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>No Payouts Yet</h3>
                   <p className="text-muted-foreground max-w-md mx-auto font-medium">
@@ -505,14 +505,14 @@ function WalletContent() {
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="font-mono text-lg font-bold text-emerald-600">
+                          <p className="font-mono text-lg font-bold text-[#2D8A70]">
                             +${parseFloat(payout.net_amount).toFixed(2)}
                           </p>
                           <span className={`text-xs px-2.5 py-1 rounded-full font-bold border-2 ${
                             payout.status === 'completed'
-                              ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                              ? 'bg-[#E8F4F0] text-[#2D8A70] border-[#E8F4F0]'
                               : payout.status === 'pending'
-                              ? 'bg-amber-50 text-amber-700 border-amber-200'
+                              ? 'bg-[#FEF7ED] text-[#E09520] border-[#FEF7ED]'
                               : 'bg-muted text-muted-foreground border-border'
                           }`}>
                             {payout.status}

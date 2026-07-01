@@ -110,12 +110,12 @@ function StatusBadge({ status }: { status: string }) {
   const config: Record<string, { icon: React.ReactNode; className: string; label: string }> = {
     active: {
       icon: <CheckCircle className="h-3.5 w-3.5" />,
-      className: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+      className: 'bg-[#E8F4F0] text-[#2D8A70] border-[#E8F4F0]',
       label: 'Active',
     },
     pending_approval: {
       icon: <Clock className="h-3.5 w-3.5" />,
-      className: 'bg-amber-100 text-amber-700 border-amber-200',
+      className: 'bg-[#FEF7ED] text-[#E09520] border-[#FEF7ED]',
       label: 'Pending',
     },
     archived: {
@@ -646,14 +646,14 @@ function ChildProfileContent() {
   if (error && !child) {
     return (
       <div className="max-w-2xl mx-auto">
-        <div className="bg-card border-2 border-red-200 rounded-2xl p-6 shadow-lg">
+        <div className="bg-card border-2 border-[#FEE2E2] rounded-2xl p-6 shadow-lg">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 bg-red-100 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md">
-              <AlertCircle className="h-6 w-6 text-red-600" />
+            <div className="w-14 h-14 bg-[#FEE2E2] rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md">
+              <AlertCircle className="h-6 w-6 text-[#C53030]" />
             </div>
             <div>
-              <p className="font-bold text-red-700" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Error Loading Profile</p>
-              <p className="text-sm text-red-600 mt-1 font-medium">{error}</p>
+              <p className="font-bold text-[#9B2C2C]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Error Loading Profile</p>
+              <p className="text-sm text-[#C53030] mt-1 font-medium">{error}</p>
             </div>
           </div>
           <button
@@ -682,30 +682,30 @@ function ChildProfileContent() {
 
       {/* Success Message */}
       {success && (
-        <div className="p-4 bg-card border-2 border-emerald-200 rounded-2xl flex items-center gap-4 shadow-lg">
-          <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center flex-shrink-0">
-            <CheckCircle className="h-5 w-5 text-emerald-600" />
+        <div className="p-4 bg-card border-2 border-[#E8F4F0] rounded-2xl flex items-center gap-4 shadow-lg">
+          <div className="w-10 h-10 bg-[#E8F4F0] rounded-xl flex items-center justify-center flex-shrink-0">
+            <CheckCircle className="h-5 w-5 text-[#2D8A70]" />
           </div>
-          <p className="text-sm text-emerald-700 font-semibold">{success}</p>
+          <p className="text-sm text-[#2D8A70] font-semibold">{success}</p>
         </div>
       )}
 
       {/* Error Message */}
       {error && (
-        <div className="p-4 bg-card border-2 border-red-200 rounded-2xl flex items-center gap-4 shadow-lg">
-          <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
-            <AlertCircle className="h-5 w-5 text-red-600" />
+        <div className="p-4 bg-card border-2 border-[#FEE2E2] rounded-2xl flex items-center gap-4 shadow-lg">
+          <div className="w-10 h-10 bg-[#FEE2E2] rounded-xl flex items-center justify-center flex-shrink-0">
+            <AlertCircle className="h-5 w-5 text-[#C53030]" />
           </div>
-          <p className="text-sm text-red-700 font-semibold">{error}</p>
+          <p className="text-sm text-[#9B2C2C] font-semibold">{error}</p>
         </div>
       )}
 
       {/* Pending Approval Banner */}
       {child.status === 'pending_approval' && (
-        <div className="bg-card border-2 border-yellow-200 rounded-2xl p-4 sm:p-5 shadow-lg hover:shadow-xl transition-all duration-300">
+        <div className="bg-card border-2 border-[#FEF7ED] rounded-2xl p-4 sm:p-5 shadow-lg hover:shadow-xl transition-all duration-300">
           <div className="flex items-start gap-3 sm:gap-4">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-yellow-100 flex items-center justify-center flex-shrink-0">
-              <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-yellow-600" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-[#FEF7ED] flex items-center justify-center flex-shrink-0">
+              <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-[#E09520]" />
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Pending Approval</h3>
@@ -730,7 +730,7 @@ function ChildProfileContent() {
                   );
                 } else if (hasApproved) {
                   return (
-                    <div className="mt-3 px-3 py-2 bg-yellow-50 text-yellow-700 rounded-xl text-sm font-medium inline-flex items-center gap-2">
+                    <div className="mt-3 px-3 py-2 bg-[#FEF7ED] text-[#E09520] rounded-xl text-sm font-medium inline-flex items-center gap-2">
                       <CheckCircle className="h-4 w-4" />
                       You've approved — waiting for co-parent
                     </div>
@@ -765,7 +765,7 @@ function ChildProfileContent() {
       {/* Profile Header */}
       <div className="bg-card rounded-2xl border-2 border-border overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
         {/* Decorative Header */}
-        <div className="h-20 sm:h-24 bg-gradient-to-br from-[#2C5F5D] via-[#2C5F5D]/90 to-[#2D6A8F] relative">
+        <div className="h-20 sm:h-24 bg-gradient-to-br from-[#3DAA8A] via-[#3DAA8A]/90 to-[#2D6A8F] relative">
           {/* Subtle pattern overlay */}
           <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 25% 25%, white 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
         </div>
@@ -867,8 +867,8 @@ function ChildProfileContent() {
                   onClick={handleWithMeCheckIn}
                   disabled={checkingIn || isChildWithMe}
                   className={`px-5 py-2.5 rounded-xl transition-all shadow-md hover:shadow-lg inline-flex items-center gap-2 font-medium ${isChildWithMe
-                    ? 'bg-[#2C5F5D]/10 text-[#2C5F5D] cursor-not-allowed border-2 border-[#2C5F5D]/20'
-                    : 'bg-gradient-to-br from-[#2C5F5D] to-[#2D6A8F] text-white hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50'
+                    ? 'bg-[#3DAA8A]/10 text-[#3DAA8A] cursor-not-allowed border-2 border-[#3DAA8A]/20'
+                    : 'bg-gradient-to-br from-[#3DAA8A] to-[#2D6A8F] text-white hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50'
                     }`}
                 >
                   {checkingIn ? (
@@ -891,7 +891,7 @@ function ChildProfileContent() {
               );
             })()}
             <Link href={`/family-files/${familyFileId}/children/${childId}/cubbie`}>
-              <button className="px-5 py-2.5 bg-card border-2 border-border text-foreground rounded-xl hover:border-[#2C5F5D]/30 hover:bg-muted transition-all shadow-md hover:shadow-lg inline-flex items-center gap-2 font-medium hover:scale-[1.02] active:scale-[0.98]">
+              <button className="px-5 py-2.5 bg-card border-2 border-border text-foreground rounded-xl hover:border-[#3DAA8A]/30 hover:bg-muted transition-all shadow-md hover:shadow-lg inline-flex items-center gap-2 font-medium hover:scale-[1.02] active:scale-[0.98]">
                 <Package className="h-4 w-4" />
                 {child.first_name}'s Cubbie
               </button>
@@ -1243,7 +1243,7 @@ function ChildProfileContent() {
                     </span>
                   )}
                   {child.has_504_plan && (
-                    <span className="px-3 py-1 bg-purple-100 text-purple-700 text-sm font-medium rounded-full">
+                    <span className="px-3 py-1 bg-[#E0EFF8] text-[#1E4E6B] text-sm font-medium rounded-full">
                       Has 504 Plan
                     </span>
                   )}
@@ -1437,7 +1437,7 @@ function ChildProfileContent() {
                     <span className="font-medium text-foreground">Contact {index + 1}</span>
                     <button
                       onClick={() => removeEmergencyContact(index)}
-                      className="p-2 rounded-lg hover:bg-red-50 text-muted-foreground hover:text-red-600 transition-colors"
+                      className="p-2 rounded-lg hover:bg-[#FEE2E2] text-muted-foreground hover:text-[#C53030] transition-colors"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>

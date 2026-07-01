@@ -31,20 +31,20 @@ export default function CollectionsManager({
   // Form state
   const [formData, setFormData] = useState({
     name: '',
-    color: '#3B82F6',
+    color: '#2D6A8F',
     is_default: false,
   });
 
   // Preset colors for quick selection
   const presetColors = [
-    '#3B82F6', // Blue
-    '#10B981', // Green
-    '#8B5CF6', // Purple
-    '#F59E0B', // Orange
-    '#EF4444', // Red
-    '#EC4899', // Pink
-    '#06B6D4', // Cyan
-    '#84CC16', // Lime
+    '#2D6A8F', // Blue
+    '#3DAA8A', // Green
+    '#4BA8C8', // Purple
+    '#F5A623', // Orange
+    '#C53030', // Red
+    '#F5A623', // Pink
+    '#2D6A8F', // Cyan
+    '#5BC4A0', // Lime
   ];
 
   useEffect(() => {
@@ -84,7 +84,7 @@ export default function CollectionsManager({
       }
 
       // Reset form
-      setFormData({ name: '', color: '#3B82F6', is_default: false });
+      setFormData({ name: '', color: '#2D6A8F', is_default: false });
       setShowForm(false);
       setEditingId(null);
     } catch (err: any) {
@@ -116,7 +116,7 @@ export default function CollectionsManager({
   };
 
   const cancelForm = () => {
-    setFormData({ name: '', color: '#3B82F6', is_default: false });
+    setFormData({ name: '', color: '#2D6A8F', is_default: false });
     setShowForm(false);
     setEditingId(null);
   };
@@ -147,14 +147,14 @@ export default function CollectionsManager({
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+        <div className="bg-[#FEE2E2] border border-[#FEE2E2] text-[#9B2C2C] px-4 py-3 rounded">
           {error}
         </div>
       )}
 
       {/* Create/Edit Form */}
       {showForm && (
-        <Card className="p-4 border-2 border-blue-200 bg-blue-50">
+        <Card className="p-4 border-2 border-[#E0EFF8] bg-[#E0EFF8]">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Label htmlFor="name">Collection Name</Label>
@@ -234,7 +234,7 @@ export default function CollectionsManager({
             <Card
               key={collection.id}
               className={`p-4 hover:shadow-md transition-shadow cursor-pointer ${
-                collection.is_default ? 'border-2 border-blue-500' : ''
+                collection.is_default ? 'border-2 border-[#2D6A8F]' : ''
               }`}
               onClick={() => onCollectionSelect?.(collection)}
             >
@@ -251,7 +251,7 @@ export default function CollectionsManager({
                     <div className="flex items-center gap-2">
                       <span className="font-medium">{collection.name}</span>
                       {collection.is_default && (
-                        <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
+                        <Star className="h-4 w-4 text-[#F5A623] fill-[#F5A623]" />
                       )}
                     </div>
                   </div>
@@ -278,7 +278,7 @@ export default function CollectionsManager({
                         e.stopPropagation();
                         handleDelete(collection.id);
                       }}
-                      className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+                      className="h-8 w-8 p-0 text-[#C53030] hover:text-[#9B2C2C] hover:bg-[#FEE2E2]"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

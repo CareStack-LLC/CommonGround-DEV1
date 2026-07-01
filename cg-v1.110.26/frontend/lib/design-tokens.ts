@@ -16,37 +16,55 @@ export const designTokens = {
   colors: {
     // Background Colors - Warm, reduces glare and stress
     background: {
-      default: '#FAFAF8',      // Warm off-white - main background
+      default: '#F4F8F7',       // Soft white - main background
       elevated: '#FFFFFF',      // Pure white - cards, elevated surfaces
       subtle: '#F5F5F3',        // Slightly darker - secondary areas
-      muted: '#EEEEEB',         // Muted background for de-escalation
+      muted: '#E8F4F8',         // Muted teal wash for de-escalation
     },
 
-    // Text Colors - Near-black, never pure black
+    // Text Colors - Deep navy, never pure black
     text: {
-      primary: '#1C1C1A',       // Primary text - headings, important
+      primary: '#1E3A4A',       // Deep Navy - headings, important
       secondary: '#4A4A47',     // Secondary text - body, descriptions
-      muted: '#6B6B66',         // Muted text - placeholders, hints
-      subtle: '#8F8F8A',        // Subtle text - timestamps, meta
+      muted: '#6B8A9A',         // Muted text - placeholders, hints, meta
+      subtle: '#8F8F8A',        // Subtle text - timestamps
       inverse: '#FAFAF8',       // Text on dark backgrounds
     },
 
-    // Primary - Muted Teal/Steel for trust, stability, care
+    // Primary - Calm Teal for trust, nature, calm
     primary: {
-      DEFAULT: '#0F766E',       // Primary actions, links
-      light: '#14B8A6',         // Hover states
-      dark: '#0D5D56',          // Active states
-      subtle: '#CCFBF1',        // Light backgrounds
+      DEFAULT: '#3DAA8A',       // Primary actions, links, brand mark
+      light: '#5BC4A0',         // Soft teal - light accents
+      dark: '#2D8A70',          // Hover / active states
+      subtle: '#E8F4F0',        // Light backgrounds
       foreground: '#FFFFFF',    // Text on primary
+    },
+
+    // Secondary - Ocean Blue for stability, depth (Parent B, professional)
+    secondary: {
+      DEFAULT: '#2D6A8F',
+      light: '#4BA8C8',         // Sky blue - highlight
+      dark: '#1E4E6B',
+      subtle: '#E0EFF8',
+      foreground: '#FFFFFF',
+    },
+
+    // Accent - Child Gold for warmth, the child, attention (the arch)
+    accent: {
+      DEFAULT: '#F5A623',
+      light: '#FFB84D',
+      dark: '#E09520',
+      subtle: '#FEF7ED',
+      foreground: '#1E3A4A',    // gold needs dark text, never white
     },
 
     // Semantic Colors - Meaningful only
     semantic: {
-      // Success/Verified/Compliant - Sage green
+      // Success/Verified/Compliant - Calm teal (brand success)
       success: {
-        DEFAULT: '#059669',
+        DEFAULT: '#3DAA8A',
         light: '#10B981',
-        subtle: '#D1FAE5',
+        subtle: '#E8F4F0',
         foreground: '#FFFFFF',
       },
 
@@ -61,7 +79,7 @@ export const designTokens = {
       // Error/Destructive - Only for confirmed issues
       // Never use for "emotion" - only missed, failed, overdue
       error: {
-        DEFAULT: '#DC2626',
+        DEFAULT: '#C53030',
         light: '#EF4444',
         subtle: '#FEE2E2',
         foreground: '#FFFFFF',
@@ -98,10 +116,13 @@ export const designTokens = {
   // Readable under stress - larger text, generous spacing
 
   typography: {
-    // Font Family - Humanist, slightly rounded, excellent legibility
+    // Font Family - see frontend/app/layout.tsx for the next/font loaders
     fontFamily: {
-      sans: 'var(--font-geist-sans), system-ui, -apple-system, sans-serif',
-      mono: 'var(--font-geist-mono), monospace',
+      sans: 'var(--font-dm-sans), system-ui, -apple-system, sans-serif',
+      serif: 'var(--font-dm-serif-display), Georgia, serif', // display / headings
+      mono: 'var(--font-dm-mono), "DM Mono", "SF Mono", Monaco, monospace',
+      kidBody: 'var(--font-inter), var(--font-dm-sans), system-ui, sans-serif',
+      kidHeading: 'var(--font-space-grotesk), var(--font-dm-sans), sans-serif',
     },
 
     // Font Sizes - Larger than typical apps

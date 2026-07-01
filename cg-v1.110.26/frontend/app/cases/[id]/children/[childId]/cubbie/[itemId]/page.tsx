@@ -205,7 +205,7 @@ export default function CubbieItemDetailPage() {
       <div className="container mx-auto py-8 max-w-2xl">
         <Card>
           <CardContent className="pt-6">
-            <div className="text-center text-red-600">
+            <div className="text-center text-[#C53030]">
               <p>{error || 'Item not found'}</p>
               <Button
                 onClick={() => router.push(`/cases/${caseId}/children/${childId}/cubbie`)}
@@ -234,12 +234,12 @@ export default function CubbieItemDetailPage() {
 
       {/* Success/Error Messages */}
       {success && (
-        <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-md text-green-600 text-sm">
+        <div className="mb-4 p-3 bg-[#E8F4F0] border border-[#E8F4F0] rounded-md text-[#2D8A70] text-sm">
           {success}
         </div>
       )}
       {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md text-red-600 text-sm">
+        <div className="mb-4 p-3 bg-[#FEE2E2] border border-[#FEE2E2] rounded-md text-[#C53030] text-sm">
           {error}
         </div>
       )}
@@ -261,7 +261,7 @@ export default function CubbieItemDetailPage() {
                   <Button
                     variant="outline"
                     onClick={() => setShowDeleteConfirm(true)}
-                    className="text-red-600 hover:text-red-700"
+                    className="text-[#C53030] hover:text-[#9B2C2C]"
                   >
                     Remove
                   </Button>
@@ -458,7 +458,7 @@ export default function CubbieItemDetailPage() {
                 <span
                   className={`text-sm px-4 py-2 rounded-full ${
                     item.current_location === 'child_traveling'
-                      ? 'bg-yellow-100 text-yellow-800'
+                      ? 'bg-[#FEF7ED] text-[#E09520]'
                       : 'bg-gray-100 text-gray-800'
                   }`}
                 >

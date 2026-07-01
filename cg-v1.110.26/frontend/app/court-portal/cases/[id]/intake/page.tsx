@@ -211,7 +211,7 @@ export default function IntakeManagementPage() {
   if (isLoading || !professional) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-[#2D6A8F]" />
       </div>
     );
   }
@@ -302,9 +302,9 @@ export default function IntakeManagementPage() {
 
               {newSessionLink ? (
                 <div className="space-y-3">
-                  <Alert className="bg-green-50 border-green-200">
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                    <AlertDescription className="text-green-800">
+                  <Alert className="bg-[#E8F4F0] border-[#E8F4F0]">
+                    <CheckCircle className="h-4 w-4 text-[#2D8A70]" />
+                    <AlertDescription className="text-[#1E3A4A]">
                       Intake session created! Send this link to the parent:
                     </AlertDescription>
                   </Alert>
@@ -351,9 +351,9 @@ export default function IntakeManagementPage() {
       </div>
 
       {/* Info Banner */}
-      <Alert className="bg-blue-50 border-blue-200">
-        <MessageSquare className="h-4 w-4 text-blue-600" />
-        <AlertDescription className="text-blue-800">
+      <Alert className="bg-[#E0EFF8] border-[#E0EFF8]">
+        <MessageSquare className="h-4 w-4 text-[#2D6A8F]" />
+        <AlertDescription className="text-[#1E4E6B]">
           <strong>How it works:</strong> Create an intake link, send it to the parent, and ARIA will conduct
           a conversational interview. No confusing forms - just natural conversation that gets organized into
           court documents.
@@ -363,7 +363,7 @@ export default function IntakeManagementPage() {
       {/* Sessions List */}
       {loadingSessions ? (
         <div className="flex justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-indigo-600" />
+          <Loader2 className="h-8 w-8 animate-spin text-[#2D6A8F]" />
         </div>
       ) : sessions.length === 0 ? (
         <Card>
@@ -390,13 +390,13 @@ export default function IntakeManagementPage() {
                       <span className="font-medium">{session.session_number}</span>
                       <StatusBadge status={session.status} />
                       {session.parent_confirmed && (
-                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                        <Badge variant="outline" className="bg-[#E8F4F0] text-[#2D8A70] border-[#E8F4F0]">
                           <CheckCircle className="h-3 w-3 mr-1" />
                           Confirmed
                         </Badge>
                       )}
                       {session.clarification_requested && (
-                        <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
+                        <Badge variant="outline" className="bg-[#FEF7ED] text-[#E09520] border-[#FEF7ED]">
                           <AlertCircle className="h-3 w-3 mr-1" />
                           Clarification Needed
                         </Badge>
@@ -518,9 +518,9 @@ export default function IntakeManagementPage() {
 function StatusBadge({ status }: { status: string }) {
   const config: Record<string, { label: string; variant: "default" | "secondary" | "outline" | "destructive"; className: string }> = {
     pending: { label: "Pending", variant: "secondary", className: "bg-gray-100 text-gray-700" },
-    in_progress: { label: "In Progress", variant: "default", className: "bg-blue-100 text-blue-700" },
-    completed: { label: "Completed", variant: "default", className: "bg-green-100 text-green-700" },
-    expired: { label: "Expired", variant: "destructive", className: "bg-red-100 text-red-700" },
+    in_progress: { label: "In Progress", variant: "default", className: "bg-[#E0EFF8] text-[#1E4E6B]" },
+    completed: { label: "Completed", variant: "default", className: "bg-[#E8F4F0] text-[#2D8A70]" },
+    expired: { label: "Expired", variant: "destructive", className: "bg-[#FEE2E2] text-[#9B2C2C]" },
     cancelled: { label: "Cancelled", variant: "secondary", className: "bg-gray-100 text-gray-500" },
   };
 

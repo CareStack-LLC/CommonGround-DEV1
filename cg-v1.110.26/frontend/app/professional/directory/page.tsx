@@ -52,9 +52,9 @@ interface DirectoryProfile {
 const PROFESSIONAL_TYPE_INFO: Record<string, { label: string; color: string }> = {
     attorney: { label: "Attorney", color: "bg-[#F4F8F7] text-[#1E3A4A] border-2 border-[#1E3A4A]/30" },
     paralegal: { label: "Paralegal", color: "bg-blue-50 text-blue-900 border-2 border-blue-900/30" },
-    mediator: { label: "Mediator", color: "bg-purple-50 text-purple-900 border-2 border-purple-900/30" },
-    parenting_coordinator: { label: "Parenting Coordinator", color: "bg-emerald-50 text-emerald-900 border-2 border-emerald-900/30" },
-    intake_coordinator: { label: "Intake Coordinator", color: "bg-cyan-50 text-cyan-900 border-2 border-cyan-900/30" },
+    mediator: { label: "Mediator", color: "bg-[#F0F7FC] text-[#163A50] border-2 border-[#163A50]/30" },
+    parenting_coordinator: { label: "Parenting Coordinator", color: "bg-[#E8F4F0] text-[#1B5544] border-2 border-[#1B5544]/30" },
+    intake_coordinator: { label: "Intake Coordinator", color: "bg-[#F0F7FC] text-[#163A50] border-2 border-[#163A50]/30" },
     practice_admin: { label: "Practice Admin", color: "bg-slate-50 text-slate-900 border-2 border-slate-900/30" },
 };
 
@@ -319,7 +319,7 @@ function ProfileCard({ profile }: { profile: DirectoryProfile }) {
                             <MapPin className="h-3 w-3 text-slate-400 flex-shrink-0" />
                             <span>{profile.license_state}</span>
                             {profile.license_verified && (
-                                <span className="flex items-center gap-0.5 text-green-600">
+                                <span className="flex items-center gap-0.5 text-[#2D8A70]">
                                     <CheckCircle2 className="h-3 w-3" /> Verified
                                 </span>
                             )}
@@ -403,7 +403,7 @@ function ProfileListItem({ profile }: { profile: DirectoryProfile }) {
                                 </Badge>
                             )}
                             {profile.license_verified && (
-                                <span className="flex items-center gap-0.5 text-[10px] text-green-600">
+                                <span className="flex items-center gap-0.5 text-[10px] text-[#2D8A70]">
                                     <CheckCircle2 className="h-3 w-3" /> Verified
                                 </span>
                             )}

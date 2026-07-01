@@ -67,17 +67,17 @@ export default function DemoPage() {
       <HeroSection
         variant="split"
         eyebrow="For family-law professionals"
-        headline="See CommonGround in action"
-        headlineAccent="in action"
-        subheadline="Book a 15-minute walkthrough tailored to your firm's workflow — client intake, case timeline, ARIA controls, and court-ready exports."
-        primaryCta={{ label: 'Book a demo', href: '#book' }}
-        secondaryCta={{ label: 'See our walkthrough', href: '/walkthrough' }}
-        trustItems={['15-minute walkthrough', 'No commitment', 'Court-ready exports']}
+        headline="Run high-conflict cases in less time"
+        headlineAccent="in less time"
+        subheadline="See it in a 15-minute walkthrough built around your firm — guided client intake, one case timeline, ARIA controls, and SHA-256 court-ready exports. No commitment."
+        primaryCta={{ label: 'Book my 15-min demo', href: '#book' }}
+        secondaryCta={{ label: 'Take the self-guided tour', href: '/walkthrough' }}
+        trustItems={['15-minute walkthrough', 'No commitment', 'SHA-256 court-ready exports']}
         media={
           <div className="relative mx-auto w-full max-w-xl lg:max-w-none">
             <Image
-              src="/images/marketing/pro1.png"
-              alt="The CommonGround professional portal — case timeline, ARIA controls, and court-ready exports"
+              src="/images/marketing/pro1.jpg"
+              alt="A family law professional using CommonGround"
               width={1200}
               height={800}
               priority
@@ -110,8 +110,8 @@ export default function DemoPage() {
               A live tour of the professional portal
             </h2>
             <p className="mt-4 text-base sm:text-lg text-gray-600 leading-relaxed">
-              Fifteen focused minutes covering the features family law firms
-              use every day.
+              Fifteen focused minutes on the features family law firms use every
+              day &mdash; and how they cut hours off each case.
             </p>
             <ul className="mt-6 space-y-3 text-gray-700">
               <li className="flex gap-3">
@@ -177,11 +177,11 @@ export default function DemoPage() {
             ) : (
               <>
                 <h3 className="font-serif text-xl text-foreground mb-2">
-                  Tell us about your practice
+                  Book your 15-min demo
                 </h3>
                 <p className="text-sm text-gray-600 mb-6">
-                  We&rsquo;ll reach out within one business day to schedule a
-                  15-minute walkthrough.
+                  Tell us about your practice and we&rsquo;ll reach out within
+                  one business day. No commitment, no card.
                 </p>
                 <ProfessionalInterestForm source="demo_page" />
               </>
@@ -219,8 +219,8 @@ export default function DemoPage() {
 
       <CtaBand
         background="gold"
-        headline="Prefer to self-tour?"
-        primaryCta={{ label: 'Try the walkthrough', href: '/walkthrough' }}
+        headline="Prefer to explore on your own first?"
+        primaryCta={{ label: 'Take the self-guided tour', href: '/walkthrough' }}
       />
     </>
   );

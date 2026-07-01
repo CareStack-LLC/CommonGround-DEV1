@@ -81,7 +81,7 @@ function LoginContent() {
           <svg className="w-[72px] h-[72px] sm:w-[80px] sm:h-[80px]" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <linearGradient id="login-bg" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#E8F4F8" />
+                <stop offset="0%" stopColor="#E0EFF8" />
                 <stop offset="100%" stopColor="#D6ECE8" />
               </linearGradient>
               <linearGradient id="login-lf" x1="0" y1="0" x2="1" y2="1">
@@ -131,8 +131,8 @@ function LoginContent() {
 
             {/* Error Message */}
             {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
-                <p className="text-sm text-red-700 font-medium">{error}</p>
+              <div className="mb-6 p-4 bg-[#FEE2E2] border border-[#FEE2E2] rounded-xl">
+                <p className="text-sm text-[#9B2C2C] font-medium">{error}</p>
               </div>
             )}
 
@@ -319,7 +319,7 @@ function LoginContent() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" /></div>}>
+    <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2D8A70]" /></div>}>
       <LoginContent />
     </Suspense>
   );

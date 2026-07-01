@@ -74,8 +74,8 @@ const TEMPLATE_TYPES = [
 const TYPE_COLORS: Record<string, string> = {
   intake: "bg-[#3DAA8A]/10 text-[#1E3A4A]",
   agreement: "bg-blue-100 text-blue-800",
-  schedule: "bg-green-100 text-green-800",
-  financial: "bg-amber-100 text-amber-800",
+  schedule: "bg-[#E8F4F0] text-[#236E59]",
+  financial: "bg-[#FEF7ED] text-[#8F5E14]",
   custom: "bg-gray-100 text-gray-800",
 };
 
@@ -543,7 +543,7 @@ export default function FirmTemplatesPage() {
                             {TEMPLATE_TYPES.find((t) => t.value === template.template_type)?.label || template.template_type}
                           </Badge>
                           {template.is_current && (
-                            <Badge className="text-xs bg-green-100 text-green-800">
+                            <Badge className="text-xs bg-[#E8F4F0] text-[#236E59]">
                               <CheckCircle2 className="h-3 w-3 mr-1" />
                               Current
                             </Badge>
@@ -825,7 +825,7 @@ export default function FirmTemplatesPage() {
               </Badge>
               <span className="text-sm text-gray-500">Version {selectedTemplate?.version}</span>
               {selectedTemplate?.is_active && (
-                <Badge className="bg-green-100 text-green-800">Active</Badge>
+                <Badge className="bg-[#E8F4F0] text-[#236E59]">Active</Badge>
               )}
             </div>
 
@@ -879,7 +879,7 @@ export default function FirmTemplatesPage() {
                 {versions.map((version) => (
                   <div
                     key={version.version}
-                    className={`flex items-center justify-between p-3 rounded-lg border ${version.is_current ? "bg-green-50 border-green-200" : "bg-white"
+                    className={`flex items-center justify-between p-3 rounded-lg border ${version.is_current ? "bg-[#E8F4F0] border-[#C5E5DB]" : "bg-white"
                       }`}
                   >
                     <div className="flex items-center gap-3">
@@ -887,7 +887,7 @@ export default function FirmTemplatesPage() {
                       <div className="text-sm text-gray-500">{formatDate(version.created_at)}</div>
                     </div>
                     {version.is_current && (
-                      <Badge className="bg-green-100 text-green-800">
+                      <Badge className="bg-[#E8F4F0] text-[#236E59]">
                         <CheckCircle2 className="h-3 w-3 mr-1" />
                         Current
                       </Badge>

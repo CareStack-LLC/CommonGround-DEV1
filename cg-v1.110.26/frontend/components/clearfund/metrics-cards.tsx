@@ -40,10 +40,10 @@ export default function MetricsCards({ metrics, balanceSummary, isLoading }: Met
       {/* Balance Card */}
       <Card className="p-4">
         <div className="flex items-center gap-2 mb-2">
-          <DollarSign className="h-4 w-4 text-green-600" />
+          <DollarSign className="h-4 w-4 text-[#2D8A70]" />
           <span className="text-sm text-gray-600">Balance</span>
         </div>
-        <p className={`text-2xl font-bold ${netBalance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+        <p className={`text-2xl font-bold ${netBalance >= 0 ? 'text-[#2D8A70]' : 'text-[#C53030]'}`}>
           {netBalance >= 0 ? '+' : ''}{formatCurrency(Math.abs(netBalance))}
         </p>
         <p className="text-xs text-gray-500 mt-1">
@@ -54,10 +54,10 @@ export default function MetricsCards({ metrics, balanceSummary, isLoading }: Met
       {/* Pending Card */}
       <Card className="p-4">
         <div className="flex items-center gap-2 mb-2">
-          <Clock className="h-4 w-4 text-amber-600" />
+          <Clock className="h-4 w-4 text-[#E09520]" />
           <span className="text-sm text-gray-600">Pending</span>
         </div>
-        <p className="text-2xl font-bold text-amber-600">
+        <p className="text-2xl font-bold text-[#E09520]">
           {metrics?.total_pending_funding || 0}
         </p>
         <p className="text-xs text-gray-500 mt-1">
@@ -68,10 +68,10 @@ export default function MetricsCards({ metrics, balanceSummary, isLoading }: Met
       {/* This Month Card */}
       <Card className="p-4">
         <div className="flex items-center gap-2 mb-2">
-          <CheckCircle className="h-4 w-4 text-blue-600" />
+          <CheckCircle className="h-4 w-4 text-[#2D6A8F]" />
           <span className="text-sm text-gray-600">This Month</span>
         </div>
-        <p className="text-2xl font-bold text-blue-600">
+        <p className="text-2xl font-bold text-[#2D6A8F]">
           {formatCurrency(balanceSummary?.total_this_month)}
         </p>
         <p className="text-xs text-gray-500 mt-1">
@@ -80,12 +80,12 @@ export default function MetricsCards({ metrics, balanceSummary, isLoading }: Met
       </Card>
 
       {/* Overdue Card */}
-      <Card className={`p-4 ${metrics && metrics.total_overdue > 0 ? 'bg-red-50 border-red-200' : ''}`}>
+      <Card className={`p-4 ${metrics && metrics.total_overdue > 0 ? 'bg-[#FEE2E2] border-[#FEE2E2]' : ''}`}>
         <div className="flex items-center gap-2 mb-2">
-          <AlertTriangle className={`h-4 w-4 ${metrics && metrics.total_overdue > 0 ? 'text-red-600' : 'text-gray-400'}`} />
+          <AlertTriangle className={`h-4 w-4 ${metrics && metrics.total_overdue > 0 ? 'text-[#C53030]' : 'text-gray-400'}`} />
           <span className="text-sm text-gray-600">Overdue</span>
         </div>
-        <p className={`text-2xl font-bold ${metrics && metrics.total_overdue > 0 ? 'text-red-600' : 'text-gray-400'}`}>
+        <p className={`text-2xl font-bold ${metrics && metrics.total_overdue > 0 ? 'text-[#C53030]' : 'text-gray-400'}`}>
           {metrics?.total_overdue || 0}
         </p>
         <p className="text-xs text-gray-500 mt-1">

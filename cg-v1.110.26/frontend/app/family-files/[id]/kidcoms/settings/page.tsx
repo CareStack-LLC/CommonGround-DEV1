@@ -184,23 +184,23 @@ export default function KidComsSettingsPage() {
           </div>
 
           {error && (
-            <div className="mb-6 bg-red-50 dark:bg-red-950/30 border-2 border-red-200 dark:border-red-800/50 rounded-2xl p-4">
+            <div className="mb-6 bg-[#FEE2E2] dark:bg-[#7A2222]/30 border-2 border-[#FEE2E2] dark:border-[#9B2C2C]/50 rounded-2xl p-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-red-100 dark:bg-red-900/50 flex items-center justify-center flex-shrink-0">
-                  <XCircle className="h-5 w-5 text-red-600 dark:text-red-400" />
+                <div className="w-10 h-10 rounded-lg bg-[#FEE2E2] dark:bg-[#7A2222]/50 flex items-center justify-center flex-shrink-0">
+                  <XCircle className="h-5 w-5 text-[#C53030] dark:text-[#E06B6B]" />
                 </div>
-                <p className="text-red-700 dark:text-red-300 font-medium">{error}</p>
+                <p className="text-[#9B2C2C] dark:text-[#FCA5A5] font-medium">{error}</p>
               </div>
             </div>
           )}
 
           {success && (
-            <div className="mb-6 bg-emerald-50 dark:bg-emerald-950/30 border-2 border-emerald-200 dark:border-emerald-800/50 rounded-2xl p-4">
+            <div className="mb-6 bg-[#E8F4F0] dark:bg-[#1E3A4A]/30 border-2 border-[#E8F4F0] dark:border-[#1E3A4A]/50 rounded-2xl p-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center flex-shrink-0">
-                  <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+                <div className="w-10 h-10 rounded-lg bg-[#E8F4F0] dark:bg-[#1E3A4A]/50 flex items-center justify-center flex-shrink-0">
+                  <CheckCircle className="h-5 w-5 text-[#2D8A70] dark:text-[#5BC4A0]" />
                 </div>
-                <p className="text-emerald-700 dark:text-emerald-300 font-medium">{success}</p>
+                <p className="text-[#2D8A70] dark:text-[#5BC4A0] font-medium">{success}</p>
               </div>
             </div>
           )}
@@ -210,8 +210,8 @@ export default function KidComsSettingsPage() {
           {/* Circle Approval */}
           <div className="bg-card border-2 border-border rounded-2xl shadow-lg p-6">
             <h2 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500/10 to-blue-600/5 flex items-center justify-center">
-                <Users className="h-4 w-4 text-blue-600" />
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#2D6A8F]/10 to-[#2D6A8F]/5 flex items-center justify-center">
+                <Users className="h-4 w-4 text-[#2D6A8F]" />
               </div>
               Circle Approval
             </h2>
@@ -295,8 +295,8 @@ export default function KidComsSettingsPage() {
           {/* Session Limits */}
           <div className="bg-card border-2 border-border rounded-2xl shadow-lg p-6">
             <h2 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500/10 to-amber-600/5 flex items-center justify-center">
-                <Clock className="h-4 w-4 text-amber-600" />
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#F5A623]/10 to-[#E09520]/5 flex items-center justify-center">
+                <Clock className="h-4 w-4 text-[#E09520]" />
               </div>
               Session Limits
             </h2>
@@ -352,8 +352,8 @@ export default function KidComsSettingsPage() {
           {/* Parental Controls */}
           <div className="bg-card border-2 border-border rounded-2xl shadow-lg p-6">
             <h2 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 flex items-center justify-center">
-                <Shield className="h-4 w-4 text-emerald-600" />
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#3DAA8A]/10 to-[#2D8A70]/5 flex items-center justify-center">
+                <Shield className="h-4 w-4 text-[#2D8A70]" />
               </div>
               Parental Controls
             </h2>

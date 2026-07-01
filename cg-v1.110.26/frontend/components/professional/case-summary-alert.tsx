@@ -29,28 +29,28 @@ interface CaseSummaryAlertProps {
 export function CaseSummaryAlert({ data }: CaseSummaryAlertProps) {
   const healthColors = {
     excellent: {
-      bg: "bg-gradient-to-r from-emerald-50 to-teal-50",
-      border: "border-emerald-200",
-      text: "text-emerald-700",
-      badge: "bg-emerald-100 text-emerald-700 border-emerald-200",
+      bg: "bg-gradient-to-r from-[#E8F4F0] to-teal-50",
+      border: "border-[#C5E5DB]",
+      text: "text-[#2D8A70]",
+      badge: "bg-[#E8F4F0] text-[#2D8A70] border-[#C5E5DB]",
     },
     good: {
-      bg: "bg-gradient-to-r from-teal-50 to-cyan-50",
+      bg: "bg-gradient-to-r from-teal-50 to-[#F0F7FC]",
       border: "border-teal-200",
       text: "text-teal-700",
       badge: "bg-teal-100 text-teal-700 border-teal-200",
     },
     fair: {
-      bg: "bg-gradient-to-r from-amber-50 to-orange-50",
-      border: "border-amber-200",
-      text: "text-amber-700",
-      badge: "bg-amber-100 text-amber-700 border-amber-200",
+      bg: "bg-gradient-to-r from-[#FEF7ED] to-[#FEF7ED]",
+      border: "border-[#FBE3BF]",
+      text: "text-[#B8791A]",
+      badge: "bg-[#FEF7ED] text-[#B8791A] border-[#FBE3BF]",
     },
     concerning: {
-      bg: "bg-gradient-to-r from-rose-50 to-red-50",
-      border: "border-rose-200",
-      text: "text-rose-700",
-      badge: "bg-rose-100 text-rose-700 border-rose-200",
+      bg: "bg-gradient-to-r from-[#FEF7ED] to-[#FEE2E2]",
+      border: "border-[#FEF7ED]",
+      text: "text-[#E09520]",
+      badge: "bg-[#FEF7ED] text-[#E09520] border-[#FEF7ED]",
     },
   };
 
@@ -80,10 +80,10 @@ export function CaseSummaryAlert({ data }: CaseSummaryAlertProps) {
               <Shield className={`h-5 w-5 ${colors.text}`} />
               <span className={`text-3xl font-bold ${colors.text}`}>{data.compliance_score}%</span>
               {data.compliance_trend === "up" && (
-                <TrendingUp className="h-5 w-5 text-emerald-600" />
+                <TrendingUp className="h-5 w-5 text-[#2D8A70]" />
               )}
               {data.compliance_trend === "down" && (
-                <TrendingDown className="h-5 w-5 text-red-600" />
+                <TrendingDown className="h-5 w-5 text-[#C53030]" />
               )}
             </div>
             <p className="text-xs text-slate-500 mt-1">Compliance Score</p>
@@ -94,7 +94,7 @@ export function CaseSummaryAlert({ data }: CaseSummaryAlertProps) {
           {/* Key Insights */}
           <div className="space-y-2">
             <div className="flex items-center gap-2 mb-3">
-              <div className="h-1 w-6 bg-blue-500 rounded-full" />
+              <div className="h-1 w-6 bg-[#2D6A8F] rounded-full" />
               <h4 className="text-sm font-bold text-slate-700 uppercase tracking-wider">
                 Key Insights
               </h4>
@@ -105,7 +105,7 @@ export function CaseSummaryAlert({ data }: CaseSummaryAlertProps) {
                   key={index}
                   className="flex items-start gap-2 p-3 bg-white/70 backdrop-blur-sm rounded-lg border border-slate-200/50 shadow-sm"
                 >
-                  <CheckCircle2 className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
+                  <CheckCircle2 className="h-4 w-4 text-[#2D6A8F] mt-0.5 shrink-0" />
                   <p className="text-sm text-slate-700 leading-snug">{insight}</p>
                 </div>
               ))}
@@ -115,7 +115,7 @@ export function CaseSummaryAlert({ data }: CaseSummaryAlertProps) {
           {/* Action Items */}
           <div className="space-y-2">
             <div className="flex items-center gap-2 mb-3">
-              <div className={`h-1 w-6 ${data.action_items.length > 0 ? "bg-amber-500" : "bg-emerald-500"} rounded-full`} />
+              <div className={`h-1 w-6 ${data.action_items.length > 0 ? "bg-[#F5A623]" : "bg-[#3DAA8A]"} rounded-full`} />
               <h4 className="text-sm font-bold text-slate-700 uppercase tracking-wider">
                 {data.action_items.length > 0 ? "Action Required" : "All Clear"}
               </h4>
@@ -125,16 +125,16 @@ export function CaseSummaryAlert({ data }: CaseSummaryAlertProps) {
                 data.action_items.map((action, index) => (
                   <div
                     key={index}
-                    className="flex items-start gap-2 p-3 bg-white/70 backdrop-blur-sm rounded-lg border border-amber-200 shadow-sm"
+                    className="flex items-start gap-2 p-3 bg-white/70 backdrop-blur-sm rounded-lg border border-[#FBE3BF] shadow-sm"
                   >
-                    <Clock className="h-4 w-4 text-amber-600 mt-0.5 shrink-0" />
+                    <Clock className="h-4 w-4 text-[#E09520] mt-0.5 shrink-0" />
                     <p className="text-sm text-slate-700 leading-snug">{action}</p>
                   </div>
                 ))
               ) : (
-                <div className="flex items-center gap-2 p-3 bg-white/70 backdrop-blur-sm rounded-lg border border-emerald-200 shadow-sm">
-                  <CheckCircle2 className="h-4 w-4 text-emerald-600" />
-                  <p className="text-sm text-emerald-700 font-medium">
+                <div className="flex items-center gap-2 p-3 bg-white/70 backdrop-blur-sm rounded-lg border border-[#C5E5DB] shadow-sm">
+                  <CheckCircle2 className="h-4 w-4 text-[#2D8A70]" />
+                  <p className="text-sm text-[#2D8A70] font-medium">
                     No urgent actions required. Case is on track.
                   </p>
                 </div>

@@ -264,7 +264,7 @@ export default function LibraryPage() {
                   <div key={label}>
                     <div className="flex items-center justify-center gap-1 mb-1">
                       {icon}
-                      <div className="text-2xl font-bold text-amber-400" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+                      <div className="text-2xl font-bold text-amber-400" style={{ fontFamily: 'var(--font-mono)' }}>
                         {value}
                       </div>
                     </div>

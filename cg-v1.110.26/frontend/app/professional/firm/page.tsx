@@ -198,7 +198,7 @@ export default function FirmSettingsPage() {
           <Badge className="bg-[#3DAA8A]/10 text-[#1E3A4A] border-0 text-xs font-medium">
             {firm?.subscription_tier === "professional" ? "Professional" : firm?.subscription_tier}
           </Badge>
-          <Badge className={`text-xs ${firm?.subscription_status === "active" ? "bg-green-50 text-green-700 border-0" : "bg-slate-100 text-slate-600 border-0"}`}>
+          <Badge className={`text-xs ${firm?.subscription_status === "active" ? "bg-[#E8F4F0] text-[#2D8A70] border-0" : "bg-slate-100 text-slate-600 border-0"}`}>
             {firm?.subscription_status || "trial"}
           </Badge>
         </div>
@@ -208,7 +208,7 @@ export default function FirmSettingsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {[
           { href: "/professional/firm/team", icon: Users, label: "Team Members", desc: `${firm?.member_count || 0} members`, color: "text-blue-600 bg-blue-50" },
-          { href: "/professional/firm/templates", icon: FileText, label: "Templates", desc: "Intake & agreement templates", color: "text-purple-600 bg-purple-50" },
+          { href: "/professional/firm/templates", icon: FileText, label: "Templates", desc: "Intake & agreement templates", color: "text-[#2D6A8F] bg-[#F0F7FC]" },
           { href: "/professional/firm/analytics", icon: BarChart3, label: "Analytics", desc: "Firm performance & trends", color: "text-[#3DAA8A] bg-[#F4F8F7]" },
           { href: "/professional/firm/queue", icon: Inbox, label: "Case Queue", desc: "Assign incoming cases", color: "text-[#1E3A4A] bg-slate-100" },
         ].map((item) => (

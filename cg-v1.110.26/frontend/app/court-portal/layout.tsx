@@ -396,7 +396,7 @@ function CourtNavigation({ pathname, activeGrant }: { pathname: string; activeGr
                 className="text-muted-foreground hover:text-foreground relative"
               >
                 <Bell className="h-4 w-4" />
-                <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 h-4 w-4 bg-[#C53030] rounded-full text-[10px] text-white flex items-center justify-center">
                   2
                 </span>
               </Button>
@@ -451,7 +451,7 @@ function CourtNavigation({ pathname, activeGrant }: { pathname: string; activeGr
           {/* Notifications */}
           <Button variant="ghost" size="sm" className="relative">
             <Bell className="h-4 w-4" />
-            <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center">
+            <span className="absolute -top-1 -right-1 h-4 w-4 bg-[#C53030] rounded-full text-[10px] text-white flex items-center justify-center">
               2
             </span>
           </Button>
@@ -578,7 +578,7 @@ function NavLink({
       {icon}
       {children}
       {badge && (
-        <span className="ml-1 px-1.5 py-0.5 text-[10px] font-semibold bg-red-500 text-white rounded-full">
+        <span className="ml-1 px-1.5 py-0.5 text-[10px] font-semibold bg-[#C53030] text-white rounded-full">
           {badge}
         </span>
       )}
@@ -619,7 +619,7 @@ function MobileNavLink({
         {children}
       </span>
       {badge && (
-        <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-red-500 text-white rounded-full">
+        <span className="px-1.5 py-0.5 text-[10px] font-semibold bg-[#C53030] text-white rounded-full">
           {badge}
         </span>
       )}

@@ -33,12 +33,12 @@ export function PresenceIndicator({
       <div className="relative">
         <div
           className={`${sizeClasses[size]} rounded-full ${
-            isOnline ? 'bg-emerald-500' : 'bg-slate-400'
+            isOnline ? 'bg-[#3DAA8A]' : 'bg-slate-400'
           }`}
         />
         {isOnline && (
           <div
-            className={`absolute inset-0 ${sizeClasses[size]} rounded-full bg-emerald-500 animate-ping opacity-75`}
+            className={`absolute inset-0 ${sizeClasses[size]} rounded-full bg-[#3DAA8A] animate-ping opacity-75`}
           />
         )}
       </div>
@@ -66,12 +66,12 @@ export function OnlineDot({
     <div className="relative">
       <div
         className={`${sizeClasses[size]} rounded-full ${
-          isOnline ? 'bg-emerald-500' : 'bg-slate-400'
+          isOnline ? 'bg-[#3DAA8A]' : 'bg-slate-400'
         }`}
       />
       {isOnline && (
         <div
-          className={`absolute inset-0 ${sizeClasses[size]} rounded-full bg-emerald-500 animate-ping opacity-75`}
+          className={`absolute inset-0 ${sizeClasses[size]} rounded-full bg-[#3DAA8A] animate-ping opacity-75`}
         />
       )}
     </div>

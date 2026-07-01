@@ -72,7 +72,7 @@ export function ProfessionalCard({ firm, onViewProfile, onInvite }: Professional
                 {/* Badges Overlay */}
                 <div className="absolute top-3 left-3 z-30 flex flex-col gap-2">
                     {firm.safety_vetted && (
-                        <Badge className="bg-emerald-500 hover:bg-emerald-600 text-white gap-1 border-0 shadow-sm">
+                        <Badge className="bg-[#3DAA8A] hover:bg-[#2D8A70] text-white gap-1 border-0 shadow-sm">
                             <ShieldCheck className="w-3 h-3" />
                             Safety Vetted
                         </Badge>

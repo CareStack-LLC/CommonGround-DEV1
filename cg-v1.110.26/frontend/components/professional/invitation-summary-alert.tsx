@@ -70,13 +70,13 @@ export function InvitationSummaryAlert({
     const statusColor = (health: string) => {
         switch (health) {
             case "excellent":
-                return "bg-emerald-100 text-emerald-700 border-emerald-200";
+                return "bg-[#E8F4F0] text-[#2D8A70] border-[#C5E5DB]";
             case "good":
                 return "bg-teal-100 text-teal-700 border-teal-200";
             case "fair":
-                return "bg-amber-100 text-amber-700 border-amber-200";
+                return "bg-[#FEF7ED] text-[#B8791A] border-[#FBE3BF]";
             case "concerning":
-                return "bg-rose-100 text-rose-700 border-rose-200";
+                return "bg-[#FEF7ED] text-[#E09520] border-[#FEF7ED]";
             default:
                 return "bg-slate-100 text-slate-700 border-slate-200";
         }
@@ -95,11 +95,11 @@ export function InvitationSummaryAlert({
 
     if (error || !preview) {
         return (
-            <Card className="border-rose-200 bg-rose-50/30 overflow-hidden">
+            <Card className="border-[#FEF7ED] bg-[#FEF7ED]/30 overflow-hidden">
                 <CardContent className="p-4 flex items-center justify-between gap-4">
                     <div className="flex items-center gap-2">
-                        <AlertCircle className="h-5 w-5 text-rose-500" />
-                        <span className="text-sm font-medium text-rose-700">{error || "Preview unavailable"}</span>
+                        <AlertCircle className="h-5 w-5 text-[#F5A623]" />
+                        <span className="text-sm font-medium text-[#E09520]">{error || "Preview unavailable"}</span>
                     </div>
                     <Button variant="ghost" size="sm" onClick={fetchPreview}>
                         Retry
@@ -110,12 +110,12 @@ export function InvitationSummaryAlert({
     }
 
     return (
-        <Card className="border-emerald-200 shadow-lg shadow-emerald-500/5 overflow-hidden transition-all hover:shadow-xl hover:shadow-emerald-500/10">
-            <div className="h-1.5 bg-gradient-to-r from-emerald-500 via-teal-500 to-blue-500" />
+        <Card className="border-[#C5E5DB] shadow-lg shadow-[#3DAA8A]/5 overflow-hidden transition-all hover:shadow-xl hover:shadow-[#3DAA8A]/10">
+            <div className="h-1.5 bg-gradient-to-r from-[#3DAA8A] via-teal-500 to-[#2D6A8F]" />
             <CardHeader className="pb-3 border-b border-slate-100">
                 <div className="flex items-start justify-between gap-4">
                     <div className="flex items-center gap-3">
-                        <div className="p-2.5 bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-xl shadow-lg shadow-emerald-500/20">
+                        <div className="p-2.5 bg-gradient-to-br from-[#3DAA8A] to-teal-600 text-white rounded-xl shadow-lg shadow-[#3DAA8A]/20">
                             <Shield className="h-5 w-5" />
                         </div>
                         <div>
@@ -144,7 +144,7 @@ export function InvitationSummaryAlert({
                             <Label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">People Involved</Label>
                             <div className="space-y-2">
                                 <div className="flex items-center gap-2 text-sm">
-                                    <Users className="h-4 w-4 text-blue-500" />
+                                    <Users className="h-4 w-4 text-[#2D6A8F]" />
                                     <span className="font-semibold">{preview.parent_a_name}</span>
                                     <span className="text-slate-400">&</span>
                                     <span className="font-semibold">{preview.parent_b_name}</span>
@@ -152,7 +152,7 @@ export function InvitationSummaryAlert({
                                 <div className="flex flex-wrap gap-1.5 pt-1">
                                     {preview.children?.map((c: any) => (
                                         <div key={c.id} className="flex items-center gap-1 px-2 py-1 bg-white border border-slate-200 rounded-md text-[11px] font-medium text-slate-600 shadow-sm">
-                                            <Baby className="h-3 w-3 text-emerald-500" />
+                                            <Baby className="h-3 w-3 text-[#3DAA8A]" />
                                             {c.first_name} ({c.age}y)
                                         </div>
                                     ))}
@@ -161,7 +161,7 @@ export function InvitationSummaryAlert({
                         </div>
                         <div>
                             <Label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1 block">Requested Role</Label>
-                            <Badge variant="outline" className="text-[10px] uppercase bg-blue-50 text-blue-600 border-blue-200">{preview.requested_role?.replace("_", " ")}</Badge>
+                            <Badge variant="outline" className="text-[10px] uppercase bg-[#E0EFF8] text-[#2D6A8F] border-[#E0EFF8]">{preview.requested_role?.replace("_", " ")}</Badge>
                         </div>
                     </div>
 
@@ -184,12 +184,12 @@ export function InvitationSummaryAlert({
                             />
                         </div>
                         <div className="flex items-center gap-2 text-xs text-slate-500 bg-white border border-slate-200 p-2 rounded-lg">
-                            <FileText className="h-3.5 w-3.5 text-blue-500" />
+                            <FileText className="h-3.5 w-3.5 text-[#2D6A8F]" />
                             <span className="flex-1 truncate">
                                 {preview.agreement.has_active_agreement ? `Active: ${preview.agreement.agreement_title}` : "No Active Agreement"}
                             </span>
                             {preview.agreement.has_active_agreement && (
-                                <span className="font-bold text-emerald-600">{preview.agreement.completed_sections}/{preview.agreement.total_sections}</span>
+                                <span className="font-bold text-[#2D8A70]">{preview.agreement.completed_sections}/{preview.agreement.total_sections}</span>
                             )}
                         </div>
                     </div>
@@ -199,16 +199,16 @@ export function InvitationSummaryAlert({
                         <Label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">Financial Obligations</Label>
                         <div className="bg-white border border-slate-200 rounded-xl p-3 shadow-sm relative overflow-hidden group">
                             <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity">
-                                <TrendingUp className="h-8 w-8 text-emerald-600" />
+                                <TrendingUp className="h-8 w-8 text-[#2D8A70]" />
                             </div>
                             <div className="flex justify-between items-end mb-1">
                                 <p className="text-xl font-bold font-mono text-slate-900">${preview.clearfund.total_amount.toLocaleString()}</p>
-                                <p className="text-[10px] font-bold text-emerald-600 uppercase">Total Volume</p>
+                                <p className="text-[10px] font-bold text-[#2D8A70] uppercase">Total Volume</p>
                             </div>
                             <div className="flex items-center gap-2 overflow-hidden">
                                 <div className="h-1.5 flex-1 bg-slate-100 rounded-full overflow-hidden flex">
-                                    <div className="bg-emerald-500 h-full" style={{ width: `${(preview.clearfund.paid_amount / preview.clearfund.total_amount) * 100 || 0}%` }} />
-                                    <div className="bg-amber-400 h-full" style={{ width: `${(preview.clearfund.pending_obligations / preview.clearfund.total_obligations) * 100 || 0}%` }} />
+                                    <div className="bg-[#3DAA8A] h-full" style={{ width: `${(preview.clearfund.paid_amount / preview.clearfund.total_amount) * 100 || 0}%` }} />
+                                    <div className="bg-[#F7B84D] h-full" style={{ width: `${(preview.clearfund.pending_obligations / preview.clearfund.total_obligations) * 100 || 0}%` }} />
                                 </div>
                                 <span className="text-[10px] whitespace-nowrap text-slate-500 font-bold">{preview.clearfund.pending_obligations} Pending</span>
                             </div>
@@ -216,7 +216,7 @@ export function InvitationSummaryAlert({
                         <div className="flex gap-2">
                             <Button
                                 onClick={() => onAccept && onAccept()}
-                                className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-600/20 py-5"
+                                className="flex-1 bg-[#2D8A70] hover:bg-[#2D8A70] text-white shadow-lg shadow-[#2D8A70]/20 py-5"
                             >
                                 Accept Case
                             </Button>
@@ -233,10 +233,10 @@ export function InvitationSummaryAlert({
 
                 {preview.message && (
                     <div className="mt-6 pt-4 border-t border-slate-100">
-                        <div className="flex items-start gap-3 bg-blue-50/50 p-3 rounded-xl border border-blue-100/50">
-                            <MessageSquare className="h-4 w-4 text-blue-500 mt-0.5" />
+                        <div className="flex items-start gap-3 bg-[#E0EFF8]/50 p-3 rounded-xl border border-[#E0EFF8]/50">
+                            <MessageSquare className="h-4 w-4 text-[#2D6A8F] mt-0.5" />
                             <div>
-                                <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest mb-1">Message from Parent</p>
+                                <p className="text-[10px] font-bold text-[#2D6A8F] uppercase tracking-widest mb-1">Message from Parent</p>
                                 <p className="text-sm text-slate-700 italic">"{preview.message}"</p>
                             </div>
                         </div>
@@ -249,9 +249,9 @@ export function InvitationSummaryAlert({
 
 function MetricBox({ label, value, subtext, status }: { label: string; value: string; subtext: string; status: "good" | "warning" | "danger" }) {
     const colors = {
-        good: "text-emerald-600",
-        warning: "text-amber-600",
-        danger: "text-rose-600"
+        good: "text-[#2D8A70]",
+        warning: "text-[#E09520]",
+        danger: "text-[#E09520]"
     };
 
     return (

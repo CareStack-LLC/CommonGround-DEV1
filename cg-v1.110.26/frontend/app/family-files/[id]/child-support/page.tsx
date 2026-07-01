@@ -49,9 +49,9 @@ function todayIsoDate(): string {
 function statusLabel(log: ChildSupportPaymentLog): { text: string; tone: string } {
   switch (log.status) {
     case 'verified':
-      return { text: 'Verified', tone: 'text-emerald-700 bg-emerald-50 border-emerald-200' };
+      return { text: 'Verified', tone: 'text-[#2D8A70] bg-[#E8F4F0] border-[#E8F4F0]' };
     case 'contested':
-      return { text: 'Contested', tone: 'text-red-700 bg-red-50 border-red-200' };
+      return { text: 'Contested', tone: 'text-[#9B2C2C] bg-[#FEE2E2] border-[#FEE2E2]' };
     case 'voided':
       return { text: 'Voided', tone: 'text-slate-600 bg-slate-100 border-slate-200' };
     default:
@@ -240,7 +240,7 @@ function ChildSupportTrackingInner() {
         </header>
 
         {error && (
-          <div className="rounded-xl border border-amber-200 bg-amber-50 text-amber-900 px-4 py-3 text-sm flex items-start gap-2">
+          <div className="rounded-xl border border-[#FEF7ED] bg-[#FEF7ED] text-[#1E3A4A] px-4 py-3 text-sm flex items-start gap-2">
             <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
             <span>{error}</span>
           </div>
@@ -251,7 +251,7 @@ function ChildSupportTrackingInner() {
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
               <h2 className="text-lg font-semibold flex items-center gap-2">
-                <ShieldCheck className="h-5 w-5 text-emerald-600" />
+                <ShieldCheck className="h-5 w-5 text-[#2D8A70]" />
                 Pay through your state SDU
               </h2>
               <p className="text-sm text-muted-foreground mt-1">
@@ -289,12 +289,12 @@ function ChildSupportTrackingInner() {
                   </p>
                 )}
                 {sdu.requires_county && (
-                  <p className="text-xs text-amber-700 mt-1">
+                  <p className="text-xs text-[#E09520] mt-1">
                     This state routes by county — have your county ready.
                   </p>
                 )}
                 {!sdu.accepts_online && (
-                  <p className="text-xs text-amber-700 mt-1">
+                  <p className="text-xs text-[#E09520] mt-1">
                     Online payments aren&apos;t available for this state — you may
                     need to mail a money order.
                   </p>
@@ -483,7 +483,7 @@ function ChildSupportTrackingInner() {
                           {badge.text}
                         </span>
                         {log.payment_channel === 'informal' && (
-                          <span className="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">
+                          <span className="text-[11px] text-[#E09520] bg-[#FEF7ED] border border-[#FEF7ED] px-2 py-0.5 rounded-full">
                             Informal
                           </span>
                         )}
@@ -502,7 +502,7 @@ function ChildSupportTrackingInner() {
                         <div className="text-sm mt-1">{log.notes}</div>
                       )}
                       {log.status === 'contested' && log.contested_reason && (
-                        <div className="mt-1 text-sm text-red-700 bg-red-50 border border-red-200 rounded-md px-2 py-1">
+                        <div className="mt-1 text-sm text-[#9B2C2C] bg-[#FEE2E2] border border-[#FEE2E2] rounded-md px-2 py-1">
                           Contested: {log.contested_reason}
                         </div>
                       )}
@@ -522,7 +522,7 @@ function ChildSupportTrackingInner() {
                       {canContest && (
                         <button
                           onClick={() => handleContest(log)}
-                          className="text-xs inline-flex items-center gap-1 text-red-700 hover:text-red-800"
+                          className="text-xs inline-flex items-center gap-1 text-[#9B2C2C] hover:text-[#9B2C2C]"
                         >
                           <Flag className="h-3 w-3" />
                           Contest
@@ -531,7 +531,7 @@ function ChildSupportTrackingInner() {
                       {canVerify && (
                         <button
                           onClick={() => handleVerify(log)}
-                          className="text-xs inline-flex items-center gap-1 text-emerald-700 hover:text-emerald-800"
+                          className="text-xs inline-flex items-center gap-1 text-[#2D8A70] hover:text-[#1E3A4A]"
                         >
                           <CheckCircle2 className="h-3 w-3" />
                           Mark verified

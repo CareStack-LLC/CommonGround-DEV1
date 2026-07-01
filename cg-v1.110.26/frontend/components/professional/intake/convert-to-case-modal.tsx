@@ -98,7 +98,7 @@ export function ConvertToCaseModal({
             <DialogContent className="sm:max-w-lg">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
-                        <div className="p-2 bg-emerald-100 text-emerald-600 rounded-lg">
+                        <div className="p-2 bg-[#E8F4F0] text-[#2D8A70] rounded-lg">
                             <FolderOpen className="h-5 w-5" />
                         </div>
                         Convert Intake to Case
@@ -110,7 +110,7 @@ export function ConvertToCaseModal({
 
                 {success ? (
                     <div className="py-6 text-center">
-                        <div className="p-4 bg-emerald-100 text-emerald-600 rounded-2xl w-fit mx-auto mb-4">
+                        <div className="p-4 bg-[#E8F4F0] text-[#2D8A70] rounded-2xl w-fit mx-auto mb-4">
                             <CheckCircle2 className="h-10 w-10" />
                         </div>
                         <h3 className="text-lg font-semibold text-slate-900 mb-1">Case Created!</h3>
@@ -119,7 +119,7 @@ export function ConvertToCaseModal({
                         </p>
                         <Button
                             asChild
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2"
+                            className="bg-[#2D8A70] hover:bg-[#2D8A70] text-white gap-2"
                         >
                             <a href={`/professional/cases/${caseId}`}>
                                 Open Case
@@ -132,7 +132,7 @@ export function ConvertToCaseModal({
                         {/* Confirmation Details */}
                         <div className="space-y-4 py-2">
                             {error && (
-                                <div className="flex items-start gap-2 text-red-600 text-sm bg-red-50 p-3 rounded-lg">
+                                <div className="flex items-start gap-2 text-[#C53030] text-sm bg-[#FEE2E2] p-3 rounded-lg">
                                     <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
                                     {error}
                                 </div>
@@ -194,7 +194,7 @@ export function ConvertToCaseModal({
                             <Button
                                 onClick={handleConvert}
                                 disabled={loading}
-                                className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2"
+                                className="bg-[#2D8A70] hover:bg-[#2D8A70] text-white gap-2"
                             >
                                 {loading ? (
                                     <>

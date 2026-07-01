@@ -95,7 +95,7 @@ export function StarRating({
       {/* Rating number */}
       <span
         className={cn(TEXT_SIZES[size], 'font-bold text-amber-500')}
-        style={{ fontFamily: 'JetBrains Mono, monospace' }}
+        style={{ fontFamily: 'var(--font-mono)' }}
       >
         {clampedRating.toFixed(1)}
       </span>

@@ -145,7 +145,7 @@ export function ParentsContent() {
             <div className="space-y-8 text-center lg:text-left">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#3DAA8A]/5 border border-[#3DAA8A]/10">
                 <Sparkles className="w-4 h-4 text-[#3DAA8A]" />
-                <span className="text-sm font-medium text-[#3DAA8A]">Trusted by 10,000+ families</span>
+                <span className="text-sm font-medium text-[#3DAA8A]">Free to start · court-ready records</span>
               </div>
 
               <h1 className="font-serif text-[#1E3A4A] text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-tight tracking-tight">
@@ -170,7 +170,7 @@ export function ParentsContent() {
                   href="/demo"
                   className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-[#3DAA8A] text-lg font-semibold rounded-xl border-2 border-[#3DAA8A]/20 hover:border-[#3DAA8A] transition-all"
                 >
-                  Watch Demo
+                  See a 2-min demo
                 </Link>
               </div>
 
@@ -385,10 +385,10 @@ export function ParentsContent() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { value: '87%', label: 'Calmer communication', subtext: 'ARIA supports constructive messaging' },
-              { value: '10,000+', label: 'Families protected', subtext: 'Growing every day' },
-              { value: '$2.4M', label: 'Expenses tracked', subtext: 'Fair & transparent' },
-              { value: '99.4%', label: 'Exchange success rate', subtext: 'GPS verified' },
+              { value: 'Real-time', label: 'Tone coaching', subtext: 'ARIA flags heat before you hit send' },
+              { value: 'Forever-free', label: 'Starter plan', subtext: 'No credit card to begin' },
+              { value: 'Auto-split', label: 'Shared expenses', subtext: 'Divided by your custody agreement' },
+              { value: 'GPS-verified', label: 'Handoffs', subtext: 'Contactless and timestamped' },
             ].map((stat, i) => (
               <div key={i} className="text-center">
                 <div className="text-5xl font-serif font-bold mb-2">{stat.value}</div>
@@ -502,7 +502,7 @@ export function ParentsContent() {
             <span className="text-[#3DAA8A]">your peace?</span>
           </h2>
           <p className="text-lg sm:text-xl text-[#6b7280] mb-10 max-w-2xl mx-auto">
-            Parents who chose a calmer path started here — free trial, no credit card.
+            Calmer messages, documented handoffs, court-ready records &mdash; set up in about 2 minutes. Free trial, no credit card.
           </p>
 
           <Link

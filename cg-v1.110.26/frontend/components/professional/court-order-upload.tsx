@@ -144,21 +144,21 @@ export function CourtOrderUpload({
   const getConfidenceBadge = (confidence: number) => {
     if (confidence >= 0.95) {
       return (
-        <Badge className="bg-emerald-50 text-emerald-700 border border-emerald-200">
+        <Badge className="bg-[#E8F4F0] text-[#2D8A70] border border-[#C5E5DB]">
           <CheckCircle2 className="h-3 w-3 mr-1" />
           High Confidence
         </Badge>
       );
     } else if (confidence >= 0.75) {
       return (
-        <Badge className="bg-amber-50 text-amber-700 border border-amber-200">
+        <Badge className="bg-[#FEF7ED] text-[#B8791A] border border-[#FBE3BF]">
           <AlertCircle className="h-3 w-3 mr-1" />
           Medium — Verify
         </Badge>
       );
     } else {
       return (
-        <Badge className="bg-red-50 text-red-700 border border-red-200">
+        <Badge className="bg-[#FEE2E2] text-[#9B2C2C] border border-[#FEE2E2]">
           <AlertCircle className="h-3 w-3 mr-1" />
           Low — Review Required
         </Badge>
@@ -247,9 +247,9 @@ export function CourtOrderUpload({
             )}
 
             {error && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-xl flex items-start gap-2">
-                <AlertCircle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
-                <p className="text-sm text-red-700">{error}</p>
+              <div className="p-3 bg-[#FEE2E2] border border-[#FEE2E2] rounded-xl flex items-start gap-2">
+                <AlertCircle className="h-5 w-5 text-[#C53030] shrink-0 mt-0.5" />
+                <p className="text-sm text-[#9B2C2C]">{error}</p>
               </div>
             )}
           </div>

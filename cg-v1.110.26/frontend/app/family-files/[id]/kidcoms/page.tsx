@@ -161,13 +161,13 @@ export default function KidComsPage() {
   function getSessionStatusBadge(status: string) {
     switch (status) {
       case 'active':
-        return <span className="inline-flex items-center px-2 py-1 rounded-md bg-emerald-50 text-emerald-700 text-xs font-medium border border-emerald-200">Active</span>;
+        return <span className="inline-flex items-center px-2 py-1 rounded-md bg-[#E8F4F0] text-[#2D8A70] text-xs font-medium border border-[#E8F4F0]">Active</span>;
       case 'completed':
         return <span className="inline-flex items-center px-2 py-1 rounded-md bg-muted text-foreground text-xs font-medium border border-border">Completed</span>;
       case 'cancelled':
-        return <span className="inline-flex items-center px-2 py-1 rounded-md bg-red-50 text-red-700 text-xs font-medium border border-red-200">Cancelled</span>;
+        return <span className="inline-flex items-center px-2 py-1 rounded-md bg-[#FEE2E2] text-[#9B2C2C] text-xs font-medium border border-[#FEE2E2]">Cancelled</span>;
       default:
-        return <span className="inline-flex items-center px-2 py-1 rounded-md bg-amber-50 text-amber-700 text-xs font-medium border border-amber-200">Waiting</span>;
+        return <span className="inline-flex items-center px-2 py-1 rounded-md bg-[#FEF7ED] text-[#E09520] text-xs font-medium border border-[#FEF7ED]">Waiting</span>;
     }
   }
 
@@ -246,12 +246,12 @@ export default function KidComsPage() {
 
           {/* Error */}
           {error && (
-            <div className="mb-6 bg-red-50 border-2 border-red-200 rounded-2xl p-4">
+            <div className="mb-6 bg-[#FEE2E2] border-2 border-[#FEE2E2] rounded-2xl p-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
-                  <XCircle className="h-5 w-5 text-red-600" />
+                <div className="w-10 h-10 rounded-lg bg-[#FEE2E2] flex items-center justify-center flex-shrink-0">
+                  <XCircle className="h-5 w-5 text-[#C53030]" />
                 </div>
-                <p className="text-red-700 font-medium">{error}</p>
+                <p className="text-[#9B2C2C] font-medium">{error}</p>
               </div>
             </div>
           )}
@@ -320,26 +320,26 @@ export default function KidComsPage() {
                   disabled={!selectedChild || isStartingSession}
                   className={cn(
                     'flex flex-col items-center p-4 rounded-xl transition-all border-2',
-                    'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue-700 hover:border-blue-300 dark:hover:border-blue-500 hover:shadow-md active:scale-95',
-                    'disabled:opacity-50 disabled:hover:border-blue-200 disabled:active:scale-100'
+                    'bg-[#E0EFF8] dark:bg-[#1E3A4A]/30 border-[#E0EFF8] dark:border-[#1E4E6B] hover:border-[#4BA8C8] dark:hover:border-[#2D6A8F] hover:shadow-md active:scale-95',
+                    'disabled:opacity-50 disabled:hover:border-[#E0EFF8] disabled:active:scale-100'
                   )}
                 >
                   {isStartingSession ? (
-                    <Loader2 className="h-8 w-8 text-blue-600 dark:text-blue-400 animate-spin" />
+                    <Loader2 className="h-8 w-8 text-[#2D6A8F] dark:text-[#4BA8C8] animate-spin" />
                   ) : (
-                    <Phone className="h-8 w-8 text-blue-600 dark:text-blue-400" />
+                    <Phone className="h-8 w-8 text-[#2D6A8F] dark:text-[#4BA8C8]" />
                   )}
-                  <span className="mt-2 text-sm font-bold text-blue-700 dark:text-blue-300">Voice Call</span>
+                  <span className="mt-2 text-sm font-bold text-[#1E4E6B] dark:text-[#4BA8C8]">Voice Call</span>
                 </button>
                 <button
                   onClick={() => router.push(`/family-files/${familyFileId}/my-circle`)}
                   className={cn(
                     'flex flex-col items-center p-4 rounded-xl transition-all border-2',
-                    'bg-[#D4AF37]/10 dark:bg-[#D4AF37]/20 border-[#D4AF37]/30 dark:border-[#D4AF37]/40 hover:border-[#D4AF37]/50 dark:hover:border-[#D4AF37]/60 hover:shadow-md active:scale-95'
+                    'bg-[#F5A623]/10 dark:bg-[#F5A623]/20 border-[#F5A623]/30 dark:border-[#F5A623]/40 hover:border-[#F5A623]/50 dark:hover:border-[#F5A623]/60 hover:shadow-md active:scale-95'
                   )}
                 >
-                  <Heart className="h-8 w-8 text-[#D4AF37] dark:text-[#E8C84A]" />
-                  <span className="mt-2 text-sm font-bold text-[#8B6914] dark:text-[#E8C84A]">My Circle</span>
+                  <Heart className="h-8 w-8 text-[#F5A623] dark:text-[#F5A623]" />
+                  <span className="mt-2 text-sm font-bold text-[#E09520] dark:text-[#F5A623]">My Circle</span>
                 </button>
                 <button
                   onClick={() => {
@@ -351,12 +351,12 @@ export default function KidComsPage() {
                   className={cn(
                     'flex flex-col items-center p-4 rounded-xl transition-all border-2',
                     settings?.allowed_features?.chat
-                      ? 'bg-emerald-50 dark:bg-emerald-900/30 border-emerald-200 dark:border-emerald-700 hover:border-emerald-300 dark:hover:border-emerald-500 hover:shadow-md active:scale-95'
+                      ? 'bg-[#E8F4F0] dark:bg-[#1E3A4A]/30 border-[#E8F4F0] dark:border-[#2D8A70] hover:border-[#5BC4A0] dark:hover:border-[#3DAA8A] hover:shadow-md active:scale-95'
                       : 'border-border bg-muted rounded-xl opacity-50 cursor-not-allowed'
                   )}
                 >
-                  <MessageCircle className={cn('h-8 w-8', settings?.allowed_features?.chat ? 'text-emerald-600 dark:text-emerald-400' : 'text-muted-foreground')} />
-                  <span className={cn('mt-2 text-sm font-bold', settings?.allowed_features?.chat ? 'text-emerald-700 dark:text-emerald-300' : 'text-muted-foreground')}>Chat</span>
+                  <MessageCircle className={cn('h-8 w-8', settings?.allowed_features?.chat ? 'text-[#2D8A70] dark:text-[#5BC4A0]' : 'text-muted-foreground')} />
+                  <span className={cn('mt-2 text-sm font-bold', settings?.allowed_features?.chat ? 'text-[#2D8A70] dark:text-[#5BC4A0]' : 'text-muted-foreground')}>Chat</span>
                 </button>
               </div>
             </div>
@@ -372,7 +372,7 @@ export default function KidComsPage() {
                 </h2>
                 <button
                   onClick={() => router.push(`/family-files/${familyFileId}/my-circle?tab=contacts`)}
-                  className="text-sm text-[#2C5F5D] hover:text-[#1a4746] font-medium flex items-center gap-1"
+                  className="text-sm text-[#3DAA8A] hover:text-[#1a4746] font-medium flex items-center gap-1"
                 >
                   <Settings className="h-4 w-4" />
                   Manage
@@ -421,7 +421,7 @@ export default function KidComsPage() {
                             <Phone className="h-4 w-4" />
                           </button>
                         ) : (
-                          <span className="text-xs px-2 py-1 rounded-md bg-amber-50 text-amber-700 border border-amber-200">Pending</span>
+                          <span className="text-xs px-2 py-1 rounded-md bg-[#FEF7ED] text-[#E09520] border border-[#FEF7ED]">Pending</span>
                         )}
                       </div>
                     </div>
@@ -498,28 +498,28 @@ export default function KidComsPage() {
                   <div className="flex items-center gap-2">
                     <div className={cn(
                       'w-3 h-3 rounded-full',
-                      settings.allowed_features.video ? 'bg-emerald-500' : 'bg-muted-foreground/30'
+                      settings.allowed_features.video ? 'bg-[#3DAA8A]' : 'bg-muted-foreground/30'
                     )} />
                     <span className="text-sm text-foreground font-medium">Video</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className={cn(
                       'w-3 h-3 rounded-full',
-                      settings.allowed_features.chat ? 'bg-emerald-500' : 'bg-muted-foreground/30'
+                      settings.allowed_features.chat ? 'bg-[#3DAA8A]' : 'bg-muted-foreground/30'
                     )} />
                     <span className="text-sm text-foreground font-medium">Chat</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className={cn(
                       'w-3 h-3 rounded-full',
-                      settings.allowed_features.theater ? 'bg-emerald-500' : 'bg-muted-foreground/30'
+                      settings.allowed_features.theater ? 'bg-[#3DAA8A]' : 'bg-muted-foreground/30'
                     )} />
                     <span className="text-sm text-foreground font-medium">Theater</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <div className={cn(
                       'w-3 h-3 rounded-full',
-                      settings.allowed_features.arcade ? 'bg-emerald-500' : 'bg-muted-foreground/30'
+                      settings.allowed_features.arcade ? 'bg-[#3DAA8A]' : 'bg-muted-foreground/30'
                     )} />
                     <span className="text-sm text-foreground font-medium">Arcade</span>
                   </div>

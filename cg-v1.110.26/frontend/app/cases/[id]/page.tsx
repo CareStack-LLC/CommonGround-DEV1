@@ -561,7 +561,7 @@ function CaseDetailsContent() {
                       className="h-auto py-6 flex flex-col items-center gap-2"
                       onClick={() => router.push(`/schedule?case=${caseId}`)}
                     >
-                      <CalendarDays className="h-8 w-8 text-purple-600" />
+                      <CalendarDays className="h-8 w-8 text-[#2D6A8F]" />
                       <span className="font-medium">View Schedule</span>
                       <span className="text-xs text-muted-foreground">Parenting time calendar</span>
                     </Button>
@@ -571,7 +571,7 @@ function CaseDetailsContent() {
                       className="h-auto py-6 flex flex-col items-center gap-2"
                       onClick={() => router.push(`/cases/${caseId}/children`)}
                     >
-                      <Users className="h-8 w-8 text-green-600" />
+                      <Users className="h-8 w-8 text-[#2D8A70]" />
                       <span className="font-medium">Children & Cubbies</span>
                       <span className="text-xs text-muted-foreground">Profiles, info & item tracking</span>
                     </Button>
@@ -581,7 +581,7 @@ function CaseDetailsContent() {
                       className="h-auto py-6 flex flex-col items-center gap-2"
                       onClick={() => router.push(`/cases/${caseId}/court-forms`)}
                     >
-                      <Scale className="h-8 w-8 text-indigo-600" />
+                      <Scale className="h-8 w-8 text-[#2D6A8F]" />
                       <span className="font-medium">Court Forms</span>
                       <span className="text-xs text-muted-foreground">FL-300, FL-311, FL-320</span>
                     </Button>
@@ -606,7 +606,7 @@ function CaseDetailsContent() {
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Scale className="h-5 w-5 text-indigo-600" />
+                      <Scale className="h-5 w-5 text-[#2D6A8F]" />
                       <CardTitle>Court & Legal Access</CardTitle>
                     </div>
                     <Button
@@ -634,7 +634,7 @@ function CaseDetailsContent() {
 
                   {/* Invite Form */}
                   {showInviteForm && (
-                    <Card className="border-indigo-200 bg-indigo-50/50">
+                    <Card className="border-[#E0EFF8] bg-[#E0EFF8]/50">
                       <CardContent className="pt-4">
                         <form onSubmit={handleInviteProfessional} className="space-y-4">
                           <div className="grid gap-4 sm:grid-cols-2">
@@ -713,7 +713,7 @@ function CaseDetailsContent() {
                   {/* Existing Grants */}
                   {isLoadingGrants ? (
                     <div className="text-center py-4">
-                      <div className="animate-spin rounded-full h-6 w-6 border-2 border-indigo-600 border-t-transparent mx-auto" />
+                      <div className="animate-spin rounded-full h-6 w-6 border-2 border-[#2D6A8F] border-t-transparent mx-auto" />
                       <p className="text-sm text-muted-foreground mt-2">Loading access grants...</p>
                     </div>
                   ) : courtGrants.length > 0 ? (
@@ -725,8 +725,8 @@ function CaseDetailsContent() {
                           className="flex items-center justify-between p-4 bg-secondary/50 rounded-lg"
                         >
                           <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
-                              <Shield className="h-5 w-5 text-indigo-600" />
+                            <div className="h-10 w-10 rounded-full bg-[#E0EFF8] flex items-center justify-center">
+                              <Shield className="h-5 w-5 text-[#2D6A8F]" />
                             </div>
                             <div>
                               <p className="font-medium text-foreground">
@@ -771,7 +771,7 @@ function CaseDetailsContent() {
                   <div className="pt-4 border-t border-border">
                     <p className="text-xs text-muted-foreground">
                       Court professionals can access the case through the{' '}
-                      <Link href="/court-portal" className="text-indigo-600 hover:underline">
+                      <Link href="/court-portal" className="text-[#2D6A8F] hover:underline">
                         Court Portal
                       </Link>
                       . All access is time-limited, logged, and audited.
@@ -879,10 +879,10 @@ function CaseDetailsContent() {
                 <button
                   onClick={() => createAgreementWithBuilder(true)}
                   disabled={isCreatingAgreement}
-                  className="w-full p-6 border-2 border-purple-200 rounded-lg hover:border-purple-400 hover:bg-purple-50 transition-all text-left group"
+                  className="w-full p-6 border-2 border-[#E0EFF8] rounded-lg hover:border-[#4BA8C8] hover:bg-[#E0EFF8] transition-all text-left group"
                 >
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center text-white flex-shrink-0">
+                    <div className="w-12 h-12 bg-[#2D6A8F] rounded-full flex items-center justify-center text-white flex-shrink-0">
                       <Sparkles className="h-6 w-6" />
                     </div>
                     <div className="flex-1">
@@ -894,7 +894,7 @@ function CaseDetailsContent() {
                         Have a natural conversation about your custody arrangement. ARIA understands casual language and will guide you through everything.
                       </p>
                       <div className="text-sm text-muted-foreground">
-                        <p className="font-medium text-purple-700 mb-1">Best for:</p>
+                        <p className="font-medium text-[#1E4E6B] mb-1">Best for:</p>
                         <ul className="list-disc list-inside space-y-1">
                           <li>People who prefer talking over forms</li>
                           <li>Complex or unique arrangements</li>

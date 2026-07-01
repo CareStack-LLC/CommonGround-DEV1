@@ -369,7 +369,7 @@ function BuilderV2Content() {
               <Button
                 variant="outline"
                 onClick={() => router.push(`/agreements/${agreementId}/aria`)}
-                className="border-2 border-amber-200 hover:border-amber-400 hover:shadow-lg transition-all duration-300 font-bold text-amber-700 bg-amber-50"
+                className="border-2 border-[#FEF7ED] hover:border-[#F5A623] hover:shadow-lg transition-all duration-300 font-bold text-[#E09520] bg-[#FEF7ED]"
               >
                 <MessageCircle className="w-4 h-4 mr-1.5" />
                 Switch to ARIA
@@ -418,7 +418,7 @@ function BuilderV2Content() {
                   index === currentSectionIndex
                     ? 'bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white border-transparent shadow-lg'
                     : completedSections.has(section.key)
-                    ? 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:shadow-md'
+                    ? 'bg-[#E8F4F0] text-[#2D8A70] border-[#E8F4F0] hover:shadow-md'
                     : 'text-muted-foreground border-border hover:border-[var(--portal-primary)]/30 hover:shadow-md bg-card'
                 }`}
               >
@@ -439,10 +439,10 @@ function BuilderV2Content() {
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Quick Accord Suggestions Modal */}
         {showQuickAccordSuggestions && suggestions.length > 0 && (
-          <Card className="mb-6 border-2 border-amber-200 rounded-2xl shadow-lg bg-gradient-to-br from-amber-50 to-white">
+          <Card className="mb-6 border-2 border-[#FEF7ED] rounded-2xl shadow-lg bg-gradient-to-br from-[#FEF7ED] to-white">
             <CardHeader>
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl flex items-center justify-center shadow-md">
+                <div className="w-12 h-12 bg-gradient-to-br from-[#F5A623] to-[#E09520] rounded-2xl flex items-center justify-center shadow-md">
                   <Lightbulb className="h-5 w-5 text-white" />
                 </div>
                 <div>
@@ -544,7 +544,7 @@ function BuilderV2Content() {
             ) : (
               <Button
                 onClick={() => router.push(`/agreements/${agreementId}`)}
-                className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:opacity-90 font-bold transition-all duration-300 shadow-lg"
+                className="bg-gradient-to-r from-[#3DAA8A] to-[#2D8A70] hover:opacity-90 font-bold transition-all duration-300 shadow-lg"
               >
                 Finish Agreement
                 <CheckCircle2 className="h-4 w-4 ml-2" />
@@ -639,14 +639,14 @@ function SectionForm({
 
       {/* Validation indicator */}
       {missingFields.length > 0 && (
-        <div className="mt-6 p-3 rounded-xl bg-amber-50 border-2 border-amber-200">
-          <p className="text-sm font-semibold text-amber-800 flex items-center gap-2">
+        <div className="mt-6 p-3 rounded-xl bg-[#FEF7ED] border-2 border-[#FEF7ED]">
+          <p className="text-sm font-semibold text-[#E09520] flex items-center gap-2">
             <AlertCircle className="h-4 w-4" />
             Required fields remaining:
           </p>
           <div className="flex flex-wrap gap-2 mt-2">
             {missingFields.map(field => (
-              <span key={field} className="px-2.5 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-full">
+              <span key={field} className="px-2.5 py-1 bg-[#FEF7ED] text-[#E09520] text-xs font-bold rounded-full">
                 {REQUIRED_FIELD_LABELS[field] || field.replace(/_/g, ' ')}
               </span>
             ))}
@@ -709,7 +709,7 @@ function PartiesChildrenForm({
         <div className="space-y-4">
           <div className="p-5 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/5 to-[var(--portal-primary)]/10 border-2 border-[var(--portal-primary)]/20">
             <h3 className="font-bold text-foreground mb-4 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-              <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+              <CheckCircle2 className="h-5 w-5 text-[#3DAA8A]" />
               Parent Information
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -752,7 +752,7 @@ function PartiesChildrenForm({
           {familyFile.children && familyFile.children.length > 0 && (
             <div className="p-5 rounded-xl bg-gradient-to-br from-[var(--portal-primary)]/5 to-[var(--portal-primary)]/10 border-2 border-[var(--portal-primary)]/20">
               <h3 className="font-bold text-foreground mb-4 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-                <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                <CheckCircle2 className="h-5 w-5 text-[#3DAA8A]" />
                 Children ({familyFile.children.length})
               </h3>
               <div className="space-y-3">
@@ -968,7 +968,7 @@ function ParentingTimeForm({ data, onChange }: { data: any; onChange: (field: st
               const holidays = [...(data.holiday_schedule || []), { holiday_name: '', arrangement: 'alternate_yearly', start_time: '', end_time: '', notes: '' }];
               onChange('holiday_schedule', holidays);
             }}
-            className="border-2 border-amber-200 hover:border-amber-400 text-amber-700 bg-amber-50"
+            className="border-2 border-[#FEF7ED] hover:border-[#F5A623] text-[#E09520] bg-[#FEF7ED]"
           >
             <Plus className="w-4 h-4 mr-1" /> Add Holiday
           </Button>
@@ -984,7 +984,7 @@ function ParentingTimeForm({ data, onChange }: { data: any; onChange: (field: st
                   holidays.splice(idx, 1);
                   onChange('holiday_schedule', holidays);
                 }}
-                className="text-red-400 hover:text-red-600 transition-colors"
+                className="text-[#E06B6B] hover:text-[#C53030] transition-colors"
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -1073,7 +1073,7 @@ function ParentingTimeForm({ data, onChange }: { data: any; onChange: (field: st
               const activities = [...(data.recurring_activities || []), { activity_name: '', day_of_week: '', time: '', end_time: '', location: '', responsible_parent: 'during_own_time', cost_per_session: '', cost_frequency: '' }];
               onChange('recurring_activities', activities);
             }}
-            className="border-2 border-amber-200 hover:border-amber-400 text-amber-700 bg-amber-50"
+            className="border-2 border-[#FEF7ED] hover:border-[#F5A623] text-[#E09520] bg-[#FEF7ED]"
           >
             <Plus className="w-4 h-4 mr-1" /> Add Activity
           </Button>
@@ -1089,7 +1089,7 @@ function ParentingTimeForm({ data, onChange }: { data: any; onChange: (field: st
                   activities.splice(idx, 1);
                   onChange('recurring_activities', activities);
                 }}
-                className="text-red-400 hover:text-red-600 transition-colors"
+                className="text-[#E06B6B] hover:text-[#C53030] transition-colors"
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -1563,7 +1563,7 @@ function AcknowledgmentForm({ data, onChange }: { data: any; onChange: (field: s
       </div>
 
       <div className="border-t-2 border-border pt-6">
-        <div className="flex items-start gap-4 p-4 rounded-xl border-2 border-emerald-200 bg-gradient-to-br from-emerald-50 to-white">
+        <div className="flex items-start gap-4 p-4 rounded-xl border-2 border-[#E8F4F0] bg-gradient-to-br from-[#E8F4F0] to-white">
           <input
             type="checkbox"
             id="acknowledgment"

@@ -67,11 +67,11 @@ export function CustodyTimeCard({ agreementId }: CustodyTimeCardProps) {
                     </div>
                     <div className="h-4 w-full bg-slate-100 rounded-full overflow-hidden flex">
                         <div
-                            className="h-full bg-blue-500"
+                            className="h-full bg-[#2D6A8F]"
                             style={{ width: `${data.scheduled.parent_a_percent}%` }}
                         />
                         <div
-                            className="h-full bg-purple-500"
+                            className="h-full bg-[#2D6A8F]"
                             style={{ width: `${data.scheduled.parent_b_percent}%` }}
                         />
                     </div>

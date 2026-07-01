@@ -76,7 +76,7 @@ export function SecurityContent() {
             <span className="text-cg-amber">is sacred</span>
           </h1>
           <p className="text-xl sm:text-2xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            We built CommonGround knowing your most sensitive information would live here.
+            Your messages, schedules, and records stay encrypted and yours alone &mdash; never sold, never shared.
             <span className="font-medium text-cg-sage"> That trust is everything to us.</span>
           </p>
         </div>
@@ -189,10 +189,11 @@ export function SecurityContent() {
             className="text-4xl sm:text-5xl font-serif mb-6"
             style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
-            Ready to get started?
+            Your data protected from day one
           </h2>
           <p className="text-xl text-white/80 mb-10 max-w-2xl mx-auto">
-            Join thousands of families who trust CommonGround with their most important information.
+            Start free with the same encryption, tamper-proof records, and zero-data-sharing policy above.
+            No credit card, and you can export or delete everything anytime.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

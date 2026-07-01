@@ -133,7 +133,7 @@ const ARIA_TAUNTS = [
   "That was textbook. Try something more creative!",
   "ARIA: 1 point. Your move.",
   "Not bad, but ARIA's seen pettier.",
-  "Close, but ARIA's trained on 127K+ messages.",
+  "Close, but ARIA's trained to catch what you'd miss.",
   "Good effort! ARIA catches these in her sleep.",
   "You'll have to do better than that!",
   "ARIA's pattern library says hi.",
@@ -412,20 +412,20 @@ export default function ARIADemoPage() {
           </h1>
 
           <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed mb-4">
-            Try to send the pettiest, most passive-aggressive co-parenting message you can think of.
-            ARIA catches it all — the same AI that protects real families on CommonGround.
+            Send the pettiest, most passive-aggressive message you can think of. ARIA rewrites the heat
+            out before it lands &mdash; the same AI that keeps real co-parents&apos; messages calm on CommonGround.
           </p>
 
           <p className="text-sm text-gray-400 mb-10">
-            Powered by 1,500+ detection patterns and 3-tier AI analysis — and always improving
+            Powered by layered detection patterns and 3-tier AI analysis — and always improving
           </p>
 
           {/* Stats */}
           <div className="grid grid-cols-3 gap-4 max-w-lg mx-auto mb-10">
             {[
-              { value: '14', label: 'Toxicity Categories', icon: Target },
+              { value: 'Real-time', label: 'Tone coaching', icon: Target },
               { value: '3-Tier', label: 'AI Analysis', icon: Brain },
-              { value: '127K+', label: 'Messages Trained', icon: Zap },
+              { value: 'Trained', label: 'On real messages', icon: Zap },
             ].map((stat, i) => (
               <div key={i} className="bg-white rounded-2xl border border-cg-sand-dark p-4">
                 <div className="flex items-center justify-center mb-2">
@@ -552,8 +552,8 @@ export default function ARIADemoPage() {
                       <div className={`
                         text-xs px-3 py-2 rounded-xl mb-1
                         ${msg.role === 'user'
-                          ? 'bg-red-50 text-red-400 line-through text-right'
-                          : 'bg-red-50 text-red-400 line-through'
+                          ? 'bg-[#FEE2E2] text-[#C53030] line-through text-right'
+                          : 'bg-[#FEE2E2] text-[#C53030] line-through'
                         }
                       `}>
                         {msg.original}
@@ -632,9 +632,9 @@ export default function ARIADemoPage() {
 
                     {/* Before / After */}
                     <div className="space-y-2 mb-4">
-                      <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-2.5">
-                        <p className="text-xs text-red-500 font-medium mb-1">Your message</p>
-                        <p className="text-sm text-red-700">{pendingIntervention.originalText}</p>
+                      <div className="bg-[#FEE2E2] border border-[#C53030]/20 rounded-xl px-4 py-2.5">
+                        <p className="text-xs text-[#C53030] font-medium mb-1">Your message</p>
+                        <p className="text-sm text-[#C53030]">{pendingIntervention.originalText}</p>
                       </div>
                       <div className="bg-white border border-cg-sage/20 rounded-xl px-4 py-2.5">
                         <p className="text-xs text-cg-sage font-medium mb-1">ARIA&apos;s suggestion</p>
@@ -711,7 +711,7 @@ export default function ARIADemoPage() {
               className="inline-flex items-center gap-2 bg-cg-slate hover:bg-foreground text-white font-semibold rounded-full px-8 py-4 transition-all hover:scale-105 shadow-lg"
             >
               <BarChart3 className="w-5 h-5" />
-              Generate Communication Report
+              See your communication report
             </button>
           </div>
         )}
@@ -739,7 +739,7 @@ export default function ARIADemoPage() {
               {
                 icon: Shield,
                 title: 'Same Detection Engine',
-                desc: '1,500+ regex patterns + Claude AI analysis. No watered-down demo version — this is the real thing.',
+                desc: 'Layered regex patterns + Claude AI analysis. No watered-down demo version — this is the real thing.',
               },
               {
                 icon: RefreshCw,
@@ -791,7 +791,7 @@ export default function ARIADemoPage() {
                   { label: 'Total Messages', value: totalMessages, color: '#2D6A8F' },
                   { label: 'ARIA Interventions', value: totalInterventions, color: '#F5A623' },
                   { label: 'Suggestions Accepted', value: acceptedInterventions, color: '#3DAA8A' },
-                  { label: 'Acceptance Rate', value: `${acceptanceRate}%`, color: acceptanceRate >= 50 ? '#3DAA8A' : '#ef4444' },
+                  { label: 'Acceptance Rate', value: `${acceptanceRate}%`, color: acceptanceRate >= 50 ? '#3DAA8A' : '#C53030' },
                 ].map((stat, i) => (
                   <div key={i} className="bg-gray-50 rounded-2xl p-5 text-center">
                     <p className="text-3xl font-bold mb-1" style={{ color: stat.color }}>
@@ -861,7 +861,7 @@ export default function ARIADemoPage() {
                         <XAxis dataKey="message" tick={{ fontSize: 12 }} label={{ value: 'Message #', position: 'bottom', fontSize: 12 }} />
                         <YAxis tick={{ fontSize: 12 }} domain={[0, 100]} label={{ value: 'Toxicity %', angle: -90, position: 'insideLeft', fontSize: 12 }} />
                         <Tooltip formatter={(value) => [`${value}%`, 'Toxicity']} />
-                        <Line type="monotone" dataKey="score" stroke="#ef4444" strokeWidth={2} dot={{ fill: '#ef4444', r: 4 }} />
+                        <Line type="monotone" dataKey="score" stroke="#C53030" strokeWidth={2} dot={{ fill: '#C53030', r: 4 }} />
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
@@ -875,12 +875,12 @@ export default function ARIADemoPage() {
                   <div className="space-y-4">
                     {interventions.slice(0, 3).map((intervention, i) => (
                       <div key={i} className="grid md:grid-cols-2 gap-3">
-                        <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+                        <div className="bg-[#FEE2E2] border border-[#C53030]/20 rounded-xl px-4 py-3">
                           <div className="flex items-center gap-1.5 mb-1.5">
-                            <X className="w-3.5 h-3.5 text-red-500" />
-                            <span className="text-xs text-red-500 font-medium">Original</span>
+                            <X className="w-3.5 h-3.5 text-[#C53030]" />
+                            <span className="text-xs text-[#C53030] font-medium">Original</span>
                           </div>
-                          <p className="text-sm text-red-700">{intervention.original}</p>
+                          <p className="text-sm text-[#C53030]">{intervention.original}</p>
                         </div>
                         <div className="bg-cg-sage/5 border border-cg-sage/20 rounded-xl px-4 py-3">
                           <div className="flex items-center gap-1.5 mb-1.5">
@@ -908,7 +908,7 @@ export default function ARIADemoPage() {
                     Ready to protect your <span className="text-cg-sage">family</span>?
                   </h3>
                   <p className="text-gray-600 max-w-lg mx-auto">
-                    Join the first 50 early adopters and get 30% off for life. ARIA is waiting.
+                    Join the first 50 early adopters and get 30% off for 3 years. ARIA is waiting.
                   </p>
                 </div>
                 <div className="max-w-md mx-auto">
@@ -934,8 +934,8 @@ export default function ARIADemoPage() {
                 <span className="text-cg-sage">better</span>
               </h2>
               <p className="text-gray-600 mb-8 leading-relaxed">
-                ARIA is just one part of CommonGround — the complete co-parenting platform
-                built with family law professionals.
+                ARIA is one part of CommonGround &mdash; where messages stay calm, schedules run
+                themselves, and every word is logged court-ready. Start free, no card needed.
               </p>
 
               <div className="space-y-4">

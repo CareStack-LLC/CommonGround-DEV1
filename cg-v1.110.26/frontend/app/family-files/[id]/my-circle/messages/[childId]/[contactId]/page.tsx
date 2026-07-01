@@ -302,7 +302,7 @@ export default function ParentChatViewPage({ params }: PageParams) {
                 <ArrowLeft className="h-5 w-5 text-muted-foreground" />
               </button>
 
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500/10 to-purple-500/10 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500/10 to-[#2D6A8F]/10 flex items-center justify-center">
                 <MessageCircle className="h-5 w-5 text-teal-600" />
               </div>
 
@@ -356,10 +356,10 @@ export default function ParentChatViewPage({ params }: PageParams) {
                                 {!isParent && (
                                   <div className="flex items-center gap-1.5 mb-1 px-1">
                                     <div className={`w-4 h-4 rounded-full flex items-center justify-center ${
-                                      isChild ? 'bg-purple-100 dark:bg-purple-900/30' : 'bg-teal-100 dark:bg-teal-900/30'
+                                      isChild ? 'bg-[#E0EFF8] dark:bg-[#1E3A4A]/30' : 'bg-teal-100 dark:bg-teal-900/30'
                                     }`}>
                                       <User className={`h-2.5 w-2.5 ${
-                                        isChild ? 'text-purple-600 dark:text-purple-400' : 'text-teal-600 dark:text-teal-400'
+                                        isChild ? 'text-[#2D6A8F] dark:text-[#4BA8C8]' : 'text-teal-600 dark:text-teal-400'
                                       }`} />
                                     </div>
                                     <span className="text-xs font-medium text-muted-foreground">
@@ -374,7 +374,7 @@ export default function ParentChatViewPage({ params }: PageParams) {
                                     isParent
                                       ? 'bg-teal-600 text-white rounded-br-md'
                                       : isChild
-                                        ? 'bg-purple-100 dark:bg-purple-900/30 text-foreground rounded-bl-md'
+                                        ? 'bg-[#E0EFF8] dark:bg-[#1E3A4A]/30 text-foreground rounded-bl-md'
                                         : 'bg-card border border-border text-foreground rounded-bl-md'
                                   }`}
                                 >
@@ -422,8 +422,8 @@ export default function ParentChatViewPage({ params }: PageParams) {
                                 {/* ARIA Flag Indicator */}
                                 {msg.aria_flagged && (
                                   <div className="flex items-center gap-1 px-1 mt-1">
-                                    <AlertTriangle className="h-3 w-3 text-amber-500" />
-                                    <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">
+                                    <AlertTriangle className="h-3 w-3 text-[#F5A623]" />
+                                    <span className="text-[10px] text-[#E09520] dark:text-[#F5A623] font-medium">
                                       Flagged by ARIA: {msg.aria_category || 'Review needed'}
                                     </span>
                                   </div>
@@ -442,10 +442,10 @@ export default function ParentChatViewPage({ params }: PageParams) {
 
             {/* Error Banner */}
             {error && (
-              <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-3 mb-2 flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4 text-red-500 flex-shrink-0" />
-                <p className="text-sm text-red-700 dark:text-red-300 flex-1">{error}</p>
-                <button onClick={() => setError(null)} className="text-red-500 hover:text-red-700 text-xs font-medium">
+              <div className="bg-[#FEE2E2] dark:bg-[#7A2222]/20 border border-[#FEE2E2] dark:border-[#9B2C2C] rounded-xl p-3 mb-2 flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-[#C53030] flex-shrink-0" />
+                <p className="text-sm text-[#9B2C2C] dark:text-[#FCA5A5] flex-1">{error}</p>
+                <button onClick={() => setError(null)} className="text-[#C53030] hover:text-[#9B2C2C] text-xs font-medium">
                   Dismiss
                 </button>
               </div>
@@ -486,7 +486,7 @@ export default function ParentChatViewPage({ params }: PageParams) {
                   />
                   <button
                     onClick={clearAttachment}
-                    className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
+                    className="absolute -top-2 -right-2 w-5 h-5 bg-[#C53030] rounded-full flex items-center justify-center hover:bg-[#C53030] transition-colors"
                     aria-label="Remove attachment"
                   >
                     <X className="w-3 h-3 text-white" />

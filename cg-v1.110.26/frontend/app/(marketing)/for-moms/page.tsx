@@ -172,7 +172,7 @@ const faqs = [
     a: 'Just the opposite. CommonGround is designed to take the heat out of co-parenting, not add to it. ARIA keeps messages calm and child-focused, reminders go out automatically, and records are kept quietly in the background — so you can step back from the conflict instead of being pulled into it.',
   },
   {
-    q: 'What does "30% off for life" actually mean?',
+    q: 'What does "30% off for 3 years" actually mean?',
     a: 'As one of our first 50 early adopters, your subscription rate is locked at 30% below the standard price for 36 months on any paid plan. The discount stays with your account regardless of future price changes.',
   },
 ];
@@ -198,7 +198,7 @@ export default function ForMomsPage() {
           },
           offers: {
             '@type': 'Offer',
-            name: 'Early Adopter — 30% Off for Life',
+            name: 'Early Adopter — 30% Off for 3 Years',
             description: 'First 50 members get 30% off all subscriptions, locked for 36 months.',
             eligibleQuantity: { '@type': 'QuantitativeValue', value: 50 },
           },
@@ -228,15 +228,16 @@ export default function ForMomsPage() {
               </h1>
               <p className="text-lg text-gray-600 leading-relaxed mb-8 max-w-xl mx-auto lg:mx-0">
                 Forgotten pickups. Texts that turn into something else. You&apos;re not
-                asking for perfection — just someone who shows up. You carry enough.
-                Let CommonGround carry the chasing, so you can be present for what
+                asking for perfection — just someone who shows up. Let TimeBridge
+                send the reminders, ClearFund track the money, and ARIA keep the
+                messages about your kids &mdash; so you can be present for what
                 actually matters.
               </p>
               <a
                 href="#early-adopter"
                 className="inline-flex items-center gap-2 bg-[#3DAA8A] text-white font-semibold px-8 py-4 rounded-xl transition-all duration-200 hover:bg-[#2E9577] hover:shadow-lg hover:shadow-[#3DAA8A]/20 text-base"
               >
-                Join the Early Adopter List
+                Lock in 30% off for 3 years
                 <ArrowDown className="w-4 h-4" />
               </a>
 
@@ -455,6 +456,14 @@ export default function ForMomsPage() {
                   </li>
                 ))}
               </ul>
+
+              <a
+                href="#early-adopter"
+                className="mt-8 inline-flex items-center gap-2 bg-[#3DAA8A] text-white font-semibold px-8 py-4 rounded-xl transition-all duration-200 hover:bg-[#2E9577] hover:shadow-lg hover:shadow-[#3DAA8A]/20 text-base"
+              >
+                Set it up in 2 minutes &mdash; free
+                <ArrowDown className="w-4 h-4" />
+              </a>
             </div>
           </div>
         </div>
@@ -552,7 +561,7 @@ export default function ForMomsPage() {
               You Deserve Peace of Mind
             </h2>
             <p className="text-gray-600 text-lg">
-              Join the first 50 members and lock in 30% off for life.
+              Join the first 50 members and lock in 30% off for 3 years.
               No credit card required. Just your email.
             </p>
           </div>

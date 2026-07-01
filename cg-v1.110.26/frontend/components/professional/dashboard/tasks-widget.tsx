@@ -45,9 +45,9 @@ interface Task {
 }
 
 const PRIORITY_COLORS: Record<string, string> = {
-    urgent: "bg-red-100 text-red-700 border-red-200",
-    high: "bg-orange-100 text-orange-700 border-orange-200",
-    medium: "bg-blue-100 text-blue-700 border-blue-200",
+    urgent: "bg-[#FEE2E2] text-[#9B2C2C] border-[#FEE2E2]",
+    high: "bg-[#FEF7ED] text-[#B8791A] border-[#FBE3BF]",
+    medium: "bg-[#E0EFF8] text-[#1E4E6B] border-[#E0EFF8]",
     low: "bg-slate-100 text-slate-600 border-slate-200",
 };
 
@@ -56,9 +56,9 @@ function formatDueDate(dateStr?: string) {
     const d = new Date(dateStr);
     const now = new Date();
     const diffDays = Math.ceil((d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-    if (diffDays < 0) return { label: "Overdue", color: "text-red-600" };
-    if (diffDays === 0) return { label: "Due today", color: "text-orange-600" };
-    if (diffDays === 1) return { label: "Due tomorrow", color: "text-amber-600" };
+    if (diffDays < 0) return { label: "Overdue", color: "text-[#C53030]" };
+    if (diffDays === 0) return { label: "Due today", color: "text-[#E09520]" };
+    if (diffDays === 1) return { label: "Due tomorrow", color: "text-[#E09520]" };
     return {
         label: `Due ${d.toLocaleDateString("en-US", { month: "short", day: "numeric" })}`,
         color: "text-slate-500",
@@ -116,7 +116,7 @@ function AddTaskModal({ open, onClose, onCreated, token }: AddTaskModalProps) {
                 </DialogHeader>
                 <div className="space-y-4 py-2">
                     {error && (
-                        <div className="flex items-center gap-2 text-red-600 text-sm bg-red-50 p-3 rounded-lg">
+                        <div className="flex items-center gap-2 text-[#C53030] text-sm bg-[#FEE2E2] p-3 rounded-lg">
                             <AlertCircle className="h-4 w-4 shrink-0" />
                             {error}
                         </div>
@@ -355,7 +355,7 @@ export function TasksWidget({ token }: TasksWidgetProps) {
                                         </div>
                                         <button
                                             onClick={() => deleteTask(task.id)}
-                                            className="shrink-0 opacity-0 group-hover:opacity-100 text-slate-300 hover:text-red-400 transition-all"
+                                            className="shrink-0 opacity-0 group-hover:opacity-100 text-slate-300 hover:text-[#E06B6B] transition-all"
                                         >
                                             <Trash2 className="h-4 w-4" />
                                         </button>

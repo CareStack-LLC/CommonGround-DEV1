@@ -33,8 +33,8 @@ export default function AboutPage() {
             </h1>
 
             <p className="text-lg sm:text-xl text-gray-600 leading-relaxed mb-8">
-              CommonGround helps families navigate co-parenting with calm and clarity.
-              We believe technology can bring structure, protect children, and create space for families to thrive.
+              CommonGround gives separated parents the structure to co-parent calmly — and keeps kids out of the conflict.
+              Clear schedules, steadier messages, and records you can trust when it matters.
             </p>
 
             {/* Mission statement box */}
@@ -90,18 +90,18 @@ export default function AboutPage() {
               </div>
               <div className="bg-white rounded-2xl p-6 border-2 border-cg-amber/10 shadow-sm">
                 <div className="text-4xl font-bold text-cg-amber mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-                  25-30%
+                  Millions
                 </div>
                 <p className="text-sm text-gray-600 font-medium">
-                  of separations involve challenges that directly affect children's wellbeing
+                  of children are caught in ongoing co-parent conflict each year
                 </p>
               </div>
               <div className="bg-white rounded-2xl p-6 border-2 border-cg-sage/10 shadow-sm">
                 <div className="text-4xl font-bold text-cg-sage mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-                  $50B+
+                  Every day
                 </div>
                 <p className="text-sm text-gray-600 font-medium">
-                  annual cost of difficult custody situations on families and courts
+                  custody conflict drains the time, money, and energy families need for their kids
                 </p>
               </div>
             </div>
@@ -123,8 +123,8 @@ export default function AboutPage() {
               Technology that creates calm, <span className="text-cg-amber">not just manages it</span>
             </h2>
             <p className="text-lg text-white/80">
-              CommonGround is designed to bring structure and peace to co-parenting.
-              We reduce friction, automate coordination, and help families focus on what matters — their children.
+              CommonGround takes the friction out of co-parenting: ARIA steadies messages, TimeBridge runs the schedule, and every exchange is documented.
+              So parents spend less energy coordinating and more on their kids.
             </p>
           </div>
 
@@ -368,22 +368,22 @@ export default function AboutPage() {
             <span className="text-cg-amber">Yours can start today.</span>
           </h2>
           <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-            Join families who've found a calmer way to co-parent.
-            Structure, clarity, and peace for your children.
+            Set up in about two minutes and start co-parenting calmer today —
+            structure, clarity, and steadier days for your children.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="/early-access"
               className="inline-flex items-center justify-center px-8 py-4 bg-cg-sage text-white font-semibold rounded-full hover:bg-cg-sage-dark transition-colors shadow-lg hover:shadow-xl group"
             >
-              Start Your Free Trial
+              Start free — no card needed
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link
               href="/features"
               className="inline-flex items-center justify-center px-8 py-4 bg-white text-cg-sage font-semibold rounded-full hover:bg-gray-50 transition-colors border-2 border-cg-sage"
             >
-              See How It Works
+              See how it works
             </Link>
           </div>
           <p className="text-sm text-gray-500 mt-6">
@@ -392,7 +392,7 @@ export default function AboutPage() {
           <p className="text-sm text-gray-400 mt-3">
             Family law professional?{' '}
             <Link href="/professionals" className="text-cg-sage hover:underline">
-              Learn about our professional partnership program
+              See how the professional portal works
             </Link>.
           </p>
         </div>

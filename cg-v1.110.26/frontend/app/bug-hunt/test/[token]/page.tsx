@@ -25,9 +25,9 @@ interface TesterDashboard {
 type Tab = 'checklist' | 'bugs' | 'feedback' | 'notes';
 
 const SEVERITY_COLORS: Record<string, string> = {
-  critical: 'bg-red-100 text-red-700 border border-red-200',
-  high: 'bg-orange-100 text-orange-700 border border-orange-200',
-  medium: 'bg-yellow-100 text-yellow-700 border border-yellow-200',
+  critical: 'bg-[#FEE2E2] text-[#9B2C2C] border border-[#FEE2E2]',
+  high: 'bg-[#FEF7ED] text-[#E09520] border border-[#FEF7ED]',
+  medium: 'bg-[#FEF7ED] text-[#E09520] border border-[#FEF7ED]',
   low: 'bg-gray-100 text-gray-600',
 };
 
@@ -126,7 +126,7 @@ export default function TesterPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="max-w-sm w-full bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
-          <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
+          <AlertCircle className="w-12 h-12 text-[#E06B6B] mx-auto mb-4" />
           <h2 className="text-lg font-semibold text-gray-900 mb-2">Access Denied</h2>
           <p className="text-sm text-gray-500">{error || 'This testing link is invalid or has expired.'}</p>
         </div>
@@ -189,9 +189,9 @@ export default function TesterPage() {
                 <div className="flex flex-wrap gap-1.5 pt-1">
                   {family.agreement_version && (
                     <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
-                      family.agreement_version === 'good_faith' ? 'bg-emerald-50 text-emerald-700' :
-                      family.agreement_version === 'co-operative' ? 'bg-blue-50 text-blue-700' :
-                      family.agreement_version === 'comprehensive' ? 'bg-purple-50 text-purple-700' :
+                      family.agreement_version === 'good_faith' ? 'bg-[#E8F4F0] text-[#2D8A70]' :
+                      family.agreement_version === 'co-operative' ? 'bg-[#E0EFF8] text-[#1E4E6B]' :
+                      family.agreement_version === 'comprehensive' ? 'bg-[#E0EFF8] text-[#1E4E6B]' :
                       'bg-gray-100 text-gray-600'
                     }`}>
                       {family.agreement_version.replace(/_/g, ' ')}
@@ -200,8 +200,8 @@ export default function TesterPage() {
                   {family.subscription_tier && (
                     <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
                       family.subscription_tier === 'web_starter' ? 'bg-gray-100 text-gray-600' :
-                      family.subscription_tier === 'plus' ? 'bg-amber-50 text-amber-700' :
-                      family.subscription_tier === 'complete' ? 'bg-rose-50 text-rose-700' :
+                      family.subscription_tier === 'plus' ? 'bg-[#FEF7ED] text-[#E09520]' :
+                      family.subscription_tier === 'complete' ? 'bg-[#FEF7ED] text-[#E09520]' :
                       'bg-gray-100 text-gray-600'
                     }`}>
                       {family.subscription_tier.replace(/_/g, ' ')}
@@ -245,9 +245,9 @@ export default function TesterPage() {
 
         {/* Error banner */}
         {actionError && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-3 flex items-center justify-between">
-            <span className="text-sm text-red-600">{actionError}</span>
-            <button onClick={() => setActionError(null)} className="text-xs text-red-400 underline">dismiss</button>
+          <div className="bg-[#FEE2E2] border border-[#FEE2E2] rounded-xl p-3 flex items-center justify-between">
+            <span className="text-sm text-[#C53030]">{actionError}</span>
+            <button onClick={() => setActionError(null)} className="text-xs text-[#E06B6B] underline">dismiss</button>
           </div>
         )}
 
@@ -338,7 +338,7 @@ export default function TesterPage() {
                           <img src={src} alt={`Screenshot ${i + 1}`} className="w-full h-full object-cover" />
                           <button
                             onClick={() => setScreenshots(prev => prev.filter((_, idx) => idx !== i))}
-                            className="absolute top-0.5 right-0.5 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center"
+                            className="absolute top-0.5 right-0.5 w-5 h-5 bg-[#C53030] text-white rounded-full flex items-center justify-center"
                           >
                             <X className="w-3 h-3" />
                           </button>
@@ -387,7 +387,7 @@ export default function TesterPage() {
                   <span className="text-xs text-gray-500">Rating:</span>
                   {[1,2,3,4,5].map(s => (
                     <button key={s} onClick={() => setFeedbackForm({...feedbackForm, rating: feedbackForm.rating === s ? 0 : s})}>
-                      <Star className={`w-6 h-6 ${s <= feedbackForm.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />
+                      <Star className={`w-6 h-6 ${s <= feedbackForm.rating ? 'text-[#F5A623] fill-[#F5A623]' : 'text-gray-300'}`} />
                     </button>
                   ))}
                 </div>
@@ -412,8 +412,8 @@ export default function TesterPage() {
             {feedbackList.map(fb => (
               <div key={fb.id} className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-blue-50 text-blue-600">{fb.category}</span>
-                  {fb.rating && <div className="flex">{[1,2,3,4,5].map(s => <Star key={s} className={`w-3 h-3 ${s <= fb.rating! ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300'}`} />)}</div>}
+                  <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-[#E0EFF8] text-[#2D6A8F]">{fb.category}</span>
+                  {fb.rating && <div className="flex">{[1,2,3,4,5].map(s => <Star key={s} className={`w-3 h-3 ${s <= fb.rating! ? 'text-[#F5A623] fill-[#F5A623]' : 'text-gray-300'}`} />)}</div>}
                   <span className="text-xs text-gray-400 ml-auto">{new Date(fb.created_at).toLocaleDateString()}</span>
                 </div>
                 <p className="text-sm text-gray-700">{fb.content}</p>
@@ -453,10 +453,10 @@ export default function TesterPage() {
               <div key={note.id} className="bg-white rounded-xl border border-gray-100 p-4 shadow-sm">
                 <div className="flex items-center gap-2 mb-1">
                   <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
-                    note.note_type === 'blocker' ? 'bg-red-50 text-red-600' :
-                    note.note_type === 'question' ? 'bg-yellow-50 text-yellow-600' :
-                    note.note_type === 'resolution' ? 'bg-green-50 text-green-600' :
-                    'bg-blue-50 text-blue-600'
+                    note.note_type === 'blocker' ? 'bg-[#FEE2E2] text-[#C53030]' :
+                    note.note_type === 'question' ? 'bg-[#FEF7ED] text-[#E09520]' :
+                    note.note_type === 'resolution' ? 'bg-[#E8F4F0] text-[#2D8A70]' :
+                    'bg-[#E0EFF8] text-[#2D6A8F]'
                   }`}>{note.note_type}</span>
                   <span className="text-xs text-gray-400 ml-auto">{new Date(note.created_at).toLocaleDateString()}</span>
                 </div>

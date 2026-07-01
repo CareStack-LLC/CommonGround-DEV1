@@ -45,28 +45,28 @@ const categoryIcons: Record<ObligationCategory, React.ReactNode> = {
 };
 
 const categoryColors: Record<ObligationCategory, string> = {
-  medical: 'bg-red-100 text-red-700 border-red-200',
-  education: 'bg-blue-100 text-blue-700 border-blue-200',
-  sports: 'bg-green-100 text-green-700 border-green-200',
-  device: 'bg-purple-100 text-purple-700 border-purple-200',
-  camp: 'bg-orange-100 text-orange-700 border-orange-200',
-  clothing: 'bg-pink-100 text-pink-700 border-pink-200',
+  medical: 'bg-[#FEE2E2] text-[#9B2C2C] border-[#FEE2E2]',
+  education: 'bg-[#E0EFF8] text-[#1E4E6B] border-[#E0EFF8]',
+  sports: 'bg-[#E8F4F0] text-[#2D8A70] border-[#E8F4F0]',
+  device: 'bg-[#E0EFF8] text-[#1E4E6B] border-[#E0EFF8]',
+  camp: 'bg-[#FEF7ED] text-[#E09520] border-[#FEF7ED]',
+  clothing: 'bg-[#FEF7ED] text-[#E09520] border-[#FEF7ED]',
   transportation: 'bg-muted text-foreground border-border',
-  child_support: 'bg-rose-100 text-rose-700 border-rose-200',
-  extracurricular: 'bg-indigo-100 text-indigo-700 border-indigo-200',
-  childcare: 'bg-cyan-100 text-cyan-700 border-cyan-200',
+  child_support: 'bg-[#FEF7ED] text-[#E09520] border-[#FEF7ED]',
+  extracurricular: 'bg-[#E0EFF8] text-[#1E4E6B] border-[#E0EFF8]',
+  childcare: 'bg-[#E0EFF8] text-[#1E4E6B] border-[#E0EFF8]',
   other: 'bg-muted text-foreground border-border',
 };
 
 const statusConfig: Record<ObligationStatus, { label: string; className: string; icon: React.ReactNode }> = {
-  open: { label: 'Open', className: 'bg-amber-100 text-amber-800', icon: <Clock className="h-3 w-3" /> },
-  partially_funded: { label: 'Partially Funded', className: 'bg-yellow-100 text-yellow-800', icon: <Clock className="h-3 w-3" /> },
-  funded: { label: 'Funded', className: 'bg-blue-100 text-blue-800', icon: <CheckCircle className="h-3 w-3" /> },
-  pending_verification: { label: 'Pending Verification', className: 'bg-purple-100 text-purple-800', icon: <Clock className="h-3 w-3" /> },
-  verified: { label: 'Verified', className: 'bg-green-100 text-green-800', icon: <CheckCircle className="h-3 w-3" /> },
-  completed: { label: 'Completed', className: 'bg-emerald-100 text-emerald-800', icon: <CheckCircle className="h-3 w-3" /> },
+  open: { label: 'Open', className: 'bg-[#FEF7ED] text-[#E09520]', icon: <Clock className="h-3 w-3" /> },
+  partially_funded: { label: 'Partially Funded', className: 'bg-[#FEF7ED] text-[#E09520]', icon: <Clock className="h-3 w-3" /> },
+  funded: { label: 'Funded', className: 'bg-[#E0EFF8] text-[#1E4E6B]', icon: <CheckCircle className="h-3 w-3" /> },
+  pending_verification: { label: 'Pending Verification', className: 'bg-[#E0EFF8] text-[#1E4E6B]', icon: <Clock className="h-3 w-3" /> },
+  verified: { label: 'Verified', className: 'bg-[#E8F4F0] text-[#1E3A4A]', icon: <CheckCircle className="h-3 w-3" /> },
+  completed: { label: 'Completed', className: 'bg-[#E8F4F0] text-[#1E3A4A]', icon: <CheckCircle className="h-3 w-3" /> },
   expired: { label: 'Expired', className: 'bg-muted text-foreground', icon: <XCircle className="h-3 w-3" /> },
-  cancelled: { label: 'Cancelled', className: 'bg-red-100 text-red-800', icon: <XCircle className="h-3 w-3" /> },
+  cancelled: { label: 'Cancelled', className: 'bg-[#FEE2E2] text-[#9B2C2C]', icon: <XCircle className="h-3 w-3" /> },
 };
 
 function formatCurrency(amount: string | number): string {
@@ -101,7 +101,7 @@ export default function ObligationCard({
 
   return (
     <Card
-      className={`p-4 hover:shadow-md transition-shadow ${onClick ? 'cursor-pointer' : ''} ${obligation.is_overdue ? 'border-red-300 bg-red-50/50' : ''}`}
+      className={`p-4 hover:shadow-md transition-shadow ${onClick ? 'cursor-pointer' : ''} ${obligation.is_overdue ? 'border-[#FCA5A5] bg-[#FEE2E2]/50' : ''}`}
       onClick={onClick}
     >
       <div className="flex flex-col sm:flex-row sm:items-start gap-4">
@@ -124,7 +124,7 @@ export default function ObligationCard({
                   {capitalizeFirst(category)}
                 </span>
                 {obligation.is_overdue && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-[#FEE2E2] text-[#9B2C2C]">
                     <AlertTriangle className="h-3 w-3" />
                     Overdue
                   </span>
@@ -158,7 +158,7 @@ export default function ObligationCard({
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mt-3">
             <div className="text-sm text-muted-foreground">
               {obligation.due_date ? (
-                <span className={obligation.is_overdue ? 'text-red-600 font-medium' : ''}>
+                <span className={obligation.is_overdue ? 'text-[#C53030] font-medium' : ''}>
                   Due: {formatDate(obligation.due_date)}
                 </span>
               ) : (

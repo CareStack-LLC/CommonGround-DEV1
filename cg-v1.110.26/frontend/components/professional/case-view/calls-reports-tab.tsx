@@ -226,7 +226,7 @@ export function CallsReportsTab({ familyFileId, token }: { familyFileId: string,
                 <div className="flex gap-2">
                     <Button
                         onClick={() => setIsLogCallOpen(true)}
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                        className="bg-[#2D6A8F] hover:bg-[#1E4E6B] text-white"
                     >
                         <Phone className="h-4 w-4 mr-2" />
                         Log Call
@@ -234,14 +234,14 @@ export function CallsReportsTab({ familyFileId, token }: { familyFileId: string,
                     <Button
                         onClick={() => setIsGenReportOpen(true)}
                         variant="outline"
-                        className="border-indigo-200 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/20 dark:bg-indigo-950/20"
+                        className="border-[#C2DEF0] text-[#1E4E6B] dark:text-[#9BCADF] hover:bg-[#F0F7FC] dark:hover:bg-[#0F2836]/20 dark:bg-[#0F2836]/20"
                     >
                         <FileText className="h-4 w-4 mr-2" />
                         Generate Report
                     </Button>
                     <Button
                         onClick={() => setIsLiveMode(true)}
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-100"
+                        className="bg-[#2D6A8F] hover:bg-[#1E4E6B] text-white shadow-md shadow-[#E0EFF8]"
                     >
                         <Phone className="h-4 w-4 mr-2" />
                         Live Control
@@ -253,7 +253,7 @@ export function CallsReportsTab({ familyFileId, token }: { familyFileId: string,
                 <div className="animate-in zoom-in-95 duration-300">
                     <div className="flex items-center justify-between mb-4 bg-slate-900 text-white p-3 rounded-xl">
                         <div className="flex items-center gap-3">
-                            <Badge className="bg-red-500 animate-pulse border-none">LIVE SESSION</Badge>
+                            <Badge className="bg-[#C53030] animate-pulse border-none">LIVE SESSION</Badge>
                             <span className="text-sm font-medium opacity-80">ARIA Safety Shield Active</span>
                         </div>
                         <Button
@@ -276,16 +276,16 @@ export function CallsReportsTab({ familyFileId, token }: { familyFileId: string,
                     {/* Call Logs Section */}
                     <div className="space-y-4">
                         <div className="flex items-center gap-2 text-foreground font-semibold px-1">
-                            <History className="h-5 w-5 text-indigo-500" />
+                            <History className="h-5 w-5 text-[#3D8DB0]" />
                             Recent Calls
                         </div>
 
                         {callLogs.length > 0 ? (
                             <div className="space-y-3">
                                 {callLogs.map((call) => (
-                                    <Card key={call.id} className="overflow-hidden border-border hover:border-indigo-200 dark:hover:border-indigo-900/40 transition-colors group">
+                                    <Card key={call.id} className="overflow-hidden border-border hover:border-[#C2DEF0] dark:hover:border-[#163A50]/40 transition-colors group">
                                         <div className="p-4 flex items-start gap-4">
-                                            <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground group-hover:bg-indigo-50 dark:hover:bg-indigo-950/20 dark:bg-indigo-950/20 group-hover:text-indigo-500 transition-colors">
+                                            <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground group-hover:bg-[#F0F7FC] dark:hover:bg-[#0F2836]/20 dark:bg-[#0F2836]/20 group-hover:text-[#3D8DB0] transition-colors">
                                                 <Phone className="h-5 w-5" />
                                             </div>
                                             <div className="flex-1 min-w-0">
@@ -326,7 +326,7 @@ export function CallsReportsTab({ familyFileId, token }: { familyFileId: string,
                                                     {call.recording_url && (
                                                         <DropdownMenuItem className="text-xs">Listen Recording</DropdownMenuItem>
                                                     )}
-                                                    <DropdownMenuItem className="text-xs text-red-600">Delete</DropdownMenuItem>
+                                                    <DropdownMenuItem className="text-xs text-[#C53030]">Delete</DropdownMenuItem>
                                                 </DropdownMenuContent>
                                             </DropdownMenu>
                                         </div>
@@ -339,7 +339,7 @@ export function CallsReportsTab({ familyFileId, token }: { familyFileId: string,
                                 <p className="text-muted-foreground font-medium">No calls logged yet.</p>
                                 <Button
                                     variant="link"
-                                    className="text-indigo-600"
+                                    className="text-[#2D6A8F]"
                                     onClick={() => setIsLogCallOpen(true)}
                                 >
                                     Log your first call
@@ -351,17 +351,17 @@ export function CallsReportsTab({ familyFileId, token }: { familyFileId: string,
                     {/* Compliance Reports Section */}
                     <div className="space-y-4">
                         <div className="flex items-center gap-2 text-foreground font-semibold px-1">
-                            <FileCheck className="h-5 w-5 text-indigo-500" />
+                            <FileCheck className="h-5 w-5 text-[#3D8DB0]" />
                             Compliance Reports
                         </div>
 
                         {reports.length > 0 ? (
                             <div className="space-y-3">
                                 {reports.map((report) => (
-                                    <Card key={report.id} className="overflow-hidden border-border hover:border-emerald-200 dark:hover:border-emerald-900/40 transition-colors group">
+                                    <Card key={report.id} className="overflow-hidden border-border hover:border-[#C5E5DB] dark:hover:border-[#1B5544]/40 transition-colors group">
                                         <div className="p-4 flex items-center justify-between">
                                             <div className="flex items-center gap-4">
-                                                <div className="h-10 w-10 rounded-lg bg-emerald-50 dark:bg-emerald-950/20 flex items-center justify-center text-emerald-500">
+                                                <div className="h-10 w-10 rounded-lg bg-[#E8F4F0] dark:bg-[#123A2E]/20 flex items-center justify-center text-[#3DAA8A]">
                                                     <FileText className="h-5 w-5" />
                                                 </div>
                                                 <div>
@@ -384,7 +384,7 @@ export function CallsReportsTab({ familyFileId, token }: { familyFileId: string,
                                                     <Button
                                                         size="icon"
                                                         variant="ghost"
-                                                        className="h-8 w-8 text-indigo-600"
+                                                        className="h-8 w-8 text-[#2D6A8F]"
                                                         onClick={() => handleDownloadReport(report.id, `Report-${report.id.slice(0, 8)}.${report.export_format === 'excel' ? 'csv' : 'pdf'}`)}
                                                     >
                                                         <Download className="h-4 w-4" />
@@ -405,7 +405,7 @@ export function CallsReportsTab({ familyFileId, token }: { familyFileId: string,
                                 <p className="text-muted-foreground font-medium">No reports generated yet.</p>
                                 <Button
                                     variant="link"
-                                    className="text-indigo-600"
+                                    className="text-[#2D6A8F]"
                                     onClick={() => setIsGenReportOpen(true)}
                                 >
                                     Generate case report
@@ -414,10 +414,10 @@ export function CallsReportsTab({ familyFileId, token }: { familyFileId: string,
                         )}
 
                         {/* Tips Card */}
-                        <Card className="bg-indigo-50 dark:bg-indigo-950/20 border-none mt-6">
+                        <Card className="bg-[#F0F7FC] dark:bg-[#0F2836]/20 border-none mt-6">
                             <CardContent className="p-4 flex gap-3">
-                                <AlertCircle className="h-5 w-5 text-indigo-500 shrink-0" />
-                                <div className="text-xs text-indigo-800 dark:text-indigo-300 leading-relaxed">
+                                <AlertCircle className="h-5 w-5 text-[#3D8DB0] shrink-0" />
+                                <div className="text-xs text-[#1E4E6B] dark:text-[#9BCADF] leading-relaxed">
                                     <p className="font-bold mb-1">Professional Advisory</p>
                                     Compliance reports aggregate ARIA flags, exchange metadata, and message sentiment. Use them for court submissions or mediation preparations.
                                 </div>
@@ -478,7 +478,7 @@ export function CallsReportsTab({ familyFileId, token }: { familyFileId: string,
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setIsLogCallOpen(false)}>Cancel</Button>
-                        <Button onClick={handleLogCall} className="bg-indigo-600 hover:bg-indigo-700">Save Log Entry</Button>
+                        <Button onClick={handleLogCall} className="bg-[#2D6A8F] hover:bg-[#1E4E6B]">Save Log Entry</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
@@ -532,7 +532,7 @@ export function CallsReportsTab({ familyFileId, token }: { familyFileId: string,
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setIsGenReportOpen(false)}>Cancel</Button>
-                        <Button onClick={handleGenerateReport} className="bg-indigo-600 hover:bg-indigo-700">
+                        <Button onClick={handleGenerateReport} className="bg-[#2D6A8F] hover:bg-[#1E4E6B]">
                             Generate PDF
                         </Button>
                     </DialogFooter>

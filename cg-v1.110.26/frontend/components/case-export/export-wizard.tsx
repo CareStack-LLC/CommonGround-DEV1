@@ -102,7 +102,7 @@ export function ExportWizard({ caseId, caseName, onSuccess, onCancel }: ExportWi
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
                 index <= currentIndex
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-[#2D6A8F] text-white'
                   : 'bg-gray-200 text-gray-500'
               }`}
             >
@@ -118,7 +118,7 @@ export function ExportWizard({ caseId, caseName, onSuccess, onCancel }: ExportWi
             {index < steps.length - 1 && (
               <div
                 className={`w-12 h-0.5 mx-4 ${
-                  index < currentIndex ? 'bg-blue-600' : 'bg-gray-200'
+                  index < currentIndex ? 'bg-[#2D6A8F]' : 'bg-gray-200'
                 }`}
               />
             )}
@@ -136,7 +136,7 @@ export function ExportWizard({ caseId, caseName, onSuccess, onCancel }: ExportWi
           <Card
             className={`cursor-pointer transition-all ${
               packageType === 'court'
-                ? 'ring-2 ring-blue-600 bg-blue-50'
+                ? 'ring-2 ring-[#2D6A8F] bg-[#E0EFF8]'
                 : 'hover:bg-gray-50'
             }`}
             onClick={() => setPackageType('court')}
@@ -163,7 +163,7 @@ export function ExportWizard({ caseId, caseName, onSuccess, onCancel }: ExportWi
           <Card
             className={`cursor-pointer transition-all ${
               packageType === 'investigation'
-                ? 'ring-2 ring-blue-600 bg-blue-50'
+                ? 'ring-2 ring-[#2D6A8F] bg-[#E0EFF8]'
                 : 'hover:bg-gray-50'
             }`}
             onClick={() => setPackageType('investigation')}
@@ -205,7 +205,7 @@ export function ExportWizard({ caseId, caseName, onSuccess, onCancel }: ExportWi
       <h3 className="text-lg font-medium">Export Details</h3>
 
       {packageType === 'investigation' && (
-        <div className="space-y-4 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+        <div className="space-y-4 p-4 bg-[#FEF7ED] rounded-lg border border-[#FEF7ED]">
           <div>
             <Label htmlFor="claimType">Claim Type *</Label>
             <select
@@ -268,7 +268,7 @@ export function ExportWizard({ caseId, caseName, onSuccess, onCancel }: ExportWi
             <label
               key={option.value}
               className={`flex items-start p-3 border rounded-lg cursor-pointer ${
-                redactionLevel === option.value ? 'border-blue-600 bg-blue-50' : 'border-gray-200'
+                redactionLevel === option.value ? 'border-[#2D6A8F] bg-[#E0EFF8]' : 'border-gray-200'
               }`}
             >
               <input
@@ -343,7 +343,7 @@ export function ExportWizard({ caseId, caseName, onSuccess, onCancel }: ExportWi
             key={section.value}
             className={`flex items-start p-3 border rounded-lg cursor-pointer ${
               selectedSections.includes(section.value)
-                ? 'border-blue-600 bg-blue-50'
+                ? 'border-[#2D6A8F] bg-[#E0EFF8]'
                 : 'border-gray-200 hover:bg-gray-50'
             }`}
           >
@@ -423,10 +423,10 @@ export function ExportWizard({ caseId, caseName, onSuccess, onCancel }: ExportWi
         </CardContent>
       </Card>
 
-      <Card className="bg-blue-50 border-blue-200">
+      <Card className="bg-[#E0EFF8] border-[#E0EFF8]">
         <CardContent className="pt-6">
-          <h4 className="font-medium text-blue-900 mb-2">What happens next?</h4>
-          <ul className="text-sm text-blue-800 space-y-1">
+          <h4 className="font-medium text-[#1E3A4A] mb-2">What happens next?</h4>
+          <ul className="text-sm text-[#1E4E6B] space-y-1">
             <li>&#x2022; Your export will be generated (this may take a moment)</li>
             <li>&#x2022; A PDF will be created with all selected sections</li>
             <li>&#x2022; The document will include SHA-256 verification</li>
@@ -436,9 +436,9 @@ export function ExportWizard({ caseId, caseName, onSuccess, onCancel }: ExportWi
       </Card>
 
       {error && (
-        <Card className="bg-red-50 border-red-200">
+        <Card className="bg-[#FEE2E2] border-[#FEE2E2]">
           <CardContent className="pt-6">
-            <p className="text-red-700">{error}</p>
+            <p className="text-[#9B2C2C]">{error}</p>
           </CardContent>
         </Card>
       )}

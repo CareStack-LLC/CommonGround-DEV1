@@ -171,18 +171,18 @@ export default function PaymentsPage() {
   const getStatusBadge = (status: string, isOverdue: boolean) => {
     if (isOverdue) {
       return (
-        <span className="px-2 py-1 bg-red-100 text-red-700 text-xs font-medium rounded">
+        <span className="px-2 py-1 bg-[#FEE2E2] text-[#9B2C2C] text-xs font-medium rounded">
           OVERDUE
         </span>
       );
     }
     const colors: Record<string, string> = {
-      open: "bg-yellow-100 text-yellow-700",
-      partially_funded: "bg-blue-100 text-blue-700",
-      funded: "bg-green-100 text-green-700",
-      verified: "bg-purple-100 text-purple-700",
+      open: "bg-[#FEF7ED] text-[#E09520]",
+      partially_funded: "bg-[#E0EFF8] text-[#1E4E6B]",
+      funded: "bg-[#E8F4F0] text-[#2D8A70]",
+      verified: "bg-[#E0EFF8] text-[#1E4E6B]",
       completed: "bg-gray-100 text-gray-700",
-      cancelled: "bg-red-100 text-red-700",
+      cancelled: "bg-[#FEE2E2] text-[#9B2C2C]",
     };
     return (
       <span className={`px-2 py-1 text-xs font-medium rounded ${colors[status] || colors.open}`}>
@@ -232,7 +232,7 @@ export default function PaymentsPage() {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+        <div className="bg-[#FEE2E2] border border-[#FEE2E2] text-[#9B2C2C] px-4 py-3 rounded">
           {error}
         </div>
       )}
@@ -278,7 +278,7 @@ export default function PaymentsPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Card>
               <CardContent className="p-4 text-center">
-                <div className={`text-2xl font-bold ${complianceRate >= 80 ? "text-green-600" : complianceRate >= 50 ? "text-yellow-600" : "text-red-600"}`}>
+                <div className={`text-2xl font-bold ${complianceRate >= 80 ? "text-[#2D8A70]" : complianceRate >= 50 ? "text-[#E09520]" : "text-[#C53030]"}`}>
                   {complianceRate}%
                 </div>
                 <div className="text-xs text-slate-500">Compliance Rate</div>
@@ -286,19 +286,19 @@ export default function PaymentsPage() {
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-red-600">{overdueObligations.length}</div>
+                <div className="text-2xl font-bold text-[#C53030]">{overdueObligations.length}</div>
                 <div className="text-xs text-slate-500">Overdue</div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-yellow-600">{pendingObligations.length}</div>
+                <div className="text-2xl font-bold text-[#E09520]">{pendingObligations.length}</div>
                 <div className="text-xs text-slate-500">Pending Funding</div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-green-600">{completedObligations.length}</div>
+                <div className="text-2xl font-bold text-[#2D8A70]">{completedObligations.length}</div>
                 <div className="text-xs text-slate-500">Completed</div>
               </CardContent>
             </Card>
@@ -313,18 +313,18 @@ export default function PaymentsPage() {
               </CardHeader>
               <CardContent>
                 <div className="grid md:grid-cols-3 gap-6">
-                  <div className="text-center p-4 bg-blue-50 rounded-lg">
-                    <div className="text-sm text-blue-600 font-medium">Petitioner Balance</div>
-                    <div className={`text-2xl font-bold mt-1 ${parseFloat(balance.petitioner_balance) >= 0 ? "text-red-600" : "text-green-600"}`}>
+                  <div className="text-center p-4 bg-[#E0EFF8] rounded-lg">
+                    <div className="text-sm text-[#2D6A8F] font-medium">Petitioner Balance</div>
+                    <div className={`text-2xl font-bold mt-1 ${parseFloat(balance.petitioner_balance) >= 0 ? "text-[#C53030]" : "text-[#2D8A70]"}`}>
                       {formatCurrency(balance.petitioner_balance)}
                     </div>
                     <div className="text-xs text-slate-500 mt-1">
                       {parseFloat(balance.petitioner_balance) >= 0 ? "Owes" : "Owed"}
                     </div>
                   </div>
-                  <div className="text-center p-4 bg-purple-50 rounded-lg">
-                    <div className="text-sm text-purple-600 font-medium">Respondent Balance</div>
-                    <div className={`text-2xl font-bold mt-1 ${parseFloat(balance.respondent_balance) >= 0 ? "text-red-600" : "text-green-600"}`}>
+                  <div className="text-center p-4 bg-[#E0EFF8] rounded-lg">
+                    <div className="text-sm text-[#2D6A8F] font-medium">Respondent Balance</div>
+                    <div className={`text-2xl font-bold mt-1 ${parseFloat(balance.respondent_balance) >= 0 ? "text-[#C53030]" : "text-[#2D8A70]"}`}>
                       {formatCurrency(balance.respondent_balance)}
                     </div>
                     <div className="text-xs text-slate-500 mt-1">
@@ -346,7 +346,7 @@ export default function PaymentsPage() {
                   </div>
                   <div>
                     <div className="text-sm text-slate-500">Total Overdue</div>
-                    <div className="font-semibold text-red-600">{formatCurrency(balance.total_overdue)}</div>
+                    <div className="font-semibold text-[#C53030]">{formatCurrency(balance.total_overdue)}</div>
                   </div>
                   <div>
                     <div className="text-sm text-slate-500">Open Obligations</div>
@@ -363,17 +363,17 @@ export default function PaymentsPage() {
 
           {/* Overdue Obligations Alert */}
           {overdueObligations.length > 0 && (
-            <Card className="border-red-200 bg-red-50">
+            <Card className="border-[#FEE2E2] bg-[#FEE2E2]">
               <CardHeader>
-                <CardTitle className="text-red-700">Overdue Obligations</CardTitle>
-                <CardDescription className="text-red-600">
+                <CardTitle className="text-[#9B2C2C]">Overdue Obligations</CardTitle>
+                <CardDescription className="text-[#C53030]">
                   These obligations have passed their due date without completion
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   {overdueObligations.map((ob) => (
-                    <div key={ob.id} className="flex items-center justify-between bg-white p-3 rounded-lg border border-red-200">
+                    <div key={ob.id} className="flex items-center justify-between bg-white p-3 rounded-lg border border-[#FEE2E2]">
                       <div className="flex items-center gap-3">
                         <span className="text-xl">{getCategoryIcon(ob.purpose_category)}</span>
                         <div>
@@ -384,7 +384,7 @@ export default function PaymentsPage() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="font-semibold text-red-700">{formatCurrency(ob.total_amount)}</div>
+                        <div className="font-semibold text-[#9B2C2C]">{formatCurrency(ob.total_amount)}</div>
                         <div className="text-xs text-slate-500">
                           Funded: {formatCurrency(ob.amount_funded)}
                         </div>
@@ -405,28 +405,28 @@ export default function PaymentsPage() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
-                  <div className="text-center p-3 bg-yellow-50 rounded-lg">
-                    <div className="text-2xl font-bold text-yellow-600">{metrics.total_open}</div>
+                  <div className="text-center p-3 bg-[#FEF7ED] rounded-lg">
+                    <div className="text-2xl font-bold text-[#E09520]">{metrics.total_open}</div>
                     <div className="text-xs text-slate-500">Open</div>
                   </div>
-                  <div className="text-center p-3 bg-blue-50 rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600">{metrics.total_pending_funding}</div>
+                  <div className="text-center p-3 bg-[#E0EFF8] rounded-lg">
+                    <div className="text-2xl font-bold text-[#2D6A8F]">{metrics.total_pending_funding}</div>
                     <div className="text-xs text-slate-500">Pending</div>
                   </div>
-                  <div className="text-center p-3 bg-green-50 rounded-lg">
-                    <div className="text-2xl font-bold text-green-600">{metrics.total_funded}</div>
+                  <div className="text-center p-3 bg-[#E8F4F0] rounded-lg">
+                    <div className="text-2xl font-bold text-[#2D8A70]">{metrics.total_funded}</div>
                     <div className="text-xs text-slate-500">Funded</div>
                   </div>
-                  <div className="text-center p-3 bg-purple-50 rounded-lg">
-                    <div className="text-2xl font-bold text-purple-600">{metrics.total_verified}</div>
+                  <div className="text-center p-3 bg-[#E0EFF8] rounded-lg">
+                    <div className="text-2xl font-bold text-[#2D6A8F]">{metrics.total_verified}</div>
                     <div className="text-xs text-slate-500">Verified</div>
                   </div>
                   <div className="text-center p-3 bg-gray-50 rounded-lg">
                     <div className="text-2xl font-bold text-gray-600">{metrics.total_completed}</div>
                     <div className="text-xs text-slate-500">Completed</div>
                   </div>
-                  <div className="text-center p-3 bg-red-50 rounded-lg">
-                    <div className="text-2xl font-bold text-red-600">{metrics.total_overdue}</div>
+                  <div className="text-center p-3 bg-[#FEE2E2] rounded-lg">
+                    <div className="text-2xl font-bold text-[#C53030]">{metrics.total_overdue}</div>
                     <div className="text-xs text-slate-500">Overdue</div>
                   </div>
                   <div className="text-center p-3 bg-slate-100 rounded-lg">
@@ -456,7 +456,7 @@ export default function PaymentsPage() {
             ) : (
               <div className="space-y-4">
                 {obligations.map((ob) => (
-                  <div key={ob.id} className={`border rounded-lg p-4 ${ob.is_overdue ? "border-red-200 bg-red-50" : ""}`}>
+                  <div key={ob.id} className={`border rounded-lg p-4 ${ob.is_overdue ? "border-[#FEE2E2] bg-[#FEE2E2]" : ""}`}>
                     <div className="flex items-start justify-between">
                       <div className="flex items-start gap-3">
                         <span className="text-2xl">{getCategoryIcon(ob.purpose_category)}</span>
@@ -487,7 +487,7 @@ export default function PaymentsPage() {
                       </div>
                       <div>
                         <div className="text-slate-500">Amount Funded</div>
-                        <div className="font-semibold text-green-600">{formatCurrency(ob.amount_funded)}</div>
+                        <div className="font-semibold text-[#2D8A70]">{formatCurrency(ob.amount_funded)}</div>
                       </div>
                     </div>
 
@@ -497,10 +497,10 @@ export default function PaymentsPage() {
                           <span>Due: {new Date(ob.due_date).toLocaleDateString()}</span>
                         )}
                         {ob.verification_required && (
-                          <span className="px-1.5 py-0.5 bg-purple-100 text-purple-700 rounded">Verification Required</span>
+                          <span className="px-1.5 py-0.5 bg-[#E0EFF8] text-[#1E4E6B] rounded">Verification Required</span>
                         )}
                         {ob.receipt_required && (
-                          <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded">Receipt Required</span>
+                          <span className="px-1.5 py-0.5 bg-[#E0EFF8] text-[#1E4E6B] rounded">Receipt Required</span>
                         )}
                       </div>
                       <span>Created: {new Date(ob.created_at).toLocaleDateString()}</span>
@@ -515,7 +515,7 @@ export default function PaymentsPage() {
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2">
                           <div
-                            className="bg-green-500 h-2 rounded-full transition-all"
+                            className="bg-[#3DAA8A] h-2 rounded-full transition-all"
                             style={{ width: `${Math.min((parseFloat(ob.amount_funded) / parseFloat(ob.total_amount)) * 100, 100)}%` }}
                           />
                         </div>
@@ -563,9 +563,9 @@ export default function PaymentsPage() {
                         </td>
                         <td className="py-3 px-4">
                           <span className={`px-2 py-1 text-xs font-medium rounded ${
-                            entry.entry_type === "funding" ? "bg-green-100 text-green-700" :
-                            entry.entry_type === "obligation" ? "bg-blue-100 text-blue-700" :
-                            entry.entry_type === "prepayment" ? "bg-purple-100 text-purple-700" :
+                            entry.entry_type === "funding" ? "bg-[#E8F4F0] text-[#2D8A70]" :
+                            entry.entry_type === "obligation" ? "bg-[#E0EFF8] text-[#1E4E6B]" :
+                            entry.entry_type === "prepayment" ? "bg-[#E0EFF8] text-[#1E4E6B]" :
                             "bg-gray-100 text-gray-700"
                           }`}>
                             {entry.entry_type.toUpperCase()}
@@ -573,7 +573,7 @@ export default function PaymentsPage() {
                         </td>
                         <td className="py-3 px-4 text-slate-700">{entry.description}</td>
                         <td className={`py-3 px-4 text-right font-medium ${
-                          parseFloat(entry.amount) >= 0 ? "text-green-600" : "text-red-600"
+                          parseFloat(entry.amount) >= 0 ? "text-[#2D8A70]" : "text-[#C53030]"
                         }`}>
                           {formatCurrency(entry.amount)}
                         </td>
@@ -582,9 +582,9 @@ export default function PaymentsPage() {
                         </td>
                         <td className="py-3 px-4 text-center">
                           {entry.is_reconciled ? (
-                            <span className="text-green-600">Reconciled</span>
+                            <span className="text-[#2D8A70]">Reconciled</span>
                           ) : (
-                            <span className="text-yellow-600">Pending</span>
+                            <span className="text-[#E09520]">Pending</span>
                           )}
                         </td>
                       </tr>

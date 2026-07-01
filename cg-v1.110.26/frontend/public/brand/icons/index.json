@@ -1,0 +1,46 @@
+{
+  "$comment": "CommonGround branded icon set. Source of truth for the custom feature-icon library. Rendered in the logo's rounded-line + gold-arch language. Palette: teal #3DAA8A, ocean blue #2D6A8F, child gold #F5A623.",
+  "version": "1.0.0",
+  "viewBox": "0 0 32 32",
+  "style": "duotone rounded-line, 2px stroke, round caps/joins, self-contained brand hex",
+  "categories": {
+    "brand": [
+      { "name": "logo-glyph", "label": "CommonGround mark", "usage": "The family glyph: two parents + gold arch + child. App icon, favicons, loaders." },
+      { "name": "parents", "label": "Parents", "usage": "Parent A / Parent B, co-parents, dual-approval." },
+      { "name": "child", "label": "Child", "usage": "Child profile, child-first framing, kid focus." },
+      { "name": "mycircle", "label": "My Circle", "usage": "Circle of support: grandparents, approved contacts." },
+      { "name": "heart", "label": "Care", "usage": "Wellbeing, empathy, family care." },
+      { "name": "handshake", "label": "Collaboration", "usage": "Agreement reached, co-parenting partnership." }
+    ],
+    "features": [
+      { "name": "aria", "label": "ARIA", "usage": "AI Relationship Intelligence Assistant — sentiment shield + heartbeat." },
+      { "name": "timebridge", "label": "TimeBridge", "usage": "Automated schedule bridging two homes." },
+      { "name": "clearfund", "label": "ClearFund", "usage": "Shared expenses, fair splits, obligations." },
+      { "name": "kidcoms", "label": "KidComs", "usage": "Monitored child chat + video comms." },
+      { "name": "kidspace", "label": "KidSpace", "usage": "Kid media space, stories, play." },
+      { "name": "safespace", "label": "SafeSpace", "usage": "Emotionally safe, protected communication." },
+      { "name": "freshstart", "label": "FreshStart", "usage": "Onboarding, new beginnings, hope." },
+      { "name": "agreement", "label": "Agreement Builder", "usage": "Custody agreement wizard, signed docs." },
+      { "name": "exchange", "label": "Custody Exchange", "usage": "Handoff between two homes, silent handoff." },
+      { "name": "familyfile", "label": "Family Files", "usage": "Case management hub." },
+      { "name": "schedule", "label": "Schedule", "usage": "Parenting time, calendar events." },
+      { "name": "custody", "label": "Custody / Home", "usage": "Physical custody, a child's home." },
+      { "name": "wallet", "label": "Child Wallet", "usage": "Allowances, child wallet." }
+    ],
+    "portals": [
+      { "name": "professional", "label": "Professional Portal", "usage": "Attorneys, mediators, firms." },
+      { "name": "court", "label": "Court Portal", "usage": "GAL dashboard, legal authority, evidence." },
+      { "name": "compliance", "label": "Compliance", "usage": "Verified, court-credible, passing metrics." },
+      { "name": "export", "label": "Court Export", "usage": "Evidence packages, PDF export." }
+    ],
+    "ui": [
+      { "name": "messages", "label": "Messages", "usage": "Mediated messaging." },
+      { "name": "video-call", "label": "Video Call", "usage": "Daily.co calls." },
+      { "name": "checkin", "label": "GPS Check-in", "usage": "Location-verified exchange." },
+      { "name": "notifications", "label": "Notifications", "usage": "Alerts, reminders." },
+      { "name": "settings", "label": "Settings", "usage": "Preferences, configuration." },
+      { "name": "security", "label": "Security", "usage": "Encryption, account protection." },
+      { "name": "privacy", "label": "Privacy", "usage": "Protected, watchful, private-by-default." }
+    ]
+  }
+}

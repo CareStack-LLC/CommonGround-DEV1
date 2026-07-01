@@ -80,7 +80,7 @@ export function createSection(
                 <Label htmlFor={field.name} className="flex items-center gap-2">
                   {field.label} {field.required && <span className="text-destructive">*</span>}
                   {field.required && isFieldFilled && (
-                    <span className="text-green-600 text-xs">✓</span>
+                    <span className="text-[#2D8A70] text-xs">✓</span>
                   )}
                   {field.required && !isFieldFilled && (
                     <span className="text-muted-foreground text-xs">(required)</span>

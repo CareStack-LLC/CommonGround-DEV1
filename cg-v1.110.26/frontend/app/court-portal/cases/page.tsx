@@ -100,7 +100,7 @@ export default function CasesListPage() {
   if (isLoading || !professional) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-10 w-10 border-2 border-indigo-600 border-t-transparent mx-auto" />
+        <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#2D6A8F] border-t-transparent mx-auto" />
       </div>
     );
   }
@@ -109,7 +109,7 @@ export default function CasesListPage() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-2 border-indigo-600 border-t-transparent mx-auto" />
+          <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#2D6A8F] border-t-transparent mx-auto" />
           <p className="mt-4 text-muted-foreground">Loading cases...</p>
         </div>
       </div>
@@ -139,7 +139,7 @@ export default function CasesListPage() {
           <p className="text-slate-600">Your active case access grants</p>
         </div>
         <Link href="/court-portal/cases/new">
-          <Button className="bg-indigo-600 hover:bg-indigo-700">
+          <Button className="bg-[#2D6A8F] hover:bg-[#1E4E6B]">
             <Plus className="h-4 w-4 mr-2" />
             New Case
           </Button>
@@ -177,7 +177,7 @@ export default function CasesListPage() {
         ) : (
           filteredCases.map((caseItem) => (
             <Link key={caseItem.id} href={`/court-portal/cases/${caseItem.id}`}>
-              <Card className="hover:bg-secondary/50 transition cursor-pointer border-indigo-100">
+              <Card className="hover:bg-secondary/50 transition cursor-pointer border-[#E0EFF8]">
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -187,8 +187,8 @@ export default function CasesListPage() {
                         </h3>
                         <span className={`px-2 py-0.5 text-xs rounded ${
                           caseItem.status === "active"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-amber-100 text-amber-800"
+                            ? "bg-[#E8F4F0] text-[#1E3A4A]"
+                            : "bg-[#FEF7ED] text-[#E09520]"
                         }`}>
                           {caseItem.status}
                         </span>
@@ -212,7 +212,7 @@ export default function CasesListPage() {
                     <div className="text-right space-y-2">
                       {caseItem.grant && (
                         <div className={`text-sm font-medium ${
-                          caseItem.grant.days_remaining <= 7 ? "text-orange-600" : "text-muted-foreground"
+                          caseItem.grant.days_remaining <= 7 ? "text-[#E09520]" : "text-muted-foreground"
                         }`}>
                           {caseItem.grant.days_remaining} days remaining
                         </div>
@@ -220,12 +220,12 @@ export default function CasesListPage() {
                       {caseItem.quick_stats && (
                         <div className="flex space-x-3 text-xs">
                           {caseItem.quick_stats.compliance_gap > 10 && (
-                            <span className="px-2 py-1 bg-orange-100 text-orange-700 rounded">
+                            <span className="px-2 py-1 bg-[#FEF7ED] text-[#E09520] rounded">
                               Compliance gap: {caseItem.quick_stats.compliance_gap}%
                             </span>
                           )}
                           {caseItem.quick_stats.flagged_messages > 20 && (
-                            <span className="px-2 py-1 bg-red-100 text-red-700 rounded">
+                            <span className="px-2 py-1 bg-[#FEE2E2] text-[#9B2C2C] rounded">
                               {caseItem.quick_stats.flagged_messages} flags
                             </span>
                           )}

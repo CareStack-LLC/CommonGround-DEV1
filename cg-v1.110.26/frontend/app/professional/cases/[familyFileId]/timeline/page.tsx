@@ -138,11 +138,11 @@ export default function CaseTimelinePage() {
 
   const getEventColor = (type: string) => {
     const colorMap: Record<string, string> = {
-      message: "bg-purple-100 text-purple-600 border-purple-200",
-      exchange: "bg-amber-100 text-amber-600 border-amber-200",
+      message: "bg-[#E0EFF8] text-[#2D6A8F] border-[#C2DEF0]",
+      exchange: "bg-[#FEF7ED] text-[#E09520] border-[#FBE3BF]",
       agreement: "bg-slate-100 text-slate-600 border-slate-200",
       court: "bg-blue-100 text-blue-600 border-blue-200",
-      aria: "bg-emerald-100 text-emerald-600 border-emerald-200",
+      aria: "bg-[#E8F4F0] text-[#2D8A70] border-[#C5E5DB]",
     };
     return colorMap[type] || "bg-gray-100 text-gray-600 border-gray-200";
   };
@@ -302,7 +302,7 @@ export default function CaseTimelinePage() {
       {/* Timeline */}
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2D8A70]" />
         </div>
       ) : events.length > 0 ? (
         <div className="space-y-6">
@@ -394,11 +394,11 @@ function TimelineEventCard({ event }: { event: TimelineEvent }) {
 
   const getEventColorClasses = (type: string) => {
     const colorMap: Record<string, string> = {
-      message: "bg-purple-50 text-purple-900 border-2 border-purple-900/20",
+      message: "bg-[#F0F7FC] text-[#163A50] border-2 border-[#163A50]/20",
       exchange: "bg-[#F4F8F7] text-[#1E3A4A] border-2 border-[#1E3A4A]/20",
       agreement: "bg-slate-50 text-slate-900 border-2 border-slate-900/20",
       court: "bg-blue-50 text-blue-900 border-2 border-blue-900/20",
-      aria: "bg-emerald-50 text-emerald-900 border-2 border-emerald-900/20",
+      aria: "bg-[#E8F4F0] text-[#1B5544] border-2 border-[#1B5544]/20",
     };
     return colorMap[type] || "bg-gray-50 text-gray-900 border-2 border-gray-900/20";
   };
@@ -464,7 +464,7 @@ function TimelineEventCard({ event }: { event: TimelineEvent }) {
                   </Badge>
                 )}
                 {event.metadata.intervention_type && (
-                  <Badge className="sans text-xs bg-emerald-50 text-emerald-900 border-2 border-emerald-900/30">
+                  <Badge className="sans text-xs bg-[#E8F4F0] text-[#1B5544] border-2 border-[#1B5544]/30">
                     {event.metadata.intervention_type}
                   </Badge>
                 )}

@@ -105,13 +105,13 @@ export function CustodyTimeline({ childId, className, compact = false }: Custody
                     <div className="bg-muted p-4 rounded-lg border border-border flex items-center space-x-4">
 
                         <div className="bg-card p-2 rounded-full shadow-sm">
-                            <Clock className="h-6 w-6 text-indigo-600" />
+                            <Clock className="h-6 w-6 text-[#2D6A8F]" />
                         </div>
                         <div>
                             <p className="text-sm font-medium text-muted-foreground">Current Custody Status</p>
                             <h3 className="text-xl font-bold text-foreground">
                                 {activeParentName}
-                                <span className="ml-2 text-indigo-600 font-mono">{currentDurationText}</span>
+                                <span className="ml-2 text-[#2D6A8F] font-mono">{currentDurationText}</span>
                             </h3>
                             <p className="text-xs text-muted-foreground mt-1">
                                 Started {format(parseISO(currentSession.start_time), 'MMM d')}
@@ -127,7 +127,7 @@ export function CustodyTimeline({ childId, className, compact = false }: Custody
                             <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Parent A</span>
                             <div className="flex items-baseline space-x-2">
                                 <span className="text-2xl font-bold text-foreground">{stats.parent_a.percentage}%</span>
-                                <span className={`text-xs font-medium ${stats.parent_a.variance > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                <span className={`text-xs font-medium ${stats.parent_a.variance > 0 ? 'text-[#2D8A70]' : 'text-[#C53030]'}`}>
                                     {stats.parent_a.variance > 0 ? '+' : ''}{stats.parent_a.variance}%
                                 </span>
                             </div>
@@ -136,7 +136,7 @@ export function CustodyTimeline({ childId, className, compact = false }: Custody
                         <div className="space-y-1 text-right">
                             <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Parent B</span>
                             <div className="flex items-baseline space-x-2 justify-end">
-                                <span className={`text-xs font-medium ${stats.parent_b.variance > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                <span className={`text-xs font-medium ${stats.parent_b.variance > 0 ? 'text-[#2D8A70]' : 'text-[#C53030]'}`}>
                                     {stats.parent_b.variance > 0 ? '+' : ''}{stats.parent_b.variance}%
                                 </span>
                                 <span className="text-2xl font-bold text-foreground">{stats.parent_b.percentage}%</span>
@@ -146,11 +146,11 @@ export function CustodyTimeline({ childId, className, compact = false }: Custody
 
                     <div className="h-4 w-full bg-muted rounded-full overflow-hidden flex">
                         <div
-                            className="bg-indigo-500 h-full transition-all duration-1000 ease-out"
+                            className="bg-[#2D6A8F] h-full transition-all duration-1000 ease-out"
                             style={{ width: `${stats.parent_a.percentage}%` }}
                         />
                         <div
-                            className="bg-sky-400 h-full transition-all duration-1000 ease-out"
+                            className="bg-[#4BA8C8] h-full transition-all duration-1000 ease-out"
                             style={{ width: `${stats.parent_b.percentage}%` }}
                         />
                     </div>
@@ -167,7 +167,7 @@ export function CustodyTimeline({ childId, className, compact = false }: Custody
                         {[...sessions].reverse().slice(0, 5).map((session, idx) => (
                             <div key={idx} className="flex justify-between items-center text-sm p-2 hover:bg-muted rounded">
                                 <div className="flex items-center space-x-2">
-                                    <div className={`w-2 h-2 rounded-full ${session.parent_id === stats.parent_a.user_id ? 'bg-indigo-500' : 'bg-sky-400'}`} />
+                                    <div className={`w-2 h-2 rounded-full ${session.parent_id === stats.parent_a.user_id ? 'bg-[#2D6A8F]' : 'bg-[#4BA8C8]'}`} />
                                     <span className="font-medium text-foreground">
                                         {session.parent_id === stats.parent_a.user_id ? 'Parent A' : 'Parent B'}
                                     </span>

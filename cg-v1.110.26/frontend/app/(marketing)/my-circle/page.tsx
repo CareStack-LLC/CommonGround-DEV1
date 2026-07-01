@@ -3,8 +3,9 @@ import Image from 'next/image';
 import { EarlyAdopterForm } from '@/components/marketing/early-adopter-form';
 import { JsonLd } from '@/components/marketing/json-ld';
 import { FaqJsonLd } from '@/components/marketing';
+import { BrandIcon, type BrandIconName } from '@/components/brand/brand-icon';
+import type { LucideIcon } from 'lucide-react';
 import {
-  Video,
   BookOpen,
   Gamepad2,
   ArrowDown,
@@ -55,9 +56,16 @@ const painPoints = [
   },
 ];
 
-const features = [
+const features: {
+  brandIcon?: BrandIconName;
+  icon?: LucideIcon;
+  name: string;
+  tagline: string;
+  description: string;
+  accent: string;
+}[] = [
   {
-    icon: Video,
+    brandIcon: 'kidspace',
     name: 'KidSpace Video Calls',
     tagline: 'Face time that matters',
     description:
@@ -96,7 +104,7 @@ const faqs = [
     a: 'Either parent can add trusted family members to their child\'s KidSpace circle. The setup is simple — they add you, set your access level, and you\'re connected. Both parents can see who has access at any time.',
   },
   {
-    q: 'What does "30% off for life" actually mean?',
+    q: 'What does "30% off for 3 years" actually mean?',
     a: 'As one of our first 50 early adopters, your subscription rate is locked at 30% below the standard price for 36 months on any paid plan. The discount stays with your account regardless of future price changes.',
   },
 ];
@@ -122,7 +130,7 @@ export default function MyCirclePage() {
           },
           offers: {
             '@type': 'Offer',
-            name: 'Early Adopter — 30% Off for Life',
+            name: 'Early Adopter — 30% Off for 3 Years',
             description: 'First 50 members get 30% off all subscriptions, locked for 36 months.',
             eligibleQuantity: { '@type': 'QuantitativeValue', value: 50 },
           },
@@ -149,25 +157,28 @@ export default function MyCirclePage() {
                 <span className="text-cg-sage">the Front Door</span>
               </h1>
               <p className="text-lg text-gray-600 leading-relaxed mb-8 max-w-xl">
-                When families separate, it&apos;s not just the parents who lose
-                connection — it&apos;s grandparents, aunts, uncles, and the entire
-                village. KidSpace gives you a safe, fun way to stay bonded with the
-                children you love, with parents in full control.
+                Stay close to the grandkids without waiting on a parent to broker
+                every call. Through My Circle, parents approve you once — then you
+                video call, read stories, and watch movies in KidSpace whenever the
+                schedule allows. Safe, monitored, and fully in the parents&apos; control.
               </p>
               <a
                 href="#early-adopter"
                 className="inline-flex items-center gap-2 bg-cg-sage text-white font-semibold px-8 py-4 rounded-xl transition-all duration-200 hover:bg-cg-sage-dark hover:shadow-lg hover:shadow-cg-sage/20 text-base"
               >
-                Join the Early Adopter List
+                Reserve your spot &mdash; no card needed
                 <ArrowDown className="w-4 h-4" />
               </a>
+              <p className="mt-4 text-sm text-gray-600">
+                First 50 members lock in 30% off for 3 years &middot; No credit card &middot; Just your email
+              </p>
             </div>
 
             <div className="relative">
               <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-cg-amber/10">
                 <Image
-                  src="/images/website/mycircle1.png"
-                  alt="Grandmother bonding with grandchild through KidSpace video call"
+                  src="/images/website/mycircle1.jpg"
+                  alt="Three generations of a family together — grandparents, parents, and children"
                   width={800}
                   height={533}
                   className="w-full h-auto object-cover"
@@ -269,7 +280,11 @@ export default function MyCirclePage() {
                     className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
                     style={{ backgroundColor: `${feature.accent}15` }}
                   >
-                    <Icon className="w-6 h-6" style={{ color: feature.accent }} />
+                    {feature.brandIcon ? (
+                      <BrandIcon name={feature.brandIcon} size={24} />
+                    ) : Icon ? (
+                      <Icon className="w-6 h-6" style={{ color: feature.accent }} />
+                    ) : null}
                   </div>
                   <span
                     className="inline-block text-xs font-bold uppercase tracking-widest mb-2"
@@ -337,7 +352,7 @@ export default function MyCirclePage() {
               Stay Part of Their Story
             </h2>
             <p className="text-gray-600 text-lg">
-              Join the first 50 members and lock in 30% off for life.
+              Join the first 50 members and lock in 30% off for 3 years.
               No credit card required. Just your email.
             </p>
           </div>

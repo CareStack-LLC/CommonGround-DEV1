@@ -159,7 +159,7 @@ function EmptyState({ caseId }: { caseId: string }) {
   return (
     <div className="cg-card">
       <div className="text-center py-16 px-6">
-        <div className="w-24 h-24 mx-auto mb-6 rounded-3xl bg-gradient-to-br from-cg-sage-subtle via-cg-amber-subtle to-pink-100 flex items-center justify-center">
+        <div className="w-24 h-24 mx-auto mb-6 rounded-3xl bg-gradient-to-br from-cg-sage-subtle via-cg-amber-subtle to-[#FEF7ED] flex items-center justify-center">
           <span className="text-5xl">👶</span>
         </div>
         <h3 className="font-serif text-xl font-semibold text-foreground mb-2">No Children Added Yet</h3>

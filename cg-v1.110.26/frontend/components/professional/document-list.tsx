@@ -50,12 +50,12 @@ interface ProfessionalDocument {
 }
 
 const DOC_TYPE_CONFIG: Record<string, { label: string; icon: any; color: string }> = {
-    agreement: { label: "Agreement", icon: FileText, color: "text-blue-600 bg-blue-50 border-blue-200" },
-    quick_accord: { label: "Quick Accord", icon: Scale, color: "text-amber-600 bg-amber-50 border-amber-200" },
+    agreement: { label: "Agreement", icon: FileText, color: "text-[#2D6A8F] bg-[#E0EFF8] border-[#E0EFF8]" },
+    quick_accord: { label: "Quick Accord", icon: Scale, color: "text-[#E09520] bg-[#FEF7ED] border-[#FBE3BF]" },
     report: { label: "Report", icon: Scale, color: "text-teal-600 bg-teal-50 border-teal-200" },
-    recording: { label: "Recording", icon: Video, color: "text-purple-600 bg-purple-50 border-purple-200" },
-    attachment: { label: "Evidence", icon: FileWarning, color: "text-red-600 bg-red-50 border-red-200" },
-    court_order: { label: "Court Order", icon: Scale, color: "text-indigo-600 bg-indigo-50 border-indigo-200" },
+    recording: { label: "Recording", icon: Video, color: "text-[#2D6A8F] bg-[#F0F7FC] border-[#C2DEF0]" },
+    attachment: { label: "Evidence", icon: FileWarning, color: "text-[#C53030] bg-[#FEE2E2] border-[#FEE2E2]" },
+    court_order: { label: "Court Order", icon: Scale, color: "text-[#2D6A8F] bg-[#F0F7FC] border-[#C2DEF0]" },
 };
 
 export function DocumentList({
@@ -231,7 +231,7 @@ export function DocumentList({
                     <Button
                         onClick={() => document.getElementById('court-order-upload')?.click()}
                         disabled={isUploading}
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white whitespace-nowrap"
+                        className="bg-[#2D6A8F] hover:bg-[#1E4E6B] text-white whitespace-nowrap"
                     >
                         {isUploading ? (
                             <Loader2 className="h-4 w-4 mr-2 animate-spin" />

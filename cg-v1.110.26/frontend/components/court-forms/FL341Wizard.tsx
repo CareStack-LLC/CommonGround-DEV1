@@ -348,8 +348,8 @@ export default function FL341Wizard({
       case 'jurisdiction':
         return (
           <div className="space-y-6">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-blue-800 text-sm">
+            <div className="bg-[#E0EFF8] border border-[#E0EFF8] rounded-lg p-4">
+              <p className="text-[#1E4E6B] text-sm">
                 <strong>Items 1-4:</strong> These are standard jurisdictional findings. They are typically checked by default.
               </p>
             </div>
@@ -441,8 +441,8 @@ export default function FL341Wizard({
       case 'abduction':
         return (
           <div className="space-y-6">
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-              <p className="text-amber-800 text-sm">
+            <div className="bg-[#FEF7ED] border border-[#FEF7ED] rounded-lg p-4">
+              <p className="text-[#E09520] text-sm">
                 <strong>Items 5-6:</strong> Child abduction prevention and mediation referral.
               </p>
             </div>
@@ -508,8 +508,8 @@ export default function FL341Wizard({
       case 'custody':
         return (
           <div className="space-y-6">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-blue-800 text-sm">
+            <div className="bg-[#E0EFF8] border border-[#E0EFF8] rounded-lg p-4">
+              <p className="text-[#1E4E6B] text-sm">
                 <strong>Item 7:</strong> Custody of the minor children is awarded as follows.
               </p>
             </div>
@@ -532,7 +532,7 @@ export default function FL341Wizard({
                         variant="ghost"
                         size="sm"
                         onClick={() => removeChild(index)}
-                        className="text-red-600 hover:text-red-700"
+                        className="text-[#C53030] hover:text-[#9B2C2C]"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -625,8 +625,8 @@ export default function FL341Wizard({
       case 'abuse':
         return (
           <div className="space-y-6">
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <p className="text-red-800 text-sm">
+            <div className="bg-[#FEE2E2] border border-[#FEE2E2] rounded-lg p-4">
+              <p className="text-[#9B2C2C] text-sm">
                 <strong>Item 8:</strong> Custody involving allegations of abuse or substance abuse.
               </p>
             </div>
@@ -760,8 +760,8 @@ export default function FL341Wizard({
       case 'visitation':
         return (
           <div className="space-y-6">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-blue-800 text-sm">
+            <div className="bg-[#E0EFF8] border border-[#E0EFF8] rounded-lg p-4">
+              <p className="text-[#1E4E6B] text-sm">
                 <strong>Item 9:</strong> Visitation (parenting time) schedule.
               </p>
             </div>
@@ -978,8 +978,8 @@ export default function FL341Wizard({
       case 'supervised':
         return (
           <div className="space-y-6">
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-              <p className="text-amber-800 text-sm">
+            <div className="bg-[#FEF7ED] border border-[#FEF7ED] rounded-lg p-4">
+              <p className="text-[#E09520] text-sm">
                 <strong>Item 10:</strong> Supervised visitation orders.
               </p>
             </div>
@@ -1051,8 +1051,8 @@ export default function FL341Wizard({
       case 'transportation':
         return (
           <div className="space-y-6">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-blue-800 text-sm">
+            <div className="bg-[#E0EFF8] border border-[#E0EFF8] rounded-lg p-4">
+              <p className="text-[#1E4E6B] text-sm">
                 <strong>Item 11:</strong> Transportation and place of exchange.
               </p>
             </div>
@@ -1153,8 +1153,8 @@ export default function FL341Wizard({
       case 'travel':
         return (
           <div className="space-y-6">
-            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-              <p className="text-amber-800 text-sm">
+            <div className="bg-[#FEF7ED] border border-[#FEF7ED] rounded-lg p-4">
+              <p className="text-[#E09520] text-sm">
                 <strong>Item 12:</strong> Travel with children restrictions.
               </p>
             </div>
@@ -1243,8 +1243,8 @@ export default function FL341Wizard({
       case 'holiday':
         return (
           <div className="space-y-6">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-blue-800 text-sm">
+            <div className="bg-[#E0EFF8] border border-[#E0EFF8] rounded-lg p-4">
+              <p className="text-[#1E4E6B] text-sm">
                 <strong>Items 13-14:</strong> Holiday schedule and additional provisions.
               </p>
             </div>
@@ -1349,8 +1349,8 @@ export default function FL341Wizard({
       case 'other':
         return (
           <div className="space-y-6">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-blue-800 text-sm">
+            <div className="bg-[#E0EFF8] border border-[#E0EFF8] rounded-lg p-4">
+              <p className="text-[#1E4E6B] text-sm">
                 <strong>Items 15-16:</strong> Access to records and other orders.
               </p>
             </div>
@@ -1401,14 +1401,14 @@ export default function FL341Wizard({
   return (
     <div className="space-y-6">
       {/* Progress Header */}
-      <Card className="border-green-200 bg-gradient-to-br from-green-50 to-white">
+      <Card className="border-[#E8F4F0] bg-gradient-to-br from-[#E8F4F0] to-white">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-green-600" />
+              <Users className="h-5 w-5 text-[#2D8A70]" />
               <CardTitle className="text-lg">FL-341: Child Custody and Visitation Order</CardTitle>
             </div>
-            <Badge variant="outline" className="text-green-600 border-green-300">
+            <Badge variant="outline" className="text-[#2D8A70] border-[#5BC4A0]">
               Attachment
             </Badge>
           </div>
@@ -1424,7 +1424,7 @@ export default function FL341Wizard({
             </div>
             <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
               <div
-                className="h-full bg-green-600 rounded-full transition-all duration-300"
+                className="h-full bg-[#2D8A70] rounded-full transition-all duration-300"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -1439,9 +1439,9 @@ export default function FL341Wizard({
                   onClick={() => setCurrentSection(idx)}
                   className={`flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors ${
                     idx === currentSection
-                      ? 'bg-green-100 text-green-700 font-medium'
+                      ? 'bg-[#E8F4F0] text-[#2D8A70] font-medium'
                       : idx < currentSection
-                      ? 'bg-green-50 text-green-700'
+                      ? 'bg-[#E8F4F0] text-[#2D8A70]'
                       : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
                   }`}
                 >
@@ -1459,7 +1459,7 @@ export default function FL341Wizard({
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
-            <SectionIcon className="h-5 w-5 text-green-600" />
+            <SectionIcon className="h-5 w-5 text-[#2D8A70]" />
             <CardTitle>{section.title}</CardTitle>
           </div>
           <CardDescription>Form items: {section.items.join(', ')}</CardDescription>
@@ -1488,7 +1488,7 @@ export default function FL341Wizard({
               <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           ) : (
-            <Button onClick={handleSubmit} disabled={isLoading} className="bg-green-600 hover:bg-green-700">
+            <Button onClick={handleSubmit} disabled={isLoading} className="bg-[#2D8A70] hover:bg-[#2D8A70]">
               {isLoading ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />

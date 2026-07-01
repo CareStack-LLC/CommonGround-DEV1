@@ -78,8 +78,8 @@ export default function CourtLoginPage() {
     <div className="min-h-[80vh] flex items-center justify-center px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center pb-2">
-          <div className="mx-auto w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center mb-4">
-            <Scale className="h-8 w-8 text-indigo-600" />
+          <div className="mx-auto w-16 h-16 bg-[#E0EFF8] rounded-2xl flex items-center justify-center mb-4">
+            <Scale className="h-8 w-8 text-[#2D6A8F]" />
           </div>
           <CardTitle className="text-2xl">MediatorMode</CardTitle>
           <CardDescription>
@@ -119,7 +119,7 @@ export default function CourtLoginPage() {
                   Use your verified court or law firm email
                 </p>
               </div>
-              <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-700" disabled={isLoading}>
+              <Button type="submit" className="w-full bg-[#2D6A8F] hover:bg-[#1E4E6B]" disabled={isLoading}>
                 {isLoading ? "Verifying..." : "Continue"}
               </Button>
             </form>
@@ -151,7 +151,7 @@ export default function CourtLoginPage() {
                 >
                   Back
                 </Button>
-                <Button type="submit" className="flex-1 bg-indigo-600 hover:bg-indigo-700" disabled={isLoading}>
+                <Button type="submit" className="flex-1 bg-[#2D6A8F] hover:bg-[#1E4E6B]" disabled={isLoading}>
                   {isLoading ? "Verifying..." : "Verify"}
                 </Button>
               </div>
@@ -188,7 +188,7 @@ export default function CourtLoginPage() {
                 >
                   Back
                 </Button>
-                <Button type="submit" className="flex-1 bg-indigo-600 hover:bg-indigo-700" disabled={isLoading}>
+                <Button type="submit" className="flex-1 bg-[#2D6A8F] hover:bg-[#1E4E6B]" disabled={isLoading}>
                   {isLoading ? "Verifying..." : "Sign In"}
                 </Button>
               </div>
@@ -199,7 +199,7 @@ export default function CourtLoginPage() {
           <div className="mt-6 pt-6 border-t border-border text-center">
             <p className="text-sm text-muted-foreground">
               Don't have an account?{" "}
-              <Link href="/court-portal/register" className="text-indigo-600 hover:underline font-medium">
+              <Link href="/court-portal/register" className="text-[#2D6A8F] hover:underline font-medium">
                 Register as a Professional
               </Link>
             </p>
@@ -208,15 +208,15 @@ export default function CourtLoginPage() {
           <div className="mt-4 pt-4 border-t border-border">
             <div className="text-xs text-muted-foreground space-y-2">
               <p className="flex items-center gap-2">
-                <Lock className="h-3.5 w-3.5 text-indigo-500" />
+                <Lock className="h-3.5 w-3.5 text-[#2D6A8F]" />
                 All access is logged and audited
               </p>
               <p className="flex items-center gap-2">
-                <Clock className="h-3.5 w-3.5 text-indigo-500" />
+                <Clock className="h-3.5 w-3.5 text-[#2D6A8F]" />
                 Access is time-limited based on your role
               </p>
               <p className="flex items-center gap-2">
-                <FileText className="h-3.5 w-3.5 text-indigo-500" />
+                <FileText className="h-3.5 w-3.5 text-[#2D6A8F]" />
                 Read-only access to case materials
               </p>
             </div>
@@ -247,7 +247,7 @@ function StepIndicator({
           complete
             ? "bg-cg-success text-white"
             : current
-            ? "bg-indigo-600 text-white"
+            ? "bg-[#2D6A8F] text-white"
             : "bg-secondary text-muted-foreground"
         }`}
       >

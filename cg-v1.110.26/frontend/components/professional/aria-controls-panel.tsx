@@ -174,10 +174,10 @@ export function ARIAControlsPanel({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto border-2 border-amber-900/20">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto border-2 border-[#6B460F]/20">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-bold text-slate-900">
-            <Bot className="h-6 w-6 text-amber-900" />
+            <Bot className="h-6 w-6 text-[#6B460F]" />
             ARIA Controls - {caseName}
           </DialogTitle>
           <DialogDescription>
@@ -209,7 +209,7 @@ export function ARIAControlsPanel({
                     How aggressively ARIA filters and rewrites messages
                   </p>
                 </div>
-                <Badge className="bg-amber-50 text-amber-900 border-amber-900/30">
+                <Badge className="bg-[#FEF7ED] text-[#6B460F] border-[#6B460F]/30">
                   {getStrictnessLabel(settings.rewrite_strictness)}
                 </Badge>
               </div>
@@ -234,9 +234,9 @@ export function ARIAControlsPanel({
                 </div>
               </div>
 
-              <Card className="border-2 border-blue-900/20 bg-blue-50/30">
+              <Card className="border-2 border-[#1E3A4A]/20 bg-[#E0EFF8]/30">
                 <CardContent className="py-3">
-                  <p className="text-xs text-blue-900">
+                  <p className="text-xs text-[#1E3A4A]">
                     {getStrictnessDescription(settings.rewrite_strictness)}
                   </p>
                 </CardContent>
@@ -280,7 +280,7 @@ export function ARIAControlsPanel({
               <Card className="border-2 border-slate-200">
                 <CardContent className="py-4 flex items-start justify-between gap-4">
                   <div className="flex items-start gap-3">
-                    <AlertTriangle className="h-5 w-5 text-amber-900 mt-0.5" />
+                    <AlertTriangle className="h-5 w-5 text-[#6B460F] mt-0.5" />
                     <div>
                       <p className="text-sm font-semibold text-slate-900">
                         Auto-Flag Hostile Messages
@@ -302,7 +302,7 @@ export function ARIAControlsPanel({
               <Card className="border-2 border-slate-200">
                 <CardContent className="py-4 flex items-start justify-between gap-4">
                   <div className="flex items-start gap-3">
-                    <MessageSquare className="h-5 w-5 text-blue-900 mt-0.5" />
+                    <MessageSquare className="h-5 w-5 text-[#1E3A4A] mt-0.5" />
                     <div>
                       <p className="text-sm font-semibold text-slate-900">
                         Structured-Only Mode
@@ -324,7 +324,7 @@ export function ARIAControlsPanel({
               <Card className="border-2 border-slate-200">
                 <CardContent className="py-4 flex items-start justify-between gap-4">
                   <div className="flex items-start gap-3">
-                    <Shield className="h-5 w-5 text-purple-900 mt-0.5" />
+                    <Shield className="h-5 w-5 text-[#163A50] mt-0.5" />
                     <div>
                       <p className="text-sm font-semibold text-slate-900">
                         Silent Handoff Mode
@@ -346,7 +346,7 @@ export function ARIAControlsPanel({
               <Card className="border-2 border-slate-200">
                 <CardContent className="py-4 flex items-start justify-between gap-4">
                   <div className="flex items-start gap-3">
-                    <Bot className="h-5 w-5 text-emerald-900 mt-0.5" />
+                    <Bot className="h-5 w-5 text-[#1B5544] mt-0.5" />
                     <div>
                       <p className="text-sm font-semibold text-slate-900">
                         Mediation Suggestions
@@ -368,14 +368,14 @@ export function ARIAControlsPanel({
 
             {/* Warning for High-Risk Settings */}
             {(settings.structured_only_mode || settings.rewrite_strictness >= 9) && (
-              <Card className="border-2 border-amber-900/30 bg-amber-50/30">
+              <Card className="border-2 border-[#6B460F]/30 bg-[#FEF7ED]/30">
                 <CardContent className="py-3 flex items-start gap-2">
-                  <AlertTriangle className="h-5 w-5 text-amber-900 shrink-0 mt-0.5" />
+                  <AlertTriangle className="h-5 w-5 text-[#6B460F] shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-sm font-semibold text-amber-900 mb-1">
+                    <p className="text-sm font-semibold text-[#6B460F] mb-1">
                       High-Conflict Protection Enabled
                     </p>
-                    <p className="text-xs text-amber-900">
+                    <p className="text-xs text-[#6B460F]">
                       These settings significantly limit parent communication. Use only for
                       high-conflict cases with documented escalation patterns.
                     </p>
@@ -407,7 +407,7 @@ export function ARIAControlsPanel({
                         {interventionStats.trend || "Stable"}
                       </p>
                       {interventionStats.trend === "Increasing" && (
-                        <TrendingUp className="h-5 w-5 text-red-600" />
+                        <TrendingUp className="h-5 w-5 text-[#C53030]" />
                       )}
                     </div>
                   </CardContent>
@@ -442,7 +442,7 @@ export function ARIAControlsPanel({
                           </div>
                           <div>
                             <p className="text-slate-600 mb-1">After:</p>
-                            <p className="text-emerald-900 line-clamp-2">
+                            <p className="text-[#1B5544] line-clamp-2">
                               "{intervention.rewritten_text?.substring(0, 100)}..."
                             </p>
                           </div>
@@ -479,7 +479,7 @@ export function ARIAControlsPanel({
           <Button
             onClick={handleSave}
             disabled={!hasChanges || saving}
-            className="bg-amber-900 hover:bg-amber-950 text-white"
+            className="bg-[#6B460F] hover:bg-[#3D2808] text-white"
           >
             {saving ? (
               <>Saving...</>

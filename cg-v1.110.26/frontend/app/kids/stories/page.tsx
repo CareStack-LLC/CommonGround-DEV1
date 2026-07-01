@@ -85,11 +85,11 @@ function StoryCard({
   delay?: number;
 }) {
   const themeColors: Record<string, { bg: string; shadow: string }> = {
-    adventure: { bg: 'from-amber-400 to-orange-500', shadow: '#c2410c' },
-    space: { bg: 'from-indigo-400 to-purple-500', shadow: '#6d28d9' },
-    nature: { bg: 'from-emerald-400 to-green-500', shadow: '#15803d' },
-    ocean: { bg: 'from-cyan-400 to-blue-500', shadow: '#1d4ed8' },
-    fantasy: { bg: 'from-pink-400 to-rose-500', shadow: '#be123c' },
+    adventure: { bg: 'from-[#F5A623] to-[#F5A623]', shadow: '#E09520' },
+    space: { bg: 'from-[#4BA8C8] to-[#2D6A8F]', shadow: '#1E4E6B' },
+    nature: { bg: 'from-[#5BC4A0] to-[#3DAA8A]', shadow: '#2D8A70' },
+    ocean: { bg: 'from-[#4BA8C8] to-[#2D6A8F]', shadow: '#1E4E6B' },
+    fantasy: { bg: 'from-[#F5A623] to-[#F5A623]', shadow: '#9B2C2C' },
   };
 
   const colors = themeColors[story.theme] || themeColors.adventure;
@@ -190,7 +190,7 @@ function StoryReader({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 bg-gradient-to-b from-purple-900 via-indigo-900 to-blue-900 z-50 flex flex-col"
+        className="fixed inset-0 bg-gradient-to-b from-[#1E3A4A] via-[#1E3A4A] to-[#1E3A4A] z-50 flex flex-col"
       >
         <header className="relative z-10 p-4 flex items-center justify-between">
           <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={onClose}
@@ -214,7 +214,7 @@ function StoryReader({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-gradient-to-b from-purple-900 via-indigo-900 to-blue-900 z-50 flex flex-col"
+      className="fixed inset-0 bg-gradient-to-b from-[#1E3A4A] via-[#1E3A4A] to-[#1E3A4A] z-50 flex flex-col"
     >
       {/* Stars background */}
       <div className="absolute inset-0 overflow-hidden">
@@ -284,7 +284,7 @@ function StoryReader({
                 <div
                   key={i}
                   className={`w-2 h-2 rounded-full transition-colors ${
-                    i === currentPage ? 'bg-purple-500' : 'bg-gray-200'
+                    i === currentPage ? 'bg-[#2D6A8F]' : 'bg-gray-200'
                   }`}
                 />
               ))}
@@ -304,7 +304,7 @@ function StoryReader({
             currentPage === 0 ? 'opacity-30' : ''
           }`}
         >
-          <ChevronLeft className="w-8 h-8 text-purple-600" />
+          <ChevronLeft className="w-8 h-8 text-[#2D6A8F]" />
         </motion.button>
 
         <div className="text-white font-bold">
@@ -320,7 +320,7 @@ function StoryReader({
             currentPage === pages.length - 1 ? 'opacity-30' : ''
           }`}
         >
-          <ChevronRight className="w-8 h-8 text-purple-600" />
+          <ChevronRight className="w-8 h-8 text-[#2D6A8F]" />
         </motion.button>
       </nav>
     </motion.div>
@@ -330,7 +330,7 @@ function StoryReader({
 // Loading fallback
 function StoriesLoading() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-500 via-pink-500 to-rose-500 flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-br from-[#2D6A8F] via-[#F5A623] to-[#F5A623] flex items-center justify-center">
       <motion.div
         animate={{ rotate: 360 }}
         transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
@@ -397,7 +397,7 @@ function StoriesPageContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-violet-500 via-purple-500 to-fuchsia-500 relative overflow-hidden pb-24">
+    <div className="min-h-screen bg-gradient-to-b from-[#2D6A8F] via-[#2D6A8F] to-fuchsia-500 relative overflow-hidden pb-24">
       <FloatingBooks />
 
       {/* Header */}
@@ -452,7 +452,7 @@ function StoriesPageContent() {
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold text-yellow-200 uppercase tracking-wider">✨ Author Spotlight</p>
+                <p className="text-xs font-bold text-[#FEF7ED] uppercase tracking-wider">✨ Author Spotlight</p>
                 <h3 className="text-white font-bold truncate">{featuredAuthor.name}</h3>
                 {featuredAuthor.showcase_book_title && (
                   <p className="text-white/70 text-xs truncate">📖 {featuredAuthor.showcase_book_title}</p>
@@ -575,7 +575,7 @@ function StoriesPageContent() {
                       transition={{ delay: 0.1 + i * 0.1 }}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      className="w-full p-3 bg-purple-50 hover:bg-purple-100 rounded-xl text-left font-medium text-gray-700 transition-colors"
+                      className="w-full p-3 bg-[#E0EFF8] hover:bg-[#E0EFF8] rounded-xl text-left font-medium text-gray-700 transition-colors"
                     >
                       {theme}
                     </motion.button>

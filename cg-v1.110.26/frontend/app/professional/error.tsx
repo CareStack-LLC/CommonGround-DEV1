@@ -23,7 +23,7 @@ export default function ProfessionalError({
     <div className="min-h-[60vh] flex items-center justify-center px-4">
       <div className="max-w-md w-full text-center">
         <div className="mx-auto w-16 h-16 rounded-2xl bg-[#FEF7ED] flex items-center justify-center mb-6">
-          <AlertTriangle className="w-8 h-8 text-[#D4910F]" />
+          <AlertTriangle className="w-8 h-8 text-[#F5A623]" />
         </div>
 
         <h2 className="text-2xl font-semibold text-[#1E3A4A] mb-2">

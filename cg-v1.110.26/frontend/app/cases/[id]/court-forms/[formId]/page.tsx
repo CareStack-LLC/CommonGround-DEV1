@@ -178,13 +178,13 @@ function generateFormPDF(form: CourtFormSubmission, caseData: Case) {
       <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 40px; color: #1f2937; line-height: 1.5; }
-        .header { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; padding: 24px 32px; margin: -40px -40px 32px -40px; }
+        .header { background: linear-gradient(135deg, #2D6A8F 0%, #1E4E6B 100%); color: white; padding: 24px 32px; margin: -40px -40px 32px -40px; }
         .header h1 { font-size: 28px; font-weight: bold; margin-bottom: 4px; }
         .header .subtitle { opacity: 0.9; font-size: 14px; }
         .header .form-type { float: right; font-size: 18px; font-weight: 600; margin-top: -36px; }
         .section { background: #f9fafb; border-radius: 8px; padding: 20px; margin-bottom: 24px; }
         .section-title { font-size: 16px; font-weight: 600; color: #374151; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-        .section-title::before { content: ''; width: 4px; height: 20px; background: #3b82f6; border-radius: 2px; }
+        .section-title::before { content: ''; width: 4px; height: 20px; background: #2D6A8F; border-radius: 2px; }
         .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
         .info-item { font-size: 14px; }
         .info-item label { color: #6b7280; display: block; margin-bottom: 2px; }
@@ -197,15 +197,15 @@ function generateFormPDF(form: CourtFormSubmission, caseData: Case) {
         .nested { margin-left: 16px; padding-left: 12px; border-left: 2px solid #e5e7eb; margin-top: 8px; }
         .text-gray { color: #9ca3af; font-style: italic; }
         .alert { padding: 16px; border-radius: 8px; margin-bottom: 24px; }
-        .alert-indigo { background: #eef2ff; border: 1px solid #c7d2fe; }
-        .alert-red { background: #fef2f2; border: 1px solid #fecaca; }
+        .alert-indigo { background: #E0EFF8; border: 1px solid #E0EFF8; }
+        .alert-red { background: #FEE2E2; border: 1px solid #FEE2E2; }
         .alert-title { font-weight: 600; margin-bottom: 8px; }
-        .alert-indigo .alert-title { color: #3730a3; }
-        .alert-red .alert-title { color: #991b1b; }
+        .alert-indigo .alert-title { color: #1E4E6B; }
+        .alert-red .alert-title { color: #9B2C2C; }
         .status-badge { display: inline-block; padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 600; }
-        .status-success { background: #dcfce7; color: #166534; }
-        .status-warning { background: #fef3c7; color: #92400e; }
-        .status-error { background: #fee2e2; color: #991b1b; }
+        .status-success { background: #E8F4F0; color: #2D8A70; }
+        .status-warning { background: #FEF7ED; color: #E09520; }
+        .status-error { background: #fee2e2; color: #9B2C2C; }
         .status-default { background: #e5e7eb; color: #374151; }
         .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb; font-size: 12px; color: #6b7280; display: flex; justify-content: space-between; }
         @media print {
@@ -322,7 +322,7 @@ function PDFDocumentCard({ pdfUrl, formType, formId }: { pdfUrl: string; formTyp
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <FileText className="h-5 w-5 text-blue-600" />
+          <FileText className="h-5 w-5 text-[#2D6A8F]" />
           Official Court Document
         </CardTitle>
         <CardDescription>
@@ -426,10 +426,10 @@ function CourtOrderDisplay({ form }: { form: CourtFormSubmission }) {
   return (
     <div className="space-y-6">
       {/* AI Summary Card */}
-      <Card className="border-purple-200 bg-gradient-to-br from-purple-50 to-white">
+      <Card className="border-[#E0EFF8] bg-gradient-to-br from-[#E0EFF8] to-white">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-purple-900">
-            <Sparkles className="h-5 w-5 text-purple-600" />
+          <CardTitle className="flex items-center gap-2 text-[#1E3A4A]">
+            <Sparkles className="h-5 w-5 text-[#2D6A8F]" />
             Order Summary
           </CardTitle>
           <CardDescription>
@@ -543,7 +543,7 @@ function CourtOrderDisplay({ form }: { form: CourtFormSubmission }) {
               <ul className="space-y-2">
                 {data.findings.map((finding: string, idx: number) => (
                   <li key={idx} className="flex items-start gap-2 text-sm text-gray-700">
-                    <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
+                    <CheckCircle className="h-4 w-4 text-[#3DAA8A] mt-0.5 flex-shrink-0" />
                     {finding}
                   </li>
                 ))}
@@ -562,7 +562,7 @@ function CourtOrderDisplay({ form }: { form: CourtFormSubmission }) {
                 {data.orders.legal_custody && (
                   <div className="flex justify-between items-center py-2 border-b border-gray-100">
                     <dt className="text-gray-600">Legal Custody</dt>
-                    <dd className="font-medium text-gray-900 bg-blue-50 px-3 py-1 rounded">
+                    <dd className="font-medium text-gray-900 bg-[#E0EFF8] px-3 py-1 rounded">
                       {data.orders.legal_custody.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
                     </dd>
                   </div>
@@ -570,7 +570,7 @@ function CourtOrderDisplay({ form }: { form: CourtFormSubmission }) {
                 {data.orders.physical_custody && (
                   <div className="flex justify-between items-center py-2 border-b border-gray-100">
                     <dt className="text-gray-600">Physical Custody</dt>
-                    <dd className="font-medium text-gray-900 bg-blue-50 px-3 py-1 rounded">
+                    <dd className="font-medium text-gray-900 bg-[#E0EFF8] px-3 py-1 rounded">
                       {data.orders.physical_custody.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
                     </dd>
                   </div>
@@ -605,7 +605,7 @@ function CourtOrderDisplay({ form }: { form: CourtFormSubmission }) {
               <ul className="space-y-2">
                 {data.orders.other_orders.map((order: string, idx: number) => (
                   <li key={idx} className="flex items-start gap-2 text-sm text-gray-700">
-                    <div className="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-xs flex-shrink-0">
+                    <div className="w-5 h-5 rounded-full bg-[#E0EFF8] text-[#1E4E6B] flex items-center justify-center text-xs flex-shrink-0">
                       {idx + 1}
                     </div>
                     {order}
@@ -617,8 +617,8 @@ function CourtOrderDisplay({ form }: { form: CourtFormSubmission }) {
 
           {/* Effective Date */}
           {data.effective_date && (
-            <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-              <div className="flex items-center gap-2 text-green-800">
+            <div className="bg-[#E8F4F0] p-4 rounded-lg border border-[#E8F4F0]">
+              <div className="flex items-center gap-2 text-[#1E3A4A]">
                 <Calendar className="h-5 w-5" />
                 <span className="font-medium">
                   Effective Date: {new Date(data.effective_date).toLocaleDateString('en-US', {
@@ -757,7 +757,7 @@ function FL311ReadOnlyView({ formData }: { formData: Record<string, any> }) {
           <Card key={section.title}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-lg">
-                <Icon className="h-5 w-5 text-blue-600" />
+                <Icon className="h-5 w-5 text-[#2D6A8F]" />
                 {section.title}
               </CardTitle>
             </CardHeader>
@@ -879,7 +879,7 @@ function CourtFormDetailContent() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2D6A8F]" />
       </div>
     );
   }
@@ -887,9 +887,9 @@ function CourtFormDetailContent() {
   if (error && (!form || !caseData)) {
     return (
       <div className="min-h-screen bg-gray-50 p-8">
-        <Card className="max-w-lg mx-auto bg-red-50 border-red-200">
+        <Card className="max-w-lg mx-auto bg-[#FEE2E2] border-[#FEE2E2]">
           <CardContent className="pt-6">
-            <p className="text-red-700">{error || 'Form not found'}</p>
+            <p className="text-[#9B2C2C]">{error || 'Form not found'}</p>
             <Button
               variant="outline"
               onClick={() => router.push(`/cases/${caseId}/court-forms`)}
@@ -944,11 +944,11 @@ function CourtFormDetailContent() {
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
-            <Link href="/cases" className="hover:text-blue-600">Cases</Link>
+            <Link href="/cases" className="hover:text-[#2D6A8F]">Cases</Link>
             <span>/</span>
-            <Link href={`/cases/${caseId}`} className="hover:text-blue-600">{caseData.case_name}</Link>
+            <Link href={`/cases/${caseId}`} className="hover:text-[#2D6A8F]">{caseData.case_name}</Link>
             <span>/</span>
-            <Link href={`/cases/${caseId}/court-forms`} className="hover:text-blue-600">Court Forms</Link>
+            <Link href={`/cases/${caseId}/court-forms`} className="hover:text-[#2D6A8F]">Court Forms</Link>
             <span>/</span>
             <span className="text-gray-900">{form.form_type}</span>
           </div>
@@ -996,7 +996,7 @@ function CourtFormDetailContent() {
                 <Button
                   variant="default"
                   onClick={() => generateFormPDF(form, caseData)}
-                  className="bg-amber-600 hover:bg-amber-700"
+                  className="bg-[#E09520] hover:bg-[#E09520]"
                 >
                   <FileText className="h-4 w-4 mr-2" />
                   Generate FL-340 Report
@@ -1006,7 +1006,7 @@ function CourtFormDetailContent() {
                 <Button
                   variant="default"
                   onClick={() => generateFormPDF(form, caseData)}
-                  className="bg-green-600 hover:bg-green-700"
+                  className="bg-[#2D8A70] hover:bg-[#2D8A70]"
                 >
                   <FileText className="h-4 w-4 mr-2" />
                   Generate FL-341 Report
@@ -1089,9 +1089,9 @@ function CourtFormDetailContent() {
         )}
 
         {saveSuccess && (
-          <Alert className="bg-green-50 border-green-200">
-            <CheckCircle className="h-4 w-4 text-green-600" />
-            <AlertDescription className="text-green-700">
+          <Alert className="bg-[#E8F4F0] border-[#E8F4F0]">
+            <CheckCircle className="h-4 w-4 text-[#2D8A70]" />
+            <AlertDescription className="text-[#2D8A70]">
               Form saved successfully!
             </AlertDescription>
           </Alert>
@@ -1099,15 +1099,15 @@ function CourtFormDetailContent() {
 
         {/* Status Info */}
         {!canEdit && (
-          <Card className="bg-amber-50 border-amber-200">
+          <Card className="bg-[#FEF7ED] border-[#FEF7ED]">
             <CardContent className="pt-6">
               <div className="flex items-start gap-3">
-                <StatusIcon className="h-5 w-5 text-amber-600 mt-0.5" />
+                <StatusIcon className="h-5 w-5 text-[#E09520] mt-0.5" />
                 <div>
-                  <h3 className="font-medium text-amber-900 mb-1">
+                  <h3 className="font-medium text-[#1E3A4A] mb-1">
                     This form cannot be edited
                   </h3>
-                  <p className="text-sm text-amber-700">
+                  <p className="text-sm text-[#E09520]">
                     {form.status === 'submitted' && 'This form has been submitted and is awaiting court review.'}
                     {form.status === 'under_court_review' && 'This form is currently under review by court staff.'}
                     {form.status === 'approved' && 'This form has been approved by the court.'}
@@ -1124,30 +1124,30 @@ function CourtFormDetailContent() {
 
         {/* Court Notes (if any) */}
         {form.court_notes && (
-          <Card className="bg-indigo-50 border-indigo-200">
+          <Card className="bg-[#E0EFF8] border-[#E0EFF8]">
             <CardHeader>
-              <CardTitle className="text-indigo-900 flex items-center gap-2">
+              <CardTitle className="text-[#1E3A4A] flex items-center gap-2">
                 <Scale className="h-5 w-5" />
                 Court Notes
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-indigo-800">{form.court_notes}</p>
+              <p className="text-[#1E4E6B]">{form.court_notes}</p>
             </CardContent>
           </Card>
         )}
 
         {/* Resubmission Issues (if any) */}
         {form.status === 'resubmit_required' && form.resubmission_issues && form.resubmission_issues.length > 0 && (
-          <Card className="bg-red-50 border-red-200">
+          <Card className="bg-[#FEE2E2] border-[#FEE2E2]">
             <CardHeader>
-              <CardTitle className="text-red-900 flex items-center gap-2">
+              <CardTitle className="text-[#7A2222] flex items-center gap-2">
                 <AlertCircle className="h-5 w-5" />
                 Issues to Address
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <ul className="list-disc list-inside space-y-1 text-red-800">
+              <ul className="list-disc list-inside space-y-1 text-[#9B2C2C]">
                 {form.resubmission_issues.map((issue: string, idx: number) => (
                   <li key={idx}>{issue}</li>
                 ))}
@@ -1158,25 +1158,25 @@ function CourtFormDetailContent() {
 
         {/* Edits Allowed by Court - Parent can make corrections */}
         {editsAllowedByCourt && (
-          <Card className="bg-amber-50 border-amber-200">
+          <Card className="bg-[#FEF7ED] border-[#FEF7ED]">
             <CardHeader>
-              <CardTitle className="text-amber-900 flex items-center gap-2">
+              <CardTitle className="text-[#1E3A4A] flex items-center gap-2">
                 <Edit className="h-5 w-5" />
                 Edits Requested by Court
               </CardTitle>
-              <p className="text-sm text-amber-700 mt-1">
+              <p className="text-sm text-[#E09520] mt-1">
                 The court has reviewed your form and requested corrections. You can now edit and resubmit.
               </p>
             </CardHeader>
             <CardContent className="space-y-3">
               {form.edits_allowed_notes && (
-                <div className="bg-white rounded-lg p-4 border border-amber-200">
-                  <h4 className="font-medium text-amber-900 mb-2">What needs to be corrected:</h4>
-                  <p className="text-amber-800">{form.edits_allowed_notes}</p>
+                <div className="bg-white rounded-lg p-4 border border-[#FEF7ED]">
+                  <h4 className="font-medium text-[#1E3A4A] mb-2">What needs to be corrected:</h4>
+                  <p className="text-[#E09520]">{form.edits_allowed_notes}</p>
                 </div>
               )}
               {form.edits_allowed_at && (
-                <p className="text-sm text-amber-600">
+                <p className="text-sm text-[#E09520]">
                   Request received on {new Date(form.edits_allowed_at).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'long',
@@ -1189,7 +1189,7 @@ function CourtFormDetailContent() {
               <div className="flex gap-3 pt-2">
                 <Button
                   onClick={() => setEditingSection(0)}
-                  className="bg-amber-600 hover:bg-amber-700"
+                  className="bg-[#E09520] hover:bg-[#E09520]"
                 >
                   <Edit className="h-4 w-4 mr-2" />
                   Make Corrections
@@ -1198,11 +1198,11 @@ function CourtFormDetailContent() {
                   variant="outline"
                   onClick={handleResubmit}
                   disabled={isSubmitting}
-                  className="border-amber-300 text-amber-700 hover:bg-amber-100"
+                  className="border-[#F5A623] text-[#E09520] hover:bg-[#FEF7ED]"
                 >
                   {isSubmitting ? (
                     <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-amber-600 border-t-transparent mr-2" />
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-[#E09520] border-t-transparent mr-2" />
                       Resubmitting...
                     </>
                   ) : (
@@ -1295,7 +1295,7 @@ function CourtFormDetailContent() {
                     Preview Official FL-311 PDF
                   </Button>
                   <Button
-                    className="w-full bg-green-600 hover:bg-green-700"
+                    className="w-full bg-[#2D8A70] hover:bg-[#2D8A70]"
                     onClick={handleSubmit}
                     disabled={isSubmitting}
                   >
@@ -1399,7 +1399,7 @@ function CourtFormDetailContent() {
                     Preview FL-300 Report
                   </Button>
                   <Button
-                    className="w-full bg-green-600 hover:bg-green-700"
+                    className="w-full bg-[#2D8A70] hover:bg-[#2D8A70]"
                     onClick={handleSubmit}
                     disabled={isSubmitting}
                   >
@@ -1500,7 +1500,7 @@ function CourtFormDetailContent() {
                     Preview FL-320 Report
                   </Button>
                   <Button
-                    className="w-full bg-green-600 hover:bg-green-700"
+                    className="w-full bg-[#2D8A70] hover:bg-[#2D8A70]"
                     onClick={handleSubmit}
                     disabled={isSubmitting}
                   >
@@ -1573,7 +1573,7 @@ function CourtFormDetailContent() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <Button
-                    className="w-full bg-amber-600 hover:bg-amber-700"
+                    className="w-full bg-[#E09520] hover:bg-[#E09520]"
                     onClick={() => setEditingSection(0)}
                   >
                     <Edit className="h-4 w-4 mr-2" />
@@ -1588,7 +1588,7 @@ function CourtFormDetailContent() {
                     Preview FL-340 Report
                   </Button>
                   <Button
-                    className="w-full bg-green-600 hover:bg-green-700"
+                    className="w-full bg-[#2D8A70] hover:bg-[#2D8A70]"
                     onClick={handleSubmit}
                     disabled={isSubmitting}
                   >
@@ -1665,7 +1665,7 @@ function CourtFormDetailContent() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <Button
-                    className="w-full bg-green-600 hover:bg-green-700"
+                    className="w-full bg-[#2D8A70] hover:bg-[#2D8A70]"
                     onClick={() => setEditingSection(0)}
                   >
                     <Edit className="h-4 w-4 mr-2" />
@@ -1680,7 +1680,7 @@ function CourtFormDetailContent() {
                     Preview FL-341 Report
                   </Button>
                   <Button
-                    className="w-full bg-blue-600 hover:bg-blue-700"
+                    className="w-full bg-[#2D6A8F] hover:bg-[#1E4E6B]"
                     onClick={handleSubmit}
                     disabled={isSubmitting}
                   >
@@ -1772,7 +1772,7 @@ function CourtFormDetailContent() {
                     Preview FL-342 Report
                   </Button>
                   <Button
-                    className="w-full bg-green-600 hover:bg-green-700"
+                    className="w-full bg-[#2D8A70] hover:bg-[#2D8A70]"
                     onClick={handleSubmit}
                     disabled={isSubmitting}
                   >
@@ -1902,7 +1902,7 @@ function CourtFormDetailContent() {
               {form.aria_assisted && (
                 <div>
                   <dt className="text-gray-500">ARIA Assisted</dt>
-                  <dd className="text-green-600">Yes</dd>
+                  <dd className="text-[#2D8A70]">Yes</dd>
                 </div>
               )}
             </dl>

@@ -272,9 +272,9 @@ function NewFamilyFileContent() {
                   <button
                     type="button"
                     onClick={() => removeChild(index)}
-                    className="w-8 h-8 rounded-lg hover:bg-red-50 flex items-center justify-center transition-colors"
+                    className="w-8 h-8 rounded-lg hover:bg-[#FEE2E2] flex items-center justify-center transition-colors"
                   >
-                    <Trash2 className="h-4 w-4 text-red-500" />
+                    <Trash2 className="h-4 w-4 text-[#C53030]" />
                   </button>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2">

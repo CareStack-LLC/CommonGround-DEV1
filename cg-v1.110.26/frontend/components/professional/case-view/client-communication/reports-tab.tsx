@@ -145,7 +145,7 @@ export function ReportsTab({ familyFileId, token }: { familyFileId: string, toke
                     <Button
                         onClick={() => setIsGenReportOpen(true)}
                         variant="outline"
-                        className="border-indigo-200 text-indigo-700 hover:bg-indigo-50"
+                        className="border-[#C2DEF0] text-[#1E4E6B] hover:bg-[#F0F7FC]"
                     >
                         <FileText className="h-4 w-4 mr-2" />
                         Generate Report
@@ -158,10 +158,10 @@ export function ReportsTab({ familyFileId, token }: { familyFileId: string, toke
                 {reports.length > 0 ? (
                     <div className="space-y-3">
                         {reports.map((report) => (
-                            <Card key={report.id} className="overflow-hidden border-border hover:border-emerald-200 transition-colors group">
+                            <Card key={report.id} className="overflow-hidden border-border hover:border-[#C5E5DB] transition-colors group">
                                 <div className="p-4 flex items-center justify-between">
                                     <div className="flex items-center gap-4">
-                                        <div className="h-10 w-10 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-500">
+                                        <div className="h-10 w-10 rounded-lg bg-[#E8F4F0] flex items-center justify-center text-[#3DAA8A]">
                                             <FileText className="h-5 w-5" />
                                         </div>
                                         <div>
@@ -184,7 +184,7 @@ export function ReportsTab({ familyFileId, token }: { familyFileId: string, toke
                                             <Button
                                                 size="icon"
                                                 variant="ghost"
-                                                className="h-8 w-8 text-indigo-600"
+                                                className="h-8 w-8 text-[#2D6A8F]"
                                                 onClick={() => handleDownloadReport(report.id, `Report-${report.id.slice(0, 8)}.${report.export_format === 'excel' ? 'csv' : 'pdf'}`)}
                                             >
                                                 <Download className="h-4 w-4" />
@@ -205,7 +205,7 @@ export function ReportsTab({ familyFileId, token }: { familyFileId: string, toke
                         <p className="text-muted-foreground font-medium">No reports generated yet.</p>
                         <Button
                             variant="link"
-                            className="text-indigo-600"
+                            className="text-[#2D6A8F]"
                             onClick={() => setIsGenReportOpen(true)}
                         >
                             Generate case report
@@ -214,10 +214,10 @@ export function ReportsTab({ familyFileId, token }: { familyFileId: string, toke
                 )}
 
                 {/* Tips Card */}
-                <Card className="bg-indigo-50 border-none mt-6">
+                <Card className="bg-[#F0F7FC] border-none mt-6">
                     <CardContent className="p-4 flex gap-3">
-                        <AlertCircle className="h-5 w-5 text-indigo-500 shrink-0" />
-                        <div className="text-xs text-indigo-800 leading-relaxed">
+                        <AlertCircle className="h-5 w-5 text-[#3D8DB0] shrink-0" />
+                        <div className="text-xs text-[#1E4E6B] leading-relaxed">
                             <p className="font-bold mb-1">Professional Advisory</p>
                             Compliance reports aggregate ARIA flags, exchange metadata, and message sentiment. Use them for court submissions or mediation preparations.
                         </div>
@@ -274,7 +274,7 @@ export function ReportsTab({ familyFileId, token }: { familyFileId: string, toke
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setIsGenReportOpen(false)}>Cancel</Button>
-                        <Button onClick={handleGenerateReport} className="bg-indigo-600 hover:bg-indigo-700">
+                        <Button onClick={handleGenerateReport} className="bg-[#2D6A8F] hover:bg-[#1E4E6B]">
                             Generate PDF
                         </Button>
                     </DialogFooter>

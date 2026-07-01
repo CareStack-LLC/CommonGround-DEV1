@@ -3,10 +3,8 @@ import Image from 'next/image';
 import { EarlyAdopterForm } from '@/components/marketing/early-adopter-form';
 import { JsonLd } from '@/components/marketing/json-ld';
 import { FaqJsonLd } from '@/components/marketing';
+import { BrandIcon, type BrandIconName } from '@/components/brand/brand-icon';
 import {
-  MapPin,
-  MessageSquare,
-  FileText,
   ArrowDown,
   CheckCircle,
   ChevronDown,
@@ -62,9 +60,15 @@ const story = [
   { time: 'This Sunday', tone: 'after', kicker: true, text: 'For the first time in a long time, the exchange came and went, and Maria felt safe.' },
 ];
 
-const features = [
+const features: {
+  brandIcon: BrandIconName;
+  name: string;
+  tagline: string;
+  description: string;
+  accent: string;
+}[] = [
   {
-    icon: MapPin,
+    brandIcon: 'exchange',
     name: 'Silent Handoff',
     tagline: 'Exchanges without interaction',
     description:
@@ -72,7 +76,7 @@ const features = [
     accent: '#3DAA8A',
   },
   {
-    icon: MessageSquare,
+    brandIcon: 'aria',
     name: 'ARIA Shield',
     tagline: 'Communication without contact',
     description:
@@ -80,7 +84,7 @@ const features = [
     accent: '#2D6A8F',
   },
   {
-    icon: FileText,
+    brandIcon: 'export',
     name: 'Court-Ready Records',
     tagline: 'Documentation that protects',
     description:
@@ -103,7 +107,7 @@ const faqs = [
     a: 'No. Silent Handoff only records that an exchange occurred at the designated location and time. Your real-time location, home address, and movement patterns are never shared with the other parent. Only the exchange confirmation is logged.',
   },
   {
-    q: 'What does "30% off for life" actually mean?',
+    q: 'What does "30% off for 3 years" actually mean?',
     a: 'As one of our first 50 early adopters, your subscription rate is locked at 30% below the standard price for 36 months on any paid plan. The discount stays with your account regardless of future price changes.',
   },
 ];
@@ -129,7 +133,7 @@ export default function SafeSpacePage() {
           },
           offers: {
             '@type': 'Offer',
-            name: 'Early Adopter — 30% Off for Life',
+            name: 'Early Adopter — 30% Off for 3 Years',
             description: 'First 50 members get 30% off all subscriptions, locked for 36 months.',
             eligibleQuantity: { '@type': 'QuantitativeValue', value: 50 },
           },
@@ -152,20 +156,20 @@ export default function SafeSpacePage() {
                 className="text-4xl sm:text-5xl lg:text-[3.4rem] text-foreground mb-6 leading-[1.1] tracking-tight"
                 style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
               >
-                You Deserve to Feel{' '}
-                <span className="text-cg-sage">Safe</span> Raising Your Child
+                Co-parent{' '}
+                <span className="text-cg-sage">without</span> the face-to-face
               </h1>
               <p className="text-lg text-gray-600 leading-relaxed mb-8 max-w-xl">
-                Co-parenting after abuse shouldn&apos;t mean giving up your safety.
-                CommonGround keeps you protected — no phone numbers exchanged, no
-                face-to-face required, every exchange documented and court-ready.
-                You focus on your child. We handle the rest.
+                Raise your child with your safety intact. Silent Handoff hands off
+                the kids with GPS-verified, contactless exchanges — no phone number
+                shared, no face-to-face — and logs every handoff and message,
+                court-ready the day you need it.
               </p>
               <a
                 href="#early-adopter"
                 className="inline-flex items-center gap-2 bg-cg-sage text-white font-semibold px-8 py-4 rounded-xl transition-all duration-200 hover:bg-cg-sage-dark hover:shadow-lg hover:shadow-cg-sage/20 text-base"
               >
-                Join the Early Adopter List
+                Claim your spot — no card needed
                 <ArrowDown className="w-4 h-4" />
               </a>
               <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-gray-600">
@@ -332,14 +336,13 @@ export default function SafeSpacePage() {
               Protection Built Into Every Feature
             </h2>
             <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-              Every tool in CommonGround was designed with your safety as the
-              first priority — not an afterthought.
+              GPS-verified handoffs, no-contact messaging, and timestamped
+              records — safety designed in, not bolted on.
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
             {features.map((feature) => {
-              const Icon = feature.icon;
               return (
                 <div
                   key={feature.name}
@@ -349,7 +352,7 @@ export default function SafeSpacePage() {
                     className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
                     style={{ backgroundColor: `${feature.accent}15` }}
                   >
-                    <Icon className="w-6 h-6" style={{ color: feature.accent }} />
+                    <BrandIcon name={feature.brandIcon} size={24} />
                   </div>
                   <span
                     className="inline-block text-xs font-bold uppercase tracking-widest mb-2"
@@ -415,10 +418,10 @@ export default function SafeSpacePage() {
               className="text-3xl sm:text-4xl text-foreground mb-4"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
-              Your Safety Comes First
+              Start safe — in about two minutes
             </h2>
             <p className="text-gray-600 text-lg">
-              Join the first 50 members and lock in 30% off for life.
+              Join the first 50 members and lock in 30% off for 3 years.
               No credit card required. Just your email.
             </p>
           </div>

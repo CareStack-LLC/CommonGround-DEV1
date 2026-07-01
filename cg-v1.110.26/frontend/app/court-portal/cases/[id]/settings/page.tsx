@@ -214,9 +214,9 @@ export default function SettingsPage() {
   }, {} as Record<string, typeof SETTING_DEFINITIONS>);
 
   const impactColors = {
-    high: "bg-red-100 text-red-700",
-    medium: "bg-yellow-100 text-yellow-700",
-    low: "bg-blue-100 text-blue-700",
+    high: "bg-[#FEE2E2] text-[#9B2C2C]",
+    medium: "bg-[#FEF7ED] text-[#E09520]",
+    low: "bg-[#E0EFF8] text-[#1E4E6B]",
   };
 
   return (
@@ -251,29 +251,29 @@ export default function SettingsPage() {
 
       {/* Error Message */}
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+        <div className="bg-[#FEE2E2] border border-[#FEE2E2] text-[#9B2C2C] px-4 py-3 rounded">
           {error}
         </div>
       )}
 
       {/* Success Message */}
       {saveSuccess && (
-        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded">
+        <div className="bg-[#E8F4F0] border border-[#E8F4F0] text-[#2D8A70] px-4 py-3 rounded">
           Settings saved successfully! Changes are now active for this case.
         </div>
       )}
 
       {/* Pending Changes Warning */}
       {hasChanges && (
-        <Card className="border-2 border-orange-300 bg-orange-50">
+        <Card className="border-2 border-[#F5A623] bg-[#FEF7ED]">
           <CardContent className="p-4">
             <div className="flex items-center space-x-3">
               <span className="text-xl">⚠️</span>
               <div>
-                <p className="font-medium text-orange-800">
+                <p className="font-medium text-[#E09520]">
                   You have {Object.keys(pendingChanges).length} unsaved change(s)
                 </p>
-                <p className="text-sm text-orange-700">
+                <p className="text-sm text-[#E09520]">
                   Changes will be logged and take effect immediately upon saving.
                 </p>
               </div>
@@ -297,7 +297,7 @@ export default function SettingsPage() {
                 <div
                   key={setting.key}
                   className={`flex items-center justify-between p-4 rounded-lg border ${
-                    hasChanged ? "border-orange-300 bg-orange-50" : "border-slate-200"
+                    hasChanged ? "border-[#F5A623] bg-[#FEF7ED]" : "border-slate-200"
                   }`}
                 >
                   <div className="flex-1">
@@ -309,7 +309,7 @@ export default function SettingsPage() {
                         {setting.impact} impact
                       </span>
                       {hasChanged && (
-                        <span className="px-2 py-0.5 rounded text-xs bg-orange-200 text-orange-800">
+                        <span className="px-2 py-0.5 rounded text-xs bg-[#FEF7ED] text-[#E09520]">
                           modified
                         </span>
                       )}

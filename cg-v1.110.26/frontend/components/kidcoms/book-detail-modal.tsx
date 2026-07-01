@@ -131,7 +131,7 @@ export function BookDetailModal({
             {pages > 0 && (
               <div className="flex items-center gap-1 px-2.5 py-1 rounded-full" style={{ background: 'var(--portal-background)' }}>
                 <Layers className="w-3.5 h-3.5" style={{ color: 'var(--portal-muted)' }} />
-                <span className="text-xs font-semibold" style={{ fontFamily: 'JetBrains Mono, monospace', color: 'var(--portal-text)' }}>
+                <span className="text-xs font-semibold" style={{ fontFamily: 'var(--font-mono)', color: 'var(--portal-text)' }}>
                   {pages} pages
                 </span>
               </div>
@@ -140,7 +140,7 @@ export function BookDetailModal({
             {/* Read Time */}
             <div className="flex items-center gap-1 px-2.5 py-1 rounded-full" style={{ background: 'var(--portal-background)' }}>
               <Clock className="w-3.5 h-3.5" style={{ color: 'var(--portal-muted)' }} />
-              <span className="text-xs font-semibold" style={{ fontFamily: 'JetBrains Mono, monospace', color: 'var(--portal-text)' }}>
+              <span className="text-xs font-semibold" style={{ fontFamily: 'var(--font-mono)', color: 'var(--portal-text)' }}>
                 ~{estimatedMinutes} min
               </span>
             </div>
@@ -171,7 +171,7 @@ export function BookDetailModal({
                 <span className="text-xs font-semibold" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>
                   Reading progress
                 </span>
-                <span className="text-xs font-bold" style={{ fontFamily: 'JetBrains Mono, monospace', color: 'var(--portal-text-heading)' }}>
+                <span className="text-xs font-bold" style={{ fontFamily: 'var(--font-mono)', color: 'var(--portal-text-heading)' }}>
                   {progressPercent}%
                 </span>
               </div>

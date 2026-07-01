@@ -124,8 +124,8 @@ function getEmbedUrl(url: string): string | null {
 }
 
 const CATEGORY_CONFIG = {
-    "getting-started": { label: "Getting Started", icon: <Compass className="h-4 w-4" />, color: "text-emerald-600 bg-emerald-50 border-emerald-200" },
-    features: { label: "Features", icon: <Sparkles className="h-4 w-4" />, color: "text-purple-600 bg-purple-50 border-purple-200" },
+    "getting-started": { label: "Getting Started", icon: <Compass className="h-4 w-4" />, color: "text-[#2D8A70] bg-[#E8F4F0] border-[#C5E5DB]" },
+    features: { label: "Features", icon: <Sparkles className="h-4 w-4" />, color: "text-[#2D6A8F] bg-[#F0F7FC] border-[#C2DEF0]" },
     faqs: { label: "FAQs", icon: <MessageCircleQuestion className="h-4 w-4" />, color: "text-blue-600 bg-blue-50 border-blue-200" },
 };
 
@@ -363,7 +363,7 @@ export default function HelpCenterPage() {
                             <Card key={tour.id} className="border-slate-200">
                                 <CardContent className="pt-4 pb-4">
                                     <div className="flex items-start gap-3">
-                                        <div className={`p-2 rounded-lg shrink-0 ${isDone ? "bg-emerald-50 text-emerald-600" : "bg-[#E8F4F0] text-[#3DAA8A]"}`}>
+                                        <div className={`p-2 rounded-lg shrink-0 ${isDone ? "bg-[#E8F4F0] text-[#2D8A70]" : "bg-[#E8F4F0] text-[#3DAA8A]"}`}>
                                             <PlayCircle className="h-4 w-4" />
                                         </div>
                                         <div className="flex-1 min-w-0">
@@ -375,7 +375,7 @@ export default function HelpCenterPage() {
                                     <Button
                                         size="sm"
                                         className={`w-full mt-3 gap-1.5 text-xs ${isDone
-                                            ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200"
+                                            ? "bg-[#E8F4F0] text-[#2D8A70] hover:bg-[#E8F4F0] border border-[#C5E5DB]"
                                             : "bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white"
                                             }`}
                                         onClick={() => startTour(tour)}

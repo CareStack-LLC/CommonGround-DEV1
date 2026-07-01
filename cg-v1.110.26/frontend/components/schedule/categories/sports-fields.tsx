@@ -15,8 +15,8 @@ export default function SportsFields({ data, onChange }: SportsFieldsProps) {
   };
 
   return (
-    <div className="space-y-4 p-4 bg-orange-50 rounded-lg border border-orange-200">
-      <h4 className="font-medium text-orange-900">Sports/Recreation Details</h4>
+    <div className="space-y-4 p-4 bg-[#FEF7ED] rounded-lg border border-[#FEF7ED]">
+      <h4 className="font-medium text-[#1E3A4A]">Sports/Recreation Details</h4>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>

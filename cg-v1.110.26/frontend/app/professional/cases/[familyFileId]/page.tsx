@@ -280,7 +280,7 @@ export default function CaseDetailPage() {
               <div className="flex flex-wrap gap-3">
                 <Button
                   onClick={() => setShowComplianceReport(true)}
-                  className="bg-emerald-900 hover:bg-emerald-950 text-white sans font-semibold px-5 h-11 shadow-lg border-2 border-emerald-900/40 gap-2"
+                  className="bg-[#1B5544] hover:bg-[#123A2E] text-white sans font-semibold px-5 h-11 shadow-lg border-2 border-[#1B5544]/40 gap-2"
                 >
                   <Download className="h-4 w-4" strokeWidth={2} />
                   Generate Report
@@ -435,8 +435,8 @@ function QuickStat({
 }) {
   const colorConfig = {
     blue: "from-blue-500 to-blue-600 shadow-blue-500/20",
-    purple: "from-purple-500 to-purple-600 shadow-purple-500/20",
-    amber: "from-amber-500 to-amber-600 shadow-amber-500/20",
+    purple: "from-[#3D8DB0] to-[#2D6A8F] shadow-[#3D8DB0]/20",
+    amber: "from-[#F5A623] to-[#E09520] shadow-[#F5A623]/20",
     teal: "from-teal-500 to-teal-600 shadow-teal-500/20",
     slate: "from-slate-500 to-slate-600 shadow-slate-500/20",
   };
@@ -478,7 +478,7 @@ function NavigationCard({
     burgundy: "bg-red-900 text-red-50 shadow-lg shadow-red-900/30",
     navy: "bg-slate-900 text-slate-50 shadow-lg shadow-slate-900/30",
     amber: "bg-[#1E3A4A] text-[#F4F8F7] shadow-lg shadow-[#1E3A4A]/30",
-    gold: "bg-yellow-700 text-yellow-50 shadow-lg shadow-yellow-700/30",
+    gold: "bg-[#B8791A] text-[#FEF7ED] shadow-lg shadow-[#B8791A]/30",
     slate: "bg-slate-700 text-slate-50 shadow-lg shadow-slate-700/30",
   };
 
@@ -486,7 +486,7 @@ function NavigationCard({
     burgundy: "border-red-900/20 hover:border-red-900/40",
     navy: "border-slate-900/20 hover:border-slate-900/40",
     amber: "border-[#1E3A4A]/20 hover:border-[#1E3A4A]/40",
-    gold: "border-yellow-700/20 hover:border-yellow-700/40",
+    gold: "border-[#B8791A]/20 hover:border-[#B8791A]/40",
     slate: "border-slate-700/20 hover:border-slate-700/40",
   };
 

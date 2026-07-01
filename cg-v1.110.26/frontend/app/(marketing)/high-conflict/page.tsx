@@ -36,17 +36,17 @@ const protectionFeatures = [
   {
     icon: MessageSquare,
     title: 'ARIA Communication Support',
-    description: 'Every message is reviewed by AI to help keep conversations constructive and focused on your children.',
+    description: 'ARIA reviews each message and rewrites the heat out before it sends, keeping the conversation about your children.',
   },
   {
     icon: FileText,
     title: 'Complete Documentation',
-    description: 'Every message, schedule change, exchange, and agreement is timestamped and securely stored for your records.',
+    description: 'Every message, schedule change, exchange, and agreement is timestamped and securely stored — automatically.',
   },
   {
     icon: Scale,
-    title: 'Court-Ready Records',
-    description: 'Export comprehensive documentation packages with hash verification that attorneys and courts can trust.',
+    title: 'Court-ready exports',
+    description: 'Export a complete documentation package with SHA-256 verification that attorneys and courts can trust.',
   },
   {
     icon: Eye,
@@ -72,7 +72,7 @@ const structuredParentingFeatures = [
   },
   {
     title: 'Minimal Direct Contact',
-    description: 'ARIA handles coordination so you can focus on your children instead of managing interactions.',
+    description: 'ARIA handles the coordination and Silent Handoff runs zero-contact exchanges, so you focus on your children, not the interactions.',
   },
   {
     title: 'Automatic Record Keeping',
@@ -198,24 +198,24 @@ export default function HighConflictPage() {
                 <span className="text-cg-sage">put the facts on your side.</span>
               </h1>
               <p className="text-lg text-muted-foreground mb-8 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-                You shouldn&apos;t have to brace for every message and handoff. CommonGround
-                strips the heat out of communication, keeps contact to zero when it has to be,
-                and quietly documents everything &mdash; so your kids stay protected and the
-                record speaks for itself.
+                You shouldn&apos;t have to brace for every message and handoff. ARIA strips
+                the heat out of communication, Silent Handoff keeps contact at zero with
+                GPS-verified exchanges, and every message is timestamped and SHA-256 sealed
+                &mdash; so your kids stay protected and the record speaks for itself.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Link
                   href="/early-access"
                   className="inline-flex items-center justify-center gap-2 bg-cg-sage text-white font-medium px-8 py-4 rounded-full text-lg transition-all duration-300 hover:bg-cg-sage-light hover:shadow-xl hover:-translate-y-1"
                 >
-                  Get Started Free
+                  Get court-ready free
                   <ArrowRight className="w-5 h-5" />
                 </Link>
                 <Link
                   href="#how-it-works"
                   className="inline-flex items-center justify-center gap-2 border-2 border-cg-sage text-cg-sage font-medium px-8 py-4 rounded-full text-lg transition-all hover:bg-cg-sage hover:text-white"
                 >
-                  See How It Works
+                  See how the documentation works
                 </Link>
               </div>
               <div className="mt-6 flex flex-wrap items-center justify-center lg:justify-start gap-x-5 gap-y-2 text-sm text-muted-foreground">
@@ -270,7 +270,7 @@ export default function HighConflictPage() {
       <section className="relative overflow-hidden py-20 lg:py-28 bg-gradient-to-b from-[#F4F8F7] to-white">
         <div className="max-w-3xl mx-auto px-6">
           <div className="text-center mb-16">
-            <p className="font-medium mb-3 tracking-wide uppercase text-sm" style={{ color: '#E85D75' }}>
+            <p className="font-medium mb-3 tracking-wide uppercase text-sm" style={{ color: '#C53030' }}>
               A day in the life
             </p>
             <h2
@@ -282,12 +282,12 @@ export default function HighConflictPage() {
             </h2>
           </div>
           <div className="relative">
-            <div className="absolute left-[19px] top-3 bottom-3 w-px bg-gradient-to-b from-[#E85D75]/40 via-[#F5A623]/40 to-[#3DAA8A]/50" />
+            <div className="absolute left-[19px] top-3 bottom-3 w-px bg-gradient-to-b from-[#C53030]/40 via-[#F5A623]/40 to-[#3DAA8A]/50" />
             <div className="space-y-10">
               {story.map((beat, i) => {
                 const dot =
                   beat.tone === 'before'
-                    ? '#E85D75'
+                    ? '#C53030'
                     : beat.tone === 'turn'
                     ? '#F5A623'
                     : '#3DAA8A';
@@ -533,14 +533,14 @@ export default function HighConflictPage() {
             Your children deserve calm.
           </h2>
           <p className="text-lg text-muted-foreground mb-10 max-w-xl mx-auto">
-            Clear structure and documentation bring peace of mind to your family.
-            Start building a calmer co-parenting experience today.
+            Let ARIA calm the messages, Silent Handoff handle the exchanges, and every
+            record stay court-ready &mdash; so you can be present for your kids again.
           </p>
           <Link
             href="/early-access"
             className="inline-flex items-center justify-center gap-2 bg-cg-sage text-white font-medium px-8 py-4 rounded-full text-lg transition-all duration-300 hover:bg-cg-sage-light hover:shadow-xl hover:-translate-y-1"
           >
-            Create Free Account
+            Get court-ready free
             <ArrowRight className="w-5 h-5" />
           </Link>
           <p className="text-sm text-muted-foreground mt-4">

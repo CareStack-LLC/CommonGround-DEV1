@@ -186,8 +186,8 @@ export default function ContributeModal({
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
         <div className="bg-card rounded-2xl shadow-xl max-w-md w-full p-8 text-center">
-          <div className="w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-4">
-            <Heart className="h-8 w-8 text-purple-600" />
+          <div className="w-16 h-16 rounded-full bg-[#E0EFF8] flex items-center justify-center mx-auto mb-4">
+            <Heart className="h-8 w-8 text-[#2D6A8F]" />
           </div>
           <h3 className="text-xl font-semibold text-foreground mb-2">Thank You!</h3>
           <p className="text-muted-foreground mb-2">
@@ -208,11 +208,11 @@ export default function ContributeModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 overflow-y-auto">
       <div className="bg-card rounded-2xl shadow-xl max-w-md w-full overflow-hidden my-8">
         {/* Header */}
-        <div className="p-6 border-b border-border bg-purple-50 dark:bg-purple-950/30">
+        <div className="p-6 border-b border-border bg-[#E0EFF8] dark:bg-[#1E3A4A]/30">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                <Gift className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+              <div className="w-10 h-10 rounded-lg bg-[#E0EFF8] dark:bg-[#1E3A4A]/30 flex items-center justify-center">
+                <Gift className="h-5 w-5 text-[#2D6A8F] dark:text-[#4BA8C8]" />
               </div>
               <div>
                 <h2 className="font-semibold text-foreground">Send Money</h2>
@@ -223,7 +223,7 @@ export default function ContributeModal({
             </div>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-lg transition-colors"
+              className="p-2 hover:bg-[#E0EFF8] dark:hover:bg-[#1E3A4A]/30 rounded-lg transition-colors"
             >
               <X className="h-5 w-5 text-muted-foreground" />
             </button>
@@ -298,7 +298,7 @@ export default function ContributeModal({
                   value={contributorName}
                   onChange={(e) => setContributorName(e.target.value)}
                   placeholder="Enter your name"
-                  className="w-full px-4 py-2.5 bg-card border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
+                  className="w-full px-4 py-2.5 bg-card border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2D6A8F]/20 focus:border-[#2D6A8F]"
                 />
               </div>
               <div>
@@ -311,7 +311,7 @@ export default function ContributeModal({
                   value={contributorEmail}
                   onChange={(e) => setContributorEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="w-full px-4 py-2.5 bg-card border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
+                  className="w-full px-4 py-2.5 bg-card border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2D6A8F]/20 focus:border-[#2D6A8F]"
                 />
               </div>
             </div>
@@ -330,7 +330,7 @@ export default function ContributeModal({
                 value={amount}
                 onChange={(e) => handleAmountChange(e.target.value)}
                 placeholder="0.00"
-                className="w-full pl-10 pr-4 py-3 text-xl font-mono bg-card border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500"
+                className="w-full pl-10 pr-4 py-3 text-xl font-mono bg-card border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2D6A8F]/20 focus:border-[#2D6A8F]"
               />
             </div>
             <div className="flex gap-2 mt-3">
@@ -341,7 +341,7 @@ export default function ContributeModal({
                   onClick={() => setAmount(preset.toString())}
                   className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     amount === preset.toString()
-                      ? 'bg-purple-600 text-white'
+                      ? 'bg-[#2D6A8F] text-white'
                       : 'bg-muted text-foreground hover:bg-muted/80'
                   }`}
                 >
@@ -359,7 +359,7 @@ export default function ContributeModal({
             <select
               value={purpose}
               onChange={(e) => setPurpose(e.target.value)}
-              className="w-full px-4 py-2.5 bg-card border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 appearance-none"
+              className="w-full px-4 py-2.5 bg-card border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2D6A8F]/20 focus:border-[#2D6A8F] appearance-none"
             >
               <option value="">Select a purpose...</option>
               {PURPOSES.map((p) => (
@@ -379,7 +379,7 @@ export default function ContributeModal({
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Write a message for the child..."
               rows={3}
-              className="w-full px-4 py-2.5 bg-card border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 resize-none"
+              className="w-full px-4 py-2.5 bg-card border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2D6A8F]/20 focus:border-[#2D6A8F] resize-none"
             />
           </div>
 
@@ -403,7 +403,7 @@ export default function ContributeModal({
             </button>
             <button
               type="submit"
-              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-purple-600 text-white rounded-xl font-medium hover:bg-purple-700 transition-colors disabled:opacity-50"
+              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#2D6A8F] text-white rounded-xl font-medium hover:bg-[#1E4E6B] transition-colors disabled:opacity-50"
               disabled={isLoading || !amount}
             >
               {isLoading ? (

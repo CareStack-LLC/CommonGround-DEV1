@@ -58,9 +58,9 @@ function redemptionStatusLabel(status: RewardRedemption['status']) {
 function redemptionStatusBadgeClass(status: RewardRedemption['status']) {
   switch (status) {
     case 'requested':
-      return 'bg-amber-50 text-amber-700 border border-amber-200';
+      return 'bg-[#FEF7ED] text-[#E09520] border border-[#FEF7ED]';
     case 'fulfilled':
-      return 'bg-emerald-50 text-emerald-700 border border-emerald-200';
+      return 'bg-[#E8F4F0] text-[#2D8A70] border border-[#E8F4F0]';
     case 'cancelled':
       return 'bg-muted text-muted-foreground border border-border';
   }
@@ -224,10 +224,10 @@ export default function ParentRewardsPage() {
           </div>
 
           {error && (
-            <div className="mb-6 bg-red-50 border-2 border-red-200 rounded-2xl p-4">
+            <div className="mb-6 bg-[#FEE2E2] border-2 border-[#FEE2E2] rounded-2xl p-4">
               <div className="flex items-center gap-3">
-                <XCircle className="h-5 w-5 text-red-600" />
-                <p className="text-red-700 font-medium">{error}</p>
+                <XCircle className="h-5 w-5 text-[#C53030]" />
+                <p className="text-[#9B2C2C] font-medium">{error}</p>
               </div>
             </div>
           )}
@@ -298,10 +298,10 @@ export default function ParentRewardsPage() {
                   className="text-lg font-bold text-foreground mb-4 flex items-center gap-2"
                   style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
                 >
-                  <Package className="h-5 w-5 text-amber-600" />
+                  <Package className="h-5 w-5 text-[#E09520]" />
                   To fulfill
                   {pendingRedemptions.length > 0 && (
-                    <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200">
+                    <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-[#FEF7ED] text-[#E09520] border border-[#FEF7ED]">
                       {pendingRedemptions.length}
                     </span>
                   )}
@@ -320,7 +320,7 @@ export default function ParentRewardsPage() {
                       return (
                         <li
                           key={red.id}
-                          className="rounded-xl border-2 border-amber-200 bg-amber-50/50 p-4"
+                          className="rounded-xl border-2 border-[#FEF7ED] bg-[#FEF7ED]/50 p-4"
                         >
                           <div className="flex items-start gap-3 mb-3">
                             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#F5A623] to-[#E8941E] flex items-center justify-center text-xl flex-shrink-0">
@@ -346,7 +346,7 @@ export default function ParentRewardsPage() {
                             <button
                               onClick={() => fulfill(red)}
                               disabled={busy}
-                              className="flex-1 flex items-center justify-center gap-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-semibold py-2 rounded-lg disabled:opacity-50"
+                              className="flex-1 flex items-center justify-center gap-1.5 bg-[#3DAA8A] hover:bg-[#2D8A70] text-white text-sm font-semibold py-2 rounded-lg disabled:opacity-50"
                             >
                               {busy ? (
                                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -358,7 +358,7 @@ export default function ParentRewardsPage() {
                             <button
                               onClick={() => cancelRedemption(red)}
                               disabled={busy}
-                              className="flex items-center justify-center gap-1.5 border-2 border-orange-300 bg-white hover:bg-orange-50 text-orange-700 text-sm font-semibold px-3 py-2 rounded-lg disabled:opacity-50"
+                              className="flex items-center justify-center gap-1.5 border-2 border-[#F5A623] bg-white hover:bg-[#FEF7ED] text-[#E09520] text-sm font-semibold px-3 py-2 rounded-lg disabled:opacity-50"
                             >
                               <X className="h-4 w-4" />
                               Cancel &amp; refund
@@ -536,7 +536,7 @@ function RewardCard({
           <button
             onClick={onDelete}
             disabled={busy}
-            className="p-1.5 rounded-md hover:bg-red-50 text-red-600"
+            className="p-1.5 rounded-md hover:bg-[#FEE2E2] text-[#C53030]"
             aria-label="Delete reward"
           >
             <Trash2 className="h-3.5 w-3.5" />
@@ -649,7 +649,7 @@ function RewardFormInline({
           className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/40"
         />
       </div>
-      {err && <p className="text-xs text-red-600">{err}</p>}
+      {err && <p className="text-xs text-[#C53030]">{err}</p>}
       <div className="flex gap-2">
         <button
           onClick={save}
@@ -824,7 +824,7 @@ function RewardFormModal({
           </div>
 
           {err && (
-            <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg px-3 py-2 text-sm">
+            <div className="bg-[#FEE2E2] border border-[#FEE2E2] text-[#9B2C2C] rounded-lg px-3 py-2 text-sm">
               {err}
             </div>
           )}

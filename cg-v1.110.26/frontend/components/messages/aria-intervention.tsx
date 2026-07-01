@@ -43,61 +43,61 @@ export function ARIAIntervention({
   const getLevelConfig = (level: string, isBlocked: boolean) => {
     if (isBlocked) {
       return {
-        bg: 'bg-gradient-to-br from-red-50 to-white dark:from-red-950/30 dark:to-card',
-        border: 'border-red-200 dark:border-red-900/60',
-        iconBg: 'bg-red-100 dark:bg-red-950/40',
-        iconColor: 'text-red-500',
-        icon: <XCircle className="h-6 w-6 text-red-500" />,
+        bg: 'bg-gradient-to-br from-[#FEE2E2] to-white dark:from-[#7A2222]/30 dark:to-card',
+        border: 'border-[#FEE2E2] dark:border-[#7A2222]/60',
+        iconBg: 'bg-[#FEE2E2] dark:bg-[#7A2222]/40',
+        iconColor: 'text-[#C53030]',
+        icon: <XCircle className="h-6 w-6 text-[#C53030]" />,
         title: 'Message Blocked',
         subtitle: 'Severe violation of communication protocols.',
-        btnPrimary: 'bg-red-600 hover:bg-red-700 text-white',
+        btnPrimary: 'bg-[#C53030] hover:bg-[#9B2C2C] text-white',
       };
     }
 
     switch (level) {
       case 'green':
         return {
-          bg: 'bg-gradient-to-br from-emerald-50 to-white dark:from-emerald-950/30 dark:to-card',
-          border: 'border-emerald-200 dark:border-emerald-900/60',
-          iconBg: 'bg-emerald-100 dark:bg-emerald-950/40',
-          iconColor: 'text-emerald-500',
-          icon: <CheckCircle className="h-6 w-6 text-emerald-500" />,
+          bg: 'bg-gradient-to-br from-[#E8F4F0] to-white dark:from-[#1E3A4A]/30 dark:to-card',
+          border: 'border-[#E8F4F0] dark:border-[#1E3A4A]/60',
+          iconBg: 'bg-[#E8F4F0] dark:bg-[#1E3A4A]/40',
+          iconColor: 'text-[#3DAA8A]',
+          icon: <CheckCircle className="h-6 w-6 text-[#3DAA8A]" />,
           title: 'Communication Verified',
           subtitle: 'Your message maintains a constructive tone.',
-          btnPrimary: 'bg-emerald-600 hover:bg-emerald-700 text-white',
+          btnPrimary: 'bg-[#2D8A70] hover:bg-[#2D8A70] text-white',
         };
       case 'yellow':
         return {
-          bg: 'bg-gradient-to-br from-amber-50 to-white dark:from-amber-950/30 dark:to-card',
-          border: 'border-amber-200 dark:border-amber-900/60',
-          iconBg: 'bg-amber-100 dark:bg-amber-950/40',
-          iconColor: 'text-amber-500',
-          icon: <Sparkles className="h-6 w-6 text-amber-500" />,
+          bg: 'bg-gradient-to-br from-[#FEF7ED] to-white dark:from-[#1E3A4A]/30 dark:to-card',
+          border: 'border-[#FEF7ED] dark:border-[#1E3A4A]/60',
+          iconBg: 'bg-[#FEF7ED] dark:bg-[#1E3A4A]/40',
+          iconColor: 'text-[#F5A623]',
+          icon: <Sparkles className="h-6 w-6 text-[#F5A623]" />,
           title: 'Tone Calibration',
           subtitle: 'This message may be misinterpreted.',
-          btnPrimary: 'bg-amber-600 hover:bg-amber-700 text-white',
+          btnPrimary: 'bg-[#E09520] hover:bg-[#E09520] text-white',
         };
       case 'orange':
         return {
-          bg: 'bg-gradient-to-br from-orange-50 to-white dark:from-orange-950/30 dark:to-card',
-          border: 'border-orange-200 dark:border-orange-900/60',
-          iconBg: 'bg-orange-100 dark:bg-orange-950/40',
-          iconColor: 'text-orange-500',
-          icon: <AlertTriangle className="h-6 w-6 text-orange-500" />,
+          bg: 'bg-gradient-to-br from-[#FEF7ED] to-white dark:from-[#1E3A4A]/30 dark:to-card',
+          border: 'border-[#FEF7ED] dark:border-[#1E3A4A]/60',
+          iconBg: 'bg-[#FEF7ED] dark:bg-[#1E3A4A]/40',
+          iconColor: 'text-[#F5A623]',
+          icon: <AlertTriangle className="h-6 w-6 text-[#F5A623]" />,
           title: 'Conflict Risk',
           subtitle: 'High probability of escalation detected.',
-          btnPrimary: 'bg-orange-600 hover:bg-orange-700 text-white',
+          btnPrimary: 'bg-[#E09520] hover:bg-[#E09520] text-white',
         };
       default:
         return {
-          bg: 'bg-gradient-to-br from-amber-50 to-white dark:from-amber-950/30 dark:to-card',
-          border: 'border-amber-200 dark:border-amber-900/60',
-          iconBg: 'bg-amber-100 dark:bg-amber-950/40',
-          iconColor: 'text-amber-500',
-          icon: <Sparkles className="h-6 w-6 text-amber-500" />,
+          bg: 'bg-gradient-to-br from-[#FEF7ED] to-white dark:from-[#1E3A4A]/30 dark:to-card',
+          border: 'border-[#FEF7ED] dark:border-[#1E3A4A]/60',
+          iconBg: 'bg-[#FEF7ED] dark:bg-[#1E3A4A]/40',
+          iconColor: 'text-[#F5A623]',
+          icon: <Sparkles className="h-6 w-6 text-[#F5A623]" />,
           title: 'ARIA Review',
           subtitle: 'Analysis complete.',
-          btnPrimary: 'bg-amber-600 hover:bg-amber-700 text-white',
+          btnPrimary: 'bg-[#E09520] hover:bg-[#E09520] text-white',
         };
     }
   };
@@ -107,9 +107,9 @@ export function ARIAIntervention({
 
   const getCategoryColor = (category: string) => {
     const cat = category.toLowerCase();
-    if (['hate_speech', 'sexual_harassment', 'threatening'].includes(cat)) return 'bg-red-500';
-    if (['custody_weaponization', 'financial_coercion', 'hostility'].includes(cat)) return 'bg-orange-500';
-    return 'bg-amber-500';
+    if (['hate_speech', 'sexual_harassment', 'threatening'].includes(cat)) return 'bg-[#C53030]';
+    if (['custody_weaponization', 'financial_coercion', 'hostility'].includes(cat)) return 'bg-[#F5A623]';
+    return 'bg-[#F5A623]';
   };
 
   return (
@@ -122,7 +122,7 @@ export function ARIAIntervention({
             <div className={`w-14 h-14 rounded-2xl ${config.iconBg} flex items-center justify-center shadow-sm`}>
               {/* Use Shield for blocked/severe, normal icon for others? Or always Shield? User likes the Guardian branding. */}
               {analysis.block_send ? (
-                <Shield className="h-7 w-7 text-red-600" />
+                <Shield className="h-7 w-7 text-[#C53030]" />
               ) : (
                 config.icon
               )}

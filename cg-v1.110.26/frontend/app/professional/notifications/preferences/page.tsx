@@ -224,7 +224,7 @@ export default function NotificationPreferencesPage() {
             <Card className="border-slate-200">
                 <CardHeader className="pb-3">
                     <CardTitle className="text-base flex items-center gap-2">
-                        <Moon className="h-4 w-4 text-indigo-500" />
+                        <Moon className="h-4 w-4 text-[#3D8DB0]" />
                         Quiet Hours
                     </CardTitle>
                     <CardDescription>Suppress push & SMS notifications during specific hours.</CardDescription>
@@ -235,7 +235,7 @@ export default function NotificationPreferencesPage() {
                         <Switch
                             checked={prefs.quiet_hours_enabled}
                             onCheckedChange={v => setPrefs(p => ({ ...p, quiet_hours_enabled: v }))}
-                            className="data-[state=checked]:bg-indigo-600"
+                            className="data-[state=checked]:bg-[#2D6A8F]"
                         />
                     </div>
 
@@ -247,7 +247,7 @@ export default function NotificationPreferencesPage() {
                                     type="time"
                                     value={prefs.quiet_hours_start}
                                     onChange={(e) => setPrefs(p => ({ ...p, quiet_hours_start: e.target.value }))}
-                                    className="h-8 px-2 text-sm border border-slate-200 rounded-lg text-slate-700 focus:outline-none focus:border-indigo-400"
+                                    className="h-8 px-2 text-sm border border-slate-200 rounded-lg text-slate-700 focus:outline-none focus:border-[#4BA8C8]"
                                 />
                             </div>
                             <div className="flex items-center gap-2">
@@ -256,7 +256,7 @@ export default function NotificationPreferencesPage() {
                                     type="time"
                                     value={prefs.quiet_hours_end}
                                     onChange={(e) => setPrefs(p => ({ ...p, quiet_hours_end: e.target.value }))}
-                                    className="h-8 px-2 text-sm border border-slate-200 rounded-lg text-slate-700 focus:outline-none focus:border-indigo-400"
+                                    className="h-8 px-2 text-sm border border-slate-200 rounded-lg text-slate-700 focus:outline-none focus:border-[#4BA8C8]"
                                 />
                             </div>
                         </div>

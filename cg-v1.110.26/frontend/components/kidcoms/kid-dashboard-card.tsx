@@ -119,7 +119,7 @@ export function KidDashboardCard({
       {/* Notification badge - modern design */}
       {badge !== undefined && badge > 0 && (
         <div className="absolute top-2 right-2 min-w-[24px] h-6 bg-red-500 rounded-full flex items-center justify-center px-1.5 shadow-md animate-bounce-subtle border-2 border-card">
-          <span className="text-white text-xs font-bold" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+          <span className="text-white text-xs font-bold" style={{ fontFamily: 'var(--font-mono)' }}>
             {badge > 99 ? '99+' : badge}
           </span>
         </div>

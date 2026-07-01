@@ -382,8 +382,8 @@ export default function BillingSettingsPage() {
       <div className="space-y-6">
         {/* Page Header - matches app design system */}
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 rounded-2xl flex items-center justify-center shadow-md">
-            <CreditCard className="w-6 h-6 text-emerald-600" />
+          <div className="w-12 h-12 bg-gradient-to-br from-[#3DAA8A]/10 to-[#2D8A70]/5 rounded-2xl flex items-center justify-center shadow-md">
+            <CreditCard className="w-6 h-6 text-[#2D8A70]" />
           </div>
           <div>
             <h2 className="text-xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
@@ -399,8 +399,8 @@ export default function BillingSettingsPage() {
         <Card className="border-2 border-border rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-              <div className="p-2 bg-gradient-to-br from-amber-500/10 to-amber-600/5 rounded-xl shadow-md">
-                <Crown className="h-5 w-5 text-amber-600" />
+              <div className="p-2 bg-gradient-to-br from-[#F5A623]/10 to-[#E09520]/5 rounded-xl shadow-md">
+                <Crown className="h-5 w-5 text-[#E09520]" />
               </div>
               Current Plan
             </CardTitle>
@@ -434,9 +434,9 @@ export default function BillingSettingsPage() {
         </Card>
 
         {/* Coming Soon Notice */}
-        <Alert className="bg-purple-50 dark:bg-purple-950/20 border-purple-200 dark:border-purple-900/40 rounded-2xl shadow-lg">
-          <Sparkles className="h-4 w-4 text-purple-600" />
-          <AlertDescription className="text-purple-600 font-medium">
+        <Alert className="bg-[#E0EFF8] dark:bg-[#1E3A4A]/20 border-[#E0EFF8] dark:border-[#1E3A4A]/40 rounded-2xl shadow-lg">
+          <Sparkles className="h-4 w-4 text-[#2D6A8F]" />
+          <AlertDescription className="text-[#2D6A8F] font-medium">
             <strong>Subscription management coming soon!</strong>
             <br />
             Upgrade options and billing management will be available shortly. For now, enjoy your current plan features.
@@ -450,8 +450,8 @@ export default function BillingSettingsPage() {
     <div className="space-y-6">
       {/* Page Header - matches app design system */}
       <div className="flex items-center gap-3">
-        <div className="w-12 h-12 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 rounded-2xl flex items-center justify-center shadow-md">
-          <CreditCard className="w-6 h-6 text-emerald-600" />
+        <div className="w-12 h-12 bg-gradient-to-br from-[#3DAA8A]/10 to-[#2D8A70]/5 rounded-2xl flex items-center justify-center shadow-md">
+          <CreditCard className="w-6 h-6 text-[#2D8A70]" />
         </div>
         <div>
           <h2 className="text-xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
@@ -465,16 +465,16 @@ export default function BillingSettingsPage() {
 
       {/* Success/Error Alerts */}
       {successMessage && (
-        <Alert className="bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/40 rounded-2xl shadow-lg">
-          <CheckCircle className="h-4 w-4 text-emerald-600" />
-          <AlertDescription className="text-emerald-600 font-medium">{successMessage}</AlertDescription>
+        <Alert className="bg-[#E8F4F0] dark:bg-[#1E3A4A]/20 border-[#E8F4F0] dark:border-[#1E3A4A]/40 rounded-2xl shadow-lg">
+          <CheckCircle className="h-4 w-4 text-[#2D8A70]" />
+          <AlertDescription className="text-[#2D8A70] font-medium">{successMessage}</AlertDescription>
         </Alert>
       )}
 
       {redeemSuccess && (
-        <Alert className="bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/40 rounded-2xl shadow-lg">
-          <CheckCircle className="h-4 w-4 text-emerald-600" />
-          <AlertDescription className="text-emerald-600 font-medium">{redeemSuccess}</AlertDescription>
+        <Alert className="bg-[#E8F4F0] dark:bg-[#1E3A4A]/20 border-[#E8F4F0] dark:border-[#1E3A4A]/40 rounded-2xl shadow-lg">
+          <CheckCircle className="h-4 w-4 text-[#2D8A70]" />
+          <AlertDescription className="text-[#2D8A70] font-medium">{redeemSuccess}</AlertDescription>
         </Alert>
       )}
 
@@ -489,8 +489,8 @@ export default function BillingSettingsPage() {
       <Card className="border-2 border-border rounded-2xl shadow-lg">
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-            <div className="p-2 bg-gradient-to-br from-amber-500/10 to-amber-600/5 rounded-xl shadow-md">
-              <Crown className="h-5 w-5 text-amber-600" />
+            <div className="p-2 bg-gradient-to-br from-[#F5A623]/10 to-[#E09520]/5 rounded-xl shadow-md">
+              <Crown className="h-5 w-5 text-[#E09520]" />
             </div>
             Current Plan
           </CardTitle>
@@ -574,8 +574,8 @@ export default function BillingSettingsPage() {
         <Card className="border-2 border-border rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-              <div className="p-2 bg-gradient-to-br from-purple-500/10 to-purple-600/5 rounded-xl shadow-md">
-                <Sparkles className="h-5 w-5 text-purple-600" />
+              <div className="p-2 bg-gradient-to-br from-[#2D6A8F]/10 to-[#2D6A8F]/5 rounded-xl shadow-md">
+                <Sparkles className="h-5 w-5 text-[#2D6A8F]" />
               </div>
               Choose Your Plan
             </CardTitle>
@@ -753,8 +753,8 @@ export default function BillingSettingsPage() {
         <Card className="border-2 border-border rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-              <div className="p-2 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 rounded-xl shadow-md">
-                <Gift className="h-5 w-5 text-emerald-600" />
+              <div className="p-2 bg-gradient-to-br from-[#3DAA8A]/10 to-[#2D8A70]/5 rounded-xl shadow-md">
+                <Gift className="h-5 w-5 text-[#2D8A70]" />
               </div>
               Have a Grant Code?
             </CardTitle>
@@ -819,8 +819,8 @@ export default function BillingSettingsPage() {
         <Card className="border-2 border-border rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-              <div className="p-2 bg-gradient-to-br from-blue-500/10 to-blue-600/5 rounded-xl shadow-md">
-                <CreditCard className="h-5 w-5 text-blue-600" />
+              <div className="p-2 bg-gradient-to-br from-[#2D6A8F]/10 to-[#2D6A8F]/5 rounded-xl shadow-md">
+                <CreditCard className="h-5 w-5 text-[#2D6A8F]" />
               </div>
               Payment Method
             </CardTitle>

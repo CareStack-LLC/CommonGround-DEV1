@@ -83,8 +83,8 @@ export default function WalletBalanceCard({
       <div className="bg-card rounded-2xl border-2 border-border shadow-lg overflow-hidden">
         <div className="p-6">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 bg-gradient-to-br from-amber-100 to-amber-50 dark:from-amber-900/30 dark:to-amber-950/20 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md">
-              <Clock className="h-6 w-6 text-amber-600" />
+            <div className="w-14 h-14 bg-gradient-to-br from-[#FEF7ED] to-[#FEF7ED] dark:from-[#1E3A4A]/30 dark:to-[#1E3A4A]/20 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md">
+              <Clock className="h-6 w-6 text-[#E09520]" />
             </div>
             <div className="flex-1">
               <h3 className="font-semibold text-foreground mb-1" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Complete Wallet Setup</h3>
@@ -103,8 +103,8 @@ export default function WalletBalanceCard({
             </div>
           </div>
         </div>
-        <div className="border-t-2 border-amber-200 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-800 px-6 py-3">
-          <p className="text-xs text-amber-700 flex items-center gap-2 font-bold">
+        <div className="border-t-2 border-[#FEF7ED] bg-[#FEF7ED] dark:bg-[#1E3A4A]/30 dark:border-[#E09520] px-6 py-3">
+          <p className="text-xs text-[#E09520] flex items-center gap-2 font-bold">
             <AlertCircle className="h-4 w-4" />
             Bank verification pending
           </p>
@@ -124,8 +124,8 @@ export default function WalletBalanceCard({
       <div className="p-6">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 bg-gradient-to-br from-emerald-100 to-emerald-50 dark:from-emerald-900/30 dark:to-emerald-950/20 rounded-2xl flex items-center justify-center shadow-md">
-              <Wallet className="h-6 w-6 text-emerald-600" />
+            <div className="w-14 h-14 bg-gradient-to-br from-[#E8F4F0] to-[#E8F4F0] dark:from-[#1E3A4A]/30 dark:to-[#1E3A4A]/20 rounded-2xl flex items-center justify-center shadow-md">
+              <Wallet className="h-6 w-6 text-[#2D8A70]" />
             </div>
             <div>
               <p className="text-sm text-muted-foreground font-medium">Available Balance</p>
@@ -136,7 +136,7 @@ export default function WalletBalanceCard({
           </div>
           <div className="flex items-center gap-2">
             {wallet.charges_enabled && wallet.payouts_enabled && (
-              <span className="flex items-center gap-1 text-xs text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 border-2 border-emerald-200 dark:border-emerald-800 px-2.5 py-1 rounded-full font-bold">
+              <span className="flex items-center gap-1 text-xs text-[#2D8A70] dark:text-[#5BC4A0] bg-[#E8F4F0] dark:bg-[#1E3A4A]/30 border-2 border-[#E8F4F0] dark:border-[#1E3A4A] px-2.5 py-1 rounded-full font-bold">
                 <CheckCircle className="h-3 w-3" />
                 Active
               </span>

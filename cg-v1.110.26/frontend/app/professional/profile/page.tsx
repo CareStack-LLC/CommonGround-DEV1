@@ -353,7 +353,7 @@ function DirectoryCardPreview({
         {/* Badges */}
         <div className="absolute top-3 left-3 z-30 flex flex-col gap-2">
           {firmFormData.safety_vetted && (
-            <Badge className="bg-emerald-500 text-white gap-1 border-0 shadow-sm text-[10px]">
+            <Badge className="bg-[#3DAA8A] text-white gap-1 border-0 shadow-sm text-[10px]">
               <ShieldCheck className="w-3 h-3" />
               Safety Vetted
             </Badge>
@@ -1027,7 +1027,7 @@ export default function ProfilePage() {
             {/* Preview Header */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <div className="w-2 h-2 rounded-full bg-[#3DAA8A] animate-pulse" />
                 <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                   Live Preview
                 </span>

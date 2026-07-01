@@ -72,15 +72,15 @@ const TEMPLATE_ICONS: Record<string, React.ReactNode> = {
 };
 
 const TEMPLATE_COLORS: Record<string, string> = {
-  "red": "bg-red-100 text-red-700 border-red-200",
-  "orange": "bg-orange-100 text-orange-700 border-orange-200",
-  "green": "bg-green-100 text-green-700 border-green-200",
-  "blue": "bg-blue-100 text-blue-700 border-blue-200",
-  "purple": "bg-purple-100 text-purple-700 border-purple-200",
-  "amber": "bg-amber-100 text-amber-700 border-amber-200",
+  "red": "bg-[#FEE2E2] text-[#9B2C2C] border-[#FEE2E2]",
+  "orange": "bg-[#FEF7ED] text-[#E09520] border-[#FEF7ED]",
+  "green": "bg-[#E8F4F0] text-[#2D8A70] border-[#E8F4F0]",
+  "blue": "bg-[#E0EFF8] text-[#1E4E6B] border-[#E0EFF8]",
+  "purple": "bg-[#E0EFF8] text-[#1E4E6B] border-[#E0EFF8]",
+  "amber": "bg-[#FEF7ED] text-[#E09520] border-[#FEF7ED]",
   "gray": "bg-gray-100 text-gray-700 border-gray-200",
   "teal": "bg-teal-100 text-teal-700 border-teal-200",
-  "indigo": "bg-indigo-100 text-indigo-700 border-indigo-200",
+  "indigo": "bg-[#E0EFF8] text-[#1E4E6B] border-[#E0EFF8]",
 };
 
 const EVENT_TYPES = [
@@ -266,21 +266,21 @@ export default function EventsPage() {
 
   const getAttendanceBadge = (attended: boolean | undefined) => {
     if (attended === true) {
-      return <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs">Attended</span>;
+      return <span className="px-2 py-0.5 bg-[#E8F4F0] text-[#2D8A70] rounded text-xs">Attended</span>;
     } else if (attended === false) {
-      return <span className="px-2 py-0.5 bg-red-100 text-red-700 rounded text-xs">Missed</span>;
+      return <span className="px-2 py-0.5 bg-[#FEE2E2] text-[#9B2C2C] rounded text-xs">Missed</span>;
     }
-    return <span className="px-2 py-0.5 bg-yellow-100 text-yellow-700 rounded text-xs">Pending</span>;
+    return <span className="px-2 py-0.5 bg-[#FEF7ED] text-[#E09520] rounded text-xs">Pending</span>;
   };
 
   const getRsvpBadge = (status: string | undefined) => {
     switch (status) {
       case "attending":
-        return <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs">✓ Attending</span>;
+        return <span className="px-2 py-0.5 bg-[#E8F4F0] text-[#2D8A70] rounded text-xs">✓ Attending</span>;
       case "not_attending":
-        return <span className="px-2 py-0.5 bg-red-100 text-red-700 rounded text-xs">✗ Declined</span>;
+        return <span className="px-2 py-0.5 bg-[#FEE2E2] text-[#9B2C2C] rounded text-xs">✗ Declined</span>;
       case "maybe":
-        return <span className="px-2 py-0.5 bg-yellow-100 text-yellow-700 rounded text-xs">? Maybe</span>;
+        return <span className="px-2 py-0.5 bg-[#FEF7ED] text-[#E09520] rounded text-xs">? Maybe</span>;
       default:
         return <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">No Response</span>;
     }
@@ -327,12 +327,12 @@ export default function EventsPage() {
 
       {/* Template Selector */}
       {showTemplateSelector && (
-        <Card className="border-2 border-indigo-200 bg-indigo-50/50">
+        <Card className="border-2 border-[#E0EFF8] bg-[#E0EFF8]/50">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-indigo-600" />
+                  <FileText className="h-5 w-5 text-[#2D6A8F]" />
                   Quick Event Templates
                 </CardTitle>
                 <CardDescription>
@@ -378,7 +378,7 @@ export default function EventsPage() {
 
       {/* Error Display */}
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+        <div className="bg-[#FEE2E2] border border-[#FEE2E2] text-[#9B2C2C] px-4 py-3 rounded">
           {error}
         </div>
       )}
@@ -392,7 +392,7 @@ export default function EventsPage() {
 
       {/* Create Event Form */}
       {showCreateForm && (
-        <Card className="border-2 border-blue-200 bg-blue-50">
+        <Card className="border-2 border-[#E0EFF8] bg-[#E0EFF8]">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
@@ -437,8 +437,8 @@ export default function EventsPage() {
                     onClick={() => setEventType(type.id)}
                     className={`p-2 border rounded-lg text-sm flex items-center space-x-2 ${
                       eventType === type.id
-                        ? "border-blue-500 bg-blue-100"
-                        : "border-slate-200 bg-white hover:border-blue-300"
+                        ? "border-[#2D6A8F] bg-[#E0EFF8]"
+                        : "border-slate-200 bg-white hover:border-[#4BA8C8]"
                     }`}
                   >
                     <span>{type.icon}</span>
@@ -551,7 +551,7 @@ export default function EventsPage() {
               {upcomingEvents.map((event) => (
                 <div
                   key={event.id}
-                  className={`border rounded-lg p-4 hover:bg-slate-50 transition ${event.is_mandatory ? 'border-l-4 border-l-red-500' : ''}`}
+                  className={`border rounded-lg p-4 hover:bg-slate-50 transition ${event.is_mandatory ? 'border-l-4 border-l-[#C53030]' : ''}`}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-start space-x-3">
@@ -560,7 +560,7 @@ export default function EventsPage() {
                         <div className="flex items-center gap-2">
                           <h3 className="font-semibold text-slate-900">{event.title}</h3>
                           {event.is_mandatory && (
-                            <span className="px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded">Mandatory</span>
+                            <span className="px-2 py-0.5 bg-[#FEE2E2] text-[#9B2C2C] text-xs rounded">Mandatory</span>
                           )}
                         </div>
                         {event.description && (
@@ -608,7 +608,7 @@ export default function EventsPage() {
                     </div>
                   </div>
                   {event.shared_notes && (
-                    <div className="mt-3 p-2 bg-yellow-50 rounded text-sm text-yellow-800">
+                    <div className="mt-3 p-2 bg-[#FEF7ED] rounded text-sm text-[#E09520]">
                       <span className="font-medium">Note:</span> {event.shared_notes}
                     </div>
                   )}

@@ -303,7 +303,7 @@ export function EmptyState({
   return (
     <div className={`text-center py-16 px-6 ${className}`}>
       {Icon && (
-        <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-cg-sage-subtle via-cg-amber-subtle to-pink-100 flex items-center justify-center">
+        <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-cg-sage-subtle via-cg-amber-subtle to-[#FEF7ED] flex items-center justify-center">
           <Icon className="h-10 w-10 text-cg-sage" />
         </div>
       )}

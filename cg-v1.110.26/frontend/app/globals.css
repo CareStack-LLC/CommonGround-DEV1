@@ -31,12 +31,12 @@
   /* Font families — powered by next/font CSS variables for zero render-blocking */
   --font-sans: var(--font-dm-sans), system-ui, -apple-system, sans-serif;
   --font-serif: var(--font-dm-serif-display), Georgia, serif;
-  --font-mono: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+  --font-mono: var(--font-dm-mono), 'DM Mono', 'SF Mono', 'Monaco', monospace;
 
   /* KidSpace Modern Fonts (Pre-teen) */
   --font-kid-body: var(--font-inter), var(--font-dm-sans), system-ui, sans-serif;
   --font-kid-heading: var(--font-space-grotesk), var(--font-dm-sans), system-ui, sans-serif;
-  --font-kid-mono: var(--font-jetbrains-mono), 'SF Mono', monospace;
+  --font-kid-mono: var(--font-dm-mono), 'DM Mono', 'SF Mono', monospace;
 
   /* Sidebar colors */
   --color-sidebar-ring: var(--sidebar-ring);
@@ -154,11 +154,11 @@
   --secondary-foreground: #FFFFFF;
 
   /* Muted */
-  --muted: #E8F4F8;
+  --muted: #E0EFF8;
   --muted-foreground: #6B8A9A;
 
   /* Accent */
-  --accent: #E8F4F8;
+  --accent: #E0EFF8;
   --accent-foreground: #3DAA8A;
 
   /* Destructive */
@@ -167,7 +167,7 @@
 
   /* Border - Soft teal tint */
   --border: #D6ECE8;
-  --input: #E8F4F8;
+  --input: #E0EFF8;
   --ring: #3DAA8A;
 
   /* Charts */
@@ -259,7 +259,7 @@
   --accent: #1E3A4A;
   --accent-foreground: #5BC4A0;
 
-  --destructive: #EF4444;
+  --destructive: #C53030;
   --destructive-foreground: #FFFFFF;
 
   --border: #2D5060;
@@ -283,7 +283,7 @@
 
   --cg-sage: #5BC4A0;
   --cg-sage-dark: #3DAA8A;
-  --cg-sage-light: #7DD8B8;
+  --cg-sage-light: #5BC4A0;
   --cg-sage-subtle: #0F2A20;
 
   --cg-slate: #4BA8C8;
@@ -301,16 +301,16 @@
   --cg-success-subtle: #0F2A20;
   --cg-warning: #F5A623;
   --cg-warning-subtle: #2D2010;
-  --cg-error: #EF4444;
+  --cg-error: #C53030;
   --cg-error-subtle: #2D1A1A;
 
   /* ARIA Sentinel Shield */
   --cg-heat: #F5A623;
-  --cg-heat-high: #EF4444;
+  --cg-heat-high: #C53030;
   --cg-heat-subtle: #2D2010;
   --cg-coaching: #4BA8C8;
   --cg-coaching-subtle: #0D2030;
-  --cg-legal: #EF4444;
+  --cg-legal: #C53030;
   --cg-legal-subtle: #2D1A1A;
   --cg-pattern: #F5A623;
   --cg-pattern-subtle: #2D2010;
@@ -343,14 +343,14 @@
   --primary-foreground: #FFFFFF;
   --secondary: #2D6A8F;
   --secondary-foreground: #FFFFFF;
-  --muted: #E8F4F8;
+  --muted: #E0EFF8;
   --muted-foreground: #6B8A9A;
-  --accent: #E8F4F8;
+  --accent: #E0EFF8;
   --accent-foreground: #3DAA8A;
   --destructive: #C53030;
   --destructive-foreground: #FFFFFF;
   --border: #D6ECE8;
-  --input: #E8F4F8;
+  --input: #E0EFF8;
   --ring: #3DAA8A;
   --chart-1: #3DAA8A;
   --chart-2: #2D6A8F;
@@ -375,7 +375,7 @@
   --cg-sand: #F4F8F7;
   --cg-sand-dark: #D6ECE8;
   --cg-cream: #FFFFFF;
-  --cg-mist: #E8F4F8;
+  --cg-mist: #E0EFF8;
   --cg-amber: #F5A623;
   --cg-amber-subtle: #FEF7ED;
   --cg-success: #3DAA8A;
@@ -446,12 +446,12 @@
 /* Parent Portal - Dark Mode */
 .dark .parent-portal {
   --portal-primary: #5BC4A0;
-  --portal-primary-hover: #7DD8B8;
+  --portal-primary-hover: #5BC4A0;
   --portal-primary-light: #3DAA8A;
   --portal-secondary: #4BA8C8;
   --portal-secondary-light: #2D6A8F;
   --portal-accent: #F5A623;
-  --portal-accent-hover: #FFB84D;
+  --portal-accent-hover: #F5A623;
   --portal-background: #0D1B24;
   --portal-surface: #162530;
   --portal-surface-elevated: #1E3A4A;
@@ -559,7 +559,7 @@
   /* Typography - Modern font stack */
   --portal-font-heading: var(--font-space-grotesk), var(--font-dm-sans), system-ui, sans-serif;
   --portal-font-body: var(--font-inter), var(--font-dm-sans), system-ui, sans-serif;
-  --portal-font-mono: var(--font-jetbrains-mono), 'SF Mono', monospace;
+  --portal-font-mono: var(--font-dm-mono), 'DM Mono', 'SF Mono', monospace;
   --portal-font-display: var(--font-dm-serif-display), Georgia, serif;
   --portal-font-size-base: 1rem;
   --portal-line-height: 1.6;
@@ -581,11 +581,11 @@
 .dark .child-portal {
   --portal-primary: #5BC4A0; /* Soft Teal - brand light teal */
   --portal-primary-hover: #3DAA8A;
-  --portal-primary-light: #7DD8B8;
+  --portal-primary-light: #5BC4A0;
   --portal-secondary: #4BA8C8; /* Sky Blue - brand lighter blue */
   --portal-secondary-light: #2D6A8F;
   --portal-accent: #F5A623; /* Child Gold */
-  --portal-accent-hover: #FFB940;
+  --portal-accent-hover: #F5A623;
   --portal-background: #0D1B24; /* Brand dark bg */
   --portal-surface: #1E3A4A; /* Brand dark navy */
   --portal-surface-elevated: #2A4D5E; /* Elevated dark navy */
@@ -615,13 +615,13 @@
 
 /* SuperAdmin Portal - "Dark Command Center" */
 .superadmin-portal {
-  --portal-primary: #7c3aed;
-  --portal-primary-hover: #6d28d9;
-  --portal-primary-light: #a78bfa;
-  --portal-secondary: #3b82f6;
-  --portal-secondary-light: #60a5fa;
-  --portal-accent: #f59e0b;
-  --portal-accent-hover: #d97706;
+  --portal-primary: #2D6A8F;
+  --portal-primary-hover: #1E4E6B;
+  --portal-primary-light: #4BA8C8;
+  --portal-secondary: #2D6A8F;
+  --portal-secondary-light: #4BA8C8;
+  --portal-accent: #F5A623;
+  --portal-accent-hover: #E09520;
   --portal-background: #0f1117;
   --portal-surface: #1a1b26;
   --portal-surface-elevated: #1e1f2e;

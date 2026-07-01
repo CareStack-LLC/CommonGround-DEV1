@@ -122,7 +122,7 @@ const faqs = [
     a: 'Every message, schedule change, and exchange is time-stamped and logged in a tamper-evident record. Exports are SHA-256 verified, so the file you hand your attorney is organized, chronological, and integrity-checked — not a folder of disputable screenshots. Many family law professionals already recommend moving communication to a monitored platform for exactly this reason.',
   },
   {
-    q: 'What does "30% off for life" actually mean?',
+    q: 'What does "30% off for 3 years" actually mean?',
     a: 'As one of our first 50 early adopters, your subscription rate is locked at 30% below the standard price for 36 months on any paid plan. The discount stays with your account regardless of future price changes.',
   },
 ];
@@ -156,7 +156,7 @@ export default function ForDadsPage() {
           },
           offers: {
             '@type': 'Offer',
-            name: 'Early Adopter — 30% Off for Life',
+            name: 'Early Adopter — 30% Off for 3 Years',
             description: 'First 50 members get 30% off all subscriptions, locked for 36 months.',
             eligibleQuantity: { '@type': 'QuantitativeValue', value: 50 },
           },
@@ -183,13 +183,14 @@ export default function ForDadsPage() {
               <p className="text-lg text-gray-600 leading-relaxed mb-8 max-w-xl mx-auto lg:mx-0">
                 Every text gets twisted. You play nice because the alternative is
                 losing time with your kids. CommonGround puts the facts on your
-                side, keeps you present, and helps you stay the dad they count on.
+                side with ARIA and SHA-256 exports, keeps you present through
+                KidSpace, and helps you stay the dad they count on.
               </p>
               <a
                 href="#early-adopter"
                 className="inline-flex items-center gap-2 bg-[#3DAA8A] text-white font-semibold px-8 py-4 rounded-xl transition-all duration-200 hover:bg-[#2E9577] hover:shadow-lg hover:shadow-[#3DAA8A]/20 text-base"
               >
-                Join the Early Adopter List
+                Lock in 30% off for 3 years
                 <ArrowDown className="w-4 h-4" />
               </a>
 
@@ -392,6 +393,14 @@ export default function ForDadsPage() {
                   );
                 })}
               </ul>
+
+              <a
+                href="#early-adopter"
+                className="mt-8 inline-flex items-center gap-2 bg-[#3DAA8A] text-white font-semibold px-8 py-4 rounded-xl transition-all duration-200 hover:bg-[#2E9577] hover:shadow-lg hover:shadow-[#3DAA8A]/20 text-base"
+              >
+                Get set up in 2 minutes &mdash; free
+                <ArrowDown className="w-4 h-4" />
+              </a>
             </div>
           </div>
         </div>
@@ -493,7 +502,7 @@ export default function ForDadsPage() {
               Your Kids Need You Present
             </h2>
             <p className="text-gray-600 text-lg">
-              Join the first 50 members and lock in 30% off for life.
+              Join the first 50 members and lock in 30% off for 3 years.
               No credit card required. Just your email.
             </p>
           </div>

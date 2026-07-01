@@ -30,13 +30,13 @@ const QUICK_CREATE_ITEMS = [
         href: "/professional/documents/ocr",
         label: "Upload Court Order",
         description: "OCR: Auto-extract & lock fields from court order",
-        icon: <Upload className="h-4 w-4 text-blue-600" />,
+        icon: <Upload className="h-4 w-4 text-[#2D6A8F]" />,
     },
     {
         href: "/professional/calendar?new=1",
         label: "Schedule Court Event",
         description: "Add a hearing, deadline, or meeting",
-        icon: <Calendar className="h-4 w-4 text-purple-600" />,
+        icon: <Calendar className="h-4 w-4 text-[#2D6A8F]" />,
     },
 ];
 
@@ -103,7 +103,7 @@ export function QuickCreateMenu({ onCreateTask }: QuickCreateMenuProps) {
                                     className="w-full flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 transition-colors group text-left"
                                 >
                                     <div className="p-1.5 bg-slate-100 rounded-lg group-hover:bg-white transition-colors shrink-0 mt-0.5">
-                                        <CheckSquare className="h-4 w-4 text-emerald-600" />
+                                        <CheckSquare className="h-4 w-4 text-[#2D8A70]" />
                                     </div>
                                     <div>
                                         <p className="text-sm font-semibold text-slate-800">Create Task</p>

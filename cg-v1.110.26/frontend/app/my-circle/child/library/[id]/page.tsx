@@ -251,7 +251,7 @@ export default function BookReaderPage() {
               >
                 <ZoomOut className="w-4 h-4" />
               </button>
-              <span className="text-xs font-bold min-w-[3rem] text-center" style={{ fontFamily: 'JetBrains Mono, monospace', color: 'var(--portal-text)' }}>
+              <span className="text-xs font-bold min-w-[3rem] text-center" style={{ fontFamily: 'var(--font-mono)', color: 'var(--portal-text)' }}>
                 {Math.round(scale * 100)}%
               </span>
               <button
@@ -326,7 +326,7 @@ export default function BookReaderPage() {
                   </button>
 
                   <div className="px-5 py-2 rounded-full" style={{ background: 'var(--portal-surface)', border: '1px solid var(--portal-border)' }}>
-                    <span className="text-sm font-bold" style={{ fontFamily: 'JetBrains Mono, monospace', color: 'var(--portal-text-heading)' }}>
+                    <span className="text-sm font-bold" style={{ fontFamily: 'var(--font-mono)', color: 'var(--portal-text-heading)' }}>
                       {pageNumber} / {numPages}
                     </span>
                   </div>

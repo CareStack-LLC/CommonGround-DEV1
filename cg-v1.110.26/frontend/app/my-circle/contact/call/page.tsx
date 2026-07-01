@@ -504,7 +504,7 @@ function CircleContactCallContent() {
           </div>
           <span className={`px-3 py-1 rounded-full text-xs font-bold ${
             isCallJoined ? 'bg-[#3DAA8A]/20 text-[#3DAA8A]' : 'bg-[#F5A623]/20 text-[#F5A623]'
-          }`} style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+          }`} style={{ fontFamily: "var(--font-mono)" }}>
             {participantList.length} {participantList.length === 1 ? 'person' : 'people'}
           </span>
         </header>
@@ -689,7 +689,7 @@ function CircleContactCallContent() {
                       <div key={msg.id} className="p-3 bg-[#1E3A4A]/60 rounded-xl border border-[#3DAA8A]/10">
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-sm font-bold text-[#3DAA8A]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{msg.sender}</span>
-                          <span className="text-xs text-[#CBD8E0]/40" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                          <span className="text-xs text-[#CBD8E0]/40" style={{ fontFamily: "var(--font-mono)" }}>
                             {msg.time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </span>
                         </div>

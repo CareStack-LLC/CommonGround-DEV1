@@ -5,13 +5,8 @@ import {
   SectionHeading,
   FaqJsonLd,
 } from '@/components/marketing';
-import type { FeatureGridItem } from '@/components/marketing/primitives/feature-grid';
+import { BrandIcon, type BrandIconName } from '@/components/brand/brand-icon';
 import {
-  MessageSquare,
-  Calendar,
-  DollarSign,
-  Video,
-  MapPin,
   Clock,
   FileCheck,
   Shield,
@@ -21,29 +16,34 @@ import {
   Sparkles,
   BookOpen,
   Lock,
-  Hash,
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 /* ── Category feature sets ─────────────────────────────────────── */
 
-const AI_FEATURES: FeatureGridItem[] = [
+type FeatureItem = { title: string; description: string; accent?: string } & (
+  | { brandIcon: BrandIconName; icon?: never }
+  | { icon: LucideIcon; brandIcon?: never }
+);
+
+const AI_FEATURES: FeatureItem[] = [
   {
-    icon: MessageSquare,
+    brandIcon: 'aria',
     title: 'ARIA message coaching',
     description:
       'Parents see how their words could land before hitting send. ARIA flags hostility or blame and suggests calmer phrasing — you choose whether to use it.',
   },
   {
-    icon: Sparkles,
+    brandIcon: 'agreement',
     title: 'ARIA agreement assistant',
     description:
       'Guided prompts help parents draft custody agreements section by section, with neutral, kid-first language.',
   },
 ];
 
-const SCHEDULING_FEATURES: FeatureGridItem[] = [
+const SCHEDULING_FEATURES: FeatureItem[] = [
   {
-    icon: Calendar,
+    brandIcon: 'timebridge',
     title: 'TimeBridge automated schedules',
     description:
       'Set custody once. Pickups, dropoffs, holidays, and reminders run on autopilot for both parents.',
@@ -62,9 +62,9 @@ const SCHEDULING_FEATURES: FeatureGridItem[] = [
   },
 ];
 
-const MONEY_FEATURES: FeatureGridItem[] = [
+const MONEY_FEATURES: FeatureItem[] = [
   {
-    icon: DollarSign,
+    brandIcon: 'clearfund',
     title: 'ClearFund shared expenses',
     description:
       'Parents upload a receipt, split by custody percentage, and track every payment. No more "I already paid for that."',
@@ -79,9 +79,9 @@ const MONEY_FEATURES: FeatureGridItem[] = [
   },
 ];
 
-const CHILD_FEATURES: FeatureGridItem[] = [
+const CHILD_FEATURES: FeatureItem[] = [
   {
-    icon: Video,
+    brandIcon: 'kidspace',
     title: 'KidSpace video calls',
     description:
       "Your child's own space to call you directly — no middleman, no middle-of-an-argument timing.",
@@ -94,16 +94,16 @@ const CHILD_FEATURES: FeatureGridItem[] = [
   },
 ];
 
-const COMPLIANCE_FEATURES: FeatureGridItem[] = [
+const COMPLIANCE_FEATURES: FeatureItem[] = [
   {
-    icon: MapPin,
+    brandIcon: 'exchange',
     title: 'Silent Handoff GPS exchanges',
     description:
       'Drop off at a public location. GPS confirms arrival. QR code confirms pickup. Zero interaction required.',
     accent: 'gold',
   },
   {
-    icon: Hash,
+    brandIcon: 'export',
     title: 'SHA-256 verified exports',
     description:
       'One-click court-ready evidence bundles with tamper-proof hashing — the strongest integrity standard in any co-parenting app.',
@@ -124,7 +124,7 @@ interface Category {
   description: string;
   image: string;
   alt: string;
-  features: FeatureGridItem[];
+  features: FeatureItem[];
 }
 
 const CATEGORIES: Category[] = [
@@ -256,13 +256,13 @@ export default function FeaturesPage() {
               Everything you need. Nothing you don&apos;t.
             </span>
             <h1 className="font-serif text-[#1E3A4A] text-4xl sm:text-5xl md:text-6xl leading-[1.05] tracking-tight mb-6">
-              Every feature solves{' '}
-              <span className="text-[var(--portal-primary)]">one problem</span>
+              Every feature ends{' '}
+              <span className="text-[var(--portal-primary)]">one fight</span>
             </h1>
             <p className="text-lg sm:text-xl text-gray-600 mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">
-              Less coordination, more peace of mind.{' '}
+              Trade coordination for calm. ARIA cools messages, TimeBridge runs the schedule, and ClearFund settles the money &mdash; each one quietly documented, {' '}
               <span className="font-medium text-[#1E3A4A]">
-                No forced mediation. No relationship coaching. Just structured tools that bring calm.
+                court-ready the day you ever need it.
               </span>
             </p>
 
@@ -278,7 +278,7 @@ export default function FeaturesPage() {
                 href="/pricing"
                 className="inline-flex items-center justify-center px-7 py-4 bg-white text-[var(--portal-primary)] font-semibold rounded-full hover:bg-gray-50 transition-all border-2 border-[var(--portal-primary)]"
               >
-                View pricing
+                See plans &amp; pricing
               </Link>
             </div>
 
@@ -375,10 +375,14 @@ export default function FeaturesPage() {
                             gold ? 'bg-cg-amber/10' : 'bg-cg-sage/10'
                           }`}
                         >
-                          <Icon
-                            className={`h-5 w-5 ${gold ? 'text-cg-amber' : 'text-cg-sage'}`}
-                            aria-hidden="true"
-                          />
+                          {f.brandIcon ? (
+                            <BrandIcon name={f.brandIcon} size={24} />
+                          ) : Icon ? (
+                            <Icon
+                              className={`h-5 w-5 ${gold ? 'text-cg-amber' : 'text-cg-sage'}`}
+                              aria-hidden="true"
+                            />
+                          ) : null}
                         </span>
                         <div>
                           <h3 className="font-serif text-lg text-[#1E3A4A]">
@@ -448,30 +452,30 @@ export default function FeaturesPage() {
             Ready to find common ground?
           </h2>
           <p className="text-lg sm:text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
-            Start with a free account. No credit card. No pressure. Just see if automation beats coordination.
+            Put these tools to work today. Create a free account, invite your co-parent when you&apos;re ready, and let automation replace the coordination.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/early-access"
               className="inline-flex items-center justify-center px-8 py-4 bg-[var(--portal-primary)] text-white rounded-xl font-medium text-lg hover:bg-[#2D6A8F] transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5 group"
             >
-              Start Free
+              Start free &mdash; no card needed
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
             </Link>
             <Link
               href="/pricing"
               className="inline-flex items-center justify-center px-8 py-4 bg-white text-[var(--portal-primary)] rounded-xl font-medium text-lg hover:bg-gray-50 transition-all duration-200 border-2 border-[var(--portal-primary)]"
             >
-              View Pricing
+              See plans &amp; pricing
             </Link>
           </div>
           <p className="mt-6 text-sm text-gray-600">
-            Free tier includes ARIA messaging, basic scheduling, and ClearFund tracking. No fees.
+            Free forever &middot; No credit card &middot; 2-minute setup &middot; Cancel anytime
           </p>
           <p className="mt-3 text-sm text-gray-600">
             Family law professional?{' '}
             <Link href="/professionals" className="text-[var(--portal-primary)] hover:underline">
-              See how professionals use CommonGround
+              See the professional portal
             </Link>
           </p>
         </div>

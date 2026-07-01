@@ -74,7 +74,7 @@ function Logo({ className = '', onClick }: { className?: string; onClick?: () =>
       <svg width="36" height="36" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" className="flex-shrink-0">
         <defs>
           <linearGradient id="nav-bg" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#E8F4F8" />
+            <stop offset="0%" stopColor="#E0EFF8" />
             <stop offset="100%" stopColor="#D6ECE8" />
           </linearGradient>
           <linearGradient id="nav-lf" x1="0" y1="0" x2="1" y2="1">
@@ -218,7 +218,7 @@ export function Navigation() {
                       <div className="relative w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
                         <span className="text-sm font-medium text-white">{initials}</span>
                         {unreadCount > 0 && (
-                          <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-red-500 rounded-full border-2 border-[var(--portal-primary)] dark:border-[#0F1D27]" />
+                          <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-[#C53030] rounded-full border-2 border-[var(--portal-primary)] dark:border-[#0F1D27]" />
                         )}
                       </div>
                       <ChevronDown

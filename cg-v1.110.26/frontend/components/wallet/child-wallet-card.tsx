@@ -31,8 +31,8 @@ export default function ChildWalletCard({
       <div className="p-5">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-              <PiggyBank className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+            <div className="w-12 h-12 rounded-xl bg-[#E0EFF8] dark:bg-[#1E3A4A]/30 flex items-center justify-center">
+              <PiggyBank className="h-6 w-6 text-[#2D6A8F] dark:text-[#4BA8C8]" />
             </div>
             <div>
               <h3 className="font-semibold text-foreground">{childWallet.child_name}'s Savings</h3>
@@ -42,9 +42,9 @@ export default function ChildWalletCard({
         </div>
 
         {/* Balance */}
-        <div className="mt-4 p-4 bg-purple-50 dark:bg-purple-950/30 rounded-xl">
-          <p className="text-sm text-purple-600 dark:text-purple-400 mb-1">Current Balance</p>
-          <p className="text-2xl font-bold text-purple-700 dark:text-purple-300 font-mono tabular-nums">
+        <div className="mt-4 p-4 bg-[#E0EFF8] dark:bg-[#1E3A4A]/30 rounded-xl">
+          <p className="text-sm text-[#2D6A8F] dark:text-[#4BA8C8] mb-1">Current Balance</p>
+          <p className="text-2xl font-bold text-[#1E4E6B] dark:text-[#4BA8C8] font-mono tabular-nums">
             {formatCurrency(balance)}
           </p>
         </div>
@@ -72,7 +72,7 @@ export default function ChildWalletCard({
           {onContribute && (
             <button
               onClick={onContribute}
-              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-purple-600 text-white rounded-xl font-medium hover:bg-purple-700 transition-colors"
+              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#2D6A8F] text-white rounded-xl font-medium hover:bg-[#1E4E6B] transition-colors"
             >
               <Gift className="h-4 w-4" />
               Send Money

@@ -187,7 +187,7 @@ export default function TemplateEditPage() {
     if (isLoading || !initialTemplate) {
         return (
             <div className="flex items-center justify-center min-h-[60vh]">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600" />
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2D6A8F]" />
             </div>
         );
     }
@@ -207,13 +207,13 @@ export default function TemplateEditPage() {
                     {isNew ? "New Template" : "Edit Template"}
                 </h1>
                 {savedStatus === "saved" && (
-                    <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-medium">
+                    <div className="flex items-center gap-1.5 text-xs text-[#2D8A70] font-medium">
                         <CheckCircle2 className="h-3.5 w-3.5" />
                         Saved
                     </div>
                 )}
                 {savedStatus === "published" && (
-                    <div className="flex items-center gap-1.5 text-xs text-purple-600 font-medium">
+                    <div className="flex items-center gap-1.5 text-xs text-[#2D6A8F] font-medium">
                         <CheckCircle2 className="h-3.5 w-3.5" />
                         Published!
                     </div>

@@ -40,19 +40,19 @@ interface Notification {
 // Helpers
 // ─────────────────────────────────────────────
 const TYPE_ICONS: Record<string, React.ReactNode> = {
-    intake_pending: <FileText className="h-4 w-4 text-amber-500" />,
+    intake_pending: <FileText className="h-4 w-4 text-[#F5A623]" />,
     access_request: <Users className="h-4 w-4 text-blue-500" />,
-    court_event: <Calendar className="h-4 w-4 text-purple-500" />,
-    message: <MessageSquare className="h-4 w-4 text-emerald-500" />,
+    court_event: <Calendar className="h-4 w-4 text-[#3D8DB0]" />,
+    message: <MessageSquare className="h-4 w-4 text-[#3DAA8A]" />,
     compliance: <Shield className="h-4 w-4 text-red-500" />,
-    task_due: <Clock className="h-4 w-4 text-orange-400" />,
+    task_due: <Clock className="h-4 w-4 text-[#F7B84D]" />,
     system: <Bot className="h-4 w-4 text-slate-400" />,
 };
 
 const SEVERITY_DOT: Record<string, string> = {
     error: "bg-red-500",
-    warning: "bg-amber-400",
-    success: "bg-emerald-500",
+    warning: "bg-[#F7B84D]",
+    success: "bg-[#3DAA8A]",
     info: "bg-blue-500",
 };
 
@@ -115,7 +115,7 @@ function NotificationItem({
                     {TYPE_ICONS[notification.type] || TYPE_ICONS.system}
                 </div>
                 {!notification.is_read && (
-                    <div className={`absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white ${SEVERITY_DOT[notification.severity] || "bg-amber-500"}`} />
+                    <div className={`absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white ${SEVERITY_DOT[notification.severity] || "bg-[#F5A623]"}`} />
                 )}
             </div>
 
@@ -136,7 +136,7 @@ function NotificationItem({
                     <button
                         onClick={(e) => { e.stopPropagation(); onMarkRead(notification.id); }}
                         title="Mark read"
-                        className="p-1.5 text-slate-400 hover:text-emerald-900 hover:bg-emerald-50 rounded-sm transition-all border-2 border-transparent hover:border-emerald-900/20"
+                        className="p-1.5 text-slate-400 hover:text-[#1B5544] hover:bg-[#E8F4F0] rounded-sm transition-all border-2 border-transparent hover:border-[#1B5544]/20"
                     >
                         <Check className="h-3.5 w-3.5" />
                     </button>

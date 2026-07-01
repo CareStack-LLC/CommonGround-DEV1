@@ -121,7 +121,7 @@ export function KidMovieCard({ video, onClick, className, progress, isFavorite: 
           )}
 
           {progress !== undefined && progress > 0 && (
-            <div className="text-xs font-medium text-teal-600 dark:text-teal-400" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+            <div className="text-xs font-medium text-teal-600 dark:text-teal-400" style={{ fontFamily: 'var(--font-mono)' }}>
               {Math.round(progress)}%
             </div>
           )}
