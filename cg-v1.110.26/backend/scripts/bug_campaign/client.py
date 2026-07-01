@@ -39,7 +39,9 @@ class ParentAgentClient:
         self.access_token: Optional[str] = None
         self.refresh_token: Optional[str] = None
         self.user_id: Optional[str] = None
-        self._http = httpx.AsyncClient(base_url=cfg.api_base, timeout=cfg.http_timeout_s)
+        self._http = httpx.AsyncClient(
+            base_url=cfg.api_base, timeout=cfg.http_timeout_s, follow_redirects=True,
+        )
 
     async def aclose(self) -> None:
         await self._http.aclose()
@@ -210,6 +212,101 @@ class ParentAgentClient:
             "GET", f"/custody-time/family/{family_file_id}/report",
             params={"start_date": start_date, "end_date": end_date},
         )
+
+    # ---- family / children lifecycle --------------------------------------
+    async def add_child(self, family_file_id: str, payload: dict) -> dict:
+        return await self._raw_request("POST", f"/family-files/{family_file_id}/children", json=payload)
+
+    async def approve_child(self, family_file_id: str, child_id: str) -> dict:
+        return await self._raw_request(
+            "POST", f"/family-files/{family_file_id}/children/{child_id}/approve", json={}
+        )
+
+    async def get_child(self, child_id: str) -> dict:
+        return await self._raw_request("GET", f"/children/{child_id}")
+
+    async def dashboard_summary(self, family_file_id: str) -> dict:
+        return await self._raw_request("GET", f"/dashboard/summary/{family_file_id}")
+
+    async def list_agreements(self, family_file_id: str) -> list:
+        data = await self._raw_request("GET", f"/family-files/{family_file_id}/agreements")
+        if isinstance(data, dict):
+            return data.get("items", data.get("agreements", []))
+        return data or []
+
+    # ---- ARIA messaging ----------------------------------------------------
+    async def analyze_message(self, content: str, family_file_id: str) -> dict:
+        # analyze takes QUERY params (content, family_file_id), not a JSON body
+        return await self._raw_request(
+            "POST", "/messages/analyze", params={"content": content, "family_file_id": family_file_id}
+        )
+
+    async def send_message(self, payload: dict) -> tuple[int, dict]:
+        """Returns (status_code, body). 201 sent, 202 flagged, 400 blocked."""
+        if self.cfg.request_delay_ms:
+            await asyncio.sleep(self.cfg.request_delay_ms / 1000)
+        resp = await self._http.request("POST", "/messages/", json=payload, headers=self._headers())
+        return resp.status_code, _safe_json(resp)
+
+    # ---- agreements --------------------------------------------------------
+    async def create_agreement(self, payload: dict) -> dict:
+        return await self._raw_request("POST", "/agreements", json=payload)
+
+    async def get_agreement(self, agreement_id: str) -> dict:
+        return await self._raw_request("GET", f"/agreements/{agreement_id}")
+
+    async def submit_agreement(self, agreement_id: str) -> dict:
+        return await self._raw_request("POST", f"/agreements/{agreement_id}/submit", json={})
+
+    async def approve_agreement(self, agreement_id: str, notes: str = "") -> dict:
+        return await self._raw_request(
+            "POST", f"/agreements/{agreement_id}/approve",
+            json={"notes": notes, "disclaimer_accepted": True},
+        )
+
+    # ---- ClearFund ---------------------------------------------------------
+    async def create_obligation(self, payload: dict) -> tuple[int, dict]:
+        if self.cfg.request_delay_ms:
+            await asyncio.sleep(self.cfg.request_delay_ms / 1000)
+        resp = await self._http.request("POST", "/clearfund/obligations/", json=payload, headers=self._headers())
+        return resp.status_code, _safe_json(resp)
+
+    async def get_splits(self, family_file_id: str) -> dict:
+        return await self._raw_request("GET", f"/clearfund/splits/{family_file_id}")
+
+    # ---- court export ------------------------------------------------------
+    async def create_export(self, payload: dict) -> tuple[int, dict]:
+        if self.cfg.request_delay_ms:
+            await asyncio.sleep(self.cfg.request_delay_ms / 1000)
+        resp = await self._http.request("POST", "/exports/", json=payload, headers=self._headers())
+        return resp.status_code, _safe_json(resp)
+
+    async def get_export(self, export_id: str) -> dict:
+        return await self._raw_request("GET", f"/exports/{export_id}")
+
+    async def download_export(self, export_id: str) -> tuple[int, bytes, dict]:
+        resp = await self._http.request("GET", f"/exports/{export_id}/download", headers=self._headers())
+        return resp.status_code, resp.content, dict(resp.headers)
+
+    async def verify_export(self, export_number: str) -> dict:
+        return await self._raw_request("GET", f"/exports/verify/{export_number}", auth=False)
+
+    # ---- KidComs -----------------------------------------------------------
+    async def coppa_consent(self, child_id: str) -> tuple[int, dict]:
+        if self.cfg.request_delay_ms:
+            await asyncio.sleep(self.cfg.request_delay_ms / 1000)
+        resp = await self._http.request("POST", f"/kidcoms/children/{child_id}/coppa-consent", json={}, headers=self._headers())
+        return resp.status_code, _safe_json(resp)
+
+    async def get_child_wallet(self, child_id: str) -> tuple[int, dict]:
+        resp = await self._http.request("GET", f"/wallets/child/{child_id}", headers=self._headers())
+        return resp.status_code, _safe_json(resp)
+
+    async def wallet_contribute(self, child_id: str, payload: dict) -> tuple[int, dict]:
+        if self.cfg.request_delay_ms:
+            await asyncio.sleep(self.cfg.request_delay_ms / 1000)
+        resp = await self._http.request("POST", f"/wallets/child/{child_id}/contribute", json=payload, headers=self._headers())
+        return resp.status_code, _safe_json(resp)
 
 
 def _safe_json(resp: httpx.Response) -> Any:

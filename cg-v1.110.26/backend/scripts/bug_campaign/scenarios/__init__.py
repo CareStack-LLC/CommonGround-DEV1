@@ -3,9 +3,23 @@
 from __future__ import annotations
 
 from .base import FamilyContext, Scenario, ScenarioOutcome
-from . import geocode, handoff, schedules
+from . import (
+    agreements, clearfund, court_export, dashboard, geocode, handoff,
+    kidcoms, messaging, onboarding, schedules,
+)
 
-ALL_SCENARIOS: list[Scenario] = [*handoff.SCENARIOS, *schedules.SCENARIOS, *geocode.SCENARIOS]
+ALL_SCENARIOS: list[Scenario] = [
+    *handoff.SCENARIOS,
+    *schedules.SCENARIOS,
+    *messaging.SCENARIOS,
+    *agreements.SCENARIOS,
+    *clearfund.SCENARIOS,
+    *onboarding.SCENARIOS,
+    *court_export.SCENARIOS,
+    *kidcoms.SCENARIOS,
+    *dashboard.SCENARIOS,
+    *geocode.SCENARIOS,
+]
 
 SCENARIO_REGISTRY: dict[str, Scenario] = {s.id: s for s in ALL_SCENARIOS}
 

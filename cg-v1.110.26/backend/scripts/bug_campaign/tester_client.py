@@ -20,7 +20,7 @@ class TesterClient:
         self.cfg = cfg
         self.token = token
         self.family_label = family_label
-        self._http = httpx.AsyncClient(base_url=cfg.api_base, timeout=cfg.http_timeout_s)
+        self._http = httpx.AsyncClient(base_url=cfg.api_base, timeout=cfg.http_timeout_s, follow_redirects=True)
 
     async def aclose(self) -> None:
         await self._http.aclose()
