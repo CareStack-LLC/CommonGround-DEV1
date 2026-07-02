@@ -58,10 +58,19 @@ if settings.SENTRY_DSN:
     except ImportError:
         logger.debug("Sentry: OpenAIIntegration not available (SDK too old?)")
 
+    # Tie the release to the deployed commit (Render sets RENDER_GIT_COMMIT)
+    # so Sentry can attribute errors to specific deploys — enables suspect
+    # commits, release health, and regressed-in-release detection. Falls back
+    # to the static API version locally.
+    _release_sha = os.environ.get("RENDER_GIT_COMMIT", "")[:12]
+    _release = (
+        f"commonground@{_release_sha}" if _release_sha
+        else f"commonground@{settings.API_VERSION}"
+    )
     sentry_sdk.init(
         dsn=settings.SENTRY_DSN,
         environment=settings.ENVIRONMENT,
-        release=f"commonground@{settings.API_VERSION}",
+        release=_release,
 
         # ── Traces (Performance Monitoring) ──
         # Sample 30% of transactions in prod, 100% in dev

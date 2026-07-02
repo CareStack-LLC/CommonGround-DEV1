@@ -76,8 +76,10 @@ async def run_email_monitor():
             urgent_emails = []
             analyzed_count = 0
             for email in new_emails:
+                # fetch_new_emails returns MonitoredEmail ORM rows, not dicts —
+                # analyze_email takes the id and returns a dict.
                 try:
-                    analysis = await analyze_email(db, email)
+                    analysis = await analyze_email(db, email.id)
                     analyzed_count += 1
 
                     # Flag urgent emails immediately
@@ -85,13 +87,13 @@ async def run_email_monitor():
                         urgent_emails.append({"email": email, "analysis": analysis})
                         logger.warning(
                             f"URGENT email detected: "
-                            f"subject={email.get('subject', 'N/A')}, "
+                            f"subject={email.subject}, "
                             f"reason={analysis.get('urgency_reason', 'unknown')}"
                         )
                 except Exception as email_err:
                     logger.error(
                         f"Failed to analyze email "
-                        f"(id={email.get('id', 'unknown')}): {email_err}",
+                        f"(id={getattr(email, 'id', 'unknown')}): {email_err}",
                         exc_info=True,
                     )
 
@@ -192,8 +194,8 @@ async def _notify_urgent_emails(urgent_emails: list):
         email = item["email"]
         analysis = item["analysis"]
         body_lines.append(
-            f"  {idx}. Subject: {email.get('subject', 'N/A')}\n"
-            f"     From: {email.get('sender', 'N/A')}\n"
+            f"  {idx}. Subject: {email.subject}\n"
+            f"     From: {email.from_email}\n"
             f"     Reason: {analysis.get('urgency_reason', 'N/A')}"
         )
     body = "\n".join(body_lines)
