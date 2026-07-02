@@ -756,7 +756,7 @@ export default function HomePage() {
                   <Shield className="h-7 w-7 text-[var(--portal-primary)]" />
                 </div>
                 <h3 className="font-semibold text-gray-900 mb-2">Encrypted &amp; Private</h3>
-                <p className="text-sm text-gray-600">End-to-end encryption on every message and file &mdash; never sold, never shared</p>
+                <p className="text-sm text-gray-600">Bank-level encryption on every message and file &mdash; never sold, never shared</p>
               </div>
 
               <div className="bg-white rounded-2xl p-6 border-2 border-gray-100 text-center">

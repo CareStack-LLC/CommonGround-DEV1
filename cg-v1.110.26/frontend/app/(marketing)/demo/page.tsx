@@ -93,7 +93,7 @@ export default function DemoPage() {
             variant="stats"
             items={[
               { value: '15-min', label: 'Tailored walkthrough' },
-              { value: 'SOC 2', label: 'Firm-grade security' },
+              { value: 'SHA-256', label: 'Tamper-proof records' },
               { value: 'Scoped', label: 'Per-case client access' },
             ]}
           />

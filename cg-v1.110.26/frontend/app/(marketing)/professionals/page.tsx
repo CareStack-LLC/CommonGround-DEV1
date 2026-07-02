@@ -533,7 +533,7 @@ export default function ProfessionalsPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  'End-to-end encryption',
+                  'Encrypted in transit & at rest',
                   'SHA-256 verification',
                   'Uneditable audit trails',
                   'Role-based access',

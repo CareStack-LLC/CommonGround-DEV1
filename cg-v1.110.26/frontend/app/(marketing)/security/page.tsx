@@ -4,7 +4,7 @@ import { SecurityContent } from './_content';
 export const metadata: Metadata = {
   title: 'Security & encryption | CommonGround',
   description:
-    'How CommonGround protects your family data — end-to-end encryption, SHA-256 tamper-proof records, SOC 2 controls, and zero-data-sharing policy.',
+    'How CommonGround protects your family data — bank-level encryption in transit and at rest, SHA-256 tamper-proof records, and a zero-data-sharing policy.',
   alternates: { canonical: '/security' },
   openGraph: {
     type: 'website',

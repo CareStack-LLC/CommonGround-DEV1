@@ -45,6 +45,14 @@ async def handle_daily_recording_webhook(
     # Get raw body for signature verification
     body = await request.body()
 
+    # Daily verifies the endpoint when a webhook is created by POSTing
+    # {"test": "test"} and requiring a 200 — this arrives unsigned, so it
+    # must be answered before the signature check or webhooks can never be
+    # registered. Real events are still signature-verified below.
+    if body.strip() in (b'{"test":"test"}', b'{"test": "test"}'):
+        logger.info("Daily.co webhook verification ping acknowledged")
+        return {"status": "ok"}
+
     # Verify webhook signature
     signature = request.headers.get("x-daily-signature", "")
     if not recording_service.verify_daily_webhook_signature(body, signature):
@@ -263,6 +271,14 @@ async def handle_daily_transcription_webhook(
     """
     # Get raw body for signature verification
     body = await request.body()
+
+    # Daily verifies the endpoint when a webhook is created by POSTing
+    # {"test": "test"} and requiring a 200 — this arrives unsigned, so it
+    # must be answered before the signature check or webhooks can never be
+    # registered. Real events are still signature-verified below.
+    if body.strip() in (b'{"test":"test"}', b'{"test": "test"}'):
+        logger.info("Daily.co webhook verification ping acknowledged")
+        return {"status": "ok"}
 
     # Verify webhook signature
     signature = request.headers.get("x-daily-signature", "")

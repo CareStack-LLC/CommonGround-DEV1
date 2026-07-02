@@ -201,12 +201,33 @@ class CampaignOrchestrator:
         return all_results
 
     # ---- 3-day custody-accuracy soak (dedicated FRESH cohort) --------------
+    _CUSTODY_COHORT_NAME = "Custody Accuracy — Multi-Day Soak"
+
     async def _ensure_custody_family(self, admin: AdminClient) -> dict:
         state = load_state()
         cid = state.get("custody_cohort_id")
         if not cid:
+            # Stateless runners (e.g. Render cron — fresh filesystem each run)
+            # have no local day_state.json. The cohort lives in the app DB, so
+            # recover it by name from the server before creating a new one.
+            try:
+                existing = await admin.list_cohorts()
+                items = existing.get("items", existing) if isinstance(existing, dict) else existing
+                for c in items or []:
+                    if c.get("name") == self._CUSTODY_COHORT_NAME:
+                        cid = c["id"]
+                        state["custody_cohort_id"] = cid
+                        created = str(c.get("created_at", ""))[:10]
+                        if created and not state.get("custody_soak_start"):
+                            state["custody_soak_start"] = created
+                        save_state(state)
+                        print(f"  recovered soak cohort {cid} from server (created {created or 'unknown'})")
+                        break
+            except Exception as exc:
+                print(f"  cohort recovery check failed ({exc}); will create fresh")
+        if not cid:
             cohort = await admin.create_cohort(
-                name="Custody Accuracy — Multi-Day Soak", target_feature="exchange", family_count=1,
+                name=self._CUSTODY_COHORT_NAME, target_feature="exchange", family_count=1,
                 description="Real-time multi-day custody-tracker accuracy check via daily exchanges.",
                 test_instructions="Automated daily exchanges; harness verifies cumulative custody accuracy.",
             )

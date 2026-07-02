@@ -83,3 +83,16 @@ services:
     dockerCommand: python -m scripts.endpoint_sweep --base-url https://commonground-api-a0fr.onrender.com --sentry
     schedule: "30 6,18 * * *"  # twice daily 06:30/18:30 UTC
     plan: starter
+
+  - type: cron
+    name: commonground-custody-soak
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    # Real-time custody-accuracy soak: drives daily exchanges for a dedicated
+    # synthetic family and verifies cumulative custody math via the oracle.
+    # Stateless-safe: the orchestrator recovers its cohort from the server by
+    # name, so the ephemeral cron filesystem is fine. Needs CAMPAIGN_* env vars
+    # (admin creds + prod gates) set on this service in the Render dashboard.
+    dockerCommand: python -m scripts.bug_campaign.run --mode custody-soak --confirm-production
+    schedule: "0 9,13,17 * * *"  # 3x daily per the soak design
+    plan: starter

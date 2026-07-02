@@ -22,7 +22,7 @@ const securityFeatures = [
   {
     icon: Lock,
     title: 'AES-256 Encryption',
-    description: 'Same encryption banks use. Your data is unreadable to everyone—including us.',
+    description: 'Same encryption banks use — in transit and at rest. Your data is never sold or shared, ever.',
   },
   {
     icon: Eye,
