@@ -89,7 +89,7 @@ def endpoints_for(tok: str, ffid: str) -> list[tuple[str, dict]]:
     mix = [
         (f"{API}/dashboard/summary/{ffid}", h),   # heaviest: aggregates across the family
         (f"{API}/dashboard/summary/{ffid}", h),
-        (f"{API}/family-files", h),
+        (f"{API}/family-files/", h),
         (f"{API}/exchanges/case/{ffid}/upcoming", h),
         (f"{API}/users/me/notifications", h),
         (f"{API}/users/me/profile", h),
