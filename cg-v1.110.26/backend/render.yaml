@@ -96,3 +96,16 @@ services:
     dockerCommand: python -m scripts.bug_campaign.run --mode custody-soak --confirm-production
     schedule: "0 9,13,17 * * *"  # 3x daily per the soak design
     plan: starter
+
+  - type: cron
+    name: commonground-perf-gate
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    # Cheap latency/availability regression gate: one low-load pass over the hot
+    # endpoints, alerts Sentry (source=perf_gate) if any exceeds its threshold.
+    # Needs CAMPAIGN_BASE_URL + CAMPAIGN_ADMIN_EMAIL/PASSWORD (set on this service).
+    # Thresholds have headroom over the cross-region baseline — tighten after
+    # app+DB are co-located.
+    dockerCommand: python -m scripts.perf_gate --sentry
+    schedule: "15 */3 * * *"  # every 3 hours
+    plan: starter
