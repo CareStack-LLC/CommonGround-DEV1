@@ -43,6 +43,15 @@ class Settings(BaseSettings):
     # across restarts).
     SIGNING_PRIVATE_KEY_PEM: str = ""
 
+    # Trusted reverse-proxy hops in front of the app, for deriving the real
+    # client IP from X-Forwarded-For without trusting client-spoofable values.
+    # Verified against the live edge 2026-07-02: traffic flows
+    #   client -> Cloudflare -> Render
+    # and the real client IP is the 2nd entry from the RIGHT of X-Forwarded-For
+    # (Cloudflare appends the real IP; Render appends Cloudflare's edge IP).
+    # Set to 1 if Cloudflare is ever removed from the path.
+    TRUSTED_PROXY_HOPS: int = 2
+
     # CORS
     ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:3001,https://www.find-commonground.com,https://find-commonground.com,https://common-ground-blue.vercel.app,https://common-ground-git-main-teejays-projects-caad17d8.vercel.app"
     # Allow only CommonGround Vercel preview/branch URLs and production custom domain

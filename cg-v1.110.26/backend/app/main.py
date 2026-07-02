@@ -606,23 +606,6 @@ async def health_check():
     return {"status": overall, "checks": checks}
 
 
-@app.get("/debug/whoami", include_in_schema=False)
-async def debug_whoami(request: Request):
-    """TEMPORARY probe to verify how Render constructs X-Forwarded-For so the
-    rate limiter can key on the real client IP (not a spoofable value). Guarded
-    by a slice of SECRET_KEY; removed once the XFF fix is verified."""
-    from fastapi import HTTPException
-    if request.query_params.get("k") != (settings.SECRET_KEY or "")[:16]:
-        raise HTTPException(status_code=404)
-    xff = request.headers.get("x-forwarded-for")
-    return {
-        "x_forwarded_for_raw": xff,
-        "xff_parts": [p.strip() for p in xff.split(",")] if xff else [],
-        "x_real_ip": request.headers.get("x-real-ip"),
-        "request_client_host": request.client.host if request.client else None,
-    }
-
-
 # Debug endpoints — only available in development
 if settings.is_development:
     from sqlalchemy import text

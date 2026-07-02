@@ -180,10 +180,33 @@ _memory_limiter = InMemoryRateLimiter()
 
 
 def _get_client_ip(request: Request) -> str:
-    """Extract the real client IP from the request."""
+    """Return the real client IP, resilient to X-Forwarded-For spoofing.
+
+    X-Forwarded-For is a client-appendable list; taking the LEFTMOST entry (the
+    old behavior) returned a fully client-controlled value, so anyone could
+    bypass every per-IP rate limit and IP block by sending their own header.
+
+    CommonGround runs behind two trusted proxies — Cloudflare then Render —
+    each of which appends to the header. Verified against the live edge
+    2026-07-02:
+        client sends:              <anything the client wants, spoofable>
+        Cloudflare appends:        <the REAL client IP it observed>
+        Render appends:            <Cloudflare's edge IP>
+    so the trustworthy client IP is the Nth entry from the RIGHT, where
+    N = settings.TRUSTED_PROXY_HOPS (2). A client cannot influence that
+    position — they can only prepend entries to the left of it.
+    """
+    from app.core.config import settings
+    hops = max(1, int(getattr(settings, "TRUSTED_PROXY_HOPS", 2)))
     forwarded = request.headers.get("x-forwarded-for")
     if forwarded:
-        return forwarded.split(",")[0].strip()
+        parts = [p.strip() for p in forwarded.split(",") if p.strip()]
+        if len(parts) >= hops:
+            return parts[-hops]
+        # Fewer entries than expected proxies (misconfig / direct hit) —
+        # fall back to the leftmost present rather than an out-of-range index.
+        if parts:
+            return parts[0]
     if request.client:
         return request.client.host
     return "unknown"
