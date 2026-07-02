@@ -112,9 +112,27 @@ construction, a real bug — this is the strongest GPS evidence available.
   a handoff-completion response omitting GPS/proximity echo on one path, and the
   geocode "exact" label on city-centroid results — worth tightening.
 
-A fresh full fast-mode run was launched against prod this session; it is slow to
-complete because of the cross-region latency in §1, so the evidence above is from
-the last completed runs (custody soak verified today).
+**Fresh full run completed this session (2026-07-02, PROD, 2 families): 27/27
+scenarios PASSED, 0 failures.** Notably S-RPT-01 (custody report reconciliation)
+and S-SCHED-01 (custody flip) — flaky in the July 1 runs — are now green:
+
+- GPS/geofence: S-GEO-01..08 ✅ (inside, just-outside, low-accuracy buffer,
+  accuracy cap, way-outside, one-parent, mixed QR+GPS) — oracle matched stored
+  distance/geofence to 1 m.
+- Check-in → custody flip + stats: S-SCHED-01 ✅ · report reconciliation S-RPT-01 ✅
+- ARIA: tone triage S-ARIA-01 ✅ · **threat intercepted on send S-ARIA-03 ✅**
+- Court export SHA-256 integrity S-EXP-01 ✅ · cross-family isolation S-SEC-01 ✅
+- Agreements, ClearFund split+funding, onboarding, wallet, dashboard,
+  notifications, calendar, geocoding — all ✅
+
+19 advisory notes were filed against otherwise-passing scenarios (6 high / 9 med
+/ 4 low) — API-quality observations, not functional breakage. The recurring high
+one: the handoff-completion **response** doesn't echo GPS coordinates/proximity
+(the data IS stored correctly — that's what the oracle verifies — the response
+just doesn't return it). Worth adding to the response for client-side proof.
+
+Note the per-scenario durations (20-70s each) — a direct symptom of the §1
+cross-region latency.
 
 ---
 
