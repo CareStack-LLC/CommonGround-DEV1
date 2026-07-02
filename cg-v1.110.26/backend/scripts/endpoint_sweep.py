@@ -110,15 +110,34 @@ def fill_path_params(path: str) -> str:
 
 
 def collect_routes(app) -> list[tuple[str, str]]:
-    """(method, path) for every APIRoute on the app."""
+    """(method, path) for every route on the app.
+
+    Primary source is the OpenAPI schema — it survives FastAPI internals
+    changing (0.139+ registers included routers as lazy `_IncludedRouter`
+    objects, so iterating `app.routes` for APIRoute instances only finds
+    app-level routes). The direct traversal is kept as a union so routes
+    with include_in_schema=False are still swept.
+    """
     from fastapi.routing import APIRoute
 
-    out = []
+    out: set[tuple[str, str]] = set()
+
+    try:
+        schema = app.openapi()
+        for path, ops in schema.get("paths", {}).items():
+            for method in ops:
+                m = method.upper()
+                if m in {"GET", "POST", "PUT", "PATCH", "DELETE", "HEAD"}:
+                    out.add((m, path))
+    except Exception as exc:  # never let schema generation kill the sweep
+        print(f"warning: openapi() route enumeration failed: {exc}", file=sys.stderr)
+
     for route in app.routes:
         if isinstance(route, APIRoute):
-            for method in sorted(route.methods - {"OPTIONS"}):
-                out.append((method, route.path))
-    return sorted(set(out))
+            for method in route.methods - {"OPTIONS"}:
+                out.add((method, route.path))
+
+    return sorted(out)
 
 
 def is_skipped(path: str) -> bool:
