@@ -7,15 +7,27 @@ migration — fully reversible by pointing back at Oregon.
 - **New (fast):** `https://commonground-api-east.onrender.com` — `srv-d93c49btqb8s73blgtf0`, Virginia
 - **Old (current prod):** `https://commonground-api-a0fr.onrender.com` — `srv-d6kithtm5p6s73ds40l0`, Oregon
 
-## Recommended: add a custom domain first (one-time, future-proof)
-Point everything at a stable domain you control so future moves need no external
-changes:
-1. Render → `commonground-api-east` → Settings → Custom Domains → add
-   `api.find-commonground.com`.
-2. Add the CNAME it gives you at your DNS provider for `find-commonground.com`.
-3. Use `https://api.find-commonground.com` everywhere in the steps below instead
-   of the raw east URL. (If you skip this, use the east URL — but you'll repeat
-   this dance on the next move.)
+## Custom domain (done on Render — needs your Cloudflare DNS record)
+`api.find-commonground.com` has been added to the `commonground-api-east` service
+(Render domain id `cdm-d93caa9o3t8c73fbd8ig`, status: unverified until DNS is set).
+
+**Add this record in Cloudflare** (dash.cloudflare.com → find-commonground.com → DNS):
+| Field | Value |
+|---|---|
+| Type | `CNAME` |
+| Name | `api` |
+| Target | `commonground-api-east.onrender.com` |
+| Proxy status | **DNS only (grey cloud)** — NOT proxied |
+| TTL | Auto |
+
+⚠️ **Must be DNS-only (grey cloud).** Render already fronts the service with its
+own CDN/Cloudflare + SSL. If you proxy it (orange cloud) you add a THIRD proxy
+hop, which (a) can break Render's SSL and (b) shifts the real client IP position
+in X-Forwarded-For — the rate limiter's `TRUSTED_PROXY_HOPS=2` would then need to
+become `3`. Keep it grey.
+
+Once the record is live, Render auto-verifies and issues SSL (a few minutes).
+Then use `https://api.find-commonground.com` everywhere below.
 
 ## Everything pointing at the OLD Oregon URL — repoint each
 1. **Frontend (Vercel)** — set `NEXT_PUBLIC_API_URL` (and `NEXT_PUBLIC_WS_URL` if
@@ -23,9 +35,17 @@ changes:
 2. **Daily.co recording webhook** — currently `…-a0fr…/api/v1/webhooks/daily/recording`.
    Re-register at the new URL (or the custom domain). *(Claude can do this via the
    Daily API once you confirm the target URL.)*
-3. **Stripe webhook** — Stripe dashboard → Developers → Webhooks → update the
-   endpoint URL to the new host; copy the new signing secret into
-   `STRIPE_WEBHOOK_SECRET` if it changes. *Needs your Stripe dashboard.*
+3. **Stripe webhook** *(test mode)* — Stripe dashboard → Developers → Webhooks →
+   open your existing CommonGround endpoint → **Update details** → set URL to:
+   `https://api.find-commonground.com/api/v1/webhooks/stripe`
+   Updating the URL on the SAME endpoint keeps the signing secret, so no env
+   change. (If you create a NEW endpoint instead, copy its `whsec_…` into
+   `STRIPE_WEBHOOK_SECRET` on both Render services.) Events the handler processes
+   (ensure these are selected):
+   `checkout.session.completed`, `customer.subscription.created/updated/deleted`,
+   `invoice.paid`, `invoice.payment_failed`, `payment_intent.succeeded`,
+   `payment_intent.payment_failed`, `payout.paid`, `payout.failed`,
+   `transfer.created`, `transfer.paid`, `account.updated`.
 4. **Monitoring crons** (`endpoint-sweep`, `perf-gate`, `custody-soak`) — their
    `--base-url` / `CAMPAIGN_BASE_URL` point at Oregon. *(Claude can flip these.)*
 5. **Any other webhooks** (Mux, SendGrid event webhook) if configured against the
