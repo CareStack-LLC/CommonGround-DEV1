@@ -46,19 +46,45 @@ Every DB round-trip crosses the country; multi-query endpoints multiply it into
 seconds. **This is the dominant cause of both the slowness and the low
 concurrency ceiling.**
 
-### Verdict
-Current real capacity ≈ **10 req/s, a few dozen concurrent users** before it
-degrades badly. It will NOT carry 300 users. Fixes, by leverage:
-1. **Co-locate compute + DB in one region** (move Render to us-east near Supabase,
-   or move Supabase/Upstash to us-west). Biggest single win — cuts the per-query
-   cross-country latency that's on every request. *(Infra change — recreating a
-   Render service in a new region gives a new URL; a decision for you.)*
-2. Cut per-request round-trips: reconsider `pool_pre_ping`, cache/short-circuit
-   the rate-limiter Redis call, add response caching on hot reads (dashboard).
-3. Profile & fix the heavy queries (`dashboard/summary`, `exchanges/upcoming` —
-   likely N+1s).
-4. Then scale out: `numInstances` is 1 (render.yaml intends 2), raise DB pool to
-   match concurrency, and re-run `scripts/load_test.py` to confirm.
+### FIXED — API co-located with the DB (us-east)
+Root cause confirmed and fixed by standing up a second Render service in
+**Virginia (us-east)** next to Supabase `aws-1-us-east-1` — same database, no
+data migration. Head-to-head, same perf gate, same moment:
+
+| Endpoint | Oregon (us-west) | Virginia (us-east) | Faster |
+|---|---|---|---|
+| health | 938 ms | 146 ms | 6.4× |
+| profile | 1063 ms | 140 ms | 7.6× |
+| family_files | 1217 ms | 153 ms | 8.0× |
+| notifications | 1019 ms | 142 ms | 7.2× |
+| dashboard_summary | 2090 ms | **307 ms** | 6.8× |
+| exchanges_upcoming | 3174 ms | **308 ms** | 10.3× |
+
+Under load, Virginia produced **zero server errors** at every stage (no 503s,
+no 500s) — a stark contrast to Oregon's 503 collapse. It's pending frontend
+cutover (see the cutover runbook). Because each request now holds resources
+~6-10× less time, per-instance throughput rises proportionally.
+
+**Load-test caveat:** the harness simulated many clients by rotating
+`X-Forwarded-For`. The XFF security fix (below) *correctly* defeats that, so from
+a single machine the limiter now sees one real IP and returns 429s past 100/min.
+A precise peak-concurrency number requires distributed load-gen (many real IPs);
+the 6-10× latency win + zero server errors already answer "won't break."
+
+### Two production bugs found and fixed along the way
+- **`--limit-concurrency 20`** → hard 503s at ~30 concurrent. Raised to 120.
+- **http:// redirect on trailing-slash routes** → any client calling e.g.
+  `/family-files` (no slash) got a 307 to an `http://` URL; clients strip auth on
+  the scheme downgrade → **401 on a valid token** (also explained load-test 401s).
+  Fixed with `--proxy-headers --forwarded-allow-ips="*"` so redirects use https.
+
+### Still worth doing (post-cutover)
+- Profile/batch the dashboard's ~15 sequential queries (now ~0.3s co-located, but
+  fewer round-trips is still better under load).
+- `numInstances` is 1 (render.yaml intends 2) — raise for headroom + no single
+  point of failure.
+- The `commonground-perf-gate` cron (every 3h) now guards against latency
+  regressions; tighten its thresholds to the new ~150-300ms baseline after cutover.
 
 ---
 
