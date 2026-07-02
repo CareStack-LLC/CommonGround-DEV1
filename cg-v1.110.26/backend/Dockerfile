@@ -16,9 +16,13 @@ RUN apt-get update && apt-get install -y \
     fonts-liberation \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements and install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Install from the fully pinned lock so every build is reproducible —
+# unpinned installs let prod silently jump framework versions (fastapi
+# 0.136→0.139 broke route introspection on 2026-07-02). requirements.txt
+# stays as the human-edited direct-dependency list; regenerate the lock
+# after changing it (instructions in requirements.lock header).
+COPY requirements.lock .
+RUN pip install --no-cache-dir -r requirements.lock
 
 # Copy application code
 COPY . .
