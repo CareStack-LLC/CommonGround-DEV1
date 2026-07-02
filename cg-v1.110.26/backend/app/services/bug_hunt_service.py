@@ -1731,7 +1731,7 @@ Respond with a JSON object (no markdown, just raw JSON) with these fields:
 
         client = get_async_anthropic()
         response = await client.messages.create(
-            model="claude-sonnet-4-5-20250514",
+            model="claude-sonnet-4-5",
             max_tokens=4096,
             messages=[{"role": "user", "content": prompt}],
         )

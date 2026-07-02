@@ -167,8 +167,20 @@ async def run_worker():
                 retry_count = getattr(job, 'retry_count', 0) or 0
                 new_retry = retry_count + 1
                 if new_retry >= max_retries:
-                    # Max retries exceeded — move to dead letter
+                    # Max retries exceeded — move to dead letter. Flagged as its
+                    # own Sentry event (distinct from the per-attempt
+                    # capture_exception above) so dead-lettered jobs can be
+                    # alerted on / filtered separately from transient retries.
                     logger.error("Job %s dead-lettered after %d attempts: %s", job.id, new_retry, e)
+                    try:
+                        import sentry_sdk as _sentry
+                        _sentry.capture_message(
+                            f"ARIA job dead-lettered after {new_retry} attempts: {e}",
+                            level="error",
+                            tags={"aria_job_dead_letter": "true"},
+                        )
+                    except Exception:
+                        pass
                     await conn.execute(text("""
                         UPDATE aria_jobs SET status = 'dead_letter', error_message = :err,
                                retry_count = :retry WHERE id = :id

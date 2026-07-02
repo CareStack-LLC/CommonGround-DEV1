@@ -22,7 +22,12 @@ from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_TIMEOUT = 15.0
+# 15s was too aggressive: any long generation (bug triage, bug-hunt AI
+# overview, blog drafts — all max_tokens=4096) takes longer than 15s and
+# timed out on EVERY run, falling back to the (unconfigured) OpenAI key.
+# The ceiling only bounds failures — fast calls still return fast; slow paths
+# are guarded by the ARIA circuit breaker.
+DEFAULT_TIMEOUT = 120.0
 DEFAULT_MAX_RETRIES = 1
 
 # Lazy singletons — created on first access

@@ -492,7 +492,7 @@ async def analyze_email(db: AsyncSession, email_id: str) -> dict:
     try:
         client = get_async_anthropic()
         response = await client.messages.create(
-            model="claude-sonnet-4-5-20250514",
+            model="claude-sonnet-4-5",
             max_tokens=2048,
             messages=[{"role": "user", "content": prompt}],
         )
@@ -1040,7 +1040,7 @@ async def generate_thread_reply(
         if settings.ANTHROPIC_API_KEY:
             client = get_async_anthropic()
             response = await client.messages.create(
-                model="claude-sonnet-4-5-20250514",
+                model="claude-sonnet-4-5",
                 max_tokens=1500,
                 messages=[{"role": "user", "content": prompt}],
             )

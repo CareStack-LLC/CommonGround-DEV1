@@ -10,3 +10,76 @@ services:
     envVars:
       - key: PORT
         value: 10000
+
+  # ---------------------------------------------------------------------
+  # Background workers / cron jobs.
+  #
+  # None of these ran in production before this file was updated — only
+  # the web service above was deployed, so aria_worker (async ARIA
+  # analysis), rolling_generator (keeps custody-exchange + obligation
+  # instances projected forward), bug_triage_worker, expire_requests,
+  # weekly_report_worker, and email_monitor_worker all silently never
+  # executed. Each needs the SAME env vars as commonground-api (DATABASE_URL,
+  # SECRET_KEY, SUPABASE_*, ANTHROPIC_API_KEY, SENTRY_DSN, etc.) — set them
+  # on each service in the Render dashboard, or put them in one Render
+  # "Environment Group" and link it to all services below.
+  # ---------------------------------------------------------------------
+
+  - type: worker
+    name: commonground-aria-worker
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerCommand: python -m app.worker.aria_worker
+    plan: starter
+    autoDeploy: true
+
+  - type: cron
+    name: commonground-rolling-generator
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerCommand: python -m app.worker.rolling_generator
+    schedule: "0 7 * * *"   # daily 07:00 UTC — keeps exchange/obligation instances projected forward
+    plan: starter
+
+  - type: cron
+    name: commonground-expire-requests
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerCommand: python -m app.worker.expire_requests
+    schedule: "15 7 * * *"  # daily 07:15 UTC
+    plan: starter
+
+  - type: cron
+    name: commonground-bug-triage
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerCommand: python -m app.worker.bug_triage_worker
+    schedule: "0 13 * * 1,3,5"  # Mon/Wed/Fri 13:00 UTC, per worker docstring
+    plan: starter
+
+  - type: cron
+    name: commonground-weekly-report
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerCommand: python -m app.worker.weekly_report_worker
+    schedule: "0 8 * * 1"   # Monday 08:00 UTC, per worker docstring
+    plan: starter
+
+  - type: cron
+    name: commonground-email-monitor
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerCommand: python -m app.worker.email_monitor_worker
+    schedule: "*/5 * * * *"  # every 5 minutes, per worker docstring
+    plan: starter
+
+  - type: cron
+    name: commonground-endpoint-sweep
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    # Synthetic monitoring: exercises every registered route against prod,
+    # alerts 5xx/unreachable routes to Sentry (tag source=endpoint_sweep).
+    # Paced (~85 req/min) to stay under the per-IP rate limit.
+    dockerCommand: python -m scripts.endpoint_sweep --base-url https://commonground-api-a0fr.onrender.com --sentry
+    schedule: "30 6,18 * * *"  # twice daily 06:30/18:30 UTC
+    plan: starter

@@ -50,8 +50,11 @@ class Settings(BaseSettings):
 
     @property
     def allowed_origins_list(self) -> List[str]:
-        """Convert ALLOWED_ORIGINS to list."""
-        return [origin.strip() for origin in self.ALLOWED_ORIGINS.split(",")]
+        """Convert ALLOWED_ORIGINS to list, dropping localhost entries in production."""
+        origins = [origin.strip() for origin in self.ALLOWED_ORIGINS.split(",")]
+        if self.is_production:
+            origins = [o for o in origins if "localhost" not in o and "127.0.0.1" not in o]
+        return origins
 
     # Database
     DATABASE_URL: str
@@ -157,10 +160,16 @@ class Settings(BaseSettings):
     # Monitoring
     SENTRY_DSN: Optional[str] = None
 
-    # Sentry API (for bug triage)
+    # Sentry API (for bug triage). Org/project verified against the live account
+    # 2026-07-02 — the old defaults ("commonground" / "commonground-frontend")
+    # pointed at a nonexistent project, so every triage run 404'd unless
+    # overridden in the environment.
     SENTRY_AUTH_TOKEN: Optional[str] = None
-    SENTRY_ORG_SLUG: str = "commonground"
-    SENTRY_PROJECT_SLUG: str = "commonground-frontend"
+    SENTRY_ORG_SLUG: str = "commonground-s0"
+    SENTRY_PROJECT_SLUG: str = "commonground"
+    # Comma-separated list to triage several projects in one run (e.g. a future
+    # separate frontend project). Falls back to SENTRY_PROJECT_SLUG when empty.
+    SENTRY_PROJECT_SLUGS: str = ""
 
     # Sentry auto-resolution (guarded). When disabled, the triage worker only
     # LOGS the actions it would take (dry-run) — it never mutates Sentry. Turn on

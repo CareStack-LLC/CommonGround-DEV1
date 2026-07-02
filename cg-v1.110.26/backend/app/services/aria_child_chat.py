@@ -554,7 +554,7 @@ Return ONLY valid JSON. No extra text."""
                 return None
             client = get_anthropic()
             response = client.messages.create(
-                model="claude-3-5-sonnet-20241022",
+                model="claude-sonnet-4-5",
                 max_tokens=500,
                 temperature=0.1,
                 system=[{"type": "text", "text": system_prompt, "cache_control": {"type": "ephemeral"}}],

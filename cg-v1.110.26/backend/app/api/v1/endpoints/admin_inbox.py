@@ -403,7 +403,7 @@ async def analyze_inbox(
         if settings.ANTHROPIC_API_KEY:
             client = AsyncAnthropic(api_key=settings.ANTHROPIC_API_KEY)
             resp = await client.messages.create(
-                model="claude-sonnet-4-20250514",
+                model="claude-sonnet-4-5",
                 max_tokens=1000,
                 messages=[{"role": "user", "content": prompt}],
             )
@@ -509,7 +509,7 @@ async def analyze_selected_emails(
         if s.ANTHROPIC_API_KEY:
             client = anthropic.AsyncAnthropic(api_key=s.ANTHROPIC_API_KEY)
             response = await client.messages.create(
-                model="claude-sonnet-4-20250514",
+                model="claude-sonnet-4-5",
                 max_tokens=2000,
                 messages=[{"role": "user", "content": prompt}],
             )

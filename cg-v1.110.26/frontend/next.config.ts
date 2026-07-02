@@ -46,6 +46,10 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  compiler: {
+    // Strip console.log from production bundles; keep error/warn for real diagnostics.
+    removeConsole: process.env.NODE_ENV === 'production' ? { exclude: ['error', 'warn'] } : false,
+  },
   async redirects() {
     return [
       { source: '/superadmin/activity-log', destination: '/superadmin/users?tab=activity', permanent: true },

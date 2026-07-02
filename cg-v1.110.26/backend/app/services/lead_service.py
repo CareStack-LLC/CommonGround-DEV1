@@ -249,7 +249,7 @@ async def generate_campaign_content(
     try:
         client = get_async_anthropic()
         response = await client.messages.create(
-            model="claude-sonnet-4-5-20250514",
+            model="claude-sonnet-4-5",
             max_tokens=4096,
             messages=[{"role": "user", "content": prompt}],
         )
@@ -908,7 +908,7 @@ async def ai_generate_landing_page(
         if settings.ANTHROPIC_API_KEY:
             client = get_async_anthropic()
             response = await client.messages.create(
-                model="claude-sonnet-4-20250514",
+                model="claude-sonnet-4-5",
                 max_tokens=4096,
                 messages=[{"role": "user", "content": prompt}],
             )
@@ -1105,7 +1105,7 @@ async def _generate_landing_page_social_posts(
         if settings.ANTHROPIC_API_KEY:
             client = get_async_anthropic()
             response = await client.messages.create(
-                model="claude-sonnet-4-20250514",
+                model="claude-sonnet-4-5",
                 max_tokens=4096,
                 messages=[{"role": "user", "content": prompt}],
             )

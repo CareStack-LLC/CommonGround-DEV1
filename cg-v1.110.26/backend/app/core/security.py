@@ -182,6 +182,15 @@ async def get_current_user(
                 "SECURITY: Redis blacklist check failed — revoked tokens may be "
                 "accepted. Error: %s", str(e),
             )
+            try:
+                import sentry_sdk as _sentry
+                _sentry.capture_message(
+                    f"SECURITY: Redis token-revocation check fail-open: {e}",
+                    level="error",
+                    tags={"redis_fail_open": "true"},
+                )
+            except Exception:
+                pass
 
     # Decode token
     payload = decode_token(token)
@@ -325,7 +334,21 @@ async def _token_revoked(token: str, subject_id: str) -> bool:
         if await r.get(f"user_revoked:{subject_id}"):
             return True
     except Exception as e:
+        import time
+        _now = time.time()
+        _last = getattr(_token_revoked, "_redis_warn_ts", 0)
         logger.error("SECURITY: child/circle revocation check failed: %s", e)
+        if _now - _last > 60:
+            _token_revoked._redis_warn_ts = _now
+            try:
+                import sentry_sdk as _sentry
+                _sentry.capture_message(
+                    f"SECURITY: Redis child/circle revocation check fail-open: {e}",
+                    level="error",
+                    tags={"redis_fail_open": "true"},
+                )
+            except Exception:
+                pass
     return False
 
 

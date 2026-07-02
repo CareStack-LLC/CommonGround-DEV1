@@ -16,16 +16,75 @@ settings = Settings()
 SENTRY_API_BASE = "https://sentry.io/api/0"
 
 
+def configured_project_slugs() -> list[str]:
+    """All project slugs to triage (SENTRY_PROJECT_SLUGS csv, else the single slug)."""
+    csv = (settings.SENTRY_PROJECT_SLUGS or "").strip()
+    if csv:
+        return [s.strip() for s in csv.split(",") if s.strip()]
+    return [settings.SENTRY_PROJECT_SLUG]
+
+
+async def verify_token_scopes() -> dict:
+    """Return the auth token's scopes + whether issue write-back is possible.
+
+    Write-back (auto-mute / reopen) needs `event:write` or an admin scope. A
+    read-only token silently breaks auto-resolution — surface that instead of
+    failing quietly on every PUT.
+    """
+    result = {"ok": False, "scopes": [], "can_write_issues": False, "error": None}
+    if not settings.SENTRY_AUTH_TOKEN:
+        result["error"] = "SENTRY_AUTH_TOKEN not configured"
+        return result
+    try:
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            resp = await client.get(
+                f"{SENTRY_API_BASE}/",
+                headers={"Authorization": f"Bearer {settings.SENTRY_AUTH_TOKEN}"},
+            )
+        if resp.status_code == 200:
+            scopes = resp.json().get("auth", {}).get("scopes", [])
+            result.update(
+                ok=True,
+                scopes=scopes,
+                can_write_issues=any(
+                    s in scopes
+                    for s in ("event:write", "event:admin", "org:write", "org:admin")
+                ),
+            )
+        else:
+            result["error"] = f"HTTP {resp.status_code}"
+    except Exception as exc:
+        result["error"] = str(exc)
+    return result
+
+
 async def fetch_sentry_issues(
     project_slug: Optional[str] = None,
     days: int = 7,
     limit: int = 100,
 ) -> list[dict]:
-    """Fetch unresolved issues from Sentry for the given project."""
+    """Fetch unresolved issues across all configured projects (or one explicit slug)."""
+    slugs = [project_slug] if project_slug else configured_project_slugs()
+    merged: list[dict] = []
+    seen_ids: set[str] = set()
+    for slug in slugs:
+        try:
+            batch = await _fetch_project_issues(slug, days=days, limit=limit)
+        except Exception as exc:
+            logger.error("Sentry fetch failed for project %s: %s", slug, exc)
+            continue
+        for issue in batch:
+            if issue["id"] not in seen_ids:
+                seen_ids.add(issue["id"])
+                merged.append(issue)
+    return merged
+
+
+async def _fetch_project_issues(slug: str, days: int = 7, limit: int = 100) -> list[dict]:
+    """Fetch unresolved issues from Sentry for a single project."""
     if not settings.SENTRY_AUTH_TOKEN:
         raise ValueError("SENTRY_AUTH_TOKEN not configured")
 
-    slug = project_slug or settings.SENTRY_PROJECT_SLUG
     org = settings.SENTRY_ORG_SLUG
 
     # Fetch ALL unresolved issues active in the last N days (not just first-seen)
@@ -90,8 +149,10 @@ async def fetch_sentry_issues(
         issues.append(
             {
                 "id": issue_id,
+                "project": slug,
                 "title": issue["title"],
                 "culprit": issue.get("culprit", ""),
+                "code_location": culprit_to_code_location(issue.get("culprit", "")),
                 "level": issue.get("level", "error"),
                 "count": int(issue.get("count", 0)),
                 "user_count": int(issue.get("userCount", 0)),
@@ -116,8 +177,10 @@ async def fetch_sentry_issues(
             issues.append(
                 {
                     "id": fb_id,
+                    "project": slug,
                     "title": fb_issue.get("title", "User Feedback"),
                     "culprit": fb_issue.get("culprit", ""),
+                    "code_location": culprit_to_code_location(fb_issue.get("culprit", "")),
                     "level": fb_issue.get("level", "info"),
                     "count": int(fb_issue.get("count", 1)),
                     "user_count": int(fb_issue.get("userCount", 1)),
@@ -137,6 +200,154 @@ async def fetch_sentry_issues(
 
     logger.info("Total issues after merging feedback: %d", len(issues))
     return issues
+
+
+def culprit_to_code_location(culprit: str) -> Optional[str]:
+    """Map a Sentry culprit like `app.api.v1.endpoints.messages.send_message`
+    to a repo location like `app/api/v1/endpoints/messages.py:send_message`.
+
+    Walks the dotted path from the right until the module part resolves to a
+    real file under the backend root. Returns None for non-app culprits
+    (middleware internals, frontend URLs, etc.).
+    """
+    if not culprit:
+        return None
+    # Python culprits can look like "app.services.foo in <module>" — keep the
+    # dotted path, drop the " in <frame>" suffix.
+    culprit = culprit.split(" in ")[0].strip()
+    if not culprit.startswith("app."):
+        return None
+    from pathlib import Path
+
+    backend_root = Path(__file__).resolve().parents[2]  # .../backend
+    parts = culprit.split(".")
+    # Try longest module path first: app.a.b.c.func -> app/a/b/c.py (func)
+    for split in range(len(parts), 1, -1):
+        module_parts, remainder = parts[:split], parts[split:]
+        candidate = backend_root.joinpath(*module_parts).with_suffix(".py")
+        if candidate.is_file():
+            rel = candidate.relative_to(backend_root)
+            suffix = f":{remainder[0]}" if remainder else ""
+            return f"{rel}{suffix}"
+    return None
+
+
+def group_duplicate_issues(issues: list[dict]) -> list[dict]:
+    """Merge issues that share the same (error type, culprit) fingerprint.
+
+    Sentry often splits one root cause into many issues (e.g. per-recipient
+    email failures, per-message AI errors). Grouping them keeps the AI-triage
+    prompt focused on root causes instead of 10 copies of the same bug. The
+    representative keeps summed counts and the sibling ids in `duplicate_ids`.
+    """
+    by_key: dict[tuple, dict] = {}
+    order: list[tuple] = []
+    for issue in issues:
+        meta_type = (issue.get("metadata") or {}).get("type", "")
+        # Normalize the title so per-entity variants collapse (emails, uuids, ints)
+        import re
+
+        norm_title = re.sub(
+            r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\S+@\S+|\d+",
+            "*",
+            (issue.get("title") or "").lower(),
+        )[:120]
+        key = (issue.get("project", ""), meta_type, issue.get("culprit", ""), norm_title)
+        if key in by_key:
+            rep = by_key[key]
+            rep["count"] += issue.get("count", 0)
+            rep["user_count"] += issue.get("user_count", 0)
+            rep["duplicate_ids"].append(issue["id"])
+            rep["is_unhandled"] = rep["is_unhandled"] or issue.get("is_unhandled", False)
+            if (issue.get("last_seen") or "") > (rep.get("last_seen") or ""):
+                rep["last_seen"] = issue.get("last_seen")
+            if (issue.get("first_seen") or "") < (rep.get("first_seen") or ""):
+                rep["first_seen"] = issue.get("first_seen")
+        else:
+            rep = {**issue, "duplicate_ids": []}
+            by_key[key] = rep
+            order.append(key)
+    grouped = [by_key[k] for k in order]
+    merged_away = len(issues) - len(grouped)
+    if merged_away:
+        logger.info(
+            "Duplicate grouping: %d issues collapsed into %d root causes",
+            len(issues), len(grouped),
+        )
+    return grouped
+
+
+async def detect_regressions(hours: int = 48) -> list[dict]:
+    """Find issues we (or someone) muted that are STILL firing — regressions.
+
+    A muted issue that keeps producing events means the mute was wrong or the
+    underlying bug got worse. These are queried per project as
+    `is:ignored lastSeen:>cutoff` and surfaced for alerting; with a
+    write-scoped token they can also be reopened via reopen_regressions().
+    """
+    if not settings.SENTRY_AUTH_TOKEN:
+        return []
+    org = settings.SENTRY_ORG_SLUG
+    cutoff = (datetime.utcnow() - timedelta(hours=hours)).strftime("%Y-%m-%dT%H:%M:%S")
+    regressions: list[dict] = []
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        for slug in configured_project_slugs():
+            try:
+                resp = await client.get(
+                    f"{SENTRY_API_BASE}/projects/{org}/{slug}/issues/",
+                    headers={"Authorization": f"Bearer {settings.SENTRY_AUTH_TOKEN}"},
+                    params={
+                        "query": f"is:ignored lastSeen:>{cutoff}",
+                        "limit": 50,
+                        "sort": "freq",
+                    },
+                )
+                if resp.status_code != 200:
+                    logger.warning(
+                        "Regression query failed for %s (HTTP %s)", slug, resp.status_code
+                    )
+                    continue
+                for issue in resp.json():
+                    regressions.append(
+                        {
+                            "id": str(issue["id"]),
+                            "project": slug,
+                            "title": issue.get("title", ""),
+                            "culprit": issue.get("culprit", ""),
+                            "count": int(issue.get("count", 0)),
+                            "last_seen": issue.get("lastSeen"),
+                            "permalink": issue.get("permalink", ""),
+                            "short_id": issue.get("shortId", ""),
+                        }
+                    )
+            except Exception as exc:
+                logger.warning("Regression detection failed for %s: %s", slug, exc)
+    if regressions:
+        logger.warning("%d muted issue(s) are still firing (regressions)", len(regressions))
+    return regressions
+
+
+async def reopen_regressions(regressions: list[dict], dry_run: Optional[bool] = None) -> dict:
+    """Reopen (unresolve) muted issues that kept firing. Same guardrails as
+    auto-mute: dry-run unless SENTRY_AUTO_RESOLVE_ENABLED, capped per run."""
+    if dry_run is None:
+        dry_run = not settings.SENTRY_AUTO_RESOLVE_ENABLED
+    cap = max(0, int(settings.SENTRY_AUTO_RESOLVE_MAX_PER_RUN))
+    to_act = regressions[:cap]
+    applied: list[dict] = []
+    if not dry_run:
+        for r in to_act:
+            if await update_sentry_issue(r["id"], status="unresolved"):
+                applied.append(r)
+        if applied:
+            logger.info("Reopened %d regressed Sentry issues", len(applied))
+    return {
+        "dry_run": dry_run,
+        "candidate_count": len(regressions),
+        "applied_count": len(applied),
+        "candidates": regressions,
+        "applied": applied,
+    }
 
 
 def categorize_issues(issues: list[dict]) -> dict:
@@ -192,12 +403,15 @@ async def ai_triage(issues: list[dict]) -> dict:
     # Build a concise summary of issues for Claude
     issue_summaries = []
     for i, issue in enumerate(issues[:30]):  # Cap at 30 for context limits
+        dupes = len(issue.get("duplicate_ids", []))
         issue_summaries.append(
-            f"{i+1}. [{issue['level'].upper()}] {issue['title']}\n"
+            f"{i+1}. [{issue['level'].upper()}] (id={issue['id']}) {issue['title']}\n"
             f"   Culprit: {issue['culprit']}\n"
-            f"   Occurrences: {issue['count']}, Users affected: {issue['user_count']}\n"
+            + (f"   Code location: {issue['code_location']}\n" if issue.get("code_location") else "")
+            + f"   Occurrences: {issue['count']}, Users affected: {issue['user_count']}\n"
             f"   First seen: {issue['first_seen']}, Last seen: {issue['last_seen']}\n"
             f"   Unhandled: {issue['is_unhandled']}"
+            f"{f'  [{dupes} duplicate issues merged]' if dupes else ''}"
             f"{'  [USER REPORTED]' if issue.get('has_user_feedback') else ''}"
         )
 
@@ -210,11 +424,15 @@ async def ai_triage(issues: list[dict]) -> dict:
         "1. **Severity**: critical / high / medium / low\n"
         "2. **Action**: resolve (fix this sprint) / defer (not urgent) / "
         "investigate (need more info) / ignore (noise/expected)\n"
-        "3. **Reason**: 1-sentence explanation\n\n"
+        "3. **Reason**: 1-sentence explanation\n"
+        "4. **Suggested fix**: for action=resolve, a 1-2 sentence concrete fix "
+        "referencing the code location when given (e.g. 'add python-dateutil to "
+        "requirements.txt', 'update the model id in app/services/aria.py')\n\n"
         "Then provide an overall summary with:\n"
         "- Top 3 most impactful issues to fix\n"
         "- Common patterns or root causes\n"
         "- Recommendations for the 3-day sprint\n\n"
+        "Use the exact id= value shown for each issue as issue_id. "
         "Format your response as JSON:\n"
         "{\n"
         '  "summary": "Overall assessment...",\n'
@@ -222,7 +440,8 @@ async def ai_triage(issues: list[dict]) -> dict:
         '  "patterns": ["pattern 1", "pattern 2"],\n'
         '  "recommendations": [\n'
         '    {"issue_id": "123", "title": "...", "severity": "high", '
-        '"action": "resolve", "reason": "...", "estimated_effort": "1h"}\n'
+        '"action": "resolve", "reason": "...", "suggested_fix": "...", '
+        '"code_location": "app/services/foo.py:bar", "estimated_effort": "1h"}\n'
         "  ]\n"
         "}"
     )
@@ -244,7 +463,7 @@ async def ai_triage(issues: list[dict]) -> dict:
 
             client = get_async_anthropic()
             response = await client.messages.create(
-                model="claude-sonnet-4-5-20250514",
+                model="claude-sonnet-4-5",
                 max_tokens=4096,
                 messages=[{"role": "user", "content": prompt}],
             )
@@ -643,18 +862,31 @@ async def auto_resolve_issues(issues: list[dict], triaged_data: dict, dry_run: O
                 "issue_id": iid, "title": issue.get("title", ""),
                 "short_id": issue.get("short_id", ""), "permalink": issue.get("permalink", ""),
                 "reason": reason,
+                # grouped siblings get muted together with their representative
+                "duplicate_ids": list(issue.get("duplicate_ids", [])),
             })
 
     cap = max(0, int(settings.SENTRY_AUTO_RESOLVE_MAX_PER_RUN))
     to_act = candidates[:cap]
     applied: list[dict] = []
+    scope_warning = None
     if not dry_run:
-        for c in to_act:
-            ok = await update_sentry_issue(c["issue_id"], status="ignored")
-            if ok:
-                applied.append(c)
-        if applied:
-            logger.info("Auto-muted %d noise/ignore Sentry issues", len(applied))
+        scopes = await verify_token_scopes()
+        if scopes["ok"] and not scopes["can_write_issues"]:
+            scope_warning = (
+                "SENTRY_AUTH_TOKEN lacks event:write — auto-mute cannot apply. "
+                f"Token scopes: {scopes['scopes']}"
+            )
+            logger.error(scope_warning)
+        else:
+            for c in to_act:
+                ok = await update_sentry_issue(c["issue_id"], status="ignored")
+                if ok:
+                    applied.append(c)
+                    for dup_id in c["duplicate_ids"]:
+                        await update_sentry_issue(dup_id, status="ignored")
+            if applied:
+                logger.info("Auto-muted %d noise/ignore Sentry issues", len(applied))
 
     result = {
         "enabled": settings.SENTRY_AUTO_RESOLVE_ENABLED,
@@ -664,6 +896,7 @@ async def auto_resolve_issues(issues: list[dict], triaged_data: dict, dry_run: O
         "applied_count": len(applied),
         "candidates": candidates,
         "applied": applied,
+        "scope_warning": scope_warning,
     }
     logger.info(
         "auto_resolve_issues: %s — %d candidate(s), %d applied",

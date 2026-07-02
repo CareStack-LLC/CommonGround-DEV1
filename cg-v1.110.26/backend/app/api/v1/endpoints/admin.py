@@ -3750,6 +3750,60 @@ async def auto_resolve_bugs(
         raise HTTPException(status_code=502, detail=f"Auto-resolve failed: {type(exc).__name__}")
 
 
+@router.get(
+    "/bugs/health",
+    summary="Sentry triage pipeline health: token scopes, projects, regressions",
+)
+async def bugs_pipeline_health(
+    admin_user: User = Depends(get_current_admin_user),
+) -> dict:
+    """One-call health check for the whole Sentry automation pipeline:
+    token validity + scopes (write-back possible?), configured org/projects,
+    and any muted issues that regressed (still firing)."""
+    from app.services.sentry_triage_service import (
+        verify_token_scopes, configured_project_slugs, detect_regressions,
+    )
+    from app.core.config import settings as app_settings
+
+    scopes = await verify_token_scopes()
+    regressions = await detect_regressions(hours=48) if scopes["ok"] else []
+    return {
+        "token": scopes,
+        "org": app_settings.SENTRY_ORG_SLUG,
+        "projects": configured_project_slugs(),
+        "auto_resolve_enabled": app_settings.SENTRY_AUTO_RESOLVE_ENABLED,
+        "regressed_muted_issues": regressions,
+    }
+
+
+@router.post(
+    "/bugs/regressions/reopen",
+    summary="Reopen muted Sentry issues that are still firing",
+)
+async def reopen_regressed_bugs(
+    db: AsyncSession = Depends(get_db),
+    admin_user: User = Depends(get_current_admin_user),
+    dry_run: bool = Query(True, description="Preview only (default). Set false to actually reopen in Sentry."),
+) -> dict:
+    """Detect muted-but-still-firing issues and (optionally) set them back to
+    unresolved so they get triaged again. Needs a write-scoped Sentry token."""
+    from app.services.sentry_triage_service import detect_regressions, reopen_regressions
+
+    try:
+        regressions = await detect_regressions(hours=48)
+        result = await reopen_regressions(regressions, dry_run=dry_run)
+        await _log_admin_action(
+            db, admin_user, "bug_regressions_reopen", "bugs",
+            details=f"dry_run={dry_run} candidates={result['candidate_count']} applied={result['applied_count']}",
+        )
+        await db.commit()
+        return result
+    except Exception as exc:
+        logger.error("Regression reopen failed: %s", exc)
+        capture_error(exc)
+        raise HTTPException(status_code=502, detail=f"Regression reopen failed: {type(exc).__name__}")
+
+
 @router.post(
     "/bugs/sprints",
     summary="Generate and save a sprint plan from AI triage",

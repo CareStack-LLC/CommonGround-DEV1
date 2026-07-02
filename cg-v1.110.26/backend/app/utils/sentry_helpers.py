@@ -28,7 +28,7 @@ def ai_span(operation: str, model: str, provider: str = "anthropic"):
     Create a Sentry span for an AI/LLM API call.
 
     Usage:
-        with ai_span("message_analysis", "claude-sonnet-4-5-20250514") as span:
+        with ai_span("message_analysis", "claude-sonnet-4-5") as span:
             result = client.messages.create(...)
             span.set_data("input_tokens", result.usage.input_tokens)
             span.set_data("output_tokens", result.usage.output_tokens)

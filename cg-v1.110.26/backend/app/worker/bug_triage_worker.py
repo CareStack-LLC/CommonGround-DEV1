@@ -60,28 +60,50 @@ async def run_bug_triage():
         try:
             from app.services.sentry_triage_service import (
                 fetch_sentry_issues,
+                group_duplicate_issues,
                 categorize_issues,
                 ai_triage,
                 generate_sprint_plan,
                 auto_resolve_issues,
+                detect_regressions,
+                reopen_regressions,
                 recent_critical_issues,
+                verify_token_scopes,
                 save_sprint,
             )
 
-            # Step 1 -- Fetch recent Sentry issues
+            # Step 0 -- Verify the Sentry token can actually do what we need
+            scopes = await verify_token_scopes()
+            if not scopes["ok"]:
+                logger.error("Sentry token check failed: %s", scopes["error"])
+            elif not scopes["can_write_issues"]:
+                logger.warning(
+                    "Sentry token is READ-ONLY (scopes=%s) — triage will run but "
+                    "auto-mute/reopen cannot apply. Issue a token with event:write.",
+                    scopes["scopes"],
+                )
+
+            # Step 1 -- Fetch recent Sentry issues (all configured projects)
             logger.info("Fetching Sentry issues...")
             issues = await fetch_sentry_issues()
             logger.info(f"Fetched {len(issues)} Sentry issues")
 
-            if not issues:
+            # Step 1b -- Regression detection runs even with no open issues:
+            #            muted issues that are still firing are their own signal.
+            regressions = await detect_regressions(hours=48)
+            reopen = await reopen_regressions(regressions) if regressions else None
+
+            if not issues and not regressions:
                 logger.info("No new Sentry issues found. Exiting.")
                 await engine.dispose()
                 return
 
-            # Step 2 -- Categorize by severity/platform (drives counts + alerts)
+            # Step 2 -- Collapse per-entity duplicates into root causes, then
+            #           categorize by severity/platform (drives counts + alerts)
+            issues = group_duplicate_issues(issues)
             categorized = categorize_issues(issues)
 
-            # Step 3 -- Run AI triage (summary + per-issue action recommendations)
+            # Step 3 -- Run AI triage (summary + per-issue action + suggested fix)
             logger.info("Running AI triage on issues...")
             triaged = await ai_triage(issues)
 
@@ -101,9 +123,13 @@ async def run_bug_triage():
             await db.commit()
             logger.info("Sprint plan saved (id=%s)", sprint_id)
 
-            # Step 6 -- Email summary (highlights newly-seen critical/high issues)
+            # Step 6 -- Email summary (highlights newly-seen critical/high issues,
+            #           regressions, and AI-suggested fixes)
             new_criticals = recent_critical_issues(categorized, hours=48)
-            await _send_triage_summary_email(categorized, sprint_plan, auto, new_criticals)
+            await _send_triage_summary_email(
+                categorized, sprint_plan, auto, new_criticals,
+                regressions=regressions, reopen=reopen, triaged=triaged,
+            )
             logger.info("Bug triage worker completed successfully")
 
         except Exception as e:
@@ -120,13 +146,17 @@ async def run_bug_triage():
 
 
 async def _send_triage_summary_email(
-    categorized: dict, sprint_plan: dict, auto: dict, new_criticals: list
+    categorized: dict, sprint_plan: dict, auto: dict, new_criticals: list,
+    regressions: list = None, reopen: dict = None, triaged: dict = None,
 ):
-    """Summary email: counts, newly-seen criticals, auto-mute actions, sprint plan."""
+    """Summary email: counts, newly-seen criticals, regressions, auto-mute
+    actions, AI-suggested fixes, sprint plan."""
+    regressions = regressions or []
     today = datetime.utcnow().strftime('%Y-%m-%d')
     subject = (
         f"Bug Triage - {today} | {categorized.get('total', 0)} open"
         f"{f' | {len(new_criticals)} NEW critical/high' if new_criticals else ''}"
+        f"{f' | {len(regressions)} REGRESSED' if regressions else ''}"
     )
 
     body_lines = [
@@ -148,10 +178,41 @@ async def _send_triage_summary_email(
             )
         body_lines.append("")
 
+    if regressions:
+        reopen_note = ""
+        if reopen:
+            reopen_note = (
+                f" — reopened {reopen.get('applied_count', 0)}"
+                if not reopen.get("dry_run")
+                else " — would reopen (dry-run)"
+            )
+        body_lines += [f"↻ REGRESSED — muted but still firing ({len(regressions)}){reopen_note}:", "-" * 40]
+        for i, issue in enumerate(regressions[:10], 1):
+            body_lines.append(
+                f"  {i}. {issue.get('title', 'Untitled')} (events {issue.get('count', 0)}) {issue.get('permalink', '')}"
+            )
+        body_lines.append("")
+
     mode = "APPLIED" if not auto.get("dry_run") else "would mute (dry-run)"
     muted_note = f", {auto.get('applied_count', 0)} muted" if not auto.get("dry_run") else ""
     body_lines += [
         f"Auto-resolve: {auto.get('candidate_count', 0)} noise/ignore issue(s) {mode}{muted_note}.",
+    ]
+    if auto.get("scope_warning"):
+        body_lines.append(f"⚠ {auto['scope_warning']}")
+
+    # AI-suggested fixes for this sprint's resolve items
+    fixes = [
+        r for r in (triaged or {}).get("recommendations", [])
+        if r.get("action") == "resolve" and r.get("suggested_fix")
+    ]
+    if fixes:
+        body_lines += ["", f"Suggested fixes ({len(fixes)}):", "-" * 40]
+        for i, r in enumerate(fixes[:10], 1):
+            loc = f" [{r['code_location']}]" if r.get("code_location") else ""
+            body_lines.append(f"  {i}. {r.get('title', '')}{loc}: {r['suggested_fix']}")
+
+    body_lines += [
         "",
         f"Sprint plan: {sprint_plan.get('total_items', 0)} to fix, "
         f"{len(sprint_plan.get('deferred', []))} deferred, "

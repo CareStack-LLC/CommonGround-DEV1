@@ -24,6 +24,14 @@ def upgrade() -> None:
         "ALTER TABLE user_profiles "
         "ADD COLUMN IF NOT EXISTS professional_message_consent_at TIMESTAMP"
     )
+    # user_profiles.terms_accepted_at exists on production via drift (added
+    # directly, never migrated) but is declared on the UserProfile model —
+    # create it here too so a fresh database converges to the model schema
+    # instead of erroring on the backfill below.
+    op.execute(
+        "ALTER TABLE user_profiles "
+        "ADD COLUMN IF NOT EXISTS terms_accepted_at TIMESTAMP"
+    )
     # Existing accounts that accepted the Terms are treated as having consented
     # (the consent language is part of the Terms). New signups set it explicitly.
     op.execute(

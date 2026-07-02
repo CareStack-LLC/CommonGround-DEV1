@@ -81,7 +81,7 @@ class VideoFrameAnalysis(Base, UUIDMixin, TimestampMixin):
 
     # Analysis
     analysis_model: Mapped[str] = mapped_column(
-        String(50), default="claude-sonnet-4-5-20250514"
+        String(50), default="claude-sonnet-4-5"
     )
     analysis_result: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
 

@@ -592,7 +592,7 @@ async def get_sales_ai_suggestions(
                 '"estimated_impact": "..."}]'
             )
             resp = await client.messages.create(
-                model="claude-3-5-haiku-20241022",
+                model="claude-haiku-4-5",
                 max_tokens=1500,
                 system=system_prompt,
                 messages=[{

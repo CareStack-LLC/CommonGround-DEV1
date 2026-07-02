@@ -800,8 +800,17 @@ async def get_audit_log(
 async def get_court_settings(
     case_id: str,
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
-    """Get court-controlled settings for a case."""
+    """Get court-controlled settings for a case.
+
+    Requires an authenticated user with a role on the case — this variant
+    returns internal fields (notes, history). It previously had NO auth, which
+    let anonymous callers read any case's settings and, via get-or-create,
+    write rows for arbitrary case ids (500s on FK violations in prod).
+    """
+    await get_user_case_role(db, current_user.id, case_id)
+
     service = CourtSettingsService(db)
     settings = await service.get_or_create_settings(case_id)
 

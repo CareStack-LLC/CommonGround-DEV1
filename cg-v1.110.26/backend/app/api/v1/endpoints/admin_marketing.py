@@ -676,7 +676,7 @@ async def get_marketing_ai_suggestions(
                 '[5 strings],\n  "timing_recommendations": [5 strings]\n}'
             )
             resp = await client.messages.create(
-                model="claude-3-5-haiku-20241022",
+                model="claude-haiku-4-5",
                 max_tokens=2000,
                 system=system_prompt,
                 messages=[{

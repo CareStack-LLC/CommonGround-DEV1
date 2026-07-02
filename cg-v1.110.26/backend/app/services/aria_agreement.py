@@ -90,7 +90,7 @@ class AriaAgreementService:
                     anthropic_messages = anthropic_messages[-15:]
 
                 kwargs = {
-                    "model": "claude-sonnet-4-20250514",
+                    "model": "claude-sonnet-4-5",
                     "max_tokens": max_tokens,
                     "messages": anthropic_messages,
                 }
