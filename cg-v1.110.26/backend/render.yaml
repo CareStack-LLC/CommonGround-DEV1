@@ -80,7 +80,7 @@ services:
     # Synthetic monitoring: exercises every registered route against prod,
     # alerts 5xx/unreachable routes to Sentry (tag source=endpoint_sweep).
     # Paced (~85 req/min) to stay under the per-IP rate limit.
-    dockerCommand: python -m scripts.endpoint_sweep --base-url https://commonground-api-a0fr.onrender.com --sentry
+    dockerCommand: python -m scripts.endpoint_sweep --base-url https://api.find-commonground.com --sentry
     schedule: "30 6,18 * * *"  # twice daily 06:30/18:30 UTC
     plan: starter
 
@@ -94,7 +94,9 @@ services:
     # name, so the ephemeral cron filesystem is fine. Needs CAMPAIGN_* env vars
     # (admin creds + prod gates) set on this service in the Render dashboard.
     dockerCommand: python -m scripts.bug_campaign.run --mode custody-soak --confirm-production
-    schedule: "0 9,13,17 * * *"  # 3x daily per the soak design
+    # Once/day: custody accrues per CALENDAR day, so re-running the same day
+    # can't add a second custody-day — 3x/day produced false "delta=0" failures.
+    schedule: "0 9 * * *"
     plan: starter
 
   - type: cron
