@@ -53,6 +53,12 @@ def _xff() -> str:
     return f"10.{random.randint(1,254)}.{random.randint(1,254)}.{random.randint(1,254)}"
 
 
+# Secret-gated rate-limit bypass token (matches LOADTEST_BYPASS_TOKEN on the
+# server). Since the X-Forwarded-For anti-spoofing fix, rotating XFF no longer
+# fools the per-IP limiter, so a real capacity test must present this token.
+LOADTEST_TOKEN = os.environ.get("LOADTEST_BYPASS_TOKEN", "")
+
+
 async def acquire_tokens(client: httpx.AsyncClient, want: int = 15) -> list[tuple[str, str]]:
     """Return [(token, family_file_id)] from existing synthetic families."""
     r = await client.post(f"{API}/auth/login", json={"email": ADMIN_EMAIL, "password": ADMIN_PW})
@@ -111,7 +117,11 @@ async def run_stage(client: httpx.AsyncClient, tokens: list[tuple[str, str]],
         while time.monotonic() < stop_at:
             tok, ffid = random.choice(tokens)
             url, base_h = random.choice(endpoints_for(tok, ffid))
-            headers = {**base_h, "X-Forwarded-For": _xff(), "User-Agent": "cg-loadtest/1.0"}
+            headers = {**base_h, "User-Agent": "cg-loadtest/1.0"}
+            if LOADTEST_TOKEN:
+                headers["X-Loadtest-Token"] = LOADTEST_TOKEN
+            else:
+                headers["X-Forwarded-For"] = _xff()  # legacy path (pre-fix envs)
             t0 = time.monotonic()
             try:
                 resp = await client.get(url, headers=headers, timeout=30.0)

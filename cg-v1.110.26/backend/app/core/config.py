@@ -52,6 +52,11 @@ class Settings(BaseSettings):
     # Set to 1 if Cloudflare is ever removed from the path.
     TRUSTED_PROXY_HOPS: int = 2
 
+    # Secret-gated rate-limit bypass for capacity testing. Empty = disabled
+    # (production default). Set to a strong random value only during a load
+    # test; callers present it as the X-Loadtest-Token header. Unset it after.
+    LOADTEST_BYPASS_TOKEN: str = ""
+
     # CORS
     ALLOWED_ORIGINS: str = "http://localhost:3000,http://localhost:3001,https://www.find-commonground.com,https://find-commonground.com,https://common-ground-blue.vercel.app,https://common-ground-git-main-teejays-projects-caad17d8.vercel.app"
     # Allow only CommonGround Vercel preview/branch URLs and production custom domain

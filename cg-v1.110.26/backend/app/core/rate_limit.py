@@ -255,6 +255,18 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         if request.url.path in ("/", "/health") or request.method == "OPTIONS":
             return await call_next(request)
 
+        # Secret-gated load-test bypass. DISABLED unless LOADTEST_BYPASS_TOKEN is
+        # set to a non-empty value in the environment AND the caller presents the
+        # exact matching token. Used to measure true server/DB capacity (the
+        # per-IP limiter otherwise caps a single load source at 100/min). Uses a
+        # constant-time compare so the header can't be brute-forced by timing.
+        from app.core.config import settings as _s
+        _lt = getattr(_s, "LOADTEST_BYPASS_TOKEN", "") or ""
+        if _lt:
+            import hmac as _hmac
+            if _hmac.compare_digest(request.headers.get("x-loadtest-token", ""), _lt):
+                return await call_next(request)
+
         client_ip = _get_client_ip(request)
 
         # Try Redis first, fall back to in-memory
