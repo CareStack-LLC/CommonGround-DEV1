@@ -436,9 +436,20 @@ async def lifespan(app: FastAPI):
                    )
                    AND is_admin = false""",
             ]
-            for sql in migrations:
+            # Schema is now owned by Alembic (the startup_ddl_consolidate
+            # migration). This idempotent self-heal used to run ~66 no-op
+            # ALTERs on EVERY prod startup under brief ACCESS EXCLUSIVE locks
+            # (terms_accepted_at alone ran 565x / 479s cumulative). Gate the
+            # DDL to dev — where developers may not run migrations — while the
+            # trailing admin-flag data fix stays idempotent across all envs.
+            ddl_stmts = [s for s in migrations if not s.strip().upper().startswith("UPDATE")]
+            data_stmts = [s for s in migrations if s.strip().upper().startswith("UPDATE")]
+            if settings.is_development:
+                for sql in ddl_stmts:
+                    await conn.execute(text(sql))
+                logger.info("Startup column self-heal applied (dev): %d statements", len(ddl_stmts))
+            for sql in data_stmts:
                 await conn.execute(text(sql))
-            logger.info("Startup column migrations applied successfully")
     except Exception as e:
         logger.warning(f"Startup migration warning (may already exist): {e}")
 
