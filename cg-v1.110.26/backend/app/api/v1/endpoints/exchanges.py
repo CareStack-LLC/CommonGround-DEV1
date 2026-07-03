@@ -233,13 +233,18 @@ async def get_upcoming_exchanges(
         limit=limit
     )
 
+    # Batch-resolve other-parent info once (avoids an N+1 of identical
+    # User/FamilyFile lookups per instance).
+    parent_info = await CustodyExchangeService.get_other_parent_info_batch(
+        db=db,
+        exchanges=[inst.exchange for inst in instances],
+        viewer_id=current_user.id,
+    )
+
     result = []
     for instance in instances:
-        # Get other parent info for perspective-aware display
-        other_parent_name, other_parent_id = await CustodyExchangeService.get_other_parent_info(
-            db=db,
-            exchange=instance.exchange,
-            viewer_id=current_user.id
+        other_parent_name, other_parent_id = parent_info.get(
+            instance.exchange.id, (None, None)
         )
 
         exchange_data = CustodyExchangeService.filter_for_viewer(
@@ -307,13 +312,17 @@ async def get_exchange_history(
         end_date=end_date_naive
     )
 
+    # Batch-resolve other-parent info once (avoids per-instance N+1).
+    parent_info = await CustodyExchangeService.get_other_parent_info_batch(
+        db=db,
+        exchanges=[inst.exchange for inst in instances],
+        viewer_id=current_user.id,
+    )
+
     result = []
     for instance in instances:
-        # Get other parent info for perspective-aware display
-        other_parent_name, other_parent_id = await CustodyExchangeService.get_other_parent_info(
-            db=db,
-            exchange=instance.exchange,
-            viewer_id=current_user.id
+        other_parent_name, other_parent_id = parent_info.get(
+            instance.exchange.id, (None, None)
         )
 
         exchange_data = CustodyExchangeService.filter_for_viewer(

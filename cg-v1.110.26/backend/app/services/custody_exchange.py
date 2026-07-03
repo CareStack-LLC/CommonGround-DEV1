@@ -1093,6 +1093,92 @@ class CustodyExchangeService:
 
         return other_parent_name, other_parent_id
 
+    @staticmethod
+    async def get_other_parent_info_batch(
+        db: AsyncSession,
+        exchanges: list,
+        viewer_id: str,
+    ) -> dict:
+        """Batched equivalent of get_other_parent_info for list endpoints.
+
+        Returns {exchange_id: (other_parent_name, other_parent_id)}. Mirrors the
+        per-row tier logic (direct from/to parent → FamilyFile → CaseParticipant,
+        then User name lookup) but runs at most 3 queries TOTAL regardless of how
+        many exchanges are passed — versus up to 3 per exchange in a loop. This
+        removes the N+1 (identical User/FamilyFile lookups repeated per instance)
+        that held the DB connection open for dozens of round-trips per request.
+        """
+        from app.models.user import User
+
+        by_id = {}
+        for ex in exchanges:
+            if ex is not None and ex.id not in by_id:
+                by_id[ex.id] = ex
+
+        oid: dict = {}                 # exchange_id -> other_parent_id
+        need_family: dict = {}         # family_file_id -> [exchange_id]
+        need_case: dict = {}           # case_id -> [exchange_id]
+
+        # Tier 1: direct from/to parent (no query)
+        for exid, ex in by_id.items():
+            if ex.from_parent_id and ex.to_parent_id:
+                if str(viewer_id) == str(ex.from_parent_id):
+                    oid[exid] = ex.to_parent_id
+                elif str(viewer_id) == str(ex.to_parent_id):
+                    oid[exid] = ex.from_parent_id
+            if exid not in oid and ex.family_file_id:
+                need_family.setdefault(ex.family_file_id, []).append(exid)
+
+        # Tier 2: batch FamilyFile lookup
+        if need_family:
+            ff_rows = (await db.execute(
+                select(FamilyFile).where(FamilyFile.id.in_(list(need_family.keys())))
+            )).scalars().all()
+            ff_map = {str(ff.id): ff for ff in ff_rows}
+            for ffid, exids in need_family.items():
+                ff = ff_map.get(str(ffid))
+                for exid in exids:
+                    if ff:
+                        if str(viewer_id) == str(ff.parent_a_id):
+                            oid[exid] = ff.parent_b_id
+                        elif str(viewer_id) == str(ff.parent_b_id):
+                            oid[exid] = ff.parent_a_id
+
+        # Tier 3 candidates: any still-unresolved exchange with a case_id
+        for exid, ex in by_id.items():
+            if exid not in oid and ex.case_id:
+                need_case.setdefault(ex.case_id, []).append(exid)
+        if need_case:
+            cp_rows = (await db.execute(
+                select(CaseParticipant).where(and_(
+                    CaseParticipant.case_id.in_(list(need_case.keys())),
+                    CaseParticipant.is_active == True,
+                    CaseParticipant.user_id != viewer_id,
+                ))
+            )).scalars().all()
+            cp_by_case: dict = {}
+            for cp in cp_rows:
+                cp_by_case.setdefault(str(cp.case_id), cp)  # first active non-viewer
+            for cid, exids in need_case.items():
+                cp = cp_by_case.get(str(cid))
+                if cp:
+                    for exid in exids:
+                        oid.setdefault(exid, cp.user_id)
+
+        # Batch User name lookup (the main N+1 offender — same parents repeat)
+        uids = list({str(v) for v in oid.values() if v})
+        name_by_uid: dict = {}
+        if uids:
+            users = (await db.execute(select(User).where(User.id.in_(uids)))).scalars().all()
+            name_by_uid = {
+                str(u.id): f"{u.first_name} {u.last_name or ''}".strip() for u in users
+            }
+
+        return {
+            exid: (name_by_uid.get(str(oid.get(exid))), oid.get(exid))
+            for exid in by_id
+        }
+
     # ============================================================
     # Silent Handoff Methods
     # ============================================================
