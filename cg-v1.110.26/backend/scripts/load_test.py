@@ -119,7 +119,9 @@ async def run_stage(client: httpx.AsyncClient, tokens: list[tuple[str, str]],
             url, base_h = random.choice(endpoints_for(tok, ffid))
             headers = {**base_h, "User-Agent": "cg-loadtest/1.0"}
             if LOADTEST_TOKEN:
-                headers["X-Loadtest-Token"] = LOADTEST_TOKEN
+                # Query param, not header — Render's edge strips unknown headers.
+                url = f"{url}{'&' if '?' in url else '?'}_lt={LOADTEST_TOKEN}"
+                headers["X-Loadtest-Token"] = LOADTEST_TOKEN  # belt & suspenders
             else:
                 headers["X-Forwarded-For"] = _xff()  # legacy path (pre-fix envs)
             t0 = time.monotonic()

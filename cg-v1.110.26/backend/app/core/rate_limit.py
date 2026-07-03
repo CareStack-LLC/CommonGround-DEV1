@@ -264,7 +264,12 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         _lt = getattr(_s, "LOADTEST_BYPASS_TOKEN", "") or ""
         if _lt:
             import hmac as _hmac
-            if _hmac.compare_digest(request.headers.get("x-loadtest-token", ""), _lt):
+            # Accept via header OR query param — Render's edge strips unknown
+            # request headers, so the query param is the reliable channel. Both
+            # are constant-time compared against the secret.
+            _provided = (request.headers.get("x-loadtest-token", "")
+                         or request.query_params.get("_lt", ""))
+            if _provided and _hmac.compare_digest(_provided, _lt):
                 return await call_next(request)
 
         client_ip = _get_client_ip(request)
