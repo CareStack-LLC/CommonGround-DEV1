@@ -100,6 +100,22 @@ services:
     plan: starter
 
   - type: cron
+    name: commonground-family-sim
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    # 14-day family simulation (docs/SIMULATION_2WEEK.md): ~50 scripted
+    # families live out daily co-parenting life (messages/exchanges/expenses/
+    # events); every action is ledgered and a daily expected-vs-actual report
+    # is generated. Stateless-safe: cohort recovered from the server by name,
+    # day derived from SIM_START_DATE. NO-FIX POLICY — records only.
+    # Requires CAMPAIGN_* (base URL, admin creds, prod gates, ANTHROPIC_API_KEY)
+    # + SIM_* (SIM_START_DATE, SIM_FAMILY_COUNT, SIM_COHORT_NAME) env vars set
+    # on this service in the Render dashboard (or via the shared env group).
+    dockerCommand: python -m scripts.simulation.run --mode day --confirm-production
+    schedule: "0 15 * * *"  # daily 15:00 UTC — exchange windows are built around this
+    plan: starter
+
+  - type: cron
     name: commonground-perf-gate
     runtime: docker
     dockerfilePath: ./Dockerfile

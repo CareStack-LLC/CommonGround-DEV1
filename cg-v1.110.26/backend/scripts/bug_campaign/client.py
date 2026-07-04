@@ -372,6 +372,69 @@ class ParentAgentClient:
         resp = await self._http.request("GET", path, headers=self._headers())
         return resp.status_code, _safe_json(resp)
 
+    # --- simulation additions ------------------------------------------------
+    # Minimal wrappers used by scripts/simulation. Verified against
+    # app/api/v1/endpoints/{events,family_files,agreements,clearfund,
+    # parent_reports}.py. Additive only.
+
+    async def rsvp_event(self, event_id: str, rsvp_status: str, rsvp_note: str | None = None) -> dict:
+        """PUT /events/{event_id}/rsvp — rsvp_status: going|not_going|maybe|no_response."""
+        return await self._raw_request(
+            "PUT", f"/events/{event_id}/rsvp",
+            json={"rsvp_status": rsvp_status, "rsvp_note": rsvp_note},
+        )
+
+    async def create_family_agreement(self, family_file_id: str, payload: dict | None = None) -> dict:
+        """POST /family-files/{id}/agreements — there is NO generic POST /agreements
+        route; SharedCare agreements are created through the family-file flow."""
+        return await self._raw_request(
+            "POST", f"/family-files/{family_file_id}/agreements", json=payload or {},
+        )
+
+    async def update_agreement_section(self, section_id: str, payload: dict) -> dict:
+        """PUT /agreements/sections/{id} — any update marks the section completed."""
+        return await self._raw_request("PUT", f"/agreements/sections/{section_id}", json=payload)
+
+    async def list_obligations(self, case_id: str, **params: Any) -> Any:
+        return await self._raw_request(
+            "GET", "/clearfund/obligations/", params={"case_id": case_id, **params}
+        )
+
+    async def dispute_obligation(self, obligation_id: str, reason: str) -> tuple[int, Any]:
+        """Decline path for an expense request (freezes the obligation)."""
+        if self.cfg.request_delay_ms:
+            await asyncio.sleep(self.cfg.request_delay_ms / 1000)
+        resp = await self._http.request(
+            "POST", f"/clearfund/obligations/{obligation_id}/dispute",
+            json={"reason": reason}, headers=self._headers(),
+        )
+        return resp.status_code, _safe_json(resp)
+
+    async def complete_obligation(self, obligation_id: str) -> tuple[int, Any]:
+        if self.cfg.request_delay_ms:
+            await asyncio.sleep(self.cfg.request_delay_ms / 1000)
+        resp = await self._http.request(
+            "POST", f"/clearfund/obligations/{obligation_id}/complete",
+            json={}, headers=self._headers(),
+        )
+        return resp.status_code, _safe_json(resp)
+
+    async def generate_parent_report(
+        self, report_type: str, family_file_id: str, date_start: str, date_end: str,
+    ) -> tuple[int, int]:
+        """POST /parent-reports/generate/{type} — returns (status, pdf_byte_count).
+        report_type: custody_time|communication|expense|schedule|kidspace_communication.
+        The endpoint streams a PDF; we only need status + size."""
+        if self.cfg.request_delay_ms:
+            await asyncio.sleep(self.cfg.request_delay_ms / 1000)
+        resp = await self._http.request(
+            "POST", f"/parent-reports/generate/{report_type}",
+            params={"family_file_id": family_file_id,
+                    "date_start": date_start, "date_end": date_end},
+            headers=self._headers(),
+        )
+        return resp.status_code, len(resp.content or b"")
+
 
 def _safe_json(resp: httpx.Response) -> Any:
     try:
