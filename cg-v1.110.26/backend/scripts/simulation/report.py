@@ -15,6 +15,7 @@ from the ledger. Writes state/sim_reports/day_NN.md and .json.
 
 from __future__ import annotations
 
+import asyncio
 import json
 import statistics
 from datetime import date, timedelta
@@ -32,6 +33,14 @@ from .config import SIM_REPORT_DIR, SimConfig
 from .family_bible import build_bible
 
 SPOT_CHECK_COUNT = 5
+
+# Auth is rate-limited to 10 requests/60s per IP (app/core/rate_limit.py
+# AUTH_RATE_LIMIT). The drift check logs into every family and the spot-check
+# logs into 5 more from the SAME cron container (one IP) — back-to-back that
+# blew through the limit and turned most of day 1's checks into 429s. Pace
+# every per-family login at this rate (with headroom) so a full 50-family
+# report run takes a few extra minutes instead of failing almost entirely.
+_LOGIN_PACE_S = 6.5
 
 
 def _load_ledger() -> list[dict]:
@@ -256,6 +265,7 @@ async def _exchange_drift_from_server(
         pa = ParentAgentClient(sim.campaign, fam["parent_a_email"],
                                fam["parent_a_password"], "drift-check")
         try:
+            await asyncio.sleep(_LOGIN_PACE_S)
             await pa.login()
             history = await pa.get_exchange_history(
                 fam["family_file_id"], days=day + 1, upcoming_days=0
@@ -321,6 +331,7 @@ async def _integrity_spot_checks(
         pa = ParentAgentClient(sim.campaign, fam["parent_a_email"],
                                fam["parent_a_password"], "spot-check")
         try:
+            await asyncio.sleep(_LOGIN_PACE_S)
             await pa.login()
             children = await pa.get_children(fam["family_file_id"])
             child_ids = [c["id"] for c in children if c.get("id")]
