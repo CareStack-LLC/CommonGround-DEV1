@@ -136,8 +136,11 @@ export default function RootLayout({
       className={`${dmSans.variable} ${dmSerifDisplay.variable} ${inter.variable} ${spaceGrotesk.variable} ${dmMono.variable}`}
     >
       <head>
-        {/* Google Analytics (gtag.js) — G-Y3BC0JNN56 */}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-Y3BC0JNN56" />
+        {/* Google Analytics (gtag.js) — G-Y3BC0JNN56.
+            The dataLayer stub is eager (events queue immediately), but the
+            gtag.js download+eval (~650ms main-thread on mobile) is deferred
+            to browser idle after load so it stays off the critical path.
+            Queued events flush automatically once the script arrives. */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -145,6 +148,26 @@ export default function RootLayout({
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
               gtag('config', 'G-Y3BC0JNN56');
+              (function() {
+                var loaded = false;
+                function loadGtag() {
+                  if (loaded) return;
+                  loaded = true;
+                  var s = document.createElement('script');
+                  s.async = true;
+                  s.src = 'https://www.googletagmanager.com/gtag/js?id=G-Y3BC0JNN56';
+                  document.head.appendChild(s);
+                }
+                function schedule() {
+                  if ('requestIdleCallback' in window) {
+                    requestIdleCallback(loadGtag, { timeout: 5000 });
+                  } else {
+                    setTimeout(loadGtag, 2500);
+                  }
+                }
+                if (document.readyState === 'complete') { schedule(); }
+                else { window.addEventListener('load', schedule, { once: true }); }
+              })();
             `,
           }}
         />
