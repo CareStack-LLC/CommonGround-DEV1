@@ -6,9 +6,10 @@ jitter, and FAILS (exit 1) if any endpoint exceeds its threshold. Safe to run on
 a schedule — it catches perf regressions (a new slow query, a worse region split,
 a cold pool) without flooding prod. Alerts to Sentry on regression.
 
-Thresholds are intentionally set with headroom over the 2026-07-02 cross-region
-baseline (app us-west ↔ DB us-east). **Tighten them after the app and DB are
-co-located** so the gate catches regressions from the faster baseline.
+Thresholds were tightened 2026-07-03 to ~3x the observed post-cutover baseline
+(docs/baselines/PERF_BASELINE_2026-07-03.md) — Virginia app co-located with
+Supabase. Previously they had 10-30x headroom left over from the pre-cutover
+cross-region baseline and would only have caught a catastrophic regression.
 
 USAGE
   cd backend && source .venv/bin/activate && source scripts/bug_campaign/state/campaign.env
@@ -25,21 +26,24 @@ import time
 
 import httpx
 
-BASE = os.environ.get("CAMPAIGN_BASE_URL", "https://commonground-api-a0fr.onrender.com")
+# Default is the live post-cutover (2026-07-03) host; the pre-cutover Oregon
+# host (commonground-api-a0fr) now returns 503. CAMPAIGN_BASE_URL overrides.
+BASE = os.environ.get("CAMPAIGN_BASE_URL", "https://api.find-commonground.com")
 API = f"{BASE}/api/v1"
 ADMIN_EMAIL = os.environ.get("CAMPAIGN_ADMIN_EMAIL", "")
 ADMIN_PW = os.environ.get("CAMPAIGN_ADMIN_PASSWORD", "")
 
 # (label, path-template, needs_auth, threshold_ms). Threshold = best-of-N ceiling.
-# Headroom over the 2026-07-02 cross-region baseline; tighten post co-location.
+# ~3x the 2026-07-03 post-cutover baseline (see docs/baselines/) — enough
+# headroom for normal jitter/load while still catching a real regression.
 CHECKS = [
-    ("health",              "{base}/health",                          False, 2000),
-    ("root",                "{base}/",                                False,  600),
-    ("profile",             "{api}/users/me/profile",                 True,  2500),
-    ("family_files",        "{api}/family-files/",                     True,  3500),
-    ("notifications",       "{api}/users/me/notifications",           True,  2500),
-    ("dashboard_summary",   "{api}/dashboard/summary/{ffid}",         True,  4500),
-    ("exchanges_upcoming",  "{api}/exchanges/case/{ffid}/upcoming",   True,  5500),
+    ("health",              "{base}/health",                          False,  500),
+    ("root",                "{base}/",                                False,  400),
+    ("profile",             "{api}/users/me/profile",                 True,   500),
+    ("family_files",        "{api}/family-files/",                     True,   500),
+    ("notifications",       "{api}/users/me/notifications",           True,   500),
+    ("dashboard_summary",   "{api}/dashboard/summary/{ffid}",         True,   800),
+    ("exchanges_upcoming",  "{api}/exchanges/case/{ffid}/upcoming",   True,   600),
 ]
 SAMPLES = 3
 

@@ -12,8 +12,13 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 # Hosts we treat as production. Hitting any of these requires explicit opt-in.
+# commonground-api-a0fr (Oregon) is the pre-cutover host, now retired (503);
+# kept here so old configs/scripts still get the production gate. The live
+# host post-cutover (2026-07-03) is api.find-commonground.com -> Virginia.
 PRODUCTION_HOSTS = {
     "commonground-api-a0fr.onrender.com",
+    "commonground-api-east.onrender.com",
+    "api.find-commonground.com",
     "www.find-commonground.com",
     "find-commonground.com",
 }

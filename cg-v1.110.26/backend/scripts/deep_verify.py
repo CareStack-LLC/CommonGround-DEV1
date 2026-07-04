@@ -25,7 +25,9 @@ import sys
 
 import httpx
 
-BASE = os.environ.get("CAMPAIGN_BASE_URL", "https://commonground-api-a0fr.onrender.com")
+# Default is the live post-cutover (2026-07-03) host; the pre-cutover Oregon
+# host (commonground-api-a0fr) now returns 503. CAMPAIGN_BASE_URL overrides.
+BASE = os.environ.get("CAMPAIGN_BASE_URL", "https://api.find-commonground.com")
 API = f"{BASE}/api/v1"
 ADMIN_EMAIL = os.environ["CAMPAIGN_ADMIN_EMAIL"]
 ADMIN_PW = os.environ["CAMPAIGN_ADMIN_PASSWORD"]
