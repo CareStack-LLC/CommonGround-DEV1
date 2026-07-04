@@ -69,12 +69,13 @@ function addDeferredSentryIntegrations() {
 }
 
 if (typeof window !== "undefined") {
-  const schedule = (cb: () => void) =>
-    "requestIdleCallback" in window
-      ? (window as unknown as {
-          requestIdleCallback: (c: () => void, o?: { timeout: number }) => void;
-        }).requestIdleCallback(cb, { timeout: 5000 })
-      : window.setTimeout(cb, 2500);
+  const schedule = (cb: () => void) => {
+    if (typeof window.requestIdleCallback === "function") {
+      window.requestIdleCallback(cb, { timeout: 5000 });
+    } else {
+      window.setTimeout(cb, 2500);
+    }
+  };
   if (document.readyState === "complete") {
     schedule(addDeferredSentryIntegrations);
   } else {
