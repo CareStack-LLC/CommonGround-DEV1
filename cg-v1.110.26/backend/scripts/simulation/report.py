@@ -422,12 +422,23 @@ def _render_md(day: int, sim_date: date, expected: dict, actual: dict,
         lines.append(f"- {json.dumps(c, default=str)}")
 
     lines += ["", f"## 5. Drift log (cumulative through day {day:02d}) — fix-list for day 15", ""]
-    if drift:
-        for d in drift:
-            lines.append(f"- day {d['day']:>2} f{d.get('family')}: "
-                         f"[{d.get('action', d['drift'])}] {d['drift']} — {d.get('detail', '')}")
+    # Two shapes land here: local per-action drift (day/family/action/drift/
+    # detail — always present) and server-sourced cross-day drift entries
+    # (family_index/drift/detail, or a no-key "skipped"/"ok" sentinel when
+    # there's nothing to report). Render each by what it actually has instead
+    # of assuming every entry carries the local shape's keys.
+    real_drift = [d for d in drift if "drift" in d]
+    if real_drift:
+        for d in real_drift:
+            tag = f"day {d['day']:>2} f{d.get('family')}" if "day" in d else f"f{d.get('family_index', d.get('family', '?'))}"
+            action = d.get("action", d["drift"])
+            lines.append(f"- {tag}: [{action}] {d['drift']} — {d.get('detail', '')}")
     else:
         lines.append("No drift recorded. The script and the platform agree so far.")
+    skipped = [d.get("skipped") for d in drift if "skipped" in d]
+    if skipped:
+        lines.append("")
+        lines.append("(server-sourced checks skipped: " + "; ".join(dict.fromkeys(skipped)) + ")")
     lines.append("")
     return "\n".join(lines)
 
