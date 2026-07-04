@@ -84,18 +84,33 @@ class ParentAgentClient:
     # ---- core request with retry + 401 refresh -----------------------------
     async def _raw_request(
         self, method: str, path: str, *, json: Any = None, params: Any = None, auth: bool = True,
+        timeout: Optional[float] = None, retry_on_timeout: bool = True,
     ) -> Any:
+        """
+        timeout: per-request override (seconds) for slow, non-idempotent bulk
+        endpoints (e.g. admin generate_families) that legitimately exceed the
+        default 30s.
+        retry_on_timeout: set False for non-idempotent mutating calls — a
+        client-side timeout retry racing a still-running server-side bulk
+        insert is exactly what causes duplicate-key errors (observed on
+        POST /admin/bug-hunts/{id}/generate: the retry re-ran the same
+        family-generation loop from index 0 while the original request was
+        still creating families, colliding on the first email).
+        """
         if self.cfg.request_delay_ms:
             await asyncio.sleep(self.cfg.request_delay_ms / 1000)
 
         headers = self._headers() if auth else {}
         last_exc: Optional[Exception] = None
+        req_kwargs = {"timeout": timeout} if timeout is not None else {}
 
         for attempt in range(3):
             try:
-                resp = await self._http.request(method, path, json=json, params=params, headers=headers)
+                resp = await self._http.request(method, path, json=json, params=params, headers=headers, **req_kwargs)
             except (httpx.TransportError, httpx.TimeoutException) as e:
                 last_exc = e
+                if not retry_on_timeout:
+                    raise
                 await asyncio.sleep(0.5 * (attempt + 1))
                 continue
 

@@ -44,7 +44,19 @@ class AdminClient:
         return await self._req("GET", f"/admin/bug-hunts/{cohort_id}")
 
     async def generate_families(self, cohort_id: str) -> dict:
-        return await self._req("POST", f"/admin/bug-hunts/{cohort_id}/generate")
+        """
+        Bulk-seeds cohort.family_count families (Supabase auth + Stripe +
+        18-section agreement per family) — sequential server-side, easily
+        60-150s+ for 50 families. Uses a long timeout and NO retry-on-timeout:
+        a client-side timeout retry of this non-idempotent endpoint would race
+        the still-running original request and crash both on a duplicate
+        email (observed in prod — the retry re-ran family generation from
+        index 0 while the original request was still creating families).
+        """
+        return await self._req(
+            "POST", f"/admin/bug-hunts/{cohort_id}/generate",
+            timeout=300.0, retry_on_timeout=False,
+        )
 
     async def list_cohorts(self, status: str | None = None, limit: int = 50) -> Any:
         params = {"limit": limit}
