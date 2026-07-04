@@ -54,7 +54,7 @@ class ExchangeComplianceReport:
             "metadata": {
                 "family_file_id": family_file_id,
                 "family_file_number": family_file.family_file_number,
-                "case_number": family_file.case_number or family_file.family_file_number,
+                "case_number": getattr(family_file, "case_number", None) or family_file.family_file_number,
                 "parents": {
                     "parent_a": f"{parent_a.first_name} {parent_a.last_name}",
                     "parent_b": f"{parent_b.first_name} {parent_b.last_name}"

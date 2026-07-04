@@ -138,6 +138,10 @@ class ParentReportService:
             pdf_bytes = await self._generate_kidspace_communication_report(
                 family_file_id, date_start, date_end, user_id
             )
+        elif report_type == "agreement_status":
+            pdf_bytes = await self._generate_agreement_status_report(
+                family_file_id, date_start, date_end, user_id
+            )
         # ------------------------------------------------------------------
         # Paid professional report types (fulfilled by admins from the paid
         # ReportRequest queue — see admin.py generate_report_for_request).
@@ -930,6 +934,145 @@ class ParentReportService:
         )
 
         # Convert to PDF
+        pdf_bytes, _ = self._html_to_pdf(html_content)
+        return pdf_bytes
+
+    async def _generate_agreement_status_report(
+        self,
+        family_file_id: str,
+        date_start: date,
+        date_end: date,
+        user_id: str,
+    ) -> bytes:
+        """
+        Agreement Status Report (P-7): ordered vs. actual.
+
+        Compares the active agreement's terms against what actually happened
+        in the period — custody split, exchange compliance, financial
+        obligations, and communication conduct.
+        """
+        family_file = await self._get_family_file(family_file_id)
+        if not family_file:
+            raise ValueError("Family file not found")
+
+        parent_a = await self._get_user(family_file.parent_a_id)
+        parent_b = (
+            await self._get_user(family_file.parent_b_id)
+            if family_file.parent_b_id
+            else None
+        )
+        parent_a_name = self._get_parent_display_name(
+            parent_a, family_file.parent_a_role
+        )
+        parent_b_name = (
+            self._get_parent_display_name(parent_b, family_file.parent_b_role)
+            if parent_b
+            else "Parent B"
+        )
+
+        # Active agreement + key terms
+        agreement = await self._get_active_agreement(family_file_id)
+        agreement_data = None
+        if agreement:
+            agreement_data = {
+                "title": agreement.title,
+                "status": agreement.status,
+                "key_terms": await self._extract_key_terms(agreement),
+                "summary": await self._get_agreement_summary(agreement),
+            }
+
+        # Ordered vs actual custody split
+        agreed_a, agreed_b = await self._get_agreed_percentages(family_file_id)
+        children = await self._get_children_with_stats(
+            family_file_id, date_start, date_end
+        )
+        actual_a = (
+            sum(c["parent_a_percentage"] for c in children) / len(children)
+            if children
+            else None
+        )
+        actual_b = (
+            sum(c["parent_b_percentage"] for c in children) / len(children)
+            if children
+            else None
+        )
+        custody_comparison = None
+        if agreed_a is not None and actual_a is not None:
+            custody_comparison = {
+                "agreed_a": agreed_a,
+                "agreed_b": agreed_b,
+                "actual_a": actual_a,
+                "actual_b": actual_b,
+                "variance_a": actual_a - agreed_a,
+            }
+
+        # Exchange compliance
+        exchanges = await self._get_exchange_instances(
+            family_file_id, date_start, date_end
+        )
+        exchange_stats = self._calculate_exchange_stats(exchanges)
+
+        # Financial obligations in the period
+        obligations = await self._get_obligations(
+            family_file_id, date_start, date_end
+        )
+        satisfied_statuses = ("funded", "completed", "closed", "verified")
+        obligations_satisfied = sum(
+            1 for o in obligations if o.status in satisfied_statuses
+        )
+        financial_stats = {
+            "total": len(obligations),
+            "satisfied": obligations_satisfied,
+            "rate": (
+                obligations_satisfied / len(obligations) * 100
+                if obligations
+                else 100.0
+            ),
+        }
+
+        # Communication conduct
+        messages = await self._get_messages(family_file_id, date_start, date_end)
+        message_ids = [str(m.id) for m in messages]
+        flags = await self._get_message_flags(message_ids) if message_ids else []
+        communication_stats = {
+            "total_messages": len(messages),
+            "flagged": len(flags),
+            "clean_rate": (
+                (len(messages) - len(flags)) / len(messages) * 100
+                if messages
+                else 100.0
+            ),
+        }
+
+        # Compliance rollup across the sections we could measure
+        section_scores = [exchange_stats["completion_rate"],
+                          financial_stats["rate"],
+                          communication_stats["clean_rate"]]
+        if custody_comparison:
+            # 100 minus how far actual drifted from agreed (capped)
+            section_scores.append(
+                max(0.0, 100.0 - abs(custody_comparison["variance_a"]) * 2)
+            )
+        overall_compliance = sum(section_scores) / len(section_scores)
+
+        template = self.jinja_env.get_template(
+            "reports/agreement_status_report.html"
+        )
+        html_content = template.render(
+            family_file=family_file,
+            report_period={"start": date_start, "end": date_end},
+            generated_at=datetime.utcnow(),
+            report_id=self.generate_report_id(),
+            parent_a_name=parent_a_name,
+            parent_b_name=parent_b_name,
+            agreement=agreement_data,
+            custody_comparison=custody_comparison,
+            exchange_stats=exchange_stats,
+            financial_stats=financial_stats,
+            communication_stats=communication_stats,
+            overall_compliance=overall_compliance,
+            children=children,
+        )
         pdf_bytes, _ = self._html_to_pdf(html_content)
         return pdf_bytes
 

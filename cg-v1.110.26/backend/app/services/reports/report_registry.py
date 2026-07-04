@@ -94,7 +94,7 @@ PARENT_REPORTS = {
         "sha256_verified": False,
         "court_ready": True,
         "pdf_export": True,
-        "available": False,  # Not yet implemented
+        "available": True,
     },
     "P-8": {
         "code": "P-8",
@@ -169,7 +169,7 @@ ATTORNEY_REPORTS = {
         "sha256_verified": False,
         "court_ready": False,
         "pdf_export": True,
-        "available": False,  # Not yet implemented
+        "available": True,
     },
     "A-5": {
         "code": "A-5",
@@ -180,7 +180,7 @@ ATTORNEY_REPORTS = {
         "sha256_verified": False,
         "court_ready": False,
         "pdf_export": True,
-        "available": False,  # Not yet implemented
+        "available": True,
     },
     "A-6": {
         "code": "A-6",
@@ -204,7 +204,7 @@ ATTORNEY_REPORTS = {
         "sha256_verified": False,
         "court_ready": False,
         "pdf_export": True,
-        "available": False,  # Not yet implemented
+        "available": True,
     },
     "A-8": {
         "code": "A-8",
@@ -216,7 +216,7 @@ ATTORNEY_REPORTS = {
         "court_ready": True,
         "pdf_export": True,
         "requires_dual_consent": True,
-        "available": False,  # Not yet implemented
+        "available": True,
     },
 }
 

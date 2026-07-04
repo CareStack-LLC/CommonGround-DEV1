@@ -89,8 +89,8 @@ class FullComplianceReport:
             "metadata": {
                 "family_file_id": family_file_id,
                 "family_file_number": family_file.family_file_number,
-                "case_number": family_file.case_number or family_file.family_file_number,
-                "court": family_file.court_name or "Superior Court",
+                "case_number": getattr(family_file, "case_number", None) or family_file.family_file_number,
+                "court": getattr(family_file, "court_name", None) or "Superior Court",
                 "parents": {
                     "parent_a": {
                         "id": parent_a.id,

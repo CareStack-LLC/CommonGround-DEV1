@@ -27,7 +27,7 @@ from app.utils.sentry_helpers import capture_error
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
-ReportType = Literal["custody_time", "communication", "expense", "schedule", "kidspace_communication"]
+ReportType = Literal["custody_time", "communication", "expense", "schedule", "kidspace_communication", "agreement_status"]
 
 
 async def verify_family_file_access(
@@ -126,6 +126,7 @@ async def generate_parent_report(
         "expense": "Expense-Summary",
         "schedule": "Schedule-History",
         "kidspace_communication": "KidSpace-Communication",
+        "agreement_status": "Agreement-Status-Report",
     }
     report_name = report_names.get(report_type, "Report")
     filename = f"CommonGround-{report_name}-{date.today().isoformat()}.pdf"

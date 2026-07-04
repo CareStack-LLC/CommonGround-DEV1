@@ -300,6 +300,54 @@ class ComplianceReportService:
                 end_date=end_date
             )
 
+        elif report_type == "firm_analytics":
+            from app.services.professional.reports.firm_analytics import (
+                FirmAnalyticsReport,
+            )
+            template = FirmAnalyticsReport(self.db)
+            return await template.generate_data(
+                family_file_id=family_file_id,
+                professional_id=professional_id,
+                start_date=start_date,
+                end_date=end_date
+            )
+
+        elif report_type == "risk_assessment":
+            from app.services.professional.reports.risk_assessment import (
+                RiskAssessmentReport,
+            )
+            template = RiskAssessmentReport(self.db)
+            return await template.generate_data(
+                family_file_id=family_file_id,
+                professional_id=professional_id,
+                start_date=start_date,
+                end_date=end_date
+            )
+
+        elif report_type == "client_progress":
+            from app.services.professional.reports.client_progress import (
+                ClientProgressReport,
+            )
+            template = ClientProgressReport(self.db)
+            return await template.generate_data(
+                family_file_id=family_file_id,
+                professional_id=professional_id,
+                start_date=start_date,
+                end_date=end_date
+            )
+
+        elif report_type == "gal_welfare":
+            from app.services.professional.reports.gal_welfare import (
+                GALWelfareReport,
+            )
+            template = GALWelfareReport(self.db)
+            return await template.generate_data(
+                family_file_id=family_file_id,
+                professional_id=professional_id,
+                start_date=start_date,
+                end_date=end_date
+            )
+
         elif report_type == "monthly_summary":
             # Monthly summary combines all 4 report types into one rolling 30-day view
             from datetime import timedelta
