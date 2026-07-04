@@ -138,6 +138,32 @@ class ParentReportService:
             pdf_bytes = await self._generate_kidspace_communication_report(
                 family_file_id, date_start, date_end, user_id
             )
+        # ------------------------------------------------------------------
+        # Paid professional report types (fulfilled by admins from the paid
+        # ReportRequest queue — see admin.py generate_report_for_request).
+        # Each maps onto the corresponding deep-dive generator; the court
+        # investigation package bundles all of them into a single PDF.
+        # ------------------------------------------------------------------
+        elif report_type == "communication_analysis":
+            pdf_bytes = await self._generate_communication_report(
+                family_file_id, date_start, date_end, user_id
+            )
+        elif report_type == "financial_compliance_report":
+            pdf_bytes = await self._generate_expense_report(
+                family_file_id, date_start, date_end, user_id
+            )
+        elif report_type == "custody_compliance_report":
+            pdf_bytes = await self._generate_custody_time_report(
+                family_file_id, date_start, date_end, user_id
+            )
+        elif report_type == "kidspace_court_communication":
+            pdf_bytes = await self._generate_kidspace_communication_report(
+                family_file_id, date_start, date_end, user_id
+            )
+        elif report_type == "court_investigation_package":
+            pdf_bytes = await self._generate_court_investigation_package(
+                family_file_id, date_start, date_end, user_id
+            )
         else:
             raise ValueError(f"Unknown report type: {report_type}")
 
@@ -906,6 +932,62 @@ class ParentReportService:
         # Convert to PDF
         pdf_bytes, _ = self._html_to_pdf(html_content)
         return pdf_bytes
+
+    async def _generate_court_investigation_package(
+        self,
+        family_file_id: str,
+        date_start: date,
+        date_end: date,
+        user_id: str,
+    ) -> bytes:
+        """
+        Court Investigation Package (P-6 / A-6, $149): every deep-dive report
+        for the period bundled into one PDF — custody time, communication,
+        expenses, schedule/GPS history, and KidSpace child communication.
+
+        Sections are generated with the existing branded generators and merged
+        with pypdf. A section that has no data (or fails) is skipped rather
+        than sinking the whole package; at least one section must succeed.
+        """
+        from pypdf import PdfWriter, PdfReader
+
+        section_generators = [
+            ("custody_time", self._generate_custody_time_report),
+            ("communication", self._generate_communication_report),
+            ("expense", self._generate_expense_report),
+            ("schedule", self._generate_schedule_report),
+            ("kidspace_communication", self._generate_kidspace_communication_report),
+        ]
+
+        writer = PdfWriter()
+        included: list[str] = []
+        for section_name, generator in section_generators:
+            try:
+                section_pdf = await generator(
+                    family_file_id, date_start, date_end, user_id
+                )
+                for page in PdfReader(io.BytesIO(section_pdf)).pages:
+                    writer.add_page(page)
+                included.append(section_name)
+            except Exception as e:
+                logger.warning(
+                    f"Court package: skipping section '{section_name}' "
+                    f"for family_file={family_file_id}: {e}"
+                )
+
+        if not included:
+            raise ValueError(
+                "Court investigation package: no report sections could be "
+                f"generated for family file {family_file_id}"
+            )
+
+        logger.info(
+            f"Court investigation package for {family_file_id}: "
+            f"sections={included}"
+        )
+        merged = io.BytesIO()
+        writer.write(merged)
+        return merged.getvalue()
 
     @staticmethod
     def generate_report_id() -> str:

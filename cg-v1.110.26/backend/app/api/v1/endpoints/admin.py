@@ -2155,7 +2155,7 @@ async def generate_report_for_request(
 
     Generates the report, stores SHA-256 hash, and updates status to 'completed'.
     """
-    import hashlib
+    from datetime import date as date_type, timedelta
     from app.models.report_request import ReportRequest
     from app.services.reports import ParentReportService
 
@@ -2178,34 +2178,52 @@ async def generate_report_for_request(
 
     try:
         service = ParentReportService(db)
-        report_id = service.generate_report_id()
 
-        pdf_bytes = await service.generate_report(
+        # Paid requests may omit the range — default to the last 30 days.
+        date_end = r.date_range_end or date_type.today()
+        date_start = r.date_range_start or (date_end - timedelta(days=30))
+
+        # generate_report returns a ReportResult (pdf_bytes, report_id,
+        # sha256_hash) and persists a GeneratedReport row + storage upload.
+        # (Previously this treated the return as raw bytes and hashed the
+        # object — every paid-report generation 500'd.)
+        gen = await service.generate_report(
             report_type=r.report_type,
             family_file_id=r.family_file_id,
-            date_start=r.date_range_start,
-            date_end=r.date_range_end,
+            date_start=date_start,
+            date_end=date_end,
             user_id=r.requested_by_id,
         )
 
-        sha256_hash = hashlib.sha256(pdf_bytes).hexdigest()
-
         r.status = "completed"
         r.generated_at = datetime.utcnow()
-        r.sha256_hash = sha256_hash
-        r.report_id = report_id
+        r.sha256_hash = gen.sha256_hash
+        r.report_id = gen.report_id
+
+        # Mirror the stored file_url so admins/parents can retrieve the exact
+        # certified artifact later.
+        from app.models.generated_report import GeneratedReport
+        gr = (
+            await db.execute(
+                select(GeneratedReport).where(
+                    GeneratedReport.report_id == gen.report_id
+                )
+            )
+        ).scalar_one_or_none()
+        if gr and gr.file_url:
+            r.file_url = gr.file_url
 
         await _log_admin_action(
             db, admin_user, "generate_report", "report_request", request_id,
-            details=f"report_id={report_id}, sha256={sha256_hash[:16]}...",
+            details=f"report_id={gen.report_id}, sha256={gen.sha256_hash[:16]}...",
         )
         await db.commit()
 
         return {
             "id": str(r.id),
             "status": r.status,
-            "report_id": report_id,
-            "sha256_hash": sha256_hash,
+            "report_id": gen.report_id,
+            "sha256_hash": gen.sha256_hash,
             "generated_at": r.generated_at.isoformat(),
         }
 
@@ -2273,7 +2291,9 @@ async def deliver_report(
                     f"(ID: {r.report_id}) has been generated and is ready for download. "
                     f"Log in to your CommonGround account to access your report."
                 ),
-                cta_url=f"{email_service.frontend_url}/reports/download/{r.id}",
+                # /settings/reports is the parent-facing reports page; the old
+                # /reports/download/{id} route never existed on the frontend.
+                cta_url=f"{email_service.frontend_url}/settings/reports",
                 cta_text="Download Report",
             )
     except Exception as e:

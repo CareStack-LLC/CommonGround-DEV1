@@ -270,6 +270,113 @@ async def generate_monthly_report(
 
 
 @router.get(
+    "/requests",
+    summary="List my paid report requests",
+    description="List the current user's paid report requests and their fulfillment status.",
+)
+async def list_my_report_requests(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    """List the requester's paid report requests (newest first)."""
+    from app.models.report_request import ReportRequest
+
+    result = await db.execute(
+        select(ReportRequest)
+        .where(ReportRequest.requested_by_id == str(current_user.id))
+        .order_by(ReportRequest.created_at.desc())
+    )
+    requests = result.scalars().all()
+    return {
+        "requests": [
+            {
+                "id": str(r.id),
+                "report_type": r.report_type,
+                "status": r.status,
+                "urgency": r.urgency,
+                "price_cents": r.price_cents,
+                "date_range_start": r.date_range_start.isoformat() if r.date_range_start else None,
+                "date_range_end": r.date_range_end.isoformat() if r.date_range_end else None,
+                "report_id": r.report_id,
+                "sha256_hash": r.sha256_hash,
+                "generated_at": r.generated_at.isoformat() if r.generated_at else None,
+                "delivered_at": r.delivered_at.isoformat() if r.delivered_at else None,
+                "created_at": r.created_at.isoformat() if r.created_at else None,
+                "downloadable": r.status in ("completed", "delivered") and bool(r.report_id),
+            }
+            for r in requests
+        ],
+        "total": len(requests),
+    }
+
+
+@router.get(
+    "/requests/{request_id}/download",
+    summary="Download a fulfilled paid report",
+    description="Get a time-limited signed URL for a completed/delivered paid report.",
+)
+async def download_paid_report(
+    request_id: str,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    """
+    Return a signed download URL for the requester's fulfilled paid report.
+
+    Only the user who purchased the report may download it, and only once an
+    admin has generated it (status completed/delivered).
+    """
+    from app.models.report_request import ReportRequest
+    from app.services.storage import (
+        StorageBucket,
+        build_report_path,
+        storage_service,
+    )
+
+    result = await db.execute(
+        select(ReportRequest).where(ReportRequest.id == request_id)
+    )
+    r = result.scalar_one_or_none()
+    if not r:
+        raise HTTPException(status_code=404, detail="Report request not found")
+    if r.requested_by_id != str(current_user.id):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You did not request this report",
+        )
+    if r.status not in ("completed", "delivered") or not r.report_id:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Report is not ready yet (status: {r.status})",
+        )
+
+    try:
+        signed_url = await storage_service.get_signed_url(
+            bucket=StorageBucket.REPORTS,
+            path=build_report_path(r.family_file_id, r.report_id),
+            expires_in=3600,
+        )
+    except Exception as e:
+        logger.error(f"Failed to sign report URL for request {request_id}: {e}")
+        capture_error(e)
+        signed_url = None
+
+    if not signed_url:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Report file is unavailable. Please contact support.",
+        )
+
+    return {
+        "download_url": signed_url,
+        "expires_in": 3600,
+        "report_id": r.report_id,
+        "report_type": r.report_type,
+        "sha256_hash": r.sha256_hash,
+    }
+
+
+@router.get(
     "/types",
     summary="Get available report types",
     description="Get parent report types with GTM spec codes (P-1 through P-7).",

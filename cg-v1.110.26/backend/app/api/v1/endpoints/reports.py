@@ -154,6 +154,36 @@ async def request_professional_report(
     urgency_fee = urgency_fees.get(request.urgency, 0)
     final_price_cents = report_info["base_price_cents"] + urgency_fee
 
+    # Pre-create the ReportRequest (status=pending_payment) so the Stripe
+    # webhook only has to flip it to "paid" by id. Previously the webhook
+    # tried to build the row from metadata but looked for `requested_by_id`
+    # while this endpoint sent `user_id` — so paid checkouts completed
+    # without ever creating a request for the admin fulfillment queue.
+    from datetime import date as date_type
+    from app.models.report_request import ReportRequest
+
+    report_request = ReportRequest(
+        family_file_id=request.family_file_id,
+        requested_by_id=str(current_user.id),
+        report_type=request.report_type,
+        status="pending_payment",
+        urgency=request.urgency,
+        description=request.description,
+        price_cents=final_price_cents,
+    )
+    for attr, raw in (
+        ("date_range_start", request.date_range_start),
+        ("date_range_end", request.date_range_end),
+    ):
+        if raw:
+            try:
+                setattr(report_request, attr, date_type.fromisoformat(raw))
+            except ValueError:
+                pass
+    db.add(report_request)
+    await db.commit()
+    await db.refresh(report_request)
+
     try:
         # Create Stripe checkout session for one-time payment
         success_url = f"{settings.FRONTEND_URL}/settings/reports?success=true&report_type={request.report_type}"
@@ -184,6 +214,10 @@ async def request_professional_report(
                 "type": "professional_report",
                 "report_type": request.report_type,
                 "family_file_id": request.family_file_id,
+                # `requested_by_id` + `report_request_id` are what the webhook
+                # reads (see webhook._handle_professional_report_checkout).
+                "requested_by_id": str(current_user.id),
+                "report_request_id": str(report_request.id),
                 "user_id": str(current_user.id),
                 "urgency": request.urgency,
                 "date_range_start": request.date_range_start or "",
@@ -198,6 +232,11 @@ async def request_professional_report(
             checkout_params["customer_email"] = current_user.email
 
         session = stripe.checkout.Session.create(**checkout_params)
+
+        # Link the checkout session to the pending request immediately so the
+        # row is traceable even before the webhook fires.
+        report_request.stripe_checkout_session_id = session.id
+        await db.commit()
 
         # Send notification email to CommonGround team
         await _send_report_request_notification(
@@ -228,6 +267,9 @@ async def request_professional_report(
     except stripe.error.StripeError as e:
         logger.error(f"Stripe error creating checkout session: {e}")
         capture_error(e)
+        # Don't leave an orphaned pending_payment row when checkout never opened
+        await db.delete(report_request)
+        await db.commit()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to create payment session. Please try again."
@@ -235,6 +277,8 @@ async def request_professional_report(
     except Exception as e:
         logger.error(f"Error requesting professional report: {e}")
         capture_error(e)
+        await db.delete(report_request)
+        await db.commit()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An error occurred. Please try again."
