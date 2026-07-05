@@ -73,6 +73,7 @@ class _FamilyCtx:
         self.child_ids: list[str] = []
         self.instances_today: Optional[list[dict]] = None
         self.events_cache: Optional[list] = None
+        self.collection_id: Optional[str] = None
         self.obligations_cache: Optional[list[dict]] = None
         self.thread_context: list[str] = []
         self.todays_events: list[str] = []
@@ -512,17 +513,43 @@ class SimulationRunner:
         return out
 
     # -- events / RSVP ----------------------------------------------------------------
+    async def _ensure_collection(self, ctx: _FamilyCtx) -> str:
+        """
+        POST /schedule/events requires a collection_id (app/services/schedule.py
+        create_event 404s "Collection not found" without one) — get-or-create
+        parent A's default My Time collection for this family, cached on ctx.
+        """
+        if ctx.collection_id is not None:
+            return ctx.collection_id
+        existing = await ctx.pa.list_collections(ctx.ff)
+        items = existing if isinstance(existing, list) else (existing or {}).get("items", [])
+        mine = [c for c in items if c.get("owner_id") == ctx.pa.user_id]
+        chosen = next((c for c in mine if c.get("is_default")), mine[0] if mine else None)
+        if chosen is None:
+            chosen = await ctx.pa.create_collection({
+                "case_id": ctx.ff, "name": "Sim My Time", "is_default": True,
+            })
+        ctx.collection_id = chosen["id"]
+        return ctx.collection_id
+
     async def _do_create_event(self, ctx: _FamilyCtx, a: tl.CreateEvent,
                                sim_date: date) -> dict:
         start_dt = datetime.combine(sim_date + timedelta(days=a.day_offset),
                                     datetime.min.time()).replace(hour=17)
+        collection_id = await self._ensure_collection(ctx)
+        # NOTE: ScheduleEvent.start_time/end_time are naive DateTime columns
+        # (app/models/schedule.py) — a tz-aware "...Z" string 500s at the
+        # asyncpg bind step ("can't subtract offset-naive and offset-aware
+        # datetimes"). Send naive ISO strings to match the column type
+        # (confirmed live 2026-07-05; platform bug, worth fixing at day 15 —
+        # not touched now per the no-mid-run-platform-fix policy).
         ev = await ctx.pa.create_event({
+            "collection_id": collection_id,
             "title": a.title,
-            "start_time": start_dt.isoformat() + "Z",
-            "end_time": (start_dt + timedelta(hours=1)).isoformat() + "Z",
+            "start_time": start_dt.isoformat(),
+            "end_time": (start_dt + timedelta(hours=1)).isoformat(),
             "child_ids": ctx.child_ids,
             "visibility": "co_parent",
-            "family_file_id": ctx.ff,
             "attendance_invites": [
                 {"parent_id": ctx.pa.user_id, "invited_role": "parent_a"},
                 {"parent_id": ctx.pb.user_id, "invited_role": "parent_b"},
@@ -570,7 +597,10 @@ class SimulationRunner:
             "child_ids": ctx.child_ids,
             "total_amount": round(a.amount_cents / 100, 2),
             "petitioner_percentage": a.petitioner_percentage,
-            "due_date": due.isoformat() + "Z",
+            # NOTE: Obligation.due_date is a naive DateTime column
+            # (app/models/clearfund.py) — same tz-aware-vs-naive crash as
+            # ScheduleEvent above. Send a naive ISO string.
+            "due_date": due.isoformat(),
             "verification_required": False,
             "receipt_required": False,
             "source_type": "request",

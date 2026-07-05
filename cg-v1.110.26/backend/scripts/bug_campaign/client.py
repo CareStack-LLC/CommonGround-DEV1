@@ -368,6 +368,13 @@ class ParentAgentClient:
     async def list_events(self, case_id: str) -> Any:
         return await self._raw_request("GET", f"/schedule/cases/{case_id}/events")
 
+    # ---- My Time collections (schedule events require a collection_id) ----
+    async def list_collections(self, case_id: str) -> Any:
+        return await self._raw_request("GET", f"/collections/cases/{case_id}")
+
+    async def create_collection(self, payload: dict) -> dict:
+        return await self._raw_request("POST", "/collections/", json=payload)
+
     # ---- ClearFund funding -------------------------------------------------
     async def fund_obligation(self, obligation_id: str, payload: dict) -> tuple[int, dict]:
         if self.cfg.request_delay_ms:
