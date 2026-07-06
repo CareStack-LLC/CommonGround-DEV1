@@ -154,6 +154,17 @@ class ParentAgentClient:
     async def create_exchange(self, payload: dict) -> dict:
         return await self._raw_request("POST", "/exchanges/", json=payload)
 
+    async def list_exchange_templates(self, case_id: str) -> list:
+        """Recurring exchange TEMPLATES. These carry the title; instance
+        responses don't (their title is always null), so any title-based
+        instance lookup must go template.title -> template.id ->
+        instance.exchange_id."""
+        return await self._raw_request("GET", f"/exchanges/case/{case_id}")
+
+    async def delete_exchange(self, exchange_id: str) -> Any:
+        """Delete a template and (cascade) all its instances. Creator-only."""
+        return await self._raw_request("DELETE", f"/exchanges/{exchange_id}")
+
     async def list_upcoming(self, case_id: str, limit: int = 20) -> list:
         return await self._raw_request(
             "GET", f"/exchanges/case/{case_id}/upcoming", params={"limit": limit}

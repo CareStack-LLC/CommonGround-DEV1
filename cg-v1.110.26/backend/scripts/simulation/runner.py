@@ -72,6 +72,7 @@ class _FamilyCtx:
         self.pb: Optional[ParentAgentClient] = None
         self.child_ids: list[str] = []
         self.instances_today: Optional[list[dict]] = None
+        self.templates_cache: Optional[list[dict]] = None
         self.events_cache: Optional[list] = None
         self.collection_id: Optional[str] = None
         self.obligations_cache: Optional[list[dict]] = None
@@ -341,9 +342,12 @@ class SimulationRunner:
                                       a: tl.SeedExchangeTemplate, sim_date: date) -> dict:
         title = tl.exchange_title(ctx.index, tl.Slot(
             a.slot_key, a.api_weekday, a.direction, a.label, a.local_label, a.cadence))
-        upcoming = await ctx.pa.list_upcoming(ctx.ff, limit=100)
-        if any((i.get("title") or "") == title for i in upcoming or []):
-            return {"ok": True, "status": 200, "endpoint": "GET /exchanges/case/{id}/upcoming",
+        # Idempotency check against TEMPLATES, not instances: instance
+        # responses have title=null, so the old instance-title check never
+        # matched and a re-run duplicated every template.
+        templates = await ctx.pa.list_exchange_templates(ctx.ff) or []
+        if any((t.get("title") or "") == title for t in templates):
+            return {"ok": True, "status": 200, "endpoint": "GET /exchanges/case/{id}",
                     "detail": f"template_exists {title!r}"}
 
         # First occurrence: first date >= sim_date whose platform weekday matches.
@@ -381,11 +385,28 @@ class SimulationRunner:
             "recurrence_end_date": end.isoformat() + "Z",
         }
         exchange = await from_c.create_exchange(payload)
-        ctx.instances_today = None  # invalidate cache
+        ctx.instances_today = None  # invalidate caches
+        ctx.templates_cache = None
         return {"ok": True, "status": 201, "endpoint": "POST /exchanges/",
                 "detail": f"template {title!r} id={exchange.get('id')}"}
 
     # -- exchanges ---------------------------------------------------------------
+    async def _slot_template_ids(self, ctx: _FamilyCtx, slot_key: str) -> set:
+        """Template ids whose title carries this slot's [SIM fNN:slot] tag.
+
+        Instance responses have title=null (the serializer doesn't join the
+        parent exchange), so instances can only be matched via
+        template.title -> template.id -> instance.exchange_id.
+        """
+        if ctx.templates_cache is None:
+            try:
+                ctx.templates_cache = await ctx.pa.list_exchange_templates(ctx.ff) or []
+            except ApiError:
+                ctx.templates_cache = []
+        tag = f"[SIM f{ctx.index:02d}:{slot_key}]"
+        return {t.get("id") for t in ctx.templates_cache
+                if tag in (t.get("title") or "")}
+
     async def _todays_instance(self, ctx: _FamilyCtx, slot_key: str,
                                sim_date: date) -> Optional[dict]:
         if ctx.instances_today is None:
@@ -399,11 +420,10 @@ class SimulationRunner:
             except ApiError:
                 pass
             ctx.instances_today = items
-        tag = f"[SIM f{ctx.index:02d}:{slot_key}]"
+        template_ids = await self._slot_template_ids(ctx, slot_key)
         for inst in ctx.instances_today:
-            title = inst.get("title") or ""
             sched = str(inst.get("scheduled_time") or "")[:10]
-            if tag in title and sched == sim_date.isoformat():
+            if inst.get("exchange_id") in template_ids and sched == sim_date.isoformat():
                 return inst
         return None
 
