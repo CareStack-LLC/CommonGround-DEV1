@@ -1674,8 +1674,16 @@ An incoming message was just received:
                     is_new_pattern = True
 
             # ── Layer 3: LLM Deep Analysis (conditional) ──
+            # Pass the message's own shape so a single hostile message the regex
+            # layer under-scored still gets an LLM look (heat/severity alone
+            # can't catch it — see should_trigger_llm / LLM_MIN_WORDS).
             llm_result = None
-            if should_trigger_llm(window_heat, max_severity, is_new_pattern):
+            regex_word_count = len(message_text.split())
+            has_regex_signal = bool(category_confidence)
+            if should_trigger_llm(
+                window_heat, max_severity, is_new_pattern,
+                word_count=regex_word_count, has_regex_signal=has_regex_signal,
+            ):
                 metric_increment("aria.v2.llm_triggered")
                 baseline_info = ""
                 if baseline_deviation:

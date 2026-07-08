@@ -6,7 +6,9 @@ Applies decay weights [0.5, 0.75, 1.0] (oldest → newest).
 
 window_heat = sum(msg_score × decay_weight)
 
-LLM deep analysis is triggered when window_heat >= 3.5.
+LLM deep analysis triggers on sustained heat, a single severe message, novel
+patterns, OR any substantive message the regex layer can't clear with
+confidence — see should_trigger_llm.
 """
 
 import logging
@@ -24,6 +26,17 @@ DECAY_WEIGHTS = [0.5, 0.75, 1.0]
 
 # Heat threshold for triggering LLM deep analysis
 LLM_TRIGGER_HEAT = 1.8
+
+# A lone message's heat can never reach LLM_TRIGGER_HEAT (it equals that
+# message's own score, capped at 1.0), and subtle/paraphrased hostility scores
+# low on the regex layer with severity floors of 1-2 — so on the heat/severity
+# gates alone, a single hostile message the regex under-matches is silently
+# passed through with no LLM second opinion. Give the LLM a look at any message
+# substantive enough to carry hostility, or any message where the regex layer
+# saw even a weak signal. gpt-4o-mini is cheap, the 10s deadline + circuit
+# breaker bound the downside, and this is a child-safety-adjacent path where
+# recall matters more than saving a model call.
+LLM_MIN_WORDS = 5
 
 
 async def get_rolling_window_heat(
@@ -107,19 +120,32 @@ def should_trigger_llm(
     window_heat: float,
     max_severity: int,
     is_new_pattern: bool = False,
+    *,
+    word_count: int = 0,
+    has_regex_signal: bool = False,
 ) -> bool:
     """
     Decide whether to invoke LLM deep analysis.
 
     Triggers when ANY of:
-    - window_heat >= 3.5 (sustained pattern)
+    - window_heat >= LLM_TRIGGER_HEAT (sustained pattern)
     - max_severity >= 3 (single severe message)
     - is_new_pattern is True (novel behavior not in baseline)
+    - has_regex_signal is True (regex saw any category, even weak/low-severity)
+    - word_count >= LLM_MIN_WORDS (message substantive enough to carry
+      hostility the regex layer may have paraphrased past)
+
+    The last two conditions exist because the heat/severity gates alone let
+    single, paraphrased hostile messages through unchecked (see LLM_MIN_WORDS).
     """
     if window_heat >= LLM_TRIGGER_HEAT:
         return True
     if max_severity >= 3:
         return True
     if is_new_pattern:
+        return True
+    if has_regex_signal:
+        return True
+    if word_count >= LLM_MIN_WORDS:
         return True
     return False
