@@ -178,4 +178,28 @@ async def generate_message(
     # Guard: reject degenerate outputs; keep threads coherent via fallback.
     if len(text) < 5 or len(text) > 1500:
         return fallback
+    # Guard: the narrator model refuses to write the "hostile" tone ("I can't
+    # write that message. I don't create hostile content...") and, without this
+    # check, that refusal text got SENT as the message — clean prose ARIA
+    # rightly scored 0.0, so every scripted-hostile turn showed as an ARIA
+    # "miss" that was really the sim never producing hostile content. Fall back
+    # to the deterministic template pool (overt insults for tone=hostile) so the
+    # platform actually sees what it's meant to catch.
+    if _is_refusal(text):
+        return fallback
     return text
+
+
+_REFUSAL_MARKERS = (
+    "i can't write", "i cannot write", "i can't create", "i cannot create",
+    "i won't write", "i won't create", "i won't generate", "i'm not able to",
+    "i am not able to", "i don't create", "i do not create", "i'm designed to",
+    "i'm not going to", "i can't help with", "i cannot help with",
+    "as an ai", "i can't produce", "i cannot produce",
+)
+
+
+def _is_refusal(text: str) -> bool:
+    """True if the narrator model refused instead of writing the message."""
+    head = text.lstrip().lower()[:80]
+    return any(marker in head for marker in _REFUSAL_MARKERS)
