@@ -22,6 +22,7 @@ from typing import Any, Optional
 
 from scripts.bug_campaign.admin_client import AdminClient
 from scripts.bug_campaign.ai.anthropic_client import AnthropicClient
+from scripts.bug_campaign.ai.openai_client import OpenAIClient
 from scripts.bug_campaign.client import ApiError, ParentAgentClient
 from scripts.bug_campaign.geo_oracle import is_within_geofence
 from scripts.bug_campaign.ledger import append_ledger, load_state, save_state
@@ -60,6 +61,19 @@ def _sim_run_key(day: int, family_id: str, action_index: int) -> str:
     return f"sim:{day}:{family_id}:{action_index}"
 
 
+def _build_narrator(cfg):
+    """Pick the message-writing model. OpenAI reliably produces the labeled
+    adversarial (hostile) fixtures the sim needs to exercise ARIA; Claude
+    refuses that tone. Prefer OpenAI when configured, else fall back to
+    Anthropic so the sim still runs (refusal guard + templates cover the gap)."""
+    provider = (getattr(cfg, "narrator_provider", "") or "").lower()
+    if provider == "openai" and getattr(cfg, "openai_api_key", None):
+        client = OpenAIClient(cfg)
+        if not client.degraded:
+            return client
+    return AnthropicClient(cfg)
+
+
 class _FamilyCtx:
     """Per-family per-day execution context and caches."""
 
@@ -94,7 +108,7 @@ class SimulationRunner:
     def __init__(self, sim: SimConfig):
         self.sim = sim
         self.cfg = sim.campaign
-        self.ai = AnthropicClient(self.cfg)
+        self.ai = _build_narrator(self.cfg)
         self.archetypes = assign_archetypes(sim.family_count)
         self.bibles = [build_bible(i, self.archetypes[i]) for i in range(sim.family_count)]
 

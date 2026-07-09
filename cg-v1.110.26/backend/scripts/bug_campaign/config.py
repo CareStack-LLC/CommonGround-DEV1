@@ -56,6 +56,11 @@ class CampaignConfig:
     # --- AI ---
     ai_enabled: bool = True
     anthropic_api_key: str | None = None
+    openai_api_key: str | None = None
+    # Which provider writes the simulated messages. OpenAI reliably produces the
+    # labeled adversarial (hostile-tone) fixtures the sim needs to exercise
+    # ARIA; Claude Haiku refuses that tone. Default to openai when a key exists.
+    narrator_provider: str = "openai"
     ai_daily_token_budget: int = 200_000
     narrator_model: str = "claude-haiku-4-5-20251001"
     judge_model: str = "claude-opus-4-8"
@@ -136,6 +141,12 @@ class CampaignConfig:
 def load_config(confirm_production: bool = False, dry_run: bool | None = None) -> CampaignConfig:
     """Build a CampaignConfig from environment variables."""
     anthropic_key = os.getenv("ANTHROPIC_API_KEY") or None
+    openai_key = os.getenv("OPENAI_API_KEY") or None
+    # Prefer openai for the narrator when its key is present (Claude refuses the
+    # hostile tone); overridable via CAMPAIGN_NARRATOR_PROVIDER.
+    narrator_provider = os.getenv(
+        "CAMPAIGN_NARRATOR_PROVIDER", "openai" if openai_key else "anthropic"
+    )
     cfg = CampaignConfig(
         base_url=os.getenv("CAMPAIGN_BASE_URL", "http://localhost:8000"),
         target=os.getenv("CAMPAIGN_ENV", os.getenv("CAMPAIGN_TARGET", "development")),
@@ -144,6 +155,8 @@ def load_config(confirm_production: bool = False, dry_run: bool | None = None) -
         admin_password=os.getenv("CAMPAIGN_ADMIN_PASSWORD"),
         ai_enabled=_envbool("CAMPAIGN_AI_ENABLED", True),
         anthropic_api_key=anthropic_key,
+        openai_api_key=openai_key,
+        narrator_provider=narrator_provider,
         ai_daily_token_budget=int(os.getenv("CAMPAIGN_AI_BUDGET", "200000")),
         dry_run=_envbool("CAMPAIGN_DRY_RUN", False) if dry_run is None else dry_run,
         request_delay_ms=int(os.getenv("CAMPAIGN_REQ_DELAY_MS", "150")),
