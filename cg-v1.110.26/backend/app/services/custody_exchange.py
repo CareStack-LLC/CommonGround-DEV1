@@ -286,6 +286,13 @@ class CustodyExchangeService:
         if exchange.recurrence_end_date:
             end_date = min(end_date, exchange.recurrence_end_date)
 
+        # Court-ready custody tracking: window_start/window_end MUST be set at
+        # creation. auto_close_expired_windows selects on `window_end < now`,
+        # and rows with a NULL window_end are invisible to it forever — a
+        # no-show handoff would sit in status='scheduled' and never be recorded
+        # as 'missed' (i.e. the court-evidence trail silently loses no-shows).
+        w_before, w_after = CustodyExchangeService._window_minutes(exchange)
+
         if not exchange.is_recurring:
             # One-time exchange - just create one instance
             instance = CustodyExchangeInstance(
@@ -293,6 +300,8 @@ class CustodyExchangeService:
                 exchange_id=exchange.id,
                 scheduled_time=exchange.scheduled_time,
                 status="scheduled",
+                window_start=exchange.scheduled_time - timedelta(minutes=w_before),
+                window_end=exchange.scheduled_time + timedelta(minutes=w_after),
             )
             db.add(instance)
             instances.append(instance)
@@ -355,6 +364,8 @@ class CustodyExchangeService:
                         exchange_id=exchange.id,
                         scheduled_time=instance_time,
                         status="scheduled",
+                        window_start=instance_time - timedelta(minutes=w_before),
+                        window_end=instance_time + timedelta(minutes=w_after),
                     )
                     db.add(instance)
                     instances.append(instance)
@@ -363,6 +374,13 @@ class CustodyExchangeService:
 
         await db.flush()
         return instances
+
+    @staticmethod
+    def _window_minutes(exchange: CustodyExchange) -> tuple:
+        """Check-in window (before, after) minutes with model defaults."""
+        before = exchange.check_in_window_before_minutes
+        after = exchange.check_in_window_after_minutes
+        return (30 if before is None else before, 30 if after is None else after)
 
     @staticmethod
     async def regenerate_future_instances(
@@ -466,11 +484,14 @@ class CustodyExchangeService:
                         microsecond=0
                     )
 
+                    w_before, w_after = CustodyExchangeService._window_minutes(exchange)
                     instance = CustodyExchangeInstance(
                         id=str(uuid.uuid4()),
                         exchange_id=exchange.id,
                         scheduled_time=instance_time,
                         status="scheduled",
+                        window_start=instance_time - timedelta(minutes=w_before),
+                        window_end=instance_time + timedelta(minutes=w_after),
                     )
                     db.add(instance)
                     new_instances.append(instance)
@@ -1564,13 +1585,27 @@ class CustodyExchangeService:
         # time. FOR UPDATE SKIP LOCKED lets concurrent schedulers (one per web
         # instance) partition the work instead of double-closing, and
         # per-instance commits keep notification I/O from holding row locks.
+        #
+        # NULL-robustness (court-critical): instance generation historically
+        # did NOT populate window_end, and `window_end < now` is NULL-false in
+        # SQL — so every such instance was invisible to this sweep forever and
+        # a no-show handoff was never recorded as 'missed'. Include NULL-window
+        # rows whose scheduled_time has passed (the real window is derived from
+        # the parent exchange inside the loop), and treat auto_closed via
+        # isnot(True) so NULLs there can't hide rows either.
         id_result = await db.execute(
             select(CustodyExchangeInstance.id)
             .where(
                 and_(
                     CustodyExchangeInstance.status == "scheduled",
-                    CustodyExchangeInstance.window_end < now,
-                    CustodyExchangeInstance.auto_closed == False
+                    CustodyExchangeInstance.auto_closed.isnot(True),
+                    or_(
+                        CustodyExchangeInstance.window_end < now,
+                        and_(
+                            CustodyExchangeInstance.window_end.is_(None),
+                            CustodyExchangeInstance.scheduled_time < now,
+                        ),
+                    ),
                 )
             )
         )
@@ -1584,7 +1619,7 @@ class CustodyExchangeService:
                     and_(
                         CustodyExchangeInstance.id == instance_id,
                         CustodyExchangeInstance.status == "scheduled",
-                        CustodyExchangeInstance.auto_closed == False,
+                        CustodyExchangeInstance.auto_closed.isnot(True),
                     )
                 )
                 .with_for_update(skip_locked=True)
@@ -1601,6 +1636,17 @@ class CustodyExchangeService:
                     )
                 )
             ).scalar_one()
+
+            # Legacy rows: derive + backfill the missing window from the parent
+            # exchange so the row carries its own court-evidence window, and
+            # skip if that real window hasn't actually expired yet.
+            if instance.window_end is None:
+                w_before, w_after = CustodyExchangeService._window_minutes(exchange)
+                instance.window_start = instance.scheduled_time - timedelta(minutes=w_before)
+                instance.window_end = instance.scheduled_time + timedelta(minutes=w_after)
+                if instance.window_end >= now:
+                    await db.commit()  # persist backfill; close on a later tick
+                    continue
 
             # Determine final outcome. Promotion to 'completed' is guarded —
             # if the evidence chain is incomplete, fall through to 'disputed'
