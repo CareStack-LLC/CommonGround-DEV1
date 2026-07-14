@@ -39,6 +39,12 @@ export function BlogContent({ slug }: BlogContentProps) {
       return <FathersMentalHealthAwareness />;
     case 'fathers-mental-health-self-care':
       return <FatherMentalHealthSelfCare />;
+    case 'summer-break-coparenting-guide':
+      return <SummerBreakGuide />;
+    case 'different-rules-two-homes':
+      return <DifferentRulesTwoHomes />;
+    case 'long-distance-coparenting':
+      return <LongDistanceCoParenting />;
     default:
       return null;
   }
@@ -2149,6 +2155,250 @@ function FatherMentalHealthSelfCare() {
       <h2>You don&apos;t have to do it all at once</h2>
       <p>
         Reading a list like this can feel like one more thing to fail at. It isn&apos;t. You don&apos;t have to overhaul your life this month. Pick one thing &mdash; one walk, one honest conversation, one earlier bedtime &mdash; and start there. Your kids don&apos;t need a perfect dad. They need a present one who&apos;s taking care of himself, too. This month, that can start with a single small step. You&apos;ve got this.
+      </p>
+    </article>
+  );
+}
+
+function SummerBreakGuide() {
+  return (
+    <article className="max-w-none">
+      <p className="lead text-xl text-gray-600">
+        Summer looks effortless from the outside: no homework, long evenings, kids on bikes. For co-parents, it&apos;s the most logistically demanding stretch of the year. The school routine that quietly held your schedule together disappears for ten weeks, and in its place come camp registrations, vacation requests, childcare gaps, and a custody calendar that often flips to a completely different pattern. The good news: almost every summer blowup traces back to one root cause &mdash; planning too late. Fix that, and summer gets a lot easier.
+      </p>
+
+      <h2>Know what your agreement says &mdash; before June</h2>
+      <p>
+        Most parenting plans handle summer differently from the school year. Some switch to week-on/week-off, some give each parent a set number of vacation weeks, some keep the regular schedule with vacation carve-outs. Before you plan a single trip, reread your agreement&apos;s summer and vacation sections and answer three questions:
+      </p>
+      <ul>
+        <li>
+          <strong>Does the regular schedule change for summer?</strong> If your plan switches patterns, know the exact start and end dates &mdash; usually tied to the last and first day of school, which move every year.
+        </li>
+        <li>
+          <strong>How much vacation time does each parent get?</strong> Many plans give each parent one to three uninterrupted weeks. Check whether they can be consecutive, whether they can include the other parent&apos;s holiday, and who gets first pick in even vs. odd years.
+        </li>
+        <li>
+          <strong>What notice is required?</strong> Plans commonly require vacation dates by a deadline &mdash; April 1 and May 1 are typical &mdash; plus a travel itinerary. Missing the deadline is how &quot;I already booked the flights&quot; fights start.
+        </li>
+      </ul>
+      <p>
+        If your agreement is silent on summer, that&apos;s worth fixing this year, not next May. A short written addendum on vacation weeks, notice deadlines, and travel rules turns an annual negotiation into a lookup.
+      </p>
+
+      <h2>Divide vacation weeks without a standoff</h2>
+      <p>
+        Two parents, two dream trips, one overlapping week &mdash; it happens every year. A few fair-by-design conventions prevent most of it:
+      </p>
+      <ul>
+        <li>
+          <strong>Alternate first pick.</strong> One parent chooses vacation weeks first in even years, the other in odd years. Nobody wins every time, and everybody knows the rule.
+        </li>
+        <li>
+          <strong>Set a selection deadline.</strong> First-pick parent submits dates by April 1, second parent by April 15. After that, the calendar is locked unless both agree.
+        </li>
+        <li>
+          <strong>Protect the other parent&apos;s contact.</strong> A week away doesn&apos;t pause the other relationship. A short call or video chat every day or two keeps the other parent connected without hovering over the trip.
+        </li>
+        <li>
+          <strong>Share the itinerary, every time.</strong> Destination, lodging, flight numbers, and a reachable phone number. It isn&apos;t surveillance &mdash; it&apos;s what any parent needs in an emergency, and most agreements require it anyway.
+        </li>
+      </ul>
+
+      <div className="bg-cg-amber-subtle rounded-xl p-6 my-8 not-prose">
+        <h3 className="text-lg font-semibold text-foreground mb-2">The summer planning timeline</h3>
+        <ul className="text-gray-600 mt-1 list-disc pl-5 space-y-1">
+          <li><strong>February&ndash;March:</strong> agree on the summer schedule pattern and trade vacation-week picks; camp registration opens (and fills) now.</li>
+          <li><strong>April:</strong> lock vacation dates in writing; book camps and figure out childcare coverage for work weeks.</li>
+          <li><strong>May:</strong> exchange itineraries, sort out travel consent for any out-of-state or international trips, and agree on cost splits.</li>
+          <li><strong>June&ndash;August:</strong> live the plan; handle small swaps in writing as they come up.</li>
+        </ul>
+      </div>
+
+      <h2>Camps, childcare, and who pays</h2>
+      <p>
+        School is also childcare, and summer removes it. If both parents work, those ten weeks need real coverage &mdash; camps, grandparents, day programs, or shifted work schedules. Decide together which weeks are camp weeks, who handles drop-off and pickup, and how costs split <em>before</em> anyone registers. Camp fees sit in the same category as other shared child expenses: agree on the split (50/50 or income-proportional, whatever your plan uses), keep receipts, and put reimbursements on a schedule instead of chasing them text by text. If a camp is one parent&apos;s choice and the other parent objects to the cost, the cleanest rule is: the parent who insists pays the difference between the agreed option and the premium one.
+      </p>
+
+      <h2>Travel consent: get it in writing early</h2>
+      <p>
+        Out-of-state and international travel is where summer plans hit legal reality. Many custody orders require the other parent&apos;s written consent &mdash; and for international trips with a minor, airlines and border officials can ask for a notarized consent letter from the non-traveling parent. Passports add another wrinkle: for children under 16, both parents generally must participate in the application. None of this is a problem in May. All of it is a crisis the week before a flight. Ask early, respond promptly, and put consent in writing where both of you can find it. And a note to the parent being asked: unless there&apos;s a genuine safety concern, saying yes quickly is one of the cheapest goodwill deposits you&apos;ll ever make.
+      </p>
+
+      <h2>Keep some rhythm in the freedom</h2>
+      <p>
+        Kids love summer&apos;s looseness, but they still need to know where they&apos;ll sleep next week. Keep exchange days consistent even if the pattern changed for summer, give younger kids a simple visual calendar in each home, and hold onto a few anchors &mdash; a regular bedtime-ish window, reading time, a weekly call with the other parent. Predictability is what lets the fun feel safe. It also helps both parents to know the plan is actually shared: CommonGround&apos;s TimeBridge keeps the whole summer &mdash; the switched schedule, vacation blocks, camp weeks, and exchange reminders &mdash; on one calendar both parents see, so &quot;I thought this was my week&quot; simply stops being a sentence anyone says.
+      </p>
+
+      <div className="bg-cg-sage-subtle rounded-xl p-6 my-8 not-prose">
+        <h3 className="text-lg font-semibold text-foreground mb-2">When a swap request comes in</h3>
+        <p className="text-gray-600">
+          Summer invites schedule changes &mdash; a cousin&apos;s visit, a work trip, a festival weekend. Say yes when you reasonably can, get the trade in writing, and keep it even over time rather than transactional in the moment. The parent who grants easy swaps in July tends to get easy swaps in December.
+        </p>
+      </div>
+
+      <h2>Let it be summer</h2>
+      <p>
+        A good co-parenting summer isn&apos;t the one where the time split came out perfectly even. It&apos;s the one your kids remember as the summer of the lake trip and the ice-cream stand and two houses that both felt like vacation. Plan early, write things down, share the calendar, and then do the most important thing: put the logistics away and be there for the long evenings. That&apos;s what the planning was for.
+      </p>
+    </article>
+  );
+}
+
+function DifferentRulesTwoHomes() {
+  return (
+    <article className="max-w-none">
+      <p className="lead text-xl text-gray-600">
+        Bedtime is 8:00 at your house and &quot;whenever&quot; at theirs. You cap screens at an hour; the other home hands over a tablet at breakfast. Vegetables are non-negotiable with you and theoretical across town. If watching your careful rules dissolve every other week drives you a little crazy, you&apos;re in good company &mdash; different rules in two homes is one of the most common frustrations in co-parenting. Here&apos;s the perspective shift that helps: you don&apos;t need identical houses. You need to know which differences matter, align on those few, and genuinely let go of the rest.
+      </p>
+
+      <h2>First, the reassuring truth</h2>
+      <p>
+        Kids are far better at handling different rule sets than we give them credit for. They already do it every day &mdash; school has different rules than home, grandma&apos;s house has different rules than both, and children code-switch between them without existential confusion. What actually destabilizes kids isn&apos;t two sets of rules. It&apos;s two parents at war <em>over</em> the rules: the eye-rolls, the &quot;well, at MY house we...&quot;, the interrogations about what happens at the other home. A child can live happily with an 8:00 bedtime here and a 9:30 bedtime there. What they can&apos;t live happily with is feeling like a defector every time they switch houses.
+      </p>
+
+      <h2>Sort every disagreement into two buckets</h2>
+      <p>
+        Before you start a conversation (or a fight) about a rule difference, sort it honestly:
+      </p>
+      <ul>
+        <li>
+          <strong>Style differences &mdash; let them go.</strong> Meals, chores, how much TV counts as &quot;too much,&quot; whether homework happens before or after dinner, how they dress, what music is allowed. These are preferences, not protections. Different is fine. Annoying, sometimes. But fine.
+        </li>
+        <li>
+          <strong>Welfare issues &mdash; align on these.</strong> Sleep for young kids on school nights, medication schedules, car seats and seatbelts, supervision levels, online safety and social media age limits, and anything touching a diagnosed condition &mdash; allergies, asthma plans, therapy homework. These affect health and safety, and they&apos;re worth a real conversation.
+        </li>
+      </ul>
+      <p>
+        A useful gut check: would a pediatrician care about this difference? If yes, it&apos;s a welfare issue. If a pediatrician would shrug, it&apos;s a style difference &mdash; and your energy is better spent elsewhere.
+      </p>
+
+      <div className="bg-cg-sage-subtle rounded-xl p-6 my-8 not-prose">
+        <h3 className="text-lg font-semibold text-foreground mb-2">The Big Four worth aligning</h3>
+        <ul className="text-gray-600 mt-1 list-disc pl-5 space-y-1">
+          <li><strong>Sleep:</strong> a consistent school-night bedtime window (within 30&ndash;60 minutes between homes).</li>
+          <li><strong>Screens:</strong> shared age limits for social media and gaming ratings, even if daily minutes differ.</li>
+          <li><strong>Safety &amp; health:</strong> identical rules for car seats, helmets, supervision, medications, and allergy plans.</li>
+          <li><strong>School:</strong> homework gets done in both homes, and both parents back the school&apos;s expectations.</li>
+        </ul>
+      </div>
+
+      <h2>How to have the conversation without relitigating your marriage</h2>
+      <p>
+        Rule disagreements go sideways when they become referendums on each other&apos;s parenting. Keep the conversation narrow and child-referenced:
+      </p>
+      <ul>
+        <li>
+          <strong>Bring data, not adjectives.</strong> &quot;She&apos;s falling asleep in class on Mondays, per her teacher&quot; lands. &quot;Your house is chaos&quot; doesn&apos;t.
+        </li>
+        <li>
+          <strong>Propose a specific, small ask.</strong> Not &quot;take bedtime seriously,&quot; but &quot;lights out by 9 on school nights &mdash; can we both commit to that?&quot; Specific requests can be agreed to. Vague criticisms can only be defended against.
+        </li>
+        <li>
+          <strong>Trade, don&apos;t lecture.</strong> If you want alignment on screens, be ready to flex on something that matters to them. Alignment is a negotiation between equals, not a compliance program.
+        </li>
+        <li>
+          <strong>Write down what you agree on.</strong> A rule that lives in one parent&apos;s memory is a future argument. The handful of shared rules &mdash; the Big Four above &mdash; belong in your parenting plan where both parents approved them. CommonGround&apos;s Agreement Builder has sections for exactly this, so the debate happens once instead of every exchange day. And when a rule conversation needs to happen mid-month, having ARIA look over the message first keeps &quot;about bedtime&quot; from arriving as an accusation.
+        </li>
+      </ul>
+
+      <h2>When kids work the gap</h2>
+      <p>
+        Every child eventually tries it: &quot;Dad lets me stay up till ten.&quot; Sometimes it&apos;s even true. The move that works is calm boundary-plus-respect: <em>&quot;That might be the rule at Dad&apos;s. At this house, bedtime is 8:30.&quot;</em> No debate, no disparaging the other home, no phone call to verify. You&apos;re teaching two things at once &mdash; that your rules are stable, and that the other parent&apos;s home doesn&apos;t need to be wrong for yours to be right. If a genuine welfare issue keeps surfacing through your child&apos;s reports, raise it with the co-parent directly and privately. Never make the child the messenger, the witness, or the spy.
+      </p>
+
+      <h2>When the difference is serious</h2>
+      <p>
+        Some gaps aren&apos;t style: no car seat, a skipped medication, drinking and driving with kids in the car, a nine-year-old home alone at night. Address safety issues directly and in writing, stick to facts, and keep records of the conversation. If it doesn&apos;t change, that&apos;s what mediators, parenting coordinators, and &mdash; when genuinely warranted &mdash; attorneys are for. A documented, dated record of specific concerns will serve you far better than months of angry texts.
+      </p>
+
+      <div className="bg-cg-amber-subtle rounded-xl p-6 my-8 not-prose">
+        <h3 className="text-lg font-semibold text-foreground mb-2">What kids actually need</h3>
+        <p className="text-gray-600">
+          Not matching households &mdash; two homes where the rules are predictable <em>within</em> each home, a few health-and-safety basics that never change anywhere, and parents who speak about each other&apos;s houses with respect. That combination beats perfectly synchronized bedtimes every time.
+        </p>
+      </div>
+
+      <h2>Two homes, one childhood</h2>
+      <p>
+        You will probably never parent identically &mdash; you didn&apos;t when you were together, either. The goal was never sameness. It&apos;s coherence: a childhood that feels like one story even though it&apos;s set in two houses. Align on the few things that protect your child, release the rest, and let your home be what it is &mdash; consistent, warm, and yours. Your kids will sort out the rest. They always do.
+      </p>
+    </article>
+  );
+}
+
+function LongDistanceCoParenting() {
+  return (
+    <article className="max-w-none">
+      <p className="lead text-xl text-gray-600">
+        A job transfer, a new marriage, a military posting, a hometown that called one of you back &mdash; however it happened, you&apos;re now parenting from a different city than your child. The fear underneath long-distance co-parenting is always the same: <em>will I become a stranger?</em> Here&apos;s the honest answer from families who&apos;ve done it well: distance changes the logistics of your relationship, not its depth. Kids don&apos;t measure parents in miles. They measure them in reliability &mdash; and reliability travels.
+      </p>
+
+      <h2>Presence is a pattern, not a location</h2>
+      <p>
+        The long-distance parents who stay close all do the same thing: they show up on a rhythm the child can count on. A Tuesday-and-Sunday video call that happens every single week builds more security than sporadic marathon calls whenever guilt spikes. Your child should never have to wonder when they&apos;ll talk to you next &mdash; the next touchpoint should always be on the calendar. Put your call schedule in the parenting plan itself, including days, time windows, and who initiates. What&apos;s written down survives busy seasons, new partners, and bad moods. What&apos;s informal quietly erodes.
+      </p>
+
+      <h2>Make virtual time actually good</h2>
+      <p>
+        Ten minutes of &quot;how was school?&quot; &mdash; &quot;fine&quot; is nobody&apos;s favorite call. Video time gets dramatically better when you do something together instead of interviewing each other:
+      </p>
+      <ul>
+        <li>
+          <strong>Read the same book.</strong> A chapter a night for little ones; a shared series you both read separately for tweens, then argue about the characters.
+        </li>
+        <li>
+          <strong>Play something.</strong> Online chess, a co-op video game, twenty questions, or a drawing app where you both sketch the same prompt.
+        </li>
+        <li>
+          <strong>Join the routine, not just the highlights.</strong> Being on the call while they eat breakfast or build a Lego set is more like real parenting than a formal weekly summit. Boring together is the goal &mdash; boring together is what family feels like.
+        </li>
+        <li>
+          <strong>Let little kids wander.</strong> A four-year-old who carries you around the house on a tablet for six minutes had a great call. Don&apos;t demand eye contact; accept being ambient.
+        </li>
+      </ul>
+      <p>
+        The channel matters too. A child who has to borrow the other parent&apos;s phone to call you doesn&apos;t control their own connection to you &mdash; and on tense days, that connection can quietly not happen. This is exactly what CommonGround&apos;s KidSpace is for: kids get their own safe, parent-approved space to video-call the distant parent (and approved grandparents) during the other household&apos;s time, so staying in touch never depends on anyone&apos;s mood at handoff.
+      </p>
+
+      <div className="bg-cg-amber-subtle rounded-xl p-6 my-8 not-prose">
+        <h3 className="text-lg font-semibold text-foreground mb-2">Stay inside the everyday information loop</h3>
+        <p className="text-gray-600">
+          Distance parents drift when they only hear the big news. Stay wired into the small stuff: get yourself added to the school portal, the class newsletter, the team schedule, and the pediatrician&apos;s contact list as a parent &mdash; not a courtesy CC. Ask the near parent for photos of ordinary moments, and return the favor with genuine gratitude. Knowing the name of your kid&apos;s lab partner is worth more than a birthday phone call.
+        </p>
+      </div>
+
+      <h2>Design the in-person time for connection, not spectacle</h2>
+      <p>
+        Long-distance schedules usually trade frequency for duration &mdash; longer school breaks, big summer blocks, alternating holidays. Two traps to avoid when you finally have them:
+      </p>
+      <ul>
+        <li>
+          <strong>The Disneyland trap.</strong> If every visit is a production, you become an event instead of a parent. Keep chores, homework, bedtime, and slow Saturdays in the mix. Kids bond over pancakes, not itineraries.
+        </li>
+        <li>
+          <strong>The re-entry wobble.</strong> Kids often need a day to warm up at the start of a long visit and a day of moodiness after it ends. That&apos;s adjustment, not rejection &mdash; on both ends. Build in soft landings and don&apos;t read the first grumpy evening as a verdict on the relationship.
+        </li>
+      </ul>
+      <p>
+        Be scrupulously reliable about travel logistics: who books flights, who pays, who escorts a younger child, and exact handoff plans &mdash; all agreed in writing before the trip. Long-distance arrangements run on trust, and travel is where trust is either banked or burned.
+      </p>
+
+      <h2>The near parent holds half of this</h2>
+      <p>
+        If you&apos;re the parent with primary time, the distant parent&apos;s relationship with your child partly runs through you &mdash; and protecting it is one of the most generous things you can do for your kid. Guard the call schedule like it&apos;s a custody exchange, because it is one. Have the child ready and the device charged. Talk the distant parent up, not down. Send the unprompted photo of the goofy haircut. None of this is required by any court order; all of it shows up in who your child becomes.
+      </p>
+
+      <div className="bg-cg-sage-subtle rounded-xl p-6 my-8 not-prose">
+        <h3 className="text-lg font-semibold text-foreground mb-2">A note on moving in the first place</h3>
+        <p className="text-gray-600">
+          If the move hasn&apos;t happened yet: most custody orders and many state laws require notice &mdash; and often consent or a court&apos;s approval &mdash; before relocating with a child. Handle it early, in writing, and through the proper process. A relocation done right can lead to a workable long-distance plan; a surprise move poisons the well for years.
+        </p>
+      </div>
+
+      <h2>Miles are not the measure</h2>
+      <p>
+        Children who grow up with a faraway parent who called every Tuesday, knew their teacher&apos;s name, showed up every summer, and never made them feel guilty about loving both homes don&apos;t describe that parent as distant. They describe them as <em>steady</em>. That&apos;s available to you from any zip code. Build the rhythm, protect it fiercely, keep showing up on the screen and at the airport &mdash; and let the miles be a detail of geography instead of the story of your family.
       </p>
     </article>
   );

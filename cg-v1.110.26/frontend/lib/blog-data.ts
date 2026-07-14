@@ -37,6 +37,63 @@ export interface BlogPost {
 
 export const blogPosts: BlogPost[] = [
   {
+    slug: 'long-distance-coparenting',
+    title: 'Long-Distance Co-Parenting: Staying Close From Miles Away',
+    excerpt: 'Distance changes the logistics of parenting, but it does not have to change the relationship. How to stay a constant, everyday presence in your child’s life when you live hours — or time zones — apart.',
+    category: 'Communication',
+    categoryColor: 'amber',
+    author: 'CommonGround Team',
+    date: '2026-07-14',
+    readTime: '9 min read',
+    featured: true,
+    image: '/images/blog/blog_longdistance.jpg',
+    metaDescription: 'A practical guide to long-distance co-parenting: building a virtual visitation routine, making video calls kids actually enjoy, handling travel and school-year logistics, and staying an everyday parent from far away.',
+    relatedPosts: ['helping-kids-thrive-two-homes', 'communication-tool-for-progress'],
+    ctaTitle: 'Stay close from any distance',
+    ctaDescription: 'KidSpace gives your child a safe, simple way to video-call you during the other parent’s time — no borrowed phones, no gatekeeping, just a reliable line to both parents.',
+    ctaLink: '/kidspace',
+    ctaLinkText: 'Explore KidSpace',
+    ctaGradient: 'from-cg-amber-subtle to-cg-sage-subtle',
+  },
+  {
+    slug: 'different-rules-two-homes',
+    title: 'Different Rules in Two Homes: What to Do When Co-Parents Disagree',
+    excerpt: 'Bedtime at 8 in one house, 10 in the other. Screens all weekend there, one hour here. When parenting styles clash across two homes, here’s what actually matters — and how to stop relitigating it.',
+    category: 'Parenting',
+    categoryColor: 'sage',
+    author: 'CommonGround Team',
+    date: '2026-07-08',
+    readTime: '8 min read',
+    featured: false,
+    image: '/images/blog/blog_tworules.jpg',
+    metaDescription: 'What to do when co-parents have different rules: which differences are fine, which need alignment, how to negotiate the big four (sleep, screens, safety, school), and how to keep kids from working the gap.',
+    relatedPosts: ['helping-kids-thrive-two-homes', 'why-written-agreements-matter'],
+    ctaTitle: 'Put the big rules in writing — together',
+    ctaDescription: 'CommonGround’s Agreement Builder helps you document the handful of rules that must match across both homes, with both parents contributing and approving — so the debate happens once, not every week.',
+    ctaLink: '/features',
+    ctaLinkText: 'Learn About Agreement Builder',
+    ctaGradient: 'from-cg-sage-subtle to-cg-amber-subtle',
+  },
+  {
+    slug: 'summer-break-coparenting-guide',
+    title: 'Summer Break Co-Parenting: A Sanity-Saving Guide for Two Homes',
+    excerpt: 'No school, camp sign-ups, vacation requests, and ten open weeks to fill across two homes. How to plan a summer your kids will remember for the right reasons — without a single scheduling standoff.',
+    category: 'Scheduling',
+    categoryColor: 'amber',
+    author: 'CommonGround Team',
+    date: '2026-07-03',
+    readTime: '8 min read',
+    featured: true,
+    image: '/images/blog/blog_summerbreak.jpg',
+    metaDescription: 'A practical summer co-parenting guide: switching to a summer custody schedule, dividing vacation weeks fairly, travel notice and itineraries, splitting camp costs, and keeping routines steady across two homes.',
+    relatedPosts: ['holiday-custody-planning', 'custody-schedule-types-guide'],
+    ctaTitle: 'Make this summer run itself',
+    ctaDescription: 'CommonGround puts the whole summer — vacation blocks, camp weeks, exchanges, and reminders — on one shared calendar both parents see, so the plan you agreed to is the plan that happens.',
+    ctaLink: '/features',
+    ctaLinkText: 'See How TimeBridge Works',
+    ctaGradient: 'from-cg-amber-subtle to-cg-sage-subtle',
+  },
+  {
     slug: '10-coparenting-best-practices',
     title: '10 Co-Parenting Best Practices That Actually Work',
     excerpt: 'The difference between co-parenting that drains you and co-parenting that works often comes down to a handful of habits. Here are 10 that actually hold up under pressure.',
@@ -281,10 +338,13 @@ export function getRelatedPosts(slugs: string[]): BlogPost[] {
 }
 
 export function formatDate(dateString: string): string {
+  // Date-only strings parse as UTC midnight; format in UTC so the displayed
+  // day matches the stored date instead of shifting back in western timezones.
   return new Date(dateString).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
+    timeZone: 'UTC',
   });
 }
 
