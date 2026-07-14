@@ -240,18 +240,19 @@ export default function KidSpaceGuidePage() {
             My Circle lets you add trusted family members, like grandparents, aunts, and uncles, as approved contacts who can interact with your child through KidSpace. Both parents must approve every contact added to the circle.
           </p>
           <div className="bg-white rounded-xl border border-gray-100 p-5 mb-4">
-            <h3 className="text-sm font-semibold text-foreground mb-3">Circle limits by plan</h3>
+            <h3 className="text-sm font-semibold text-foreground mb-3">Circle limits</h3>
             <div className="space-y-2">
               <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-600">Plus plan ($17.99/mo)</span>
-                <span className="font-medium text-foreground">1 trusted contact</span>
+                <span className="text-gray-600">Complete plan ($34.99/mo)</span>
+                <span className="font-medium text-foreground">Up to 5 trusted contacts</span>
               </div>
               <div className="border-t border-gray-50" />
               <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-600">Complete plan ($34.99/mo)</span>
-                <span className="font-medium text-foreground">3 trusted contacts</span>
+                <span className="text-gray-600">Max call duration</span>
+                <span className="font-medium text-foreground">2 hours</span>
               </div>
             </div>
+            <p className="text-xs text-gray-500 mt-3">You stay in full control of My Circle — add or remove any contact at any time.</p>
           </div>
           <div className="bg-cg-amber/5 border-l-4 border-cg-amber rounded-lg px-5 py-4">
             <div className="flex gap-2 items-start">
@@ -305,18 +306,13 @@ export default function KidSpaceGuidePage() {
             </h2>
           </div>
           <p className="text-gray-600 leading-relaxed mb-4">
-            KidSpace is available on the Plus and Complete plans. Here is what each plan includes.
+            KidSpace is part of the Complete plan. Here is what is included.
           </p>
           <div className="bg-white rounded-xl border border-gray-100 p-5 mb-4">
             <div className="space-y-4">
               <div>
-                <h3 className="text-sm font-semibold text-foreground mb-1">Plus &mdash; $17.99/month</h3>
-                <p className="text-xs text-gray-500">Video calls, Read Together, Watch Together, Play Together, and 1 My Circle contact.</p>
-              </div>
-              <div className="border-t border-gray-50" />
-              <div>
                 <h3 className="text-sm font-semibold text-foreground mb-1">Complete &mdash; $34.99/month</h3>
-                <p className="text-xs text-gray-500">Everything in Plus, up to 3 My Circle contacts, priority ARIA monitoring, and advanced activity reports.</p>
+                <p className="text-xs text-gray-500">Video &amp; voice calls, messaging, Read Together, Watch Together, Play Together, up to 5 My Circle contacts, 2-hour call limit, and full ARIA safety monitoring.</p>
               </div>
             </div>
           </div>
@@ -324,7 +320,7 @@ export default function KidSpaceGuidePage() {
             <div className="flex gap-2 items-start">
               <Lightbulb className="w-4 h-4 text-cg-amber mt-0.5 flex-shrink-0" />
               <p className="text-sm text-gray-700">
-                <strong>Tip:</strong> Not sure which plan is right? Start with Plus and upgrade to Complete if you need more My Circle contacts or advanced reporting.
+                <strong>Tip:</strong> KidSpace shines when the whole village joins — add grandparents, aunts, and uncles to My Circle so your child stays close to everyone who loves them.
               </p>
             </div>
           </div>

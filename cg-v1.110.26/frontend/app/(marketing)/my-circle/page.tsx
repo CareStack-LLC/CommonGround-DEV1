@@ -104,6 +104,10 @@ const faqs = [
     a: 'Either parent can add trusted family members to their child\'s KidSpace circle. The setup is simple — they add you, set your access level, and you\'re connected. Both parents can see who has access at any time.',
   },
   {
+    q: 'How do I get set up, and does it cost me anything?',
+    a: 'You don\'t need your own subscription. KidSpace and My Circle are part of a parent\'s Complete plan — once they add you as one of their up to 5 approved contacts, you\'re in. From there you can video call, read stories, and watch movies together whenever the schedule allows, with parents in full control of the circle.',
+  },
+  {
     q: 'What does "30% off for 3 years" actually mean?',
     a: 'As one of our first 50 early adopters, your subscription rate is locked at 30% below the standard price for 36 months on any paid plan. The discount stays with your account regardless of future price changes.',
   },

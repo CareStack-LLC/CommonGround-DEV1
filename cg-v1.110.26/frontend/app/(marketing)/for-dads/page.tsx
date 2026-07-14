@@ -64,7 +64,7 @@ const outcomes = [
 ];
 
 const trustBand = [
-  { icon: UserCheck, label: 'Built by a co-parent' },
+  { icon: UserCheck, label: 'Built by co-parents' },
   { icon: Scale, label: 'Attorney-reviewed workflows' },
   { icon: Shield, label: 'SHA-256 verified exports' },
   { icon: Lock, label: 'Encrypted & private' },

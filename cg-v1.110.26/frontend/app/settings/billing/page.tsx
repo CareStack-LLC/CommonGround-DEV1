@@ -79,7 +79,6 @@ const PLAN_DETAILS: Record<string, {
       'Automated scheduling & recurring exchanges',
       'Custody tracking dashboard',
       'QuickAccords (unlimited)',
-      'My Circle: +1 trusted contact',
       'No ClearFund payout fees',
       'Monthly PDF reports',
     ],

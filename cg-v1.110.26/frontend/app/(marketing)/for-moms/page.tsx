@@ -70,7 +70,7 @@ const outcomes = [
 ];
 
 const trustBand = [
-  { icon: Heart, label: 'Built by a co-parent' },
+  { icon: Heart, label: 'Built by co-parents' },
   { icon: Scale, label: 'Attorney-reviewed workflows' },
   { icon: Shield, label: 'Court-ready records' },
   { icon: Lock, label: 'Encrypted & private' },

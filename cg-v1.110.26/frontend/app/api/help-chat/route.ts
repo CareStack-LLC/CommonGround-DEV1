@@ -42,8 +42,8 @@ KNOWLEDGE BASE — FEATURES:
 
 KNOWLEDGE BASE — PRICING:
 - **Web Starter (FREE forever):** ARIA messaging, shared calendar, expense tracking, basic web access. No credit card required.
-- **Plus ($17.99/month or $199.99/year):** Everything in Starter + automated recurring schedules, Quick Accords, PDF exports, My Circle (1 contact), holiday rotation, reminders.
-- **Complete ($34.99/month or $349.99/year):** Everything in Plus + Silent Handoff GPS, KidSpace video/messaging/activities, custody analytics, court-ready exports, SHA-256 verification, My Circle (3 contacts), priority support.
+- **Plus ($17.99/month or $199.99/year):** Everything in Starter + automated recurring schedules, Quick Accords, PDF exports, holiday rotation, reminders. (Does NOT include KidSpace.)
+- **Complete ($34.99/month or $349.99/year):** Everything in Plus + KidSpace for kids (video/voice calls, messaging, activities, up to 5 My Circle contacts, 2-hour max call duration, parent-controlled circle), Silent Handoff GPS, custody analytics, court-ready exports, SHA-256 verification, priority support. KidSpace is only on the Complete plan.
 - **Hardship pricing:** Available on a case-by-case basis. Contact support@find-commonground.com.
 - Pricing page: [See Pricing](/pricing)
 

@@ -257,7 +257,7 @@ export default function HomePage() {
           <div className="max-w-6xl mx-auto px-6 py-7 sm:py-8">
             <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-5">
               {[
-                { Icon: Heart, color: '#E07A5F', label: 'Built by a co-parent' },
+                { Icon: Heart, color: '#E07A5F', label: 'Built by co-parents' },
                 { Icon: Lock, color: '#3DAA8A', label: 'Encrypted & private' },
                 { Icon: Scale, color: '#2D6A8F', label: 'Attorney-reviewed workflows' },
               ].map(({ Icon, color, label }) => (

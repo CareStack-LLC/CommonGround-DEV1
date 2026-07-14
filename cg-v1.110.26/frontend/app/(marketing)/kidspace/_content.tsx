@@ -145,7 +145,7 @@ export function KidSpaceContent() {
                         </div>
 
                         <p className="mt-4 text-sm text-gray-500">
-                            Included with Plus ($17/mo) and Complete. 14-day free trial — no card.
+                            Part of the Complete plan ($34.99/mo). 14-day free trial — no card.
                         </p>
                     </div>
 
@@ -302,13 +302,15 @@ export function KidSpaceContent() {
                                 You decide who, when, and how long
                             </h2>
                             <p className="text-lg text-white/80 mb-8">
-                                Think of it like a supervised visit: you approve every contact through My Circle, set calling hours, control screen time, and see every activity log. Kids get freedom to bond — inside boundaries you set.
+                                Think of it like a supervised visit: you approve up to 5 trusted contacts through My Circle, set calling hours, and every call is capped at 2 hours. You control screen time, see every activity log, and can add or remove anyone anytime. Kids get freedom to bond — inside boundaries you set.
                             </p>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                             {[
-                                'Approve every contact',
+                                'Approve up to 5 contacts',
+                                'You control My Circle',
                                 'Set calling hours',
+                                '2-hour call limit',
                                 'Control screen time',
                                 'ARIA monitors calls',
                                 'End calls anytime',
@@ -405,7 +407,7 @@ export function KidSpaceContent() {
                                 What does it cost?
                             </AccordionTrigger>
                             <AccordionContent className="text-gray-600 leading-relaxed">
-                                KidSpace is included with the Plus plan ($17/mo) and Complete plan ($34.99/mo). Both come with a 14-day free trial. No contracts — cancel anytime.
+                                KidSpace is part of the Complete plan ($34.99/mo), which comes with a 14-day free trial. You can add up to 5 approved contacts in My Circle and calls run up to 2 hours. No contracts — cancel anytime.
                             </AccordionContent>
                         </AccordionItem>
                     </Accordion>

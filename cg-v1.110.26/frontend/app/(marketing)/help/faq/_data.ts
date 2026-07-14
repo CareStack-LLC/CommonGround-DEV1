@@ -212,12 +212,12 @@ export const faqCategories: FaqCategory[] = [
       {
         question: 'What is My Circle?',
         answer:
-          'My Circle lets parents add trusted contacts — like grandparents, aunts, or uncles — who can connect with the child through KidSpace. Plus plan includes 1 contact, Complete plan includes 3.',
+          'My Circle lets parents add trusted contacts — like grandparents, aunts, or uncles — who can connect with the child through KidSpace. The Complete plan includes up to 5 approved contacts, and parents stay in full control of who is in the circle at all times.',
       },
       {
         question: 'Which plans include KidSpace?',
         answer:
-          'KidSpace is available on Plus ($17.99/mo) and Complete ($34.99/mo) plans. The Complete plan includes full KidSpace with video calls, messaging, all activities, and 3 My Circle contacts.',
+          'KidSpace is part of the Complete plan ($34.99/mo). It includes video and voice calls, messaging, all activities, up to 5 My Circle contacts, and a 2-hour maximum call duration. The free and Plus plans do not include KidSpace.',
       },
     ],
   },
@@ -261,7 +261,7 @@ export const faqCategories: FaqCategory[] = [
       {
         question: 'How much does CommonGround cost?',
         answer:
-          'CommonGround offers three plans: Web Starter (free forever — includes ARIA messaging, shared calendar, and expense tracking), Plus ($17.99/month or $199.99/year — adds automated schedules, KidSpace, Quick Accords, and PDF exports), and Complete ($34.99/month or $349.99/year — adds Silent Handoff GPS, custody analytics, court-ready exports, and priority support).',
+          'CommonGround offers three plans: Web Starter (free forever — includes ARIA messaging, shared calendar, and expense tracking), Plus ($17.99/month or $199.99/year — adds automated schedules, Quick Accords, holiday rotation, and PDF exports), and Complete ($34.99/month or $349.99/year — adds KidSpace for kids, Silent Handoff GPS, custody analytics, court-ready exports, and priority support).',
       },
       {
         question: 'Do both parents need to pay?',
