@@ -642,6 +642,18 @@ async def create_and_invite_circle_user(
     # Verify parent has access to this family
     await get_family_file_with_access(db, invite_data.family_file_id, current_user.id)
 
+    # Gate: My Circle is a Complete-plan feature and is capped per plan.
+    from app.services.feature_gate import feature_gate
+    try:
+        await feature_gate.enforce_circle_contact_limit(
+            db, current_user, invite_data.family_file_id
+        )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=str(e),
+        )
+
     # Determine room number
     room_number = invite_data.room_number
     if not room_number:

@@ -28,6 +28,12 @@ if TYPE_CHECKING:
     from app.models.user import User, UserProfile
 
 
+# ── KidSpace / My Circle call caps (Complete plan) ──────────────────
+# Single source of truth, enforced in the circle_call service.
+KIDSPACE_MAX_CALL_MINUTES = 120   # Hard 2-hour ceiling per call
+KIDSPACE_DAILY_CALL_LIMIT = 5     # Default calls/day per contact-child pair
+
+
 # Feature definitions with tier access
 # Keys are feature names, values are either:
 # - List of tiers that have access (boolean features)
@@ -52,10 +58,11 @@ FEATURE_DEFINITIONS = {
     "pdf_summaries": ["plus", "complete", "family_plus"],
 
     # Circle / Trusted Contacts (numeric limit)
+    # KidSpace + My Circle are Complete-only. Plus/free have no circle access.
     "circle_contacts_limit": {
         "web_starter": 0,
         "starter": 0,
-        "plus": 1,
+        "plus": 0,
         "complete": 5,
         "family_plus": 5,
     },
@@ -298,6 +305,42 @@ class FeatureGate:
     def is_paid_tier(tier: str) -> bool:
         """Check if tier is a paid tier (Plus or Complete)."""
         return tier in ("plus", "complete", "family_plus")
+
+    @staticmethod
+    async def enforce_circle_contact_limit(
+        db: AsyncSession,
+        user: "User",
+        family_file_id: str,
+    ) -> None:
+        """
+        Enforce the My Circle contact cap for a family before adding a contact.
+
+        My Circle / KidSpace is a Complete-plan feature. Raises ValueError if
+        the user's plan does not include circle contacts, or if the family has
+        already reached its plan limit (5 on Complete).
+        """
+        from sqlalchemy import func
+        from app.models.circle import CircleContact
+
+        if not FeatureGate.has_feature(user, "circle_contacts_limit"):
+            raise ValueError(
+                FeatureGate.get_upgrade_message("circle_contacts_limit")
+            )
+
+        limit = FeatureGate.get_limit(user, "circle_contacts_limit")
+
+        result = await db.execute(
+            select(func.count(CircleContact.id)).where(
+                CircleContact.family_file_id == family_file_id,
+                CircleContact.is_active.is_(True),
+            )
+        )
+        existing = result.scalar() or 0
+        if existing >= limit:
+            raise ValueError(
+                f"You've reached your plan's limit of {limit} My Circle "
+                "contacts. Remove a contact before adding another."
+            )
 
     @staticmethod
     async def check_feature_or_raise(

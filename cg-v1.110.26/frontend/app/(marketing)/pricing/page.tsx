@@ -134,10 +134,10 @@ const comparisonCategories = [
 
 /* ── Competitor comparison rows — publicly listed pricing snapshot ─ */
 const OFW_ROWS = [
-  { feature: 'Price', ours: '$17.99/mo flat', theirs: '$174/yr per parent' },
+  { feature: 'Price', ours: 'From $17.99/mo flat', theirs: '$174/yr per parent', note: 'Flat rate — no per-parent or per-child fees' },
   { feature: 'Per-child fees', ours: 'None', theirs: 'Yes' },
   { feature: 'AI message coaching', ours: true, theirs: 'Limited' },
-  { feature: 'Child app (KidSpace)', ours: true, theirs: false },
+  { feature: 'Child app (KidSpace)', ours: true, theirs: false, note: 'On the Complete plan' },
   { feature: 'GPS-verified handoffs', ours: true, theirs: false },
   { feature: 'Court-ready exports', ours: true, theirs: true },
   { feature: 'iOS + Android', ours: true, theirs: true },
@@ -145,10 +145,10 @@ const OFW_ROWS = [
 ];
 
 const TP_ROWS = [
-  { feature: 'Price', ours: '$17.99/mo flat', theirs: '$12.99/mo per parent' },
+  { feature: 'Price', ours: 'From $17.99/mo flat', theirs: '$12.99/mo per parent', note: 'Flat rate — no per-parent or per-child fees' },
   { feature: 'Per-child fees', ours: 'None', theirs: 'None' },
   { feature: 'AI message coaching', ours: true, theirs: false },
-  { feature: 'Child app (KidSpace)', ours: true, theirs: false },
+  { feature: 'Child app (KidSpace)', ours: true, theirs: false, note: 'On the Complete plan' },
   { feature: 'GPS-verified handoffs', ours: true, theirs: false },
   { feature: 'Court-ready exports', ours: true, theirs: true },
   { feature: 'iOS + Android', ours: true, theirs: true },

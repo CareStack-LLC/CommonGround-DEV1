@@ -202,13 +202,17 @@ async def create_circle_contact(
     - **relationship**: grandparent, aunt, uncle, etc.
     - Contact will be pending approval from other parent (based on settings)
 
-    Requires Plus or Complete subscription.
+    Requires a Complete subscription, and enforces the plan's contact limit.
     """
     from app.services.feature_gate import feature_gate
-    if not feature_gate.has_feature(current_user, "circle_contacts_limit"):
+    try:
+        await feature_gate.enforce_circle_contact_limit(
+            db, current_user, contact_data.family_file_id
+        )
+    except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail=feature_gate.get_upgrade_message("circle_contacts_limit")
+            detail=str(e),
         )
     # Verify access to family file
     family_file = await get_family_file_with_access(

@@ -24,6 +24,10 @@ from app.models.circle import CircleContact
 from app.models.child import Child
 from app.models.kidcoms import CirclePermission, KidComsSettings
 from app.services.daily_video import daily_service
+from app.services.feature_gate import (
+    KIDSPACE_MAX_CALL_MINUTES,
+    KIDSPACE_DAILY_CALL_LIMIT,
+)
 from app.utils.sentry_helpers import capture_error
 
 logger = logging.getLogger(__name__)
@@ -120,7 +124,14 @@ class CircleCallService:
         )
         settings = settings_result.scalar_one_or_none()
 
-        if settings and settings.max_daily_sessions:
+        # Enforce a daily call cap. Use the family's configured limit when set,
+        # otherwise fall back to the plan default so a cap always applies.
+        daily_limit = (
+            settings.max_daily_sessions
+            if settings and settings.max_daily_sessions
+            else KIDSPACE_DAILY_CALL_LIMIT
+        )
+        if daily_limit:
             # Count sessions today
             today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
             count_result = await db.execute(
@@ -135,8 +146,8 @@ class CircleCallService:
             )
             session_count = count_result.scalar()
 
-            if session_count >= settings.max_daily_sessions:
-                return False, f"Daily session limit reached ({settings.max_daily_sessions} calls per day)", permission
+            if session_count >= daily_limit:
+                return False, f"Daily call limit reached ({daily_limit} calls per day)", permission
 
         # All checks passed
         return True, "Call allowed", permission
@@ -341,7 +352,10 @@ class CircleCallService:
 
         # Generate meeting token
         is_audio_only = session.call_type == "audio"
-        max_duration = session.permission_snapshot.get("max_call_duration_minutes", 60)
+        # Per-call duration is capped at the 2-hour KidSpace ceiling, even if a
+        # parent's permission was set (or drifted) higher.
+        requested_duration = session.permission_snapshot.get("max_call_duration_minutes") or 60
+        max_duration = min(requested_duration, KIDSPACE_MAX_CALL_MINUTES)
 
         token = await self.daily_service.create_meeting_token(
             room_name=session.daily_room_name,
