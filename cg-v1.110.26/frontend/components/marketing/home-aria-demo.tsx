@@ -13,6 +13,7 @@ import {
   ArrowRight,
   X,
 } from 'lucide-react';
+import { fallbackAnalyze, fallbackCoparentReply } from './aria-demo-fallback';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -125,9 +126,7 @@ export function HomeARIADemo() {
     originalText: string;
   } | null>(null);
   const [currentTaunt, setCurrentTaunt] = useState('');
-  const [demoError, setDemoError] = useState<string | null>(null);
-
-  const DEMO_UNAVAILABLE = "ARIA's live demo is taking a quick break — the demo service is temporarily unavailable. Please try again in a moment.";
+  const [offlineMode, setOfflineMode] = useState(false);
 
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -154,12 +153,19 @@ export function HomeARIADemo() {
     };
     setMessages(prev => [...prev, msg]);
     setInputText('');
-    setDemoError(null);
     setIsLoading(true);
 
     try {
       const history = [...messages, msg].map(m => ({ role: m.role, text: m.text }));
-      const result = await getCoparentReply(history, text, ariaEnabled);
+      let result;
+      try {
+        result = await getCoparentReply(history, text, ariaEnabled);
+      } catch (err) {
+        // Backend unreachable — keep the demo alive with a local simulation.
+        console.error('Falling back to offline demo reply:', err);
+        result = fallbackCoparentReply('schedule', history, text, ariaEnabled);
+        setOfflineMode(true);
+      }
 
       const coparentMsg: ChatMessage = {
         id: crypto.randomUUID(), role: 'coparent',
@@ -168,9 +174,6 @@ export function HomeARIADemo() {
         timestamp: new Date(),
       };
       setMessages(prev => [...prev, coparentMsg]);
-    } catch (err) {
-      console.error('Failed to get reply:', err);
-      setDemoError(DEMO_UNAVAILABLE);
     } finally {
       setIsLoading(false);
       inputRef.current?.focus({ preventScroll: true });
@@ -179,24 +182,23 @@ export function HomeARIADemo() {
 
   const handleSend = async () => {
     if (!inputText.trim() || isLoading) return;
-    setDemoError(null);
 
     if (ariaEnabled) {
+      // When ARIA is ON, force_rewrite=true means EVERY message gets a civil rewrite
+      const history = messages.slice(-6).map(m => ({ role: m.role, text: m.text }));
+      let analysis;
       try {
-        // When ARIA is ON, force_rewrite=true means EVERY message gets a civil rewrite
-        const history = messages.slice(-6).map(m => ({ role: m.role, text: m.text }));
-        const analysis = await analyzeMessage(inputText, history, true);
-        if (analysis.suggestion) {
-          // Auto-send the ARIA suggestion (shows original crossed out + rewrite)
-          setCurrentTaunt(TAUNTS[Math.floor(Math.random() * TAUNTS.length)]);
-          await sendMessage(analysis.suggestion, true, inputText);
-          return;
-        }
+        analysis = await analyzeMessage(inputText, history, true);
       } catch (err) {
-        // ARIA analysis couldn't reach the demo service — surface it instead
-        // of silently sending an unprotected message with no reply.
-        console.error('Analysis failed:', err);
-        setDemoError(DEMO_UNAVAILABLE);
+        // Backend unreachable — analyze locally so ARIA still catches it.
+        console.error('Falling back to offline demo analysis:', err);
+        analysis = fallbackAnalyze(inputText, true);
+        setOfflineMode(true);
+      }
+      if (analysis.suggestion) {
+        // Auto-send the ARIA suggestion (shows original crossed out + rewrite)
+        setCurrentTaunt(TAUNTS[Math.floor(Math.random() * TAUNTS.length)]);
+        await sendMessage(analysis.suggestion, true, inputText);
         return;
       }
     }
@@ -337,14 +339,6 @@ export function HomeARIADemo() {
               </div>
             )}
 
-            {demoError && !isLoading && (
-              <div className="flex justify-center">
-                <div className="max-w-[90%] text-center text-xs text-white/70 bg-[#C53030]/15 border border-[#C53030]/25 rounded-xl px-3.5 py-2.5 leading-relaxed">
-                  {demoError}
-                </div>
-              </div>
-            )}
-
             {/* scroll anchor handled by chatContainerRef */}
           </div>
 
@@ -449,6 +443,11 @@ export function HomeARIADemo() {
                     The <span className="text-[#E06B6B]/60 line-through">crossed-out text</span> is shown here so you can see what ARIA blocked — in the real app, only the rewritten message is sent.
                   </p>
                 </div>
+              )}
+              {offlineMode && (
+                <p className="mt-1.5 px-1 text-[10px] text-white/30 flex items-center gap-1">
+                  <Sparkles className="w-2.5 h-2.5 text-cg-amber" /> Offline preview — showing a simulated ARIA response. The full ARIA runs live inside the app.
+                </p>
               )}
             </div>
           )}

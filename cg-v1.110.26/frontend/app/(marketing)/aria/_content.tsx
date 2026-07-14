@@ -44,6 +44,7 @@ import {
 } from 'recharts';
 import { EarlyAdopterForm } from '@/components/marketing/early-adopter-form';
 import { BrandIcon, type BrandIconName } from '@/components/brand/brand-icon';
+import { fallbackAnalyze, fallbackCoparentReply } from '@/components/marketing/aria-demo-fallback';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -214,9 +215,7 @@ export function ARIAContent() {
   const [userScore, setUserScore] = useState(0);
   const [currentTaunt, setCurrentTaunt] = useState('');
   const [hoveredBA, setHoveredBA] = useState<number | null>(null);
-  const [demoError, setDemoError] = useState<string | null>(null);
-
-  const DEMO_UNAVAILABLE = "ARIA's live demo is taking a quick break — the demo service is temporarily unavailable. Please try again in a moment.";
+  const [offlineMode, setOfflineMode] = useState(false);
 
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const challengeRef = useRef<HTMLDivElement>(null);
@@ -261,12 +260,19 @@ export function ARIAContent() {
     };
     setMessages(prev => [...prev, msg]);
     setInputText('');
-    setDemoError(null);
     setIsLoading(true);
 
     try {
       const history = [...messages, msg].map(m => ({ role: m.role, text: m.text }));
-      const result = await getCoparentReply(scenario, history, text, ariaEnabled);
+      let result;
+      try {
+        result = await getCoparentReply(scenario, history, text, ariaEnabled);
+      } catch (err) {
+        // Backend unreachable — keep the demo alive with a local simulation.
+        console.error('Falling back to offline demo reply:', err);
+        result = fallbackCoparentReply(scenario, history, text, ariaEnabled);
+        setOfflineMode(true);
+      }
 
       const coparentMsg: ChatMessage = {
         id: crypto.randomUUID(), role: 'coparent',
@@ -284,9 +290,6 @@ export function ARIAContent() {
           score: result.aria_analysis.toxicity_score,
         }]);
       }
-    } catch (err) {
-      console.error('Failed to get reply:', err);
-      setDemoError(DEMO_UNAVAILABLE);
     } finally {
       setIsLoading(false);
       inputRef.current?.focus({ preventScroll: true });
@@ -295,23 +298,22 @@ export function ARIAContent() {
 
   const handleSend = async () => {
     if (!inputText.trim() || isLoading) return;
-    setDemoError(null);
 
     if (ariaEnabled) {
+      const history = messages.slice(-6).map(m => ({ role: m.role, text: m.text }));
+      let analysis;
       try {
-        const history = messages.slice(-6).map(m => ({ role: m.role, text: m.text }));
-        const analysis = await analyzeMessage(inputText, history, true);
-        if (analysis.suggestion) {
-          setAriaScore(prev => prev + 1);
-          setCurrentTaunt(getRandomTaunt());
-          await sendMessage(analysis.suggestion, true, inputText);
-          return;
-        }
+        analysis = await analyzeMessage(inputText, history, true);
       } catch (err) {
-        // Demo service unreachable — surface an error instead of silently
-        // sending an unprotected message that never gets a reply.
-        console.error('Analysis failed:', err);
-        setDemoError(DEMO_UNAVAILABLE);
+        // Backend unreachable — analyze locally so ARIA still catches it.
+        console.error('Falling back to offline demo analysis:', err);
+        analysis = fallbackAnalyze(inputText, true);
+        setOfflineMode(true);
+      }
+      if (analysis.suggestion) {
+        setAriaScore(prev => prev + 1);
+        setCurrentTaunt(getRandomTaunt());
+        await sendMessage(analysis.suggestion, true, inputText);
         return;
       }
     }
@@ -732,10 +734,11 @@ export function ARIAContent() {
                   </div>
                 )}
 
-                {demoError && !isLoading && (
+                {offlineMode && !isLoading && (
                   <div className="flex justify-center">
-                    <div className="max-w-[90%] text-center text-xs text-white/70 bg-[#C53030]/15 border border-[#C53030]/25 rounded-xl px-4 py-2.5 leading-relaxed">
-                      {demoError}
+                    <div className="max-w-[90%] text-center text-[11px] text-white/40 flex items-center gap-1.5 px-3 py-1.5">
+                      <Sparkles className="w-3 h-3 text-[#F5A623]" />
+                      Offline preview — showing a simulated ARIA response. The full ARIA runs live inside the app.
                     </div>
                   </div>
                 )}
