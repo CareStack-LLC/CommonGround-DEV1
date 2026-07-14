@@ -125,6 +125,9 @@ export function HomeARIADemo() {
     originalText: string;
   } | null>(null);
   const [currentTaunt, setCurrentTaunt] = useState('');
+  const [demoError, setDemoError] = useState<string | null>(null);
+
+  const DEMO_UNAVAILABLE = "ARIA's live demo is taking a quick break — the demo service is temporarily unavailable. Please try again in a moment.";
 
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -151,6 +154,7 @@ export function HomeARIADemo() {
     };
     setMessages(prev => [...prev, msg]);
     setInputText('');
+    setDemoError(null);
     setIsLoading(true);
 
     try {
@@ -166,6 +170,7 @@ export function HomeARIADemo() {
       setMessages(prev => [...prev, coparentMsg]);
     } catch (err) {
       console.error('Failed to get reply:', err);
+      setDemoError(DEMO_UNAVAILABLE);
     } finally {
       setIsLoading(false);
       inputRef.current?.focus({ preventScroll: true });
@@ -174,6 +179,7 @@ export function HomeARIADemo() {
 
   const handleSend = async () => {
     if (!inputText.trim() || isLoading) return;
+    setDemoError(null);
 
     if (ariaEnabled) {
       try {
@@ -187,7 +193,11 @@ export function HomeARIADemo() {
           return;
         }
       } catch (err) {
+        // ARIA analysis couldn't reach the demo service — surface it instead
+        // of silently sending an unprotected message with no reply.
         console.error('Analysis failed:', err);
+        setDemoError(DEMO_UNAVAILABLE);
+        return;
       }
     }
 
@@ -323,6 +333,14 @@ export function HomeARIADemo() {
                     <div className="w-1.5 h-1.5 bg-white/40 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
                     <div className="w-1.5 h-1.5 bg-white/40 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                   </div>
+                </div>
+              </div>
+            )}
+
+            {demoError && !isLoading && (
+              <div className="flex justify-center">
+                <div className="max-w-[90%] text-center text-xs text-white/70 bg-[#C53030]/15 border border-[#C53030]/25 rounded-xl px-3.5 py-2.5 leading-relaxed">
+                  {demoError}
                 </div>
               </div>
             )}
