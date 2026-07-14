@@ -10,7 +10,6 @@ import {
 } from 'lucide-react';
 
 import ImpactBoard from './components/ImpactBoard';
-import LeftRight4UImpactBoard from './components/LeftRight4UImpactBoard';
 
 interface PartnerMetrics {
     codes_distributed: number;
@@ -143,11 +142,5 @@ export default function PartnerDashboardPage() {
 
     const { partner, metrics } = data;
 
-    // Route Left Right 4 U specifically to their highly tailored impact board
-    if (partner.partner_slug.toLowerCase() === 'leftright4u') {
-        return <LeftRight4UImpactBoard partner={partner} metrics={metrics} isStaff={isStaff} />;
-    }
-
-    // Default to generic ImpactBoard
     return <ImpactBoard partner={partner} metrics={metrics} isStaff={isStaff} />;
 }

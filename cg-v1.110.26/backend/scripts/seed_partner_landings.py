@@ -1,6 +1,6 @@
 """
-Wave 5 — Idempotently upsert the two launch partners so their landing
-pages (/foreverforward and /leftright4u) always render.
+Wave 5 — Idempotently upsert the launch partner(s) so their landing
+page (/foreverforward) always renders.
 
 Root cause of the user-reported issue:
     The frontend route /{partner} fetches /api/v1/partners/{slug}. If the
@@ -73,37 +73,6 @@ PARTNERS_TO_SEED: list[dict] = [
             "contact_method": "email",
         },
         "code_prefix": "FF",
-    },
-    {
-        "partner_slug": "leftright4u",
-        "legal_name": "Left Right 4 U",
-        "display_name": "Left Right 4 U",
-        "mission_statement": (
-            "Left Right 4 U supports co-parents navigating high-conflict "
-            "separations. Through our partnership, CommonGround's Complete "
-            "tier is free for six months."
-        ),
-        "branding_config": {
-            "logo_url": "",
-            "primary_color": "#6B4E9B",
-            "secondary_color": "#F59E0B",
-            "accent_color": "#10B981",
-            "font_family": "system-ui",
-            "hero_image_url": "",
-            "tagline": (
-                "Left Right 4 U + CommonGround — reduce conflict, protect "
-                "your kids, build a better co-parenting path forward."
-            ),
-        },
-        "landing_config": {
-            "show_mission": True,
-            "show_stats": True,
-            "show_testimonials": False,
-            "custom_welcome_message": "",
-            "faq_items": [],
-            "contact_method": "email",
-        },
-        "code_prefix": "LR",
     },
 ]
 

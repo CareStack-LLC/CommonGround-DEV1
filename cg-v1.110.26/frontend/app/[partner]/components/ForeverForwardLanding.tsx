@@ -109,7 +109,7 @@ export default function ForeverForwardLanding({ partnerSlug }: ForeverForwardLan
                         <Button
                             variant="outline"
                             className="border-gray-700 text-gray-300 hover:text-white hover:bg-gray-800 h-14 px-8 text-lg"
-                            onClick={() => window.open('https://foreverforwardsite.vercel.app', '_blank')}
+                            onClick={() => window.open('https://4everforward.net', '_blank')}
                         >
                             Learn How It Works
                         </Button>
@@ -372,14 +372,14 @@ export default function ForeverForwardLanding({ partnerSlug }: ForeverForwardLan
                     <div className="flex flex-col sm:flex-row justify-center gap-4 mb-12">
                         <Button
                             className="bg-[#F5A623] hover:bg-[#E09520] text-gray-900 font-bold h-14 px-8 text-lg rounded-xl"
-                            onClick={() => window.open('https://foreverforwardsite.vercel.app', '_blank')}
+                            onClick={() => window.open('https://4everforward.net', '_blank')}
                         >
                             Apply for a Grant Code
                         </Button>
                         <Button
                             variant="outline"
                             className="border-gray-700 text-gray-300 hover:text-white hover:bg-gray-800 h-14 px-8 text-lg rounded-xl"
-                            onClick={() => window.open('https://foreverforwardsite.vercel.app', '_blank')}
+                            onClick={() => window.open('https://4everforward.net', '_blank')}
                         >
                             Visit Forever Forward
                         </Button>

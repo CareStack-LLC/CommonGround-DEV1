@@ -157,7 +157,9 @@ async def get_partner_landing(
     )
     partner = result.scalar_one_or_none()
 
-    if not partner:
+    # A missing OR deactivated partner is a 404 — deactivated partners must
+    # not render a public landing page.
+    if not partner or partner.status != PartnerStatus.ACTIVE:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Partner not found"

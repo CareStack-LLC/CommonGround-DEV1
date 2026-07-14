@@ -182,7 +182,7 @@ export default function GrantPartnershipPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="grid gap-8 max-w-md mx-auto">
             {[
               {
                 name: '4Ever Forward Foundation',
@@ -191,14 +191,6 @@ export default function GrantPartnershipPage() {
                   'CommonGround gave us a way to support fathers beyond our program walls. The families we serve now have tools that work 24/7 — not just during office hours.',
                 image: '/assets/marketing/forever-forward-hero.png',
                 href: '/foreverforward',
-              },
-              {
-                name: 'Left Right 4 U',
-                tagline: 'Recover. Refresh. Restore.',
-                quote:
-                  'Our mothers are dealing with cancer treatment, domestic violence, and co-parenting — all at once. CommonGround takes the communication conflict off their plate so they can focus on healing.',
-                image: '/assets/marketing/lr4u_hero_nano_banana_1772567466304.png',
-                href: '/leftright4u',
               },
             ].map((partner) => (
               <Link

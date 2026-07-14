@@ -23,7 +23,6 @@ import {
 
 import GenericPartnerLanding from './components/GenericPartnerLanding';
 import ForeverForwardLanding from './components/ForeverForwardLanding';
-import LeftRight4ULanding from './components/LeftRight4ULanding';
 
 interface PartnerBranding {
     logo_url: string;
@@ -69,6 +68,14 @@ export default function PartnerLandingPage() {
     const [codeValid, setCodeValid] = useState(false);
 
     useEffect(() => {
+        // Decommissioned partners are treated as not-found regardless of any
+        // lingering backend record.
+        const DECOMMISSIONED = new Set(['leftright4u']);
+        if (partnerSlug && DECOMMISSIONED.has(partnerSlug.toLowerCase())) {
+            setError('Partner not found');
+            setLoading(false);
+            return;
+        }
         async function fetchPartner() {
             try {
                 const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/partners/${partnerSlug}`);
@@ -154,11 +161,6 @@ export default function PartnerLandingPage() {
     // Check if this is Forever Forward for custom content
     if (partnerSlug.toLowerCase() === 'foreverforward') {
         return <ForeverForwardLanding partnerSlug={partnerSlug} />;
-    }
-
-    // Check if this is Left Right 4 U for custom content
-    if (partnerSlug.toLowerCase() === 'leftright4u') {
-        return <LeftRight4ULanding partnerSlug={partnerSlug} />;
     }
 
     // Apply partner branding as CSS variables

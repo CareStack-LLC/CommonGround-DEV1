@@ -191,16 +191,6 @@ const partners: PartnerHighlight[] = [
     accentFrom: '#F59E0B',
     accentTo: '#D97706',
   },
-  {
-    name: 'Left Right 4 U',
-    tagline: 'Recover. Refresh. Restore.',
-    description:
-      'Empowering single mothers facing breast cancer and domestic violence with the resources and support to rebuild their lives.',
-    image: '/assets/marketing/lr4u_hero_nano_banana_1772567466304.png',
-    href: '/leftright4u',
-    accentFrom: '#FF6B6B',
-    accentTo: '#4ECDC4',
-  },
 ];
 
 /* ------------------------------------------------------------------ */

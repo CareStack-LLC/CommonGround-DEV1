@@ -188,21 +188,10 @@ export function PartnersDirectoryContent() {
                         slug="foreverforward"
                         name="Forever Forward"
                         description="Forever Forward is committed to empowering dads to be the best parents they can be. Through education, mentorship, and community support, we help fathers navigate the challenges of co-parenting and build lasting, positive relationships with their children."
-                        website="foreverforward.org"
-                        contact="info@foreverforward.org"
+                        website="4everforward.net"
+                        contact="info@4everforward.net"
                         location="Los Angeles, CA"
                         logoUrl="/assets/marketing/forever-forward-hero.png"
-                    />
-
-                    {/* Left Right 4 U Foundation Card */}
-                    <PartnerCard
-                        slug="leftright4u"
-                        name="Left Right 4 U Foundation"
-                        description="LeftRight 4 U Foundation assist children of low-income single Mother's who are fighting Breast Cancer and/or Domestic Violence."
-                        website="leftright4u.org"
-                        contact="info@leftright4u.org"
-                        location="San Bernardino, CA"
-                        logoUrl="/assets/marketing/lr4u_hero_nano_banana_1772567466304.png"
                     />
 
                     {/* Call to Action for new partners */}
