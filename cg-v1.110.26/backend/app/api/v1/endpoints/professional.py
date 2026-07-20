@@ -1,5 +1,4 @@
 """
-from app.utils.sentry_helpers import capture_error
 Professional Portal API endpoints.
 
 Endpoints for professional profiles, firms, memberships,
@@ -19,6 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.core.security import get_current_user
+from app.utils.sentry_helpers import capture_error
 from app.models.user import User
 from app.models.professional import (
     ProfessionalProfile,

@@ -1,5 +1,4 @@
 """
-from app.utils.sentry_helpers import capture_error
 ClearFund service - Business logic for purpose-locked financial obligations.
 
 Key Invariants:

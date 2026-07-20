@@ -1,5 +1,4 @@
 """
-from app.utils.sentry_helpers import capture_error
 Court Access Mode service layer.
 
 Business logic for court professional access, settings, events, and reports.

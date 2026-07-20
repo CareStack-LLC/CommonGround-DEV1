@@ -1,5 +1,4 @@
 """
-from app.utils.sentry_helpers import capture_error
 ARIA Unified Chat Monitor Service
 
 Provides content moderation for ALL messaging channels:
@@ -32,6 +31,7 @@ from dataclasses import dataclass, field
 
 from app.core.config import settings
 from app.core.ai_clients import get_anthropic, get_openai
+from app.utils.sentry_helpers import capture_error
 from app.services.aria_sanitize import (
     sanitize_for_prompt,
     sanitize_name,

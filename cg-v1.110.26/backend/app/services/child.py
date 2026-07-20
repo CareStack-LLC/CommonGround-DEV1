@@ -1,5 +1,4 @@
 """
-from app.utils.sentry_helpers import capture_error
 Child Profile Service - Business logic for child profile management.
 
 This service handles:

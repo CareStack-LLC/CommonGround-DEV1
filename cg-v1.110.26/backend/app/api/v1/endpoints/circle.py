@@ -1,5 +1,4 @@
 """
-from app.utils.sentry_helpers import capture_error
 Circle API endpoints for managing approved child contacts.
 
 The Circle is a list of trusted contacts (grandparents, family friends, etc.)
@@ -18,6 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import settings
 from app.core.database import get_db
 from app.core.security import get_current_user
+from app.utils.sentry_helpers import capture_error
 from app.models.user import User
 from app.models.family_file import FamilyFile
 from app.models.child import Child
