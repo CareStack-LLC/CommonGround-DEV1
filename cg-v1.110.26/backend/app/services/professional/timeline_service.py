@@ -398,7 +398,7 @@ class CaseTimelineService:
             events.append({
                 "id": f"exch-{instance.id}",
                 "event_type": event_type.value,
-                "timestamp": instance.actual_time or instance.scheduled_time,
+                "timestamp": instance.completed_at or instance.scheduled_time,
                 "title": title,
                 "description": f"Exchange at {instance.scheduled_time}",
                 "is_flagged": instance.status == "missed",

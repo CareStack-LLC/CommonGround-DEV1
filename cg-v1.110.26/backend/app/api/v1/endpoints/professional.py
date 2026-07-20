@@ -2274,7 +2274,15 @@ async def get_aria_settings(
         )
 
     aria_service = ARIAControlService(db)
-    return await aria_service.get_aria_settings(family_file_id)
+    try:
+        return await aria_service.get_aria_settings(family_file_id)
+    except ValueError as e:
+        logger.error(f"ARIA settings access denied: {e}")
+        capture_error(e)
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="This case has not granted ARIA access to your assignment.",
+        )
 
 
 @router.patch(
@@ -2332,14 +2340,22 @@ async def get_aria_interventions(
         )
 
     aria_service = ARIAControlService(db)
-    result = await aria_service.get_intervention_history(
-        family_file_id=family_file_id,
-        professional_id=profile.id,
-        start_date=start_date,
-        end_date=end_date,
-        limit=limit,
-        offset=offset,
-    )
+    try:
+        result = await aria_service.get_intervention_history(
+            family_file_id=family_file_id,
+            professional_id=profile.id,
+            start_date=start_date,
+            end_date=end_date,
+            limit=limit,
+            offset=offset,
+        )
+    except ValueError as e:
+        logger.error(f"ARIA interventions access denied: {e}")
+        capture_error(e)
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="This case has not granted ARIA access to your assignment.",
+        )
 
     return [
         ARIAInterventionResponse(
@@ -2422,11 +2438,19 @@ async def get_aria_metrics(
         )
 
     aria_service = ARIAControlService(db)
-    return await aria_service.get_aria_metrics(
-        family_file_id=family_file_id,
-        professional_id=profile.id,
-        days=days,
-    )
+    try:
+        return await aria_service.get_aria_metrics(
+            family_file_id=family_file_id,
+            professional_id=profile.id,
+            days=days,
+        )
+    except ValueError as e:
+        logger.error(f"ARIA metrics access denied: {e}")
+        capture_error(e)
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="This case has not granted ARIA access to your assignment.",
+        )
 
 
 # =============================================================================
