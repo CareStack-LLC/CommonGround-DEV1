@@ -34,7 +34,13 @@ V2_SYSTEM_PROMPT = """You are ARIA Sentinel Shield, an AI safety system for Comm
 
 CRITICAL CONTEXT: All messages are COURT DOCUMENTATION reviewed by judges, attorneys, and guardians ad litem.
 
-Analyze the message for these 32 categories across 8 domains:
+SCORING SCOPE — READ CAREFULLY:
+You score ONLY the language in the CURRENT MESSAGE. Any "SENDER BACKGROUND", "SESSION HISTORY", or "BASELINE" information describes the sender's PAST messages. It is background to help you weigh genuinely ambiguous wording in the current message — it is NOT evidence about the current message, and it can NEVER by itself justify a category.
+- A category may ONLY be assigned when the CURRENT MESSAGE's own words support it. For every category you report, the phrase that supports it must appear in the current message.
+- If the current message is neutral, cooperative, or purely logistical (confirming a pickup time, saying thanks, sharing a schedule), return an EMPTY categories object — no matter how hostile the sender's history is.
+- A parent with a hostile history who sends a genuinely cooperative message must score ZERO categories. Flagging their good-faith message punishes de-escalation and corrupts the court record. Do not do it.
+
+Analyze the CURRENT MESSAGE for these 32 categories across 8 domains:
 
 COERCIVE CONTROL (CTRL):
 - schedule_control: Unilaterally dictating schedule changes
@@ -138,23 +144,29 @@ async def run_llm_deep_analysis(
         from app.core.ai_clients import get_openai
         client = get_openai()
 
-        # Build enriched user prompt
+        # Build enriched user prompt.
+        # The background block is explicitly labelled PAST-ONLY so the model
+        # does not treat the sender's history as evidence about the current
+        # message (that priming was manufacturing hostility categories on
+        # clean messages from hostile-history senders — a self-reinforcing
+        # false-positive loop, since flags feed back into session memory).
         context_parts = []
         if session_context:
-            context_parts.append(f"SESSION HISTORY:\n{session_context}")
+            context_parts.append(f"SENDER BACKGROUND (PAST SESSIONS — context only, NOT evidence about this message):\n{session_context}")
         if baseline_info:
-            context_parts.append(f"BASELINE DEVIATION:\n{baseline_info}")
+            context_parts.append(f"BASELINE DEVIATION (PAST behavior — context only):\n{baseline_info}")
         if time_signals:
             context_parts.append(f"TIME SIGNALS: {', '.join(time_signals)}")
 
         context_block = "\n\n".join(context_parts)
 
-        user_prompt = f"""Analyze this co-parenting message:
+        user_prompt = f"""Analyze the CURRENT MESSAGE below. Score ONLY its own words.
 
-MESSAGE: "{message}"
+CURRENT MESSAGE: "{message}"
 
 {context_block}
 
+Reminder: the background above is the sender's PAST behavior only. Assign a category ONLY if the CURRENT MESSAGE's own words support it; if the current message is neutral/cooperative/logistical, return empty categories.
 Respond in JSON format with categories, triggers, explanation, and suggestion."""
 
         with ai_span("aria_v2_deep_analysis", "gpt-4o-mini", "openai") as span:
@@ -227,13 +239,18 @@ async def run_llm_severity_analysis(
         from app.core.ai_clients import get_openai
         client = get_openai()
 
-        user_prompt = f"""CRITICAL SEVERITY ANALYSIS — this message requires careful review:
+        background = (
+            f"SENDER BACKGROUND (PAST SESSIONS — context only, NOT evidence about this message):\n{session_context}"
+            if session_context else ""
+        )
+        user_prompt = f"""CRITICAL SEVERITY ANALYSIS — this message requires careful review.
+Score ONLY the words in the CURRENT MESSAGE.
 
-MESSAGE: "{message}"
+CURRENT MESSAGE: "{message}"
 
-{session_context}
+{background}
 
-This message has been flagged as severity 4-5 (high/severe). Analyze with extra care.
+This message's regex layer flagged severity 4-5 (high/severe). Analyze the current message's own language with extra care; the background above is past behavior only and cannot by itself create a category.
 Respond in JSON format with categories, triggers, explanation, and suggestion."""
 
         with ai_span("aria_v2_severity_analysis", "gpt-4o", "openai") as span:
