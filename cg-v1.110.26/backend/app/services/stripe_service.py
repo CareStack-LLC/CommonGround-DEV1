@@ -26,6 +26,29 @@ from app.core.config import settings
 # Initialize Stripe with the secret key
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
+# Network resilience under load:
+# - max_network_retries: the SDK retries transient failures (connection resets,
+#   429s, 5xx) with exponential backoff, automatically attaching an idempotency
+#   key so retried writes never double-charge.
+# - a bounded timeout keeps a stalled Stripe request from pinning a worker
+#   thread for the SDK default (80s).
+stripe.max_network_retries = 2
+try:  # http client config API varies across SDK versions; never fail import
+    stripe.default_http_client = stripe.http_client.new_default_http_client(timeout=20)
+except Exception:  # pragma: no cover - defensive
+    pass
+
+
+async def _stripe_call(func, *args, **kwargs):
+    """Run a blocking Stripe SDK call off the event loop.
+
+    The Stripe SDK is synchronous: calling it directly inside an ``async def``
+    blocks the entire asyncio event loop for the whole network round-trip, so
+    concurrent requests serialize and throughput collapses under load. Offload
+    every SDK call to a worker thread so the event loop stays free.
+    """
+    return await asyncio.to_thread(func, *args, **kwargs)
+
 
 class StripeService:
     """
@@ -175,7 +198,7 @@ class StripeService:
         Returns:
             URL to the Express dashboard
         """
-        login_link = stripe.Account.create_login_link(account_id)
+        login_link = await _stripe_call(stripe.Account.create_login_link, account_id)
         return login_link.url
 
     # =========================================================================
@@ -231,7 +254,7 @@ class StripeService:
         if idempotency_key:
             stripe_params["idempotency_key"] = idempotency_key
 
-        payment_intent = stripe.PaymentIntent.create(**params, **stripe_params)
+        payment_intent = await _stripe_call(stripe.PaymentIntent.create, **params, **stripe_params)
 
         return {
             "payment_intent_id": payment_intent.id,
@@ -257,7 +280,7 @@ class StripeService:
         if payment_method_id:
             params["payment_method"] = payment_method_id
 
-        payment_intent = stripe.PaymentIntent.confirm(payment_intent_id, **params)
+        payment_intent = await _stripe_call(stripe.PaymentIntent.confirm, payment_intent_id, **params)
 
         return {
             "payment_intent_id": payment_intent.id,
@@ -270,7 +293,7 @@ class StripeService:
         """
         Get Payment Intent details.
         """
-        pi = stripe.PaymentIntent.retrieve(payment_intent_id)
+        pi = await _stripe_call(stripe.PaymentIntent.retrieve, payment_intent_id)
 
         return {
             "payment_intent_id": pi.id,
@@ -288,7 +311,7 @@ class StripeService:
         Returns True if cancelled successfully.
         """
         try:
-            stripe.PaymentIntent.cancel(payment_intent_id)
+            await _stripe_call(stripe.PaymentIntent.cancel, payment_intent_id)
             return True
         except stripe.error.InvalidRequestError:
             return False
@@ -326,7 +349,8 @@ class StripeService:
         if idempotency_key:
             stripe_params["idempotency_key"] = idempotency_key
 
-        transfer = stripe.Transfer.create(
+        transfer = await _stripe_call(
+            stripe.Transfer.create,
             amount=amount_cents,
             currency="usd",
             destination=destination_account_id,
@@ -349,7 +373,7 @@ class StripeService:
         """
         Get transfer details.
         """
-        transfer = stripe.Transfer.retrieve(transfer_id)
+        transfer = await _stripe_call(stripe.Transfer.retrieve, transfer_id)
 
         return {
             "transfer_id": transfer.id,
@@ -369,7 +393,7 @@ class StripeService:
 
         Returns available and pending balances.
         """
-        balance = stripe.Balance.retrieve(stripe_account=account_id)
+        balance = await _stripe_call(stripe.Balance.retrieve, stripe_account=account_id)
 
         available = Decimal(0)
         pending = Decimal(0)
@@ -405,7 +429,8 @@ class StripeService:
         """
         from app.utils.sentry_helpers import external_api_span
         with external_api_span("stripe", "create_customer"):
-            customer = stripe.Customer.create(
+            customer = await _stripe_call(
+                stripe.Customer.create,
                 email=email,
                 name=name,
                 metadata={
@@ -432,7 +457,8 @@ class StripeService:
         Returns True if attached successfully.
         """
         try:
-            stripe.PaymentMethod.attach(
+            await _stripe_call(
+                stripe.PaymentMethod.attach,
                 payment_method_id,
                 customer=customer_id,
             )
@@ -448,7 +474,8 @@ class StripeService:
         """
         List payment methods for a customer.
         """
-        methods = stripe.PaymentMethod.list(
+        methods = await _stripe_call(
+            stripe.PaymentMethod.list,
             customer=customer_id,
             type=type,
         )
@@ -515,7 +542,7 @@ class StripeService:
         if trial_days > 0:
             params["subscription_data"]["trial_period_days"] = trial_days
 
-        session = stripe.checkout.Session.create(**params)
+        session = await _stripe_call(stripe.checkout.Session.create, **params)
 
         return {
             "id": session.id,
@@ -540,7 +567,8 @@ class StripeService:
         Returns:
             Portal session URL
         """
-        session = stripe.billing_portal.Session.create(
+        session = await _stripe_call(
+            stripe.billing_portal.Session.create,
             customer=customer_id,
             return_url=return_url,
         )
@@ -563,12 +591,13 @@ class StripeService:
             Dict with subscription status and cancel_at date
         """
         if at_period_end:
-            subscription = stripe.Subscription.modify(
+            subscription = await _stripe_call(
+                stripe.Subscription.modify,
                 subscription_id,
                 cancel_at_period_end=True,
             )
         else:
-            subscription = stripe.Subscription.cancel(subscription_id)
+            subscription = await _stripe_call(stripe.Subscription.cancel, subscription_id)
 
         # Use dict-style access for all Stripe object fields
         return {
@@ -592,7 +621,8 @@ class StripeService:
         Returns:
             Dict with subscription status
         """
-        subscription = stripe.Subscription.modify(
+        subscription = await _stripe_call(
+            stripe.Subscription.modify,
             subscription_id,
             cancel_at_period_end=False,
         )
@@ -617,7 +647,7 @@ class StripeService:
         Returns:
             Dict with subscription details
         """
-        subscription = stripe.Subscription.retrieve(subscription_id)
+        subscription = await _stripe_call(stripe.Subscription.retrieve, subscription_id)
 
         # Use dict-style access for ALL Stripe object fields
         items_data = subscription.get("items", {}).get("data", [])
@@ -658,7 +688,7 @@ class StripeService:
         logger = logging.getLogger(__name__)
 
         logger.info(f"get_customer_subscriptions called for customer {customer_id}")
-        subscriptions = stripe.Subscription.list(customer=customer_id, limit=10)
+        subscriptions = await _stripe_call(stripe.Subscription.list, customer=customer_id, limit=10)
         logger.info(f"Found {len(subscriptions.data)} subscriptions")
 
         result = []
@@ -705,7 +735,7 @@ class StripeService:
             Dict with updated subscription details
         """
         # Get current subscription to find the item ID
-        subscription = stripe.Subscription.retrieve(subscription_id)
+        subscription = await _stripe_call(stripe.Subscription.retrieve, subscription_id)
 
         # Access items via dict-style (sub["items"]) not attribute (sub.items)
         items_data = subscription.get("items", {}).get("data", [])
@@ -716,7 +746,8 @@ class StripeService:
         item_id = items_data[0]["id"]
 
         # Update the subscription with the new price
-        updated_subscription = stripe.Subscription.modify(
+        updated_subscription = await _stripe_call(
+            stripe.Subscription.modify,
             subscription_id,
             items=[{
                 "id": item_id,
