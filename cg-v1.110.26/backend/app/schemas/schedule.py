@@ -4,6 +4,8 @@ from datetime import datetime, date
 from typing import Optional, List, Dict, Any
 from pydantic import BaseModel, Field
 
+from app.schemas._types import NaiveUTCDatetime
+
 
 # ========== MY TIME COLLECTION SCHEMAS ==========
 
@@ -51,8 +53,8 @@ class TimeBlockCreate(BaseModel):
 
     collection_id: str
     title: str = Field(..., min_length=1, max_length=200)
-    start_time: datetime
-    end_time: datetime
+    start_time: NaiveUTCDatetime
+    end_time: NaiveUTCDatetime
     all_day: bool = False
     is_recurring: bool = False
     recurrence_pattern: Optional[str] = Field(None, pattern=r"^(daily|weekly)$")
@@ -65,8 +67,8 @@ class TimeBlockUpdate(BaseModel):
     """Update a time block."""
 
     title: Optional[str] = Field(None, min_length=1, max_length=200)
-    start_time: Optional[datetime] = None
-    end_time: Optional[datetime] = None
+    start_time: Optional[NaiveUTCDatetime] = None
+    end_time: Optional[NaiveUTCDatetime] = None
     notes: Optional[str] = None
 
 
@@ -134,8 +136,8 @@ class ScheduleEventCreate(BaseModel):
     collection_id: Optional[str] = None  # Made optional for professional events
     agreement_id: Optional[str] = None  # SharedCare Agreement context
     title: str = Field(..., min_length=1)
-    start_time: datetime
-    end_time: datetime
+    start_time: NaiveUTCDatetime
+    end_time: NaiveUTCDatetime
     child_ids: List[str] = []  # Made optional for professional events
     description: Optional[str] = None
     location: Optional[str] = None
@@ -182,8 +184,8 @@ class ScheduleEventUpdate(BaseModel):
 
     title: Optional[str] = Field(None, min_length=1)
     description: Optional[str] = None
-    start_time: Optional[datetime] = None
-    end_time: Optional[datetime] = None
+    start_time: Optional[NaiveUTCDatetime] = None
+    end_time: Optional[NaiveUTCDatetime] = None
     location: Optional[str] = None
     location_shared: Optional[bool] = None
     # V2: Event category for specialized forms

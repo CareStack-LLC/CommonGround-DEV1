@@ -9,6 +9,8 @@ from decimal import Decimal
 from typing import Optional
 from pydantic import BaseModel, Field, field_validator, model_validator
 
+from app.schemas._types import NaiveUTCDatetime
+
 from app.models.clearfund import (
     OBLIGATION_SOURCE_TYPES,
     OBLIGATION_CATEGORIES,
@@ -30,7 +32,7 @@ class ObligationBase(BaseModel):
     child_ids: list[str] = Field(default_factory=list, description="Children affected")
     total_amount: Decimal = Field(..., gt=0, description="Total amount")
     petitioner_percentage: int = Field(50, ge=0, le=100, description="Petitioner share %")
-    due_date: Optional[datetime] = Field(None, description="Due date for payment")
+    due_date: Optional[NaiveUTCDatetime] = Field(None, description="Due date for payment")
     verification_required: bool = Field(True, description="Require verification")
     receipt_required: bool = Field(False, description="Require receipt upload")
     notes: Optional[str] = Field(None, max_length=2000, description="Additional notes")
@@ -99,7 +101,7 @@ class ObligationCreateFromRequest(BaseModel):
 class ObligationUpdate(BaseModel):
     """Update obligation request (limited fields after creation)."""
 
-    due_date: Optional[datetime] = Field(None, description="Update due date")
+    due_date: Optional[NaiveUTCDatetime] = Field(None, description="Update due date")
     notes: Optional[str] = Field(None, max_length=2000, description="Update notes")
     receipt_required: Optional[bool] = Field(None, description="Update receipt requirement")
 
@@ -273,7 +275,7 @@ class VerificationCreate(BaseModel):
     artifact_type: str = Field(..., description="Type: transaction, receipt, vendor_confirmation, manual")
     vendor_name: Optional[str] = Field(None, max_length=200, description="Vendor name")
     vendor_mcc: Optional[str] = Field(None, max_length=10, description="Merchant category code")
-    transaction_date: Optional[datetime] = Field(None, description="Transaction date")
+    transaction_date: Optional[NaiveUTCDatetime] = Field(None, description="Transaction date")
     amount_verified: Decimal = Field(..., gt=0, description="Amount verified")
     stripe_transaction_id: Optional[str] = Field(None, description="Stripe transaction ID")
     verification_notes: Optional[str] = Field(None, max_length=1000, description="Verification notes")
@@ -292,7 +294,7 @@ class ReceiptUpload(BaseModel):
 
     vendor_name: Optional[str] = Field(None, max_length=200, description="Vendor name")
     amount: Decimal = Field(..., gt=0, description="Receipt amount")
-    transaction_date: Optional[datetime] = Field(None, description="Purchase date")
+    transaction_date: Optional[NaiveUTCDatetime] = Field(None, description="Purchase date")
     notes: Optional[str] = Field(None, max_length=500, description="Notes about purchase")
 
 
