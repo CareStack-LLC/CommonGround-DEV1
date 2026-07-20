@@ -112,7 +112,6 @@ _register(IntakeTemplate(
         {"name": "concerns", "type": "string", "description": "Specific background or worries affecting the plan"}
     ]
 ))
-))
 
 
 # ── 2. Custody & Visitation Only ──────────────────────────────────
@@ -137,7 +136,6 @@ _register(IntakeTemplate(
         {"name": "transportation_plan", "type": "string", "description": "Who is responsible for pick-ups/drop-offs"}
     ]
 ))
-))
 
 
 # ── 3. Child Support Only ─────────────────────────────────────────
@@ -161,7 +159,6 @@ _register(IntakeTemplate(
         {"name": "custody_percentage", "type": "number", "description": "Current time spent with children (%)"}
     ]
 ))
-))
 
 
 # ── 4. Modification of Existing Order ─────────────────────────────
@@ -184,7 +181,6 @@ _register(IntakeTemplate(
         {"name": "requested_updates", "type": "string", "description": "Terms to be modified"},
         {"name": "children_impact", "type": "string", "description": "How the change benefits the children"}
     ]
-))
 ))
 
 
@@ -210,7 +206,6 @@ _register(IntakeTemplate(
         {"name": "transportation_plan", "type": "string", "description": "Who is responsible for pick-ups/drop-offs"}
     ]
 ))
-))
 
 
 # ── 6. Domestic Violence Case Screening ───────────────────────────
@@ -234,7 +229,6 @@ _register(IntakeTemplate(
         {"name": "supervised_handovers", "type": "string", "description": "Need for supervision"}
     ]
 ))
-))
 
 
 # ── 7. Move-Away / Relocation ─────────────────────────────────────
@@ -256,7 +250,6 @@ _register(IntakeTemplate(
         {"name": "move_justification", "type": "string", "description": "Reason for move"},
         {"name": "long_distance_plan", "type": "string", "description": "Plan for long-distance contact"}
     ]
-))
 ))
 
 
