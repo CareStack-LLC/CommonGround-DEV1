@@ -2436,7 +2436,6 @@ async def get_aria_thread_analysis(
 
 @router.get(
     "/cases/{family_file_id}/aria/metrics",
-    response_model=ARIAMetrics,
     summary="Get ARIA metrics",
 )
 async def get_aria_metrics(

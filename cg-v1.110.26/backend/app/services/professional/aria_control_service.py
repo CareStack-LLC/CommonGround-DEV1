@@ -329,6 +329,29 @@ class ARIAControlService:
     # ARIA Metrics
     # -------------------------------------------------------------------------
 
+    @staticmethod
+    def _empty_aria_metrics(days: int) -> dict:
+        """Well-formed zero-metrics payload for cases with no legacy corpus."""
+        return {
+            "period_days": days,
+            "total_messages": 0,
+            "flagged_messages": 0,
+            "flag_rate": 0.0,
+            "sentiment_by_sender": {},
+            "average_sentiment": None,
+            "sentiment_trend": "stable",
+            "good_faith_score": None,
+            "v2_heat_parent_a": None,
+            "v2_heat_parent_b": None,
+            "v2_avg_heat": None,
+            "v2_domain_breakdown": {},
+            "v2_session_pattern_frequency": {},
+            "v2_time_signal_distribution": {},
+            "v2_legal_flag_count": 0,
+            "v2_coaching_acceptance_rate": None,
+            "v2_category_breakdown": {},
+        }
+
     async def get_aria_metrics(
         self,
         family_file_id: str,
@@ -346,12 +369,15 @@ class ARIAControlService:
         await self._verify_aria_access(professional_id, family_file_id)
 
         family_file = await self._get_family_file(family_file_id)
-        if not family_file:
-            return {}
 
-        case_id = family_file.legacy_case_id
+        # The V1/V2 message aggregations below are keyed on the legacy case id.
+        # Family-file-native cases (no legacy_case_id) simply have no legacy
+        # message corpus to aggregate — return a well-formed zero-metrics
+        # payload rather than an empty dict (which would fail response
+        # serialization / break the client).
+        case_id = family_file.legacy_case_id if family_file else None
         if not case_id:
-            return {}
+            return self._empty_aria_metrics(days)
 
         since = datetime.utcnow() - timedelta(days=days)
 
@@ -367,9 +393,16 @@ class ARIAControlService:
         previous_sentiment = await self._get_average_sentiment(
             case_id, datetime.utcnow() - timedelta(days=14), datetime.utcnow() - timedelta(days=7),
         )
-        sentiment_trend = "improving" if recent_sentiment > previous_sentiment else (
-            "declining" if recent_sentiment < previous_sentiment else "stable"
-        )
+        if recent_sentiment is None or previous_sentiment is None:
+            # Sentiment is not persisted yet (see the sentiment helpers) — no
+            # trend to compute. Comparing None would raise TypeError.
+            sentiment_trend = "stable"
+        elif recent_sentiment > previous_sentiment:
+            sentiment_trend = "improving"
+        elif recent_sentiment < previous_sentiment:
+            sentiment_trend = "declining"
+        else:
+            sentiment_trend = "stable"
 
         # V2 Sentinel Shield aggregations
         parent_a_id = family_file.parent_a_id
