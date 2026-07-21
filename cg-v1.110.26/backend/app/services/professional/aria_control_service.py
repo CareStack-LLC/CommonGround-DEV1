@@ -330,6 +330,22 @@ class ARIAControlService:
     # -------------------------------------------------------------------------
 
     @staticmethod
+    def _message_scope(family_file_id: str, case_id):
+        """Filter matching every message that belongs to this case.
+
+        Family-file-native messages carry ``family_file_id`` (the normal flow);
+        messages migrated from a legacy case carry ``case_id``. Keying the
+        aggregations on either means metrics are no longer empty for
+        family-file-native cases (the common case).
+        """
+        if case_id:
+            return or_(
+                Message.family_file_id == family_file_id,
+                Message.case_id == case_id,
+            )
+        return Message.family_file_id == family_file_id
+
+    @staticmethod
     def _empty_aria_metrics(days: int) -> dict:
         """Well-formed zero-metrics payload for cases with no legacy corpus."""
         return {
@@ -369,29 +385,29 @@ class ARIAControlService:
         await self._verify_aria_access(professional_id, family_file_id)
 
         family_file = await self._get_family_file(family_file_id)
-
-        # The V1/V2 message aggregations below are keyed on the legacy case id.
-        # Family-file-native cases (no legacy_case_id) simply have no legacy
-        # message corpus to aggregate — return a well-formed zero-metrics
-        # payload rather than an empty dict (which would fail response
-        # serialization / break the client).
-        case_id = family_file.legacy_case_id if family_file else None
-        if not case_id:
+        if not family_file:
             return self._empty_aria_metrics(days)
+
+        # Key every aggregation on the family file (native messages) OR the
+        # legacy case id (migrated messages) — see _message_scope. Previously
+        # this keyed on legacy_case_id alone and returned zeros for every
+        # family-file-native case.
+        case_id = family_file.legacy_case_id
+        scope = self._message_scope(family_file_id, case_id)
 
         since = datetime.utcnow() - timedelta(days=days)
 
         # V1 metrics
-        total_messages = await self._count_messages(case_id, since)
-        flagged_messages = await self._count_flagged_messages(case_id, since)
-        sentiment_by_sender = await self._get_sentiment_by_sender(case_id, since)
+        total_messages = await self._count_messages(scope, since)
+        flagged_messages = await self._count_flagged_messages(scope, since)
+        sentiment_by_sender = await self._get_sentiment_by_sender(scope, since)
         flag_rate = (flagged_messages / total_messages * 100) if total_messages > 0 else 0
 
         recent_sentiment = await self._get_average_sentiment(
-            case_id, datetime.utcnow() - timedelta(days=7), datetime.utcnow(),
+            scope, datetime.utcnow() - timedelta(days=7), datetime.utcnow(),
         )
         previous_sentiment = await self._get_average_sentiment(
-            case_id, datetime.utcnow() - timedelta(days=14), datetime.utcnow() - timedelta(days=7),
+            scope, datetime.utcnow() - timedelta(days=14), datetime.utcnow() - timedelta(days=7),
         )
         if recent_sentiment is None or previous_sentiment is None:
             # Sentiment is not persisted yet (see the sentiment helpers) — no
@@ -407,13 +423,13 @@ class ARIAControlService:
         # V2 Sentinel Shield aggregations
         parent_a_id = family_file.parent_a_id
         parent_b_id = family_file.parent_b_id
-        heat_by_sender = await self._get_v2_heat_by_sender(case_id, since)
-        domain_breakdown = await self._get_v2_domain_breakdown(case_id, since)
-        session_patterns = await self._get_v2_session_patterns(case_id, since)
-        time_signals = await self._get_v2_time_signal_distribution(case_id, since)
-        legal_count = await self._get_v2_legal_flag_count(case_id, since)
-        coaching_rate = await self._get_v2_coaching_acceptance_rate(case_id, since)
-        category_breakdown = await self._get_v2_category_breakdown(case_id, since)
+        heat_by_sender = await self._get_v2_heat_by_sender(scope, since)
+        domain_breakdown = await self._get_v2_domain_breakdown(scope, since)
+        session_patterns = await self._get_v2_session_patterns(scope, since)
+        time_signals = await self._get_v2_time_signal_distribution(scope, since)
+        legal_count = await self._get_v2_legal_flag_count(scope, since)
+        coaching_rate = await self._get_v2_coaching_acceptance_rate(scope, since)
+        category_breakdown = await self._get_v2_category_breakdown(scope, since)
 
         all_heats = [v for v in heat_by_sender.values() if v is not None]
         overall_avg_heat = round(sum(all_heats) / len(all_heats), 2) if all_heats else None
@@ -427,7 +443,7 @@ class ARIAControlService:
             "average_sentiment": round(recent_sentiment, 2) if recent_sentiment else None,
             "sentiment_trend": sentiment_trend,
             "good_faith_score": await self._calculate_good_faith_score(
-                case_id, since, heat_by_sender, legal_count, domain_breakdown,
+                scope, since, heat_by_sender, legal_count, domain_breakdown,
             ),
             # V2 Sentinel Shield
             "v2_heat_parent_a": heat_by_sender.get(parent_a_id),
@@ -457,25 +473,24 @@ class ARIAControlService:
         if not family_file:
             return {}
 
-        case_id = family_file.legacy_case_id
-        if not case_id:
-            return {}
+        # Native OR legacy message scope — see _message_scope.
+        scope = self._message_scope(family_file_id, family_file.legacy_case_id)
 
         since = datetime.utcnow() - timedelta(days=days)
 
         # Messages sent by this parent
         messages_sent = await self._count_messages_by_sender(
-            case_id, parent_user_id, since
+            scope, parent_user_id, since
         )
 
         # Flagged messages by this parent
         flagged_sent = await self._count_flagged_by_sender(
-            case_id, parent_user_id, since
+            scope, parent_user_id, since
         )
 
         # Average sentiment
         avg_sentiment = await self._get_sender_average_sentiment(
-            case_id, parent_user_id, since
+            scope, parent_user_id, since
         )
 
         return {
@@ -557,13 +572,13 @@ class ARIAControlService:
 
     async def _count_messages(
         self,
-        case_id: str,
+        scope,
         since: datetime,
     ) -> int:
         result = await self.db.execute(
             select(func.count(Message.id)).where(
                 and_(
-                    Message.case_id == case_id,
+                    scope,
                     Message.created_at >= since,
                 )
             )
@@ -572,13 +587,13 @@ class ARIAControlService:
 
     async def _count_flagged_messages(
         self,
-        case_id: str,
+        scope,
         since: datetime,
     ) -> int:
         result = await self.db.execute(
             select(func.count(Message.id)).where(
                 and_(
-                    Message.case_id == case_id,
+                    scope,
                     Message.created_at >= since,
                     Message.was_flagged == True,
                 )
@@ -588,14 +603,14 @@ class ARIAControlService:
 
     async def _count_messages_by_sender(
         self,
-        case_id: str,
+        scope,
         sender_id: str,
         since: datetime,
     ) -> int:
         result = await self.db.execute(
             select(func.count(Message.id)).where(
                 and_(
-                    Message.case_id == case_id,
+                    scope,
                     Message.sender_id == sender_id,
                     Message.created_at >= since,
                 )
@@ -605,14 +620,14 @@ class ARIAControlService:
 
     async def _count_flagged_by_sender(
         self,
-        case_id: str,
+        scope,
         sender_id: str,
         since: datetime,
     ) -> int:
         result = await self.db.execute(
             select(func.count(Message.id)).where(
                 and_(
-                    Message.case_id == case_id,
+                    scope,
                     Message.sender_id == sender_id,
                     Message.created_at >= since,
                     Message.was_flagged == True,
@@ -626,7 +641,7 @@ class ARIAControlService:
     # the column are NULL and excluded via `.isnot(None)`.
     async def _get_sentiment_by_sender(
         self,
-        case_id: str,
+        scope,
         since: datetime,
     ) -> dict:
         """Get average sentiment grouped by sender."""
@@ -638,7 +653,7 @@ class ARIAControlService:
             )
             .where(
                 and_(
-                    Message.case_id == case_id,
+                    scope,
                     Message.created_at >= since,
                     Message.sentiment_score.isnot(None),
                 )
@@ -656,14 +671,14 @@ class ARIAControlService:
 
     async def _get_average_sentiment(
         self,
-        case_id: str,
+        scope,
         start_date: datetime,
         end_date: datetime,
     ) -> Optional[float]:
         result = await self.db.execute(
             select(func.avg(Message.sentiment_score)).where(
                 and_(
-                    Message.case_id == case_id,
+                    scope,
                     Message.created_at >= start_date,
                     Message.created_at <= end_date,
                     Message.sentiment_score.isnot(None),
@@ -675,14 +690,14 @@ class ARIAControlService:
 
     async def _get_sender_average_sentiment(
         self,
-        case_id: str,
+        scope,
         sender_id: str,
         since: datetime,
     ) -> Optional[float]:
         result = await self.db.execute(
             select(func.avg(Message.sentiment_score)).where(
                 and_(
-                    Message.case_id == case_id,
+                    scope,
                     Message.sender_id == sender_id,
                     Message.created_at >= since,
                     Message.sentiment_score.isnot(None),
@@ -697,7 +712,7 @@ class ARIAControlService:
     # -------------------------------------------------------------------------
 
     async def _get_v2_heat_by_sender(
-        self, case_id: str, since: datetime,
+        self, scope, since: datetime,
     ) -> dict:
         """Average window_heat_score grouped by sender."""
         result = await self.db.execute(
@@ -708,7 +723,7 @@ class ARIAControlService:
             .join(MessageFlag, MessageFlag.message_id == Message.id)
             .where(
                 and_(
-                    Message.case_id == case_id,
+                    scope,
                     Message.created_at >= since,
                     MessageFlag.window_heat_score.isnot(None),
                 )
@@ -721,7 +736,7 @@ class ARIAControlService:
         }
 
     async def _get_v2_domain_breakdown(
-        self, case_id: str, since: datetime,
+        self, scope, since: datetime,
     ) -> dict:
         """Aggregate domain_scores across all flagged messages."""
         result = await self.db.execute(
@@ -729,7 +744,7 @@ class ARIAControlService:
             .join(Message, MessageFlag.message_id == Message.id)
             .where(
                 and_(
-                    Message.case_id == case_id,
+                    scope,
                     Message.created_at >= since,
                     MessageFlag.domain_scores.isnot(None),
                 )
@@ -754,7 +769,7 @@ class ARIAControlService:
         }
 
     async def _get_v2_session_patterns(
-        self, case_id: str, since: datetime,
+        self, scope, since: datetime,
     ) -> dict:
         """Count frequency of each reporting_tag across flagged messages."""
         result = await self.db.execute(
@@ -762,7 +777,7 @@ class ARIAControlService:
             .join(Message, MessageFlag.message_id == Message.id)
             .where(
                 and_(
-                    Message.case_id == case_id,
+                    scope,
                     Message.created_at >= since,
                     MessageFlag.reporting_tags.isnot(None),
                 )
@@ -777,7 +792,7 @@ class ARIAControlService:
         return tag_counts
 
     async def _get_v2_time_signal_distribution(
-        self, case_id: str, since: datetime,
+        self, scope, since: datetime,
     ) -> dict:
         """Count frequency of each time_frequency_flag."""
         result = await self.db.execute(
@@ -785,7 +800,7 @@ class ARIAControlService:
             .join(Message, MessageFlag.message_id == Message.id)
             .where(
                 and_(
-                    Message.case_id == case_id,
+                    scope,
                     Message.created_at >= since,
                     MessageFlag.time_frequency_flags.isnot(None),
                 )
@@ -800,7 +815,7 @@ class ARIAControlService:
         return signal_counts
 
     async def _get_v2_legal_flag_count(
-        self, case_id: str, since: datetime,
+        self, scope, since: datetime,
     ) -> int:
         """Count flags with legal-relevant reporting tags."""
         legal_categories = {"threats", "grooming", "hate_speech", "sexual_harassment",
@@ -810,7 +825,7 @@ class ARIAControlService:
             .join(Message, MessageFlag.message_id == Message.id)
             .where(
                 and_(
-                    Message.case_id == case_id,
+                    scope,
                     Message.created_at >= since,
                     MessageFlag.reporting_tags.isnot(None),
                 )
@@ -823,7 +838,7 @@ class ARIAControlService:
         return count
 
     async def _get_v2_coaching_acceptance_rate(
-        self, case_id: str, since: datetime,
+        self, scope, since: datetime,
     ) -> Optional[float]:
         """Acceptance rate for messages that had coaching suggestions."""
         result = await self.db.execute(
@@ -831,7 +846,7 @@ class ARIAControlService:
             .join(Message, MessageFlag.message_id == Message.id)
             .where(
                 and_(
-                    Message.case_id == case_id,
+                    scope,
                     Message.created_at >= since,
                     MessageFlag.recipient_coaching.isnot(None),
                 )
@@ -844,7 +859,7 @@ class ARIAControlService:
         return round(accepted / len(actions), 3)
 
     async def _get_v2_category_breakdown(
-        self, case_id: str, since: datetime,
+        self, scope, since: datetime,
     ) -> dict:
         """Aggregate V2 categories with average confidence scores."""
         result = await self.db.execute(
@@ -852,7 +867,7 @@ class ARIAControlService:
             .join(Message, MessageFlag.message_id == Message.id)
             .where(
                 and_(
-                    Message.case_id == case_id,
+                    scope,
                     Message.created_at >= since,
                     MessageFlag.v2_categories.isnot(None),
                 )
@@ -882,7 +897,7 @@ class ARIAControlService:
 
     async def _calculate_good_faith_score(
         self,
-        case_id: str,
+        scope,
         since: datetime,
         heat_by_sender: Optional[dict] = None,
         legal_flag_count: Optional[int] = None,
@@ -897,8 +912,8 @@ class ARIAControlService:
         - V2: High heat (-10), legal flags (-5 each, max -15),
           severe domains THRT/CTRL (-10)
         """
-        total = await self._count_messages(case_id, since)
-        flagged = await self._count_flagged_messages(case_id, since)
+        total = await self._count_messages(scope, since)
+        flagged = await self._count_flagged_messages(scope, since)
 
         if total == 0:
             return None
@@ -911,7 +926,7 @@ class ARIAControlService:
 
         # V1: Factor in average sentiment (±30 points)
         avg_sentiment = await self._get_average_sentiment(
-            case_id, since, datetime.utcnow(),
+            scope, since, datetime.utcnow(),
         )
         if avg_sentiment is not None:
             score += avg_sentiment * 30
