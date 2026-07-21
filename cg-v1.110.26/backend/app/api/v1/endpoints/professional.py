@@ -2275,7 +2275,7 @@ async def get_aria_settings(
 
     aria_service = ARIAControlService(db)
     try:
-        return await aria_service.get_aria_settings(family_file_id)
+        return await aria_service.get_aria_settings(family_file_id, profile.id)
     except ValueError as e:
         logger.error(f"ARIA settings access denied: {e}")
         capture_error(e)

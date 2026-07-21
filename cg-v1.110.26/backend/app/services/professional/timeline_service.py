@@ -404,7 +404,7 @@ class CaseTimelineService:
                 "is_flagged": instance.status == "missed",
                 "details": {
                     "instance_id": instance.id,
-                    "exchange_id": instance.custody_exchange_id,
+                    "exchange_id": instance.exchange_id,
                     "status": instance.status,
                 },
             })
