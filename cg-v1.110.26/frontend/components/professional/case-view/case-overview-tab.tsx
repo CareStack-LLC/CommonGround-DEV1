@@ -550,20 +550,20 @@ export function CaseOverviewTab({ familyFileId, token }: CaseOverviewTabProps) {
                                 <div className="flex items-end justify-between">
                                     <div>
                                         <p className="serif text-3xl font-bold text-slate-900 mb-1">
-                                            {ariaMetrics?.total_messages_analyzed || 128}
+                                            {ariaMetrics?.total_messages ?? 128}
                                         </p>
                                         <p className="sans text-xs text-slate-600">Messages Analyzed</p>
                                     </div>
                                     <div className="text-right">
                                         <p className="serif text-2xl font-bold text-slate-900">
-                                            {ariaMetrics?.good_faith_score_a || 88}%
+                                            {ariaMetrics?.good_faith_score ?? 88}%
                                         </p>
                                         <p className="sans text-[10px] text-slate-500">Resolution Score</p>
                                     </div>
                                 </div>
                                 <div className="pt-3 border-t border-slate-900/10">
                                     <div className="flex flex-wrap gap-2 mb-3">
-                                        {ariaMetrics?.by_category ? Object.keys(ariaMetrics.by_category).slice(0, 3).map(cat => (
+                                        {ariaMetrics?.v2_category_breakdown ? Object.keys(ariaMetrics.v2_category_breakdown).slice(0, 3).map(cat => (
                                             <Badge key={cat} variant="outline" className="bg-white border-slate-900/20 sans text-[10px] capitalize font-medium">
                                                 {cat.replace("_", " ")}
                                             </Badge>

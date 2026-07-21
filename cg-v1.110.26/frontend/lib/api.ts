@@ -8430,15 +8430,27 @@ export interface ARIASettings {
   custom_rules: Record<string, any>;
 }
 
+// Mirrors the dict returned by backend aria_control_service.get_aria_metrics.
+// All *_rate fields are already scaled (flag_rate 0-100; v2_coaching_acceptance_rate 0-1).
 export interface ARIAMetrics {
-  total_messages_analyzed: number;
-  total_interventions: number;
-  intervention_rate: number;
-  acceptance_rate: number;
-  trend: string;
-  by_category: Record<string, number>;
-  good_faith_score_a: number;
-  good_faith_score_b: number;
+  period_days?: number;
+  total_messages: number;
+  flagged_messages: number;
+  flag_rate: number; // 0-100
+  sentiment_by_sender?: Record<string, number | null>;
+  average_sentiment?: number | null;
+  sentiment_trend: string; // "improving" | "declining" | "stable"
+  good_faith_score: number | null; // 0-100, overall (case-level)
+  // V2 Sentinel Shield
+  v2_avg_heat?: number | null;
+  v2_heat_parent_a?: number | null;
+  v2_heat_parent_b?: number | null;
+  v2_domain_breakdown?: Record<string, { count: number; avg_score: number }>;
+  v2_session_pattern_frequency?: Record<string, number>;
+  v2_coaching_acceptance_rate?: number | null; // 0-1
+  v2_time_signal_distribution?: Record<string, number>;
+  v2_legal_flag_count?: number;
+  v2_category_breakdown?: Record<string, { count: number; avg_score: number }>;
 }
 
 export interface ARIAIntervention {
