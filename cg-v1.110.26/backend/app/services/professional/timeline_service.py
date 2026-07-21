@@ -505,8 +505,14 @@ class CaseTimelineService:
         """Get payment and expense events."""
         events = []
 
-        # Get payments by family_file_id
-        query = select(Payment).where(Payment.family_file_id == family_file_id)
+        # Payment links to the legacy Case, not the FamilyFile directly.
+        family_file = await self._get_family_file(family_file_id)
+        if not family_file or not family_file.legacy_case_id:
+            return events
+        case_id = str(family_file.legacy_case_id)
+
+        # Get payments by case_id
+        query = select(Payment).where(Payment.case_id == case_id)
         if start_date:
             query = query.where(Payment.created_at >= start_date)
         if end_date:

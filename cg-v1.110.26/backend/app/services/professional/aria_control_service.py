@@ -588,35 +588,19 @@ class ARIAControlService:
         )
         return result.scalar() or 0
 
+    # NOTE: the Message model has no `sentiment_score` column — a numeric
+    # per-message sentiment was never persisted. Querying it raised
+    # AttributeError at query-build time and 500'd get_aria_metrics for every
+    # real case. Until a sentiment column exists (needs a model change +
+    # backfill), these helpers return neutral defaults so the metrics endpoint
+    # stays up and simply omits sentiment.
     async def _get_sentiment_by_sender(
         self,
         case_id: str,
         since: datetime,
     ) -> dict:
-        """Get average sentiment grouped by sender."""
-        result = await self.db.execute(
-            select(
-                Message.sender_id,
-                func.avg(Message.sentiment_score).label("avg_sentiment"),
-                func.count(Message.id).label("message_count"),
-            )
-            .where(
-                and_(
-                    Message.case_id == case_id,
-                    Message.created_at >= since,
-                    Message.sentiment_score.isnot(None),
-                )
-            )
-            .group_by(Message.sender_id)
-        )
-
-        return {
-            row.sender_id: {
-                "average_sentiment": round(float(row.avg_sentiment), 2) if row.avg_sentiment else None,
-                "message_count": row.message_count,
-            }
-            for row in result.fetchall()
-        }
+        """Average sentiment grouped by sender (unavailable — no sentiment column)."""
+        return {}
 
     async def _get_average_sentiment(
         self,
@@ -624,18 +608,7 @@ class ARIAControlService:
         start_date: datetime,
         end_date: datetime,
     ) -> Optional[float]:
-        result = await self.db.execute(
-            select(func.avg(Message.sentiment_score)).where(
-                and_(
-                    Message.case_id == case_id,
-                    Message.created_at >= start_date,
-                    Message.created_at <= end_date,
-                    Message.sentiment_score.isnot(None),
-                )
-            )
-        )
-        avg = result.scalar()
-        return float(avg) if avg else None
+        return None
 
     async def _get_sender_average_sentiment(
         self,
@@ -643,18 +616,7 @@ class ARIAControlService:
         sender_id: str,
         since: datetime,
     ) -> Optional[float]:
-        result = await self.db.execute(
-            select(func.avg(Message.sentiment_score)).where(
-                and_(
-                    Message.case_id == case_id,
-                    Message.sender_id == sender_id,
-                    Message.created_at >= since,
-                    Message.sentiment_score.isnot(None),
-                )
-            )
-        )
-        avg = result.scalar()
-        return float(avg) if avg else None
+        return None
 
     # -------------------------------------------------------------------------
     # V2 Sentinel Shield Aggregation Helpers

@@ -1314,6 +1314,15 @@ async def accept_firm_invitation(
             "case_assignment_id": invitation.case_assignment_id,
             "message": "Professional assigned" if invitation.status == AccessRequestStatus.PENDING.value else "Invitation accepted and access granted",
         }
+    except ValueError as e:
+        # Domain conflicts (e.g. "already has an active assignment", "request
+        # has no linked professional") are client errors, not 500s.
+        logger.error(f"Cannot accept invitation: {e}")
+        capture_error(e)
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(e),
+        )
     except Exception as e:
         logger.exception(f"Failed to accept invitation: {e}")
         capture_error(e)
@@ -1473,7 +1482,15 @@ async def accept_invitation_by_token(
 ):
     """Accept a firm membership invitation using the invite token."""
     service = FirmService(db)
-    membership = await service.accept_invite(invite_token, profile.id)
+    try:
+        membership = await service.accept_invite(invite_token, profile.id)
+    except ValueError as e:
+        logger.error(f"Failed to accept firm invite: {e}")
+        capture_error(e)
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
 
     if not membership:
         raise HTTPException(
