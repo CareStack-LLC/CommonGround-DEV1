@@ -115,6 +115,11 @@ class Message(Base, UUIDMixin, TimestampMixin):
     original_content: Mapped[Optional[str]] = mapped_column(
         Text, nullable=True
     )  # If user modified after ARIA suggestion
+    # Communication-tone signal in [0.0, 1.0], higher = more positive. Derived
+    # at send time as (1 - ARIA v2 toxicity_score): a clean message scores ~1.0,
+    # a hostile one ~0.0. Nullable for pre-existing rows (backfilled by
+    # migration). Feeds the professional ARIA metrics sentiment trend.
+    sentiment_score: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
 
     # Relationships
     case: Mapped[Optional["Case"]] = relationship("Case", back_populates="messages")

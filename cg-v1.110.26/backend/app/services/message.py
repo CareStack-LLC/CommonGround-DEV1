@@ -154,6 +154,8 @@ class MessageService:
                 message_type=message_data.message_type,
                 sent_at=datetime.utcnow(),
                 was_flagged=analysis_result["is_flagged"],
+                # Communication tone: 1 - toxicity, so higher = more positive.
+                sentiment_score=round(1.0 - float(analysis_result.get("toxicity_score") or 0.0), 4),
                 original_content=original_content,
             )
             self.db.add(message)

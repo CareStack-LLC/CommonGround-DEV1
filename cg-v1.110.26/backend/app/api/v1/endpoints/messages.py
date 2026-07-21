@@ -874,6 +874,8 @@ async def send_message(
         message_type=message_data.message_type,
         sent_at=datetime.utcnow(),
         was_flagged=aria_analysis.is_flagged,
+        # Communication tone: 1 - toxicity, so higher = more positive.
+        sentiment_score=round(1.0 - float(aria_analysis.toxicity_score or 0.0), 4),
         original_content=original_content
     )
 
