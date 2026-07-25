@@ -3,17 +3,11 @@
   "version": "1.0.0",
   "private": true,
   "workspaces": [
-    "apps/*",
-    "packages/*",
     "cg-v1.110.26/*"
   ],
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
-    "dev:web": "turbo dev --filter=web-parent",
-    "dev:parent": "turbo dev --filter=mobile-parent",
-    "dev:kidscom": "turbo dev --filter=mobile-kidscom",
-    "dev:mycircle": "turbo dev --filter=mobile-mycircle",
     "lint": "turbo lint",
     "type-check": "turbo type-check",
     "test": "turbo test",

@@ -56,18 +56,6 @@
         "dist/**"
       ]
     },
-    "build:ios": {
-      "dependsOn": [
-        "^build"
-      ],
-      "cache": false
-    },
-    "build:android": {
-      "dependsOn": [
-        "^build"
-      ],
-      "cache": false
-    },
     "lint": {
       "dependsOn": [
         "^build"
