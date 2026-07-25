@@ -24,7 +24,16 @@ function endpointKey(endpoint: string): string {
 
 export type ApiErrorKind = "network" | "server" | "timeout"
 
-export function notifyApiError(endpoint: string, kind: ApiErrorKind): void {
+/**
+ * @param reference Support reference id from the error envelope
+ *   (`error.reference`). Shown to the user so a mysterious failure becomes a
+ *   quotable ticket, and printed to the console for in-session debugging.
+ */
+export function notifyApiError(
+  endpoint: string,
+  kind: ApiErrorKind,
+  reference?: string,
+): void {
   if (typeof window === "undefined") return
 
   const key = `${kind}:${endpointKey(endpoint)}`
@@ -54,10 +63,17 @@ export function notifyApiError(endpoint: string, kind: ApiErrorKind): void {
       description: "We couldn't reach the server. Check your connection and try again.",
     })
   } else {
+    if (reference) {
+      // Help future debugging: the same id is on the response header, in
+      // Sentry, and in the backend logs.
+      console.error(`API error on ${endpoint} — reference ${reference}`)
+    }
     toast({
       variant: "destructive",
       title: "Something went wrong",
-      description: "An unexpected error occurred. Please try again in a moment.",
+      description: reference
+        ? `An unexpected error occurred. Please try again. If it continues, quote reference ${reference} to support.`
+        : "An unexpected error occurred. Please try again in a moment.",
     })
   }
 }

@@ -42,6 +42,26 @@ export class APIError extends Error {
     super(message);
     this.name = 'APIError';
   }
+
+  /**
+   * Support reference id for this error — matches the X-Request-ID header, the
+   * Sentry event tag, and the backend log line. Quote it to support and the
+   * full server-side detail can be looked up. Undefined for pre-envelope or
+   * network errors.
+   */
+  get reference(): string | undefined {
+    return this.data?.error?.reference;
+  }
+
+  /** Stable machine category (e.g. "validation_error", "not_found"). */
+  get errorType(): string | undefined {
+    return this.data?.error?.type;
+  }
+
+  /** Per-field validation problems, when status is 422. */
+  get fields(): Array<{ field: string; message: string }> | undefined {
+    return this.data?.error?.fields;
+  }
 }
 
 /** Default per-request timeout. Callers can pass their own `signal`. */
@@ -164,7 +184,7 @@ export async function fetchAPI<T>(
       if (response.status >= 500 && !silent) {
         try {
           const { notifyApiError } = await import('./api-error-notify');
-          notifyApiError(endpoint, 'server');
+          notifyApiError(endpoint, 'server', errorData?.error?.reference);
         } catch { /* never block the error path on the notifier */ }
       }
 

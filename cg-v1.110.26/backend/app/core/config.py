@@ -211,6 +211,12 @@ class Settings(BaseSettings):
     # Rate Limiting
     RATE_LIMIT_REQUESTS: int = 100
     RATE_LIMIT_PERIOD: int = 60  # seconds
+    # Use the Redis-backed (shared-across-instances) rate limiter. Costs ~4
+    # Redis commands per request. Only needed when running MORE THAN ONE app
+    # instance — on a single instance the in-memory limiter is equivalent and
+    # burns zero Redis commands (important on Upstash's metered free tier).
+    # Flip to true when scaling horizontally.
+    RATE_LIMIT_USE_REDIS: bool = False
 
     # JWT
     JWT_SECRET_KEY: Optional[str] = None

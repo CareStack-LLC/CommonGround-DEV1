@@ -77,8 +77,20 @@ class RedisRateLimiter:
         """Initialize Redis connection. Safe to call multiple times."""
         if self._initialized:
             return
+        from app.core.config import settings
+        # Single-instance deployments don't need shared rate-limit state; the
+        # in-memory limiter is equivalent and avoids ~4 Redis commands/request
+        # (and the metered-quota churn that comes with them). Opt in via
+        # RATE_LIMIT_USE_REDIS when running multiple instances.
+        if not settings.RATE_LIMIT_USE_REDIS:
+            self._redis = None
+            self._initialized = True
+            logger.info(
+                "Rate limiter using in-memory backend "
+                "(RATE_LIMIT_USE_REDIS=false; set true for multi-instance)."
+            )
+            return
         try:
-            from app.core.config import settings
             import redis.asyncio as aioredis
             self._redis = aioredis.from_url(
                 settings.REDIS_URL,
