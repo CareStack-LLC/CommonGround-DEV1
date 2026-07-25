@@ -4,8 +4,10 @@ Authentication endpoints.
 
 import logging
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status, Body
+from typing import Optional
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status, Body
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from app.core.auth_cookies import set_refresh_cookie, clear_refresh_cookie
 from sqlalchemy.exc import IntegrityError, OperationalError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -33,6 +35,7 @@ router = APIRouter()
 async def register(
     http_request: Request,
     request: RegisterRequest,
+    response: Response,
     db: AsyncSession = Depends(get_db)
 ):
     """
@@ -46,6 +49,8 @@ async def register(
     """
     auth_service = AuthService(db)
     user, access_token, refresh_token, checkout_url = await auth_service.register_user(request)
+
+    set_refresh_cookie(response, refresh_token)
 
     return LoginResponse(
         access_token=access_token,
@@ -66,6 +71,7 @@ async def register(
 async def login(
     http_request: Request,
     request: LoginRequest,
+    response: Response,
     db: AsyncSession = Depends(get_db)
 ):
     """
@@ -85,6 +91,9 @@ async def login(
         # Track login metrics
         metric_increment("auth.login.success")
         metric_set("auth.active_users", str(user.id))
+
+        # Deliver the refresh token as an HttpOnly cookie (never JS-readable).
+        set_refresh_cookie(response, refresh_token)
 
         return LoginResponse(
             access_token=access_token,
@@ -123,6 +132,7 @@ async def login(
 
 @router.post("/logout")
 async def logout(
+    response: Response,
     credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer()),
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
@@ -154,28 +164,38 @@ async def logout(
     auth_service = AuthService(db)
     await auth_service.logout_user(current_user.id)
 
+    clear_refresh_cookie(response)
+
     return {"message": "Logged out successfully"}
 
 
 @router.post("/refresh", response_model=LoginResponse)
 async def refresh_token(
     request: Request,
-    refresh_token: str = Body(..., embed=True),
+    response: Response,
+    refresh_token: Optional[str] = Body(None, embed=True),
     db: AsyncSession = Depends(get_db)
 ):
     """
-    Refresh access token using refresh token.
+    Refresh access token using the refresh token.
 
-    Validates refresh token and issues new access and refresh tokens.
-
-    Args:
-        refresh_token: Valid refresh token
-
-    Returns:
-        LoginResponse with new tokens
+    Reads the refresh token from the HttpOnly cookie (preferred) or, for
+    backward compatibility during the migration, the request body. Issues a new
+    access token (returned in the body → frontend memory) and rotates the
+    refresh cookie.
     """
+    token = refresh_token or request.cookies.get(settings.REFRESH_COOKIE_NAME)
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Missing refresh token",
+        )
+
     auth_service = AuthService(db)
-    new_access_token, new_refresh_token = await auth_service.refresh_access_token(refresh_token)
+    new_access_token, new_refresh_token = await auth_service.refresh_access_token(token)
+
+    # Rotate the refresh cookie.
+    set_refresh_cookie(response, new_refresh_token)
 
     # Get user info for response
     from app.core.security import decode_token
@@ -386,6 +406,7 @@ async def send_magic_link(
 async def oauth_sync(
     http_request: Request,
     request: OAuthSyncRequest,
+    response: Response,
     db: AsyncSession = Depends(get_db)
 ):
     """
@@ -402,6 +423,8 @@ async def oauth_sync(
     """
     auth_service = AuthService(db)
     user, access_token, refresh_token = await auth_service.oauth_sync(request)
+
+    set_refresh_cookie(response, refresh_token)
 
     return LoginResponse(
         access_token=access_token,

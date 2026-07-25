@@ -224,6 +224,16 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 3
 
+    # Refresh-token cookie. The access token lives in frontend memory; the
+    # refresh token is delivered as an HttpOnly cookie so it is never readable
+    # by JS (no localStorage XSS exfiltration). Frontend (www.find-commonground)
+    # and API (api.find-commonground) are different subdomains, so the cookie
+    # must be scoped to the parent domain and be SameSite=None; Secure to be sent
+    # cross-subdomain. Set COOKIE_DOMAIN=.find-commonground.com in production;
+    # leave empty for localhost dev (host-only cookie).
+    COOKIE_DOMAIN: str = ""
+    REFRESH_COOKIE_NAME: str = "cg_refresh"
+
     # Web Push (VAPID)
     VAPID_PUBLIC_KEY: Optional[str] = None
     VAPID_PRIVATE_KEY: Optional[str] = None
