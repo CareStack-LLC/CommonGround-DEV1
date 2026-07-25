@@ -188,9 +188,18 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
+        {/* Skip link (WCAG 2.4.1) — visually hidden until keyboard-focused. */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-slate-900 focus:shadow-lg focus:ring-2 focus:ring-cg-sage"
+        >
+          Skip to main content
+        </a>
         <AuthProvider>
           <AppProviders>
-            {children}
+            {/* Focus target for the skip link; a div (not <main>) so pages
+                that render their own <main> don't create nested landmarks. */}
+            <div id="main-content" tabIndex={-1}>{children}</div>
           </AppProviders>
         </AuthProvider>
       </body>

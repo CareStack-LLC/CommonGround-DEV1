@@ -433,7 +433,7 @@ export default function ProfessionalCalendarPage() {
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-3">
-              <Button variant="outline" size="icon" onClick={prevPeriod} className="border-slate-200 hover:bg-[#F4F8F7] rounded-lg h-9 w-9">
+              <Button variant="outline" size="icon" aria-label="Previous period" onClick={prevPeriod} className="border-slate-200 hover:bg-[#F4F8F7] rounded-lg h-9 w-9">
                 <ChevronLeft className="h-4 w-4" />
               </Button>
               <h2 className="text-lg font-semibold text-slate-900 min-w-[160px] text-center">
@@ -443,7 +443,7 @@ export default function ProfessionalCalendarPage() {
                     ? `${weekDates[0].toLocaleDateString("en-US", { month: "short", day: "numeric" })} – ${weekDates[6].toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`
                     : `${monthName} ${year}`}
               </h2>
-              <Button variant="outline" size="icon" onClick={nextPeriod} className="border-slate-200 hover:bg-[#F4F8F7] rounded-lg h-9 w-9">
+              <Button variant="outline" size="icon" aria-label="Next period" onClick={nextPeriod} className="border-slate-200 hover:bg-[#F4F8F7] rounded-lg h-9 w-9">
                 <ChevronRight className="h-4 w-4" />
               </Button>
               <Input

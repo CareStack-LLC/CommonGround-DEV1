@@ -28,7 +28,7 @@ export function ProfessionalCard({ firm, onViewProfile, onInvite }: Professional
     return (
         <Card className="overflow-hidden bg-white rounded-3xl border-2 border-slate-100 shadow-md hover:shadow-xl transition-all duration-300 group flex flex-col h-full">
             {/* Media Header */}
-            <div className="relative h-48 sm:h-52 bg-slate-50 overflow-hidden cursor-pointer" onClick={handleViewProfile}>
+            <div role="button" tabIndex={0} aria-label={`View ${firm.name || 'firm'} profile`} className="relative h-48 sm:h-52 bg-slate-50 overflow-hidden cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cg-sage" onClick={handleViewProfile} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleViewProfile(); } }}>
                 {firm.video_url ? (
                     <div className="absolute inset-0">
                         {/* Autoplay preview video */}
