@@ -964,7 +964,6 @@ async def create_court_event(
 
     MVP Demo: If professional_id/grant_id not provided, uses token's subject ID.
     """
-    from jose import jwt
     from app.core.config import settings
 
     # Extract professional ID from token

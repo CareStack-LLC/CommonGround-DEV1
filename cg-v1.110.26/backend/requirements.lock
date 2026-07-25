@@ -35,7 +35,6 @@ deprecation==2.1.0
 distro==1.9.0
 dnspython==2.8.0
 docstring_parser==0.18.0
-ecdsa==0.19.2
 email-validator==2.3.0
 fakeredis==2.36.2
 fastapi==0.139.0
@@ -95,7 +94,6 @@ python-dateutil==2.9.0.post0
 python-docx==1.2.0
 python-dotenv==1.2.2
 python-http-client==3.3.7
-python-jose==3.5.0
 python-multipart==0.0.32
 pytokens==0.4.1
 pywebpush==2.3.0

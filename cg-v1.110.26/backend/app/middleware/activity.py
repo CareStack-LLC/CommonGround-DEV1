@@ -13,7 +13,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
 
-from jose import JWTError, jwt
+import jwt  # PyJWT
 from sqlalchemy import update
 
 from app.core.config import settings
@@ -74,7 +74,7 @@ class ActivityTrackingMiddleware(BaseHTTPMiddleware):
             try:
                 secret_key = settings.JWT_SECRET_KEY or settings.SECRET_KEY
                 payload = jwt.decode(token, secret_key, algorithms=[settings.JWT_ALGORITHM])
-            except JWTError:
+            except jwt.PyJWTError:
                 return response
 
             if payload.get("type") != "access":

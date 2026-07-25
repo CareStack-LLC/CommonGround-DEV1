@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
-from jose import jwt
+import jwt  # PyJWT
 
 from app.core.database import get_db
 from app.core.security import get_current_user
@@ -152,7 +152,7 @@ async def get_court_professional_id(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token has expired",
         )
-    except jwt.JWTError as e:
+    except jwt.PyJWTError as e:
         logger.error(f"Invalid court professional token: {e}")
         capture_error(e)
         raise HTTPException(

@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from jose import JWTError, jwt
+import jwt  # PyJWT (replaced python-jose to drop the no-fix ecdsa Minerva advisory)
 from passlib.context import CryptContext
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -126,7 +126,7 @@ def decode_token(token: str) -> dict:
         secret_key = settings.JWT_SECRET_KEY or settings.SECRET_KEY
         payload = jwt.decode(token, secret_key, algorithms=[settings.JWT_ALGORITHM])
         return payload
-    except JWTError as e:
+    except jwt.PyJWTError as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
