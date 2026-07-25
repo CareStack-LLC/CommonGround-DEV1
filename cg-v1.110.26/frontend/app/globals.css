@@ -345,12 +345,12 @@
   --cg-amber-deep: #B8791A;
   --cg-amber-tint: #2D2010;
   --cg-error-dark: #E06B6B;
-  --cg-error-deep: #9B2C2C;
-  --cg-error-light: #9B2C2C;
+  --cg-error-deep: #E06B6B;   /* keep error text/accents readable on dark (was #9B2C2C ≈ 2.5:1) */
+  --cg-error-light: #E06B6B;
   --cg-sage-deep: #3DAA8A;
   --cg-sage-tint: #0F2A20;
   --cg-ink: #0D1B24;
-  --cg-mist: #2D5060;
+  --cg-mist: #9FB4C4;   /* text token (light gray on dark surfaces) — must stay light in dark mode, not a dark surface value */
 
   /* ARIA Sentinel Shield */
   --cg-heat: #F5A623;
