@@ -97,7 +97,7 @@ export default function CircleCallsHistoryPage() {
   }
 
   function getStatusColor(status: string, hasFlags: boolean): string {
-    if (hasFlags) return 'text-[#E09520] bg-cg-amber-subtle border-cg-amber-subtle';
+    if (hasFlags) return 'text-cg-amber-dark bg-cg-amber-subtle border-cg-amber-subtle';
     if (status === 'completed') return 'text-cg-sage-dark bg-cg-sage-subtle border-cg-sage-subtle';
     if (status === 'missed') return 'text-gray-500 bg-gray-100 border-gray-200';
     if (status === 'terminated') return 'text-cg-error bg-cg-error-subtle border-cg-error-subtle';
@@ -146,12 +146,12 @@ export default function CircleCallsHistoryPage() {
       <div className="min-h-screen bg-gray-50 p-6">
         <div className="max-w-5xl mx-auto">
           <div className="bg-white rounded-2xl border border-gray-200 p-8 text-center">
-            <AlertTriangle className="h-12 w-12 text-[#E06B6B] mx-auto mb-4" />
+            <AlertTriangle className="h-12 w-12 text-cg-error-light mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-foreground mb-2">Unable to Load Calls</h2>
             <p className="text-muted-foreground">{error}</p>
             <button
               onClick={loadCallHistory}
-              className="mt-6 px-6 py-2 bg-cg-slate text-white rounded-lg hover:bg-[#1E4E6B]"
+              className="mt-6 px-6 py-2 bg-cg-slate text-white rounded-lg hover:bg-cg-slate-dark"
             >
               Try Again
             </button>
@@ -208,7 +208,7 @@ export default function CircleCallsHistoryPage() {
                   setFilterChild('all');
                   setFilterContact('all');
                 }}
-                className="text-sm text-cg-slate hover:text-[#1E4E6B]"
+                className="text-sm text-cg-slate hover:text-cg-slate-dark"
               >
                 Clear All
               </button>
@@ -275,12 +275,12 @@ export default function CircleCallsHistoryPage() {
         {/* Safety Notice */}
         {flaggedCalls > 0 && (
           <div className="mb-6 p-4 bg-cg-amber-subtle border border-cg-amber-subtle rounded-xl flex items-start gap-3">
-            <AlertTriangle className="h-5 w-5 text-[#E09520] mt-0.5 flex-shrink-0" />
+            <AlertTriangle className="h-5 w-5 text-cg-amber-dark mt-0.5 flex-shrink-0" />
             <div>
               <p className="font-medium text-foreground">
                 {flaggedCalls} {flaggedCalls === 1 ? 'call has' : 'calls have'} safety notices
               </p>
-              <p className="text-sm text-[#E09520] mt-1">
+              <p className="text-sm text-cg-amber-dark mt-1">
                 ARIA detected potentially concerning content during {flaggedCalls === 1 ? 'this call' : 'these calls'}.
                 Review the details below.
               </p>
@@ -329,8 +329,8 @@ export default function CircleCallsHistoryPage() {
                         </p>
                         {call.aria_intervention_count > 0 && (
                           <div className="flex items-center gap-1 px-2 py-0.5 bg-cg-amber-subtle rounded-full">
-                            <Shield className="h-3 w-3 text-[#E09520]" />
-                            <span className="text-xs font-medium text-[#E09520]">
+                            <Shield className="h-3 w-3 text-cg-amber-dark" />
+                            <span className="text-xs font-medium text-cg-amber-dark">
                               {call.aria_intervention_count} {call.aria_intervention_count === 1 ? 'flag' : 'flags'}
                             </span>
                           </div>
@@ -408,7 +408,7 @@ export default function CircleCallsHistoryPage() {
                         {Object.keys(callReport.category_counts).length > 0 && (
                           <div className="bg-white rounded-lg p-4 border border-gray-200">
                             <h4 className="font-medium text-foreground mb-3 flex items-center gap-2">
-                              <Shield className="h-4 w-4 text-[#E09520]" />
+                              <Shield className="h-4 w-4 text-cg-amber-dark" />
                               Safety Categories
                             </h4>
                             <div className="space-y-2">
@@ -430,7 +430,7 @@ export default function CircleCallsHistoryPage() {
                         <div className="flex gap-3">
                           <button
                             onClick={() => alert('Court report generation coming soon')}
-                            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-cg-slate text-white rounded-lg hover:bg-[#1E4E6B]"
+                            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-cg-slate text-white rounded-lg hover:bg-cg-slate-dark"
                           >
                             <FileText className="h-4 w-4" />
                             View Full Report

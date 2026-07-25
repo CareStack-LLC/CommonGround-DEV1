@@ -146,7 +146,7 @@ export function AriaTab({ familyFileId, token }: { familyFileId: string, token: 
 
     const getGoodFaithColor = (score: number) => {
         if (score >= 80) return "text-cg-sage-dark";
-        if (score >= 60) return "text-[#E09520]";
+        if (score >= 60) return "text-cg-amber-dark";
         return "text-cg-error";
     };
 
@@ -280,7 +280,7 @@ export function AriaTab({ familyFileId, token }: { familyFileId: string, token: 
                     <CardContent className="space-y-6">
                         {/* Read-only notice: ARIA (incl. child-safety monitoring)
                             is controlled only by the parents and by court order. */}
-                        <div className="flex items-start gap-2 rounded-md border border-[#FBE3BF] bg-cg-amber-subtle p-3 text-sm text-[#6B460F]">
+                        <div className="flex items-start gap-2 rounded-md border border-cg-amber-tint bg-cg-amber-subtle p-3 text-sm text-cg-amber-deep">
                             <Lock className="h-4 w-4 mt-0.5 shrink-0" />
                             <p>
                                 These settings are <span className="font-semibold">read-only</span> for
@@ -424,7 +424,7 @@ export function AriaTab({ familyFileId, token }: { familyFileId: string, token: 
                                                 <p className="text-sm">{intervention.original_text}</p>
                                             </div>
                                             {intervention.suggested_text && (
-                                                <div className="p-3 bg-cg-sage-subtle border border-[#C5E5DB] rounded-lg">
+                                                <div className="p-3 bg-cg-sage-subtle border border-cg-sage-tint rounded-lg">
                                                     <p className="text-xs font-medium text-cg-sage-dark mb-1">
                                                         Suggested Rewrite
                                                     </p>

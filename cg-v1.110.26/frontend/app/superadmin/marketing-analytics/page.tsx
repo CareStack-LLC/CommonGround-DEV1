@@ -125,12 +125,12 @@ const TABS = [
 /* ── Recharts dark theme ───────────────────────────────────────────── */
 
 const GRID_PROPS = { strokeDasharray: '3 3', stroke: 'var(--cg-slate)', opacity: 0.2 } as const;
-const AXIS_PROPS = { stroke: '#4A6E7F', tick: { fill: 'var(--muted-foreground)', fontSize: 10 } } as const;
+const AXIS_PROPS = { stroke: 'var(--cg-slate-strong)', tick: { fill: 'var(--muted-foreground)', fontSize: 10 } } as const;
 const TOOLTIP_STYLE = {
   backgroundColor: 'var(--foreground)',
   border: '1px solid var(--cg-slate)',
   borderRadius: 8,
-  color: '#D0E4EC',
+  color: 'var(--cg-slate-tint)',
   fontSize: 12,
 };
 
@@ -140,7 +140,7 @@ const CHART_COLORS = ['var(--cg-sage)', '#3b82f6', '#f59e0b', '#8b5cf6', '#ef444
 
 function Card({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5 ${className}`}>
+    <div className={`bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5 ${className}`}>
       {children}
     </div>
   );
@@ -264,11 +264,11 @@ function ContentTab() {
               <tbody>
                 {posts.map((post, i) => (
                   <tr key={i} className="border-b border-cg-slate/10 last:border-0 hover:bg-cg-slate/10 transition-colors">
-                    <td className="py-2.5 pr-4 text-[#D0E4EC] font-medium max-w-[280px] truncate">{post.title}</td>
-                    <td className="py-2.5 px-3 text-right text-[#D0E4EC]">{formatNumber(post.views)}</td>
-                    <td className="py-2.5 px-3 text-right text-[#D0E4EC]">{post.avg_duration}s</td>
+                    <td className="py-2.5 pr-4 text-cg-slate-tint font-medium max-w-[280px] truncate">{post.title}</td>
+                    <td className="py-2.5 px-3 text-right text-cg-slate-tint">{formatNumber(post.views)}</td>
+                    <td className="py-2.5 px-3 text-right text-cg-slate-tint">{post.avg_duration}s</td>
                     <td className="py-2.5 px-3 text-right text-cg-sage">{(post.ctr * 100).toFixed(1)}%</td>
-                    <td className="py-2.5 pl-3 text-right text-[#D0E4EC]">{formatNumber(post.conversions)}</td>
+                    <td className="py-2.5 pl-3 text-right text-cg-slate-tint">{formatNumber(post.conversions)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -370,10 +370,10 @@ function SEOTab() {
               <tbody>
                 {queries.map((q, i) => (
                   <tr key={i} className="border-b border-cg-slate/10 last:border-0 hover:bg-cg-slate/10 transition-colors">
-                    <td className="py-2.5 pr-4 text-[#D0E4EC] font-medium max-w-[280px] truncate">{q.query}</td>
-                    <td className="py-2.5 px-3 text-right text-[#D0E4EC]">{q.position.toFixed(1)}</td>
-                    <td className="py-2.5 px-3 text-right text-[#D0E4EC]">{formatNumber(q.impressions)}</td>
-                    <td className="py-2.5 px-3 text-right text-[#D0E4EC]">{formatNumber(q.clicks)}</td>
+                    <td className="py-2.5 pr-4 text-cg-slate-tint font-medium max-w-[280px] truncate">{q.query}</td>
+                    <td className="py-2.5 px-3 text-right text-cg-slate-tint">{q.position.toFixed(1)}</td>
+                    <td className="py-2.5 px-3 text-right text-cg-slate-tint">{formatNumber(q.impressions)}</td>
+                    <td className="py-2.5 px-3 text-right text-cg-slate-tint">{formatNumber(q.clicks)}</td>
                     <td className="py-2.5 pl-3 text-right text-cg-sage">{(q.ctr * 100).toFixed(1)}%</td>
                   </tr>
                 ))}
@@ -403,10 +403,10 @@ function SEOTab() {
               <tbody>
                 {topPages.map((p, i) => (
                   <tr key={i} className="border-b border-cg-slate/10 last:border-0 hover:bg-cg-slate/10 transition-colors">
-                    <td className="py-2.5 pr-4 text-[#D0E4EC] font-medium max-w-[320px] truncate">{p.page}</td>
-                    <td className="py-2.5 px-3 text-right text-[#D0E4EC]">{p.position.toFixed(1)}</td>
-                    <td className="py-2.5 px-3 text-right text-[#D0E4EC]">{formatNumber(p.impressions)}</td>
-                    <td className="py-2.5 px-3 text-right text-[#D0E4EC]">{formatNumber(p.clicks)}</td>
+                    <td className="py-2.5 pr-4 text-cg-slate-tint font-medium max-w-[320px] truncate">{p.page}</td>
+                    <td className="py-2.5 px-3 text-right text-cg-slate-tint">{p.position.toFixed(1)}</td>
+                    <td className="py-2.5 px-3 text-right text-cg-slate-tint">{formatNumber(p.impressions)}</td>
+                    <td className="py-2.5 px-3 text-right text-cg-slate-tint">{formatNumber(p.clicks)}</td>
                     <td className="py-2.5 pl-3 text-right text-cg-sage">{(p.ctr * 100).toFixed(1)}%</td>
                   </tr>
                 ))}
@@ -505,7 +505,7 @@ function SocialTab() {
                     live
                   </span>
                 ) : (
-                  <span className="text-[10px] font-medium text-muted-foreground bg-[#0F2533]/80 border border-cg-slate/20 rounded px-1.5 py-0.5">
+                  <span className="text-[10px] font-medium text-muted-foreground bg-cg-ink/80 border border-cg-slate/20 rounded px-1.5 py-0.5">
                     no data
                   </span>
                 )}
@@ -513,11 +513,11 @@ function SocialTab() {
               <div className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-xs text-muted-foreground">Followers</span>
-                  <span className="text-sm font-medium text-[#D0E4EC]">{formatNumber(p.followers)}</span>
+                  <span className="text-sm font-medium text-cg-slate-tint">{formatNumber(p.followers)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-xs text-muted-foreground">Impressions</span>
-                  <span className="text-sm font-medium text-[#D0E4EC]">{formatNumber(p.impressions)}</span>
+                  <span className="text-sm font-medium text-cg-slate-tint">{formatNumber(p.impressions)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-xs text-muted-foreground">Engagement</span>
@@ -525,7 +525,7 @@ function SocialTab() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-xs text-muted-foreground">Referral Clicks</span>
-                  <span className="text-sm font-medium text-[#D0E4EC]">{formatNumber(p.referral_clicks)}</span>
+                  <span className="text-sm font-medium text-cg-slate-tint">{formatNumber(p.referral_clicks)}</span>
                 </div>
                 <div className="flex justify-between pt-1 border-t border-cg-slate/20">
                   <span className="text-xs text-muted-foreground">Leads Generated</span>
@@ -671,13 +671,13 @@ function AttributionTab() {
               <tbody>
                 {channels.map((ch, i) => (
                   <tr key={i} className="border-b border-cg-slate/10 last:border-0 hover:bg-cg-slate/10 transition-colors">
-                    <td className="py-2.5 pr-4 text-[#D0E4EC] font-medium">{ch.channel}</td>
-                    <td className="py-2.5 px-3 text-right text-[#D0E4EC]">{formatNumber(ch.total_leads ?? 0)}</td>
-                    <td className="py-2.5 px-3 text-right text-[#D0E4EC]">{formatNumber(ch.first_touch)}</td>
-                    <td className="py-2.5 px-3 text-right text-[#D0E4EC]">{formatNumber(ch.last_touch)}</td>
-                    <td className="py-2.5 px-3 text-right text-[#D0E4EC]">{formatNumber(ch.assisted)}</td>
+                    <td className="py-2.5 pr-4 text-cg-slate-tint font-medium">{ch.channel}</td>
+                    <td className="py-2.5 px-3 text-right text-cg-slate-tint">{formatNumber(ch.total_leads ?? 0)}</td>
+                    <td className="py-2.5 px-3 text-right text-cg-slate-tint">{formatNumber(ch.first_touch)}</td>
+                    <td className="py-2.5 px-3 text-right text-cg-slate-tint">{formatNumber(ch.last_touch)}</td>
+                    <td className="py-2.5 px-3 text-right text-cg-slate-tint">{formatNumber(ch.assisted)}</td>
                     <td className="py-2.5 px-3 text-right text-cg-sage">{(ch.conversion_rate * 100).toFixed(1)}%</td>
-                    <td className="py-2.5 pl-3 text-right text-[#D0E4EC]">${formatNumber(Math.round(ch.attributed_mrr ?? 0))}</td>
+                    <td className="py-2.5 pl-3 text-right text-cg-slate-tint">${formatNumber(Math.round(ch.attributed_mrr ?? 0))}</td>
                   </tr>
                 ))}
               </tbody>
@@ -717,7 +717,7 @@ function AIInsightsTab() {
     return (
       <Card className="flex flex-col items-center justify-center py-16">
         <Sparkles className="w-10 h-10 text-cg-sage mb-4" />
-        <p className="text-[#D0E4EC] text-sm mb-1">Generate AI-powered marketing insights</p>
+        <p className="text-cg-slate-tint text-sm mb-1">Generate AI-powered marketing insights</p>
         <p className="text-muted-foreground text-xs mb-6 max-w-md text-center">
           Analyze your marketing data to get content ideas, campaign suggestions, audience insights, and timing recommendations.
         </p>
@@ -746,7 +746,7 @@ function AIInsightsTab() {
     return (
       <Card className="flex flex-col items-center justify-center py-16">
         <Loader2 className="w-8 h-8 text-cg-sage animate-spin mb-4" />
-        <p className="text-[#D0E4EC] text-sm">Analyzing your marketing data...</p>
+        <p className="text-cg-slate-tint text-sm">Analyzing your marketing data...</p>
         <p className="text-muted-foreground text-xs mt-1">This may take a moment</p>
       </Card>
     );
@@ -764,15 +764,15 @@ function AIInsightsTab() {
       {/* Context + regenerate */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         {data.context && (
-          <div className="text-xs text-muted-foreground bg-[#0F2533]/60 border border-cg-slate/20 rounded-lg px-3 py-2 flex-1 min-w-[280px]">
-            <span className="font-medium text-[#D0E4EC]">Grounded on: </span>
+          <div className="text-xs text-muted-foreground bg-cg-ink/60 border border-cg-slate/20 rounded-lg px-3 py-2 flex-1 min-w-[280px]">
+            <span className="font-medium text-cg-slate-tint">Grounded on: </span>
             {data.context.recent_signups_30d ?? 0} signups (30d),
             {' '}growth {data.context.growth_pct != null && data.context.growth_pct >= 0 ? '+' : ''}{data.context.growth_pct?.toFixed(1) ?? '0'}%
             {data.context.top_sources && data.context.top_sources.length > 0 && (
-              <>, top source <span className="text-[#D0E4EC]">{data.context.top_sources[0].source}</span></>
+              <>, top source <span className="text-cg-slate-tint">{data.context.top_sources[0].source}</span></>
             )}
             {data.context.best_campaign && (
-              <>, best campaign <span className="text-[#D0E4EC]">{data.context.best_campaign.name}</span> (CTR {(data.context.best_campaign.ctr * 100).toFixed(1)}%)</>
+              <>, best campaign <span className="text-cg-slate-tint">{data.context.best_campaign.name}</span> (CTR {(data.context.best_campaign.ctr * 100).toFixed(1)}%)</>
             )}
           </div>
         )}
@@ -797,7 +797,7 @@ function AIInsightsTab() {
         ) : (
           <ul className="space-y-2">
             {contentIdeas.map((idea, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm text-[#D0E4EC]">
+              <li key={i} className="flex items-start gap-2 text-sm text-cg-slate-tint">
                 <span className="text-cg-sage mt-0.5 shrink-0">-</span>
                 {idea}
               </li>
@@ -819,7 +819,7 @@ function AIInsightsTab() {
             {campaignSuggestions.map((s, i) => (
               <div
                 key={i}
-                className="bg-[#0F2533]/60 border border-cg-slate/15 rounded-lg p-4"
+                className="bg-cg-ink/60 border border-cg-slate/15 rounded-lg p-4"
               >
                 <h4 className="text-sm font-medium text-white mb-1">{s.title}</h4>
                 <p className="text-xs text-muted-foreground leading-relaxed">{s.description}</p>
@@ -840,7 +840,7 @@ function AIInsightsTab() {
         ) : (
           <ul className="space-y-2">
             {audienceInsights.map((insight, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm text-[#D0E4EC]">
+              <li key={i} className="flex items-start gap-2 text-sm text-cg-slate-tint">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#8b5cf6] mt-1.5 shrink-0" />
                 {insight}
               </li>
@@ -860,7 +860,7 @@ function AIInsightsTab() {
         ) : (
           <ul className="space-y-2">
             {timingRecs.map((rec, i) => (
-              <li key={i} className="flex items-start gap-2 text-sm text-[#D0E4EC]">
+              <li key={i} className="flex items-start gap-2 text-sm text-cg-slate-tint">
                 <span className="text-cg-sage mt-0.5 shrink-0">-</span>
                 {rec}
               </li>
@@ -890,7 +890,7 @@ interface Ga4Status {
  */
 function ConnectGa4Card({ connectUrl, message }: { connectUrl?: string; message?: string }) {
   return (
-    <div className="rounded-xl border border-cg-slate/30 bg-gradient-to-br from-[#1A3648]/80 to-[#0F2533]/60 p-8 max-w-2xl mx-auto text-center">
+    <div className="rounded-xl border border-cg-slate/30 bg-gradient-to-br from-cg-slate-deep/80 to-cg-ink/60 p-8 max-w-2xl mx-auto text-center">
       <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-cg-sage/10 border border-cg-sage/30 mb-4">
         <PlugZap className="w-7 h-7 text-cg-sage" />
       </div>
@@ -911,7 +911,7 @@ function ConnectGa4Card({ connectUrl, message }: { connectUrl?: string; message?
         </a>
       ) : (
         <p className="text-xs text-muted-foreground">
-          Ask an engineer to set <code className="text-[#D0E4EC]">GA4_*</code> env vars and restart the API.
+          Ask an engineer to set <code className="text-cg-slate-tint">GA4_*</code> env vars and restart the API.
         </p>
       )}
     </div>

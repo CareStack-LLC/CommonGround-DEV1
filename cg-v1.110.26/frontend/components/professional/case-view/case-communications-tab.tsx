@@ -123,7 +123,7 @@ export function CaseCommunicationsTab({ familyFileId, token }: { familyFileId: s
                         variant={filterFlagged ? "default" : "outline"}
                         size="sm"
                         onClick={() => setFilterFlagged(!filterFlagged)}
-                        className={filterFlagged ? "bg-cg-error hover:bg-[#9B2C2C] h-9" : "h-9"}
+                        className={filterFlagged ? "bg-cg-error hover:bg-cg-error-dark h-9" : "h-9"}
                     >
                         <AlertTriangle className="h-4 w-4 mr-2" />
                         Flagged
@@ -179,7 +179,7 @@ function MessageCard({ message }: { message: Message }) {
                         </div>
                     </div>
                     {message.flagged_by_aria && (
-                        <Badge className="bg-cg-error-subtle text-[#9B2C2C] hover:bg-cg-error-subtle border-cg-error-subtle text-[10px] py-0 h-5">
+                        <Badge className="bg-cg-error-subtle text-cg-error-dark hover:bg-cg-error-subtle border-cg-error-subtle text-[10px] py-0 h-5">
                             ARIA Flag: {message.aria_flag_category || "Inappropriate"}
                         </Badge>
                     )}

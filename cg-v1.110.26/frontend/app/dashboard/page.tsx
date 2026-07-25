@@ -993,7 +993,7 @@ function DashboardContent() {
                                 {activeAgreement ? (
                                   <>Active: <span className="text-foreground">{activeAgreement.title}</span></>
                                 ) : pendingCount > 0 ? (
-                                  <span className="text-[#E09520] dark:text-cg-amber">{pendingCount} pending agreement{pendingCount > 1 ? 's' : ''}</span>
+                                  <span className="text-cg-amber-dark dark:text-cg-amber">{pendingCount} pending agreement{pendingCount > 1 ? 's' : ''}</span>
                                 ) : (
                                   <span className="text-muted-foreground">No agreements</span>
                                 )}

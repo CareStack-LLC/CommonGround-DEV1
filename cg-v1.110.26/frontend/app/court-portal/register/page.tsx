@@ -190,7 +190,7 @@ export default function CourtRegisterPage() {
               Your account has been created and verified. You can now log in to access the Court Portal.
             </p>
             <div className="space-y-3">
-              <Button asChild className="w-full bg-cg-slate hover:bg-[#1E4E6B]">
+              <Button asChild className="w-full bg-cg-slate hover:bg-cg-slate-dark">
                 <Link href="/court-portal/login">
                   Continue to Login
                   <ArrowRight className="h-4 w-4 ml-2" />
@@ -304,7 +304,7 @@ export default function CourtRegisterPage() {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full bg-cg-slate hover:bg-[#1E4E6B]">
+              <Button type="submit" className="w-full bg-cg-slate hover:bg-cg-slate-dark">
                 Continue
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
@@ -410,7 +410,7 @@ export default function CourtRegisterPage() {
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back
                 </Button>
-                <Button type="submit" className="flex-1 bg-cg-slate hover:bg-[#1E4E6B]">
+                <Button type="submit" className="flex-1 bg-cg-slate hover:bg-cg-slate-dark">
                   Continue
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
@@ -464,9 +464,9 @@ export default function CourtRegisterPage() {
               <div className="p-3 bg-cg-slate-subtle rounded-lg">
                 <div className="flex items-start gap-2">
                   <Shield className="h-4 w-4 text-cg-slate mt-0.5 flex-shrink-0" />
-                  <div className="text-sm text-[#1E4E6B]">
+                  <div className="text-sm text-cg-slate-dark">
                     <p className="font-medium">Professional Verification</p>
-                    <p className="text-[#1E4E6B] text-xs mt-1">
+                    <p className="text-cg-slate-dark text-xs mt-1">
                       For MVP demo, your account will be automatically verified.
                       In production, verification would include bar number validation
                       and court email confirmation.
@@ -488,7 +488,7 @@ export default function CourtRegisterPage() {
                 </Button>
                 <Button
                   type="submit"
-                  className="flex-1 bg-cg-slate hover:bg-[#1E4E6B]"
+                  className="flex-1 bg-cg-slate hover:bg-cg-slate-dark"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? (

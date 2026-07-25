@@ -894,7 +894,7 @@ function CaseDetailsContent() {
                         Have a natural conversation about your custody arrangement. ARIA understands casual language and will guide you through everything.
                       </p>
                       <div className="text-sm text-muted-foreground">
-                        <p className="font-medium text-[#1E4E6B] mb-1">Best for:</p>
+                        <p className="font-medium text-cg-slate-dark mb-1">Best for:</p>
                         <ul className="list-disc list-inside space-y-1">
                           <li>People who prefer talking over forms</li>
                           <li>Complex or unique arrangements</li>

@@ -100,34 +100,34 @@ function getSeverityConfig(severity?: string) {
     switch (severity) {
         case 'severe':
             return {
-                gradient: 'from-cg-error to-[#E09520] dark:from-[#9B2C2C] dark:to-foreground',
-                headerBg: 'bg-gradient-to-r from-cg-error-subtle to-cg-amber-subtle dark:from-[#7A2222]/50 dark:to-foreground/40',
-                border: 'border-cg-error-subtle/80 dark:border-[#7A2222]/60',
+                gradient: 'from-cg-error to-cg-amber-dark dark:from-cg-error-dark dark:to-foreground',
+                headerBg: 'bg-gradient-to-r from-cg-error-subtle to-cg-amber-subtle dark:from-cg-error-deep/50 dark:to-foreground/40',
+                border: 'border-cg-error-subtle/80 dark:border-cg-error-deep/60',
                 icon: ShieldX,
                 title: 'Message Blocked',
-                iconColor: 'text-cg-error dark:text-[#E06B6B]',
-                iconBg: 'bg-cg-error-subtle dark:bg-[#7A2222]/50',
+                iconColor: 'text-cg-error dark:text-cg-error-light',
+                iconBg: 'bg-cg-error-subtle dark:bg-cg-error-deep/50',
                 pulse: true,
             };
         case 'moderate':
             return {
-                gradient: 'from-cg-amber to-[#E09520] dark:from-[#E09520] dark:to-foreground',
+                gradient: 'from-cg-amber to-cg-amber-dark dark:from-cg-amber-dark dark:to-foreground',
                 headerBg: 'bg-gradient-to-r from-cg-amber-subtle to-cg-amber-subtle dark:from-foreground/40 dark:to-foreground/30',
                 border: 'border-cg-amber-subtle/80 dark:border-foreground/60',
                 icon: ShieldAlert,
                 title: 'Court Risk Warning',
-                iconColor: 'text-[#E09520] dark:text-cg-amber',
+                iconColor: 'text-cg-amber-dark dark:text-cg-amber',
                 iconBg: 'bg-cg-amber-subtle dark:bg-foreground/50',
                 pulse: false,
             };
         default: // mild or safe
             return {
-                gradient: 'from-cg-amber to-cg-amber dark:from-[#E09520] dark:to-[#E09520]',
+                gradient: 'from-cg-amber to-cg-amber dark:from-cg-amber-dark dark:to-cg-amber-dark',
                 headerBg: 'bg-gradient-to-r from-cg-amber-subtle/80 to-cg-amber-subtle/60 dark:from-foreground/30 dark:to-foreground/20',
                 border: 'border-cg-amber-subtle/60 dark:border-foreground/40',
                 icon: Shield,
                 title: 'Tone Check',
-                iconColor: 'text-[#E09520] dark:text-cg-amber',
+                iconColor: 'text-cg-amber-dark dark:text-cg-amber',
                 iconBg: 'bg-cg-amber-subtle dark:bg-foreground/50',
                 pulse: false,
             };
@@ -482,7 +482,7 @@ export function ARIARewriteModal({
                 {/* Original */}
                 <div className="space-y-1.5">
                     <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Your message</p>
-                    <div className="rounded-xl bg-cg-error-subtle/80 dark:bg-[#7A2222]/15 border border-cg-error-subtle/50 dark:border-[#7A2222]/30 p-3 min-h-[80px]">
+                    <div className="rounded-xl bg-cg-error-subtle/80 dark:bg-cg-error-deep/15 border border-cg-error-subtle/50 dark:border-cg-error-deep/30 p-3 min-h-[80px]">
                         <p className="text-sm text-foreground leading-relaxed">{payload.original_message}</p>
                     </div>
                 </div>

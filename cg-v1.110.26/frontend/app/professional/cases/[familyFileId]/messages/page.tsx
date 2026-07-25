@@ -278,7 +278,7 @@ export default function ClientMessagingPage() {
                       onClick={() => setSelectedThread(thread.id)}
                       className={`w-full p-3 rounded-lg text-left transition-colors ${
                         selectedThread === thread.id
-                          ? "bg-cg-sage-subtle border border-[#C5E5DB]"
+                          ? "bg-cg-sage-subtle border border-cg-sage-tint"
                           : "hover:bg-muted/50"
                       }`}
                     >

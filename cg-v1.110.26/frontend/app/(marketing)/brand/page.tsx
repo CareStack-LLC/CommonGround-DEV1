@@ -134,7 +134,7 @@ export default function BrandPage() {
           <span className="rounded-full bg-cg-slate-subtle px-4 py-1.5 font-medium text-cg-slate">
             Light-locked
           </span>
-          <span className="rounded-full bg-cg-amber-subtle px-4 py-1.5 font-medium text-[#B8791A]">
+          <span className="rounded-full bg-cg-amber-subtle px-4 py-1.5 font-medium text-cg-amber-deep">
             30 brand icons
           </span>
         </div>

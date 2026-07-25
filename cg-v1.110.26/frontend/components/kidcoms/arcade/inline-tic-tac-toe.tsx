@@ -328,7 +328,7 @@ export function InlineTicTacToe({
             </div>
             <button
               onClick={handleReset}
-              className="flex items-center gap-1 text-xs text-[#CBD8E0]/80 hover:text-white px-2 py-1 rounded-md bg-[#0D1B24] border border-cg-sage/20"
+              className="flex items-center gap-1 text-xs text-cg-mist/80 hover:text-white px-2 py-1 rounded-md bg-cg-ink border border-cg-sage/20"
             >
               <RotateCcw className="h-3.5 w-3.5" />
               Reset
@@ -336,14 +336,14 @@ export function InlineTicTacToe({
           </div>
 
           <div className="grid grid-cols-2 gap-3 text-xs">
-            <div className="flex items-center justify-between bg-[#0D1B24]/60 px-3 py-2 rounded-lg">
+            <div className="flex items-center justify-between bg-cg-ink/60 px-3 py-2 rounded-lg">
               <div className="flex items-center gap-2">
                 <UserIcon className="h-4 w-4 text-cg-sage" />
                 <span className="text-white font-medium truncate">{userName || 'You'}</span>
               </div>
               <span className="text-cg-sage font-bold">{localScore}</span>
             </div>
-            <div className="flex items-center justify-between bg-[#0D1B24]/60 px-3 py-2 rounded-lg">
+            <div className="flex items-center justify-between bg-cg-ink/60 px-3 py-2 rounded-lg">
               <div className="flex items-center gap-2">
                 <OpponentIcon className="h-4 w-4 text-cg-amber" />
                 <span className="text-white font-medium truncate">{opponentLabel}</span>
@@ -401,7 +401,7 @@ export function InlineTicTacToe({
         <div className="max-w-lg mx-auto mt-4 text-center">
           <button
             onClick={onExit}
-            className="text-xs text-[#CBD8E0]/70 hover:text-white underline"
+            className="text-xs text-cg-mist/70 hover:text-white underline"
           >
             Back to arcade
           </button>

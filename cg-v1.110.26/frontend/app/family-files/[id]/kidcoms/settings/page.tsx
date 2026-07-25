@@ -184,12 +184,12 @@ export default function KidComsSettingsPage() {
           </div>
 
           {error && (
-            <div className="mb-6 bg-cg-error-subtle dark:bg-[#7A2222]/30 border-2 border-cg-error-subtle dark:border-[#9B2C2C]/50 rounded-2xl p-4">
+            <div className="mb-6 bg-cg-error-subtle dark:bg-cg-error-deep/30 border-2 border-cg-error-subtle dark:border-cg-error-dark/50 rounded-2xl p-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-cg-error-subtle dark:bg-[#7A2222]/50 flex items-center justify-center flex-shrink-0">
-                  <XCircle className="h-5 w-5 text-cg-error dark:text-[#E06B6B]" />
+                <div className="w-10 h-10 rounded-lg bg-cg-error-subtle dark:bg-cg-error-deep/50 flex items-center justify-center flex-shrink-0">
+                  <XCircle className="h-5 w-5 text-cg-error dark:text-cg-error-light" />
                 </div>
-                <p className="text-[#9B2C2C] dark:text-[#FCA5A5] font-medium">{error}</p>
+                <p className="text-cg-error-dark dark:text-[#FCA5A5] font-medium">{error}</p>
               </div>
             </div>
           )}
@@ -295,8 +295,8 @@ export default function KidComsSettingsPage() {
           {/* Session Limits */}
           <div className="bg-card border-2 border-border rounded-2xl shadow-lg p-6">
             <h2 className="text-lg font-bold text-foreground mb-2 flex items-center gap-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cg-amber/10 to-[#E09520]/5 flex items-center justify-center">
-                <Clock className="h-4 w-4 text-[#E09520]" />
+              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cg-amber/10 to-cg-amber-dark/5 flex items-center justify-center">
+                <Clock className="h-4 w-4 text-cg-amber-dark" />
               </div>
               Session Limits
             </h2>

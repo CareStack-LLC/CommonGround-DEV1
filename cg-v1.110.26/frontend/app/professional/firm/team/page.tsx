@@ -37,8 +37,8 @@ const ROLE_COLORS: Record<string, string> = {
   owner: "bg-cg-sage/10 text-foreground border-0",
   admin: "bg-blue-50 text-blue-700 border-0",
   attorney: "bg-cg-sage-subtle text-cg-sage-dark border-0",
-  paralegal: "bg-[#F0F7FC] text-[#1E4E6B] border-0",
-  intake: "bg-cg-amber-subtle text-[#B8791A] border-0",
+  paralegal: "bg-cg-slate-tint text-cg-slate-dark border-0",
+  intake: "bg-cg-amber-subtle text-cg-amber-deep border-0",
   readonly: "bg-slate-100 text-slate-600 border-0",
 };
 
@@ -175,7 +175,7 @@ export default function TeamManagementPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <Link href="/professional/firm" className="inline-flex items-center gap-1.5 text-xs text-cg-sage hover:text-[#2D8A6E] font-medium mb-2">
+          <Link href="/professional/firm" className="inline-flex items-center gap-1.5 text-xs text-cg-sage hover:text-cg-sage-dark font-medium mb-2">
             <ArrowLeft className="h-3.5 w-3.5" /> Firm Settings
           </Link>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Team Members</h1>
@@ -183,7 +183,7 @@ export default function TeamManagementPage() {
         </div>
         <Dialog open={showInviteDialog} onOpenChange={setShowInviteDialog}>
           <DialogTrigger asChild>
-            <Button className="bg-cg-sage hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm gap-2">
+            <Button className="bg-cg-sage hover:bg-cg-sage-dark text-white rounded-xl shadow-sm gap-2">
               <UserPlus className="h-4 w-4" /> Invite Member
             </Button>
           </DialogTrigger>
@@ -216,7 +216,7 @@ export default function TeamManagementPage() {
             <DialogFooter>
               <Button variant="outline" onClick={() => setShowInviteDialog(false)} className="rounded-lg">Cancel</Button>
               <Button onClick={handleInvite} disabled={isInviting || !inviteData.email}
-                className="bg-cg-sage hover:bg-[#2D8A6E] text-white rounded-lg">
+                className="bg-cg-sage hover:bg-cg-sage-dark text-white rounded-lg">
                 {isInviting ? <><Loader2 className="h-4 w-4 animate-spin mr-1.5" />Sending...</> : "Send Invitation"}
               </Button>
             </DialogFooter>
@@ -235,7 +235,7 @@ export default function TeamManagementPage() {
             <Users className="h-10 w-10 mx-auto text-slate-300 mb-3" />
             <h2 className="text-base font-semibold text-slate-900">No Team Members Yet</h2>
             <p className="text-sm text-slate-500 mt-1 mb-4">Invite colleagues to collaborate on cases.</p>
-            <Button onClick={() => setShowInviteDialog(true)} className="bg-cg-sage hover:bg-[#2D8A6E] text-white rounded-xl gap-2">
+            <Button onClick={() => setShowInviteDialog(true)} className="bg-cg-sage hover:bg-cg-sage-dark text-white rounded-xl gap-2">
               <UserPlus className="h-4 w-4" /> Invite Your First Member
             </Button>
           </CardContent>

@@ -383,7 +383,7 @@ export default function AccessRequestsPage() {
           <Card className="border-2 border-foreground/30 bg-gradient-to-br from-white via-background/20 to-white shadow-sm relative">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-foreground via-cg-sage to-foreground"></div>
             <CardContent className="p-8 text-center">
-              <Check className="h-12 w-12 mx-auto text-[#1B5544] mb-4" />
+              <Check className="h-12 w-12 mx-auto text-cg-sage-deep mb-4" />
               <h3 className="serif text-lg font-bold mb-2 text-slate-900">All Caught Up</h3>
               <p className="sans text-slate-600">You have no pending invitations to review.</p>
             </CardContent>
@@ -421,7 +421,7 @@ export default function AccessRequestsPage() {
                           {request.family_name || "Family Case"}
                         </h3>
                         {isExpiringSoon(request.expires_at) && (
-                          <Badge className="bg-cg-amber-subtle text-[#6B460F] border-2 border-[#6B460F]/30 sans">
+                          <Badge className="bg-cg-amber-subtle text-cg-amber-deep border-2 border-cg-amber-deep/30 sans">
                             <AlertCircle className="h-3 w-3 mr-1" />
                             Expires soon
                           </Badge>
@@ -434,7 +434,7 @@ export default function AccessRequestsPage() {
                           className={`mb-4 rounded-md border p-3 text-sm ${
                             isBlocked(request.id)
                               ? "border-red-300 bg-red-50 text-red-900"
-                              : "border-[#F8CE8A] bg-cg-amber-subtle text-[#6B460F]"
+                              : "border-[#F8CE8A] bg-cg-amber-subtle text-cg-amber-deep"
                           }`}
                         >
                           <div className="flex items-center gap-2 font-semibold mb-1">

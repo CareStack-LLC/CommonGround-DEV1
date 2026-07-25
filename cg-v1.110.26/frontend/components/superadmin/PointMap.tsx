@@ -37,7 +37,7 @@ const DEFAULT_STATUS_COLORS: Record<string, string> = {
   disputed: 'var(--cg-error)',
   scheduled: 'var(--cg-slate-light)',
   cancelled: 'var(--muted-foreground)',
-  unknown: '#8AACBC',
+  unknown: 'var(--cg-slate-muted)',
 };
 
 export function PointMap({
@@ -63,12 +63,12 @@ export function PointMap({
   if (!MAPBOX_TOKEN) {
     return (
       <div
-        className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-8 flex flex-col items-center justify-center text-center gap-3"
+        className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-8 flex flex-col items-center justify-center text-center gap-3"
         style={{ height }}
       >
         <AlertTriangle className="w-6 h-6 text-amber-400" />
-        <div className="text-sm text-[#D0E4EC] font-medium">Mapbox token not configured</div>
-        <p className="text-xs text-[#8AACBC] max-w-md">
+        <div className="text-sm text-cg-slate-tint font-medium">Mapbox token not configured</div>
+        <p className="text-xs text-cg-slate-muted max-w-md">
           Set <code className="text-cg-sage-light">NEXT_PUBLIC_MAPBOX_TOKEN</code> in the frontend env
           to enable maps.
         </p>
@@ -79,12 +79,12 @@ export function PointMap({
   if (points.length === 0) {
     return (
       <div
-        className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-8 flex flex-col items-center justify-center text-center gap-3"
+        className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-8 flex flex-col items-center justify-center text-center gap-3"
         style={{ height }}
       >
         <MapPin className="w-6 h-6 text-muted-foreground opacity-60" />
-        <div className="text-sm text-[#D0E4EC] font-medium">No {label} recorded in this window</div>
-        <p className="text-xs text-[#8AACBC] max-w-md">
+        <div className="text-sm text-cg-slate-tint font-medium">No {label} recorded in this window</div>
+        <p className="text-xs text-cg-slate-muted max-w-md">
           Check-ins without GPS coordinates (silent handoff, manual entry) aren&apos;t plotted here.
         </p>
       </div>
@@ -93,7 +93,7 @@ export function PointMap({
 
   return (
     <div
-      className="relative bg-[#0F2533] border border-cg-slate/20 rounded-xl overflow-hidden"
+      className="relative bg-cg-ink border border-cg-slate/20 rounded-xl overflow-hidden"
       style={{ height }}
     >
       <Map
@@ -131,8 +131,8 @@ export function PointMap({
       </Map>
 
       {/* Legend overlay */}
-      <div className="absolute top-3 left-3 bg-[#0F2533]/85 backdrop-blur-md border border-cg-slate/30 rounded-lg px-3 py-2 text-[11px]">
-        <div className="text-[#D0E4EC] font-medium mb-1">
+      <div className="absolute top-3 left-3 bg-cg-ink/85 backdrop-blur-md border border-cg-slate/30 rounded-lg px-3 py-2 text-[11px]">
+        <div className="text-cg-slate-tint font-medium mb-1">
           {points.length.toLocaleString()} {label}
         </div>
         <div className="space-y-0.5">
@@ -144,8 +144,8 @@ export function PointMap({
                   className="inline-block w-2 h-2 rounded-full"
                   style={{ backgroundColor: colors[status] || colors.unknown }}
                 />
-                <span className="text-[#8AACBC] capitalize">{status.replace(/_/g, ' ')}:</span>
-                <span className="text-[#D0E4EC] font-medium">{count.toLocaleString()}</span>
+                <span className="text-cg-slate-muted capitalize">{status.replace(/_/g, ' ')}:</span>
+                <span className="text-cg-slate-tint font-medium">{count.toLocaleString()}</span>
               </div>
             ))}
         </div>

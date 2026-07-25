@@ -29,7 +29,7 @@ const SOURCE_COLORS: Record<string, string> = {
   social: 'bg-pink-500/20 text-pink-300 border-pink-500/30',
   paid: 'bg-orange-500/20 text-orange-300 border-orange-500/30',
   referral: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
-  other: 'bg-zinc-500/20 text-[#D0E4EC] border-zinc-500/30',
+  other: 'bg-zinc-500/20 text-cg-slate-tint border-zinc-500/30',
 };
 
 const SOURCE_ICONS: Record<string, React.ReactNode> = {
@@ -45,7 +45,7 @@ const SOURCE_ICONS: Record<string, React.ReactNode> = {
 
 // Sales funnel stages (matches backend admin_leads.py _VALID_STAGES)
 const STAGE_OPTIONS = [
-  { value: 'new',          label: 'New',          color: 'bg-zinc-500/20 text-[#D0E4EC]' },
+  { value: 'new',          label: 'New',          color: 'bg-zinc-500/20 text-cg-slate-tint' },
   { value: 'contacted',    label: 'Contacted',    color: 'bg-sky-500/20 text-sky-300' },
   { value: 'qualified',    label: 'Qualified',    color: 'bg-violet-500/20 text-violet-300' },
   { value: 'negotiation',  label: 'Negotiation',  color: 'bg-amber-500/20 text-amber-300' },
@@ -336,7 +336,7 @@ export default function LeadsContent() {
       <div className="space-y-6">
         <div className="flex items-center gap-3">
           <button aria-label="Previous" onClick={() => setSelectedList(null)} className="p-1.5 rounded-lg hover:bg-cg-slate/20 transition-colors">
-            <ChevronLeft className="w-5 h-5 text-[#8AACBC]" />
+            <ChevronLeft className="w-5 h-5 text-cg-slate-muted" />
           </button>
           <div className="flex-1">
             <h1 className="text-xl font-bold text-white">{selectedList.name}</h1>
@@ -371,17 +371,17 @@ export default function LeadsContent() {
 
         {/* Inline Add Lead Form */}
         {showAddLead && (
-          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
+          <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-[#D0E4EC]">Add Lead</h3>
-              <button aria-label="Close" onClick={() => setShowAddLead(false)} className="text-muted-foreground hover:text-[#D0E4EC]"><X className="w-4 h-4" /></button>
+              <h3 className="text-sm font-semibold text-cg-slate-tint">Add Lead</h3>
+              <button aria-label="Close" onClick={() => setShowAddLead(false)} className="text-muted-foreground hover:text-cg-slate-tint"><X className="w-4 h-4" /></button>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <input aria-label="Email" value={newLead.email} onChange={e => setNewLead({ ...newLead, email: e.target.value })} placeholder="Email *" className="col-span-2 px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50" />
-              <input aria-label="First name" value={newLead.first_name} onChange={e => setNewLead({ ...newLead, first_name: e.target.value })} placeholder="First name" className="px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50" />
-              <input aria-label="Last name" value={newLead.last_name} onChange={e => setNewLead({ ...newLead, last_name: e.target.value })} placeholder="Last name" className="px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50" />
-              <input aria-label="Company" value={newLead.company} onChange={e => setNewLead({ ...newLead, company: e.target.value })} placeholder="Company" className="px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50" />
-              <input aria-label="Title" value={newLead.title} onChange={e => setNewLead({ ...newLead, title: e.target.value })} placeholder="Title" className="px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50" />
+              <input aria-label="Email" value={newLead.email} onChange={e => setNewLead({ ...newLead, email: e.target.value })} placeholder="Email *" className="col-span-2 px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-violet-500/50" />
+              <input aria-label="First name" value={newLead.first_name} onChange={e => setNewLead({ ...newLead, first_name: e.target.value })} placeholder="First name" className="px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-violet-500/50" />
+              <input aria-label="Last name" value={newLead.last_name} onChange={e => setNewLead({ ...newLead, last_name: e.target.value })} placeholder="Last name" className="px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-violet-500/50" />
+              <input aria-label="Company" value={newLead.company} onChange={e => setNewLead({ ...newLead, company: e.target.value })} placeholder="Company" className="px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-violet-500/50" />
+              <input aria-label="Title" value={newLead.title} onChange={e => setNewLead({ ...newLead, title: e.target.value })} placeholder="Title" className="px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-violet-500/50" />
             </div>
             <button onClick={addLead} disabled={addingLead || !newLead.email} className="mt-3 px-4 py-2 rounded-lg bg-cg-sage hover:bg-cg-sage-light text-white text-sm font-medium transition-colors disabled:opacity-50">
               {addingLead ? 'Adding...' : 'Add Lead'}
@@ -395,7 +395,7 @@ export default function LeadsContent() {
             {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-10" />)}
           </div>
         ) : (
-          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden">
+          <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl overflow-hidden">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-cg-slate/20">
@@ -424,14 +424,14 @@ export default function LeadsContent() {
                           <button aria-label="Next"
                             onClick={() => toggleLeadExpand(lead.id)}
                             title={isOpen ? 'Collapse' : 'Expand'}
-                            className="p-1 rounded text-[#8AACBC] hover:text-white hover:bg-cg-slate/30 transition-colors"
+                            className="p-1 rounded text-cg-slate-muted hover:text-white hover:bg-cg-slate/30 transition-colors"
                           >
                             {isOpen ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
                           </button>
                         </td>
                         <td className="px-4 py-3 text-white">{lead.email}</td>
-                        <td className="px-4 py-3 text-[#8AACBC] hidden md:table-cell">{[lead.first_name, lead.last_name].filter(Boolean).join(' ') || '\u2014'}</td>
-                        <td className="px-4 py-3 text-[#8AACBC] hidden lg:table-cell">{lead.company || '\u2014'}</td>
+                        <td className="px-4 py-3 text-cg-slate-muted hidden md:table-cell">{[lead.first_name, lead.last_name].filter(Boolean).join(' ') || '\u2014'}</td>
+                        <td className="px-4 py-3 text-cg-slate-muted hidden lg:table-cell">{lead.company || '\u2014'}</td>
                         <td className="px-4 py-3">
                           <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium border ${SOURCE_COLORS[lead.source] || SOURCE_COLORS.other}`}>
                             {lead.source}
@@ -449,7 +449,7 @@ export default function LeadsContent() {
                             <span className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium ${
                               lead.status === 'active' ? 'bg-emerald-500/15 text-emerald-400' :
                               lead.status === 'bounced' ? 'bg-red-500/15 text-red-400' :
-                              'bg-zinc-700/50 text-[#8AACBC]'
+                              'bg-zinc-700/50 text-cg-slate-muted'
                             }`}>
                               {lead.status}
                             </span>
@@ -487,7 +487,7 @@ export default function LeadsContent() {
                             <button aria-label="More options"
                               onClick={() => openStageModal(lead)}
                               title="Change stage"
-                              className="p-1.5 rounded text-[#8AACBC] hover:bg-cg-slate/30 hover:text-white transition-colors"
+                              className="p-1.5 rounded text-cg-slate-muted hover:bg-cg-slate/30 hover:text-white transition-colors"
                             >
                               <MoreVertical className="w-4 h-4" />
                             </button>
@@ -495,12 +495,12 @@ export default function LeadsContent() {
                         </td>
                       </tr>
                       {isOpen && (
-                        <tr className="bg-[#0F2533]/40 border-t border-cg-slate/10">
+                        <tr className="bg-cg-ink/40 border-t border-cg-slate/10">
                           <td colSpan={7} className="px-6 py-4">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
                               <div>
                                 <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Attribution</div>
-                                <div className="space-y-1 text-[#D0E4EC]">
+                                <div className="space-y-1 text-cg-slate-tint">
                                   <div><span className="text-muted-foreground">utm_source:</span> <span className="font-mono">{lead.utm_source || '\u2014'}</span></div>
                                   <div><span className="text-muted-foreground">utm_medium:</span> <span className="font-mono">{lead.utm_medium || '\u2014'}</span></div>
                                   <div><span className="text-muted-foreground">utm_campaign:</span> <span className="font-mono">{lead.utm_campaign || '\u2014'}</span></div>
@@ -508,7 +508,7 @@ export default function LeadsContent() {
                               </div>
                               <div>
                                 <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Timeline</div>
-                                <div className="space-y-1 text-[#D0E4EC]">
+                                <div className="space-y-1 text-cg-slate-tint">
                                   <div><span className="text-muted-foreground">Created:</span> {lead.created_at ? new Date(lead.created_at).toLocaleString() : '\u2014'}</div>
                                   <div><span className="text-muted-foreground">Converted:</span> {lead.converted_at ? new Date(lead.converted_at).toLocaleString() : '\u2014'}</div>
                                   <div><span className="text-muted-foreground">Closed:</span> {lead.closed_at ? new Date(lead.closed_at).toLocaleString() : '\u2014'}</div>
@@ -516,7 +516,7 @@ export default function LeadsContent() {
                               </div>
                               <div>
                                 <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Identifiers</div>
-                                <div className="space-y-1 text-[#D0E4EC]">
+                                <div className="space-y-1 text-cg-slate-tint">
                                   <div className="flex items-center gap-2">
                                     <span className="text-muted-foreground">id:</span>
                                     <span className="font-mono truncate">{lead.id}</span>
@@ -526,7 +526,7 @@ export default function LeadsContent() {
                                         setSuccess('Lead id copied');
                                       }}
                                       title="Copy lead id"
-                                      className="p-0.5 rounded text-[#8AACBC] hover:text-white hover:bg-cg-slate/30 transition-colors"
+                                      className="p-0.5 rounded text-cg-slate-muted hover:text-white hover:bg-cg-slate/30 transition-colors"
                                     >
                                       <Copy className="w-3 h-3" />
                                     </button>
@@ -544,11 +544,11 @@ export default function LeadsContent() {
                                 </div>
                                 <div className="space-y-1">
                                   {stageNotes.map((n, i) => (
-                                    <div key={i} className="text-xs text-[#D0E4EC] flex items-start gap-2">
+                                    <div key={i} className="text-xs text-cg-slate-tint flex items-start gap-2">
                                       <span className="text-muted-foreground whitespace-nowrap">{n.at ? new Date(n.at).toLocaleDateString() : '\u2014'}</span>
-                                      <span className="capitalize text-[#8AACBC]">{(n.stage || '').replace(/_/g, ' ')}</span>
+                                      <span className="capitalize text-cg-slate-muted">{(n.stage || '').replace(/_/g, ' ')}</span>
                                       {n.reason && <span className="text-amber-300/80">({n.reason.replace(/_/g, ' ')})</span>}
-                                      {n.note && <span className="text-[#D0E4EC]">— {n.note}</span>}
+                                      {n.note && <span className="text-cg-slate-tint">— {n.note}</span>}
                                       {n.by && <span className="text-muted-foreground ml-auto text-[10px]">by {n.by}</span>}
                                     </div>
                                   ))}
@@ -573,17 +573,17 @@ export default function LeadsContent() {
             onClick={closeStageModal}
           >
             <div
-              className="bg-[#0F2533] border border-cg-slate/30 rounded-xl p-6 w-full max-w-md shadow-2xl"
+              className="bg-cg-ink border border-cg-slate/30 rounded-xl p-6 w-full max-w-md shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <h3 className="text-base font-semibold text-white">Update Lead Stage</h3>
-                  <p className="text-xs text-[#8AACBC] mt-0.5 truncate max-w-[280px]">{stageLead.email}</p>
+                  <p className="text-xs text-cg-slate-muted mt-0.5 truncate max-w-[280px]">{stageLead.email}</p>
                 </div>
                 <button aria-label="Close"
                   onClick={closeStageModal}
-                  className="p-1 rounded text-[#8AACBC] hover:bg-cg-slate/30 hover:text-white transition-colors"
+                  className="p-1 rounded text-cg-slate-muted hover:bg-cg-slate/30 hover:text-white transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -591,7 +591,7 @@ export default function LeadsContent() {
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-medium text-[#8AACBC] mb-2">Stage</label>
+                  <label className="block text-xs font-medium text-cg-slate-muted mb-2">Stage</label>
                   <div className="grid grid-cols-2 gap-2">
                     {STAGE_OPTIONS.map((s) => (
                       <button
@@ -600,7 +600,7 @@ export default function LeadsContent() {
                         className={`px-3 py-2 rounded text-xs font-medium text-left transition-colors border ${
                           stageChoice === s.value
                             ? 'border-cg-sage bg-cg-sage/15 text-white'
-                            : 'border-cg-slate/20 text-[#8AACBC] hover:text-white hover:border-cg-slate/50'
+                            : 'border-cg-slate/20 text-cg-slate-muted hover:text-white hover:border-cg-slate/50'
                         }`}
                       >
                         {s.label}
@@ -611,13 +611,13 @@ export default function LeadsContent() {
 
                 {stageChoice === 'closed_lost' && (
                   <div>
-                    <label className="block text-xs font-medium text-[#8AACBC] mb-2">
+                    <label className="block text-xs font-medium text-cg-slate-muted mb-2">
                       Lost Reason <span className="text-red-400">*</span>
                     </label>
                     <select
                       value={lostReason}
                       onChange={(e) => setLostReason(e.target.value)}
-                      className="w-full bg-[#1A3648]/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-cg-sage"
+                      className="w-full bg-cg-slate-deep/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-cg-sage"
                     >
                       {LOST_REASONS.map((r) => (
                         <option key={r.value} value={r.value}>{r.label}</option>
@@ -627,7 +627,7 @@ export default function LeadsContent() {
                 )}
 
                 <div>
-                  <label className="block text-xs font-medium text-[#8AACBC] mb-2">
+                  <label className="block text-xs font-medium text-cg-slate-muted mb-2">
                     Note (optional)
                   </label>
                   <textarea
@@ -635,7 +635,7 @@ export default function LeadsContent() {
                     onChange={(e) => setStageNote(e.target.value)}
                     placeholder="Context for this stage change — stored in the audit trail"
                     rows={2}
-                    className="w-full bg-[#1A3648]/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-cg-sage resize-none"
+                    className="w-full bg-cg-slate-deep/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-cg-sage resize-none"
                   />
                 </div>
               </div>
@@ -644,7 +644,7 @@ export default function LeadsContent() {
                 <button
                   onClick={closeStageModal}
                   disabled={stageSaving}
-                  className="px-4 py-2 rounded text-sm font-medium text-[#8AACBC] hover:text-white transition-colors disabled:opacity-50"
+                  className="px-4 py-2 rounded text-sm font-medium text-cg-slate-muted hover:text-white transition-colors disabled:opacity-50"
                 >
                   Cancel
                 </button>
@@ -690,7 +690,7 @@ export default function LeadsContent() {
             className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
               activeTab === tab.key
                 ? 'bg-cg-sage text-white'
-                : 'text-[#8AACBC] hover:text-white'
+                : 'text-cg-slate-muted hover:text-white'
             }`}
           >
             {tab.icon}
@@ -729,7 +729,7 @@ export default function LeadsContent() {
             <>
               {/* Funnel Visualization */}
               <div>
-                <h2 className="text-sm font-semibold text-[#8AACBC] uppercase tracking-wider mb-3">Conversion Funnel</h2>
+                <h2 className="text-sm font-semibold text-cg-slate-muted uppercase tracking-wider mb-3">Conversion Funnel</h2>
                 <div className="flex items-center gap-2">
                   {[
                     { label: 'Total', value: pipeline?.funnel?.total ?? 0, color: 'from-violet-500/20 to-violet-600/10 border-violet-500/30' },
@@ -740,10 +740,10 @@ export default function LeadsContent() {
                     <div key={step.label} className="flex items-center gap-2 flex-1">
                       <div className={`flex-1 bg-gradient-to-br ${step.color} border rounded-xl p-4 text-center`}>
                         <div className="text-2xl font-bold text-white">{step.value.toLocaleString()}</div>
-                        <div className="text-xs font-medium text-[#8AACBC] mt-1">{step.label}</div>
+                        <div className="text-xs font-medium text-cg-slate-muted mt-1">{step.label}</div>
                       </div>
                       {idx < arr.length - 1 && (
-                        <ArrowRight className="w-5 h-5 text-[#4A6E7F] flex-shrink-0" />
+                        <ArrowRight className="w-5 h-5 text-cg-slate-strong flex-shrink-0" />
                       )}
                     </div>
                   ))}
@@ -751,7 +751,7 @@ export default function LeadsContent() {
                 {pipeline?.conversion_rate != null && (
                   <div className="mt-3 flex items-center gap-2">
                     <TrendingUp className="w-4 h-4 text-emerald-400" />
-                    <span className="text-sm text-[#8AACBC]">Conversion rate:</span>
+                    <span className="text-sm text-cg-slate-muted">Conversion rate:</span>
                     <span className="text-sm font-semibold text-emerald-400">{pipeline.conversion_rate.toFixed(1)}%</span>
                   </div>
                 )}
@@ -759,7 +759,7 @@ export default function LeadsContent() {
 
               {/* Source Breakdown */}
               <div>
-                <h2 className="text-sm font-semibold text-[#8AACBC] uppercase tracking-wider mb-3">By Source</h2>
+                <h2 className="text-sm font-semibold text-cg-slate-muted uppercase tracking-wider mb-3">By Source</h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                   {Object.entries(pipeline?.by_source ?? {}).map(([source, count]) => (
                     <div
@@ -779,10 +779,10 @@ export default function LeadsContent() {
               </div>
 
               {/* Match Users */}
-              <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
+              <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="text-sm font-semibold text-[#D0E4EC]">Match Leads to Users</h2>
+                    <h2 className="text-sm font-semibold text-cg-slate-tint">Match Leads to Users</h2>
                     <p className="text-xs text-muted-foreground mt-1">Link lead records with existing platform users by email</p>
                   </div>
                   <button
@@ -798,7 +798,7 @@ export default function LeadsContent() {
                   <div className="mt-3 flex items-center gap-4 text-sm">
                     <span className="text-emerald-400 font-medium">{matchResult.matched} matched</span>
                     <span className="text-muted-foreground">|</span>
-                    <span className="text-[#8AACBC]">{matchResult.total_unmatched} unmatched</span>
+                    <span className="text-cg-slate-muted">{matchResult.total_unmatched} unmatched</span>
                   </div>
                 )}
               </div>
@@ -806,8 +806,8 @@ export default function LeadsContent() {
               {/* Recent Conversions */}
               {(pipeline?.recent_conversions?.length ?? 0) > 0 && (
                 <div>
-                  <h2 className="text-sm font-semibold text-[#8AACBC] uppercase tracking-wider mb-3">Recent Conversions</h2>
-                  <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden">
+                  <h2 className="text-sm font-semibold text-cg-slate-muted uppercase tracking-wider mb-3">Recent Conversions</h2>
+                  <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl overflow-hidden">
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="border-b border-cg-slate/20">
@@ -839,8 +839,8 @@ export default function LeadsContent() {
               {/* Top Lists */}
               {(pipeline?.top_lists?.length ?? 0) > 0 && (
                 <div>
-                  <h2 className="text-sm font-semibold text-[#8AACBC] uppercase tracking-wider mb-3">Top Lists</h2>
-                  <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden">
+                  <h2 className="text-sm font-semibold text-cg-slate-muted uppercase tracking-wider mb-3">Top Lists</h2>
+                  <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl overflow-hidden">
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="border-b border-cg-slate/20">
@@ -853,7 +853,7 @@ export default function LeadsContent() {
                         {pipeline?.top_lists?.map(list => (
                           <tr key={list.id} className="hover:bg-cg-slate/10 transition-colors">
                             <td className="px-4 py-3 text-white font-medium">{list.name}</td>
-                            <td className="px-4 py-3 text-right text-[#D0E4EC]">{list.lead_count}</td>
+                            <td className="px-4 py-3 text-right text-cg-slate-tint">{list.lead_count}</td>
                             <td className="px-4 py-3 text-right text-emerald-400 font-medium">{list.converted}</td>
                           </tr>
                         ))}
@@ -881,20 +881,20 @@ export default function LeadsContent() {
 
           {/* Create List Modal */}
           {showCreate && (
-            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
+            <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-semibold text-[#D0E4EC]">Create Lead List</h3>
-                <button aria-label="Close" onClick={() => setShowCreate(false)} className="text-muted-foreground hover:text-[#D0E4EC]"><X className="w-4 h-4" /></button>
+                <h3 className="text-sm font-semibold text-cg-slate-tint">Create Lead List</h3>
+                <button aria-label="Close" onClick={() => setShowCreate(false)} className="text-muted-foreground hover:text-cg-slate-tint"><X className="w-4 h-4" /></button>
               </div>
               <div className="space-y-3">
-                <input value={createName} onChange={e => setCreateName(e.target.value)} placeholder="List name *" className="w-full px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50" />
-                <select value={createType} onChange={e => setCreateType(e.target.value)} className="w-full px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-[#D0E4EC] focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer">
+                <input value={createName} onChange={e => setCreateName(e.target.value)} placeholder="List name *" className="w-full px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-violet-500/50" />
+                <select value={createType} onChange={e => setCreateType(e.target.value)} className="w-full px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-cg-slate-tint focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer">
                   <option value="prospect">Prospect</option>
                   <option value="customer">Customer</option>
                   <option value="partner">Partner</option>
                   <option value="other">Other</option>
                 </select>
-                <input value={createDesc} onChange={e => setCreateDesc(e.target.value)} placeholder="Description (optional)" className="w-full px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50" />
+                <input value={createDesc} onChange={e => setCreateDesc(e.target.value)} placeholder="Description (optional)" className="w-full px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-violet-500/50" />
                 <button onClick={createList} disabled={creating || !createName.trim()} className="px-4 py-2 rounded-lg bg-cg-sage hover:bg-cg-sage-light text-white text-sm font-medium transition-colors disabled:opacity-50">
                   {creating ? 'Creating...' : 'Create List'}
                 </button>
@@ -913,7 +913,7 @@ export default function LeadsContent() {
               <p className="text-muted-foreground text-sm">No lead lists yet. Create one to get started.</p>
             </div>
           ) : (
-            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden">
+            <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-cg-slate/20">
@@ -930,14 +930,14 @@ export default function LeadsContent() {
                     <tr key={list.id} className="hover:bg-cg-slate/10 transition-colors">
                       <td className="px-4 py-3">
                         <button onClick={() => viewList(list.id)} className="text-white font-medium hover:text-cg-sage-light transition-colors flex items-center gap-1.5">
-                          {list.name} <ExternalLink className="w-3 h-3 text-[#4A6E7F]" />
+                          {list.name} <ExternalLink className="w-3 h-3 text-cg-slate-strong" />
                         </button>
-                        {list.description && <div className="text-xs text-[#4A6E7F] truncate max-w-xs">{list.description}</div>}
+                        {list.description && <div className="text-xs text-cg-slate-strong truncate max-w-xs">{list.description}</div>}
                       </td>
                       <td className="px-4 py-3">
-                        <span className="inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium bg-zinc-700/50 text-[#8AACBC] capitalize">{list.lead_type}</span>
+                        <span className="inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium bg-zinc-700/50 text-cg-slate-muted capitalize">{list.lead_type}</span>
                       </td>
-                      <td className="px-4 py-3 text-right text-[#D0E4EC] font-medium">{list.lead_count}</td>
+                      <td className="px-4 py-3 text-right text-cg-slate-tint font-medium">{list.lead_count}</td>
                       <td className="px-4 py-3 hidden md:table-cell">
                         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${
                           list.sendgrid_list_id ? 'bg-emerald-500/15 text-emerald-400' : 'bg-zinc-700/50 text-muted-foreground'
@@ -953,7 +953,7 @@ export default function LeadsContent() {
                         <div className="flex items-center justify-end gap-1">
                           <button aria-label="Open link"
                             onClick={() => viewList(list.id)}
-                            className="p-1.5 rounded-lg hover:bg-cg-slate/20 text-muted-foreground hover:text-[#D0E4EC] transition-colors"
+                            className="p-1.5 rounded-lg hover:bg-cg-slate/20 text-muted-foreground hover:text-cg-slate-tint transition-colors"
                             title="View leads"
                           >
                             <ExternalLink className="w-4 h-4" />
@@ -988,8 +988,8 @@ export default function LeadsContent() {
       {activeTab === 'import' && (
         <div className="space-y-6">
           {/* List Selection */}
-          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-            <h2 className="text-sm font-semibold text-[#D0E4EC] mb-3">Target List</h2>
+          <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+            <h2 className="text-sm font-semibold text-cg-slate-tint mb-3">Target List</h2>
             <p className="text-xs text-muted-foreground mb-3">Select a list before importing leads via CSV or manual entry.</p>
             {listsLoading ? (
               <Skeleton className="h-10 w-full" />
@@ -1004,7 +1004,7 @@ export default function LeadsContent() {
               <select
                 value={importListId}
                 onChange={e => setImportListId(e.target.value)}
-                className="w-full px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-[#D0E4EC] focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer"
+                className="w-full px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-cg-slate-tint focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer"
               >
                 <option value="">Select a list...</option>
                 {lists.map(l => (
@@ -1015,12 +1015,12 @@ export default function LeadsContent() {
           </div>
 
           {/* Source Selection */}
-          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-            <h2 className="text-sm font-semibold text-[#D0E4EC] mb-3">Source</h2>
+          <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+            <h2 className="text-sm font-semibold text-cg-slate-tint mb-3">Source</h2>
             <select
               value={importSource}
               onChange={e => setImportSource(e.target.value)}
-              className="w-full px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-[#D0E4EC] focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer"
+              className="w-full px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-cg-slate-tint focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer"
             >
               {SOURCE_OPTIONS.map(s => (
                 <option key={s} value={s}>{s.replace('_', ' ')}</option>
@@ -1029,8 +1029,8 @@ export default function LeadsContent() {
           </div>
 
           {/* CSV Upload */}
-          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-            <h2 className="text-sm font-semibold text-[#D0E4EC] mb-3">CSV Import</h2>
+          <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+            <h2 className="text-sm font-semibold text-cg-slate-tint mb-3">CSV Import</h2>
             <div
               onDragOver={e => { e.preventDefault(); setDragOver(true); }}
               onDragLeave={() => setDragOver(false)}
@@ -1039,8 +1039,8 @@ export default function LeadsContent() {
                 dragOver ? 'border-violet-500/50 bg-violet-500/5' : 'border-cg-slate/20'
               } ${!importListId ? 'opacity-50 pointer-events-none' : ''}`}
             >
-              <Upload className="w-8 h-8 text-[#4A6E7F] mx-auto mb-3" />
-              <p className="text-sm text-[#8AACBC] mb-2">
+              <Upload className="w-8 h-8 text-cg-slate-strong mx-auto mb-3" />
+              <p className="text-sm text-cg-slate-muted mb-2">
                 {importListId
                   ? 'Drag and drop a CSV file here, or click to browse'
                   : 'Select a list above before uploading'}
@@ -1055,7 +1055,7 @@ export default function LeadsContent() {
               <button
                 onClick={() => fileRef.current?.click()}
                 disabled={importing || !importListId}
-                className="px-4 py-2 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-[#D0E4EC] text-sm font-medium transition-colors disabled:opacity-50"
+                className="px-4 py-2 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-cg-slate-tint text-sm font-medium transition-colors disabled:opacity-50"
               >
                 {importing ? 'Importing...' : 'Choose File'}
               </button>
@@ -1063,10 +1063,10 @@ export default function LeadsContent() {
           </div>
 
           {/* Manual Add */}
-          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
+          <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h2 className="text-sm font-semibold text-[#D0E4EC]">Manual Add</h2>
+                <h2 className="text-sm font-semibold text-cg-slate-tint">Manual Add</h2>
                 <p className="text-xs text-muted-foreground mt-1">Add a single lead manually</p>
               </div>
               {!showAddLead && (
@@ -1090,36 +1090,36 @@ export default function LeadsContent() {
                     value={newLead.email}
                     onChange={e => setNewLead({ ...newLead, email: e.target.value })}
                     placeholder="Email *"
-                    className="col-span-2 px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50"
+                    className="col-span-2 px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-violet-500/50"
                   />
                   <input
                     value={newLead.first_name}
                     onChange={e => setNewLead({ ...newLead, first_name: e.target.value })}
                     placeholder="First name"
-                    className="px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50"
+                    className="px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-violet-500/50"
                   />
                   <input
                     value={newLead.last_name}
                     onChange={e => setNewLead({ ...newLead, last_name: e.target.value })}
                     placeholder="Last name"
-                    className="px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50"
+                    className="px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-violet-500/50"
                   />
                   <input
                     value={newLead.company}
                     onChange={e => setNewLead({ ...newLead, company: e.target.value })}
                     placeholder="Company"
-                    className="px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50"
+                    className="px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-violet-500/50"
                   />
                   <input
                     value={newLead.title}
                     onChange={e => setNewLead({ ...newLead, title: e.target.value })}
                     placeholder="Title"
-                    className="px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50"
+                    className="px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-violet-500/50"
                   />
                   <select
                     value={newLead.source}
                     onChange={e => setNewLead({ ...newLead, source: e.target.value })}
-                    className="col-span-2 px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-[#D0E4EC] focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer"
+                    className="col-span-2 px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-cg-slate-tint focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer"
                   >
                     {SOURCE_OPTIONS.map(s => (
                       <option key={s} value={s}>{s.replace('_', ' ')}</option>
@@ -1136,7 +1136,7 @@ export default function LeadsContent() {
                   </button>
                   <button
                     onClick={() => setShowAddLead(false)}
-                    className="px-4 py-2 rounded-lg text-muted-foreground hover:text-[#D0E4EC] text-sm transition-colors"
+                    className="px-4 py-2 rounded-lg text-muted-foreground hover:text-cg-slate-tint text-sm transition-colors"
                   >
                     Cancel
                   </button>

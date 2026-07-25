@@ -73,12 +73,12 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.
     },
     review: {
         label: "Ready for Review",
-        color: "bg-cg-amber-subtle text-[#B8791A] border-[#FBE3BF]",
+        color: "bg-cg-amber-subtle text-cg-amber-deep border-cg-amber-tint",
         icon: <Eye className="h-3 w-3" />,
     },
     approved: {
         label: "Approved",
-        color: "bg-cg-sage-subtle text-cg-sage-dark border-[#C5E5DB]",
+        color: "bg-cg-sage-subtle text-cg-sage-dark border-cg-sage-tint",
         icon: <CheckCircle2 className="h-3 w-3" />,
     },
     rejected: {
@@ -256,7 +256,7 @@ export default function OCRDocumentCenterPage() {
                 </div>
                 <Button
                     onClick={() => setShowUploadForm(!showUploadForm)}
-                    className="bg-gradient-to-r from-cg-slate to-cg-slate hover:from-[#1E4E6B] hover:to-[#1E4E6B] text-white shadow-lg shadow-[#3D8DB0]/20"
+                    className="bg-gradient-to-r from-cg-slate to-cg-slate hover:from-cg-slate-dark hover:to-cg-slate-dark text-white shadow-lg shadow-[#3D8DB0]/20"
                 >
                     <Upload className="h-4 w-4 mr-2" />
                     Upload Court Order
@@ -265,7 +265,7 @@ export default function OCRDocumentCenterPage() {
 
             {/* Upload Form */}
             {showUploadForm && (
-                <Card className="border-[#C2DEF0] bg-gradient-to-br from-[#F0F7FC]/50 to-[#F0F7FC]/50">
+                <Card className="border-cg-slate-tint bg-gradient-to-br from-cg-slate-tint/50 to-cg-slate-tint/50">
                     <CardHeader>
                         <CardTitle className="text-base flex items-center gap-2">
                             <Sparkles className="h-4 w-4 text-cg-slate" />
@@ -313,7 +313,7 @@ export default function OCRDocumentCenterPage() {
                             <Button
                                 onClick={handleUpload}
                                 disabled={isUploading || !uploadForm.fileUrl || !uploadForm.filename || !uploadForm.familyFileId}
-                                className="bg-cg-slate hover:bg-[#1E4E6B]"
+                                className="bg-cg-slate hover:bg-cg-slate-dark"
                             >
                                 {isUploading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Upload className="h-4 w-4 mr-2" />}
                                 {isUploading ? "Uploading..." : "Upload & Process"}
@@ -484,7 +484,7 @@ function OCRDetailPanel({
 
     const confidenceColor = (score: number) => {
         if (score >= 0.85) return "text-cg-sage-dark bg-cg-sage-subtle";
-        if (score >= 0.5) return "text-[#E09520] bg-cg-amber-subtle";
+        if (score >= 0.5) return "text-cg-amber-dark bg-cg-amber-subtle";
         return "text-red-600 bg-red-50";
     };
 
@@ -492,7 +492,7 @@ function OCRDetailPanel({
         <div className="fixed inset-0 bg-black/50 z-50 flex items-start justify-center pt-10 overflow-y-auto">
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl mb-10 mx-4">
                 {/* Header */}
-                <div className="p-6 border-b bg-gradient-to-r from-[#F0F7FC] to-[#F0F7FC] rounded-t-2xl">
+                <div className="p-6 border-b bg-gradient-to-r from-cg-slate-tint to-cg-slate-tint rounded-t-2xl">
                     <div className="flex items-center justify-between">
                         <div>
                             <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
@@ -623,7 +623,7 @@ function OCRDetailPanel({
                                     onClick={submitCorrections}
                                     disabled={isSavingCorrections}
                                     variant="outline"
-                                    className="border-[#C2DEF0] text-[#1E4E6B] hover:bg-[#F0F7FC]"
+                                    className="border-cg-slate-tint text-cg-slate-dark hover:bg-cg-slate-tint"
                                 >
                                     {isSavingCorrections ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
                                     Save Corrections ({Object.keys(corrections).length})

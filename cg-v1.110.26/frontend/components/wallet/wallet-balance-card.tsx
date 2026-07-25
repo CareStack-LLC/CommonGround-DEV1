@@ -84,7 +84,7 @@ export default function WalletBalanceCard({
         <div className="p-6">
           <div className="flex items-start gap-4">
             <div className="w-14 h-14 bg-gradient-to-br from-cg-amber-subtle to-cg-amber-subtle dark:from-foreground/30 dark:to-foreground/20 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md">
-              <Clock className="h-6 w-6 text-[#E09520]" />
+              <Clock className="h-6 w-6 text-cg-amber-dark" />
             </div>
             <div className="flex-1">
               <h3 className="font-semibold text-foreground mb-1" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Complete Wallet Setup</h3>
@@ -103,8 +103,8 @@ export default function WalletBalanceCard({
             </div>
           </div>
         </div>
-        <div className="border-t-2 border-cg-amber-subtle bg-cg-amber-subtle dark:bg-foreground/30 dark:border-[#E09520] px-6 py-3">
-          <p className="text-xs text-[#E09520] flex items-center gap-2 font-bold">
+        <div className="border-t-2 border-cg-amber-subtle bg-cg-amber-subtle dark:bg-foreground/30 dark:border-cg-amber-dark px-6 py-3">
+          <p className="text-xs text-cg-amber-dark flex items-center gap-2 font-bold">
             <AlertCircle className="h-4 w-4" />
             Bank verification pending
           </p>

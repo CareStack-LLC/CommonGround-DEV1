@@ -121,7 +121,7 @@ function AuthSyncContent() {
                     <p className="text-gray-600 mb-6">{error}</p>
                     <button
                         onClick={() => router.push('/login')}
-                        className="w-full px-4 py-2 bg-cg-slate text-white rounded-md hover:bg-[#1E4E6B] transition-colors"
+                        className="w-full px-4 py-2 bg-cg-slate text-white rounded-md hover:bg-cg-slate-dark transition-colors"
                     >
                         Return to Login
                     </button>

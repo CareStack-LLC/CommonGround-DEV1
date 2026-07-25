@@ -58,7 +58,7 @@ export function LeadTrackingChart({ data }: LeadTrackingChartProps) {
             <div className="p-6">
                 <div className="flex items-start justify-between mb-6">
                     <div className="flex items-center gap-3">
-                        <div className="p-3 bg-gradient-to-br from-cg-amber to-[#E09520] text-white rounded-xl shadow-lg shadow-cg-amber/20">
+                        <div className="p-3 bg-gradient-to-br from-cg-amber to-cg-amber-dark text-white rounded-xl shadow-lg shadow-cg-amber/20">
                             <UserPlus className="h-5 w-5" />
                         </div>
                         <div>
@@ -160,7 +160,7 @@ export function LeadTrackingChart({ data }: LeadTrackingChartProps) {
                         <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
                             This Week
                         </p>
-                        <p className="text-xl font-bold text-[#E09520]">{lastWeek}</p>
+                        <p className="text-xl font-bold text-cg-amber-dark">{lastWeek}</p>
                     </div>
                     <div className="text-center">
                         <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">

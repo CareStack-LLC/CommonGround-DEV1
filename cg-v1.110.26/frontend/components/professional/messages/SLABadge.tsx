@@ -54,9 +54,9 @@ export function SLABadge({ lastMessageAt, thresholdHours = 24, onlyShowWarning =
     if (!status) return null;
 
     const styles = {
-        green: "bg-cg-sage-subtle text-cg-sage-dark border-[#C5E5DB]",
-        yellow: "bg-cg-amber-subtle text-[#B8791A] border-[#FBE3BF]",
-        red: "bg-cg-error-subtle text-[#9B2C2C] border-cg-error-subtle",
+        green: "bg-cg-sage-subtle text-cg-sage-dark border-cg-sage-tint",
+        yellow: "bg-cg-amber-subtle text-cg-amber-deep border-cg-amber-tint",
+        red: "bg-cg-error-subtle text-cg-error-dark border-cg-error-subtle",
     };
 
     return (

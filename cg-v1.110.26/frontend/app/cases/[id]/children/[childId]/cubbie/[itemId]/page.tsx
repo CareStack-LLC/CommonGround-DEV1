@@ -261,7 +261,7 @@ export default function CubbieItemDetailPage() {
                   <Button
                     variant="outline"
                     onClick={() => setShowDeleteConfirm(true)}
-                    className="text-cg-error hover:text-[#9B2C2C]"
+                    className="text-cg-error hover:text-cg-error-dark"
                   >
                     Remove
                   </Button>
@@ -458,7 +458,7 @@ export default function CubbieItemDetailPage() {
                 <span
                   className={`text-sm px-4 py-2 rounded-full ${
                     item.current_location === 'child_traveling'
-                      ? 'bg-cg-amber-subtle text-[#E09520]'
+                      ? 'bg-cg-amber-subtle text-cg-amber-dark'
                       : 'bg-gray-100 text-gray-800'
                   }`}
                 >

@@ -737,7 +737,7 @@ export default function FL300Summary({ formData, canEdit, onEditSection }: FL300
                             e.stopPropagation();
                             toggleSection(section.id);
                           }}
-                          className="text-cg-slate hover:text-[#1E4E6B]"
+                          className="text-cg-slate hover:text-cg-slate-dark"
                         >
                           <Eye className="h-3.5 w-3.5 mr-1" />
                           {isExpanded ? 'Hide' : 'View'}

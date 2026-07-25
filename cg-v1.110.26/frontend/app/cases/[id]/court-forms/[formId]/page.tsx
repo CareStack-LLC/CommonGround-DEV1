@@ -178,7 +178,7 @@ function generateFormPDF(form: CourtFormSubmission, caseData: Case) {
       <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 40px; color: #1f2937; line-height: 1.5; }
-        .header { background: linear-gradient(135deg, var(--cg-slate) 0%, #1E4E6B 100%); color: white; padding: 24px 32px; margin: -40px -40px 32px -40px; }
+        .header { background: linear-gradient(135deg, var(--cg-slate) 0%, var(--cg-slate-dark) 100%); color: white; padding: 24px 32px; margin: -40px -40px 32px -40px; }
         .header h1 { font-size: 28px; font-weight: bold; margin-bottom: 4px; }
         .header .subtitle { opacity: 0.9; font-size: 14px; }
         .header .form-type { float: right; font-size: 18px; font-weight: 600; margin-top: -36px; }
@@ -200,12 +200,12 @@ function generateFormPDF(form: CourtFormSubmission, caseData: Case) {
         .alert-indigo { background: var(--cg-slate-subtle); border: 1px solid var(--cg-slate-subtle); }
         .alert-red { background: var(--cg-error-subtle); border: 1px solid var(--cg-error-subtle); }
         .alert-title { font-weight: 600; margin-bottom: 8px; }
-        .alert-indigo .alert-title { color: #1E4E6B; }
-        .alert-red .alert-title { color: #9B2C2C; }
+        .alert-indigo .alert-title { color: var(--cg-slate-dark); }
+        .alert-red .alert-title { color: var(--cg-error-dark); }
         .status-badge { display: inline-block; padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 600; }
         .status-success { background: var(--cg-sage-subtle); color: var(--cg-sage-dark); }
-        .status-warning { background: var(--cg-amber-subtle); color: #E09520; }
-        .status-error { background: var(--cg-error-subtle); color: #9B2C2C; }
+        .status-warning { background: var(--cg-amber-subtle); color: var(--cg-amber-dark); }
+        .status-error { background: var(--cg-error-subtle); color: var(--cg-error-dark); }
         .status-default { background: #e5e7eb; color: #374151; }
         .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb; font-size: 12px; color: #6b7280; display: flex; justify-content: space-between; }
         @media print {
@@ -605,7 +605,7 @@ function CourtOrderDisplay({ form }: { form: CourtFormSubmission }) {
               <ul className="space-y-2">
                 {data.orders.other_orders.map((order: string, idx: number) => (
                   <li key={idx} className="flex items-start gap-2 text-sm text-gray-700">
-                    <div className="w-5 h-5 rounded-full bg-cg-slate-subtle text-[#1E4E6B] flex items-center justify-center text-xs flex-shrink-0">
+                    <div className="w-5 h-5 rounded-full bg-cg-slate-subtle text-cg-slate-dark flex items-center justify-center text-xs flex-shrink-0">
                       {idx + 1}
                     </div>
                     {order}
@@ -889,7 +889,7 @@ function CourtFormDetailContent() {
       <div className="min-h-screen bg-gray-50 p-8">
         <Card className="max-w-lg mx-auto bg-cg-error-subtle border-cg-error-subtle">
           <CardContent className="pt-6">
-            <p className="text-[#9B2C2C]">{error || 'Form not found'}</p>
+            <p className="text-cg-error-dark">{error || 'Form not found'}</p>
             <Button
               variant="outline"
               onClick={() => router.push(`/cases/${caseId}/court-forms`)}
@@ -996,7 +996,7 @@ function CourtFormDetailContent() {
                 <Button
                   variant="default"
                   onClick={() => generateFormPDF(form, caseData)}
-                  className="bg-[#E09520] hover:bg-[#E09520]"
+                  className="bg-cg-amber-dark hover:bg-cg-amber-dark"
                 >
                   <FileText className="h-4 w-4 mr-2" />
                   Generate FL-340 Report
@@ -1102,12 +1102,12 @@ function CourtFormDetailContent() {
           <Card className="bg-cg-amber-subtle border-cg-amber-subtle">
             <CardContent className="pt-6">
               <div className="flex items-start gap-3">
-                <StatusIcon className="h-5 w-5 text-[#E09520] mt-0.5" />
+                <StatusIcon className="h-5 w-5 text-cg-amber-dark mt-0.5" />
                 <div>
                   <h3 className="font-medium text-foreground mb-1">
                     This form cannot be edited
                   </h3>
-                  <p className="text-sm text-[#E09520]">
+                  <p className="text-sm text-cg-amber-dark">
                     {form.status === 'submitted' && 'This form has been submitted and is awaiting court review.'}
                     {form.status === 'under_court_review' && 'This form is currently under review by court staff.'}
                     {form.status === 'approved' && 'This form has been approved by the court.'}
@@ -1132,7 +1132,7 @@ function CourtFormDetailContent() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-[#1E4E6B]">{form.court_notes}</p>
+              <p className="text-cg-slate-dark">{form.court_notes}</p>
             </CardContent>
           </Card>
         )}
@@ -1141,13 +1141,13 @@ function CourtFormDetailContent() {
         {form.status === 'resubmit_required' && form.resubmission_issues && form.resubmission_issues.length > 0 && (
           <Card className="bg-cg-error-subtle border-cg-error-subtle">
             <CardHeader>
-              <CardTitle className="text-[#7A2222] flex items-center gap-2">
+              <CardTitle className="text-cg-error-deep flex items-center gap-2">
                 <AlertCircle className="h-5 w-5" />
                 Issues to Address
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <ul className="list-disc list-inside space-y-1 text-[#9B2C2C]">
+              <ul className="list-disc list-inside space-y-1 text-cg-error-dark">
                 {form.resubmission_issues.map((issue: string, idx: number) => (
                   <li key={idx}>{issue}</li>
                 ))}
@@ -1164,7 +1164,7 @@ function CourtFormDetailContent() {
                 <Edit className="h-5 w-5" />
                 Edits Requested by Court
               </CardTitle>
-              <p className="text-sm text-[#E09520] mt-1">
+              <p className="text-sm text-cg-amber-dark mt-1">
                 The court has reviewed your form and requested corrections. You can now edit and resubmit.
               </p>
             </CardHeader>
@@ -1172,11 +1172,11 @@ function CourtFormDetailContent() {
               {form.edits_allowed_notes && (
                 <div className="bg-white rounded-lg p-4 border border-cg-amber-subtle">
                   <h4 className="font-medium text-foreground mb-2">What needs to be corrected:</h4>
-                  <p className="text-[#E09520]">{form.edits_allowed_notes}</p>
+                  <p className="text-cg-amber-dark">{form.edits_allowed_notes}</p>
                 </div>
               )}
               {form.edits_allowed_at && (
-                <p className="text-sm text-[#E09520]">
+                <p className="text-sm text-cg-amber-dark">
                   Request received on {new Date(form.edits_allowed_at).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'long',
@@ -1189,7 +1189,7 @@ function CourtFormDetailContent() {
               <div className="flex gap-3 pt-2">
                 <Button
                   onClick={() => setEditingSection(0)}
-                  className="bg-[#E09520] hover:bg-[#E09520]"
+                  className="bg-cg-amber-dark hover:bg-cg-amber-dark"
                 >
                   <Edit className="h-4 w-4 mr-2" />
                   Make Corrections
@@ -1198,11 +1198,11 @@ function CourtFormDetailContent() {
                   variant="outline"
                   onClick={handleResubmit}
                   disabled={isSubmitting}
-                  className="border-cg-amber text-[#E09520] hover:bg-cg-amber-subtle"
+                  className="border-cg-amber text-cg-amber-dark hover:bg-cg-amber-subtle"
                 >
                   {isSubmitting ? (
                     <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-[#E09520] border-t-transparent mr-2" />
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-cg-amber-dark border-t-transparent mr-2" />
                       Resubmitting...
                     </>
                   ) : (
@@ -1573,7 +1573,7 @@ function CourtFormDetailContent() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <Button
-                    className="w-full bg-[#E09520] hover:bg-[#E09520]"
+                    className="w-full bg-cg-amber-dark hover:bg-cg-amber-dark"
                     onClick={() => setEditingSection(0)}
                   >
                     <Edit className="h-4 w-4 mr-2" />
@@ -1680,7 +1680,7 @@ function CourtFormDetailContent() {
                     Preview FL-341 Report
                   </Button>
                   <Button aria-label="Send message"
-                    className="w-full bg-cg-slate hover:bg-[#1E4E6B]"
+                    className="w-full bg-cg-slate hover:bg-cg-slate-dark"
                     onClick={handleSubmit}
                     disabled={isSubmitting}
                   >

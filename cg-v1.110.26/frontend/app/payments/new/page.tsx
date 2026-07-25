@@ -323,7 +323,7 @@ function NewExpenseContent() {
 
       <div className="max-w-2xl mx-auto px-6 py-6 pb-32">
         {error && (
-          <div className="mb-4 bg-cg-error-subtle border-2 border-cg-error-subtle text-[#9B2C2C] px-4 py-3 rounded-2xl flex items-center gap-2 shadow-lg">
+          <div className="mb-4 bg-cg-error-subtle border-2 border-cg-error-subtle text-cg-error-dark px-4 py-3 rounded-2xl flex items-center gap-2 shadow-lg">
             <AlertCircle className="h-5 w-5 flex-shrink-0" />
             <span className="font-medium">{error}</span>
           </div>

@@ -314,7 +314,7 @@ export default function IntakePage() {
                             </Button>
                             <Button
                                 onClick={() => router.push("/professional/intake/new")}
-                                className="bg-cg-sage hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm font-semibold"
+                                className="bg-cg-sage hover:bg-cg-sage-dark text-white rounded-xl shadow-sm font-semibold"
                             >
                                 <Plus className="h-4 w-4 mr-2" />
                                 New ARIA Intake
@@ -331,10 +331,10 @@ export default function IntakePage() {
                             <p className="text-2xl font-bold text-slate-900 mt-1">{stats.total}</p>
                         </CardContent>
                     </Card>
-                    <Card className="border border-[#FBE3BF] bg-cg-amber-subtle/50 shadow-sm rounded-2xl">
+                    <Card className="border border-cg-amber-tint bg-cg-amber-subtle/50 shadow-sm rounded-2xl">
                         <CardContent className="pt-4">
-                            <p className="text-xs font-semibold text-[#E09520]/70 uppercase tracking-wide">Pending</p>
-                            <p className="text-2xl font-bold text-[#B8791A] mt-1">{stats.pending}</p>
+                            <p className="text-xs font-semibold text-cg-amber-dark/70 uppercase tracking-wide">Pending</p>
+                            <p className="text-2xl font-bold text-cg-amber-deep mt-1">{stats.pending}</p>
                         </CardContent>
                     </Card>
                     <Card className="border border-blue-200 bg-blue-50/50 shadow-sm rounded-2xl">
@@ -343,7 +343,7 @@ export default function IntakePage() {
                             <p className="text-2xl font-bold text-blue-700 mt-1">{stats.active}</p>
                         </CardContent>
                     </Card>
-                    <Card className="border border-[#C5E5DB] bg-cg-sage-subtle/50 shadow-sm rounded-2xl">
+                    <Card className="border border-cg-sage-tint bg-cg-sage-subtle/50 shadow-sm rounded-2xl">
                         <CardContent className="pt-4">
                             <p className="text-xs font-semibold text-cg-sage-dark/70 uppercase tracking-wide">Completed</p>
                             <p className="text-2xl font-bold text-cg-sage-dark mt-1">{stats.completed}</p>

@@ -28,8 +28,8 @@ export function CohortHeatmap({ cohorts, title = 'Cohort Retention' }: CohortHea
   const maxMonths = Math.max(...cohorts.map(c => c.retention.length));
 
   return (
-    <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-      <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">
+    <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+      <h2 className="text-sm font-semibold text-cg-slate-tint mb-4">
         {title}
         <InfoTooltip text="Monthly cohort retention rates. Each row is a signup month, columns show % retained in subsequent months." />
       </h2>
@@ -50,7 +50,7 @@ export function CohortHeatmap({ cohorts, title = 'Cohort Retention' }: CohortHea
           <tbody>
             {cohorts.map((cohort) => (
               <tr key={cohort.month} className="border-t border-cg-slate/10">
-                <td className="py-1 text-[#8AACBC] font-mono">{cohort.month}</td>
+                <td className="py-1 text-cg-slate-muted font-mono">{cohort.month}</td>
                 <td className="py-1 text-right text-muted-foreground">{cohort.size}</td>
                 {Array.from({ length: maxMonths }).map((_, i) => {
                   const val = cohort.retention[i];

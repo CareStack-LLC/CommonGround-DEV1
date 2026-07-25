@@ -150,7 +150,7 @@ function CourtFormsPageContent() {
       <div className="min-h-screen bg-gray-50 p-8">
         <Card className="max-w-lg mx-auto bg-cg-error-subtle border-cg-error-subtle">
           <CardContent className="pt-6">
-            <p className="text-[#9B2C2C]">{error || 'Case not found'}</p>
+            <p className="text-cg-error-dark">{error || 'Case not found'}</p>
             <Button variant="outline" onClick={() => router.push('/cases')} className="mt-4">
               Back to Cases
             </Button>
@@ -217,7 +217,7 @@ function CourtFormsPageContent() {
                   <p className="text-sm text-gray-600">Approved</p>
                 </div>
                 <div className="bg-white/50 rounded-lg p-3 text-center">
-                  <p className="text-2xl font-bold text-[#E09520]">
+                  <p className="text-2xl font-bold text-cg-amber-dark">
                     {progress.pending_forms}
                   </p>
                   <p className="text-sm text-gray-600">Pending</p>
@@ -234,7 +234,7 @@ function CourtFormsPageContent() {
               {progress.next_action && (
                 <Alert className="mt-4 bg-white/70">
                   <AlertCircle className="h-4 w-4 text-cg-slate" />
-                  <AlertDescription className="text-[#1E4E6B]">
+                  <AlertDescription className="text-cg-slate-dark">
                     <strong>Next Step:</strong> {progress.next_action}
                   </AlertDescription>
                 </Alert>
@@ -249,12 +249,12 @@ function CourtFormsPageContent() {
             <h3 className="font-medium text-foreground mb-2">
               California Family Court Forms
             </h3>
-            <p className="text-sm text-[#1E4E6B] mb-3">
+            <p className="text-sm text-cg-slate-dark mb-3">
               This workflow guides you through the California family court process.
               Forms are submitted electronically and tracked throughout the hearing
               process.
             </p>
-            <div className="grid md:grid-cols-2 gap-4 text-sm text-[#1E4E6B]">
+            <div className="grid md:grid-cols-2 gap-4 text-sm text-cg-slate-dark">
               <div>
                 <p className="font-medium mb-1">Petitioner Forms:</p>
                 <ul className="space-y-1 ml-4">

@@ -140,7 +140,7 @@ export function ComplianceLineChart({ data, period = "30d" }: ComplianceLineChar
           </div>
           <div className="text-center">
             <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Lowest</p>
-            <p className="text-xl font-bold text-[#E09520]">
+            <p className="text-xl font-bold text-cg-amber-dark">
               {Math.min(...chartData.map((d) => d.firm_avg)).toFixed(1)}%
             </p>
           </div>

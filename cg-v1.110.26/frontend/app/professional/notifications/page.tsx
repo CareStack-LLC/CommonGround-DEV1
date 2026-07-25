@@ -136,7 +136,7 @@ function NotificationItem({
                     <button
                         onClick={(e) => { e.stopPropagation(); onMarkRead(notification.id); }}
                         title="Mark read"
-                        className="p-1.5 text-slate-400 hover:text-[#1B5544] hover:bg-cg-sage-subtle rounded-sm transition-all border-2 border-transparent hover:border-[#1B5544]/20"
+                        className="p-1.5 text-slate-400 hover:text-cg-sage-deep hover:bg-cg-sage-subtle rounded-sm transition-all border-2 border-transparent hover:border-cg-sage-deep/20"
                     >
                         <Check className="h-3.5 w-3.5" />
                     </button>

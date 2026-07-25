@@ -184,8 +184,8 @@ export function WhiteboardMode({
   if (!isActive) return null;
 
   return (
-    <div className="fixed inset-0 z-40 bg-gradient-to-b from-[#0D1B24] via-foreground/95 to-[#0D1B24] flex flex-col">
-      <div className="flex items-center justify-between px-4 py-2.5 bg-[#0D1B24]/90 backdrop-blur-sm border-b border-cg-sage/10">
+    <div className="fixed inset-0 z-40 bg-gradient-to-b from-cg-ink via-foreground/95 to-cg-ink flex flex-col">
+      <div className="flex items-center justify-between px-4 py-2.5 bg-cg-ink/90 backdrop-blur-sm border-b border-cg-sage/10">
         <div className="flex items-center space-x-3">
           <span
             className="text-cg-sage text-sm font-semibold px-3 py-1 bg-cg-sage/10 rounded-lg border border-cg-sage/20"

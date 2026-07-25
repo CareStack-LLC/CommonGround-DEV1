@@ -62,7 +62,7 @@ export function PreCallSettingsDialog({
                 type="button"
                 variant={callType === "video" ? "default" : "outline"}
                 onClick={() => setCallType("video")}
-                className={callType === "video" ? "bg-cg-slate hover:bg-[#1E4E6B]" : ""}
+                className={callType === "video" ? "bg-cg-slate hover:bg-cg-slate-dark" : ""}
               >
                 <Video className="w-4 h-4 mr-2" />
                 Video
@@ -71,7 +71,7 @@ export function PreCallSettingsDialog({
                 type="button"
                 variant={callType === "audio" ? "default" : "outline"}
                 onClick={() => setCallType("audio")}
-                className={callType === "audio" ? "bg-cg-slate hover:bg-[#1E4E6B]" : ""}
+                className={callType === "audio" ? "bg-cg-slate hover:bg-cg-slate-dark" : ""}
               >
                 <Phone className="w-4 h-4 mr-2" />
                 Audio Only
@@ -102,7 +102,7 @@ export function PreCallSettingsDialog({
             type="button"
             onClick={handleStartCall}
             disabled={isLoading}
-            className="bg-cg-slate hover:bg-[#1E4E6B] text-white"
+            className="bg-cg-slate hover:bg-cg-slate-dark text-white"
           >
             {isLoading ? (
               <>

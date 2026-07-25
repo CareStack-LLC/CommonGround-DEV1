@@ -528,7 +528,7 @@ function SubscriptionTab({
                         <a href="mailto:sales@find-commonground.com?subject=Enterprise%20Inquiry"><Mail className="h-3 w-3 mr-1" />Contact</a>
                       </Button>
                     ) : canCheckout ? (
-                      <Button onClick={() => handleCheckout(tierKey)} disabled={checkoutLoading === tierKey} size="sm" className="w-full bg-cg-sage hover:bg-[#2D8A6E] text-white text-xs h-8 rounded-lg">
+                      <Button onClick={() => handleCheckout(tierKey)} disabled={checkoutLoading === tierKey} size="sm" className="w-full bg-cg-sage hover:bg-cg-sage-dark text-white text-xs h-8 rounded-lg">
                         {checkoutLoading === tierKey ? <Loader2 className="h-3 w-3 animate-spin" /> : <>Switch</>}
                       </Button>
                     ) : (
@@ -544,7 +544,7 @@ function SubscriptionTab({
 
       {/* Usage */}
       <div className="grid sm:grid-cols-2 gap-4">
-        <Card className={`rounded-2xl border ${isNearLimit ? "border-[#FBE3BF]" : "border-slate-200"}`}>
+        <Card className={`rounded-2xl border ${isNearLimit ? "border-cg-amber-tint" : "border-slate-200"}`}>
           <CardContent className="pt-5 pb-4">
             <div className="flex items-center justify-between mb-3">
               <span className="text-sm font-medium text-slate-700 flex items-center gap-2">
@@ -675,7 +675,7 @@ function FirmTab({
           <h3 className="text-sm font-semibold text-slate-900">No Firm Created</h3>
           <p className="text-xs text-slate-500 mt-1 mb-4">Create a firm to manage your team and directory presence.</p>
           <Link href="/professional/firm/new">
-            <Button className="bg-cg-sage hover:bg-[#2D8A6E] text-white rounded-xl">Create Firm</Button>
+            <Button className="bg-cg-sage hover:bg-cg-sage-dark text-white rounded-xl">Create Firm</Button>
           </Link>
         </CardContent>
       </Card>
@@ -698,7 +698,7 @@ function FirmTab({
                 <Button variant="outline" size="sm" className="rounded-lg border-slate-200 text-xs" onClick={() => { setFirmEditing(false); setFirmDraft(firm); }}>
                   Cancel
                 </Button>
-                <Button size="sm" className="rounded-lg bg-cg-sage hover:bg-[#2D8A6E] text-white text-xs" onClick={handleFirmSave} disabled={firmSaving}>
+                <Button size="sm" className="rounded-lg bg-cg-sage hover:bg-cg-sage-dark text-white text-xs" onClick={handleFirmSave} disabled={firmSaving}>
                   {firmSaving ? <Loader2 className="h-3 w-3 animate-spin" /> : "Save"}
                 </Button>
               </div>
@@ -774,7 +774,7 @@ function FirmTab({
             </Badge>
           </div>
 
-          <Link href="/professional/firm" className="inline-flex items-center gap-1.5 text-xs text-cg-sage hover:text-[#2D8A6E] font-medium">
+          <Link href="/professional/firm" className="inline-flex items-center gap-1.5 text-xs text-cg-sage hover:text-cg-sage-dark font-medium">
             View full firm settings <ExternalLink className="h-3 w-3" />
           </Link>
         </CardContent>
@@ -786,7 +786,7 @@ function FirmTab({
           <div className="flex items-center justify-between">
             <CardTitle className="text-base text-slate-900">Team Members</CardTitle>
             {usage?.team_members?.max > 0 && (
-              <Button size="sm" className="rounded-lg bg-cg-sage hover:bg-[#2D8A6E] text-white text-xs gap-1.5"
+              <Button size="sm" className="rounded-lg bg-cg-sage hover:bg-cg-sage-dark text-white text-xs gap-1.5"
                 onClick={() => setShowInvite(!showInvite)}>
                 <UserPlus className="h-3.5 w-3.5" /> Invite
               </Button>
@@ -811,7 +811,7 @@ function FirmTab({
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button size="sm" className="rounded-lg bg-cg-sage hover:bg-[#2D8A6E] text-white text-xs" onClick={handleInvite} disabled={inviting || !inviteEmail}>
+                <Button size="sm" className="rounded-lg bg-cg-sage hover:bg-cg-sage-dark text-white text-xs" onClick={handleInvite} disabled={inviting || !inviteEmail}>
                   {inviting ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Mail className="h-3 w-3 mr-1" />} Send Invite
                 </Button>
                 <Button variant="outline" size="sm" className="rounded-lg border-slate-200 text-xs" onClick={() => setShowInvite(false)}>Cancel</Button>

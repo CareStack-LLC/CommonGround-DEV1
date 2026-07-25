@@ -65,11 +65,11 @@ export default function EffectivenessTab({ data }: { data: AriaInsights }) {
 
       {/* Weekly Acceptance Rate Trend */}
       {trendData.length > 1 && (
-        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-[#D0E4EC] mb-1">
+        <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+          <h2 className="text-sm font-semibold text-cg-slate-tint mb-1">
             Weekly Acceptance Rate
           </h2>
-          <p className="text-xs text-[#4A6E7F] mb-4">
+          <p className="text-xs text-cg-slate-strong mb-4">
             Higher is better — shows how often users accept or modify ARIA suggestions
           </p>
           <ResponsiveContainer width="100%" height={240}>
@@ -110,11 +110,11 @@ export default function EffectivenessTab({ data }: { data: AriaInsights }) {
 
       {/* Weekly Toxicity Trend */}
       {trendData.length > 1 && (
-        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-[#D0E4EC] mb-1">
+        <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+          <h2 className="text-sm font-semibold text-cg-slate-tint mb-1">
             Weekly Average Toxicity Score
           </h2>
-          <p className="text-xs text-[#4A6E7F] mb-4">
+          <p className="text-xs text-cg-slate-strong mb-4">
             Lower is better — tracks if flagged message toxicity is decreasing over time
           </p>
           <ResponsiveContainer width="100%" height={240}>
@@ -151,11 +151,11 @@ export default function EffectivenessTab({ data }: { data: AriaInsights }) {
 
       {/* Intervention Volume Trend */}
       {trendData.length > 1 && (
-        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-[#D0E4EC] mb-1">
+        <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+          <h2 className="text-sm font-semibold text-cg-slate-tint mb-1">
             Weekly Intervention Volume
           </h2>
-          <p className="text-xs text-[#4A6E7F] mb-4">
+          <p className="text-xs text-cg-slate-strong mb-4">
             Total flags per week — accepted vs total
           </p>
           <ResponsiveContainer width="100%" height={240}>
@@ -195,8 +195,8 @@ export default function EffectivenessTab({ data }: { data: AriaInsights }) {
       )}
 
       {trendData.length <= 1 && (
-        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-10 text-center">
-          <p className="text-[#4A6E7F] text-sm">
+        <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-10 text-center">
+          <p className="text-cg-slate-strong text-sm">
             Not enough data for trend analysis. Need at least 2 weeks of ARIA activity.
           </p>
         </div>
@@ -204,11 +204,11 @@ export default function EffectivenessTab({ data }: { data: AriaInsights }) {
 
       {/* Top Cases */}
       {data.top_cases?.length > 0 && (
-        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-[#D0E4EC] mb-1">
+        <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+          <h2 className="text-sm font-semibold text-cg-slate-tint mb-1">
             Top Cases by Interventions
           </h2>
-          <p className="text-xs text-[#4A6E7F] mb-4">
+          <p className="text-xs text-cg-slate-strong mb-4">
             Family files with the most ARIA interventions in this period
           </p>
           <div className="space-y-2">
@@ -218,10 +218,10 @@ export default function EffectivenessTab({ data }: { data: AriaInsights }) {
               return (
                 <div key={tc.family_file_id}>
                   <div className="flex justify-between text-xs mb-1">
-                    <span className="text-[#8AACBC] font-mono">
+                    <span className="text-cg-slate-muted font-mono">
                       {tc.family_file_id.slice(0, 8)}...
                     </span>
-                    <span className="text-[#D0E4EC] font-medium">
+                    <span className="text-cg-slate-tint font-medium">
                       {formatNumber(tc.count)} interventions
                     </span>
                   </div>
@@ -261,7 +261,7 @@ function EffectivenessCard({
       className={`rounded-xl border p-4 ${
         highlight
           ? 'bg-red-500/5 border-red-500/20'
-          : 'bg-[#1A3648]/60 border-cg-slate/20'
+          : 'bg-cg-slate-deep/60 border-cg-slate/20'
       }`}
     >
       <div className="text-xs text-muted-foreground mb-1">{label}</div>

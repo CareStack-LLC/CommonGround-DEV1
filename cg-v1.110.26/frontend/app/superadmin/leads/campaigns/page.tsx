@@ -19,7 +19,7 @@ function Skeleton({ className = '' }: { className?: string }) {
 }
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof Mail; bg: string }> = {
-  draft: { label: 'Draft', color: 'text-[#8AACBC]', icon: Pencil, bg: 'bg-[#8AACBC]/10 border border-[#8AACBC]/20' },
+  draft: { label: 'Draft', color: 'text-cg-slate-muted', icon: Pencil, bg: 'bg-cg-slate-muted/10 border border-cg-slate-muted/20' },
   scheduled: { label: 'Scheduled', color: 'text-blue-400', icon: Clock, bg: 'bg-blue-500/10 border border-blue-500/20' },
   sent: { label: 'Sent', color: 'text-emerald-400', icon: CheckCircle2, bg: 'bg-emerald-500/10 border border-emerald-500/20' },
   failed: { label: 'Failed', color: 'text-red-400', icon: XCircle, bg: 'bg-red-500/10 border border-red-500/20' },
@@ -218,7 +218,7 @@ export default function CampaignsPage() {
           <p className="text-sm text-muted-foreground mt-1">Create, generate, and send email campaigns to your leads</p>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={fetchData} disabled={loading} className="p-2 rounded-lg bg-[#1A3648]/60 border border-cg-slate/20 hover:border-cg-sage/30 text-[#8AACBC] hover:text-cg-sage-light transition-colors disabled:opacity-50" title="Refresh">
+          <button onClick={fetchData} disabled={loading} className="p-2 rounded-lg bg-cg-slate-deep/60 border border-cg-slate/20 hover:border-cg-sage/30 text-cg-slate-muted hover:text-cg-sage-light transition-colors disabled:opacity-50" title="Refresh">
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
           <button onClick={() => setShowCreate(true)} className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-cg-sage hover:bg-cg-sage-light text-white text-sm font-medium transition-colors shadow-sm shadow-cg-sage/20">
@@ -235,7 +235,7 @@ export default function CampaignsPage() {
           { label: 'Emails Sent', value: sentCount > 0 ? `${sentCount} (${totalRecipients} recipients)` : '0', icon: Send, color: 'var(--cg-sage-light)', tooltip: 'Campaigns sent and total recipients reached' },
           { label: 'Avg Open Rate', value: avgOpenRate ? `${(avgOpenRate * 100).toFixed(1)}%` : 'No data', icon: MousePointerClick, color: 'var(--cg-slate)', tooltip: 'Average open rate across sent campaigns' },
         ].map(card => (
-          <div key={card.label} className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-4 group relative">
+          <div key={card.label} className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-4 group relative">
             <div className="flex items-center gap-2 mb-2">
               <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${card.color}15` }}>
                 <card.icon className="w-4 h-4" style={{ color: card.color }} />
@@ -244,7 +244,7 @@ export default function CampaignsPage() {
             </div>
             <div className="text-xl font-bold text-white">{card.value}</div>
             {/* Tooltip */}
-            <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[#0D1F2B] border border-cg-slate/30 text-[#8AACBC] text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
+            <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[#0D1F2B] border border-cg-slate/30 text-cg-slate-muted text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10">
               {card.tooltip}
             </div>
           </div>
@@ -269,31 +269,31 @@ export default function CampaignsPage() {
 
       {/* ── Create Campaign Modal ── */}
       {showCreate && (
-        <div className="bg-[#1A3648]/60 border border-cg-sage/30 rounded-xl p-6">
+        <div className="bg-cg-slate-deep/60 border border-cg-sage/30 rounded-xl p-6">
           <div className="flex items-center justify-between mb-5">
-            <h3 className="text-base font-semibold text-[#D0E4EC] flex items-center gap-2">
+            <h3 className="text-base font-semibold text-cg-slate-tint flex items-center gap-2">
               <Plus className="w-5 h-5 text-cg-sage" /> Create New Campaign
             </h3>
-            <button aria-label="Close" onClick={() => setShowCreate(false)} className="text-muted-foreground hover:text-[#D0E4EC]"><X className="w-5 h-5" /></button>
+            <button aria-label="Close" onClick={() => setShowCreate(false)} className="text-muted-foreground hover:text-cg-slate-tint"><X className="w-5 h-5" /></button>
           </div>
           <div className="space-y-4">
             <div>
-              <label className="text-xs font-medium text-[#8AACBC] mb-1.5 block">Campaign Name</label>
-              <input value={createName} onChange={e => setCreateName(e.target.value)} placeholder="e.g. Early Adopter Welcome Series" className="w-full px-3 py-2.5 bg-[#162D3A] border border-cg-slate/30 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-cg-sage/50 transition-colors" />
+              <label className="text-xs font-medium text-cg-slate-muted mb-1.5 block">Campaign Name</label>
+              <input value={createName} onChange={e => setCreateName(e.target.value)} placeholder="e.g. Early Adopter Welcome Series" className="w-full px-3 py-2.5 bg-cg-slate-deep border border-cg-slate/30 rounded-lg text-sm text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-cg-sage/50 transition-colors" />
             </div>
             <div>
-              <label className="text-xs font-medium text-[#8AACBC] mb-1.5 block">Email Subject Line</label>
-              <input value={createSubject} onChange={e => setCreateSubject(e.target.value)} placeholder="e.g. Welcome to CommonGround - Your co-parenting journey starts here" className="w-full px-3 py-2.5 bg-[#162D3A] border border-cg-slate/30 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-cg-sage/50 transition-colors" />
+              <label className="text-xs font-medium text-cg-slate-muted mb-1.5 block">Email Subject Line</label>
+              <input value={createSubject} onChange={e => setCreateSubject(e.target.value)} placeholder="e.g. Welcome to CommonGround - Your co-parenting journey starts here" className="w-full px-3 py-2.5 bg-cg-slate-deep border border-cg-slate/30 rounded-lg text-sm text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-cg-sage/50 transition-colors" />
             </div>
             <div>
-              <label className="text-xs font-medium text-[#8AACBC] mb-1.5 block">Target Lead List</label>
-              <select value={createListId} onChange={e => setCreateListId(e.target.value)} className="w-full px-3 py-2.5 bg-[#162D3A] border border-cg-slate/30 rounded-lg text-sm text-[#D0E4EC] focus:outline-none focus:border-cg-sage/50 appearance-none cursor-pointer">
+              <label className="text-xs font-medium text-cg-slate-muted mb-1.5 block">Target Lead List</label>
+              <select value={createListId} onChange={e => setCreateListId(e.target.value)} className="w-full px-3 py-2.5 bg-cg-slate-deep border border-cg-slate/30 rounded-lg text-sm text-cg-slate-tint focus:outline-none focus:border-cg-sage/50 appearance-none cursor-pointer">
                 <option value="">Select a list...</option>
                 {lists.map(l => <option key={l.id} value={l.id}>{l.name} ({l.lead_count} leads)</option>)}
               </select>
             </div>
             <div className="flex justify-end gap-3 pt-2">
-              <button onClick={() => setShowCreate(false)} className="px-4 py-2 rounded-lg text-sm text-[#8AACBC] hover:text-white transition-colors">Cancel</button>
+              <button onClick={() => setShowCreate(false)} className="px-4 py-2 rounded-lg text-sm text-cg-slate-muted hover:text-white transition-colors">Cancel</button>
               <button onClick={createCampaign} disabled={creating || !createName.trim() || !createSubject.trim() || !createListId} className="flex items-center gap-1.5 px-5 py-2 rounded-lg bg-cg-sage hover:bg-cg-sage-light text-white text-sm font-medium transition-colors disabled:opacity-50 shadow-sm shadow-cg-sage/20">
                 {creating ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                 {creating ? 'Creating...' : 'Create & Generate Content'}
@@ -305,18 +305,18 @@ export default function CampaignsPage() {
 
       {/* ── AI Content Generator ── */}
       {aiCampaignId && (
-        <div className="bg-[#1A3648]/60 border border-cg-sage/30 rounded-xl p-6">
+        <div className="bg-cg-slate-deep/60 border border-cg-sage/30 rounded-xl p-6">
           <div className="flex items-center justify-between mb-5">
             <h3 className="text-base font-semibold text-cg-sage-light flex items-center gap-2">
               <Wand2 className="w-5 h-5" /> AI Content Generator
             </h3>
-            <button aria-label="Close" onClick={() => setAiCampaignId(null)} className="text-muted-foreground hover:text-[#D0E4EC]"><X className="w-5 h-5" /></button>
+            <button aria-label="Close" onClick={() => setAiCampaignId(null)} className="text-muted-foreground hover:text-cg-slate-tint"><X className="w-5 h-5" /></button>
           </div>
           <p className="text-xs text-muted-foreground mb-4">Configure the AI to generate a professionally designed HTML email tailored to your audience.</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="text-xs font-medium text-[#8AACBC] mb-1.5 block">Target Audience</label>
-              <select value={aiAudience} onChange={e => setAiAudience(e.target.value)} className="w-full px-3 py-2.5 bg-[#162D3A] border border-cg-slate/30 rounded-lg text-sm text-[#D0E4EC] focus:outline-none focus:border-cg-sage/50 appearance-none cursor-pointer">
+              <label className="text-xs font-medium text-cg-slate-muted mb-1.5 block">Target Audience</label>
+              <select value={aiAudience} onChange={e => setAiAudience(e.target.value)} className="w-full px-3 py-2.5 bg-cg-slate-deep border border-cg-slate/30 rounded-lg text-sm text-cg-slate-tint focus:outline-none focus:border-cg-sage/50 appearance-none cursor-pointer">
                 <option value="co-parents">Co-Parents</option>
                 <option value="family-lawyers">Family Lawyers</option>
                 <option value="mediators">Mediators</option>
@@ -325,8 +325,8 @@ export default function CampaignsPage() {
               </select>
             </div>
             <div>
-              <label className="text-xs font-medium text-[#8AACBC] mb-1.5 block">Product Focus</label>
-              <select value={aiProductFocus} onChange={e => setAiProductFocus(e.target.value)} className="w-full px-3 py-2.5 bg-[#162D3A] border border-cg-slate/30 rounded-lg text-sm text-[#D0E4EC] focus:outline-none focus:border-cg-sage/50 appearance-none cursor-pointer">
+              <label className="text-xs font-medium text-cg-slate-muted mb-1.5 block">Product Focus</label>
+              <select value={aiProductFocus} onChange={e => setAiProductFocus(e.target.value)} className="w-full px-3 py-2.5 bg-cg-slate-deep border border-cg-slate/30 rounded-lg text-sm text-cg-slate-tint focus:outline-none focus:border-cg-sage/50 appearance-none cursor-pointer">
                 <option value="platform">Full Platform</option>
                 <option value="aria">ARIA AI Messaging</option>
                 <option value="kidcoms">KidComs</option>
@@ -335,8 +335,8 @@ export default function CampaignsPage() {
               </select>
             </div>
             <div>
-              <label className="text-xs font-medium text-[#8AACBC] mb-1.5 block">Tone</label>
-              <select value={aiTone} onChange={e => setAiTone(e.target.value)} className="w-full px-3 py-2.5 bg-[#162D3A] border border-cg-slate/30 rounded-lg text-sm text-[#D0E4EC] focus:outline-none focus:border-cg-sage/50 appearance-none cursor-pointer">
+              <label className="text-xs font-medium text-cg-slate-muted mb-1.5 block">Tone</label>
+              <select value={aiTone} onChange={e => setAiTone(e.target.value)} className="w-full px-3 py-2.5 bg-cg-slate-deep border border-cg-slate/30 rounded-lg text-sm text-cg-slate-tint focus:outline-none focus:border-cg-sage/50 appearance-none cursor-pointer">
                 <option value="professional">Professional</option>
                 <option value="friendly">Friendly & Warm</option>
                 <option value="empathetic">Empathetic</option>
@@ -353,24 +353,24 @@ export default function CampaignsPage() {
 
       {/* ── Email Preview ── */}
       {previewHtml && (
-        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden">
+        <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl overflow-hidden">
           <div className="flex items-center justify-between px-5 py-3 border-b border-cg-slate/20">
-            <h3 className="text-sm font-semibold text-[#D0E4EC] flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-cg-slate-tint flex items-center gap-2">
               <Eye className="w-4 h-4 text-cg-sage" /> Email Preview
             </h3>
             <div className="flex items-center gap-2">
               {previewCampaignId && (
                 <>
-                  <button onClick={() => { setAiCampaignId(previewCampaignId); setPreviewHtml(null); }} className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-[#8AACBC] text-xs font-medium transition-colors">
+                  <button onClick={() => { setAiCampaignId(previewCampaignId); setPreviewHtml(null); }} className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-cg-slate-muted text-xs font-medium transition-colors">
                     <Wand2 className="w-3 h-3" /> Regenerate
                   </button>
-                  <button onClick={() => copyHtml(previewHtml, 'preview')} className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-[#8AACBC] text-xs font-medium transition-colors">
+                  <button onClick={() => copyHtml(previewHtml, 'preview')} className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-cg-slate-muted text-xs font-medium transition-colors">
                     {copied === 'preview' ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
                     {copied === 'preview' ? 'Copied!' : 'Copy HTML'}
                   </button>
                 </>
               )}
-              <button aria-label="Close" onClick={() => { setPreviewHtml(null); setPreviewCampaignId(null); }} className="text-muted-foreground hover:text-[#D0E4EC]"><X className="w-4 h-4" /></button>
+              <button aria-label="Close" onClick={() => { setPreviewHtml(null); setPreviewCampaignId(null); }} className="text-muted-foreground hover:text-cg-slate-tint"><X className="w-4 h-4" /></button>
             </div>
           </div>
           <div className="bg-white rounded-b-xl p-6 max-h-[500px] overflow-y-auto">
@@ -395,18 +395,18 @@ export default function CampaignsPage() {
             {sendingId === confirmSend ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
             {sendingId === confirmSend ? 'Sending...' : 'Confirm Send'}
           </button>
-          <button onClick={() => setConfirmSend(null)} className="px-3 py-2 rounded-lg text-[#8AACBC] hover:text-white text-sm transition-colors">
+          <button onClick={() => setConfirmSend(null)} className="px-3 py-2 rounded-lg text-cg-slate-muted hover:text-white text-sm transition-colors">
             Cancel
           </button>
         </div>
       )}
 
       {/* ── Filter Tabs ── */}
-      <div className="flex items-center gap-1 bg-[#1A3648]/40 border border-cg-slate/15 rounded-xl p-1">
+      <div className="flex items-center gap-1 bg-cg-slate-deep/40 border border-cg-slate/15 rounded-xl p-1">
         {(['all', 'draft', 'sent', 'scheduled', 'failed'] as const).map(f => {
           const count = f === 'all' ? campaigns.length : campaigns.filter(c => c.status === f).length;
           return (
-            <button key={f} onClick={() => setFilter(f)} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${filter === f ? 'bg-cg-sage/15 text-cg-sage-light' : 'text-muted-foreground hover:text-[#8AACBC] hover:bg-cg-slate/10'}`}>
+            <button key={f} onClick={() => setFilter(f)} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${filter === f ? 'bg-cg-sage/15 text-cg-sage-light' : 'text-muted-foreground hover:text-cg-slate-muted hover:bg-cg-slate/10'}`}>
               <span className="capitalize">{f}</span>
               <span className={`px-1.5 py-0.5 rounded-full text-[10px] ${filter === f ? 'bg-cg-sage/20' : 'bg-cg-slate/20'}`}>{count}</span>
             </button>
@@ -420,14 +420,14 @@ export default function CampaignsPage() {
           {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-24" />)}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-20 bg-[#1A3648]/30 border border-cg-slate/15 rounded-xl">
+        <div className="flex flex-col items-center justify-center py-20 bg-cg-slate-deep/30 border border-cg-slate/15 rounded-xl">
           <div className="w-14 h-14 rounded-2xl bg-cg-sage/10 flex items-center justify-center mb-4">
             <Inbox className="w-7 h-7 text-cg-sage/50" />
           </div>
           <p className="text-muted-foreground text-sm mb-1">
             {filter === 'all' ? 'No campaigns yet' : `No ${filter} campaigns`}
           </p>
-          <p className="text-[#4A6E7F] text-xs">
+          <p className="text-cg-slate-strong text-xs">
             {filter === 'all' ? 'Create your first campaign to start reaching leads.' : 'Try a different filter.'}
           </p>
         </div>
@@ -440,7 +440,7 @@ export default function CampaignsPage() {
             const listCount = getListCount(c.lead_list_id);
 
             return (
-              <div key={c.id} className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden hover:border-cg-slate/40 transition-colors">
+              <div key={c.id} className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl overflow-hidden hover:border-cg-slate/40 transition-colors">
                 {/* Main row */}
                 <div role="button" tabIndex={0} aria-expanded={isExpanded} className="flex items-center gap-4 px-5 py-4 cursor-pointer" onClick={() => setExpandedId(isExpanded ? null : c.id)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpandedId(isExpanded ? null : c.id); } }}>
                   {/* Status icon */}
@@ -458,7 +458,7 @@ export default function CampaignsPage() {
                     </div>
                     <div className="flex items-center gap-3 mt-1">
                       <span className="text-xs text-muted-foreground truncate max-w-xs">Subject: {c.subject}</span>
-                      <span className="text-[10px] text-[#4A6E7F]">{timeAgo(c.created_at)}</span>
+                      <span className="text-[10px] text-cg-slate-strong">{timeAgo(c.created_at)}</span>
                     </div>
                   </div>
 
@@ -466,7 +466,7 @@ export default function CampaignsPage() {
                   <div className="hidden md:flex items-center gap-6">
                     <div className="text-center">
                       <div className="text-xs text-muted-foreground">Recipients</div>
-                      <div className="text-sm font-medium text-[#D0E4EC]">{listCount}</div>
+                      <div className="text-sm font-medium text-cg-slate-tint">{listCount}</div>
                     </div>
                     {c.stats_json?.open_rate && (
                       <div className="text-center">
@@ -477,7 +477,7 @@ export default function CampaignsPage() {
                     {c.sent_at && (
                       <div className="text-center">
                         <div className="text-xs text-muted-foreground">Sent</div>
-                        <div className="text-xs font-medium text-[#8AACBC]">{formatDate(c.sent_at)}</div>
+                        <div className="text-xs font-medium text-cg-slate-muted">{formatDate(c.sent_at)}</div>
                       </div>
                     )}
                   </div>
@@ -485,14 +485,14 @@ export default function CampaignsPage() {
                   {/* Actions */}
                   <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
                     {c.html_content && (
-                      <button aria-label="Show" onClick={() => { setPreviewHtml(c.html_content!); setPreviewCampaignId(c.id); }} className="p-2 rounded-lg hover:bg-cg-slate/20 text-muted-foreground hover:text-[#D0E4EC] transition-colors" title="Preview email">
+                      <button aria-label="Show" onClick={() => { setPreviewHtml(c.html_content!); setPreviewCampaignId(c.id); }} className="p-2 rounded-lg hover:bg-cg-slate/20 text-muted-foreground hover:text-cg-slate-tint transition-colors" title="Preview email">
                         <Eye className="w-4 h-4" />
                       </button>
                     )}
                     <button aria-label="Generate" onClick={() => setAiCampaignId(c.id)} className="p-2 rounded-lg hover:bg-cg-sage/10 text-muted-foreground hover:text-cg-sage transition-colors" title="Generate content">
                       <Wand2 className="w-4 h-4" />
                     </button>
-                    <button aria-label="Copy" onClick={() => duplicateCampaign(c)} className="p-2 rounded-lg hover:bg-cg-slate/20 text-muted-foreground hover:text-[#8AACBC] transition-colors" title="Duplicate">
+                    <button aria-label="Copy" onClick={() => duplicateCampaign(c)} className="p-2 rounded-lg hover:bg-cg-slate/20 text-muted-foreground hover:text-cg-slate-muted transition-colors" title="Duplicate">
                       <Copy className="w-4 h-4" />
                     </button>
                     {c.status === 'draft' && c.html_content && (
@@ -503,30 +503,30 @@ export default function CampaignsPage() {
                   </div>
 
                   {/* Expand toggle */}
-                  <div className="text-[#4A6E7F]">
+                  <div className="text-cg-slate-strong">
                     {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                   </div>
                 </div>
 
                 {/* Expanded details */}
                 {isExpanded && (
-                  <div className="border-t border-cg-slate/20 px-5 py-4 bg-[#162D3A]/30 space-y-3">
+                  <div className="border-t border-cg-slate/20 px-5 py-4 bg-cg-slate-deep/30 space-y-3">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div>
                         <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Lead List</span>
-                        <p className="text-sm text-[#D0E4EC] mt-0.5 flex items-center gap-1">
+                        <p className="text-sm text-cg-slate-tint mt-0.5 flex items-center gap-1">
                           <Users className="w-3.5 h-3.5 text-cg-sage" />
                           {getListName(c.lead_list_id)} ({listCount})
                         </p>
                       </div>
                       <div>
                         <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Created</span>
-                        <p className="text-sm text-[#D0E4EC] mt-0.5">{formatDate(c.created_at)} {formatTime(c.created_at)}</p>
+                        <p className="text-sm text-cg-slate-tint mt-0.5">{formatDate(c.created_at)} {formatTime(c.created_at)}</p>
                       </div>
                       {c.sent_at && (
                         <div>
                           <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider">Sent At</span>
-                          <p className="text-sm text-[#D0E4EC] mt-0.5">{formatDate(c.sent_at)} {formatTime(c.sent_at)}</p>
+                          <p className="text-sm text-cg-slate-tint mt-0.5">{formatDate(c.sent_at)} {formatTime(c.sent_at)}</p>
                         </div>
                       )}
                       <div>
@@ -542,7 +542,7 @@ export default function CampaignsPage() {
                     </div>
 
                     {c.stats_json && Object.keys(c.stats_json).length > 0 && (
-                      <div className="bg-[#1A3648]/60 border border-cg-slate/15 rounded-lg p-3">
+                      <div className="bg-cg-slate-deep/60 border border-cg-slate/15 rounded-lg p-3">
                         <h4 className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1">
                           <BarChart3 className="w-3 h-3" /> Campaign Stats
                         </h4>
@@ -577,11 +577,11 @@ export default function CampaignsPage() {
                         </button>
                       )}
                       {c.html_content && (
-                        <button onClick={() => { setPreviewHtml(c.html_content!); setPreviewCampaignId(c.id); }} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cg-slate/15 text-[#8AACBC] text-xs font-medium hover:bg-cg-slate/25 transition-colors">
+                        <button onClick={() => { setPreviewHtml(c.html_content!); setPreviewCampaignId(c.id); }} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cg-slate/15 text-cg-slate-muted text-xs font-medium hover:bg-cg-slate/25 transition-colors">
                           <Eye className="w-3.5 h-3.5" /> Preview
                         </button>
                       )}
-                      <button onClick={() => duplicateCampaign(c)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cg-slate/15 text-[#8AACBC] text-xs font-medium hover:bg-cg-slate/25 transition-colors">
+                      <button onClick={() => duplicateCampaign(c)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cg-slate/15 text-cg-slate-muted text-xs font-medium hover:bg-cg-slate/25 transition-colors">
                         <Copy className="w-3.5 h-3.5" /> Duplicate
                       </button>
                       {c.status === 'draft' && c.html_content && (

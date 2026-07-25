@@ -66,11 +66,11 @@ export function FieldLockIndicator({
             {/* Lock Badge */}
             <div className="group relative inline-flex items-center">
                 <Badge
-                    className="bg-cg-amber-subtle text-[#8F5E14] border border-[#FBE3BF] hover:bg-cg-amber-subtle 
+                    className="bg-cg-amber-subtle text-[#8F5E14] border border-cg-amber-tint hover:bg-cg-amber-subtle 
                      transition-colors cursor-default text-xs font-medium gap-1.5 py-1 px-2.5
                      shadow-sm"
                 >
-                    <Lock className="h-3 w-3 text-[#E09520]" />
+                    <Lock className="h-3 w-3 text-cg-amber-dark" />
                     <span>🔒 Locked by Case-{caseNumber || "unknown"}</span>
                 </Badge>
 
@@ -104,7 +104,7 @@ export function FieldLockIndicator({
                 <Button
                     variant="ghost"
                     size="sm"
-                    className="ml-2 h-6 text-xs text-slate-500 hover:text-[#B8791A] hover:bg-cg-amber-subtle px-2"
+                    className="ml-2 h-6 text-xs text-slate-500 hover:text-cg-amber-deep hover:bg-cg-amber-subtle px-2"
                     onClick={() => setShowUnlockDialog(true)}
                 >
                     <Unlock className="h-3 w-3 mr-1" />
@@ -118,7 +118,7 @@ export function FieldLockIndicator({
                     <div className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md mx-4">
                         <div className="flex items-center gap-3 mb-4">
                             <div className="p-2 bg-cg-amber-subtle rounded-lg">
-                                <AlertTriangle className="h-5 w-5 text-[#E09520]" />
+                                <AlertTriangle className="h-5 w-5 text-cg-amber-dark" />
                             </div>
                             <div>
                                 <h3 className="font-semibold text-slate-900">Unlock Court-Ordered Field</h3>
@@ -128,7 +128,7 @@ export function FieldLockIndicator({
                             </div>
                         </div>
 
-                        <div className="bg-cg-amber-subtle border border-[#FBE3BF] rounded-lg p-3 mb-4">
+                        <div className="bg-cg-amber-subtle border border-cg-amber-tint rounded-lg p-3 mb-4">
                             <p className="text-sm text-[#8F5E14]">
                                 <strong>Field:</strong> {fieldPath.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
                             </p>
@@ -154,7 +154,7 @@ export function FieldLockIndicator({
                                 Cancel
                             </Button>
                             <Button
-                                className="bg-[#E09520] hover:bg-[#B8791A] text-white"
+                                className="bg-cg-amber-dark hover:bg-cg-amber-deep text-white"
                                 onClick={handleUnlock}
                                 disabled={!reason.trim() || confirming}
                             >
@@ -196,7 +196,7 @@ export function FieldLockSummary({ locks, onUnlock, canUnlock = false }: FieldLo
         <div className="space-y-3">
             <div className="flex items-center justify-between">
                 <h4 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-                    <Lock className="h-4 w-4 text-[#E09520]" />
+                    <Lock className="h-4 w-4 text-cg-amber-dark" />
                     Court-Order Locked Fields
                 </h4>
                 <Badge variant="outline" className="text-xs">
@@ -211,11 +211,11 @@ export function FieldLockSummary({ locks, onUnlock, canUnlock = false }: FieldLo
                         className="flex items-center justify-between px-3 py-2 bg-cg-amber-subtle/60 border border-cg-amber-subtle rounded-lg"
                     >
                         <div className="flex items-center gap-2">
-                            <Lock className="h-3.5 w-3.5 text-[#E09520]" />
+                            <Lock className="h-3.5 w-3.5 text-cg-amber-dark" />
                             <span className="text-sm font-medium text-slate-700">
                                 {lock.field_path.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
                             </span>
-                            <span className="text-xs text-[#E09520]">Case-{lock.case_number}</span>
+                            <span className="text-xs text-cg-amber-dark">Case-{lock.case_number}</span>
                         </div>
                         {canUnlock && onUnlock && (
                             <FieldLockIndicator

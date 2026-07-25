@@ -145,7 +145,7 @@ export function ReportsTab({ familyFileId, token }: { familyFileId: string, toke
                     <Button
                         onClick={() => setIsGenReportOpen(true)}
                         variant="outline"
-                        className="border-[#C2DEF0] text-[#1E4E6B] hover:bg-[#F0F7FC]"
+                        className="border-cg-slate-tint text-cg-slate-dark hover:bg-cg-slate-tint"
                     >
                         <FileText className="h-4 w-4 mr-2" />
                         Generate Report
@@ -158,7 +158,7 @@ export function ReportsTab({ familyFileId, token }: { familyFileId: string, toke
                 {reports.length > 0 ? (
                     <div className="space-y-3">
                         {reports.map((report) => (
-                            <Card key={report.id} className="overflow-hidden border-border hover:border-[#C5E5DB] transition-colors group">
+                            <Card key={report.id} className="overflow-hidden border-border hover:border-cg-sage-tint transition-colors group">
                                 <div className="p-4 flex items-center justify-between">
                                     <div className="flex items-center gap-4">
                                         <div className="h-10 w-10 rounded-lg bg-cg-sage-subtle flex items-center justify-center text-cg-sage">
@@ -214,10 +214,10 @@ export function ReportsTab({ familyFileId, token }: { familyFileId: string, toke
                 )}
 
                 {/* Tips Card */}
-                <Card className="bg-[#F0F7FC] border-none mt-6">
+                <Card className="bg-cg-slate-tint border-none mt-6">
                     <CardContent className="p-4 flex gap-3">
                         <AlertCircle className="h-5 w-5 text-[#3D8DB0] shrink-0" />
-                        <div className="text-xs text-[#1E4E6B] leading-relaxed">
+                        <div className="text-xs text-cg-slate-dark leading-relaxed">
                             <p className="font-bold mb-1">Professional Advisory</p>
                             Compliance reports aggregate ARIA flags, exchange metadata, and message sentiment. Use them for court submissions or mediation preparations.
                         </div>
@@ -274,7 +274,7 @@ export function ReportsTab({ familyFileId, token }: { familyFileId: string, toke
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setIsGenReportOpen(false)}>Cancel</Button>
-                        <Button onClick={handleGenerateReport} className="bg-cg-slate hover:bg-[#1E4E6B]">
+                        <Button onClick={handleGenerateReport} className="bg-cg-slate hover:bg-cg-slate-dark">
                             Generate PDF
                         </Button>
                     </DialogFooter>

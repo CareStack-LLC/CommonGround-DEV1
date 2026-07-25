@@ -180,7 +180,7 @@ function CourtFilingContent() {
         <div className="bg-cg-error-subtle border-2 border-cg-error-subtle rounded-2xl p-6 shadow-lg">
           <div className="flex items-center gap-3">
             <AlertCircle className="h-5 w-5 text-cg-error" />
-            <p className="text-[#9B2C2C] font-medium">{error}</p>
+            <p className="text-cg-error-dark font-medium">{error}</p>
           </div>
         </div>
       </div>
@@ -257,10 +257,10 @@ function CourtFilingContent() {
       {/* Important Notice */}
       <div className="bg-cg-amber-subtle border-2 border-cg-amber-subtle rounded-2xl p-4 shadow-lg">
         <div className="flex items-start gap-3">
-          <Info className="h-5 w-5 text-[#E09520] flex-shrink-0 mt-0.5" />
+          <Info className="h-5 w-5 text-cg-amber-dark flex-shrink-0 mt-0.5" />
           <div>
-            <p className="font-bold text-[#E09520]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>California Family Court Forms</p>
-            <p className="text-sm text-[#E09520] mt-1 font-medium">
+            <p className="font-bold text-cg-amber-dark" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>California Family Court Forms</p>
+            <p className="text-sm text-cg-amber-dark mt-1 font-medium">
               The FL-300 (Request for Order) and FL-311 (Child Custody and Visitation Application Attachment) are California judicial council forms. Requirements may vary by county.
             </p>
           </div>
@@ -271,7 +271,7 @@ function CourtFilingContent() {
         <div className="bg-cg-error-subtle border-2 border-cg-error-subtle rounded-2xl p-4 shadow-lg">
           <div className="flex items-center gap-3">
             <AlertCircle className="h-5 w-5 text-cg-error" />
-            <p className="text-[#9B2C2C] font-medium">{error}</p>
+            <p className="text-cg-error-dark font-medium">{error}</p>
           </div>
         </div>
       )}
@@ -469,7 +469,7 @@ function CourtFilingContent() {
                 <span className={`text-xs px-2.5 py-1 rounded-full font-bold border-2 ${
                   familyFile?.is_complete
                     ? 'bg-cg-sage-subtle text-cg-sage-dark border-cg-sage-subtle'
-                    : 'bg-cg-amber-subtle text-[#E09520] border-cg-amber-subtle'
+                    : 'bg-cg-amber-subtle text-cg-amber-dark border-cg-amber-subtle'
                 }`}>
                   {familyFile?.is_complete ? 'Joined' : 'Pending'}
                 </span>

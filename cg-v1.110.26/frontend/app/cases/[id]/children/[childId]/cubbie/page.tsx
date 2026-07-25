@@ -191,7 +191,7 @@ export default function ChildCubbiePage() {
                   <span
                     className={`text-xs px-2 py-1 rounded-full ${
                       item.current_location === 'child_traveling'
-                        ? 'bg-cg-amber-subtle text-[#E09520]'
+                        ? 'bg-cg-amber-subtle text-cg-amber-dark'
                         : 'bg-gray-100 text-gray-800'
                     }`}
                   >

@@ -64,17 +64,17 @@ export function CSAgentChat({ onSend, onSearchUser, loading }: CSAgentChatProps)
   };
 
   return (
-    <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden flex flex-col h-[600px]">
+    <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl overflow-hidden flex flex-col h-[600px]">
       {/* User selector */}
       <div className="px-4 py-3 border-b border-cg-slate/20">
         <div className="flex items-center gap-2">
           <Search className="w-4 h-4 text-muted-foreground" />
           {selectedUser ? (
             <div className="flex items-center gap-2 flex-1">
-              <span className="text-sm text-[#D0E4EC]">
+              <span className="text-sm text-cg-slate-tint">
                 {selectedUser.first_name} {selectedUser.last_name}
               </span>
-              <span className="text-xs text-[#4A6E7F]">{selectedUser.email}</span>
+              <span className="text-xs text-cg-slate-strong">{selectedUser.email}</span>
               <button
                 onClick={() => { setSelectedUser(null); setUserId(null); }}
                 className="text-xs text-muted-foreground hover:text-red-400 ml-auto"
@@ -89,7 +89,7 @@ export function CSAgentChat({ onSend, onSearchUser, loading }: CSAgentChatProps)
                 value={userSearch}
                 onChange={(e) => handleSearchUser(e.target.value)}
                 placeholder="Search user by name or email (optional)..."
-                className="w-full bg-transparent text-sm text-[#D0E4EC] placeholder-[#4A6E7F] outline-none"
+                className="w-full bg-transparent text-sm text-cg-slate-tint placeholder-cg-slate-strong outline-none"
               />
               {searchResults.length > 0 && (
                 <div className="absolute top-8 left-0 right-0 bg-foreground border border-cg-slate/30 rounded-lg shadow-xl z-20 max-h-40 overflow-y-auto">
@@ -99,8 +99,8 @@ export function CSAgentChat({ onSend, onSearchUser, loading }: CSAgentChatProps)
                       onClick={() => selectUser(user)}
                       className="w-full text-left px-3 py-2 hover:bg-cg-slate/20 flex items-center gap-2"
                     >
-                      <span className="text-xs text-[#D0E4EC]">{user.first_name} {user.last_name}</span>
-                      <span className="text-[10px] text-[#4A6E7F]">{user.email}</span>
+                      <span className="text-xs text-cg-slate-tint">{user.first_name} {user.last_name}</span>
+                      <span className="text-[10px] text-cg-slate-strong">{user.email}</span>
                     </button>
                   ))}
                 </div>
@@ -116,7 +116,7 @@ export function CSAgentChat({ onSend, onSearchUser, loading }: CSAgentChatProps)
           <div className="text-center py-12">
             <Bot className="w-10 h-10 text-cg-sage/40 mx-auto mb-3" />
             <p className="text-sm text-muted-foreground">AI Customer Success Agent</p>
-            <p className="text-xs text-[#4A6E7F] mt-1">
+            <p className="text-xs text-cg-slate-strong mt-1">
               Describe a customer issue to get analysis, resolution suggestions, and draft communications.
             </p>
           </div>
@@ -131,8 +131,8 @@ export function CSAgentChat({ onSend, onSearchUser, loading }: CSAgentChatProps)
             )}
             <div className={`max-w-[80%] rounded-xl px-4 py-3 ${
               msg.role === 'user'
-                ? 'bg-cg-sage/20 text-[#D0E4EC]'
-                : 'bg-foreground text-[#8AACBC]'
+                ? 'bg-cg-sage/20 text-cg-slate-tint'
+                : 'bg-foreground text-cg-slate-muted'
             }`}>
               <div className="text-xs whitespace-pre-wrap leading-relaxed">{msg.content}</div>
             </div>
@@ -172,7 +172,7 @@ export function CSAgentChat({ onSend, onSearchUser, loading }: CSAgentChatProps)
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
             placeholder="Describe the customer issue..."
-            className="flex-1 bg-foreground border border-cg-slate/20 rounded-lg px-3 py-2 text-sm text-[#D0E4EC] placeholder-[#4A6E7F] outline-none focus:border-cg-sage/40"
+            className="flex-1 bg-foreground border border-cg-slate/20 rounded-lg px-3 py-2 text-sm text-cg-slate-tint placeholder-cg-slate-strong outline-none focus:border-cg-sage/40"
             disabled={sending}
           />
           <button aria-label="Send message"

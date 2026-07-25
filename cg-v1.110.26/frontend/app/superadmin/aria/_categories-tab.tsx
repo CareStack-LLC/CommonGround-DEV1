@@ -16,8 +16,8 @@ export default function CategoriesTab({ data }: { data: AriaInsights }) {
     <div className="space-y-4">
       <div className="grid lg:grid-cols-2 gap-4">
         {/* Actual category breakdown */}
-        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">
+        <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+          <h2 className="text-sm font-semibold text-cg-slate-tint mb-4">
             Detected Categories ({data.days}d)
           </h2>
           {data.detailed_categories?.length ? (
@@ -28,10 +28,10 @@ export default function CategoriesTab({ data }: { data: AriaInsights }) {
                 return (
                   <div key={cat.category}>
                     <div className="flex justify-between text-xs mb-1">
-                      <span className="text-[#8AACBC] capitalize">
+                      <span className="text-cg-slate-muted capitalize">
                         {cat.category.replace(/_/g, ' ')}
                       </span>
-                      <span className="text-[#D0E4EC] font-medium">{cat.count}</span>
+                      <span className="text-cg-slate-tint font-medium">{cat.count}</span>
                     </div>
                     <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
                       <div
@@ -44,13 +44,13 @@ export default function CategoriesTab({ data }: { data: AriaInsights }) {
               })}
             </div>
           ) : (
-            <p className="text-[#4A6E7F] text-sm text-center py-10">No category data</p>
+            <p className="text-cg-slate-strong text-sm text-center py-10">No category data</p>
           )}
         </div>
 
         {/* Severity distribution */}
-        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">By Severity</h2>
+        <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+          <h2 className="text-sm font-semibold text-cg-slate-tint mb-4">By Severity</h2>
           {severityData.length ? (
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={severityData} layout="vertical" margin={{ left: 20 }}>
@@ -78,15 +78,15 @@ export default function CategoriesTab({ data }: { data: AriaInsights }) {
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <p className="text-[#4A6E7F] text-sm text-center py-10">No severity data</p>
+            <p className="text-cg-slate-strong text-sm text-center py-10">No severity data</p>
           )}
         </div>
       </div>
 
       {/* Circle categories */}
       {data.circle_data?.categories?.length > 0 && (
-        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">
+        <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+          <h2 className="text-sm font-semibold text-cg-slate-tint mb-4">
             Circle (KidComs) Categories
           </h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -95,7 +95,7 @@ export default function CategoriesTab({ data }: { data: AriaInsights }) {
                 key={cat.category}
                 className="flex items-center justify-between p-3 bg-cg-slate/10 rounded-lg"
               >
-                <span className="text-xs text-[#8AACBC] capitalize">
+                <span className="text-xs text-cg-slate-muted capitalize">
                   {cat.category.replace(/_/g, ' ')}
                 </span>
                 <span className="text-sm font-semibold text-white">{cat.count}</span>
@@ -107,8 +107,8 @@ export default function CategoriesTab({ data }: { data: AriaInsights }) {
 
       {/* Call flag severity */}
       {data.call_data?.flag_severity?.length > 0 && (
-        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">Call Flag Severity</h2>
+        <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+          <h2 className="text-sm font-semibold text-cg-slate-tint mb-4">Call Flag Severity</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {data.call_data.flag_severity.map((item) => (
               <div
@@ -117,7 +117,7 @@ export default function CategoriesTab({ data }: { data: AriaInsights }) {
               >
                 <span
                   className="text-xs font-medium capitalize"
-                  style={{ color: SEVERITY_COLORS[item.severity] || '#8AACBC' }}
+                  style={{ color: SEVERITY_COLORS[item.severity] || 'var(--cg-slate-muted)' }}
                 >
                   {item.severity}
                 </span>

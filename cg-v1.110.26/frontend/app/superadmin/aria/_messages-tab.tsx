@@ -7,7 +7,7 @@ import { type AriaInsights, type FlaggedMessage, SEVERITY_COLORS, ACTION_COLORS 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 function SeverityBadge({ severity }: { severity: string }) {
-  const color = SEVERITY_COLORS[severity] || '#8AACBC';
+  const color = SEVERITY_COLORS[severity] || 'var(--cg-slate-muted)';
   return (
     <span
       className="inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium border"
@@ -23,7 +23,7 @@ function SeverityBadge({ severity }: { severity: string }) {
 }
 
 function ActionBadge({ action }: { action: string }) {
-  const color = ACTION_COLORS[action] || '#8AACBC';
+  const color = ACTION_COLORS[action] || 'var(--cg-slate-muted)';
   return (
     <span
       className="inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium"
@@ -49,7 +49,7 @@ function ToxicityBar({ score }: { score: number }) {
           style={{ width: `${pct}%`, backgroundColor: color }}
         />
       </div>
-      <span className="text-[11px] text-[#8AACBC] tabular-nums">{score.toFixed(2)}</span>
+      <span className="text-[11px] text-cg-slate-muted tabular-nums">{score.toFixed(2)}</span>
     </div>
   );
 }
@@ -93,11 +93,11 @@ export default function MessagesTab({
   }, [days, messages.length]);
 
   return (
-    <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
+    <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="text-sm font-semibold text-[#D0E4EC]">Recent Flagged Messages</h2>
-          <p className="text-xs text-[#4A6E7F] mt-0.5">
+          <h2 className="text-sm font-semibold text-cg-slate-tint">Recent Flagged Messages</h2>
+          <p className="text-xs text-cg-slate-strong mt-0.5">
             Metadata only — no message content shown for privacy compliance
           </p>
         </div>
@@ -159,7 +159,7 @@ export default function MessagesTab({
                         {(msg.categories || []).slice(0, 3).map((cat) => (
                           <span
                             key={cat}
-                            className="inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium bg-cg-slate/20 text-[#8AACBC] capitalize"
+                            className="inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium bg-cg-slate/20 text-cg-slate-muted capitalize"
                           >
                             {cat.replace(/_/g, ' ')}
                           </span>
@@ -177,7 +177,7 @@ export default function MessagesTab({
                     <td className="py-2.5 pr-4">
                       <ActionBadge action={msg.user_action} />
                     </td>
-                    <td className="py-2.5 pr-4 text-xs text-[#8AACBC] text-center">
+                    <td className="py-2.5 pr-4 text-xs text-cg-slate-muted text-center">
                       {msg.intervention_level || '—'}
                     </td>
                     <td className="py-2.5 text-xs text-muted-foreground font-mono">
@@ -194,7 +194,7 @@ export default function MessagesTab({
               <button
                 onClick={loadMore}
                 disabled={loadingMore}
-                className="px-4 py-2 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-[#8AACBC] hover:text-white text-xs font-medium transition-colors disabled:opacity-50"
+                className="px-4 py-2 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-cg-slate-muted hover:text-white text-xs font-medium transition-colors disabled:opacity-50"
               >
                 {loadingMore ? 'Loading...' : 'Load More'}
               </button>
@@ -202,7 +202,7 @@ export default function MessagesTab({
           )}
         </>
       ) : (
-        <p className="text-[#4A6E7F] text-sm text-center py-10">No flagged messages</p>
+        <p className="text-cg-slate-strong text-sm text-center py-10">No flagged messages</p>
       )}
     </div>
   );

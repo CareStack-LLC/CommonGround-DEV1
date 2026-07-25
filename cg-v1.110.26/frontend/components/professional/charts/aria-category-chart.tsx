@@ -21,8 +21,8 @@ const CATEGORY_COLORS: Record<string, string> = {
   "passive-aggressive": "var(--cg-amber)",
   profanity: "var(--cg-error)",
   dismissive: "var(--cg-amber)",
-  controlling: "#E09520",
-  threatening: "#9B2C2C",
+  controlling: "var(--cg-amber-dark)",
+  threatening: "var(--cg-error-dark)",
   sarcasm: "#F7B84D",
 };
 
@@ -54,7 +54,7 @@ export function ARIACategoryChart({ data, totalMessages = 0 }: ARIACategoryChart
       <div className="p-6">
         <div className="flex items-start justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-gradient-to-br from-cg-amber to-[#E09520] text-white rounded-xl shadow-lg shadow-cg-amber/20">
+            <div className="p-3 bg-gradient-to-br from-cg-amber to-cg-amber-dark text-white rounded-xl shadow-lg shadow-cg-amber/20">
               <AlertTriangle className="h-5 w-5" />
             </div>
             <div>
@@ -63,7 +63,7 @@ export function ARIACategoryChart({ data, totalMessages = 0 }: ARIACategoryChart
             </div>
           </div>
           <div className="text-right">
-            <div className="text-3xl font-bold text-[#E09520]">{totalInterventions}</div>
+            <div className="text-3xl font-bold text-cg-amber-dark">{totalInterventions}</div>
             <p className="text-xs text-slate-500 mt-1">Total Flags</p>
           </div>
         </div>

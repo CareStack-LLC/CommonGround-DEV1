@@ -53,7 +53,7 @@ export default function NewBugHuntPage() {
       <div className="flex items-center gap-3">
         <button aria-label="Back"
           onClick={() => router.push('/superadmin/bug-hunts')}
-          className="p-2 rounded-lg hover:bg-cg-slate/20 transition-colors text-[#8AACBC]"
+          className="p-2 rounded-lg hover:bg-cg-slate/20 transition-colors text-cg-slate-muted"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
@@ -75,32 +75,32 @@ export default function NewBugHuntPage() {
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Name */}
         <div>
-          <label className="block text-sm font-medium text-[#D0E4EC] mb-1.5">Name</label>
+          <label className="block text-sm font-medium text-cg-slate-tint mb-1.5">Name</label>
           <input
             type="text"
             value={name}
             onChange={e => setName(e.target.value)}
             placeholder="e.g., Exchange System Verification Q1"
-            className="w-full px-3 py-2 bg-foreground border border-cg-slate/30 rounded-lg text-white placeholder-[#4A6E7F] focus:outline-none focus:border-cg-sage/50 text-sm"
+            className="w-full px-3 py-2 bg-foreground border border-cg-slate/30 rounded-lg text-white placeholder-cg-slate-strong focus:outline-none focus:border-cg-sage/50 text-sm"
             required
           />
         </div>
 
         {/* Description */}
         <div>
-          <label className="block text-sm font-medium text-[#D0E4EC] mb-1.5">Description</label>
+          <label className="block text-sm font-medium text-cg-slate-tint mb-1.5">Description</label>
           <textarea
             value={description}
             onChange={e => setDescription(e.target.value)}
             placeholder="What are we testing and why?"
             rows={2}
-            className="w-full px-3 py-2 bg-foreground border border-cg-slate/30 rounded-lg text-white placeholder-[#4A6E7F] focus:outline-none focus:border-cg-sage/50 text-sm resize-none"
+            className="w-full px-3 py-2 bg-foreground border border-cg-slate/30 rounded-lg text-white placeholder-cg-slate-strong focus:outline-none focus:border-cg-sage/50 text-sm resize-none"
           />
         </div>
 
         {/* Target Feature */}
         <div>
-          <label className="block text-sm font-medium text-[#D0E4EC] mb-1.5">Target Feature</label>
+          <label className="block text-sm font-medium text-cg-slate-tint mb-1.5">Target Feature</label>
           <div className="grid grid-cols-2 gap-2">
             {FEATURES.map(f => (
               <button
@@ -110,7 +110,7 @@ export default function NewBugHuntPage() {
                 className={`text-left p-3 rounded-lg border transition-all ${
                   targetFeature === f.value
                     ? 'bg-cg-sage/10 border-cg-sage/40 text-white'
-                    : 'bg-foreground/50 border-cg-slate/20 text-[#8AACBC] hover:border-cg-slate/40'
+                    : 'bg-foreground/50 border-cg-slate/20 text-cg-slate-muted hover:border-cg-slate/40'
                 }`}
               >
                 <div className="text-sm font-medium">{f.label}</div>
@@ -122,7 +122,7 @@ export default function NewBugHuntPage() {
 
         {/* Family Count */}
         <div>
-          <label className="block text-sm font-medium text-[#D0E4EC] mb-1.5">
+          <label className="block text-sm font-medium text-cg-slate-tint mb-1.5">
             Number of Test Families
           </label>
           <div className="flex items-center gap-3">
@@ -140,7 +140,7 @@ export default function NewBugHuntPage() {
             Each family gets 2 parent accounts + 1-2 children with test credentials
           </p>
           <div className="mt-2 p-2.5 bg-cg-slate/10 border border-cg-slate/20 rounded-lg">
-            <p className="text-xs text-[#8AACBC]">
+            <p className="text-xs text-cg-slate-muted">
               Families auto-rotate through agreement types and subscription tiers:
             </p>
             <div className="flex flex-wrap gap-1.5 mt-1.5">
@@ -157,7 +157,7 @@ export default function NewBugHuntPage() {
 
         {/* Test Instructions */}
         <div>
-          <label className="block text-sm font-medium text-[#D0E4EC] mb-1.5">
+          <label className="block text-sm font-medium text-cg-slate-tint mb-1.5">
             Test Instructions <span className="text-muted-foreground font-normal">(optional)</span>
           </label>
           <textarea
@@ -165,7 +165,7 @@ export default function NewBugHuntPage() {
             onChange={e => setTestInstructions(e.target.value)}
             placeholder="Step-by-step instructions for testers..."
             rows={4}
-            className="w-full px-3 py-2 bg-foreground border border-cg-slate/30 rounded-lg text-white placeholder-[#4A6E7F] focus:outline-none focus:border-cg-sage/50 text-sm resize-none font-mono"
+            className="w-full px-3 py-2 bg-foreground border border-cg-slate/30 rounded-lg text-white placeholder-cg-slate-strong focus:outline-none focus:border-cg-sage/50 text-sm resize-none font-mono"
           />
         </div>
 
@@ -191,7 +191,7 @@ export default function NewBugHuntPage() {
           <button
             type="button"
             onClick={() => router.push('/superadmin/bug-hunts')}
-            className="px-4 py-2.5 text-[#8AACBC] hover:text-white transition-colors text-sm"
+            className="px-4 py-2.5 text-cg-slate-muted hover:text-white transition-colors text-sm"
           >
             Cancel
           </button>

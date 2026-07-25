@@ -138,11 +138,11 @@ export default function CaseTimelinePage() {
 
   const getEventColor = (type: string) => {
     const colorMap: Record<string, string> = {
-      message: "bg-cg-slate-subtle text-cg-slate border-[#C2DEF0]",
-      exchange: "bg-cg-amber-subtle text-[#E09520] border-[#FBE3BF]",
+      message: "bg-cg-slate-subtle text-cg-slate border-cg-slate-tint",
+      exchange: "bg-cg-amber-subtle text-cg-amber-dark border-cg-amber-tint",
       agreement: "bg-slate-100 text-slate-600 border-slate-200",
       court: "bg-blue-100 text-blue-600 border-blue-200",
-      aria: "bg-cg-sage-subtle text-cg-sage-dark border-[#C5E5DB]",
+      aria: "bg-cg-sage-subtle text-cg-sage-dark border-cg-sage-tint",
     };
     return colorMap[type] || "bg-gray-100 text-gray-600 border-gray-200";
   };
@@ -394,11 +394,11 @@ function TimelineEventCard({ event }: { event: TimelineEvent }) {
 
   const getEventColorClasses = (type: string) => {
     const colorMap: Record<string, string> = {
-      message: "bg-[#F0F7FC] text-[#163A50] border-2 border-[#163A50]/20",
+      message: "bg-cg-slate-tint text-[#163A50] border-2 border-[#163A50]/20",
       exchange: "bg-background text-foreground border-2 border-foreground/20",
       agreement: "bg-slate-50 text-slate-900 border-2 border-slate-900/20",
       court: "bg-blue-50 text-blue-900 border-2 border-blue-900/20",
-      aria: "bg-cg-sage-subtle text-[#1B5544] border-2 border-[#1B5544]/20",
+      aria: "bg-cg-sage-subtle text-cg-sage-deep border-2 border-cg-sage-deep/20",
     };
     return colorMap[type] || "bg-gray-50 text-gray-900 border-2 border-gray-900/20";
   };
@@ -464,7 +464,7 @@ function TimelineEventCard({ event }: { event: TimelineEvent }) {
                   </Badge>
                 )}
                 {event.metadata.intervention_type && (
-                  <Badge className="sans text-xs bg-cg-sage-subtle text-[#1B5544] border-2 border-[#1B5544]/30">
+                  <Badge className="sans text-xs bg-cg-sage-subtle text-cg-sage-deep border-2 border-cg-sage-deep/30">
                     {event.metadata.intervention_type}
                   </Badge>
                 )}

@@ -106,8 +106,8 @@ export function ARIAInterventionAlert({
               isTerminate && 'bg-cg-error-subtle'
             )}
           >
-            {isWarning && <AlertTriangle className="w-6 h-6 text-[#E09520]" />}
-            {isMute && <MicOff className="w-6 h-6 text-[#E09520]" />}
+            {isWarning && <AlertTriangle className="w-6 h-6 text-cg-amber-dark" />}
+            {isMute && <MicOff className="w-6 h-6 text-cg-amber-dark" />}
             {isTerminate && <PhoneOff className="w-6 h-6 text-cg-error" />}
           </div>
 
@@ -116,9 +116,9 @@ export function ARIAInterventionAlert({
               <h3
                 className={cn(
                   'font-semibold text-lg',
-                  isWarning && 'text-[#E09520]',
-                  isMute && 'text-[#E09520]',
-                  isTerminate && 'text-[#9B2C2C]'
+                  isWarning && 'text-cg-amber-dark',
+                  isMute && 'text-cg-amber-dark',
+                  isTerminate && 'text-cg-error-dark'
                 )}
               >
                 {isWarning && 'ARIA Warning'}
@@ -131,7 +131,7 @@ export function ARIAInterventionAlert({
                   onClick={onDismiss}
                   className="p-1 rounded-full hover:bg-cg-amber-subtle transition-colors"
                 >
-                  <X className="w-4 h-4 text-[#E09520]" />
+                  <X className="w-4 h-4 text-cg-amber-dark" />
                 </button>
               )}
             </div>
@@ -139,9 +139,9 @@ export function ARIAInterventionAlert({
             <p
               className={cn(
                 'mt-1 text-sm',
-                isWarning && 'text-[#E09520]',
-                isMute && 'text-[#E09520]',
-                isTerminate && 'text-[#9B2C2C]'
+                isWarning && 'text-cg-amber-dark',
+                isMute && 'text-cg-amber-dark',
+                isTerminate && 'text-cg-error-dark'
               )}
             >
               {intervention.warning_message}
@@ -158,13 +158,13 @@ export function ARIAInterventionAlert({
                     }}
                   />
                 </div>
-                <span className="text-[#9B2C2C] font-bold text-lg">{terminationCountdown}s</span>
+                <span className="text-cg-error-dark font-bold text-lg">{terminationCountdown}s</span>
               </div>
             )}
 
             {/* Mute countdown */}
             {isMute && muteCountdown !== null && (
-              <div className="mt-2 text-sm text-[#E09520] font-medium">
+              <div className="mt-2 text-sm text-cg-amber-dark font-medium">
                 Unmuting in {muteCountdown} seconds...
               </div>
             )}

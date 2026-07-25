@@ -443,7 +443,7 @@ export function EventForm({
                 type="button"
                 onClick={() => toggleAttendee(parent.id)}
                 className={`flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs transition-all ${formData.attendee_ids.includes(parent.id)
-                  ? "bg-[#F0F7FC] border-[#C2DEF0] text-[#1E4E6B] font-bold shadow-sm"
+                  ? "bg-cg-slate-tint border-cg-slate-tint text-cg-slate-dark font-bold shadow-sm"
                   : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
                   }`}
               >

@@ -206,7 +206,7 @@ export default function SilentHandoffCheckIn({
                       Within geofence ({formatDistance(distance)})
                     </Badge>
                   ) : (
-                    <Badge variant="secondary" className="bg-cg-amber-subtle text-[#E09520] dark:bg-foreground/30 dark:text-cg-amber">
+                    <Badge variant="secondary" className="bg-cg-amber-subtle text-cg-amber-dark dark:bg-foreground/30 dark:text-cg-amber">
                       Outside geofence ({formatDistance(distance)})
                     </Badge>
                   )}
@@ -369,20 +369,20 @@ export default function SilentHandoffCheckIn({
                   </p>
                 </div>
               ) : windowStatus.is_before_window ? (
-                <div className="bg-cg-amber-subtle dark:bg-foreground/30 border border-cg-amber dark:border-[#E09520] rounded-lg p-3">
-                  <p className="text-[#E09520] dark:text-cg-amber font-medium">
+                <div className="bg-cg-amber-subtle dark:bg-foreground/30 border border-cg-amber dark:border-cg-amber-dark rounded-lg p-3">
+                  <p className="text-cg-amber-dark dark:text-cg-amber font-medium">
                     Check-in window opens in {formatMinutesHumanReadable(windowStatus.minutes_until_window)}
                   </p>
-                  <p className="text-xs text-[#E09520]/80 dark:text-cg-amber/80 mt-1">
+                  <p className="text-xs text-cg-amber-dark/80 dark:text-cg-amber/80 mt-1">
                     The check-in window is a set time frame around your scheduled exchange when GPS check-in becomes available. You&apos;ll be able to confirm your arrival once the window opens.
                   </p>
                 </div>
               ) : (
-                <div className="bg-cg-error-subtle dark:bg-[#7A2222]/30 border border-[#FCA5A5] dark:border-[#9B2C2C] rounded-lg p-3">
-                  <p className="text-[#9B2C2C] dark:text-[#FCA5A5] font-medium">
+                <div className="bg-cg-error-subtle dark:bg-cg-error-deep/30 border border-[#FCA5A5] dark:border-cg-error-dark rounded-lg p-3">
+                  <p className="text-cg-error-dark dark:text-[#FCA5A5] font-medium">
                     Check-in window has closed
                   </p>
-                  <p className="text-xs text-[#9B2C2C]/80 dark:text-[#E06B6B]/80 mt-1">
+                  <p className="text-xs text-cg-error-dark/80 dark:text-cg-error-light/80 mt-1">
                     The GPS check-in window has passed. You can still record this exchange using the &quot;Child is With Me&quot; button below.
                   </p>
                   {familyFileId && !withMeSuccess && (
@@ -391,7 +391,7 @@ export default function SilentHandoffCheckIn({
                       disabled={isWithMe}
                       variant="outline"
                       size="sm"
-                      className="mt-2 w-full border-[#FCA5A5] text-[#9B2C2C] hover:bg-cg-error-subtle dark:border-[#9B2C2C] dark:text-[#E06B6B] dark:hover:bg-[#7A2222]/20"
+                      className="mt-2 w-full border-[#FCA5A5] text-cg-error-dark hover:bg-cg-error-subtle dark:border-cg-error-dark dark:text-cg-error-light dark:hover:bg-cg-error-deep/20"
                     >
                       {isWithMe ? (
                         <><Loader2 className="h-3 w-3 animate-spin mr-1" /> Recording...</>
@@ -423,8 +423,8 @@ export default function SilentHandoffCheckIn({
 
           {/* Geolocation Support */}
           {!isSupported && (
-            <div className="bg-cg-error-subtle dark:bg-[#7A2222]/30 border border-[#FCA5A5] dark:border-[#9B2C2C] rounded-lg p-3 mb-6">
-              <p className="text-[#9B2C2C] dark:text-[#FCA5A5]">
+            <div className="bg-cg-error-subtle dark:bg-cg-error-deep/30 border border-[#FCA5A5] dark:border-cg-error-dark rounded-lg p-3 mb-6">
+              <p className="text-cg-error-dark dark:text-[#FCA5A5]">
                 GPS location is not supported in your browser.
               </p>
             </div>
@@ -432,15 +432,15 @@ export default function SilentHandoffCheckIn({
 
           {/* GPS Error */}
           {geoError && (
-            <div className="bg-cg-error-subtle dark:bg-[#7A2222]/30 border border-[#FCA5A5] dark:border-[#9B2C2C] rounded-lg p-3 mb-6">
-              <p className="text-[#9B2C2C] dark:text-[#FCA5A5]">{geoError.message}</p>
+            <div className="bg-cg-error-subtle dark:bg-cg-error-deep/30 border border-[#FCA5A5] dark:border-cg-error-dark rounded-lg p-3 mb-6">
+              <p className="text-cg-error-dark dark:text-[#FCA5A5]">{geoError.message}</p>
             </div>
           )}
 
           {/* Check-in Error */}
           {checkInError && (
-            <div className="bg-cg-error-subtle dark:bg-[#7A2222]/30 border border-[#FCA5A5] dark:border-[#9B2C2C] rounded-lg p-3 mb-6">
-              <p className="text-[#9B2C2C] dark:text-[#FCA5A5]">{checkInError}</p>
+            <div className="bg-cg-error-subtle dark:bg-cg-error-deep/30 border border-[#FCA5A5] dark:border-cg-error-dark rounded-lg p-3 mb-6">
+              <p className="text-cg-error-dark dark:text-[#FCA5A5]">{checkInError}</p>
             </div>
           )}
 
@@ -541,7 +541,7 @@ export default function SilentHandoffCheckIn({
                 }}
                 disabled={isCheckingIn || (windowStatus !== null && !windowStatus.is_within_window)}
                 variant="outline"
-                className="w-full border-cg-amber text-[#E09520] hover:bg-cg-amber-subtle dark:border-[#E09520] dark:text-cg-amber dark:hover:bg-foreground/20"
+                className="w-full border-cg-amber text-cg-amber-dark hover:bg-cg-amber-subtle dark:border-cg-amber-dark dark:text-cg-amber dark:hover:bg-foreground/20"
               >
                 🧪 Test: Check In at Exchange Location
               </Button>

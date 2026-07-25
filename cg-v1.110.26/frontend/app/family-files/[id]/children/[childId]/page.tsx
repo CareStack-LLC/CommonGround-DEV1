@@ -115,7 +115,7 @@ function StatusBadge({ status }: { status: string }) {
     },
     pending_approval: {
       icon: <Clock className="h-3.5 w-3.5" />,
-      className: 'bg-cg-amber-subtle text-[#E09520] border-cg-amber-subtle',
+      className: 'bg-cg-amber-subtle text-cg-amber-dark border-cg-amber-subtle',
       label: 'Pending',
     },
     archived: {
@@ -652,7 +652,7 @@ function ChildProfileContent() {
               <AlertCircle className="h-6 w-6 text-cg-error" />
             </div>
             <div>
-              <p className="font-bold text-[#9B2C2C]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Error Loading Profile</p>
+              <p className="font-bold text-cg-error-dark" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Error Loading Profile</p>
               <p className="text-sm text-cg-error mt-1 font-medium">{error}</p>
             </div>
           </div>
@@ -696,7 +696,7 @@ function ChildProfileContent() {
           <div className="w-10 h-10 bg-cg-error-subtle rounded-xl flex items-center justify-center flex-shrink-0">
             <AlertCircle className="h-5 w-5 text-cg-error" />
           </div>
-          <p className="text-sm text-[#9B2C2C] font-semibold">{error}</p>
+          <p className="text-sm text-cg-error-dark font-semibold">{error}</p>
         </div>
       )}
 
@@ -705,7 +705,7 @@ function ChildProfileContent() {
         <div className="bg-card border-2 border-cg-amber-subtle rounded-2xl p-4 sm:p-5 shadow-lg hover:shadow-xl transition-all duration-300">
           <div className="flex items-start gap-3 sm:gap-4">
             <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-cg-amber-subtle flex items-center justify-center flex-shrink-0">
-              <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-[#E09520]" />
+              <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-cg-amber-dark" />
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Pending Approval</h3>
@@ -730,7 +730,7 @@ function ChildProfileContent() {
                   );
                 } else if (hasApproved) {
                   return (
-                    <div className="mt-3 px-3 py-2 bg-cg-amber-subtle text-[#E09520] rounded-xl text-sm font-medium inline-flex items-center gap-2">
+                    <div className="mt-3 px-3 py-2 bg-cg-amber-subtle text-cg-amber-dark rounded-xl text-sm font-medium inline-flex items-center gap-2">
                       <CheckCircle className="h-4 w-4" />
                       You've approved — waiting for co-parent
                     </div>
@@ -1243,7 +1243,7 @@ function ChildProfileContent() {
                     </span>
                   )}
                   {child.has_504_plan && (
-                    <span className="px-3 py-1 bg-cg-slate-subtle text-[#1E4E6B] text-sm font-medium rounded-full">
+                    <span className="px-3 py-1 bg-cg-slate-subtle text-cg-slate-dark text-sm font-medium rounded-full">
                       Has 504 Plan
                     </span>
                   )}

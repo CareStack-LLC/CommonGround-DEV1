@@ -229,7 +229,7 @@ export default function ARIAAssistantPage() {
         <CardContent className="p-4">
           <div className="flex items-start space-x-3">
             <span className="text-xl">ℹ️</span>
-            <div className="text-sm text-[#1E4E6B]">
+            <div className="text-sm text-cg-slate-dark">
               <p className="font-medium">ARIA provides facts, not recommendations</p>
               <p className="mt-1">
                 ARIA can answer questions about schedules, compliance, and communication patterns.
@@ -366,7 +366,7 @@ export default function ARIAAssistantPage() {
 
           <Card className="bg-cg-amber-subtle border-cg-amber-subtle">
             <CardContent className="p-4">
-              <div className="text-sm text-[#E09520]">
+              <div className="text-sm text-cg-amber-dark">
                 <p className="font-medium">What ARIA Cannot Do</p>
                 <ul className="mt-2 space-y-1 text-xs">
                   <li>❌ Recommend custody changes</li>

@@ -165,9 +165,9 @@ export default function KidComsPage() {
       case 'completed':
         return <span className="inline-flex items-center px-2 py-1 rounded-md bg-muted text-foreground text-xs font-medium border border-border">Completed</span>;
       case 'cancelled':
-        return <span className="inline-flex items-center px-2 py-1 rounded-md bg-cg-error-subtle text-[#9B2C2C] text-xs font-medium border border-cg-error-subtle">Cancelled</span>;
+        return <span className="inline-flex items-center px-2 py-1 rounded-md bg-cg-error-subtle text-cg-error-dark text-xs font-medium border border-cg-error-subtle">Cancelled</span>;
       default:
-        return <span className="inline-flex items-center px-2 py-1 rounded-md bg-cg-amber-subtle text-[#E09520] text-xs font-medium border border-cg-amber-subtle">Waiting</span>;
+        return <span className="inline-flex items-center px-2 py-1 rounded-md bg-cg-amber-subtle text-cg-amber-dark text-xs font-medium border border-cg-amber-subtle">Waiting</span>;
     }
   }
 
@@ -251,7 +251,7 @@ export default function KidComsPage() {
                 <div className="w-10 h-10 rounded-lg bg-cg-error-subtle flex items-center justify-center flex-shrink-0">
                   <XCircle className="h-5 w-5 text-cg-error" />
                 </div>
-                <p className="text-[#9B2C2C] font-medium">{error}</p>
+                <p className="text-cg-error-dark font-medium">{error}</p>
               </div>
             </div>
           )}
@@ -320,7 +320,7 @@ export default function KidComsPage() {
                   disabled={!selectedChild || isStartingSession}
                   className={cn(
                     'flex flex-col items-center p-4 rounded-xl transition-all border-2',
-                    'bg-cg-slate-subtle dark:bg-foreground/30 border-cg-slate-subtle dark:border-[#1E4E6B] hover:border-cg-slate-light dark:hover:border-cg-slate hover:shadow-md active:scale-95',
+                    'bg-cg-slate-subtle dark:bg-foreground/30 border-cg-slate-subtle dark:border-cg-slate-dark hover:border-cg-slate-light dark:hover:border-cg-slate hover:shadow-md active:scale-95',
                     'disabled:opacity-50 disabled:hover:border-cg-slate-subtle disabled:active:scale-100'
                   )}
                 >
@@ -329,7 +329,7 @@ export default function KidComsPage() {
                   ) : (
                     <Phone className="h-8 w-8 text-cg-slate dark:text-cg-slate-light" />
                   )}
-                  <span className="mt-2 text-sm font-bold text-[#1E4E6B] dark:text-cg-slate-light">Voice Call</span>
+                  <span className="mt-2 text-sm font-bold text-cg-slate-dark dark:text-cg-slate-light">Voice Call</span>
                 </button>
                 <button
                   onClick={() => router.push(`/family-files/${familyFileId}/my-circle`)}
@@ -339,7 +339,7 @@ export default function KidComsPage() {
                   )}
                 >
                   <Heart className="h-8 w-8 text-cg-amber dark:text-cg-amber" />
-                  <span className="mt-2 text-sm font-bold text-[#E09520] dark:text-cg-amber">My Circle</span>
+                  <span className="mt-2 text-sm font-bold text-cg-amber-dark dark:text-cg-amber">My Circle</span>
                 </button>
                 <button
                   onClick={() => {
@@ -421,7 +421,7 @@ export default function KidComsPage() {
                             <Phone className="h-4 w-4" />
                           </button>
                         ) : (
-                          <span className="text-xs px-2 py-1 rounded-md bg-cg-amber-subtle text-[#E09520] border border-cg-amber-subtle">Pending</span>
+                          <span className="text-xs px-2 py-1 rounded-md bg-cg-amber-subtle text-cg-amber-dark border border-cg-amber-subtle">Pending</span>
                         )}
                       </div>
                     </div>

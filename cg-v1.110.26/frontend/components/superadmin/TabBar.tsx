@@ -21,7 +21,7 @@ export function TabBar({ tabs, activeTab, onTabChange, size = "md" }: TabBarProp
   const sizeClass = size === "sm" ? "text-xs px-3 py-1.5" : "text-sm px-4 py-2";
 
   return (
-    <div className="flex items-center gap-1 bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-1">
+    <div className="flex items-center gap-1 bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-1">
       {tabs.map((tab) => {
         const isActive = tab.key === activeTab;
         const Icon = tab.icon;

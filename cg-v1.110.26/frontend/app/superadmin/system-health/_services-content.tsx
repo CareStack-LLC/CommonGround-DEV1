@@ -59,10 +59,10 @@ function ServiceCard({ service }: { service: ServiceStatus }) {
   const ServiceIcon = SLUG_ICONS[service.slug] || Activity;
 
   return (
-    <div className={`bg-[#1A3648]/60 border ${cfg.border} rounded-xl p-4 transition-all hover:bg-zinc-900/70`}>
+    <div className={`bg-cg-slate-deep/60 border ${cfg.border} rounded-xl p-4 transition-all hover:bg-zinc-900/70`}>
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2.5">
-          <ServiceIcon className="w-4 h-4 text-[#8AACBC]" />
+          <ServiceIcon className="w-4 h-4 text-cg-slate-muted" />
           <span className="text-sm font-medium text-white">{service.name}</span>
         </div>
         <StatusDot status={service.status} />
@@ -71,7 +71,7 @@ function ServiceCard({ service }: { service: ServiceStatus }) {
         <StatusIcon className={`w-3.5 h-3.5 ${cfg.color}`} />
         <span className={`text-xs font-medium ${cfg.color}`}>{cfg.label}</span>
         {service.latency_ms > 0 && (
-          <span className="text-[11px] text-[#4A6E7F] ml-auto">{service.latency_ms}ms</span>
+          <span className="text-[11px] text-cg-slate-strong ml-auto">{service.latency_ms}ms</span>
         )}
       </div>
       <p className="text-[11px] text-muted-foreground leading-relaxed truncate" title={service.detail}>
@@ -140,7 +140,7 @@ export default function ServicesContent() {
         <button
           onClick={fetchStatus}
           disabled={loading}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-[#8AACBC] hover:text-white transition-colors disabled:opacity-50 text-sm"
+          className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-cg-slate-muted hover:text-white transition-colors disabled:opacity-50 text-sm"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           Refresh
@@ -214,15 +214,15 @@ export default function ServicesContent() {
       {data && categoryOrder.map(cat => {
         const services = grouped[cat];
         if (!services || services.length === 0) return null;
-        const catCfg = CATEGORY_CONFIG[cat] || { label: cat, icon: Activity, color: 'text-[#8AACBC]' };
+        const catCfg = CATEGORY_CONFIG[cat] || { label: cat, icon: Activity, color: 'text-cg-slate-muted' };
         const CatIcon = catCfg.icon;
 
         return (
           <div key={cat}>
             <div className="flex items-center gap-2 mb-3">
               <CatIcon className={`w-4 h-4 ${catCfg.color}`} />
-              <h3 className="text-sm font-semibold text-[#D0E4EC]">{catCfg.label}</h3>
-              <span className="text-[11px] text-[#4A6E7F]">
+              <h3 className="text-sm font-semibold text-cg-slate-tint">{catCfg.label}</h3>
+              <span className="text-[11px] text-cg-slate-strong">
                 {services.filter(s => s.status === 'operational').length}/{services.length} operational
               </span>
             </div>

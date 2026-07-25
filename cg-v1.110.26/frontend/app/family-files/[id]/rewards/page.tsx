@@ -58,7 +58,7 @@ function redemptionStatusLabel(status: RewardRedemption['status']) {
 function redemptionStatusBadgeClass(status: RewardRedemption['status']) {
   switch (status) {
     case 'requested':
-      return 'bg-cg-amber-subtle text-[#E09520] border border-cg-amber-subtle';
+      return 'bg-cg-amber-subtle text-cg-amber-dark border border-cg-amber-subtle';
     case 'fulfilled':
       return 'bg-cg-sage-subtle text-cg-sage-dark border border-cg-sage-subtle';
     case 'cancelled':
@@ -227,7 +227,7 @@ export default function ParentRewardsPage() {
             <div className="mb-6 bg-cg-error-subtle border-2 border-cg-error-subtle rounded-2xl p-4">
               <div className="flex items-center gap-3">
                 <XCircle className="h-5 w-5 text-cg-error" />
-                <p className="text-[#9B2C2C] font-medium">{error}</p>
+                <p className="text-cg-error-dark font-medium">{error}</p>
               </div>
             </div>
           )}
@@ -298,10 +298,10 @@ export default function ParentRewardsPage() {
                   className="text-lg font-bold text-foreground mb-4 flex items-center gap-2"
                   style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
                 >
-                  <Package className="h-5 w-5 text-[#E09520]" />
+                  <Package className="h-5 w-5 text-cg-amber-dark" />
                   To fulfill
                   {pendingRedemptions.length > 0 && (
-                    <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-cg-amber-subtle text-[#E09520] border border-cg-amber-subtle">
+                    <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-cg-amber-subtle text-cg-amber-dark border border-cg-amber-subtle">
                       {pendingRedemptions.length}
                     </span>
                   )}
@@ -358,7 +358,7 @@ export default function ParentRewardsPage() {
                             <button
                               onClick={() => cancelRedemption(red)}
                               disabled={busy}
-                              className="flex items-center justify-center gap-1.5 border-2 border-cg-amber bg-white hover:bg-cg-amber-subtle text-[#E09520] text-sm font-semibold px-3 py-2 rounded-lg disabled:opacity-50"
+                              className="flex items-center justify-center gap-1.5 border-2 border-cg-amber bg-white hover:bg-cg-amber-subtle text-cg-amber-dark text-sm font-semibold px-3 py-2 rounded-lg disabled:opacity-50"
                             >
                               <X className="h-4 w-4" />
                               Cancel &amp; refund
@@ -824,7 +824,7 @@ function RewardFormModal({
           </div>
 
           {err && (
-            <div className="bg-cg-error-subtle border border-cg-error-subtle text-[#9B2C2C] rounded-lg px-3 py-2 text-sm">
+            <div className="bg-cg-error-subtle border border-cg-error-subtle text-cg-error-dark rounded-lg px-3 py-2 text-sm">
               {err}
             </div>
           )}

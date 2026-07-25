@@ -310,8 +310,8 @@ export default function GenericPartnerLanding({ partner }: GenericPartnerLanding
                             </div>
 
                             {codeError && (
-                                <p className="text-[#E06B6B] text-sm flex items-center gap-2 animate-in fade-in slide-in-from-top-1">
-                                    <span className="h-1.5 w-1.5 rounded-full bg-[#E06B6B]" />
+                                <p className="text-cg-error-light text-sm flex items-center gap-2 animate-in fade-in slide-in-from-top-1">
+                                    <span className="h-1.5 w-1.5 rounded-full bg-cg-error-light" />
                                     {codeError}
                                 </p>
                             )}

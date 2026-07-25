@@ -353,7 +353,7 @@ export default function IntakeManagementPage() {
       {/* Info Banner */}
       <Alert className="bg-cg-slate-subtle border-cg-slate-subtle">
         <MessageSquare className="h-4 w-4 text-cg-slate" />
-        <AlertDescription className="text-[#1E4E6B]">
+        <AlertDescription className="text-cg-slate-dark">
           <strong>How it works:</strong> Create an intake link, send it to the parent, and ARIA will conduct
           a conversational interview. No confusing forms - just natural conversation that gets organized into
           court documents.
@@ -396,7 +396,7 @@ export default function IntakeManagementPage() {
                         </Badge>
                       )}
                       {session.clarification_requested && (
-                        <Badge variant="outline" className="bg-cg-amber-subtle text-[#E09520] border-cg-amber-subtle">
+                        <Badge variant="outline" className="bg-cg-amber-subtle text-cg-amber-dark border-cg-amber-subtle">
                           <AlertCircle className="h-3 w-3 mr-1" />
                           Clarification Needed
                         </Badge>
@@ -518,9 +518,9 @@ export default function IntakeManagementPage() {
 function StatusBadge({ status }: { status: string }) {
   const config: Record<string, { label: string; variant: "default" | "secondary" | "outline" | "destructive"; className: string }> = {
     pending: { label: "Pending", variant: "secondary", className: "bg-gray-100 text-gray-700" },
-    in_progress: { label: "In Progress", variant: "default", className: "bg-cg-slate-subtle text-[#1E4E6B]" },
+    in_progress: { label: "In Progress", variant: "default", className: "bg-cg-slate-subtle text-cg-slate-dark" },
     completed: { label: "Completed", variant: "default", className: "bg-cg-sage-subtle text-cg-sage-dark" },
-    expired: { label: "Expired", variant: "destructive", className: "bg-cg-error-subtle text-[#9B2C2C]" },
+    expired: { label: "Expired", variant: "destructive", className: "bg-cg-error-subtle text-cg-error-dark" },
     cancelled: { label: "Cancelled", variant: "secondary", className: "bg-gray-100 text-gray-500" },
   };
 

@@ -331,7 +331,7 @@ export default function ImpactBoard({ partner, metrics, isStaff = false }: Impac
                             If you serve fathers, families, or community stability programs, this partnership model is built to scale. Funding turns into grant codes. Grant codes turn into real usage. Usage turns into measurable reductions in conflict patterns.
                         </p>
                         <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
-                            <Button className="bg-cg-amber hover:bg-[#E09520] text-gray-900 font-bold h-12 px-8">
+                            <Button className="bg-cg-amber hover:bg-cg-amber-dark text-gray-900 font-bold h-12 px-8">
                                 Become a Partner
                             </Button>
                             <Button variant="secondary" className="bg-white text-gray-900 hover:bg-gray-100 h-12 px-8 font-bold">

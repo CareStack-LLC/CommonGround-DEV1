@@ -208,7 +208,7 @@ export default function FirmSettingsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {[
           { href: "/professional/firm/team", icon: Users, label: "Team Members", desc: `${firm?.member_count || 0} members`, color: "text-blue-600 bg-blue-50" },
-          { href: "/professional/firm/templates", icon: FileText, label: "Templates", desc: "Intake & agreement templates", color: "text-cg-slate bg-[#F0F7FC]" },
+          { href: "/professional/firm/templates", icon: FileText, label: "Templates", desc: "Intake & agreement templates", color: "text-cg-slate bg-cg-slate-tint" },
           { href: "/professional/firm/analytics", icon: BarChart3, label: "Analytics", desc: "Firm performance & trends", color: "text-cg-sage bg-background" },
           { href: "/professional/firm/queue", icon: Inbox, label: "Case Queue", desc: "Assign incoming cases", color: "text-foreground bg-slate-100" },
         ].map((item) => (
@@ -431,7 +431,7 @@ export default function FirmSettingsPage() {
 
       {/* Save Button */}
       <div className="flex justify-end">
-        <Button onClick={handleSave} disabled={isSaving} className="bg-cg-sage hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm font-semibold">
+        <Button onClick={handleSave} disabled={isSaving} className="bg-cg-sage hover:bg-cg-sage-dark text-white rounded-xl shadow-sm font-semibold">
           <Save className="h-4 w-4 mr-2" />
           {isSaving ? "Saving..." : "Save Changes"}
         </Button>

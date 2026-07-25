@@ -45,28 +45,28 @@ const categoryIcons: Record<ObligationCategory, React.ReactNode> = {
 };
 
 const categoryColors: Record<ObligationCategory, string> = {
-  medical: 'bg-cg-error-subtle text-[#9B2C2C] border-cg-error-subtle',
-  education: 'bg-cg-slate-subtle text-[#1E4E6B] border-cg-slate-subtle',
+  medical: 'bg-cg-error-subtle text-cg-error-dark border-cg-error-subtle',
+  education: 'bg-cg-slate-subtle text-cg-slate-dark border-cg-slate-subtle',
   sports: 'bg-cg-sage-subtle text-cg-sage-dark border-cg-sage-subtle',
-  device: 'bg-cg-slate-subtle text-[#1E4E6B] border-cg-slate-subtle',
-  camp: 'bg-cg-amber-subtle text-[#E09520] border-cg-amber-subtle',
-  clothing: 'bg-cg-amber-subtle text-[#E09520] border-cg-amber-subtle',
+  device: 'bg-cg-slate-subtle text-cg-slate-dark border-cg-slate-subtle',
+  camp: 'bg-cg-amber-subtle text-cg-amber-dark border-cg-amber-subtle',
+  clothing: 'bg-cg-amber-subtle text-cg-amber-dark border-cg-amber-subtle',
   transportation: 'bg-muted text-foreground border-border',
-  child_support: 'bg-cg-amber-subtle text-[#E09520] border-cg-amber-subtle',
-  extracurricular: 'bg-cg-slate-subtle text-[#1E4E6B] border-cg-slate-subtle',
-  childcare: 'bg-cg-slate-subtle text-[#1E4E6B] border-cg-slate-subtle',
+  child_support: 'bg-cg-amber-subtle text-cg-amber-dark border-cg-amber-subtle',
+  extracurricular: 'bg-cg-slate-subtle text-cg-slate-dark border-cg-slate-subtle',
+  childcare: 'bg-cg-slate-subtle text-cg-slate-dark border-cg-slate-subtle',
   other: 'bg-muted text-foreground border-border',
 };
 
 const statusConfig: Record<ObligationStatus, { label: string; className: string; icon: React.ReactNode }> = {
-  open: { label: 'Open', className: 'bg-cg-amber-subtle text-[#E09520]', icon: <Clock className="h-3 w-3" /> },
-  partially_funded: { label: 'Partially Funded', className: 'bg-cg-amber-subtle text-[#E09520]', icon: <Clock className="h-3 w-3" /> },
-  funded: { label: 'Funded', className: 'bg-cg-slate-subtle text-[#1E4E6B]', icon: <CheckCircle className="h-3 w-3" /> },
-  pending_verification: { label: 'Pending Verification', className: 'bg-cg-slate-subtle text-[#1E4E6B]', icon: <Clock className="h-3 w-3" /> },
+  open: { label: 'Open', className: 'bg-cg-amber-subtle text-cg-amber-dark', icon: <Clock className="h-3 w-3" /> },
+  partially_funded: { label: 'Partially Funded', className: 'bg-cg-amber-subtle text-cg-amber-dark', icon: <Clock className="h-3 w-3" /> },
+  funded: { label: 'Funded', className: 'bg-cg-slate-subtle text-cg-slate-dark', icon: <CheckCircle className="h-3 w-3" /> },
+  pending_verification: { label: 'Pending Verification', className: 'bg-cg-slate-subtle text-cg-slate-dark', icon: <Clock className="h-3 w-3" /> },
   verified: { label: 'Verified', className: 'bg-cg-sage-subtle text-foreground', icon: <CheckCircle className="h-3 w-3" /> },
   completed: { label: 'Completed', className: 'bg-cg-sage-subtle text-foreground', icon: <CheckCircle className="h-3 w-3" /> },
   expired: { label: 'Expired', className: 'bg-muted text-foreground', icon: <XCircle className="h-3 w-3" /> },
-  cancelled: { label: 'Cancelled', className: 'bg-cg-error-subtle text-[#9B2C2C]', icon: <XCircle className="h-3 w-3" /> },
+  cancelled: { label: 'Cancelled', className: 'bg-cg-error-subtle text-cg-error-dark', icon: <XCircle className="h-3 w-3" /> },
 };
 
 function formatCurrency(amount: string | number): string {
@@ -124,7 +124,7 @@ export default function ObligationCard({
                   {capitalizeFirst(category)}
                 </span>
                 {obligation.is_overdue && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-cg-error-subtle text-[#9B2C2C]">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-cg-error-subtle text-cg-error-dark">
                     <AlertTriangle className="h-3 w-3" />
                     Overdue
                   </span>

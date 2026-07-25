@@ -132,7 +132,7 @@ function LoginContent() {
             {/* Error Message */}
             {error && (
               <div className="mb-6 p-4 bg-cg-error-subtle border border-cg-error-subtle rounded-xl">
-                <p className="text-sm text-[#9B2C2C] font-medium">{error}</p>
+                <p className="text-sm text-cg-error-dark font-medium">{error}</p>
               </div>
             )}
 

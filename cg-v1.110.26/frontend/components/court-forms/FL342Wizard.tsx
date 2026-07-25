@@ -337,7 +337,7 @@ export default function FL342Wizard({
                       variant="ghost"
                       size="sm"
                       onClick={() => removeChild(index)}
-                      className="text-cg-error hover:text-[#9B2C2C]"
+                      className="text-cg-error hover:text-cg-error-dark"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -589,7 +589,7 @@ export default function FL342Wizard({
 
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-4 p-4 bg-cg-slate-subtle rounded-lg">
-                <h5 className="font-medium text-[#1E4E6B]">Petitioner&apos;s Income</h5>
+                <h5 className="font-medium text-cg-slate-dark">Petitioner&apos;s Income</h5>
                 <div>
                   <Label>Gross Monthly Income ($)</Label>
                   <Input
@@ -623,7 +623,7 @@ export default function FL342Wizard({
               </div>
 
               <div className="space-y-4 p-4 bg-cg-slate-subtle rounded-lg">
-                <h5 className="font-medium text-[#1E4E6B]">Respondent&apos;s Income</h5>
+                <h5 className="font-medium text-cg-slate-dark">Respondent&apos;s Income</h5>
                 <div>
                   <Label>Gross Monthly Income ($)</Label>
                   <Input
@@ -1030,7 +1030,7 @@ export default function FL342Wizard({
             </div>
 
             <div className="p-4 bg-cg-amber-subtle border border-cg-amber-subtle rounded-lg">
-              <p className="text-sm text-[#E09520]">
+              <p className="text-sm text-cg-amber-dark">
                 <strong>Note:</strong> Earnings assignment (wage garnishment) is mandatory under California law
                 unless the court finds good cause to stay the assignment, or the parties agree to an alternative
                 arrangement with court approval.

@@ -926,9 +926,9 @@ function AgreementDetailsContent() {
                               )}
                             </ul>
                           </div>
-                          <div className="bg-cg-error-subtle dark:bg-[#7A2222]/10 rounded-lg p-3 border border-cg-error-subtle dark:border-[#9B2C2C]">
-                            <p className="font-semibold text-[#7A2222] dark:text-cg-error-subtle mb-2">✗ Not Covered</p>
-                            <ul className="space-y-1.5 text-[#9B2C2C] dark:text-cg-error-subtle">
+                          <div className="bg-cg-error-subtle dark:bg-cg-error-deep/10 rounded-lg p-3 border border-cg-error-subtle dark:border-cg-error-dark">
+                            <p className="font-semibold text-cg-error-deep dark:text-cg-error-subtle mb-2">✗ Not Covered</p>
+                            <ul className="space-y-1.5 text-cg-error-dark dark:text-cg-error-subtle">
                               {summary.shared_expenses_table.not_covered?.map((item: string, idx: number) => (
                                 <li key={idx}>• {item}</li>
                               ))}
@@ -966,8 +966,8 @@ function AgreementDetailsContent() {
                       )}
                       {activationSummary.summary.holiday_events > 0 && (
                         <div className="p-3 rounded-xl bg-cg-amber-subtle dark:bg-foreground/30 text-center">
-                          <div className="text-2xl font-bold text-[#E09520]">{activationSummary.summary.holiday_events}</div>
-                          <div className="text-xs text-[#E09520]/70">Holidays</div>
+                          <div className="text-2xl font-bold text-cg-amber-dark">{activationSummary.summary.holiday_events}</div>
+                          <div className="text-xs text-cg-amber-dark/70">Holidays</div>
                         </div>
                       )}
                       {activationSummary.summary.activity_events > 0 && (
@@ -1033,7 +1033,7 @@ function AgreementDetailsContent() {
                           <div className={`text-5xl font-bold ${
                             complianceData.overall_score >= 90 ? 'text-cg-sage-dark' :
                             complianceData.overall_score >= 75 ? 'text-cg-slate' :
-                            complianceData.overall_score >= 50 ? 'text-[#E09520]' :
+                            complianceData.overall_score >= 50 ? 'text-cg-amber-dark' :
                             'text-cg-error'
                           }`}>
                             {complianceData.overall_score}%

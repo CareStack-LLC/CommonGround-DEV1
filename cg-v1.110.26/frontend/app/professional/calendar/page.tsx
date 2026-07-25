@@ -386,7 +386,7 @@ export default function ProfessionalCalendarPage() {
             Events, meetings & important deadlines
           </p>
         </div>
-        <Button onClick={() => setShowEventForm(true)} className="bg-cg-sage hover:bg-[#2D8A6E] text-white font-semibold px-5 h-10 rounded-xl shadow-sm">
+        <Button onClick={() => setShowEventForm(true)} className="bg-cg-sage hover:bg-cg-sage-dark text-white font-semibold px-5 h-10 rounded-xl shadow-sm">
           <Plus className="h-4 w-4 mr-2" />
           New Event
         </Button>

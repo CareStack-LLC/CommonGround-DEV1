@@ -101,7 +101,7 @@ export function CourtDatesWidget({ events }: CourtDatesWidgetProps) {
                                 </p>
                                 <div className="flex items-center gap-2 mt-0.5">
                                     <span
-                                        className={`text-[10px] font-semibold ${urgent ? "text-[#E09520]" : "text-slate-400"
+                                        className={`text-[10px] font-semibold ${urgent ? "text-cg-amber-dark" : "text-slate-400"
                                             }`}
                                     >
                                         {daysLabel}
@@ -112,7 +112,7 @@ export function CourtDatesWidget({ events }: CourtDatesWidgetProps) {
                                         </span>
                                     )}
                                     {event.is_mandatory && (
-                                        <Badge className="text-[9px] px-1.5 py-0 bg-cg-amber-subtle text-[#E09520] border border-cg-amber-subtle flex items-center gap-0.5">
+                                        <Badge className="text-[9px] px-1.5 py-0 bg-cg-amber-subtle text-cg-amber-dark border border-cg-amber-subtle flex items-center gap-0.5">
                                             <AlertTriangle className="h-2.5 w-2.5" />
                                             Req.
                                         </Badge>

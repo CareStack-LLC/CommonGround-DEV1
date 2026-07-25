@@ -74,15 +74,15 @@ export function LiveStatusBar() {
         ? 'bg-cg-amber'
         : health?.status === 'critical'
           ? 'bg-red-500'
-          : 'bg-[#4A6E7F]';
+          : 'bg-cg-slate-strong';
 
-  const firingColor = (firing ?? 0) > 0 ? 'text-red-400' : 'text-[#D0E4EC]';
+  const firingColor = (firing ?? 0) > 0 ? 'text-red-400' : 'text-cg-slate-tint';
 
   // NOTE: PlatformHealth doesn't carry error_rate_5m or db_latency_ms today;
   // these render "—". Hook point: extend the backend's platform-health
   // endpoint to surface those and replace the "—" below.
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-30 h-9 bg-[#0F2533]/95 backdrop-blur-md border-t border-cg-slate/20 flex items-center px-4 text-xs">
+    <div className="fixed bottom-0 left-0 right-0 z-30 h-9 bg-cg-ink/95 backdrop-blur-md border-t border-cg-slate/20 flex items-center px-4 text-xs">
       <div className="flex items-center gap-2 mr-4">
         <div className={`relative flex items-center justify-center w-2 h-2`}>
           <span className={`absolute inline-flex h-full w-full rounded-full ${healthColor} ${health?.status === 'healthy' ? 'animate-pulse' : ''} opacity-75`} />
@@ -92,7 +92,7 @@ export function LiveStatusBar() {
         <span className="text-cg-sage-light/90 font-medium">Live</span>
       </div>
 
-      <div className="hidden sm:flex items-center gap-1.5 mr-4 text-[#8AACBC]">
+      <div className="hidden sm:flex items-center gap-1.5 mr-4 text-cg-slate-muted">
         <UsersIcon className="w-3 h-3" />
         <span>Online admins:</span>
         <span className="text-white font-medium">
@@ -100,7 +100,7 @@ export function LiveStatusBar() {
         </span>
       </div>
 
-      <div className="hidden md:flex items-center gap-1.5 mr-4 text-[#8AACBC]">
+      <div className="hidden md:flex items-center gap-1.5 mr-4 text-cg-slate-muted">
         <Activity className="w-3 h-3" />
         <span>Error rate (5m):</span>
         <span className="text-white font-medium">—</span>
@@ -109,13 +109,13 @@ export function LiveStatusBar() {
 
       <div className="flex items-center gap-1.5 mr-4">
         <AlertCircle className={`w-3 h-3 ${firingColor}`} />
-        <span className="text-[#8AACBC]">Alerts firing:</span>
+        <span className="text-cg-slate-muted">Alerts firing:</span>
         <span className={`font-medium ${firingColor}`}>
           {firing ?? '—'}
         </span>
       </div>
 
-      <div className="hidden lg:flex items-center gap-1.5 mr-4 text-[#8AACBC]">
+      <div className="hidden lg:flex items-center gap-1.5 mr-4 text-cg-slate-muted">
         <Database className="w-3 h-3" />
         <span>DB latency:</span>
         <span className="text-white font-medium">—</span>

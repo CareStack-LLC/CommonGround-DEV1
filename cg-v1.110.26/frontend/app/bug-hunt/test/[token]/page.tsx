@@ -25,9 +25,9 @@ interface TesterDashboard {
 type Tab = 'checklist' | 'bugs' | 'feedback' | 'notes';
 
 const SEVERITY_COLORS: Record<string, string> = {
-  critical: 'bg-cg-error-subtle text-[#9B2C2C] border border-cg-error-subtle',
-  high: 'bg-cg-amber-subtle text-[#E09520] border border-cg-amber-subtle',
-  medium: 'bg-cg-amber-subtle text-[#E09520] border border-cg-amber-subtle',
+  critical: 'bg-cg-error-subtle text-cg-error-dark border border-cg-error-subtle',
+  high: 'bg-cg-amber-subtle text-cg-amber-dark border border-cg-amber-subtle',
+  medium: 'bg-cg-amber-subtle text-cg-amber-dark border border-cg-amber-subtle',
   low: 'bg-gray-100 text-gray-600',
 };
 
@@ -126,7 +126,7 @@ export default function TesterPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="max-w-sm w-full bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
-          <AlertCircle className="w-12 h-12 text-[#E06B6B] mx-auto mb-4" />
+          <AlertCircle className="w-12 h-12 text-cg-error-light mx-auto mb-4" />
           <h2 className="text-lg font-semibold text-gray-900 mb-2">Access Denied</h2>
           <p className="text-sm text-gray-500">{error || 'This testing link is invalid or has expired.'}</p>
         </div>
@@ -190,8 +190,8 @@ export default function TesterPage() {
                   {family.agreement_version && (
                     <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
                       family.agreement_version === 'good_faith' ? 'bg-cg-sage-subtle text-cg-sage-dark' :
-                      family.agreement_version === 'co-operative' ? 'bg-cg-slate-subtle text-[#1E4E6B]' :
-                      family.agreement_version === 'comprehensive' ? 'bg-cg-slate-subtle text-[#1E4E6B]' :
+                      family.agreement_version === 'co-operative' ? 'bg-cg-slate-subtle text-cg-slate-dark' :
+                      family.agreement_version === 'comprehensive' ? 'bg-cg-slate-subtle text-cg-slate-dark' :
                       'bg-gray-100 text-gray-600'
                     }`}>
                       {family.agreement_version.replace(/_/g, ' ')}
@@ -200,8 +200,8 @@ export default function TesterPage() {
                   {family.subscription_tier && (
                     <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${
                       family.subscription_tier === 'web_starter' ? 'bg-gray-100 text-gray-600' :
-                      family.subscription_tier === 'plus' ? 'bg-cg-amber-subtle text-[#E09520]' :
-                      family.subscription_tier === 'complete' ? 'bg-cg-amber-subtle text-[#E09520]' :
+                      family.subscription_tier === 'plus' ? 'bg-cg-amber-subtle text-cg-amber-dark' :
+                      family.subscription_tier === 'complete' ? 'bg-cg-amber-subtle text-cg-amber-dark' :
                       'bg-gray-100 text-gray-600'
                     }`}>
                       {family.subscription_tier.replace(/_/g, ' ')}
@@ -247,7 +247,7 @@ export default function TesterPage() {
         {actionError && (
           <div className="bg-cg-error-subtle border border-cg-error-subtle rounded-xl p-3 flex items-center justify-between">
             <span className="text-sm text-cg-error">{actionError}</span>
-            <button onClick={() => setActionError(null)} className="text-xs text-[#E06B6B] underline">dismiss</button>
+            <button onClick={() => setActionError(null)} className="text-xs text-cg-error-light underline">dismiss</button>
           </div>
         )}
 
@@ -454,7 +454,7 @@ export default function TesterPage() {
                 <div className="flex items-center gap-2 mb-1">
                   <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${
                     note.note_type === 'blocker' ? 'bg-cg-error-subtle text-cg-error' :
-                    note.note_type === 'question' ? 'bg-cg-amber-subtle text-[#E09520]' :
+                    note.note_type === 'question' ? 'bg-cg-amber-subtle text-cg-amber-dark' :
                     note.note_type === 'resolution' ? 'bg-cg-sage-subtle text-cg-sage-dark' :
                     'bg-cg-slate-subtle text-cg-slate'
                   }`}>{note.note_type}</span>

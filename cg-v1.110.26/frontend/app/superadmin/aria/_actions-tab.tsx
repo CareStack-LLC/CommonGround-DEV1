@@ -45,7 +45,7 @@ export default function ActionsTab({ data }: { data: AriaInsights }) {
       <div className="bg-gradient-to-r from-red-900/20 to-transparent border border-red-500/20 rounded-xl p-4 flex items-center justify-between">
         <div>
           <div className="text-xs text-red-400 font-medium mb-0.5">Override Rate</div>
-          <div className="text-sm text-[#8AACBC]">
+          <div className="text-sm text-cg-slate-muted">
             Users who ignored ARIA and sent the original message
           </div>
         </div>
@@ -54,8 +54,8 @@ export default function ActionsTab({ data }: { data: AriaInsights }) {
 
       <div className="grid lg:grid-cols-2 gap-4">
         {/* Action breakdown bar chart */}
-        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">User Response Actions</h2>
+        <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+          <h2 className="text-sm font-semibold text-cg-slate-tint mb-4">User Response Actions</h2>
           {actionData.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={actionData} layout="vertical" margin={{ left: 30 }}>
@@ -83,13 +83,13 @@ export default function ActionsTab({ data }: { data: AriaInsights }) {
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <p className="text-[#4A6E7F] text-sm text-center py-10">No action data</p>
+            <p className="text-cg-slate-strong text-sm text-center py-10">No action data</p>
           )}
         </div>
 
         {/* Action summary cards */}
-        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">Action Summary</h2>
+        <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+          <h2 className="text-sm font-semibold text-cg-slate-tint mb-4">Action Summary</h2>
           <div className="space-y-3">
             {ACTION_ITEMS.map(({ label, key, icon: Icon, color, desc }) => (
               <div
@@ -112,8 +112,8 @@ export default function ActionsTab({ data }: { data: AriaInsights }) {
 
       {/* Acceptance Rate Trend */}
       {trendData.length > 1 && (
-        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">
+        <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+          <h2 className="text-sm font-semibold text-cg-slate-tint mb-4">
             Weekly Acceptance Rate Trend
           </h2>
           <ResponsiveContainer width="100%" height={220}>
@@ -152,8 +152,8 @@ export default function ActionsTab({ data }: { data: AriaInsights }) {
 
       {/* Circle action breakdown */}
       {data.circle_data?.action_breakdown && Object.keys(data.circle_data.action_breakdown).length > 0 && (
-        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">
+        <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+          <h2 className="text-sm font-semibold text-cg-slate-tint mb-4">
             Circle (KidComs) Actions
           </h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-3">

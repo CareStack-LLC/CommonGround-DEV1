@@ -133,7 +133,7 @@ function getResponseBadge(consented: boolean, doNotConsent: boolean): { label: s
     return { label: 'Consented', color: 'bg-cg-sage-subtle text-cg-sage-dark' };
   }
   if (doNotConsent) {
-    return { label: 'Counter-Proposed', color: 'bg-cg-amber-subtle text-[#E09520]' };
+    return { label: 'Counter-Proposed', color: 'bg-cg-amber-subtle text-cg-amber-dark' };
   }
   return { label: 'Pending', color: 'bg-gray-100 text-gray-500' };
 }
@@ -778,7 +778,7 @@ export default function FL320Summary({ formData, fl300Data, canEdit, onEditSecti
                             e.stopPropagation();
                             toggleSection(section.id);
                           }}
-                          className="text-cg-slate hover:text-[#1E4E6B]"
+                          className="text-cg-slate hover:text-cg-slate-dark"
                         >
                           <Eye className="h-3.5 w-3.5 mr-1" />
                           {isExpanded ? 'Hide' : 'View'}

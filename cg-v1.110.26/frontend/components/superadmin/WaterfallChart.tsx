@@ -21,8 +21,8 @@ export function WaterfallChart({ items, title = 'MRR Movement', tooltip }: Water
   const maxAbs = Math.max(...items.map(i => Math.abs(i.value)), 1);
 
   return (
-    <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-      <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">
+    <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+      <h2 className="text-sm font-semibold text-cg-slate-tint mb-4">
         {title}
         {tooltip && <InfoTooltip text={tooltip} />}
       </h2>
@@ -38,7 +38,7 @@ export function WaterfallChart({ items, title = 'MRR Movement', tooltip }: Water
               {/* Value label */}
               <div className="text-[10px] font-medium mb-1 text-center whitespace-nowrap">
                 <span className={
-                  isTotal ? 'text-[#D0E4EC]' :
+                  isTotal ? 'text-cg-slate-tint' :
                   isPositive ? 'text-emerald-400' : 'text-red-400'
                 }>
                   {item.value >= 0 ? '+' : ''}{formatCurrency(item.value)}

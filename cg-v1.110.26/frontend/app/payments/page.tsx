@@ -129,7 +129,7 @@ function NetBalanceCard({
                 isOwed
                   ? 'bg-cg-sage-subtle text-cg-sage-dark'
                   : netBalance < 0
-                  ? 'bg-cg-error-subtle text-[#9B2C2C]'
+                  ? 'bg-cg-error-subtle text-cg-error-dark'
                   : 'bg-muted text-muted-foreground'
               }`}>
                 {netBalance === 0 ? 'Balanced' : isOwed ? 'Owed to You' : 'You Owe'}
@@ -260,7 +260,7 @@ function MetricsRow({
                 <stat.icon className={`h-5 w-5 ${stat.text}`} />
                 {hasOverdue && (
                   <span className="absolute -top-1 -right-1 flex h-4 w-4">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#E06B6B] opacity-75" />
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cg-error-light opacity-75" />
                     <span className="relative inline-flex rounded-full h-4 w-4 bg-cg-error items-center justify-center text-[9px] text-white font-bold">
                       {stat.value}
                     </span>
@@ -741,7 +741,7 @@ function PaymentsContent() {
               group flex items-center gap-2 px-4 py-3 text-sm font-bold rounded-xl
               transition-all duration-300 whitespace-nowrap flex-shrink-0
               ${activeTab === 'pending'
-                ? 'bg-gradient-to-r from-cg-amber to-[#E09520] text-white shadow-md'
+                ? 'bg-gradient-to-r from-cg-amber to-cg-amber-dark text-white shadow-md'
                 : 'text-muted-foreground hover:text-foreground hover:bg-muted'
               }
             `}

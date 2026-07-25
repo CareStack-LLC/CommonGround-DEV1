@@ -36,8 +36,8 @@ interface CaseCardProps {
 export function CaseCard({ caseData }: CaseCardProps) {
     const getUrgencyColor = (score: number) => {
         if (score >= 80) return "text-cg-error bg-cg-error-subtle border-cg-error-subtle";
-        if (score >= 50) return "text-[#E09520] bg-cg-amber-subtle border-[#FBE3BF]";
-        return "text-cg-sage-dark bg-cg-sage-subtle border-[#C5E5DB]";
+        if (score >= 50) return "text-cg-amber-dark bg-cg-amber-subtle border-cg-amber-tint";
+        return "text-cg-sage-dark bg-cg-sage-subtle border-cg-sage-tint";
     };
 
     const getUrgencyBadge = (score: number) => {

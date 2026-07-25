@@ -46,7 +46,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 const categoryColors: Record<string, { bg: string; text: string; gradient: string }> = {
   communication: { bg: 'bg-cg-slate-subtle dark:bg-foreground/30', text: 'text-cg-slate dark:text-cg-slate-light', gradient: 'from-cg-slate-subtle to-cg-slate-subtle dark:from-foreground/30 dark:to-foreground/10' },
   custody: { bg: 'bg-cg-sage-subtle dark:bg-foreground/30', text: 'text-cg-sage-dark dark:text-cg-sage-light', gradient: 'from-cg-sage-subtle to-cg-sage-subtle dark:from-foreground/30 dark:to-foreground/10' },
-  schedule: { bg: 'bg-cg-amber-subtle dark:bg-foreground/30', text: 'text-[#E09520] dark:text-cg-amber', gradient: 'from-cg-amber-subtle to-cg-amber-subtle dark:from-foreground/30 dark:to-foreground/10' },
+  schedule: { bg: 'bg-cg-amber-subtle dark:bg-foreground/30', text: 'text-cg-amber-dark dark:text-cg-amber', gradient: 'from-cg-amber-subtle to-cg-amber-subtle dark:from-foreground/30 dark:to-foreground/10' },
   financial: { bg: 'bg-cg-slate-subtle dark:bg-foreground/30', text: 'text-cg-slate dark:text-cg-slate-light', gradient: 'from-cg-slate-subtle to-cg-slate-subtle dark:from-foreground/30 dark:to-foreground/10' },
   system: { bg: 'bg-slate-100 dark:bg-slate-800/50', text: 'text-slate-500 dark:text-slate-400', gradient: 'from-slate-100 to-slate-50 dark:from-slate-800/50 dark:to-slate-800/30' },
 };

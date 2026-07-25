@@ -179,7 +179,7 @@ export default function CaseQueuePage() {
         normal: { label: "Normal", color: "bg-slate-100 text-slate-600", icon: null },
         high: {
             label: "High",
-            color: "bg-cg-amber-subtle text-[#B8791A]",
+            color: "bg-cg-amber-subtle text-cg-amber-deep",
             icon: <Clock className="h-3.5 w-3.5" />,
         },
         urgent: {
@@ -224,7 +224,7 @@ export default function CaseQueuePage() {
                     </Link>
                     <h1 className="text-2xl font-bold">Case Queue</h1>
                 </div>
-                <Card className="border-[#FBE3BF] bg-gradient-to-br from-cg-amber-subtle/50 to-cg-amber-subtle/50">
+                <Card className="border-cg-amber-tint bg-gradient-to-br from-cg-amber-subtle/50 to-cg-amber-subtle/50">
                     <CardContent className="py-12 text-center">
                         <Lock className="h-12 w-12 mx-auto text-cg-amber mb-4" />
                         <h3 className="text-lg font-semibold mb-2">Firm Required</h3>
@@ -418,7 +418,7 @@ export default function CaseQueuePage() {
                                                                 daysLeft <= 1
                                                                     ? "text-red-600 font-medium"
                                                                     : daysLeft <= 3
-                                                                        ? "text-[#E09520]"
+                                                                        ? "text-cg-amber-dark"
                                                                         : ""
                                                             }
                                                         >
@@ -460,7 +460,7 @@ export default function CaseQueuePage() {
                                                     size="sm"
                                                     onClick={() => handleAssign(item.id)}
                                                     disabled={!selectedMember[item.id] || assigning === item.id}
-                                                    className="bg-cg-sage hover:bg-[#2D8A6E] text-white"
+                                                    className="bg-cg-sage hover:bg-cg-sage-dark text-white"
                                                 >
                                                     {assigning === item.id ? (
                                                         <Loader2 className="h-4 w-4 animate-spin" />

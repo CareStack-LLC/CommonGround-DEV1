@@ -289,7 +289,7 @@ export default function IntakePage() {
 
             <div className="bg-cg-slate-subtle rounded-lg p-4">
               <h3 className="font-medium text-foreground mb-2">How This Works</h3>
-              <ul className="text-sm text-[#1E4E6B] space-y-1">
+              <ul className="text-sm text-cg-slate-dark space-y-1">
                 <li>• You&apos;ll have a conversation with ARIA, an AI assistant</li>
                 <li>• Answer questions in your own words - no forms to fill out</li>
                 <li>• Your answers will be organized for {accessInfo.professional_name}</li>
@@ -298,7 +298,7 @@ export default function IntakePage() {
             </div>
 
             <div className="bg-cg-amber-subtle rounded-lg p-4">
-              <p className="text-sm text-[#E09520]">
+              <p className="text-sm text-cg-amber-dark">
                 <strong>Note:</strong> ARIA is an AI assistant that gathers information. It cannot and will not give legal advice. All your answers go directly to {accessInfo.professional_name}.
               </p>
             </div>
@@ -333,7 +333,7 @@ export default function IntakePage() {
               </div>
 
               <div className="bg-cg-amber-subtle rounded-lg p-4">
-                <p className="text-sm text-[#E09520]">
+                <p className="text-sm text-cg-amber-dark">
                   By confirming, you attest that the information above is accurate to the best of your knowledge.
                 </p>
               </div>

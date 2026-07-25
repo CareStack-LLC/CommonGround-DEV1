@@ -584,7 +584,7 @@ export default function CourtPortalFormDetailPage() {
           }
           .header {
             text-align: center;
-            border-bottom: 2px solid #1E4E6B;
+            border-bottom: 2px solid var(--cg-slate-dark);
             padding-bottom: 20px;
             margin-bottom: 30px;
           }
@@ -592,7 +592,7 @@ export default function CourtPortalFormDetailPage() {
             font-size: 14px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            color: #1E4E6B;
+            color: var(--cg-slate-dark);
             margin-bottom: 10px;
           }
           .form-type {
@@ -610,7 +610,7 @@ export default function CourtPortalFormDetailPage() {
           .section-title {
             font-size: 16px;
             font-weight: bold;
-            color: #1E4E6B;
+            color: var(--cg-slate-dark);
             border-bottom: 1px solid #e5e7eb;
             padding-bottom: 5px;
             margin-bottom: 15px;
@@ -639,10 +639,10 @@ export default function CourtPortalFormDetailPage() {
             text-transform: uppercase;
           }
           .status-approved { background: var(--cg-sage-subtle); color: var(--foreground); }
-          .status-submitted { background: var(--cg-slate-subtle); color: #1E4E6B; }
+          .status-submitted { background: var(--cg-slate-subtle); color: var(--cg-slate-dark); }
           .status-draft { background: #f3f4f6; color: #374151; }
-          .status-rejected { background: var(--cg-error-subtle); color: #9B2C2C; }
-          .status-under_court_review { background: var(--cg-amber-subtle); color: #E09520; }
+          .status-rejected { background: var(--cg-error-subtle); color: var(--cg-error-dark); }
+          .status-under_court_review { background: var(--cg-amber-subtle); color: var(--cg-amber-dark); }
           .data-table {
             width: 100%;
             border-collapse: collapse;
@@ -678,7 +678,7 @@ export default function CourtPortalFormDetailPage() {
           }
           .court-notes-label {
             font-weight: 600;
-            color: #1E4E6B;
+            color: var(--cg-slate-dark);
             margin-bottom: 5px;
           }
         </style>
@@ -858,7 +858,7 @@ export default function CourtPortalFormDetailPage() {
             <>
               <Button
                 variant="outline"
-                className="text-[#E09520] hover:bg-cg-amber-subtle border-cg-amber-subtle"
+                className="text-cg-amber-dark hover:bg-cg-amber-subtle border-cg-amber-subtle"
                 onClick={() => setShowResubmitModal(true)}
               >
                 <Edit className="h-4 w-4 mr-2" />
@@ -961,7 +961,7 @@ export default function CourtPortalFormDetailPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-[#1E4E6B]">{form.court_notes}</p>
+            <p className="text-cg-slate-dark">{form.court_notes}</p>
           </CardContent>
         </Card>
       )}
@@ -970,13 +970,13 @@ export default function CourtPortalFormDetailPage() {
       {form.resubmission_issues && form.resubmission_issues.length > 0 && (
         <Card className="bg-cg-error-subtle border-cg-error-subtle">
           <CardHeader>
-            <CardTitle className="text-[#7A2222] flex items-center gap-2">
+            <CardTitle className="text-cg-error-deep flex items-center gap-2">
               <AlertCircle className="h-5 w-5" />
               Issues Requiring Resubmission
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <ul className="list-disc list-inside space-y-1 text-[#9B2C2C]">
+            <ul className="list-disc list-inside space-y-1 text-cg-error-dark">
               {form.resubmission_issues.map((issue, idx) => (
                 <li key={idx}>{issue}</li>
               ))}
@@ -993,26 +993,26 @@ export default function CourtPortalFormDetailPage() {
               <Edit className="h-5 w-5" />
               Parent Edits Allowed
             </CardTitle>
-            <CardDescription className="text-[#E09520]">
+            <CardDescription className="text-cg-amber-dark">
               The parent has been granted permission to make corrections to this form.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
             {form.edits_allowed_notes && (
               <div>
-                <span className="font-medium text-[#E09520]">Notes to parent: </span>
-                <span className="text-[#E09520]">{form.edits_allowed_notes}</span>
+                <span className="font-medium text-cg-amber-dark">Notes to parent: </span>
+                <span className="text-cg-amber-dark">{form.edits_allowed_notes}</span>
               </div>
             )}
             {form.edits_allowed_at && (
-              <div className="text-sm text-[#E09520]">
+              <div className="text-sm text-cg-amber-dark">
                 Granted on {formatDate(form.edits_allowed_at)}
               </div>
             )}
             {form.edits_allowed_sections && form.edits_allowed_sections.length > 0 && (
               <div className="text-sm">
-                <span className="font-medium text-[#E09520]">Sections allowed: </span>
-                <span className="text-[#E09520]">
+                <span className="font-medium text-cg-amber-dark">Sections allowed: </span>
+                <span className="text-cg-amber-dark">
                   {form.edits_allowed_sections.map((s: string) => {
                     const section = (FORM_SECTIONS[form.form_type] || []).find((fs) => fs.id === s);
                     return section ? section.label : s;
@@ -1024,7 +1024,7 @@ export default function CourtPortalFormDetailPage() {
               <Button
                 variant="outline"
                 size="sm"
-                className="text-[#E09520] border-cg-amber hover:bg-cg-amber-subtle"
+                className="text-cg-amber-dark border-cg-amber hover:bg-cg-amber-subtle"
                 onClick={handleRevokeEdits}
                 disabled={isSubmitting}
               >
@@ -1176,8 +1176,8 @@ export default function CourtPortalFormDetailPage() {
         <Modal onClose={() => { setShowResubmitModal(false); setSelectedSections([]); }} size="large">
           <h2 className="text-xl font-bold mb-4">Request Changes</h2>
           <Alert className="mb-4 bg-cg-amber-subtle border-cg-amber-subtle">
-            <AlertCircle className="h-4 w-4 text-[#E09520]" />
-            <AlertDescription className="text-[#E09520]">
+            <AlertCircle className="h-4 w-4 text-cg-amber-dark" />
+            <AlertDescription className="text-cg-amber-dark">
               This will allow the parent to edit <strong>only</strong> the sections you select below.
               You cannot edit the form directly - only request corrections from the parent.
             </AlertDescription>
@@ -1255,7 +1255,7 @@ export default function CourtPortalFormDetailPage() {
             <Button
               onClick={handleRequestResubmission}
               disabled={isSubmitting || !resubmitIssues.trim() || selectedSections.length === 0}
-              className="bg-[#E09520] hover:bg-[#E09520]"
+              className="bg-cg-amber-dark hover:bg-cg-amber-dark"
             >
               {isSubmitting ? "Requesting..." : "Request Changes"}
             </Button>
@@ -1577,7 +1577,7 @@ function FormDataDisplay({ data, formType }: { data: Record<string, any>; formTy
           <Sparkles className="h-5 w-5 text-cg-slate" />
           <h4 className="font-semibold text-foreground">Form Summary</h4>
         </div>
-        <div className="prose prose-sm max-w-none text-[#1E4E6B]">
+        <div className="prose prose-sm max-w-none text-cg-slate-dark">
           {summary.split('\n\n').map((paragraph, idx) => (
             <p key={idx} className="mb-2 last:mb-0" dangerouslySetInnerHTML={{
               __html: sanitizeHtml(paragraph.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'))

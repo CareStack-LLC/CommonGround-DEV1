@@ -61,7 +61,7 @@ const CHANNELS: { id: Channel; label: string; icon: React.ElementType; color: st
   { id: 'instagram', label: 'Instagram', icon: Instagram, color: '#E1306C' },
   { id: 'tiktok', label: 'TikTok', icon: Video, color: '#00F2EA' },
   { id: 'facebook', label: 'Facebook', icon: Users, color: '#1877F2' },
-  { id: 'twitter', label: 'X / Twitter', icon: Hash, color: '#8AACBC' },
+  { id: 'twitter', label: 'X / Twitter', icon: Hash, color: 'var(--cg-slate-muted)' },
   { id: 'email_outreach', label: 'Email Outreach', icon: Mail, color: 'var(--cg-amber)' },
   { id: 'blog', label: 'Blog Post', icon: FileText, color: 'var(--cg-sage)' },
 ];
@@ -389,7 +389,7 @@ export default function GTMCommandCenter() {
             <Rocket className="w-6 h-6 text-cg-sage" />
             GTM Command Center
           </h1>
-          <p className="text-sm text-[#8AACBC] mt-1">Plan, create, track — all your go-to-market activities in one place</p>
+          <p className="text-sm text-cg-slate-muted mt-1">Plan, create, track — all your go-to-market activities in one place</p>
         </div>
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-cg-sage/15 text-cg-sage-light text-sm font-medium">
           <CheckCircle2 className="w-4 h-4" />
@@ -416,11 +416,11 @@ export default function GTMCommandCenter() {
         </div>
       )}
       {credsMissing && (
-        <div className="flex items-start gap-3 px-4 py-3 rounded-lg border border-cg-sage/30 bg-cg-sage/5 text-[#D0E4EC] text-sm">
+        <div className="flex items-start gap-3 px-4 py-3 rounded-lg border border-cg-sage/30 bg-cg-sage/5 text-cg-slate-tint text-sm">
           <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0 text-cg-sage" />
           <div className="flex-1">
             <p className="font-semibold">Reddit credentials missing.</p>
-            <p className="text-xs text-[#8AACBC] mt-1 leading-relaxed">
+            <p className="text-xs text-cg-slate-muted mt-1 leading-relaxed">
               The table is ready but no client_id / client_secret / username / password
               stored yet. Open the Reddit settings form to add credentials — until then,
               subreddit browsing is disabled.
@@ -430,9 +430,9 @@ export default function GTMCommandCenter() {
       )}
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-1">
+      <div className="flex gap-1 bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-1">
         {tabs.map(tab => (
-          <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === tab.id ? 'bg-cg-sage/15 text-cg-sage-light' : 'text-[#8AACBC] hover:bg-cg-slate/15'}`}>
+          <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === tab.id ? 'bg-cg-sage/15 text-cg-sage-light' : 'text-cg-slate-muted hover:bg-cg-slate/15'}`}>
             <tab.icon className="w-4 h-4" />
             {tab.label}
           </button>
@@ -443,12 +443,12 @@ export default function GTMCommandCenter() {
       {activeTab === 'dashboard' && (
         <div className="space-y-6">
           {/* Progress */}
-          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
+          <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-[#D0E4EC]">GTM Playbook Progress</span>
+              <span className="text-sm font-medium text-cg-slate-tint">GTM Playbook Progress</span>
               <span className="text-xs text-muted-foreground">{completedCount} of {totalTasks} tasks</span>
             </div>
-            <div className="h-3 bg-[#162D3A] rounded-full overflow-hidden">
+            <div className="h-3 bg-cg-slate-deep rounded-full overflow-hidden">
               <div className="h-full bg-gradient-to-r from-cg-sage to-cg-sage-light rounded-full transition-all duration-500" style={{ width: `${progressPct}%` }} />
             </div>
             <div className="flex gap-4 mt-3">
@@ -457,7 +457,7 @@ export default function GTMCommandCenter() {
                 return (
                   <div key={w.id} className="flex-1 text-center">
                     <div className="text-xs text-muted-foreground">{w.title.split(' — ')[0]}</div>
-                    <div className={`text-sm font-medium ${wDone === w.tasks.length ? 'text-emerald-400' : 'text-[#D0E4EC]'}`}>{wDone}/{w.tasks.length}</div>
+                    <div className={`text-sm font-medium ${wDone === w.tasks.length ? 'text-emerald-400' : 'text-cg-slate-tint'}`}>{wDone}/{w.tasks.length}</div>
                   </div>
                 );
               })}
@@ -472,7 +472,7 @@ export default function GTMCommandCenter() {
               { label: 'Email Campaigns', icon: Mail, color: 'var(--cg-amber)', stat: `${campaignCount} campaigns`, link: '/superadmin/leads/campaigns' },
               { label: 'Landing Pages', icon: Globe, color: 'var(--cg-slate)', stat: `${lpCount} pages`, link: '/superadmin/leads/landing-pages' },
               { label: 'LinkedIn', icon: Linkedin, color: '#0A66C2', stat: `${draftCounts.linkedin || 0} drafts, ${postedCounts.linkedin || 0} posted`, link: 'studio' },
-              { label: 'Outreach', icon: Briefcase, color: '#8AACBC', stat: `${contacts.length} contacts, ${contacts.filter(c => c.status === 'active_partner').length} partners`, link: 'outreach' },
+              { label: 'Outreach', icon: Briefcase, color: 'var(--cg-slate-muted)', stat: `${contacts.length} contacts, ${contacts.filter(c => c.status === 'active_partner').length} partners`, link: 'outreach' },
             ].map(card => (
               <button
                 key={card.label}
@@ -481,12 +481,12 @@ export default function GTMCommandCenter() {
                   else if (card.link === 'outreach') setActiveTab('outreach');
                   else window.location.href = card.link;
                 }}
-                className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-4 text-left hover:border-cg-sage/30 transition-colors group"
+                className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-4 text-left hover:border-cg-sage/30 transition-colors group"
               >
                 <div className="flex items-center gap-2 mb-2">
                   <card.icon className="w-5 h-5" style={{ color: card.color }} />
-                  <span className="text-sm font-medium text-[#D0E4EC]">{card.label}</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-[#4A6E7F] ml-auto group-hover:text-cg-sage-light transition-colors" />
+                  <span className="text-sm font-medium text-cg-slate-tint">{card.label}</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-cg-slate-strong ml-auto group-hover:text-cg-sage-light transition-colors" />
                 </div>
                 <p className="text-xs text-muted-foreground">{card.stat}</p>
               </button>
@@ -494,8 +494,8 @@ export default function GTMCommandCenter() {
           </div>
 
           {/* Recent Activity */}
-          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-            <h3 className="text-sm font-semibold text-[#D0E4EC] mb-3">Recent Activity</h3>
+          <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+            <h3 className="text-sm font-semibold text-cg-slate-tint mb-3">Recent Activity</h3>
             {activity.length === 0 ? (
               <p className="text-xs text-muted-foreground">No activity yet. Start by checking off playbook tasks!</p>
             ) : (
@@ -503,8 +503,8 @@ export default function GTMCommandCenter() {
                 {activity.slice(0, 10).map(a => (
                   <div key={a.id} className="flex items-center gap-2 text-xs">
                     <span className="w-1.5 h-1.5 rounded-full bg-cg-sage" />
-                    <span className="text-[#D0E4EC]">{a.action}</span>
-                    <span className="text-[#4A6E7F] ml-auto">{timeAgo(a.timestamp)}</span>
+                    <span className="text-cg-slate-tint">{a.action}</span>
+                    <span className="text-cg-slate-strong ml-auto">{timeAgo(a.timestamp)}</span>
                   </div>
                 ))}
               </div>
@@ -520,14 +520,14 @@ export default function GTMCommandCenter() {
             const wDone = week.tasks.filter(t => checkedTasks[t.id]).length;
             const isExpanded = expandedWeek === week.id;
             return (
-              <div key={week.id} className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden">
+              <div key={week.id} className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl overflow-hidden">
                 <button onClick={() => setExpandedWeek(isExpanded ? '' : week.id)} className="w-full flex items-center justify-between px-5 py-4 hover:bg-cg-slate/10 transition-colors">
                   <div className="flex items-center gap-3">
                     <span className={`px-2.5 py-1 rounded-lg text-xs font-bold ${wDone === week.tasks.length ? 'bg-emerald-500/15 text-emerald-400' : 'bg-cg-sage/15 text-cg-sage-light'}`}>
                       {wDone}/{week.tasks.length}
                     </span>
                     <div className="text-left">
-                      <span className="text-sm font-medium text-[#D0E4EC]">{week.title}</span>
+                      <span className="text-sm font-medium text-cg-slate-tint">{week.title}</span>
                       <p className="text-xs text-muted-foreground">{week.subtitle}</p>
                     </div>
                   </div>
@@ -541,7 +541,7 @@ export default function GTMCommandCenter() {
                       return (
                         <div key={task.id} className={`rounded-lg p-3 transition-colors ${done ? 'bg-emerald-500/5' : 'bg-cg-slate/10'}`}>
                           <div className="flex items-start gap-3">
-                            <button onClick={() => toggleTask(task.id)} className={`mt-0.5 flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${done ? 'bg-emerald-500 border-emerald-500' : 'border-[#4A6E7F] hover:border-cg-sage'}`}>
+                            <button onClick={() => toggleTask(task.id)} className={`mt-0.5 flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${done ? 'bg-emerald-500 border-emerald-500' : 'border-cg-slate-strong hover:border-cg-sage'}`}>
                               {done && <Check className="w-3 h-3 text-white" />}
                             </button>
                             <div className="flex-1 min-w-0">
@@ -549,9 +549,9 @@ export default function GTMCommandCenter() {
                                 <ch.icon className="w-3.5 h-3.5" style={{ color: ch.color }} />
                                 <span className="text-[10px] font-medium uppercase tracking-wider" style={{ color: ch.color }}>{ch.label}</span>
                               </div>
-                              <p className={`text-sm ${done ? 'text-muted-foreground line-through' : 'text-[#D0E4EC]'}`}>{task.text}</p>
+                              <p className={`text-sm ${done ? 'text-muted-foreground line-through' : 'text-cg-slate-tint'}`}>{task.text}</p>
                               {task.tip && (
-                                <p className="text-xs text-[#4A6E7F] mt-1 italic">{task.tip}</p>
+                                <p className="text-xs text-cg-slate-strong mt-1 italic">{task.tip}</p>
                               )}
                               {/* Note input */}
                               <input
@@ -559,7 +559,7 @@ export default function GTMCommandCenter() {
                                 placeholder="Add a note..."
                                 value={taskNotes[task.id] || ''}
                                 onChange={(e) => setTaskNotes(prev => ({ ...prev, [task.id]: e.target.value }))}
-                                className="mt-2 w-full px-2.5 py-1 rounded bg-[#162D3A]/60 border border-cg-slate/20 text-xs text-[#8AACBC] placeholder-[#4A6E7F] focus:outline-none focus:border-cg-sage/40"
+                                className="mt-2 w-full px-2.5 py-1 rounded bg-cg-slate-deep/60 border border-cg-slate/20 text-xs text-cg-slate-muted placeholder-cg-slate-strong focus:outline-none focus:border-cg-sage/40"
                               />
                             </div>
                           </div>
@@ -579,14 +579,14 @@ export default function GTMCommandCenter() {
         <div className="space-y-4">
           {/* Channel filter */}
           <div className="flex flex-wrap gap-2">
-            <button onClick={() => setDraftFilter('all')} className={`px-3 py-1.5 rounded-lg text-xs font-medium ${draftFilter === 'all' ? 'bg-cg-sage/15 text-cg-sage-light' : 'text-[#8AACBC] hover:bg-cg-slate/15'}`}>
+            <button onClick={() => setDraftFilter('all')} className={`px-3 py-1.5 rounded-lg text-xs font-medium ${draftFilter === 'all' ? 'bg-cg-sage/15 text-cg-sage-light' : 'text-cg-slate-muted hover:bg-cg-slate/15'}`}>
               All ({drafts.length})
             </button>
             {CHANNELS.map(ch => {
               const count = draftCounts[ch.id] || 0;
               if (count === 0 && draftFilter !== ch.id) return null;
               return (
-                <button key={ch.id} onClick={() => setDraftFilter(ch.id)} className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium ${draftFilter === ch.id ? 'bg-cg-sage/15 text-cg-sage-light' : 'text-[#8AACBC] hover:bg-cg-slate/15'}`}>
+                <button key={ch.id} onClick={() => setDraftFilter(ch.id)} className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium ${draftFilter === ch.id ? 'bg-cg-sage/15 text-cg-sage-light' : 'text-cg-slate-muted hover:bg-cg-slate/15'}`}>
                   <ch.icon className="w-3 h-3" />
                   {ch.label} ({count})
                 </button>
@@ -596,7 +596,7 @@ export default function GTMCommandCenter() {
 
           {/* New draft button */}
           {!showDraftForm && !editDraftId && (
-            <button onClick={() => { setShowDraftForm(true); setDraftBody(''); setDraftTitle(''); }} className="flex items-center gap-2 px-4 py-3 w-full rounded-xl border-2 border-dashed border-cg-slate/30 text-[#8AACBC] hover:border-cg-sage/50 hover:text-cg-sage-light transition-colors">
+            <button onClick={() => { setShowDraftForm(true); setDraftBody(''); setDraftTitle(''); }} className="flex items-center gap-2 px-4 py-3 w-full rounded-xl border-2 border-dashed border-cg-slate/30 text-cg-slate-muted hover:border-cg-sage/50 hover:text-cg-sage-light transition-colors">
               <Plus className="w-5 h-5" />
               New Draft
             </button>
@@ -604,22 +604,22 @@ export default function GTMCommandCenter() {
 
           {/* Draft form */}
           {(showDraftForm || editDraftId) && (
-            <div className="bg-[#1A3648]/60 border border-cg-sage/30 rounded-xl p-5 space-y-4">
-              <h3 className="text-sm font-semibold text-[#D0E4EC]">{editDraftId ? 'Edit Draft' : 'New Draft'}</h3>
+            <div className="bg-cg-slate-deep/60 border border-cg-sage/30 rounded-xl p-5 space-y-4">
+              <h3 className="text-sm font-semibold text-cg-slate-tint">{editDraftId ? 'Edit Draft' : 'New Draft'}</h3>
               <div className="flex flex-wrap gap-2">
                 {CHANNELS.map(ch => (
-                  <button key={ch.id} onClick={() => setDraftChannel(ch.id)} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${draftChannel === ch.id ? 'ring-2 ring-cg-sage/50 bg-cg-sage/10 text-cg-sage-light' : 'bg-cg-slate/15 text-[#8AACBC] hover:bg-cg-slate/25'}`}>
+                  <button key={ch.id} onClick={() => setDraftChannel(ch.id)} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${draftChannel === ch.id ? 'ring-2 ring-cg-sage/50 bg-cg-sage/10 text-cg-sage-light' : 'bg-cg-slate/15 text-cg-slate-muted hover:bg-cg-slate/25'}`}>
                     <ch.icon className="w-3.5 h-3.5" style={{ color: draftChannel === ch.id ? ch.color : undefined }} />
                     {ch.label}
                   </button>
                 ))}
               </div>
               {['blog', 'reddit', 'linkedin'].includes(draftChannel) && (
-                <input type="text" value={draftTitle} onChange={(e) => setDraftTitle(e.target.value)} placeholder="Title (optional)" className="w-full px-3 py-2 rounded-lg bg-[#162D3A] border border-cg-slate/30 text-sm text-[#D0E4EC] placeholder-muted-foreground focus:outline-none focus:border-cg-sage/50" />
+                <input type="text" value={draftTitle} onChange={(e) => setDraftTitle(e.target.value)} placeholder="Title (optional)" className="w-full px-3 py-2 rounded-lg bg-cg-slate-deep border border-cg-slate/30 text-sm text-cg-slate-tint placeholder-muted-foreground focus:outline-none focus:border-cg-sage/50" />
               )}
-              <textarea value={draftBody} onChange={(e) => setDraftBody(e.target.value)} placeholder="Write your content..." rows={6} className="w-full px-3 py-2 rounded-lg bg-[#162D3A] border border-cg-slate/30 text-sm text-[#D0E4EC] placeholder-muted-foreground focus:outline-none focus:border-cg-sage/50 resize-none" />
+              <textarea value={draftBody} onChange={(e) => setDraftBody(e.target.value)} placeholder="Write your content..." rows={6} className="w-full px-3 py-2 rounded-lg bg-cg-slate-deep border border-cg-slate/30 text-sm text-cg-slate-tint placeholder-muted-foreground focus:outline-none focus:border-cg-sage/50 resize-none" />
               <div className="flex justify-end gap-2">
-                <button onClick={() => { setShowDraftForm(false); setEditDraftId(null); setDraftTitle(''); setDraftBody(''); }} className="px-3 py-1.5 rounded-lg text-xs text-[#8AACBC] hover:bg-cg-slate/20">Cancel</button>
+                <button onClick={() => { setShowDraftForm(false); setEditDraftId(null); setDraftTitle(''); setDraftBody(''); }} className="px-3 py-1.5 rounded-lg text-xs text-cg-slate-muted hover:bg-cg-slate/20">Cancel</button>
                 <button onClick={saveDraft} disabled={!draftBody.trim()} className="px-4 py-1.5 rounded-lg bg-cg-sage hover:bg-cg-sage-light text-white text-xs font-medium disabled:opacity-50 transition-colors">
                   {editDraftId ? 'Update' : 'Save Draft'}
                 </button>
@@ -638,17 +638,17 @@ export default function GTMCommandCenter() {
               {filteredDrafts.map(draft => {
                 const ch = getChannelInfo(draft.channel);
                 return (
-                  <div key={draft.id} className={`bg-[#1A3648]/60 border rounded-xl p-4 ${draft.status === 'posted' ? 'border-emerald-500/20 opacity-70' : 'border-cg-slate/20'}`}>
+                  <div key={draft.id} className={`bg-cg-slate-deep/60 border rounded-xl p-4 ${draft.status === 'posted' ? 'border-emerald-500/20 opacity-70' : 'border-cg-slate/20'}`}>
                     <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <ch.icon className="w-3.5 h-3.5" style={{ color: ch.color }} />
                           <span className="text-[10px] font-medium uppercase" style={{ color: ch.color }}>{ch.label}</span>
                           {draft.status === 'posted' && <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 text-[10px]"><Check className="w-3 h-3" /> Posted</span>}
-                          <span className="text-[10px] text-[#4A6E7F]">{timeAgo(draft.createdAt)}</span>
+                          <span className="text-[10px] text-cg-slate-strong">{timeAgo(draft.createdAt)}</span>
                         </div>
-                        {draft.title && <h3 className="text-sm font-medium text-[#D0E4EC] mb-1">{draft.title}</h3>}
-                        <p className="text-xs text-[#8AACBC] line-clamp-3 whitespace-pre-wrap">{draft.body}</p>
+                        {draft.title && <h3 className="text-sm font-medium text-cg-slate-tint mb-1">{draft.title}</h3>}
+                        <p className="text-xs text-cg-slate-muted line-clamp-3 whitespace-pre-wrap">{draft.body}</p>
                       </div>
                       <div className="flex items-center gap-1 ml-3">
                         <button aria-label="Copy" onClick={() => copyText(draft.title ? `${draft.title}\n\n${draft.body}` : draft.body, draft.id)} className="p-1.5 rounded-lg hover:bg-cg-slate/20 text-muted-foreground hover:text-cg-sage-light" title="Copy">
@@ -659,7 +659,7 @@ export default function GTMCommandCenter() {
                             <button aria-label="Send message" onClick={() => markPosted(draft.id)} className="p-1.5 rounded-lg hover:bg-emerald-500/10 text-muted-foreground hover:text-emerald-400" title="Mark posted">
                               <Send className="w-4 h-4" />
                             </button>
-                            <button aria-label="Edit" onClick={() => { setEditDraftId(draft.id); setDraftChannel(draft.channel); setDraftTitle(draft.title); setDraftBody(draft.body); }} className="p-1.5 rounded-lg hover:bg-cg-slate/20 text-muted-foreground hover:text-[#8AACBC]" title="Edit">
+                            <button aria-label="Edit" onClick={() => { setEditDraftId(draft.id); setDraftChannel(draft.channel); setDraftTitle(draft.title); setDraftBody(draft.body); }} className="p-1.5 rounded-lg hover:bg-cg-slate/20 text-muted-foreground hover:text-cg-slate-muted" title="Edit">
                               <Pencil className="w-4 h-4" />
                             </button>
                           </>
@@ -683,12 +683,12 @@ export default function GTMCommandCenter() {
           {/* Summary cards */}
           <div className="grid grid-cols-4 gap-4">
             {[
-              { label: 'Total Contacts', value: contacts.length, icon: Users, color: '#8AACBC' },
+              { label: 'Total Contacts', value: contacts.length, icon: Users, color: 'var(--cg-slate-muted)' },
               { label: 'Emailed', value: contacts.filter(c => c.status !== 'not_contacted').length, icon: Mail, color: 'var(--cg-amber)' },
               { label: 'Meetings', value: contacts.filter(c => c.status === 'meeting_scheduled').length, icon: Clock, color: 'var(--cg-sage)' },
               { label: 'Partners', value: contacts.filter(c => c.status === 'active_partner').length, icon: CheckCircle2, color: 'var(--cg-sage-light)' },
             ].map(card => (
-              <div key={card.label} className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-4">
+              <div key={card.label} className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <card.icon className="w-4 h-4" style={{ color: card.color }} />
                   <span className="text-xs text-muted-foreground">{card.label}</span>
@@ -699,29 +699,29 @@ export default function GTMCommandCenter() {
           </div>
 
           {/* Email template */}
-          <div className="bg-[#1A3648]/60 border border-cg-amber/20 rounded-xl p-5">
+          <div className="bg-cg-slate-deep/60 border border-cg-amber/20 rounded-xl p-5">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-semibold text-[#D0E4EC]">Attorney Outreach Template</h3>
+              <h3 className="text-sm font-semibold text-cg-slate-tint">Attorney Outreach Template</h3>
               <button onClick={() => copyText(ATTORNEY_TEMPLATE, 'template')} className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-cg-amber/10 text-cg-amber text-xs hover:bg-cg-amber/20">
                 {copied === 'template' ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
                 {copied === 'template' ? 'Copied!' : 'Copy'}
               </button>
             </div>
-            <pre className="text-xs text-[#8AACBC] whitespace-pre-wrap font-sans">{ATTORNEY_TEMPLATE}</pre>
+            <pre className="text-xs text-cg-slate-muted whitespace-pre-wrap font-sans">{ATTORNEY_TEMPLATE}</pre>
           </div>
 
           {/* Add contact */}
           {!showContactForm ? (
-            <button onClick={() => setShowContactForm(true)} className="flex items-center gap-2 px-4 py-3 w-full rounded-xl border-2 border-dashed border-cg-slate/30 text-[#8AACBC] hover:border-cg-sage/50 hover:text-cg-sage-light transition-colors">
+            <button onClick={() => setShowContactForm(true)} className="flex items-center gap-2 px-4 py-3 w-full rounded-xl border-2 border-dashed border-cg-slate/30 text-cg-slate-muted hover:border-cg-sage/50 hover:text-cg-sage-light transition-colors">
               <Plus className="w-5 h-5" />
               Add Contact
             </button>
           ) : (
-            <div className="bg-[#1A3648]/60 border border-cg-sage/30 rounded-xl p-5 space-y-3">
+            <div className="bg-cg-slate-deep/60 border border-cg-sage/30 rounded-xl p-5 space-y-3">
               <div className="grid grid-cols-3 gap-3">
-                <input type="text" value={contactName} onChange={(e) => setContactName(e.target.value)} placeholder="Name" className="px-3 py-2 rounded-lg bg-[#162D3A] border border-cg-slate/30 text-sm text-[#D0E4EC] placeholder-muted-foreground focus:outline-none focus:border-cg-sage/50" />
-                <input type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} placeholder="Email" className="px-3 py-2 rounded-lg bg-[#162D3A] border border-cg-slate/30 text-sm text-[#D0E4EC] placeholder-muted-foreground focus:outline-none focus:border-cg-sage/50" />
-                <select value={contactType} onChange={(e) => setContactType(e.target.value as Contact['type'])} className="px-3 py-2 rounded-lg bg-[#162D3A] border border-cg-slate/30 text-sm text-[#D0E4EC]">
+                <input type="text" value={contactName} onChange={(e) => setContactName(e.target.value)} placeholder="Name" className="px-3 py-2 rounded-lg bg-cg-slate-deep border border-cg-slate/30 text-sm text-cg-slate-tint placeholder-muted-foreground focus:outline-none focus:border-cg-sage/50" />
+                <input type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} placeholder="Email" className="px-3 py-2 rounded-lg bg-cg-slate-deep border border-cg-slate/30 text-sm text-cg-slate-tint placeholder-muted-foreground focus:outline-none focus:border-cg-sage/50" />
+                <select value={contactType} onChange={(e) => setContactType(e.target.value as Contact['type'])} className="px-3 py-2 rounded-lg bg-cg-slate-deep border border-cg-slate/30 text-sm text-cg-slate-tint">
                   <option value="attorney">Attorney</option>
                   <option value="mediator">Mediator</option>
                   <option value="therapist">Therapist</option>
@@ -729,9 +729,9 @@ export default function GTMCommandCenter() {
                   <option value="other">Other</option>
                 </select>
               </div>
-              <input type="text" value={contactNotes} onChange={(e) => setContactNotes(e.target.value)} placeholder="Notes (optional)" className="w-full px-3 py-2 rounded-lg bg-[#162D3A] border border-cg-slate/30 text-sm text-[#D0E4EC] placeholder-muted-foreground focus:outline-none focus:border-cg-sage/50" />
+              <input type="text" value={contactNotes} onChange={(e) => setContactNotes(e.target.value)} placeholder="Notes (optional)" className="w-full px-3 py-2 rounded-lg bg-cg-slate-deep border border-cg-slate/30 text-sm text-cg-slate-tint placeholder-muted-foreground focus:outline-none focus:border-cg-sage/50" />
               <div className="flex justify-end gap-2">
-                <button onClick={() => setShowContactForm(false)} className="px-3 py-1.5 rounded-lg text-xs text-[#8AACBC]">Cancel</button>
+                <button onClick={() => setShowContactForm(false)} className="px-3 py-1.5 rounded-lg text-xs text-cg-slate-muted">Cancel</button>
                 <button onClick={addContact} disabled={!contactName.trim() || !contactEmail.trim()} className="px-4 py-1.5 rounded-lg bg-cg-sage hover:bg-cg-sage-light text-white text-xs font-medium disabled:opacity-50">Add Contact</button>
               </div>
             </div>
@@ -739,23 +739,23 @@ export default function GTMCommandCenter() {
 
           {/* Contact list */}
           {contacts.length > 0 && (
-            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden">
-              <div className="grid grid-cols-6 gap-0 text-[10px] font-medium text-muted-foreground uppercase tracking-wider bg-[#162D3A] px-5 py-3">
+            <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl overflow-hidden">
+              <div className="grid grid-cols-6 gap-0 text-[10px] font-medium text-muted-foreground uppercase tracking-wider bg-cg-slate-deep px-5 py-3">
                 <span>Name</span><span>Type</span><span>Email</span><span>Status</span><span>Last Contact</span><span>Notes</span>
               </div>
               {contacts.map((c, i) => {
                 const statusInfo = CONTACT_STATUSES.find(s => s.value === c.status)!;
                 return (
-                  <div key={c.id} className={`grid grid-cols-6 gap-0 items-center px-5 py-3 border-t border-cg-slate/10 ${i % 2 ? 'bg-[#162D3A]/30' : ''}`}>
-                    <span className="text-sm text-[#D0E4EC]">{c.name}</span>
-                    <span className="text-xs text-[#8AACBC] capitalize">{c.type}</span>
+                  <div key={c.id} className={`grid grid-cols-6 gap-0 items-center px-5 py-3 border-t border-cg-slate/10 ${i % 2 ? 'bg-cg-slate-deep/30' : ''}`}>
+                    <span className="text-sm text-cg-slate-tint">{c.name}</span>
+                    <span className="text-xs text-cg-slate-muted capitalize">{c.type}</span>
                     <span className="text-xs text-muted-foreground truncate">{c.email}</span>
                     <div>
                       <select value={c.status} onChange={(e) => updateContactStatus(c.id, e.target.value as Contact['status'])} className={`px-2 py-0.5 rounded-full text-[10px] font-medium border-0 ${statusInfo.color}`}>
                         {CONTACT_STATUSES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
                       </select>
                     </div>
-                    <span className="text-xs text-[#4A6E7F]">{c.lastContact ? timeAgo(c.lastContact) : '—'}</span>
+                    <span className="text-xs text-cg-slate-strong">{c.lastContact ? timeAgo(c.lastContact) : '—'}</span>
                     <span className="text-xs text-muted-foreground truncate">{c.notes || '—'}</span>
                   </div>
                 );
@@ -776,34 +776,34 @@ export default function GTMCommandCenter() {
               { label: 'Campaigns', value: campaignCount.toString(), sub: 'total', icon: Mail, color: 'var(--cg-sage-light)' },
               { label: 'Contacts', value: contacts.length.toString(), sub: `${contacts.filter(c => c.status === 'active_partner').length} partners`, icon: Briefcase, color: 'var(--cg-slate)' },
             ].map(card => (
-              <div key={card.label} className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-4">
+              <div key={card.label} className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <card.icon className="w-4 h-4" style={{ color: card.color }} />
                   <span className="text-xs text-muted-foreground">{card.label}</span>
                 </div>
                 <div className="text-2xl font-bold text-white">{card.value}</div>
-                <div className="text-xs text-[#4A6E7F]">{card.sub}</div>
+                <div className="text-xs text-cg-slate-strong">{card.sub}</div>
               </div>
             ))}
           </div>
 
           {/* Channel performance */}
-          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden">
-            <h3 className="text-sm font-semibold text-[#D0E4EC] px-5 pt-4 pb-2">Channel Performance</h3>
-            <div className="grid grid-cols-4 gap-0 text-[10px] font-medium text-muted-foreground uppercase tracking-wider bg-[#162D3A] px-5 py-2">
+          <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl overflow-hidden">
+            <h3 className="text-sm font-semibold text-cg-slate-tint px-5 pt-4 pb-2">Channel Performance</h3>
+            <div className="grid grid-cols-4 gap-0 text-[10px] font-medium text-muted-foreground uppercase tracking-wider bg-cg-slate-deep px-5 py-2">
               <span>Channel</span><span className="text-center">Drafted</span><span className="text-center">Posted</span><span className="text-center">Status</span>
             </div>
             {CHANNELS.map((ch, i) => {
               const drafted = draftCounts[ch.id] || 0;
               const posted = postedCounts[ch.id] || 0;
               return (
-                <div key={ch.id} className={`grid grid-cols-4 gap-0 items-center px-5 py-2.5 border-t border-cg-slate/10 ${i % 2 ? 'bg-[#162D3A]/30' : ''}`}>
+                <div key={ch.id} className={`grid grid-cols-4 gap-0 items-center px-5 py-2.5 border-t border-cg-slate/10 ${i % 2 ? 'bg-cg-slate-deep/30' : ''}`}>
                   <div className="flex items-center gap-2">
                     <ch.icon className="w-4 h-4" style={{ color: ch.color }} />
-                    <span className="text-sm text-[#D0E4EC]">{ch.label}</span>
+                    <span className="text-sm text-cg-slate-tint">{ch.label}</span>
                   </div>
-                  <span className="text-sm text-center text-[#8AACBC]">{drafted}</span>
-                  <span className="text-sm text-center text-[#8AACBC]">{posted}</span>
+                  <span className="text-sm text-center text-cg-slate-muted">{drafted}</span>
+                  <span className="text-sm text-center text-cg-slate-muted">{posted}</span>
                   <div className="flex justify-center">
                     {posted > 0 ? (
                       <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 text-[10px]">Active</span>
@@ -825,7 +825,7 @@ export default function GTMCommandCenter() {
               { label: 'View Leads Pipeline', href: '/superadmin/leads', icon: Users },
               { label: 'View Blog Posts', href: '/superadmin/blog', icon: FileText },
             ].map(link => (
-              <a key={link.label} href={link.href} className="flex items-center gap-2 px-4 py-3 bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl text-[#8AACBC] hover:text-cg-sage-light hover:border-cg-sage/30 transition-colors text-sm">
+              <a key={link.label} href={link.href} className="flex items-center gap-2 px-4 py-3 bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl text-cg-slate-muted hover:text-cg-sage-light hover:border-cg-sage/30 transition-colors text-sm">
                 <link.icon className="w-4 h-4" />
                 {link.label}
                 <ArrowRight className="w-3.5 h-3.5 ml-auto" />

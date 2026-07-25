@@ -119,7 +119,7 @@ export default function CourtLoginPage() {
                   Use your verified court or law firm email
                 </p>
               </div>
-              <Button type="submit" className="w-full bg-cg-slate hover:bg-[#1E4E6B]" disabled={isLoading}>
+              <Button type="submit" className="w-full bg-cg-slate hover:bg-cg-slate-dark" disabled={isLoading}>
                 {isLoading ? "Verifying..." : "Continue"}
               </Button>
             </form>
@@ -151,7 +151,7 @@ export default function CourtLoginPage() {
                 >
                   Back
                 </Button>
-                <Button type="submit" className="flex-1 bg-cg-slate hover:bg-[#1E4E6B]" disabled={isLoading}>
+                <Button type="submit" className="flex-1 bg-cg-slate hover:bg-cg-slate-dark" disabled={isLoading}>
                   {isLoading ? "Verifying..." : "Verify"}
                 </Button>
               </div>
@@ -188,7 +188,7 @@ export default function CourtLoginPage() {
                 >
                   Back
                 </Button>
-                <Button type="submit" className="flex-1 bg-cg-slate hover:bg-[#1E4E6B]" disabled={isLoading}>
+                <Button type="submit" className="flex-1 bg-cg-slate hover:bg-cg-slate-dark" disabled={isLoading}>
                   {isLoading ? "Verifying..." : "Sign In"}
                 </Button>
               </div>

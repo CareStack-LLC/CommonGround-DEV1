@@ -12,7 +12,7 @@ export function TimePeriodSelector({
   onChange,
 }: TimePeriodSelectorProps) {
   return (
-    <div className="flex items-center gap-1 bg-[#1A3648]/60 border border-cg-slate/20 rounded-lg p-0.5">
+    <div className="flex items-center gap-1 bg-cg-slate-deep/60 border border-cg-slate/20 rounded-lg p-0.5">
       {options.map((d) => (
         <button
           key={d}

@@ -11,7 +11,7 @@ export function ErrorState({ message, onRetry }: ErrorStateProps) {
   return (
     <div className="flex flex-col items-center justify-center py-12">
       <AlertTriangle className="w-8 h-8 text-cg-amber mb-3" />
-      <p className="text-sm text-[#8AACBC] mb-4 text-center max-w-sm">
+      <p className="text-sm text-cg-slate-muted mb-4 text-center max-w-sm">
         {message}
       </p>
       {onRetry && (

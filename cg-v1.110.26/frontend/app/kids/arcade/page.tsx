@@ -215,7 +215,7 @@ function MemoryGame({ onClose, onScore }: { onClose: () => void, onScore: (score
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-gradient-to-br from-[#E09520] via-cg-slate to-cg-slate z-50 flex flex-col"
+      className="fixed inset-0 bg-gradient-to-br from-cg-amber-dark via-cg-slate to-cg-slate z-50 flex flex-col"
     >
       {/* Header */}
       <div className="flex items-center justify-between p-4">
@@ -617,8 +617,8 @@ export default function ArcadePage() {
       id: 'memory',
       title: 'Memory Match',
       icon: '🧠',
-      color: 'bg-gradient-to-br from-cg-amber to-[#E09520]',
-      shadowColor: '#9B2C2C',
+      color: 'bg-gradient-to-br from-cg-amber to-cg-amber-dark',
+      shadowColor: 'var(--cg-error-dark)',
       description: 'Match the pairs!',
       highScore: 85,
       isNew: false
@@ -628,7 +628,7 @@ export default function ArcadePage() {
       title: 'Star Catcher',
       icon: '⭐',
       color: 'bg-gradient-to-br from-cg-slate to-cg-slate',
-      shadowColor: '#1E4E6B',
+      shadowColor: 'var(--cg-slate-dark)',
       description: 'Catch falling stars!',
       highScore: 120,
       isNew: true
@@ -638,7 +638,7 @@ export default function ArcadePage() {
       title: 'Color Match',
       icon: '🎨',
       color: 'bg-gradient-to-br from-cg-slate to-cg-slate',
-      shadowColor: '#1E4E6B',
+      shadowColor: 'var(--cg-slate-dark)',
       description: 'Match colors fast!',
       highScore: 95,
       isNew: false
@@ -647,8 +647,8 @@ export default function ArcadePage() {
       id: 'puzzle',
       title: 'Puzzle Time',
       icon: '🧩',
-      color: 'bg-gradient-to-br from-cg-amber to-[#E09520]',
-      shadowColor: '#E09520',
+      color: 'bg-gradient-to-br from-cg-amber to-cg-amber-dark',
+      shadowColor: 'var(--cg-amber-dark)',
       description: 'Solve fun puzzles!',
       highScore: 0,
       isNew: true,
@@ -668,8 +668,8 @@ export default function ArcadePage() {
       id: 'draw',
       title: 'Doodle Dash',
       icon: '✏️',
-      color: 'bg-gradient-to-br from-cg-error to-[#E09520]',
-      shadowColor: '#9B2C2C',
+      color: 'bg-gradient-to-br from-cg-error to-cg-amber-dark',
+      shadowColor: 'var(--cg-error-dark)',
       description: 'Draw and guess!',
       highScore: 50,
       isMultiplayer: true
@@ -700,7 +700,7 @@ export default function ArcadePage() {
   const totalHighScore = games.reduce((sum, g) => sum + g.highScore, 0)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cg-amber via-cg-error to-[#E09520] relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-cg-amber via-cg-error to-cg-amber-dark relative overflow-hidden">
       {/* Floating elements */}
       <FloatingGameElements />
 

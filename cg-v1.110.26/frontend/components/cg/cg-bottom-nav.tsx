@@ -133,8 +133,8 @@ export function CGChildBottomNav({ items, className }: CGChildBottomNavProps) {
     purple: 'bg-cg-slate-subtle text-cg-slate',
     blue: 'bg-cg-slate-subtle text-cg-slate',
     green: 'bg-cg-sage-subtle text-cg-sage-dark',
-    pink: 'bg-cg-amber-subtle text-[#E09520]',
-    amber: 'bg-cg-amber-subtle text-[#E09520]',
+    pink: 'bg-cg-amber-subtle text-cg-amber-dark',
+    amber: 'bg-cg-amber-subtle text-cg-amber-dark',
   };
 
   return (

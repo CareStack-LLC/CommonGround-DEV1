@@ -142,14 +142,14 @@ export function CallsTab({ familyFileId, token }: { familyFileId: string, token:
                     <Button
                         onClick={() => setIsLogCallOpen(true)}
                         variant="outline"
-                        className="border-[#C2DEF0] text-[#1E4E6B] hover:bg-[#F0F7FC]"
+                        className="border-cg-slate-tint text-cg-slate-dark hover:bg-cg-slate-tint"
                     >
                         <Phone className="h-4 w-4 mr-2" />
                         Log Manual Call
                     </Button>
                     <Button
                         onClick={() => setIsLiveMode(true)}
-                        className="bg-cg-slate hover:bg-[#1E4E6B] text-white shadow-md shadow-cg-slate-subtle"
+                        className="bg-cg-slate hover:bg-cg-slate-dark text-white shadow-md shadow-cg-slate-subtle"
                     >
                         <Phone className="h-4 w-4 mr-2" />
                         Start Live Call
@@ -182,9 +182,9 @@ export function CallsTab({ familyFileId, token }: { familyFileId: string, token:
             ) : callLogs.length > 0 ? (
                 <div className="space-y-3">
                     {callLogs.map((call) => (
-                        <Card key={call.id} className="overflow-hidden border-border hover:border-[#C2DEF0] transition-colors group">
+                        <Card key={call.id} className="overflow-hidden border-border hover:border-cg-slate-tint transition-colors group">
                             <div className="p-4 flex items-start gap-4">
-                                <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground group-hover:bg-[#F0F7FC] group-hover:text-[#3D8DB0] transition-colors">
+                                <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground group-hover:bg-cg-slate-tint group-hover:text-[#3D8DB0] transition-colors">
                                     <Phone className="h-5 w-5" />
                                 </div>
                                 <div className="flex-1 min-w-0">
@@ -297,7 +297,7 @@ export function CallsTab({ familyFileId, token }: { familyFileId: string, token:
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setIsLogCallOpen(false)}>Cancel</Button>
-                        <Button onClick={handleLogCall} className="bg-cg-slate hover:bg-[#1E4E6B]">Save Log Entry</Button>
+                        <Button onClick={handleLogCall} className="bg-cg-slate hover:bg-cg-slate-dark">Save Log Entry</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

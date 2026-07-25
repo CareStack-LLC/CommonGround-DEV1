@@ -544,7 +544,7 @@ export default function NewCaseWizardPage() {
                 <Sparkles className="h-5 w-5 text-cg-slate mt-0.5" />
                 <div>
                   <h4 className="font-medium text-foreground">ARIA-Powered Extraction</h4>
-                  <p className="text-sm text-[#1E4E6B] mt-1">
+                  <p className="text-sm text-cg-slate-dark mt-1">
                     Our AI assistant will automatically extract party information, children details,
                     custody requests, and more from the uploaded forms. You&apos;ll be able to review
                     and edit all extracted data before creating the case.
@@ -558,7 +558,7 @@ export default function NewCaseWizardPage() {
               <Button
                 onClick={processWithARIA}
                 disabled={uploadedFiles.length === 0}
-                className="bg-cg-slate hover:bg-[#1E4E6B]"
+                className="bg-cg-slate hover:bg-cg-slate-dark"
               >
                 Process with ARIA
                 <ArrowRight className="h-4 w-4 ml-2" />
@@ -788,7 +788,7 @@ export default function NewCaseWizardPage() {
                       variant="ghost"
                       size="sm"
                       onClick={() => removeChild(index)}
-                      className="text-cg-error hover:text-[#9B2C2C] hover:bg-cg-error-subtle"
+                      className="text-cg-error hover:text-cg-error-dark hover:bg-cg-error-subtle"
                     >
                       <XCircle className="h-4 w-4" />
                     </Button>
@@ -811,19 +811,19 @@ export default function NewCaseWizardPage() {
                 {extractedData.legal_custody_request && (
                   <div>
                     <span className="font-medium text-foreground">Legal Custody Request:</span>{" "}
-                    <span className="text-[#1E4E6B]">{extractedData.legal_custody_request}</span>
+                    <span className="text-cg-slate-dark">{extractedData.legal_custody_request}</span>
                   </div>
                 )}
                 {extractedData.physical_custody_request && (
                   <div>
                     <span className="font-medium text-foreground">Physical Custody Request:</span>{" "}
-                    <span className="text-[#1E4E6B]">{extractedData.physical_custody_request}</span>
+                    <span className="text-cg-slate-dark">{extractedData.physical_custody_request}</span>
                   </div>
                 )}
                 {extractedData.visitation_schedule && (
                   <div>
                     <span className="font-medium text-foreground">Visitation Schedule:</span>{" "}
-                    <span className="text-[#1E4E6B]">{extractedData.visitation_schedule}</span>
+                    <span className="text-cg-slate-dark">{extractedData.visitation_schedule}</span>
                   </div>
                 )}
               </CardContent>
@@ -839,7 +839,7 @@ export default function NewCaseWizardPage() {
             <Button aria-label="Next"
               onClick={createCase}
               disabled={isProcessing || !formData.petitioner_name || !formData.respondent_name}
-              className="bg-cg-slate hover:bg-[#1E4E6B]"
+              className="bg-cg-slate hover:bg-cg-slate-dark"
             >
               {isProcessing ? (
                 <>
@@ -890,7 +890,7 @@ export default function NewCaseWizardPage() {
               <div className="p-4 bg-cg-slate-subtle rounded-lg">
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="font-medium text-foreground">Petitioner Invite</h4>
-                  <Badge className="bg-cg-slate-subtle text-[#1E4E6B]">
+                  <Badge className="bg-cg-slate-subtle text-cg-slate-dark">
                     {formData.petitioner_name}
                   </Badge>
                 </div>
@@ -923,7 +923,7 @@ export default function NewCaseWizardPage() {
               <div className="p-4 bg-cg-slate-subtle rounded-lg">
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="font-medium text-foreground">Respondent Invite</h4>
-                  <Badge className="bg-cg-slate-subtle text-[#1E4E6B]">
+                  <Badge className="bg-cg-slate-subtle text-cg-slate-dark">
                     {formData.respondent_name}
                   </Badge>
                 </div>
@@ -1010,7 +1010,7 @@ export default function NewCaseWizardPage() {
               </Button>
             </Link>
             <Link href={`/court-portal/cases/${createdCase.id}`}>
-              <Button className="bg-cg-slate hover:bg-[#1E4E6B]">
+              <Button className="bg-cg-slate hover:bg-cg-slate-dark">
                 View Case
                 <ExternalLink className="h-4 w-4 ml-2" />
               </Button>

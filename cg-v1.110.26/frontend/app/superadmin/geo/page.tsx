@@ -132,7 +132,7 @@ export default function GeoPage() {
                     className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
                       exchangeDays === d
                         ? 'bg-cg-sage text-white'
-                        : 'bg-[#1A3648]/60 text-[#8AACBC] hover:text-white border border-cg-slate/20'
+                        : 'bg-cg-slate-deep/60 text-cg-slate-muted hover:text-white border border-cg-slate/20'
                     }`}
                   >
                     {d}d
@@ -169,8 +169,8 @@ function TopStatesTable({
   if (entries.length === 0) return null;
 
   return (
-    <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-4">
-      <h3 className="text-sm font-semibold text-[#D0E4EC] mb-3 flex items-center gap-2">
+    <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-4">
+      <h3 className="text-sm font-semibold text-cg-slate-tint mb-3 flex items-center gap-2">
         <Globe className="w-3.5 h-3.5 text-muted-foreground" />
         Top 10 states by {label}
       </h3>
@@ -179,14 +179,14 @@ function TopStatesTable({
           const pct = total > 0 ? (count / total) * 100 : 0;
           return (
             <div key={state} className="flex items-center gap-3 text-xs">
-              <span className="w-10 font-mono text-[#8AACBC]">{state}</span>
-              <div className="flex-1 h-1.5 bg-[#0F2533] rounded-full overflow-hidden">
+              <span className="w-10 font-mono text-cg-slate-muted">{state}</span>
+              <div className="flex-1 h-1.5 bg-cg-ink rounded-full overflow-hidden">
                 <div
                   className="h-full rounded-full transition-all"
                   style={{ width: `${pct}%`, backgroundColor: color }}
                 />
               </div>
-              <span className="w-20 text-right text-[#D0E4EC] font-medium">
+              <span className="w-20 text-right text-cg-slate-tint font-medium">
                 {count.toLocaleString()}
               </span>
               <span className="w-12 text-right text-muted-foreground">

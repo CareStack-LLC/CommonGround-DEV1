@@ -525,7 +525,7 @@ function CubbieItemDetailPageContent() {
                   <span
                     className={`text-sm px-4 py-2 rounded-full ${
                       item.current_location === 'child_traveling'
-                        ? 'bg-cg-amber-subtle text-[#E09520] dark:bg-foreground/30 dark:text-cg-amber'
+                        ? 'bg-cg-amber-subtle text-cg-amber-dark dark:bg-foreground/30 dark:text-cg-amber'
                         : 'bg-secondary text-muted-foreground'
                     }`}
                   >

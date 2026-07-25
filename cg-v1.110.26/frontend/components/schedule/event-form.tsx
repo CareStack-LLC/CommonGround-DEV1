@@ -419,7 +419,7 @@ export default function EventForm({
                           Verified
                         </span>
                       ) : (
-                        <span className="text-xs bg-cg-amber-subtle text-[#E09520] px-2.5 py-1 rounded-full flex items-center gap-1.5 font-medium border border-cg-amber-subtle">
+                        <span className="text-xs bg-cg-amber-subtle text-cg-amber-dark px-2.5 py-1 rounded-full flex items-center gap-1.5 font-medium border border-cg-amber-subtle">
                           <AlertTriangle className="w-3.5 h-3.5" />
                           Required
                         </span>

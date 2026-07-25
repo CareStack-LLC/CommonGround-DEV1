@@ -49,7 +49,7 @@ const EVENT_BADGE_COLORS: Record<string, string> = {
   aria_intervention: 'bg-red-500/15 text-red-400 border-red-500/20',
 };
 
-const DEFAULT_BADGE = 'bg-zinc-500/15 text-[#8AACBC] border-zinc-500/20';
+const DEFAULT_BADGE = 'bg-zinc-500/15 text-cg-slate-muted border-zinc-500/20';
 
 const DATE_RANGES = [
   { label: '7d', days: 7 },
@@ -210,13 +210,13 @@ export default function ActivityLogContent() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-[#1A3648]/60 border border-cg-slate/20 rounded-lg p-1">
+      <div className="flex gap-1 bg-cg-slate-deep/60 border border-cg-slate/20 rounded-lg p-1">
         <button
           onClick={() => setActiveTab('admin')}
           className={`flex items-center gap-1.5 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
             activeTab === 'admin'
               ? 'bg-cg-sage/15 text-cg-sage-light'
-              : 'text-[#8AACBC] hover:text-white hover:bg-cg-slate/20'
+              : 'text-cg-slate-muted hover:text-white hover:bg-cg-slate/20'
           }`}
         >
           <ScrollText className="w-4 h-4" />
@@ -227,7 +227,7 @@ export default function ActivityLogContent() {
           className={`flex items-center gap-1.5 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
             activeTab === 'platform'
               ? 'bg-cg-sage/15 text-cg-sage-light'
-              : 'text-[#8AACBC] hover:text-white hover:bg-cg-slate/20'
+              : 'text-cg-slate-muted hover:text-white hover:bg-cg-slate/20'
           }`}
         >
           <Radio className="w-4 h-4" />
@@ -243,7 +243,7 @@ export default function ActivityLogContent() {
             <select
               value={actionFilter}
               onChange={(e) => setActionFilter(e.target.value)}
-              className="px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-[#D0E4EC] focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer"
+              className="px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-cg-slate-tint focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer"
             >
               {ACTION_FILTERS.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
             </select>
@@ -254,13 +254,13 @@ export default function ActivityLogContent() {
                 placeholder="Filter by admin email..."
                 value={adminEmailFilter}
                 onChange={(e) => setAdminEmailFilter(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50"
+                className="w-full pl-10 pr-4 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-violet-500/50"
               />
             </div>
           </div>
 
           {/* Table */}
-          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden">
+          <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -289,22 +289,22 @@ export default function ActivityLogContent() {
                       </td>
                       <td className="px-4 py-3">
                         <span className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium ${
-                          ACTION_COLORS[log.action] || 'bg-zinc-800 text-[#8AACBC]'
+                          ACTION_COLORS[log.action] || 'bg-zinc-800 text-cg-slate-muted'
                         }`}>
                           {formatAction(log.action)}
                         </span>
                       </td>
                       <td className="px-4 py-3 hidden md:table-cell">
-                        <span className="text-xs text-[#8AACBC]">{log.user_email || '\u2014'}</span>
+                        <span className="text-xs text-cg-slate-muted">{log.user_email || '\u2014'}</span>
                       </td>
                       <td className="px-4 py-3 hidden lg:table-cell">
                         <span className="text-xs text-muted-foreground">
                           {log.resource_type}
-                          {log.resource_id && <span className="ml-1 text-[#4A6E7F] font-mono">{log.resource_id.slice(0, 8)}</span>}
+                          {log.resource_id && <span className="ml-1 text-cg-slate-strong font-mono">{log.resource_id.slice(0, 8)}</span>}
                         </span>
                       </td>
                       <td className="px-4 py-3 hidden xl:table-cell">
-                        <span className="text-xs text-[#4A6E7F] truncate max-w-xs block">{log.description || '\u2014'}</span>
+                        <span className="text-xs text-cg-slate-strong truncate max-w-xs block">{log.description || '\u2014'}</span>
                       </td>
                     </tr>
                   ))}
@@ -322,7 +322,7 @@ export default function ActivityLogContent() {
                     className="p-1.5 rounded-lg hover:bg-cg-slate/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
                     <ChevronLeft className="w-4 h-4" />
                   </button>
-                  <span className="text-xs text-[#8AACBC] px-2">{adminPage + 1} / {adminTotalPages}</span>
+                  <span className="text-xs text-cg-slate-muted px-2">{adminPage + 1} / {adminTotalPages}</span>
                   <button aria-label="Next" disabled={adminPage >= adminTotalPages - 1} onClick={() => setAdminPage(adminPage + 1)}
                     className="p-1.5 rounded-lg hover:bg-cg-slate/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
                     <ChevronRight className="w-4 h-4" />
@@ -344,7 +344,7 @@ export default function ActivityLogContent() {
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 autoRefresh
                   ? 'bg-emerald-500/15 text-emerald-400 border border-cg-sage/20'
-                  : 'bg-cg-slate/20 text-[#8AACBC] hover:text-white hover:bg-zinc-800'
+                  : 'bg-cg-slate/20 text-cg-slate-muted hover:text-white hover:bg-zinc-800'
               }`}
             >
               <Radio className={`w-3 h-3 ${autoRefresh ? 'animate-pulse' : ''}`} />
@@ -353,7 +353,7 @@ export default function ActivityLogContent() {
             <button
               onClick={() => fetchPlatformEvents()}
               disabled={platformLoading}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-[#8AACBC] hover:text-white text-xs font-medium transition-colors disabled:opacity-50"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-cg-slate-muted hover:text-white text-xs font-medium transition-colors disabled:opacity-50"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${platformLoading ? 'animate-spin' : ''}`} />
               Refresh
@@ -361,7 +361,7 @@ export default function ActivityLogContent() {
           </div>
 
           {/* Filters */}
-          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-4">
+          <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-4">
             <div className="flex flex-wrap items-center gap-3">
               {/* Event Type Dropdown */}
               <div className="flex items-center gap-2">
@@ -369,7 +369,7 @@ export default function ActivityLogContent() {
                 <select
                   value={eventType}
                   onChange={(e) => { setEventType(e.target.value); handlePlatformFilterChange(); }}
-                  className="bg-zinc-800/80 border border-zinc-700/60 rounded-lg px-3 py-1.5 text-xs text-[#D0E4EC] focus:outline-none focus:ring-1 focus:ring-violet-500/50 appearance-none cursor-pointer"
+                  className="bg-zinc-800/80 border border-zinc-700/60 rounded-lg px-3 py-1.5 text-xs text-cg-slate-tint focus:outline-none focus:ring-1 focus:ring-violet-500/50 appearance-none cursor-pointer"
                 >
                   {EVENT_TYPES.map(t => (
                     <option key={t} value={t}>{t === 'all' ? 'All Events' : t.replace(/_/g, ' ')}</option>
@@ -385,7 +385,7 @@ export default function ActivityLogContent() {
                   placeholder="Search by email..."
                   value={platformEmailSearch}
                   onChange={(e) => { setPlatformEmailSearch(e.target.value); handlePlatformFilterChange(); }}
-                  className="flex-1 bg-zinc-800/80 border border-zinc-700/60 rounded-lg px-3 py-1.5 text-xs text-[#D0E4EC] placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-violet-500/50"
+                  className="flex-1 bg-zinc-800/80 border border-zinc-700/60 rounded-lg px-3 py-1.5 text-xs text-cg-slate-tint placeholder-zinc-600 focus:outline-none focus:ring-1 focus:ring-violet-500/50"
                 />
               </div>
 
@@ -396,7 +396,7 @@ export default function ActivityLogContent() {
                     key={r.days}
                     onClick={() => { setDateRange(r.days); handlePlatformFilterChange(); }}
                     className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                      dateRange === r.days ? 'bg-cg-sage text-white' : 'text-[#8AACBC] hover:text-white'
+                      dateRange === r.days ? 'bg-cg-sage text-white' : 'text-cg-slate-muted hover:text-white'
                     }`}
                   >
                     {r.label}
@@ -410,7 +410,7 @@ export default function ActivityLogContent() {
           {platformError && (
             <div className="flex flex-col items-center justify-center py-20">
               <AlertTriangle className="w-10 h-10 text-amber-500 mb-3" />
-              <p className="text-[#8AACBC] mb-4">{platformError}</p>
+              <p className="text-cg-slate-muted mb-4">{platformError}</p>
               <button onClick={() => fetchPlatformEvents()} className="px-4 py-2 rounded-lg bg-cg-sage hover:bg-cg-sage-light text-white text-sm font-medium transition-colors">
                 Retry
               </button>
@@ -419,7 +419,7 @@ export default function ActivityLogContent() {
 
           {/* Events Table */}
           {!platformError && (
-            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden">
+            <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl overflow-hidden">
               {platformLoading ? (
                 <div className="p-5 space-y-2">
                   {Array.from({ length: 10 }).map((_, i) => <Skeleton key={i} className="h-10" />)}
@@ -451,11 +451,11 @@ export default function ActivityLogContent() {
                               {event.event_type?.replace(/_/g, ' ')}
                             </span>
                           </td>
-                          <td className="py-2.5 px-4 text-xs text-[#D0E4EC] font-mono">{event.user_email || '---'}</td>
+                          <td className="py-2.5 px-4 text-xs text-cg-slate-tint font-mono">{event.user_email || '---'}</td>
                           <td className="py-2.5 px-4 text-xs text-muted-foreground font-mono truncate max-w-[140px]">
                             {event.target_id || '---'}
                           </td>
-                          <td className="py-2.5 px-4 text-xs text-[#4A6E7F] truncate max-w-[200px]">
+                          <td className="py-2.5 px-4 text-xs text-cg-slate-strong truncate max-w-[200px]">
                             {event.metadata ? JSON.stringify(event.metadata) : '---'}
                           </td>
                         </tr>
@@ -480,7 +480,7 @@ export default function ActivityLogContent() {
                     <button aria-label="Previous"
                       onClick={() => setPlatformPage(Math.max(0, platformPage - 1))}
                       disabled={platformPage === 0}
-                      className="p-1.5 rounded-lg hover:bg-cg-slate/30 text-[#8AACBC] hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                      className="p-1.5 rounded-lg hover:bg-cg-slate/30 text-cg-slate-muted hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
@@ -490,7 +490,7 @@ export default function ActivityLogContent() {
                     <button aria-label="Next"
                       onClick={() => setPlatformPage(Math.min(platformTotalPages - 1, platformPage + 1))}
                       disabled={platformPage >= platformTotalPages - 1}
-                      className="p-1.5 rounded-lg hover:bg-cg-slate/30 text-[#8AACBC] hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                      className="p-1.5 rounded-lg hover:bg-cg-slate/30 text-cg-slate-muted hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                     >
                       <ChevronRight className="w-4 h-4" />
                     </button>

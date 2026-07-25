@@ -349,7 +349,7 @@ export default function FL341Wizard({
         return (
           <div className="space-y-6">
             <div className="bg-cg-slate-subtle border border-cg-slate-subtle rounded-lg p-4">
-              <p className="text-[#1E4E6B] text-sm">
+              <p className="text-cg-slate-dark text-sm">
                 <strong>Items 1-4:</strong> These are standard jurisdictional findings. They are typically checked by default.
               </p>
             </div>
@@ -442,7 +442,7 @@ export default function FL341Wizard({
         return (
           <div className="space-y-6">
             <div className="bg-cg-amber-subtle border border-cg-amber-subtle rounded-lg p-4">
-              <p className="text-[#E09520] text-sm">
+              <p className="text-cg-amber-dark text-sm">
                 <strong>Items 5-6:</strong> Child abduction prevention and mediation referral.
               </p>
             </div>
@@ -509,7 +509,7 @@ export default function FL341Wizard({
         return (
           <div className="space-y-6">
             <div className="bg-cg-slate-subtle border border-cg-slate-subtle rounded-lg p-4">
-              <p className="text-[#1E4E6B] text-sm">
+              <p className="text-cg-slate-dark text-sm">
                 <strong>Item 7:</strong> Custody of the minor children is awarded as follows.
               </p>
             </div>
@@ -532,7 +532,7 @@ export default function FL341Wizard({
                         variant="ghost"
                         size="sm"
                         onClick={() => removeChild(index)}
-                        className="text-cg-error hover:text-[#9B2C2C]"
+                        className="text-cg-error hover:text-cg-error-dark"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -626,7 +626,7 @@ export default function FL341Wizard({
         return (
           <div className="space-y-6">
             <div className="bg-cg-error-subtle border border-cg-error-subtle rounded-lg p-4">
-              <p className="text-[#9B2C2C] text-sm">
+              <p className="text-cg-error-dark text-sm">
                 <strong>Item 8:</strong> Custody involving allegations of abuse or substance abuse.
               </p>
             </div>
@@ -761,7 +761,7 @@ export default function FL341Wizard({
         return (
           <div className="space-y-6">
             <div className="bg-cg-slate-subtle border border-cg-slate-subtle rounded-lg p-4">
-              <p className="text-[#1E4E6B] text-sm">
+              <p className="text-cg-slate-dark text-sm">
                 <strong>Item 9:</strong> Visitation (parenting time) schedule.
               </p>
             </div>
@@ -979,7 +979,7 @@ export default function FL341Wizard({
         return (
           <div className="space-y-6">
             <div className="bg-cg-amber-subtle border border-cg-amber-subtle rounded-lg p-4">
-              <p className="text-[#E09520] text-sm">
+              <p className="text-cg-amber-dark text-sm">
                 <strong>Item 10:</strong> Supervised visitation orders.
               </p>
             </div>
@@ -1052,7 +1052,7 @@ export default function FL341Wizard({
         return (
           <div className="space-y-6">
             <div className="bg-cg-slate-subtle border border-cg-slate-subtle rounded-lg p-4">
-              <p className="text-[#1E4E6B] text-sm">
+              <p className="text-cg-slate-dark text-sm">
                 <strong>Item 11:</strong> Transportation and place of exchange.
               </p>
             </div>
@@ -1154,7 +1154,7 @@ export default function FL341Wizard({
         return (
           <div className="space-y-6">
             <div className="bg-cg-amber-subtle border border-cg-amber-subtle rounded-lg p-4">
-              <p className="text-[#E09520] text-sm">
+              <p className="text-cg-amber-dark text-sm">
                 <strong>Item 12:</strong> Travel with children restrictions.
               </p>
             </div>
@@ -1244,7 +1244,7 @@ export default function FL341Wizard({
         return (
           <div className="space-y-6">
             <div className="bg-cg-slate-subtle border border-cg-slate-subtle rounded-lg p-4">
-              <p className="text-[#1E4E6B] text-sm">
+              <p className="text-cg-slate-dark text-sm">
                 <strong>Items 13-14:</strong> Holiday schedule and additional provisions.
               </p>
             </div>
@@ -1350,7 +1350,7 @@ export default function FL341Wizard({
         return (
           <div className="space-y-6">
             <div className="bg-cg-slate-subtle border border-cg-slate-subtle rounded-lg p-4">
-              <p className="text-[#1E4E6B] text-sm">
+              <p className="text-cg-slate-dark text-sm">
                 <strong>Items 15-16:</strong> Access to records and other orders.
               </p>
             </div>

@@ -446,7 +446,7 @@ export function generateFL311PDF(formData: FL311FormData, caseData: CaseData) {
 
     ${formData.legal_custody_to === 'joint' ? `
     <!-- FL-341(E) Note for Joint Legal Custody -->
-    <div class="note-box" style="background: var(--cg-amber-subtle); border: 2px solid #E09520;">
+    <div class="note-box" style="background: var(--cg-amber-subtle); border: 2px solid var(--cg-amber-dark);">
       <p style="font-size: 9pt;">
         <strong>JOINT LEGAL CUSTODY NOTE:</strong> If joint legal custody is ordered, the parents must consult with each
         other on major decisions relating to the health, education, and welfare of the children. Consider completing and

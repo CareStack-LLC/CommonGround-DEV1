@@ -1229,8 +1229,8 @@ function FactsSection({
       </Alert>
 
       <Alert className="bg-cg-amber-subtle border-cg-amber-subtle">
-        <AlertTriangle className="h-4 w-4 text-[#E09520]" />
-        <AlertDescription className="text-[#E09520]">
+        <AlertTriangle className="h-4 w-4 text-cg-amber-dark" />
+        <AlertDescription className="text-cg-amber-dark">
           <strong>Important:</strong> This is your declaration under penalty of perjury. State only facts you know to be true.
           The facts cannot be longer than 10 pages unless the court gives permission.
         </AlertDescription>

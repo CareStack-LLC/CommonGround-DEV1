@@ -72,15 +72,15 @@ const TEMPLATE_ICONS: Record<string, React.ReactNode> = {
 };
 
 const TEMPLATE_COLORS: Record<string, string> = {
-  "red": "bg-cg-error-subtle text-[#9B2C2C] border-cg-error-subtle",
-  "orange": "bg-cg-amber-subtle text-[#E09520] border-cg-amber-subtle",
+  "red": "bg-cg-error-subtle text-cg-error-dark border-cg-error-subtle",
+  "orange": "bg-cg-amber-subtle text-cg-amber-dark border-cg-amber-subtle",
   "green": "bg-cg-sage-subtle text-cg-sage-dark border-cg-sage-subtle",
-  "blue": "bg-cg-slate-subtle text-[#1E4E6B] border-cg-slate-subtle",
-  "purple": "bg-cg-slate-subtle text-[#1E4E6B] border-cg-slate-subtle",
-  "amber": "bg-cg-amber-subtle text-[#E09520] border-cg-amber-subtle",
+  "blue": "bg-cg-slate-subtle text-cg-slate-dark border-cg-slate-subtle",
+  "purple": "bg-cg-slate-subtle text-cg-slate-dark border-cg-slate-subtle",
+  "amber": "bg-cg-amber-subtle text-cg-amber-dark border-cg-amber-subtle",
   "gray": "bg-gray-100 text-gray-700 border-gray-200",
   "teal": "bg-teal-100 text-teal-700 border-teal-200",
-  "indigo": "bg-cg-slate-subtle text-[#1E4E6B] border-cg-slate-subtle",
+  "indigo": "bg-cg-slate-subtle text-cg-slate-dark border-cg-slate-subtle",
 };
 
 const EVENT_TYPES = [
@@ -268,9 +268,9 @@ export default function EventsPage() {
     if (attended === true) {
       return <span className="px-2 py-0.5 bg-cg-sage-subtle text-cg-sage-dark rounded text-xs">Attended</span>;
     } else if (attended === false) {
-      return <span className="px-2 py-0.5 bg-cg-error-subtle text-[#9B2C2C] rounded text-xs">Missed</span>;
+      return <span className="px-2 py-0.5 bg-cg-error-subtle text-cg-error-dark rounded text-xs">Missed</span>;
     }
-    return <span className="px-2 py-0.5 bg-cg-amber-subtle text-[#E09520] rounded text-xs">Pending</span>;
+    return <span className="px-2 py-0.5 bg-cg-amber-subtle text-cg-amber-dark rounded text-xs">Pending</span>;
   };
 
   const getRsvpBadge = (status: string | undefined) => {
@@ -278,9 +278,9 @@ export default function EventsPage() {
       case "attending":
         return <span className="px-2 py-0.5 bg-cg-sage-subtle text-cg-sage-dark rounded text-xs">✓ Attending</span>;
       case "not_attending":
-        return <span className="px-2 py-0.5 bg-cg-error-subtle text-[#9B2C2C] rounded text-xs">✗ Declined</span>;
+        return <span className="px-2 py-0.5 bg-cg-error-subtle text-cg-error-dark rounded text-xs">✗ Declined</span>;
       case "maybe":
-        return <span className="px-2 py-0.5 bg-cg-amber-subtle text-[#E09520] rounded text-xs">? Maybe</span>;
+        return <span className="px-2 py-0.5 bg-cg-amber-subtle text-cg-amber-dark rounded text-xs">? Maybe</span>;
       default:
         return <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">No Response</span>;
     }
@@ -378,7 +378,7 @@ export default function EventsPage() {
 
       {/* Error Display */}
       {error && (
-        <div className="bg-cg-error-subtle border border-cg-error-subtle text-[#9B2C2C] px-4 py-3 rounded">
+        <div className="bg-cg-error-subtle border border-cg-error-subtle text-cg-error-dark px-4 py-3 rounded">
           {error}
         </div>
       )}
@@ -560,7 +560,7 @@ export default function EventsPage() {
                         <div className="flex items-center gap-2">
                           <h3 className="font-semibold text-slate-900">{event.title}</h3>
                           {event.is_mandatory && (
-                            <span className="px-2 py-0.5 bg-cg-error-subtle text-[#9B2C2C] text-xs rounded">Mandatory</span>
+                            <span className="px-2 py-0.5 bg-cg-error-subtle text-cg-error-dark text-xs rounded">Mandatory</span>
                           )}
                         </div>
                         {event.description && (
@@ -608,7 +608,7 @@ export default function EventsPage() {
                     </div>
                   </div>
                   {event.shared_notes && (
-                    <div className="mt-3 p-2 bg-cg-amber-subtle rounded text-sm text-[#E09520]">
+                    <div className="mt-3 p-2 bg-cg-amber-subtle rounded text-sm text-cg-amber-dark">
                       <span className="font-medium">Note:</span> {event.shared_notes}
                     </div>
                   )}

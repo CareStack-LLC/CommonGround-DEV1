@@ -183,10 +183,10 @@ export function ComplianceReportGenerator({
 
   return (
     <Dialog open={open} onOpenChange={handleReset}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto border-2 border-[#6B460F]/20">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto border-2 border-cg-amber-deep/20">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-bold text-slate-900">
-            <FileText className="h-6 w-6 text-[#6B460F]" />
+            <FileText className="h-6 w-6 text-cg-amber-deep" />
             Generate Compliance Report
           </DialogTitle>
           <DialogDescription>
@@ -224,7 +224,7 @@ export function ComplianceReportGenerator({
                     key={section.id}
                     className={`cursor-pointer transition-all ${
                       includeSections.has(section.id)
-                        ? "border-2 border-[#6B460F]/40 bg-cg-amber-subtle/30"
+                        ? "border-2 border-cg-amber-deep/40 bg-cg-amber-subtle/30"
                         : "border-2 border-slate-200 hover:border-slate-300"
                     }`}
                     onClick={() => toggleSection(section.id)}
@@ -266,7 +266,7 @@ export function ComplianceReportGenerator({
             </div>
 
             {/* SHA-256 Verification */}
-            <Card className="border-2 border-[#1B5544]/30 bg-cg-sage-subtle/30">
+            <Card className="border-2 border-cg-sage-deep/30 bg-cg-sage-subtle/30">
               <CardContent className="py-3 flex items-start gap-3">
                 <Checkbox
                   checked={includeSHA256}
@@ -275,7 +275,7 @@ export function ComplianceReportGenerator({
                 />
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <Shield className="h-4 w-4 text-[#1B5544]" />
+                    <Shield className="h-4 w-4 text-cg-sage-deep" />
                     <p className="text-sm font-semibold text-slate-900">
                       Include SHA-256 Verification
                     </p>
@@ -292,7 +292,7 @@ export function ComplianceReportGenerator({
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
                   <span className="font-medium text-slate-700">Generating report...</span>
-                  <Clock className="h-4 w-4 text-[#6B460F] animate-spin" />
+                  <Clock className="h-4 w-4 text-cg-amber-deep animate-spin" />
                 </div>
                 <Progress value={66} className="h-2" />
                 <p className="text-xs text-slate-600 text-center">
@@ -302,19 +302,19 @@ export function ComplianceReportGenerator({
             )}
 
             {error && (
-              <div className="p-3 bg-cg-error-subtle border border-[#7A2222]/30 rounded-lg flex items-start gap-2">
-                <XCircle className="h-5 w-5 text-[#7A2222] shrink-0 mt-0.5" />
-                <p className="text-sm text-[#7A2222]">{error}</p>
+              <div className="p-3 bg-cg-error-subtle border border-cg-error-deep/30 rounded-lg flex items-start gap-2">
+                <XCircle className="h-5 w-5 text-cg-error-deep shrink-0 mt-0.5" />
+                <p className="text-sm text-cg-error-deep">{error}</p>
               </div>
             )}
           </div>
         ) : (
           <div className="space-y-4">
             {/* Success Message */}
-            <Card className="border-2 border-[#1B5544]/30 bg-cg-sage-subtle/30">
+            <Card className="border-2 border-cg-sage-deep/30 bg-cg-sage-subtle/30">
               <CardContent className="py-6 text-center space-y-3">
                 <div className="p-4 bg-cg-sage-subtle rounded-full w-fit mx-auto">
-                  <CheckCircle2 className="h-8 w-8 text-[#1B5544]" />
+                  <CheckCircle2 className="h-8 w-8 text-cg-sage-deep" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-lg text-slate-900 mb-1">
@@ -337,7 +337,7 @@ export function ComplianceReportGenerator({
                       {generatedReport.file_name}
                     </p>
                   </div>
-                  <Badge className="bg-cg-amber-subtle text-[#6B460F] border-[#6B460F]/30">
+                  <Badge className="bg-cg-amber-subtle text-cg-amber-deep border-cg-amber-deep/30">
                     {format.toUpperCase()}
                   </Badge>
                 </div>
@@ -386,7 +386,7 @@ export function ComplianceReportGenerator({
             <Button
               onClick={handleGenerate}
               disabled={generating || includeSections.size === 0}
-              className="bg-[#6B460F] hover:bg-[#3D2808] text-white"
+              className="bg-cg-amber-deep hover:bg-[#3D2808] text-white"
             >
               {generating ? (
                 <>Generating...</>
@@ -400,7 +400,7 @@ export function ComplianceReportGenerator({
           ) : (
             <Button
               onClick={handleDownload}
-              className="bg-[#1B5544] hover:bg-[#123A2E] text-white"
+              className="bg-cg-sage-deep hover:bg-[#123A2E] text-white"
             >
               <Download className="h-4 w-4 mr-2" />
               Download Report

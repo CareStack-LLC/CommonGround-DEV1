@@ -858,7 +858,7 @@ export default function ProfilePage() {
                 <Button
                   onClick={handleSaveProfile}
                   disabled={isSaving}
-                  className="bg-cg-sage hover:bg-[#2D8A6E] text-white px-8 h-11 rounded-xl shadow-sm font-semibold"
+                  className="bg-cg-sage hover:bg-cg-sage-dark text-white px-8 h-11 rounded-xl shadow-sm font-semibold"
                 >
                   {isSaving ? (
                     <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Saving...</>
@@ -1001,7 +1001,7 @@ export default function ProfilePage() {
                     <Button
                       onClick={handleSaveFirm}
                       disabled={isSavingFirm}
-                      className="bg-cg-sage hover:bg-[#2D8A6E] text-white px-8 h-11 rounded-xl shadow-sm font-semibold"
+                      className="bg-cg-sage hover:bg-cg-sage-dark text-white px-8 h-11 rounded-xl shadow-sm font-semibold"
                     >
                       {isSavingFirm ? (
                         <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Saving...</>

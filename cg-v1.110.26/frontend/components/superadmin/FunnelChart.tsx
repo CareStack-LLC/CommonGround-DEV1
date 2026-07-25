@@ -30,8 +30,8 @@ export function FunnelChart({ stages, title = 'Conversion Funnel', tooltip }: Fu
   const maxVal = stages[0]?.count || 1;
 
   return (
-    <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-      <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">
+    <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+      <h2 className="text-sm font-semibold text-cg-slate-tint mb-4">
         {title}
         {tooltip && <InfoTooltip text={tooltip} />}
       </h2>
@@ -47,9 +47,9 @@ export function FunnelChart({ stages, title = 'Conversion Funnel', tooltip }: Fu
           return (
             <div key={stage.name} className="group">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs text-[#8AACBC]">{stage.name}</span>
+                <span className="text-xs text-cg-slate-muted">{stage.name}</span>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-medium text-[#D0E4EC]">{formatNumber(stage.count)}</span>
+                  <span className="text-xs font-medium text-cg-slate-tint">{formatNumber(stage.count)}</span>
                   {convRate && (
                     <span className="text-[10px] text-muted-foreground">({convRate}%)</span>
                   )}
@@ -63,7 +63,7 @@ export function FunnelChart({ stages, title = 'Conversion Funnel', tooltip }: Fu
               </div>
               {convRate && (
                 <div className="flex justify-end mt-0.5">
-                  <span className="text-[10px] text-[#4A6E7F]">
+                  <span className="text-[10px] text-cg-slate-strong">
                     {convRate}% from {stages[i - 1].name}
                   </span>
                 </div>

@@ -348,12 +348,12 @@ export default function RequestAccessPage() {
                   )}
 
                   {/* Info box */}
-                  <div className="p-3 bg-cg-slate-subtle rounded-lg text-sm text-[#1E4E6B]">
+                  <div className="p-3 bg-cg-slate-subtle rounded-lg text-sm text-cg-slate-dark">
                     <div className="flex items-start gap-2">
                       <Clock className="h-4 w-4 mt-0.5 flex-shrink-0" />
                       <div>
                         <p className="font-medium">What happens next?</p>
-                        <ul className="mt-1 text-[#1E4E6B] text-xs space-y-1">
+                        <ul className="mt-1 text-cg-slate-dark text-xs space-y-1">
                           <li>• Your request will be sent to the case participants</li>
                           <li>• For GAL/Mediator roles, both parents must approve</li>
                           <li>• Attorney roles need approval from the represented party</li>
@@ -374,7 +374,7 @@ export default function RequestAccessPage() {
                     <Button aria-label="Send message"
                       type="submit"
                       disabled={isSubmitting}
-                      className="bg-cg-slate hover:bg-[#1E4E6B]"
+                      className="bg-cg-slate hover:bg-cg-slate-dark"
                     >
                       {isSubmitting ? (
                         <>

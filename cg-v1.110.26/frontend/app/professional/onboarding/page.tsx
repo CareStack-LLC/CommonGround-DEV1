@@ -348,7 +348,7 @@ export default function ProfessionalOnboardingPage() {
                           onClick={() => togglePracticeArea(area.value)}
                           className={
                             formData.practice_areas.includes(area.value)
-                              ? "bg-cg-sage hover:bg-[#2D8A6E]"
+                              ? "bg-cg-sage hover:bg-cg-sage-dark"
                               : ""
                           }
                         >
@@ -476,7 +476,7 @@ export default function ProfessionalOnboardingPage() {
                 <div className="space-y-3 pt-4">
                   <Button
                     onClick={() => router.push("/professional/dashboard")}
-                    className="w-full bg-cg-sage hover:bg-[#2D8A6E]"
+                    className="w-full bg-cg-sage hover:bg-cg-sage-dark"
                   >
                     Go to Dashboard
                     <ArrowRight className="h-4 w-4 ml-2" />
@@ -515,7 +515,7 @@ export default function ProfessionalOnboardingPage() {
                 <Button aria-label="Next"
                   onClick={nextStep}
                   disabled={!canProceed() || isSubmitting}
-                  className="bg-cg-sage hover:bg-[#2D8A6E]"
+                  className="bg-cg-sage hover:bg-cg-sage-dark"
                 >
                   {isSubmitting ? (
                     "Creating..."

@@ -134,9 +134,9 @@ export default function ChildRewardsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0D1B24] via-foreground to-[#0D1B24] text-white">
+    <div className="min-h-screen bg-gradient-to-b from-cg-ink via-foreground to-cg-ink text-white">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-[#0D1B24]/80 backdrop-blur-md border-b border-cg-sage/10">
+      <header className="sticky top-0 z-10 bg-cg-ink/80 backdrop-blur-md border-b border-cg-sage/10">
         <div className="max-w-3xl mx-auto flex items-center justify-between px-4 py-3">
           <button
             onClick={() => router.push('/my-circle/child/dashboard')}

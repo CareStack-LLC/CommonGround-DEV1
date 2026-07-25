@@ -165,7 +165,7 @@ export default function CaseClearFundPage() {
       open: { color: "bg-blue-100 text-blue-800", icon: Clock },
       partially_funded: { color: "bg-cg-amber-subtle text-[#8F5E14]", icon: TrendingUp },
       funded: { color: "bg-cg-sage-subtle text-[#236E59]", icon: CheckCircle2 },
-      authorized: { color: "bg-cg-slate-subtle text-[#1E4E6B]", icon: CreditCard },
+      authorized: { color: "bg-cg-slate-subtle text-cg-slate-dark", icon: CreditCard },
       pending_verification: { color: "bg-cg-amber-subtle text-[#8F5E14]", icon: Receipt },
       verified: { color: "bg-cg-sage-subtle text-[#236E59]", icon: CheckCircle2 },
       completed: { color: "bg-slate-100 text-slate-800", icon: CheckCircle2 },
@@ -270,7 +270,7 @@ export default function CaseClearFundPage() {
                   <p className="text-xs text-muted-foreground">Verified</p>
                   <p className="text-xl font-bold mt-1">{formatCurrency(stats.amount_verified)}</p>
                 </div>
-                <div className="p-2 bg-[#F0F7FC] text-cg-slate rounded-lg">
+                <div className="p-2 bg-cg-slate-tint text-cg-slate rounded-lg">
                   <Receipt className="h-5 w-5" />
                 </div>
               </div>
@@ -283,7 +283,7 @@ export default function CaseClearFundPage() {
                   <p className="text-xs text-muted-foreground">Pending</p>
                   <p className="text-xl font-bold mt-1">{stats.pending_count}</p>
                 </div>
-                <div className="p-2 bg-cg-amber-subtle text-[#E09520] rounded-lg">
+                <div className="p-2 bg-cg-amber-subtle text-cg-amber-dark rounded-lg">
                   <Clock className="h-5 w-5" />
                 </div>
               </div>
@@ -303,7 +303,7 @@ export default function CaseClearFundPage() {
                   {(stats.top_category || "None").replace("_", " ")}
                 </p>
               </div>
-              <div className="p-2 bg-[#F0F7FC] text-cg-slate rounded-lg">
+              <div className="p-2 bg-cg-slate-tint text-cg-slate rounded-lg">
                 <TrendingUp className="h-5 w-5" />
               </div>
             </CardContent>
@@ -484,7 +484,7 @@ function ObligationCard({
                   {getCategoryLabel(obligation.purpose_category)}
                 </Badge>
                 {obligation.verification_required && (
-                  <Badge variant="outline" className="text-xs bg-[#F0F7FC] text-[#1E4E6B] border-[#C2DEF0]">
+                  <Badge variant="outline" className="text-xs bg-cg-slate-tint text-cg-slate-dark border-cg-slate-tint">
                     <Receipt className="h-3 w-3 mr-1" />
                     Receipt Required
                   </Badge>
@@ -589,9 +589,9 @@ function ObligationDetailModal({
                 {formatCurrency(obligation.amount_funded)}
               </p>
             </div>
-            <div className="p-4 bg-[#F0F7FC] rounded-lg text-center">
+            <div className="p-4 bg-cg-slate-tint rounded-lg text-center">
               <p className="text-sm text-cg-slate">Amount Verified</p>
-              <p className="text-2xl font-bold text-[#1E4E6B]">
+              <p className="text-2xl font-bold text-cg-slate-dark">
                 {formatCurrency(obligation.amount_verified)}
               </p>
             </div>
@@ -672,7 +672,7 @@ function ObligationDetailModal({
                 {obligation.verification_artifacts.map((artifact) => (
                   <div
                     key={artifact.id}
-                    className="flex items-center justify-between p-3 bg-[#F0F7FC] rounded-lg"
+                    className="flex items-center justify-between p-3 bg-cg-slate-tint rounded-lg"
                   >
                     <div className="flex items-center gap-3">
                       <Receipt className="h-5 w-5 text-cg-slate" />

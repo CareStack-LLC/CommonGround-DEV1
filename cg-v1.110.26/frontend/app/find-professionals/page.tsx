@@ -387,7 +387,7 @@ function FindProfessionalsContent() {
                   </p>
 
                   {familyFileId && hasExistingFirm && (
-                    <div className="mt-3 flex items-start gap-3 p-3 bg-cg-amber-subtle border border-cg-amber-subtle rounded-lg text-sm text-[#E09520]">
+                    <div className="mt-3 flex items-start gap-3 p-3 bg-cg-amber-subtle border border-cg-amber-subtle rounded-lg text-sm text-cg-amber-dark">
                       <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
                       <p><strong>Note:</strong> You already have a professional assigned. They will be replaced only if you confirm removal in settings later.</p>
                     </div>
@@ -400,8 +400,8 @@ function FindProfessionalsContent() {
                     <div className="flex items-start gap-3">
                       <AlertCircle className="h-5 w-5 text-cg-error shrink-0 mt-0.5" />
                       <div>
-                        <h4 className="font-bold text-[#7A2222] text-sm">Invitation Failed</h4>
-                        <p className="text-xs text-[#9B2C2C]">{inviteError}</p>
+                        <h4 className="font-bold text-cg-error-deep text-sm">Invitation Failed</h4>
+                        <p className="text-xs text-cg-error-dark">{inviteError}</p>
                       </div>
                     </div>
                   </div>
@@ -448,10 +448,10 @@ function FindProfessionalsContent() {
                 {!familyFileId && familyFiles.length === 0 && !isLoadingFamilyFiles && (
                   <div className="bg-cg-amber-subtle border-2 border-cg-amber-subtle rounded-2xl p-4">
                     <div className="flex items-start gap-3">
-                      <AlertCircle className="h-5 w-5 text-[#E09520] shrink-0 mt-0.5" />
+                      <AlertCircle className="h-5 w-5 text-cg-amber-dark shrink-0 mt-0.5" />
                       <div>
                         <h4 className="font-bold text-foreground text-sm">Family File Required</h4>
-                        <p className="text-xs text-[#E09520]">
+                        <p className="text-xs text-cg-amber-dark">
                           Please create a Family File first or go to your existing Family File and click "Invite Professional".
                         </p>
                       </div>

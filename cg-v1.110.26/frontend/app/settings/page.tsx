@@ -41,8 +41,8 @@ const settingCards: SettingCard[] = [
     description: 'Configure email alerts, push notifications, and communication preferences',
     icon: Bell,
     path: '/settings/notifications',
-    iconBgGradient: 'from-cg-amber/10 to-[#E09520]/5',
-    iconColor: 'text-[#E09520]',
+    iconBgGradient: 'from-cg-amber/10 to-cg-amber-dark/5',
+    iconColor: 'text-cg-amber-dark',
   },
   {
     title: 'Security',

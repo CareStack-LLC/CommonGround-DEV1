@@ -353,7 +353,7 @@ export default function CaseAgreementPage() {
                       </CardDescription>
                     </div>
                     {agreement.court_ordered && (
-                      <Badge variant="outline" className="bg-[#F0F7FC] text-[#1E4E6B] border-[#C2DEF0]">
+                      <Badge variant="outline" className="bg-cg-slate-tint text-cg-slate-dark border-cg-slate-tint">
                         <Scale className="h-3 w-3 mr-1" />
                         Court Ordered
                       </Badge>
@@ -406,7 +406,7 @@ export default function CaseAgreementPage() {
 
               {/* AI Quick Summary */}
               {(isSummaryLoading || summary) && (
-                <Card className="border-cg-slate-subtle bg-[#F0F7FC]/30 overflow-hidden mt-6">
+                <Card className="border-cg-slate-subtle bg-cg-slate-tint/30 overflow-hidden mt-6">
                   <CardHeader className="pb-3 border-b border-cg-slate-subtle/50 bg-white/50">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
@@ -504,7 +504,7 @@ export default function CaseAgreementPage() {
                                   Complete
                                 </Badge>
                               ) : (
-                                <Badge className="ml-auto mr-4 bg-cg-amber-subtle text-[#B8791A] border-cg-amber-subtle">
+                                <Badge className="ml-auto mr-4 bg-cg-amber-subtle text-cg-amber-deep border-cg-amber-subtle">
                                   In Progress
                                 </Badge>
                               )}
@@ -611,7 +611,7 @@ export default function CaseAgreementPage() {
                       <div className="flex flex-col items-end gap-2">
                         <div className="flex items-center gap-4 text-sm">
                           <span
-                            className={`flex items-center gap-1 ${accord.parent_a_approved ? "text-cg-sage-dark" : "text-[#E09520]"
+                            className={`flex items-center gap-1 ${accord.parent_a_approved ? "text-cg-sage-dark" : "text-cg-amber-dark"
                               }`}
                           >
                             {accord.parent_a_approved ? (
@@ -622,7 +622,7 @@ export default function CaseAgreementPage() {
                             Parent A
                           </span>
                           <span
-                            className={`flex items-center gap-1 ${accord.parent_b_approved ? "text-cg-sage-dark" : "text-[#E09520]"
+                            className={`flex items-center gap-1 ${accord.parent_b_approved ? "text-cg-sage-dark" : "text-cg-amber-dark"
                               }`}
                           >
                             {accord.parent_b_approved ? (
@@ -674,7 +674,7 @@ export default function CaseAgreementPage() {
               {versions.map((version, index) => (
                 <Card
                   key={version.id}
-                  className={index === 0 ? "border-[#C5E5DB] bg-cg-sage-subtle/30" : ""}
+                  className={index === 0 ? "border-cg-sage-tint bg-cg-sage-subtle/30" : ""}
                 >
                   <CardContent className="pt-4">
                     <div className="flex items-center justify-between">

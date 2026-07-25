@@ -99,7 +99,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   pending: { label: "Pending", color: "bg-cg-amber-subtle text-[#8F5E14]" },
   in_progress: { label: "In Progress", color: "bg-blue-100 text-blue-800" },
   completed: { label: "Completed", color: "bg-cg-sage-subtle text-[#236E59]" },
-  reviewed: { label: "Reviewed", color: "bg-cg-slate-subtle text-[#1E4E6B]" },
+  reviewed: { label: "Reviewed", color: "bg-cg-slate-subtle text-cg-slate-dark" },
   cancelled: { label: "Cancelled", color: "bg-gray-100 text-gray-800" },
 };
 
@@ -334,14 +334,14 @@ export default function IntakeDetailPage() {
               variant="outline"
               size="sm"
               onClick={markAsReviewed}
-              className="border-2 border-[#1B5544]/20 hover:bg-cg-sage-subtle text-[#1B5544] sans"
+              className="border-2 border-cg-sage-deep/20 hover:bg-cg-sage-subtle text-cg-sage-deep sans"
             >
               <CheckCircle2 className="h-4 w-4 mr-2" />
               Mark Reviewed
             </Button>
           )}
           {session.status === "reviewed" && (
-            <div className="flex items-center gap-1.5 text-sm text-[#1B5544] font-medium bg-cg-sage-subtle border-2 border-[#C5E5DB] rounded-sm px-3 py-1.5 sans">
+            <div className="flex items-center gap-1.5 text-sm text-cg-sage-deep font-medium bg-cg-sage-subtle border-2 border-cg-sage-tint rounded-sm px-3 py-1.5 sans">
               <CheckCircle2 className="h-4 w-4" />
               Review Complete
             </div>
@@ -477,10 +477,10 @@ export default function IntakeDetailPage() {
               )}
 
               {/* Goals */}
-              <Card className="border-2 border-[#1B5544]/30 bg-gradient-to-br from-white via-cg-sage-subtle/30 to-white shadow-lg">
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1B5544] via-cg-sage-dark to-[#1B5544]"></div>
+              <Card className="border-2 border-cg-sage-deep/30 bg-gradient-to-br from-white via-cg-sage-subtle/30 to-white shadow-lg">
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cg-sage-deep via-cg-sage-dark to-cg-sage-deep"></div>
                 <CardHeader>
-                  <CardTitle className="serif text-lg font-bold text-[#1B5544]">Client Goals</CardTitle>
+                  <CardTitle className="serif text-lg font-bold text-cg-sage-deep">Client Goals</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2">
@@ -504,7 +504,7 @@ export default function IntakeDetailPage() {
                   <ul className="space-y-2">
                     {summary.concerns.map((concern, index) => (
                       <li key={index} className="flex items-start gap-2 sans text-sm text-slate-700">
-                        <AlertCircle className="h-4 w-4 text-[#E09520] mt-0.5 shrink-0" strokeWidth={2} />
+                        <AlertCircle className="h-4 w-4 text-cg-amber-dark mt-0.5 shrink-0" strokeWidth={2} />
                         {concern}
                       </li>
                     ))}
@@ -721,7 +721,7 @@ export default function IntakeDetailPage() {
                             key={index}
                             className="flex items-start gap-2 sans text-sm p-3 bg-backgroundborder border-foreground/20 rounded-sm"
                           >
-                            <AlertCircle className="h-4 w-4 text-[#E09520] mt-0.5" strokeWidth={2} />
+                            <AlertCircle className="h-4 w-4 text-cg-amber-dark mt-0.5" strokeWidth={2} />
                             {item}
                           </li>
                         ))}

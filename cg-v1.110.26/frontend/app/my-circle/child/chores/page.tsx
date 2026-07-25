@@ -161,8 +161,8 @@ export default function ChildChoresPage() {
       : chores.filter((c) => statusGroup(c.status) === filter);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0D1B24] via-foreground to-[#0D1B24] text-white">
-      <header className="sticky top-0 z-10 bg-[#0D1B24]/80 backdrop-blur-md border-b border-cg-sage/10">
+    <div className="min-h-screen bg-gradient-to-b from-cg-ink via-foreground to-cg-ink text-white">
+      <header className="sticky top-0 z-10 bg-cg-ink/80 backdrop-blur-md border-b border-cg-sage/10">
         <div className="max-w-3xl mx-auto flex items-center justify-between px-4 py-3">
           <button
             onClick={() => router.push('/my-circle/child/dashboard')}
@@ -316,7 +316,7 @@ export default function ChildChoresPage() {
                   )}
 
                 {chore.status === 'completed' && (
-                  <div className="mt-3 flex items-center gap-2 text-xs text-[#CBD8E0]/80">
+                  <div className="mt-3 flex items-center gap-2 text-xs text-cg-mist/80">
                     <Loader2 className="h-3.5 w-3.5 animate-spin text-cg-slate-light" />
                     A parent will check it soon.
                   </div>

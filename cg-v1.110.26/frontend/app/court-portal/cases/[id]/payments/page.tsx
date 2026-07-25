@@ -171,18 +171,18 @@ export default function PaymentsPage() {
   const getStatusBadge = (status: string, isOverdue: boolean) => {
     if (isOverdue) {
       return (
-        <span className="px-2 py-1 bg-cg-error-subtle text-[#9B2C2C] text-xs font-medium rounded">
+        <span className="px-2 py-1 bg-cg-error-subtle text-cg-error-dark text-xs font-medium rounded">
           OVERDUE
         </span>
       );
     }
     const colors: Record<string, string> = {
-      open: "bg-cg-amber-subtle text-[#E09520]",
-      partially_funded: "bg-cg-slate-subtle text-[#1E4E6B]",
+      open: "bg-cg-amber-subtle text-cg-amber-dark",
+      partially_funded: "bg-cg-slate-subtle text-cg-slate-dark",
       funded: "bg-cg-sage-subtle text-cg-sage-dark",
-      verified: "bg-cg-slate-subtle text-[#1E4E6B]",
+      verified: "bg-cg-slate-subtle text-cg-slate-dark",
       completed: "bg-gray-100 text-gray-700",
-      cancelled: "bg-cg-error-subtle text-[#9B2C2C]",
+      cancelled: "bg-cg-error-subtle text-cg-error-dark",
     };
     return (
       <span className={`px-2 py-1 text-xs font-medium rounded ${colors[status] || colors.open}`}>
@@ -232,7 +232,7 @@ export default function PaymentsPage() {
       </div>
 
       {error && (
-        <div className="bg-cg-error-subtle border border-cg-error-subtle text-[#9B2C2C] px-4 py-3 rounded">
+        <div className="bg-cg-error-subtle border border-cg-error-subtle text-cg-error-dark px-4 py-3 rounded">
           {error}
         </div>
       )}
@@ -278,7 +278,7 @@ export default function PaymentsPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Card>
               <CardContent className="p-4 text-center">
-                <div className={`text-2xl font-bold ${complianceRate >= 80 ? "text-cg-sage-dark" : complianceRate >= 50 ? "text-[#E09520]" : "text-cg-error"}`}>
+                <div className={`text-2xl font-bold ${complianceRate >= 80 ? "text-cg-sage-dark" : complianceRate >= 50 ? "text-cg-amber-dark" : "text-cg-error"}`}>
                   {complianceRate}%
                 </div>
                 <div className="text-xs text-slate-500">Compliance Rate</div>
@@ -292,7 +292,7 @@ export default function PaymentsPage() {
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-[#E09520]">{pendingObligations.length}</div>
+                <div className="text-2xl font-bold text-cg-amber-dark">{pendingObligations.length}</div>
                 <div className="text-xs text-slate-500">Pending Funding</div>
               </CardContent>
             </Card>
@@ -365,7 +365,7 @@ export default function PaymentsPage() {
           {overdueObligations.length > 0 && (
             <Card className="border-cg-error-subtle bg-cg-error-subtle">
               <CardHeader>
-                <CardTitle className="text-[#9B2C2C]">Overdue Obligations</CardTitle>
+                <CardTitle className="text-cg-error-dark">Overdue Obligations</CardTitle>
                 <CardDescription className="text-cg-error">
                   These obligations have passed their due date without completion
                 </CardDescription>
@@ -384,7 +384,7 @@ export default function PaymentsPage() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="font-semibold text-[#9B2C2C]">{formatCurrency(ob.total_amount)}</div>
+                        <div className="font-semibold text-cg-error-dark">{formatCurrency(ob.total_amount)}</div>
                         <div className="text-xs text-slate-500">
                           Funded: {formatCurrency(ob.amount_funded)}
                         </div>
@@ -406,7 +406,7 @@ export default function PaymentsPage() {
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
                   <div className="text-center p-3 bg-cg-amber-subtle rounded-lg">
-                    <div className="text-2xl font-bold text-[#E09520]">{metrics.total_open}</div>
+                    <div className="text-2xl font-bold text-cg-amber-dark">{metrics.total_open}</div>
                     <div className="text-xs text-slate-500">Open</div>
                   </div>
                   <div className="text-center p-3 bg-cg-slate-subtle rounded-lg">
@@ -497,10 +497,10 @@ export default function PaymentsPage() {
                           <span>Due: {new Date(ob.due_date).toLocaleDateString()}</span>
                         )}
                         {ob.verification_required && (
-                          <span className="px-1.5 py-0.5 bg-cg-slate-subtle text-[#1E4E6B] rounded">Verification Required</span>
+                          <span className="px-1.5 py-0.5 bg-cg-slate-subtle text-cg-slate-dark rounded">Verification Required</span>
                         )}
                         {ob.receipt_required && (
-                          <span className="px-1.5 py-0.5 bg-cg-slate-subtle text-[#1E4E6B] rounded">Receipt Required</span>
+                          <span className="px-1.5 py-0.5 bg-cg-slate-subtle text-cg-slate-dark rounded">Receipt Required</span>
                         )}
                       </div>
                       <span>Created: {new Date(ob.created_at).toLocaleDateString()}</span>
@@ -564,8 +564,8 @@ export default function PaymentsPage() {
                         <td className="py-3 px-4">
                           <span className={`px-2 py-1 text-xs font-medium rounded ${
                             entry.entry_type === "funding" ? "bg-cg-sage-subtle text-cg-sage-dark" :
-                            entry.entry_type === "obligation" ? "bg-cg-slate-subtle text-[#1E4E6B]" :
-                            entry.entry_type === "prepayment" ? "bg-cg-slate-subtle text-[#1E4E6B]" :
+                            entry.entry_type === "obligation" ? "bg-cg-slate-subtle text-cg-slate-dark" :
+                            entry.entry_type === "prepayment" ? "bg-cg-slate-subtle text-cg-slate-dark" :
                             "bg-gray-100 text-gray-700"
                           }`}>
                             {entry.entry_type.toUpperCase()}
@@ -584,7 +584,7 @@ export default function PaymentsPage() {
                           {entry.is_reconciled ? (
                             <span className="text-cg-sage-dark">Reconciled</span>
                           ) : (
-                            <span className="text-[#E09520]">Pending</span>
+                            <span className="text-cg-amber-dark">Pending</span>
                           )}
                         </td>
                       </tr>

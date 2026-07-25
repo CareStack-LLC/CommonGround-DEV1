@@ -121,7 +121,7 @@ export default function ImpersonationAuditPage() {
               onChange={(e) => { setOpenOnly(e.target.checked); setPage(1); }}
               className="rounded border-cg-slate/40 bg-zinc-900/80 text-cg-sage focus:ring-cg-sage/30"
             />
-            <span className="text-sm text-[#D0E4EC]">Only show open sessions</span>
+            <span className="text-sm text-cg-slate-tint">Only show open sessions</span>
           </label>
           {openOnly && openCount > 0 && (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-amber-500/15 text-amber-300 border border-amber-500/30">
@@ -145,7 +145,7 @@ export default function ImpersonationAuditPage() {
 
       {/* Table */}
       {!error && (
-        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden">
+        <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -195,7 +195,7 @@ export default function ImpersonationAuditPage() {
                         )}
                       </td>
                       <td className="px-4 py-3">
-                        <div className="text-[#D0E4EC] font-medium">{s.superadmin_email || s.superadmin_id.slice(0, 8)}</div>
+                        <div className="text-cg-slate-tint font-medium">{s.superadmin_email || s.superadmin_id.slice(0, 8)}</div>
                       </td>
                       <td className="px-4 py-3">
                         <UserHoverCard userId={s.target_user_id}>
@@ -208,12 +208,12 @@ export default function ImpersonationAuditPage() {
                           </Link>
                         </UserHoverCard>
                       </td>
-                      <td className="px-4 py-3 text-[#8AACBC] text-xs">{formatTime(s.started_at)}</td>
-                      <td className="px-4 py-3 text-[#8AACBC] text-xs">
+                      <td className="px-4 py-3 text-cg-slate-muted text-xs">{formatTime(s.started_at)}</td>
+                      <td className="px-4 py-3 text-cg-slate-muted text-xs">
                         {s.ended_at ? formatTime(s.ended_at) : '\u2014'}
                         {s.end_reason && <span className="block text-[10px] opacity-75">{s.end_reason.replace(/_/g, ' ')}</span>}
                       </td>
-                      <td className="px-4 py-3 text-[#D0E4EC] text-xs">{formatDuration(s.duration_seconds)}</td>
+                      <td className="px-4 py-3 text-cg-slate-tint text-xs">{formatDuration(s.duration_seconds)}</td>
                       <td className="px-4 py-3 text-muted-foreground text-xs hidden md:table-cell">{s.ip_address || '\u2014'}</td>
                       <td className="px-4 py-3 text-right">
                         {isOpen && (
@@ -246,15 +246,15 @@ export default function ImpersonationAuditPage() {
                 <button aria-label="Previous"
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="p-1.5 rounded text-[#8AACBC] hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="p-1.5 rounded text-cg-slate-muted hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
-                <span className="text-xs text-[#D0E4EC] px-2">{page} / {totalPages}</span>
+                <span className="text-xs text-cg-slate-tint px-2">{page} / {totalPages}</span>
                 <button aria-label="Next"
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page >= totalPages}
-                  className="p-1.5 rounded text-[#8AACBC] hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+                  className="p-1.5 rounded text-cg-slate-muted hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>

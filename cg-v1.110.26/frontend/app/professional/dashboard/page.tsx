@@ -88,7 +88,7 @@ function eventTypeBadge(type: string) {
   }
   if (t.includes("filing") || t.includes("deadline")) {
     return (
-      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-cg-amber-subtle text-[#B8791A] border border-[#FBE3BF]">
+      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-cg-amber-subtle text-cg-amber-deep border border-cg-amber-tint">
         Filing
       </span>
     );
@@ -176,7 +176,7 @@ export default function ProfessionalDashboardPage() {
             <div className="flex flex-wrap gap-3">
               <Link
                 href="/professional/intake"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-cg-sage hover:bg-[#2D8A6E] text-white text-sm font-semibold transition-colors shadow-sm"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-cg-sage hover:bg-cg-sage-dark text-white text-sm font-semibold transition-colors shadow-sm"
               >
                 <UserPlus className="h-4 w-4" />
                 New Intake
@@ -226,7 +226,7 @@ export default function ProfessionalDashboardPage() {
           {/* Unread Messages */}
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 flex items-center gap-4">
             <div className="w-11 h-11 rounded-full bg-cg-amber-subtle flex items-center justify-center shrink-0">
-              <MessageSquare className="h-5 w-5 text-[#E09520]" />
+              <MessageSquare className="h-5 w-5 text-cg-amber-dark" />
             </div>
             <div>
               <p className="text-2xl font-bold text-foreground">{unreadMessages}</p>
@@ -373,7 +373,7 @@ export default function ProfessionalDashboardPage() {
                         <span className="text-sm text-slate-700 font-medium">Unread messages</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-semibold bg-cg-amber-subtle text-[#B8791A] px-2 py-0.5 rounded-full">
+                        <span className="text-xs font-semibold bg-cg-amber-subtle text-cg-amber-deep px-2 py-0.5 rounded-full">
                           {unreadMessages}
                         </span>
                         <ArrowRight className="h-3.5 w-3.5 text-slate-300" />

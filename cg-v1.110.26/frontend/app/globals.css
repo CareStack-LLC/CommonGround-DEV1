@@ -103,6 +103,22 @@
   --color-cg-warning-subtle: var(--cg-warning-subtle);
   --color-cg-error: var(--cg-error);
   --color-cg-error-subtle: var(--cg-error-subtle);
+  /* extended shade scale (hex→token migration) */
+  --color-cg-slate-dark: var(--cg-slate-dark);
+  --color-cg-slate-deep: var(--cg-slate-deep);
+  --color-cg-slate-strong: var(--cg-slate-strong);
+  --color-cg-slate-muted: var(--cg-slate-muted);
+  --color-cg-slate-tint: var(--cg-slate-tint);
+  --color-cg-amber-dark: var(--cg-amber-dark);
+  --color-cg-amber-deep: var(--cg-amber-deep);
+  --color-cg-amber-tint: var(--cg-amber-tint);
+  --color-cg-error-dark: var(--cg-error-dark);
+  --color-cg-error-deep: var(--cg-error-deep);
+  --color-cg-error-light: var(--cg-error-light);
+  --color-cg-sage-deep: var(--cg-sage-deep);
+  --color-cg-sage-tint: var(--cg-sage-tint);
+  --color-cg-ink: var(--cg-ink);
+  --color-cg-mist: var(--cg-mist);
 
   /* ARIA Sentinel Shield Semantic Colors */
   --color-cg-heat: var(--cg-heat);
@@ -218,6 +234,22 @@
   --cg-warning-subtle: #FEF7ED;
   --cg-error: #C53030;
   --cg-error-subtle: #FEE2E2;
+  /* extended shade scale */
+  --cg-slate-dark: #1E4E6B;
+  --cg-slate-deep: #1A3648;
+  --cg-slate-strong: #4A6E7F;
+  --cg-slate-muted: #8AACBC;
+  --cg-slate-tint: #D0E4EC;
+  --cg-amber-dark: #E09520;
+  --cg-amber-deep: #6B460F;
+  --cg-amber-tint: #FBE3BF;
+  --cg-error-dark: #9B2C2C;
+  --cg-error-deep: #7A2222;
+  --cg-error-light: #E06B6B;
+  --cg-sage-deep: #1B5544;
+  --cg-sage-tint: #C5E5DB;
+  --cg-ink: #0D1B24;
+  --cg-mist: #CBD8E0;
 
   /* ARIA Sentinel Shield */
   --cg-heat: #F5A623;
@@ -303,6 +335,22 @@
   --cg-warning-subtle: #2D2010;
   --cg-error: #C53030;
   --cg-error-subtle: #2D1A1A;
+  /* extended shade scale (dark) */
+  --cg-slate-dark: #7CC4DC;
+  --cg-slate-deep: #2D5060;
+  --cg-slate-strong: #8AACBC;
+  --cg-slate-muted: #7A9CAD;
+  --cg-slate-tint: #1E3A4A;
+  --cg-amber-dark: #F5A623;
+  --cg-amber-deep: #B8791A;
+  --cg-amber-tint: #2D2010;
+  --cg-error-dark: #E06B6B;
+  --cg-error-deep: #9B2C2C;
+  --cg-error-light: #9B2C2C;
+  --cg-sage-deep: #3DAA8A;
+  --cg-sage-tint: #0F2A20;
+  --cg-ink: #0D1B24;
+  --cg-mist: #2D5060;
 
   /* ARIA Sentinel Shield */
   --cg-heat: #F5A623;

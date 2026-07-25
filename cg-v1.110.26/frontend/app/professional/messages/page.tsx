@@ -219,7 +219,7 @@ export default function MessagesPage() {
             <RefreshCw className="h-3.5 w-3.5 mr-2" />
             Refresh
           </Button>
-          <Button onClick={() => setShowCompose(true)} className="bg-cg-sage hover:bg-[#2D8A6E] text-white rounded-xl h-9 shadow-sm font-semibold">
+          <Button onClick={() => setShowCompose(true)} className="bg-cg-sage hover:bg-cg-sage-dark text-white rounded-xl h-9 shadow-sm font-semibold">
             <Plus className="h-4 w-4 mr-2" />
             New Message
           </Button>
@@ -394,7 +394,7 @@ export default function MessagesPage() {
                 : "Messages from your cases will appear here. Start a conversation with a client below."}
             </p>
             {!searchQuery && readFilter === "all" && (
-              <Button onClick={() => setShowCompose(true)} className="mt-5 bg-cg-sage hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm font-semibold">
+              <Button onClick={() => setShowCompose(true)} className="mt-5 bg-cg-sage hover:bg-cg-sage-dark text-white rounded-xl shadow-sm font-semibold">
                 <Plus className="h-4 w-4 mr-2" /> New Message
               </Button>
             )}
@@ -528,7 +528,7 @@ function ComposeDialog({
           <Button aria-label="Send message"
             onClick={handleSend}
             disabled={!content.trim() || !selectedCaseId || isSending}
-            className="bg-cg-sage hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm font-semibold"
+            className="bg-cg-sage hover:bg-cg-sage-dark text-white rounded-xl shadow-sm font-semibold"
           >
             {isSending ? (
               <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Sending...</>

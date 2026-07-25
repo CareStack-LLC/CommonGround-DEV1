@@ -44,7 +44,7 @@ export default function ChildWalletCard({
         {/* Balance */}
         <div className="mt-4 p-4 bg-cg-slate-subtle dark:bg-foreground/30 rounded-xl">
           <p className="text-sm text-cg-slate dark:text-cg-slate-light mb-1">Current Balance</p>
-          <p className="text-2xl font-bold text-[#1E4E6B] dark:text-cg-slate-light font-mono tabular-nums">
+          <p className="text-2xl font-bold text-cg-slate-dark dark:text-cg-slate-light font-mono tabular-nums">
             {formatCurrency(balance)}
           </p>
         </div>
@@ -72,7 +72,7 @@ export default function ChildWalletCard({
           {onContribute && (
             <button
               onClick={onContribute}
-              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-cg-slate text-white rounded-xl font-medium hover:bg-[#1E4E6B] transition-colors"
+              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-cg-slate text-white rounded-xl font-medium hover:bg-cg-slate-dark transition-colors"
             >
               <Gift className="h-4 w-4" />
               Send Money

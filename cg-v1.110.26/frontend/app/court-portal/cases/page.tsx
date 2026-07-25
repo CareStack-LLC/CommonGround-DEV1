@@ -139,7 +139,7 @@ export default function CasesListPage() {
           <p className="text-slate-600">Your active case access grants</p>
         </div>
         <Link href="/court-portal/cases/new">
-          <Button className="bg-cg-slate hover:bg-[#1E4E6B]">
+          <Button className="bg-cg-slate hover:bg-cg-slate-dark">
             <Plus className="h-4 w-4 mr-2" />
             New Case
           </Button>
@@ -188,7 +188,7 @@ export default function CasesListPage() {
                         <span className={`px-2 py-0.5 text-xs rounded ${
                           caseItem.status === "active"
                             ? "bg-cg-sage-subtle text-foreground"
-                            : "bg-cg-amber-subtle text-[#E09520]"
+                            : "bg-cg-amber-subtle text-cg-amber-dark"
                         }`}>
                           {caseItem.status}
                         </span>
@@ -212,7 +212,7 @@ export default function CasesListPage() {
                     <div className="text-right space-y-2">
                       {caseItem.grant && (
                         <div className={`text-sm font-medium ${
-                          caseItem.grant.days_remaining <= 7 ? "text-[#E09520]" : "text-muted-foreground"
+                          caseItem.grant.days_remaining <= 7 ? "text-cg-amber-dark" : "text-muted-foreground"
                         }`}>
                           {caseItem.grant.days_remaining} days remaining
                         </div>
@@ -220,12 +220,12 @@ export default function CasesListPage() {
                       {caseItem.quick_stats && (
                         <div className="flex space-x-3 text-xs">
                           {caseItem.quick_stats.compliance_gap > 10 && (
-                            <span className="px-2 py-1 bg-cg-amber-subtle text-[#E09520] rounded">
+                            <span className="px-2 py-1 bg-cg-amber-subtle text-cg-amber-dark rounded">
                               Compliance gap: {caseItem.quick_stats.compliance_gap}%
                             </span>
                           )}
                           {caseItem.quick_stats.flagged_messages > 20 && (
-                            <span className="px-2 py-1 bg-cg-error-subtle text-[#9B2C2C] rounded">
+                            <span className="px-2 py-1 bg-cg-error-subtle text-cg-error-dark rounded">
                               {caseItem.quick_stats.flagged_messages} flags
                             </span>
                           )}

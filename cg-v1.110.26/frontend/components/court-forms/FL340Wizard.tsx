@@ -382,7 +382,7 @@ export default function FL340Wizard({
         return (
           <div className="space-y-6">
             <div className="bg-cg-amber-subtle border border-cg-amber-subtle rounded-lg p-4">
-              <p className="text-[#E09520] text-sm">
+              <p className="text-cg-amber-dark text-sm">
                 <strong>Item 1:</strong> This proceeding was heard on the date, time, and location specified below.
               </p>
             </div>
@@ -477,7 +477,7 @@ export default function FL340Wizard({
         return (
           <div className="space-y-6">
             <div className="bg-cg-amber-subtle border border-cg-amber-subtle rounded-lg p-4">
-              <p className="text-[#E09520] text-sm">
+              <p className="text-cg-amber-dark text-sm">
                 <strong>Items 1a-c:</strong> Record attendance at the hearing.
               </p>
             </div>
@@ -587,7 +587,7 @@ export default function FL340Wizard({
         return (
           <div className="space-y-6">
             <div className="bg-cg-amber-subtle border border-cg-amber-subtle rounded-lg p-4">
-              <p className="text-[#E09520] text-sm">
+              <p className="text-cg-amber-dark text-sm">
                 <strong>Item 2:</strong> Custody and visitation/parenting time orders.
               </p>
             </div>
@@ -599,7 +599,7 @@ export default function FL340Wizard({
         return (
           <div className="space-y-6">
             <div className="bg-cg-amber-subtle border border-cg-amber-subtle rounded-lg p-4">
-              <p className="text-[#E09520] text-sm">
+              <p className="text-cg-amber-dark text-sm">
                 <strong>Item 3:</strong> Child support orders.
               </p>
             </div>
@@ -611,7 +611,7 @@ export default function FL340Wizard({
         return (
           <div className="space-y-6">
             <div className="bg-cg-amber-subtle border border-cg-amber-subtle rounded-lg p-4">
-              <p className="text-[#E09520] text-sm">
+              <p className="text-cg-amber-dark text-sm">
                 <strong>Item 4:</strong> Spousal or family support orders.
               </p>
             </div>
@@ -623,7 +623,7 @@ export default function FL340Wizard({
         return (
           <div className="space-y-6">
             <div className="bg-cg-amber-subtle border border-cg-amber-subtle rounded-lg p-4">
-              <p className="text-[#E09520] text-sm">
+              <p className="text-cg-amber-dark text-sm">
                 <strong>Item 5:</strong> Property orders.
               </p>
             </div>
@@ -635,7 +635,7 @@ export default function FL340Wizard({
         return (
           <div className="space-y-6">
             <div className="bg-cg-amber-subtle border border-cg-amber-subtle rounded-lg p-4">
-              <p className="text-[#E09520] text-sm">
+              <p className="text-cg-amber-dark text-sm">
                 <strong>Item 6:</strong> Attorney&apos;s fees orders.
               </p>
             </div>
@@ -647,7 +647,7 @@ export default function FL340Wizard({
         return (
           <div className="space-y-6">
             <div className="bg-cg-amber-subtle border border-cg-amber-subtle rounded-lg p-4">
-              <p className="text-[#E09520] text-sm">
+              <p className="text-cg-amber-dark text-sm">
                 <strong>Items 7-8:</strong> Other orders and reserved issues.
               </p>
             </div>
@@ -718,7 +718,7 @@ export default function FL340Wizard({
         return (
           <div className="space-y-6">
             <div className="bg-cg-amber-subtle border border-cg-amber-subtle rounded-lg p-4">
-              <p className="text-[#E09520] text-sm">
+              <p className="text-cg-amber-dark text-sm">
                 <strong>Item 9:</strong> If the matter is rescheduled for further hearing.
               </p>
             </div>
@@ -782,7 +782,7 @@ export default function FL340Wizard({
         return (
           <div className="space-y-6">
             <div className="bg-cg-amber-subtle border border-cg-amber-subtle rounded-lg p-4">
-              <p className="text-[#E09520] text-sm">
+              <p className="text-cg-amber-dark text-sm">
                 <strong>Signatures:</strong> Judicial officer and attorney signatures.
               </p>
             </div>
@@ -895,10 +895,10 @@ export default function FL340Wizard({
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Scale className="h-5 w-5 text-[#E09520]" />
+              <Scale className="h-5 w-5 text-cg-amber-dark" />
               <CardTitle className="text-lg">FL-340: Findings and Order After Hearing</CardTitle>
             </div>
-            <Badge variant="outline" className="text-[#E09520] border-cg-amber">
+            <Badge variant="outline" className="text-cg-amber-dark border-cg-amber">
               Court Form
             </Badge>
           </div>
@@ -915,7 +915,7 @@ export default function FL340Wizard({
             </div>
             <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
               <div
-                className="h-full bg-[#E09520] rounded-full transition-all duration-300"
+                className="h-full bg-cg-amber-dark rounded-full transition-all duration-300"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -931,7 +931,7 @@ export default function FL340Wizard({
                   onClick={() => setCurrentSection(idx)}
                   className={`flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors ${
                     idx === currentSection
-                      ? 'bg-cg-amber-subtle text-[#E09520] font-medium'
+                      ? 'bg-cg-amber-subtle text-cg-amber-dark font-medium'
                       : idx < currentSection
                       ? 'bg-cg-sage-subtle text-cg-sage-dark'
                       : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
@@ -951,7 +951,7 @@ export default function FL340Wizard({
       <Card>
         <CardHeader>
           <div className="flex items-center gap-2">
-            <SectionIcon className="h-5 w-5 text-[#E09520]" />
+            <SectionIcon className="h-5 w-5 text-cg-amber-dark" />
             <CardTitle>{section.title}</CardTitle>
           </div>
           <CardDescription>
@@ -982,7 +982,7 @@ export default function FL340Wizard({
               <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           ) : (
-            <Button aria-label="Send message" onClick={handleSubmit} disabled={isLoading} className="bg-[#E09520] hover:bg-[#E09520]">
+            <Button aria-label="Send message" onClick={handleSubmit} disabled={isLoading} className="bg-cg-amber-dark hover:bg-cg-amber-dark">
               {isLoading ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />

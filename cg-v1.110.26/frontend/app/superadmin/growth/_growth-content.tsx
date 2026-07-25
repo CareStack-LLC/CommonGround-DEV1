@@ -74,7 +74,7 @@ export default function GrowthContent() {
                 key={d}
                 onClick={() => setDays(d)}
                 className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                  days === d ? 'bg-cg-sage text-white' : 'text-[#8AACBC] hover:text-white'
+                  days === d ? 'bg-cg-sage text-white' : 'text-cg-slate-muted hover:text-white'
                 }`}
               >
                 {d}d
@@ -82,7 +82,7 @@ export default function GrowthContent() {
             ))}
           </div>
           <button onClick={fetchData} disabled={loading}
-            className="p-2 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-[#8AACBC] hover:text-white transition-colors disabled:opacity-50">
+            className="p-2 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-cg-slate-muted hover:text-white transition-colors disabled:opacity-50">
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
         </div>
@@ -104,7 +104,7 @@ export default function GrowthContent() {
       </div>
 
       {/* Chart */}
-      <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
+      <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
         <div className="flex items-center justify-between mb-5">
           <div className="flex gap-1">
             {[
@@ -118,7 +118,7 @@ export default function GrowthContent() {
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                   activeChart === tab.key
                     ? 'bg-cg-sage/15 text-cg-sage'
-                    : 'text-muted-foreground hover:text-[#D0E4EC] hover:bg-cg-slate/15'
+                    : 'text-muted-foreground hover:text-cg-slate-tint hover:bg-cg-slate/15'
                 }`}
               >
                 <tab.icon className="w-3.5 h-3.5" />
@@ -126,7 +126,7 @@ export default function GrowthContent() {
               </button>
             ))}
           </div>
-          <span className="text-xs text-[#4A6E7F]">Peak: {chartMax} {chartLabel}/day</span>
+          <span className="text-xs text-cg-slate-strong">Peak: {chartMax} {chartLabel}/day</span>
         </div>
 
         {loading ? (
@@ -146,7 +146,7 @@ export default function GrowthContent() {
                   />
                   <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-zinc-800 border border-zinc-700/60 text-white text-[10px] px-2.5 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10 shadow-xl">
                     <div className="font-semibold">{d.count} {chartLabel}</div>
-                    <div className="text-[#8AACBC]">{new Date(d.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</div>
+                    <div className="text-cg-slate-muted">{new Date(d.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</div>
                   </div>
                 </div>
               );
@@ -155,7 +155,7 @@ export default function GrowthContent() {
         )}
 
         {chartData.length > 0 && (
-          <div className="flex justify-between mt-2 text-[10px] text-[#4A6E7F]">
+          <div className="flex justify-between mt-2 text-[10px] text-cg-slate-strong">
             <span>{new Date(chartData[0].date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
             {chartData.length > 10 && (
               <span>{new Date(chartData[Math.floor(chartData.length / 2)].date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
@@ -168,8 +168,8 @@ export default function GrowthContent() {
       {/* Engagement + Breakdown */}
       {engagement && (
         <div className="grid lg:grid-cols-2 gap-4">
-          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-            <h3 className="text-sm font-semibold text-[#D0E4EC] mb-4">Feature Adoption ({days}d)</h3>
+          <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+            <h3 className="text-sm font-semibold text-cg-slate-tint mb-4">Feature Adoption ({days}d)</h3>
             <div className="space-y-3">
               <FeatureRow label="New Family Files" value={engagement.totals?.new_family_files ?? 0} icon={FileText} />
               <FeatureRow label="New Agreements" value={engagement.totals?.new_agreements ?? 0} icon={CheckCircle} />
@@ -177,8 +177,8 @@ export default function GrowthContent() {
             </div>
           </div>
 
-          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-            <h3 className="text-sm font-semibold text-[#D0E4EC] mb-4">Daily Breakdown</h3>
+          <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+            <h3 className="text-sm font-semibold text-cg-slate-tint mb-4">Daily Breakdown</h3>
             <div className="max-h-64 overflow-y-auto space-y-0">
               {growth && [...(growth.daily_registrations || [])].reverse().slice(0, 14).map((d) => (
                 <div key={d.date} className="flex items-center justify-between py-2 border-b border-cg-slate/10 last:border-0">
@@ -189,7 +189,7 @@ export default function GrowthContent() {
                     <div className="w-20 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
                       <div className="h-full rounded-full bg-cg-sage/60" style={{ width: `${(d.count / chartMax) * 100}%` }} />
                     </div>
-                    <span className="text-xs text-[#D0E4EC] font-medium w-8 text-right">{d.count}</span>
+                    <span className="text-xs text-cg-slate-tint font-medium w-8 text-right">{d.count}</span>
                   </div>
                 </div>
               ))}
@@ -233,7 +233,7 @@ function SummaryCard({
     amber: 'text-amber-400', indigo: 'text-indigo-400',
   };
   return (
-    <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-4">
+    <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-4">
       <div className="flex items-center gap-2 mb-2">
         <Icon className={`w-4 h-4 ${colors[color]}`} />
         <span className="text-[11px] text-muted-foreground">{label}</span>
@@ -260,7 +260,7 @@ function FeatureRow({ label, value, icon: Icon }: {
     <div className="flex items-center justify-between py-2">
       <div className="flex items-center gap-2">
         <Icon className="w-3.5 h-3.5 text-muted-foreground" />
-        <span className="text-xs text-[#8AACBC]">{label}</span>
+        <span className="text-xs text-cg-slate-muted">{label}</span>
       </div>
       <span className="text-sm font-semibold text-white">
         {typeof value === 'number' ? value.toLocaleString() : value}

@@ -232,7 +232,7 @@ export default function CourtHelpPage() {
           variant={selectedCategory === null ? "default" : "outline"}
           size="sm"
           onClick={() => setSelectedCategory(null)}
-          className={selectedCategory === null ? "bg-cg-slate hover:bg-[#1E4E6B]" : ""}
+          className={selectedCategory === null ? "bg-cg-slate hover:bg-cg-slate-dark" : ""}
         >
           All Topics
         </Button>
@@ -242,7 +242,7 @@ export default function CourtHelpPage() {
             variant={selectedCategory === category ? "default" : "outline"}
             size="sm"
             onClick={() => setSelectedCategory(category)}
-            className={selectedCategory === category ? "bg-cg-slate hover:bg-[#1E4E6B]" : ""}
+            className={selectedCategory === category ? "bg-cg-slate hover:bg-cg-slate-dark" : ""}
           >
             {category}
           </Button>

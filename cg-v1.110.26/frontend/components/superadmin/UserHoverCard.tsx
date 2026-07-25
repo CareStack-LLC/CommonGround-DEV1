@@ -118,7 +118,7 @@ export function UserHoverCard({ userId, children, disabled }: Props) {
   // Card content — separated so error/loading can share the frame
   const card = (
     <div
-      className="fixed z-[60] w-[288px] bg-[#1A3648] border border-cg-slate/30 rounded-xl shadow-2xl p-4"
+      className="fixed z-[60] w-[288px] bg-cg-slate-deep border border-cg-slate/30 rounded-xl shadow-2xl p-4"
       style={{ left: coords?.x ?? 0, top: coords?.y ?? 0 }}
       onPointerEnter={() => clearTimers()}
       onPointerLeave={onLeave}
@@ -180,7 +180,7 @@ export function UserHoverCard({ userId, children, disabled }: Props) {
             </span>
           </div>
 
-          <div className="space-y-1.5 text-xs text-[#8AACBC] mb-3">
+          <div className="space-y-1.5 text-xs text-cg-slate-muted mb-3">
             <div className="flex items-center gap-1.5">
               <Clock className="w-3 h-3 text-muted-foreground" />
               <span>Joined {timeAgo(data.created_at)}</span>

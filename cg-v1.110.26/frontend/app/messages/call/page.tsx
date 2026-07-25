@@ -766,7 +766,7 @@ function ParentCallContent() {
                 <ArrowLeft className="w-5 h-5 text-muted-foreground" />
               </button>
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-cg-amber/10 to-[#E09520]/5 rounded-2xl flex items-center justify-center shadow-md">
+                <div className="w-12 h-12 bg-gradient-to-br from-cg-amber/10 to-cg-amber-dark/5 rounded-2xl flex items-center justify-center shadow-md">
                   <PhoneOff className="w-6 h-6 text-cg-amber" />
                 </div>
                 <div>
@@ -780,7 +780,7 @@ function ParentCallContent() {
 
             <Card className="border-2 border-border rounded-2xl shadow-lg">
               <CardContent className="pt-8 pb-8 text-center">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-cg-amber/10 to-[#E09520]/5 flex items-center justify-center mx-auto mb-6 shadow-md">
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-cg-amber/10 to-cg-amber-dark/5 flex items-center justify-center mx-auto mb-6 shadow-md">
                   <PhoneOff className="h-10 w-10 text-cg-amber" />
                 </div>
                 <h2 className="text-2xl font-bold text-foreground mb-3" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
@@ -979,7 +979,7 @@ function ParentCallContent() {
                     <div className="w-6 h-6 rounded-full bg-cg-amber-subtle flex items-center justify-center">
                       <div className="w-2.5 h-2.5 rounded-full bg-cg-amber animate-pulse"></div>
                     </div>
-                    <span className="text-[#E09520] font-medium">Initializing ARIA monitoring...</span>
+                    <span className="text-cg-amber-dark font-medium">Initializing ARIA monitoring...</span>
                   </div>
                   <div className="flex items-center gap-3 text-sm opacity-50">
                     <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center">
@@ -1147,7 +1147,7 @@ function ParentCallContent() {
               className={`w-14 h-14 md:w-16 md:h-16 rounded-full transition-all shadow-lg flex items-center justify-center ${
                 isAudioOn
                   ? 'bg-white/15 hover:bg-white/25 border-2 border-white/20'
-                  : 'bg-cg-error hover:bg-cg-error border-2 border-[#E06B6B]'
+                  : 'bg-cg-error hover:bg-cg-error border-2 border-cg-error-light'
               }`}
               title={isAudioOn ? 'Mute' : 'Unmute'}
             >
@@ -1161,7 +1161,7 @@ function ParentCallContent() {
             {/* End Call */}
             <button aria-label="End call"
               onClick={handleEndCall}
-              className="w-16 h-16 md:w-18 md:h-18 rounded-full bg-cg-error hover:bg-cg-error transition-all shadow-xl flex items-center justify-center border-2 border-[#E06B6B]"
+              className="w-16 h-16 md:w-18 md:h-18 rounded-full bg-cg-error hover:bg-cg-error transition-all shadow-xl flex items-center justify-center border-2 border-cg-error-light"
               title="End call"
             >
               <PhoneOff className="h-7 w-7 md:h-8 md:w-8 text-white" />
@@ -1174,7 +1174,7 @@ function ParentCallContent() {
                 className={`w-14 h-14 md:w-16 md:h-16 rounded-full transition-all shadow-lg flex items-center justify-center ${
                   isVideoOn
                     ? 'bg-white/15 hover:bg-white/25 border-2 border-white/20'
-                    : 'bg-cg-error hover:bg-cg-error border-2 border-[#E06B6B]'
+                    : 'bg-cg-error hover:bg-cg-error border-2 border-cg-error-light'
                 }`}
                 title={isVideoOn ? 'Turn off camera' : 'Turn on camera'}
               >

@@ -280,7 +280,7 @@ export default function GenerateReportPage() {
 
           {/* Generate Button */}
           <Button
-            className="w-full bg-cg-sage hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm font-semibold h-11"
+            className="w-full bg-cg-sage hover:bg-cg-sage-dark text-white rounded-xl shadow-sm font-semibold h-11"
             onClick={handleGenerate}
             disabled={isGenerating || !familyFileId}
           >

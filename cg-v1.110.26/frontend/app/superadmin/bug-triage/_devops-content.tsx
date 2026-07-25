@@ -15,7 +15,7 @@ import {
   ResponsiveContainer, XAxis, YAxis, Tooltip, CartesianGrid,
 } from 'recharts';
 
-const RECHARTS_TOOLTIP = { backgroundColor: 'var(--foreground)', border: '1px solid var(--cg-slate)', borderRadius: 8, color: '#D0E4EC', fontSize: 12 };
+const RECHARTS_TOOLTIP = { backgroundColor: 'var(--foreground)', border: '1px solid var(--cg-slate)', borderRadius: 8, color: 'var(--cg-slate-tint)', fontSize: 12 };
 
 /* ── Velocity Tab ── */
 export function VelocityContent() {
@@ -49,13 +49,13 @@ export function VelocityContent() {
 
       {/* Velocity Trend */}
       {data?.sprints && data.sprints.length > 0 && (
-        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">Sprint Velocity Trend <InfoTooltip text="Story points completed per sprint" /></h2>
+        <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+          <h2 className="text-sm font-semibold text-cg-slate-tint mb-4">Sprint Velocity Trend <InfoTooltip text="Story points completed per sprint" /></h2>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={data.sprints}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--cg-slate)" opacity={0.2} />
-              <XAxis dataKey="name" stroke="#4A6E7F" tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }} />
-              <YAxis stroke="#4A6E7F" tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }} />
+              <XAxis dataKey="name" stroke="var(--cg-slate-strong)" tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }} />
+              <YAxis stroke="var(--cg-slate-strong)" tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }} />
               <Tooltip contentStyle={RECHARTS_TOOLTIP} />
               <Bar dataKey="completed" fill="var(--cg-sage)" radius={[4, 4, 0, 0]} name="Completed" />
               <Bar dataKey="planned" fill="var(--cg-slate)" radius={[4, 4, 0, 0]} name="Planned" opacity={0.5} />
@@ -66,13 +66,13 @@ export function VelocityContent() {
 
       {/* Repair Trends */}
       {trends?.daily && trends.daily.length > 0 && (
-        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">Bug Opened vs Closed <InfoTooltip text="Daily bug resolution trend" /></h2>
+        <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+          <h2 className="text-sm font-semibold text-cg-slate-tint mb-4">Bug Opened vs Closed <InfoTooltip text="Daily bug resolution trend" /></h2>
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={trends.daily}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--cg-slate)" opacity={0.2} />
-              <XAxis dataKey="date" stroke="#4A6E7F" tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }} tickFormatter={(v) => new Date(v).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} />
-              <YAxis stroke="#4A6E7F" tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }} />
+              <XAxis dataKey="date" stroke="var(--cg-slate-strong)" tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }} tickFormatter={(v) => new Date(v).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} />
+              <YAxis stroke="var(--cg-slate-strong)" tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }} />
               <Tooltip contentStyle={RECHARTS_TOOLTIP} />
               <Line type="monotone" dataKey="opened" stroke="var(--cg-error)" strokeWidth={2} dot={false} name="Opened" />
               <Line type="monotone" dataKey="closed" stroke="var(--cg-sage)" strokeWidth={2} dot={false} name="Closed" />
@@ -114,8 +114,8 @@ export function DeploymentsContent() {
         <MetricCard icon={GitBranch} label="Latest" value={deployments[0]?.branch || '—'} color="ocean" tooltip="Most recent deployment branch" />
       </div>
 
-      <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-        <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">Deployment History</h2>
+      <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+        <h2 className="text-sm font-semibold text-cg-slate-tint mb-4">Deployment History</h2>
         <DeploymentTimeline deployments={deployments} loading={loading} />
       </div>
     </div>
@@ -142,8 +142,8 @@ export function QualityContent() {
   return (
     <div className="space-y-6">
       {/* Quality Scoreboard */}
-      <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-6">
-        <h2 className="text-sm font-semibold text-[#D0E4EC] mb-6">Code Quality Scoreboard</h2>
+      <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-6">
+        <h2 className="text-sm font-semibold text-cg-slate-tint mb-6">Code Quality Scoreboard</h2>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
           <ProgressRing value={latest?.test_coverage_pct ?? 0} label="Test Coverage" sublabel="% of code covered" />
           <ProgressRing value={latest?.lint_errors === 0 ? 100 : Math.max(100 - (latest?.lint_errors || 0) * 5, 0)} label="Lint Health" sublabel={`${latest?.lint_errors ?? 0} errors`} />
@@ -154,13 +154,13 @@ export function QualityContent() {
 
       {/* Quality Trends */}
       {trend.length > 0 && (
-        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">Quality Trends</h2>
+        <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+          <h2 className="text-sm font-semibold text-cg-slate-tint mb-4">Quality Trends</h2>
           <ResponsiveContainer width="100%" height={200}>
             <LineChart data={trend}>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--cg-slate)" opacity={0.2} />
-              <XAxis dataKey="date" stroke="#4A6E7F" tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }} />
-              <YAxis stroke="#4A6E7F" tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }} />
+              <XAxis dataKey="date" stroke="var(--cg-slate-strong)" tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }} />
+              <YAxis stroke="var(--cg-slate-strong)" tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }} />
               <Tooltip contentStyle={RECHARTS_TOOLTIP} />
               <Line type="monotone" dataKey="test_coverage_pct" stroke="var(--cg-sage)" strokeWidth={2} dot={false} name="Coverage %" />
               <Line type="monotone" dataKey="lint_errors" stroke="var(--cg-amber)" strokeWidth={2} dot={false} name="Lint Errors" />
@@ -172,13 +172,13 @@ export function QualityContent() {
       {/* Bundle Size */}
       {latest?.bundle_size_kb && (
         <div className="grid grid-cols-2 gap-3">
-          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-4">
+          <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-4">
             <div className="text-xs text-muted-foreground mb-1">Bundle Size</div>
-            <div className="text-lg font-bold text-[#D0E4EC]">{(latest.bundle_size_kb / 1024).toFixed(1)} MB</div>
+            <div className="text-lg font-bold text-cg-slate-tint">{(latest.bundle_size_kb / 1024).toFixed(1)} MB</div>
           </div>
-          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-4">
+          <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-4">
             <div className="text-xs text-muted-foreground mb-1">Last Updated</div>
-            <div className="text-lg font-bold text-[#D0E4EC]">{latest?.date || '—'}</div>
+            <div className="text-lg font-bold text-cg-slate-tint">{latest?.date || '—'}</div>
           </div>
         </div>
       )}
@@ -262,7 +262,7 @@ export function SprintsKanbanContent() {
 
       {/* Create Sprint */}
       {showCreate && (
-        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-4 flex gap-3 items-end">
+        <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-4 flex gap-3 items-end">
           <div className="flex-1">
             <label className="text-xs text-muted-foreground mb-1 block">Sprint Name</label>
             <input
@@ -270,7 +270,7 @@ export function SprintsKanbanContent() {
               onChange={(e) => setNewSprintName(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleCreateSprint()}
               placeholder="e.g., Sprint 12 - Auth Fixes"
-              className="w-full bg-foreground border border-cg-slate/20 rounded-lg px-3 py-2 text-sm text-[#D0E4EC] placeholder-[#4A6E7F] outline-none focus:border-cg-sage/40"
+              className="w-full bg-foreground border border-cg-slate/20 rounded-lg px-3 py-2 text-sm text-cg-slate-tint placeholder-cg-slate-strong outline-none focus:border-cg-sage/40"
             />
           </div>
           <button onClick={handleCreateSprint} disabled={creating} className="px-4 py-2 bg-cg-sage rounded-lg text-sm text-white disabled:opacity-50">

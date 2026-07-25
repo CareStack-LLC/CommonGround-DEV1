@@ -334,11 +334,11 @@ export default function AgreementUploadPage() {
 
   const getStatusBadge = (status: string) => {
     const colors: Record<string, string> = {
-      pending: "bg-cg-amber-subtle text-[#E09520]",
-      processing: "bg-cg-slate-subtle text-[#1E4E6B]",
+      pending: "bg-cg-amber-subtle text-cg-amber-dark",
+      processing: "bg-cg-slate-subtle text-cg-slate-dark",
       completed: "bg-cg-sage-subtle text-cg-sage-dark",
-      failed: "bg-cg-error-subtle text-[#9B2C2C]",
-      needs_review: "bg-cg-amber-subtle text-[#E09520]",
+      failed: "bg-cg-error-subtle text-cg-error-dark",
+      needs_review: "bg-cg-amber-subtle text-cg-amber-dark",
     };
     return (
       <span className={`px-2 py-1 text-xs font-medium rounded ${colors[status] || colors.pending}`}>
@@ -350,7 +350,7 @@ export default function AgreementUploadPage() {
   const getConfidenceBadge = (confidence: number | null) => {
     if (!confidence) return null;
     const percent = Math.round(confidence * 100);
-    const color = percent >= 80 ? "text-cg-sage-dark" : percent >= 60 ? "text-[#E09520]" : "text-cg-error";
+    const color = percent >= 80 ? "text-cg-sage-dark" : percent >= 60 ? "text-cg-amber-dark" : "text-cg-error";
     return <span className={`text-sm font-medium ${color}`}>{percent}% confidence</span>;
   };
 
@@ -375,7 +375,7 @@ export default function AgreementUploadPage() {
       </div>
 
       {error && (
-        <div className="bg-cg-error-subtle border border-cg-error-subtle text-[#9B2C2C] px-4 py-3 rounded">
+        <div className="bg-cg-error-subtle border border-cg-error-subtle text-cg-error-dark px-4 py-3 rounded">
           {error}
         </div>
       )}
@@ -465,7 +465,7 @@ export default function AgreementUploadPage() {
               </div>
 
               {uploadProgress && (
-                <div className="bg-cg-slate-subtle border border-cg-slate-subtle text-[#1E4E6B] px-4 py-3 rounded">
+                <div className="bg-cg-slate-subtle border border-cg-slate-subtle text-cg-slate-dark px-4 py-3 rounded">
                   {uploadProgress}
                 </div>
               )}
@@ -570,7 +570,7 @@ export default function AgreementUploadPage() {
                           {order.form_type} ({order.form_state})
                         </span>
                         {order.requires_review && (
-                          <span className="px-1.5 py-0.5 bg-cg-amber-subtle text-[#E09520] text-xs rounded">
+                          <span className="px-1.5 py-0.5 bg-cg-amber-subtle text-cg-amber-dark text-xs rounded">
                             Review
                           </span>
                         )}
@@ -671,7 +671,7 @@ export default function AgreementUploadPage() {
                                 {schedule.parent_type} - {schedule.schedule_type}
                               </span>
                               {schedule.is_virtual && (
-                                <span className="px-1.5 py-0.5 bg-cg-slate-subtle text-[#1E4E6B] text-xs rounded">
+                                <span className="px-1.5 py-0.5 bg-cg-slate-subtle text-cg-slate-dark text-xs rounded">
                                   Virtual
                                 </span>
                               )}
@@ -720,32 +720,32 @@ export default function AgreementUploadPage() {
                   {/* Flags */}
                   <div className="flex flex-wrap gap-2">
                     {selectedOrder.order.has_abuse_allegations && (
-                      <span className="px-2 py-1 bg-cg-error-subtle text-[#9B2C2C] text-xs rounded">
+                      <span className="px-2 py-1 bg-cg-error-subtle text-cg-error-dark text-xs rounded">
                         Abuse Allegations
                       </span>
                     )}
                     {selectedOrder.order.has_substance_abuse_allegations && (
-                      <span className="px-2 py-1 bg-cg-error-subtle text-[#9B2C2C] text-xs rounded">
+                      <span className="px-2 py-1 bg-cg-error-subtle text-cg-error-dark text-xs rounded">
                         Substance Abuse Allegations
                       </span>
                     )}
                     {selectedOrder.order.abduction_risk && (
-                      <span className="px-2 py-1 bg-cg-error-subtle text-[#9B2C2C] text-xs rounded">
+                      <span className="px-2 py-1 bg-cg-error-subtle text-cg-error-dark text-xs rounded">
                         Abduction Risk
                       </span>
                     )}
                     {selectedOrder.order.travel_restriction_state && (
-                      <span className="px-2 py-1 bg-cg-amber-subtle text-[#E09520] text-xs rounded">
+                      <span className="px-2 py-1 bg-cg-amber-subtle text-cg-amber-dark text-xs rounded">
                         Travel Restricted
                       </span>
                     )}
                     {selectedOrder.order.mediation_required && (
-                      <span className="px-2 py-1 bg-cg-slate-subtle text-[#1E4E6B] text-xs rounded">
+                      <span className="px-2 py-1 bg-cg-slate-subtle text-cg-slate-dark text-xs rounded">
                         Mediation Required
                       </span>
                     )}
                     {selectedOrder.supervised_visitation && (
-                      <span className="px-2 py-1 bg-cg-slate-subtle text-[#1E4E6B] text-xs rounded">
+                      <span className="px-2 py-1 bg-cg-slate-subtle text-cg-slate-dark text-xs rounded">
                         Supervised Visitation
                       </span>
                     )}
@@ -778,10 +778,10 @@ export default function AgreementUploadPage() {
                   {/* Extraction Notes */}
                   {selectedOrder.order.extraction_notes && (
                     <div className="bg-cg-amber-subtle border border-cg-amber-subtle rounded-lg p-3">
-                      <div className="text-xs text-[#E09520] font-medium uppercase mb-1">
+                      <div className="text-xs text-cg-amber-dark font-medium uppercase mb-1">
                         Extraction Notes
                       </div>
-                      <div className="text-sm text-[#E09520]">
+                      <div className="text-sm text-cg-amber-dark">
                         {selectedOrder.order.extraction_notes}
                       </div>
                     </div>

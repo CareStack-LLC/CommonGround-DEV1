@@ -423,7 +423,7 @@ export default function ParentChatViewPage({ params }: PageParams) {
                                 {msg.aria_flagged && (
                                   <div className="flex items-center gap-1 px-1 mt-1">
                                     <AlertTriangle className="h-3 w-3 text-cg-amber" />
-                                    <span className="text-[10px] text-[#E09520] dark:text-cg-amber font-medium">
+                                    <span className="text-[10px] text-cg-amber-dark dark:text-cg-amber font-medium">
                                       Flagged by ARIA: {msg.aria_category || 'Review needed'}
                                     </span>
                                   </div>
@@ -442,10 +442,10 @@ export default function ParentChatViewPage({ params }: PageParams) {
 
             {/* Error Banner */}
             {error && (
-              <div className="bg-cg-error-subtle dark:bg-[#7A2222]/20 border border-cg-error-subtle dark:border-[#9B2C2C] rounded-xl p-3 mb-2 flex items-center gap-2">
+              <div className="bg-cg-error-subtle dark:bg-cg-error-deep/20 border border-cg-error-subtle dark:border-cg-error-dark rounded-xl p-3 mb-2 flex items-center gap-2">
                 <AlertTriangle className="h-4 w-4 text-cg-error flex-shrink-0" />
-                <p className="text-sm text-[#9B2C2C] dark:text-[#FCA5A5] flex-1">{error}</p>
-                <button onClick={() => setError(null)} className="text-cg-error hover:text-[#9B2C2C] text-xs font-medium">
+                <p className="text-sm text-cg-error-dark dark:text-[#FCA5A5] flex-1">{error}</p>
+                <button onClick={() => setError(null)} className="text-cg-error hover:text-cg-error-dark text-xs font-medium">
                   Dismiss
                 </button>
               </div>

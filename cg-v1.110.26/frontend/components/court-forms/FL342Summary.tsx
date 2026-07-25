@@ -289,25 +289,25 @@ export default function FL342Summary({ formData, canEdit = false, onEditSection 
           <CardContent>
             <div className="space-y-3">
               <div className="flex items-center justify-between p-3 bg-cg-slate-subtle rounded-lg">
-                <span className="text-sm text-[#1E4E6B]">Guideline Amount:</span>
-                <span className="font-bold text-[#1E4E6B]">{formatCurrency(formData.guideline_monthly_amount)}</span>
+                <span className="text-sm text-cg-slate-dark">Guideline Amount:</span>
+                <span className="font-bold text-cg-slate-dark">{formatCurrency(formData.guideline_monthly_amount)}</span>
               </div>
               {formData.order_below_guideline && (
                 <div className="p-3 bg-cg-amber-subtle border border-cg-amber-subtle rounded-lg">
                   <div className="flex items-center gap-2 mb-2">
-                    <AlertTriangle className="h-4 w-4 text-[#E09520]" />
-                    <span className="font-medium text-[#E09520]">Order Below Guideline</span>
+                    <AlertTriangle className="h-4 w-4 text-cg-amber-dark" />
+                    <span className="font-medium text-cg-amber-dark">Order Below Guideline</span>
                   </div>
                   {formData.below_guideline_reason && (
-                    <p className="text-sm text-[#E09520]">{formData.below_guideline_reason}</p>
+                    <p className="text-sm text-cg-amber-dark">{formData.below_guideline_reason}</p>
                   )}
                 </div>
               )}
               {formData.order_above_guideline && (
                 <div className="p-3 bg-cg-slate-subtle border border-cg-slate-subtle rounded-lg">
-                  <span className="font-medium text-[#1E4E6B]">Order Above Guideline</span>
+                  <span className="font-medium text-cg-slate-dark">Order Above Guideline</span>
                   {formData.above_guideline_reason && (
-                    <p className="text-sm text-[#1E4E6B] mt-1">{formData.above_guideline_reason}</p>
+                    <p className="text-sm text-cg-slate-dark mt-1">{formData.above_guideline_reason}</p>
                   )}
                 </div>
               )}
@@ -335,7 +335,7 @@ export default function FL342Summary({ formData, canEdit = false, onEditSection 
             <div className="grid grid-cols-2 gap-4">
               {formData.petitioner_income && (
                 <div className="p-3 bg-cg-slate-subtle rounded-lg">
-                  <h5 className="font-medium text-[#1E4E6B] mb-2">Petitioner</h5>
+                  <h5 className="font-medium text-cg-slate-dark mb-2">Petitioner</h5>
                   <div className="space-y-1 text-sm">
                     <div className="flex justify-between">
                       <span className="text-cg-slate">Gross Monthly:</span>
@@ -352,7 +352,7 @@ export default function FL342Summary({ formData, canEdit = false, onEditSection 
               )}
               {formData.respondent_income && (
                 <div className="p-3 bg-cg-slate-subtle rounded-lg">
-                  <h5 className="font-medium text-[#1E4E6B] mb-2">Respondent</h5>
+                  <h5 className="font-medium text-cg-slate-dark mb-2">Respondent</h5>
                   <div className="space-y-1 text-sm">
                     <div className="flex justify-between">
                       <span className="text-cg-slate">Gross Monthly:</span>
@@ -372,10 +372,10 @@ export default function FL342Summary({ formData, canEdit = false, onEditSection 
               <div className="mt-4 pt-4 border-t">
                 <p className="text-sm font-medium mb-2">Timeshare Percentages:</p>
                 <div className="flex gap-4">
-                  <Badge variant="outline" className="border-cg-slate-light text-[#1E4E6B]">
+                  <Badge variant="outline" className="border-cg-slate-light text-cg-slate-dark">
                     Petitioner: {formData.timeshare_percentage_petitioner || 0}%
                   </Badge>
-                  <Badge variant="outline" className="border-cg-slate-light text-[#1E4E6B]">
+                  <Badge variant="outline" className="border-cg-slate-light text-cg-slate-dark">
                     Respondent: {formData.timeshare_percentage_respondent || 0}%
                   </Badge>
                 </div>
@@ -447,7 +447,7 @@ export default function FL342Summary({ formData, canEdit = false, onEditSection 
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-[#E09520]" />
+                <Users className="h-5 w-5 text-cg-amber-dark" />
                 <CardTitle className="text-base">Childcare Costs (Item 6)</CardTitle>
               </div>
               {renderEditButton('childcare')}
@@ -457,15 +457,15 @@ export default function FL342Summary({ formData, canEdit = false, onEditSection 
             <div className="space-y-3">
               <div className="p-3 bg-cg-amber-subtle rounded-lg">
                 <div className="flex items-center justify-between">
-                  <span className="text-[#E09520]">Monthly Childcare Cost:</span>
-                  <span className="font-bold text-[#E09520]">{formatCurrency(formData.childcare_monthly_cost)}</span>
+                  <span className="text-cg-amber-dark">Monthly Childcare Cost:</span>
+                  <span className="font-bold text-cg-amber-dark">{formatCurrency(formData.childcare_monthly_cost)}</span>
                 </div>
               </div>
               <div className="flex gap-4">
-                <Badge variant="outline" className="border-cg-amber text-[#E09520]">
+                <Badge variant="outline" className="border-cg-amber text-cg-amber-dark">
                   Petitioner: {formData.childcare_petitioner_percentage || 0}%
                 </Badge>
-                <Badge variant="outline" className="border-cg-amber text-[#E09520]">
+                <Badge variant="outline" className="border-cg-amber text-cg-amber-dark">
                   Respondent: {formData.childcare_respondent_percentage || 0}%
                 </Badge>
               </div>
@@ -498,15 +498,15 @@ export default function FL342Summary({ formData, canEdit = false, onEditSection 
               )}
               <div className="p-3 bg-cg-slate-subtle rounded-lg">
                 <div className="flex items-center justify-between">
-                  <span className="text-[#1E4E6B]">Monthly Cost:</span>
-                  <span className="font-bold text-[#1E4E6B]">{formatCurrency(formData.education_monthly_cost)}</span>
+                  <span className="text-cg-slate-dark">Monthly Cost:</span>
+                  <span className="font-bold text-cg-slate-dark">{formatCurrency(formData.education_monthly_cost)}</span>
                 </div>
               </div>
               <div className="flex gap-4">
-                <Badge variant="outline" className="border-cg-slate-light text-[#1E4E6B]">
+                <Badge variant="outline" className="border-cg-slate-light text-cg-slate-dark">
                   Petitioner: {formData.education_petitioner_percentage || 0}%
                 </Badge>
-                <Badge variant="outline" className="border-cg-slate-light text-[#1E4E6B]">
+                <Badge variant="outline" className="border-cg-slate-light text-cg-slate-dark">
                   Respondent: {formData.education_respondent_percentage || 0}%
                 </Badge>
               </div>
@@ -530,10 +530,10 @@ export default function FL342Summary({ formData, canEdit = false, onEditSection 
           <CardContent>
             <div className="space-y-3">
               <div className="flex gap-4">
-                <Badge variant="outline" className="border-cg-slate-light text-[#1E4E6B]">
+                <Badge variant="outline" className="border-cg-slate-light text-cg-slate-dark">
                   Petitioner: {formData.travel_petitioner_percentage || 0}%
                 </Badge>
-                <Badge variant="outline" className="border-cg-slate-light text-[#1E4E6B]">
+                <Badge variant="outline" className="border-cg-slate-light text-cg-slate-dark">
                   Respondent: {formData.travel_respondent_percentage || 0}%
                 </Badge>
               </div>
@@ -550,7 +550,7 @@ export default function FL342Summary({ formData, canEdit = false, onEditSection 
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <CreditCard className="h-5 w-5 text-[#E09520]" />
+              <CreditCard className="h-5 w-5 text-cg-amber-dark" />
               <CardTitle className="text-base">Earnings Assignment (Item 10)</CardTitle>
             </div>
             {renderEditButton('earnings')}
@@ -568,7 +568,7 @@ export default function FL342Summary({ formData, canEdit = false, onEditSection 
             </div>
             {formData.earnings_assignment_stayed && (
               <div className="p-3 bg-cg-amber-subtle border border-cg-amber-subtle rounded-lg">
-                <span className="text-sm text-[#E09520]">
+                <span className="text-sm text-cg-amber-dark">
                   <strong>STAYED:</strong> {formData.earnings_assignment_stayed_reason || 'Reason not specified'}
                 </span>
               </div>
@@ -587,7 +587,7 @@ export default function FL342Summary({ formData, canEdit = false, onEditSection 
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <AlertTriangle className="h-5 w-5 text-cg-error" />
-                <CardTitle className="text-base text-[#9B2C2C]">Arrears (Item 11)</CardTitle>
+                <CardTitle className="text-base text-cg-error-dark">Arrears (Item 11)</CardTitle>
               </div>
               {renderEditButton('arrears')}
             </div>
@@ -595,8 +595,8 @@ export default function FL342Summary({ formData, canEdit = false, onEditSection 
           <CardContent>
             <div className="p-4 bg-cg-error-subtle rounded-lg mb-4">
               <div className="text-center">
-                <p className="text-sm text-[#9B2C2C] mb-1">Total Arrears Amount</p>
-                <p className="text-2xl font-bold text-[#9B2C2C]">
+                <p className="text-sm text-cg-error-dark mb-1">Total Arrears Amount</p>
+                <p className="text-2xl font-bold text-cg-error-dark">
                   {formatCurrency(formData.arrears_amount)}
                 </p>
                 {formData.arrears_as_of_date && (

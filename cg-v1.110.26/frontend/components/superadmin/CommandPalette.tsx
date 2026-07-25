@@ -247,7 +247,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
               onClick={() => activate(r)}
               onMouseEnter={() => setHighlightedIdx(myIdx)}
               className={`w-full flex items-center gap-3 px-3 py-2 text-left rounded transition-colors ${
-                active ? 'bg-cg-sage/15 text-white' : 'text-[#D0E4EC] hover:bg-cg-slate/20'
+                active ? 'bg-cg-sage/15 text-white' : 'text-cg-slate-tint hover:bg-cg-slate/20'
               }`}
             >
               {iconKind === 'page' && r.kind === 'page' && (
@@ -274,7 +274,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                   </>
                 )}
               </span>
-              <ArrowRight className={`w-3.5 h-3.5 flex-shrink-0 ${active ? 'text-cg-sage' : 'text-[#4A6E7F]'}`} />
+              <ArrowRight className={`w-3.5 h-3.5 flex-shrink-0 ${active ? 'text-cg-sage' : 'text-cg-slate-strong'}`} />
             </button>
           );
         })}
@@ -289,7 +289,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
       onKeyDown={handleKeyDown}
     >
       <div
-        className="w-[600px] max-w-full bg-[#1A3648] border border-cg-slate/30 rounded-xl shadow-2xl overflow-hidden"
+        className="w-[600px] max-w-full bg-cg-slate-deep border border-cg-slate/30 rounded-xl shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
         onKeyDown={handleKeyDown}
       >
@@ -304,7 +304,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
               setHighlightedIdx(0);
             }}
             placeholder="Search pages, users, runbooks…"
-            className="flex-1 bg-transparent text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none"
+            className="flex-1 bg-transparent text-sm text-white placeholder:text-cg-slate-strong focus:outline-none"
           />
           {userLoading && (
             <span className="text-[10px] text-muted-foreground">searching…</span>
@@ -322,7 +322,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
           {!query && recentResults.length === 0 && (
             <div className="px-3 py-8 text-center text-xs text-muted-foreground">
               <LayoutDashboard className="w-6 h-6 mx-auto mb-2 opacity-40" />
-              Tip: <span className="font-mono text-[#8AACBC]">Cmd+K</span> from anywhere.
+              Tip: <span className="font-mono text-cg-slate-muted">Cmd+K</span> from anywhere.
               Start typing to find pages, users, or runbooks.
             </div>
           )}
@@ -339,9 +339,9 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
 
         <div className="px-3 py-2 border-t border-cg-slate/20 flex items-center justify-between text-[10px] text-muted-foreground">
           <div className="flex items-center gap-3">
-            <span><kbd className="font-mono bg-[#0F2533] border border-cg-slate/30 px-1 rounded">↑↓</kbd> navigate</span>
-            <span><kbd className="font-mono bg-[#0F2533] border border-cg-slate/30 px-1 rounded">↵</kbd> open</span>
-            <span><kbd className="font-mono bg-[#0F2533] border border-cg-slate/30 px-1 rounded">esc</kbd> close</span>
+            <span><kbd className="font-mono bg-cg-ink border border-cg-slate/30 px-1 rounded">↑↓</kbd> navigate</span>
+            <span><kbd className="font-mono bg-cg-ink border border-cg-slate/30 px-1 rounded">↵</kbd> open</span>
+            <span><kbd className="font-mono bg-cg-ink border border-cg-slate/30 px-1 rounded">esc</kbd> close</span>
           </div>
           <span>{results.length} result{results.length === 1 ? '' : 's'}</span>
         </div>

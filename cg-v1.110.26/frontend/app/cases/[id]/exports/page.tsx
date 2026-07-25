@@ -54,7 +54,7 @@ function ExportsPageContent() {
       <div className="min-h-screen bg-gray-50 p-8">
         <Card className="max-w-lg mx-auto bg-cg-error-subtle border-cg-error-subtle">
           <CardContent className="pt-6">
-            <p className="text-[#9B2C2C]">{error || 'Case not found'}</p>
+            <p className="text-cg-error-dark">{error || 'Case not found'}</p>
             <Button variant="outline" onClick={() => router.push('/cases')} className="mt-4">
               Back to Cases
             </Button>
@@ -116,11 +116,11 @@ function ExportsPageContent() {
         <Card className="mb-8 bg-cg-slate-subtle border-cg-slate-subtle">
           <CardContent className="pt-6">
             <h3 className="font-medium text-foreground mb-2">About CaseExport</h3>
-            <p className="text-sm text-[#1E4E6B] mb-3">
+            <p className="text-sm text-cg-slate-dark mb-3">
               CaseExport generates court-ready PDF packages that compile your case data into professional,
               verifiable documents. Each export includes:
             </p>
-            <ul className="text-sm text-[#1E4E6B] space-y-1">
+            <ul className="text-sm text-cg-slate-dark space-y-1">
               <li>&#x2022; <strong>Comprehensive Data:</strong> Agreement terms, compliance metrics, communications</li>
               <li>&#x2022; <strong>SHA-256 Verification:</strong> Cryptographic proof of document integrity</li>
               <li>&#x2022; <strong>PII Redaction:</strong> Configurable privacy protection</li>

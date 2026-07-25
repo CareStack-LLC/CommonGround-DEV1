@@ -54,7 +54,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   maintenance: 'bg-blue-500/15 text-blue-300 border-blue-500/30',
   escalation: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
   postmortem: 'bg-violet-500/15 text-violet-300 border-violet-500/30',
-  other: 'bg-zinc-500/15 text-[#D0E4EC] border-zinc-500/30',
+  other: 'bg-zinc-500/15 text-cg-slate-tint border-zinc-500/30',
 };
 
 export default function RunbookPage() {
@@ -137,13 +137,13 @@ export default function RunbookPage() {
       {!error && (
         <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6">
           {/* Sidebar */}
-          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-3 space-y-2 lg:max-h-[calc(100vh-12rem)] lg:overflow-y-auto">
+          <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-3 space-y-2 lg:max-h-[calc(100vh-12rem)] lg:overflow-y-auto">
             <div className="flex items-center gap-2">
               <Filter className="w-3.5 h-3.5 text-muted-foreground" />
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="flex-1 bg-[#0F2533]/60 border border-cg-slate/30 rounded px-2 py-1.5 text-xs text-[#D0E4EC] focus:outline-none focus:border-cg-sage"
+                className="flex-1 bg-cg-ink/60 border border-cg-slate/30 rounded px-2 py-1.5 text-xs text-cg-slate-tint focus:outline-none focus:border-cg-sage"
               >
                 {CATEGORIES.map((c) => (
                   <option key={c.value} value={c.value}>{c.label}</option>
@@ -192,7 +192,7 @@ export default function RunbookPage() {
           </div>
 
           {/* Detail pane */}
-          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-6">
+          <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-6">
             {!selected ? (
               <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
                 <BookOpen className="w-10 h-10 mb-3 opacity-40" />
@@ -207,21 +207,21 @@ export default function RunbookPage() {
                         {selected.category}
                       </span>
                       {selected.tags.map((t) => (
-                        <span key={t} className="inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium bg-cg-slate/20 text-[#8AACBC]">
+                        <span key={t} className="inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium bg-cg-slate/20 text-cg-slate-muted">
                           {t}
                         </span>
                       ))}
                     </div>
                     <h2 className="text-xl font-semibold text-white">{selected.title}</h2>
                     {selected.summary && (
-                      <p className="text-sm text-[#8AACBC] mt-2 leading-relaxed">{selected.summary}</p>
+                      <p className="text-sm text-cg-slate-muted mt-2 leading-relaxed">{selected.summary}</p>
                     )}
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
                     <button aria-label="Edit"
                       onClick={() => { setEditing(selected); setCreating(false); }}
                       title="Edit"
-                      className="p-2 rounded text-[#8AACBC] hover:bg-cg-slate/30 hover:text-white transition-colors"
+                      className="p-2 rounded text-cg-slate-muted hover:bg-cg-slate/30 hover:text-white transition-colors"
                     >
                       <Edit3 className="w-4 h-4" />
                     </button>
@@ -244,7 +244,7 @@ export default function RunbookPage() {
                     selected.steps.map((step, i) => (
                       <div
                         key={i}
-                        className="bg-[#0F2533]/60 border border-cg-slate/20 rounded-lg p-4"
+                        className="bg-cg-ink/60 border border-cg-slate/20 rounded-lg p-4"
                       >
                         <div className="flex items-start gap-3">
                           <span className="flex items-center justify-center w-6 h-6 rounded-full bg-cg-sage/20 text-cg-sage text-xs font-semibold shrink-0">
@@ -253,7 +253,7 @@ export default function RunbookPage() {
                           <div className="flex-1 min-w-0">
                             <h4 className="text-sm font-medium text-white">{step.title}</h4>
                             {step.body && (
-                              <p className="text-sm text-[#D0E4EC] mt-1 whitespace-pre-wrap leading-relaxed">
+                              <p className="text-sm text-cg-slate-tint mt-1 whitespace-pre-wrap leading-relaxed">
                                 {step.body}
                               </p>
                             )}
@@ -274,7 +274,7 @@ export default function RunbookPage() {
                 {selected.notes && (
                   <div className="mt-6 pt-4 border-t border-cg-slate/15">
                     <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Notes</h3>
-                    <p className="text-sm text-[#D0E4EC] whitespace-pre-wrap leading-relaxed">{selected.notes}</p>
+                    <p className="text-sm text-cg-slate-tint whitespace-pre-wrap leading-relaxed">{selected.notes}</p>
                   </div>
                 )}
               </>
@@ -371,14 +371,14 @@ function RunbookModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" onClick={onClose}>
       <div
-        className="bg-[#0F2533] border border-cg-slate/30 rounded-xl p-6 w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto"
+        className="bg-cg-ink border border-cg-slate/30 rounded-xl p-6 w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between mb-4">
           <h3 className="text-base font-semibold text-white">
             {runbook ? 'Edit Runbook' : 'New Runbook'}
           </h3>
-          <button aria-label="Close" onClick={onClose} className="p-1 text-[#8AACBC] hover:text-white transition-colors">
+          <button aria-label="Close" onClick={onClose} className="p-1 text-cg-slate-muted hover:text-white transition-colors">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -386,20 +386,20 @@ function RunbookModal({
         <div className="space-y-4">
           <div className="grid grid-cols-[1fr_140px] gap-3">
             <div>
-              <label className="block text-xs font-medium text-[#8AACBC] mb-1">Title</label>
+              <label className="block text-xs font-medium text-cg-slate-muted mb-1">Title</label>
               <input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g. Stripe webhook 5xx spike"
-                className="w-full bg-[#1A3648]/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-cg-sage"
+                className="w-full bg-cg-slate-deep/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-cg-sage"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-[#8AACBC] mb-1">Category</label>
+              <label className="block text-xs font-medium text-cg-slate-muted mb-1">Category</label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full bg-[#1A3648]/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-cg-sage"
+                className="w-full bg-cg-slate-deep/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-cg-sage"
               >
                 {CATEGORIES.slice(1).map((c) => (
                   <option key={c.value} value={c.value}>{c.label}</option>
@@ -409,30 +409,30 @@ function RunbookModal({
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-[#8AACBC] mb-1">Summary</label>
+            <label className="block text-xs font-medium text-cg-slate-muted mb-1">Summary</label>
             <textarea
               value={summary}
               onChange={(e) => setSummary(e.target.value)}
               rows={2}
               placeholder="When should an admin use this runbook?"
-              className="w-full bg-[#1A3648]/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-cg-sage resize-none"
+              className="w-full bg-cg-slate-deep/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-cg-sage resize-none"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-[#8AACBC] mb-1">Tags (comma-separated)</label>
+            <label className="block text-xs font-medium text-cg-slate-muted mb-1">Tags (comma-separated)</label>
             <input
               value={tagsText}
               onChange={(e) => setTagsText(e.target.value)}
               placeholder="stripe, webhook, billing"
-              className="w-full bg-[#1A3648]/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-cg-sage"
+              className="w-full bg-cg-slate-deep/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-cg-sage"
             />
           </div>
 
           {/* Steps editor */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="block text-xs font-medium text-[#8AACBC]">Steps</label>
+              <label className="block text-xs font-medium text-cg-slate-muted">Steps</label>
               <button
                 onClick={addStep}
                 className="text-xs text-cg-sage hover:text-cg-sage-light inline-flex items-center gap-1"
@@ -445,7 +445,7 @@ function RunbookModal({
               {steps.map((step, i) => (
                 <div
                   key={i}
-                  className="bg-[#1A3648]/40 border border-cg-slate/20 rounded p-3 space-y-2"
+                  className="bg-cg-slate-deep/40 border border-cg-slate/20 rounded p-3 space-y-2"
                 >
                   <div className="flex items-center gap-2">
                     <span className="text-[11px] text-muted-foreground font-medium">Step {i + 1}</span>
@@ -453,14 +453,14 @@ function RunbookModal({
                     <button
                       onClick={() => moveStep(i, -1)}
                       disabled={i === 0}
-                      className="text-[11px] text-[#8AACBC] hover:text-white disabled:opacity-30 transition-colors"
+                      className="text-[11px] text-cg-slate-muted hover:text-white disabled:opacity-30 transition-colors"
                     >
                       ↑
                     </button>
                     <button
                       onClick={() => moveStep(i, 1)}
                       disabled={i === steps.length - 1}
-                      className="text-[11px] text-[#8AACBC] hover:text-white disabled:opacity-30 transition-colors"
+                      className="text-[11px] text-cg-slate-muted hover:text-white disabled:opacity-30 transition-colors"
                     >
                       ↓
                     </button>
@@ -475,20 +475,20 @@ function RunbookModal({
                     value={step.title}
                     onChange={(e) => updateStep(i, { title: e.target.value })}
                     placeholder="Step title"
-                    className="w-full bg-[#0F2533]/60 border border-cg-slate/20 rounded px-2 py-1.5 text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-cg-sage"
+                    className="w-full bg-cg-ink/60 border border-cg-slate/20 rounded px-2 py-1.5 text-sm text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-cg-sage"
                   />
                   <textarea
                     value={step.body}
                     onChange={(e) => updateStep(i, { body: e.target.value })}
                     rows={3}
                     placeholder="What to do (markdown supported). Use SQL snippets / CLI commands as needed."
-                    className="w-full bg-[#0F2533]/60 border border-cg-slate/20 rounded px-2 py-1.5 text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-cg-sage resize-none font-mono"
+                    className="w-full bg-cg-ink/60 border border-cg-slate/20 rounded px-2 py-1.5 text-sm text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-cg-sage resize-none font-mono"
                   />
                   <input
                     value={step.expected_outcome || ''}
                     onChange={(e) => updateStep(i, { expected_outcome: e.target.value })}
                     placeholder="Expected outcome (optional)"
-                    className="w-full bg-[#0F2533]/60 border border-cg-slate/20 rounded px-2 py-1.5 text-xs text-emerald-200 placeholder:text-[#4A6E7F] focus:outline-none focus:border-cg-sage"
+                    className="w-full bg-cg-ink/60 border border-cg-slate/20 rounded px-2 py-1.5 text-xs text-emerald-200 placeholder:text-cg-slate-strong focus:outline-none focus:border-cg-sage"
                   />
                 </div>
               ))}
@@ -496,13 +496,13 @@ function RunbookModal({
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-[#8AACBC] mb-1">Notes</label>
+            <label className="block text-xs font-medium text-cg-slate-muted mb-1">Notes</label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
               placeholder="SLAs, escalation contacts, related dashboards, etc."
-              className="w-full bg-[#1A3648]/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-cg-sage resize-none"
+              className="w-full bg-cg-slate-deep/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-cg-sage resize-none"
             />
           </div>
 
@@ -513,7 +513,7 @@ function RunbookModal({
               onChange={(e) => setEnabled(e.target.checked)}
               className="rounded border-cg-slate/40 bg-zinc-900/80 text-cg-sage focus:ring-cg-sage/30"
             />
-            <span className="text-sm text-[#D0E4EC]">Enabled (show in the list)</span>
+            <span className="text-sm text-cg-slate-tint">Enabled (show in the list)</span>
           </label>
 
           {err && (
@@ -527,7 +527,7 @@ function RunbookModal({
           <button
             onClick={onClose}
             disabled={saving}
-            className="px-4 py-2 rounded text-sm font-medium text-[#8AACBC] hover:text-white transition-colors disabled:opacity-50"
+            className="px-4 py-2 rounded text-sm font-medium text-cg-slate-muted hover:text-white transition-colors disabled:opacity-50"
           >
             Cancel
           </button>

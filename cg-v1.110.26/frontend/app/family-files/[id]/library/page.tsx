@@ -104,7 +104,7 @@ function LibraryContent() {
         )}
 
         {error ? (
-          <div className="p-6 rounded-xl bg-cg-error-subtle border border-cg-error-subtle text-[#9B2C2C]">
+          <div className="p-6 rounded-xl bg-cg-error-subtle border border-cg-error-subtle text-cg-error-dark">
             {error}
           </div>
         ) : books === null ? (

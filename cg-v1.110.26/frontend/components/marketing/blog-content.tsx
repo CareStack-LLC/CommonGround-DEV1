@@ -558,9 +558,9 @@ function WrittenAgreements() {
 
       <div className="bg-white rounded-xl p-6 my-6 border border-gray-200 not-prose">
         <div className="grid gap-4">
-          <div className="bg-cg-error-subtle dark:bg-[#7A2222]/20 rounded-lg p-4">
-            <p className="text-sm font-medium text-[#9B2C2C] dark:text-[#E06B6B] mb-2">Vague (problematic):</p>
-            <p className="text-[#9B2C2C] dark:text-[#FCA5A5] italic">
+          <div className="bg-cg-error-subtle dark:bg-cg-error-deep/20 rounded-lg p-4">
+            <p className="text-sm font-medium text-cg-error-dark dark:text-cg-error-light mb-2">Vague (problematic):</p>
+            <p className="text-cg-error-dark dark:text-[#FCA5A5] italic">
               &quot;Parents will share holidays fairly.&quot;
             </p>
           </div>
@@ -649,7 +649,7 @@ function HighConflictGuide() {
 
       <div className="bg-cg-amber-subtle dark:bg-foreground/20 rounded-xl p-6 my-8 not-prose border border-cg-amber-subtle dark:border-foreground">
         <div className="flex items-start gap-3">
-          <AlertTriangle className="w-6 h-6 text-[#E09520] flex-shrink-0 mt-0.5" />
+          <AlertTriangle className="w-6 h-6 text-cg-amber-dark flex-shrink-0 mt-0.5" />
           <div>
             <h3 className="text-lg font-semibold text-foreground mb-2">Important Note</h3>
             <p className="text-gray-600 text-sm">
@@ -757,7 +757,7 @@ function HighConflictGuide() {
         <h3 className="text-lg font-semibold text-foreground mb-4">BIFF Response Examples</h3>
         <div className="space-y-4">
           <div>
-            <p className="text-sm font-medium text-cg-error dark:text-[#E06B6B] mb-1">Incoming hostile message:</p>
+            <p className="text-sm font-medium text-cg-error dark:text-cg-error-light mb-1">Incoming hostile message:</p>
             <p className="text-gray-600 italic text-sm">
               &quot;You&apos;re ALWAYS doing this. You don&apos;t care about the kids at all.
               I&apos;m done trying to work with you. You&apos;re going to hear from my lawyer.&quot;
@@ -1035,9 +1035,9 @@ function ChildrenFirst() {
                 <CheckCircle className="w-4 h-4 text-cg-sage-dark flex-shrink-0 mt-0.5" />
                 <p className="text-sm text-cg-sage-dark dark:text-cg-sage-light">{item.right}</p>
               </div>
-              <div className="flex items-start gap-2 bg-cg-error-subtle dark:bg-[#7A2222]/20 rounded-lg p-3">
+              <div className="flex items-start gap-2 bg-cg-error-subtle dark:bg-cg-error-deep/20 rounded-lg p-3">
                 <XCircle className="w-4 h-4 text-cg-error flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-[#9B2C2C] dark:text-[#FCA5A5]">{item.wrong}</p>
+                <p className="text-sm text-cg-error-dark dark:text-[#FCA5A5]">{item.wrong}</p>
               </div>
             </div>
           ))}

@@ -84,7 +84,7 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#162D3A] flex items-center justify-center">
+      <div className="min-h-screen bg-cg-slate-deep flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="w-10 h-10 border-2 border-cg-sage/30 border-t-cg-sage rounded-full animate-spin" />
           <p className="text-muted-foreground text-sm">Loading admin portal...</p>
@@ -99,11 +99,11 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
     exact ? pathname === href : pathname.startsWith(href);
 
   const healthColor = health?.status === 'healthy' ? 'bg-cg-sage' :
-    health?.status === 'degraded' ? 'bg-cg-amber' : health?.status === 'critical' ? 'bg-red-500' : 'bg-[#4A6E7F]';
+    health?.status === 'degraded' ? 'bg-cg-amber' : health?.status === 'critical' ? 'bg-red-500' : 'bg-cg-slate-strong';
 
   return (
-    <div className="min-h-screen bg-[#162D3A] text-[#D0E4EC]">
-      <header className="sticky top-0 z-50 h-14 border-b border-cg-slate/20 bg-[#162D3A]/95 backdrop-blur-md flex items-center px-4 lg:px-6">
+    <div className="min-h-screen bg-cg-slate-deep text-cg-slate-tint">
+      <header className="sticky top-0 z-50 h-14 border-b border-cg-slate/20 bg-cg-slate-deep/95 backdrop-blur-md flex items-center px-4 lg:px-6">
         <button aria-label="Open menu"
           onClick={() => setSidebarOpen(!sidebarOpen)}
           className="lg:hidden mr-3 p-1.5 rounded-lg hover:bg-cg-slate/20 transition-colors"
@@ -136,7 +136,7 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
           {/* Cmd+K hint button — also opens the palette on click */}
           <button
             onClick={() => setPaletteOpen(true)}
-            className="hidden md:inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-[#0F2533]/60 border border-cg-slate/20 hover:border-cg-slate/50 text-xs text-[#8AACBC] hover:text-white transition-colors"
+            className="hidden md:inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-cg-ink/60 border border-cg-slate/20 hover:border-cg-slate/50 text-xs text-cg-slate-muted hover:text-white transition-colors"
             title="Open command palette (Cmd+K)"
           >
             <Search className="w-3 h-3" />
@@ -151,12 +151,12 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
             </div>
           )}
           <div className="hidden sm:block text-right">
-            <div className="text-xs font-medium text-[#D0E4EC]">{user.first_name} {user.last_name}</div>
+            <div className="text-xs font-medium text-cg-slate-tint">{user.first_name} {user.last_name}</div>
             <div className="text-[11px] text-muted-foreground">{user.email}</div>
           </div>
           <button aria-label="Log out"
             onClick={() => logout()}
-            className="p-2 rounded-lg hover:bg-cg-slate/20 transition-colors text-[#8AACBC] hover:text-white"
+            className="p-2 rounded-lg hover:bg-cg-slate/20 transition-colors text-cg-slate-muted hover:text-white"
             title="Sign out"
           >
             <LogOut className="w-4 h-4" />
@@ -200,16 +200,16 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
                         className={`relative flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 group ${
                           active
                             ? 'bg-cg-sage/15 text-cg-sage-light shadow-sm shadow-cg-sage/5'
-                            : 'text-[#8AACBC] hover:bg-cg-slate/20 hover:text-white'
+                            : 'text-cg-slate-muted hover:bg-cg-slate/20 hover:text-white'
                         } ${collapsed ? 'lg:justify-center lg:px-2' : ''}`}
                         title={collapsed ? item.label : undefined}
                       >
-                        <item.icon className={`w-4 h-4 flex-shrink-0 ${active ? 'text-cg-sage' : 'text-muted-foreground group-hover:text-[#8AACBC]'}`} />
+                        <item.icon className={`w-4 h-4 flex-shrink-0 ${active ? 'text-cg-sage' : 'text-muted-foreground group-hover:text-cg-slate-muted'}`} />
                         <span className={collapsed ? 'lg:hidden' : ''}>
                           {item.label}
                         </span>
                         {collapsed && (
-                          <span className="hidden lg:block absolute left-full top-1/2 -translate-y-1/2 ml-2 whitespace-nowrap bg-[#0F2533] border border-cg-slate/30 text-xs text-white px-2 py-1 rounded opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50">
+                          <span className="hidden lg:block absolute left-full top-1/2 -translate-y-1/2 ml-2 whitespace-nowrap bg-cg-ink border border-cg-slate/30 text-xs text-white px-2 py-1 rounded opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-50">
                             {item.label}
                           </span>
                         )}

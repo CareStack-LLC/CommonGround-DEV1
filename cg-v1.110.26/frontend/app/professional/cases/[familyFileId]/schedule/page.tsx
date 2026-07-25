@@ -354,7 +354,7 @@ function StatCard({
     blue: "bg-blue-50 text-blue-600",
     emerald: "bg-cg-sage-subtle text-cg-sage-dark",
     red: "bg-red-50 text-red-600",
-    amber: "bg-cg-amber-subtle text-[#E09520]",
+    amber: "bg-cg-amber-subtle text-cg-amber-dark",
   };
 
   return (
@@ -464,13 +464,13 @@ function ExchangeCard({
             {/* Evidence Badges */}
             <div className="flex items-center gap-2">
               {hasGPSEvidence && (
-                <Badge variant="outline" className="text-xs bg-cg-sage-subtle text-cg-sage-dark border-[#C5E5DB]">
+                <Badge variant="outline" className="text-xs bg-cg-sage-subtle text-cg-sage-dark border-cg-sage-tint">
                   <Navigation className="h-3 w-3 mr-1" />
                   GPS
                 </Badge>
               )}
               {hasPhotoEvidence && (
-                <Badge variant="outline" className="text-xs bg-[#F0F7FC] text-[#1E4E6B] border-[#C2DEF0]">
+                <Badge variant="outline" className="text-xs bg-cg-slate-tint text-cg-slate-dark border-cg-slate-tint">
                   <Camera className="h-3 w-3 mr-1" />
                   Photo
                 </Badge>

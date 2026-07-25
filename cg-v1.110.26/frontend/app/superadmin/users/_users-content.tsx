@@ -25,7 +25,7 @@ const TIERS = [
 ];
 
 const TIER_COLORS: Record<string, string> = {
-  web_starter: 'bg-zinc-700/50 text-[#8AACBC]',
+  web_starter: 'bg-zinc-700/50 text-cg-slate-muted',
   plus: 'bg-blue-500/15 text-blue-400 border border-cg-slate/20',
   complete: 'bg-cg-sage/15 text-cg-sage border border-cg-sage/20',
   professional_starter: 'bg-teal-500/15 text-teal-400 border border-teal-500/20',
@@ -277,10 +277,10 @@ export default function UsersContent() {
 
       {/* Tier Breakdown Chart */}
       {tierPieData.length > 0 && (
-        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
+        <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
           <div className="flex items-center gap-2 mb-4">
             <PieChartIcon className="w-4 h-4 text-cg-sage" />
-            <h2 className="text-sm font-semibold text-[#D0E4EC]">Subscription Tier Distribution</h2>
+            <h2 className="text-sm font-semibold text-cg-slate-tint">Subscription Tier Distribution</h2>
           </div>
           <ResponsiveContainer width="100%" height={220}>
             <PieChart>
@@ -304,7 +304,7 @@ export default function UsersContent() {
                 verticalAlign="middle"
                 align="right"
                 layout="vertical"
-                formatter={(value: any) => <span className="text-[#8AACBC] text-xs capitalize">{value}</span>}
+                formatter={(value: any) => <span className="text-cg-slate-muted text-xs capitalize">{value}</span>}
               />
             </PieChart>
           </ResponsiveContainer>
@@ -320,21 +320,21 @@ export default function UsersContent() {
             placeholder="Search by name or email..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 transition-colors"
+            className="w-full pl-10 pr-4 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 transition-colors"
           />
         </div>
         <div className="flex gap-2 flex-wrap">
           <select
             value={tier}
             onChange={(e) => setTier(e.target.value)}
-            className="px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-[#D0E4EC] focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer"
+            className="px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-cg-slate-tint focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer"
           >
             {TIERS.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
           </select>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-[#D0E4EC] focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer"
+            className="px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-cg-slate-tint focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer"
           >
             <option value="all">All status</option>
             <option value="active">Active</option>
@@ -367,7 +367,7 @@ export default function UsersContent() {
             </span>
             <button
               onClick={clearSelection}
-              className="text-xs text-[#8AACBC] hover:text-white transition-colors"
+              className="text-xs text-cg-slate-muted hover:text-white transition-colors"
             >
               Clear
             </button>
@@ -399,7 +399,7 @@ export default function UsersContent() {
       )}
 
       {/* Table */}
-      <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden">
+      <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -416,18 +416,18 @@ export default function UsersContent() {
                   </button>
                 </th>
                 <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  <button onClick={() => toggleSort('first_name')} className="flex items-center gap-1 hover:text-[#D0E4EC] transition-colors">
+                  <button onClick={() => toggleSort('first_name')} className="flex items-center gap-1 hover:text-cg-slate-tint transition-colors">
                     User <ArrowUpDown className="w-3 h-3" />
                   </button>
                 </th>
                 <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Tier</th>
                 <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider hidden lg:table-cell">
-                  <button onClick={() => toggleSort('created_at')} className="flex items-center gap-1 hover:text-[#D0E4EC] transition-colors">
+                  <button onClick={() => toggleSort('created_at')} className="flex items-center gap-1 hover:text-cg-slate-tint transition-colors">
                     Joined <ArrowUpDown className="w-3 h-3" />
                   </button>
                 </th>
                 <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider hidden md:table-cell">
-                  <button onClick={() => toggleSort('last_active')} className="flex items-center gap-1 hover:text-[#D0E4EC] transition-colors">
+                  <button onClick={() => toggleSort('last_active')} className="flex items-center gap-1 hover:text-cg-slate-tint transition-colors">
                     Last Active <ArrowUpDown className="w-3 h-3" />
                   </button>
                 </th>
@@ -468,7 +468,7 @@ export default function UsersContent() {
                     onClick={() => router.push(`/superadmin/users/${user.id}`)}
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-medium text-[#8AACBC]">
+                      <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-medium text-cg-slate-muted">
                         {user.first_name?.[0]}{user.last_name?.[0]}
                       </div>
                       <div className="min-w-0">
@@ -520,7 +520,7 @@ export default function UsersContent() {
                           onClick={(e) => { e.stopPropagation(); startImpersonation(user.id, user.email); }}
                           disabled={impersonating === user.id}
                           title="View the app as this user (audit-logged)"
-                          className="p-1.5 rounded text-[#8AACBC] hover:bg-cg-sage/20 hover:text-cg-sage transition-colors disabled:opacity-50"
+                          className="p-1.5 rounded text-cg-slate-muted hover:bg-cg-sage/20 hover:text-cg-sage transition-colors disabled:opacity-50"
                         >
                           {impersonating === user.id
                             ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -530,7 +530,7 @@ export default function UsersContent() {
                       <button aria-label="Show"
                         onClick={() => router.push(`/superadmin/users/${user.id}`)}
                         title="Open detail"
-                        className="p-1.5 rounded text-[#4A6E7F] hover:bg-cg-slate/30 hover:text-[#D0E4EC] transition-colors"
+                        className="p-1.5 rounded text-cg-slate-strong hover:bg-cg-slate/30 hover:text-cg-slate-tint transition-colors"
                       >
                         <Eye className="w-3.5 h-3.5" />
                       </button>
@@ -552,7 +552,7 @@ export default function UsersContent() {
               <button aria-label="Previous" disabled={page === 0} onClick={() => setPage(page - 1)} className="p-1.5 rounded-lg hover:bg-cg-slate/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
                 <ChevronLeft className="w-4 h-4" />
               </button>
-              <span className="text-xs text-[#8AACBC] px-2">{page + 1} / {totalPages}</span>
+              <span className="text-xs text-cg-slate-muted px-2">{page + 1} / {totalPages}</span>
               <button aria-label="Next" disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)} className="p-1.5 rounded-lg hover:bg-cg-slate/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -568,7 +568,7 @@ export default function UsersContent() {
           onClick={closeBulkModal}
         >
           <div
-            className="bg-[#0F2533] border border-cg-slate/30 rounded-xl p-6 w-full max-w-md shadow-2xl"
+            className="bg-cg-ink border border-cg-slate/30 rounded-xl p-6 w-full max-w-md shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between mb-4">
@@ -579,7 +579,7 @@ export default function UsersContent() {
               </h3>
               <button aria-label="Close"
                 onClick={closeBulkModal}
-                className="p-1 rounded text-[#8AACBC] hover:bg-cg-slate/30 hover:text-white transition-colors"
+                className="p-1 rounded text-cg-slate-muted hover:bg-cg-slate/30 hover:text-white transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -596,11 +596,11 @@ export default function UsersContent() {
 
             {bulkAction === 'tier' && (
               <div className="mb-4">
-                <label className="block text-xs font-medium text-[#8AACBC] mb-2">New Tier</label>
+                <label className="block text-xs font-medium text-cg-slate-muted mb-2">New Tier</label>
                 <select
                   value={bulkTierChoice}
                   onChange={(e) => setBulkTierChoice(e.target.value)}
-                  className="w-full bg-[#1A3648]/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-cg-sage"
+                  className="w-full bg-cg-slate-deep/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-cg-sage"
                 >
                   {TIERS.filter(t => t.value).map((t) => (
                     <option key={t.value} value={t.value}>{t.label}</option>
@@ -610,7 +610,7 @@ export default function UsersContent() {
             )}
 
             <div className="mb-4">
-              <label className="block text-xs font-medium text-[#8AACBC] mb-2">
+              <label className="block text-xs font-medium text-cg-slate-muted mb-2">
                 Reason <span className="text-red-400">*</span>
                 <span className="ml-1 text-muted-foreground font-normal">(min 3 chars, recorded in audit log)</span>
               </label>
@@ -619,7 +619,7 @@ export default function UsersContent() {
                 onChange={(e) => setBulkReason(e.target.value)}
                 placeholder="Why are you making this change?"
                 rows={3}
-                className="w-full bg-[#1A3648]/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-cg-sage resize-none"
+                className="w-full bg-cg-slate-deep/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-cg-sage resize-none"
               />
             </div>
 
@@ -649,7 +649,7 @@ export default function UsersContent() {
               <button
                 onClick={closeBulkModal}
                 disabled={bulkRunning}
-                className="px-4 py-2 rounded text-sm font-medium text-[#8AACBC] hover:text-white transition-colors disabled:opacity-50"
+                className="px-4 py-2 rounded text-sm font-medium text-cg-slate-muted hover:text-white transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>

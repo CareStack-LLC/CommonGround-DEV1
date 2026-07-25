@@ -57,15 +57,15 @@ export function KanbanBoard({ items, onStatusChange, loading }: KanbanBoardProps
         return (
           <div
             key={col.key}
-            className={`bg-[#1A3648]/40 border-t-2 ${col.color} rounded-lg min-h-[200px]`}
+            className={`bg-cg-slate-deep/40 border-t-2 ${col.color} rounded-lg min-h-[200px]`}
             onDragOver={(e) => e.preventDefault()}
             onDrop={() => handleDrop(col.key)}
           >
             {/* Column header */}
             <div className="flex items-center gap-2 px-3 py-2.5 border-b border-cg-slate/15">
               <Icon className="w-3.5 h-3.5 text-muted-foreground" />
-              <span className="text-xs font-semibold text-[#8AACBC]">{col.label}</span>
-              <span className="ml-auto text-[10px] text-[#4A6E7F] bg-foreground px-1.5 py-0.5 rounded">
+              <span className="text-xs font-semibold text-cg-slate-muted">{col.label}</span>
+              <span className="ml-auto text-[10px] text-cg-slate-strong bg-foreground px-1.5 py-0.5 rounded">
                 {colItems.length}
               </span>
             </div>
@@ -87,7 +87,7 @@ export function KanbanBoard({ items, onStatusChange, loading }: KanbanBoardProps
                       dragItem === item.id ? 'opacity-50' : ''
                     }`}
                   >
-                    <div className="text-xs text-[#D0E4EC] font-medium mb-1.5 line-clamp-2">
+                    <div className="text-xs text-cg-slate-tint font-medium mb-1.5 line-clamp-2">
                       {item.title}
                     </div>
                     <div className="flex items-center gap-1.5 flex-wrap">
@@ -102,13 +102,13 @@ export function KanbanBoard({ items, onStatusChange, loading }: KanbanBoardProps
                         </span>
                       )}
                       {item.story_points && (
-                        <span className="text-[10px] text-[#4A6E7F] ml-auto">{item.story_points}sp</span>
+                        <span className="text-[10px] text-cg-slate-strong ml-auto">{item.story_points}sp</span>
                       )}
                     </div>
                     {item.assigned_to && (
                       <div className="flex items-center gap-1 mt-1.5">
-                        <User className="w-2.5 h-2.5 text-[#4A6E7F]" />
-                        <span className="text-[10px] text-[#4A6E7F]">{item.assigned_to}</span>
+                        <User className="w-2.5 h-2.5 text-cg-slate-strong" />
+                        <span className="text-[10px] text-cg-slate-strong">{item.assigned_to}</span>
                       </div>
                     )}
                   </div>

@@ -55,7 +55,7 @@ const CATEGORY_CONFIG: Record<string, { color: string; icon: any; label: string 
   notification: { color: 'bg-indigo-500/15 text-indigo-400 border-indigo-500/20', icon: Mail, label: 'Notification' },
   personal: { color: 'bg-pink-500/15 text-pink-400 border-pink-500/20', icon: Star, label: 'Personal' },
   spam: { color: 'bg-zinc-700/50 text-muted-foreground border-zinc-700/30', icon: Archive, label: 'Spam' },
-  other: { color: 'bg-zinc-700/50 text-[#8AACBC] border-zinc-700/30', icon: Mail, label: 'Other' },
+  other: { color: 'bg-zinc-700/50 text-cg-slate-muted border-zinc-700/30', icon: Mail, label: 'Other' },
 };
 
 const PRIORITY_COLORS: Record<string, { dot: string; label: string }> = {
@@ -143,7 +143,7 @@ function KPICard({ label, value, icon: Icon, trend, color = 'text-white' }: {
   label: string; value: string | number; icon: any; trend?: string; color?: string;
 }) {
   return (
-    <div className="bg-[#1A3648]/60 border border-cg-slate/15 rounded-xl px-4 py-3 flex items-center gap-3 hover:border-cg-slate/30 transition-colors">
+    <div className="bg-cg-slate-deep/60 border border-cg-slate/15 rounded-xl px-4 py-3 flex items-center gap-3 hover:border-cg-slate/30 transition-colors">
       <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${
         color === 'text-red-400' ? 'bg-red-500/10' :
         color === 'text-amber-400' ? 'bg-amber-500/10' :
@@ -205,7 +205,7 @@ function HtmlEmailBody({ html }: { html: string }) {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             font-size: 14px;
             line-height: 1.6;
-            color: #D0E4EC;
+            color: var(--cg-slate-tint);
             background: transparent;
             padding: 8px;
             word-wrap: break-word;
@@ -218,10 +218,10 @@ function HtmlEmailBody({ html }: { html: string }) {
             border-left: 3px solid var(--cg-slate);
             padding-left: 12px;
             margin: 8px 0;
-            color: #8AACBC;
+            color: var(--cg-slate-muted);
           }
           pre, code {
-            background: #162D3A;
+            background: var(--cg-slate-deep);
             border-radius: 4px;
             padding: 2px 4px;
             font-size: 13px;
@@ -280,7 +280,7 @@ function ThreadMessage({ email, isLatest }: { email: MonitoredEmail; isLatest: b
 
   return (
     <div className={`rounded-xl border transition-all ${
-      isLatest ? 'border-cg-slate/30 bg-[#1A3648]/40' : 'border-cg-slate/10 bg-[#1A3648]/20'
+      isLatest ? 'border-cg-slate/30 bg-cg-slate-deep/40' : 'border-cg-slate/10 bg-cg-slate-deep/20'
     }`}>
       {/* Message Header */}
       <button
@@ -289,7 +289,7 @@ function ThreadMessage({ email, isLatest }: { email: MonitoredEmail; isLatest: b
       >
         {/* Avatar */}
         <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold ${
-          isOutbound ? 'bg-cg-sage/20 text-cg-sage' : 'bg-cg-slate/30 text-[#8AACBC]'
+          isOutbound ? 'bg-cg-sage/20 text-cg-sage' : 'bg-cg-slate/30 text-cg-slate-muted'
         }`}>
           {(email.from_name || email.from_email).charAt(0).toUpperCase()}
         </div>
@@ -305,7 +305,7 @@ function ThreadMessage({ email, isLatest }: { email: MonitoredEmail; isLatest: b
             {bodyIsHtml && (
               <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 font-medium">HTML</span>
             )}
-            <span className="text-[10px] text-[#4A6E7F] ml-auto">{formatFullDate(email.received_at)}</span>
+            <span className="text-[10px] text-cg-slate-strong ml-auto">{formatFullDate(email.received_at)}</span>
           </div>
           {!expanded && (
             <p className="text-xs text-muted-foreground truncate mt-0.5">
@@ -317,26 +317,26 @@ function ThreadMessage({ email, isLatest }: { email: MonitoredEmail; isLatest: b
           )}
         </div>
 
-        {expanded ? <ChevronDown className="w-4 h-4 text-[#4A6E7F]" /> : <ChevronRight className="w-4 h-4 text-[#4A6E7F]" />}
+        {expanded ? <ChevronDown className="w-4 h-4 text-cg-slate-strong" /> : <ChevronRight className="w-4 h-4 text-cg-slate-strong" />}
       </button>
 
       {/* Message Body */}
       {expanded && (
         <div className="px-4 pb-4 pt-0">
           <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3">
-            <span>From: <span className="text-[#8AACBC]">{email.from_name ? `${email.from_name} <${email.from_email}>` : email.from_email}</span></span>
+            <span>From: <span className="text-cg-slate-muted">{email.from_name ? `${email.from_name} <${email.from_email}>` : email.from_email}</span></span>
             <span>→</span>
-            <span>To: <span className="text-[#8AACBC]">{email.to_email}</span></span>
+            <span>To: <span className="text-cg-slate-muted">{email.to_email}</span></span>
           </div>
 
           {/* Render HTML or plain text */}
           <div className="ml-11">
             {bodyIsHtml ? (
-              <div className="bg-[#0F2533]/60 rounded-lg border border-cg-slate/15 overflow-hidden">
+              <div className="bg-cg-ink/60 rounded-lg border border-cg-slate/15 overflow-hidden">
                 <HtmlEmailBody html={email.body_full || ''} />
               </div>
             ) : (
-              <div className="text-sm text-[#D0E4EC] whitespace-pre-wrap leading-relaxed">
+              <div className="text-sm text-cg-slate-tint whitespace-pre-wrap leading-relaxed">
                 {email.body_full}
               </div>
             )}
@@ -349,7 +349,7 @@ function ThreadMessage({ email, isLatest }: { email: MonitoredEmail; isLatest: b
                 <Sparkles className="w-3 h-3 text-violet-400" />
                 <span className="text-[10px] font-semibold text-violet-300">AI Summary</span>
               </div>
-              <p className="text-xs text-[#D0E4EC]">{email.ai_summary}</p>
+              <p className="text-xs text-cg-slate-tint">{email.ai_summary}</p>
             </div>
           )}
         </div>
@@ -700,7 +700,7 @@ export default function InboxPage() {
           <button onClick={runAnalysis} disabled={analyzing || !gmailConnected} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-500/15 hover:bg-violet-500/25 text-violet-300 text-xs font-medium transition-colors disabled:opacity-50">
             <Brain className={`w-3.5 h-3.5 ${analyzing ? 'animate-pulse' : ''}`} /> {analyzing ? 'Analyzing...' : 'AI Summary'}
           </button>
-          <button onClick={connectGoogleOAuth} disabled={connectingOAuth || !clientConfigured} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-[#8AACBC] text-xs font-medium transition-colors disabled:opacity-50">
+          <button onClick={connectGoogleOAuth} disabled={connectingOAuth || !clientConfigured} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-cg-slate-muted text-xs font-medium transition-colors disabled:opacity-50">
             <Link className="w-3.5 h-3.5" /> Connect
           </button>
           <button onClick={syncInbox} disabled={syncing || !gmailConnected} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cg-sage hover:bg-cg-sage-light text-white text-xs font-medium transition-colors disabled:opacity-50">
@@ -710,7 +710,7 @@ export default function InboxPage() {
             onClick={backfillAliases}
             disabled={backfilling || !gmailConnected}
             title="Re-tag previously-synced emails with their real recipient alias (info@, partnerships@, etc.). Safe to run anytime."
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cg-slate/15 hover:bg-cg-slate/25 text-[#8AACBC] text-xs font-medium transition-colors disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cg-slate/15 hover:bg-cg-slate/25 text-cg-slate-muted text-xs font-medium transition-colors disabled:opacity-50"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${backfilling ? 'animate-spin' : ''}`} /> {backfilling ? 'Re-tagging...' : 'Fix alias tabs'}
           </button>
@@ -759,7 +759,7 @@ export default function InboxPage() {
           className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border whitespace-nowrap text-xs font-medium transition-all flex-shrink-0 ${
             !recipientFilter
               ? 'bg-cg-sage/15 border-cg-sage/30 text-cg-sage-light'
-              : 'bg-[#1A3648]/40 border-cg-slate/15 text-[#8AACBC] hover:border-cg-slate/30'
+              : 'bg-cg-slate-deep/40 border-cg-slate/15 text-cg-slate-muted hover:border-cg-slate/30'
           }`}
         >
           <Inbox className="w-3.5 h-3.5" /> All ({total})
@@ -775,8 +775,8 @@ export default function InboxPage() {
                 isActive
                   ? 'bg-cg-sage/15 border-cg-sage/30 text-cg-sage-light'
                   : count > 0
-                    ? 'bg-[#1A3648]/40 border-cg-slate/15 text-[#8AACBC] hover:border-cg-slate/30'
-                    : 'bg-[#1A3648]/20 border-cg-slate/10 text-[#4A6E7F]'
+                    ? 'bg-cg-slate-deep/40 border-cg-slate/15 text-cg-slate-muted hover:border-cg-slate/30'
+                    : 'bg-cg-slate-deep/20 border-cg-slate/10 text-cg-slate-strong'
               }`}
             >
               <span>{icon}</span> {label} {count > 0 && <span className="bg-cg-slate/30 px-1.5 py-0.5 rounded-full text-[10px]">{count}</span>}
@@ -812,20 +812,20 @@ export default function InboxPage() {
             <button aria-label="Close" onClick={() => setShowAnalysis(false)} className="text-muted-foreground hover:text-white"><X className="w-4 h-4" /></button>
           </div>
           {analysis.analysis.summary && (
-            <p className="text-sm text-[#D0E4EC] leading-relaxed">{analysis.analysis.summary}</p>
+            <p className="text-sm text-cg-slate-tint leading-relaxed">{analysis.analysis.summary}</p>
           )}
           {analysis.analysis.action_items?.length > 0 && (
             <div>
-              <h3 className="text-xs font-semibold text-[#8AACBC] uppercase tracking-wider mb-2">Action Items</h3>
+              <h3 className="text-xs font-semibold text-cg-slate-muted uppercase tracking-wider mb-2">Action Items</h3>
               <div className="space-y-1.5">
                 {analysis.analysis.action_items.map((item: any, i: number) => (
                   <div key={i} className="flex items-start gap-2 text-sm">
                     <span className={`inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium mt-0.5 ${
                       item.priority === 'high' ? 'bg-red-500/15 text-red-400' :
                       item.priority === 'medium' ? 'bg-amber-500/15 text-amber-400' :
-                      'bg-zinc-700/50 text-[#8AACBC]'
+                      'bg-zinc-700/50 text-cg-slate-muted'
                     }`}>{item.priority}</span>
-                    <span className="text-[#D0E4EC]">{item.action}</span>
+                    <span className="text-cg-slate-tint">{item.action}</span>
                   </div>
                 ))}
               </div>
@@ -833,10 +833,10 @@ export default function InboxPage() {
           )}
           {analysis.analysis.recommendations?.length > 0 && (
             <div>
-              <h3 className="text-xs font-semibold text-[#8AACBC] uppercase tracking-wider mb-2">Recommendations</h3>
+              <h3 className="text-xs font-semibold text-cg-slate-muted uppercase tracking-wider mb-2">Recommendations</h3>
               <ul className="space-y-1">
                 {analysis.analysis.recommendations.map((r: string, i: number) => (
-                  <li key={i} className="text-sm text-[#D0E4EC] flex items-start gap-2">
+                  <li key={i} className="text-sm text-cg-slate-tint flex items-start gap-2">
                     <Sparkles className="w-3.5 h-3.5 text-violet-400 mt-0.5 flex-shrink-0" /> {r}
                   </li>
                 ))}
@@ -854,7 +854,7 @@ export default function InboxPage() {
           <button
             onClick={() => setCategoryFilter('')}
             className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-              !categoryFilter ? 'bg-cg-slate/20 text-white' : 'text-[#8AACBC] hover:bg-cg-slate/10'
+              !categoryFilter ? 'bg-cg-slate/20 text-white' : 'text-cg-slate-muted hover:bg-cg-slate/10'
             }`}
           >
             <Inbox className="w-3.5 h-3.5" /> All Mail
@@ -882,7 +882,7 @@ export default function InboxPage() {
                   key={cat}
                   onClick={() => setCategoryFilter(categoryFilter === cat ? '' : cat)}
                   className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-                    categoryFilter === cat ? `${cfg.color}` : 'text-[#8AACBC] hover:bg-cg-slate/10'
+                    categoryFilter === cat ? `${cfg.color}` : 'text-cg-slate-muted hover:bg-cg-slate/10'
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" /> {cfg.label}
@@ -893,17 +893,17 @@ export default function InboxPage() {
         </div>
 
         {/* ── Center: Thread List ────────────────────────────────────────── */}
-        <div className="w-[340px] flex-shrink-0 bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden flex flex-col">
+        <div className="w-[340px] flex-shrink-0 bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl overflow-hidden flex flex-col">
           {/* Search */}
           <div className="px-3 py-2.5 border-b border-cg-slate/15">
             <div className="relative">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#4A6E7F]" />
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-cg-slate-strong" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
                 placeholder="Search threads..."
-                className="w-full pl-8 pr-3 py-1.5 bg-[#162D3A] border border-cg-slate/15 rounded-lg text-xs text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-cg-sage/30"
+                className="w-full pl-8 pr-3 py-1.5 bg-cg-slate-deep border border-cg-slate/15 rounded-lg text-xs text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-cg-sage/30"
               />
             </div>
           </div>
@@ -946,16 +946,16 @@ export default function InboxPage() {
                             {thread.emails.length}
                           </span>
                         )}
-                        <span className="text-[10px] text-[#4A6E7F] ml-auto flex-shrink-0">{formatEmailTime(thread.latestEmail.received_at)}</span>
+                        <span className="text-[10px] text-cg-slate-strong ml-auto flex-shrink-0">{formatEmailTime(thread.latestEmail.received_at)}</span>
                       </div>
-                      <div className="text-xs text-[#8AACBC] truncate">{thread.subject}</div>
+                      <div className="text-xs text-cg-slate-muted truncate">{thread.subject}</div>
                       <div className="flex items-center gap-1.5 mt-1">
                         {thread.hasUrgent && <Flame className="w-3 h-3 text-red-400" />}
                         {thread.hasPendingDraft && (
                           <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-400 font-medium">Draft</span>
                         )}
                         <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${cfg.color}`}>{cfg.label}</span>
-                        <span className="text-[10px] text-[#4A6E7F] truncate">→ {thread.to_email.split('@')[0]}@</span>
+                        <span className="text-[10px] text-cg-slate-strong truncate">→ {thread.to_email.split('@')[0]}@</span>
                       </div>
                     </div>
                   </div>
@@ -966,7 +966,7 @@ export default function InboxPage() {
         </div>
 
         {/* ── Right: Thread Detail ──────────────────────────────────────── */}
-        <div className="flex-1 bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden flex flex-col">
+        <div className="flex-1 bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl overflow-hidden flex flex-col">
           {selectedThread ? (
             <>
               {/* Thread Header */}
@@ -1019,14 +1019,14 @@ export default function InboxPage() {
                       <span className="text-xs font-semibold text-cg-sage-light">AI Draft Reply</span>
                       <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-400 font-medium">Pending Review</span>
                     </div>
-                    <p className="text-sm text-[#D0E4EC] whitespace-pre-wrap leading-relaxed mb-4">
+                    <p className="text-sm text-cg-slate-tint whitespace-pre-wrap leading-relaxed mb-4">
                       {selectedThread.latestEmail.ai_draft_response}
                     </p>
                     <div className="flex items-center gap-2">
                       <button onClick={approveDraft} className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-cg-sage hover:bg-cg-sage-light text-white text-xs font-medium transition-colors">
                         <Send className="w-3.5 h-3.5" /> Approve & Send
                       </button>
-                      <button onClick={() => { setCustomReply(selectedThread.latestEmail.ai_draft_response || ''); setShowReplyComposer(true); }} className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-[#8AACBC] text-xs font-medium transition-colors">
+                      <button onClick={() => { setCustomReply(selectedThread.latestEmail.ai_draft_response || ''); setShowReplyComposer(true); }} className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-cg-slate-muted text-xs font-medium transition-colors">
                         <Eye className="w-3.5 h-3.5" /> Edit Before Sending
                       </button>
                       <button onClick={rejectDraft} className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-medium transition-colors">
@@ -1043,7 +1043,7 @@ export default function InboxPage() {
                   <div className="flex items-center gap-2 px-4 py-3">
                     <button
                       onClick={() => setShowReplyComposer(true)}
-                      className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-[#D0E4EC] text-xs font-medium transition-colors"
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-cg-slate-tint text-xs font-medium transition-colors"
                     >
                       <Reply className="w-3.5 h-3.5" /> Reply
                     </button>
@@ -1059,7 +1059,7 @@ export default function InboxPage() {
                 ) : (
                   <div className="p-4 space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-semibold text-[#D0E4EC]">Compose Reply</span>
+                      <span className="text-xs font-semibold text-cg-slate-tint">Compose Reply</span>
                       <div className="flex items-center gap-2">
                         <button
                           onClick={generateAIReply}
@@ -1079,17 +1079,17 @@ export default function InboxPage() {
                       value={replyInstructions}
                       onChange={e => setReplyInstructions(e.target.value)}
                       placeholder="AI instructions: e.g., be empathetic, mention refund policy..."
-                      className="w-full px-3 py-1.5 bg-[#162D3A] border border-cg-slate/15 rounded-lg text-xs text-[#D0E4EC] placeholder:text-[#4A6E7F] focus:outline-none focus:border-cg-sage/30"
+                      className="w-full px-3 py-1.5 bg-cg-slate-deep border border-cg-slate/15 rounded-lg text-xs text-cg-slate-tint placeholder:text-cg-slate-strong focus:outline-none focus:border-cg-sage/30"
                     />
                     <textarea
                       value={customReply}
                       onChange={e => setCustomReply(e.target.value)}
                       placeholder="Type your reply or generate with AI..."
                       rows={4}
-                      className="w-full px-3 py-2.5 bg-[#162D3A] border border-cg-slate/15 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-cg-sage/40 resize-none"
+                      className="w-full px-3 py-2.5 bg-cg-slate-deep border border-cg-slate/15 rounded-lg text-sm text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-cg-sage/40 resize-none"
                     />
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] text-[#4A6E7F]">CommonGround signature auto-attached</span>
+                      <span className="text-[10px] text-cg-slate-strong">CommonGround signature auto-attached</span>
                       <button
                         onClick={sendReply}
                         disabled={sendingReply || !customReply.trim()}
@@ -1109,7 +1109,7 @@ export default function InboxPage() {
                 <Mail className="w-8 h-8 text-[#3A5A6A]" />
               </div>
               <p className="text-muted-foreground text-sm font-medium">Select a thread to view conversation</p>
-              <p className="text-[#4A6E7F] text-xs mt-1">Messages are grouped by conversation thread</p>
+              <p className="text-cg-slate-strong text-xs mt-1">Messages are grouped by conversation thread</p>
             </div>
           )}
         </div>

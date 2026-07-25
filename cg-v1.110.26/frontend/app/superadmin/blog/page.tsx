@@ -74,7 +74,7 @@ function CopyButton({ text, label }: { text: string; label?: string }) {
   return (
     <button
       onClick={handleCopy}
-      className="inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] bg-cg-slate/20 hover:bg-zinc-700 text-[#8AACBC] hover:text-white transition-colors"
+      className="inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] bg-cg-slate/20 hover:bg-zinc-700 text-cg-slate-muted hover:text-white transition-colors"
     >
       {copied ? <CheckCircle className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
       {label || (copied ? 'Copied!' : 'Copy')}
@@ -88,7 +88,7 @@ function MarketingTabs({ content, imageUrl }: { content: MarketingContent[]; ima
 
   if (!content.length) {
     return (
-      <div className="px-5 py-4 text-sm text-[#4A6E7F] italic">
+      <div className="px-5 py-4 text-sm text-cg-slate-strong italic">
         No marketing content generated yet. Edit the post and use AI Generate to create marketing content.
       </div>
     );
@@ -109,7 +109,7 @@ function MarketingTabs({ content, imageUrl }: { content: MarketingContent[]; ima
               className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium transition-colors whitespace-nowrap border-b-2 ${
                 activeTab === mc.platform
                   ? `${meta.color} border-current`
-                  : 'text-muted-foreground border-transparent hover:text-[#D0E4EC]'
+                  : 'text-muted-foreground border-transparent hover:text-cg-slate-tint'
               }`}
             >
               <Icon className="w-3.5 h-3.5" />
@@ -137,7 +137,7 @@ function MarketingTabs({ content, imageUrl }: { content: MarketingContent[]; ima
               <span className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Post Copy</span>
               <CopyButton text={active.body} />
             </div>
-            <div className="bg-cg-slate/15 rounded-lg p-3 text-sm text-[#D0E4EC] whitespace-pre-wrap max-h-48 overflow-y-auto">
+            <div className="bg-cg-slate/15 rounded-lg p-3 text-sm text-cg-slate-tint whitespace-pre-wrap max-h-48 overflow-y-auto">
               {active.body}
             </div>
           </div>
@@ -153,7 +153,7 @@ function MarketingTabs({ content, imageUrl }: { content: MarketingContent[]; ima
                 {active.hashtags.map((tag, i) => (
                   <span
                     key={i}
-                    className="px-2 py-0.5 rounded-full bg-cg-slate/20 text-xs text-[#8AACBC]"
+                    className="px-2 py-0.5 rounded-full bg-cg-slate/20 text-xs text-cg-slate-muted"
                   >
                     {tag.startsWith('#') ? tag : `#${tag}`}
                   </span>
@@ -418,7 +418,7 @@ export default function BlogPage() {
           <button
             onClick={fetchPosts}
             disabled={loading}
-            className="p-2 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-[#8AACBC] hover:text-white transition-colors disabled:opacity-50"
+            className="p-2 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-cg-slate-muted hover:text-white transition-colors disabled:opacity-50"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
@@ -455,7 +455,7 @@ export default function BlogPage() {
               <h2 className="text-lg font-semibold text-white">
                 {editingPost ? 'Edit Post' : 'Create New Post'}
               </h2>
-              <button aria-label="Close" onClick={() => { setShowModal(false); resetForm(); }} className="text-muted-foreground hover:text-[#D0E4EC] transition-colors">
+              <button aria-label="Close" onClick={() => { setShowModal(false); resetForm(); }} className="text-muted-foreground hover:text-cg-slate-tint transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -473,14 +473,14 @@ export default function BlogPage() {
                   value={aiTopic}
                   onChange={(e) => setAiTopic(e.target.value)}
                   placeholder="Enter a topic..."
-                  className="flex-1 px-3 py-2 bg-cg-slate/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50"
+                  className="flex-1 px-3 py-2 bg-cg-slate/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-violet-500/50"
                 />
                 <input
                   type="text"
                   value={aiKeywords}
                   onChange={(e) => setAiKeywords(e.target.value)}
                   placeholder="Keywords (comma-separated)"
-                  className="flex-1 px-3 py-2 bg-cg-slate/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50"
+                  className="flex-1 px-3 py-2 bg-cg-slate/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-violet-500/50"
                 />
                 <button
                   onClick={handleAIGenerate}
@@ -502,7 +502,7 @@ export default function BlogPage() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="Post title..."
-                  className="w-full px-3 py-2 bg-cg-slate/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50"
+                  className="w-full px-3 py-2 bg-cg-slate/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-violet-500/50"
                 />
               </div>
 
@@ -513,7 +513,7 @@ export default function BlogPage() {
                   onChange={(e) => setContent(e.target.value)}
                   placeholder="Write your blog post content..."
                   rows={10}
-                  className="w-full px-3 py-2 bg-cg-slate/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50 resize-y"
+                  className="w-full px-3 py-2 bg-cg-slate/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-violet-500/50 resize-y"
                 />
               </div>
 
@@ -524,7 +524,7 @@ export default function BlogPage() {
                   onChange={(e) => setExcerpt(e.target.value)}
                   placeholder="Short excerpt or summary..."
                   rows={2}
-                  className="w-full px-3 py-2 bg-cg-slate/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50 resize-y"
+                  className="w-full px-3 py-2 bg-cg-slate/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-violet-500/50 resize-y"
                 />
               </div>
 
@@ -549,7 +549,7 @@ export default function BlogPage() {
                     value={seoTitle}
                     onChange={(e) => setSeoTitle(e.target.value)}
                     placeholder="SEO title..."
-                    className="w-full px-3 py-2 bg-cg-slate/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50"
+                    className="w-full px-3 py-2 bg-cg-slate/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-violet-500/50"
                   />
                 </div>
                 <div>
@@ -559,7 +559,7 @@ export default function BlogPage() {
                     value={seoDescription}
                     onChange={(e) => setSeoDescription(e.target.value)}
                     placeholder="SEO description..."
-                    className="w-full px-3 py-2 bg-cg-slate/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50"
+                    className="w-full px-3 py-2 bg-cg-slate/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-violet-500/50"
                   />
                 </div>
               </div>
@@ -582,10 +582,10 @@ export default function BlogPage() {
                 value={featuredImageUrl}
                 onChange={(e) => setFeaturedImageUrl(e.target.value)}
                 placeholder="Image URL (auto-generated with AI, or paste your own)..."
-                className="w-full px-3 py-2 bg-cg-slate/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50"
+                className="w-full px-3 py-2 bg-cg-slate/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-violet-500/50"
               />
               {!featuredImageUrl && (
-                <p className="text-xs text-[#4A6E7F] mt-1">An image will be auto-generated when you use AI generation</p>
+                <p className="text-xs text-cg-slate-strong mt-1">An image will be auto-generated when you use AI generation</p>
               )}
             </div>
 
@@ -605,7 +605,7 @@ export default function BlogPage() {
             <div className="flex justify-end gap-2 pt-2 border-t border-cg-slate/20">
               <button
                 onClick={() => { setShowModal(false); resetForm(); }}
-                className="px-4 py-2 rounded-lg text-sm text-[#8AACBC] hover:text-white hover:bg-cg-slate/20 transition-colors"
+                className="px-4 py-2 rounded-lg text-sm text-cg-slate-muted hover:text-white hover:bg-cg-slate/20 transition-colors"
               >
                 Cancel
               </button>
@@ -631,7 +631,7 @@ export default function BlogPage() {
       )}
 
       {/* Blog Posts List */}
-      <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden">
+      <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl overflow-hidden">
         {loading ? (
           <div className="p-4 space-y-3">
             {Array.from({ length: 5 }).map((_, i) => (
@@ -642,7 +642,7 @@ export default function BlogPage() {
           <div className="py-16 text-center">
             <PenTool className="w-10 h-10 text-[#3A5A6A] mx-auto mb-3" />
             <p className="text-sm text-muted-foreground">No blog posts yet</p>
-            <p className="text-xs text-[#4A6E7F] mt-1">Create your first post to get started</p>
+            <p className="text-xs text-cg-slate-strong mt-1">Create your first post to get started</p>
           </div>
         ) : (
           <div className="divide-y divide-zinc-800/40">
@@ -679,14 +679,14 @@ export default function BlogPage() {
                             const Icon = meta.icon;
                             return <Icon key={mc.platform} className={`w-3 h-3 ${meta.color} opacity-60`} />;
                           })}
-                          <span className="text-[10px] text-[#4A6E7F]">{post.marketing_content!.length} platforms</span>
+                          <span className="text-[10px] text-cg-slate-strong">{post.marketing_content!.length} platforms</span>
                         </div>
                       )}
                     </div>
 
                     {/* Category */}
                     <div className="hidden sm:block w-32 flex-shrink-0">
-                      <span className="text-xs text-[#8AACBC]">{post.category}</span>
+                      <span className="text-xs text-cg-slate-muted">{post.category}</span>
                     </div>
 
                     {/* Status */}
@@ -694,7 +694,7 @@ export default function BlogPage() {
                       <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium ${
                         post.status === 'published'
                           ? 'bg-emerald-500/15 text-emerald-400'
-                          : 'bg-zinc-500/15 text-[#8AACBC]'
+                          : 'bg-zinc-500/15 text-cg-slate-muted'
                       }`}>
                         {post.status}
                       </span>
@@ -710,7 +710,7 @@ export default function BlogPage() {
                       <button aria-label="Show"
                         onClick={() => handleTogglePublish(post)}
                         disabled={toggling === post.id}
-                        className="p-1.5 rounded-lg hover:bg-cg-slate/20 text-muted-foreground hover:text-[#D0E4EC] transition-colors disabled:opacity-50"
+                        className="p-1.5 rounded-lg hover:bg-cg-slate/20 text-muted-foreground hover:text-cg-slate-tint transition-colors disabled:opacity-50"
                         title={post.status === 'published' ? 'Unpublish' : 'Publish'}
                       >
                         {toggling === post.id ? (
@@ -723,7 +723,7 @@ export default function BlogPage() {
                       </button>
                       <button aria-label="Edit"
                         onClick={() => openEdit(post)}
-                        className="p-1.5 rounded-lg hover:bg-cg-slate/20 text-muted-foreground hover:text-[#D0E4EC] transition-colors"
+                        className="p-1.5 rounded-lg hover:bg-cg-slate/20 text-muted-foreground hover:text-cg-slate-tint transition-colors"
                         title="Edit"
                       >
                         <Edit3 className="w-3.5 h-3.5" />

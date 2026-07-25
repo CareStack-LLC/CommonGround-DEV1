@@ -420,12 +420,12 @@ export default function ProfessionalDocumentsPage() {
                         <div className="space-y-1.5">
                             <Label>File *</Label>
                             <div
-                                className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors ${uploadFile ? "border-[#9BCADF] bg-[#F0F7FC]" : "border-slate-200 hover:border-slate-300"
+                                className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors ${uploadFile ? "border-[#9BCADF] bg-cg-slate-tint" : "border-slate-200 hover:border-slate-300"
                                     }`}
                                 onClick={() => fileRef.current?.click()}
                             >
                                 {uploadFile ? (
-                                    <div className="flex items-center justify-center gap-2 text-[#1E4E6B]">
+                                    <div className="flex items-center justify-center gap-2 text-cg-slate-dark">
                                         <FileText className="h-5 w-5" />
                                         <span className="font-medium">{uploadFile.name}</span>
                                         <span className="text-sm text-[#3D8DB0]">({formatBytes(uploadFile.size)})</span>
@@ -454,7 +454,7 @@ export default function ProfessionalDocumentsPage() {
                         <Button
                             onClick={handleUpload}
                             disabled={!uploadFile || uploading}
-                            className="bg-cg-slate hover:bg-[#1E4E6B] text-white gap-2"
+                            className="bg-cg-slate hover:bg-cg-slate-dark text-white gap-2"
                         >
                             {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
                             {uploading ? "Uploading..." : "Upload"}

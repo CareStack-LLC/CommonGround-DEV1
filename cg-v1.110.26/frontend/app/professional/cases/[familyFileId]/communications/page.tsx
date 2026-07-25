@@ -462,7 +462,7 @@ export default function CommunicationsPage() {
                         <div className="flex justify-between text-sm mb-1">
                           <span>Parent A</span>
                           <span className={`font-medium ${stats.good_faith_scores.parent_a >= 0.7 ? "text-cg-sage-dark" :
-                            stats.good_faith_scores.parent_a >= 0.4 ? "text-[#E09520]" : "text-red-600"
+                            stats.good_faith_scores.parent_a >= 0.4 ? "text-cg-amber-dark" : "text-red-600"
                             }`}>
                             {Math.round(stats.good_faith_scores.parent_a * 100)}%
                           </span>
@@ -480,7 +480,7 @@ export default function CommunicationsPage() {
                         <div className="flex justify-between text-sm mb-1">
                           <span>Parent B</span>
                           <span className={`font-medium ${stats.good_faith_scores.parent_b >= 0.7 ? "text-cg-sage-dark" :
-                            stats.good_faith_scores.parent_b >= 0.4 ? "text-[#E09520]" : "text-red-600"
+                            stats.good_faith_scores.parent_b >= 0.4 ? "text-cg-amber-dark" : "text-red-600"
                             }`}>
                             {Math.round(stats.good_faith_scores.parent_b * 100)}%
                           </span>
@@ -554,7 +554,7 @@ export default function CommunicationsPage() {
                           <div key={index} className="flex-1 flex flex-col items-center">
                             <div className="w-full flex flex-col justify-end h-20 relative">
                               <div
-                                className="w-full bg-[#C2DEF0] rounded-t transition-all"
+                                className="w-full bg-cg-slate-tint rounded-t transition-all"
                                 style={{ height: `${height}%` }}
                               >
                                 <div
@@ -572,7 +572,7 @@ export default function CommunicationsPage() {
                     </div>
                     <div className="flex items-center justify-center gap-4 mt-3 text-xs">
                       <div className="flex items-center gap-1">
-                        <div className="w-3 h-3 bg-[#C2DEF0] rounded" />
+                        <div className="w-3 h-3 bg-cg-slate-tint rounded" />
                         <span className="text-muted-foreground">Total</span>
                       </div>
                       <div className="flex items-center gap-1">
@@ -606,7 +606,7 @@ export default function CommunicationsPage() {
                           key={thread.id}
                           onClick={() => setSelectedThread(thread.id)}
                           className={`w-full p-3 rounded-lg text-left transition-colors ${selectedThread === thread.id
-                            ? "bg-[#F0F7FC] border border-[#C2DEF0]"
+                            ? "bg-cg-slate-tint border border-cg-slate-tint"
                             : "hover:bg-muted/50"
                             }`}
                         >
@@ -674,7 +674,7 @@ export default function CommunicationsPage() {
                           key={message.id}
                           className={`p-4 rounded-lg border ${message.sender_role === "parent_a"
                             ? "border-l-4 border-l-blue-500 bg-blue-50/50"
-                            : "border-l-4 border-l-[#3D8DB0] bg-[#F0F7FC]/50"
+                            : "border-l-4 border-l-[#3D8DB0] bg-cg-slate-tint/50"
                             }`}
                         >
                           <div className="flex items-start justify-between mb-2">
@@ -684,7 +684,7 @@ export default function CommunicationsPage() {
                                 className={
                                   message.sender_role === "parent_a"
                                     ? "border-blue-300 text-blue-700"
-                                    : "border-[#9BCADF] text-[#1E4E6B]"
+                                    : "border-[#9BCADF] text-cg-slate-dark"
                                 }
                               >
                                 {message.sender_name}
@@ -696,7 +696,7 @@ export default function CommunicationsPage() {
                                 </Badge>
                               )}
                               {message.was_rewritten && (
-                                <Badge className="bg-cg-slate-subtle text-[#1E4E6B]">
+                                <Badge className="bg-cg-slate-subtle text-cg-slate-dark">
                                   <Bot className="h-3 w-3 mr-1" />
                                   ARIA Rewritten
                                 </Badge>

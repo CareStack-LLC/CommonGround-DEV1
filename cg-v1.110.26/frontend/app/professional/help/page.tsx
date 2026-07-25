@@ -124,8 +124,8 @@ function getEmbedUrl(url: string): string | null {
 }
 
 const CATEGORY_CONFIG = {
-    "getting-started": { label: "Getting Started", icon: <Compass className="h-4 w-4" />, color: "text-cg-sage-dark bg-cg-sage-subtle border-[#C5E5DB]" },
-    features: { label: "Features", icon: <Sparkles className="h-4 w-4" />, color: "text-cg-slate bg-[#F0F7FC] border-[#C2DEF0]" },
+    "getting-started": { label: "Getting Started", icon: <Compass className="h-4 w-4" />, color: "text-cg-sage-dark bg-cg-sage-subtle border-cg-sage-tint" },
+    features: { label: "Features", icon: <Sparkles className="h-4 w-4" />, color: "text-cg-slate bg-cg-slate-tint border-cg-slate-tint" },
     faqs: { label: "FAQs", icon: <MessageCircleQuestion className="h-4 w-4" />, color: "text-blue-600 bg-blue-50 border-blue-200" },
 };
 
@@ -319,7 +319,7 @@ export default function HelpCenterPage() {
                                                     {cfg.icon}
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <p className="font-semibold text-slate-900 group-hover:text-[#2D8A6E] transition-colors">
+                                                    <p className="font-semibold text-slate-900 group-hover:text-cg-sage-dark transition-colors">
                                                         {article.title}
                                                     </p>
                                                     {article.excerpt && (
@@ -375,8 +375,8 @@ export default function HelpCenterPage() {
                                     <Button
                                         size="sm"
                                         className={`w-full mt-3 gap-1.5 text-xs ${isDone
-                                            ? "bg-cg-sage-subtle text-cg-sage-dark hover:bg-cg-sage-subtle border border-[#C5E5DB]"
-                                            : "bg-cg-sage hover:bg-[#2D8A6E] text-white"
+                                            ? "bg-cg-sage-subtle text-cg-sage-dark hover:bg-cg-sage-subtle border border-cg-sage-tint"
+                                            : "bg-cg-sage hover:bg-cg-sage-dark text-white"
                                             }`}
                                         onClick={() => startTour(tour)}
                                     >

@@ -214,9 +214,9 @@ export default function SettingsPage() {
   }, {} as Record<string, typeof SETTING_DEFINITIONS>);
 
   const impactColors = {
-    high: "bg-cg-error-subtle text-[#9B2C2C]",
-    medium: "bg-cg-amber-subtle text-[#E09520]",
-    low: "bg-cg-slate-subtle text-[#1E4E6B]",
+    high: "bg-cg-error-subtle text-cg-error-dark",
+    medium: "bg-cg-amber-subtle text-cg-amber-dark",
+    low: "bg-cg-slate-subtle text-cg-slate-dark",
   };
 
   return (
@@ -251,7 +251,7 @@ export default function SettingsPage() {
 
       {/* Error Message */}
       {error && (
-        <div className="bg-cg-error-subtle border border-cg-error-subtle text-[#9B2C2C] px-4 py-3 rounded">
+        <div className="bg-cg-error-subtle border border-cg-error-subtle text-cg-error-dark px-4 py-3 rounded">
           {error}
         </div>
       )}
@@ -270,10 +270,10 @@ export default function SettingsPage() {
             <div className="flex items-center space-x-3">
               <span className="text-xl">⚠️</span>
               <div>
-                <p className="font-medium text-[#E09520]">
+                <p className="font-medium text-cg-amber-dark">
                   You have {Object.keys(pendingChanges).length} unsaved change(s)
                 </p>
-                <p className="text-sm text-[#E09520]">
+                <p className="text-sm text-cg-amber-dark">
                   Changes will be logged and take effect immediately upon saving.
                 </p>
               </div>
@@ -309,7 +309,7 @@ export default function SettingsPage() {
                         {setting.impact} impact
                       </span>
                       {hasChanged && (
-                        <span className="px-2 py-0.5 rounded text-xs bg-cg-amber-subtle text-[#E09520]">
+                        <span className="px-2 py-0.5 rounded text-xs bg-cg-amber-subtle text-cg-amber-dark">
                           modified
                         </span>
                       )}

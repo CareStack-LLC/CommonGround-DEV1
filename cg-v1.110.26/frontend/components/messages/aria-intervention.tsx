@@ -43,14 +43,14 @@ export function ARIAIntervention({
   const getLevelConfig = (level: string, isBlocked: boolean) => {
     if (isBlocked) {
       return {
-        bg: 'bg-gradient-to-br from-cg-error-subtle to-white dark:from-[#7A2222]/30 dark:to-card',
-        border: 'border-cg-error-subtle dark:border-[#7A2222]/60',
-        iconBg: 'bg-cg-error-subtle dark:bg-[#7A2222]/40',
+        bg: 'bg-gradient-to-br from-cg-error-subtle to-white dark:from-cg-error-deep/30 dark:to-card',
+        border: 'border-cg-error-subtle dark:border-cg-error-deep/60',
+        iconBg: 'bg-cg-error-subtle dark:bg-cg-error-deep/40',
         iconColor: 'text-cg-error',
         icon: <XCircle className="h-6 w-6 text-cg-error" />,
         title: 'Message Blocked',
         subtitle: 'Severe violation of communication protocols.',
-        btnPrimary: 'bg-cg-error hover:bg-[#9B2C2C] text-white',
+        btnPrimary: 'bg-cg-error hover:bg-cg-error-dark text-white',
       };
     }
 
@@ -75,7 +75,7 @@ export function ARIAIntervention({
           icon: <Sparkles className="h-6 w-6 text-cg-amber" />,
           title: 'Tone Calibration',
           subtitle: 'This message may be misinterpreted.',
-          btnPrimary: 'bg-[#E09520] hover:bg-[#E09520] text-white',
+          btnPrimary: 'bg-cg-amber-dark hover:bg-cg-amber-dark text-white',
         };
       case 'orange':
         return {
@@ -86,7 +86,7 @@ export function ARIAIntervention({
           icon: <AlertTriangle className="h-6 w-6 text-cg-amber" />,
           title: 'Conflict Risk',
           subtitle: 'High probability of escalation detected.',
-          btnPrimary: 'bg-[#E09520] hover:bg-[#E09520] text-white',
+          btnPrimary: 'bg-cg-amber-dark hover:bg-cg-amber-dark text-white',
         };
       default:
         return {
@@ -97,7 +97,7 @@ export function ARIAIntervention({
           icon: <Sparkles className="h-6 w-6 text-cg-amber" />,
           title: 'ARIA Review',
           subtitle: 'Analysis complete.',
-          btnPrimary: 'bg-[#E09520] hover:bg-[#E09520] text-white',
+          btnPrimary: 'bg-cg-amber-dark hover:bg-cg-amber-dark text-white',
         };
     }
   };

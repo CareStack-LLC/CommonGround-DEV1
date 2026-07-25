@@ -873,8 +873,8 @@ function VisitationTypeSection({
       )}
 
       <Alert className="bg-cg-amber-subtle border-cg-amber-subtle">
-        <AlertTriangle className="h-4 w-4 text-[#E09520]" />
-        <AlertDescription className="text-[#E09520]">
+        <AlertTriangle className="h-4 w-4 text-cg-amber-dark" />
+        <AlertDescription className="text-cg-amber-dark">
           <strong>Note:</strong> Unless specifically ordered, a child's holiday schedule order has
           priority over the regular parenting time.
         </AlertDescription>
@@ -1136,7 +1136,7 @@ function ScheduleSection({
                 {/* 5th Weekend Handling */}
                 {formData.weekend_schedules.find(w => w.weekend === '5th')?.enabled && (
                   <div className="mt-4 p-4 bg-cg-amber-subtle border border-cg-amber-subtle rounded-lg">
-                    <Label className="font-medium text-[#E09520]">5th Weekend Handling:</Label>
+                    <Label className="font-medium text-cg-amber-dark">5th Weekend Handling:</Label>
                     <div className="mt-3 space-y-3">
                       <label className="flex items-start gap-2">
                         <input
@@ -1467,7 +1467,7 @@ function AbuseSection({
     <div className="space-y-6">
       <Alert className="bg-cg-error-subtle border-cg-error-subtle">
         <AlertTriangle className="h-4 w-4 text-cg-error" />
-        <AlertDescription className="text-[#9B2C2C]">
+        <AlertDescription className="text-cg-error-dark">
           <strong>Item 5:</strong> This section is required because you indicated abuse or substance
           abuse allegations in Item 2c.
         </AlertDescription>
@@ -1734,7 +1734,7 @@ function SupervisedSection({
 
               {formData.supervisor_type === 'professional' && (
                 <div className="ml-6 p-4 bg-cg-slate-subtle rounded-lg border border-cg-slate-subtle">
-                  <Label className="font-medium text-[#1E4E6B] mb-3 block">Fee Split (must total 100%):</Label>
+                  <Label className="font-medium text-cg-slate-dark mb-3 block">Fee Split (must total 100%):</Label>
                   <div className="grid grid-cols-3 gap-4">
                     <div>
                       <Label className="text-sm">Petitioner pays</Label>
@@ -1782,7 +1782,7 @@ function SupervisedSection({
                   {(formData.professional_fee_petitioner_percent || 0) +
                    (formData.professional_fee_respondent_percent || 0) +
                    (formData.professional_fee_other_percent || 0) !== 100 && (
-                    <p className="mt-2 text-sm text-[#E09520]">
+                    <p className="mt-2 text-sm text-cg-amber-dark">
                       Total: {(formData.professional_fee_petitioner_percent || 0) +
                              (formData.professional_fee_respondent_percent || 0) +
                              (formData.professional_fee_other_percent || 0)}% (should be 100%)
@@ -2151,8 +2151,8 @@ function MediationSection({
           )}
 
           <Alert className="bg-cg-amber-subtle border-cg-amber-subtle">
-            <AlertTriangle className="h-4 w-4 text-[#E09520]" />
-            <AlertDescription className="text-[#E09520] text-sm">
+            <AlertTriangle className="h-4 w-4 text-cg-amber-dark" />
+            <AlertDescription className="text-cg-amber-dark text-sm">
               <strong>Note:</strong> A party who alleges domestic violence in a written declaration
               or who is protected by a protective order may ask the mediator to meet with the
               parties separately and at separate times.

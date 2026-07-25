@@ -39,16 +39,16 @@ interface PageParams {
 }
 
 const ROOM_COLORS = [
-  'bg-cg-error-subtle dark:bg-[#7A2222]/30 border-[#FCA5A5] dark:border-[#9B2C2C] text-[#9B2C2C] dark:text-[#FCA5A5]',
-  'bg-cg-amber-subtle dark:bg-foreground/30 border-cg-amber dark:border-[#E09520] text-[#E09520] dark:text-cg-amber',
-  'bg-cg-amber-subtle dark:bg-foreground/30 border-cg-amber dark:border-[#E09520] text-[#E09520] dark:text-cg-amber',
-  'bg-cg-amber-subtle dark:bg-foreground/30 border-cg-amber dark:border-[#E09520] text-[#E09520] dark:text-cg-amber',
+  'bg-cg-error-subtle dark:bg-cg-error-deep/30 border-[#FCA5A5] dark:border-cg-error-dark text-cg-error-dark dark:text-[#FCA5A5]',
+  'bg-cg-amber-subtle dark:bg-foreground/30 border-cg-amber dark:border-cg-amber-dark text-cg-amber-dark dark:text-cg-amber',
+  'bg-cg-amber-subtle dark:bg-foreground/30 border-cg-amber dark:border-cg-amber-dark text-cg-amber-dark dark:text-cg-amber',
+  'bg-cg-amber-subtle dark:bg-foreground/30 border-cg-amber dark:border-cg-amber-dark text-cg-amber-dark dark:text-cg-amber',
   'bg-lime-100 dark:bg-lime-900/30 border-lime-300 dark:border-lime-700 text-lime-700 dark:text-lime-300',
   'bg-cg-sage-subtle dark:bg-foreground/30 border-cg-sage-light dark:border-cg-sage-dark text-cg-sage-dark dark:text-cg-sage-light',
   'bg-teal-100 dark:bg-teal-900/30 border-teal-300 dark:border-teal-700 text-teal-700 dark:text-teal-300',
-  'bg-cg-slate-subtle dark:bg-foreground/30 border-cg-slate-light dark:border-[#1E4E6B] text-[#1E4E6B] dark:text-cg-slate-light',
-  'bg-cg-slate-subtle dark:bg-foreground/30 border-cg-slate-light dark:border-[#1E4E6B] text-[#1E4E6B] dark:text-cg-slate-light',
-  'bg-cg-amber-subtle dark:bg-foreground/30 border-cg-amber dark:border-[#E09520] text-[#E09520] dark:text-cg-amber',
+  'bg-cg-slate-subtle dark:bg-foreground/30 border-cg-slate-light dark:border-cg-slate-dark text-cg-slate-dark dark:text-cg-slate-light',
+  'bg-cg-slate-subtle dark:bg-foreground/30 border-cg-slate-light dark:border-cg-slate-dark text-cg-slate-dark dark:text-cg-slate-light',
+  'bg-cg-amber-subtle dark:bg-foreground/30 border-cg-amber dark:border-cg-amber-dark text-cg-amber-dark dark:text-cg-amber',
 ];
 
 const RELATIONSHIP_OPTIONS = [
@@ -426,10 +426,10 @@ function MyCircleContent({ params }: PageParams) {
                   <div className="w-10 h-10 rounded-lg bg-cg-error-subtle flex items-center justify-center flex-shrink-0">
                     <X className="h-5 w-5 text-cg-error" />
                   </div>
-                  <p className="text-[#9B2C2C] font-medium flex-1">{error}</p>
+                  <p className="text-cg-error-dark font-medium flex-1">{error}</p>
                   <button aria-label="Dismiss"
                     onClick={() => setError(null)}
-                    className="text-cg-error hover:text-[#9B2C2C]"
+                    className="text-cg-error hover:text-cg-error-dark"
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -653,7 +653,7 @@ function MyCircleContent({ params }: PageParams) {
                               contact.can_communicate
                                 ? 'bg-cg-success-subtle text-cg-success'
                                 : contact.is_partially_approved
-                                  ? 'bg-cg-amber-subtle text-[#E09520]'
+                                  ? 'bg-cg-amber-subtle text-cg-amber-dark'
                                   : 'bg-muted text-muted-foreground'
                             }`}>
                               {contact.can_communicate
@@ -1013,7 +1013,7 @@ function MyCircleContent({ params }: PageParams) {
                 <button
                   onClick={handleSaveContactEdit}
                   disabled={isSavingContact || !editContactName.trim()}
-                  className="flex-1 py-2.5 bg-cg-sage text-white rounded-xl font-semibold hover:bg-[#2D8A6E] disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
+                  className="flex-1 py-2.5 bg-cg-sage text-white rounded-xl font-semibold hover:bg-cg-sage-dark disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
                 >
                   {isSavingContact ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
                   {isSavingContact ? 'Saving...' : 'Save'}
@@ -1247,7 +1247,7 @@ function MyCircleContent({ params }: PageParams) {
                 <button
                   onClick={handleSetupChildUser}
                   disabled={isSettingUpChild}
-                  className="flex-1 py-3 bg-cg-sage text-white rounded-xl font-semibold hover:bg-[#2D8A6E] disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
+                  className="flex-1 py-3 bg-cg-sage text-white rounded-xl font-semibold hover:bg-cg-sage-dark disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
                 >
                   {isSettingUpChild ? (
                     <>

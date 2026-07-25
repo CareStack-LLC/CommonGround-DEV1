@@ -1840,7 +1840,7 @@ function UrgencySection({
                 type="checkbox"
                 checked={formData.urgency_hearing_sooner}
                 onChange={(e) => updateField('urgency_hearing_sooner', e.target.checked)}
-                className="h-4 w-4 text-[#E09520]"
+                className="h-4 w-4 text-cg-amber-dark"
               />
               <span>Request hearing sooner than the court's regular calendar allows</span>
             </label>
@@ -1888,8 +1888,8 @@ function FactsSection({
       </Alert>
 
       <Alert className="bg-cg-amber-subtle border-cg-amber-subtle">
-        <AlertTriangle className="h-4 w-4 text-[#E09520]" />
-        <AlertDescription className="text-[#E09520]">
+        <AlertTriangle className="h-4 w-4 text-cg-amber-dark" />
+        <AlertDescription className="text-cg-amber-dark">
           <strong>Important:</strong> This is your declaration under penalty of perjury. State only facts you know to be true.
           Include dates, names, and specific details that support your request.
         </AlertDescription>

@@ -85,11 +85,11 @@ function StoryCard({
   delay?: number;
 }) {
   const themeColors: Record<string, { bg: string; shadow: string }> = {
-    adventure: { bg: 'from-cg-amber to-cg-amber', shadow: '#E09520' },
-    space: { bg: 'from-cg-slate-light to-cg-slate', shadow: '#1E4E6B' },
+    adventure: { bg: 'from-cg-amber to-cg-amber', shadow: 'var(--cg-amber-dark)' },
+    space: { bg: 'from-cg-slate-light to-cg-slate', shadow: 'var(--cg-slate-dark)' },
     nature: { bg: 'from-cg-sage-light to-cg-sage', shadow: 'var(--cg-sage-dark)' },
-    ocean: { bg: 'from-cg-slate-light to-cg-slate', shadow: '#1E4E6B' },
-    fantasy: { bg: 'from-cg-amber to-cg-amber', shadow: '#9B2C2C' },
+    ocean: { bg: 'from-cg-slate-light to-cg-slate', shadow: 'var(--cg-slate-dark)' },
+    fantasy: { bg: 'from-cg-amber to-cg-amber', shadow: 'var(--cg-error-dark)' },
   };
 
   const colors = themeColors[story.theme] || themeColors.adventure;

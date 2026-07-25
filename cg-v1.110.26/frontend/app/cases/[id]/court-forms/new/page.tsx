@@ -162,7 +162,7 @@ function NewCourtFormPageContent() {
       <div className="min-h-screen bg-gray-50 p-8">
         <Card className="max-w-lg mx-auto bg-cg-error-subtle border-cg-error-subtle">
           <CardContent className="pt-6">
-            <p className="text-[#9B2C2C]">{error || 'Case not found'}</p>
+            <p className="text-cg-error-dark">{error || 'Case not found'}</p>
             <Button variant="outline" onClick={() => router.push('/cases')} className="mt-4">
               Back to Cases
             </Button>
@@ -250,7 +250,7 @@ function NewCourtFormPageContent() {
                       </div>
                       <p className="mt-2 text-gray-600">{option.description}</p>
                       {isDisabled && check.reason && (
-                        <p className="mt-2 text-sm text-[#E09520]">
+                        <p className="mt-2 text-sm text-cg-amber-dark">
                           {check.reason}
                         </p>
                       )}
@@ -316,7 +316,7 @@ function NewCourtFormPageContent() {
                   <div className="flex-1">
                     <h3 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
                       Talk to ARIA
-                      <span className="px-2 py-0.5 bg-cg-slate-subtle text-[#1E4E6B] text-xs rounded-full">
+                      <span className="px-2 py-0.5 bg-cg-slate-subtle text-cg-slate-dark text-xs rounded-full">
                         Recommended
                       </span>
                     </h3>

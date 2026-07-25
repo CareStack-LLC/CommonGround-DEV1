@@ -23,11 +23,11 @@ const SEVERITY_COLORS: Record<string, string> = {
   critical: 'bg-red-500/15 text-red-400 border border-red-500/20',
   high: 'bg-orange-500/15 text-orange-400 border border-orange-500/20',
   medium: 'bg-yellow-500/15 text-yellow-400 border border-yellow-500/20',
-  low: 'bg-zinc-700/50 text-[#8AACBC]',
+  low: 'bg-zinc-700/50 text-cg-slate-muted',
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  draft: 'bg-zinc-700/50 text-[#8AACBC]',
+  draft: 'bg-zinc-700/50 text-cg-slate-muted',
   seeding: 'bg-blue-500/15 text-blue-400 border border-blue-500/20',
   active: 'bg-cg-sage/15 text-cg-sage border border-cg-sage/20',
   completed: 'bg-purple-500/15 text-purple-400 border border-purple-500/20',
@@ -35,7 +35,7 @@ const STATUS_COLORS: Record<string, string> = {
   confirmed: 'bg-red-500/15 text-red-400',
   fixed: 'bg-cg-sage/15 text-cg-sage',
   wont_fix: 'bg-zinc-700/50 text-zinc-500',
-  pending: 'bg-zinc-700/50 text-[#8AACBC]',
+  pending: 'bg-zinc-700/50 text-cg-slate-muted',
   in_progress: 'bg-blue-500/15 text-blue-400',
   blocked: 'bg-red-500/15 text-red-400',
 };
@@ -301,7 +301,7 @@ export default function BugHuntDetailPage() {
         <div className="flex items-center gap-3">
           <button aria-label="Back"
             onClick={() => router.push('/superadmin/bug-hunts')}
-            className="p-2 rounded-lg hover:bg-cg-slate/20 transition-colors text-[#8AACBC]"
+            className="p-2 rounded-lg hover:bg-cg-slate/20 transition-colors text-cg-slate-muted"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
@@ -320,7 +320,7 @@ export default function BugHuntDetailPage() {
         </div>
         <button
           onClick={() => fetchData()}
-          className="p-2 rounded-lg hover:bg-cg-slate/20 transition-colors text-[#8AACBC]"
+          className="p-2 rounded-lg hover:bg-cg-slate/20 transition-colors text-cg-slate-muted"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
         </button>
@@ -347,7 +347,7 @@ export default function BugHuntDetailPage() {
             key={t.key}
             onClick={() => setTab(t.key)}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
-              tab === t.key ? 'bg-cg-slate/40 text-white' : 'text-muted-foreground hover:text-[#8AACBC]'
+              tab === t.key ? 'bg-cg-slate/40 text-white' : 'text-muted-foreground hover:text-cg-slate-muted'
             }`}
           >
             <t.icon className="w-3.5 h-3.5" />
@@ -420,15 +420,15 @@ export default function BugHuntDetailPage() {
           {/* Test Instructions */}
           {cohort.test_instructions && (
             <div className="bg-foreground/50 border border-cg-slate/20 rounded-xl p-5">
-              <h3 className="text-sm font-medium text-[#8AACBC] uppercase tracking-wider mb-3">Test Instructions</h3>
-              <pre className="text-sm text-[#D0E4EC] whitespace-pre-wrap font-mono">{cohort.test_instructions}</pre>
+              <h3 className="text-sm font-medium text-cg-slate-muted uppercase tracking-wider mb-3">Test Instructions</h3>
+              <pre className="text-sm text-cg-slate-tint whitespace-pre-wrap font-mono">{cohort.test_instructions}</pre>
             </div>
           )}
 
           {/* AI Overview */}
           <div className="bg-foreground/50 border border-cg-slate/20 rounded-xl p-5">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-medium text-[#8AACBC] uppercase tracking-wider flex items-center gap-2">
+              <h3 className="text-sm font-medium text-cg-slate-muted uppercase tracking-wider flex items-center gap-2">
                 <Brain className="w-4 h-4 text-cg-sage" />
                 AI Analysis
               </h3>
@@ -450,19 +450,19 @@ export default function BugHuntDetailPage() {
                 {/* Health indicator */}
                 <div className="flex items-center gap-2">
                   <div className={`w-2.5 h-2.5 rounded-full ${aiOverview.overall_health === 'healthy' ? 'bg-cg-sage' : aiOverview.overall_health === 'critical' ? 'bg-red-500' : 'bg-yellow-500'}`} />
-                  <span className="text-xs uppercase tracking-wider text-[#8AACBC]">{aiOverview.overall_health}</span>
+                  <span className="text-xs uppercase tracking-wider text-cg-slate-muted">{aiOverview.overall_health}</span>
                 </div>
 
                 {/* Executive Summary */}
-                <p className="text-sm text-[#D0E4EC] leading-relaxed">{aiOverview.executive_summary}</p>
+                <p className="text-sm text-cg-slate-tint leading-relaxed">{aiOverview.executive_summary}</p>
 
                 {/* Key Findings */}
                 {aiOverview.key_findings?.length > 0 && (
                   <div>
-                    <h4 className="text-xs font-medium text-[#8AACBC] uppercase tracking-wider mb-2">Key Findings</h4>
+                    <h4 className="text-xs font-medium text-cg-slate-muted uppercase tracking-wider mb-2">Key Findings</h4>
                     <ul className="space-y-1">
                       {aiOverview.key_findings.map((f: string, i: number) => (
-                        <li key={i} className="text-sm text-[#D0E4EC] flex items-start gap-2">
+                        <li key={i} className="text-sm text-cg-slate-tint flex items-start gap-2">
                           <span className="text-cg-sage mt-1">&#x2022;</span> {f}
                         </li>
                       ))}
@@ -473,10 +473,10 @@ export default function BugHuntDetailPage() {
                 {/* Bug Patterns */}
                 {aiOverview.bug_patterns?.length > 0 && (
                   <div>
-                    <h4 className="text-xs font-medium text-[#8AACBC] uppercase tracking-wider mb-2">Bug Patterns</h4>
+                    <h4 className="text-xs font-medium text-cg-slate-muted uppercase tracking-wider mb-2">Bug Patterns</h4>
                     <ul className="space-y-1">
                       {aiOverview.bug_patterns.map((p: string, i: number) => (
-                        <li key={i} className="text-sm text-[#D0E4EC] flex items-start gap-2">
+                        <li key={i} className="text-sm text-cg-slate-tint flex items-start gap-2">
                           <Bug className="w-3.5 h-3.5 text-orange-400 mt-0.5 flex-shrink-0" /> {p}
                         </li>
                       ))}
@@ -487,16 +487,16 @@ export default function BugHuntDetailPage() {
                 {/* Action Items */}
                 {aiOverview.action_items?.length > 0 && (
                   <div>
-                    <h4 className="text-xs font-medium text-[#8AACBC] uppercase tracking-wider mb-2">Action Items</h4>
+                    <h4 className="text-xs font-medium text-cg-slate-muted uppercase tracking-wider mb-2">Action Items</h4>
                     <div className="space-y-2">
                       {aiOverview.action_items.map((a: { priority: string; action: string; category: string }, i: number) => (
-                        <div key={i} className="flex items-start gap-2 bg-[#162D3A]/50 rounded-lg p-3">
+                        <div key={i} className="flex items-start gap-2 bg-cg-slate-deep/50 rounded-lg p-3">
                           <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded-full mt-0.5 flex-shrink-0 ${
                             a.priority === 'high' ? 'bg-red-500/15 text-red-400' :
                             a.priority === 'medium' ? 'bg-yellow-500/15 text-yellow-400' :
-                            'bg-zinc-700/50 text-[#8AACBC]'
+                            'bg-zinc-700/50 text-cg-slate-muted'
                           }`}>{a.priority}</span>
-                          <span className="text-sm text-[#D0E4EC]">{a.action}</span>
+                          <span className="text-sm text-cg-slate-tint">{a.action}</span>
                         </div>
                       ))}
                     </div>
@@ -506,13 +506,13 @@ export default function BugHuntDetailPage() {
                 {/* Tester Engagement */}
                 {aiOverview.tester_engagement && (
                   <div>
-                    <h4 className="text-xs font-medium text-[#8AACBC] uppercase tracking-wider mb-2">Tester Engagement</h4>
-                    <p className="text-sm text-[#D0E4EC]">{aiOverview.tester_engagement}</p>
+                    <h4 className="text-xs font-medium text-cg-slate-muted uppercase tracking-wider mb-2">Tester Engagement</h4>
+                    <p className="text-sm text-cg-slate-tint">{aiOverview.tester_engagement}</p>
                   </div>
                 )}
 
                 {cohort.summary_json?.ai_generated_at && (
-                  <p className="text-[10px] text-[#4A6E7F] mt-2">Generated {new Date(cohort.summary_json.ai_generated_at).toLocaleString()}</p>
+                  <p className="text-[10px] text-cg-slate-strong mt-2">Generated {new Date(cohort.summary_json.ai_generated_at).toLocaleString()}</p>
                 )}
               </div>
             )}
@@ -530,7 +530,7 @@ export default function BugHuntDetailPage() {
           {/* Bulk actions bar */}
           {families.length > 0 && testers.length > 0 && (
             <div className="flex items-center gap-3 bg-foreground/30 rounded-xl px-4 py-3">
-              <span className="text-xs text-[#8AACBC]">
+              <span className="text-xs text-cg-slate-muted">
                 {testers.filter(t => t.first_accessed_at).length}/{testers.length} testers active
                 {testers.filter(t => !t.first_accessed_at && t.email_sent_at).length > 0 && (
                   <span className="text-yellow-400/70 ml-2">
@@ -594,7 +594,7 @@ export default function BugHuntDetailPage() {
                       </td>
                       <td className="py-3 px-3">
                         <div className="flex items-center gap-1">
-                          <span className="text-[#D0E4EC] font-mono text-xs">{f.parent_a_email}</span>
+                          <span className="text-cg-slate-tint font-mono text-xs">{f.parent_a_email}</span>
                           <CopyButton text={f.parent_a_email} />
                         </div>
                         <div className="flex items-center gap-1 mt-0.5">
@@ -604,7 +604,7 @@ export default function BugHuntDetailPage() {
                       </td>
                       <td className="py-3 px-3">
                         <div className="flex items-center gap-1">
-                          <span className="text-[#D0E4EC] font-mono text-xs">{f.parent_b_email}</span>
+                          <span className="text-cg-slate-tint font-mono text-xs">{f.parent_b_email}</span>
                           <CopyButton text={f.parent_b_email} />
                         </div>
                         <div className="flex items-center gap-1 mt-0.5">
@@ -651,9 +651,9 @@ export default function BugHuntDetailPage() {
                         ) : assigningFamily === f.id ? (
                           <div className="space-y-1">
                             <input type="text" placeholder="Name" value={assignForm.tester_name} onChange={e => setAssignForm({...assignForm, tester_name: e.target.value})}
-                              className="w-full px-2 py-1 bg-[#162D3A] border border-cg-slate/30 rounded text-xs text-white placeholder-[#4A6E7F]" />
+                              className="w-full px-2 py-1 bg-cg-slate-deep border border-cg-slate/30 rounded text-xs text-white placeholder-cg-slate-strong" />
                             <input type="email" placeholder="Email" value={assignForm.tester_email} onChange={e => setAssignForm({...assignForm, tester_email: e.target.value})}
-                              className="w-full px-2 py-1 bg-[#162D3A] border border-cg-slate/30 rounded text-xs text-white placeholder-[#4A6E7F]" />
+                              className="w-full px-2 py-1 bg-cg-slate-deep border border-cg-slate/30 rounded text-xs text-white placeholder-cg-slate-strong" />
                             <div className="flex gap-1">
                               <button onClick={() => handleAssignTester(f.id)} className="px-2 py-0.5 bg-cg-sage text-white rounded text-[10px]">Assign</button>
                               <button onClick={() => { setAssigningFamily(null); setAssignForm({ tester_name: '', tester_email: '' }); }} className="px-2 py-0.5 text-muted-foreground text-[10px]">Cancel</button>
@@ -695,7 +695,7 @@ export default function BugHuntDetailPage() {
                   <h4 className="text-white font-semibold text-sm">Professional portal — {pro.firm_name}</h4>
                 </div>
                 <p className="text-xs text-muted-foreground mb-3">
-                  {pro.name} (attorney) has the case for <span className="text-[#D0E4EC]">{pro.assigned_family}</span> assigned with full access.
+                  {pro.name} (attorney) has the case for <span className="text-cg-slate-tint">{pro.assigned_family}</span> assigned with full access.
                   Log in below and open the Professional portal to test it.
                   {pro.kidspace_incidents_seeded && (
                     <span className="text-cg-sage"> Includes seeded KidSpace incidents (a flagged child message + a terminated call with a recording) to test the Circle incidents view and recording requests.</span>
@@ -708,14 +708,14 @@ export default function BugHuntDetailPage() {
                   <div>
                     <div className="text-[10px] uppercase text-muted-foreground mb-1">Email</div>
                     <div className="flex items-center gap-1">
-                      <span className="text-[#D0E4EC] font-mono text-xs">{pro.email}</span>
+                      <span className="text-cg-slate-tint font-mono text-xs">{pro.email}</span>
                       <CopyButton text={pro.email} />
                     </div>
                   </div>
                   <div>
                     <div className="text-[10px] uppercase text-muted-foreground mb-1">Password</div>
                     <div className="flex items-center gap-1">
-                      <span className="text-[#D0E4EC] font-mono text-xs">{pro.password}</span>
+                      <span className="text-cg-slate-tint font-mono text-xs">{pro.password}</span>
                       <CopyButton text={pro.password} />
                     </div>
                   </div>
@@ -743,7 +743,7 @@ export default function BugHuntDetailPage() {
           {stats.checklist_total > 0 && (
             <div className="bg-foreground/50 border border-cg-slate/20 rounded-xl p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-[#8AACBC]">Progress</span>
+                <span className="text-sm text-cg-slate-muted">Progress</span>
                 <span className="text-sm text-white font-medium">{stats.checklist_completed}/{stats.checklist_total} ({checklistProgress}%)</span>
               </div>
               <div className="w-full h-2 bg-cg-slate/20 rounded-full overflow-hidden">
@@ -761,7 +761,7 @@ export default function BugHuntDetailPage() {
                   className={`mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all ${
                     item.is_completed
                       ? 'bg-cg-sage border-cg-sage text-white'
-                      : 'border-[#4A6E7F] hover:border-cg-sage'
+                      : 'border-cg-slate-strong hover:border-cg-sage'
                   }`}
                 >
                   {item.is_completed && <Check className="w-3 h-3" />}
@@ -774,19 +774,19 @@ export default function BugHuntDetailPage() {
                     <div className="text-xs text-muted-foreground mt-0.5">{item.description}</div>
                   )}
                   {item.completed_at && (
-                    <div className="text-[10px] text-[#4A6E7F] mt-1">
+                    <div className="text-[10px] text-cg-slate-strong mt-1">
                       Completed {new Date(item.completed_at).toLocaleString()}
                       {item.tester_name ? (
                         <span className="ml-1 text-cg-sage">by {item.tester_name}</span>
                       ) : item.completed_by ? (
-                        <span className="ml-1 text-[#8AACBC]">by Admin</span>
+                        <span className="ml-1 text-cg-slate-muted">by Admin</span>
                       ) : null}
                     </div>
                   )}
                 </div>
                 <button aria-label="Delete"
                   onClick={() => handleDeleteCheckItem(item.id)}
-                  className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-500/10 text-[#4A6E7F] hover:text-red-400 transition-all"
+                  className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-500/10 text-cg-slate-strong hover:text-red-400 transition-all"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
@@ -802,7 +802,7 @@ export default function BugHuntDetailPage() {
               onChange={e => setNewCheckItem(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleAddCheckItem()}
               placeholder="Add checklist item..."
-              className="flex-1 px-3 py-2 bg-foreground border border-cg-slate/30 rounded-lg text-white placeholder-[#4A6E7F] focus:outline-none focus:border-cg-sage/50 text-sm"
+              className="flex-1 px-3 py-2 bg-foreground border border-cg-slate/30 rounded-lg text-white placeholder-cg-slate-strong focus:outline-none focus:border-cg-sage/50 text-sm"
             />
             <button aria-label="Add"
               onClick={handleAddCheckItem}
@@ -836,20 +836,20 @@ export default function BugHuntDetailPage() {
                 value={bugForm.title}
                 onChange={e => setBugForm({ ...bugForm, title: e.target.value })}
                 placeholder="Bug title"
-                className="w-full px-3 py-2 bg-[#162D3A] border border-cg-slate/30 rounded-lg text-white placeholder-[#4A6E7F] focus:outline-none focus:border-cg-sage/50 text-sm"
+                className="w-full px-3 py-2 bg-cg-slate-deep border border-cg-slate/30 rounded-lg text-white placeholder-cg-slate-strong focus:outline-none focus:border-cg-sage/50 text-sm"
               />
               <textarea
                 value={bugForm.description}
                 onChange={e => setBugForm({ ...bugForm, description: e.target.value })}
                 placeholder="Description"
                 rows={3}
-                className="w-full px-3 py-2 bg-[#162D3A] border border-cg-slate/30 rounded-lg text-white placeholder-[#4A6E7F] focus:outline-none focus:border-cg-sage/50 text-sm resize-none"
+                className="w-full px-3 py-2 bg-cg-slate-deep border border-cg-slate/30 rounded-lg text-white placeholder-cg-slate-strong focus:outline-none focus:border-cg-sage/50 text-sm resize-none"
               />
               <div className="flex gap-3">
                 <select
                   value={bugForm.severity}
                   onChange={e => setBugForm({ ...bugForm, severity: e.target.value })}
-                  className="px-3 py-2 bg-[#162D3A] border border-cg-slate/30 rounded-lg text-white text-sm"
+                  className="px-3 py-2 bg-cg-slate-deep border border-cg-slate/30 rounded-lg text-white text-sm"
                 >
                   <option value="critical">Critical</option>
                   <option value="high">High</option>
@@ -860,7 +860,7 @@ export default function BugHuntDetailPage() {
                   <select
                     value={bugForm.family_id}
                     onChange={e => setBugForm({ ...bugForm, family_id: e.target.value })}
-                    className="px-3 py-2 bg-[#162D3A] border border-cg-slate/30 rounded-lg text-white text-sm"
+                    className="px-3 py-2 bg-cg-slate-deep border border-cg-slate/30 rounded-lg text-white text-sm"
                   >
                     <option value="">No family</option>
                     {families.map(f => (
@@ -874,11 +874,11 @@ export default function BugHuntDetailPage() {
                 onChange={e => setBugForm({ ...bugForm, steps_to_reproduce: e.target.value })}
                 placeholder="Steps to reproduce (optional)"
                 rows={2}
-                className="w-full px-3 py-2 bg-[#162D3A] border border-cg-slate/30 rounded-lg text-white placeholder-[#4A6E7F] focus:outline-none focus:border-cg-sage/50 text-sm resize-none font-mono"
+                className="w-full px-3 py-2 bg-cg-slate-deep border border-cg-slate/30 rounded-lg text-white placeholder-cg-slate-strong focus:outline-none focus:border-cg-sage/50 text-sm resize-none font-mono"
               />
               <div className="flex gap-2">
                 <button onClick={handleSubmitBug} className="px-4 py-2 bg-cg-sage text-white rounded-lg hover:bg-cg-sage/80 text-sm font-medium">Submit Bug</button>
-                <button onClick={() => setShowBugForm(false)} className="px-4 py-2 text-[#8AACBC] hover:text-white text-sm">Cancel</button>
+                <button onClick={() => setShowBugForm(false)} className="px-4 py-2 text-cg-slate-muted hover:text-white text-sm">Cancel</button>
               </div>
             </div>
           )}
@@ -917,11 +917,11 @@ export default function BugHuntDetailPage() {
                   </button>
                   {expandedBugs.has(bug.id) && (
                     <div className="px-11 pb-3 space-y-3">
-                      <p className="text-sm text-[#D0E4EC]">{bug.description}</p>
+                      <p className="text-sm text-cg-slate-tint">{bug.description}</p>
                       {bug.steps_to_reproduce && (
                         <div>
                           <span className="text-xs text-muted-foreground font-medium">Steps to Reproduce:</span>
-                          <pre className="text-xs text-[#8AACBC] mt-1 whitespace-pre-wrap font-mono">{bug.steps_to_reproduce}</pre>
+                          <pre className="text-xs text-cg-slate-muted mt-1 whitespace-pre-wrap font-mono">{bug.steps_to_reproduce}</pre>
                         </div>
                       )}
                       {bug.screenshot_urls && bug.screenshot_urls.length > 0 && (
@@ -966,7 +966,7 @@ export default function BugHuntDetailPage() {
                 <span className="text-sm text-muted-foreground">Average Rating:</span>
                 <div className="flex items-center gap-1">
                   {[1, 2, 3, 4, 5].map(s => (
-                    <Star key={s} className={`w-4 h-4 ${s <= (stats.avg_rating || 0) ? 'text-yellow-400 fill-yellow-400' : 'text-[#4A6E7F]'}`} />
+                    <Star key={s} className={`w-4 h-4 ${s <= (stats.avg_rating || 0) ? 'text-yellow-400 fill-yellow-400' : 'text-cg-slate-strong'}`} />
                   ))}
                   <span className="text-white font-medium ml-1">{stats.avg_rating}</span>
                 </div>
@@ -987,7 +987,7 @@ export default function BugHuntDetailPage() {
                 <select
                   value={feedbackForm.category}
                   onChange={e => setFeedbackForm({ ...feedbackForm, category: e.target.value })}
-                  className="px-3 py-2 bg-[#162D3A] border border-cg-slate/30 rounded-lg text-white text-sm"
+                  className="px-3 py-2 bg-cg-slate-deep border border-cg-slate/30 rounded-lg text-white text-sm"
                 >
                   <option value="ux">UX</option>
                   <option value="performance">Performance</option>
@@ -1002,7 +1002,7 @@ export default function BugHuntDetailPage() {
                       onClick={() => setFeedbackForm({ ...feedbackForm, rating: feedbackForm.rating === s ? 0 : s })}
                       className="p-0.5"
                     >
-                      <Star className={`w-5 h-5 ${s <= feedbackForm.rating ? 'text-yellow-400 fill-yellow-400' : 'text-[#4A6E7F]'}`} />
+                      <Star className={`w-5 h-5 ${s <= feedbackForm.rating ? 'text-yellow-400 fill-yellow-400' : 'text-cg-slate-strong'}`} />
                     </button>
                   ))}
                 </div>
@@ -1012,11 +1012,11 @@ export default function BugHuntDetailPage() {
                 onChange={e => setFeedbackForm({ ...feedbackForm, content: e.target.value })}
                 placeholder="Feedback details..."
                 rows={3}
-                className="w-full px-3 py-2 bg-[#162D3A] border border-cg-slate/30 rounded-lg text-white placeholder-[#4A6E7F] focus:outline-none focus:border-cg-sage/50 text-sm resize-none"
+                className="w-full px-3 py-2 bg-cg-slate-deep border border-cg-slate/30 rounded-lg text-white placeholder-cg-slate-strong focus:outline-none focus:border-cg-sage/50 text-sm resize-none"
               />
               <div className="flex gap-2">
                 <button onClick={handleSubmitFeedback} className="px-4 py-2 bg-cg-sage text-white rounded-lg hover:bg-cg-sage/80 text-sm font-medium">Submit</button>
-                <button onClick={() => setShowFeedbackForm(false)} className="px-4 py-2 text-[#8AACBC] hover:text-white text-sm">Cancel</button>
+                <button onClick={() => setShowFeedbackForm(false)} className="px-4 py-2 text-cg-slate-muted hover:text-white text-sm">Cancel</button>
               </div>
             </div>
           )}
@@ -1032,13 +1032,13 @@ export default function BugHuntDetailPage() {
                     {fb.rating && (
                       <div className="flex items-center gap-0.5">
                         {[1, 2, 3, 4, 5].map(s => (
-                          <Star key={s} className={`w-3 h-3 ${s <= fb.rating! ? 'text-yellow-400 fill-yellow-400' : 'text-[#4A6E7F]'}`} />
+                          <Star key={s} className={`w-3 h-3 ${s <= fb.rating! ? 'text-yellow-400 fill-yellow-400' : 'text-cg-slate-strong'}`} />
                         ))}
                       </div>
                     )}
                     <span className="text-xs text-muted-foreground ml-auto">{new Date(fb.created_at).toLocaleString()}</span>
                   </div>
-                  <p className="text-sm text-[#D0E4EC]">{fb.content}</p>
+                  <p className="text-sm text-cg-slate-tint">{fb.content}</p>
                 </div>
               ))}
             </div>
@@ -1065,7 +1065,7 @@ export default function BugHuntDetailPage() {
                 <select
                   value={noteForm.note_type}
                   onChange={e => setNoteForm({ ...noteForm, note_type: e.target.value })}
-                  className="px-3 py-2 bg-[#162D3A] border border-cg-slate/30 rounded-lg text-white text-sm"
+                  className="px-3 py-2 bg-cg-slate-deep border border-cg-slate/30 rounded-lg text-white text-sm"
                 >
                   <option value="observation">Observation</option>
                   <option value="blocker">Blocker</option>
@@ -1076,7 +1076,7 @@ export default function BugHuntDetailPage() {
                   <select
                     value={noteForm.family_id}
                     onChange={e => setNoteForm({ ...noteForm, family_id: e.target.value })}
-                    className="px-3 py-2 bg-[#162D3A] border border-cg-slate/30 rounded-lg text-white text-sm"
+                    className="px-3 py-2 bg-cg-slate-deep border border-cg-slate/30 rounded-lg text-white text-sm"
                   >
                     <option value="">Cohort-level</option>
                     {families.map(f => (
@@ -1090,11 +1090,11 @@ export default function BugHuntDetailPage() {
                 onChange={e => setNoteForm({ ...noteForm, content: e.target.value })}
                 placeholder="Your observation or note..."
                 rows={3}
-                className="w-full px-3 py-2 bg-[#162D3A] border border-cg-slate/30 rounded-lg text-white placeholder-[#4A6E7F] focus:outline-none focus:border-cg-sage/50 text-sm resize-none"
+                className="w-full px-3 py-2 bg-cg-slate-deep border border-cg-slate/30 rounded-lg text-white placeholder-cg-slate-strong focus:outline-none focus:border-cg-sage/50 text-sm resize-none"
               />
               <div className="flex gap-2">
                 <button onClick={handleSubmitNote} className="px-4 py-2 bg-cg-sage text-white rounded-lg hover:bg-cg-sage/80 text-sm font-medium">Add Note</button>
-                <button onClick={() => setShowNoteForm(false)} className="px-4 py-2 text-[#8AACBC] hover:text-white text-sm">Cancel</button>
+                <button onClick={() => setShowNoteForm(false)} className="px-4 py-2 text-cg-slate-muted hover:text-white text-sm">Cancel</button>
               </div>
             </div>
           )}
@@ -1111,7 +1111,7 @@ export default function BugHuntDetailPage() {
                     </span>
                     <span className="text-xs text-muted-foreground">{new Date(note.created_at).toLocaleString()}</span>
                   </div>
-                  <p className="text-sm text-[#D0E4EC]">{note.content}</p>
+                  <p className="text-sm text-cg-slate-tint">{note.content}</p>
                 </div>
               ))}
             </div>

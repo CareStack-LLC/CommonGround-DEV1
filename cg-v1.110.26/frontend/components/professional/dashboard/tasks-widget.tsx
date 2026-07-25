@@ -45,9 +45,9 @@ interface Task {
 }
 
 const PRIORITY_COLORS: Record<string, string> = {
-    urgent: "bg-cg-error-subtle text-[#9B2C2C] border-cg-error-subtle",
-    high: "bg-cg-amber-subtle text-[#B8791A] border-[#FBE3BF]",
-    medium: "bg-cg-slate-subtle text-[#1E4E6B] border-cg-slate-subtle",
+    urgent: "bg-cg-error-subtle text-cg-error-dark border-cg-error-subtle",
+    high: "bg-cg-amber-subtle text-cg-amber-deep border-cg-amber-tint",
+    medium: "bg-cg-slate-subtle text-cg-slate-dark border-cg-slate-subtle",
     low: "bg-slate-100 text-slate-600 border-slate-200",
 };
 
@@ -57,8 +57,8 @@ function formatDueDate(dateStr?: string) {
     const now = new Date();
     const diffDays = Math.ceil((d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
     if (diffDays < 0) return { label: "Overdue", color: "text-cg-error" };
-    if (diffDays === 0) return { label: "Due today", color: "text-[#E09520]" };
-    if (diffDays === 1) return { label: "Due tomorrow", color: "text-[#E09520]" };
+    if (diffDays === 0) return { label: "Due today", color: "text-cg-amber-dark" };
+    if (diffDays === 1) return { label: "Due tomorrow", color: "text-cg-amber-dark" };
     return {
         label: `Due ${d.toLocaleDateString("en-US", { month: "short", day: "numeric" })}`,
         color: "text-slate-500",
@@ -355,7 +355,7 @@ export function TasksWidget({ token }: TasksWidgetProps) {
                                         </div>
                                         <button aria-label="Delete"
                                             onClick={() => deleteTask(task.id)}
-                                            className="shrink-0 opacity-0 group-hover:opacity-100 text-slate-300 hover:text-[#E06B6B] transition-all"
+                                            className="shrink-0 opacity-0 group-hover:opacity-100 text-slate-300 hover:text-cg-error-light transition-all"
                                         >
                                             <Trash2 className="h-4 w-4" />
                                         </button>

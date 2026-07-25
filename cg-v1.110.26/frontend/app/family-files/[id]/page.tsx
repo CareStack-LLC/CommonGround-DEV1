@@ -574,8 +574,8 @@ function FamilyFileDetailContent() {
                             onClick={() => setShowRemoveConfirm(true)}
                             className="w-full flex items-center gap-3 p-3 rounded-xl border-2 border-cg-amber-subtle bg-cg-amber-subtle hover:bg-cg-amber-subtle hover:border-cg-amber transition-all text-left"
                           >
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cg-amber/10 to-[#E09520]/5 flex items-center justify-center shadow-md">
-                              <UserMinus className="h-5 w-5 text-[#E09520]" />
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cg-amber/10 to-cg-amber-dark/5 flex items-center justify-center shadow-md">
+                              <UserMinus className="h-5 w-5 text-cg-amber-dark" />
                             </div>
                             <div>
                               <div className="font-bold text-foreground">Remove Co-Parent</div>
@@ -596,7 +596,7 @@ function FamilyFileDetailContent() {
                               <button
                                 onClick={handleRemoveParentB}
                                 disabled={isRemovingParent}
-                                className="px-4 py-2 rounded-lg bg-[#E09520] text-white font-medium hover:bg-[#E09520] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                className="px-4 py-2 rounded-lg bg-cg-amber-dark text-white font-medium hover:bg-cg-amber-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                               >
                                 {isRemovingParent ? 'Removing...' : 'Yes, Remove'}
                               </button>
@@ -620,8 +620,8 @@ function FamilyFileDetailContent() {
                             onClick={() => setShowRemoveProfConfirm(true)}
                             className="w-full flex items-center gap-3 p-3 rounded-xl border-2 border-cg-amber-subtle bg-cg-amber-subtle hover:bg-cg-amber-subtle hover:border-cg-amber transition-all text-left"
                           >
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cg-amber/10 to-[#E09520]/5 flex items-center justify-center shadow-md">
-                              <Briefcase className="h-5 w-5 text-[#E09520]" />
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cg-amber/10 to-cg-amber-dark/5 flex items-center justify-center shadow-md">
+                              <Briefcase className="h-5 w-5 text-cg-amber-dark" />
                             </div>
                             <div>
                               <div className="font-bold text-foreground">Remove Legal Professional</div>
@@ -648,7 +648,7 @@ function FamilyFileDetailContent() {
                                   setShowRemoveProfConfirm(false);
                                 }}
                                 disabled={isRevokingAccess !== null}
-                                className="px-4 py-2 rounded-lg bg-[#E09520] text-white font-medium hover:bg-[#E09520] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                className="px-4 py-2 rounded-lg bg-cg-amber-dark text-white font-medium hover:bg-cg-amber-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                               >
                                 {isRevokingAccess ? 'Removing...' : 'Yes, Remove'}
                               </button>
@@ -694,7 +694,7 @@ function FamilyFileDetailContent() {
                               <button
                                 onClick={handleDelete}
                                 disabled={isDeleting}
-                                className="px-4 py-2 rounded-lg bg-cg-error text-white font-medium hover:bg-[#9B2C2C] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                className="px-4 py-2 rounded-lg bg-cg-error text-white font-medium hover:bg-cg-error-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                               >
                                 {isDeleting ? 'Deleting...' : 'Yes, Delete Everything'}
                               </button>
@@ -776,13 +776,13 @@ function FamilyFileDetailContent() {
                   onClick={() => router.push(`/family-files/${id}/child-support`)}
                   className="flex items-start gap-4 p-4 rounded-xl border-2 border-border bg-card hover:bg-muted hover:border-[var(--portal-primary)]/30 hover:shadow-md transition-all text-left group"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cg-amber/10 to-[#E09520]/5 flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
-                    <Scale className="h-5 w-5 text-[#E09520]" />
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cg-amber/10 to-cg-amber-dark/5 flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
+                    <Scale className="h-5 w-5 text-cg-amber-dark" />
                   </div>
                   <div>
                     <div className="font-bold text-foreground flex items-center gap-1.5">
                       Child Support
-                      <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-cg-amber-subtle text-[#E09520] uppercase tracking-wide">SDU</span>
+                      <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-cg-amber-subtle text-cg-amber-dark uppercase tracking-wide">SDU</span>
                     </div>
                     <div className="text-sm text-muted-foreground font-medium">
                       Log state disbursement payments
@@ -876,7 +876,7 @@ function FamilyFileDetailContent() {
                   className="flex items-start gap-4 p-4 rounded-xl border-2 border-border bg-card hover:bg-muted hover:border-[var(--portal-primary)]/30 hover:shadow-md transition-all text-left group"
                 >
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cg-amber/10 to-cg-amber/5 flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
-                    <Gift className="h-5 w-5 text-[#E09520]" />
+                    <Gift className="h-5 w-5 text-cg-amber-dark" />
                   </div>
                   <div>
                     <div className="font-bold text-foreground">Rewards</div>
@@ -1228,7 +1228,7 @@ function FamilyFileDetailContent() {
                               `/family-files/${familyFile.id}/library?childId=${child.id}`,
                             );
                           }}
-                          className="flex items-center gap-1.5 flex-shrink-0 px-3 py-2 rounded-xl bg-cg-amber/10 text-[#E09520] hover:bg-cg-amber/20 transition-colors text-xs font-semibold"
+                          className="flex items-center gap-1.5 flex-shrink-0 px-3 py-2 rounded-xl bg-cg-amber/10 text-cg-amber-dark hover:bg-cg-amber/20 transition-colors text-xs font-semibold"
                           aria-label={`Read together with ${childDisplayName}`}
                           title={`Read a book together with ${childDisplayName}`}
                         >
@@ -1397,7 +1397,7 @@ function FamilyFileDetailContent() {
                     >
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-cg-amber-subtle flex items-center justify-center">
-                          <Briefcase className="h-4 w-4 text-[#E09520]" />
+                          <Briefcase className="h-4 w-4 text-cg-amber-dark" />
                         </div>
                         <div>
                           <div className="font-medium text-foreground text-sm">

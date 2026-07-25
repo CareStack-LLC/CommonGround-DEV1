@@ -366,8 +366,8 @@ export default function AccountSettingsPage() {
         <Card className="border-2 border-border rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-              <div className="p-2 bg-gradient-to-br from-cg-amber/10 to-[#E09520]/5 rounded-xl shadow-md">
-                <MapPin className="h-5 w-5 text-[#E09520]" />
+              <div className="p-2 bg-gradient-to-br from-cg-amber/10 to-cg-amber-dark/5 rounded-xl shadow-md">
+                <MapPin className="h-5 w-5 text-cg-amber-dark" />
               </div>
               Address
             </CardTitle>
@@ -524,7 +524,7 @@ export default function AccountSettingsPage() {
                 </p>
               )}
               {exportStatus === 'error' && exportError && (
-                <p className="text-xs text-[#E09520] font-semibold mt-1.5">{exportError}</p>
+                <p className="text-xs text-cg-amber-dark font-semibold mt-1.5">{exportError}</p>
               )}
             </div>
             <button aria-label="Download"
@@ -551,7 +551,7 @@ export default function AccountSettingsPage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl border-2 border-cg-amber-subtle bg-cg-amber-subtle/40">
             <div className="flex-1">
               <p className="font-bold text-foreground">Delete my account</p>
-              <p className="text-sm text-[#E09520]/80 font-medium">
+              <p className="text-sm text-cg-amber-dark/80 font-medium">
                 Schedules your account for deletion in 30 days. You can cancel by contacting
                 support before then. This is permanent once the grace period ends.
               </p>
@@ -564,7 +564,7 @@ export default function AccountSettingsPage() {
                 setDeleteConfirmText('');
                 setDeleteError(null);
               }}
-              className="shrink-0 inline-flex items-center gap-2 px-4 py-2.5 bg-white border-2 border-cg-amber text-[#E09520] rounded-xl font-bold hover:bg-cg-amber-subtle hover:border-cg-amber transition-all"
+              className="shrink-0 inline-flex items-center gap-2 px-4 py-2.5 bg-white border-2 border-cg-amber text-cg-amber-dark rounded-xl font-bold hover:bg-cg-amber-subtle hover:border-cg-amber transition-all"
             >
               <Trash2 className="h-4 w-4" />
               Delete account
@@ -587,13 +587,13 @@ export default function AccountSettingsPage() {
           >
             <div className="bg-cg-amber-subtle border-b-2 border-cg-amber-subtle p-5 flex items-start gap-3">
               <div className="p-2 bg-cg-amber-subtle rounded-xl">
-                <AlertTriangle className="h-6 w-6 text-[#E09520]" />
+                <AlertTriangle className="h-6 w-6 text-cg-amber-dark" />
               </div>
               <div>
                 <h3 className="text-lg font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   Delete your CommonGround account?
                 </h3>
-                <p className="text-sm text-[#E09520]/90 mt-1 font-medium">
+                <p className="text-sm text-cg-amber-dark/90 mt-1 font-medium">
                   Your account will be scheduled for deletion on a 30-day timer.
                 </p>
               </div>
@@ -629,7 +629,7 @@ export default function AccountSettingsPage() {
 
                   <label className="block">
                     <span className="text-sm font-semibold text-foreground">
-                      Type <span className="font-mono text-[#E09520]">DELETE</span> to confirm
+                      Type <span className="font-mono text-cg-amber-dark">DELETE</span> to confirm
                     </span>
                     <Input
                       value={deleteConfirmText}
@@ -642,7 +642,7 @@ export default function AccountSettingsPage() {
                   </label>
 
                   {deleteError && (
-                    <p className="text-sm text-[#E09520] font-medium">{deleteError}</p>
+                    <p className="text-sm text-cg-amber-dark font-medium">{deleteError}</p>
                   )}
 
                   <div className="flex justify-end gap-2 pt-2">
@@ -656,7 +656,7 @@ export default function AccountSettingsPage() {
                     <button aria-label="Delete"
                       onClick={handleRequestDeletion}
                       disabled={deleteConfirmText !== 'DELETE' || deleteStatus === 'working'}
-                      className="px-4 py-2.5 bg-[#E09520] hover:bg-[#E09520] text-white rounded-xl font-bold transition disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
+                      className="px-4 py-2.5 bg-cg-amber-dark hover:bg-cg-amber-dark text-white rounded-xl font-bold transition disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
                     >
                       {deleteStatus === 'working' ? (
                         <>

@@ -95,10 +95,10 @@ function QRCameraScanner({
 
   if (cameraError) {
     return (
-      <div className="bg-cg-amber-subtle dark:bg-foreground/20 border border-cg-amber-subtle dark:border-[#E09520] rounded-lg p-4 mb-4">
+      <div className="bg-cg-amber-subtle dark:bg-foreground/20 border border-cg-amber-subtle dark:border-cg-amber-dark rounded-lg p-4 mb-4">
         <div className="flex items-start gap-2">
-          <AlertTriangle className="h-5 w-5 text-[#E09520] mt-0.5 shrink-0" />
-          <p className="text-sm text-[#E09520] dark:text-cg-amber">{cameraError}</p>
+          <AlertTriangle className="h-5 w-5 text-cg-amber-dark mt-0.5 shrink-0" />
+          <p className="text-sm text-cg-amber-dark dark:text-cg-amber">{cameraError}</p>
         </div>
       </div>
     );
@@ -269,8 +269,8 @@ export default function QRConfirmation({
 
           {/* Error */}
           {error && !isLoading && (
-            <div className="bg-cg-error-subtle dark:bg-[#7A2222]/30 border border-[#FCA5A5] dark:border-[#9B2C2C] rounded-lg p-4 mb-6">
-              <p className="text-[#9B2C2C] dark:text-[#FCA5A5]">{error}</p>
+            <div className="bg-cg-error-subtle dark:bg-cg-error-deep/30 border border-[#FCA5A5] dark:border-cg-error-dark rounded-lg p-4 mb-6">
+              <p className="text-cg-error-dark dark:text-[#FCA5A5]">{error}</p>
             </div>
           )}
 
@@ -323,7 +323,7 @@ export default function QRConfirmation({
                   onClick={() => setScanMode('camera')}
                   className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                     scanMode === 'camera'
-                      ? 'bg-cg-slate-subtle dark:bg-foreground/30 text-[#1E4E6B] dark:text-cg-slate-light border border-cg-slate-light dark:border-[#1E4E6B]'
+                      ? 'bg-cg-slate-subtle dark:bg-foreground/30 text-cg-slate-dark dark:text-cg-slate-light border border-cg-slate-light dark:border-cg-slate-dark'
                       : 'bg-secondary text-muted-foreground hover:text-foreground'
                   }`}
                 >
@@ -334,7 +334,7 @@ export default function QRConfirmation({
                   onClick={() => setScanMode('manual')}
                   className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                     scanMode === 'manual'
-                      ? 'bg-cg-slate-subtle dark:bg-foreground/30 text-[#1E4E6B] dark:text-cg-slate-light border border-cg-slate-light dark:border-[#1E4E6B]'
+                      ? 'bg-cg-slate-subtle dark:bg-foreground/30 text-cg-slate-dark dark:text-cg-slate-light border border-cg-slate-light dark:border-cg-slate-dark'
                       : 'bg-secondary text-muted-foreground hover:text-foreground'
                   }`}
                 >
@@ -376,7 +376,7 @@ export default function QRConfirmation({
               <Button
                 onClick={() => handleConfirmQR()}
                 disabled={isConfirming || (!scanToken.trim() && scanMode === 'manual')}
-                className="w-full bg-cg-slate hover:bg-[#1E4E6B]"
+                className="w-full bg-cg-slate hover:bg-cg-slate-dark"
               >
                 {isConfirming ? (
                   <>

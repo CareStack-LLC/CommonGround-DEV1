@@ -98,7 +98,7 @@ export function ArcadeMode({
   // ── Lobby: game picker ──────────────────────────────────────────────
   if (!activeGame) {
     return (
-      <div className="fixed inset-0 z-[100] bg-[#0D1B24]/95 backdrop-blur-sm flex flex-col">
+      <div className="fixed inset-0 z-[100] bg-cg-ink/95 backdrop-blur-sm flex flex-col">
         <div className="flex items-center justify-between px-4 py-3 border-b border-cg-sage/10">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cg-sage to-cg-slate flex items-center justify-center shadow-lg shadow-cg-sage/20">
@@ -108,7 +108,7 @@ export function ArcadeMode({
               <h2 className="text-white font-bold text-lg" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                 Arcade
               </h2>
-              <p className="text-[#CBD8E0]/50 text-xs" style={{ fontFamily: "'Inter', sans-serif" }}>
+              <p className="text-cg-mist/50 text-xs" style={{ fontFamily: "'Inter', sans-serif" }}>
                 Play games during your call
               </p>
             </div>
@@ -137,7 +137,7 @@ export function ArcadeMode({
                     <h3 className="text-white font-bold" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                       {game.title}
                     </h3>
-                    <p className="text-[#CBD8E0]/50 text-sm" style={{ fontFamily: "'Inter', sans-serif" }}>
+                    <p className="text-cg-mist/50 text-sm" style={{ fontFamily: "'Inter', sans-serif" }}>
                       {game.description}
                       {callRef && <span className="text-cg-sage"> · 2-player ready</span>}
                     </p>
@@ -159,7 +159,7 @@ export function ArcadeMode({
                     <h3 className="text-white font-bold" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                       {game.title}
                     </h3>
-                    <p className="text-[#CBD8E0]/50 text-sm" style={{ fontFamily: "'Inter', sans-serif" }}>
+                    <p className="text-cg-mist/50 text-sm" style={{ fontFamily: "'Inter', sans-serif" }}>
                       {game.description}
                     </p>
                   </div>
@@ -179,7 +179,7 @@ export function ArcadeMode({
                 </span>
                 <ArrowRight className="h-5 w-5 text-cg-sage group-hover:translate-x-1 transition-transform" />
               </div>
-              <p className="text-[#CBD8E0]/50 text-sm mt-1" style={{ fontFamily: "'Inter', sans-serif" }}>
+              <p className="text-cg-mist/50 text-sm mt-1" style={{ fontFamily: "'Inter', sans-serif" }}>
                 See all games, scores, and badges
               </p>
             </button>
@@ -192,7 +192,7 @@ export function ArcadeMode({
   // ── Opponent picker for the selected game ────────────────────────────
   if (!opponentKind) {
     return (
-      <div className="fixed inset-0 z-[100] bg-[#0D1B24]/95 backdrop-blur-sm flex flex-col">
+      <div className="fixed inset-0 z-[100] bg-cg-ink/95 backdrop-blur-sm flex flex-col">
         <div className="flex items-center justify-between px-4 py-3 border-b border-cg-sage/10">
           <button
             onClick={resetToLobby}
@@ -223,7 +223,7 @@ export function ArcadeMode({
               </div>
               <div className="flex-1">
                 <h3 className="text-white font-bold">Play the computer</h3>
-                <p className="text-[#CBD8E0]/60 text-sm">Sharp AI — good practice when you're on your own.</p>
+                <p className="text-cg-mist/60 text-sm">Sharp AI — good practice when you're on your own.</p>
               </div>
             </button>
 
@@ -239,7 +239,7 @@ export function ArcadeMode({
                 <h3 className="text-white font-bold">
                   Play {remoteParticipant?.odName || 'your partner'}
                 </h3>
-                <p className="text-[#CBD8E0]/60 text-sm">
+                <p className="text-cg-mist/60 text-sm">
                   {canPlayVsParticipant
                     ? 'Take turns live — moves sync over your call.'
                     : 'Waiting for someone to join the call…'}
@@ -257,7 +257,7 @@ export function ArcadeMode({
 
   // ── Active game ──────────────────────────────────────────────────────
   return (
-    <div className="fixed inset-0 z-[100] bg-[#0D1B24]/95 backdrop-blur-sm flex flex-col">
+    <div className="fixed inset-0 z-[100] bg-cg-ink/95 backdrop-blur-sm flex flex-col">
       <div className="flex items-center justify-between px-4 py-3 border-b border-cg-sage/10">
         <button
           onClick={() => setOpponentKind(null)}

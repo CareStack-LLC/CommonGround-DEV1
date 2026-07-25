@@ -70,13 +70,13 @@ export function InvitationSummaryAlert({
     const statusColor = (health: string) => {
         switch (health) {
             case "excellent":
-                return "bg-cg-sage-subtle text-cg-sage-dark border-[#C5E5DB]";
+                return "bg-cg-sage-subtle text-cg-sage-dark border-cg-sage-tint";
             case "good":
                 return "bg-teal-100 text-teal-700 border-teal-200";
             case "fair":
-                return "bg-cg-amber-subtle text-[#B8791A] border-[#FBE3BF]";
+                return "bg-cg-amber-subtle text-cg-amber-deep border-cg-amber-tint";
             case "concerning":
-                return "bg-cg-amber-subtle text-[#E09520] border-cg-amber-subtle";
+                return "bg-cg-amber-subtle text-cg-amber-dark border-cg-amber-subtle";
             default:
                 return "bg-slate-100 text-slate-700 border-slate-200";
         }
@@ -99,7 +99,7 @@ export function InvitationSummaryAlert({
                 <CardContent className="p-4 flex items-center justify-between gap-4">
                     <div className="flex items-center gap-2">
                         <AlertCircle className="h-5 w-5 text-cg-amber" />
-                        <span className="text-sm font-medium text-[#E09520]">{error || "Preview unavailable"}</span>
+                        <span className="text-sm font-medium text-cg-amber-dark">{error || "Preview unavailable"}</span>
                     </div>
                     <Button variant="ghost" size="sm" onClick={fetchPreview}>
                         Retry
@@ -110,7 +110,7 @@ export function InvitationSummaryAlert({
     }
 
     return (
-        <Card className="border-[#C5E5DB] shadow-lg shadow-cg-sage/5 overflow-hidden transition-all hover:shadow-xl hover:shadow-cg-sage/10">
+        <Card className="border-cg-sage-tint shadow-lg shadow-cg-sage/5 overflow-hidden transition-all hover:shadow-xl hover:shadow-cg-sage/10">
             <div className="h-1.5 bg-gradient-to-r from-cg-sage via-teal-500 to-cg-slate" />
             <CardHeader className="pb-3 border-b border-slate-100">
                 <div className="flex items-start justify-between gap-4">
@@ -250,8 +250,8 @@ export function InvitationSummaryAlert({
 function MetricBox({ label, value, subtext, status }: { label: string; value: string; subtext: string; status: "good" | "warning" | "danger" }) {
     const colors = {
         good: "text-cg-sage-dark",
-        warning: "text-[#E09520]",
-        danger: "text-[#E09520]"
+        warning: "text-cg-amber-dark",
+        danger: "text-cg-amber-dark"
     };
 
     return (

@@ -58,14 +58,14 @@ export function ProgressRing({
         </svg>
         {/* Center text */}
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-lg font-bold text-[#D0E4EC]">
+          <span className="text-lg font-bold text-cg-slate-tint">
             {Math.round(value)}%
           </span>
         </div>
       </div>
       <div className="text-center">
-        <div className="text-xs font-medium text-[#8AACBC]">{label}</div>
-        {sublabel && <div className="text-[10px] text-[#4A6E7F]">{sublabel}</div>}
+        <div className="text-xs font-medium text-cg-slate-muted">{label}</div>
+        {sublabel && <div className="text-[10px] text-cg-slate-strong">{sublabel}</div>}
       </div>
     </div>
   );

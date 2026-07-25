@@ -129,7 +129,7 @@ export default function CompliancePage() {
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return "text-cg-sage-dark";
-    if (score >= 60) return "text-[#E09520]";
+    if (score >= 60) return "text-cg-amber-dark";
     return "text-red-600";
   };
 
@@ -202,7 +202,7 @@ export default function CompliancePage() {
           />
 
           {/* Overall Score Card (keep for additional details) */}
-          <Card className="bg-gradient-to-br from-cg-sage-subtle to-teal-50 border-[#C5E5DB]">
+          <Card className="bg-gradient-to-br from-cg-sage-subtle to-teal-50 border-cg-sage-tint">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -599,7 +599,7 @@ export default function CompliancePage() {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-sm text-muted-foreground">Flagged</span>
-                        <span className="font-medium text-[#E09520]">
+                        <span className="font-medium text-cg-amber-dark">
                           {dashboard.communication_compliance.by_parent.parent_a.flagged}
                         </span>
                       </div>
@@ -636,7 +636,7 @@ export default function CompliancePage() {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-sm text-muted-foreground">Flagged</span>
-                        <span className="font-medium text-[#E09520]">
+                        <span className="font-medium text-cg-amber-dark">
                           {dashboard.communication_compliance.by_parent.parent_b.flagged}
                         </span>
                       </div>
@@ -692,7 +692,7 @@ function MetricCard({
 }) {
   const colorClasses = {
     green: "bg-cg-sage-subtle text-cg-sage-dark",
-    amber: "bg-cg-amber-subtle text-[#E09520]",
+    amber: "bg-cg-amber-subtle text-cg-amber-dark",
     red: "bg-red-100 text-red-600",
     blue: "bg-blue-100 text-blue-600",
     slate: "bg-slate-100 text-slate-600",
@@ -740,7 +740,7 @@ function ParentComplianceCard({
         <div className="space-y-3">
           <div className="flex justify-between items-center">
             <span className="text-sm text-muted-foreground">On-Time Rate</span>
-            <span className={`font-bold ${onTimeRate >= 80 ? "text-cg-sage-dark" : "text-[#E09520]"}`}>
+            <span className={`font-bold ${onTimeRate >= 80 ? "text-cg-sage-dark" : "text-cg-amber-dark"}`}>
               {onTimeRate.toFixed(0)}%
             </span>
           </div>
@@ -750,7 +750,7 @@ function ParentComplianceCard({
               <p className="text-xs text-muted-foreground">On Time</p>
             </div>
             <div className="p-2 bg-cg-amber-subtle rounded">
-              <p className="text-lg font-bold text-[#E09520]">{data.late}</p>
+              <p className="text-lg font-bold text-cg-amber-dark">{data.late}</p>
               <p className="text-xs text-muted-foreground">Late</p>
             </div>
             <div className="p-2 bg-red-50 rounded">
@@ -841,7 +841,7 @@ function ReportGenerationSection({
   };
 
   return (
-    <Card className="border-[#C5E5DB] bg-gradient-to-br from-cg-sage-subtle/30 to-teal-50/30">
+    <Card className="border-cg-sage-tint bg-gradient-to-br from-cg-sage-subtle/30 to-teal-50/30">
       <CardHeader>
         <CardTitle className="text-base flex items-center gap-2">
           <FileText className="h-4 w-4 text-cg-sage-dark" />
@@ -883,7 +883,7 @@ function ReportGenerationSection({
 
           {generatedReportId && (
             <>
-              <Button variant="outline" onClick={trackDownload} className="border-[#C5E5DB]">
+              <Button variant="outline" onClick={trackDownload} className="border-cg-sage-tint">
                 <Download className="h-4 w-4 mr-2" />
                 Download ({downloadCount})
               </Button>

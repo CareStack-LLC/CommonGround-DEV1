@@ -51,7 +51,7 @@ function statusLabel(log: ChildSupportPaymentLog): { text: string; tone: string 
     case 'verified':
       return { text: 'Verified', tone: 'text-cg-sage-dark bg-cg-sage-subtle border-cg-sage-subtle' };
     case 'contested':
-      return { text: 'Contested', tone: 'text-[#9B2C2C] bg-cg-error-subtle border-cg-error-subtle' };
+      return { text: 'Contested', tone: 'text-cg-error-dark bg-cg-error-subtle border-cg-error-subtle' };
     case 'voided':
       return { text: 'Voided', tone: 'text-slate-600 bg-slate-100 border-slate-200' };
     default:
@@ -289,12 +289,12 @@ function ChildSupportTrackingInner() {
                   </p>
                 )}
                 {sdu.requires_county && (
-                  <p className="text-xs text-[#E09520] mt-1">
+                  <p className="text-xs text-cg-amber-dark mt-1">
                     This state routes by county — have your county ready.
                   </p>
                 )}
                 {!sdu.accepts_online && (
-                  <p className="text-xs text-[#E09520] mt-1">
+                  <p className="text-xs text-cg-amber-dark mt-1">
                     Online payments aren&apos;t available for this state — you may
                     need to mail a money order.
                   </p>
@@ -483,7 +483,7 @@ function ChildSupportTrackingInner() {
                           {badge.text}
                         </span>
                         {log.payment_channel === 'informal' && (
-                          <span className="text-[11px] text-[#E09520] bg-cg-amber-subtle border border-cg-amber-subtle px-2 py-0.5 rounded-full">
+                          <span className="text-[11px] text-cg-amber-dark bg-cg-amber-subtle border border-cg-amber-subtle px-2 py-0.5 rounded-full">
                             Informal
                           </span>
                         )}
@@ -502,7 +502,7 @@ function ChildSupportTrackingInner() {
                         <div className="text-sm mt-1">{log.notes}</div>
                       )}
                       {log.status === 'contested' && log.contested_reason && (
-                        <div className="mt-1 text-sm text-[#9B2C2C] bg-cg-error-subtle border border-cg-error-subtle rounded-md px-2 py-1">
+                        <div className="mt-1 text-sm text-cg-error-dark bg-cg-error-subtle border border-cg-error-subtle rounded-md px-2 py-1">
                           Contested: {log.contested_reason}
                         </div>
                       )}
@@ -522,7 +522,7 @@ function ChildSupportTrackingInner() {
                       {canContest && (
                         <button
                           onClick={() => handleContest(log)}
-                          className="text-xs inline-flex items-center gap-1 text-[#9B2C2C] hover:text-[#9B2C2C]"
+                          className="text-xs inline-flex items-center gap-1 text-cg-error-dark hover:text-cg-error-dark"
                         >
                           <Flag className="h-3 w-3" />
                           Contest

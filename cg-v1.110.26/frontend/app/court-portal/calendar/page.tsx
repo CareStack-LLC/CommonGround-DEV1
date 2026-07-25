@@ -43,11 +43,11 @@ interface CourtHearing {
 }
 
 const HEARING_TYPES: Record<string, { label: string; color: string; icon: typeof Gavel }> = {
-  rfo_hearing: { label: "RFO Hearing", color: "bg-cg-slate-subtle text-[#1E4E6B]", icon: Gavel },
-  status_conference: { label: "Status Conference", color: "bg-cg-slate-subtle text-[#1E4E6B]", icon: Users },
-  trial: { label: "Trial", color: "bg-cg-error-subtle text-[#9B2C2C]", icon: Scale },
+  rfo_hearing: { label: "RFO Hearing", color: "bg-cg-slate-subtle text-cg-slate-dark", icon: Gavel },
+  status_conference: { label: "Status Conference", color: "bg-cg-slate-subtle text-cg-slate-dark", icon: Users },
+  trial: { label: "Trial", color: "bg-cg-error-subtle text-cg-error-dark", icon: Scale },
   settlement_conference: { label: "Settlement Conference", color: "bg-cg-sage-subtle text-cg-sage-dark", icon: Users },
-  mediation: { label: "Mediation", color: "bg-cg-amber-subtle text-[#E09520]", icon: Users },
+  mediation: { label: "Mediation", color: "bg-cg-amber-subtle text-cg-amber-dark", icon: Users },
   other: { label: "Other Hearing", color: "bg-gray-100 text-gray-700", icon: CalendarIcon },
 };
 
@@ -198,7 +198,7 @@ export default function CourtCalendarPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-cg-slate font-medium">Today</p>
-                <p className="text-2xl font-bold text-[#1E4E6B]">{todaysHearings.length}</p>
+                <p className="text-2xl font-bold text-cg-slate-dark">{todaysHearings.length}</p>
                 <p className="text-xs text-cg-slate">
                   {todaysHearings.length === 1 ? "hearing" : "hearings"}
                 </p>
@@ -212,8 +212,8 @@ export default function CourtCalendarPage() {
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-[#E09520] font-medium">Next 7 Days</p>
-                <p className="text-2xl font-bold text-[#E09520]">{upcomingHearings.length}</p>
+                <p className="text-sm text-cg-amber-dark font-medium">Next 7 Days</p>
+                <p className="text-2xl font-bold text-cg-amber-dark">{upcomingHearings.length}</p>
                 <p className="text-xs text-cg-amber">upcoming</p>
               </div>
               <Clock className="h-8 w-8 text-cg-amber" />

@@ -51,11 +51,11 @@ interface ProfessionalDocument {
 
 const DOC_TYPE_CONFIG: Record<string, { label: string; icon: any; color: string }> = {
     agreement: { label: "Agreement", icon: FileText, color: "text-cg-slate bg-cg-slate-subtle border-cg-slate-subtle" },
-    quick_accord: { label: "Quick Accord", icon: Scale, color: "text-[#E09520] bg-cg-amber-subtle border-[#FBE3BF]" },
+    quick_accord: { label: "Quick Accord", icon: Scale, color: "text-cg-amber-dark bg-cg-amber-subtle border-cg-amber-tint" },
     report: { label: "Report", icon: Scale, color: "text-teal-600 bg-teal-50 border-teal-200" },
-    recording: { label: "Recording", icon: Video, color: "text-cg-slate bg-[#F0F7FC] border-[#C2DEF0]" },
+    recording: { label: "Recording", icon: Video, color: "text-cg-slate bg-cg-slate-tint border-cg-slate-tint" },
     attachment: { label: "Evidence", icon: FileWarning, color: "text-cg-error bg-cg-error-subtle border-cg-error-subtle" },
-    court_order: { label: "Court Order", icon: Scale, color: "text-cg-slate bg-[#F0F7FC] border-[#C2DEF0]" },
+    court_order: { label: "Court Order", icon: Scale, color: "text-cg-slate bg-cg-slate-tint border-cg-slate-tint" },
 };
 
 export function DocumentList({
@@ -231,7 +231,7 @@ export function DocumentList({
                     <Button
                         onClick={() => document.getElementById('court-order-upload')?.click()}
                         disabled={isUploading}
-                        className="bg-cg-slate hover:bg-[#1E4E6B] text-white whitespace-nowrap"
+                        className="bg-cg-slate hover:bg-cg-slate-dark text-white whitespace-nowrap"
                     >
                         {isUploading ? (
                             <Loader2 className="h-4 w-4 mr-2 animate-spin" />

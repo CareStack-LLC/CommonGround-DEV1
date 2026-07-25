@@ -268,7 +268,7 @@ export default function VideoCall({
 
   if (error) {
     return (
-      <div className="h-full flex items-center justify-center bg-[#0D1B24] rounded-2xl border border-foreground/50">
+      <div className="h-full flex items-center justify-center bg-cg-ink rounded-2xl border border-foreground/50">
         <div className="text-center p-8">
           <div className="w-20 h-20 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
             <VideoOff className="h-10 w-10 text-red-400" />
@@ -276,7 +276,7 @@ export default function VideoCall({
           <p className="text-white font-semibold mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
             Connection Error
           </p>
-          <p className="text-[#CBD8E0]/60 mb-6 text-sm" style={{ fontFamily: "'Inter', sans-serif" }}>
+          <p className="text-cg-mist/60 mb-6 text-sm" style={{ fontFamily: "'Inter', sans-serif" }}>
             {error}
           </p>
           <button
@@ -293,7 +293,7 @@ export default function VideoCall({
 
   if (isJoining) {
     return (
-      <div className="h-full flex items-center justify-center bg-[#0D1B24] rounded-2xl border border-foreground/50">
+      <div className="h-full flex items-center justify-center bg-cg-ink rounded-2xl border border-foreground/50">
         <div className="text-center">
           <div className="relative">
             <div className="absolute inset-0 bg-cg-sage rounded-full blur-xl opacity-20 animate-pulse" />
@@ -302,7 +302,7 @@ export default function VideoCall({
           <p className="text-white font-semibold" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
             Connecting to call...
           </p>
-          <p className="text-[#CBD8E0]/50 text-sm mt-1" style={{ fontFamily: "'Inter', sans-serif" }}>
+          <p className="text-cg-mist/50 text-sm mt-1" style={{ fontFamily: "'Inter', sans-serif" }}>
             Setting up secure connection
           </p>
         </div>
@@ -313,7 +313,7 @@ export default function VideoCall({
   const participantList = Array.from(participants.values());
 
   return (
-    <div className="h-full flex flex-col bg-[#0D1B24] rounded-2xl overflow-hidden border border-foreground/50">
+    <div className="h-full flex flex-col bg-cg-ink rounded-2xl overflow-hidden border border-foreground/50">
       {/* Video Grid */}
       <div className="flex-1 p-3">
         {participantList.length === 0 ? (
@@ -322,7 +322,7 @@ export default function VideoCall({
               <div className="w-16 h-16 rounded-full bg-cg-sage/10 flex items-center justify-center mx-auto mb-4">
                 <Video className="h-8 w-8 text-cg-sage" />
               </div>
-              <p className="text-[#CBD8E0]/60" style={{ fontFamily: "'Inter', sans-serif" }}>
+              <p className="text-cg-mist/60" style={{ fontFamily: "'Inter', sans-serif" }}>
                 Waiting for others to join...
               </p>
             </div>
@@ -422,7 +422,7 @@ function VideoTile({ participant, isLarge = false }: VideoTileProps) {
           className="w-full h-full object-cover"
         />
       ) : (
-        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-foreground to-[#0D1B24]">
+        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-foreground to-cg-ink">
           <div className="w-20 h-20 rounded-full bg-gradient-to-br from-cg-sage to-cg-slate flex items-center justify-center text-white text-2xl font-bold shadow-lg shadow-cg-sage/20" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
             {participant.userName[0]?.toUpperCase() || '?'}
           </div>

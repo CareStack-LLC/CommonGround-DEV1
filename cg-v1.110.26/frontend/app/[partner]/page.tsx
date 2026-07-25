@@ -234,7 +234,7 @@ export default function PartnerLandingPage() {
                                 <Button aria-label="Next"
                                     onClick={handleValidateCode}
                                     disabled={validating || codeValid}
-                                    className="bg-cg-amber hover:bg-[#E09520] text-gray-900 font-semibold"
+                                    className="bg-cg-amber hover:bg-cg-amber-dark text-gray-900 font-semibold"
                                 >
                                     {validating ? (
                                         <Loader2 className="h-4 w-4 animate-spin" />
@@ -246,7 +246,7 @@ export default function PartnerLandingPage() {
                                 </Button>
                             </div>
                             {codeError && (
-                                <p className="text-[#E06B6B] text-sm mt-2">{codeError}</p>
+                                <p className="text-cg-error-light text-sm mt-2">{codeError}</p>
                             )}
                             {codeValid && (
                                 <p className="text-cg-sage-light text-sm mt-2 flex items-center gap-1">

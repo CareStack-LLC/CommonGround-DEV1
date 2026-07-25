@@ -71,14 +71,14 @@ export function EarlyAdopterForm({ source, className = '' }: EarlyAdopterFormPro
   return (
     <div className={`rounded-2xl border-2 border-cg-amber/40 bg-gradient-to-b from-cg-amber/5 to-transparent p-6 sm:p-8 ${className}`}>
       <div className="text-center mb-6">
-        <span className="inline-block px-3 py-1 text-xs font-semibold tracking-wider uppercase bg-cg-amber/15 text-[#E09520] rounded-full mb-3">
+        <span className="inline-block px-3 py-1 text-xs font-semibold tracking-wider uppercase bg-cg-amber/15 text-cg-amber-dark rounded-full mb-3">
           Limited Spots
         </span>
         <h3 className="text-xl sm:text-2xl font-semibold text-foreground font-serif mb-2">
           Be One of the First 50
         </h3>
         <p className="text-muted-foreground text-sm sm:text-base">
-          Early adopters get <span className="font-semibold text-[#E09520]">30% off for life</span> — locked in for 36 months on any paid plan.
+          Early adopters get <span className="font-semibold text-cg-amber-dark">30% off for life</span> — locked in for 36 months on any paid plan.
         </p>
       </div>
 

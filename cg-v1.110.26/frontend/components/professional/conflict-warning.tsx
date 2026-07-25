@@ -47,10 +47,10 @@ const formatOverlap = (minutes: number): string => {
 export function ConflictWarning({ conflicts, isLoading }: ConflictWarningProps) {
   if (isLoading) {
     return (
-      <Alert className="border-[#FBE3BF] bg-cg-amber-subtle">
-        <Loader2 className="h-4 w-4 animate-spin text-[#E09520]" />
+      <Alert className="border-cg-amber-tint bg-cg-amber-subtle">
+        <Loader2 className="h-4 w-4 animate-spin text-cg-amber-dark" />
         <AlertTitle className="text-[#8F5E14]">Checking for conflicts...</AlertTitle>
-        <AlertDescription className="text-[#B8791A]">
+        <AlertDescription className="text-cg-amber-deep">
           Verifying your schedule for overlapping events.
         </AlertDescription>
       </Alert>
@@ -63,11 +63,11 @@ export function ConflictWarning({ conflicts, isLoading }: ConflictWarningProps) 
 
   return (
     <Alert variant="destructive" className="border-[#F8CE8A] bg-cg-amber-subtle">
-      <AlertTriangle className="h-4 w-4 text-[#E09520]" />
+      <AlertTriangle className="h-4 w-4 text-cg-amber-dark" />
       <AlertTitle className="text-[#8F5E14]">
         Schedule Conflict{conflicts.length > 1 ? "s" : ""} Detected
       </AlertTitle>
-      <AlertDescription className="text-[#B8791A]">
+      <AlertDescription className="text-cg-amber-deep">
         <p className="mb-3">
           This event overlaps with {conflicts.length} existing event
           {conflicts.length > 1 ? "s" : ""}. You can still create it, but consider
@@ -77,16 +77,16 @@ export function ConflictWarning({ conflicts, isLoading }: ConflictWarningProps) 
           {conflicts.map((conflict) => (
             <div
               key={conflict.event_id}
-              className="flex items-start gap-3 p-2 bg-white/60 rounded border border-[#FBE3BF]"
+              className="flex items-start gap-3 p-2 bg-white/60 rounded border border-cg-amber-tint"
             >
-              <Clock className="h-4 w-4 mt-0.5 text-[#E09520] shrink-0" />
+              <Clock className="h-4 w-4 mt-0.5 text-cg-amber-dark shrink-0" />
               <div className="flex-1 min-w-0">
-                <div className="font-medium text-[#6B460F] truncate">{conflict.title}</div>
-                <div className="text-sm text-[#B8791A]">
+                <div className="font-medium text-cg-amber-deep truncate">{conflict.title}</div>
+                <div className="text-sm text-cg-amber-deep">
                   {formatDate(conflict.start_time)} at {formatTime(conflict.start_time)} -{" "}
                   {formatTime(conflict.end_time)}
                 </div>
-                <div className="text-xs text-[#E09520] mt-1">
+                <div className="text-xs text-cg-amber-dark mt-1">
                   Overlaps by {formatOverlap(conflict.overlap_minutes)}
                 </div>
               </div>

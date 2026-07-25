@@ -369,7 +369,7 @@ function BuilderV2Content() {
               <Button
                 variant="outline"
                 onClick={() => router.push(`/agreements/${agreementId}/aria`)}
-                className="border-2 border-cg-amber-subtle hover:border-cg-amber hover:shadow-lg transition-all duration-300 font-bold text-[#E09520] bg-cg-amber-subtle"
+                className="border-2 border-cg-amber-subtle hover:border-cg-amber hover:shadow-lg transition-all duration-300 font-bold text-cg-amber-dark bg-cg-amber-subtle"
               >
                 <MessageCircle className="w-4 h-4 mr-1.5" />
                 Switch to ARIA
@@ -442,7 +442,7 @@ function BuilderV2Content() {
           <Card className="mb-6 border-2 border-cg-amber-subtle rounded-2xl shadow-lg bg-gradient-to-br from-cg-amber-subtle to-white">
             <CardHeader>
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-cg-amber to-[#E09520] rounded-2xl flex items-center justify-center shadow-md">
+                <div className="w-12 h-12 bg-gradient-to-br from-cg-amber to-cg-amber-dark rounded-2xl flex items-center justify-center shadow-md">
                   <Lightbulb className="h-5 w-5 text-white" />
                 </div>
                 <div>
@@ -640,13 +640,13 @@ function SectionForm({
       {/* Validation indicator */}
       {missingFields.length > 0 && (
         <div className="mt-6 p-3 rounded-xl bg-cg-amber-subtle border-2 border-cg-amber-subtle">
-          <p className="text-sm font-semibold text-[#E09520] flex items-center gap-2">
+          <p className="text-sm font-semibold text-cg-amber-dark flex items-center gap-2">
             <AlertCircle className="h-4 w-4" />
             Required fields remaining:
           </p>
           <div className="flex flex-wrap gap-2 mt-2">
             {missingFields.map(field => (
-              <span key={field} className="px-2.5 py-1 bg-cg-amber-subtle text-[#E09520] text-xs font-bold rounded-full">
+              <span key={field} className="px-2.5 py-1 bg-cg-amber-subtle text-cg-amber-dark text-xs font-bold rounded-full">
                 {REQUIRED_FIELD_LABELS[field] || field.replace(/_/g, ' ')}
               </span>
             ))}
@@ -968,7 +968,7 @@ function ParentingTimeForm({ data, onChange }: { data: any; onChange: (field: st
               const holidays = [...(data.holiday_schedule || []), { holiday_name: '', arrangement: 'alternate_yearly', start_time: '', end_time: '', notes: '' }];
               onChange('holiday_schedule', holidays);
             }}
-            className="border-2 border-cg-amber-subtle hover:border-cg-amber text-[#E09520] bg-cg-amber-subtle"
+            className="border-2 border-cg-amber-subtle hover:border-cg-amber text-cg-amber-dark bg-cg-amber-subtle"
           >
             <Plus className="w-4 h-4 mr-1" /> Add Holiday
           </Button>
@@ -984,7 +984,7 @@ function ParentingTimeForm({ data, onChange }: { data: any; onChange: (field: st
                   holidays.splice(idx, 1);
                   onChange('holiday_schedule', holidays);
                 }}
-                className="text-[#E06B6B] hover:text-cg-error transition-colors"
+                className="text-cg-error-light hover:text-cg-error transition-colors"
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -1073,7 +1073,7 @@ function ParentingTimeForm({ data, onChange }: { data: any; onChange: (field: st
               const activities = [...(data.recurring_activities || []), { activity_name: '', day_of_week: '', time: '', end_time: '', location: '', responsible_parent: 'during_own_time', cost_per_session: '', cost_frequency: '' }];
               onChange('recurring_activities', activities);
             }}
-            className="border-2 border-cg-amber-subtle hover:border-cg-amber text-[#E09520] bg-cg-amber-subtle"
+            className="border-2 border-cg-amber-subtle hover:border-cg-amber text-cg-amber-dark bg-cg-amber-subtle"
           >
             <Plus className="w-4 h-4 mr-1" /> Add Activity
           </Button>
@@ -1089,7 +1089,7 @@ function ParentingTimeForm({ data, onChange }: { data: any; onChange: (field: st
                   activities.splice(idx, 1);
                   onChange('recurring_activities', activities);
                 }}
-                className="text-[#E06B6B] hover:text-cg-error transition-colors"
+                className="text-cg-error-light hover:text-cg-error transition-colors"
               >
                 <Trash2 className="w-4 h-4" />
               </button>

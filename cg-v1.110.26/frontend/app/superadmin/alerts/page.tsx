@@ -205,7 +205,7 @@ function RulesTab() {
       </div>
 
       {/* Rules table */}
-      <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden">
+      <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-cg-slate/20">
@@ -230,7 +230,7 @@ function RulesTab() {
                 <tr key={r.id} className={r.current_state === 'firing' ? 'bg-red-500/5' : ''}>
                   <td className="px-4 py-3">
                     {!r.enabled ? (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-zinc-700/40 text-[#8AACBC]">
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-zinc-700/40 text-cg-slate-muted">
                         Disabled
                       </span>
                     ) : r.current_state === 'firing' ? (
@@ -251,10 +251,10 @@ function RulesTab() {
                       <div className="text-[11px] text-muted-foreground mt-0.5 max-w-xs truncate">{r.description}</div>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-[#D0E4EC] text-xs font-mono">
+                  <td className="px-4 py-3 text-cg-slate-tint text-xs font-mono">
                     {r.metric_path} <span className="text-muted-foreground">{COMPARISON_LABELS[r.comparison] || r.comparison}</span> {formatValue(r.threshold_value, metric?.units || 'count')}
                   </td>
-                  <td className="px-4 py-3 text-[#D0E4EC] text-xs">
+                  <td className="px-4 py-3 text-cg-slate-tint text-xs">
                     {r.last_value != null ? formatValue(r.last_value, metric?.units || 'count') : '—'}
                   </td>
                   <td className="px-4 py-3 hidden md:table-cell text-muted-foreground text-xs">{formatTime(r.last_evaluated_at)}</td>
@@ -264,14 +264,14 @@ function RulesTab() {
                         onClick={() => handleForceEvaluate(r.id)}
                         disabled={forcingId === r.id}
                         title="Force evaluation now"
-                        className="p-1.5 rounded text-[#8AACBC] hover:bg-cg-slate/30 hover:text-white transition-colors disabled:opacity-50"
+                        className="p-1.5 rounded text-cg-slate-muted hover:bg-cg-slate/30 hover:text-white transition-colors disabled:opacity-50"
                       >
                         {forcingId === r.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5" />}
                       </button>
                       <button aria-label="Edit"
                         onClick={() => setEditing(r)}
                         title="Edit"
-                        className="p-1.5 rounded text-[#8AACBC] hover:bg-cg-slate/30 hover:text-white transition-colors"
+                        className="p-1.5 rounded text-cg-slate-muted hover:bg-cg-slate/30 hover:text-white transition-colors"
                       >
                         <Edit3 className="w-3.5 h-3.5" />
                       </button>
@@ -365,49 +365,49 @@ function RuleModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" onClick={onClose}>
       <div
-        className="bg-[#0F2533] border border-cg-slate/30 rounded-xl p-6 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto"
+        className="bg-cg-ink border border-cg-slate/30 rounded-xl p-6 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between mb-4">
           <h3 className="text-base font-semibold text-white">
             {rule ? 'Edit Alert Rule' : 'New Alert Rule'}
           </h3>
-          <button aria-label="Close" onClick={onClose} className="p-1 text-[#8AACBC] hover:text-white transition-colors">
+          <button aria-label="Close" onClick={onClose} className="p-1 text-cg-slate-muted hover:text-white transition-colors">
             <X className="w-4 h-4" />
           </button>
         </div>
 
         <div className="space-y-4">
           <div>
-            <label className="block text-xs font-medium text-[#8AACBC] mb-1">Name</label>
+            <label className="block text-xs font-medium text-cg-slate-muted mb-1">Name</label>
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Error rate spike"
-              className="w-full bg-[#1A3648]/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-cg-sage"
+              className="w-full bg-cg-slate-deep/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-cg-sage"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-[#8AACBC] mb-1">Description (optional)</label>
+            <label className="block text-xs font-medium text-cg-slate-muted mb-1">Description (optional)</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={2}
               placeholder="Why does this rule exist? What should happen when it fires?"
-              className="w-full bg-[#1A3648]/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-cg-sage resize-none"
+              className="w-full bg-cg-slate-deep/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-cg-sage resize-none"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-[#8AACBC] mb-1">
+            <label className="block text-xs font-medium text-cg-slate-muted mb-1">
               Metric
               <InfoTooltip text="Dot-path identifying which live platform metric this rule watches." />
             </label>
             <select
               value={metricPath}
               onChange={(e) => setMetricPath(e.target.value)}
-              className="w-full bg-[#1A3648]/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-cg-sage"
+              className="w-full bg-cg-slate-deep/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-cg-sage"
             >
               {metrics.map((m) => (
                 <option key={m.path} value={m.path}>
@@ -422,11 +422,11 @@ function RuleModal({
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-medium text-[#8AACBC] mb-1">Comparison</label>
+              <label className="block text-xs font-medium text-cg-slate-muted mb-1">Comparison</label>
               <select
                 value={comparison}
                 onChange={(e) => setComparison(e.target.value)}
-                className="w-full bg-[#1A3648]/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-cg-sage"
+                className="w-full bg-cg-slate-deep/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-cg-sage"
               >
                 {comparisons.map((c) => (
                   <option key={c} value={c}>{c} ({COMPARISON_LABELS[c] || c})</option>
@@ -434,24 +434,24 @@ function RuleModal({
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-[#8AACBC] mb-1">Threshold</label>
+              <label className="block text-xs font-medium text-cg-slate-muted mb-1">Threshold</label>
               <input
                 type="number"
                 step="any"
                 value={thresholdValue}
                 onChange={(e) => setThresholdValue(Number(e.target.value))}
-                className="w-full bg-[#1A3648]/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-cg-sage"
+                className="w-full bg-cg-slate-deep/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-cg-sage"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-[#8AACBC] mb-1">Notify emails (comma-separated)</label>
+            <label className="block text-xs font-medium text-cg-slate-muted mb-1">Notify emails (comma-separated)</label>
             <input
               value={emailsText}
               onChange={(e) => setEmailsText(e.target.value)}
               placeholder="oncall@commonground.family, tj@..."
-              className="w-full bg-[#1A3648]/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-cg-sage"
+              className="w-full bg-cg-slate-deep/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white placeholder:text-cg-slate-strong focus:outline-none focus:border-cg-sage"
             />
           </div>
 
@@ -463,7 +463,7 @@ function RuleModal({
                 onChange={(e) => setNotifyPush(e.target.checked)}
                 className="rounded border-cg-slate/40 bg-zinc-900/80 text-cg-sage focus:ring-cg-sage/30"
               />
-              <span className="text-sm text-[#D0E4EC]">Push admin devices</span>
+              <span className="text-sm text-cg-slate-tint">Push admin devices</span>
             </label>
             <label className="inline-flex items-center gap-2 cursor-pointer">
               <input
@@ -472,7 +472,7 @@ function RuleModal({
                 onChange={(e) => setEnabled(e.target.checked)}
                 className="rounded border-cg-slate/40 bg-zinc-900/80 text-cg-sage focus:ring-cg-sage/30"
               />
-              <span className="text-sm text-[#D0E4EC]">Enabled</span>
+              <span className="text-sm text-cg-slate-tint">Enabled</span>
             </label>
           </div>
 
@@ -487,7 +487,7 @@ function RuleModal({
           <button
             onClick={onClose}
             disabled={saving}
-            className="px-4 py-2 rounded text-sm font-medium text-[#8AACBC] hover:text-white transition-colors disabled:opacity-50"
+            className="px-4 py-2 rounded text-sm font-medium text-cg-slate-muted hover:text-white transition-colors disabled:opacity-50"
           >
             Cancel
           </button>
@@ -544,7 +544,7 @@ function HistoryTab() {
             onChange={(e) => { setOpenOnly(e.target.checked); setPage(1); }}
             className="rounded border-cg-slate/40 bg-zinc-900/80 text-cg-sage focus:ring-cg-sage/30"
           />
-          <span className="text-sm text-[#D0E4EC]">Only unresolved</span>
+          <span className="text-sm text-cg-slate-tint">Only unresolved</span>
         </label>
         <button
           onClick={fetchData}
@@ -558,7 +558,7 @@ function HistoryTab() {
       {error && <ErrorState message={error} onRetry={fetchData} />}
 
       {!error && (
-        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden">
+        <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl overflow-hidden">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-cg-slate/20">
@@ -592,11 +592,11 @@ function HistoryTab() {
                       <div className="text-white font-medium">{h.rule_name}</div>
                       <div className="text-[11px] text-muted-foreground font-mono">{h.metric_path}</div>
                     </td>
-                    <td className="px-4 py-3 text-[#8AACBC] text-xs">{formatTime(h.fired_at)}</td>
+                    <td className="px-4 py-3 text-cg-slate-muted text-xs">{formatTime(h.fired_at)}</td>
                     <td className="px-4 py-3 text-red-300 text-xs font-medium">
                       {h.fired_value.toLocaleString()} {COMPARISON_LABELS[h.comparison] || h.comparison} {h.threshold_value.toLocaleString()}
                     </td>
-                    <td className="px-4 py-3 text-[#8AACBC] text-xs">
+                    <td className="px-4 py-3 text-cg-slate-muted text-xs">
                       {open ? (
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-red-500/15 text-red-300 border border-red-500/30">
                           Still firing
@@ -605,7 +605,7 @@ function HistoryTab() {
                         formatTime(h.resolved_at)
                       )}
                     </td>
-                    <td className="px-4 py-3 text-[#D0E4EC] text-xs">
+                    <td className="px-4 py-3 text-cg-slate-tint text-xs">
                       {h.duration_seconds != null
                         ? h.duration_seconds < 60
                           ? `${h.duration_seconds}s`
@@ -627,15 +627,15 @@ function HistoryTab() {
                 <button aria-label="Previous"
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="p-1.5 rounded text-[#8AACBC] hover:text-white disabled:opacity-30"
+                  className="p-1.5 rounded text-cg-slate-muted hover:text-white disabled:opacity-30"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
-                <span className="text-xs text-[#D0E4EC] px-2">{page} / {totalPages}</span>
+                <span className="text-xs text-cg-slate-tint px-2">{page} / {totalPages}</span>
                 <button aria-label="Next"
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page >= totalPages}
-                  className="p-1.5 rounded text-[#8AACBC] hover:text-white disabled:opacity-30"
+                  className="p-1.5 rounded text-cg-slate-muted hover:text-white disabled:opacity-30"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>

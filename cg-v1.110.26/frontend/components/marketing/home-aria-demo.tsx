@@ -91,8 +91,8 @@ const CATEGORY_LABELS: Record<string, string> = {
 const CATEGORY_COLORS: Record<string, string> = {
   hostility: 'var(--cg-error)', blame: 'var(--cg-amber)', passive_aggressive: 'var(--cg-amber)',
   manipulation: 'var(--cg-slate-light)', dismissive: '#6b7280', threatening: 'var(--cg-error)',
-  profanity: 'var(--cg-error)', custody_weaponization: '#9B2C2C', financial_coercion: '#E09520',
-  hate_speech: '#7A2222', sexual_harassment: '#9B2C2C', insult: '#E09520',
+  profanity: 'var(--cg-error)', custody_weaponization: 'var(--cg-error-dark)', financial_coercion: 'var(--cg-amber-dark)',
+  hate_speech: 'var(--cg-error-deep)', sexual_harassment: 'var(--cg-error-dark)', insult: 'var(--cg-amber-dark)',
   sarcasm: '#a3a3a3', all_caps: 'var(--cg-amber)',
 };
 
@@ -372,7 +372,7 @@ export function HomeARIADemo() {
                   {/* Before/After compact */}
                   <div className="space-y-1.5 mb-3">
                     <div className="bg-cg-error/15 rounded-lg px-3 py-2 border border-cg-error/20">
-                      <p className="text-[10px] text-[#E06B6B] font-medium mb-0.5">Your message</p>
+                      <p className="text-[10px] text-cg-error-light font-medium mb-0.5">Your message</p>
                       <p className="text-xs text-[#FCA5A5] line-clamp-2">{pendingIntervention.originalText}</p>
                     </div>
                     <div className="bg-white/10 rounded-lg px-3 py-2 border border-cg-sage/20">
@@ -440,7 +440,7 @@ export function HomeARIADemo() {
                     <Shield className="w-2.5 h-2.5" /> ARIA is rewriting all messages to be civil and child-focused
                   </p>
                   <p className="text-[10px] text-white/20 italic">
-                    The <span className="text-[#E06B6B]/60 line-through">crossed-out text</span> is shown here so you can see what ARIA blocked — in the real app, only the rewritten message is sent.
+                    The <span className="text-cg-error-light/60 line-through">crossed-out text</span> is shown here so you can see what ARIA blocked — in the real app, only the rewritten message is sent.
                   </p>
                 </div>
               )}

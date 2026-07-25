@@ -125,9 +125,9 @@ export default function ExchangeCompliancePage() {
 
   const statusConfig = {
     excellent: { label: "Excellent", color: "bg-cg-sage-subtle text-foreground border-cg-sage-subtle", icon: "text-cg-sage-dark" },
-    good: { label: "Good", color: "bg-cg-slate-subtle text-[#1E4E6B] border-cg-slate-subtle", icon: "text-cg-slate" },
-    needs_improvement: { label: "Needs Improvement", color: "bg-cg-amber-subtle text-[#E09520] border-cg-amber-subtle", icon: "text-[#E09520]" },
-    concerning: { label: "Concerning", color: "bg-cg-error-subtle text-[#9B2C2C] border-cg-error-subtle", icon: "text-cg-error" },
+    good: { label: "Good", color: "bg-cg-slate-subtle text-cg-slate-dark border-cg-slate-subtle", icon: "text-cg-slate" },
+    needs_improvement: { label: "Needs Improvement", color: "bg-cg-amber-subtle text-cg-amber-dark border-cg-amber-subtle", icon: "text-cg-amber-dark" },
+    concerning: { label: "Concerning", color: "bg-cg-error-subtle text-cg-error-dark border-cg-error-subtle", icon: "text-cg-error" },
     no_data: { label: "No Data", color: "bg-gray-100 text-gray-800 border-gray-200", icon: "text-gray-600" },
   };
 
@@ -341,7 +341,7 @@ export default function ExchangeCompliancePage() {
         <MapPin className="h-4 w-4 text-cg-slate" />
         <AlertDescription className="text-foreground">
           <span className="font-medium">Privacy Notice:</span>{" "}
-          <span className="text-[#1E4E6B]">
+          <span className="text-cg-slate-dark">
             GPS coordinates are captured only at the moment of check-in. No continuous tracking is performed.
             This data is provided as objective evidence for court proceedings.
           </span>
@@ -378,7 +378,7 @@ function MetricCard({
     purple: "text-cg-slate",
     green: "text-cg-sage-dark",
     blue: "text-cg-slate",
-    amber: "text-[#E09520]",
+    amber: "text-cg-amber-dark",
     red: "text-cg-error",
   };
 
@@ -407,8 +407,8 @@ function OutcomeCard({
   const colorClasses = {
     green: "bg-cg-sage-subtle border-cg-sage-subtle text-cg-sage-dark",
     red: "bg-cg-error-subtle border-cg-error-subtle text-cg-error",
-    amber: "bg-cg-amber-subtle border-cg-amber-subtle text-[#E09520]",
-    orange: "bg-cg-amber-subtle border-cg-amber-subtle text-[#E09520]",
+    amber: "bg-cg-amber-subtle border-cg-amber-subtle text-cg-amber-dark",
+    orange: "bg-cg-amber-subtle border-cg-amber-subtle text-cg-amber-dark",
   };
 
   return (
@@ -460,7 +460,7 @@ function ParentMetricsCard({
           <div className="text-center p-3 bg-secondary/50 rounded-lg">
             <div className={`text-xl font-bold ${
               metrics.geofence_hit_rate >= 90 ? "text-cg-sage-dark" :
-              metrics.geofence_hit_rate >= 70 ? "text-cg-slate" : "text-[#E09520]"
+              metrics.geofence_hit_rate >= 70 ? "text-cg-slate" : "text-cg-amber-dark"
             }`}>
               {metrics.geofence_hit_rate.toFixed(0)}%
             </div>
@@ -469,7 +469,7 @@ function ParentMetricsCard({
           <div className="text-center p-3 bg-secondary/50 rounded-lg">
             <div className={`text-xl font-bold ${
               metrics.on_time_rate >= 90 ? "text-cg-sage-dark" :
-              metrics.on_time_rate >= 70 ? "text-cg-slate" : "text-[#E09520]"
+              metrics.on_time_rate >= 70 ? "text-cg-slate" : "text-cg-amber-dark"
             }`}>
               {metrics.on_time_rate.toFixed(0)}%
             </div>
@@ -560,14 +560,14 @@ function ParentCheckInBadge({
 
   if (inGeofence === false) {
     return (
-      <Badge className="bg-cg-amber-subtle text-[#E09520] border-cg-amber-subtle text-xs">
+      <Badge className="bg-cg-amber-subtle text-cg-amber-dark border-cg-amber-subtle text-xs">
         {label}: Outside geofence
       </Badge>
     );
   }
 
   return (
-    <Badge className="bg-cg-slate-subtle text-[#1E4E6B] border-cg-slate-subtle text-xs">
+    <Badge className="bg-cg-slate-subtle text-cg-slate-dark border-cg-slate-subtle text-xs">
       {label}: Checked in
     </Badge>
   );
@@ -576,10 +576,10 @@ function ParentCheckInBadge({
 function StatusBadge({ status }: { status: string }) {
   const config: Record<string, { color: string; label: string }> = {
     completed: { color: "bg-cg-sage-subtle text-foreground", label: "Completed" },
-    missed: { color: "bg-cg-error-subtle text-[#9B2C2C]", label: "Missed" },
-    one_party_present: { color: "bg-cg-amber-subtle text-[#E09520]", label: "One Party" },
-    disputed: { color: "bg-cg-amber-subtle text-[#E09520]", label: "Disputed" },
-    scheduled: { color: "bg-cg-slate-subtle text-[#1E4E6B]", label: "Scheduled" },
+    missed: { color: "bg-cg-error-subtle text-cg-error-dark", label: "Missed" },
+    one_party_present: { color: "bg-cg-amber-subtle text-cg-amber-dark", label: "One Party" },
+    disputed: { color: "bg-cg-amber-subtle text-cg-amber-dark", label: "Disputed" },
+    scheduled: { color: "bg-cg-slate-subtle text-cg-slate-dark", label: "Scheduled" },
     cancelled: { color: "bg-gray-100 text-gray-800", label: "Cancelled" },
   };
 
@@ -684,7 +684,7 @@ function ParentGPSInfo({
           {data.gps && (
             <>
               {data.gps.in_geofence !== null && (
-                <div className={`flex items-center gap-1 ${data.gps.in_geofence ? "text-cg-sage-dark" : "text-[#E09520]"}`}>
+                <div className={`flex items-center gap-1 ${data.gps.in_geofence ? "text-cg-sage-dark" : "text-cg-amber-dark"}`}>
                   <Target className="h-3 w-3" />
                   {data.gps.in_geofence ? "Within geofence" : "Outside geofence"}
                 </div>

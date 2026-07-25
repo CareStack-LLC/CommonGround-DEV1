@@ -58,12 +58,12 @@ const EVENT_CONFIG: Record<string, { icon: React.ReactNode; color: string; label
     },
     role_changed: {
         icon: <Shield className="h-4 w-4" />,
-        color: "text-[#E09520] bg-cg-amber-subtle",
+        color: "text-cg-amber-dark bg-cg-amber-subtle",
         label: "Role Changed",
     },
     case_assigned: {
         icon: <FileText className="h-4 w-4" />,
-        color: "text-cg-slate bg-[#F0F7FC]",
+        color: "text-cg-slate bg-cg-slate-tint",
         label: "Case Assigned",
     },
     case_unassigned: {
@@ -73,7 +73,7 @@ const EVENT_CONFIG: Record<string, { icon: React.ReactNode; color: string; label
     },
     settings_updated: {
         icon: <Settings className="h-4 w-4" />,
-        color: "text-cg-slate bg-[#F0F7FC]",
+        color: "text-cg-slate bg-cg-slate-tint",
         label: "Settings Updated",
     },
     template_created: {

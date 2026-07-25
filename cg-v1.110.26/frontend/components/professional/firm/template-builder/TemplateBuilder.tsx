@@ -66,7 +66,7 @@ const blankQuestion = (): Question => ({
 function ValidationErrors({ errors }: { errors: string[] }) {
     if (!errors.length) return null;
     return (
-        <div className="flex items-start gap-3 p-4 bg-cg-error-subtle border border-cg-error-subtle rounded-xl text-sm text-[#9B2C2C]">
+        <div className="flex items-start gap-3 p-4 bg-cg-error-subtle border border-cg-error-subtle rounded-xl text-sm text-cg-error-dark">
             <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0 text-cg-error" />
             <ul className="space-y-1 list-disc list-inside">
                 {errors.map((e, i) => <li key={i}>{e}</li>)}
@@ -94,7 +94,7 @@ function LivePreview({ template }: { template: TemplateData }) {
                     <p className="text-xs font-semibold text-slate-700 truncate">ARIA — {template.name || "Untitled Template"}</p>
                     <p className="text-xs text-slate-400">{template.estimated_minutes} min estimated</p>
                 </div>
-                <Badge variant="outline" className="text-xs text-cg-slate border-[#C2DEF0] bg-[#F0F7FC]">Preview</Badge>
+                <Badge variant="outline" className="text-xs text-cg-slate border-cg-slate-tint bg-cg-slate-tint">Preview</Badge>
             </div>
 
             {/* Section picker */}
@@ -142,7 +142,7 @@ function LivePreview({ template }: { template: TemplateData }) {
                             <div className="bg-white rounded-xl rounded-tl-sm px-3 py-2 shadow-sm border border-slate-100 max-w-[85%]">
                                 <p className="text-xs text-slate-700">
                                     {q.text || `Question ${qi + 1}`}
-                                    {q.required && <span className="text-[#E06B6B] ml-1">*</span>}
+                                    {q.required && <span className="text-cg-error-light ml-1">*</span>}
                                 </p>
                             </div>
                         </div>
@@ -155,9 +155,9 @@ function LivePreview({ template }: { template: TemplateData }) {
                                         <span className="text-xs px-2 py-0.5 bg-white/20 rounded-full">No</span>
                                     </div>
                                 ) : q.type === "select" && q.options?.length ? (
-                                    <p className="text-xs text-[#C2DEF0] italic">{q.options[0]}</p>
+                                    <p className="text-xs text-cg-slate-tint italic">{q.options[0]}</p>
                                 ) : (
-                                    <p className="text-xs text-[#C2DEF0] italic">{q.placeholder || "Client's response..."}</p>
+                                    <p className="text-xs text-cg-slate-tint italic">{q.placeholder || "Client's response..."}</p>
                                 )}
                             </div>
                         </div>
@@ -373,7 +373,7 @@ function SectionEditor({
             onDragStart={() => onDragStart(section.id)}
             onDragOver={(e) => { e.preventDefault(); onDragOver(e); }}
             onDrop={() => onDrop(section.id)}
-            className={`border rounded-xl transition-all ${isDragging ? "opacity-40 border-cg-slate-light shadow-inner bg-[#F0F7FC]/20" : "border-slate-200 bg-white hover:shadow-sm"
+            className={`border rounded-xl transition-all ${isDragging ? "opacity-40 border-cg-slate-light shadow-inner bg-cg-slate-tint/20" : "border-slate-200 bg-white hover:shadow-sm"
                 }`}
         >
             {/* Section header */}
@@ -441,7 +441,7 @@ function SectionEditor({
                     {/* Add question */}
                     <button
                         onClick={addQuestion}
-                        className="w-full flex items-center justify-center gap-2 py-2.5 text-xs text-slate-400 hover:text-cg-slate border border-dashed border-slate-200 hover:border-[#9BCADF] rounded-lg transition-all hover:bg-[#F0F7FC]/30"
+                        className="w-full flex items-center justify-center gap-2 py-2.5 text-xs text-slate-400 hover:text-cg-slate border border-dashed border-slate-200 hover:border-[#9BCADF] rounded-lg transition-all hover:bg-cg-slate-tint/30"
                     >
                         <Plus className="h-3.5 w-3.5" />
                         Add Question
@@ -593,7 +593,7 @@ export function TemplateBuilder({
                         size="sm"
                         onClick={handlePublish}
                         disabled={isSaving}
-                        className="gap-1.5 text-xs bg-cg-slate hover:bg-[#1E4E6B] text-white"
+                        className="gap-1.5 text-xs bg-cg-slate hover:bg-cg-slate-dark text-white"
                     >
                         <Rocket className="h-3.5 w-3.5" />
                         Publish
@@ -642,7 +642,7 @@ export function TemplateBuilder({
                     {/* Add section */}
                     <button
                         onClick={addSection}
-                        className="w-full flex items-center justify-center gap-2 py-4 text-sm text-slate-400 hover:text-cg-slate border-2 border-dashed border-slate-200 hover:border-[#9BCADF] rounded-xl transition-all hover:bg-[#F0F7FC]/20"
+                        className="w-full flex items-center justify-center gap-2 py-4 text-sm text-slate-400 hover:text-cg-slate border-2 border-dashed border-slate-200 hover:border-[#9BCADF] rounded-xl transition-all hover:bg-cg-slate-tint/20"
                     >
                         <Plus className="h-4 w-4" />
                         Add Section

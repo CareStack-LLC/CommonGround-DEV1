@@ -122,8 +122,8 @@ function ReaderContent() {
             togetherStatus === 'connected'
               ? 'bg-gradient-to-r from-cg-amber to-cg-amber text-white border-transparent'
               : togetherStatus === 'error'
-                ? 'bg-cg-error-subtle text-[#9B2C2C] border-cg-error-subtle'
-                : 'bg-cg-amber-subtle text-[#E09520] border-cg-amber-subtle',
+                ? 'bg-cg-error-subtle text-cg-error-dark border-cg-error-subtle'
+                : 'bg-cg-amber-subtle text-cg-amber-dark border-cg-amber-subtle',
           )}
         >
           <span className="inline-flex items-center gap-2">

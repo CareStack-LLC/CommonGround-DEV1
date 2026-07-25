@@ -16,13 +16,13 @@ function StatCard({ label, value, icon: Icon, color }: {
   label: string; value: string | number; icon: any; color: string;
 }) {
   return (
-    <div className="bg-[#1A3648]/60 border border-zinc-800 rounded-xl p-4">
+    <div className="bg-cg-slate-deep/60 border border-zinc-800 rounded-xl p-4">
       <div className="flex items-center gap-3">
         <div className={`p-2 rounded-lg ${color}`}>
           <Icon className="h-4 w-4" />
         </div>
         <div>
-          <p className="text-[#8AACBC] text-xs">{label}</p>
+          <p className="text-cg-slate-muted text-xs">{label}</p>
           <p className="text-zinc-100 text-xl font-semibold">{value}</p>
         </div>
       </div>
@@ -33,7 +33,7 @@ function StatCard({ label, value, icon: Icon, color }: {
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
     active: 'bg-emerald-500/10 text-emerald-400 border-cg-sage/20',
-    closed: 'bg-zinc-500/10 text-[#8AACBC] border-zinc-500/20',
+    closed: 'bg-zinc-500/10 text-cg-slate-muted border-zinc-500/20',
     escalated: 'bg-amber-500/10 text-amber-400 border-cg-amber/20',
   };
   return (
@@ -179,13 +179,13 @@ export default function ChatbotAdminPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-zinc-100">Chatbot Management</h1>
-          <p className="text-[#8AACBC] text-sm mt-1">Aria customer success chatbot</p>
+          <p className="text-cg-slate-muted text-sm mt-1">Aria customer success chatbot</p>
         </div>
         <div className="flex items-center gap-2">
           {activeTab === 'conversations' && (
             <button
               onClick={fetchData}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-[#D0E4EC] text-sm transition-colors"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-cg-slate-tint text-sm transition-colors"
             >
               <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
               Refresh
@@ -195,13 +195,13 @@ export default function ChatbotAdminPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-[#1A3648]/60 border border-zinc-800 rounded-lg p-1 w-fit">
+      <div className="flex gap-1 bg-cg-slate-deep/60 border border-zinc-800 rounded-lg p-1 w-fit">
         <button
           onClick={() => setActiveTab('conversations')}
           className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm transition-colors ${
             activeTab === 'conversations'
               ? 'bg-zinc-700 text-zinc-100'
-              : 'text-[#8AACBC] hover:text-white'
+              : 'text-cg-slate-muted hover:text-white'
           }`}
         >
           <MessageCircle className="h-4 w-4" />
@@ -212,7 +212,7 @@ export default function ChatbotAdminPage() {
           className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm transition-colors ${
             activeTab === 'settings'
               ? 'bg-zinc-700 text-zinc-100'
-              : 'text-[#8AACBC] hover:text-white'
+              : 'text-cg-slate-muted hover:text-white'
           }`}
         >
           <Settings className="h-4 w-4" />
@@ -229,7 +229,7 @@ export default function ChatbotAdminPage() {
       {/* ── Settings Tab ── */}
       {activeTab === 'settings' && (
         <div className="space-y-6">
-          <div className="bg-[#1A3648]/60 border border-zinc-800 rounded-xl p-6 space-y-6">
+          <div className="bg-cg-slate-deep/60 border border-zinc-800 rounded-xl p-6 space-y-6">
             <div>
               <h3 className="text-zinc-100 font-semibold text-lg mb-1">System Prompt</h3>
               <p className="text-muted-foreground text-sm mb-3">
@@ -241,7 +241,7 @@ export default function ChatbotAdminPage() {
                 onChange={(e) => setSystemPrompt(e.target.value)}
                 placeholder="Leave empty to use default system prompt..."
                 rows={12}
-                className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-white text-sm font-mono placeholder:text-[#4A6E7F] outline-none focus:border-zinc-600 resize-y"
+                className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-white text-sm font-mono placeholder:text-cg-slate-strong outline-none focus:border-zinc-600 resize-y"
               />
             </div>
 
@@ -256,7 +256,7 @@ export default function ChatbotAdminPage() {
                 onChange={(e) => setActivePromotions(e.target.value)}
                 placeholder={"Example:\n- 30-day free trial of Plus plan for new signups\n- 20% off annual billing through March 2026\n- Free onboarding call for Professional plans"}
                 rows={6}
-                className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-white text-sm placeholder:text-[#4A6E7F] outline-none focus:border-zinc-600 resize-y"
+                className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-lg text-white text-sm placeholder:text-cg-slate-strong outline-none focus:border-zinc-600 resize-y"
               />
             </div>
 
@@ -284,7 +284,7 @@ export default function ChatbotAdminPage() {
           <StatCard label="Active Today" value={stats.active_today} icon={TrendingUp} color="bg-blue-500/10 text-blue-400" />
           <StatCard label="Avg Messages" value={stats.avg_messages_per_session} icon={MessageCircle} color="bg-purple-500/10 text-purple-400" />
           <StatCard label="Escalation Rate" value={`${stats.escalation_rate}%`} icon={AlertTriangle} color="bg-amber-500/10 text-amber-400" />
-          <StatCard label="Unique Visitors" value={stats.total_visitors} icon={Users} color="bg-zinc-500/10 text-[#8AACBC]" />
+          <StatCard label="Unique Visitors" value={stats.total_visitors} icon={Users} color="bg-zinc-500/10 text-cg-slate-muted" />
         </div>
       )}
 
@@ -297,7 +297,7 @@ export default function ChatbotAdminPage() {
             placeholder="Search by name or email..."
             value={searchQuery}
             onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }}
-            className="w-full pl-9 pr-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-white text-sm placeholder:text-[#4A6E7F] outline-none focus:border-zinc-600"
+            className="w-full pl-9 pr-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-white text-sm placeholder:text-cg-slate-strong outline-none focus:border-zinc-600"
           />
         </div>
         <select
@@ -314,11 +314,11 @@ export default function ChatbotAdminPage() {
 
       {/* Sessions Table */}
       {activeTab === 'conversations' && <>
-      <div className="bg-[#1A3648]/60 border border-zinc-800 rounded-xl overflow-hidden">
+      <div className="bg-cg-slate-deep/60 border border-zinc-800 rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-zinc-800 text-[#8AACBC]">
+              <tr className="border-b border-zinc-800 text-cg-slate-muted">
                 <th className="text-left px-4 py-3 font-medium">Visitor</th>
                 <th className="text-left px-4 py-3 font-medium">Email</th>
                 <th className="text-left px-4 py-3 font-medium">Status</th>
@@ -349,10 +349,10 @@ export default function ChatbotAdminPage() {
                     className="border-b border-zinc-800/50 hover:bg-cg-slate/10 cursor-pointer transition-colors"
                   >
                     <td className="px-4 py-3 text-white">{s.visitor_name || 'Anonymous'}</td>
-                    <td className="px-4 py-3 text-[#8AACBC]">{s.visitor_email || '—'}</td>
+                    <td className="px-4 py-3 text-cg-slate-muted">{s.visitor_email || '—'}</td>
                     <td className="px-4 py-3"><StatusBadge status={s.status} /></td>
-                    <td className="px-4 py-3 text-[#D0E4EC]">{s.message_count}</td>
-                    <td className="px-4 py-3 text-[#8AACBC]">{formatDate(s.started_at)}</td>
+                    <td className="px-4 py-3 text-cg-slate-tint">{s.message_count}</td>
+                    <td className="px-4 py-3 text-cg-slate-muted">{formatDate(s.started_at)}</td>
                   </tr>
                 ))
               )}
@@ -368,7 +368,7 @@ export default function ChatbotAdminPage() {
               <button
                 disabled={page <= 1}
                 onClick={() => setPage(page - 1)}
-                className="px-3 py-1 rounded bg-zinc-800 text-[#D0E4EC] text-xs disabled:opacity-40 hover:bg-zinc-700"
+                className="px-3 py-1 rounded bg-zinc-800 text-cg-slate-tint text-xs disabled:opacity-40 hover:bg-zinc-700"
               >
                 Previous
               </button>
@@ -376,7 +376,7 @@ export default function ChatbotAdminPage() {
               <button
                 disabled={page >= totalPages}
                 onClick={() => setPage(page + 1)}
-                className="px-3 py-1 rounded bg-zinc-800 text-[#D0E4EC] text-xs disabled:opacity-40 hover:bg-zinc-700"
+                className="px-3 py-1 rounded bg-zinc-800 text-cg-slate-tint text-xs disabled:opacity-40 hover:bg-zinc-700"
               >
                 Next
               </button>
@@ -409,13 +409,13 @@ export default function ChatbotAdminPage() {
                     <h2 className="text-zinc-100 font-semibold text-lg">
                       {selectedSession.visitor.name || 'Anonymous'}
                     </h2>
-                    <p className="text-[#8AACBC] text-xs mt-0.5">
+                    <p className="text-cg-slate-muted text-xs mt-0.5">
                       {selectedSession.visitor.email || 'No email'} &middot; <StatusBadge status={selectedSession.status} />
                     </p>
                   </div>
                   <button aria-label="Close"
                     onClick={() => setSelectedSession(null)}
-                    className="p-2 rounded-lg hover:bg-cg-slate/30 text-[#8AACBC]"
+                    className="p-2 rounded-lg hover:bg-cg-slate/30 text-cg-slate-muted"
                   >
                     <X className="h-5 w-5" />
                   </button>
@@ -425,24 +425,24 @@ export default function ChatbotAdminPage() {
                 <div className="px-5 py-4 border-b border-zinc-800 space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Phone</span>
-                    <span className="text-[#D0E4EC]">{selectedSession.visitor.phone || '—'}</span>
+                    <span className="text-cg-slate-tint">{selectedSession.visitor.phone || '—'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Source Page</span>
-                    <span className="text-[#D0E4EC] text-right truncate max-w-[200px]">{selectedSession.visitor.source_page || '—'}</span>
+                    <span className="text-cg-slate-tint text-right truncate max-w-[200px]">{selectedSession.visitor.source_page || '—'}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Started</span>
-                    <span className="text-[#D0E4EC]">{formatDate(selectedSession.started_at)} {formatTime(selectedSession.started_at)}</span>
+                    <span className="text-cg-slate-tint">{formatDate(selectedSession.started_at)} {formatTime(selectedSession.started_at)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Messages</span>
-                    <span className="text-[#D0E4EC]">{selectedSession.message_count}</span>
+                    <span className="text-cg-slate-tint">{selectedSession.message_count}</span>
                   </div>
                   {selectedSession.escalation_reason && (
                     <div className="bg-amber-500/10 border border-cg-amber/20 rounded-lg p-3 mt-2">
                       <p className="text-amber-400 text-xs font-medium">Escalation Reason</p>
-                      <p className="text-[#D0E4EC] text-sm mt-1">{selectedSession.escalation_reason}</p>
+                      <p className="text-cg-slate-tint text-sm mt-1">{selectedSession.escalation_reason}</p>
                     </div>
                   )}
                 </div>
@@ -461,7 +461,7 @@ export default function ChatbotAdminPage() {
 
                 {/* Messages */}
                 <div className="px-5 py-4 space-y-3">
-                  <h3 className="text-[#8AACBC] text-xs font-medium uppercase tracking-wider">Conversation</h3>
+                  <h3 className="text-cg-slate-muted text-xs font-medium uppercase tracking-wider">Conversation</h3>
                   {selectedSession.messages.map((msg) => (
                     <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                       <div
@@ -470,11 +470,11 @@ export default function ChatbotAdminPage() {
                             ? 'bg-emerald-600/20 text-emerald-200'
                             : msg.role === 'system'
                             ? 'bg-cg-slate/20 text-muted-foreground text-xs text-center w-full'
-                            : 'bg-zinc-800 text-[#D0E4EC]'
+                            : 'bg-zinc-800 text-cg-slate-tint'
                         }`}
                       >
                         <p>{msg.content}</p>
-                        <p className="text-[#4A6E7F] text-[10px] mt-1">{formatTime(msg.created_at)}</p>
+                        <p className="text-cg-slate-strong text-[10px] mt-1">{formatTime(msg.created_at)}</p>
                       </div>
                     </div>
                   ))}

@@ -85,14 +85,14 @@ const SYSTEM_VIEWS: SavedView[] = [
 
 const URGENCY_COLORS: Record<string, string> = {
   urgent: "text-red-900 bg-red-50 border-2 border-red-900/30",
-  high: "text-[#6B460F] bg-cg-amber-subtle border-2 border-[#6B460F]/30",
+  high: "text-cg-amber-deep bg-cg-amber-subtle border-2 border-cg-amber-deep/30",
   medium: "text-blue-900 bg-blue-50 border-2 border-blue-900/30",
   low: "text-slate-600 bg-slate-50 border-2 border-slate-300",
 };
 
 const RISK_ICONS: Record<string, React.JSX.Element> = {
   high: <AlertCircle className="h-4 w-4 text-red-700" strokeWidth={2} />,
-  medium: <Zap className="h-4 w-4 text-[#B8791A]" strokeWidth={2} />,
+  medium: <Zap className="h-4 w-4 text-cg-amber-deep" strokeWidth={2} />,
   low: <CheckCircle2 className="h-4 w-4 text-cg-sage-dark" strokeWidth={2} />,
 };
 
@@ -233,7 +233,7 @@ export default function CasesListPage() {
 
   const statusColors: Record<string, string> = {
     active: "bg-background text-foreground border border-cg-sage/20",
-    on_hold: "bg-cg-amber-subtle text-[#B8791A] border border-[#FBE3BF]",
+    on_hold: "bg-cg-amber-subtle text-cg-amber-deep border border-cg-amber-tint",
     completed: "bg-blue-50 text-blue-700 border border-blue-200",
     withdrawn: "bg-slate-50 text-slate-500 border border-slate-200",
   };
@@ -268,7 +268,7 @@ export default function CasesListPage() {
               {/* Professionals don't create family cases — they request access
                   to a family's case (with dual-parent consent). */}
               <Link href="/professional/access-requests">
-                <Button className="bg-cg-sage hover:bg-[#2D8A6E] text-white font-semibold px-5 h-10 rounded-xl shadow-sm">
+                <Button className="bg-cg-sage hover:bg-cg-sage-dark text-white font-semibold px-5 h-10 rounded-xl shadow-sm">
                   <FolderOpen className="h-4 w-4 mr-2" />
                   Request Case Access
                 </Button>
@@ -508,7 +508,7 @@ function CaseRow({
 }) {
   const statusAccent: Record<string, string> = {
     active: "border-l-cg-sage-dark",
-    on_hold: "border-l-[#B8791A]",
+    on_hold: "border-l-cg-amber-deep",
     completed: "border-l-blue-700",
     withdrawn: "border-l-slate-400",
   };
@@ -592,7 +592,7 @@ function CaseRow({
           </div>
         )}
         {caseItem.access_scopes?.includes("schedule") && (
-          <div className="p-1.5 bg-cg-amber-subtle text-[#E09520] rounded-sm border border-[#FBE3BF]" title="Schedule Access">
+          <div className="p-1.5 bg-cg-amber-subtle text-cg-amber-dark rounded-sm border border-cg-amber-tint" title="Schedule Access">
             <Calendar className="h-3.5 w-3.5" strokeWidth={2} />
           </div>
         )}

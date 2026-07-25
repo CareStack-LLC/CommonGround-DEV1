@@ -332,7 +332,7 @@ export default function CourtSettingsPage() {
         <Button aria-label="Refresh"
           onClick={handleSave}
           disabled={isSaving}
-          className="bg-cg-slate hover:bg-[#1E4E6B]"
+          className="bg-cg-slate hover:bg-cg-slate-dark"
         >
           {isSaving ? (
             <>

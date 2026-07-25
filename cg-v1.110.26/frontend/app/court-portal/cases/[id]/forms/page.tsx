@@ -279,7 +279,7 @@ export default function CourtPortalFormsPage() {
             {progress.next_action && (
               <Alert className="mt-4 bg-white/70">
                 <AlertCircle className="h-4 w-4 text-cg-slate" />
-                <AlertDescription className="text-[#1E4E6B]">
+                <AlertDescription className="text-cg-slate-dark">
                   <strong>Next Step:</strong> {progress.next_action}
                 </AlertDescription>
               </Alert>
@@ -309,7 +309,7 @@ export default function CourtPortalFormsPage() {
                   >
                     <div className="flex items-center gap-4">
                       <div className="h-12 w-12 bg-cg-amber-subtle rounded-lg flex items-center justify-center">
-                        <FileText className="h-6 w-6 text-[#E09520]" />
+                        <FileText className="h-6 w-6 text-cg-amber-dark" />
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
@@ -435,7 +435,7 @@ export default function CourtPortalFormsPage() {
                             : form.status === "rejected"
                             ? "text-cg-error"
                             : config.actionable
-                            ? "text-[#E09520]"
+                            ? "text-cg-amber-dark"
                             : "text-gray-600"
                         }`} />
                       </div>
@@ -492,7 +492,7 @@ function StatusIndicator({
         )}
       </div>
       <p className={`text-xs font-medium ${
-        approved ? "text-cg-sage-dark" : active ? "text-[#1E4E6B]" : "text-gray-500"
+        approved ? "text-cg-sage-dark" : active ? "text-cg-slate-dark" : "text-gray-500"
       }`}>
         {label}
       </p>

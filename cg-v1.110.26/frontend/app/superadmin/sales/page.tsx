@@ -36,7 +36,7 @@ const RECHARTS_TOOLTIP = {
   backgroundColor: 'var(--foreground)',
   border: '1px solid var(--cg-slate)',
   borderRadius: 8,
-  color: '#D0E4EC',
+  color: 'var(--cg-slate-tint)',
   fontSize: 12,
 };
 
@@ -115,7 +115,7 @@ function PipelineTab() {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <AlertTriangle className="w-10 h-10 text-amber-500 mb-3" />
-        <p className="text-[#8AACBC] mb-4">{error}</p>
+        <p className="text-cg-slate-muted mb-4">{error}</p>
         <button onClick={fetchData} className="px-4 py-2 rounded-lg bg-cg-sage hover:bg-cg-sage-light text-white text-sm font-medium">Retry</button>
       </div>
     );
@@ -146,10 +146,10 @@ function PipelineTab() {
               <div className="text-xs text-muted-foreground">Total Pipeline Value</div>
             </div>
             {pipeline.stages.map((stage, i) => (
-              <div key={stage.name} className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-4">
+              <div key={stage.name} className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-4">
                 <div className="text-xs text-muted-foreground mb-1">{stage.name}</div>
                 <div className="text-lg font-bold text-white">{formatNumber(stage.count)}</div>
-                <div className="text-xs text-[#4A6E7F]">
+                <div className="text-xs text-cg-slate-strong">
                   {formatCurrency(stage.value)}
                   {stage.conversion_from_prev_pct > 0 && (
                     <span className="ml-1 text-cg-sage">({stage.conversion_from_prev_pct.toFixed(1)}%)</span>
@@ -190,7 +190,7 @@ function ConversionsTab() {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <AlertTriangle className="w-10 h-10 text-amber-500 mb-3" />
-        <p className="text-[#8AACBC] mb-4">{error}</p>
+        <p className="text-cg-slate-muted mb-4">{error}</p>
         <button onClick={fetchData} className="px-4 py-2 rounded-lg bg-cg-sage hover:bg-cg-sage-light text-white text-sm font-medium">Retry</button>
       </div>
     );
@@ -237,8 +237,8 @@ function ConversionsTab() {
       </div>
 
       {/* Conversion Trend */}
-      <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-        <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">
+      <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+        <h2 className="text-sm font-semibold text-cg-slate-tint mb-4">
           Conversion Trend (30 days)
           <InfoTooltip text="Daily conversion rate over the past 30 days" />
         </h2>
@@ -248,14 +248,14 @@ function ConversionsTab() {
               <CartesianGrid strokeDasharray="3 3" stroke="var(--cg-slate)" opacity={0.2} />
               <XAxis
                 dataKey="date"
-                stroke="#4A6E7F"
+                stroke="var(--cg-slate-strong)"
                 tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }}
                 tickFormatter={(v) => new Date(v).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                axisLine={{ stroke: '#4A6E7F' }}
+                axisLine={{ stroke: 'var(--cg-slate-strong)' }}
                 tickLine={false}
               />
               <YAxis
-                stroke="#4A6E7F"
+                stroke="var(--cg-slate-strong)"
                 tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }}
                 axisLine={false}
                 tickLine={false}
@@ -286,14 +286,14 @@ function ConversionsTab() {
             </LineChart>
           </ResponsiveContainer>
         ) : (
-          <p className="text-[#4A6E7F] text-sm text-center py-10">No conversion data available</p>
+          <p className="text-cg-slate-strong text-sm text-center py-10">No conversion data available</p>
         )}
       </div>
 
       {/* Conversion by Source */}
       {data?.by_source?.length > 0 && (
-        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">
+        <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+          <h2 className="text-sm font-semibold text-cg-slate-tint mb-4">
             Conversions by Source
             <InfoTooltip text="Conversion performance broken down by acquisition channel" />
           </h2>
@@ -311,11 +311,11 @@ function ConversionsTab() {
               <tbody>
                 {data.by_source.map((src: any) => (
                   <tr key={src.source} className="border-b border-cg-slate/10 last:border-0 hover:bg-cg-slate/10">
-                    <td className="py-2.5 text-[#D0E4EC] capitalize">{src.source?.replace(/_/g, ' ') || 'Unknown'}</td>
-                    <td className="py-2.5 text-right text-[#8AACBC]">{formatNumber(src.trials)}</td>
-                    <td className="py-2.5 text-right text-[#8AACBC]">{formatNumber(src.conversions)}</td>
+                    <td className="py-2.5 text-cg-slate-tint capitalize">{src.source?.replace(/_/g, ' ') || 'Unknown'}</td>
+                    <td className="py-2.5 text-right text-cg-slate-muted">{formatNumber(src.trials)}</td>
+                    <td className="py-2.5 text-right text-cg-slate-muted">{formatNumber(src.conversions)}</td>
                     <td className="py-2.5 text-right">
-                      <span className={src.rate > 10 ? 'text-cg-sage' : 'text-[#8AACBC]'}>
+                      <span className={src.rate > 10 ? 'text-cg-sage' : 'text-cg-slate-muted'}>
                         {src.rate?.toFixed(1) ?? 0}%
                       </span>
                     </td>
@@ -357,7 +357,7 @@ function ForecastTab() {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <AlertTriangle className="w-10 h-10 text-amber-500 mb-3" />
-        <p className="text-[#8AACBC] mb-4">{error}</p>
+        <p className="text-cg-slate-muted mb-4">{error}</p>
         <button onClick={fetchData} className="px-4 py-2 rounded-lg bg-cg-sage hover:bg-cg-sage-light text-white text-sm font-medium">Retry</button>
       </div>
     );
@@ -396,15 +396,15 @@ function ForecastTab() {
   return (
     <div className="space-y-6">
       {/* MRR Forecast Chart */}
-      <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
+      <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
         <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-          <h2 className="text-sm font-semibold text-[#D0E4EC]">
+          <h2 className="text-sm font-semibold text-cg-slate-tint">
             MRR Forecast
             <InfoTooltip text="OLS linear regression on real daily MRR history; shaded band is ±1σ residual." />
           </h2>
           {data && (
             <span className="text-[11px] text-muted-foreground">
-              method: <span className="text-[#D0E4EC]">{data.method}</span>
+              method: <span className="text-cg-slate-tint">{data.method}</span>
               {' · '}implied MoM growth:{' '}
               <span className={(data.implied_mom_growth_pct ?? 0) >= 0 ? 'text-cg-sage' : 'text-red-400'}>
                 {(data.implied_mom_growth_pct ?? 0) >= 0 ? '+' : ''}
@@ -419,13 +419,13 @@ function ForecastTab() {
               <CartesianGrid strokeDasharray="3 3" stroke="var(--cg-slate)" opacity={0.2} />
               <XAxis
                 dataKey="label"
-                stroke="#4A6E7F"
+                stroke="var(--cg-slate-strong)"
                 tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }}
-                axisLine={{ stroke: '#4A6E7F' }}
+                axisLine={{ stroke: 'var(--cg-slate-strong)' }}
                 tickLine={false}
               />
               <YAxis
-                stroke="#4A6E7F"
+                stroke="var(--cg-slate-strong)"
                 tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }}
                 axisLine={false}
                 tickLine={false}
@@ -436,7 +436,7 @@ function ForecastTab() {
                 formatter={(value: any) => [formatCurrency(Number(value ?? 0)), '']}
               />
               <Area type="monotone" dataKey="high" name="High" stroke="none" fill="var(--cg-sage)" fillOpacity={0.1} />
-              <Area type="monotone" dataKey="low" name="Low" stroke="none" fill="#1A3648" fillOpacity={0.8} />
+              <Area type="monotone" dataKey="low" name="Low" stroke="none" fill="var(--cg-slate-deep)" fillOpacity={0.8} />
               <Area
                 type="monotone"
                 dataKey="projected"
@@ -458,7 +458,7 @@ function ForecastTab() {
             </AreaChart>
           </ResponsiveContainer>
         ) : (
-          <p className="text-[#4A6E7F] text-sm text-center py-10">No forecast data available</p>
+          <p className="text-cg-slate-strong text-sm text-center py-10">No forecast data available</p>
         )}
       </div>
 
@@ -550,7 +550,7 @@ function WinLossTab() {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <AlertTriangle className="w-10 h-10 text-amber-500 mb-3" />
-        <p className="text-[#8AACBC] mb-4">{error}</p>
+        <p className="text-cg-slate-muted mb-4">{error}</p>
         <button onClick={fetchData} className="px-4 py-2 rounded-lg bg-cg-sage hover:bg-cg-sage-light text-white text-sm font-medium">Retry</button>
       </div>
     );
@@ -572,7 +572,7 @@ function WinLossTab() {
             className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
               days === d
                 ? 'bg-cg-sage text-white'
-                : 'bg-[#1A3648]/60 text-[#8AACBC] hover:text-white border border-cg-slate/20'
+                : 'bg-cg-slate-deep/60 text-cg-slate-muted hover:text-white border border-cg-slate/20'
             }`}
           >
             {d}d
@@ -583,9 +583,9 @@ function WinLossTab() {
       {loading ? <SkeletonCards count={4} /> : (
         <>
           {/* Funnel summary */}
-          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
+          <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
             <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-              <h2 className="text-sm font-semibold text-[#D0E4EC]">
+              <h2 className="text-sm font-semibold text-cg-slate-tint">
                 Funnel-based Win/Loss
                 <InfoTooltip text="Based on Lead.stage — populated by the 'Close as lost' UX on the Leads page." />
               </h2>
@@ -596,10 +596,10 @@ function WinLossTab() {
 
             {funnelEmpty ? (
               <div className="text-center py-8">
-                <p className="text-sm text-[#8AACBC] mb-1">No funnel-tracked leads in this window.</p>
+                <p className="text-sm text-cg-slate-muted mb-1">No funnel-tracked leads in this window.</p>
                 <p className="text-xs text-muted-foreground">
-                  Mark leads as <span className="text-[#D0E4EC]">closed_won</span> or{' '}
-                  <span className="text-[#D0E4EC]">closed_lost</span> from the Leads page
+                  Mark leads as <span className="text-cg-slate-tint">closed_won</span> or{' '}
+                  <span className="text-cg-slate-tint">closed_lost</span> from the Leads page
                   to populate this view.
                 </p>
               </div>
@@ -626,12 +626,12 @@ function WinLossTab() {
             {/* Loss reasons breakdown */}
             {funnel?.by_reason?.length > 0 && (
               <div className="mt-5 pt-5 border-t border-cg-slate/20">
-                <h3 className="text-xs font-medium text-[#8AACBC] mb-3">Why Deals Are Lost</h3>
+                <h3 className="text-xs font-medium text-cg-slate-muted mb-3">Why Deals Are Lost</h3>
                 <div className="space-y-2">
                   {funnel.by_reason.map((r: any) => (
                     <div key={r.reason}>
                       <div className="flex items-center justify-between mb-1 text-xs">
-                        <span className="text-[#D0E4EC] capitalize">{r.reason?.replace(/_/g, ' ')}</span>
+                        <span className="text-cg-slate-tint capitalize">{r.reason?.replace(/_/g, ' ')}</span>
                         <span className="text-muted-foreground">
                           {r.count} ({r.pct_of_losses?.toFixed(1) ?? 0}%)
                         </span>
@@ -651,8 +651,8 @@ function WinLossTab() {
 
           {/* Signup fallback view — shown alongside for context */}
           {signups && (
-            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-              <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">
+            <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+              <h2 className="text-sm font-semibold text-cg-slate-tint mb-4">
                 Signup-based (fallback)
                 <InfoTooltip text="Signups vs paid conversions in window. Useful when funnel tracking is sparse." />
               </h2>
@@ -704,7 +704,7 @@ function UnitEconomicsTab() {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <AlertTriangle className="w-10 h-10 text-amber-500 mb-3" />
-        <p className="text-[#8AACBC] mb-4">{error}</p>
+        <p className="text-cg-slate-muted mb-4">{error}</p>
         <button onClick={fetchData} className="px-4 py-2 rounded-lg bg-cg-sage hover:bg-cg-sage-light text-white text-sm font-medium">Retry</button>
       </div>
     );
@@ -720,8 +720,8 @@ function UnitEconomicsTab() {
       {loading ? (
         <SkeletonCards count={4} />
       ) : unitEcon && (
-        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-6">
-          <h2 className="text-sm font-semibold text-[#D0E4EC] mb-6">Key Ratios</h2>
+        <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-6">
+          <h2 className="text-sm font-semibold text-cg-slate-tint mb-6">Key Ratios</h2>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
             <ProgressRing
               value={ltvCacPct}
@@ -752,8 +752,8 @@ function UnitEconomicsTab() {
 
       {/* CAC by Channel */}
       <div className="grid lg:grid-cols-2 gap-4">
-        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">
+        <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+          <h2 className="text-sm font-semibold text-cg-slate-tint mb-4">
             CAC by Channel
             <InfoTooltip text="Customer acquisition cost broken down by marketing channel" />
           </h2>
@@ -763,7 +763,7 @@ function UnitEconomicsTab() {
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--cg-slate)" opacity={0.2} horizontal={false} />
                 <XAxis
                   type="number"
-                  stroke="#4A6E7F"
+                  stroke="var(--cg-slate-strong)"
                   tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }}
                   axisLine={false}
                   tickLine={false}
@@ -772,8 +772,8 @@ function UnitEconomicsTab() {
                 <YAxis
                   type="category"
                   dataKey="channel"
-                  stroke="#4A6E7F"
-                  tick={{ fill: '#8AACBC', fontSize: 10 }}
+                  stroke="var(--cg-slate-strong)"
+                  tick={{ fill: 'var(--cg-slate-muted)', fontSize: 10 }}
                   axisLine={false}
                   tickLine={false}
                   width={90}
@@ -783,13 +783,13 @@ function UnitEconomicsTab() {
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <p className="text-[#4A6E7F] text-sm text-center py-10">No CAC data available</p>
+            <p className="text-cg-slate-strong text-sm text-center py-10">No CAC data available</p>
           )}
         </div>
 
         {/* LTV by Tier */}
-        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">
+        <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+          <h2 className="text-sm font-semibold text-cg-slate-tint mb-4">
             LTV by Tier
             <InfoTooltip text="Lifetime value broken down by subscription tier" />
           </h2>
@@ -799,7 +799,7 @@ function UnitEconomicsTab() {
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--cg-slate)" opacity={0.2} horizontal={false} />
                 <XAxis
                   type="number"
-                  stroke="#4A6E7F"
+                  stroke="var(--cg-slate-strong)"
                   tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }}
                   axisLine={false}
                   tickLine={false}
@@ -808,8 +808,8 @@ function UnitEconomicsTab() {
                 <YAxis
                   type="category"
                   dataKey="tier"
-                  stroke="#4A6E7F"
-                  tick={{ fill: '#8AACBC', fontSize: 10 }}
+                  stroke="var(--cg-slate-strong)"
+                  tick={{ fill: 'var(--cg-slate-muted)', fontSize: 10 }}
                   axisLine={false}
                   tickLine={false}
                   width={90}
@@ -819,15 +819,15 @@ function UnitEconomicsTab() {
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <p className="text-[#4A6E7F] text-sm text-center py-10">No LTV data available</p>
+            <p className="text-cg-slate-strong text-sm text-center py-10">No LTV data available</p>
           )}
         </div>
       </div>
 
       {/* Key Metrics */}
       {unitEcon && (
-        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-          <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">Key Metrics</h2>
+        <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+          <h2 className="text-sm font-semibold text-cg-slate-tint mb-4">Key Metrics</h2>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
             <div className="bg-cg-slate/10 rounded-lg p-4 text-center">
               <div className="text-lg font-bold text-white">{formatCurrency(unitEcon.mrr)}</div>
@@ -850,7 +850,7 @@ function UnitEconomicsTab() {
           {/* Tier Breakdown */}
           {Object.keys(unitEcon.tier_breakdown || {}).length > 0 && (
             <div className="mt-4 pt-4 border-t border-cg-slate/20">
-              <h3 className="text-xs font-medium text-[#8AACBC] mb-3">Revenue by Tier</h3>
+              <h3 className="text-xs font-medium text-cg-slate-muted mb-3">Revenue by Tier</h3>
               <div className="space-y-2">
                 {Object.entries(unitEcon.tier_breakdown)
                   .sort(([, a], [, b]) => b.revenue - a.revenue)
@@ -859,7 +859,7 @@ function UnitEconomicsTab() {
                     return (
                       <div key={tier}>
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-xs text-[#8AACBC] capitalize">{tier.replace(/_/g, ' ')}</span>
+                          <span className="text-xs text-cg-slate-muted capitalize">{tier.replace(/_/g, ' ')}</span>
                           <div className="flex items-center gap-3">
                             <span className="text-xs text-muted-foreground">{info.count} users x ${info.price}/mo</span>
                             <span className="text-xs font-medium text-white">{formatCurrency(info.revenue)}</span>
@@ -919,9 +919,9 @@ function AIAdvisorTab() {
   return (
     <div className="space-y-6">
       {/* Generate Button */}
-      <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-6 text-center">
+      <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-6 text-center">
         <Brain className="w-10 h-10 text-cg-sage mx-auto mb-3" />
-        <h2 className="text-sm font-semibold text-[#D0E4EC] mb-2">AI Sales Advisor</h2>
+        <h2 className="text-sm font-semibold text-cg-slate-tint mb-2">AI Sales Advisor</h2>
         <p className="text-xs text-muted-foreground mb-4 max-w-md mx-auto">
           Analyze your sales data to generate actionable insights, identify opportunities, and surface risks.
         </p>
@@ -946,10 +946,10 @@ function AIAdvisorTab() {
 
       {/* Loading State */}
       {loading && (
-        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-6">
+        <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-3 h-3 bg-cg-sage rounded-full animate-pulse" />
-            <span className="text-sm text-[#8AACBC]">AI is analyzing your sales data...</span>
+            <span className="text-sm text-cg-slate-muted">AI is analyzing your sales data...</span>
           </div>
           <div className="space-y-3">
             {Array.from({ length: 3 }).map((_, i) => (
@@ -967,7 +967,7 @@ function AIAdvisorTab() {
       {error && (
         <div className="flex flex-col items-center justify-center py-10">
           <AlertTriangle className="w-8 h-8 text-amber-500 mb-3" />
-          <p className="text-[#8AACBC] mb-3 text-sm">{error}</p>
+          <p className="text-cg-slate-muted mb-3 text-sm">{error}</p>
           <button
             onClick={generateInsights}
             className="px-4 py-2 rounded-lg bg-cg-sage hover:bg-cg-sage-light text-white text-sm font-medium"
@@ -981,30 +981,30 @@ function AIAdvisorTab() {
       {suggestions && !loading && (
         <div className="space-y-3">
           {dataSummary && (
-            <div className="bg-[#0F2533]/60 border border-cg-slate/20 rounded-lg p-3 text-xs text-[#8AACBC]">
-              <span className="font-medium text-[#D0E4EC]">Grounded on: </span>
+            <div className="bg-cg-ink/60 border border-cg-slate/20 rounded-lg p-3 text-xs text-cg-slate-muted">
+              <span className="font-medium text-cg-slate-tint">Grounded on: </span>
               {formatNumber(dataSummary.total_users ?? 0)} users,
               {' '}{formatNumber(dataSummary.paid_users ?? 0)} paying
               {' '}({(dataSummary.conversion_rate ?? 0).toFixed(1)}% conversion),
               {' '}MRR {formatCurrency(dataSummary.current_mrr ?? 0)},
               {' '}growth {(dataSummary.growth_pct ?? 0) >= 0 ? '+' : ''}{(dataSummary.growth_pct ?? 0).toFixed(1)}% MoM
               {dataSummary.top_lost_reasons?.length > 0 && (
-                <>, top lost reason: <span className="text-[#D0E4EC]">{dataSummary.top_lost_reasons[0].reason}</span> ({dataSummary.top_lost_reasons[0].count})</>
+                <>, top lost reason: <span className="text-cg-slate-tint">{dataSummary.top_lost_reasons[0].reason}</span> ({dataSummary.top_lost_reasons[0].count})</>
               )}
             </div>
           )}
-          <h2 className="text-sm font-semibold text-[#D0E4EC]">
+          <h2 className="text-sm font-semibold text-cg-slate-tint">
             AI Suggestions ({suggestions.length})
           </h2>
           {suggestions.map((s: any, i: number) => (
             <div
               key={i}
-              className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5 hover:border-cg-slate/40 transition-colors"
+              className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5 hover:border-cg-slate/40 transition-colors"
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-2 flex-wrap">
                   {/* Type Badge */}
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wider ${TYPE_COLORS[s.type] || 'bg-cg-slate/20 text-[#8AACBC]'}`}>
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wider ${TYPE_COLORS[s.type] || 'bg-cg-slate/20 text-cg-slate-muted'}`}>
                     {s.type}
                   </span>
                   {/* Target */}
@@ -1028,7 +1028,7 @@ function AIAdvisorTab() {
 
               {/* Reasoning */}
               {s.reasoning && (
-                <p className="text-xs text-[#8AACBC] leading-relaxed mb-3">{s.reasoning}</p>
+                <p className="text-xs text-cg-slate-muted leading-relaxed mb-3">{s.reasoning}</p>
               )}
 
               {/* Expected Impact */}
@@ -1046,7 +1046,7 @@ function AIAdvisorTab() {
       {/* Empty state if no suggestions yet */}
       {!suggestions && !loading && !error && (
         <div className="text-center py-10">
-          <p className="text-[#4A6E7F] text-sm">Click the button above to generate AI-powered sales insights.</p>
+          <p className="text-cg-slate-strong text-sm">Click the button above to generate AI-powered sales insights.</p>
         </div>
       )}
     </div>

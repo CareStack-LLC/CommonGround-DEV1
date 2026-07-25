@@ -440,7 +440,7 @@ export default function ExchangeForm({
               </div>
             ) : (
               <div className="p-4 bg-cg-amber-subtle border border-cg-amber/30 rounded-lg">
-                <p className="text-sm text-[#E09520] dark:text-cg-amber">
+                <p className="text-sm text-cg-amber-dark dark:text-cg-amber">
                   No children found. Please add children to your family file first.
                 </p>
               </div>

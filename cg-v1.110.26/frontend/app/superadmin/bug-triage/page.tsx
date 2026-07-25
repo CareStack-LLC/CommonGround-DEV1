@@ -13,7 +13,7 @@ const SEVERITY_COLORS: Record<string, string> = {
   critical: 'bg-red-500/15 text-red-400 border border-red-500/20',
   high: 'bg-orange-500/15 text-orange-400 border border-orange-500/20',
   medium: 'bg-yellow-500/15 text-yellow-400 border border-yellow-500/20',
-  low: 'bg-zinc-700/50 text-[#8AACBC]',
+  low: 'bg-zinc-700/50 text-cg-slate-muted',
 };
 
 const PLATFORM_COLORS: Record<string, string> = {
@@ -237,7 +237,7 @@ export default function BugTriagePage() {
           <button
             onClick={() => fetchBugs()}
             disabled={loading}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-[#D0E4EC] text-sm font-medium transition-colors disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-cg-slate-tint text-sm font-medium transition-colors disabled:opacity-50"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             Fetch Issues
@@ -269,7 +269,7 @@ export default function BugTriagePage() {
       )}
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-[#1A3648]/60 border border-cg-slate/20 rounded-lg p-1">
+      <div className="flex gap-1 bg-cg-slate-deep/60 border border-cg-slate/20 rounded-lg p-1">
         {tabs.map(tab => (
           <button
             key={tab.id}
@@ -280,7 +280,7 @@ export default function BugTriagePage() {
             className={`flex items-center gap-1.5 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
               activeTab === tab.id
                 ? 'bg-cg-sage/15 text-cg-sage-light'
-                : 'text-[#8AACBC] hover:text-white hover:bg-cg-slate/20'
+                : 'text-cg-slate-muted hover:text-white hover:bg-cg-slate/20'
             }`}
           >
             <tab.icon className="w-4 h-4" />
@@ -317,7 +317,7 @@ export default function BugTriagePage() {
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                     issueSubTab === 'system'
                       ? 'bg-cg-sage/15 text-cg-sage-light border border-violet-500/30'
-                      : 'bg-cg-slate/20 text-[#8AACBC] border border-cg-slate/20 hover:text-white'
+                      : 'bg-cg-slate/20 text-cg-slate-muted border border-cg-slate/20 hover:text-white'
                   }`}
                 >
                   <AlertCircle className="w-3.5 h-3.5" />
@@ -328,7 +328,7 @@ export default function BugTriagePage() {
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                     issueSubTab === 'user'
                       ? 'bg-cg-sage/15 text-cg-sage-light border border-violet-500/30'
-                      : 'bg-cg-slate/20 text-[#8AACBC] border border-cg-slate/20 hover:text-white'
+                      : 'bg-cg-slate/20 text-cg-slate-muted border border-cg-slate/20 hover:text-white'
                   }`}
                 >
                   <MessageSquare className="w-3.5 h-3.5" />
@@ -338,7 +338,7 @@ export default function BugTriagePage() {
               {(() => {
                 const filteredIssues = issueSubTab === 'system' ? systemErrors : userReports;
                 return (
-                  <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden">
+                  <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl overflow-hidden">
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="border-b border-cg-slate/20">
@@ -355,7 +355,7 @@ export default function BugTriagePage() {
                             <td className="px-4 py-3">
                               <div className="text-white font-medium truncate max-w-md">{issue.title || issue.culprit || 'Untitled issue'}</div>
                               {issue.culprit && issue.title && (
-                                <div className="text-xs text-[#4A6E7F] truncate">{issue.culprit}</div>
+                                <div className="text-xs text-cg-slate-strong truncate">{issue.culprit}</div>
                               )}
                             </td>
                             <td className="px-4 py-3">
@@ -364,14 +364,14 @@ export default function BugTriagePage() {
                               </span>
                             </td>
                             <td className="px-4 py-3 hidden md:table-cell">
-                              <span className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium ${PLATFORM_COLORS[issue.platform] || 'bg-zinc-700/50 text-[#8AACBC]'}`}>
+                              <span className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium ${PLATFORM_COLORS[issue.platform] || 'bg-zinc-700/50 text-cg-slate-muted'}`}>
                                 {issue.platform || 'unknown'}
                               </span>
                             </td>
-                            <td className="px-4 py-3 text-right text-[#8AACBC] hidden lg:table-cell">
+                            <td className="px-4 py-3 text-right text-cg-slate-muted hidden lg:table-cell">
                               {issue.userCount ?? issue.user_count ?? '\u2014'}
                             </td>
-                            <td className="px-4 py-3 text-right text-[#8AACBC]">
+                            <td className="px-4 py-3 text-right text-cg-slate-muted">
                               {issue.count ?? issue.events ?? '\u2014'}
                             </td>
                           </tr>
@@ -404,9 +404,9 @@ export default function BugTriagePage() {
         <>
           {triaging && (
             <div className="space-y-3">
-              <div className="bg-[#1A3648]/60 border border-cg-sage/20 rounded-xl p-5 flex items-center gap-3">
+              <div className="bg-cg-slate-deep/60 border border-cg-sage/20 rounded-xl p-5 flex items-center gap-3">
                 <Brain className="w-5 h-5 text-cg-sage animate-pulse" />
-                <p className="text-sm text-[#D0E4EC]">Analyzing issues with Claude AI...</p>
+                <p className="text-sm text-cg-slate-tint">Analyzing issues with Claude AI...</p>
               </div>
               {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-20" />)}
             </div>
@@ -414,22 +414,22 @@ export default function BugTriagePage() {
           {triageResult && !triaging && (
             <div className="space-y-4">
               {/* Summary */}
-              <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-                <h3 className="text-sm font-semibold text-[#D0E4EC] mb-2 flex items-center gap-2">
+              <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+                <h3 className="text-sm font-semibold text-cg-slate-tint mb-2 flex items-center gap-2">
                   <Brain className="w-4 h-4 text-cg-sage" /> AI Summary
                 </h3>
-                <p className="text-sm text-[#8AACBC] leading-relaxed">{triageResult.summary}</p>
+                <p className="text-sm text-cg-slate-muted leading-relaxed">{triageResult.summary}</p>
               </div>
 
               {/* Top 3 Priorities */}
               {triageResult.top_3 && triageResult.top_3.length > 0 && (
-                <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
+                <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
                   <h3 className="text-sm font-semibold text-amber-400 mb-3 flex items-center gap-2">
                     <Zap className="w-4 h-4" /> Top Priorities
                   </h3>
                   <ul className="space-y-2">
                     {triageResult.top_3.map((item, i) => (
-                      <li key={i} className="flex items-start gap-3 text-sm text-[#D0E4EC]">
+                      <li key={i} className="flex items-start gap-3 text-sm text-cg-slate-tint">
                         <span className="flex-shrink-0 w-5 h-5 rounded-full bg-amber-500/15 text-amber-400 text-xs flex items-center justify-center font-bold">{i + 1}</span>
                         {item}
                       </li>
@@ -440,11 +440,11 @@ export default function BugTriagePage() {
 
               {/* Patterns */}
               {triageResult.patterns && triageResult.patterns.length > 0 && (
-                <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
+                <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
                   <h3 className="text-sm font-semibold text-blue-400 mb-3">Common Patterns</h3>
                   <ul className="space-y-1.5">
                     {triageResult.patterns.map((p, i) => (
-                      <li key={i} className="text-sm text-[#8AACBC] flex items-start gap-2">
+                      <li key={i} className="text-sm text-cg-slate-muted flex items-start gap-2">
                         <span className="text-blue-400 mt-0.5">•</span> {p}
                       </li>
                     ))}
@@ -454,9 +454,9 @@ export default function BugTriagePage() {
 
               {/* Recommendations Table */}
               {triageResult.recommendations && triageResult.recommendations.length > 0 && (
-                <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden">
+                <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl overflow-hidden">
                   <div className="px-5 py-3 border-b border-cg-slate/20">
-                    <h3 className="text-sm font-semibold text-[#D0E4EC]">Recommendations ({triageResult.recommendations.length})</h3>
+                    <h3 className="text-sm font-semibold text-cg-slate-tint">Recommendations ({triageResult.recommendations.length})</h3>
                   </div>
                   <table className="w-full text-sm">
                     <thead>
@@ -473,9 +473,9 @@ export default function BugTriagePage() {
                       {triageResult.recommendations.map((rec, idx) => {
                         const actionColors: Record<string, string> = {
                           resolve: 'bg-emerald-500/15 text-emerald-400',
-                          defer: 'bg-zinc-700/50 text-[#8AACBC]',
+                          defer: 'bg-zinc-700/50 text-cg-slate-muted',
                           investigate: 'bg-blue-500/15 text-blue-400',
-                          ignore: 'bg-cg-slate/20 text-[#4A6E7F]',
+                          ignore: 'bg-cg-slate/20 text-cg-slate-strong',
                         };
                         return (
                           <tr key={idx} className="hover:bg-cg-slate/10 transition-colors">
@@ -502,7 +502,7 @@ export default function BugTriagePage() {
                             <td className="px-4 py-3 text-center">
                               <button
                                 onClick={() => copyFixPrompt(rec, idx)}
-                                className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-cg-slate/20 hover:bg-zinc-700/60 text-[#8AACBC] hover:text-white text-[11px] font-medium transition-colors"
+                                className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-cg-slate/20 hover:bg-zinc-700/60 text-cg-slate-muted hover:text-white text-[11px] font-medium transition-colors"
                                 title="Copy AI fix prompt to clipboard"
                               >
                                 {copiedPromptIdx === idx ? (
@@ -548,9 +548,9 @@ export default function BugTriagePage() {
             <div className="space-y-4">
               {/* Completion Bar */}
               {sprintTotalCount > 0 && (
-                <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-4">
+                <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-[#D0E4EC] font-medium">
+                    <span className="text-sm text-cg-slate-tint font-medium">
                       {sprintCompletedCount} of {sprintTotalCount} items completed
                     </span>
                     <span className="text-xs text-muted-foreground">
@@ -574,7 +574,7 @@ export default function BugTriagePage() {
                       </button>
                     ) : (
                       <div className="flex items-center gap-2 bg-zinc-800/80 rounded-lg px-3 py-2">
-                        <span className="text-xs text-[#D0E4EC]">
+                        <span className="text-xs text-cg-slate-tint">
                           Close this sprint? {sprintCompletedCount} completed, {sprintTotalCount - sprintCompletedCount} remaining.
                         </span>
                         <button
@@ -586,7 +586,7 @@ export default function BugTriagePage() {
                         </button>
                         <button
                           onClick={() => setShowCloseConfirm(false)}
-                          className="px-2 py-1 rounded bg-zinc-700 hover:bg-zinc-600 text-[#D0E4EC] text-xs font-medium"
+                          className="px-2 py-1 rounded bg-zinc-700 hover:bg-zinc-600 text-cg-slate-tint text-xs font-medium"
                         >
                           Cancel
                         </button>
@@ -597,15 +597,15 @@ export default function BugTriagePage() {
               )}
 
               {/* Sprint Summary */}
-              <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-                <h3 className="text-sm font-semibold text-[#D0E4EC] mb-2">Sprint Summary</h3>
-                <p className="text-sm text-[#8AACBC]">{sprint.plan.summary}</p>
+              <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+                <h3 className="text-sm font-semibold text-cg-slate-tint mb-2">Sprint Summary</h3>
+                <p className="text-sm text-cg-slate-muted">{sprint.plan.summary}</p>
                 {sprint.plan.top_3 && sprint.plan.top_3.length > 0 && (
                   <div className="mt-3">
                     <span className="text-xs text-muted-foreground uppercase tracking-wider">Top Priorities</span>
                     <ul className="mt-1 space-y-1">
                       {sprint.plan.top_3.map((item, i) => (
-                        <li key={i} className="flex items-start gap-2 text-sm text-[#D0E4EC]">
+                        <li key={i} className="flex items-start gap-2 text-sm text-cg-slate-tint">
                           <Zap className="w-3.5 h-3.5 text-amber-400 mt-0.5 flex-shrink-0" />
                           {item}
                         </li>
@@ -613,15 +613,15 @@ export default function BugTriagePage() {
                     </ul>
                   </div>
                 )}
-                <div className="mt-3 text-xs text-[#4A6E7F]">
+                <div className="mt-3 text-xs text-cg-slate-strong">
                   {sprint.plan.days}-day sprint | {sprint.plan.total_items} items total
                 </div>
               </div>
 
               {/* Day-by-Day Breakdown with Checkboxes */}
               {Object.entries(sprint.plan.plan || {}).map(([day, items]) => (
-                <div key={day} className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-                  <h3 className="text-sm font-semibold text-[#D0E4EC] mb-3 capitalize">{day}</h3>
+                <div key={day} className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+                  <h3 className="text-sm font-semibold text-cg-slate-tint mb-3 capitalize">{day}</h3>
                   <div className="space-y-2">
                     {(items as any[])?.map((item: any, idx: number) => {
                       const itemKey = `${day}-${idx}`;
@@ -647,7 +647,7 @@ export default function BugTriagePage() {
                           <span className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium capitalize ${SEVERITY_COLORS[item.severity] || SEVERITY_COLORS.low}`}>
                             {item.severity || 'med'}
                           </span>
-                          <span className={`flex-1 text-sm truncate ${isChecked ? 'text-muted-foreground line-through' : 'text-[#D0E4EC]'}`}>
+                          <span className={`flex-1 text-sm truncate ${isChecked ? 'text-muted-foreground line-through' : 'text-cg-slate-tint'}`}>
                             {item.title || item.description || 'Task'}
                           </span>
                           {item.effort && (
@@ -667,7 +667,7 @@ export default function BugTriagePage() {
                               onChange={(e) =>
                                 setResolutionNotes((prev) => ({ ...prev, [itemKey]: e.target.value }))
                               }
-                              className="w-full px-3 py-1.5 rounded-lg bg-cg-slate/15 border border-cg-slate/30 text-sm text-[#D0E4EC] placeholder-muted-foreground focus:outline-none focus:border-cg-sage/50"
+                              className="w-full px-3 py-1.5 rounded-lg bg-cg-slate/15 border border-cg-slate/30 text-sm text-cg-slate-tint placeholder-muted-foreground focus:outline-none focus:border-cg-sage/50"
                             />
                           </div>
                         )}
@@ -680,13 +680,13 @@ export default function BugTriagePage() {
 
               {/* Carry Over Section (unchecked items when close confirmed) */}
               {showCloseConfirm && sprintTotalCount - sprintCompletedCount > 0 && (
-                <div className="bg-[#1A3648]/60 border border-cg-amber/20 rounded-xl p-5">
+                <div className="bg-cg-slate-deep/60 border border-cg-amber/20 rounded-xl p-5">
                   <h3 className="text-sm font-semibold text-amber-400 mb-3">Carry Over ({sprintTotalCount - sprintCompletedCount} items)</h3>
                   <div className="space-y-1.5">
                     {allSprintItems
                       .filter((si) => !checkedSprintItems.has(si.key))
                       .map((si) => (
-                        <div key={si.key} className="text-sm text-[#8AACBC] px-3 py-1.5 flex items-center gap-2">
+                        <div key={si.key} className="text-sm text-cg-slate-muted px-3 py-1.5 flex items-center gap-2">
                           <span className="text-amber-400/60">&bull;</span>
                           {si.item?.title || si.item?.description || 'Task'}
                         </div>
@@ -697,21 +697,21 @@ export default function BugTriagePage() {
 
               {/* Deferred / Investigate */}
               {sprint.plan.deferred && sprint.plan.deferred.length > 0 && (
-                <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
+                <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
                   <h3 className="text-sm font-semibold text-amber-400 mb-3">Deferred</h3>
                   <div className="space-y-1">
                     {sprint.plan.deferred.map((item: any, i: number) => (
-                      <div key={i} className="text-sm text-[#8AACBC] px-3 py-1.5">{item.title || item.description || item}</div>
+                      <div key={i} className="text-sm text-cg-slate-muted px-3 py-1.5">{item.title || item.description || item}</div>
                     ))}
                   </div>
                 </div>
               )}
               {sprint.plan.investigate && sprint.plan.investigate.length > 0 && (
-                <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
+                <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
                   <h3 className="text-sm font-semibold text-blue-400 mb-3">Investigate</h3>
                   <div className="space-y-1">
                     {sprint.plan.investigate.map((item: any, i: number) => (
-                      <div key={i} className="text-sm text-[#8AACBC] px-3 py-1.5">{item.title || item.description || item}</div>
+                      <div key={i} className="text-sm text-cg-slate-muted px-3 py-1.5">{item.title || item.description || item}</div>
                     ))}
                   </div>
                 </div>
@@ -738,7 +738,7 @@ export default function BugTriagePage() {
           {sprints && sprints.length > 0 && (
             <div className="space-y-2">
               {sprints.map((s: any) => (
-                <div key={s.id || s.sprint_id} className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden">
+                <div key={s.id || s.sprint_id} className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl overflow-hidden">
                   <button
                     onClick={() => toggleSprintExpand(s.id || s.sprint_id)}
                     className="w-full flex items-center gap-3 px-5 py-4 hover:bg-cg-slate/10 transition-colors text-left"
@@ -760,7 +760,7 @@ export default function BugTriagePage() {
                     <span className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium capitalize ${
                       s.status === 'completed' ? 'bg-emerald-500/15 text-emerald-400 border border-cg-sage/20' :
                       s.status === 'active' ? 'bg-cg-sage/15 text-cg-sage border border-cg-sage/20' :
-                      'bg-zinc-700/50 text-[#8AACBC] border border-zinc-600/20'
+                      'bg-zinc-700/50 text-cg-slate-muted border border-zinc-600/20'
                     }`}>
                       {s.status || 'draft'}
                     </span>
@@ -772,11 +772,11 @@ export default function BugTriagePage() {
                   </button>
                   {expandedSprints.has(s.id || s.sprint_id) && s.plan && (
                     <div className="border-t border-cg-slate/20 px-5 py-4 space-y-4">
-                      <p className="text-sm text-[#8AACBC]">{s.plan.summary}</p>
+                      <p className="text-sm text-cg-slate-muted">{s.plan.summary}</p>
                       {s.plan.top_3 && (
                         <ul className="space-y-1 mt-2">
                           {s.plan.top_3.map((t: string, i: number) => (
-                            <li key={i} className="text-xs text-[#8AACBC] flex items-start gap-2">
+                            <li key={i} className="text-xs text-cg-slate-muted flex items-start gap-2">
                               <span className="text-cg-sage mt-0.5">-</span> {t}
                             </li>
                           ))}
@@ -801,7 +801,7 @@ export default function BugTriagePage() {
                                     <span className={`inline-flex px-1.5 py-0.5 rounded-full text-[10px] font-medium capitalize ${SEVERITY_COLORS[item.severity] || SEVERITY_COLORS.low}`}>
                                       {item.severity || 'med'}
                                     </span>
-                                    <span className={`text-sm ${wasCompleted ? 'text-[#8AACBC]' : 'text-muted-foreground'}`}>
+                                    <span className={`text-sm ${wasCompleted ? 'text-cg-slate-muted' : 'text-muted-foreground'}`}>
                                       {item.title || item.description || 'Task'}
                                     </span>
                                   </div>
@@ -857,11 +857,11 @@ function SeverityCard({ label, count, color }: { label: string; count: number; c
     red: 'border-red-500/20 text-red-400',
     orange: 'border-orange-500/20 text-orange-400',
     yellow: 'border-yellow-500/20 text-yellow-400',
-    zinc: 'border-zinc-700/60 text-[#8AACBC]',
+    zinc: 'border-zinc-700/60 text-cg-slate-muted',
     violet: 'border-cg-sage/20 text-cg-sage',
   };
   return (
-    <div className={`bg-[#1A3648]/60 border ${colorMap[color]} rounded-xl px-4 py-3`}>
+    <div className={`bg-cg-slate-deep/60 border ${colorMap[color]} rounded-xl px-4 py-3`}>
       <div className={`text-2xl font-bold ${colorMap[color].split(' ')[1]}`}>{count}</div>
       <div className="text-[11px] text-muted-foreground">{label}</div>
     </div>

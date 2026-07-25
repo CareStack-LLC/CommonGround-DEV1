@@ -454,7 +454,7 @@ export default function QuestionnaireBuilderPage() {
                                                 variant={q.is_active ? "default" : "outline"}
                                                 className={
                                                     q.is_active
-                                                        ? "bg-cg-sage-subtle text-[#1B5544] border-2 border-[#C5E5DB] sans"
+                                                        ? "bg-cg-sage-subtle text-cg-sage-deep border-2 border-cg-sage-tint sans"
                                                         : "border-2 border-slate-300 text-slate-600 sans"
                                                 }
                                             >
@@ -516,7 +516,7 @@ export default function QuestionnaireBuilderPage() {
                                 <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#3D8DB0] to-cg-slate flex items-center justify-center flex-shrink-0">
                                     <Sparkles className="h-4 w-4 text-white" />
                                 </div>
-                                <div className="bg-[#F0F7FC] rounded-2xl rounded-tl-sm px-4 py-3 max-w-[85%]">
+                                <div className="bg-cg-slate-tint rounded-2xl rounded-tl-sm px-4 py-3 max-w-[85%]">
                                     <p className="text-sm">
                                         Hi there! I&apos;m ARIA, your intake assistant. I&apos;ll be asking you some
                                         questions to help your attorney understand your situation better.
@@ -532,7 +532,7 @@ export default function QuestionnaireBuilderPage() {
                                         <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#3D8DB0] to-cg-slate flex items-center justify-center flex-shrink-0">
                                             <Sparkles className="h-4 w-4 text-white" />
                                         </div>
-                                        <div className="bg-[#F0F7FC] rounded-2xl rounded-tl-sm px-4 py-3 max-w-[85%]">
+                                        <div className="bg-cg-slate-tint rounded-2xl rounded-tl-sm px-4 py-3 max-w-[85%]">
                                             <p className="text-sm font-medium">{section.title || "Untitled Section"}</p>
                                             {section.description && (
                                                 <p className="text-xs text-cg-slate mt-1">{section.description}</p>
@@ -547,7 +547,7 @@ export default function QuestionnaireBuilderPage() {
                                                 <div className="h-8 w-8 rounded-full bg-gradient-to-br from-[#3D8DB0] to-cg-slate flex items-center justify-center flex-shrink-0">
                                                     <Sparkles className="h-4 w-4 text-white" />
                                                 </div>
-                                                <div className="bg-[#F0F7FC] rounded-2xl rounded-tl-sm px-4 py-3 max-w-[85%]">
+                                                <div className="bg-cg-slate-tint rounded-2xl rounded-tl-sm px-4 py-3 max-w-[85%]">
                                                     <p className="text-sm">
                                                         {field.label || "Untitled question"}
                                                         {field.required && (

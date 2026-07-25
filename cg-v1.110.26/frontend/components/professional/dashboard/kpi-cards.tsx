@@ -116,9 +116,9 @@ export function KPICards({
 function getGradient(color: string): string {
   const gradients: Record<string, string> = {
     teal: "from-teal-500 to-cg-slate",
-    amber: "from-cg-amber to-[#E09520]",
+    amber: "from-cg-amber to-cg-amber-dark",
     blue: "from-cg-slate to-cg-slate",
-    purple: "from-[#3D8DB0] to-[#E09520]",
+    purple: "from-[#3D8DB0] to-cg-amber-dark",
     emerald: "from-cg-sage to-teal-600",
   };
   return gradients[color] || gradients.teal;

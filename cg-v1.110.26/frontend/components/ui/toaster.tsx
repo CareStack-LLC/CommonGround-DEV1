@@ -34,7 +34,7 @@ export function Toaster() {
               ? "translate-y-2 opacity-0"
               : "translate-y-0 opacity-100",
             t.variant === "destructive"
-              ? "border-cg-error-subtle bg-cg-error-subtle text-[#7A2222] dark:border-[#7A2222]/50 dark:bg-[#7A2222] dark:text-cg-error-subtle"
+              ? "border-cg-error-subtle bg-cg-error-subtle text-cg-error-deep dark:border-cg-error-deep/50 dark:bg-cg-error-deep dark:text-cg-error-subtle"
               : "border-gray-200 bg-white text-gray-900 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
           )}
         >

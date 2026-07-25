@@ -216,7 +216,7 @@ export default function TimeBlocksManager({
           <Lock className="h-5 w-5 text-cg-slate mt-0.5" />
           <div className="flex-1">
             <p className="font-semibold text-foreground">Private Availability Blocks</p>
-            <p className="text-sm text-[#1E4E6B] mt-1">
+            <p className="text-sm text-cg-slate-dark mt-1">
               Time blocks are completely private. The co-parent will never see these details.
               They're only used by ARIA to warn about potential scheduling conflicts.
             </p>
@@ -257,7 +257,7 @@ export default function TimeBlocksManager({
       </div>
 
       {error && (
-        <div className="bg-cg-error-subtle border border-cg-error-subtle text-[#9B2C2C] px-4 py-3 rounded">
+        <div className="bg-cg-error-subtle border border-cg-error-subtle text-cg-error-dark px-4 py-3 rounded">
           {error}
         </div>
       )}
@@ -490,7 +490,7 @@ export default function TimeBlocksManager({
                     size="sm"
                     variant="ghost"
                     onClick={() => handleDelete(block.id)}
-                    className="h-8 w-8 p-0 text-cg-error hover:text-[#9B2C2C] hover:bg-cg-error-subtle"
+                    className="h-8 w-8 p-0 text-cg-error hover:text-cg-error-dark hover:bg-cg-error-subtle"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>

@@ -258,8 +258,8 @@ export default function NotificationSettingsPage() {
     <div className="space-y-6">
       {/* Page Header - matches app design system */}
       <div className="flex items-center gap-3">
-        <div className="w-12 h-12 bg-gradient-to-br from-cg-amber/10 to-[#E09520]/5 rounded-2xl flex items-center justify-center shadow-md">
-          <Bell className="w-6 h-6 text-[#E09520]" />
+        <div className="w-12 h-12 bg-gradient-to-br from-cg-amber/10 to-cg-amber-dark/5 rounded-2xl flex items-center justify-center shadow-md">
+          <Bell className="w-6 h-6 text-cg-amber-dark" />
         </div>
         <div>
           <h2 className="text-xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>

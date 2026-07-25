@@ -226,7 +226,7 @@ export function CallsReportsTab({ familyFileId, token }: { familyFileId: string,
                 <div className="flex gap-2">
                     <Button
                         onClick={() => setIsLogCallOpen(true)}
-                        className="bg-cg-slate hover:bg-[#1E4E6B] text-white"
+                        className="bg-cg-slate hover:bg-cg-slate-dark text-white"
                     >
                         <Phone className="h-4 w-4 mr-2" />
                         Log Call
@@ -234,14 +234,14 @@ export function CallsReportsTab({ familyFileId, token }: { familyFileId: string,
                     <Button
                         onClick={() => setIsGenReportOpen(true)}
                         variant="outline"
-                        className="border-[#C2DEF0] text-[#1E4E6B] dark:text-[#9BCADF] hover:bg-[#F0F7FC] dark:hover:bg-[#0F2836]/20 dark:bg-[#0F2836]/20"
+                        className="border-cg-slate-tint text-cg-slate-dark dark:text-[#9BCADF] hover:bg-cg-slate-tint dark:hover:bg-[#0F2836]/20 dark:bg-[#0F2836]/20"
                     >
                         <FileText className="h-4 w-4 mr-2" />
                         Generate Report
                     </Button>
                     <Button
                         onClick={() => setIsLiveMode(true)}
-                        className="bg-cg-slate hover:bg-[#1E4E6B] text-white shadow-md shadow-cg-slate-subtle"
+                        className="bg-cg-slate hover:bg-cg-slate-dark text-white shadow-md shadow-cg-slate-subtle"
                     >
                         <Phone className="h-4 w-4 mr-2" />
                         Live Control
@@ -283,9 +283,9 @@ export function CallsReportsTab({ familyFileId, token }: { familyFileId: string,
                         {callLogs.length > 0 ? (
                             <div className="space-y-3">
                                 {callLogs.map((call) => (
-                                    <Card key={call.id} className="overflow-hidden border-border hover:border-[#C2DEF0] dark:hover:border-[#163A50]/40 transition-colors group">
+                                    <Card key={call.id} className="overflow-hidden border-border hover:border-cg-slate-tint dark:hover:border-[#163A50]/40 transition-colors group">
                                         <div className="p-4 flex items-start gap-4">
-                                            <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground group-hover:bg-[#F0F7FC] dark:hover:bg-[#0F2836]/20 dark:bg-[#0F2836]/20 group-hover:text-[#3D8DB0] transition-colors">
+                                            <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground group-hover:bg-cg-slate-tint dark:hover:bg-[#0F2836]/20 dark:bg-[#0F2836]/20 group-hover:text-[#3D8DB0] transition-colors">
                                                 <Phone className="h-5 w-5" />
                                             </div>
                                             <div className="flex-1 min-w-0">
@@ -358,7 +358,7 @@ export function CallsReportsTab({ familyFileId, token }: { familyFileId: string,
                         {reports.length > 0 ? (
                             <div className="space-y-3">
                                 {reports.map((report) => (
-                                    <Card key={report.id} className="overflow-hidden border-border hover:border-[#C5E5DB] dark:hover:border-[#1B5544]/40 transition-colors group">
+                                    <Card key={report.id} className="overflow-hidden border-border hover:border-cg-sage-tint dark:hover:border-cg-sage-deep/40 transition-colors group">
                                         <div className="p-4 flex items-center justify-between">
                                             <div className="flex items-center gap-4">
                                                 <div className="h-10 w-10 rounded-lg bg-cg-sage-subtle dark:bg-[#123A2E]/20 flex items-center justify-center text-cg-sage">
@@ -414,10 +414,10 @@ export function CallsReportsTab({ familyFileId, token }: { familyFileId: string,
                         )}
 
                         {/* Tips Card */}
-                        <Card className="bg-[#F0F7FC] dark:bg-[#0F2836]/20 border-none mt-6">
+                        <Card className="bg-cg-slate-tint dark:bg-[#0F2836]/20 border-none mt-6">
                             <CardContent className="p-4 flex gap-3">
                                 <AlertCircle className="h-5 w-5 text-[#3D8DB0] shrink-0" />
-                                <div className="text-xs text-[#1E4E6B] dark:text-[#9BCADF] leading-relaxed">
+                                <div className="text-xs text-cg-slate-dark dark:text-[#9BCADF] leading-relaxed">
                                     <p className="font-bold mb-1">Professional Advisory</p>
                                     Compliance reports aggregate ARIA flags, exchange metadata, and message sentiment. Use them for court submissions or mediation preparations.
                                 </div>
@@ -478,7 +478,7 @@ export function CallsReportsTab({ familyFileId, token }: { familyFileId: string,
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setIsLogCallOpen(false)}>Cancel</Button>
-                        <Button onClick={handleLogCall} className="bg-cg-slate hover:bg-[#1E4E6B]">Save Log Entry</Button>
+                        <Button onClick={handleLogCall} className="bg-cg-slate hover:bg-cg-slate-dark">Save Log Entry</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
@@ -532,7 +532,7 @@ export function CallsReportsTab({ familyFileId, token }: { familyFileId: string,
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setIsGenReportOpen(false)}>Cancel</Button>
-                        <Button onClick={handleGenerateReport} className="bg-cg-slate hover:bg-[#1E4E6B]">
+                        <Button onClick={handleGenerateReport} className="bg-cg-slate hover:bg-cg-slate-dark">
                             Generate PDF
                         </Button>
                     </DialogFooter>

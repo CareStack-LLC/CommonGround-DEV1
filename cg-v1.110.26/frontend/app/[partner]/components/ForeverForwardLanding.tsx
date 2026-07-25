@@ -102,7 +102,7 @@ export default function ForeverForwardLanding({ partnerSlug }: ForeverForwardLan
                     <div className="flex flex-col sm:flex-row gap-4 mb-8">
                         <Button
                             onClick={scrollToGrant}
-                            className="bg-cg-amber hover:bg-[#E09520] text-gray-900 font-bold h-14 px-8 text-lg"
+                            className="bg-cg-amber hover:bg-cg-amber-dark text-gray-900 font-bold h-14 px-8 text-lg"
                         >
                             Get a Grant Code
                         </Button>
@@ -279,15 +279,15 @@ export default function ForeverForwardLanding({ partnerSlug }: ForeverForwardLan
                                 <Button aria-label="Next"
                                     onClick={handleValidateCode}
                                     disabled={validating || codeValid}
-                                    className="bg-cg-amber hover:bg-[#E09520] text-gray-900 font-bold h-12 px-6"
+                                    className="bg-cg-amber hover:bg-cg-amber-dark text-gray-900 font-bold h-12 px-6"
                                 >
                                     {validating ? <Loader2 className="animate-spin" /> : <ArrowRight />}
                                 </Button>
                             </div>
 
                             {codeError && (
-                                <p className="text-[#E06B6B] text-sm flex items-center gap-2 animate-in fade-in slide-in-from-top-1">
-                                    <span className="h-1.5 w-1.5 rounded-full bg-[#E06B6B]" />
+                                <p className="text-cg-error-light text-sm flex items-center gap-2 animate-in fade-in slide-in-from-top-1">
+                                    <span className="h-1.5 w-1.5 rounded-full bg-cg-error-light" />
                                     {codeError}
                                 </p>
                             )}
@@ -371,7 +371,7 @@ export default function ForeverForwardLanding({ partnerSlug }: ForeverForwardLan
                     </p>
                     <div className="flex flex-col sm:flex-row justify-center gap-4 mb-12">
                         <Button
-                            className="bg-cg-amber hover:bg-[#E09520] text-gray-900 font-bold h-14 px-8 text-lg rounded-xl"
+                            className="bg-cg-amber hover:bg-cg-amber-dark text-gray-900 font-bold h-14 px-8 text-lg rounded-xl"
                             onClick={() => window.open('https://4everforward.net', '_blank')}
                         >
                             Apply for a Grant Code

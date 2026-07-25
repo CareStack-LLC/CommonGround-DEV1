@@ -20,8 +20,8 @@ export function EmptyState({
       <div className="p-3 rounded-full bg-cg-slate/20 mb-3">
         <Icon className="w-6 h-6 text-muted-foreground" />
       </div>
-      <p className="text-sm font-medium text-[#8AACBC] mb-1">{title}</p>
-      <p className="text-xs text-[#4A6E7F] max-w-xs">{message}</p>
+      <p className="text-sm font-medium text-cg-slate-muted mb-1">{title}</p>
+      <p className="text-xs text-cg-slate-strong max-w-xs">{message}</p>
       {action && (
         <button
           onClick={action.onClick}

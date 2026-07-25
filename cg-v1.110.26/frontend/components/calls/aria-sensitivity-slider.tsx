@@ -31,7 +31,7 @@ const sensitivityOptions: SensitivityOption[] = [
     label: "Moderate",
     description: "Balanced detection. Recommended for most situations.",
     icon: Shield,
-    color: "text-[#E09520]",
+    color: "text-cg-amber-dark",
     bgColor: "bg-cg-amber-subtle",
     borderColor: "border-cg-amber-subtle",
   },

@@ -30,27 +30,27 @@ export function CaseSummaryAlert({ data }: CaseSummaryAlertProps) {
   const healthColors = {
     excellent: {
       bg: "bg-gradient-to-r from-cg-sage-subtle to-teal-50",
-      border: "border-[#C5E5DB]",
+      border: "border-cg-sage-tint",
       text: "text-cg-sage-dark",
-      badge: "bg-cg-sage-subtle text-cg-sage-dark border-[#C5E5DB]",
+      badge: "bg-cg-sage-subtle text-cg-sage-dark border-cg-sage-tint",
     },
     good: {
-      bg: "bg-gradient-to-r from-teal-50 to-[#F0F7FC]",
+      bg: "bg-gradient-to-r from-teal-50 to-cg-slate-tint",
       border: "border-teal-200",
       text: "text-teal-700",
       badge: "bg-teal-100 text-teal-700 border-teal-200",
     },
     fair: {
       bg: "bg-gradient-to-r from-cg-amber-subtle to-cg-amber-subtle",
-      border: "border-[#FBE3BF]",
-      text: "text-[#B8791A]",
-      badge: "bg-cg-amber-subtle text-[#B8791A] border-[#FBE3BF]",
+      border: "border-cg-amber-tint",
+      text: "text-cg-amber-deep",
+      badge: "bg-cg-amber-subtle text-cg-amber-deep border-cg-amber-tint",
     },
     concerning: {
       bg: "bg-gradient-to-r from-cg-amber-subtle to-cg-error-subtle",
       border: "border-cg-amber-subtle",
-      text: "text-[#E09520]",
-      badge: "bg-cg-amber-subtle text-[#E09520] border-cg-amber-subtle",
+      text: "text-cg-amber-dark",
+      badge: "bg-cg-amber-subtle text-cg-amber-dark border-cg-amber-subtle",
     },
   };
 
@@ -125,14 +125,14 @@ export function CaseSummaryAlert({ data }: CaseSummaryAlertProps) {
                 data.action_items.map((action, index) => (
                   <div
                     key={index}
-                    className="flex items-start gap-2 p-3 bg-white/70 backdrop-blur-sm rounded-lg border border-[#FBE3BF] shadow-sm"
+                    className="flex items-start gap-2 p-3 bg-white/70 backdrop-blur-sm rounded-lg border border-cg-amber-tint shadow-sm"
                   >
-                    <Clock className="h-4 w-4 text-[#E09520] mt-0.5 shrink-0" />
+                    <Clock className="h-4 w-4 text-cg-amber-dark mt-0.5 shrink-0" />
                     <p className="text-sm text-slate-700 leading-snug">{action}</p>
                   </div>
                 ))
               ) : (
-                <div className="flex items-center gap-2 p-3 bg-white/70 backdrop-blur-sm rounded-lg border border-[#C5E5DB] shadow-sm">
+                <div className="flex items-center gap-2 p-3 bg-white/70 backdrop-blur-sm rounded-lg border border-cg-sage-tint shadow-sm">
                   <CheckCircle2 className="h-4 w-4 text-cg-sage-dark" />
                   <p className="text-sm text-cg-sage-dark font-medium">
                     No urgent actions required. Case is on track.

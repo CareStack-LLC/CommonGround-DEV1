@@ -10,12 +10,12 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 // Predefined tag color palette cycling
 const TAG_COLORS = [
-    "bg-cg-slate-subtle text-[#1E4E6B] border-cg-slate-subtle",
-    "bg-cg-slate-subtle text-[#1E4E6B] border-[#C2DEF0]",
-    "bg-cg-sage-subtle text-cg-sage-dark border-[#C5E5DB]",
-    "bg-cg-amber-subtle text-[#B8791A] border-[#FBE3BF]",
-    "bg-cg-amber-subtle text-[#E09520] border-cg-amber-subtle",
-    "bg-cg-slate-subtle text-[#1E4E6B] border-[#C2DEF0]",
+    "bg-cg-slate-subtle text-cg-slate-dark border-cg-slate-subtle",
+    "bg-cg-slate-subtle text-cg-slate-dark border-cg-slate-tint",
+    "bg-cg-sage-subtle text-cg-sage-dark border-cg-sage-tint",
+    "bg-cg-amber-subtle text-cg-amber-deep border-cg-amber-tint",
+    "bg-cg-amber-subtle text-cg-amber-dark border-cg-amber-subtle",
+    "bg-cg-slate-subtle text-cg-slate-dark border-cg-slate-tint",
 ];
 
 function tagColor(tag: string) {

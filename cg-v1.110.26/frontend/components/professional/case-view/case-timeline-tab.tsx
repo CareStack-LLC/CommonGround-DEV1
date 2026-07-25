@@ -108,7 +108,7 @@ export function CaseTimelineTab({ familyFileId, token }: { familyFileId: string,
                             variant={selectedTypes.includes(type.value) ? "default" : "outline"}
                             size="sm"
                             onClick={() => toggleEventType(type.value)}
-                            className={selectedTypes.includes(type.value) ? "bg-cg-slate hover:bg-[#1E4E6B]" : "h-8"}
+                            className={selectedTypes.includes(type.value) ? "bg-cg-slate hover:bg-cg-slate-dark" : "h-8"}
                         >
                             <type.icon className="h-3.5 w-3.5 mr-1.5" />
                             {type.label}
@@ -167,8 +167,8 @@ function TimelineItem({ event }: { event: TimelineEvent }) {
 
     const getEventColor = (type: string) => {
         const colorMap: Record<string, string> = {
-            message: "bg-[#F0F7FC] text-cg-slate border-cg-slate-subtle",
-            exchange: "bg-cg-amber-subtle text-[#E09520] border-cg-amber-subtle",
+            message: "bg-cg-slate-tint text-cg-slate border-cg-slate-subtle",
+            exchange: "bg-cg-amber-subtle text-cg-amber-dark border-cg-amber-subtle",
             agreement: "bg-slate-50 text-slate-600 border-slate-100",
             court: "bg-cg-slate-subtle text-cg-slate border-cg-slate-subtle",
             aria: "bg-cg-sage-subtle text-cg-sage-dark border-cg-sage-subtle",

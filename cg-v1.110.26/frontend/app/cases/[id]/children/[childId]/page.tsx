@@ -1046,7 +1046,7 @@ function ChildProfileContent() {
                           </span>
                         )}
                         {child.has_504_plan && (
-                          <span className="px-3 py-1 bg-cg-slate-subtle text-[#1E4E6B] text-sm font-medium rounded-full">
+                          <span className="px-3 py-1 bg-cg-slate-subtle text-cg-slate-dark text-sm font-medium rounded-full">
                             Has 504 Plan
                           </span>
                         )}

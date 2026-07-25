@@ -41,10 +41,10 @@ interface FormSubmission {
 }
 
 const FORM_LABELS: Record<string, { name: string; color: string }> = {
-  "FL-300": { name: "Request for Order", color: "bg-cg-slate-subtle text-[#1E4E6B]" },
-  "FL-311": { name: "Child Custody Application", color: "bg-cg-slate-subtle text-[#1E4E6B]" },
-  "FL-320": { name: "Responsive Declaration", color: "bg-cg-slate-subtle text-[#1E4E6B]" },
-  "FL-340": { name: "Findings and Order", color: "bg-cg-amber-subtle text-[#E09520]" },
+  "FL-300": { name: "Request for Order", color: "bg-cg-slate-subtle text-cg-slate-dark" },
+  "FL-311": { name: "Child Custody Application", color: "bg-cg-slate-subtle text-cg-slate-dark" },
+  "FL-320": { name: "Responsive Declaration", color: "bg-cg-slate-subtle text-cg-slate-dark" },
+  "FL-340": { name: "Findings and Order", color: "bg-cg-amber-subtle text-cg-amber-dark" },
   "FL-341": { name: "Custody Order Attachment", color: "bg-cg-sage-subtle text-cg-sage-dark" },
   "FL-342": { name: "Child Support Attachment", color: "bg-teal-100 text-teal-700" },
 };
@@ -217,10 +217,10 @@ export default function FormsQueuePage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-cg-error font-medium">Urgent</p>
-                <p className="text-2xl font-bold text-[#9B2C2C]">{urgentForms.length}</p>
+                <p className="text-2xl font-bold text-cg-error-dark">{urgentForms.length}</p>
                 <p className="text-xs text-cg-error">Older than 48h</p>
               </div>
-              <AlertCircle className="h-8 w-8 text-[#E06B6B]" />
+              <AlertCircle className="h-8 w-8 text-cg-error-light" />
             </div>
           </CardContent>
         </Card>
@@ -229,8 +229,8 @@ export default function FormsQueuePage() {
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-[#E09520] font-medium">Recent</p>
-                <p className="text-2xl font-bold text-[#E09520]">{recentForms.length}</p>
+                <p className="text-sm text-cg-amber-dark font-medium">Recent</p>
+                <p className="text-2xl font-bold text-cg-amber-dark">{recentForms.length}</p>
                 <p className="text-xs text-cg-amber">Last 48 hours</p>
               </div>
               <Clock className="h-8 w-8 text-cg-amber" />
@@ -268,7 +268,7 @@ export default function FormsQueuePage() {
       {!isLoadingData && urgentForms.length > 0 && (
         <Card className="border-cg-error-subtle">
           <CardHeader className="bg-cg-error-subtle/50">
-            <CardTitle className="text-[#7A2222] flex items-center gap-2">
+            <CardTitle className="text-cg-error-deep flex items-center gap-2">
               <AlertCircle className="h-5 w-5" />
               Urgent - Needs Immediate Attention
             </CardTitle>

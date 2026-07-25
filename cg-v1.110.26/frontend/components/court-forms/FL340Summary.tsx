@@ -136,12 +136,12 @@ function getOrderBadge(
     return { label: `Attached (${attachmentForm || 'form'})`, color: 'bg-cg-sage-subtle text-cg-sage-dark' };
   }
   if (other) {
-    return { label: 'Other', color: 'bg-cg-slate-subtle text-[#1E4E6B]' };
+    return { label: 'Other', color: 'bg-cg-slate-subtle text-cg-slate-dark' };
   }
   if (notApplicable) {
     return { label: 'N/A', color: 'bg-gray-100 text-gray-500' };
   }
-  return { label: 'Not Set', color: 'bg-cg-amber-subtle text-[#E09520]' };
+  return { label: 'Not Set', color: 'bg-cg-amber-subtle text-cg-amber-dark' };
 }
 
 // Get section summary text
@@ -363,7 +363,7 @@ export default function FL340Summary({ formData, canEdit, onEditSection }: FL340
       <Card className="border-cg-amber-subtle bg-gradient-to-br from-cg-amber-subtle to-white">
         <CardHeader>
           <div className="flex items-center gap-2">
-            <Scale className="h-5 w-5 text-[#E09520]" />
+            <Scale className="h-5 w-5 text-cg-amber-dark" />
             <CardTitle className="text-lg">FL-340 Summary</CardTitle>
           </div>
           <CardDescription>Findings and Order After Hearing</CardDescription>
@@ -379,7 +379,7 @@ export default function FL340Summary({ formData, canEdit, onEditSection }: FL340
             </div>
             <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
               <div
-                className="h-full bg-[#E09520] rounded-full transition-all duration-500"
+                className="h-full bg-cg-amber-dark rounded-full transition-all duration-500"
                 style={{ width: `${completionPercentage}%` }}
               />
             </div>
@@ -554,14 +554,14 @@ export default function FL340Summary({ formData, canEdit, onEditSection }: FL340
                 <h3 className="font-medium text-foreground mb-1">
                   Matter Rescheduled
                 </h3>
-                <p className="text-sm text-[#1E4E6B]">
+                <p className="text-sm text-cg-slate-dark">
                   This matter has been rescheduled for further hearing on{' '}
                   <strong>{new Date(formData.rescheduled_date).toLocaleDateString()}</strong>
                   {formData.rescheduled_time && ` at ${formData.rescheduled_time}`}
                   {formData.rescheduled_dept && ` in Dept. ${formData.rescheduled_dept}`}.
                 </p>
                 {formData.rescheduled_issues && (
-                  <p className="text-sm text-[#1E4E6B] mt-2">
+                  <p className="text-sm text-cg-slate-dark mt-2">
                     <strong>Issues:</strong> {formData.rescheduled_issues}
                   </p>
                 )}

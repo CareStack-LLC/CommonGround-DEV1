@@ -49,12 +49,12 @@ export function StateBubbleMap({
   if (!MAPBOX_TOKEN) {
     return (
       <div
-        className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-8 flex flex-col items-center justify-center text-center gap-3"
+        className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-8 flex flex-col items-center justify-center text-center gap-3"
         style={{ height }}
       >
         <AlertTriangle className="w-6 h-6 text-amber-400" />
-        <div className="text-sm text-[#D0E4EC] font-medium">Mapbox token not configured</div>
-        <p className="text-xs text-[#8AACBC] max-w-md">
+        <div className="text-sm text-cg-slate-tint font-medium">Mapbox token not configured</div>
+        <p className="text-xs text-cg-slate-muted max-w-md">
           Set <code className="text-cg-sage-light">NEXT_PUBLIC_MAPBOX_TOKEN</code> in the frontend env
           and redeploy to enable maps.
         </p>
@@ -65,12 +65,12 @@ export function StateBubbleMap({
   if (total === 0) {
     return (
       <div
-        className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-8 flex flex-col items-center justify-center text-center gap-3"
+        className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-8 flex flex-col items-center justify-center text-center gap-3"
         style={{ height }}
       >
         <MapPin className="w-6 h-6 text-muted-foreground opacity-60" />
-        <div className="text-sm text-[#D0E4EC] font-medium">No {label} mapped yet</div>
-        <p className="text-xs text-[#8AACBC] max-w-md">
+        <div className="text-sm text-cg-slate-tint font-medium">No {label} mapped yet</div>
+        <p className="text-xs text-cg-slate-muted max-w-md">
           {label} without a recognized state code don&apos;t appear on the map.
         </p>
       </div>
@@ -79,7 +79,7 @@ export function StateBubbleMap({
 
   return (
     <div
-      className="relative bg-[#0F2533] border border-cg-slate/20 rounded-xl overflow-hidden"
+      className="relative bg-cg-ink border border-cg-slate/20 rounded-xl overflow-hidden"
       style={{ height }}
     >
       <Map
@@ -119,7 +119,7 @@ export function StateBubbleMap({
                     borderColor: color,
                   }}
                 />
-                <div className="absolute left-1/2 -translate-x-1/2 -top-7 whitespace-nowrap bg-[#0F2533]/95 backdrop-blur-sm text-white text-[11px] font-medium px-2 py-0.5 rounded border border-cg-slate/30 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute left-1/2 -translate-x-1/2 -top-7 whitespace-nowrap bg-cg-ink/95 backdrop-blur-sm text-white text-[11px] font-medium px-2 py-0.5 rounded border border-cg-slate/30 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity">
                   {s.name}: {count.toLocaleString()}
                 </div>
               </div>
@@ -129,10 +129,10 @@ export function StateBubbleMap({
       </Map>
 
       {/* Overlay stats */}
-      <div className="absolute top-3 left-3 bg-[#0F2533]/85 backdrop-blur-md border border-cg-slate/30 rounded-lg px-3 py-2 text-[11px]">
+      <div className="absolute top-3 left-3 bg-cg-ink/85 backdrop-blur-md border border-cg-slate/30 rounded-lg px-3 py-2 text-[11px]">
         <div className="flex items-center gap-2 mb-0.5">
           <span className="inline-block w-2.5 h-2.5 rounded-full" style={{ backgroundColor: color }} />
-          <span className="text-[#D0E4EC] font-medium">
+          <span className="text-cg-slate-tint font-medium">
             {total.toLocaleString()} {label}
           </span>
         </div>

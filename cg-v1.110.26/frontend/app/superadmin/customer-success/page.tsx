@@ -155,16 +155,16 @@ function OverviewTab() {
       </div>
 
       {/* Health Distribution Chart */}
-      <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
+      <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-sm font-semibold text-[#D0E4EC]">Health Score Distribution</h3>
+          <h3 className="text-sm font-semibold text-cg-slate-tint">Health Score Distribution</h3>
           <SafetyScoreExplainer scoring={scoring} variant="inline" />
         </div>
         <div className="space-y-3">
           {distribution.map((range) => (
             <div key={range.label} className="flex items-center gap-3">
               <span className="text-xs text-muted-foreground w-12 text-right font-mono">{range.label}</span>
-              <div className="flex-1 bg-[#162D3A] rounded-full h-6 overflow-hidden">
+              <div className="flex-1 bg-cg-slate-deep rounded-full h-6 overflow-hidden">
                 <div
                   className="h-full rounded-full transition-all duration-500 flex items-center justify-end pr-2"
                   style={{
@@ -184,28 +184,28 @@ function OverviewTab() {
       </div>
 
       {/* Recent Interventions Feed */}
-      <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-        <h3 className="text-sm font-semibold text-[#D0E4EC] mb-4">Recent Interventions</h3>
+      <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+        <h3 className="text-sm font-semibold text-cg-slate-tint mb-4">Recent Interventions</h3>
         {interventions.length === 0 ? (
-          <p className="text-xs text-[#4A6E7F] py-4 text-center">No interventions recorded yet.</p>
+          <p className="text-xs text-cg-slate-strong py-4 text-center">No interventions recorded yet.</p>
         ) : (
           <div className="space-y-3">
             {interventions.map((iv) => (
               <div key={iv.id} className="flex items-start gap-3 py-2 border-b border-cg-slate/10 last:border-0">
                 <div className="mt-0.5">
-                  <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-medium border ${TYPE_COLORS[iv.type] || 'bg-cg-slate/15 text-[#8AACBC] border-cg-slate/30'}`}>
+                  <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-medium border ${TYPE_COLORS[iv.type] || 'bg-cg-slate/15 text-cg-slate-muted border-cg-slate/30'}`}>
                     {iv.type}
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs text-[#D0E4EC] truncate">
+                  <p className="text-xs text-cg-slate-tint truncate">
                     {iv.user_name || iv.user_email || iv.user_id}
                   </p>
                   {iv.notes && (
                     <p className="text-[11px] text-muted-foreground truncate mt-0.5">{iv.notes}</p>
                   )}
                 </div>
-                <span className="text-[10px] text-[#4A6E7F] whitespace-nowrap">
+                <span className="text-[10px] text-cg-slate-strong whitespace-nowrap">
                   {timeAgo(iv.created_at)}
                 </span>
               </div>
@@ -271,18 +271,18 @@ function HealthScoresTab() {
 
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#4A6E7F]" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-cg-slate-strong" />
         <input
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search by name or email..."
-          className="w-full bg-[#1A3648]/60 border border-cg-slate/20 rounded-lg pl-9 pr-4 py-2.5 text-sm text-[#D0E4EC] placeholder-[#4A6E7F] outline-none focus:border-cg-sage/40"
+          className="w-full bg-cg-slate-deep/60 border border-cg-slate/20 rounded-lg pl-9 pr-4 py-2.5 text-sm text-cg-slate-tint placeholder-cg-slate-strong outline-none focus:border-cg-sage/40"
         />
       </div>
 
       {/* Table */}
-      <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden">
+      <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -311,10 +311,10 @@ function HealthScoresTab() {
               ) : (
                 filtered.map((entry) => (
                   <tr key={entry.user_id} className="border-b border-cg-slate/10 hover:bg-cg-slate/10 transition-colors">
-                    <td className="px-4 py-3 text-sm text-[#D0E4EC]">
+                    <td className="px-4 py-3 text-sm text-cg-slate-tint">
                       {entry.first_name} {entry.last_name}
                     </td>
-                    <td className="px-4 py-3 text-xs text-[#8AACBC]">{entry.email}</td>
+                    <td className="px-4 py-3 text-xs text-cg-slate-muted">{entry.email}</td>
                     <td className="px-4 py-3">
                       <div className="flex justify-center">
                         <HealthScoreBadge score={entry.overall_score} riskLevel={entry.risk_level} size="sm" />
@@ -329,7 +329,7 @@ function HealthScoresTab() {
                         {entry.risk_level?.replace('_', ' ') || 'unknown'}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-xs text-[#8AACBC] capitalize">
+                    <td className="px-4 py-3 text-xs text-cg-slate-muted capitalize">
                       {entry.subscription_tier || '-'}
                     </td>
                     <td className="px-4 py-3 text-xs text-muted-foreground">
@@ -428,18 +428,18 @@ function AtRiskTab() {
         return (
           <div
             key={entry.user_id}
-            className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-4 hover:border-cg-slate/40 transition-colors"
+            className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-4 hover:border-cg-slate/40 transition-colors"
           >
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-3 min-w-0">
                 <HealthScoreBadge score={entry.overall_score} riskLevel={entry.risk_level} size="lg" showLabel />
                 <div className="min-w-0">
-                  <p className="text-sm font-medium text-[#D0E4EC] truncate">
+                  <p className="text-sm font-medium text-cg-slate-tint truncate">
                     {entry.first_name} {entry.last_name}
                   </p>
                   <p className="text-xs text-muted-foreground truncate">{entry.email}</p>
                   {daysSinceActive !== null && (
-                    <p className="text-[11px] text-[#4A6E7F] mt-1 flex items-center gap-1">
+                    <p className="text-[11px] text-cg-slate-strong mt-1 flex items-center gap-1">
                       <Clock className="w-3 h-3" />
                       {daysSinceActive === 0 ? 'Active today' : `${daysSinceActive} day${daysSinceActive === 1 ? '' : 's'} since last active`}
                     </p>
@@ -568,7 +568,7 @@ function InterventionsTab() {
       </div>
 
       {/* Timeline */}
-      <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
+      <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
         {loading ? (
           <SkeletonRows count={5} />
         ) : interventions.length === 0 ? (
@@ -582,23 +582,23 @@ function InterventionsTab() {
                   <div className="absolute left-[11px] top-6 bottom-0 w-px bg-cg-slate/20" />
                 )}
                 {/* Timeline dot */}
-                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-[#162D3A] border-2 border-cg-slate/30 flex items-center justify-center mt-0.5">
+                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-cg-slate-deep border-2 border-cg-slate/30 flex items-center justify-center mt-0.5">
                   <div className="w-2 h-2 rounded-full bg-cg-sage" />
                 </div>
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-medium border ${TYPE_COLORS[iv.type] || 'bg-cg-slate/15 text-[#8AACBC] border-cg-slate/30'}`}>
+                    <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-medium border ${TYPE_COLORS[iv.type] || 'bg-cg-slate/15 text-cg-slate-muted border-cg-slate/30'}`}>
                       {iv.type}
                     </span>
-                    <span className="text-xs text-[#D0E4EC] font-medium">
+                    <span className="text-xs text-cg-slate-tint font-medium">
                       {iv.user_name || iv.user_email || iv.user_id}
                     </span>
                     {iv.outcome && (
                       <span className={`text-[10px] px-1.5 py-0.5 rounded ${
                         iv.outcome === 'resolved' ? 'bg-emerald-500/10 text-emerald-400' :
                         iv.outcome === 'failed' ? 'bg-red-500/10 text-red-400' :
-                        'bg-cg-slate/15 text-[#8AACBC]'
+                        'bg-cg-slate/15 text-cg-slate-muted'
                       }`}>
                         {iv.outcome}
                       </span>
@@ -607,7 +607,7 @@ function InterventionsTab() {
                   {iv.notes && (
                     <p className="text-xs text-muted-foreground mt-1">{iv.notes}</p>
                   )}
-                  <p className="text-[10px] text-[#4A6E7F] mt-1">{timeAgo(iv.created_at)}</p>
+                  <p className="text-[10px] text-cg-slate-strong mt-1">{timeAgo(iv.created_at)}</p>
                 </div>
               </div>
             ))}

@@ -444,10 +444,10 @@ export function TheaterMode({
   const remoteParticipants = participantList.filter((p) => !p.isLocal);
 
   return (
-    <div className="fixed inset-0 z-40 bg-gradient-to-b from-[#0D1B24] via-foreground/95 to-[#0D1B24] flex flex-col">
+    <div className="fixed inset-0 z-40 bg-gradient-to-b from-cg-ink via-foreground/95 to-cg-ink flex flex-col">
       {presenterDisconnected && (
         <div
-          className="bg-amber-500/95 text-[#0D1B24] text-sm font-medium px-4 py-2 text-center"
+          className="bg-amber-500/95 text-cg-ink text-sm font-medium px-4 py-2 text-center"
           style={{ fontFamily: "'Inter', sans-serif" }}
           role="status"
         >
@@ -455,7 +455,7 @@ export function TheaterMode({
         </div>
       )}
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2.5 bg-[#0D1B24]/90 backdrop-blur-sm border-b border-cg-sage/10">
+      <div className="flex items-center justify-between px-4 py-2.5 bg-cg-ink/90 backdrop-blur-sm border-b border-cg-sage/10">
         <div className="flex items-center space-x-3">
           <span
             className="text-cg-sage text-sm font-semibold px-3 py-1 bg-cg-sage/10 rounded-lg border border-cg-sage/20"
@@ -536,7 +536,7 @@ export function TheaterMode({
                 >
                   Choose something to watch together
                 </h2>
-                <p className="text-[#CBD8E0]/60 mb-6 text-sm md:text-base" style={{ fontFamily: "'Inter', sans-serif" }}>
+                <p className="text-cg-mist/60 mb-6 text-sm md:text-base" style={{ fontFamily: "'Inter', sans-serif" }}>
                   Select a video or storybook from the library
                 </p>
                 <button
@@ -589,7 +589,7 @@ export function TheaterMode({
       </div>
 
       {/* Bottom Controls */}
-      <div className="px-4 py-3 bg-[#0D1B24] safe-area-bottom border-t border-cg-sage/10 shadow-lg">
+      <div className="px-4 py-3 bg-cg-ink safe-area-bottom border-t border-cg-sage/10 shadow-lg">
         <div className="flex items-center justify-center space-x-3">
           <button aria-label="Toggle microphone"
             onClick={onToggleAudio}
@@ -683,7 +683,7 @@ function PiPVideoTile({ participant }: { participant: VideoParticipant }) {
       {!participant.isLocal && <audio ref={audioRef} />}
 
       {/* Name label */}
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#0D1B24]/90 to-transparent px-2 py-1">
+      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-cg-ink/90 to-transparent px-2 py-1">
         <span className="text-white text-xs truncate block drop-shadow-lg" style={{ fontFamily: "'Inter', sans-serif" }}>
           {participant.odName}
           {participant.isLocal && <span className="text-cg-amber"> (You)</span>}

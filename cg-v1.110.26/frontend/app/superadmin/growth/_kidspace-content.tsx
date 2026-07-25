@@ -136,7 +136,7 @@ export default function KidSpaceContent() {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <AlertTriangle className="w-10 h-10 text-amber-500 mb-3" />
-        <p className="text-[#8AACBC] mb-4">{error}</p>
+        <p className="text-cg-slate-muted mb-4">{error}</p>
         <button onClick={fetchData} className="px-4 py-2 rounded-lg bg-cg-sage hover:bg-cg-sage-light text-white text-sm font-medium transition-colors">Retry</button>
       </div>
     );
@@ -146,10 +146,10 @@ export default function KidSpaceContent() {
     return (
       <div className="space-y-6">
         <Header loading={false} onRefresh={fetchData} />
-        <div className="flex flex-col items-center justify-center py-20 bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl">
-          <Gamepad2 className="w-12 h-12 text-[#4A6E7F] mb-4" />
-          <p className="text-[#8AACBC] text-lg font-medium">No KidSpace data available yet</p>
-          <p className="text-[#4A6E7F] text-sm mt-1">Analytics will populate as families use KidSpace features.</p>
+        <div className="flex flex-col items-center justify-center py-20 bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl">
+          <Gamepad2 className="w-12 h-12 text-cg-slate-strong mb-4" />
+          <p className="text-cg-slate-muted text-lg font-medium">No KidSpace data available yet</p>
+          <p className="text-cg-slate-strong text-sm mt-1">Analytics will populate as families use KidSpace features.</p>
         </div>
       </div>
     );
@@ -185,7 +185,7 @@ export default function KidSpaceContent() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-1">
+      <div className="flex gap-1 bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-1">
         {tabs.map((t) => (
           <button
             key={t.key}
@@ -193,7 +193,7 @@ export default function KidSpaceContent() {
             className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-medium transition-colors ${
               tab === t.key
                 ? 'bg-violet-500/20 text-cg-sage-light border border-violet-500/30'
-                : 'text-muted-foreground hover:text-[#D0E4EC] hover:bg-cg-slate/20'
+                : 'text-muted-foreground hover:text-cg-slate-tint hover:bg-cg-slate/20'
             }`}
           >
             <t.icon className="w-3.5 h-3.5" />
@@ -205,8 +205,8 @@ export default function KidSpaceContent() {
       {tab === 'overview' && (
         <div className="space-y-4">
           {/* Daily Usage Chart */}
-          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-            <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">Daily Usage Trends (30 days)</h2>
+          <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+            <h2 className="text-sm font-semibold text-cg-slate-tint mb-4">Daily Usage Trends (30 days)</h2>
             {data?.daily_usage?.length ? (
               <ResponsiveContainer width="100%" height={280}>
                 <LineChart data={data.daily_usage}>
@@ -214,27 +214,27 @@ export default function KidSpaceContent() {
                   <XAxis dataKey="date" tick={{ fill: '#71717a', fontSize: 11 }} tickFormatter={(v) => new Date(v).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} axisLine={{ stroke: '#3f3f46' }} tickLine={false} />
                   <YAxis tick={{ fill: '#71717a', fontSize: 11 }} axisLine={false} tickLine={false} />
                   <Tooltip contentStyle={CustomTooltipStyle} labelFormatter={(v) => new Date(v).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} />
-                  <Legend verticalAlign="top" height={36} formatter={(value: any) => <span className="text-[#8AACBC] text-xs capitalize">{value}</span>} />
+                  <Legend verticalAlign="top" height={36} formatter={(value: any) => <span className="text-cg-slate-muted text-xs capitalize">{value}</span>} />
                   <Line type="monotone" dataKey="calls" name="Calls" stroke="#3b82f6" strokeWidth={2} dot={false} />
                   <Line type="monotone" dataKey="theater" name="Theater" stroke="#10b981" strokeWidth={2} dot={false} />
                   <Line type="monotone" dataKey="arcade" name="Arcade" stroke="#f59e0b" strokeWidth={2} dot={false} />
                   <Line type="monotone" dataKey="stories" name="Stories" stroke="#a78bfa" strokeWidth={2} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
-            ) : <p className="text-[#4A6E7F] text-sm text-center py-10">No usage data</p>}
+            ) : <p className="text-cg-slate-strong text-sm text-center py-10">No usage data</p>}
           </div>
 
           {/* COPPA + Session Averages */}
           <div className="grid lg:grid-cols-2 gap-4">
-            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
+            <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
               <div className="flex items-center gap-2 mb-4">
                 <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                <h2 className="text-sm font-semibold text-[#D0E4EC]">COPPA Consent Status</h2>
+                <h2 className="text-sm font-semibold text-cg-slate-tint">COPPA Consent Status</h2>
               </div>
               {data ? (
                 <div>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs text-[#8AACBC]">
+                    <span className="text-xs text-cg-slate-muted">
                       {data.coppa_consent?.children_with_consent ?? 0} of {data.coppa_consent?.total_children ?? 0} children have consent
                     </span>
                     <span className="text-sm font-semibold text-white">{consentPct}%</span>
@@ -251,10 +251,10 @@ export default function KidSpaceContent() {
               ) : null}
             </div>
 
-            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
+            <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
               <div className="flex items-center gap-2 mb-4">
                 <Timer className="w-4 h-4 text-blue-400" />
-                <h2 className="text-sm font-semibold text-[#D0E4EC]">Avg Session Duration</h2>
+                <h2 className="text-sm font-semibold text-cg-slate-tint">Avg Session Duration</h2>
               </div>
               {data?.session_averages?.length ? (
                 <ResponsiveContainer width="100%" height={200}>
@@ -270,7 +270,7 @@ export default function KidSpaceContent() {
                     </Bar>
                   </BarChart>
                 </ResponsiveContainer>
-              ) : <p className="text-[#4A6E7F] text-sm text-center py-10">No session data</p>}
+              ) : <p className="text-cg-slate-strong text-sm text-center py-10">No session data</p>}
             </div>
           </div>
         </div>
@@ -279,10 +279,10 @@ export default function KidSpaceContent() {
       {tab === 'content' && (
         <div className="grid lg:grid-cols-2 gap-4">
           {/* Most Played */}
-          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
+          <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
             <div className="flex items-center gap-2 mb-4">
               <Trophy className="w-4 h-4 text-amber-400" />
-              <h2 className="text-sm font-semibold text-[#D0E4EC]">Most Played</h2>
+              <h2 className="text-sm font-semibold text-cg-slate-tint">Most Played</h2>
             </div>
             {data?.most_played?.length ? (
               <div className="space-y-0">
@@ -292,27 +292,27 @@ export default function KidSpaceContent() {
                       {i === 0 ? (
                         <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 text-[10px] font-bold">#1</span>
                       ) : (
-                        <span className="text-xs font-bold text-[#4A6E7F]">#{item.rank}</span>
+                        <span className="text-xs font-bold text-cg-slate-strong">#{item.rank}</span>
                       )}
                     </span>
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm text-[#D0E4EC] truncate">{item.title}</div>
+                      <div className="text-sm text-cg-slate-tint truncate">{item.title}</div>
                     </div>
                     <div className="text-right flex-shrink-0">
-                      <div className="text-xs text-[#D0E4EC] font-medium">{(item.view_count ?? 0).toLocaleString()} views</div>
-                      <div className="text-[11px] text-[#4A6E7F]">{(item.minutes_watched ?? 0).toLocaleString()} min</div>
+                      <div className="text-xs text-cg-slate-tint font-medium">{(item.view_count ?? 0).toLocaleString()} views</div>
+                      <div className="text-[11px] text-cg-slate-strong">{(item.minutes_watched ?? 0).toLocaleString()} min</div>
                     </div>
                   </div>
                 ))}
               </div>
-            ) : <p className="text-[#4A6E7F] text-sm text-center py-6">No viewing data yet</p>}
+            ) : <p className="text-cg-slate-strong text-sm text-center py-6">No viewing data yet</p>}
           </div>
 
           {/* Most Read */}
-          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
+          <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
             <div className="flex items-center gap-2 mb-4">
               <BookOpen className="w-4 h-4 text-emerald-400" />
-              <h2 className="text-sm font-semibold text-[#D0E4EC]">Most Read</h2>
+              <h2 className="text-sm font-semibold text-cg-slate-tint">Most Read</h2>
             </div>
             {data?.most_read?.length ? (
               <div className="space-y-0">
@@ -322,20 +322,20 @@ export default function KidSpaceContent() {
                       {i === 0 ? (
                         <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 text-[10px] font-bold">#1</span>
                       ) : (
-                        <span className="text-xs font-bold text-[#4A6E7F]">#{item.rank}</span>
+                        <span className="text-xs font-bold text-cg-slate-strong">#{item.rank}</span>
                       )}
                     </span>
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm text-[#D0E4EC] truncate">{item.title}</div>
+                      <div className="text-sm text-cg-slate-tint truncate">{item.title}</div>
                     </div>
                     <div className="text-right flex-shrink-0">
-                      <div className="text-xs text-[#D0E4EC] font-medium">{(item.read_count ?? 0).toLocaleString()} reads</div>
-                      <div className="text-[11px] text-[#4A6E7F]">{(item.pages_turned ?? 0).toLocaleString()} pages</div>
+                      <div className="text-xs text-cg-slate-tint font-medium">{(item.read_count ?? 0).toLocaleString()} reads</div>
+                      <div className="text-[11px] text-cg-slate-strong">{(item.pages_turned ?? 0).toLocaleString()} pages</div>
                     </div>
                   </div>
                 ))}
               </div>
-            ) : <p className="text-[#4A6E7F] text-sm text-center py-6">No reading data yet</p>}
+            ) : <p className="text-cg-slate-strong text-sm text-center py-6">No reading data yet</p>}
           </div>
         </div>
       )}
@@ -354,14 +354,14 @@ export default function KidSpaceContent() {
                 <Icon className={`w-4 h-4 text-${color}-400 mb-1.5`} />
                 <div className="text-lg font-bold text-white">{sessions}</div>
                 <span className="text-[11px] text-muted-foreground">{label}</span>
-                {sub && <div className="text-[11px] text-[#4A6E7F] mt-0.5">{sub}</div>}
+                {sub && <div className="text-[11px] text-cg-slate-strong mt-0.5">{sub}</div>}
               </div>
             ))}
           </div>
 
           {/* Session averages table */}
           {data?.session_averages?.length ? (
-            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden">
+            <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl overflow-hidden">
               <div className="px-5 py-4 border-b border-zinc-800">
                 <h2 className="text-sm font-semibold text-white">Session Type Breakdown</h2>
               </div>
@@ -377,8 +377,8 @@ export default function KidSpaceContent() {
                   {data.session_averages.map((sa, i) => (
                     <tr key={i} className="border-b border-zinc-800/50 hover:bg-cg-slate/10">
                       <td className="px-5 py-3 text-white capitalize">{sa.type.replace('_', ' ')}</td>
-                      <td className="px-5 py-3 text-right text-[#D0E4EC]">{formatNumber(sa.total_sessions)}</td>
-                      <td className="px-5 py-3 text-right text-[#D0E4EC]">{sa.avg_minutes} min</td>
+                      <td className="px-5 py-3 text-right text-cg-slate-tint">{formatNumber(sa.total_sessions)}</td>
+                      <td className="px-5 py-3 text-right text-cg-slate-tint">{sa.avg_minutes} min</td>
                     </tr>
                   ))}
                 </tbody>
@@ -399,7 +399,7 @@ function Header({ loading, onRefresh }: { loading: boolean; onRefresh: () => voi
         <p className="text-sm text-muted-foreground mt-0.5">Usage stats, content leaderboards &amp; session details</p>
       </div>
       <button onClick={onRefresh} disabled={loading}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-[#8AACBC] hover:text-white text-xs font-medium transition-colors disabled:opacity-50">
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-cg-slate-muted hover:text-white text-xs font-medium transition-colors disabled:opacity-50">
         <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
         Refresh
       </button>

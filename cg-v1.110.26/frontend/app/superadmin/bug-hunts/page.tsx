@@ -9,7 +9,7 @@ import {
 import { adminAPI, type BugHuntCohort } from '@/lib/admin-api';
 
 const STATUS_COLORS: Record<string, string> = {
-  draft: 'bg-zinc-700/50 text-[#8AACBC]',
+  draft: 'bg-zinc-700/50 text-cg-slate-muted',
   seeding: 'bg-blue-500/15 text-blue-400 border border-blue-500/20',
   active: 'bg-cg-sage/15 text-cg-sage border border-cg-sage/20',
   completed: 'bg-purple-500/15 text-purple-400 border border-purple-500/20',
@@ -22,7 +22,7 @@ const FEATURE_COLORS: Record<string, string> = {
   agreement: 'bg-cg-sage/15 text-cg-sage',
   custody_tracking: 'bg-yellow-500/15 text-yellow-400',
   clearfund: 'bg-purple-500/15 text-purple-400',
-  general: 'bg-zinc-700/50 text-[#8AACBC]',
+  general: 'bg-zinc-700/50 text-cg-slate-muted',
 };
 
 const FEATURE_LABELS: Record<string, string> = {
@@ -94,7 +94,7 @@ export default function BugHuntsPage() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => fetchCohorts()}
-            className="p-2 rounded-lg hover:bg-cg-slate/20 transition-colors text-[#8AACBC]"
+            className="p-2 rounded-lg hover:bg-cg-slate/20 transition-colors text-cg-slate-muted"
             title="Refresh"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -118,7 +118,7 @@ export default function BugHuntsPage() {
             className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
               tab === t
                 ? 'bg-cg-slate/40 text-white'
-                : 'text-muted-foreground hover:text-[#8AACBC]'
+                : 'text-muted-foreground hover:text-cg-slate-muted'
             }`}
           >
             {t === 'active' ? 'Active' : t === 'completed' ? 'Completed' : 'All'}
@@ -145,8 +145,8 @@ export default function BugHuntsPage() {
       {/* Empty state */}
       {!loading && !error && cohorts.length === 0 && (
         <div className="text-center py-16 bg-foreground/30 rounded-xl border border-cg-slate/20">
-          <FlaskConical className="w-12 h-12 text-[#4A6E7F] mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-[#8AACBC] mb-2">No bug hunts yet</h3>
+          <FlaskConical className="w-12 h-12 text-cg-slate-strong mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-cg-slate-muted mb-2">No bug hunts yet</h3>
           <p className="text-sm text-muted-foreground mb-6">Create your first organized testing session</p>
           <button
             onClick={() => router.push('/superadmin/bug-hunts/new')}
@@ -215,7 +215,7 @@ export default function BugHuntsPage() {
                       />
                     </div>
                   )}
-                  <ChevronRight className="w-5 h-5 text-[#4A6E7F] group-hover:text-[#8AACBC] transition-colors" />
+                  <ChevronRight className="w-5 h-5 text-cg-slate-strong group-hover:text-cg-slate-muted transition-colors" />
                 </div>
               </div>
             </button>

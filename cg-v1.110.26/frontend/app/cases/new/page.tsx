@@ -263,7 +263,7 @@ function CreateCaseContent() {
                 <svg className="w-5 h-5 text-cg-error" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <p className="text-sm text-[#9B2C2C]">{error}</p>
+                <p className="text-sm text-cg-error-dark">{error}</p>
               </div>
             </CardContent>
           </Card>
@@ -466,7 +466,7 @@ function CreateCaseContent() {
               </svg>
               <div className="text-sm text-foreground">
                 <p className="font-medium mb-1">What happens next?</p>
-                <ul className="list-disc list-inside space-y-1 text-[#1E4E6B]">
+                <ul className="list-disc list-inside space-y-1 text-cg-slate-dark">
                   <li>An invitation email will be sent to the other parent</li>
                   <li>They'll create an account and accept the invitation</li>
                   <li>Once accepted, the case becomes active</li>

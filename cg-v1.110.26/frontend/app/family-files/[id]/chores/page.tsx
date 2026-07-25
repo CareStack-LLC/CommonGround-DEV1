@@ -61,11 +61,11 @@ function statusBadgeClass(status: Chore['status']) {
     case 'pending':
       return 'bg-cg-sage/10 text-[#2F8569] border border-cg-sage/30';
     case 'completed':
-      return 'bg-cg-amber-subtle text-[#E09520] border border-cg-amber-subtle';
+      return 'bg-cg-amber-subtle text-cg-amber-dark border border-cg-amber-subtle';
     case 'approved':
       return 'bg-cg-sage-subtle text-cg-sage-dark border border-cg-sage-subtle';
     case 'rejected':
-      return 'bg-cg-amber-subtle text-[#E09520] border border-cg-amber-subtle';
+      return 'bg-cg-amber-subtle text-cg-amber-dark border border-cg-amber-subtle';
     case 'cancelled':
       return 'bg-muted text-muted-foreground border border-border';
   }
@@ -219,7 +219,7 @@ export default function ParentChoresPage() {
             <div className="mb-6 bg-cg-error-subtle border-2 border-cg-error-subtle rounded-2xl p-4">
               <div className="flex items-center gap-3">
                 <XCircle className="h-5 w-5 text-cg-error" />
-                <p className="text-[#9B2C2C] font-medium">{error}</p>
+                <p className="text-cg-error-dark font-medium">{error}</p>
               </div>
             </div>
           )}
@@ -252,10 +252,10 @@ export default function ParentChoresPage() {
                   className="text-lg font-bold text-foreground mb-4 flex items-center gap-2"
                   style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
                 >
-                  <CheckCircle2 className="h-5 w-5 text-[#E09520]" />
+                  <CheckCircle2 className="h-5 w-5 text-cg-amber-dark" />
                   Needs your review
                   {reviewQueue.length > 0 && (
-                    <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-cg-amber-subtle text-[#E09520] border border-cg-amber-subtle">
+                    <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-cg-amber-subtle text-cg-amber-dark border border-cg-amber-subtle">
                       {reviewQueue.length}
                     </span>
                   )}
@@ -344,7 +344,7 @@ export default function ParentChoresPage() {
                                 <button
                                   onClick={() => submitReject(chore)}
                                   disabled={busy}
-                                  className="flex-1 bg-cg-amber hover:bg-[#E09520] text-white text-sm font-semibold py-2 rounded-lg disabled:opacity-50"
+                                  className="flex-1 bg-cg-amber hover:bg-cg-amber-dark text-white text-sm font-semibold py-2 rounded-lg disabled:opacity-50"
                                 >
                                   {busy ? 'Sending...' : 'Send back'}
                                 </button>
@@ -379,7 +379,7 @@ export default function ParentChoresPage() {
                                   setRejectReason('');
                                 }}
                                 disabled={busy}
-                                className="flex-1 flex items-center justify-center gap-1.5 border-2 border-cg-amber bg-white hover:bg-cg-amber-subtle text-[#E09520] text-sm font-semibold py-2 rounded-lg disabled:opacity-50"
+                                className="flex-1 flex items-center justify-center gap-1.5 border-2 border-cg-amber bg-white hover:bg-cg-amber-subtle text-cg-amber-dark text-sm font-semibold py-2 rounded-lg disabled:opacity-50"
                               >
                                 <X className="h-4 w-4" />
                                 Reject
@@ -652,7 +652,7 @@ function ChoreRow({
             <p className="text-sm text-foreground/80 mt-1">{chore.description}</p>
           )}
           {chore.status === 'rejected' && chore.rejection_reason && (
-            <p className="mt-1 text-xs text-[#E09520] bg-cg-amber-subtle border border-cg-amber-subtle rounded-md px-2 py-1 inline-block">
+            <p className="mt-1 text-xs text-cg-amber-dark bg-cg-amber-subtle border border-cg-amber-subtle rounded-md px-2 py-1 inline-block">
               Sent back: {chore.rejection_reason}
             </p>
           )}
@@ -837,7 +837,7 @@ function CreateChoreModal({
           </div>
 
           {err && (
-            <div className="bg-cg-error-subtle border border-cg-error-subtle text-[#9B2C2C] rounded-lg px-3 py-2 text-sm">
+            <div className="bg-cg-error-subtle border border-cg-error-subtle text-cg-error-dark rounded-lg px-3 py-2 text-sm">
               {err}
             </div>
           )}

@@ -440,7 +440,7 @@ export default function SessionPage() {
               disabled={!isCallJoined}
               className={`p-4 md:p-3 rounded-full transition-colors ${isAudioOn
                 ? 'bg-gray-700 hover:bg-gray-600 text-white'
-                : 'bg-cg-error hover:bg-[#9B2C2C] text-white'
+                : 'bg-cg-error hover:bg-cg-error-dark text-white'
                 } ${!isCallJoined ? 'opacity-50 cursor-not-allowed' : ''}`}
               title={isAudioOn ? 'Mute' : 'Unmute'}
             >
@@ -453,7 +453,7 @@ export default function SessionPage() {
               disabled={!isCallJoined}
               className={`p-4 md:p-3 rounded-full transition-colors ${isVideoOn
                 ? 'bg-gray-700 hover:bg-gray-600 text-white'
-                : 'bg-cg-error hover:bg-[#9B2C2C] text-white'
+                : 'bg-cg-error hover:bg-cg-error-dark text-white'
                 } ${!isCallJoined ? 'opacity-50 cursor-not-allowed' : ''}`}
               title={isVideoOn ? 'Turn off camera' : 'Turn on camera'}
             >
@@ -463,7 +463,7 @@ export default function SessionPage() {
             {/* End Call */}
             <button aria-label="End call"
               onClick={handleEndCall}
-              className="p-4 md:p-3 rounded-full bg-cg-error hover:bg-[#9B2C2C] text-white"
+              className="p-4 md:p-3 rounded-full bg-cg-error hover:bg-cg-error-dark text-white"
               title="Leave Call"
             >
               <PhoneOff className="h-6 w-6 md:h-5 md:w-5" />
@@ -552,7 +552,7 @@ export default function SessionPage() {
                     messages.map((msg) => (
                       <div
                         key={msg.id}
-                        className={`p-3 rounded-lg ${msg.aria_flagged ? 'bg-foreground/30 border border-[#E09520]' : 'bg-gray-700'
+                        className={`p-3 rounded-lg ${msg.aria_flagged ? 'bg-foreground/30 border border-cg-amber-dark' : 'bg-gray-700'
                           }`}
                       >
                         <div className="flex items-center justify-between mb-1">
@@ -790,8 +790,8 @@ function VideoTile({ participant, isFullScreen, isCompact }: VideoTileProps) {
             {participant.isLocal && ' (You)'}
           </span>
           <div className="flex items-center space-x-2">
-            {!participant.audioOn && <MicOff className="h-4 w-4 text-[#E06B6B]" />}
-            {!participant.videoOn && <VideoOff className="h-4 w-4 text-[#E06B6B]" />}
+            {!participant.audioOn && <MicOff className="h-4 w-4 text-cg-error-light" />}
+            {!participant.videoOn && <VideoOff className="h-4 w-4 text-cg-error-light" />}
           </div>
         </div>
       </div>

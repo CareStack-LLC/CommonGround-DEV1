@@ -188,7 +188,7 @@ function TimelineItem({ event }: { event: TimelineEvent }) {
     message: { icon: <MessageSquare className="h-4 w-4" />, color: 'bg-cg-slate-subtle text-cg-slate' },
     payment: { icon: <DollarSign className="h-4 w-4" />, color: 'bg-cg-sage-subtle text-cg-sage-dark' },
     event: { icon: <Calendar className="h-4 w-4" />, color: 'bg-[var(--portal-primary)]/10 text-[var(--portal-primary)]' },
-    alert: { icon: <AlertTriangle className="h-4 w-4" />, color: 'bg-cg-amber-subtle text-[#E09520]' },
+    alert: { icon: <AlertTriangle className="h-4 w-4" />, color: 'bg-cg-amber-subtle text-cg-amber-dark' },
   };
 
   const statusColors = {
@@ -530,25 +530,25 @@ export default function CourtDashboardPage() {
           <div className="bg-card border border-border rounded-xl overflow-hidden">
             <div className="p-4 border-b border-border bg-cg-amber-subtle/50">
               <h2 className="font-semibold text-foreground flex items-center gap-2">
-                <Bell className="h-4 w-4 text-[#E09520]" />
+                <Bell className="h-4 w-4 text-cg-amber-dark" />
                 Alerts & Flags
               </h2>
             </div>
             <div className="p-4 space-y-3">
               {stats.access_expiring_soon > 0 && (
                 <div className="flex items-center gap-3 p-3 bg-cg-amber-subtle border border-cg-amber-subtle rounded-lg">
-                  <Clock className="h-4 w-4 text-[#E09520]" />
+                  <Clock className="h-4 w-4 text-cg-amber-dark" />
                   <div className="flex-1">
                     <p className="text-sm font-medium text-foreground">Access Expiring</p>
-                    <p className="text-xs text-[#E09520]">{stats.access_expiring_soon} case(s) expiring within 7 days</p>
+                    <p className="text-xs text-cg-amber-dark">{stats.access_expiring_soon} case(s) expiring within 7 days</p>
                   </div>
                 </div>
               )}
               <div className="flex items-center gap-3 p-3 bg-cg-error-subtle border border-cg-error-subtle rounded-lg">
                 <XCircle className="h-4 w-4 text-cg-error" />
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-[#7A2222]">Missed Exchange</p>
-                  <p className="text-xs text-[#9B2C2C]">Thompson v. Thompson - No check-in recorded</p>
+                  <p className="text-sm font-medium text-cg-error-deep">Missed Exchange</p>
+                  <p className="text-xs text-cg-error-dark">Thompson v. Thompson - No check-in recorded</p>
                 </div>
               </div>
               <div className="flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-lg">

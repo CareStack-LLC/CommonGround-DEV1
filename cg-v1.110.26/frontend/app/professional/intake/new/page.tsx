@@ -90,7 +90,7 @@ function TemplateCard({
     >
       {isLocked && (
         <div className="absolute top-3 right-3">
-          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#B8791A] bg-cg-amber-subtle border border-[#FBE3BF]/60 rounded-full px-2 py-0.5">
+          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-cg-amber-deep bg-cg-amber-subtle border border-cg-amber-tint/60 rounded-full px-2 py-0.5">
             <Crown className="h-2.5 w-2.5" /> Pro
           </span>
         </div>
@@ -141,7 +141,7 @@ function TemplateCard({
             <div className="mt-3 pt-3 border-t border-cg-sage/15">
               <button
                 type="button"
-                className="flex items-center gap-1 text-[11px] font-medium text-cg-sage hover:text-[#2D8A6E]"
+                className="flex items-center gap-1 text-[11px] font-medium text-cg-sage hover:text-cg-sage-dark"
                 onClick={(e) => { e.stopPropagation(); setExpanded(!expanded); }}
               >
                 {expanded ? <><ChevronUp className="h-3 w-3" /> Hide sections</> : <><ChevronDown className="h-3 w-3" /> View {template.sections.length} sections</>}
@@ -255,7 +255,7 @@ export default function NewIntakePage() {
   if (createdSession) {
     return (
       <div className="max-w-lg mx-auto space-y-6">
-        <Link href="/professional/intake" className="inline-flex items-center gap-1.5 text-xs text-cg-sage hover:text-[#2D8A6E] font-medium">
+        <Link href="/professional/intake" className="inline-flex items-center gap-1.5 text-xs text-cg-sage hover:text-cg-sage-dark font-medium">
           <ArrowLeft className="h-3.5 w-3.5" /> Back to Intake Center
         </Link>
 
@@ -290,7 +290,7 @@ export default function NewIntakePage() {
 
           <div className="flex justify-center gap-3 mt-6">
             <Button variant="outline" onClick={resetForm} className="rounded-xl border-slate-200">Create Another</Button>
-            <Button onClick={() => router.push(`/professional/intake/${createdSession.id}`)} className="bg-cg-sage hover:bg-[#2D8A6E] rounded-xl">View Session</Button>
+            <Button onClick={() => router.push(`/professional/intake/${createdSession.id}`)} className="bg-cg-sage hover:bg-cg-sage-dark rounded-xl">View Session</Button>
           </div>
         </div>
       </div>
@@ -305,7 +305,7 @@ export default function NewIntakePage() {
 
     return (
       <div className="max-w-3xl mx-auto space-y-6">
-        <Link href="/professional/intake" className="inline-flex items-center gap-1.5 text-xs text-cg-sage hover:text-[#2D8A6E] font-medium">
+        <Link href="/professional/intake" className="inline-flex items-center gap-1.5 text-xs text-cg-sage hover:text-cg-sage-dark font-medium">
           <ArrowLeft className="h-3.5 w-3.5" /> Back to Intake Center
         </Link>
 
@@ -338,7 +338,7 @@ export default function NewIntakePage() {
               <Crown className="h-4 w-4 text-[#D4AF37]" />
               <h2 className="text-sm font-semibold text-slate-900">Professional Templates</h2>
               {!isPaid && (
-                <Badge className="text-[10px] bg-cg-amber-subtle text-[#B8791A] border border-[#FBE3BF]/60 font-semibold">
+                <Badge className="text-[10px] bg-cg-amber-subtle text-cg-amber-deep border border-cg-amber-tint/60 font-semibold">
                   Upgrade Required
                 </Badge>
               )}
@@ -354,7 +354,7 @@ export default function NewIntakePage() {
         {/* Continue */}
         <div className="flex justify-end gap-3 pt-2">
           <Button variant="outline" onClick={() => router.push("/professional/intake")} className="rounded-xl border-slate-200">Cancel</Button>
-          <Button onClick={() => setStep(2)} className="bg-cg-sage hover:bg-[#2D8A6E] rounded-xl gap-2">
+          <Button onClick={() => setStep(2)} className="bg-cg-sage hover:bg-cg-sage-dark rounded-xl gap-2">
             Continue <ArrowRight className="h-4 w-4" />
           </Button>
         </div>
@@ -366,7 +366,7 @@ export default function NewIntakePage() {
 
   return (
     <div className="max-w-xl mx-auto space-y-6">
-      <button type="button" onClick={() => setStep(1)} className="inline-flex items-center gap-1.5 text-xs text-cg-sage hover:text-[#2D8A6E] font-medium">
+      <button type="button" onClick={() => setStep(1)} className="inline-flex items-center gap-1.5 text-xs text-cg-sage hover:text-cg-sage-dark font-medium">
         <ArrowLeft className="h-3.5 w-3.5" /> Back to Templates
       </button>
 
@@ -392,7 +392,7 @@ export default function NewIntakePage() {
               </p>
             </div>
           </div>
-          <Button variant="ghost" size="sm" onClick={() => setStep(1)} className="text-xs text-cg-sage hover:text-[#2D8A6E] hover:bg-cg-sage/5 rounded-lg h-8">
+          <Button variant="ghost" size="sm" onClick={() => setStep(1)} className="text-xs text-cg-sage hover:text-cg-sage-dark hover:bg-cg-sage/5 rounded-lg h-8">
             Change
           </Button>
         </div>
@@ -496,7 +496,7 @@ export default function NewIntakePage() {
           <Button aria-label="Send message"
             type="submit"
             disabled={isSubmitting || !formData.client_name || !formData.client_email}
-            className="bg-cg-sage hover:bg-[#2D8A6E] rounded-xl gap-2 min-w-[140px]"
+            className="bg-cg-sage hover:bg-cg-sage-dark rounded-xl gap-2 min-w-[140px]"
           >
             {isSubmitting ? <><Loader2 className="h-4 w-4 animate-spin" /> Creating...</> : <><Send className="h-4 w-4" /> Create Intake</>}
           </Button>

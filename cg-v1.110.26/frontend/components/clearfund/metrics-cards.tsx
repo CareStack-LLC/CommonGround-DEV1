@@ -54,10 +54,10 @@ export default function MetricsCards({ metrics, balanceSummary, isLoading }: Met
       {/* Pending Card */}
       <Card className="p-4">
         <div className="flex items-center gap-2 mb-2">
-          <Clock className="h-4 w-4 text-[#E09520]" />
+          <Clock className="h-4 w-4 text-cg-amber-dark" />
           <span className="text-sm text-gray-600">Pending</span>
         </div>
-        <p className="text-2xl font-bold text-[#E09520]">
+        <p className="text-2xl font-bold text-cg-amber-dark">
           {metrics?.total_pending_funding || 0}
         </p>
         <p className="text-xs text-gray-500 mt-1">

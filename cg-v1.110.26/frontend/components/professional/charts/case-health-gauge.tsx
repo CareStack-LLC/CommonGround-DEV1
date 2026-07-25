@@ -19,8 +19,8 @@ export function CaseHealthGauge({
   const getHealthStatus = (score: number) => {
     if (score >= 90) return { label: "Excellent", color: "var(--cg-sage)", bg: "from-cg-sage to-teal-600" };
     if (score >= 75) return { label: "Good", color: "var(--cg-sage)", bg: "from-teal-500 to-cg-slate" };
-    if (score >= 60) return { label: "Fair", color: "var(--cg-amber)", bg: "from-cg-amber to-[#E09520]" };
-    return { label: "Concerning", color: "var(--cg-error)", bg: "from-cg-error to-[#E09520]" };
+    if (score >= 60) return { label: "Fair", color: "var(--cg-amber)", bg: "from-cg-amber to-cg-amber-dark" };
+    return { label: "Concerning", color: "var(--cg-error)", bg: "from-cg-error to-cg-amber-dark" };
   };
 
   const health = getHealthStatus(score);

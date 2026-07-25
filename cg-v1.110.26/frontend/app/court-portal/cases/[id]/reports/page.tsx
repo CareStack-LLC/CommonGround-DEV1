@@ -59,11 +59,11 @@ const REPORT_ICONS: Record<string, React.ReactNode> = {
 
 const REPORT_COLORS: Record<string, string> = {
   "green": "bg-cg-sage-subtle text-cg-sage-dark border-cg-sage-subtle hover:bg-cg-sage-subtle",
-  "blue": "bg-cg-slate-subtle text-[#1E4E6B] border-cg-slate-subtle hover:bg-cg-slate-subtle",
-  "purple": "bg-cg-slate-subtle text-[#1E4E6B] border-cg-slate-subtle hover:bg-cg-slate-subtle",
-  "red": "bg-cg-error-subtle text-[#9B2C2C] border-cg-error-subtle hover:bg-cg-error-subtle",
-  "indigo": "bg-cg-slate-subtle text-[#1E4E6B] border-cg-slate-subtle hover:bg-cg-slate-subtle",
-  "amber": "bg-cg-amber-subtle text-[#E09520] border-cg-amber-subtle hover:bg-cg-amber-subtle",
+  "blue": "bg-cg-slate-subtle text-cg-slate-dark border-cg-slate-subtle hover:bg-cg-slate-subtle",
+  "purple": "bg-cg-slate-subtle text-cg-slate-dark border-cg-slate-subtle hover:bg-cg-slate-subtle",
+  "red": "bg-cg-error-subtle text-cg-error-dark border-cg-error-subtle hover:bg-cg-error-subtle",
+  "indigo": "bg-cg-slate-subtle text-cg-slate-dark border-cg-slate-subtle hover:bg-cg-slate-subtle",
+  "amber": "bg-cg-amber-subtle text-cg-amber-dark border-cg-amber-subtle hover:bg-cg-amber-subtle",
   "teal": "bg-teal-100 text-teal-700 border-teal-200 hover:bg-teal-200",
   "gray": "bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200",
 };
@@ -553,7 +553,7 @@ export default function ReportsPage() {
 
       {/* Error Display */}
       {error && (
-        <div className="bg-cg-error-subtle border border-cg-error-subtle text-[#9B2C2C] px-4 py-3 rounded">
+        <div className="bg-cg-error-subtle border border-cg-error-subtle text-cg-error-dark px-4 py-3 rounded">
           {error}
         </div>
       )}
@@ -659,7 +659,7 @@ export default function ReportsPage() {
             </Button>
           </div>
           {verifyResult && (
-            <div className={`mt-3 p-3 rounded ${verifyResult.is_valid ? 'bg-cg-sage-subtle text-cg-sage-dark' : 'bg-cg-error-subtle text-[#9B2C2C]'}`}>
+            <div className={`mt-3 p-3 rounded ${verifyResult.is_valid ? 'bg-cg-sage-subtle text-cg-sage-dark' : 'bg-cg-error-subtle text-cg-error-dark'}`}>
               <div className="flex items-center gap-2">
                 <span>{verifyResult.is_valid ? '✅' : '❌'}</span>
                 <span>{verifyResult.message}</span>

@@ -147,7 +147,7 @@ export default function CollectionsManager({
       </div>
 
       {error && (
-        <div className="bg-cg-error-subtle border border-cg-error-subtle text-[#9B2C2C] px-4 py-3 rounded">
+        <div className="bg-cg-error-subtle border border-cg-error-subtle text-cg-error-dark px-4 py-3 rounded">
           {error}
         </div>
       )}
@@ -278,7 +278,7 @@ export default function CollectionsManager({
                         e.stopPropagation();
                         handleDelete(collection.id);
                       }}
-                      className="h-8 w-8 p-0 text-cg-error hover:text-[#9B2C2C] hover:bg-cg-error-subtle"
+                      className="h-8 w-8 p-0 text-cg-error hover:text-cg-error-dark hover:bg-cg-error-subtle"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

@@ -284,7 +284,7 @@ export default function IntakeOutputsPage() {
 
       {/* Confidence Score */}
       {summary && (
-        <Card className="bg-gradient-to-r from-[#F0F7FC] to-[#F0F7FC] border-[#C2DEF0]">
+        <Card className="bg-gradient-to-r from-cg-slate-tint to-cg-slate-tint border-cg-slate-tint">
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -450,7 +450,7 @@ export default function IntakeOutputsPage() {
                             </div>
                           </div>
                           {child.special_needs && (
-                            <Badge variant="outline" className="bg-cg-amber-subtle text-[#B8791A]">
+                            <Badge variant="outline" className="bg-cg-amber-subtle text-cg-amber-deep">
                               Special Needs
                             </Badge>
                           )}
@@ -481,7 +481,7 @@ export default function IntakeOutputsPage() {
 
                 <Card>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-base text-[#E09520]">Key Concerns</CardTitle>
+                    <CardTitle className="text-base text-cg-amber-dark">Key Concerns</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ul className="space-y-2">
@@ -737,9 +737,9 @@ export default function IntakeOutputsPage() {
                     {summary.recommended_actions.map((action, index) => (
                       <div
                         key={index}
-                        className="flex items-start gap-3 p-3 bg-[#F0F7FC] rounded-lg"
+                        className="flex items-start gap-3 p-3 bg-cg-slate-tint rounded-lg"
                       >
-                        <div className="flex items-center justify-center w-6 h-6 rounded-full bg-[#C2DEF0] text-[#1E4E6B] text-sm font-medium shrink-0">
+                        <div className="flex items-center justify-center w-6 h-6 rounded-full bg-cg-slate-tint text-cg-slate-dark text-sm font-medium shrink-0">
                           {index + 1}
                         </div>
                         <p className="text-sm">{action}</p>

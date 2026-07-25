@@ -61,22 +61,22 @@ interface CustodyIntakeTableProps {
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
     pending: {
         label: "Pending",
-        color: "bg-cg-amber-subtle text-[#B8791A] border-[#FBE3BF]",
+        color: "bg-cg-amber-subtle text-cg-amber-deep border-cg-amber-tint",
         icon: <Clock className="h-3.5 w-3.5" />,
     },
     active: {
         label: "In Progress",
-        color: "bg-cg-slate-subtle text-[#1E4E6B] border-cg-slate-subtle",
+        color: "bg-cg-slate-subtle text-cg-slate-dark border-cg-slate-subtle",
         icon: <Eye className="h-3.5 w-3.5" />,
     },
     completed: {
         label: "Completed",
-        color: "bg-cg-sage-subtle text-cg-sage-dark border-[#C5E5DB]",
+        color: "bg-cg-sage-subtle text-cg-sage-dark border-cg-sage-tint",
         icon: <CheckCircle2 className="h-3.5 w-3.5" />,
     },
     reviewed: {
         label: "Reviewed",
-        color: "bg-cg-sage-subtle text-cg-sage-dark border-[#C5E5DB]",
+        color: "bg-cg-sage-subtle text-cg-sage-dark border-cg-sage-tint",
         icon: <CheckCircle2 className="h-3.5 w-3.5" />,
     },
     cancelled: {

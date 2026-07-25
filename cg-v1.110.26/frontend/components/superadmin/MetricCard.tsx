@@ -31,7 +31,7 @@ const COLOR_MAP = {
   gold: { icon: "text-cg-amber", bg: "bg-cg-amber/10", border: "border-cg-amber/20" },
   sky: { icon: "text-cg-slate-light", bg: "bg-cg-slate-light/10", border: "border-cg-slate-light/20" },
   coral: { icon: "text-cg-error", bg: "bg-cg-error/10", border: "border-cg-error/20" },
-  neutral: { icon: "text-[#8AACBC]", bg: "bg-[#8AACBC]/10", border: "border-[#8AACBC]/20" },
+  neutral: { icon: "text-cg-slate-muted", bg: "bg-cg-slate-muted/10", border: "border-cg-slate-muted/20" },
 };
 
 function MiniSparkline({ data }: { data: number[] }) {
@@ -98,7 +98,7 @@ export function MetricCard({
           <div className={`${compact ? "p-1" : "p-1.5"} rounded-lg ${c.bg}`}>
             <Icon className={`${compact ? "w-3.5 h-3.5" : "w-4 h-4"} ${c.icon}`} />
           </div>
-          <span className={`${compact ? "text-[11px]" : "text-xs"} text-[#8AACBC] font-medium`}>
+          <span className={`${compact ? "text-[11px]" : "text-xs"} text-cg-slate-muted font-medium`}>
             {label}
             {tooltip && <InfoTooltip text={tooltip} />}
           </span>
@@ -157,7 +157,7 @@ export function SmallMetric({
   tooltip?: string;
 }) {
   return (
-    <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-3 flex items-center gap-3">
+    <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-3 flex items-center gap-3">
       <Icon className="w-4 h-4 text-muted-foreground flex-shrink-0" />
       <div>
         <div className="text-[11px] text-muted-foreground">

@@ -220,7 +220,7 @@ export default function KidSpaceMessagesPage() {
             <div className="w-12 h-12 border-4 border-cg-slate-light/30 border-t-cg-slate-light rounded-full animate-spin" />
           </div>
         ) : error ? (
-          <div className="p-4 rounded-2xl bg-cg-error-subtle border-4 border-cg-error-subtle text-base text-[#9B2C2C] font-semibold">
+          <div className="p-4 rounded-2xl bg-cg-error-subtle border-4 border-cg-error-subtle text-base text-cg-error-dark font-semibold">
             {error}
           </div>
         ) : messages.length === 0 ? (

@@ -398,8 +398,8 @@ export default function BillingSettingsPage() {
         <Card className="border-2 border-border rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-              <div className="p-2 bg-gradient-to-br from-cg-amber/10 to-[#E09520]/5 rounded-xl shadow-md">
-                <Crown className="h-5 w-5 text-[#E09520]" />
+              <div className="p-2 bg-gradient-to-br from-cg-amber/10 to-cg-amber-dark/5 rounded-xl shadow-md">
+                <Crown className="h-5 w-5 text-cg-amber-dark" />
               </div>
               Current Plan
             </CardTitle>
@@ -488,8 +488,8 @@ export default function BillingSettingsPage() {
       <Card className="border-2 border-border rounded-2xl shadow-lg">
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-            <div className="p-2 bg-gradient-to-br from-cg-amber/10 to-[#E09520]/5 rounded-xl shadow-md">
-              <Crown className="h-5 w-5 text-[#E09520]" />
+            <div className="p-2 bg-gradient-to-br from-cg-amber/10 to-cg-amber-dark/5 rounded-xl shadow-md">
+              <Crown className="h-5 w-5 text-cg-amber-dark" />
             </div>
             Current Plan
           </CardTitle>

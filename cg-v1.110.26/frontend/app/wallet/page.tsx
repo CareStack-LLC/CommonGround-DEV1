@@ -279,11 +279,11 @@ function WalletContent() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {/* Error Alert */}
         {error && (
-          <div className="flex items-center gap-3 p-4 bg-cg-error-subtle dark:bg-[#7A2222]/30 border-2 border-cg-error-subtle dark:border-[#9B2C2C] rounded-2xl shadow-lg">
-            <AlertCircle className="h-5 w-5 text-cg-error dark:text-[#E06B6B] flex-shrink-0" />
-            <p className="text-sm text-[#9B2C2C] dark:text-[#FCA5A5] flex-1 font-medium">{error}</p>
-            <button aria-label="Dismiss" onClick={() => setError(null)} className="hover:bg-cg-error-subtle dark:hover:bg-[#7A2222]/30 p-1 rounded-lg transition-colors">
-              <X className="h-4 w-4 text-cg-error dark:text-[#E06B6B]" />
+          <div className="flex items-center gap-3 p-4 bg-cg-error-subtle dark:bg-cg-error-deep/30 border-2 border-cg-error-subtle dark:border-cg-error-dark rounded-2xl shadow-lg">
+            <AlertCircle className="h-5 w-5 text-cg-error dark:text-cg-error-light flex-shrink-0" />
+            <p className="text-sm text-cg-error-dark dark:text-[#FCA5A5] flex-1 font-medium">{error}</p>
+            <button aria-label="Dismiss" onClick={() => setError(null)} className="hover:bg-cg-error-subtle dark:hover:bg-cg-error-deep/30 p-1 rounded-lg transition-colors">
+              <X className="h-4 w-4 text-cg-error dark:text-cg-error-light" />
             </button>
           </div>
         )}
@@ -326,7 +326,7 @@ function WalletContent() {
               onClick={() => setActiveTab('children')}
               className={`group flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-300 whitespace-nowrap ${
                 activeTab === 'children'
-                  ? 'bg-gradient-to-r from-cg-slate to-[#1E4E6B] text-white shadow-md'
+                  ? 'bg-gradient-to-r from-cg-slate to-cg-slate-dark text-white shadow-md'
                   : 'bg-card border-2 border-border text-muted-foreground hover:text-foreground hover:border-cg-slate-light hover:shadow-lg'
               }`}
             >
@@ -400,17 +400,17 @@ function WalletContent() {
                       className="p-5 bg-gradient-to-br from-cg-amber-subtle to-card rounded-2xl border-2 border-cg-amber-subtle hover:border-cg-amber hover:shadow-xl transition-all duration-300 hover:scale-[1.01] text-left group relative overflow-hidden"
                     >
                       <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 bg-gradient-to-br from-cg-amber/15 to-[#E09520]/10 rounded-2xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
-                          <Scale className="h-6 w-6 text-[#E09520]" />
+                        <div className="w-14 h-14 bg-gradient-to-br from-cg-amber/15 to-cg-amber-dark/10 rounded-2xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300">
+                          <Scale className="h-6 w-6 text-cg-amber-dark" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="font-bold text-foreground flex items-center gap-1.5" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                             Child Support
-                            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-cg-amber-subtle text-[#E09520] uppercase tracking-wide">SDU</span>
+                            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-cg-amber-subtle text-cg-amber-dark uppercase tracking-wide">SDU</span>
                           </p>
                           <p className="text-sm text-muted-foreground font-medium">Log state disbursement payments</p>
                         </div>
-                        <ChevronRight className="h-5 w-5 text-[#E09520] group-hover:text-[#E09520] group-hover:translate-x-1 transition-all duration-300" />
+                        <ChevronRight className="h-5 w-5 text-cg-amber-dark group-hover:text-cg-amber-dark group-hover:translate-x-1 transition-all duration-300" />
                       </div>
                     </button>
                   )}
@@ -512,7 +512,7 @@ function WalletContent() {
                             payout.status === 'completed'
                               ? 'bg-cg-sage-subtle text-cg-sage-dark border-cg-sage-subtle'
                               : payout.status === 'pending'
-                              ? 'bg-cg-amber-subtle text-[#E09520] border-cg-amber-subtle'
+                              ? 'bg-cg-amber-subtle text-cg-amber-dark border-cg-amber-subtle'
                               : 'bg-muted text-muted-foreground border-border'
                           }`}>
                             {payout.status}

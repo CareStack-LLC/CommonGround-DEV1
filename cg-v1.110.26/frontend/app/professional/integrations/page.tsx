@@ -110,9 +110,9 @@ export default function IntegrationsPage() {
 
   const categoryColors: Record<string, string> = {
     "Practice Management": "bg-blue-100 text-blue-700 border-blue-200",
-    Billing: "bg-cg-sage-subtle text-cg-sage-dark border-[#C5E5DB]",
-    Communication: "bg-cg-slate-subtle text-[#1E4E6B] border-[#C2DEF0]",
-    "Document Management": "bg-cg-amber-subtle text-[#B8791A] border-[#FBE3BF]",
+    Billing: "bg-cg-sage-subtle text-cg-sage-dark border-cg-sage-tint",
+    Communication: "bg-cg-slate-subtle text-cg-slate-dark border-cg-slate-tint",
+    "Document Management": "bg-cg-amber-subtle text-cg-amber-deep border-cg-amber-tint",
   };
 
   return (
@@ -226,8 +226,8 @@ export default function IntegrationsPage() {
                   disabled={notifyRequests.has(integration.id)}
                   className={
                     notifyRequests.has(integration.id)
-                      ? "border-[#C5E5DB] text-cg-sage-dark"
-                      : "bg-cg-sage hover:bg-[#2D8A6E] text-white ml-auto"
+                      ? "border-cg-sage-tint text-cg-sage-dark"
+                      : "bg-cg-sage hover:bg-cg-sage-dark text-white ml-auto"
                   }
                 >
                   {notifyRequests.has(integration.id) ? (

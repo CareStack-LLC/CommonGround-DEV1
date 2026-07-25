@@ -131,7 +131,7 @@ export default function IncomingCallAlert({
                 <Phone className="h-6 w-6 text-white rotate-[135deg]" />
               </div>
             )}
-            <span className="font-semibold text-[#9B2C2C]">Decline</span>
+            <span className="font-semibold text-cg-error-dark">Decline</span>
           </button>
 
           {/* Accept Button */}

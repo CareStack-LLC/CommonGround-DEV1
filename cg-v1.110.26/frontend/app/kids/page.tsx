@@ -253,7 +253,7 @@ function ContactCard({
     { bg: 'bg-gradient-to-br from-cg-sage-light to-cg-sage', shadow: 'var(--cg-sage-dark)' },
     { bg: 'bg-gradient-to-br from-cg-slate-light to-cg-slate', shadow: 'var(--cg-slate)' },
     { bg: 'bg-gradient-to-br from-cg-amber to-cg-amber', shadow: 'var(--cg-error)' },
-    { bg: 'bg-gradient-to-br from-cg-amber to-cg-amber', shadow: '#E09520' },
+    { bg: 'bg-gradient-to-br from-cg-amber to-cg-amber', shadow: 'var(--cg-amber-dark)' },
     { bg: 'bg-gradient-to-br from-cg-slate-light to-cg-slate', shadow: 'var(--cg-slate)' },
   ];
   const colorIndex = contact.contact_name.charCodeAt(0) % colors.length;
@@ -522,7 +522,7 @@ function KidsHubPageContent() {
                   icon={Phone}
                   emoji="📞"
                   color="bg-gradient-to-br from-cg-amber to-cg-amber"
-                  shadowColor="#9B2C2C"
+                  shadowColor="var(--cg-error-dark)"
                   onClick={() => handleFeatureClick('call')}
                   delay={0.1}
                 />
@@ -532,7 +532,7 @@ function KidsHubPageContent() {
                   icon={BookOpen}
                   emoji="📚"
                   color="bg-gradient-to-br from-cg-slate-light to-cg-slate"
-                  shadowColor="#1E4E6B"
+                  shadowColor="var(--cg-slate-dark)"
                   onClick={() => handleFeatureClick('stories')}
                   badge="NEW"
                   delay={0.2}
@@ -543,7 +543,7 @@ function KidsHubPageContent() {
                   icon={Film}
                   emoji="🎬"
                   color="bg-gradient-to-br from-cg-amber to-cg-amber"
-                  shadowColor="#E09520"
+                  shadowColor="var(--cg-amber-dark)"
                   onClick={() => handleFeatureClick('theater')}
                   delay={0.3}
                 />

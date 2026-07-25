@@ -30,7 +30,7 @@ const TABS = [
 ];
 
 const CHART_COLORS = ['var(--cg-sage)', 'var(--cg-slate-light)', 'var(--cg-slate)', 'var(--cg-amber)', '#E8834A', 'var(--cg-error)'];
-const RECHARTS_TOOLTIP = { backgroundColor: 'var(--foreground)', border: '1px solid var(--cg-slate)', borderRadius: 8, color: '#D0E4EC', fontSize: 12 };
+const RECHARTS_TOOLTIP = { backgroundColor: 'var(--foreground)', border: '1px solid var(--cg-slate)', borderRadius: 8, color: 'var(--cg-slate-tint)', fontSize: 12 };
 
 function DashboardInner() {
   const router = useRouter();
@@ -274,13 +274,13 @@ function DashboardInner() {
           activeTab === 'glance' ? (
             <div className="flex items-center gap-1.5">
               {/* Density toggle — glance tab only */}
-              <div className="hidden md:flex items-center gap-0.5 p-0.5 rounded-lg bg-[#0F2533]/60 border border-cg-slate/20">
+              <div className="hidden md:flex items-center gap-0.5 p-0.5 rounded-lg bg-cg-ink/60 border border-cg-slate/20">
                 <button
                   onClick={() => setDensity('comfortable')}
                   className={`px-2 py-0.5 text-[11px] font-medium rounded transition-colors ${
                     density === 'comfortable'
                       ? 'bg-cg-slate/40 text-white'
-                      : 'text-[#8AACBC] hover:text-white'
+                      : 'text-cg-slate-muted hover:text-white'
                   }`}
                   title="Comfortable spacing"
                 >
@@ -291,7 +291,7 @@ function DashboardInner() {
                   className={`px-2 py-0.5 text-[11px] font-medium rounded transition-colors ${
                     density === 'compact'
                       ? 'bg-cg-slate/40 text-white'
-                      : 'text-[#8AACBC] hover:text-white'
+                      : 'text-cg-slate-muted hover:text-white'
                   }`}
                   title="Dense, information-packed layout"
                 >
@@ -300,7 +300,7 @@ function DashboardInner() {
               </div>
               <button
                 onClick={() => setCustomizeOpen(true)}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#0F2533]/60 border border-cg-slate/20 hover:border-cg-slate/50 text-xs text-[#8AACBC] hover:text-white transition-colors"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-cg-ink/60 border border-cg-slate/20 hover:border-cg-slate/50 text-xs text-cg-slate-muted hover:text-white transition-colors"
                 title="Customize dashboard"
               >
                 <Settings2 className="w-3.5 h-3.5" />
@@ -340,11 +340,11 @@ function DashboardInner() {
                   <Brain className="w-4 h-4 text-cg-sage" />
                 </div>
                 <div>
-                  <h2 className="text-sm font-bold text-[#D0E4EC] tracking-tight">Executive Pulse</h2>
-                  <span className="text-[10px] text-[#4A6E7F]">Platform overview</span>
+                  <h2 className="text-sm font-bold text-cg-slate-tint tracking-tight">Executive Pulse</h2>
+                  <span className="text-[10px] text-cg-slate-strong">Platform overview</span>
                 </div>
                 {aiSummary.generated_at && (
-                  <span className="text-[10px] text-[#4A6E7F] ml-auto">{timeAgo(aiSummary.generated_at)}</span>
+                  <span className="text-[10px] text-cg-slate-strong ml-auto">{timeAgo(aiSummary.generated_at)}</span>
                 )}
               </div>
 
@@ -381,7 +381,7 @@ function DashboardInner() {
               {/* Summary bullets in 2-column layout */}
               <ul className={`grid gap-x-6 gap-y-2 ${aiSummary.summary.length > 4 ? 'lg:grid-cols-2' : 'grid-cols-1'}`}>
                 {aiSummary.summary.map((bullet: string, i: number) => (
-                  <li key={i} className="flex gap-2 text-[13px] text-[#8AACBC] leading-relaxed">
+                  <li key={i} className="flex gap-2 text-[13px] text-cg-slate-muted leading-relaxed">
                     <span className="text-cg-sage mt-0.5 flex-shrink-0">•</span>
                     <span>{bullet}</span>
                   </li>
@@ -454,9 +454,9 @@ function DashboardInner() {
           {isWidgetVisible('charts_row') && (
           <div className="grid lg:grid-cols-3 gap-4">
             {/* User Growth Chart */}
-            <div className="lg:col-span-2 bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
+            <div className="lg:col-span-2 bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-sm font-semibold text-[#D0E4EC]">
+                <h2 className="text-sm font-semibold text-cg-slate-tint">
                   User Growth (14 days)
                   <InfoTooltip text="Daily new user registrations. Weekend days are shown lighter." />
                 </h2>
@@ -485,7 +485,7 @@ function DashboardInner() {
                     })}
                   </div>
                   {growth.daily_registrations?.length > 0 && (
-                    <div className="flex justify-between mt-2 text-[10px] text-[#4A6E7F]">
+                    <div className="flex justify-between mt-2 text-[10px] text-cg-slate-strong">
                       <span>{new Date(growth.daily_registrations[0].date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                       <span>{new Date(growth.daily_registrations[growth.daily_registrations.length - 1].date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                     </div>
@@ -495,9 +495,9 @@ function DashboardInner() {
             </div>
 
             {/* Revenue Split */}
-            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
+            <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-sm font-semibold text-[#D0E4EC]">
+                <h2 className="text-sm font-semibold text-cg-slate-tint">
                   Revenue Split
                   <InfoTooltip text="Subscription breakdown by tier as percentage of total users" />
                 </h2>
@@ -510,7 +510,7 @@ function DashboardInner() {
               ) : dashboard && (
                 <div className="space-y-2.5">
                   {Object.keys(dashboard.subscriptions?.tier_breakdown || {}).length === 0 ? (
-                    <p className="text-xs text-[#4A6E7F] text-center py-4">No active subscriptions</p>
+                    <p className="text-xs text-cg-slate-strong text-center py-4">No active subscriptions</p>
                   ) : Object.entries(dashboard.subscriptions?.tier_breakdown || {})
                     .sort(([, a], [, b]) => b - a)
                     .map(([tier, count]) => {
@@ -519,7 +519,7 @@ function DashboardInner() {
                       return (
                         <div key={tier}>
                           <div className="flex justify-between text-xs mb-1">
-                            <span className="text-[#8AACBC] capitalize">{tier.replace('_', ' ')}</span>
+                            <span className="text-cg-slate-muted capitalize">{tier.replace('_', ' ')}</span>
                             <span className="text-muted-foreground">{count as number} ({pct}%)</span>
                           </div>
                           <div className="h-1.5 bg-foreground rounded-full overflow-hidden">
@@ -538,9 +538,9 @@ function DashboardInner() {
           {isWidgetVisible('activity_feeds') && (
           <div className="grid lg:grid-cols-2 gap-4">
             {/* Recent Signups */}
-            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
+            <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-sm font-semibold text-[#D0E4EC]">Recent Signups</h2>
+                <h2 className="text-sm font-semibold text-cg-slate-tint">Recent Signups</h2>
                 <button onClick={() => router.push('/superadmin/users')} className="text-xs text-cg-sage hover:text-cg-sage-light flex items-center gap-1">
                   All users <ExternalLink className="w-3 h-3" />
                 </button>
@@ -555,9 +555,9 @@ function DashboardInner() {
                         {s.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm text-[#D0E4EC] truncate">{s.name}</div>
+                        <div className="text-sm text-cg-slate-tint truncate">{s.name}</div>
                       </div>
-                      <span className="text-[11px] text-[#4A6E7F] whitespace-nowrap">{timeAgo(s.created_at)}</span>
+                      <span className="text-[11px] text-cg-slate-strong whitespace-nowrap">{timeAgo(s.created_at)}</span>
                     </div>
                   ))}
                 </div>
@@ -565,9 +565,9 @@ function DashboardInner() {
             </div>
 
             {/* Admin Activity */}
-            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
+            <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-sm font-semibold text-[#D0E4EC]">Admin Activity</h2>
+                <h2 className="text-sm font-semibold text-cg-slate-tint">Admin Activity</h2>
                 <button onClick={() => router.push('/superadmin/users?tab=activity')} className="text-xs text-cg-sage hover:text-cg-sage-light flex items-center gap-1">
                   Full log <ExternalLink className="w-3 h-3" />
                 </button>
@@ -580,13 +580,13 @@ function DashboardInner() {
                     <div key={a.id} className="flex items-start gap-3 px-3 py-2 rounded-lg hover:bg-cg-slate/15 transition-colors">
                       <div className="w-1.5 h-1.5 rounded-full bg-cg-sage/60 mt-2 flex-shrink-0" />
                       <div className="flex-1 min-w-0">
-                        <div className="text-xs text-[#8AACBC]">
-                          <span className="text-[#D0E4EC] font-medium">{a.action.replace('admin:', '').replace(/_/g, ' ')}</span>
-                          {a.user_email && <span className="text-[#4A6E7F] ml-1">by {a.user_email.split('@')[0]}</span>}
+                        <div className="text-xs text-cg-slate-muted">
+                          <span className="text-cg-slate-tint font-medium">{a.action.replace('admin:', '').replace(/_/g, ' ')}</span>
+                          {a.user_email && <span className="text-cg-slate-strong ml-1">by {a.user_email.split('@')[0]}</span>}
                         </div>
-                        {a.description && <div className="text-[11px] text-[#4A6E7F] mt-0.5 truncate">{a.description}</div>}
+                        {a.description && <div className="text-[11px] text-cg-slate-strong mt-0.5 truncate">{a.description}</div>}
                       </div>
-                      <span className="text-[11px] text-[#4A6E7F] whitespace-nowrap flex-shrink-0">{timeAgo(a.created_at)}</span>
+                      <span className="text-[11px] text-cg-slate-strong whitespace-nowrap flex-shrink-0">{timeAgo(a.created_at)}</span>
                     </div>
                   ))}
                 </div>
@@ -623,13 +623,13 @@ function DashboardInner() {
 
           {/* MRR Trend Chart */}
           {revenueData?.mrr_trend && revenueData.mrr_trend.length > 0 && (
-            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-              <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">MRR Trend <InfoTooltip text="Monthly recurring revenue over time" /></h2>
+            <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+              <h2 className="text-sm font-semibold text-cg-slate-tint mb-4">MRR Trend <InfoTooltip text="Monthly recurring revenue over time" /></h2>
               <ResponsiveContainer width="100%" height={200}>
                 <AreaChart data={revenueData.mrr_trend}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--cg-slate)" opacity={0.2} />
-                  <XAxis dataKey="date" stroke="#4A6E7F" tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }} tickFormatter={(v) => new Date(v).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} />
-                  <YAxis stroke="#4A6E7F" tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }} tickFormatter={(v) => `$${v}`} />
+                  <XAxis dataKey="date" stroke="var(--cg-slate-strong)" tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }} tickFormatter={(v) => new Date(v).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} />
+                  <YAxis stroke="var(--cg-slate-strong)" tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }} tickFormatter={(v) => `$${v}`} />
                   <Tooltip contentStyle={RECHARTS_TOOLTIP} formatter={(v) => [`$${Number(v ?? 0).toFixed(2)}`, 'MRR']} />
                   <defs>
                     <linearGradient id="mrrGrad" x1="0" y1="0" x2="0" y2="1">
@@ -647,8 +647,8 @@ function DashboardInner() {
           <div className="grid lg:grid-cols-2 gap-4">
             {/* Revenue by Tier */}
             {revenueData?.breakdown && (
-              <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-                <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">Revenue by Tier <InfoTooltip text="Monthly revenue contribution by subscription tier" /></h2>
+              <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+                <h2 className="text-sm font-semibold text-cg-slate-tint mb-4">Revenue by Tier <InfoTooltip text="Monthly revenue contribution by subscription tier" /></h2>
                 <ResponsiveContainer width="100%" height={200}>
                   <PieChart>
                     <Pie data={Object.entries(revenueData.breakdown).map(([tier, data]: [string, any]) => ({ name: tier.replace('_', ' '), value: data.revenue }))} cx="50%" cy="50%" innerRadius={50} outerRadius={80} dataKey="value" label={(props: any) => `${props.name ?? ''} ${((props.percent ?? 0) * 100).toFixed(0)}%`}>
@@ -664,8 +664,8 @@ function DashboardInner() {
 
             {/* Unit Economics Summary */}
             {unitEcon && (
-              <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-                <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">Unit Economics <InfoTooltip text="Key SaaS metrics for financial health" /></h2>
+              <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+                <h2 className="text-sm font-semibold text-cg-slate-tint mb-4">Unit Economics <InfoTooltip text="Key SaaS metrics for financial health" /></h2>
                 <div className="space-y-3">
                   {[
                     { label: 'ARPU', value: formatCurrency(unitEcon.arpu), desc: 'Avg revenue per paying user' },
@@ -676,10 +676,10 @@ function DashboardInner() {
                   ].map((item) => (
                     <div key={item.label} className="flex items-center justify-between">
                       <div>
-                        <span className="text-xs text-[#8AACBC]">{item.label}</span>
-                        <span className="text-[10px] text-[#4A6E7F] ml-2">{item.desc}</span>
+                        <span className="text-xs text-cg-slate-muted">{item.label}</span>
+                        <span className="text-[10px] text-cg-slate-strong ml-2">{item.desc}</span>
                       </div>
-                      <span className="text-sm font-medium text-[#D0E4EC]">{item.value}</span>
+                      <span className="text-sm font-medium text-cg-slate-tint">{item.value}</span>
                     </div>
                   ))}
                 </div>
@@ -719,13 +719,13 @@ function DashboardInner() {
 
           {/* Retention Curve */}
           {retentionCurve?.curve && retentionCurve.curve.length > 0 && (
-            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-              <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">Retention Curve <InfoTooltip text="Percentage of users retained over days since signup" /></h2>
+            <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+              <h2 className="text-sm font-semibold text-cg-slate-tint mb-4">Retention Curve <InfoTooltip text="Percentage of users retained over days since signup" /></h2>
               <ResponsiveContainer width="100%" height={200}>
                 <LineChart data={retentionCurve.curve.filter((_: any, i: number) => i % 3 === 0 || i <= 7)}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--cg-slate)" opacity={0.2} />
-                  <XAxis dataKey="day" stroke="#4A6E7F" tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }} label={{ value: 'Days', position: 'insideBottom', offset: -5, fill: 'var(--muted-foreground)', fontSize: 10 }} />
-                  <YAxis stroke="#4A6E7F" tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }} domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
+                  <XAxis dataKey="day" stroke="var(--cg-slate-strong)" tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }} label={{ value: 'Days', position: 'insideBottom', offset: -5, fill: 'var(--muted-foreground)', fontSize: 10 }} />
+                  <YAxis stroke="var(--cg-slate-strong)" tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }} domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
                   <Tooltip contentStyle={RECHARTS_TOOLTIP} formatter={(v) => [`${Number(v ?? 0)}%`, 'Retained']} />
                   <Line type="monotone" dataKey="pct" stroke="var(--cg-sage)" strokeWidth={2} dot={{ r: 2, fill: 'var(--cg-sage)' }} />
                 </LineChart>
@@ -777,8 +777,8 @@ function DashboardInner() {
 
           {/* Service Health Grid */}
           {systemStatus?.services && (
-            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-              <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">
+            <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+              <h2 className="text-sm font-semibold text-cg-slate-tint mb-4">
                 Service Health
                 <InfoTooltip text="Real-time status of all backend services and integrations" />
               </h2>
@@ -789,8 +789,8 @@ function DashboardInner() {
                       s.status === 'operational' ? 'bg-emerald-400 animate-pulse' :
                       s.status === 'degraded' ? 'bg-amber-400' : 'bg-red-400'
                     }`} />
-                    <span className="text-xs text-[#8AACBC] truncate">{s.name}</span>
-                    {s.latency_ms && <span className="text-[10px] text-[#4A6E7F] ml-auto">{s.latency_ms}ms</span>}
+                    <span className="text-xs text-cg-slate-muted truncate">{s.name}</span>
+                    {s.latency_ms && <span className="text-[10px] text-cg-slate-strong ml-auto">{s.latency_ms}ms</span>}
                   </div>
                 ))}
               </div>
@@ -799,8 +799,8 @@ function DashboardInner() {
 
           {/* API Endpoints Table */}
           {perfData?.transactions && (
-            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
-              <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">
+            <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
+              <h2 className="text-sm font-semibold text-cg-slate-tint mb-4">
                 Top API Endpoints
                 <InfoTooltip text="Busiest endpoints by request volume with latency and failure metrics" />
               </h2>
@@ -818,11 +818,11 @@ function DashboardInner() {
                   <tbody>
                     {perfData.transactions.slice(0, 10).map((t: any, i: number) => (
                       <tr key={i} className="border-b border-cg-slate/10 hover:bg-cg-slate/10">
-                        <td className="py-2 text-[#D0E4EC] font-mono text-xs truncate max-w-xs">{t.transaction}</td>
-                        <td className="py-2 text-right text-[#8AACBC]">{t.count}</td>
-                        <td className="py-2 text-right text-[#8AACBC]">{t.p75_ms}ms</td>
-                        <td className={`py-2 text-right ${t.p95_ms > 1000 ? 'text-amber-400' : 'text-[#8AACBC]'}`}>{t.p95_ms}ms</td>
-                        <td className={`py-2 text-right ${t.failure_rate > 5 ? 'text-red-400' : 'text-[#8AACBC]'}`}>{(t.failure_rate || 0).toFixed(1)}%</td>
+                        <td className="py-2 text-cg-slate-tint font-mono text-xs truncate max-w-xs">{t.transaction}</td>
+                        <td className="py-2 text-right text-cg-slate-muted">{t.count}</td>
+                        <td className="py-2 text-right text-cg-slate-muted">{t.p75_ms}ms</td>
+                        <td className={`py-2 text-right ${t.p95_ms > 1000 ? 'text-amber-400' : 'text-cg-slate-muted'}`}>{t.p95_ms}ms</td>
+                        <td className={`py-2 text-right ${t.failure_rate > 5 ? 'text-red-400' : 'text-cg-slate-muted'}`}>{(t.failure_rate || 0).toFixed(1)}%</td>
                       </tr>
                     ))}
                   </tbody>
@@ -862,9 +862,9 @@ function DashboardInner() {
 
           {/* Chatbot + Inbox Summary */}
           <div className="grid lg:grid-cols-2 gap-4">
-            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
+            <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-sm font-semibold text-[#D0E4EC]">Chatbot Overview</h2>
+                <h2 className="text-sm font-semibold text-cg-slate-tint">Chatbot Overview</h2>
                 <button onClick={() => router.push('/superadmin/chatbot')} className="text-xs text-cg-sage hover:text-cg-sage-light flex items-center gap-1">
                   Manage <ExternalLink className="w-3 h-3" />
                 </button>
@@ -873,21 +873,21 @@ function DashboardInner() {
                 <div className="space-y-3">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Total Sessions</span>
-                    <span className="text-[#D0E4EC]">{chatbotStats.total_sessions ?? 0}</span>
+                    <span className="text-cg-slate-tint">{chatbotStats.total_sessions ?? 0}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Avg Messages/Session</span>
-                    <span className="text-[#D0E4EC]">{chatbotStats.avg_messages ?? '—'}</span>
+                    <span className="text-cg-slate-tint">{chatbotStats.avg_messages ?? '—'}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Escalation Rate</span>
-                    <span className={`${chatbotStats.escalation_rate > 20 ? 'text-amber-400' : 'text-[#D0E4EC]'}`}>
+                    <span className={`${chatbotStats.escalation_rate > 20 ? 'text-amber-400' : 'text-cg-slate-tint'}`}>
                       {chatbotStats.escalation_rate ?? 0}%
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Unique Visitors</span>
-                    <span className="text-[#D0E4EC]">{chatbotStats.unique_visitors ?? 0}</span>
+                    <span className="text-cg-slate-tint">{chatbotStats.unique_visitors ?? 0}</span>
                   </div>
                 </div>
               ) : (
@@ -895,9 +895,9 @@ function DashboardInner() {
               )}
             </div>
 
-            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
+            <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-sm font-semibold text-[#D0E4EC]">Inbox Summary</h2>
+                <h2 className="text-sm font-semibold text-cg-slate-tint">Inbox Summary</h2>
                 <button onClick={() => router.push('/superadmin/inbox')} className="text-xs text-cg-sage hover:text-cg-sage-light flex items-center gap-1">
                   Open inbox <ExternalLink className="w-3 h-3" />
                 </button>
@@ -906,21 +906,21 @@ function DashboardInner() {
                 <div className="space-y-3">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Total Emails</span>
-                    <span className="text-[#D0E4EC]">{inboxStats.total ?? 0}</span>
+                    <span className="text-cg-slate-tint">{inboxStats.total ?? 0}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Urgent</span>
-                    <span className={`${inboxStats.urgent_pending > 0 ? 'text-amber-400 font-medium' : 'text-[#D0E4EC]'}`}>
+                    <span className={`${inboxStats.urgent_pending > 0 ? 'text-amber-400 font-medium' : 'text-cg-slate-tint'}`}>
                       {inboxStats.urgent_pending ?? 0}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Support</span>
-                    <span className="text-[#D0E4EC]">{inboxStats.by_category?.support ?? 0}</span>
+                    <span className="text-cg-slate-tint">{inboxStats.by_category?.support ?? 0}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Sales</span>
-                    <span className="text-[#D0E4EC]">{inboxStats.by_category?.sales ?? 0}</span>
+                    <span className="text-cg-slate-tint">{inboxStats.by_category?.sales ?? 0}</span>
                   </div>
                 </div>
               ) : (
@@ -945,17 +945,17 @@ function DashboardInner() {
           onClick={() => setCustomizeOpen(false)}
         >
           <div
-            className="bg-[#0F2533] border border-cg-slate/30 rounded-xl p-6 w-full max-w-md shadow-2xl"
+            className="bg-cg-ink border border-cg-slate/30 rounded-xl p-6 w-full max-w-md shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between mb-4">
               <div>
                 <h3 className="text-base font-semibold text-white">Customize Dashboard</h3>
-                <p className="text-xs text-[#8AACBC] mt-0.5">Show, hide, or reorder glance-tab widgets.</p>
+                <p className="text-xs text-cg-slate-muted mt-0.5">Show, hide, or reorder glance-tab widgets.</p>
               </div>
               <button aria-label="Close"
                 onClick={() => setCustomizeOpen(false)}
-                className="p-1 text-[#8AACBC] hover:text-white transition-colors"
+                className="p-1 text-cg-slate-muted hover:text-white transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -963,12 +963,12 @@ function DashboardInner() {
 
             {/* Density */}
             <div className="mb-4">
-              <label className="block text-xs font-medium text-[#8AACBC] mb-2">Density</label>
-              <div className="flex items-center gap-0.5 p-0.5 rounded bg-[#1A3648]/60 border border-cg-slate/20">
+              <label className="block text-xs font-medium text-cg-slate-muted mb-2">Density</label>
+              <div className="flex items-center gap-0.5 p-0.5 rounded bg-cg-slate-deep/60 border border-cg-slate/20">
                 <button
                   onClick={() => setDensity('comfortable')}
                   className={`flex-1 px-2 py-1 text-xs font-medium rounded transition-colors ${
-                    density === 'comfortable' ? 'bg-cg-slate/40 text-white' : 'text-[#8AACBC] hover:text-white'
+                    density === 'comfortable' ? 'bg-cg-slate/40 text-white' : 'text-cg-slate-muted hover:text-white'
                   }`}
                 >
                   Comfortable
@@ -976,7 +976,7 @@ function DashboardInner() {
                 <button
                   onClick={() => setDensity('compact')}
                   className={`flex-1 px-2 py-1 text-xs font-medium rounded transition-colors ${
-                    density === 'compact' ? 'bg-cg-slate/40 text-white' : 'text-[#8AACBC] hover:text-white'
+                    density === 'compact' ? 'bg-cg-slate/40 text-white' : 'text-cg-slate-muted hover:text-white'
                   }`}
                 >
                   Compact
@@ -986,7 +986,7 @@ function DashboardInner() {
 
             {/* Widget list with show/hide + reorder */}
             <div className="space-y-1 mb-4">
-              <label className="block text-xs font-medium text-[#8AACBC] mb-2">Widgets</label>
+              <label className="block text-xs font-medium text-cg-slate-muted mb-2">Widgets</label>
               {orderedGlanceWidgets.map((id) => {
                 const w = GLANCE_WIDGETS.find((x) => x.id === id);
                 if (!w) return null;
@@ -994,7 +994,7 @@ function DashboardInner() {
                 return (
                   <div
                     key={id}
-                    className="flex items-center justify-between gap-2 px-3 py-2 rounded bg-[#1A3648]/60 border border-cg-slate/20"
+                    className="flex items-center justify-between gap-2 px-3 py-2 rounded bg-cg-slate-deep/60 border border-cg-slate/20"
                   >
                     <button
                       onClick={() => toggleWidgetHidden(id)}
@@ -1006,14 +1006,14 @@ function DashboardInner() {
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => moveWidget(id, -1)}
-                        className="px-1.5 py-0.5 text-[10px] text-[#8AACBC] hover:text-white transition-colors"
+                        className="px-1.5 py-0.5 text-[10px] text-cg-slate-muted hover:text-white transition-colors"
                         title="Move up"
                       >
                         ↑
                       </button>
                       <button
                         onClick={() => moveWidget(id, 1)}
-                        className="px-1.5 py-0.5 text-[10px] text-[#8AACBC] hover:text-white transition-colors"
+                        className="px-1.5 py-0.5 text-[10px] text-cg-slate-muted hover:text-white transition-colors"
                         title="Move down"
                       >
                         ↓
@@ -1027,7 +1027,7 @@ function DashboardInner() {
             <div className="flex items-center justify-between gap-2">
               <button
                 onClick={resetCustomize}
-                className="text-xs text-[#8AACBC] hover:text-white transition-colors"
+                className="text-xs text-cg-slate-muted hover:text-white transition-colors"
               >
                 Reset to defaults
               </button>
@@ -1056,11 +1056,11 @@ function QuickLink({ icon: Icon, label, badge, badgeColor, onClick }: {
   icon: React.ElementType; label: string; badge?: number; badgeColor?: string; onClick: () => void;
 }) {
   return (
-    <button onClick={onClick} className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl px-4 py-3 flex items-center gap-3 hover:bg-cg-slate/15 hover:border-zinc-700/60 transition-all text-left group">
+    <button onClick={onClick} className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl px-4 py-3 flex items-center gap-3 hover:bg-cg-slate/15 hover:border-zinc-700/60 transition-all text-left group">
       <Icon className="w-4 h-4 text-muted-foreground group-hover:text-cg-sage transition-colors" />
-      <span className="text-sm text-[#8AACBC] group-hover:text-white transition-colors">{label}</span>
+      <span className="text-sm text-cg-slate-muted group-hover:text-white transition-colors">{label}</span>
       {badge !== undefined && badge > 0 && (
-        <span className={`text-xs font-medium ml-auto ${badgeColor || 'text-[#8AACBC]'}`}>{badge}</span>
+        <span className={`text-xs font-medium ml-auto ${badgeColor || 'text-cg-slate-muted'}`}>{badge}</span>
       )}
       <ArrowUpRight className="w-3.5 h-3.5 text-[#3A5A6A] group-hover:text-muted-foreground ml-auto transition-colors" />
     </button>

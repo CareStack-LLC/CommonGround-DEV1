@@ -73,7 +73,7 @@ export function ExportList({ caseId, onCreateNew }: ExportListProps) {
       case 'downloaded':
         return 'text-cg-slate bg-cg-slate-subtle';
       case 'generating':
-        return 'text-[#E09520] bg-cg-amber-subtle';
+        return 'text-cg-amber-dark bg-cg-amber-subtle';
       case 'failed':
         return 'text-cg-error bg-cg-error-subtle';
       default:
@@ -108,7 +108,7 @@ export function ExportList({ caseId, onCreateNew }: ExportListProps) {
     return (
       <Card className="bg-cg-error-subtle border-cg-error-subtle">
         <CardContent className="pt-6">
-          <p className="text-[#9B2C2C]">{error}</p>
+          <p className="text-cg-error-dark">{error}</p>
           <Button variant="outline" onClick={loadExports} className="mt-4">
             Retry
           </Button>
@@ -216,7 +216,7 @@ export function ExportList({ caseId, onCreateNew }: ExportListProps) {
                     size="sm"
                     variant="outline"
                     onClick={() => handleDelete(exportItem)}
-                    className="text-cg-error hover:text-[#9B2C2C]"
+                    className="text-cg-error hover:text-cg-error-dark"
                   >
                     Delete
                   </Button>

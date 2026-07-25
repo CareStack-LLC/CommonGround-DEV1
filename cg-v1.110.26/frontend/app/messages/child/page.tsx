@@ -135,7 +135,7 @@ function ParentChildInboxContent() {
             <div className="w-10 h-10 border-3 border-[var(--portal-primary)]/20 border-t-[var(--portal-primary)] rounded-full animate-spin" />
           </div>
         ) : error ? (
-          <div className="p-4 rounded-xl bg-cg-error-subtle border-2 border-cg-error-subtle text-sm text-[#9B2C2C]">
+          <div className="p-4 rounded-xl bg-cg-error-subtle border-2 border-cg-error-subtle text-sm text-cg-error-dark">
             {error}
           </div>
         ) : threads.length === 0 ? (

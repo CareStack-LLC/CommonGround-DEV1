@@ -162,7 +162,7 @@ export default function GeofenceMap({
                 className={`mt-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium whitespace-nowrap shadow-sm ${
                   parent.inGeofence
                     ? 'bg-cg-sage-subtle text-foreground'
-                    : 'bg-cg-amber-subtle text-[#E09520]'
+                    : 'bg-cg-amber-subtle text-cg-amber-dark'
                 }`}
               >
                 {parent.name.split(' ')[0]}

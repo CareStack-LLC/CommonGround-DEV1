@@ -47,7 +47,7 @@ export default function BalanceSummaryCard({ balance, className = '' }: BalanceS
         {/* Net Balance */}
         <div className="p-4 bg-gray-50 rounded-lg flex flex-col items-center justify-center">
           <p className="text-sm text-gray-600 mb-1">Net Balance</p>
-          <div className={`flex items-center gap-2 ${netOwed > 0 ? 'text-[#E09520]' : netOwed < 0 ? 'text-cg-slate' : 'text-cg-sage-dark'}`}>
+          <div className={`flex items-center gap-2 ${netOwed > 0 ? 'text-cg-amber-dark' : netOwed < 0 ? 'text-cg-slate' : 'text-cg-sage-dark'}`}>
             {netOwed > 0 ? (
               <TrendingUp className="h-5 w-5" />
             ) : netOwed < 0 ? (

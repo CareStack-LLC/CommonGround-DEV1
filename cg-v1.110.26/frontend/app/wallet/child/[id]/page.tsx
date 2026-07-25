@@ -162,7 +162,7 @@ function ChildWalletContent() {
             </div>
             <button
               onClick={() => setShowContributeModal(true)}
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-cg-slate text-white rounded-xl font-medium hover:bg-[#1E4E6B] transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-cg-slate text-white rounded-xl font-medium hover:bg-cg-slate-dark transition-colors"
             >
               <Gift className="h-4 w-4" />
               Send Money
@@ -175,7 +175,7 @@ function ChildWalletContent() {
         {/* Balance Card */}
         <div className="cg-card-elevated p-6 bg-gradient-to-br from-cg-slate-subtle to-cg-amber-subtle border-cg-slate-subtle">
           <p className="text-sm text-cg-slate mb-2">Current Balance</p>
-          <p className="text-4xl font-bold text-[#1E4E6B] font-mono tabular-nums">
+          <p className="text-4xl font-bold text-cg-slate-dark font-mono tabular-nums">
             {formatCurrency(balance)}
           </p>
           <div className="grid grid-cols-2 gap-4 mt-6">
@@ -218,7 +218,7 @@ function ChildWalletContent() {
               </p>
               <button
                 onClick={() => setShowContributeModal(true)}
-                className="inline-flex items-center gap-2 px-4 py-2.5 bg-cg-slate text-white rounded-xl font-medium hover:bg-[#1E4E6B] transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2.5 bg-cg-slate text-white rounded-xl font-medium hover:bg-cg-slate-dark transition-colors"
               >
                 <Gift className="h-4 w-4" />
                 Send Money

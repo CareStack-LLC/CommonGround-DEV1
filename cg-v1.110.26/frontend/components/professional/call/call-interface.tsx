@@ -179,7 +179,7 @@ export function CallInterface({ familyFileId, token, onEndCall }: CallInterfaceP
                                     </div>
                                 ) : (
                                     transcripts.map((t, i) => (
-                                        <div key={i} className={`flex gap-3 text-sm animate-in fade-in slide-in-from-bottom-2 ${t.sender === 'ARIA' ? 'bg-[#F0F7FC] dark:bg-[#0F2836]/30 p-2 rounded-lg border border-cg-slate-subtle dark:border-[#163A50]/40' : ''}`}>
+                                        <div key={i} className={`flex gap-3 text-sm animate-in fade-in slide-in-from-bottom-2 ${t.sender === 'ARIA' ? 'bg-cg-slate-tint dark:bg-[#0F2836]/30 p-2 rounded-lg border border-cg-slate-subtle dark:border-[#163A50]/40' : ''}`}>
                                             <span className={`font-bold min-w-[70px] ${t.sender === 'Parent A' ? 'text-teal-600 dark:text-teal-400' : t.sender === 'Parent B' ? 'text-cg-slate dark:text-cg-slate-light' : 'text-cg-slate dark:text-cg-slate-light'}`}>
                                                 {t.sender}:
                                             </span>
@@ -197,7 +197,7 @@ export function CallInterface({ familyFileId, token, onEndCall }: CallInterfaceP
             {/* Sidebar Controls (Safety Shields & Metadata) */}
             <div className="w-full lg:w-80 flex flex-col gap-6">
                 {/* ARIA Safety Shield */}
-                <Card className="border-[#C2DEF0] dark:border-[#163A50]/40 shadow-sm bg-gradient-to-b from-[#F0F7FC]/30 dark:from-[#0F2836]/20 to-card">
+                <Card className="border-cg-slate-tint dark:border-[#163A50]/40 shadow-sm bg-gradient-to-b from-cg-slate-tint/30 dark:from-[#0F2836]/20 to-card">
                     <CardHeader className="pb-3 border-b border-cg-slate-subtle dark:border-[#163A50]/40 transition-colors">
                         <div className="flex items-center justify-between">
                             <CardTitle className="text-sm font-bold flex items-center gap-2 text-[#163A50] dark:text-[#9BCADF]">
@@ -220,11 +220,11 @@ export function CallInterface({ familyFileId, token, onEndCall }: CallInterfaceP
                         </div>
 
                         <div className="grid grid-cols-2 gap-2">
-                            <Button variant="outline" className="h-20 flex flex-col gap-2 border-border hover:bg-cg-error-subtle dark:hover:bg-[#7A2222]/20 hover:border-cg-error-subtle dark:hover:border-[#7A2222]/40 group">
+                            <Button variant="outline" className="h-20 flex flex-col gap-2 border-border hover:bg-cg-error-subtle dark:hover:bg-cg-error-deep/20 hover:border-cg-error-subtle dark:hover:border-cg-error-deep/40 group">
                                 <AlertTriangle className="h-4 w-4 text-muted-foreground group-hover:text-cg-error" />
                                 <span className="text-[10px] font-bold">Intervene</span>
                             </Button>
-                            <Button variant="outline" className="h-20 flex flex-col gap-2 border-border hover:bg-[#F0F7FC] dark:hover:bg-[#0F2836]/20 hover:border-[#C2DEF0] dark:hover:border-[#163A50]/40 group">
+                            <Button variant="outline" className="h-20 flex flex-col gap-2 border-border hover:bg-cg-slate-tint dark:hover:bg-[#0F2836]/20 hover:border-cg-slate-tint dark:hover:border-[#163A50]/40 group">
                                 <Zap className="h-4 w-4 text-muted-foreground group-hover:text-[#3D8DB0]" />
                                 <span className="text-[10px] font-bold">Quiet Handoff</span>
                             </Button>
@@ -250,8 +250,8 @@ export function CallInterface({ familyFileId, token, onEndCall }: CallInterfaceP
                             <TabsContent value="agreements" className="h-full m-0">
                                 <ScrollArea className="h-[280px] p-4">
                                     <div className="space-y-3">
-                                        <div className="p-2 rounded-lg border border-cg-sage-subtle dark:border-[#1B5544]/40 bg-cg-sage-subtle/50 dark:bg-[#123A2E]/20">
-                                            <h4 className="text-xs font-bold text-[#1B5544] dark:text-[#9BD5C2] flex items-center justify-between">
+                                        <div className="p-2 rounded-lg border border-cg-sage-subtle dark:border-cg-sage-deep/40 bg-cg-sage-subtle/50 dark:bg-[#123A2E]/20">
+                                            <h4 className="text-xs font-bold text-cg-sage-deep dark:text-[#9BD5C2] flex items-center justify-between">
                                                 Exchange Plan A-1
                                                 <ChevronRight className="h-3 w-3" />
                                             </h4>
@@ -271,7 +271,7 @@ export function CallInterface({ familyFileId, token, onEndCall }: CallInterfaceP
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-1">
                                         <p className="text-[10px] font-bold text-muted-foreground uppercase">Conflict Level</p>
-                                        <Badge variant="outline" className="text-[#E09520] dark:text-[#F7B84D] bg-cg-amber-subtle dark:bg-[#3D2808]/20 border-[#FBE3BF] dark:border-[#6B460F]/40">HIGH-TEMP</Badge>
+                                        <Badge variant="outline" className="text-cg-amber-dark dark:text-[#F7B84D] bg-cg-amber-subtle dark:bg-[#3D2808]/20 border-cg-amber-tint dark:border-cg-amber-deep/40">HIGH-TEMP</Badge>
                                     </div>
                                     <div className="space-y-1">
                                         <p className="text-[10px] font-bold text-muted-foreground uppercase">Avg Response</p>

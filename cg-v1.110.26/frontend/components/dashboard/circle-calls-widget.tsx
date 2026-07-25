@@ -61,10 +61,10 @@ export default function CircleCallsWidget({ familyFileId, className }: CircleCal
   }
 
   function getStatusColor(status: string, hasFlags: boolean): string {
-    if (hasFlags) return 'text-[#E09520] dark:text-cg-amber bg-cg-amber-subtle dark:bg-foreground/30';
+    if (hasFlags) return 'text-cg-amber-dark dark:text-cg-amber bg-cg-amber-subtle dark:bg-foreground/30';
     if (status === 'completed') return 'text-cg-sage-dark dark:text-cg-sage-light bg-cg-sage-subtle dark:bg-foreground/30';
     if (status === 'missed') return 'text-muted-foreground bg-muted';
-    if (status === 'terminated') return 'text-cg-error dark:text-[#E06B6B] bg-cg-error-subtle dark:bg-[#7A2222]/30';
+    if (status === 'terminated') return 'text-cg-error dark:text-cg-error-light bg-cg-error-subtle dark:bg-cg-error-deep/30';
     return 'text-cg-slate dark:text-cg-slate-light bg-cg-slate-subtle dark:bg-foreground/30';
   }
 
@@ -148,7 +148,7 @@ export default function CircleCallsWidget({ familyFileId, className }: CircleCal
         </div>
         <button
           onClick={() => router.push(`/family-files/${familyFileId}/circle-calls`)}
-          className="text-sm text-cg-slate hover:text-[#1E4E6B] font-medium flex items-center gap-1"
+          className="text-sm text-cg-slate hover:text-cg-slate-dark font-medium flex items-center gap-1"
         >
           View All
           <ChevronRight className="h-4 w-4" />
@@ -158,12 +158,12 @@ export default function CircleCallsWidget({ familyFileId, className }: CircleCal
       {/* Safety Notice if flags */}
       {flaggedCalls > 0 && (
         <div className="mb-4 p-3 bg-cg-amber-subtle dark:bg-foreground/20 border border-cg-amber-subtle dark:border-foreground/40 rounded-xl flex items-start gap-2">
-          <AlertTriangle className="h-4 w-4 text-[#E09520] dark:text-cg-amber mt-0.5 flex-shrink-0" />
+          <AlertTriangle className="h-4 w-4 text-cg-amber-dark dark:text-cg-amber mt-0.5 flex-shrink-0" />
           <div className="flex-1">
             <p className="text-sm font-medium text-foreground dark:text-cg-amber">
               {flaggedCalls} {flaggedCalls === 1 ? 'call has' : 'calls have'} safety notices
             </p>
-            <p className="text-xs text-[#E09520] dark:text-cg-amber mt-0.5">
+            <p className="text-xs text-cg-amber-dark dark:text-cg-amber mt-0.5">
               ARIA detected concerning content
             </p>
           </div>
@@ -199,8 +199,8 @@ export default function CircleCallsWidget({ familyFileId, className }: CircleCal
                   </p>
                   {call.aria_intervention_count > 0 && (
                     <div className="flex items-center gap-1 px-1.5 py-0.5 bg-cg-amber-subtle dark:bg-foreground/30 rounded-full">
-                      <Shield className="h-3 w-3 text-[#E09520] dark:text-cg-amber" />
-                      <span className="text-xs font-medium text-[#E09520] dark:text-cg-amber">
+                      <Shield className="h-3 w-3 text-cg-amber-dark dark:text-cg-amber" />
+                      <span className="text-xs font-medium text-cg-amber-dark dark:text-cg-amber">
                         {call.aria_intervention_count}
                       </span>
                     </div>

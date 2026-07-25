@@ -108,9 +108,9 @@ export function useProfessionalAuth() {
 const PROFESSIONAL_TYPE_INFO: Record<string, { label: string; color: string }> = {
   attorney: { label: "Attorney", color: "bg-cg-sage-subtle text-[#236E59]" },
   paralegal: { label: "Paralegal", color: "bg-blue-100 text-blue-800" },
-  mediator: { label: "Mediator", color: "bg-cg-slate-subtle text-[#1E4E6B]" },
+  mediator: { label: "Mediator", color: "bg-cg-slate-subtle text-cg-slate-dark" },
   parenting_coordinator: { label: "Parenting Coordinator", color: "bg-cg-amber-subtle text-[#8F5E14]" },
-  intake_coordinator: { label: "Intake Coordinator", color: "bg-cg-slate-subtle text-[#1E4E6B]" },
+  intake_coordinator: { label: "Intake Coordinator", color: "bg-cg-slate-subtle text-cg-slate-dark" },
   practice_admin: { label: "Practice Admin", color: "bg-slate-100 text-slate-800" },
 };
 
@@ -535,7 +535,7 @@ function ProfessionalNavigation({
             <div className="flex items-center gap-2.5">
               {dashboardData?.pending_firm_invitations > 0 && (
                 <Link href="/professional/intake?tab=invitations">
-                  <Badge className="text-xs bg-cg-amber-subtle text-[#B8791A] border border-[#FBE3BF] hover:bg-cg-amber-subtle cursor-pointer transition-colors font-medium">
+                  <Badge className="text-xs bg-cg-amber-subtle text-cg-amber-deep border border-cg-amber-tint hover:bg-cg-amber-subtle cursor-pointer transition-colors font-medium">
                     {dashboardData.pending_firm_invitations} case invitation{dashboardData.pending_firm_invitations !== 1 ? "s" : ""}
                   </Badge>
                 </Link>

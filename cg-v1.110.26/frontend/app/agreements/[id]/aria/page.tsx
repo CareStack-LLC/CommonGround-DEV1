@@ -437,7 +437,7 @@ Either way, I'll organize everything into a clear agreement for you to review. W
             {extractionPreview && Object.keys(extractionPreview).length === 0 && (
               <Card className="mb-6 border-cg-amber-subtle bg-cg-amber-subtle">
                 <CardContent className="pt-6">
-                  <p className="text-[#E09520]">
+                  <p className="text-cg-amber-dark">
                     I couldn't extract specific details yet. Click "Continue Editing" to provide more information about your custody arrangement.
                   </p>
                   <Button
@@ -480,7 +480,7 @@ Either way, I'll organize everything into a clear agreement for you to review. W
                     {/* Document upload card */}
                     {message.type === 'document_upload' && message.attachment ? (
                       <div className={`flex items-center gap-3 p-3 rounded-lg ${
-                        message.role === 'user' ? 'bg-[#1E4E6B]/50' : 'bg-background'
+                        message.role === 'user' ? 'bg-cg-slate-dark/50' : 'bg-background'
                       }`}>
                         <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
                           message.role === 'user' ? 'bg-cg-slate' : 'bg-cg-slate-subtle'

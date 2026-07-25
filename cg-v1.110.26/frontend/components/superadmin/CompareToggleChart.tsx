@@ -58,12 +58,12 @@ const TOOLTIP_STYLE = {
   backgroundColor: 'var(--foreground)',
   border: '1px solid var(--cg-slate)',
   borderRadius: 8,
-  color: '#D0E4EC',
+  color: 'var(--cg-slate-tint)',
   fontSize: 12,
 } as const;
 
 const AXIS_PROPS = {
-  stroke: '#4A6E7F',
+  stroke: 'var(--cg-slate-strong)',
   tick: { fill: 'var(--muted-foreground)', fontSize: 10 },
   tickLine: false,
 } as const;
@@ -99,10 +99,10 @@ export function CompareToggleChart({
   const fmt = formatValue ?? ((n: number) => n.toLocaleString());
 
   return (
-    <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
+    <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
       {(title || hasPrior || !hasPrior) && (
         <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
-          <h3 className="text-sm font-semibold text-[#D0E4EC]">
+          <h3 className="text-sm font-semibold text-cg-slate-tint">
             {title}
             {tooltip && <InfoTooltip text={tooltip} />}
           </h3>
@@ -111,7 +111,7 @@ export function CompareToggleChart({
             className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-colors ${
               compareOn
                 ? 'bg-cg-sage/15 border-cg-sage/30 text-cg-sage-light'
-                : 'bg-[#0F2533]/60 border-cg-slate/20 text-[#8AACBC] hover:text-white hover:border-cg-slate/50'
+                : 'bg-cg-ink/60 border-cg-slate/20 text-cg-slate-muted hover:text-white hover:border-cg-slate/50'
             }`}
             title="Overlay the prior period for side-by-side comparison"
           >
@@ -160,7 +160,7 @@ export function CompareToggleChart({
           />
           {compareOn && hasPrior && (
             <Legend
-              wrapperStyle={{ fontSize: 10, color: '#8AACBC' }}
+              wrapperStyle={{ fontSize: 10, color: 'var(--cg-slate-muted)' }}
               iconType="plainline"
               iconSize={20}
             />

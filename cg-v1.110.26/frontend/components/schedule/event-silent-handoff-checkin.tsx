@@ -240,17 +240,17 @@ export default function EventSilentHandoffCheckIn({
                                     </p>
                                 </div>
                             ) : windowStatus.is_before_window ? (
-                                <div className="bg-cg-amber-subtle dark:bg-foreground/30 border border-cg-amber dark:border-[#E09520] rounded-lg p-3">
-                                    <p className="text-[#E09520] dark:text-cg-amber font-medium">
+                                <div className="bg-cg-amber-subtle dark:bg-foreground/30 border border-cg-amber dark:border-cg-amber-dark rounded-lg p-3">
+                                    <p className="text-cg-amber-dark dark:text-cg-amber font-medium">
                                         Check-in window opens soon
                                     </p>
-                                    <p className="text-sm text-[#E09520] dark:text-cg-amber">
+                                    <p className="text-sm text-cg-amber-dark dark:text-cg-amber">
                                         In {formatMinutesHumanReadable(windowStatus.minutes_until_window)}
                                     </p>
                                 </div>
                             ) : (
-                                <div className="bg-cg-error-subtle dark:bg-[#7A2222]/30 border border-[#FCA5A5] dark:border-[#9B2C2C] rounded-lg p-3">
-                                    <p className="text-[#9B2C2C] dark:text-[#FCA5A5] font-medium">
+                                <div className="bg-cg-error-subtle dark:bg-cg-error-deep/30 border border-[#FCA5A5] dark:border-cg-error-dark rounded-lg p-3">
+                                    <p className="text-cg-error-dark dark:text-[#FCA5A5] font-medium">
                                         Check-in window has closed
                                     </p>
                                 </div>
@@ -260,8 +260,8 @@ export default function EventSilentHandoffCheckIn({
 
                     {/* Geolocation Support */}
                     {!isSupported && (
-                        <div className="bg-cg-error-subtle dark:bg-[#7A2222]/30 border border-[#FCA5A5] dark:border-[#9B2C2C] rounded-lg p-3 mb-6">
-                            <p className="text-[#9B2C2C] dark:text-[#FCA5A5]">
+                        <div className="bg-cg-error-subtle dark:bg-cg-error-deep/30 border border-[#FCA5A5] dark:border-cg-error-dark rounded-lg p-3 mb-6">
+                            <p className="text-cg-error-dark dark:text-[#FCA5A5]">
                                 GPS location is not supported in your browser.
                             </p>
                         </div>
@@ -269,15 +269,15 @@ export default function EventSilentHandoffCheckIn({
 
                     {/* GPS Error */}
                     {geoError && (
-                        <div className="bg-cg-error-subtle dark:bg-[#7A2222]/30 border border-[#FCA5A5] dark:border-[#9B2C2C] rounded-lg p-3 mb-6">
-                            <p className="text-[#9B2C2C] dark:text-[#FCA5A5]">{geoError.message}</p>
+                        <div className="bg-cg-error-subtle dark:bg-cg-error-deep/30 border border-[#FCA5A5] dark:border-cg-error-dark rounded-lg p-3 mb-6">
+                            <p className="text-cg-error-dark dark:text-[#FCA5A5]">{geoError.message}</p>
                         </div>
                     )}
 
                     {/* Check-in Error */}
                     {checkInError && (
-                        <div className="bg-cg-error-subtle dark:bg-[#7A2222]/30 border border-[#FCA5A5] dark:border-[#9B2C2C] rounded-lg p-3 mb-6">
-                            <p className="text-[#9B2C2C] dark:text-[#FCA5A5]">{checkInError}</p>
+                        <div className="bg-cg-error-subtle dark:bg-cg-error-deep/30 border border-[#FCA5A5] dark:border-cg-error-dark rounded-lg p-3 mb-6">
+                            <p className="text-cg-error-dark dark:text-[#FCA5A5]">{checkInError}</p>
                         </div>
                     )}
 
@@ -316,7 +316,7 @@ export default function EventSilentHandoffCheckIn({
                             <Button
                                 onClick={handleCheckIn}
                                 disabled={!isSupported || isCheckingIn || geoLoading || (windowStatus !== null && !windowStatus.is_within_window)}
-                                className="flex-1 bg-cg-slate hover:bg-[#1E4E6B]"
+                                className="flex-1 bg-cg-slate hover:bg-cg-slate-dark"
                             >
                                 {isCheckingIn || geoLoading ? (
                                     <>
@@ -358,7 +358,7 @@ export default function EventSilentHandoffCheckIn({
                                 }}
                                 disabled={isCheckingIn || (windowStatus !== null && !windowStatus.is_within_window)}
                                 variant="outline"
-                                className="w-full border-cg-amber text-[#E09520] hover:bg-cg-amber-subtle"
+                                className="w-full border-cg-amber text-cg-amber-dark hover:bg-cg-amber-subtle"
                             >
                                 🧪 Test: Check In at Event Location
                             </Button>

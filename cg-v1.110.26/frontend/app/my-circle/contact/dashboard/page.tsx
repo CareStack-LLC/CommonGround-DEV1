@@ -541,7 +541,7 @@ export default function CircleContactDashboardPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="fixed inset-0 bg-gradient-to-br from-[#E8F4F8] via-background to-border dark:from-[#0D1B24] dark:via-background dark:to-[#0D1B24] -z-10" />
+        <div className="fixed inset-0 bg-gradient-to-br from-[#E8F4F8] via-background to-border dark:from-cg-ink dark:via-background dark:to-cg-ink -z-10" />
         <div className="flex flex-col items-center gap-5">
           <div className="relative">
             <div className="absolute inset-0 bg-cg-sage/20 rounded-full blur-2xl animate-pulse" />
@@ -563,7 +563,7 @@ export default function CircleContactDashboardPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Branded Background */}
-      <div className="fixed inset-0 bg-gradient-to-br from-[#E8F4F8]/50 via-background to-border/30 dark:from-[#0D1B24]/80 dark:via-background dark:to-[#0D1B24]/60 -z-10" />
+      <div className="fixed inset-0 bg-gradient-to-br from-[#E8F4F8]/50 via-background to-border/30 dark:from-cg-ink/80 dark:via-background dark:to-cg-ink/60 -z-10" />
 
       {/* Incoming Call Alert */}
       {incomingCall && (

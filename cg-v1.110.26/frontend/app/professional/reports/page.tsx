@@ -45,10 +45,10 @@ const REPORT_TYPES = [
     title: "Communication Analysis",
     description: "Detailed communication patterns with before/after ARIA intervention examples",
     icon: MessageCircle,
-    color: "from-cg-amber to-[#E09520]",
+    color: "from-cg-amber to-cg-amber-dark",
     bgColor: "bg-cg-amber-subtle",
-    borderColor: "border-[#FBE3BF]",
-    textColor: "text-[#B8791A]",
+    borderColor: "border-cg-amber-tint",
+    textColor: "text-cg-amber-deep",
     roles: ["Attorney", "GAL", "Parenting Coordinator"],
     includes: [
       "ARIA intervention history with before/after examples",
@@ -266,7 +266,7 @@ export default function ReportsPage() {
                 {/* Generate Button */}
                 <div className="flex items-center gap-2">
                   <Link href={`/professional/reports/generate?type=${reportType.id}`} className="flex-1">
-                    <Button className="w-full bg-cg-sage hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm font-semibold">
+                    <Button className="w-full bg-cg-sage hover:bg-cg-sage-dark text-white rounded-xl shadow-sm font-semibold">
                       Generate Report
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
@@ -350,7 +350,7 @@ export default function ReportsPage() {
                     <div className="flex items-center gap-2">
                       <Button
                         size="sm"
-                        className="flex-1 text-xs bg-cg-sage hover:bg-[#2D8A6E] text-white rounded-lg shadow-sm"
+                        className="flex-1 text-xs bg-cg-sage hover:bg-cg-sage-dark text-white rounded-lg shadow-sm"
                         onClick={() => downloadReport(report.id)}
                       >
                         <Download className="h-3.5 w-3.5 mr-1.5" />

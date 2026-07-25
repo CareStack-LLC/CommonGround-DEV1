@@ -60,7 +60,7 @@ const statusColors: Record<string, string> = {
   open: 'bg-cg-warning-subtle text-cg-warning',
   partially_funded: 'bg-cg-amber-subtle text-cg-amber',
   funded: 'bg-cg-sage-subtle text-cg-sage',
-  pending_verification: 'bg-cg-slate-subtle text-[#1E4E6B]',
+  pending_verification: 'bg-cg-slate-subtle text-cg-slate-dark',
   verified: 'bg-cg-success-subtle text-cg-success',
   completed: 'bg-cg-success-subtle text-cg-success',
   expired: 'bg-muted text-muted-foreground',
@@ -497,7 +497,7 @@ function ObligationDetailContent() {
             </h2>
 
             <div className="bg-cg-slate-subtle rounded-xl p-4 border border-cg-slate-subtle">
-              <p className="text-sm text-[#1E4E6B] font-medium mb-2">Sworn Statement</p>
+              <p className="text-sm text-cg-slate-dark font-medium mb-2">Sworn Statement</p>
               <p className="text-foreground">{attestation.attestation_text}</p>
               <p className="text-sm text-cg-slate mt-2">
                 Attested on {formatDate(attestation.attested_at)}
@@ -521,8 +521,8 @@ function ObligationDetailContent() {
                 const reviewStatusBadge = artifact.review_status === 'acknowledged'
                   ? { label: 'Acknowledged', bg: 'bg-cg-sage-subtle text-cg-sage-dark border-cg-sage-subtle' }
                   : artifact.review_status === 'disputed'
-                  ? { label: 'Disputed', bg: 'bg-cg-error-subtle text-[#9B2C2C] border-cg-error-subtle' }
-                  : { label: 'Pending Review', bg: 'bg-cg-amber-subtle text-[#E09520] border-cg-amber-subtle' };
+                  ? { label: 'Disputed', bg: 'bg-cg-error-subtle text-cg-error-dark border-cg-error-subtle' }
+                  : { label: 'Pending Review', bg: 'bg-cg-amber-subtle text-cg-amber-dark border-cg-amber-subtle' };
 
                 return (
                   <div key={artifact.id} className="p-4 bg-muted/30 rounded-xl border border-border">
@@ -611,7 +611,7 @@ function ObligationDetailContent() {
                               setReviewingArtifact(null);
                             }
                           }}
-                          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-bold text-[#9B2C2C] bg-cg-error-subtle border border-cg-error-subtle rounded-lg hover:bg-cg-error-subtle transition-all duration-200"
+                          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-bold text-cg-error-dark bg-cg-error-subtle border border-cg-error-subtle rounded-lg hover:bg-cg-error-subtle transition-all duration-200"
                         >
                           <AlertTriangle className="h-3.5 w-3.5" />
                           Dispute

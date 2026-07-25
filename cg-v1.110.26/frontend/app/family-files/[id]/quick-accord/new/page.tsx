@@ -192,7 +192,7 @@ function NewQuickAccordContent() {
           <ArrowLeft className="w-5 h-5 text-muted-foreground" />
         </button>
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-gradient-to-br from-cg-amber/10 to-[#E09520]/5 rounded-2xl flex items-center justify-center shadow-md">
+          <div className="w-12 h-12 bg-gradient-to-br from-cg-amber/10 to-cg-amber-dark/5 rounded-2xl flex items-center justify-center shadow-md">
             <Zap className="w-6 h-6 text-cg-amber" />
           </div>
           <div>
@@ -473,7 +473,7 @@ function NewQuickAccordContent() {
               {extractedData.missing_info?.length > 0 && (
                 <div className="mt-2 pt-3 border-t-2 border-cg-amber-subtle dark:border-foreground/40 bg-cg-amber-subtle/50 dark:bg-foreground/20 -mx-6 px-6 pb-2 rounded-b-xl">
                   <span className="text-muted-foreground font-medium">Still needed: </span>
-                  <span className="text-[#E09520] dark:text-cg-amber font-bold">{extractedData.missing_info.join(', ')}</span>
+                  <span className="text-cg-amber-dark dark:text-cg-amber font-bold">{extractedData.missing_info.join(', ')}</span>
                 </div>
               )}
             </div>

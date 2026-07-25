@@ -96,7 +96,7 @@ function FamilyFileCard({
           </div>
         </div>
         {familyFile.has_court_case && (
-          <span className="px-2 py-1 bg-cg-amber-subtle text-[#E09520] text-xs font-semibold rounded-full flex items-center gap-1">
+          <span className="px-2 py-1 bg-cg-amber-subtle text-cg-amber-dark text-xs font-semibold rounded-full flex items-center gap-1">
             <Scale className="h-3 w-3" />
             Court
           </span>
@@ -120,7 +120,7 @@ function StatusBadge({ status }: { status: string }) {
     },
     pending_approval: {
       icon: <Clock className="h-3.5 w-3.5" />,
-      className: 'bg-cg-amber-subtle text-[#E09520] border-cg-amber-subtle',
+      className: 'bg-cg-amber-subtle text-cg-amber-dark border-cg-amber-subtle',
       label: 'Pending Approval',
     },
     draft: {
@@ -130,12 +130,12 @@ function StatusBadge({ status }: { status: string }) {
     },
     rejected: {
       icon: <AlertCircle className="h-3.5 w-3.5" />,
-      className: 'bg-cg-error-subtle text-[#9B2C2C] border-cg-error-subtle',
+      className: 'bg-cg-error-subtle text-cg-error-dark border-cg-error-subtle',
       label: 'Rejected',
     },
     expired: {
       icon: <AlertCircle className="h-3.5 w-3.5" />,
-      className: 'bg-cg-amber-subtle text-[#E09520] border-cg-amber-subtle',
+      className: 'bg-cg-amber-subtle text-cg-amber-dark border-cg-amber-subtle',
       label: 'Expired',
     },
   };
@@ -199,8 +199,8 @@ function AgreementCard({
         {/* Pending Approval Status */}
         {agreement.status === 'pending_approval' && (
           <div className="mt-3 p-3 bg-cg-amber-subtle rounded-xl border-2 border-cg-amber-subtle">
-            <p className="text-xs font-bold text-[#E09520] mb-2">Awaiting Approvals</p>
-            <div className="flex gap-4 text-xs text-[#E09520]">
+            <p className="text-xs font-bold text-cg-amber-dark mb-2">Awaiting Approvals</p>
+            <div className="flex gap-4 text-xs text-cg-amber-dark">
               <span className="flex items-center gap-1.5 font-medium">
                 {agreement.petitioner_approved ? (
                   <CheckCircle className="h-3.5 w-3.5 text-cg-sage-dark" />
@@ -299,10 +299,10 @@ function QuickAccordCard({
   };
 
   const categoryColors: Record<string, string> = {
-    travel: 'bg-cg-slate-subtle text-[#1E4E6B] border-cg-slate-subtle',
-    schedule_swap: 'bg-cg-slate-subtle text-[#1E4E6B] border-cg-slate-subtle',
-    special_event: 'bg-cg-amber-subtle text-[#E09520] border-cg-amber-subtle',
-    overnight: 'bg-cg-slate-subtle text-[#1E4E6B] border-cg-slate-subtle',
+    travel: 'bg-cg-slate-subtle text-cg-slate-dark border-cg-slate-subtle',
+    schedule_swap: 'bg-cg-slate-subtle text-cg-slate-dark border-cg-slate-subtle',
+    special_event: 'bg-cg-amber-subtle text-cg-amber-dark border-cg-amber-subtle',
+    overnight: 'bg-cg-slate-subtle text-cg-slate-dark border-cg-slate-subtle',
     expense: 'bg-cg-sage-subtle text-cg-sage-dark border-cg-sage-subtle',
     other: 'bg-muted text-foreground border-border',
   };
@@ -319,10 +319,10 @@ function QuickAccordCard({
       <div className="flex items-start justify-between gap-4 mb-3">
         <div className="flex items-start gap-3 flex-1 min-w-0">
           <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cg-amber-subtle to-cg-amber-subtle flex items-center justify-center flex-shrink-0 shadow-md">
-            <Handshake className="h-5 w-5 text-[#E09520]" />
+            <Handshake className="h-5 w-5 text-cg-amber-dark" />
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="font-bold text-foreground truncate group-hover:text-[#E09520] transition-colors" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+            <h3 className="font-bold text-foreground truncate group-hover:text-cg-amber-dark transition-colors" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
               {quickAccord.title}
             </h3>
             <p className="text-xs text-muted-foreground mt-0.5 font-medium">
@@ -356,7 +356,7 @@ function QuickAccordCard({
 
       <div className="mt-4 pt-3 border-t-2 border-border flex items-center justify-between">
         <span className="text-xs text-muted-foreground font-medium">Click to view details</span>
-        <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-[#E09520] group-hover:translate-x-1 transition-all duration-300" />
+        <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-cg-amber-dark group-hover:translate-x-1 transition-all duration-300" />
       </div>
     </button>
   );
@@ -393,7 +393,7 @@ function BuilderChoiceModal({
       icon: Handshake,
       description: 'A simple mutual agreement. Both parents acknowledge their commitment to co-parent cooperatively. No detailed sections to complete.',
       tag: 'Quick Start',
-      tagClass: 'bg-cg-slate-subtle text-[#1E4E6B]',
+      tagClass: 'bg-cg-slate-subtle text-cg-slate-dark',
     },
     {
       id: 'co-operative',
@@ -410,7 +410,7 @@ function BuilderChoiceModal({
       icon: FileText,
       description: '18 detailed sections for high-conflict or court-ordered situations. Covers holidays, birthdays, vacations, school breaks, healthcare, and more.',
       tag: 'Most Detailed',
-      tagClass: 'bg-cg-slate-subtle text-[#1E4E6B]',
+      tagClass: 'bg-cg-slate-subtle text-cg-slate-dark',
     },
   ];
 
@@ -522,15 +522,15 @@ function BuilderChoiceModal({
               "
             >
               <div className="flex items-start gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cg-amber to-[#E09520] flex items-center justify-center text-white flex-shrink-0 shadow-md group-hover:scale-105 transition-transform duration-300">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cg-amber to-cg-amber-dark flex items-center justify-center text-white flex-shrink-0 shadow-md group-hover:scale-105 transition-transform duration-300">
                   <Sparkles className="h-7 w-7" />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-bold text-foreground group-hover:text-[#E09520] transition-colors" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                    <h3 className="font-bold text-foreground group-hover:text-cg-amber-dark transition-colors" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                       Talk with ARIA
                     </h3>
-                    <span className="px-2.5 py-0.5 bg-cg-amber-subtle text-[#E09520] text-xs font-bold rounded-full shadow-sm">
+                    <span className="px-2.5 py-0.5 bg-cg-amber-subtle text-cg-amber-dark text-xs font-bold rounded-full shadow-sm">
                       Recommended
                     </span>
                   </div>
@@ -538,13 +538,13 @@ function BuilderChoiceModal({
                     Describe your custody arrangement in your own words. ARIA will ask the right questions and build your agreement from the conversation.
                   </p>
                   <div className="flex flex-wrap gap-2 mt-3">
-                    <span className="px-2.5 py-1 bg-cg-amber-subtle text-[#E09520] text-xs font-bold rounded-full">
+                    <span className="px-2.5 py-1 bg-cg-amber-subtle text-cg-amber-dark text-xs font-bold rounded-full">
                       Conversational
                     </span>
-                    <span className="px-2.5 py-1 bg-cg-amber-subtle text-[#E09520] text-xs font-bold rounded-full">
+                    <span className="px-2.5 py-1 bg-cg-amber-subtle text-cg-amber-dark text-xs font-bold rounded-full">
                       Guided
                     </span>
-                    <span className="px-2.5 py-1 bg-cg-amber-subtle text-[#E09520] text-xs font-bold rounded-full">
+                    <span className="px-2.5 py-1 bg-cg-amber-subtle text-cg-amber-dark text-xs font-bold rounded-full">
                       AI-Powered
                     </span>
                   </div>
@@ -838,7 +838,7 @@ function AgreementsListContent() {
                 {selectedFamilyFile.has_court_case && (
                   <div className="bg-card rounded-2xl border-2 border-cg-amber-subtle shadow-lg p-5 bg-gradient-to-r from-cg-amber-subtle to-transparent">
                     <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cg-amber to-[#E09520] flex items-center justify-center flex-shrink-0 shadow-md">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cg-amber to-cg-amber-dark flex items-center justify-center flex-shrink-0 shadow-md">
                         <Scale className="h-5 w-5 text-white" />
                       </div>
                       <div>
@@ -892,7 +892,7 @@ function AgreementsListContent() {
                         onClick={() => router.push(`/family-files/${selectedFamilyFile.id}/quick-accord/new`)}
                         className="
                           inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold
-                          bg-gradient-to-r from-cg-amber to-[#E09520] text-white shadow-md hover:shadow-lg
+                          bg-gradient-to-r from-cg-amber to-cg-amber-dark text-white shadow-md hover:shadow-lg
                           transition-all duration-300
                         "
                       >
@@ -935,7 +935,7 @@ function AgreementsListContent() {
                       <Handshake className="h-4 w-4" />
                       QuickAccords
                       {quickAccords.length > 0 && (
-                        <span className="px-2 py-0.5 bg-cg-amber-subtle text-[#E09520] text-xs font-bold rounded-full">
+                        <span className="px-2 py-0.5 bg-cg-amber-subtle text-cg-amber-dark text-xs font-bold rounded-full">
                           {quickAccords.length}
                         </span>
                       )}
@@ -964,11 +964,11 @@ function AgreementsListContent() {
                             <AlertCircle className="h-5 w-5 text-cg-error" />
                           </div>
                           <div className="flex-1">
-                            <p className="font-bold text-[#7A2222]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Failed to load agreements</p>
-                            <p className="text-sm text-[#9B2C2C] font-medium mt-1">{error}</p>
+                            <p className="font-bold text-cg-error-deep" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Failed to load agreements</p>
+                            <p className="text-sm text-cg-error-dark font-medium mt-1">{error}</p>
                             <button
                               onClick={() => loadAgreements(selectedFamilyFile.id)}
-                              className="mt-3 px-4 py-2 bg-card border-2 border-[#FCA5A5] text-[#9B2C2C] rounded-xl text-sm font-bold hover:bg-cg-error-subtle transition-all duration-300"
+                              className="mt-3 px-4 py-2 bg-card border-2 border-[#FCA5A5] text-cg-error-dark rounded-xl text-sm font-bold hover:bg-cg-error-subtle transition-all duration-300"
                             >
                               Try Again
                             </button>
@@ -1035,7 +1035,7 @@ function AgreementsListContent() {
                             onClick={() => router.push(`/family-files/${selectedFamilyFile.id}/quick-accord/new`)}
                             className="
                               inline-flex items-center gap-2 px-6 py-3
-                              bg-gradient-to-r from-cg-amber to-[#E09520] text-white
+                              bg-gradient-to-r from-cg-amber to-cg-amber-dark text-white
                               rounded-xl font-bold shadow-md hover:shadow-lg
                               transition-all duration-300
                             "

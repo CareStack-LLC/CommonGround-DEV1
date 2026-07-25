@@ -170,8 +170,8 @@ export default function ItemsPage() {
 
   const getLocationBadge = (location: string) => {
     const colors: Record<string, string> = {
-      parent_a: "bg-cg-slate-subtle text-[#1E4E6B]",
-      parent_b: "bg-cg-slate-subtle text-[#1E4E6B]",
+      parent_a: "bg-cg-slate-subtle text-cg-slate-dark",
+      parent_b: "bg-cg-slate-subtle text-cg-slate-dark",
       child_traveling: "bg-cg-sage-subtle text-cg-sage-dark",
     };
     return (
@@ -184,10 +184,10 @@ export default function ItemsPage() {
   const getConditionBadge = (condition: string) => {
     const colors: Record<string, string> = {
       excellent: "bg-cg-sage-subtle text-cg-sage-dark",
-      good: "bg-cg-slate-subtle text-[#1E4E6B]",
-      fair: "bg-cg-amber-subtle text-[#E09520]",
-      poor: "bg-cg-amber-subtle text-[#E09520]",
-      damaged: "bg-cg-error-subtle text-[#9B2C2C]",
+      good: "bg-cg-slate-subtle text-cg-slate-dark",
+      fair: "bg-cg-amber-subtle text-cg-amber-dark",
+      poor: "bg-cg-amber-subtle text-cg-amber-dark",
+      damaged: "bg-cg-error-subtle text-cg-error-dark",
     };
     return (
       <span className={`px-2 py-1 text-xs font-medium rounded ${colors[condition] || "bg-gray-100 text-gray-700"}`}>

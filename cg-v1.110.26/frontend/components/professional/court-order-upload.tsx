@@ -144,21 +144,21 @@ export function CourtOrderUpload({
   const getConfidenceBadge = (confidence: number) => {
     if (confidence >= 0.95) {
       return (
-        <Badge className="bg-cg-sage-subtle text-cg-sage-dark border border-[#C5E5DB]">
+        <Badge className="bg-cg-sage-subtle text-cg-sage-dark border border-cg-sage-tint">
           <CheckCircle2 className="h-3 w-3 mr-1" />
           High Confidence
         </Badge>
       );
     } else if (confidence >= 0.75) {
       return (
-        <Badge className="bg-cg-amber-subtle text-[#B8791A] border border-[#FBE3BF]">
+        <Badge className="bg-cg-amber-subtle text-cg-amber-deep border border-cg-amber-tint">
           <AlertCircle className="h-3 w-3 mr-1" />
           Medium — Verify
         </Badge>
       );
     } else {
       return (
-        <Badge className="bg-cg-error-subtle text-[#9B2C2C] border border-cg-error-subtle">
+        <Badge className="bg-cg-error-subtle text-cg-error-dark border border-cg-error-subtle">
           <AlertCircle className="h-3 w-3 mr-1" />
           Low — Review Required
         </Badge>
@@ -249,7 +249,7 @@ export function CourtOrderUpload({
             {error && (
               <div className="p-3 bg-cg-error-subtle border border-cg-error-subtle rounded-xl flex items-start gap-2">
                 <AlertCircle className="h-5 w-5 text-cg-error shrink-0 mt-0.5" />
-                <p className="text-sm text-[#9B2C2C]">{error}</p>
+                <p className="text-sm text-cg-error-dark">{error}</p>
               </div>
             )}
           </div>
@@ -403,7 +403,7 @@ export function CourtOrderUpload({
             <Button aria-label="Upload"
               onClick={handleUploadAndExtract}
               disabled={!file || uploading || extracting}
-              className="bg-cg-sage hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm font-semibold"
+              className="bg-cg-sage hover:bg-cg-sage-dark text-white rounded-xl shadow-sm font-semibold"
             >
               {uploading || extracting ? (
                 <>Processing...</>
@@ -419,7 +419,7 @@ export function CourtOrderUpload({
           {step === "review" && (
             <Button
               onClick={handleConfirm}
-              className="bg-cg-sage hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm font-semibold"
+              className="bg-cg-sage hover:bg-cg-sage-dark text-white rounded-xl shadow-sm font-semibold"
             >
               <CheckCircle2 className="h-4 w-4 mr-2" />
               Confirm & Create Case

@@ -304,7 +304,7 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-[#E09520]" />
+              <Shield className="h-5 w-5 text-cg-amber-dark" />
               <CardTitle className="text-base">Child Abduction Prevention (Items 5-6)</CardTitle>
             </div>
             {renderEditButton('abduction')}
@@ -314,11 +314,11 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
           {formData.child_abduction_risk ? (
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <AlertTriangle className="h-4 w-4 text-[#E09520]" />
-                <span className="text-sm font-medium text-[#E09520]">5. Child abduction risk identified</span>
+                <AlertTriangle className="h-4 w-4 text-cg-amber-dark" />
+                <span className="text-sm font-medium text-cg-amber-dark">5. Child abduction risk identified</span>
               </div>
               {formData.fl341b_attached && (
-                <Badge variant="secondary" className="bg-cg-amber-subtle text-[#E09520]">
+                <Badge variant="secondary" className="bg-cg-amber-subtle text-cg-amber-dark">
                   FL-341(B) Attached
                 </Badge>
               )}
@@ -397,7 +397,7 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <AlertTriangle className="h-5 w-5 text-cg-error" />
-                <CardTitle className="text-base text-[#9B2C2C]">Abuse Allegations (Item 8)</CardTitle>
+                <CardTitle className="text-base text-cg-error-dark">Abuse Allegations (Item 8)</CardTitle>
               </div>
               {renderEditButton('abuse')}
             </div>
@@ -425,13 +425,13 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
                   <p className="text-sm font-medium mb-2">8a(2). Substance abuse alleged against:</p>
                   <div className="flex flex-wrap gap-2">
                     {formData.substance_abuse_alleged_against_petitioner && (
-                      <Badge variant="outline" className="border-[#FCA5A5] text-[#9B2C2C]">Petitioner</Badge>
+                      <Badge variant="outline" className="border-[#FCA5A5] text-cg-error-dark">Petitioner</Badge>
                     )}
                     {formData.substance_abuse_alleged_against_respondent && (
-                      <Badge variant="outline" className="border-[#FCA5A5] text-[#9B2C2C]">Respondent</Badge>
+                      <Badge variant="outline" className="border-[#FCA5A5] text-cg-error-dark">Respondent</Badge>
                     )}
                     {formData.substance_abuse_alleged_against_other && (
-                      <Badge variant="outline" className="border-[#FCA5A5] text-[#9B2C2C]">Other Parent/Party</Badge>
+                      <Badge variant="outline" className="border-[#FCA5A5] text-cg-error-dark">Other Parent/Party</Badge>
                     )}
                   </div>
                 </div>
@@ -456,7 +456,7 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
               )}
               {formData.custody_granted_despite_allegations && (
                 <div className="p-3 bg-cg-amber-subtle border border-cg-amber-subtle rounded-lg">
-                  <p className="text-sm text-[#E09520]">
+                  <p className="text-sm text-cg-amber-dark">
                     <strong>8c.</strong> Despite allegations, custody granted as in Item 7 (best interests finding)
                   </p>
                 </div>
@@ -480,7 +480,7 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
         <CardContent>
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="border-cg-slate-light text-[#1E4E6B]">
+              <Badge variant="outline" className="border-cg-slate-light text-cg-slate-dark">
                 {getVisitationType()}
               </Badge>
               {formData.visitation_for_party && (
@@ -529,7 +529,7 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
 
             {formData.virtual_visitation_enabled && (
               <div className="p-3 bg-cg-slate-subtle rounded-lg">
-                <p className="font-medium text-sm text-[#1E4E6B] mb-1">Virtual Visitation</p>
+                <p className="font-medium text-sm text-cg-slate-dark mb-1">Virtual Visitation</p>
                 <p className="text-sm text-cg-slate">{formData.virtual_visitation_details || 'Enabled'}</p>
               </div>
             )}
@@ -543,7 +543,7 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Shield className="h-5 w-5 text-[#E09520]" />
+                <Shield className="h-5 w-5 text-cg-amber-dark" />
                 <CardTitle className="text-base">Supervised Visitation (Item 10)</CardTitle>
               </div>
               {renderEditButton('supervised')}
@@ -560,7 +560,7 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
                   ? 'Until further order of the court'
                   : formData.supervised_until_other || 'Not specified'}
               </p>
-              <Badge variant="secondary" className="bg-cg-amber-subtle text-[#E09520]">
+              <Badge variant="secondary" className="bg-cg-amber-subtle text-cg-amber-dark">
                 FL-341(A) Attached
               </Badge>
             </div>
@@ -621,7 +621,7 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
                 </div>
               )}
               {formData.curbside_exchange && (
-                <Badge variant="outline" className="border-cg-slate-light text-[#1E4E6B]">
+                <Badge variant="outline" className="border-cg-slate-light text-cg-slate-dark">
                   Curbside Exchange Required
                 </Badge>
               )}
@@ -642,7 +642,7 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Plane className="h-5 w-5 text-[#E09520]" />
+                <Plane className="h-5 w-5 text-cg-amber-dark" />
                 <CardTitle className="text-base">Travel Restrictions (Item 12)</CardTitle>
               </div>
               {renderEditButton('travel')}
@@ -656,17 +656,17 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
               <p className="text-sm text-muted-foreground">Must have written permission to take children out of:</p>
               <div className="flex flex-wrap gap-2">
                 {formData.travel_restrict_california && (
-                  <Badge variant="outline" className="border-cg-amber text-[#E09520]">
+                  <Badge variant="outline" className="border-cg-amber text-cg-amber-dark">
                     State of California
                   </Badge>
                 )}
                 {formData.travel_restrict_counties && formData.travel_allowed_counties && (
-                  <Badge variant="outline" className="border-cg-amber text-[#E09520]">
+                  <Badge variant="outline" className="border-cg-amber text-cg-amber-dark">
                     Counties: {formData.travel_allowed_counties}
                   </Badge>
                 )}
                 {formData.travel_restrict_other_places && formData.travel_other_places && (
-                  <Badge variant="outline" className="border-cg-amber text-[#E09520]">
+                  <Badge variant="outline" className="border-cg-amber text-cg-amber-dark">
                     {formData.travel_other_places}
                   </Badge>
                 )}
@@ -691,12 +691,12 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
           <CardContent>
             <div className="flex flex-wrap gap-2">
               {formData.holiday_schedule_below && (
-                <Badge variant="outline" className="border-cg-slate-light text-[#1E4E6B]">
+                <Badge variant="outline" className="border-cg-slate-light text-cg-slate-dark">
                   Specified Below
                 </Badge>
               )}
               {formData.holiday_schedule_attached && (
-                <Badge variant="secondary" className="bg-cg-slate-subtle text-[#1E4E6B]">
+                <Badge variant="secondary" className="bg-cg-slate-subtle text-cg-slate-dark">
                   FL-341(C) Attached
                 </Badge>
               )}

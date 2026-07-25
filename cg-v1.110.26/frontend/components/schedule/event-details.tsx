@@ -131,9 +131,9 @@ export default function EventDetails({
       case 'going':
         return 'bg-cg-sage-subtle text-foreground dark:bg-foreground/30 dark:text-cg-sage-light';
       case 'not_going':
-        return 'bg-cg-error-subtle text-[#9B2C2C] dark:bg-[#7A2222]/30 dark:text-[#E06B6B]';
+        return 'bg-cg-error-subtle text-cg-error-dark dark:bg-cg-error-deep/30 dark:text-cg-error-light';
       case 'maybe':
-        return 'bg-cg-amber-subtle text-[#E09520] dark:bg-foreground/30 dark:text-cg-amber';
+        return 'bg-cg-amber-subtle text-cg-amber-dark dark:bg-foreground/30 dark:text-cg-amber';
       default:
         return 'bg-muted text-muted-foreground';
     }
@@ -285,7 +285,7 @@ export default function EventDetails({
                         {data.appointment_reason && <p><span className="text-muted-foreground">Reason:</span> {data.appointment_reason}</p>}
                         {data.address && <p><span className="text-muted-foreground">Address:</span> {data.address}</p>}
                         {data.phone && <p><span className="text-muted-foreground">Phone:</span> {data.phone}</p>}
-                        {data.follow_up_needed && <p className="text-[#1E4E6B] dark:text-cg-slate-light">Follow-up needed</p>}
+                        {data.follow_up_needed && <p className="text-cg-slate-dark dark:text-cg-slate-light">Follow-up needed</p>}
                       </>
                     );
                   })()}
@@ -359,7 +359,7 @@ export default function EventDetails({
                     </p>
                     <Button
                       size="sm"
-                      className="w-full bg-cg-slate hover:bg-[#1E4E6B] text-white"
+                      className="w-full bg-cg-slate hover:bg-cg-slate-dark text-white"
                       onClick={() => setShowCheckInModal(true)}
                     >
                       <MapPin className="h-4 w-4 mr-2" />
@@ -419,7 +419,7 @@ export default function EventDetails({
                     <Button
                       onClick={() => handleSwapResponse(false)}
                       disabled={isUpdating || event.status !== 'pending'}
-                      className="flex-1 bg-cg-error hover:bg-[#9B2C2C]"
+                      className="flex-1 bg-cg-error hover:bg-cg-error-dark"
                     >
                       <XIcon className="h-4 w-4 mr-1" />
                       Deny Request
@@ -444,7 +444,7 @@ export default function EventDetails({
                       onClick={() => handleRsvp('maybe')}
                       disabled={isUpdating}
                       className={`flex-1 ${currentRsvp === 'maybe'
-                        ? 'bg-[#E09520] hover:bg-[#E09520]'
+                        ? 'bg-cg-amber-dark hover:bg-cg-amber-dark'
                         : ''
                         }`}
                       variant={currentRsvp === 'maybe' ? 'default' : 'outline'}
@@ -456,7 +456,7 @@ export default function EventDetails({
                       onClick={() => handleRsvp('not_going')}
                       disabled={isUpdating}
                       className={`flex-1 ${currentRsvp === 'not_going'
-                        ? 'bg-cg-error hover:bg-[#9B2C2C]'
+                        ? 'bg-cg-error hover:bg-cg-error-dark'
                         : ''
                         }`}
                       variant={currentRsvp === 'not_going' ? 'default' : 'outline'}

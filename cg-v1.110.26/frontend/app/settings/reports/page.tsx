@@ -503,8 +503,8 @@ export default function ReportsSettingsPage() {
       {/* Professional Reports Section */}
       <div>
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-gradient-to-br from-cg-amber/10 to-[#E09520]/5 rounded-xl shadow-md">
-            <Scale className="h-5 w-5 text-[#E09520]" />
+          <div className="p-2 bg-gradient-to-br from-cg-amber/10 to-cg-amber-dark/5 rounded-xl shadow-md">
+            <Scale className="h-5 w-5 text-cg-amber-dark" />
           </div>
           <h3 className="text-xl font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             Professional Investigation Reports
@@ -525,7 +525,7 @@ export default function ReportsSettingsPage() {
             const showForm = showRequestForm === report.id;
 
             return (
-              <Card key={report.id} className="relative border-2 border-border rounded-2xl shadow-lg hover:shadow-xl hover:border-[#E09520]/30 transition-all duration-300">
+              <Card key={report.id} className="relative border-2 border-border rounded-2xl shadow-lg hover:shadow-xl hover:border-cg-amber-dark/30 transition-all duration-300">
                 {isSuccess && (
                   <div className="absolute inset-0 bg-cg-sage/10 rounded-2xl flex items-center justify-center z-10">
                     <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 shadow-xl flex items-center gap-2">
@@ -537,8 +537,8 @@ export default function ReportsSettingsPage() {
                 <CardHeader className="pb-4">
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-3">
-                      <div className="p-3 rounded-2xl bg-gradient-to-br from-cg-amber/10 to-[#E09520]/5 shadow-md">
-                        <Icon className="h-6 w-6 text-[#E09520]" />
+                      <div className="p-3 rounded-2xl bg-gradient-to-br from-cg-amber/10 to-cg-amber-dark/5 shadow-md">
+                        <Icon className="h-6 w-6 text-cg-amber-dark" />
                       </div>
                       <div>
                         <CardTitle className="text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>

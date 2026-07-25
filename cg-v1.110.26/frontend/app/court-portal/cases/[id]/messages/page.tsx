@@ -182,8 +182,8 @@ export default function MessagesPage() {
   const getToxicityColor = (score: number | null) => {
     if (score === null) return "bg-gray-100 text-gray-700";
     if (score < 0.3) return "bg-cg-sage-subtle text-cg-sage-dark";
-    if (score < 0.6) return "bg-cg-amber-subtle text-[#E09520]";
-    return "bg-cg-error-subtle text-[#9B2C2C]";
+    if (score < 0.6) return "bg-cg-amber-subtle text-cg-amber-dark";
+    return "bg-cg-error-subtle text-cg-error-dark";
   };
 
   // Sort messages by date (newest first)
@@ -282,7 +282,7 @@ export default function MessagesPage() {
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-[#E09520]">
+                <div className="text-2xl font-bold text-cg-amber-dark">
                   {messages.filter(m => m.was_flagged && !m.suggestion_accepted).length}
                 </div>
                 <div className="text-xs text-slate-500">Sent Anyway</div>
@@ -321,8 +321,8 @@ export default function MessagesPage() {
                       <div className="flex items-center space-x-2">
                         <span className={`px-2 py-0.5 rounded text-xs font-medium ${
                           msg.sender_role === "petitioner"
-                            ? "bg-cg-slate-subtle text-[#1E4E6B]"
-                            : "bg-cg-slate-subtle text-[#1E4E6B]"
+                            ? "bg-cg-slate-subtle text-cg-slate-dark"
+                            : "bg-cg-slate-subtle text-cg-slate-dark"
                         }`}>
                           {msg.sender_role === "petitioner" ? "Petitioner" : "Respondent"}
                         </span>
@@ -361,7 +361,7 @@ export default function MessagesPage() {
                             <span className="font-medium">Original:</span>{" "}
                             <span className="line-through">{msg.original_content}</span>
                           </div>
-                          <div className={`${msg.suggestion_accepted ? "text-cg-sage-dark" : "text-[#E09520]"}`}>
+                          <div className={`${msg.suggestion_accepted ? "text-cg-sage-dark" : "text-cg-amber-dark"}`}>
                             <span className="font-medium">
                               {msg.suggestion_accepted ? "Accepted suggestion" : "Sent original anyway"}
                             </span>

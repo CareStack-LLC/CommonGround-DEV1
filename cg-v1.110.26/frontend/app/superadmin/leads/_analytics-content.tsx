@@ -18,7 +18,7 @@ const SOURCE_COLORS: Record<string, string> = {
   blog: 'bg-emerald-500/15 text-emerald-400 border-cg-sage/20',
   contact_form: 'bg-amber-500/15 text-amber-400 border-cg-amber/20',
   import: 'bg-cg-sage/15 text-cg-sage border-cg-sage/20',
-  manual: 'bg-zinc-700/50 text-[#8AACBC] border-zinc-700/40',
+  manual: 'bg-zinc-700/50 text-cg-slate-muted border-zinc-700/40',
   landing_page: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/20',
   social: 'bg-pink-500/15 text-pink-400 border-pink-500/20',
   referral: 'bg-orange-500/15 text-orange-400 border-orange-500/20',
@@ -77,7 +77,7 @@ export default function AnalyticsContent() {
           <h1 className="text-xl font-bold text-white">Marketing Analytics</h1>
           <p className="text-sm text-muted-foreground mt-0.5">Cross-channel performance overview</p>
         </div>
-        <button onClick={fetchAll} disabled={loading} className="p-2 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-[#8AACBC] hover:text-white transition-colors disabled:opacity-50">
+        <button onClick={fetchAll} disabled={loading} className="p-2 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-cg-slate-muted hover:text-white transition-colors disabled:opacity-50">
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
         </button>
       </div>
@@ -104,10 +104,10 @@ export default function AnalyticsContent() {
           </div>
 
           {/* Conversion Funnel */}
-          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
+          <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
             <div className="flex items-center gap-2 mb-4">
               <BarChart3 className="w-4 h-4 text-cg-sage" />
-              <h2 className="text-sm font-semibold text-[#D0E4EC]">Conversion Funnel</h2>
+              <h2 className="text-sm font-semibold text-cg-slate-tint">Conversion Funnel</h2>
             </div>
             <div className="flex items-center gap-2">
               {[
@@ -126,7 +126,7 @@ export default function AnalyticsContent() {
                         style={{ width: `${Math.max(totalLeads > 0 ? (step.count / totalLeads) * 100 : 0, 2)}%` }}
                       />
                     </div>
-                    <div className="text-[10px] text-[#4A6E7F] mt-1">
+                    <div className="text-[10px] text-cg-slate-strong mt-1">
                       {totalLeads > 0 ? `${((step.count / totalLeads) * 100).toFixed(1)}%` : '0%'}
                     </div>
                   </div>
@@ -137,13 +137,13 @@ export default function AnalyticsContent() {
           </div>
 
           {/* Source Attribution */}
-          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
+          <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
             <div className="flex items-center gap-2 mb-4">
               <TrendingUp className="w-4 h-4 text-emerald-400" />
-              <h2 className="text-sm font-semibold text-[#D0E4EC]">Lead Source Attribution</h2>
+              <h2 className="text-sm font-semibold text-cg-slate-tint">Lead Source Attribution</h2>
             </div>
             {Object.keys(bySource).length === 0 ? (
-              <p className="text-sm text-[#4A6E7F] text-center py-6">No source data yet. Import leads with a source tag to see attribution.</p>
+              <p className="text-sm text-cg-slate-strong text-center py-6">No source data yet. Import leads with a source tag to see attribution.</p>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                 {Object.entries(bySource)
@@ -164,13 +164,13 @@ export default function AnalyticsContent() {
           </div>
 
           {/* Campaign Performance */}
-          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
+          <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
             <div className="flex items-center gap-2 mb-4">
               <Mail className="w-4 h-4 text-blue-400" />
-              <h2 className="text-sm font-semibold text-[#D0E4EC]">Campaign Performance</h2>
+              <h2 className="text-sm font-semibold text-cg-slate-tint">Campaign Performance</h2>
             </div>
             {sentCampaigns.length === 0 ? (
-              <p className="text-sm text-[#4A6E7F] text-center py-6">No campaigns sent yet.</p>
+              <p className="text-sm text-cg-slate-strong text-center py-6">No campaigns sent yet.</p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -197,9 +197,9 @@ export default function AnalyticsContent() {
                           <td className="py-2 text-right">
                             <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/15 text-emerald-400">{c.status}</span>
                           </td>
-                          <td className="py-2 text-right text-[#8AACBC]">{c.sent_at ? new Date(c.sent_at).toLocaleDateString() : '—'}</td>
-                          <td className="py-2 text-right text-[#D0E4EC] font-medium">{openRate}{openRate !== '—' ? '%' : ''}</td>
-                          <td className="py-2 text-right text-[#D0E4EC] font-medium">{clickRate}{clickRate !== '—' ? '%' : ''}</td>
+                          <td className="py-2 text-right text-cg-slate-muted">{c.sent_at ? new Date(c.sent_at).toLocaleDateString() : '—'}</td>
+                          <td className="py-2 text-right text-cg-slate-tint font-medium">{openRate}{openRate !== '—' ? '%' : ''}</td>
+                          <td className="py-2 text-right text-cg-slate-tint font-medium">{clickRate}{clickRate !== '—' ? '%' : ''}</td>
                         </tr>
                       );
                     })}
@@ -210,13 +210,13 @@ export default function AnalyticsContent() {
           </div>
 
           {/* Landing Page Performance */}
-          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
+          <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
             <div className="flex items-center gap-2 mb-4">
               <Globe className="w-4 h-4 text-cyan-400" />
-              <h2 className="text-sm font-semibold text-[#D0E4EC]">Landing Page Performance</h2>
+              <h2 className="text-sm font-semibold text-cg-slate-tint">Landing Page Performance</h2>
             </div>
             {landingPages.length === 0 ? (
-              <p className="text-sm text-[#4A6E7F] text-center py-6">No landing pages created yet.</p>
+              <p className="text-sm text-cg-slate-strong text-center py-6">No landing pages created yet.</p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -236,13 +236,13 @@ export default function AnalyticsContent() {
                           <div className="text-white">{lp.title}</div>
                           <div className="text-[11px] text-muted-foreground">/lp/{lp.slug}</div>
                         </td>
-                        <td className="py-2 text-[#8AACBC] text-xs capitalize">{lp.target_audience}</td>
+                        <td className="py-2 text-cg-slate-muted text-xs capitalize">{lp.target_audience}</td>
                         <td className="py-2">
                           <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium ${
-                            lp.status === 'published' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-zinc-700/50 text-[#8AACBC]'
+                            lp.status === 'published' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-zinc-700/50 text-cg-slate-muted'
                           }`}>{lp.status}</span>
                         </td>
-                        <td className="py-2 text-right text-[#D0E4EC] font-medium">{(lp.view_count || 0).toLocaleString()}</td>
+                        <td className="py-2 text-right text-cg-slate-tint font-medium">{(lp.view_count || 0).toLocaleString()}</td>
                         <td className="py-2 text-right text-xs text-muted-foreground">{lp.utm_campaign || '—'}</td>
                       </tr>
                     ))}
@@ -254,10 +254,10 @@ export default function AnalyticsContent() {
 
           {/* Recent Conversions */}
           {pipeline?.recent_conversions?.length > 0 && (
-            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
+            <div className="bg-cg-slate-deep/60 border border-cg-slate/20 rounded-xl p-5">
               <div className="flex items-center gap-2 mb-4">
                 <Users className="w-4 h-4 text-emerald-400" />
-                <h2 className="text-sm font-semibold text-[#D0E4EC]">Recent Conversions</h2>
+                <h2 className="text-sm font-semibold text-cg-slate-tint">Recent Conversions</h2>
               </div>
               <div className="space-y-2">
                 {pipeline.recent_conversions.map((conv: any, i: number) => (

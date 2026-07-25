@@ -426,7 +426,7 @@ export function ExportWizard({ caseId, caseName, onSuccess, onCancel }: ExportWi
       <Card className="bg-cg-slate-subtle border-cg-slate-subtle">
         <CardContent className="pt-6">
           <h4 className="font-medium text-foreground mb-2">What happens next?</h4>
-          <ul className="text-sm text-[#1E4E6B] space-y-1">
+          <ul className="text-sm text-cg-slate-dark space-y-1">
             <li>&#x2022; Your export will be generated (this may take a moment)</li>
             <li>&#x2022; A PDF will be created with all selected sections</li>
             <li>&#x2022; The document will include SHA-256 verification</li>
@@ -438,7 +438,7 @@ export function ExportWizard({ caseId, caseName, onSuccess, onCancel }: ExportWi
       {error && (
         <Card className="bg-cg-error-subtle border-cg-error-subtle">
           <CardContent className="pt-6">
-            <p className="text-[#9B2C2C]">{error}</p>
+            <p className="text-cg-error-dark">{error}</p>
           </CardContent>
         </Card>
       )}

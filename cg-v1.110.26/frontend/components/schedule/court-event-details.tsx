@@ -91,9 +91,9 @@ export default function CourtEventDetails({
       case 'attending':
         return { label: 'Attending', color: 'bg-cg-sage-subtle text-foreground', icon: Check };
       case 'not_attending':
-        return { label: 'Not Attending', color: 'bg-cg-error-subtle text-[#9B2C2C]', icon: XCircle };
+        return { label: 'Not Attending', color: 'bg-cg-error-subtle text-cg-error-dark', icon: XCircle };
       case 'maybe':
-        return { label: 'Maybe', color: 'bg-cg-amber-subtle text-[#E09520]', icon: HelpCircle };
+        return { label: 'Maybe', color: 'bg-cg-amber-subtle text-cg-amber-dark', icon: HelpCircle };
       default:
         return { label: 'No Response', color: 'bg-gray-100 text-gray-600', icon: User };
     }
@@ -127,7 +127,7 @@ export default function CourtEventDetails({
           {event.is_mandatory && (
             <Alert className="border-cg-error-subtle bg-cg-error-subtle">
               <AlertTriangle className="h-4 w-4 text-cg-error" />
-              <AlertDescription className="text-[#9B2C2C]">
+              <AlertDescription className="text-cg-error-dark">
                 This is a mandatory court event. Your attendance is required.
               </AlertDescription>
             </Alert>
@@ -187,7 +187,7 @@ export default function CourtEventDetails({
           {event.shared_notes && (
             <div className="p-3 bg-cg-slate-subtle rounded-lg">
               <h4 className="font-medium text-foreground mb-1">Notes from Court</h4>
-              <p className="text-[#1E4E6B] text-sm">{event.shared_notes}</p>
+              <p className="text-cg-slate-dark text-sm">{event.shared_notes}</p>
             </div>
           )}
 
@@ -279,8 +279,8 @@ export default function CourtEventDetails({
                   disabled={isSubmitting}
                   className={`flex items-center gap-2 ${
                     event.my_rsvp_status === 'maybe'
-                      ? 'bg-[#E09520] hover:bg-[#E09520]'
-                      : 'bg-cg-amber-subtle text-[#E09520] hover:bg-cg-amber-subtle'
+                      ? 'bg-cg-amber-dark hover:bg-cg-amber-dark'
+                      : 'bg-cg-amber-subtle text-cg-amber-dark hover:bg-cg-amber-subtle'
                   }`}
                   variant={event.my_rsvp_status === 'maybe' ? 'default' : 'outline'}
                 >
@@ -292,8 +292,8 @@ export default function CourtEventDetails({
                   disabled={isSubmitting}
                   className={`flex items-center gap-2 ${
                     event.my_rsvp_status === 'not_attending'
-                      ? 'bg-cg-error hover:bg-[#9B2C2C]'
-                      : 'bg-cg-error-subtle text-[#9B2C2C] hover:bg-cg-error-subtle'
+                      ? 'bg-cg-error hover:bg-cg-error-dark'
+                      : 'bg-cg-error-subtle text-cg-error-dark hover:bg-cg-error-subtle'
                   }`}
                   variant={event.my_rsvp_status === 'not_attending' ? 'default' : 'outline'}
                 >
