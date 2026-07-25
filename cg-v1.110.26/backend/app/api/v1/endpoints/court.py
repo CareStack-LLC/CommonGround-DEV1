@@ -4,6 +4,7 @@ Court Access Mode API endpoints.
 Endpoints for court professional access, settings, events, and reports.
 """
 
+import asyncio
 import logging
 from datetime import datetime
 from typing import Optional
@@ -3608,7 +3609,8 @@ For children, extract all children listed in the forms.
         })
 
         # Call Claude (vision-capable model for reading the scanned form)
-        response = client.messages.create(
+        response = await asyncio.to_thread(
+            client.messages.create,
             model="claude-sonnet-4-6",
             max_tokens=4096,
             messages=[

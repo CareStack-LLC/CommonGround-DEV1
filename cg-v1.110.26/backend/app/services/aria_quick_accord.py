@@ -13,6 +13,7 @@ ARIA: "Great! Let me help you formalize this..."
 
 from datetime import datetime
 from typing import Optional, Dict, Any, List
+import asyncio
 import json
 import logging
 import uuid
@@ -515,7 +516,8 @@ Return ONLY the JSON object, no other text."""
         # Try Claude first
         if self.anthropic:
             try:
-                response = self.anthropic.messages.create(
+                response = await asyncio.to_thread(
+                    self.anthropic.messages.create,
                     model="claude-haiku-4-5-20251001",
                     max_tokens=1024,
                     system=system_prompt,
@@ -551,7 +553,8 @@ Return ONLY the JSON object, no other text."""
             for msg in messages:
                 formatted_messages.append({"role": msg["role"], "content": msg["content"]})
 
-            response = self.openai.chat.completions.create(
+            response = await asyncio.to_thread(
+                self.openai.chat.completions.create,
                 model="gpt-4o",
                 messages=formatted_messages,
                 max_tokens=1024
@@ -573,7 +576,8 @@ Return ONLY the JSON object, no other text."""
         # Try Claude first if available
         if self.anthropic:
             try:
-                response = self.anthropic.messages.create(
+                response = await asyncio.to_thread(
+                    self.anthropic.messages.create,
                     model="claude-haiku-4-5-20251001",
                     max_tokens=1024,
                     system="You are a data extraction assistant. Extract structured data from conversations.",
@@ -588,7 +592,8 @@ Return ONLY the JSON object, no other text."""
         # Fallback to OpenAI if Claude failed or unavailable
         if json_str is None and self.openai:
             try:
-                response = self.openai.chat.completions.create(
+                response = await asyncio.to_thread(
+                    self.openai.chat.completions.create,
                     model="gpt-4o",
                     messages=[
                         {"role": "system", "content": "You are a data extraction assistant. Return only valid JSON."},

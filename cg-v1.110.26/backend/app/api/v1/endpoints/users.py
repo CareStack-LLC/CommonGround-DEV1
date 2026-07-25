@@ -2,6 +2,7 @@
 User management endpoints.
 """
 
+import asyncio
 import logging
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -74,7 +75,10 @@ async def delete_account(
             from app.core.config import settings as _settings
             if _settings.STRIPE_SECRET_KEY:
                 stripe.api_key = _settings.STRIPE_SECRET_KEY
-                stripe.Subscription.cancel(user.profile.stripe_subscription_id)
+                await asyncio.to_thread(
+                    stripe.Subscription.cancel,
+                    user.profile.stripe_subscription_id,
+                )
                 stripe_subscription_cancelled = True
         except Exception as e:
             logger.warning(

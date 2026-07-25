@@ -10,6 +10,7 @@ Operator capabilities the dashboards previously lacked:
 All mutating actions are written to the admin audit log.
 """
 
+import asyncio
 import logging
 from datetime import datetime, timedelta
 from typing import Optional
@@ -334,7 +335,10 @@ async def soft_delete_user(
             from app.core.config import settings as _settings
             if _settings.STRIPE_SECRET_KEY:
                 stripe.api_key = _settings.STRIPE_SECRET_KEY
-                stripe.Subscription.cancel(user.profile.stripe_subscription_id)
+                await asyncio.to_thread(
+                    stripe.Subscription.cancel,
+                    user.profile.stripe_subscription_id,
+                )
         except Exception as e:
             logger.warning("soft_delete_user: stripe cancel failed: %s", e)
 

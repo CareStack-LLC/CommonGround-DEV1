@@ -13,6 +13,7 @@ Key principles:
 
 from datetime import datetime
 from typing import Optional, Dict, Any, List
+import asyncio
 import json
 import logging
 
@@ -480,7 +481,8 @@ Ready to begin? First, could you tell me a little about yourself and your situat
             for msg in messages
         ]
 
-        response = self.anthropic_client.messages.create(
+        response = await asyncio.to_thread(
+            self.anthropic_client.messages.create,
             model="claude-sonnet-4-6",
             max_tokens=1500,
             system=[{"type": "text", "text": system_prompt, "cache_control": {"type": "ephemeral"}}],
@@ -502,7 +504,8 @@ Ready to begin? First, could you tell me a little about yourself and your situat
             for msg in messages
         ]
 
-        response = self.openai_client.chat.completions.create(
+        response = await asyncio.to_thread(
+            self.openai_client.chat.completions.create,
             model="gpt-4o",
             max_tokens=1500,
             messages=openai_messages
@@ -625,7 +628,8 @@ Rules:
                 if m.get('role') in ('assistant', 'user')
             ])
 
-            response = self.openai_client.chat.completions.create(
+            response = await asyncio.to_thread(
+                self.openai_client.chat.completions.create,
                 model="gpt-4o",
                 max_tokens=3000,
                 response_format={"type": "json_object"},

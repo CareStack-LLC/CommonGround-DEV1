@@ -5,6 +5,7 @@ Admin endpoints require get_current_admin_user.
 Public endpoint serves published posts for the /blog page.
 """
 
+import asyncio
 import logging
 import re
 from datetime import datetime
@@ -537,7 +538,8 @@ async def generate_blog_post(
         if settings.ANTHROPIC_API_KEY:
             import anthropic
             client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
-            response = client.messages.create(
+            response = await asyncio.to_thread(
+                client.messages.create,
                 model="claude-sonnet-4-5",
                 max_tokens=8192,
                 system=system_prompt,
@@ -560,7 +562,8 @@ async def generate_blog_post(
 
         from openai import OpenAI
         openai_client = OpenAI(api_key=openai_key)
-        response = openai_client.chat.completions.create(
+        response = await asyncio.to_thread(
+            openai_client.chat.completions.create,
             model="gpt-4o",
             max_tokens=8192,
             messages=[
@@ -700,7 +703,8 @@ async def _generate_blog_image(
 
     # Generate image with DALL-E 3
     openai_client = OpenAI(api_key=openai_key)
-    response = openai_client.images.generate(
+    response = await asyncio.to_thread(
+        openai_client.images.generate,
         model="dall-e-3",
         prompt=dalle_prompt,
         size="1792x1024",

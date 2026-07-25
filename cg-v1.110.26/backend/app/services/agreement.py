@@ -4,6 +4,7 @@ Agreement service for managing custody agreements and parenting plans.
 
 from datetime import datetime
 from typing import Optional, Dict, Any, List
+import asyncio
 import hashlib
 import json
 import logging
@@ -1195,7 +1196,8 @@ class AgreementService:
 """
 
             import json
-            response = client.chat.completions.create(
+            response = await asyncio.to_thread(
+                client.chat.completions.create,
                 model="gpt-4o",
                 max_tokens=3500,
                 response_format={ "type": "json_object" },

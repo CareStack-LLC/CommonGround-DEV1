@@ -7,6 +7,7 @@ This module handles:
 - Email notifications to CommonGround team
 """
 
+import asyncio
 import logging
 import stripe
 from datetime import datetime
@@ -243,7 +244,9 @@ async def request_professional_report(
             checkout_params["customer_email"] = current_user.email
 
         try:
-            session = stripe.checkout.Session.create(**checkout_params)
+            session = await asyncio.to_thread(
+                stripe.checkout.Session.create, **checkout_params
+            )
         except stripe.error.InvalidRequestError as e:
             if "No such price" not in str(e):
                 raise
@@ -275,7 +278,9 @@ async def request_professional_report(
                     "quantity": 1,
                 })
             checkout_params["line_items"] = fallback_items
-            session = stripe.checkout.Session.create(**checkout_params)
+            session = await asyncio.to_thread(
+                stripe.checkout.Session.create, **checkout_params
+            )
 
         # Link the checkout session to the pending request immediately so the
         # row is traceable even before the webhook fires.

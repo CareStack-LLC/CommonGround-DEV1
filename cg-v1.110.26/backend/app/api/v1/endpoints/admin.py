@@ -1569,7 +1569,8 @@ async def sync_stripe_subscriptions(
     for profile in profiles:
         checked += 1
         try:
-            subs = stripe.Subscription.list(
+            subs = await asyncio.to_thread(
+                stripe.Subscription.list,
                 customer=profile.stripe_customer_id,
                 status="all",
                 limit=1,
@@ -1666,7 +1667,7 @@ async def stripe_diagnostic(
 
     # 1. List customers
     try:
-        customers = stripe.Customer.list(limit=3)
+        customers = await asyncio.to_thread(stripe.Customer.list, limit=3)
         results["customers"] = {
             "count_in_page": len(customers.data),
             "has_more": customers.has_more,
@@ -1677,7 +1678,7 @@ async def stripe_diagnostic(
 
     # 2. List ALL subscriptions (no status filter)
     try:
-        all_subs = stripe.Subscription.list(limit=10)
+        all_subs = await asyncio.to_thread(stripe.Subscription.list, limit=10)
         results["subscriptions_all"] = {
             "count_in_page": len(all_subs.data),
             "has_more": all_subs.has_more,
@@ -1698,7 +1699,9 @@ async def stripe_diagnostic(
 
     # 3. List active subscriptions specifically
     try:
-        active_subs = stripe.Subscription.list(status="active", limit=5)
+        active_subs = await asyncio.to_thread(
+            stripe.Subscription.list, status="active", limit=5
+        )
         results["subscriptions_active"] = {
             "count_in_page": len(active_subs.data),
             "has_more": active_subs.has_more,
@@ -1708,7 +1711,9 @@ async def stripe_diagnostic(
 
     # 4. List invoices
     try:
-        invoices = stripe.Invoice.list(limit=3, status="paid")
+        invoices = await asyncio.to_thread(
+            stripe.Invoice.list, limit=3, status="paid"
+        )
         results["invoices_paid"] = {
             "count_in_page": len(invoices.data),
             "has_more": invoices.has_more,
@@ -1719,10 +1724,12 @@ async def stripe_diagnostic(
 
     # 5. Check a specific customer's subscriptions
     try:
-        customers = stripe.Customer.list(limit=1)
+        customers = await asyncio.to_thread(stripe.Customer.list, limit=1)
         if customers.data:
             cust = customers.data[0]
-            cust_subs = stripe.Subscription.list(customer=cust.id, limit=5)
+            cust_subs = await asyncio.to_thread(
+                stripe.Subscription.list, customer=cust.id, limit=5
+            )
             results["first_customer_subs"] = {
                 "customer_id": cust.id,
                 "customer_email": cust.email,
@@ -1757,10 +1764,13 @@ async def full_stripe_sync(
 
     # Step 1: Get all Stripe customers with their subscriptions
     all_customers = []
-    cust_page = stripe.Customer.list(limit=100, expand=["data.subscriptions"])
+    cust_page = await asyncio.to_thread(
+        stripe.Customer.list, limit=100, expand=["data.subscriptions"]
+    )
     all_customers.extend(cust_page.data)
     while cust_page.has_more:
-        cust_page = stripe.Customer.list(
+        cust_page = await asyncio.to_thread(
+            stripe.Customer.list,
             limit=100, starting_after=cust_page.data[-1].id,
             expand=["data.subscriptions"],
         )
@@ -3443,7 +3453,7 @@ async def get_billing_transactions(
 
     transactions = []
     try:
-        invoices = stripe.Invoice.list(limit=limit)
+        invoices = await asyncio.to_thread(stripe.Invoice.list, limit=limit)
 
         for inv in invoices.data:
             # Resolve user email from stripe customer
@@ -3452,7 +3462,9 @@ async def get_billing_transactions(
                 customer_email = inv.customer_email
             elif inv.customer:
                 try:
-                    cust = stripe.Customer.retrieve(inv.customer)
+                    cust = await asyncio.to_thread(
+                        stripe.Customer.retrieve, inv.customer
+                    )
                     customer_email = cust.email
                 except Exception:
                     customer_email = None

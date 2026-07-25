@@ -26,6 +26,7 @@ Key differences from parent call ARIA:
 - Different categories and detection patterns
 """
 
+import asyncio
 import json
 import logging
 from typing import Optional, Dict, Any, List
@@ -264,7 +265,8 @@ Be very sensitive to child safety but avoid false positives on normal family con
 
             from app.utils.sentry_helpers import ai_span
             with ai_span("child_safety_analysis", "claude-haiku-4-5-20251001") as span:
-                response = client.messages.create(
+                response = await asyncio.to_thread(
+                    client.messages.create,
                     model="claude-haiku-4-5-20251001",
                     max_tokens=500,
                     system=[{"type": "text", "text": system_prompt, "cache_control": {"type": "ephemeral"}}],
