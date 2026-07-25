@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import MuxPlayer from '@mux/mux-player-react';
 import {
   Play,
   Pause,
@@ -11,6 +12,20 @@ import {
   SkipForward,
   Users,
 } from 'lucide-react';
+
+/**
+ * Theater video sources come in two shapes:
+ *   - a plain URL (direct-served file)                       → native <video>
+ *   - "mux:<playbackId>"  (streamed from Mux)                → headless <MuxPlayer>
+ *
+ * The Mux path renders <MuxPlayer> with its own control chrome hidden, so the
+ * SAME custom overlay + Watch-Together sync logic drives it via the shared
+ * media-element ref. That means switching a title to Mux is purely a data
+ * change (the library hands us "mux:<id>") with zero change to the sync layer.
+ */
+function parseMuxSource(src: string): string | null {
+  return src.startsWith('mux:') ? src.slice(4) : null;
+}
 
 interface TheaterVideoPlayerProps {
   src: string;
@@ -37,6 +52,10 @@ export function TheaterVideoPlayer({
 }: TheaterVideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
+  const muxPlaybackId = parseMuxSource(src);
+  // MuxPlayer is a browser custom element — only mount it client-side.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -199,14 +218,39 @@ export function TheaterVideoPlayer({
       onMouseMove={showControlsTemporarily}
       onMouseLeave={() => isPlaying && setShowControls(false)}
     >
-      {/* Video Element - use aspect ratio for mobile, fill for desktop */}
-      <video
-        ref={videoRef}
-        src={src}
-        className="w-full h-full object-contain absolute inset-0"
-        playsInline
-        onClick={handlePlayPause}
-      />
+      {/* Media element — Mux stream or direct file. Both expose the same
+          HTMLMediaElement API on videoRef, so the sync effects above are
+          identical for either. Mux's own controls are hidden (--controls: none)
+          so the custom overlay below is the single control surface. */}
+      {muxPlaybackId ? (
+        mounted ? (
+          <MuxPlayer
+            // MuxPlayerElement implements the HTMLMediaElement members we sync
+            // against (currentTime, play/pause, timeupdate…); share the ref.
+            // Cast: videoRef is typed HTMLVideoElement, structurally compatible.
+            ref={videoRef as any}
+            playbackId={muxPlaybackId}
+            streamType="on-demand"
+            accentColor="#3DAA8A"
+            style={
+              {
+                '--controls': 'none',
+                width: '100%',
+                height: '100%',
+              } as any
+            }
+            className="w-full h-full object-contain absolute inset-0"
+          />
+        ) : null
+      ) : (
+        <video
+          ref={videoRef}
+          src={src}
+          className="w-full h-full object-contain absolute inset-0"
+          playsInline
+          onClick={handlePlayPause}
+        />
+      )}
 
       {/* Title Overlay */}
       {title && showControls && (

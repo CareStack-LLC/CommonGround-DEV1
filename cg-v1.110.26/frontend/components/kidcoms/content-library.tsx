@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import {
   X,
@@ -40,6 +40,50 @@ export function ContentLibrary({ isOpen, onClose, onSelect }: ContentLibraryProp
   const [youtubeError, setYoutubeError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
+  // Movies come from the KidSpace API (streamed via Mux), not bundled files.
+  // Mux titles are handed to the player as "mux:<playbackId>"; the player
+  // renders <MuxPlayer> for those and keeps the same Watch-Together sync.
+  const [apiVideos, setApiVideos] = useState<VideoContent[]>([]);
+  const [videosLoading, setVideosLoading] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    let cancelled = false;
+    const load = async () => {
+      setVideosLoading(true);
+      try {
+        const base = process.env.NEXT_PUBLIC_API_URL || '';
+        const res = await fetch(`${base}/api/v1/kidspace/movies?limit=50`);
+        if (!res.ok) throw new Error(`movies ${res.status}`);
+        const data = await res.json();
+        const items = data.movies || data || [];
+        const mapped: VideoContent[] = items.map((m: any) => ({
+          id: m.id,
+          title: m.title,
+          // Mux titles → "mux:<id>"; direct-served fall back to their URL.
+          url:
+            m.playback_provider === 'mux' && m.mux_playback_id
+              ? `mux:${m.mux_playback_id}`
+              : m.video_url || '',
+          thumbnail: m.poster_url || '',
+          duration: m.duration_minutes ? `${m.duration_minutes} min` : undefined,
+          description: m.description || '',
+          category: 'family',
+          ageRange: m.age_min && m.age_max ? `${m.age_min}-${m.age_max}` : '3-12',
+        }));
+        if (!cancelled) setApiVideos(mapped.filter((v) => v.url));
+      } catch (err) {
+        console.error('[Watch Together] movie load failed:', err);
+        if (!cancelled) setApiVideos([]);
+      } finally {
+        if (!cancelled) setVideosLoading(false);
+      }
+    };
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -82,7 +126,7 @@ export function ContentLibrary({ isOpen, onClose, onSelect }: ContentLibraryProp
   };
 
   // Filter content based on search
-  const filteredVideos = theaterContent.videos.filter(v =>
+  const filteredVideos = apiVideos.filter(v =>
     v.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -177,7 +221,12 @@ export function ContentLibrary({ isOpen, onClose, onSelect }: ContentLibraryProp
           {/* Videos Tab - Netflix-style cards */}
           {activeTab === 'videos' && (
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-5">
-              {filteredVideos.length === 0 ? (
+              {videosLoading ? (
+                <div className="col-span-full text-center py-12">
+                  <Film className="h-12 w-12 text-slate-600 mx-auto mb-3 animate-pulse" />
+                  <p className="text-slate-400">Loading movies…</p>
+                </div>
+              ) : filteredVideos.length === 0 ? (
                 <div className="col-span-full text-center py-12">
                   <Film className="h-12 w-12 text-slate-600 mx-auto mb-3" />
                   <p className="text-slate-400">No movies found</p>
