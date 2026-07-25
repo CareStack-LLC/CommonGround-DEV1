@@ -23,30 +23,38 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # The project uses pnpm (packageManager: pnpm@9.15.0, pnpm-lock.yaml,
+      # vercel.json installCommand: pnpm install). The old npm-based steps here
+      # failed at `npm ci` because there is no package-lock.json.
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: cg-v1.110.26/frontend/package-lock.json
+          cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
 
       - name: Install dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Run ESLint
-        run: npm run lint || echo "::warning::ESLint found issues"
+        run: pnpm run lint || echo "::warning::ESLint found issues"
         continue-on-error: true
 
       - name: Run TypeScript type checking
-        run: npx tsc --noEmit || echo "::warning::TypeScript found type errors"
+        run: pnpm exec tsc --noEmit || echo "::warning::TypeScript found type errors"
         continue-on-error: true
 
       - name: Build application
         env:
-          NEXT_PUBLIC_API_URL: https://commonground-api.onrender.com
+          NEXT_PUBLIC_API_URL: https://api.find-commonground.com
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-        run: npm run build
+        run: pnpm run build
 
       - name: Check build output
         run: |
