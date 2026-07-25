@@ -651,20 +651,20 @@ export default function GTMCommandCenter() {
                         <p className="text-xs text-[#8AACBC] line-clamp-3 whitespace-pre-wrap">{draft.body}</p>
                       </div>
                       <div className="flex items-center gap-1 ml-3">
-                        <button onClick={() => copyText(draft.title ? `${draft.title}\n\n${draft.body}` : draft.body, draft.id)} className="p-1.5 rounded-lg hover:bg-[#2D6A8F]/20 text-[#6B8A9A] hover:text-[#5BC4A0]" title="Copy">
+                        <button aria-label="Copy" onClick={() => copyText(draft.title ? `${draft.title}\n\n${draft.body}` : draft.body, draft.id)} className="p-1.5 rounded-lg hover:bg-[#2D6A8F]/20 text-[#6B8A9A] hover:text-[#5BC4A0]" title="Copy">
                           {copied === draft.id ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
                         </button>
                         {draft.status === 'draft' && (
                           <>
-                            <button onClick={() => markPosted(draft.id)} className="p-1.5 rounded-lg hover:bg-emerald-500/10 text-[#6B8A9A] hover:text-emerald-400" title="Mark posted">
+                            <button aria-label="Send message" onClick={() => markPosted(draft.id)} className="p-1.5 rounded-lg hover:bg-emerald-500/10 text-[#6B8A9A] hover:text-emerald-400" title="Mark posted">
                               <Send className="w-4 h-4" />
                             </button>
-                            <button onClick={() => { setEditDraftId(draft.id); setDraftChannel(draft.channel); setDraftTitle(draft.title); setDraftBody(draft.body); }} className="p-1.5 rounded-lg hover:bg-[#2D6A8F]/20 text-[#6B8A9A] hover:text-[#8AACBC]" title="Edit">
+                            <button aria-label="Edit" onClick={() => { setEditDraftId(draft.id); setDraftChannel(draft.channel); setDraftTitle(draft.title); setDraftBody(draft.body); }} className="p-1.5 rounded-lg hover:bg-[#2D6A8F]/20 text-[#6B8A9A] hover:text-[#8AACBC]" title="Edit">
                               <Pencil className="w-4 h-4" />
                             </button>
                           </>
                         )}
-                        <button onClick={() => setDrafts(prev => prev.filter(d => d.id !== draft.id))} className="p-1.5 rounded-lg hover:bg-red-500/10 text-[#6B8A9A] hover:text-red-400" title="Delete">
+                        <button aria-label="Delete" onClick={() => setDrafts(prev => prev.filter(d => d.id !== draft.id))} className="p-1.5 rounded-lg hover:bg-red-500/10 text-[#6B8A9A] hover:text-red-400" title="Delete">
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>

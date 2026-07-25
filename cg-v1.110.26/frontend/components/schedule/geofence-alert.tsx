@@ -90,7 +90,7 @@ export default function GeofenceAlert({
             </div>
 
             {/* Close button */}
-            <button
+            <button aria-label="Close"
               onClick={handleDismiss}
               className="text-muted-foreground hover:text-foreground shrink-0"
             >

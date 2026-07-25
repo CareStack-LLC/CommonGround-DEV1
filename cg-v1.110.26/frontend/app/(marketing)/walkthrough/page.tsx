@@ -657,7 +657,7 @@ export default function ARIADemoPage() {
                       >
                         Send Original
                       </button>
-                      <button
+                      <button aria-label="Close"
                         onClick={() => setPendingIntervention(null)}
                         className="flex items-center gap-2 text-gray-400 hover:text-gray-600 text-sm transition-colors ml-auto"
                       >
@@ -683,7 +683,7 @@ export default function ARIADemoPage() {
                     disabled={isLoading}
                     className="flex-1 bg-gray-50 border border-gray-200 rounded-full px-5 py-3 text-sm text-foreground placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-cg-sage/30 focus:border-cg-sage disabled:opacity-50 transition-all"
                   />
-                  <button
+                  <button aria-label="Send message"
                     onClick={handleSend}
                     disabled={!inputText.trim() || isLoading}
                     className="w-11 h-11 bg-cg-sage hover:bg-cg-sage-dark text-white rounded-full flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0"

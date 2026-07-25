@@ -141,7 +141,7 @@ function NotificationItem({
                         <Check className="h-3.5 w-3.5" />
                     </button>
                 )}
-                <button
+                <button aria-label="Delete"
                     onClick={(e) => { e.stopPropagation(); onDismiss(notification.id); }}
                     title="Dismiss"
                     className="p-1.5 text-slate-400 hover:text-red-900 hover:bg-red-50 rounded-sm transition-all border-2 border-transparent hover:border-red-900/20"

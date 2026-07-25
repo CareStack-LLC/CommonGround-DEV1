@@ -241,7 +241,7 @@ function FindProfessionalsContent() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-start gap-4">
-        <button
+        <button aria-label="Next"
           onClick={() => router.back()}
           className="w-10 h-10 rounded-lg hover:bg-slate-100 flex items-center justify-center transition-colors mt-1"
         >
@@ -470,7 +470,7 @@ function FindProfessionalsContent() {
                     Cancel
                   </button>
                   {familyFileId && (
-                    <button
+                    <button aria-label="Send message"
                       onClick={handleInviteFirm}
                       disabled={isInviting || !!inviteSuccess}
                       className="cg-btn-primary flex items-center justify-center gap-2 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed order-1 sm:order-2 text-sm py-2 px-4"

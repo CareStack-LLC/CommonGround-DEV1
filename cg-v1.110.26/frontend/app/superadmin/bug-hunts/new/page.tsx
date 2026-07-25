@@ -51,7 +51,7 @@ export default function NewBugHuntPage() {
     <div className="max-w-2xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <button
+        <button aria-label="Back"
           onClick={() => router.push('/superadmin/bug-hunts')}
           className="p-2 rounded-lg hover:bg-[#2D6A8F]/20 transition-colors text-[#8AACBC]"
         >

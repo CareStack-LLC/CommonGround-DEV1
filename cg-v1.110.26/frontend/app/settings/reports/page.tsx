@@ -471,7 +471,7 @@ export default function ReportsSettingsPage() {
                   </p>
                 </CardContent>
                 <CardFooter>
-                  <Button
+                  <Button aria-label="Download"
                     variant="outline"
                     size="sm"
                     onClick={() => handleGenerateReport(report.id, report.reportType)}
@@ -652,7 +652,7 @@ export default function ReportsSettingsPage() {
                         >
                           Cancel
                         </Button>
-                        <Button
+                        <Button aria-label="Open link"
                           onClick={() => {
                             const extraCharge =
                               requestFormData.urgency === 'rush'

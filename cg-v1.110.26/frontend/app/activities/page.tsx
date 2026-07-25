@@ -315,7 +315,7 @@ function ActivitiesContent() {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
-            <button
+            <button aria-label="Back"
               onClick={() => router.back()}
               className="p-2.5 rounded-xl bg-card border-2 border-border hover:border-[var(--portal-primary)]/30 hover:shadow-lg transition-all duration-300"
             >

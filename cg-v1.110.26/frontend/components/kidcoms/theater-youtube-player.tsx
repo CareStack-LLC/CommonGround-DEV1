@@ -382,7 +382,7 @@ export function TheaterYoutubePlayer({
         <div className="p-4 bg-gradient-to-t from-black/80 to-transparent">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <button
+              <button aria-label="Rewind"
                 onClick={(e) => { e.stopPropagation(); handleSkip(-10); }}
                 className="p-2 text-white hover:text-red-300 transition-colors"
                 title="Rewind 10s"
@@ -390,7 +390,7 @@ export function TheaterYoutubePlayer({
                 <SkipBack className="h-5 w-5" />
               </button>
 
-              <button
+              <button aria-label="Play"
                 onClick={(e) => { e.stopPropagation(); handlePlayPause(); }}
                 className="p-3 bg-red-600 hover:bg-red-700 rounded-full text-white transition-colors"
               >
@@ -401,7 +401,7 @@ export function TheaterYoutubePlayer({
                 )}
               </button>
 
-              <button
+              <button aria-label="Skip forward"
                 onClick={(e) => { e.stopPropagation(); handleSkip(10); }}
                 className="p-2 text-white hover:text-red-300 transition-colors"
                 title="Forward 10s"
@@ -423,7 +423,7 @@ export function TheaterYoutubePlayer({
 
             <div className="flex items-center space-x-2">
               {/* Volume */}
-              <button
+              <button aria-label="Toggle sound"
                 onClick={(e) => { e.stopPropagation(); handleMuteToggle(); }}
                 className="p-2 text-white hover:text-red-300 transition-colors"
               >
@@ -435,7 +435,7 @@ export function TheaterYoutubePlayer({
               </button>
 
               {/* Fullscreen */}
-              <button
+              <button aria-label="Fullscreen"
                 onClick={(e) => { e.stopPropagation(); handleFullscreen(); }}
                 className="p-2 text-white hover:text-red-300 transition-colors"
               >
@@ -448,7 +448,7 @@ export function TheaterYoutubePlayer({
 
       {/* Big Play Button Overlay (when paused) */}
       {isReady && !isPlaying && (
-        <button
+        <button aria-label="Play"
           onClick={handlePlayPause}
           className="absolute inset-0 flex items-center justify-center bg-black/30 z-10"
         >

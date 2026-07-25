@@ -263,7 +263,7 @@ export default function SilentHandoffCheckIn({
               <Navigation className="h-6 w-6 text-cg-sage" />
               <h2 className="text-xl font-bold text-foreground">Silent Handoff Check-in</h2>
             </div>
-            <button
+            <button aria-label="Close"
               onClick={onClose}
               className="text-muted-foreground hover:text-foreground"
             >

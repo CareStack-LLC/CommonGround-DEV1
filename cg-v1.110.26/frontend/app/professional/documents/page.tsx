@@ -197,7 +197,7 @@ export default function ProfessionalDocumentsPage() {
                         </div>
                     </div>
                     <div className="flex items-center gap-2 flex-wrap">
-                        <Button variant="outline" size="sm" onClick={fetchDocs} className="border-2 border-white/30 text-white hover:bg-white/10 sans">
+                        <Button aria-label="Refresh" variant="outline" size="sm" onClick={fetchDocs} className="border-2 border-white/30 text-white hover:bg-white/10 sans">
                             <RefreshCw className="h-4 w-4" />
                         </Button>
                         <Button variant="outline" size="sm" onClick={handleBatchExport} className="border-2 border-white/30 text-white hover:bg-white/10 sans">
@@ -248,7 +248,7 @@ export default function ProfessionalDocumentsPage() {
                     onChange={(e) => setSearchQuery(e.target.value)}
                 />
                 {searchQuery && (
-                    <button onClick={() => setSearchQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <button aria-label="Clear" onClick={() => setSearchQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2">
                         <X className="h-4 w-4 text-slate-400 hover:text-slate-600" />
                     </button>
                 )}
@@ -333,7 +333,7 @@ export default function ProfessionalDocumentsPage() {
                                     <td className="px-4 py-3 text-right">
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>
-                                                <Button variant="ghost" size="sm">
+                                                <Button aria-label="More options" variant="ghost" size="sm">
                                                     <MoreVertical className="h-4 w-4" />
                                                 </Button>
                                             </DropdownMenuTrigger>

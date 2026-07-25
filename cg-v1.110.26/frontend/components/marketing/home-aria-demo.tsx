@@ -394,7 +394,7 @@ export function HomeARIADemo() {
                     >
                       Send Original
                     </button>
-                    <button onClick={() => setPendingIntervention(null)} className="text-white/30 hover:text-white/50 ml-auto">
+                    <button aria-label="Close" onClick={() => setPendingIntervention(null)} className="text-white/30 hover:text-white/50 ml-auto">
                       <X className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -426,7 +426,7 @@ export function HomeARIADemo() {
                   autoComplete="off"
                   autoCorrect="on"
                 />
-                <button
+                <button aria-label="Send message"
                   onClick={handleSend}
                   disabled={!inputText.trim() || isLoading}
                   className="w-10 h-10 bg-cg-sage hover:bg-cg-sage-dark text-white rounded-full flex items-center justify-center transition-colors disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0"

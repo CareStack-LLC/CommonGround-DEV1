@@ -299,7 +299,7 @@ export default function GenericPartnerLanding({ partner }: GenericPartnerLanding
                                     className="bg-gray-800 border-gray-600 text-white placeholder:text-gray-600 h-12 text-lg font-mono focus:border-[var(--partner-primary)] transition-colors"
                                     disabled={validating || codeValid}
                                 />
-                                <Button
+                                <Button aria-label="Next"
                                     onClick={handleValidateCode}
                                     disabled={validating || codeValid}
                                     className="text-white font-bold h-12 px-6"

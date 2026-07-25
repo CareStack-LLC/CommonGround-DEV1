@@ -359,7 +359,7 @@ export default function ReportsPage() {
                   Choose a predefined report type with optimized settings
                 </CardDescription>
               </div>
-              <Button
+              <Button aria-label="Close"
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowQuickSelect(false)}
@@ -440,7 +440,7 @@ export default function ReportsPage() {
                     : "Select report type and date range"}
                 </CardDescription>
               </div>
-              <Button
+              <Button aria-label="Close"
                 variant="ghost"
                 size="sm"
                 onClick={() => {

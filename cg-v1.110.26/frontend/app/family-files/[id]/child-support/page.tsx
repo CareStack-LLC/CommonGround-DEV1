@@ -331,7 +331,7 @@ function ChildSupportTrackingInner() {
                 Already paid? Record it for the other parent and the court.
               </p>
             </div>
-            <button
+            <button aria-label="Add"
               onClick={() => setShowLogForm((s) => !s)}
               className="inline-flex items-center gap-1.5 rounded-md bg-primary text-primary-foreground px-3 py-1.5 text-sm font-medium hover:opacity-90"
             >

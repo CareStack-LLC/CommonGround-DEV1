@@ -66,7 +66,7 @@ function SettingsLayoutContent({ children }: { children: React.ReactNode }) {
       <PageContainer className="pb-32" background="transparent">
         {/* Header with back button - matches Quick Accord styling */}
         <div className="flex items-center gap-4 mb-8">
-          <button
+          <button aria-label="Back"
             onClick={() => router.back()}
             className="p-2.5 rounded-xl bg-card border-2 border-border hover:border-[var(--portal-primary)]/30 hover:shadow-lg transition-all duration-300"
           >

@@ -349,7 +349,7 @@ export default function ClientMessagingPage() {
                     </div>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
+                        <Button aria-label="More options" variant="ghost" size="icon">
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
@@ -398,7 +398,7 @@ export default function ClientMessagingPage() {
                       className="min-h-[44px] max-h-32 resize-none"
                       rows={1}
                     />
-                    <Button
+                    <Button aria-label="Send message"
                       onClick={sendMessage}
                       disabled={!newMessage.trim() || isSending}
                       className="bg-[#2D8A70] hover:bg-[#2D8A70] shrink-0"

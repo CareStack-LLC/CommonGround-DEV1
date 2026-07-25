@@ -339,7 +339,7 @@ export default function EventsPage() {
                   Select a template to pre-fill event details
                 </CardDescription>
               </div>
-              <Button variant="ghost" size="sm" onClick={() => setShowTemplateSelector(false)}>
+              <Button aria-label="Close" variant="ghost" size="sm" onClick={() => setShowTemplateSelector(false)}>
                 <X className="h-4 w-4" />
               </Button>
             </div>

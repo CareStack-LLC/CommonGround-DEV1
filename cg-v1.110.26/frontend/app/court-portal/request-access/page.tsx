@@ -208,7 +208,7 @@ export default function RequestAccessPage() {
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
                 </div>
-                <Button type="submit" disabled={isSearching || !searchQuery.trim()}>
+                <Button aria-label="Search" type="submit" disabled={isSearching || !searchQuery.trim()}>
                   {isSearching ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
@@ -371,7 +371,7 @@ export default function RequestAccessPage() {
                     >
                       Cancel
                     </Button>
-                    <Button
+                    <Button aria-label="Send message"
                       type="submit"
                       disabled={isSubmitting}
                       className="bg-[#2D6A8F] hover:bg-[#1E4E6B]"

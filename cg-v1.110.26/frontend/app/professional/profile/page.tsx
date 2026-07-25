@@ -145,7 +145,7 @@ function ListEditor({
             className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#F4F8F7] text-[#1E3A4A] text-xs font-medium border border-[#3DAA8A]/20"
           >
             {item}
-            <button
+            <button aria-label="Remove"
               onClick={() => onRemove(index)}
               className="hover:text-red-500 transition-colors ml-0.5"
             >
@@ -223,7 +223,7 @@ function ComplexListEditor<T extends Record<string, any>>({
                 </span>
               ))}
             </div>
-            <button
+            <button aria-label="Remove"
               onClick={() => onRemove(index)}
               className="text-slate-400 hover:text-red-500 transition-colors p-1"
             >

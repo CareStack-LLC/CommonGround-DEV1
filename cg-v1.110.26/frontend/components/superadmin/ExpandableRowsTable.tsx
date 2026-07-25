@@ -122,7 +122,7 @@ export function ExpandableRowsTable<T>({
                       className={`transition-colors ${open ? 'bg-[#2D6A8F]/10' : 'hover:bg-[#2D6A8F]/10'}`}
                     >
                       <td className="w-8 px-2 py-3">
-                        <button
+                        <button aria-label="Next"
                           onClick={() => toggle(row)}
                           onKeyDown={(e) => handleKey(e, row)}
                           className="p-1 rounded text-[#8AACBC] hover:text-white hover:bg-[#2D6A8F]/30 transition-colors"

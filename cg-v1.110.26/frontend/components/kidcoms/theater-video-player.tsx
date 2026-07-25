@@ -282,7 +282,7 @@ export function TheaterVideoPlayer({
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               {/* Play/Pause - Available to both callers */}
-              <button
+              <button aria-label="Rewind"
                 onClick={() => handleSkip(-10)}
                 className="p-2 text-white hover:text-purple-300 transition-colors"
                 title="Rewind 10s"
@@ -290,7 +290,7 @@ export function TheaterVideoPlayer({
                 <SkipBack className="h-5 w-5" />
               </button>
 
-              <button
+              <button aria-label="Play"
                 onClick={handlePlayPause}
                 className="p-3 bg-purple-600 hover:bg-purple-700 rounded-full text-white transition-colors"
               >
@@ -301,7 +301,7 @@ export function TheaterVideoPlayer({
                 )}
               </button>
 
-              <button
+              <button aria-label="Skip forward"
                 onClick={() => handleSkip(10)}
                 className="p-2 text-white hover:text-purple-300 transition-colors"
                 title="Forward 10s"
@@ -323,7 +323,7 @@ export function TheaterVideoPlayer({
 
             <div className="flex items-center space-x-2">
               {/* Volume */}
-              <button
+              <button aria-label="Toggle sound"
                 onClick={handleVolumeToggle}
                 className="p-2 text-white hover:text-purple-300 transition-colors"
               >
@@ -335,7 +335,7 @@ export function TheaterVideoPlayer({
               </button>
 
               {/* Fullscreen */}
-              <button
+              <button aria-label="Fullscreen"
                 onClick={handleFullscreen}
                 className="p-2 text-white hover:text-purple-300 transition-colors"
               >
@@ -348,7 +348,7 @@ export function TheaterVideoPlayer({
 
       {/* Big Play Button Overlay (when paused) - both callers can click */}
       {!isPlaying && (
-        <button
+        <button aria-label="Play"
           onClick={handlePlayPause}
           className="absolute inset-0 flex items-center justify-center bg-black/30"
         >

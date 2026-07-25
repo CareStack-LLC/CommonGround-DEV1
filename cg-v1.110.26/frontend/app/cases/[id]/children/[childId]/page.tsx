@@ -184,7 +184,7 @@ function SectionCard({
 
         {editMode ? (
           <div className="flex items-center gap-2">
-            <button
+            <button aria-label="Close"
               onClick={onCancel}
               disabled={isSaving}
               className="p-2 rounded-lg hover:bg-muted text-muted-foreground transition-colors"
@@ -200,7 +200,7 @@ function SectionCard({
             </button>
           </div>
         ) : canEdit ? (
-          <button
+          <button aria-label="Edit"
             onClick={onEdit}
             className="p-2 rounded-lg hover:bg-muted text-muted-foreground hover:text-cg-sage transition-colors"
           >
@@ -295,7 +295,7 @@ function FormSelect({
       <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
         {label}
       </label>
-      <select value={value} onChange={(e) => onChange(e.target.value)} className="cg-input">
+      <select aria-label={label} value={value} onChange={(e) => onChange(e.target.value)} className="cg-input">
         {options.map((opt) => (
           <option key={opt.value} value={opt.value}>
             {opt.label}
@@ -1242,7 +1242,7 @@ function ChildProfileContent() {
                       <div key={index} className="p-4 bg-muted/30 rounded-xl space-y-4">
                         <div className="flex items-center justify-between">
                           <span className="font-medium text-foreground">Contact {index + 1}</span>
-                          <button
+                          <button aria-label="Delete"
                             onClick={() => removeEmergencyContact(index)}
                             className="p-2 rounded-lg hover:bg-cg-error-subtle text-muted-foreground hover:text-cg-error transition-colors"
                           >

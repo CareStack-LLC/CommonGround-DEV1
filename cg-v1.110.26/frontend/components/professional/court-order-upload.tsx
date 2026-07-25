@@ -400,7 +400,7 @@ export function CourtOrderUpload({
           </Button>
 
           {step === "upload" && (
-            <Button
+            <Button aria-label="Upload"
               onClick={handleUploadAndExtract}
               disabled={!file || uploading || extracting}
               className="bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm font-semibold"

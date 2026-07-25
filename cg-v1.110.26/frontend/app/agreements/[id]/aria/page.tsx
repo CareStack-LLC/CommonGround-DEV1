@@ -534,7 +534,7 @@ Either way, I'll organize everything into a clear agreement for you to review. W
             <div className="border-t p-4">
               <div className="flex gap-3 items-end">
                 {/* Upload button */}
-                <button
+                <button aria-label="Attach file"
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isLoading || isUploading}

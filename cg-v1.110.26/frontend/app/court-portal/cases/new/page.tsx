@@ -784,7 +784,7 @@ export default function NewCaseWizardPage() {
                         onChange={(e) => updateChild(index, "date_of_birth", e.target.value)}
                       />
                     </div>
-                    <Button
+                    <Button aria-label="Remove"
                       variant="ghost"
                       size="sm"
                       onClick={() => removeChild(index)}
@@ -836,7 +836,7 @@ export default function NewCaseWizardPage() {
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back
             </Button>
-            <Button
+            <Button aria-label="Next"
               onClick={createCase}
               disabled={isProcessing || !formData.petitioner_name || !formData.respondent_name}
               className="bg-[#2D6A8F] hover:bg-[#1E4E6B]"
@@ -900,7 +900,7 @@ export default function NewCaseWizardPage() {
                     readOnly
                     className="bg-white text-sm"
                   />
-                  <Button
+                  <Button aria-label="Copy"
                     variant="outline"
                     size="sm"
                     onClick={() => copyToClipboard(createdCase.petitioner_invite_url, "petitioner")}
@@ -933,7 +933,7 @@ export default function NewCaseWizardPage() {
                     readOnly
                     className="bg-white text-sm"
                   />
-                  <Button
+                  <Button aria-label="Copy"
                     variant="outline"
                     size="sm"
                     onClick={() => copyToClipboard(createdCase.respondent_invite_url, "respondent")}

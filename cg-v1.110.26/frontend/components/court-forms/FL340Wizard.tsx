@@ -982,7 +982,7 @@ export default function FL340Wizard({
               <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           ) : (
-            <Button onClick={handleSubmit} disabled={isLoading} className="bg-[#E09520] hover:bg-[#E09520]">
+            <Button aria-label="Send message" onClick={handleSubmit} disabled={isLoading} className="bg-[#E09520] hover:bg-[#E09520]">
               {isLoading ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />

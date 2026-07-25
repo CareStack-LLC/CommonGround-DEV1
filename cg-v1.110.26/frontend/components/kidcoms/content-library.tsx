@@ -155,7 +155,7 @@ export function ContentLibrary({ isOpen, onClose, onSelect }: ContentLibraryProp
               <p className="text-sm text-slate-400">Choose content to enjoy in real-time</p>
             </div>
           </div>
-          <button
+          <button aria-label="Close"
             onClick={onClose}
             className="p-2.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-all duration-200"
           >

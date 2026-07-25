@@ -276,7 +276,7 @@ export default function ForeverForwardLanding({ partnerSlug }: ForeverForwardLan
                                     className="bg-gray-800 border-gray-600 text-white placeholder:text-gray-600 h-12 text-lg font-mono focus:border-[#F5A623] transition-colors"
                                     disabled={validating || codeValid}
                                 />
-                                <Button
+                                <Button aria-label="Next"
                                     onClick={handleValidateCode}
                                     disabled={validating || codeValid}
                                     className="bg-[#F5A623] hover:bg-[#E09520] text-gray-900 font-bold h-12 px-6"

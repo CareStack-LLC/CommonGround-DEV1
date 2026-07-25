@@ -127,7 +127,7 @@ export function IncomingCallBanner({
           </div>
 
           {/* Dismiss button */}
-          <button
+          <button aria-label="Close"
             onClick={handleDismiss}
             className="flex-shrink-0 text-muted-foreground hover:text-foreground transition-colors"
           >

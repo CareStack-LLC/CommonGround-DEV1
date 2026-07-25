@@ -790,7 +790,7 @@ export default function InboxPage() {
         <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 flex items-center gap-3">
           <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0" />
           <p className="text-sm text-red-300 flex-1">{error}</p>
-          <button onClick={() => setError(null)} className="text-red-400 hover:text-red-300"><X className="w-4 h-4" /></button>
+          <button aria-label="Dismiss" onClick={() => setError(null)} className="text-red-400 hover:text-red-300"><X className="w-4 h-4" /></button>
         </div>
       )}
       {success && (
@@ -809,7 +809,7 @@ export default function InboxPage() {
               <h2 className="text-sm font-semibold text-violet-300">AI Inbox Intelligence</h2>
               <span className="text-[10px] text-[#6B8A9A]">{analysis.email_count} emails · via {analysis.provider}</span>
             </div>
-            <button onClick={() => setShowAnalysis(false)} className="text-[#6B8A9A] hover:text-white"><X className="w-4 h-4" /></button>
+            <button aria-label="Close" onClick={() => setShowAnalysis(false)} className="text-[#6B8A9A] hover:text-white"><X className="w-4 h-4" /></button>
           </div>
           {analysis.analysis.summary && (
             <p className="text-sm text-[#D0E4EC] leading-relaxed">{analysis.analysis.summary}</p>
@@ -1069,7 +1069,7 @@ export default function InboxPage() {
                           <Sparkles className={`w-3 h-3 ${generatingReply ? 'animate-pulse' : ''}`} />
                           {generatingReply ? 'Generating...' : 'AI Generate'}
                         </button>
-                        <button onClick={() => { setShowReplyComposer(false); setCustomReply(''); }} className="text-[#6B8A9A] hover:text-white">
+                        <button aria-label="Close" onClick={() => { setShowReplyComposer(false); setCustomReply(''); }} className="text-[#6B8A9A] hover:text-white">
                           <X className="w-4 h-4" />
                         </button>
                       </div>

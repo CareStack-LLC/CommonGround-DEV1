@@ -203,7 +203,7 @@ function SettingsContent() {
         <div className="max-w-3xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <button
+              <button aria-label="Previous"
                 onClick={() => router.push(`/kidcoms?case=${familyFileId}`)}
                 className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg"
               >

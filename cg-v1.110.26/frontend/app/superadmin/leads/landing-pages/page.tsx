@@ -195,7 +195,7 @@ export default function LandingPagesPage() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           {tab === 'detail' && (
-            <button onClick={backToList} className="p-2 rounded-lg bg-[#2D6A8F]/20 hover:bg-[#2D6A8F]/30 text-[#8AACBC] hover:text-white transition-colors">
+            <button aria-label="Back" onClick={backToList} className="p-2 rounded-lg bg-[#2D6A8F]/20 hover:bg-[#2D6A8F]/30 text-[#8AACBC] hover:text-white transition-colors">
               <ArrowLeft className="w-4 h-4" />
             </button>
           )}
@@ -234,7 +234,7 @@ export default function LandingPagesPage() {
                   <ExternalLink className="w-4 h-4" /> View Live
                 </a>
               )}
-              <button onClick={() => handleDelete(selected.id)} className="p-2 rounded-lg bg-[#2D6A8F]/20 hover:bg-red-500/20 text-[#8AACBC] hover:text-red-400 transition-colors">
+              <button aria-label="Delete" onClick={() => handleDelete(selected.id)} className="p-2 rounded-lg bg-[#2D6A8F]/20 hover:bg-red-500/20 text-[#8AACBC] hover:text-red-400 transition-colors">
                 <Trash2 className="w-4 h-4" />
               </button>
             </>
@@ -269,7 +269,7 @@ export default function LandingPagesPage() {
         <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 flex items-center gap-3">
           <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0" />
           <p className="text-sm text-red-300">{error}</p>
-          <button onClick={() => setError(null)} className="ml-auto text-red-400"><X className="w-4 h-4" /></button>
+          <button aria-label="Dismiss" onClick={() => setError(null)} className="ml-auto text-red-400"><X className="w-4 h-4" /></button>
         </div>
       )}
       {success && (
@@ -286,7 +286,7 @@ export default function LandingPagesPage() {
             <h2 className="text-lg font-semibold text-white flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-[#3DAA8A]" /> AI Generate Landing Page
             </h2>
-            <button onClick={() => setShowGenerate(false)} className="text-[#6B8A9A] hover:text-[#D0E4EC]"><X className="w-5 h-5" /></button>
+            <button aria-label="Close" onClick={() => setShowGenerate(false)} className="text-[#6B8A9A] hover:text-[#D0E4EC]"><X className="w-5 h-5" /></button>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>

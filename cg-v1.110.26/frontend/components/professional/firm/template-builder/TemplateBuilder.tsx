@@ -297,7 +297,7 @@ function QuestionEditor({
             </div>
 
             {/* Delete */}
-            <button
+            <button aria-label="Delete"
                 onClick={onDelete}
                 className="mt-1 text-slate-300 hover:text-[#C53030] transition-colors opacity-0 group-hover:opacity-100"
             >
@@ -397,7 +397,7 @@ function SectionEditor({
                     {section.questions.length} Q{section.questions.length !== 1 ? "s" : ""}
                 </Badge>
 
-                <button
+                <button aria-label="Next"
                     onClick={() => setCollapsed(!collapsed)}
                     className="text-slate-400 hover:text-slate-600 transition-colors"
                 >
@@ -405,7 +405,7 @@ function SectionEditor({
                 </button>
 
                 {total > 1 && (
-                    <button onClick={onDelete} className="text-slate-300 hover:text-[#C53030] transition-colors">
+                    <button aria-label="Delete" onClick={onDelete} className="text-slate-300 hover:text-[#C53030] transition-colors">
                         <Trash2 className="h-4 w-4" />
                     </button>
                 )}

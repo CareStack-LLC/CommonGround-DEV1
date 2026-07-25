@@ -342,7 +342,7 @@ export default function SessionPage() {
         {/* Minimal Header - hidden on mobile during call */}
         <header className="bg-gray-800/50 px-4 py-2 flex items-center justify-between md:flex hidden">
           <div className="flex items-center space-x-3">
-            <button
+            <button aria-label="Previous"
               onClick={() => router.push(`/family-files/${familyFileId}/kidcoms`)}
               className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg"
             >
@@ -401,7 +401,7 @@ export default function SessionPage() {
 
                 {/* Mobile header overlay */}
                 <div className="absolute top-4 left-4 z-10">
-                  <button
+                  <button aria-label="Previous"
                     onClick={() => router.push(`/family-files/${familyFileId}/kidcoms`)}
                     className="p-2 bg-black/40 backdrop-blur-sm text-white rounded-full"
                   >
@@ -435,7 +435,7 @@ export default function SessionPage() {
         <div className="bg-gray-800/90 md:bg-gray-800 px-4 py-3 md:py-3 absolute md:relative bottom-0 left-0 right-0 backdrop-blur-sm md:backdrop-blur-none safe-area-bottom">
           <div className="flex items-center justify-center space-x-4 md:space-x-3">
             {/* Audio Toggle */}
-            <button
+            <button aria-label="Toggle microphone"
               onClick={toggleAudio}
               disabled={!isCallJoined}
               className={`p-4 md:p-3 rounded-full transition-colors ${isAudioOn
@@ -448,7 +448,7 @@ export default function SessionPage() {
             </button>
 
             {/* Video Toggle */}
-            <button
+            <button aria-label="Toggle camera"
               onClick={toggleVideo}
               disabled={!isCallJoined}
               className={`p-4 md:p-3 rounded-full transition-colors ${isVideoOn
@@ -461,7 +461,7 @@ export default function SessionPage() {
             </button>
 
             {/* End Call */}
-            <button
+            <button aria-label="End call"
               onClick={handleEndCall}
               className="p-4 md:p-3 rounded-full bg-[#C53030] hover:bg-[#9B2C2C] text-white"
               title="Leave Call"
@@ -473,7 +473,7 @@ export default function SessionPage() {
             <div className="hidden md:block w-px h-8 bg-gray-700" />
 
             {/* Chat Toggle - hidden on mobile */}
-            <button
+            <button aria-label="Open chat"
               onClick={() => setActivePanel(activePanel === 'chat' ? null : 'chat')}
               className={`hidden md:flex p-3 rounded-full transition-colors ${activePanel === 'chat'
                 ? 'bg-cg-sage text-white'
@@ -497,7 +497,7 @@ export default function SessionPage() {
             </button>
 
             {/* Theater Mode - visible on all devices */}
-            <button
+            <button aria-label="Theater mode"
               onClick={() => setIsTheaterMode(true)}
               disabled={!isCallJoined}
               className={`p-4 md:p-3 rounded-full transition-colors ${!isCallJoined
@@ -509,7 +509,7 @@ export default function SessionPage() {
               <Film className="h-6 w-6 md:h-5 md:w-5" />
             </button>
 
-            <button
+            <button aria-label="Arcade mode"
               onClick={() => setIsArcadeMode(true)}
               disabled={!isCallJoined}
               className={`p-4 md:p-3 rounded-full transition-colors ${!isCallJoined
@@ -520,7 +520,7 @@ export default function SessionPage() {
             >
               <Gamepad2 className="h-5 w-5" />
             </button>
-            <button
+            <button aria-label="Whiteboard"
               onClick={() => setIsWhiteboardMode(true)}
               disabled={!isCallJoined}
               className={`hidden md:flex p-3 rounded-full transition-colors ${!isCallJoined
@@ -577,7 +577,7 @@ export default function SessionPage() {
                       placeholder="Type a message..."
                       className="flex-1 bg-gray-700 text-white rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cg-sage"
                     />
-                    <button
+                    <button aria-label="Send message"
                       onClick={handleSendMessage}
                       disabled={isSendingMessage || !newMessage.trim()}
                       className="p-2 bg-cg-sage hover:bg-cg-sage-light text-white rounded-lg disabled:opacity-50"

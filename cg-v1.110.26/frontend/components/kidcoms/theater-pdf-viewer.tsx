@@ -104,7 +104,7 @@ export function TheaterPdfViewer({
 
         <div className="flex items-center space-x-2">
           {/* Zoom controls */}
-          <button
+          <button aria-label="Zoom out"
             onClick={zoomOut}
             disabled={scale <= 0.5}
             className="p-1.5 text-gray-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
@@ -115,7 +115,7 @@ export function TheaterPdfViewer({
           <span className="text-gray-400 text-xs w-12 text-center">
             {Math.round(scale * 100)}%
           </span>
-          <button
+          <button aria-label="Zoom in"
             onClick={zoomIn}
             disabled={scale >= 2.0}
             className="p-1.5 text-gray-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
@@ -199,7 +199,7 @@ export function TheaterPdfViewer({
       {/* Page Navigation */}
       <div className="flex items-center justify-center px-4 py-3 bg-gray-800/90 border-t border-gray-700">
         <div className="flex items-center space-x-4">
-          <button
+          <button aria-label="Previous"
             onClick={previousPage}
             disabled={pageNumber <= 1}
             className="p-2 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
@@ -215,7 +215,7 @@ export function TheaterPdfViewer({
             <span className="text-white font-medium">{numPages}</span>
           </div>
 
-          <button
+          <button aria-label="Next"
             onClick={nextPage}
             disabled={pageNumber >= numPages}
             className="p-2 bg-gray-700 hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-colors"

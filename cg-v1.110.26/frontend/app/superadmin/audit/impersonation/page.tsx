@@ -243,7 +243,7 @@ export default function ImpersonationAuditPage() {
                 Showing {(page - 1) * pageSize + 1}\u2013{Math.min(page * pageSize, total)} of {total}
               </span>
               <div className="flex items-center gap-1">
-                <button
+                <button aria-label="Previous"
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
                   className="p-1.5 rounded text-[#8AACBC] hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
@@ -251,7 +251,7 @@ export default function ImpersonationAuditPage() {
                   <ChevronLeft className="w-4 h-4" />
                 </button>
                 <span className="text-xs text-[#D0E4EC] px-2">{page} / {totalPages}</span>
-                <button
+                <button aria-label="Next"
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page >= totalPages}
                   className="p-1.5 rounded text-[#8AACBC] hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"

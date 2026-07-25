@@ -575,7 +575,7 @@ export default function CircleManagementPage() {
                             </button>
                           )}
 
-                          <button
+                          <button aria-label="Edit"
                             onClick={() => startEdit(contact)}
                             className="p-2 text-muted-foreground hover:bg-muted rounded-lg transition-colors"
                             title="Edit"
@@ -583,7 +583,7 @@ export default function CircleManagementPage() {
                             <Edit className="h-5 w-5" />
                           </button>
 
-                          <button
+                          <button aria-label="Delete"
                             onClick={() => handleDelete(contact.id)}
                             className="p-2 text-cg-error hover:bg-cg-error-subtle rounded-lg transition-colors"
                             title="Remove"

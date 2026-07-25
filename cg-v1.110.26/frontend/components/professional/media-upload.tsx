@@ -84,7 +84,7 @@ export function MediaUpload({
               alt="Preview"
               className="w-full h-full object-cover"
             />
-            <Button
+            <Button aria-label="Remove"
               type="button"
               variant="destructive"
               size="sm"

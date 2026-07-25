@@ -234,7 +234,7 @@ export default function MoviesPage() {
         userInitial={userInitial}
         avatarGradient="from-red-500 to-orange-500"
         actions={
-          <button
+          <button aria-label="Search"
             onClick={() => setShowSearch(!showSearch)}
             className="w-9 h-9 rounded-full flex items-center justify-center transition-colors"
             style={{ background: 'var(--portal-surface)', color: 'var(--portal-muted)' }}

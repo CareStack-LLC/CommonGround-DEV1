@@ -113,7 +113,7 @@ export function ArcadeMode({
               </p>
             </div>
           </div>
-          <button
+          <button aria-label="Close"
             onClick={onExit}
             className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
           >
@@ -204,7 +204,7 @@ export function ArcadeMode({
           <div className="text-white font-semibold" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
             Pick an opponent
           </div>
-          <button
+          <button aria-label="Close"
             onClick={onExit}
             className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
           >
@@ -269,7 +269,7 @@ export function ArcadeMode({
         <div className="text-white font-semibold" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
           Tic Tac Toe · {opponentKind === 'computer' ? 'vs Computer' : `vs ${remoteParticipant?.odName || 'Partner'}`}
         </div>
-        <button
+        <button aria-label="Close"
           onClick={onExit}
           className="p-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
         >

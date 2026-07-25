@@ -590,7 +590,7 @@ export function TheaterMode({
       {/* Bottom Controls */}
       <div className="px-4 py-3 bg-[#0D1B24] safe-area-bottom border-t border-[#3DAA8A]/10 shadow-lg">
         <div className="flex items-center justify-center space-x-3">
-          <button
+          <button aria-label="Toggle microphone"
             onClick={onToggleAudio}
             className={`p-3 rounded-full transition-all duration-200 ${
               isAudioOn
@@ -600,7 +600,7 @@ export function TheaterMode({
           >
             {isAudioOn ? <Mic className="h-5 w-5" /> : <MicOff className="h-5 w-5" />}
           </button>
-          <button
+          <button aria-label="Toggle camera"
             onClick={onToggleVideo}
             className={`p-3 rounded-full transition-all duration-200 ${
               isVideoOn

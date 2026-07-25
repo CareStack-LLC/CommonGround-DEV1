@@ -199,7 +199,7 @@ export function ARIARewriteModal({
                             Your message might not sound the way you mean it. Here's a nicer version!
                         </p>
                     </div>
-                    <button
+                    <button aria-label="Close"
                         onClick={onCancel}
                         disabled={isSending}
                         className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-50"
@@ -320,7 +320,7 @@ export function ARIARewriteModal({
                     </div>
                     <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{payload.explanation}</p>
                 </div>
-                <button
+                <button aria-label="Close"
                     onClick={onCancel}
                     disabled={isSending}
                     className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-50"

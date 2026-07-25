@@ -231,7 +231,7 @@ export default function PartnerLandingPage() {
                                     className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-500"
                                     disabled={validating || codeValid}
                                 />
-                                <Button
+                                <Button aria-label="Next"
                                     onClick={handleValidateCode}
                                     disabled={validating || codeValid}
                                     className="bg-[#F5A623] hover:bg-[#E09520] text-gray-900 font-semibold"

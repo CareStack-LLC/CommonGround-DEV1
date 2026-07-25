@@ -349,14 +349,14 @@ function HealthScoresTab() {
               Page {currentPage} of {totalPages} ({formatNumber(total)} total)
             </span>
             <div className="flex gap-1">
-              <button
+              <button aria-label="Previous"
                 onClick={() => setOffset(Math.max(0, offset - limit))}
                 disabled={offset === 0}
                 className="p-1.5 rounded-lg text-[#6B8A9A] hover:text-white hover:bg-[#2D6A8F]/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
-              <button
+              <button aria-label="Next"
                 onClick={() => setOffset(offset + limit)}
                 disabled={offset + limit >= total}
                 className="p-1.5 rounded-lg text-[#6B8A9A] hover:text-white hover:bg-[#2D6A8F]/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
@@ -621,14 +621,14 @@ function InterventionsTab() {
               Page {currentPage} of {totalPages}
             </span>
             <div className="flex gap-1">
-              <button
+              <button aria-label="Previous"
                 onClick={() => setOffset(Math.max(0, offset - limit))}
                 disabled={offset === 0}
                 className="p-1.5 rounded-lg text-[#6B8A9A] hover:text-white hover:bg-[#2D6A8F]/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
-              <button
+              <button aria-label="Next"
                 onClick={() => setOffset(offset + limit)}
                 disabled={offset + limit >= total}
                 className="p-1.5 rounded-lg text-[#6B8A9A] hover:text-white hover:bg-[#2D6A8F]/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"

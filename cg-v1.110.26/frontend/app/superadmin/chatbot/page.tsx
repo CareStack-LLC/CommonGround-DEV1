@@ -413,7 +413,7 @@ export default function ChatbotAdminPage() {
                       {selectedSession.visitor.email || 'No email'} &middot; <StatusBadge status={selectedSession.status} />
                     </p>
                   </div>
-                  <button
+                  <button aria-label="Close"
                     onClick={() => setSelectedSession(null)}
                     className="p-2 rounded-lg hover:bg-[#2D6A8F]/30 text-[#8AACBC]"
                   >

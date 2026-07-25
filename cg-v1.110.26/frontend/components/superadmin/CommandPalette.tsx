@@ -309,7 +309,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
           {userLoading && (
             <span className="text-[10px] text-[#6B8A9A]">searching…</span>
           )}
-          <button
+          <button aria-label="Close"
             onClick={onClose}
             className="p-1 text-[#6B8A9A] hover:text-white transition-colors"
             title="Close (Esc)"

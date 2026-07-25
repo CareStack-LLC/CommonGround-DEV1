@@ -83,14 +83,14 @@ export function EarlyAdopterForm({ source, className = '' }: EarlyAdopterFormPro
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-3 max-w-md mx-auto">
-        <input
+        <input aria-label="First name"
           type="text"
           value={firstName}
           onChange={(e) => setFirstName(e.target.value)}
           placeholder="First name (optional)"
           className="w-full px-4 py-3 rounded-lg border border-cg-sage/20 bg-white text-foreground placeholder:text-[#6B8A9A] focus:outline-none focus:ring-2 focus:ring-cg-sage/40 focus:border-transparent"
         />
-        <input
+        <input aria-label="Email address"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}

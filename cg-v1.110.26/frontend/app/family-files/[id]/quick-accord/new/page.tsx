@@ -185,7 +185,7 @@ function NewQuickAccordContent() {
     <div className="max-w-3xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <button
+        <button aria-label="Back"
           onClick={() => router.back()}
           className="p-2.5 rounded-xl bg-card border-2 border-border hover:border-[var(--portal-primary)]/30 hover:shadow-lg transition-all duration-300"
         >
@@ -396,7 +396,7 @@ function NewQuickAccordContent() {
                 {isCreating ? 'Creating...' : 'Create QuickAccord'}
               </Button>
             ) : (
-              <Button
+              <Button aria-label="Send message"
                 onClick={sendMessage}
                 disabled={!inputValue.trim() || isSending}
                 className="bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white font-bold px-4 rounded-xl hover:shadow-lg transition-all duration-300"

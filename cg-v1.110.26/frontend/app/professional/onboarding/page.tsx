@@ -511,7 +511,7 @@ export default function ProfessionalOnboardingPage() {
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back
                 </Button>
-                <Button
+                <Button aria-label="Next"
                   onClick={nextStep}
                   disabled={!canProceed() || isSubmitting}
                   className="bg-[#3DAA8A] hover:bg-[#2D8A6E]"

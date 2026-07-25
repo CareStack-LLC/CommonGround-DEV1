@@ -744,7 +744,7 @@ function CaseDetailsContent() {
                               {grant.status.replace(/_/g, ' ')}
                             </Badge>
                             {grant.status === 'active' && (
-                              <Button
+                              <Button aria-label="Close"
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => handleRevokeGrant(grant.id)}

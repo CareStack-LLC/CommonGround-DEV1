@@ -243,7 +243,7 @@ function CircleManagementContent() {
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <button
+              <button aria-label="Previous"
                 onClick={() => router.push(`/kidcoms?case=${familyFileId}`)}
                 className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg"
               >
@@ -465,7 +465,7 @@ function CircleManagementContent() {
 
                       {/* Send Invite */}
                       {!contact.is_verified && contact.contact_email && (
-                        <button
+                        <button aria-label="Send message"
                           onClick={() => handleSendInvite(contact.id)}
                           className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/50 rounded-lg"
                           title="Send verification invite"
@@ -496,7 +496,7 @@ function CircleManagementContent() {
                       </button>
 
                       {/* Edit */}
-                      <button
+                      <button aria-label="Edit"
                         onClick={() => startEdit(contact)}
                         className="p-2 text-muted-foreground hover:bg-muted rounded-lg"
                         title="Edit"
@@ -505,7 +505,7 @@ function CircleManagementContent() {
                       </button>
 
                       {/* Delete */}
-                      <button
+                      <button aria-label="Delete"
                         onClick={() => handleDelete(contact.id)}
                         className="p-2 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/50 rounded-lg"
                         title="Remove"

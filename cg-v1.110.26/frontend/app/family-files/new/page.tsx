@@ -102,7 +102,7 @@ function NewFamilyFileContent() {
     <div className="max-w-2xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <button
+        <button aria-label="Back"
           onClick={() => router.back()}
           className="w-10 h-10 rounded-lg hover:bg-muted flex items-center justify-center transition-colors"
         >
@@ -269,7 +269,7 @@ function NewFamilyFileContent() {
               <div key={index} className="p-4 border-2 border-border rounded-xl bg-muted space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="font-bold text-foreground">Child {index + 1}</span>
-                  <button
+                  <button aria-label="Delete"
                     type="button"
                     onClick={() => removeChild(index)}
                     className="w-8 h-8 rounded-lg hover:bg-[#FEE2E2] flex items-center justify-center transition-colors"

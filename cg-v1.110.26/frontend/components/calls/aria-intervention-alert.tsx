@@ -127,7 +127,7 @@ export function ARIAInterventionAlert({
               </h3>
 
               {isWarning && (
-                <button
+                <button aria-label="Close"
                   onClick={onDismiss}
                   className="p-1 rounded-full hover:bg-[#FEF7ED] transition-colors"
                 >

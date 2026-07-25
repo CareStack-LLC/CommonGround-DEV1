@@ -528,7 +528,7 @@ export default function FL341Wizard({
                   <div className="flex justify-between items-start">
                     <h5 className="font-medium text-gray-700">Child {index + 1}</h5>
                     {(formData.children || []).length > 1 && (
-                      <Button
+                      <Button aria-label="Delete"
                         variant="ghost"
                         size="sm"
                         onClick={() => removeChild(index)}
@@ -1488,7 +1488,7 @@ export default function FL341Wizard({
               <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           ) : (
-            <Button onClick={handleSubmit} disabled={isLoading} className="bg-[#2D8A70] hover:bg-[#2D8A70]">
+            <Button aria-label="Send message" onClick={handleSubmit} disabled={isLoading} className="bg-[#2D8A70] hover:bg-[#2D8A70]">
               {isLoading ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />

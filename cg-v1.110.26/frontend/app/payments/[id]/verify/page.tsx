@@ -284,7 +284,7 @@ function VerifyReceiptContent() {
                       alt="Receipt preview"
                       className="max-h-64 mx-auto rounded-lg object-contain"
                     />
-                    <button
+                    <button aria-label="Remove"
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
@@ -404,7 +404,7 @@ function VerifyReceiptContent() {
             >
               Cancel
             </button>
-            <button
+            <button aria-label="Upload"
               type="submit"
               className="cg-btn-primary flex-1 inline-flex items-center justify-center gap-2"
               disabled={isSubmitting || !receiptFile}

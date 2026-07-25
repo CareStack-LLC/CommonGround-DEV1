@@ -200,7 +200,7 @@ export function CustodyIntakeTable({ data, isLoading, onRefresh }: CustodyIntake
                                 </TableCell>
                                 <TableCell className="text-right">
                                     <div className="flex items-center justify-end gap-2">
-                                        <Button
+                                        <Button aria-label="Copy"
                                             variant="ghost"
                                             size="icon"
                                             className="h-8 w-8"

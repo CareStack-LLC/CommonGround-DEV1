@@ -157,7 +157,7 @@ export function PartnershipInquiryForm({
         </div>
 
         {/* Org Name */}
-        <input
+        <input aria-label="Organization name"
           type="text"
           value={formState.org_name}
           onChange={(e) =>
@@ -170,7 +170,7 @@ export function PartnershipInquiryForm({
 
         {/* Name Fields */}
         <div className="grid sm:grid-cols-2 gap-3">
-          <input
+          <input aria-label="First name"
             type="text"
             value={formState.first_name}
             onChange={(e) =>
@@ -179,7 +179,7 @@ export function PartnershipInquiryForm({
             placeholder="Your first name"
             className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white text-foreground placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-cg-sage/50 focus:border-transparent"
           />
-          <input
+          <input aria-label="Last name"
             type="text"
             value={formState.last_name}
             onChange={(e) =>
@@ -191,7 +191,7 @@ export function PartnershipInquiryForm({
         </div>
 
         {/* Email */}
-        <input
+        <input aria-label="Work email"
           type="email"
           value={formState.email}
           onChange={(e) =>
@@ -203,7 +203,7 @@ export function PartnershipInquiryForm({
         />
 
         {/* Families served */}
-        <input
+        <input aria-label="Approx. families served per year"
           type="text"
           value={formState.families_served}
           onChange={(e) =>
@@ -214,7 +214,7 @@ export function PartnershipInquiryForm({
         />
 
         {/* Message */}
-        <textarea
+        <textarea aria-label="About the families you serve"
           value={formState.message}
           onChange={(e) =>
             setFormState({ ...formState, message: e.target.value })
@@ -225,7 +225,7 @@ export function PartnershipInquiryForm({
         />
 
         {/* Submit */}
-        <button
+        <button aria-label="Send message"
           type="submit"
           disabled={isSubmitting}
           className="w-full bg-cg-sage text-white font-semibold px-6 py-4 rounded-lg transition-all duration-200 hover:bg-cg-sage-dark hover:shadow-lg disabled:opacity-50 text-lg flex items-center justify-center gap-2"

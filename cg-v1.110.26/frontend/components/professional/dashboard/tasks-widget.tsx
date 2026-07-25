@@ -353,7 +353,7 @@ export function TasksWidget({ token }: TasksWidgetProps) {
                                                 )}
                                             </div>
                                         </div>
-                                        <button
+                                        <button aria-label="Delete"
                                             onClick={() => deleteTask(task.id)}
                                             className="shrink-0 opacity-0 group-hover:opacity-100 text-slate-300 hover:text-[#E06B6B] transition-all"
                                         >

@@ -295,7 +295,7 @@ export default function ParentChatViewPage({ params }: PageParams) {
           <div className="flex flex-col h-[calc(100vh-180px)]">
             {/* Chat Header */}
             <div className="flex items-center gap-3 pb-4 border-b border-border mb-4">
-              <button
+              <button aria-label="Back"
                 onClick={() => router.push(`/family-files/${familyFileId}/my-circle?tab=messages`)}
                 className="w-10 h-10 rounded-lg hover:bg-muted flex items-center justify-center transition-colors"
               >
@@ -537,7 +537,7 @@ export default function ParentChatViewPage({ params }: PageParams) {
                     }}
                   />
                 </div>
-                <button
+                <button aria-label="Send message"
                   onClick={() => handleSend()}
                   disabled={(!newMessage.trim() && !pendingAttachment) || isSending}
                   className="w-11 h-11 rounded-xl bg-teal-600 text-white flex items-center justify-center hover:bg-teal-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex-shrink-0"

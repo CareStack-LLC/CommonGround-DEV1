@@ -146,7 +146,7 @@ export function CallInterface({ familyFileId, token, onEndCall }: CallInterfaceP
                         </div>
                         <Users className="h-20 w-20 text-slate-700" />
                         <div className="absolute bottom-4 right-4 flex gap-2">
-                            <Button size="icon" variant="ghost" className="h-8 w-8 bg-black/40 text-white hover:bg-black/60 rounded-full"><Mic className="h-4 w-4" /></Button>
+                            <Button aria-label="Toggle microphone" size="icon" variant="ghost" className="h-8 w-8 bg-black/40 text-white hover:bg-black/60 rounded-full"><Mic className="h-4 w-4" /></Button>
                         </div>
                     </div>
                     <div className="bg-slate-900 rounded-2xl relative overflow-hidden flex items-center justify-center border-2 border-slate-800">
@@ -156,7 +156,7 @@ export function CallInterface({ familyFileId, token, onEndCall }: CallInterfaceP
                         </div>
                         <Users className="h-20 w-20 text-slate-700" />
                         <div className="absolute bottom-4 right-4 flex gap-2">
-                            <Button size="icon" variant="ghost" className="h-8 w-8 bg-black/40 text-white hover:bg-black/60 rounded-full"><Mic className="h-4 w-4" /></Button>
+                            <Button aria-label="Toggle microphone" size="icon" variant="ghost" className="h-8 w-8 bg-black/40 text-white hover:bg-black/60 rounded-full"><Mic className="h-4 w-4" /></Button>
                         </div>
                     </div>
                 </div>

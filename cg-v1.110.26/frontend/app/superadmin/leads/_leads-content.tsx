@@ -335,7 +335,7 @@ export default function LeadsContent() {
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-3">
-          <button onClick={() => setSelectedList(null)} className="p-1.5 rounded-lg hover:bg-[#2D6A8F]/20 transition-colors">
+          <button aria-label="Previous" onClick={() => setSelectedList(null)} className="p-1.5 rounded-lg hover:bg-[#2D6A8F]/20 transition-colors">
             <ChevronLeft className="w-5 h-5 text-[#8AACBC]" />
           </button>
           <div className="flex-1">
@@ -374,14 +374,14 @@ export default function LeadsContent() {
           <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-semibold text-[#D0E4EC]">Add Lead</h3>
-              <button onClick={() => setShowAddLead(false)} className="text-[#6B8A9A] hover:text-[#D0E4EC]"><X className="w-4 h-4" /></button>
+              <button aria-label="Close" onClick={() => setShowAddLead(false)} className="text-[#6B8A9A] hover:text-[#D0E4EC]"><X className="w-4 h-4" /></button>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <input value={newLead.email} onChange={e => setNewLead({ ...newLead, email: e.target.value })} placeholder="Email *" className="col-span-2 px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50" />
-              <input value={newLead.first_name} onChange={e => setNewLead({ ...newLead, first_name: e.target.value })} placeholder="First name" className="px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50" />
-              <input value={newLead.last_name} onChange={e => setNewLead({ ...newLead, last_name: e.target.value })} placeholder="Last name" className="px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50" />
-              <input value={newLead.company} onChange={e => setNewLead({ ...newLead, company: e.target.value })} placeholder="Company" className="px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50" />
-              <input value={newLead.title} onChange={e => setNewLead({ ...newLead, title: e.target.value })} placeholder="Title" className="px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50" />
+              <input aria-label="Email" value={newLead.email} onChange={e => setNewLead({ ...newLead, email: e.target.value })} placeholder="Email *" className="col-span-2 px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50" />
+              <input aria-label="First name" value={newLead.first_name} onChange={e => setNewLead({ ...newLead, first_name: e.target.value })} placeholder="First name" className="px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50" />
+              <input aria-label="Last name" value={newLead.last_name} onChange={e => setNewLead({ ...newLead, last_name: e.target.value })} placeholder="Last name" className="px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50" />
+              <input aria-label="Company" value={newLead.company} onChange={e => setNewLead({ ...newLead, company: e.target.value })} placeholder="Company" className="px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50" />
+              <input aria-label="Title" value={newLead.title} onChange={e => setNewLead({ ...newLead, title: e.target.value })} placeholder="Title" className="px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50" />
             </div>
             <button onClick={addLead} disabled={addingLead || !newLead.email} className="mt-3 px-4 py-2 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors disabled:opacity-50">
               {addingLead ? 'Adding...' : 'Add Lead'}
@@ -421,7 +421,7 @@ export default function LeadsContent() {
                     <React.Fragment key={lead.id}>
                       <tr className={`transition-colors ${isOpen ? 'bg-[#2D6A8F]/10' : 'hover:bg-[#2D6A8F]/10'}`}>
                         <td className="w-8 px-2 py-3">
-                          <button
+                          <button aria-label="Next"
                             onClick={() => toggleLeadExpand(lead.id)}
                             title={isOpen ? 'Collapse' : 'Expand'}
                             className="p-1 rounded text-[#8AACBC] hover:text-white hover:bg-[#2D6A8F]/30 transition-colors"
@@ -470,7 +470,7 @@ export default function LeadsContent() {
                                 >
                                   <CheckCircle2 className="w-4 h-4" />
                                 </button>
-                                <button
+                                <button aria-label="Close"
                                   onClick={() => {
                                     setStageLead(lead);
                                     setStageChoice('closed_lost');
@@ -484,7 +484,7 @@ export default function LeadsContent() {
                                 </button>
                               </>
                             )}
-                            <button
+                            <button aria-label="More options"
                               onClick={() => openStageModal(lead)}
                               title="Change stage"
                               className="p-1.5 rounded text-[#8AACBC] hover:bg-[#2D6A8F]/30 hover:text-white transition-colors"
@@ -520,7 +520,7 @@ export default function LeadsContent() {
                                   <div className="flex items-center gap-2">
                                     <span className="text-[#6B8A9A]">id:</span>
                                     <span className="font-mono truncate">{lead.id}</span>
-                                    <button
+                                    <button aria-label="Copy"
                                       onClick={() => {
                                         navigator.clipboard.writeText(lead.id);
                                         setSuccess('Lead id copied');
@@ -581,7 +581,7 @@ export default function LeadsContent() {
                   <h3 className="text-base font-semibold text-white">Update Lead Stage</h3>
                   <p className="text-xs text-[#8AACBC] mt-0.5 truncate max-w-[280px]">{stageLead.email}</p>
                 </div>
-                <button
+                <button aria-label="Close"
                   onClick={closeStageModal}
                   className="p-1 rounded text-[#8AACBC] hover:bg-[#2D6A8F]/30 hover:text-white transition-colors"
                 >
@@ -704,13 +704,13 @@ export default function LeadsContent() {
         <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 flex items-center gap-3">
           <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0" />
           <p className="text-sm text-red-300">{error}</p>
-          <button onClick={() => setError(null)} className="ml-auto text-red-400 hover:text-red-300"><X className="w-4 h-4" /></button>
+          <button aria-label="Dismiss" onClick={() => setError(null)} className="ml-auto text-red-400 hover:text-red-300"><X className="w-4 h-4" /></button>
         </div>
       )}
       {success && (
         <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 flex items-center justify-between">
           <p className="text-sm text-emerald-300">{success}</p>
-          <button onClick={() => setSuccess(null)} className="text-emerald-400 hover:text-emerald-300"><X className="w-4 h-4" /></button>
+          <button aria-label="Dismiss" onClick={() => setSuccess(null)} className="text-emerald-400 hover:text-emerald-300"><X className="w-4 h-4" /></button>
         </div>
       )}
 
@@ -884,7 +884,7 @@ export default function LeadsContent() {
             <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-semibold text-[#D0E4EC]">Create Lead List</h3>
-                <button onClick={() => setShowCreate(false)} className="text-[#6B8A9A] hover:text-[#D0E4EC]"><X className="w-4 h-4" /></button>
+                <button aria-label="Close" onClick={() => setShowCreate(false)} className="text-[#6B8A9A] hover:text-[#D0E4EC]"><X className="w-4 h-4" /></button>
               </div>
               <div className="space-y-3">
                 <input value={createName} onChange={e => setCreateName(e.target.value)} placeholder="List name *" className="w-full px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50" />
@@ -951,7 +951,7 @@ export default function LeadsContent() {
                       </td>
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center justify-end gap-1">
-                          <button
+                          <button aria-label="Open link"
                             onClick={() => viewList(list.id)}
                             className="p-1.5 rounded-lg hover:bg-[#2D6A8F]/20 text-[#6B8A9A] hover:text-[#D0E4EC] transition-colors"
                             title="View leads"
@@ -966,7 +966,7 @@ export default function LeadsContent() {
                           >
                             <CloudUpload className={`w-4 h-4 ${syncing === list.id ? 'animate-pulse' : ''}`} />
                           </button>
-                          <button
+                          <button aria-label="Delete"
                             onClick={() => deleteList(list.id)}
                             className="p-1.5 rounded-lg hover:bg-[#2D6A8F]/20 text-[#6B8A9A] hover:text-red-400 transition-colors"
                             title="Delete list"

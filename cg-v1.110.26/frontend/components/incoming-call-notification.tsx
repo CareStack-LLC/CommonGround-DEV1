@@ -174,7 +174,7 @@ export function IncomingCallNotification() {
         {/* Action Buttons */}
         <div className="flex justify-center gap-8">
           {/* Decline Button */}
-          <button
+          <button aria-label="End call"
             onClick={handleDecline}
             className="w-16 h-16 rounded-full bg-[#C53030] hover:bg-[#C53030] transition-all shadow-lg flex items-center justify-center"
             title="Decline"
@@ -183,7 +183,7 @@ export function IncomingCallNotification() {
           </button>
 
           {/* Accept Button */}
-          <button
+          <button aria-label="Toggle camera"
             onClick={handleAccept}
             className="w-16 h-16 rounded-full bg-[#3DAA8A] hover:bg-[#2D8A70] transition-all shadow-lg flex items-center justify-center animate-pulse"
             title="Accept"

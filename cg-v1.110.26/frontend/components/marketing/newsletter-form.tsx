@@ -61,7 +61,7 @@ export function NewsletterForm({ source, className = '' }: NewsletterFormProps) 
   return (
     <div className={className}>
       <form className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto" onSubmit={handleSubmit}>
-        <input
+        <input aria-label="Email address"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}

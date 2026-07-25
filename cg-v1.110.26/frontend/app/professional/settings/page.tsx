@@ -714,7 +714,7 @@ function FirmTab({
               </div>
               <div className="space-y-1.5">
                 <Label className="text-xs text-slate-500">Type</Label>
-                <select value={firmDraft.type || ""} onChange={(e) => setFirmDraft({ ...firmDraft, type: e.target.value })}
+                <select aria-label="Firm type" value={firmDraft.type || ""} onChange={(e) => setFirmDraft({ ...firmDraft, type: e.target.value })}
                   className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm">
                   {Object.entries(FIRM_TYPE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                 </select>
@@ -800,11 +800,11 @@ function FirmTab({
               <div className="grid sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <Label className="text-xs text-slate-500">Email</Label>
-                  <Input value={inviteEmail} onChange={(e: any) => setInviteEmail(e.target.value)} placeholder="colleague@firm.com" className="border-slate-200" />
+                  <Input aria-label="Colleague email" value={inviteEmail} onChange={(e: any) => setInviteEmail(e.target.value)} placeholder="colleague@firm.com" className="border-slate-200" />
                 </div>
                 <div className="space-y-1">
                   <Label className="text-xs text-slate-500">Role</Label>
-                  <select value={inviteRole} onChange={(e) => setInviteRole(e.target.value)}
+                  <select aria-label="Role" value={inviteRole} onChange={(e) => setInviteRole(e.target.value)}
                     className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm">
                     {Object.entries(ROLE_LABELS).filter(([k]) => k !== "owner").map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                   </select>

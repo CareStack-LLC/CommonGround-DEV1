@@ -279,10 +279,10 @@ export default function NewIntakePage() {
             <label className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Client Link</label>
             <div className="flex items-center gap-2 mt-1.5">
               <Input value={createdSession.intake_link} readOnly className="font-mono text-xs border-slate-200 bg-slate-50" />
-              <Button variant="outline" size="icon" onClick={copyLink} className="h-9 w-9 rounded-lg shrink-0 border-slate-200">
+              <Button aria-label="Copy" variant="outline" size="icon" onClick={copyLink} className="h-9 w-9 rounded-lg shrink-0 border-slate-200">
                 <Copy className="h-3.5 w-3.5" />
               </Button>
-              <Button variant="outline" size="icon" onClick={() => window.open(createdSession.intake_link, "_blank")} className="h-9 w-9 rounded-lg shrink-0 border-slate-200">
+              <Button aria-label="Open link" variant="outline" size="icon" onClick={() => window.open(createdSession.intake_link, "_blank")} className="h-9 w-9 rounded-lg shrink-0 border-slate-200">
                 <ExternalLink className="h-3.5 w-3.5" />
               </Button>
             </div>
@@ -493,7 +493,7 @@ export default function NewIntakePage() {
         {/* Actions */}
         <div className="flex justify-end gap-3">
           <Button type="button" variant="outline" onClick={() => setStep(1)} className="rounded-xl border-slate-200">Back</Button>
-          <Button
+          <Button aria-label="Send message"
             type="submit"
             disabled={isSubmitting || !formData.client_name || !formData.client_email}
             className="bg-[#3DAA8A] hover:bg-[#2D8A6E] rounded-xl gap-2 min-w-[140px]"

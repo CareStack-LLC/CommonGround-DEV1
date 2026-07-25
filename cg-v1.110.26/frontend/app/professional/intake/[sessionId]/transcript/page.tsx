@@ -379,7 +379,7 @@ export default function IntakeTranscriptPage() {
                       >
                         <p className="text-sm whitespace-pre-wrap">{displayContent}</p>
                         {isLongMessage && (
-                          <Button
+                          <Button aria-label="Move up"
                             variant="ghost"
                             size="sm"
                             className="mt-2 text-xs print:hidden"

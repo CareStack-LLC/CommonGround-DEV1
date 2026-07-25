@@ -73,7 +73,7 @@ export function InlineNewsletterCta({
           <span className="font-semibold text-foreground text-sm">{headline}</span>
         </div>
         <form onSubmit={handleSubmit} className="flex gap-2">
-          <input
+          <input aria-label="Email address"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -104,7 +104,7 @@ export function InlineNewsletterCta({
         </h3>
         <p className="text-white/70 text-sm mb-5 max-w-md mx-auto">{subtext}</p>
         <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-          <input
+          <input aria-label="Email address"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -140,7 +140,7 @@ export function InlineNewsletterCta({
       </h3>
       <p className="text-gray-600 text-sm mb-5 max-w-md mx-auto">{subtext}</p>
       <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-        <input
+        <input aria-label="Email address"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}

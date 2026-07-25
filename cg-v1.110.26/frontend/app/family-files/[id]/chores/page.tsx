@@ -178,7 +178,7 @@ export default function ParentChoresPage() {
         <PageContainer background="transparent">
           {/* Header */}
           <div className="flex items-start gap-4 mb-8">
-            <button
+            <button aria-label="Back"
               onClick={() => router.push(`/family-files/${familyFileId}`)}
               className="w-10 h-10 rounded-lg hover:bg-muted flex items-center justify-center transition-colors mt-1"
             >

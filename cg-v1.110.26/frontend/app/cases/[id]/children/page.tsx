@@ -252,7 +252,7 @@ function ChildrenListContent() {
           </div>
 
           <div className="flex items-center gap-3">
-            <button
+            <button aria-label="Show"
               onClick={() => setShowArchived(!showArchived)}
               className={`cg-btn-secondary text-sm py-2 px-4 ${showArchived ? 'bg-muted' : ''}`}
             >

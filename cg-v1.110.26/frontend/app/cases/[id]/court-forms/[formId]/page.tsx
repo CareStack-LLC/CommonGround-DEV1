@@ -1194,7 +1194,7 @@ function CourtFormDetailContent() {
                   <Edit className="h-4 w-4 mr-2" />
                   Make Corrections
                 </Button>
-                <Button
+                <Button aria-label="Send message"
                   variant="outline"
                   onClick={handleResubmit}
                   disabled={isSubmitting}
@@ -1294,7 +1294,7 @@ function CourtFormDetailContent() {
                     <FileText className="h-4 w-4 mr-2" />
                     Preview Official FL-311 PDF
                   </Button>
-                  <Button
+                  <Button aria-label="Send message"
                     className="w-full bg-[#2D8A70] hover:bg-[#2D8A70]"
                     onClick={handleSubmit}
                     disabled={isSubmitting}
@@ -1398,7 +1398,7 @@ function CourtFormDetailContent() {
                     <FileText className="h-4 w-4 mr-2" />
                     Preview FL-300 Report
                   </Button>
-                  <Button
+                  <Button aria-label="Send message"
                     className="w-full bg-[#2D8A70] hover:bg-[#2D8A70]"
                     onClick={handleSubmit}
                     disabled={isSubmitting}
@@ -1499,7 +1499,7 @@ function CourtFormDetailContent() {
                     <FileText className="h-4 w-4 mr-2" />
                     Preview FL-320 Report
                   </Button>
-                  <Button
+                  <Button aria-label="Send message"
                     className="w-full bg-[#2D8A70] hover:bg-[#2D8A70]"
                     onClick={handleSubmit}
                     disabled={isSubmitting}
@@ -1587,7 +1587,7 @@ function CourtFormDetailContent() {
                     <FileText className="h-4 w-4 mr-2" />
                     Preview FL-340 Report
                   </Button>
-                  <Button
+                  <Button aria-label="Send message"
                     className="w-full bg-[#2D8A70] hover:bg-[#2D8A70]"
                     onClick={handleSubmit}
                     disabled={isSubmitting}
@@ -1679,7 +1679,7 @@ function CourtFormDetailContent() {
                     <FileText className="h-4 w-4 mr-2" />
                     Preview FL-341 Report
                   </Button>
-                  <Button
+                  <Button aria-label="Send message"
                     className="w-full bg-[#2D6A8F] hover:bg-[#1E4E6B]"
                     onClick={handleSubmit}
                     disabled={isSubmitting}
@@ -1771,7 +1771,7 @@ function CourtFormDetailContent() {
                     <FileText className="h-4 w-4 mr-2" />
                     Preview FL-342 Report
                   </Button>
-                  <Button
+                  <Button aria-label="Send message"
                     className="w-full bg-[#2D8A70] hover:bg-[#2D8A70]"
                     onClick={handleSubmit}
                     disabled={isSubmitting}

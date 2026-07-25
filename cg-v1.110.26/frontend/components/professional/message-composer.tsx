@@ -182,7 +182,7 @@ export function MessageComposer({
                             </DropdownMenuContent>
                         </DropdownMenu>
                         {onCancel && (
-                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onCancel}>
+                            <Button aria-label="Close" variant="ghost" size="icon" className="h-8 w-8" onClick={onCancel}>
                                 <X className="h-4 w-4" />
                             </Button>
                         )}
@@ -277,7 +277,7 @@ export function MessageComposer({
                             Discard
                         </Button>
                     )}
-                    <Button
+                    <Button aria-label="Send message"
                         className="bg-teal-600 hover:bg-teal-700 text-white min-w-[120px]"
                         size="sm"
                         onClick={handleSendMessage}

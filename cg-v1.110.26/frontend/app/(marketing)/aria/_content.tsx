@@ -785,7 +785,7 @@ export function ARIAContent() {
                         <button onClick={handleSendOriginal} className="flex items-center gap-1.5 bg-white/10 hover:bg-white/15 text-white/70 text-xs font-medium rounded-full px-4 py-2 transition-colors">
                           Send Original
                         </button>
-                        <button onClick={() => setPendingIntervention(null)} className="ml-auto text-white/30 hover:text-white/60 transition-colors">
+                        <button aria-label="Close" onClick={() => setPendingIntervention(null)} className="ml-auto text-white/30 hover:text-white/60 transition-colors">
                           <X className="w-4 h-4" />
                         </button>
                       </div>
@@ -808,7 +808,7 @@ export function ARIAContent() {
                       disabled={isLoading}
                       className="flex-1 bg-white/[0.06] border border-white/[0.08] rounded-full px-5 py-2.5 text-sm text-white placeholder:text-white/25 focus:outline-none focus:ring-1 focus:ring-[#3DAA8A]/40 focus:border-[#3DAA8A]/30 disabled:opacity-40 transition-all"
                     />
-                    <button
+                    <button aria-label="Send message"
                       onClick={handleSend}
                       disabled={!inputText.trim() || isLoading}
                       className="w-10 h-10 bg-[#3DAA8A] hover:bg-[#2D8A70] text-white rounded-full flex items-center justify-center transition-all disabled:opacity-20 disabled:cursor-not-allowed flex-shrink-0"

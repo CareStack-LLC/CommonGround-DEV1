@@ -454,7 +454,7 @@ export default function IntakePage() {
             disabled={sending}
             className="flex-1"
           />
-          <Button onClick={sendMessage} disabled={sending || !inputValue.trim()}>
+          <Button aria-label="Send message" onClick={sendMessage} disabled={sending || !inputValue.trim()}>
             {sending ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (

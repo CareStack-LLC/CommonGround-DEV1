@@ -104,7 +104,7 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
   return (
     <div className="min-h-screen bg-[#162D3A] text-[#D0E4EC]">
       <header className="sticky top-0 z-50 h-14 border-b border-[#2D6A8F]/20 bg-[#162D3A]/95 backdrop-blur-md flex items-center px-4 lg:px-6">
-        <button
+        <button aria-label="Open menu"
           onClick={() => setSidebarOpen(!sidebarOpen)}
           className="lg:hidden mr-3 p-1.5 rounded-lg hover:bg-[#2D6A8F]/20 transition-colors"
         >
@@ -154,7 +154,7 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
             <div className="text-xs font-medium text-[#D0E4EC]">{user.first_name} {user.last_name}</div>
             <div className="text-[11px] text-[#6B8A9A]">{user.email}</div>
           </div>
-          <button
+          <button aria-label="Log out"
             onClick={() => logout()}
             className="p-2 rounded-lg hover:bg-[#2D6A8F]/20 transition-colors text-[#8AACBC] hover:text-white"
             title="Sign out"

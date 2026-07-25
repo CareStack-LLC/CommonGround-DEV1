@@ -525,7 +525,7 @@ export default function UsersContent() {
                             : <UserCog className="w-3.5 h-3.5" />}
                         </button>
                       )}
-                      <button
+                      <button aria-label="Show"
                         onClick={() => router.push(`/superadmin/users/${user.id}`)}
                         title="Open detail"
                         className="p-1.5 rounded text-[#4A6E7F] hover:bg-[#2D6A8F]/30 hover:text-[#D0E4EC] transition-colors"
@@ -547,11 +547,11 @@ export default function UsersContent() {
               Showing {page * PAGE_SIZE + 1}\u2013{Math.min((page + 1) * PAGE_SIZE, data.total)} of {data.total}
             </span>
             <div className="flex items-center gap-1">
-              <button disabled={page === 0} onClick={() => setPage(page - 1)} className="p-1.5 rounded-lg hover:bg-[#2D6A8F]/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+              <button aria-label="Previous" disabled={page === 0} onClick={() => setPage(page - 1)} className="p-1.5 rounded-lg hover:bg-[#2D6A8F]/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
                 <ChevronLeft className="w-4 h-4" />
               </button>
               <span className="text-xs text-[#8AACBC] px-2">{page + 1} / {totalPages}</span>
-              <button disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)} className="p-1.5 rounded-lg hover:bg-[#2D6A8F]/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+              <button aria-label="Next" disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)} className="p-1.5 rounded-lg hover:bg-[#2D6A8F]/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>
@@ -575,7 +575,7 @@ export default function UsersContent() {
                 {bulkAction === 'reactivate' && `Reactivate ${selected.size} user${selected.size === 1 ? '' : 's'}`}
                 {bulkAction === 'tier' && `Change tier for ${selected.size} user${selected.size === 1 ? '' : 's'}`}
               </h3>
-              <button
+              <button aria-label="Close"
                 onClick={closeBulkModal}
                 className="p-1 rounded text-[#8AACBC] hover:bg-[#2D6A8F]/30 hover:text-white transition-colors"
               >

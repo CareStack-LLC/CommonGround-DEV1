@@ -473,7 +473,7 @@ export function MessageCompose({
                       </div>
                     </div>
                     {!attachment.uploading && !attachment.uploaded && (
-                      <button
+                      <button aria-label="Remove"
                         type="button"
                         onClick={() => removeAttachment(attachment.id)}
                         className="absolute top-1 right-1 p-1 bg-card border border-border rounded-full hover:bg-[#FEE2E2] hover:border-[#FCA5A5] transition-colors"
@@ -529,7 +529,7 @@ export function MessageCompose({
             {/* Attachment & Send Buttons */}
             <div className={`absolute bottom-3 right-3 flex gap-2 ${isAnalyzing ? 'opacity-0 pointer-events-none' : ''}`}>
               {/* Attachment Button */}
-              <button
+              <button aria-label="Attach file"
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isSending || isAnalyzing}
@@ -551,7 +551,7 @@ export function MessageCompose({
               </button>
 
               {/* Send Button */}
-              <button
+              <button aria-label="Send message"
                 type="button"
                 onClick={handleQuickSend}
                 disabled={(!message.trim() && attachments.length === 0) || isAnalyzing || isSending}

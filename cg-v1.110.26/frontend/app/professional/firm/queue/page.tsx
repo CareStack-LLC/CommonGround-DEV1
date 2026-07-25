@@ -218,7 +218,7 @@ export default function CaseQueuePage() {
             <div className="p-6 max-w-4xl mx-auto">
                 <div className="flex items-center gap-3 mb-6">
                     <Link href="/professional/firm">
-                        <Button variant="ghost" size="icon">
+                        <Button aria-label="Back" variant="ghost" size="icon">
                             <ArrowLeft className="h-5 w-5" />
                         </Button>
                     </Link>
@@ -249,7 +249,7 @@ export default function CaseQueuePage() {
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
                     <Link href="/professional/firm">
-                        <Button variant="ghost" size="icon">
+                        <Button aria-label="Back" variant="ghost" size="icon">
                             <ArrowLeft className="h-5 w-5" />
                         </Button>
                     </Link>
@@ -456,7 +456,7 @@ export default function CaseQueuePage() {
                                                     </SelectContent>
                                                 </Select>
 
-                                                <Button
+                                                <Button aria-label="Next"
                                                     size="sm"
                                                     onClick={() => handleAssign(item.id)}
                                                     disabled={!selectedMember[item.id] || assigning === item.id}

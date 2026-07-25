@@ -204,7 +204,7 @@ export default function EventSilentHandoffCheckIn({
                             <Navigation className="h-6 w-6 text-[#2D6A8F]" />
                             <h2 className="text-xl font-bold text-foreground">Silent Handoff Check-in</h2>
                         </div>
-                        <button
+                        <button aria-label="Close"
                             onClick={onClose}
                             className="text-muted-foreground hover:text-foreground"
                         >

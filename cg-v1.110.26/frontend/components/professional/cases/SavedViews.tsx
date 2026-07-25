@@ -150,7 +150,7 @@ export function SavedViews({ token, activeFilters, onApplyView, activeViewId }: 
                         {!view.id.startsWith("sys_") && (
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <button className="absolute -right-1 -top-1 p-0.5 bg-white border border-slate-200 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button aria-label="More options" className="absolute -right-1 -top-1 p-0.5 bg-white border border-slate-200 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
                                         <MoreHorizontal className="h-2.5 w-2.5 text-slate-500" />
                                     </button>
                                 </DropdownMenuTrigger>

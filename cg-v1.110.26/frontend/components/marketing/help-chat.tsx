@@ -300,7 +300,7 @@ export function HelpChat() {
         {/* Input area — pinned at bottom */}
         <div className="border-t border-gray-100 px-4 py-3 bg-white">
           <div className="flex gap-2">
-            <textarea
+            <textarea aria-label="Your question"
               ref={inputRef}
               value={input}
               onChange={handleInputChange}

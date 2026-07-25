@@ -260,7 +260,7 @@ function RulesTab() {
                   <td className="px-4 py-3 hidden md:table-cell text-[#6B8A9A] text-xs">{formatTime(r.last_evaluated_at)}</td>
                   <td className="px-4 py-3 text-right">
                     <div className="inline-flex items-center gap-1">
-                      <button
+                      <button aria-label="Play"
                         onClick={() => handleForceEvaluate(r.id)}
                         disabled={forcingId === r.id}
                         title="Force evaluation now"
@@ -268,14 +268,14 @@ function RulesTab() {
                       >
                         {forcingId === r.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5" />}
                       </button>
-                      <button
+                      <button aria-label="Edit"
                         onClick={() => setEditing(r)}
                         title="Edit"
                         className="p-1.5 rounded text-[#8AACBC] hover:bg-[#2D6A8F]/30 hover:text-white transition-colors"
                       >
                         <Edit3 className="w-3.5 h-3.5" />
                       </button>
-                      <button
+                      <button aria-label="Delete"
                         onClick={() => handleDelete(r.id, r.name)}
                         title="Delete"
                         className="p-1.5 rounded text-red-300 hover:bg-red-500/20 transition-colors"
@@ -372,7 +372,7 @@ function RuleModal({
           <h3 className="text-base font-semibold text-white">
             {rule ? 'Edit Alert Rule' : 'New Alert Rule'}
           </h3>
-          <button onClick={onClose} className="p-1 text-[#8AACBC] hover:text-white transition-colors">
+          <button aria-label="Close" onClick={onClose} className="p-1 text-[#8AACBC] hover:text-white transition-colors">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -624,7 +624,7 @@ function HistoryTab() {
                 Showing {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, total)} of {total}
               </span>
               <div className="flex items-center gap-1">
-                <button
+                <button aria-label="Previous"
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
                   className="p-1.5 rounded text-[#8AACBC] hover:text-white disabled:opacity-30"
@@ -632,7 +632,7 @@ function HistoryTab() {
                   <ChevronLeft className="w-4 h-4" />
                 </button>
                 <span className="text-xs text-[#D0E4EC] px-2">{page} / {totalPages}</span>
-                <button
+                <button aria-label="Next"
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page >= totalPages}
                   className="p-1.5 rounded text-[#8AACBC] hover:text-white disabled:opacity-30"

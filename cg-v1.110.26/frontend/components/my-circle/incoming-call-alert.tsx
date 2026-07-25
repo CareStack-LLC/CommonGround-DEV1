@@ -83,7 +83,7 @@ export default function IncomingCallAlert({
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in">
       <div className="bg-card rounded-3xl p-8 max-w-sm w-full shadow-2xl animate-in zoom-in-95">
         {/* Dismiss button */}
-        <button
+        <button aria-label="Close"
           onClick={onDismiss}
           className="absolute top-4 right-4 p-2 text-muted-foreground hover:text-foreground rounded-full hover:bg-muted"
         >

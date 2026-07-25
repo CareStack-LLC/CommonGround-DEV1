@@ -175,7 +175,7 @@ export function CSAgentChat({ onSend, onSearchUser, loading }: CSAgentChatProps)
             className="flex-1 bg-[#1E3A4A] border border-[#2D6A8F]/20 rounded-lg px-3 py-2 text-sm text-[#D0E4EC] placeholder-[#4A6E7F] outline-none focus:border-[#3DAA8A]/40"
             disabled={sending}
           />
-          <button
+          <button aria-label="Send message"
             onClick={handleSend}
             disabled={!input.trim() || sending}
             className="px-3 py-2 bg-[#3DAA8A] hover:bg-[#3DAA8A]/80 disabled:bg-[#3DAA8A]/30 disabled:cursor-not-allowed rounded-lg transition-colors"

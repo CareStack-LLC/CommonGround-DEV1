@@ -317,7 +317,7 @@ export function CallsReportsTab({ familyFileId, token }: { familyFileId: string,
                                             </div>
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
+                                                    <Button aria-label="More options" variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
                                                         <MoreVertical className="h-4 w-4" />
                                                     </Button>
                                                 </DropdownMenuTrigger>
@@ -381,7 +381,7 @@ export function CallsReportsTab({ familyFileId, token }: { familyFileId: string,
                                                     {report.status}
                                                 </Badge>
                                                 {report.status === 'completed' ? (
-                                                    <Button
+                                                    <Button aria-label="Download"
                                                         size="icon"
                                                         variant="ghost"
                                                         className="h-8 w-8 text-[#2D6A8F]"

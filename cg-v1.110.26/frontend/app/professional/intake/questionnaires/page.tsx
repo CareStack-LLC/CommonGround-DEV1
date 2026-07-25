@@ -460,7 +460,7 @@ export default function QuestionnaireBuilderPage() {
                                             >
                                                 {q.is_active ? "Published" : "Draft"}
                                             </Badge>
-                                            <Button
+                                            <Button aria-label="Edit"
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={(e) => {
@@ -736,7 +736,7 @@ export default function QuestionnaireBuilderPage() {
                                         />
                                     </div>
                                     <div className="flex items-center gap-1 self-end sm:self-auto">
-                                        <Button
+                                        <Button aria-label="Move up"
                                             variant="ghost"
                                             size="icon"
                                             className="h-7 w-7"
@@ -754,7 +754,7 @@ export default function QuestionnaireBuilderPage() {
                                         >
                                             <ChevronDown className="h-4 w-4" />
                                         </Button>
-                                        <Button
+                                        <Button aria-label="Delete"
                                             variant="ghost"
                                             size="icon"
                                             className="h-7 w-7 text-red-500 hover:text-red-700"
@@ -890,7 +890,7 @@ export default function QuestionnaireBuilderPage() {
                                                     className="bg-white text-sm text-muted-foreground"
                                                 />
                                             </div>
-                                            <Button
+                                            <Button aria-label="Delete"
                                                 variant="ghost"
                                                 size="icon"
                                                 className="h-7 w-7 text-red-400 hover:text-red-600 mt-1"

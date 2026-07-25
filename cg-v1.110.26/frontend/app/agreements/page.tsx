@@ -431,7 +431,7 @@ function BuilderChoiceModal({
         <div className="p-6 border-b-2 border-border">
           <div className="flex items-center gap-3">
             {step === 'builder' && (
-              <button
+              <button aria-label="Back"
                 onClick={() => { setStep('type'); setSelectedType(null); }}
                 className="p-2 rounded-lg hover:bg-muted transition-colors"
               >
@@ -858,7 +858,7 @@ function AgreementsListContent() {
                       {selectedFamilyFile.title}
                     </h2>
                     {activeTab === 'agreements' ? (
-                      <button
+                      <button aria-label="Add"
                         onClick={() => setShowBuilderChoice(true)}
                         disabled={isCreatingAgreement || !canCreateAgreement}
                         className={`

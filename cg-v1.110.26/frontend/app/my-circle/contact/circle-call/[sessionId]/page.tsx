@@ -389,7 +389,7 @@ function ContactCircleCallContent() {
         {/* Header */}
         <header className="bg-white/90 backdrop-blur-sm border-b border-teal-100/50 px-4 py-3 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <button
+            <button aria-label="Back"
               onClick={handleGoBack}
               className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-teal-50 rounded-lg"
             >
@@ -467,7 +467,7 @@ function ContactCircleCallContent() {
         <div className="bg-teal-600 px-4 py-4 shadow-lg">
           <div className="flex items-center justify-center space-x-4">
             {/* Audio Toggle */}
-            <button
+            <button aria-label="Toggle microphone"
               onClick={toggleAudio}
               disabled={!isCallJoined}
               className={`p-4 rounded-full transition-all transform hover:scale-105 ${isAudioOn
@@ -481,7 +481,7 @@ function ContactCircleCallContent() {
 
             {/* Video Toggle */}
             {callSession.callType === 'video' && (
-              <button
+              <button aria-label="Toggle camera"
                 onClick={toggleVideo}
                 disabled={!isCallJoined}
                 className={`p-4 rounded-full transition-all transform hover:scale-105 ${isVideoOn
@@ -495,7 +495,7 @@ function ContactCircleCallContent() {
             )}
 
             {/* End Call */}
-            <button
+            <button aria-label="End call"
               onClick={handleLeaveCall}
               className="p-4 rounded-full bg-red-600 hover:bg-red-700 text-white transition-all transform hover:scale-105"
               title="Leave Call"

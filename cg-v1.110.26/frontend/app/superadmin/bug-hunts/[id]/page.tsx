@@ -89,7 +89,7 @@ function CopyButton({ text }: { text: string }) {
     } catch { /* non-HTTPS */ }
   };
   return (
-    <button onClick={handleCopy} className="p-1 rounded hover:bg-[#2D6A8F]/20 transition-colors" title="Copy">
+    <button aria-label="Copy" onClick={handleCopy} className="p-1 rounded hover:bg-[#2D6A8F]/20 transition-colors" title="Copy">
       {copied ? <Check className="w-3 h-3 text-[#3DAA8A]" /> : <Copy className="w-3 h-3 text-[#6B8A9A]" />}
     </button>
   );
@@ -299,7 +299,7 @@ export default function BugHuntDetailPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <button
+          <button aria-label="Back"
             onClick={() => router.push('/superadmin/bug-hunts')}
             className="p-2 rounded-lg hover:bg-[#2D6A8F]/20 transition-colors text-[#8AACBC]"
           >
@@ -784,7 +784,7 @@ export default function BugHuntDetailPage() {
                     </div>
                   )}
                 </div>
-                <button
+                <button aria-label="Delete"
                   onClick={() => handleDeleteCheckItem(item.id)}
                   className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-500/10 text-[#4A6E7F] hover:text-red-400 transition-all"
                 >
@@ -804,7 +804,7 @@ export default function BugHuntDetailPage() {
               placeholder="Add checklist item..."
               className="flex-1 px-3 py-2 bg-[#1E3A4A] border border-[#2D6A8F]/30 rounded-lg text-white placeholder-[#4A6E7F] focus:outline-none focus:border-[#3DAA8A]/50 text-sm"
             />
-            <button
+            <button aria-label="Add"
               onClick={handleAddCheckItem}
               disabled={!newCheckItem.trim()}
               className="px-3 py-2 bg-[#3DAA8A]/20 text-[#3DAA8A] rounded-lg hover:bg-[#3DAA8A]/30 transition-colors disabled:opacity-50"

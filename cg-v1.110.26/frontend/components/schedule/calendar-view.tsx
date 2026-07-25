@@ -323,10 +323,10 @@ export default function CalendarView({
           <Button onClick={goToToday} variant="outline" size="sm" className="text-xs sm:text-sm">
             Today
           </Button>
-          <Button onClick={goToPrevious} variant="outline" size="sm">
+          <Button aria-label="Previous" onClick={goToPrevious} variant="outline" size="sm">
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <Button onClick={goToNext} variant="outline" size="sm">
+          <Button aria-label="Next" onClick={goToNext} variant="outline" size="sm">
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>

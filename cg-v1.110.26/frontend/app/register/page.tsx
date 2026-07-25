@@ -584,7 +584,7 @@ function RegisterContent() {
                   >
                     Back to Personal Info
                   </button>
-                  <button
+                  <button aria-label="Next"
                     onClick={handleSubmit}
                     disabled={isLoading || !selectedPlan}
                     className="flex-[2] py-3.5 px-6 rounded-xl bg-cg-sage hover:bg-cg-sage-dark text-white font-medium transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm hover:shadow-md"

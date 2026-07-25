@@ -203,7 +203,7 @@ export default function SwapRequestModal({
                             <ArrowLeftRight className="h-5 w-5 text-[var(--portal-primary)]" />
                             Request Schedule Swap
                         </h2>
-                        <button onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors">
+                        <button aria-label="Close" onClick={onClose} className="text-muted-foreground hover:text-foreground transition-colors">
                             <X className="h-6 w-6" />
                         </button>
                     </div>

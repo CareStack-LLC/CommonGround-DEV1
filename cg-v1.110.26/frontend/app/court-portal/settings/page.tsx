@@ -329,7 +329,7 @@ export default function CourtSettingsPage() {
         <Button variant="outline" onClick={() => router.back()}>
           Cancel
         </Button>
-        <Button
+        <Button aria-label="Refresh"
           onClick={handleSave}
           disabled={isSaving}
           className="bg-[#2D6A8F] hover:bg-[#1E4E6B]"

@@ -527,7 +527,7 @@ export default function AccountSettingsPage() {
                 <p className="text-xs text-[#E09520] font-semibold mt-1.5">{exportError}</p>
               )}
             </div>
-            <button
+            <button aria-label="Download"
               type="button"
               onClick={handleExport}
               disabled={exportStatus === 'working'}
@@ -653,7 +653,7 @@ export default function AccountSettingsPage() {
                     >
                       Cancel
                     </button>
-                    <button
+                    <button aria-label="Delete"
                       onClick={handleRequestDeletion}
                       disabled={deleteConfirmText !== 'DELETE' || deleteStatus === 'working'}
                       className="px-4 py-2.5 bg-[#E09520] hover:bg-[#E09520] text-white rounded-xl font-bold transition disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"

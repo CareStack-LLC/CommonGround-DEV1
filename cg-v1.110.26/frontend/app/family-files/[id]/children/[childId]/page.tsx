@@ -192,7 +192,7 @@ function SectionCard({
 
         {editMode ? (
           <div className="flex items-center gap-2">
-            <button
+            <button aria-label="Close"
               onClick={onCancel}
               disabled={isSaving}
               className="p-2 rounded-xl hover:bg-secondary text-muted-foreground transition-colors"
@@ -208,7 +208,7 @@ function SectionCard({
             </button>
           </div>
         ) : canEdit ? (
-          <button
+          <button aria-label="Edit"
             onClick={onEdit}
             className="p-2 rounded-xl hover:bg-cg-sage/10 text-muted-foreground hover:text-cg-sage transition-colors"
           >
@@ -1435,7 +1435,7 @@ function ChildProfileContent() {
                 <div key={index} className="p-4 bg-secondary/30 rounded-xl space-y-4">
                   <div className="flex items-center justify-between">
                     <span className="font-medium text-foreground">Contact {index + 1}</span>
-                    <button
+                    <button aria-label="Delete"
                       onClick={() => removeEmergencyContact(index)}
                       className="p-2 rounded-lg hover:bg-[#FEE2E2] text-muted-foreground hover:text-[#C53030] transition-colors"
                     >

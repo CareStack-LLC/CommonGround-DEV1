@@ -352,7 +352,7 @@ export default function VideoCall({
 
       {/* Controls */}
       <div className="bg-[#1E3A4A]/60 backdrop-blur-sm px-6 py-4 flex items-center justify-center space-x-3 border-t border-[#3DAA8A]/10">
-        <button
+        <button aria-label="Toggle microphone"
           onClick={toggleAudio}
           className={`p-4 rounded-full transition-all duration-200 ${
             isAudioOn
@@ -364,7 +364,7 @@ export default function VideoCall({
           {isAudioOn ? <Mic className="h-6 w-6" /> : <MicOff className="h-6 w-6" />}
         </button>
 
-        <button
+        <button aria-label="Toggle camera"
           onClick={toggleVideo}
           className={`p-4 rounded-full transition-all duration-200 ${
             isVideoOn
@@ -376,7 +376,7 @@ export default function VideoCall({
           {isVideoOn ? <Video className="h-6 w-6" /> : <VideoOff className="h-6 w-6" />}
         </button>
 
-        <button
+        <button aria-label="End call"
           onClick={leaveCall}
           className="p-4 rounded-full bg-red-500 hover:bg-red-600 text-white transition-all duration-200 hover:scale-105 shadow-lg shadow-red-500/25"
           title="Leave call"

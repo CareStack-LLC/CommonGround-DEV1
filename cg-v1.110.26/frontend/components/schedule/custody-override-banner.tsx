@@ -183,7 +183,7 @@ export default function CustodyOverrideBanner({ onRefresh }: CustodyOverrideBann
                 )}
               </div>
 
-              <button
+              <button aria-label="Close"
                 onClick={() => dismissEvent(event)}
                 className="text-[#F5A623] hover:text-[#E09520] shrink-0"
               >

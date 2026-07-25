@@ -318,12 +318,12 @@ export default function ActivityLogContent() {
                   {adminPage * PAGE_SIZE + 1}&ndash;{Math.min((adminPage + 1) * PAGE_SIZE, adminTotal)} of {adminTotal}
                 </span>
                 <div className="flex items-center gap-1">
-                  <button disabled={adminPage === 0} onClick={() => setAdminPage(adminPage - 1)}
+                  <button aria-label="Previous" disabled={adminPage === 0} onClick={() => setAdminPage(adminPage - 1)}
                     className="p-1.5 rounded-lg hover:bg-[#2D6A8F]/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
                     <ChevronLeft className="w-4 h-4" />
                   </button>
                   <span className="text-xs text-[#8AACBC] px-2">{adminPage + 1} / {adminTotalPages}</span>
-                  <button disabled={adminPage >= adminTotalPages - 1} onClick={() => setAdminPage(adminPage + 1)}
+                  <button aria-label="Next" disabled={adminPage >= adminTotalPages - 1} onClick={() => setAdminPage(adminPage + 1)}
                     className="p-1.5 rounded-lg hover:bg-[#2D6A8F]/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
                     <ChevronRight className="w-4 h-4" />
                   </button>
@@ -477,7 +477,7 @@ export default function ActivityLogContent() {
                     Showing {platformPage * PAGE_SIZE + 1}--{Math.min((platformPage + 1) * PAGE_SIZE, platformTotal)} of {platformTotal.toLocaleString()} events
                   </span>
                   <div className="flex items-center gap-1">
-                    <button
+                    <button aria-label="Previous"
                       onClick={() => setPlatformPage(Math.max(0, platformPage - 1))}
                       disabled={platformPage === 0}
                       className="p-1.5 rounded-lg hover:bg-[#2D6A8F]/30 text-[#8AACBC] hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
@@ -487,7 +487,7 @@ export default function ActivityLogContent() {
                     <span className="text-xs text-[#6B8A9A] px-2">
                       Page {platformPage + 1} of {platformTotalPages}
                     </span>
-                    <button
+                    <button aria-label="Next"
                       onClick={() => setPlatformPage(Math.min(platformTotalPages - 1, platformPage + 1))}
                       disabled={platformPage >= platformTotalPages - 1}
                       className="p-1.5 rounded-lg hover:bg-[#2D6A8F]/30 text-[#8AACBC] hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"

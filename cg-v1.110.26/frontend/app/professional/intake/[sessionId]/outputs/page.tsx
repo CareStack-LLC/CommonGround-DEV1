@@ -397,7 +397,7 @@ export default function IntakeOutputsPage() {
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-base">Case Overview</CardTitle>
-                    <Button
+                    <Button aria-label="Copy"
                       variant="ghost"
                       size="sm"
                       onClick={() => copyToClipboard(summary.case_overview)}

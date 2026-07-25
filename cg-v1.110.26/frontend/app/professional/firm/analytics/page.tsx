@@ -29,7 +29,7 @@ export default function FirmAnalyticsPage() {
         <div className="p-6 max-w-7xl mx-auto">
             <div className="flex items-center gap-4 mb-8">
                 <Link href="/professional/firm">
-                    <Button variant="ghost" size="icon">
+                    <Button aria-label="Back" variant="ghost" size="icon">
                         <ArrowLeft className="h-5 w-5" />
                     </Button>
                 </Link>

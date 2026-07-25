@@ -135,7 +135,7 @@ export default function GrantCodeManagementPage() {
                 <div className="flex items-center justify-between mb-12">
                     <div className="flex items-center gap-6">
                         <Link href={`/dashboard/partners/${partnerSlug}`}>
-                            <button className="h-12 w-12 rounded-full border border-gray-800 flex items-center justify-center hover:bg-gray-900 transition-colors">
+                            <button aria-label="Back" className="h-12 w-12 rounded-full border border-gray-800 flex items-center justify-center hover:bg-gray-900 transition-colors">
                                 <ArrowLeft className="h-5 w-5 text-gray-400" />
                             </button>
                         </Link>
@@ -220,7 +220,7 @@ export default function GrantCodeManagementPage() {
                                             </div>
                                             <div className="flex items-center gap-2">
                                                 {!code.is_activated && (
-                                                    <Button
+                                                    <Button aria-label="Copy"
                                                         size="sm"
                                                         variant="ghost"
                                                         onClick={() => copyCode(code.code)}

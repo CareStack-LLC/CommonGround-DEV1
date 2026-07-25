@@ -528,10 +528,10 @@ export default function MediaLibraryPage() {
                           </div>
                         )}
                         <div className="absolute top-2 right-2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button onClick={() => openMovieEdit(movie)} className="p-1.5 rounded-lg bg-black/60 text-white hover:bg-black/80 transition-colors">
+                          <button aria-label="Edit" onClick={() => openMovieEdit(movie)} className="p-1.5 rounded-lg bg-black/60 text-white hover:bg-black/80 transition-colors">
                             <Edit3 className="w-3.5 h-3.5" />
                           </button>
-                          <button onClick={() => handleDeleteMovie(movie.id)} className="p-1.5 rounded-lg bg-black/60 text-red-400 hover:bg-black/80 transition-colors">
+                          <button aria-label="Delete" onClick={() => handleDeleteMovie(movie.id)} className="p-1.5 rounded-lg bg-black/60 text-red-400 hover:bg-black/80 transition-colors">
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </div>
@@ -585,10 +585,10 @@ export default function MediaLibraryPage() {
                           </div>
                         )}
                         <div className="absolute top-2 right-2 flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button onClick={() => openBookEdit(book)} className="p-1.5 rounded-lg bg-black/60 text-white hover:bg-black/80 transition-colors">
+                          <button aria-label="Edit" onClick={() => openBookEdit(book)} className="p-1.5 rounded-lg bg-black/60 text-white hover:bg-black/80 transition-colors">
                             <Edit3 className="w-3.5 h-3.5" />
                           </button>
-                          <button onClick={() => handleDeleteBook(book.id)} className="p-1.5 rounded-lg bg-black/60 text-red-400 hover:bg-black/80 transition-colors">
+                          <button aria-label="Delete" onClick={() => handleDeleteBook(book.id)} className="p-1.5 rounded-lg bg-black/60 text-red-400 hover:bg-black/80 transition-colors">
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </div>
@@ -647,10 +647,10 @@ export default function MediaLibraryPage() {
                         <p className="text-xs text-[#6B8A9A] mt-0.5 line-clamp-1">{author.bio || 'No bio'}</p>
                       </div>
                       <div className="flex items-center gap-1 flex-shrink-0">
-                        <button onClick={() => openAuthorEdit(author)} className="p-1.5 rounded-lg hover:bg-[#2D6A8F]/20 text-[#6B8A9A] hover:text-[#D0E4EC] transition-colors">
+                        <button aria-label="Edit" onClick={() => openAuthorEdit(author)} className="p-1.5 rounded-lg hover:bg-[#2D6A8F]/20 text-[#6B8A9A] hover:text-[#D0E4EC] transition-colors">
                           <Edit3 className="w-3.5 h-3.5" />
                         </button>
-                        <button onClick={() => handleDeleteAuthor(author.id)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-[#6B8A9A] hover:text-red-400 transition-colors">
+                        <button aria-label="Delete" onClick={() => handleDeleteAuthor(author.id)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-[#6B8A9A] hover:text-red-400 transition-colors">
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
@@ -672,7 +672,7 @@ export default function MediaLibraryPage() {
           <div className="relative w-full max-w-2xl bg-zinc-900 border border-[#2D6A8F]/20 rounded-xl p-6 space-y-4 max-h-[85vh] overflow-y-auto">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-white">{editingMovie ? 'Edit Movie' : 'Add Movie'}</h2>
-              <button onClick={() => { setShowMovieModal(false); resetMovieForm(); }} className="text-[#6B8A9A] hover:text-[#D0E4EC]"><X className="w-5 h-5" /></button>
+              <button aria-label="Close" onClick={() => { setShowMovieModal(false); resetMovieForm(); }} className="text-[#6B8A9A] hover:text-[#D0E4EC]"><X className="w-5 h-5" /></button>
             </div>
 
             <div className="space-y-3">
@@ -743,7 +743,7 @@ export default function MediaLibraryPage() {
           <div className="relative w-full max-w-2xl bg-zinc-900 border border-[#2D6A8F]/20 rounded-xl p-6 space-y-4 max-h-[85vh] overflow-y-auto">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-white">{editingBook ? 'Edit Book' : 'Add Book'}</h2>
-              <button onClick={() => { setShowBookModal(false); resetBookForm(); }} className="text-[#6B8A9A] hover:text-[#D0E4EC]"><X className="w-5 h-5" /></button>
+              <button aria-label="Close" onClick={() => { setShowBookModal(false); resetBookForm(); }} className="text-[#6B8A9A] hover:text-[#D0E4EC]"><X className="w-5 h-5" /></button>
             </div>
 
             <div className="space-y-3">
@@ -818,7 +818,7 @@ export default function MediaLibraryPage() {
           <div className="relative w-full max-w-lg bg-zinc-900 border border-[#2D6A8F]/20 rounded-xl p-6 space-y-4 max-h-[85vh] overflow-y-auto">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-white">{editingAuthor ? 'Edit Author' : 'Add Author'}</h2>
-              <button onClick={() => { setShowAuthorModal(false); resetAuthorForm(); }} className="text-[#6B8A9A] hover:text-[#D0E4EC]"><X className="w-5 h-5" /></button>
+              <button aria-label="Close" onClick={() => { setShowAuthorModal(false); resetAuthorForm(); }} className="text-[#6B8A9A] hover:text-[#D0E4EC]"><X className="w-5 h-5" /></button>
             </div>
 
             <div className="space-y-3">

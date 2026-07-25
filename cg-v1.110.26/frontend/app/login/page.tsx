@@ -191,7 +191,7 @@ function LoginContent() {
               </div>
 
               {/* Submit Button */}
-              <button
+              <button aria-label="Next"
                 type="submit"
                 disabled={isLoading || oauthLoading}
                 className="w-full py-4 px-6 rounded-xl bg-[var(--portal-primary)] hover:bg-[#2D6A8F] text-white font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"

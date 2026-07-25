@@ -206,7 +206,7 @@ export function VerifyResultContent() {
                         <p className="text-sm font-mono text-foreground break-all">
                           {result.sha256_hash}
                         </p>
-                        <button
+                        <button aria-label="Copy"
                           onClick={copyHash}
                           className="shrink-0 p-1.5 rounded-md hover:bg-cg-mist transition-colors print:hidden"
                           title="Copy full hash"

@@ -351,7 +351,7 @@ function BuilderV2Content() {
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center gap-4">
-              <button
+              <button aria-label="Back"
                 onClick={() => router.push(`/agreements/${agreementId}`)}
                 className="p-2.5 rounded-xl bg-card border-2 border-border hover:border-[var(--portal-primary)]/30 hover:shadow-lg transition-all duration-300"
               >
@@ -977,7 +977,7 @@ function ParentingTimeForm({ data, onChange }: { data: any; onChange: (field: st
           <div key={idx} className="p-4 rounded-xl border-2 border-border bg-card mb-3">
             <div className="flex items-center justify-between mb-3">
               <span className="text-sm font-semibold text-muted-foreground">Holiday {idx + 1}</span>
-              <button
+              <button aria-label="Delete"
                 type="button"
                 onClick={() => {
                   const holidays = [...(data.holiday_schedule || [])];
@@ -1082,7 +1082,7 @@ function ParentingTimeForm({ data, onChange }: { data: any; onChange: (field: st
           <div key={idx} className="p-4 rounded-xl border-2 border-border bg-card mb-3">
             <div className="flex items-center justify-between mb-3">
               <span className="text-sm font-semibold text-muted-foreground">Activity {idx + 1}</span>
-              <button
+              <button aria-label="Delete"
                 type="button"
                 onClick={() => {
                   const activities = [...(data.recurring_activities || [])];

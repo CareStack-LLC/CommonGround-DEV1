@@ -727,7 +727,7 @@ export default function ChildDashboardPage() {
                         {call.status === 'missed' && <span className="text-red-400 ml-1">Missed</span>}
                       </p>
                     </div>
-                    <button
+                    <button aria-label="Toggle camera"
                       onClick={() => router.push(`/my-circle/child/my-circle-page`)}
                       className="w-10 h-10 rounded-full flex items-center justify-center hover:text-[#5BC4A0] transition-all"
                       style={{ background: 'var(--portal-surface-hover, var(--portal-surface))', color: 'var(--portal-muted)' }}
@@ -1014,7 +1014,7 @@ export default function ChildDashboardPage() {
             ) : (
               <>
                 <div className="flex items-center gap-3 mb-6">
-                  <button onClick={() => setEventStep('type')} className="text-slate-400 hover:text-white transition-colors">
+                  <button aria-label="Next" onClick={() => setEventStep('type')} className="text-slate-400 hover:text-white transition-colors">
                     <ChevronRight className="w-5 h-5 rotate-180" />
                   </button>
                   <h3 className="text-xl font-bold" style={{ fontFamily: 'var(--portal-font-heading)', color: 'var(--portal-text-heading)' }}>

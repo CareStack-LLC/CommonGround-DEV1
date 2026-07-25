@@ -550,7 +550,7 @@ function DashboardInner() {
               ) : (
                 <div className="space-y-1">
                   {(dashboard?.recent_signups || []).map((s) => (
-                    <div key={s.id} onClick={() => router.push(`/superadmin/users/${s.id}`)} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#2D6A8F]/15 cursor-pointer transition-colors">
+                    <div key={s.id} role="button" tabIndex={0} onClick={() => router.push(`/superadmin/users/${s.id}`)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); router.push(`/superadmin/users/${s.id}`); } }} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#2D6A8F]/15 cursor-pointer transition-colors">
                       <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#3DAA8A]/40 to-[#2D6A8F]/40 flex items-center justify-center text-xs font-medium text-[#5BC4A0]">
                         {s.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
                       </div>
@@ -953,7 +953,7 @@ function DashboardInner() {
                 <h3 className="text-base font-semibold text-white">Customize Dashboard</h3>
                 <p className="text-xs text-[#8AACBC] mt-0.5">Show, hide, or reorder glance-tab widgets.</p>
               </div>
-              <button
+              <button aria-label="Close"
                 onClick={() => setCustomizeOpen(false)}
                 className="p-1 text-[#8AACBC] hover:text-white transition-colors"
               >

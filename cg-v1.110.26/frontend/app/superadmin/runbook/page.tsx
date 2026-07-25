@@ -218,14 +218,14 @@ export default function RunbookPage() {
                     )}
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
-                    <button
+                    <button aria-label="Edit"
                       onClick={() => { setEditing(selected); setCreating(false); }}
                       title="Edit"
                       className="p-2 rounded text-[#8AACBC] hover:bg-[#2D6A8F]/30 hover:text-white transition-colors"
                     >
                       <Edit3 className="w-4 h-4" />
                     </button>
-                    <button
+                    <button aria-label="Delete"
                       onClick={() => handleDelete(selected)}
                       title="Delete"
                       className="p-2 rounded text-red-300 hover:bg-red-500/20 transition-colors"
@@ -378,7 +378,7 @@ function RunbookModal({
           <h3 className="text-base font-semibold text-white">
             {runbook ? 'Edit Runbook' : 'New Runbook'}
           </h3>
-          <button onClick={onClose} className="p-1 text-[#8AACBC] hover:text-white transition-colors">
+          <button aria-label="Close" onClick={onClose} className="p-1 text-[#8AACBC] hover:text-white transition-colors">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -464,7 +464,7 @@ function RunbookModal({
                     >
                       ↓
                     </button>
-                    <button
+                    <button aria-label="Delete"
                       onClick={() => removeStep(i)}
                       className="text-[11px] text-red-400 hover:text-red-300 transition-colors"
                     >

@@ -256,14 +256,14 @@ export default function CampaignsPage() {
         <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 flex items-center gap-3">
           <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0" />
           <p className="text-sm text-red-300 flex-1">{error}</p>
-          <button onClick={() => setError(null)} className="text-red-400 hover:text-red-300"><X className="w-4 h-4" /></button>
+          <button aria-label="Dismiss" onClick={() => setError(null)} className="text-red-400 hover:text-red-300"><X className="w-4 h-4" /></button>
         </div>
       )}
       {success && (
         <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 flex items-center gap-3">
           <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
           <p className="text-sm text-emerald-300 flex-1">{success}</p>
-          <button onClick={() => setSuccess(null)} className="text-emerald-400 hover:text-emerald-300"><X className="w-4 h-4" /></button>
+          <button aria-label="Dismiss" onClick={() => setSuccess(null)} className="text-emerald-400 hover:text-emerald-300"><X className="w-4 h-4" /></button>
         </div>
       )}
 
@@ -274,7 +274,7 @@ export default function CampaignsPage() {
             <h3 className="text-base font-semibold text-[#D0E4EC] flex items-center gap-2">
               <Plus className="w-5 h-5 text-[#3DAA8A]" /> Create New Campaign
             </h3>
-            <button onClick={() => setShowCreate(false)} className="text-[#6B8A9A] hover:text-[#D0E4EC]"><X className="w-5 h-5" /></button>
+            <button aria-label="Close" onClick={() => setShowCreate(false)} className="text-[#6B8A9A] hover:text-[#D0E4EC]"><X className="w-5 h-5" /></button>
           </div>
           <div className="space-y-4">
             <div>
@@ -310,7 +310,7 @@ export default function CampaignsPage() {
             <h3 className="text-base font-semibold text-[#5BC4A0] flex items-center gap-2">
               <Wand2 className="w-5 h-5" /> AI Content Generator
             </h3>
-            <button onClick={() => setAiCampaignId(null)} className="text-[#6B8A9A] hover:text-[#D0E4EC]"><X className="w-5 h-5" /></button>
+            <button aria-label="Close" onClick={() => setAiCampaignId(null)} className="text-[#6B8A9A] hover:text-[#D0E4EC]"><X className="w-5 h-5" /></button>
           </div>
           <p className="text-xs text-[#6B8A9A] mb-4">Configure the AI to generate a professionally designed HTML email tailored to your audience.</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -370,7 +370,7 @@ export default function CampaignsPage() {
                   </button>
                 </>
               )}
-              <button onClick={() => { setPreviewHtml(null); setPreviewCampaignId(null); }} className="text-[#6B8A9A] hover:text-[#D0E4EC]"><X className="w-4 h-4" /></button>
+              <button aria-label="Close" onClick={() => { setPreviewHtml(null); setPreviewCampaignId(null); }} className="text-[#6B8A9A] hover:text-[#D0E4EC]"><X className="w-4 h-4" /></button>
             </div>
           </div>
           <div className="bg-white rounded-b-xl p-6 max-h-[500px] overflow-y-auto">
@@ -442,7 +442,7 @@ export default function CampaignsPage() {
             return (
               <div key={c.id} className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl overflow-hidden hover:border-[#2D6A8F]/40 transition-colors">
                 {/* Main row */}
-                <div className="flex items-center gap-4 px-5 py-4 cursor-pointer" onClick={() => setExpandedId(isExpanded ? null : c.id)}>
+                <div role="button" tabIndex={0} aria-expanded={isExpanded} className="flex items-center gap-4 px-5 py-4 cursor-pointer" onClick={() => setExpandedId(isExpanded ? null : c.id)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setExpandedId(isExpanded ? null : c.id); } }}>
                   {/* Status icon */}
                   <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${status.bg}`}>
                     <StatusIcon className={`w-4 h-4 ${status.color}`} />
@@ -485,14 +485,14 @@ export default function CampaignsPage() {
                   {/* Actions */}
                   <div className="flex items-center gap-1" onClick={e => e.stopPropagation()}>
                     {c.html_content && (
-                      <button onClick={() => { setPreviewHtml(c.html_content!); setPreviewCampaignId(c.id); }} className="p-2 rounded-lg hover:bg-[#2D6A8F]/20 text-[#6B8A9A] hover:text-[#D0E4EC] transition-colors" title="Preview email">
+                      <button aria-label="Show" onClick={() => { setPreviewHtml(c.html_content!); setPreviewCampaignId(c.id); }} className="p-2 rounded-lg hover:bg-[#2D6A8F]/20 text-[#6B8A9A] hover:text-[#D0E4EC] transition-colors" title="Preview email">
                         <Eye className="w-4 h-4" />
                       </button>
                     )}
-                    <button onClick={() => setAiCampaignId(c.id)} className="p-2 rounded-lg hover:bg-[#3DAA8A]/10 text-[#6B8A9A] hover:text-[#3DAA8A] transition-colors" title="Generate content">
+                    <button aria-label="Generate" onClick={() => setAiCampaignId(c.id)} className="p-2 rounded-lg hover:bg-[#3DAA8A]/10 text-[#6B8A9A] hover:text-[#3DAA8A] transition-colors" title="Generate content">
                       <Wand2 className="w-4 h-4" />
                     </button>
-                    <button onClick={() => duplicateCampaign(c)} className="p-2 rounded-lg hover:bg-[#2D6A8F]/20 text-[#6B8A9A] hover:text-[#8AACBC] transition-colors" title="Duplicate">
+                    <button aria-label="Copy" onClick={() => duplicateCampaign(c)} className="p-2 rounded-lg hover:bg-[#2D6A8F]/20 text-[#6B8A9A] hover:text-[#8AACBC] transition-colors" title="Duplicate">
                       <Copy className="w-4 h-4" />
                     </button>
                     {c.status === 'draft' && c.html_content && (

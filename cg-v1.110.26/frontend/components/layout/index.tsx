@@ -573,7 +573,7 @@ export function ListItem({
   }
 
   return (
-    <div onClick={onClick} className={baseClasses}>
+    <div role="button" tabIndex={0} onClick={onClick} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick?.(); } }} className={baseClasses}>
       {content}
     </div>
   );

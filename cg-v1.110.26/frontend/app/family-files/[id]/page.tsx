@@ -523,7 +523,7 @@ function FamilyFileDetailContent() {
                 ) : (
                   <div className="flex items-center justify-between p-3 rounded-xl bg-muted border-2 border-border">
                     <span className="text-foreground font-medium">{familyFile?.title}</span>
-                    <button
+                    <button aria-label="Edit"
                       onClick={() => setIsEditingTitle(true)}
                       className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center transition-colors"
                     >
@@ -1165,7 +1165,7 @@ function FamilyFileDetailContent() {
                 </div>
                 <h2 className="text-xl font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Children</h2>
               </div>
-              <button className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center transition-colors">
+              <button aria-label="Add" className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center transition-colors">
                 <Plus className="h-4 w-4 text-muted-foreground" />
               </button>
             </div>
@@ -1308,7 +1308,7 @@ function FamilyFileDetailContent() {
               </div>
               <Dialog open={isInviteProfOpen} onOpenChange={setIsInviteProfOpen}>
                 <DialogTrigger asChild>
-                  <button className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center transition-colors">
+                  <button aria-label="Add" className="w-8 h-8 rounded-lg hover:bg-muted flex items-center justify-center transition-colors">
                     <Plus className="h-4 w-4 text-muted-foreground" />
                   </button>
                 </DialogTrigger>
@@ -1419,7 +1419,7 @@ function FamilyFileDetailContent() {
                         >
                           <CheckCircle2 className="h-4 w-4" />
                         </button>
-                        <button
+                        <button aria-label="Close"
                           className="h-7 w-7 p-0 text-[#C53030] hover:bg-[#FEE2E2] rounded transition-colors disabled:opacity-50"
                           onClick={() => handleDeclineRequest(request.id)}
                           disabled={isProcessingRequest === request.id}
@@ -1461,7 +1461,7 @@ function FamilyFileDetailContent() {
                           </div>
                         </div>
                       </div>
-                      <button
+                      <button aria-label="Close"
                         className="h-7 w-7 p-0 text-muted-foreground hover:text-[#C53030] opacity-0 group-hover:opacity-100 transition-all rounded disabled:opacity-50"
                         onClick={() => handleRevokeProfessionalAccess(prof.assignment_id)}
                         disabled={isRevokingAccess === prof.assignment_id}

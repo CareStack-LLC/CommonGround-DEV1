@@ -254,7 +254,7 @@ function ChildLoginContent() {
           <>
             {/* PIN Entry */}
             <div className="text-center mb-6">
-              <button
+              <button aria-label="Back"
                 onClick={() => {
                   setStep('username');
                   setPin('');
@@ -360,7 +360,7 @@ function ChildLoginContent() {
               >
                 0
               </button>
-              <button
+              <button aria-label="Backspace"
                 onClick={handlePinBackspace}
                 disabled={isLoading}
                 className="p-4 rounded-2xl transition-all duration-200 active:scale-95 flex items-center justify-center disabled:opacity-50"

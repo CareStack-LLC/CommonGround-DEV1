@@ -259,7 +259,7 @@ export default function CollectionsManager({
 
                 {/* Actions */}
                 <div className="flex items-center gap-2">
-                  <Button
+                  <Button aria-label="Edit"
                     size="sm"
                     variant="ghost"
                     onClick={(e) => {
@@ -271,7 +271,7 @@ export default function CollectionsManager({
                     <Edit2 className="h-4 w-4" />
                   </Button>
                   {!collection.is_default && (
-                    <Button
+                    <Button aria-label="Delete"
                       size="sm"
                       variant="ghost"
                       onClick={(e) => {

@@ -221,7 +221,7 @@ export default function ContributeModal({
                 </p>
               </div>
             </div>
-            <button
+            <button aria-label="Close"
               onClick={onClose}
               className="p-2 hover:bg-[#E0EFF8] dark:hover:bg-[#1E3A4A]/30 rounded-lg transition-colors"
             >

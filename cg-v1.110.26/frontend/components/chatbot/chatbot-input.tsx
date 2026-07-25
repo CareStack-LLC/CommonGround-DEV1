@@ -52,7 +52,7 @@ export function ChatbotInput({ onSend, disabled }: ChatbotInputProps) {
         rows={1}
         className="flex-1 resize-none border-0 bg-transparent text-sm text-gray-800 outline-none placeholder:text-gray-400 disabled:opacity-50 max-h-[100px]"
       />
-      <Button
+      <Button aria-label="Send message"
         size="icon"
         onClick={handleSend}
         disabled={disabled || !value.trim()}

@@ -142,14 +142,14 @@ export function ProfessionalInterestForm({
 
         {/* Name Fields */}
         <div className="grid sm:grid-cols-2 gap-3">
-          <input
+          <input aria-label="First name"
             type="text"
             value={formState.first_name}
             onChange={(e) => setFormState({ ...formState, first_name: e.target.value })}
             placeholder="First name"
             className="w-full px-4 py-3 rounded-lg border border-gray-200 bg-white text-foreground placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-cg-sage/50 focus:border-transparent"
           />
-          <input
+          <input aria-label="Last name"
             type="text"
             value={formState.last_name}
             onChange={(e) => setFormState({ ...formState, last_name: e.target.value })}
@@ -159,7 +159,7 @@ export function ProfessionalInterestForm({
         </div>
 
         {/* Email */}
-        <input
+        <input aria-label="Work email"
           type="email"
           value={formState.email}
           onChange={(e) => setFormState({ ...formState, email: e.target.value })}
@@ -169,7 +169,7 @@ export function ProfessionalInterestForm({
         />
 
         {/* Firm */}
-        <input
+        <input aria-label="Firm or organization"
           type="text"
           value={formState.firm_name}
           onChange={(e) => setFormState({ ...formState, firm_name: e.target.value })}

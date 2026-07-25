@@ -143,7 +143,7 @@ export function ARIAIntervention({
           </div>
 
           {/* Close Button */}
-          <button
+          <button aria-label="Close"
             onClick={onCancel}
             className="p-2 rounded-xl hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
           >

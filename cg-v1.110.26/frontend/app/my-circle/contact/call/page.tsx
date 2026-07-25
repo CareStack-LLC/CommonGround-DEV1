@@ -479,7 +479,7 @@ function CircleContactCallContent() {
         {/* Header - Desktop */}
         <header className="hidden md:flex bg-[#0D1B24]/90 backdrop-blur-sm border-b border-[#3DAA8A]/10 px-4 py-2 items-center justify-between">
           <div className="flex items-center space-x-3">
-            <button
+            <button aria-label="Back"
               onClick={handleGoBack}
               className="p-1.5 text-[#CBD8E0]/60 hover:text-[#3DAA8A] hover:bg-[#1E3A4A] rounded-lg transition-colors"
             >
@@ -549,7 +549,7 @@ function CircleContactCallContent() {
                 )}
 
                 {/* Mobile back button */}
-                <button
+                <button aria-label="Back"
                   onClick={handleGoBack}
                   className="absolute top-4 left-4 z-10 p-2 bg-[#0D1B24]/80 backdrop-blur-sm text-white rounded-full border border-[#3DAA8A]/20"
                 >
@@ -583,7 +583,7 @@ function CircleContactCallContent() {
         <div className="bg-[#0D1B24] px-4 py-4 absolute md:relative bottom-0 left-0 right-0 safe-area-bottom border-t border-[#3DAA8A]/10">
           <div className="flex items-center justify-center space-x-3 md:space-x-4">
             {/* Audio Toggle */}
-            <button
+            <button aria-label="Toggle microphone"
               onClick={toggleAudio}
               disabled={!isCallJoined}
               className={`p-4 rounded-full transition-all transform hover:scale-105 ${
@@ -597,7 +597,7 @@ function CircleContactCallContent() {
             </button>
 
             {/* Video Toggle */}
-            <button
+            <button aria-label="Toggle camera"
               onClick={toggleVideo}
               disabled={!isCallJoined}
               className={`p-4 rounded-full transition-all transform hover:scale-105 ${
@@ -611,7 +611,7 @@ function CircleContactCallContent() {
             </button>
 
             {/* End Call */}
-            <button
+            <button aria-label="End call"
               onClick={handleLeaveCall}
               className="p-4 rounded-full bg-red-500 hover:bg-red-600 text-white transition-all transform hover:scale-105 shadow-lg shadow-red-500/25"
               title="Leave Call"
@@ -623,7 +623,7 @@ function CircleContactCallContent() {
             <div className="hidden md:block w-px h-10 bg-[#3DAA8A]/20" />
 
             {/* Chat Toggle - Desktop only */}
-            <button
+            <button aria-label="Open chat"
               onClick={() => setActivePanel(activePanel === 'chat' ? null : 'chat')}
               className={`hidden md:flex p-3 rounded-full transition-all ${
                 activePanel === 'chat'
@@ -649,7 +649,7 @@ function CircleContactCallContent() {
             </button>
 
             {/* Theater Mode */}
-            <button
+            <button aria-label="Theater mode"
               onClick={() => setIsTheaterMode(true)}
               disabled={!isCallJoined}
               className={`p-4 md:p-3 rounded-full transition-all transform hover:scale-105 ${
@@ -710,7 +710,7 @@ function CircleContactCallContent() {
                       className="flex-1 bg-[#1E3A4A]/60 text-white rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/50 border border-[#3DAA8A]/10 placeholder-[#CBD8E0]/30"
                       style={{ fontFamily: "'Inter', sans-serif" }}
                     />
-                    <button
+                    <button aria-label="Send message"
                       onClick={handleSendMessage}
                       disabled={!newMessage.trim()}
                       className="p-2 bg-[#3DAA8A] hover:bg-[#3DAA8A]/90 text-white rounded-xl disabled:opacity-50 transition-colors"

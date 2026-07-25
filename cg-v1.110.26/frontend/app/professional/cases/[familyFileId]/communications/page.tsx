@@ -744,7 +744,7 @@ export default function CommunicationsPage() {
                               onOpenChange={() => toggleMessageExpand(message.id)}
                             >
                               <CollapsibleTrigger asChild>
-                                <Button variant="ghost" size="sm" className="mt-2 text-xs">
+                                <Button aria-label="Move up" variant="ghost" size="sm" className="mt-2 text-xs">
                                   {expandedMessages.has(message.id) ? (
                                     <>
                                       <ChevronUp className="h-3 w-3 mr-1" />

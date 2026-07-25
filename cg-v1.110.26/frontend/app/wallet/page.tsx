@@ -238,7 +238,7 @@ function WalletContent() {
                   Wallet setup complete! You can now receive payments and manage funds.
                 </p>
               </div>
-              <button
+              <button aria-label="Close"
                 onClick={() => setShowOnboardingSuccess(false)}
                 className="text-[#2D8A70] hover:text-[#1E3A4A] transition-colors"
               >
@@ -282,7 +282,7 @@ function WalletContent() {
           <div className="flex items-center gap-3 p-4 bg-[#FEE2E2] dark:bg-[#7A2222]/30 border-2 border-[#FEE2E2] dark:border-[#9B2C2C] rounded-2xl shadow-lg">
             <AlertCircle className="h-5 w-5 text-[#C53030] dark:text-[#E06B6B] flex-shrink-0" />
             <p className="text-sm text-[#9B2C2C] dark:text-[#FCA5A5] flex-1 font-medium">{error}</p>
-            <button onClick={() => setError(null)} className="hover:bg-[#FEE2E2] dark:hover:bg-[#7A2222]/30 p-1 rounded-lg transition-colors">
+            <button aria-label="Dismiss" onClick={() => setError(null)} className="hover:bg-[#FEE2E2] dark:hover:bg-[#7A2222]/30 p-1 rounded-lg transition-colors">
               <X className="h-4 w-4 text-[#C53030] dark:text-[#E06B6B]" />
             </button>
           </div>
@@ -535,7 +535,7 @@ function WalletContent() {
             <div className="p-6 border-b-2 border-border bg-gradient-to-r from-muted/50 to-card">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Add Funds</h2>
-                <button
+                <button aria-label="Close"
                   onClick={() => setShowDepositModal(false)}
                   className="p-2 hover:bg-muted rounded-xl transition-all duration-300"
                 >

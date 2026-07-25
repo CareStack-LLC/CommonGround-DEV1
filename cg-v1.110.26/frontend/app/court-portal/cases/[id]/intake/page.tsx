@@ -310,7 +310,7 @@ export default function IntakeManagementPage() {
                   </Alert>
                   <div className="flex gap-2">
                     <Input value={newSessionLink} readOnly className="text-sm" />
-                    <Button size="sm" onClick={() => copyLink(newSessionLink)}>
+                    <Button aria-label="Copy" size="sm" onClick={() => copyLink(newSessionLink)}>
                       <Copy className="h-4 w-4" />
                     </Button>
                   </div>
@@ -327,7 +327,7 @@ export default function IntakeManagementPage() {
                   </Button>
                 </div>
               ) : (
-                <Button
+                <Button aria-label="Send message"
                   onClick={createSession}
                   disabled={!selectedParent || selectedForms.length === 0 || creating}
                   className="w-full"

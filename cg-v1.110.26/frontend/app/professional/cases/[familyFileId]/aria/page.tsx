@@ -887,7 +887,7 @@ export default function ARIAControlPage() {
                     AI-powered communication analysis with V2 Sentinel Shield enrichment
                   </CardDescription>
                 </div>
-                <Button
+                <Button aria-label="Refresh"
                   size="sm"
                   onClick={runNewAnalysis}
                   disabled={isAnalyzing}

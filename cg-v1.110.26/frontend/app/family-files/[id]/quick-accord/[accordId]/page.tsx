@@ -275,7 +275,7 @@ function QuickAccordDetailContent() {
       {/* Header - Mobile optimized */}
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
         <div className="flex items-start gap-3">
-          <Button variant="ghost" size="icon" className="flex-shrink-0 -ml-2" onClick={() => router.push(`/family-files/${familyFileId}`)}>
+          <Button aria-label="Back" variant="ghost" size="icon" className="flex-shrink-0 -ml-2" onClick={() => router.push(`/family-files/${familyFileId}`)}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="min-w-0 flex-1">

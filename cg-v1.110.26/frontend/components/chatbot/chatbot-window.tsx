@@ -47,7 +47,7 @@ export function ChatbotWindow({
           >
             <Mail className="h-4 w-4" />
           </Button>
-          <Button
+          <Button aria-label="Close"
             variant="ghost"
             size="icon"
             onClick={onClose}

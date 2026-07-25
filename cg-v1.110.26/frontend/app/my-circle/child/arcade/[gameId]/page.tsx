@@ -65,7 +65,7 @@ export default function GamePlayPage() {
       {/* Floating back header */}
       <header className="sticky top-0 z-50 backdrop-blur-lg" style={{ background: 'var(--portal-background)', borderBottom: '1px solid var(--portal-border)' }}>
         <div className="px-4 py-3 flex items-center gap-3">
-          <button
+          <button aria-label="Back"
             onClick={() => router.push('/my-circle/child/arcade')}
             className="w-9 h-9 rounded-xl flex items-center justify-center transition-colors"
             style={{ background: 'var(--portal-surface)', color: 'var(--portal-text-heading)' }}

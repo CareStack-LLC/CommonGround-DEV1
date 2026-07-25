@@ -41,7 +41,7 @@ function CopyBtn({ text }: { text: string }) {
     } catch { /* non-HTTPS or clipboard unavailable */ }
   };
   return (
-    <button onClick={handleCopy} className="p-1 rounded hover:bg-gray-100 transition-colors">
+    <button aria-label="Copy" onClick={handleCopy} className="p-1 rounded hover:bg-gray-100 transition-colors">
       {copied ? <Check className="w-3.5 h-3.5 text-teal-600" /> : <Copy className="w-3.5 h-3.5 text-gray-400" />}
     </button>
   );
@@ -336,7 +336,7 @@ export default function TesterPage() {
                       {screenshots.map((src, i) => (
                         <div key={i} className="relative w-20 h-20 rounded-lg overflow-hidden border border-gray-200">
                           <img src={src} alt={`Screenshot ${i + 1}`} className="w-full h-full object-cover" />
-                          <button
+                          <button aria-label="Close"
                             onClick={() => setScreenshots(prev => prev.filter((_, idx) => idx !== i))}
                             className="absolute top-0.5 right-0.5 w-5 h-5 bg-[#C53030] text-white rounded-full flex items-center justify-center"
                           >

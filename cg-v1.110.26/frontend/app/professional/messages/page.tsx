@@ -356,7 +356,7 @@ export default function MessagesPage() {
                 <div className="flex items-center gap-1 shrink-0">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
+                      <Button aria-label="More options" variant="ghost" size="icon" className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
                         <MoreVertical className="h-4 w-4 text-slate-400" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -525,7 +525,7 @@ function ComposeDialog({
           <Button variant="outline" onClick={onClose} className="rounded-xl border-slate-200">
             Cancel
           </Button>
-          <Button
+          <Button aria-label="Send message"
             onClick={handleSend}
             disabled={!content.trim() || !selectedCaseId || isSending}
             className="bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm font-semibold"

@@ -117,7 +117,7 @@ export default function CourtEventDetails({
               </p>
             </div>
           </div>
-          <Button variant="ghost" size="sm" onClick={onClose}>
+          <Button aria-label="Close" variant="ghost" size="sm" onClick={onClose}>
             <X className="h-5 w-5" />
           </Button>
         </CardHeader>

@@ -246,7 +246,7 @@ function PayObligationModalInner({
                 </p>
               </div>
             </div>
-            <button
+            <button aria-label="Close"
               onClick={onClose}
               className="p-2 hover:bg-muted rounded-lg transition-colors"
             >

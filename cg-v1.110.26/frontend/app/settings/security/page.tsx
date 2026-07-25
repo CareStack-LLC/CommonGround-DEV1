@@ -348,7 +348,7 @@ export default function SecuritySettingsPage() {
                   onChange={handlePasswordChange}
                   placeholder="Enter your current password"
                 />
-                <button
+                <button aria-label="Show"
                   type="button"
                   onClick={() => setShowCurrentPassword(!showCurrentPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
@@ -373,7 +373,7 @@ export default function SecuritySettingsPage() {
                   onChange={handlePasswordChange}
                   placeholder="Enter your new password"
                 />
-                <button
+                <button aria-label="Show"
                   type="button"
                   onClick={() => setShowNewPassword(!showNewPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"

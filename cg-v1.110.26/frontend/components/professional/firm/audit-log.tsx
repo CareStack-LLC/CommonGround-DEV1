@@ -223,7 +223,7 @@ export function FirmAuditLog({ firmId, token }: AuditLogProps) {
                         <Download className="h-3.5 w-3.5 mr-1.5" />
                         Export CSV
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={fetchEvents} className="h-8">
+                    <Button aria-label="Refresh" variant="ghost" size="sm" onClick={fetchEvents} className="h-8">
                         <RefreshCw className="h-3.5 w-3.5" />
                     </Button>
                 </div>

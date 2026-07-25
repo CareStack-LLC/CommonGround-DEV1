@@ -403,7 +403,7 @@ function MyCircleContent({ params }: PageParams) {
           <div className="space-y-8">
             {/* Page Header */}
             <div className="flex items-start gap-4">
-              <button
+              <button aria-label="Back"
                 onClick={() => router.back()}
                 className="w-10 h-10 rounded-lg hover:bg-muted flex items-center justify-center transition-colors mt-1"
               >
@@ -427,7 +427,7 @@ function MyCircleContent({ params }: PageParams) {
                     <X className="h-5 w-5 text-[#C53030]" />
                   </div>
                   <p className="text-[#9B2C2C] font-medium flex-1">{error}</p>
-                  <button
+                  <button aria-label="Dismiss"
                     onClick={() => setError(null)}
                     className="text-[#C53030] hover:text-[#9B2C2C]"
                   >
@@ -697,7 +697,7 @@ function MyCircleContent({ params }: PageParams) {
                             </button>
 
                             {/* Edit Contact Details */}
-                            <button
+                            <button aria-label="Edit"
                               onClick={() => openEditContactModal(contact)}
                               className="p-2 text-[#F5A623] bg-[#F5A623]/10 hover:bg-[#F5A623]/20 rounded-lg transition-colors"
                               title="Edit contact name & photo"
@@ -805,7 +805,7 @@ function MyCircleContent({ params }: PageParams) {
                         readOnly
                         className="flex-1 px-3 py-2 bg-background border border-border rounded-lg text-sm"
                       />
-                      <button
+                      <button aria-label="Copy"
                         onClick={() => copyInviteLink(inviteSuccess.token)}
                         className="px-3 py-2 bg-cg-sage text-white rounded-lg hover:bg-cg-sage/90"
                       >
@@ -831,7 +831,7 @@ function MyCircleContent({ params }: PageParams) {
                 <>
                   <div className="flex items-center justify-between mb-6">
                     <h2 className="text-xl font-bold text-foreground">Invite to Circle</h2>
-                    <button
+                    <button aria-label="Close"
                       onClick={() => setShowInviteModal(false)}
                       className="p-1 text-muted-foreground hover:text-foreground"
                     >
@@ -940,7 +940,7 @@ function MyCircleContent({ params }: PageParams) {
             <div className="bg-card border-2 border-border rounded-2xl shadow-2xl w-full max-w-md p-6">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Edit Contact</h3>
-                <button onClick={() => setShowEditContactModal(false)} className="p-1 hover:bg-muted rounded-lg"><X className="h-5 w-5 text-muted-foreground" /></button>
+                <button aria-label="Close" onClick={() => setShowEditContactModal(false)} className="p-1 hover:bg-muted rounded-lg"><X className="h-5 w-5 text-muted-foreground" /></button>
               </div>
 
               {/* Photo Upload */}
@@ -1029,7 +1029,7 @@ function MyCircleContent({ params }: PageParams) {
             <div className="bg-card rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-xl">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-foreground">Edit Permissions</h2>
-                <button
+                <button aria-label="Close"
                   onClick={() => setShowPermissionModal(false)}
                   className="p-1 text-muted-foreground hover:text-foreground"
                 >
@@ -1147,7 +1147,7 @@ function MyCircleContent({ params }: PageParams) {
             <div className="bg-card rounded-2xl p-6 max-w-md w-full shadow-xl">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-foreground">Setup Child Account</h2>
-                <button
+                <button aria-label="Close"
                   onClick={() => setShowChildSetupModal(false)}
                   className="p-1 text-muted-foreground hover:text-foreground"
                 >

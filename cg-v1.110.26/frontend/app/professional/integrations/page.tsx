@@ -219,7 +219,7 @@ export default function IntegrationsPage() {
                     <span>Est. {integration.estimatedLaunch}</span>
                   </div>
                 )}
-                <Button
+                <Button aria-label="Notifications"
                   variant={notifyRequests.has(integration.id) ? "outline" : "default"}
                   size="sm"
                   onClick={() => handleNotifyMe(integration.id)}

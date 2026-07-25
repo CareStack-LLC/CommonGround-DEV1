@@ -707,7 +707,7 @@ function ParentCallContent() {
           <div className="max-w-lg mx-auto pt-8">
             {/* Header */}
             <div className="flex items-center gap-4 mb-8">
-              <button
+              <button aria-label="Back"
                 onClick={() => router.push('/messages')}
                 className="p-2.5 rounded-xl bg-card border-2 border-border hover:border-[#3DAA8A]/30 hover:shadow-lg transition-all duration-300"
               >
@@ -758,7 +758,7 @@ function ParentCallContent() {
           <div className="max-w-lg mx-auto pt-8">
             {/* Header */}
             <div className="flex items-center gap-4 mb-8">
-              <button
+              <button aria-label="Back"
                 onClick={() => router.push('/messages')}
                 className="p-2.5 rounded-xl bg-card border-2 border-border hover:border-[#3DAA8A]/30 hover:shadow-lg transition-all duration-300"
               >
@@ -819,7 +819,7 @@ function ParentCallContent() {
           <div className="max-w-lg mx-auto pt-8">
             {/* Header */}
             <div className="flex items-center gap-4 mb-8">
-              <button
+              <button aria-label="Back"
                 onClick={() => router.push('/messages')}
                 className="p-2.5 rounded-xl bg-card border-2 border-border hover:border-[#3DAA8A]/30 hover:shadow-lg transition-all duration-300"
               >
@@ -879,7 +879,7 @@ function ParentCallContent() {
           <div className="max-w-lg mx-auto pt-8">
             {/* Header */}
             <div className="flex items-center gap-4 mb-8">
-              <button
+              <button aria-label="Back"
                 onClick={() => router.push('/messages')}
                 className="p-2.5 rounded-xl bg-card border-2 border-border hover:border-[#3DAA8A]/30 hover:shadow-lg transition-all duration-300"
               >
@@ -1141,7 +1141,7 @@ function ParentCallContent() {
           {/* Control Buttons */}
           <div className="flex justify-center items-center gap-5">
             {/* Audio Toggle */}
-            <button
+            <button aria-label="Toggle microphone"
               onClick={toggleAudio}
               className={`w-14 h-14 md:w-16 md:h-16 rounded-full transition-all shadow-lg flex items-center justify-center ${
                 isAudioOn
@@ -1158,7 +1158,7 @@ function ParentCallContent() {
             </button>
 
             {/* End Call */}
-            <button
+            <button aria-label="End call"
               onClick={handleEndCall}
               className="w-16 h-16 md:w-18 md:h-18 rounded-full bg-[#C53030] hover:bg-[#C53030] transition-all shadow-xl flex items-center justify-center border-2 border-[#E06B6B]"
               title="End call"
@@ -1168,7 +1168,7 @@ function ParentCallContent() {
 
             {/* Video Toggle - Only show for video calls */}
             {callType === 'video' && (
-              <button
+              <button aria-label="Toggle camera"
                 onClick={toggleVideo}
                 className={`w-14 h-14 md:w-16 md:h-16 rounded-full transition-all shadow-lg flex items-center justify-center ${
                   isVideoOn

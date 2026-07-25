@@ -232,7 +232,7 @@ export default function QRConfirmation({
               <QrCode className="h-6 w-6 text-[#2D6A8F]" />
               <h2 className="text-xl font-bold text-foreground">QR Confirmation</h2>
             </div>
-            <button
+            <button aria-label="Close"
               onClick={onClose}
               className="text-muted-foreground hover:text-foreground"
             >
@@ -299,7 +299,7 @@ export default function QRConfirmation({
                 <code className="px-3 py-2 bg-secondary rounded text-sm font-mono break-all">
                   {qrToken.token.substring(0, 20)}...
                 </code>
-                <Button
+                <Button aria-label="Copy"
                   variant="outline"
                   size="sm"
                   onClick={copyToken}

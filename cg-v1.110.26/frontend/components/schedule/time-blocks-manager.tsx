@@ -478,7 +478,7 @@ export default function TimeBlocksManager({
 
                 {/* Actions */}
                 <div className="flex items-center gap-2">
-                  <Button
+                  <Button aria-label="Edit"
                     size="sm"
                     variant="ghost"
                     onClick={() => handleEdit(block)}
@@ -486,7 +486,7 @@ export default function TimeBlocksManager({
                   >
                     <Edit2 className="h-4 w-4" />
                   </Button>
-                  <Button
+                  <Button aria-label="Delete"
                     size="sm"
                     variant="ghost"
                     onClick={() => handleDelete(block.id)}

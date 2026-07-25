@@ -333,7 +333,7 @@ export default function FL342Wizard({
                 <div key={index} className="p-4 bg-gray-50 rounded-lg border">
                   <div className="flex items-center justify-between mb-3">
                     <span className="font-medium">Child {index + 1}</span>
-                    <Button
+                    <Button aria-label="Delete"
                       variant="ghost"
                       size="sm"
                       onClick={() => removeChild(index)}
@@ -1320,7 +1320,7 @@ export default function FL342Wizard({
               <ArrowRight className="h-4 w-4 ml-2" />
             </Button>
           ) : (
-            <Button
+            <Button aria-label="Send message"
               onClick={handleSubmit}
               disabled={isLoading}
               className="bg-[#2D8A70] hover:bg-[#2D8A70]"

@@ -181,7 +181,7 @@ export function ReportsTab({ familyFileId, token }: { familyFileId: string, toke
                                             {report.status}
                                         </Badge>
                                         {report.status === 'completed' ? (
-                                            <Button
+                                            <Button aria-label="Download"
                                                 size="icon"
                                                 variant="ghost"
                                                 className="h-8 w-8 text-[#2D6A8F]"

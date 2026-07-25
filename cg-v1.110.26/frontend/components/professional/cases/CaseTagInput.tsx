@@ -153,7 +153,7 @@ export function CaseTagInput({ caseId, token, allTags = [], onChange, compact = 
                     >
                         {tag}
                         {!compact && (
-                            <button
+                            <button aria-label="Remove"
                                 onClick={(e) => { e.stopPropagation(); removeTag(tag); }}
                                 className="hover:text-[#C53030] transition-colors"
                             >

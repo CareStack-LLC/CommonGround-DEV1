@@ -925,7 +925,7 @@ function AIAdvisorTab() {
         <p className="text-xs text-[#6B8A9A] mb-4 max-w-md mx-auto">
           Analyze your sales data to generate actionable insights, identify opportunities, and surface risks.
         </p>
-        <button
+        <button aria-label="Refresh"
           onClick={generateInsights}
           disabled={loading}
           className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors disabled:opacity-50"

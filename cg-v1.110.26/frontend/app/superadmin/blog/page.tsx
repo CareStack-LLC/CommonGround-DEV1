@@ -454,7 +454,7 @@ export default function BlogPage() {
               <h2 className="text-lg font-semibold text-white">
                 {editingPost ? 'Edit Post' : 'Create New Post'}
               </h2>
-              <button onClick={() => { setShowModal(false); resetForm(); }} className="text-[#6B8A9A] hover:text-[#D0E4EC] transition-colors">
+              <button aria-label="Close" onClick={() => { setShowModal(false); resetForm(); }} className="text-[#6B8A9A] hover:text-[#D0E4EC] transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -706,7 +706,7 @@ export default function BlogPage() {
 
                     {/* Actions */}
                     <div className="flex items-center gap-1 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
-                      <button
+                      <button aria-label="Show"
                         onClick={() => handleTogglePublish(post)}
                         disabled={toggling === post.id}
                         className="p-1.5 rounded-lg hover:bg-[#2D6A8F]/20 text-[#6B8A9A] hover:text-[#D0E4EC] transition-colors disabled:opacity-50"
@@ -720,14 +720,14 @@ export default function BlogPage() {
                           <Eye className="w-3.5 h-3.5" />
                         )}
                       </button>
-                      <button
+                      <button aria-label="Edit"
                         onClick={() => openEdit(post)}
                         className="p-1.5 rounded-lg hover:bg-[#2D6A8F]/20 text-[#6B8A9A] hover:text-[#D0E4EC] transition-colors"
                         title="Edit"
                       >
                         <Edit3 className="w-3.5 h-3.5" />
                       </button>
-                      <button
+                      <button aria-label="Delete"
                         onClick={() => handleDelete(post.id)}
                         disabled={deleting === post.id}
                         className="p-1.5 rounded-lg hover:bg-red-500/10 text-[#6B8A9A] hover:text-red-400 transition-colors disabled:opacity-50"
