@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { getAccessToken } from '@/lib/api';
 import { DailyCall } from '@daily-co/daily-js';
 import {
   X,
@@ -108,7 +109,7 @@ export function TheaterMode({
       const token =
         authToken ||
         (typeof window !== 'undefined'
-          ? localStorage.getItem('access_token') || localStorage.getItem('authToken')
+          ? getAccessToken() || localStorage.getItem('authToken')
           : null);
       if (!token) return;
       const payload = {

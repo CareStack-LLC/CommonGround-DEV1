@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { getAccessToken } from '@/lib/api';
 import {
   PenTool, Plus, Loader2, Trash2, Edit3, Eye, EyeOff,
   Sparkles, X, RefreshCw, CheckCircle, AlertTriangle,
@@ -208,7 +209,7 @@ export default function BlogPage() {
   const [aiKeywords, setAiKeywords] = useState('');
   const [generating, setGenerating] = useState(false);
 
-  const getToken = () => localStorage.getItem('access_token') || '';
+  const getToken = () => getAccessToken() || '';
 
   const fetchPosts = useCallback(async () => {
     try {

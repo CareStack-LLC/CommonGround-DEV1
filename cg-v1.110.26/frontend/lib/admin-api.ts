@@ -6,6 +6,7 @@
  */
 
 import * as Sentry from '@sentry/nextjs';
+import { getAccessToken } from '@/lib/api';
 
 let apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
 if (apiUrl.endsWith('/')) apiUrl = apiUrl.slice(0, -1);
@@ -17,7 +18,7 @@ const RETRYABLE_STATUSES = new Set([502, 503, 504]);
 
 function getAuthToken(): string | null {
   if (typeof window === 'undefined') return null;
-  return localStorage.getItem('access_token');
+  return getAccessToken();
 }
 
 async function adminFetch<T>(

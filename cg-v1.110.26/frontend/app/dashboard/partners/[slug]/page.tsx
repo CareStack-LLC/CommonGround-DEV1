@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { getAccessToken } from '@/lib/api';
 import { useParams } from 'next/navigation';
 // import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 // import { Button } from '@/components/ui/button';
@@ -68,7 +69,7 @@ export default function PartnerDashboardPage() {
         setLoading(true);
         setError(null);
         try {
-            const token = localStorage.getItem('access_token');
+            const token = getAccessToken();
 
             // 1. Try fetching protected dashboard data
             let res = await fetch(

@@ -1,6 +1,7 @@
 "use client";
 
 import "./globals-professional.css";
+import { getAccessToken } from '@/lib/api';
 import { useState, useEffect, createContext, useContext } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -129,7 +130,7 @@ export default function ProfessionalPortalLayout({
 
   // Check for auth token from main app
   useEffect(() => {
-    const storedToken = localStorage.getItem("access_token");
+    const storedToken = getAccessToken();
     if (storedToken) {
       setToken(storedToken);
       fetchProfile(storedToken);

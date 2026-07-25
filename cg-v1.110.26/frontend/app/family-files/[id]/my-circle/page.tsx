@@ -25,7 +25,7 @@ import {
   Sparkles,
   Home as HomeIcon,
 } from 'lucide-react';
-import { myCircleAPI, familyFilesAPI, circleAPI, circleMessagesAPI, KidComsRoom, CirclePermission, FamilyFileChild, CircleContact, CircleMessageData } from '@/lib/api';
+import { myCircleAPI, familyFilesAPI, circleAPI, circleMessagesAPI, KidComsRoom, CirclePermission, FamilyFileChild, CircleContact, CircleMessageData, getAccessToken } from '@/lib/api';
 import { Navigation } from '@/components/navigation';
 import { ProtectedRoute } from '@/components/protected-route';
 import { PageContainer } from '@/components/layout';
@@ -308,7 +308,7 @@ function MyCircleContent({ params }: PageParams) {
           `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/v1/circle/${editingContact.id}/photo`,
           {
             method: 'POST',
-            headers: { Authorization: `Bearer ${localStorage.getItem('access_token')}` },
+            headers: { Authorization: `Bearer ${getAccessToken()}` },
             body: formData,
           }
         );

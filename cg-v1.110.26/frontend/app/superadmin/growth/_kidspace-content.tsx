@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { getAccessToken } from '@/lib/api';
 import {
   Users, RefreshCw, AlertTriangle, Phone,
   Tv, BookOpen, Gamepad2, Trophy, ShieldCheck,
@@ -101,7 +102,7 @@ export default function KidSpaceContent() {
       setError(null);
       setNoData(false);
 
-      const token = localStorage.getItem('access_token');
+      const token = getAccessToken();
       if (!token) throw new Error('Not authenticated');
 
       const res = await fetch(`${API_BASE}/api/v1/admin/kidspace/stats`, {

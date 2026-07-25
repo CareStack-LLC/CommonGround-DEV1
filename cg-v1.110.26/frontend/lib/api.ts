@@ -108,6 +108,9 @@ export async function fetchAPI<T>(
   }
 
   const config: RequestInit = {
+    // Send the HttpOnly refresh cookie on cross-subdomain auth calls (the cookie
+    // is path-scoped to /api/v1/auth, so it's only actually attached there).
+    credentials: 'include',
     ...fetchOptions,
     signal: buildRequestSignal(fetchOptions.signal),
     headers: {
@@ -236,11 +239,25 @@ export async function fetchAPI<T>(
 }
 
 /**
- * Get auth token from localStorage
+ * In-memory access token.
+ *
+ * The access token is deliberately NOT persisted to localStorage — a token in
+ * localStorage is readable by any XSS and survives across tabs/reloads. Instead
+ * it lives in this module variable (lost on full reload, then transparently
+ * restored via the HttpOnly refresh cookie by authAPI.refresh() / the 401
+ * interceptor). The refresh token itself is never in JS at all — it's an
+ * HttpOnly cookie the backend sets.
  */
+let inMemoryAccessToken: string | null = null;
+
+/** Current access token (in-memory). Exported for the ~dozen modules that
+ * previously read localStorage.getItem('access_token') directly. */
+export function getAccessToken(): string | null {
+  return inMemoryAccessToken;
+}
+
 function getAuthToken(): string | null {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem('access_token');
+  return inMemoryAccessToken;
 }
 
 /**
@@ -356,23 +373,22 @@ async function fetchAPIWithCircleAuth<T>(
 }
 
 /**
- * Set auth tokens in localStorage
+ * Store the access token in memory. The refresh token is ignored here — it is
+ * delivered/rotated as an HttpOnly cookie by the backend, never touched by JS.
  */
-function setAuthTokens(accessToken: string, refreshToken?: string) {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem('access_token', accessToken);
-  if (refreshToken) {
-    localStorage.setItem('refresh_token', refreshToken);
-  }
+export function setAuthTokens(accessToken: string, _refreshToken?: string) {
+  inMemoryAccessToken = accessToken;
 }
 
 /**
- * Clear auth tokens from localStorage
+ * Clear the in-memory access token. Also removes any legacy localStorage tokens
+ * left over from the pre-cookie scheme, plus the cached user object.
  */
 function clearAuthTokens() {
+  inMemoryAccessToken = null;
   if (typeof window === 'undefined') return;
-  localStorage.removeItem('access_token');
-  localStorage.removeItem('refresh_token');
+  localStorage.removeItem('access_token');   // legacy cleanup
+  localStorage.removeItem('refresh_token');   // legacy cleanup
   localStorage.removeItem('user');
 }
 
@@ -507,20 +523,11 @@ export const authAPI = {
    * Refresh access token
    */
   async refresh(): Promise<{ access_token: string; token_type: string }> {
-    const refreshToken = typeof window !== 'undefined'
-      ? localStorage.getItem('refresh_token')
-      : null;
-
-    if (!refreshToken) {
-      throw new APIError('No refresh token available', 401);
-    }
-
+    // The refresh token is the HttpOnly cookie — sent automatically because of
+    // credentials:'include' (set globally in fetchAPI). No token in the body.
     const response = await fetchAPI<{ access_token: string; token_type: string }>(
       '/auth/refresh',
-      {
-        method: 'POST',
-        body: JSON.stringify({ refresh_token: refreshToken }),
-      }
+      { method: 'POST', body: JSON.stringify({}) },
     );
 
     setAuthTokens(response.access_token);
@@ -531,7 +538,11 @@ export const authAPI = {
    * Check if user is authenticated
    */
   isAuthenticated(): boolean {
-    return !!getAuthToken();
+    // After a full reload the in-memory access token is null until the cookie
+    // refresh runs, so treat a cached user as "has a session" too — the 401
+    // interceptor / bootstrap will restore the token from the refresh cookie.
+    if (getAuthToken()) return true;
+    return typeof window !== 'undefined' && !!localStorage.getItem('user');
   },
 
   /**

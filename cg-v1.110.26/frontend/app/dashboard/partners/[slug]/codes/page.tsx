@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { getAccessToken } from '@/lib/api';
 import { useParams, useRouter } from 'next/navigation';
 import {
     Loader2,
@@ -63,7 +64,7 @@ export default function GrantCodeManagementPage() {
     async function fetchData() {
         setLoading(true);
         try {
-            const token = localStorage.getItem('access_token');
+            const token = getAccessToken();
             const res = await fetch(
                 `${process.env.NEXT_PUBLIC_API_URL}/api/v1/partners/${partnerSlug}/dashboard`,
                 {

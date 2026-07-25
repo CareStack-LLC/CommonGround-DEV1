@@ -20,6 +20,7 @@
 import { useEffect, useState } from 'react';
 import { ShieldAlert, XCircle, Loader2 } from 'lucide-react';
 import { adminAPI } from '@/lib/admin-api';
+import { setAuthTokens } from '@/lib/api';
 
 export function ImpersonationBanner() {
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -52,7 +53,7 @@ export function ImpersonationBanner() {
     } finally {
       const originalToken = localStorage.getItem('admin_original_token');
       if (originalToken) {
-        localStorage.setItem('access_token', originalToken);
+        setAuthTokens(originalToken);
       }
       localStorage.removeItem('admin_original_token');
       localStorage.removeItem('impersonation_session_id');

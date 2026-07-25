@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef, useCallback } from 'react';
+import { getAccessToken } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import { useWebSocket } from '@/contexts/websocket-context';
 import { useAuth } from '@/lib/auth-context';
@@ -123,7 +124,7 @@ export function IncomingCallNotification() {
         await fetch(`${apiUrl}/api/v1/parent-calls/${incomingCall.session_id}/decline`, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+            'Authorization': `Bearer ${getAccessToken()}`,
           },
         });
       } catch (err) {

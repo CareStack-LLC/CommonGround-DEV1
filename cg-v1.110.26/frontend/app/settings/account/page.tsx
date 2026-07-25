@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
-import { usersAPI } from '@/lib/api';
+import { usersAPI, getAccessToken } from '@/lib/api';
 import { TIMEZONE_OPTIONS } from '@/lib/timezone';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -57,7 +57,7 @@ export default function AccountSettingsPage() {
     setExportStatus('working');
     setExportError(null);
     try {
-      const token = localStorage.getItem('access_token');
+      const token = getAccessToken();
       const res = await fetch(`${API_BASE}/api/v1/users/me/export`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -85,7 +85,7 @@ export default function AccountSettingsPage() {
     setDeleteStatus('working');
     setDeleteError(null);
     try {
-      const token = localStorage.getItem('access_token');
+      const token = getAccessToken();
       const res = await fetch(`${API_BASE}/api/v1/users/request-deletion`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef, useCallback, Suspense } from 'react';
+import { getAccessToken } from '@/lib/api';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { useWebSocket } from '@/contexts/websocket-context';
@@ -260,7 +261,7 @@ function ParentCallContent() {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+              'Authorization': `Bearer ${getAccessToken()}`,
             },
             body: JSON.stringify({
               user_name: userName,
@@ -279,7 +280,7 @@ function ParentCallContent() {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+              'Authorization': `Bearer ${getAccessToken()}`,
             },
             body: JSON.stringify({
               family_file_id: familyFileId,
@@ -587,7 +588,7 @@ function ParentCallContent() {
     }
 
     // Get auth token for WebSocket authentication
-    const token = localStorage.getItem('access_token');
+    const token = getAccessToken();
     if (!token) {
       console.error('No auth token for WebSocket');
       return;
@@ -667,7 +668,7 @@ function ParentCallContent() {
         await fetch(`${apiUrl}/api/v1/parent-calls/${session.session_id}/end`, {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+            'Authorization': `Bearer ${getAccessToken()}`,
           },
         });
       } catch (err) {

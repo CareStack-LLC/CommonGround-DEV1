@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback, Suspense } from 'react';
+import { getAccessToken } from '@/lib/api';
 import {
   Shield, RefreshCw, Brain, Activity, Layers,
   BarChart3, MessageSquare, TrendingUp, PhoneOff, Send, Clock, Users, Phone,
@@ -134,7 +135,7 @@ export default function AriaInsightsPage() {
       setError(null);
       setNoData(false);
 
-      const token = localStorage.getItem('access_token');
+      const token = getAccessToken();
       if (!token) throw new Error('Not authenticated');
 
       const res = await fetch(`${API_BASE}/api/v1/admin/aria/insights?days=${d}`, {

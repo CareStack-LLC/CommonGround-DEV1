@@ -38,6 +38,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const loadUser = async () => {
       try {
         if (authAPI.isAuthenticated()) {
+          // Bootstrap: the access token lives in memory and is empty after a
+          // full reload, so restore it from the HttpOnly refresh cookie before
+          // hitting authenticated endpoints. If there's no valid cookie this
+          // throws → caught below → treated as logged out.
+          if (!authAPI.getToken()) {
+            try {
+              await authAPI.refresh();
+            } catch {
+              if (typeof window !== 'undefined') localStorage.removeItem('user');
+              setUser(null);
+              setProfile(null);
+              setIsLoading(false);
+              return;
+            }
+          }
           // Try to get fresh user data from API
           const userData = await authAPI.me();
           setUser(userData);

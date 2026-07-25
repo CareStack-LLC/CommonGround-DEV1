@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { getAccessToken } from '@/lib/api';
 import {
   Film, BookOpen, Users2, Tag, Plus, Loader2, Trash2, Edit3,
   X, RefreshCw, CheckCircle, AlertTriangle, Star, Upload,
@@ -154,7 +155,7 @@ export default function MediaLibraryPage() {
   const [authorFeatured, setAuthorFeatured] = useState(false);
   const [authorPhotoFile, setAuthorPhotoFile] = useState<File | null>(null);
 
-  const getToken = () => localStorage.getItem('access_token') || '';
+  const getToken = () => getAccessToken() || '';
 
   const showSuccess = (msg: string) => {
     setSuccessMessage(msg);

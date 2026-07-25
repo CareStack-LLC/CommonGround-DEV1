@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { authAPI, usersAPI } from '@/lib/api';
+import { authAPI, usersAPI, setAuthTokens } from '@/lib/api';
 import { Loader2 } from 'lucide-react';
 
 /**
@@ -67,10 +67,7 @@ function AuthSyncContent() {
 
                 // Store backend tokens
                 if (response.access_token) {
-                    localStorage.setItem('access_token', response.access_token);
-                }
-                if (response.refresh_token) {
-                    localStorage.setItem('refresh_token', response.refresh_token);
+                    setAuthTokens(response.access_token);
                 }
                 if (response.user) {
                     localStorage.setItem('user', JSON.stringify(response.user));

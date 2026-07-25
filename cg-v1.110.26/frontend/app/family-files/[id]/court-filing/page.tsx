@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
-import { familyFilesAPI, FamilyFileDetail } from '@/lib/api';
+import { familyFilesAPI, FamilyFileDetail, getAccessToken } from '@/lib/api';
 import { ProtectedRoute } from '@/components/protected-route';
 import { Navigation } from '@/components/navigation';
 import { PageContainer } from '@/components/layout';
@@ -132,7 +132,7 @@ function CourtFilingContent() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
+          'Authorization': `Bearer ${getAccessToken()}`,
         },
         body: JSON.stringify({
           case_number: caseNumber,

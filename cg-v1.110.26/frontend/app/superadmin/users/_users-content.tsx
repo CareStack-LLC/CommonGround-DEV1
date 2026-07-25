@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { adminAPI, type AdminUser, type UserSearchResult } from '@/lib/admin-api';
+import { getAccessToken, setAuthTokens } from '@/lib/api';
 import { ExportCsvButton, UserHoverCard } from '@/components/superadmin';
 
 const TIERS = [
@@ -187,13 +188,14 @@ export default function UsersContent() {
     setImpersonating(userId);
     try {
       const result = await adminAPI.startImpersonation(userId, 'Superadmin viewing user account for support/debug');
-      // Swap out the admin's token for the impersonation token. localStorage key
-      // matches `getAuthToken` in admin-api.ts (access_token).
-      const prevToken = localStorage.getItem('access_token');
+      // Swap the in-memory access token to the impersonation token. The admin's
+      // original token is stashed in localStorage so the impersonation banner
+      // (a separate component) can restore it on "End" (superadmin-only flow).
+      const prevToken = getAccessToken();
       if (prevToken) {
         localStorage.setItem('admin_original_token', prevToken);
       }
-      localStorage.setItem('access_token', result.access_token);
+      setAuthTokens(result.access_token);
       localStorage.setItem('impersonation_session_id', result.session_id);
       alert(
         `Now viewing as ${result.target_email}.\n\nSession expires in ${result.expires_in_minutes} minutes.\n\nClick "End impersonation" from the profile menu (or /superadmin/audit/impersonation → End) to return to your admin session.`,

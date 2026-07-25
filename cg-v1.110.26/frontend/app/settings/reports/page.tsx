@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
-import { familyFilesAPI, exportsAPI, FamilyFile } from '@/lib/api';
+import { familyFilesAPI, exportsAPI, FamilyFile, getAccessToken } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -231,7 +231,7 @@ export default function ReportsSettingsPage() {
         {
           method: 'POST',
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+            Authorization: `Bearer ${getAccessToken()}`,
           },
         }
       );
@@ -284,7 +284,7 @@ export default function ReportsSettingsPage() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+            Authorization: `Bearer ${getAccessToken()}`,
           },
           body: JSON.stringify({
             family_file_id: selectedFamilyFile,

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
+import { getAccessToken } from '@/lib/api';
 import { type AriaInsights, type FlaggedMessage, SEVERITY_COLORS, ACTION_COLORS } from './page';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -67,7 +68,7 @@ export default function MessagesTab({
   const loadMore = useCallback(async () => {
     try {
       setLoadingMore(true);
-      const token = localStorage.getItem('access_token');
+      const token = getAccessToken();
       if (!token) return;
 
       const res = await fetch(

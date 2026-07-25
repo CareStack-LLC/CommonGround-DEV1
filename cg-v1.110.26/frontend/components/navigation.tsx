@@ -1,6 +1,7 @@
 'use client';
 
 import { usePathname, useRouter } from 'next/navigation';
+import { getAccessToken } from '@/lib/api';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { useNotification } from '@/contexts/notification-context';
@@ -132,7 +133,7 @@ export function Navigation() {
       }
       try {
         const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-        const token = localStorage.getItem('access_token');
+        const token = getAccessToken();
         if (!token) return;
 
         const res = await fetch(`${API_URL}/api/v1/partners/my-partners`, {

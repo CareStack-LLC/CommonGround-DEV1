@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { getAccessToken } from '@/lib/api';
 import { useRouter } from "next/navigation";
 import {
   Briefcase,
@@ -112,7 +113,7 @@ export default function ProfessionalOnboardingPage() {
     firm_type: "solo_practice",
   });
 
-  const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+  const token = typeof window !== "undefined" ? getAccessToken() : null;
 
   const steps: { key: Step; label: string }[] = [
     { key: "type", label: "Role" },

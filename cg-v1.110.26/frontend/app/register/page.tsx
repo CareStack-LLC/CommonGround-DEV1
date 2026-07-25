@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
-import { APIError } from '@/lib/api';
+import { APIError, getAccessToken } from '@/lib/api';
 import { signInWithGoogle } from '@/lib/supabase';
 import { Loader2, Mail, Lock, User, ArrowRight, Users, CheckCircle } from 'lucide-react';
 import { trackSignupStarted, trackSignupCompleted, trackBeginCheckout } from '@/lib/analytics';
@@ -182,7 +182,7 @@ function RegisterContent() {
       if (inviteData) {
         try {
           const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-          const token = localStorage.getItem('access_token');
+          const token = getAccessToken();
 
           const response = await fetch(`${API_BASE}/cases/accept-invite`, {
             method: 'POST',
@@ -209,7 +209,7 @@ function RegisterContent() {
       if (grantData) {
         try {
           const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-          const token = localStorage.getItem('access_token');
+          const token = getAccessToken();
 
           const response = await fetch(`${API_BASE}/api/v1/grants/redeem`, {
             method: 'POST',
