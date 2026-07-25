@@ -26,10 +26,11 @@ jobs:
       # The project uses pnpm (packageManager: pnpm@9.15.0, pnpm-lock.yaml,
       # vercel.json installCommand: pnpm install). The old npm-based steps here
       # failed at `npm ci` because there is no package-lock.json.
+      # Version is read from the root package.json "packageManager" field
+      # (pnpm@9.15.0) — do NOT also set `version:` here or action-setup errors
+      # with "Multiple versions of pnpm specified".
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 9
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
