@@ -113,48 +113,11 @@ export interface TheaterContentLibrary {
 }
 
 export const theaterContent: TheaterContentLibrary = {
-  videos: [
-    {
-      id: 'crunch',
-      title: 'Crunch',
-      url: '/kidsComms/Crunch.mp4',
-      thumbnail: '/kidsComms/posters/crunch-poster.jpg',
-      duration: '4:30',
-      description: 'Animated short film about an alien who loves cereal',
-      category: 'comedy',
-      ageRange: '6-12'
-    },
-    {
-      id: 'johnny-express',
-      title: 'Johnny Express',
-      url: '/kidsComms/johnny-express.mp4',
-      thumbnail: '/kidsComms/posters/johnny-express-poster.jpg',
-      duration: '5:15',
-      description: 'Funny space delivery adventure',
-      category: 'adventure',
-      ageRange: '8-12'
-    },
-    {
-      id: 'the-bread',
-      title: 'The Bread',
-      url: '/kidsComms/the-bread.mp4',
-      thumbnail: '/kidsComms/posters/the-bread-poster.jpg',
-      duration: '2:45',
-      description: 'Charming animated story about bread',
-      category: 'animation',
-      ageRange: '5-10'
-    },
-    {
-      id: 'minions',
-      title: 'Minions Clip',
-      url: '/kidsComms/minions-clip.mp4',
-      thumbnail: '/kidsComms/posters/minions-poster.jpg',
-      duration: '3:24',
-      description: 'Fun animated adventure clip',
-      category: 'comedy',
-      ageRange: '6-12'
-    },
-  ],
+  // Movies are now served from the KidSpace API (streamed via Mux) and loaded
+  // directly by the Watch Together library — see content-library.tsx. The old
+  // bundled local-clip entries were retired with those files. Storybooks below
+  // are still local read-along PDFs.
+  videos: [],
   storybooks: [
     {
       id: 'luna-midnight',
