@@ -508,65 +508,147 @@ from app.middleware.activity import ActivityTrackingMiddleware
 app.add_middleware(ActivityTrackingMiddleware)
 
 
-# Global exception handler to ensure CORS headers are always present
-# This is important because uncaught exceptions skip the CORS middleware
+# ---------------------------------------------------------------------------
+# Unified exception handling.
+#
+# Every error response carries a `reference` (the request id, also on the
+# X-Request-ID header, the Sentry event, and the canonical log line) so the
+# user-facing message and the full server-side detail are always joinable.
+# Handlers also set CORS headers themselves, since uncaught exceptions bypass
+# the CORS middleware (otherwise the browser masks the real error).
+# ---------------------------------------------------------------------------
 from fastapi import Request
-from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
 import traceback
+
+from app.core.error_responses import build_error_response, get_request_reference
+
+
+def _capture_to_sentry(request: Request, exc: Exception, *, reference: str) -> None:
+    """Report an exception to Sentry with request context attached.
+
+    The reference is set both as a tag (already done by RequestIDMiddleware,
+    repeated here defensively) and echoed in the message so it is greppable
+    from the issue title.
+    """
+    if not settings.SENTRY_DSN:
+        return
+    try:
+        import sentry_sdk
+        with sentry_sdk.new_scope() as scope:
+            scope.set_tag("request_id", reference)
+            scope.set_context(
+                "request",
+                {
+                    "method": request.method,
+                    "path": request.url.path,
+                    "query": str(request.url.query),
+                    "reference": reference,
+                },
+            )
+            sentry_sdk.capture_exception(exc)
+    except Exception:  # never let error reporting raise
+        pass
 
 
 @app.exception_handler(Exception)
-async def global_exception_handler(request: Request, exc: Exception):
-    """
-    Global exception handler that ensures CORS headers are included
-    even when the server returns a 500 error.
-    """
-    # Get the origin from the request
-    origin = request.headers.get("origin", "")
-    
-    # Log the error and report to Sentry
-    error_msg = f"{type(exc).__name__}: {exc}"
-    tb_str = traceback.format_exc()
-    logger.error(f"Unhandled exception: {error_msg}\n{tb_str}")
+async def unhandled_exception_handler(request: Request, exc: Exception):
+    """500 handler for anything uncaught.
 
-    # Capture in Sentry with request context
-    if settings.SENTRY_DSN:
-        import sentry_sdk
-        sentry_sdk.capture_exception(exc)
-    
-    # Build response with CORS headers - never expose internals in production
+    Hides internals in production but ALWAYS returns a reference the user can
+    quote to support, so a 500 is diagnosable instead of a dead end.
+    """
+    reference = get_request_reference(request)
+    tb_str = traceback.format_exc()
+    logger.error(
+        "Unhandled exception [ref=%s] %s: %s\n%s",
+        reference, type(exc).__name__, exc, tb_str,
+    )
+    _capture_to_sentry(request, exc, reference=reference)
+
     if settings.is_production:
-        response = JSONResponse(
-            status_code=500,
-            content={"detail": "Internal server error"}
+        message = (
+            "Something went wrong on our end. Our team has been alerted. "
+            f"If this keeps happening, quote reference {reference} to support."
         )
+        debug = None
     else:
-        response = JSONResponse(
-            status_code=500,
-            content={
-                "detail": str(exc),
-                "type": type(exc).__name__,
-            }
-        )
-    
-    # Add CORS headers if origin is allowed
-    if origin:
-        # Check if origin matches allowed list or regex
-        import re
-        allowed = origin in settings.allowed_origins_list
-        if not allowed and settings.CORS_ORIGIN_REGEX:
-            try:
-                allowed = bool(re.match(settings.CORS_ORIGIN_REGEX, origin))
-            except Exception:
-                allowed = False
-        
-        if allowed:
-            response.headers["Access-Control-Allow-Origin"] = origin
-            response.headers["Access-Control-Allow-Credentials"] = "true"
-            response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
-            response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With"
-    
-    return response
+        message = f"{type(exc).__name__}: {exc}"
+        debug = {
+            "type": type(exc).__name__,
+            "message": str(exc),
+            "traceback": tb_str.splitlines()[-12:],
+        }
+
+    return build_error_response(
+        request,
+        status_code=500,
+        message=message,
+        error_type="internal_error",
+        debug=debug,
+    )
+
+
+@app.exception_handler(StarletteHTTPException)
+async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+    """Deliberate HTTP errors (404/403/409/...).
+
+    These `detail` messages are author-written and safe to show, so we preserve
+    them verbatim and just attach the reference + a stable machine `type`.
+    """
+    reference = get_request_reference(request)
+    detail = exc.detail if isinstance(exc.detail, str) else "Request could not be completed."
+
+    # 5xx raised as HTTPException still deserves a Sentry breadcrumb.
+    if exc.status_code >= 500:
+        logger.error("HTTP %s [ref=%s]: %s", exc.status_code, reference, detail)
+        _capture_to_sentry(request, exc, reference=reference)
+
+    type_by_status = {
+        400: "bad_request", 401: "unauthorized", 403: "forbidden",
+        404: "not_found", 409: "conflict", 422: "unprocessable", 429: "rate_limited",
+    }
+    return build_error_response(
+        request,
+        status_code=exc.status_code,
+        message=detail,
+        error_type=type_by_status.get(exc.status_code, "http_error"),
+        extra_headers=getattr(exc, "headers", None),
+    )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    """422 handler that tells the user EXACTLY which fields were wrong.
+
+    Validation detail is safe and genuinely useful to end users, so we surface a
+    clean per-field list plus a readable summary — instead of FastAPI's raw,
+    nested default shape.
+    """
+    reference = get_request_reference(request)
+    fields: list[dict] = []
+    for err in exc.errors():
+        loc = [str(p) for p in err.get("loc", []) if p not in ("body", "query", "path")]
+        field = ".".join(loc) if loc else "(request)"
+        fields.append({"field": field, "message": err.get("msg", "invalid value")})
+
+    if not fields:
+        summary = "The request could not be validated."
+    else:
+        head = f"{fields[0]['field']}: {fields[0]['message']}"
+        summary = f"Validation failed — {head}"
+        if len(fields) > 1:
+            summary += f" (and {len(fields) - 1} more field{'s' if len(fields) > 2 else ''})"
+
+    logger.info("Validation error [ref=%s] on %s: %s", reference, request.url.path, fields)
+    return build_error_response(
+        request,
+        status_code=422,
+        message=summary,
+        error_type="validation_error",
+        fields=fields,
+    )
 
 
 # Include API router
@@ -583,14 +665,61 @@ async def root():
     }
 
 
+# Health-check state (module-level, per-process):
+#  - a short result cache so frequent monitor polls don't hammer Redis/DB
+#    (each Redis ping counts against the Upstash command quota), and
+#  - throttles so a degraded dependency alerts Sentry at most once per window
+#    instead of on every poll.
+_HEALTH_CACHE_TTL = 15.0          # seconds to reuse the last deep-check result
+_HEALTH_ALERT_THROTTLE = 600.0    # seconds between Sentry alerts per component
+_health_cache: dict = {"ts": 0.0, "result": None}
+_health_alert_ts: dict = {}       # component -> last-alerted monotonic ts
+
+
+def _alert_unhealthy(component: str, detail: str) -> None:
+    """Fire a throttled Sentry alert when a health dependency is unhealthy.
+
+    Throttled per-component so a monitor polling /health every minute doesn't
+    spam Sentry — one alert per _HEALTH_ALERT_THROTTLE window while degraded.
+    """
+    if not settings.SENTRY_DSN:
+        return
+    import time as _t
+    now = _t.monotonic()
+    last = _health_alert_ts.get(component, 0.0)
+    if now - last < _HEALTH_ALERT_THROTTLE:
+        return
+    _health_alert_ts[component] = now
+    try:
+        import sentry_sdk
+        sentry_sdk.capture_message(
+            f"Health check: {component} unhealthy — {detail}",
+            level="error",
+            tags={"health_component": component, "health_status": "degraded"},
+        )
+    except Exception:
+        pass
+
+
 @app.get("/health")
 async def health_check():
     """
     Lightweight health check for monitoring (UptimeRobot, Render, etc.).
 
-    Returns fast — DB and Redis checks are best-effort with short timeouts.
-    Use /api/v1/admin/system-status for deep checks.
+    Returns fast — DB and Redis checks are best-effort with short timeouts and a
+    short result cache (so frequent polls don't burn the Redis command quota).
+    A degraded dependency fires a throttled Sentry alert. Use
+    /api/v1/admin/system-status for deep checks.
     """
+    import time as _t
+
+    # Serve a cached result if it's fresh — avoids a DB round-trip and a Redis
+    # command on every monitor poll.
+    now = _t.monotonic()
+    cached = _health_cache.get("result")
+    if cached is not None and (now - _health_cache["ts"]) < _HEALTH_CACHE_TTL:
+        return cached
+
     checks = {"api": "healthy"}
 
     # Check database connectivity (with short timeout)
@@ -600,21 +729,34 @@ async def health_check():
         async with engine.connect() as conn:
             await conn.execute(sa_text("SELECT 1"))
         checks["database"] = "healthy"
-    except Exception:
+    except Exception as e:
         checks["database"] = "unhealthy"
+        _alert_unhealthy("database", str(e)[:200])
 
-    # Check Redis connectivity (short timeout to avoid blocking)
+    # Check Redis connectivity. Async client + short timeout so a slow/unreachable
+    # Redis can't block the event loop. A raised error here also covers the
+    # Upstash "max requests limit exceeded" case (quota exhausted → all commands,
+    # incl. PING, are rejected), which correctly reports redis as unhealthy.
     try:
-        import redis
-        r = redis.from_url(settings.REDIS_URL, socket_timeout=1, socket_connect_timeout=1)
-        r.ping()
-        checks["redis"] = "healthy"
-    except Exception:
+        import redis.asyncio as aioredis
+        r = aioredis.from_url(
+            settings.REDIS_URL, socket_timeout=1, socket_connect_timeout=1
+        )
+        try:
+            await r.ping()
+            checks["redis"] = "healthy"
+        finally:
+            await r.aclose()
+    except Exception as e:
         checks["redis"] = "unhealthy"
+        _alert_unhealthy("redis", str(e)[:200])
 
     overall = "healthy" if all(v == "healthy" for v in checks.values()) else "degraded"
 
-    return {"status": overall, "checks": checks}
+    result = {"status": overall, "checks": checks}
+    _health_cache["ts"] = now
+    _health_cache["result"] = result
+    return result
 
 
 # Debug endpoints — only available in development
