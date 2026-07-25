@@ -222,7 +222,7 @@ const SUB_NAV = [
 
 export default function FeaturesPage() {
   return (
-    <div className="min-h-screen bg-[#F4F8F7]">
+    <div className="min-h-screen bg-background">
       <JsonLd
         data={{
           '@context': 'https://schema.org',
@@ -246,22 +246,22 @@ export default function FeaturesPage() {
       <section className="relative pt-16 pb-12 sm:pt-20 sm:pb-16 px-6 overflow-hidden">
         <div className="absolute inset-0 opacity-[0.06] pointer-events-none">
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-[var(--portal-primary)] rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#F5A623] rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-cg-amber rounded-full blur-3xl" />
         </div>
 
         <div className="relative max-w-6xl mx-auto grid items-center gap-10 lg:gap-14 lg:grid-cols-2">
           <div className="text-center lg:text-left">
             <span className="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-1.5 text-sm font-medium text-[var(--portal-primary)] mb-6">
-              <Sparkles className="h-4 w-4 text-[#F5A623]" />
+              <Sparkles className="h-4 w-4 text-cg-amber" />
               Everything you need. Nothing you don&apos;t.
             </span>
-            <h1 className="font-serif text-[#1E3A4A] text-4xl sm:text-5xl md:text-6xl leading-[1.05] tracking-tight mb-6">
+            <h1 className="font-serif text-foreground text-4xl sm:text-5xl md:text-6xl leading-[1.05] tracking-tight mb-6">
               Every feature ends{' '}
               <span className="text-[var(--portal-primary)]">one fight</span>
             </h1>
             <p className="text-lg sm:text-xl text-gray-600 mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">
               Trade coordination for calm. ARIA cools messages, TimeBridge runs the schedule, and ClearFund settles the money &mdash; each one quietly documented, {' '}
-              <span className="font-medium text-[#1E3A4A]">
+              <span className="font-medium text-foreground">
                 court-ready the day you ever need it.
               </span>
             </p>
@@ -269,7 +269,7 @@ export default function FeaturesPage() {
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-7">
               <Link
                 href="/early-access"
-                className="group inline-flex items-center justify-center px-8 py-4 bg-[var(--portal-primary)] text-white font-semibold rounded-full hover:bg-[#2D8A70] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                className="group inline-flex items-center justify-center px-8 py-4 bg-[var(--portal-primary)] text-white font-semibold rounded-full hover:bg-cg-sage-dark transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
               >
                 Start free &mdash; no card needed
                 <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
@@ -322,7 +322,7 @@ export default function FeaturesPage() {
               <li key={link.id}>
                 <a
                   href={`#${link.id}`}
-                  className="text-[#1E3A4A]/70 hover:text-[var(--portal-primary)] transition-colors"
+                  className="text-foreground/70 hover:text-[var(--portal-primary)] transition-colors"
                 >
                   {link.label}
                 </a>
@@ -339,7 +339,7 @@ export default function FeaturesPage() {
           <section
             key={cat.id}
             id={cat.id}
-            className={`scroll-mt-28 py-16 sm:py-24 ${i % 2 === 0 ? 'bg-white' : 'bg-[#F4F8F7]'}`}
+            className={`scroll-mt-28 py-16 sm:py-24 ${i % 2 === 0 ? 'bg-white' : 'bg-background'}`}
           >
             <div className="max-w-6xl mx-auto px-6 grid items-center gap-10 lg:gap-16 lg:grid-cols-2">
               {/* Image */}
@@ -358,7 +358,7 @@ export default function FeaturesPage() {
                 <p className="text-xs sm:text-sm font-semibold uppercase tracking-[0.18em] text-[var(--portal-primary)] mb-3">
                   {cat.eyebrow}
                 </p>
-                <h2 className="font-serif text-3xl sm:text-4xl text-[#1E3A4A] leading-tight tracking-tight mb-4">
+                <h2 className="font-serif text-3xl sm:text-4xl text-foreground leading-tight tracking-tight mb-4">
                   {cat.title}
                 </h2>
                 <p className="text-lg text-gray-600 leading-relaxed mb-8">
@@ -385,7 +385,7 @@ export default function FeaturesPage() {
                           ) : null}
                         </span>
                         <div>
-                          <h3 className="font-serif text-lg text-[#1E3A4A]">
+                          <h3 className="font-serif text-lg text-foreground">
                             {f.title}
                           </h3>
                           <p className="mt-1 text-gray-600 leading-relaxed">
@@ -403,16 +403,16 @@ export default function FeaturesPage() {
       })}
 
       {/* Philosophy */}
-      <section className="py-20 px-6 bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] text-white relative overflow-hidden">
+      <section className="py-20 px-6 bg-gradient-to-br from-[var(--portal-primary)] to-cg-slate text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#F5A623] rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-cg-amber rounded-full blur-3xl" />
         </div>
         <div className="relative max-w-4xl mx-auto text-center">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif mb-6 leading-tight tracking-tight">
             The less you have to coordinate,
             <br />
-            <span className="text-[#F5A623]">the more peace your family has</span>
+            <span className="text-cg-amber">the more peace your family has</span>
           </h2>
           <p className="text-lg sm:text-xl text-white/80 mb-8 leading-relaxed max-w-2xl mx-auto">
             Parents focus on being parents. Schedules run themselves. Money tracks itself. The kids stay connected.
@@ -434,7 +434,7 @@ export default function FeaturesPage() {
           <div className="space-y-4">
             {FEATURES_FAQ_ITEMS.map((faq) => (
               <details key={faq.question} className="group bg-gray-50 rounded-xl p-6">
-                <summary className="cursor-pointer list-none flex items-center justify-between font-medium text-[#1E3A4A]">
+                <summary className="cursor-pointer list-none flex items-center justify-between font-medium text-foreground">
                   {faq.question}
                   <span className="text-gray-600 group-open:rotate-180 transition-transform">▼</span>
                 </summary>
@@ -446,9 +446,9 @@ export default function FeaturesPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 px-6 bg-[#F4F8F7]">
+      <section className="py-20 px-6 bg-background">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif text-[#1E3A4A] mb-6 leading-tight tracking-tight">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif text-foreground mb-6 leading-tight tracking-tight">
             Ready to find common ground?
           </h2>
           <p className="text-lg sm:text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
@@ -457,7 +457,7 @@ export default function FeaturesPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/early-access"
-              className="inline-flex items-center justify-center px-8 py-4 bg-[var(--portal-primary)] text-white rounded-xl font-medium text-lg hover:bg-[#2D6A8F] transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5 group"
+              className="inline-flex items-center justify-center px-8 py-4 bg-[var(--portal-primary)] text-white rounded-xl font-medium text-lg hover:bg-cg-slate transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5 group"
             >
               Start free &mdash; no card needed
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />

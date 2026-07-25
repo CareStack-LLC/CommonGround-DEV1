@@ -9,7 +9,7 @@ import {
 import { adminAPI, type SystemStatusResponse, type ServiceStatus } from '@/lib/admin-api';
 
 const CATEGORY_CONFIG: Record<string, { label: string; icon: React.ElementType; color: string }> = {
-  ai: { label: 'AI & Intelligence', icon: Brain, color: 'text-[#3DAA8A]' },
+  ai: { label: 'AI & Intelligence', icon: Brain, color: 'text-cg-sage' },
   communication: { label: 'Communication', icon: MessageSquare, color: 'text-blue-400' },
   infrastructure: { label: 'Infrastructure', icon: Database, color: 'text-emerald-400' },
   content: { label: 'Content', icon: FileText, color: 'text-amber-400' },
@@ -32,8 +32,8 @@ const SLUG_ICONS: Record<string, React.ElementType> = {
 };
 
 const STATUS_CONFIG = {
-  operational: { icon: CheckCircle, color: 'text-emerald-400', bg: 'bg-emerald-500/15', border: 'border-[#3DAA8A]/20', label: 'Operational' },
-  degraded: { icon: AlertTriangle, color: 'text-amber-400', bg: 'bg-amber-500/15', border: 'border-[#F5A623]/20', label: 'Degraded' },
+  operational: { icon: CheckCircle, color: 'text-emerald-400', bg: 'bg-emerald-500/15', border: 'border-cg-sage/20', label: 'Operational' },
+  degraded: { icon: AlertTriangle, color: 'text-amber-400', bg: 'bg-amber-500/15', border: 'border-cg-amber/20', label: 'Degraded' },
   down: { icon: XCircle, color: 'text-red-400', bg: 'bg-red-500/15', border: 'border-red-500/20', label: 'Down' },
 };
 
@@ -74,7 +74,7 @@ function ServiceCard({ service }: { service: ServiceStatus }) {
           <span className="text-[11px] text-[#4A6E7F] ml-auto">{service.latency_ms}ms</span>
         )}
       </div>
-      <p className="text-[11px] text-[#6B8A9A] leading-relaxed truncate" title={service.detail}>
+      <p className="text-[11px] text-muted-foreground leading-relaxed truncate" title={service.detail}>
         {service.detail}
       </p>
     </div>
@@ -128,10 +128,10 @@ export default function ServicesContent() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-white flex items-center gap-2">
-            <Activity className="w-5 h-5 text-[#3DAA8A]" />
+            <Activity className="w-5 h-5 text-cg-sage" />
             System Status
           </h1>
-          <p className="text-sm text-[#6B8A9A] mt-0.5">
+          <p className="text-sm text-muted-foreground mt-0.5">
             {lastRefresh
               ? `Last checked ${lastRefresh.toLocaleTimeString()} \u00b7 Auto-refreshes every 60s`
               : 'Checking services...'}
@@ -140,7 +140,7 @@ export default function ServicesContent() {
         <button
           onClick={fetchStatus}
           disabled={loading}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#2D6A8F]/20 hover:bg-[#2D6A8F]/30 text-[#8AACBC] hover:text-white transition-colors disabled:opacity-50 text-sm"
+          className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-[#8AACBC] hover:text-white transition-colors disabled:opacity-50 text-sm"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           Refresh
@@ -169,7 +169,7 @@ export default function ServicesContent() {
                     ? 'Some Systems Degraded'
                     : 'Critical Systems Down'}
                 </h2>
-                <p className="text-xs text-[#6B8A9A] mt-0.5">
+                <p className="text-xs text-muted-foreground mt-0.5">
                   {data.operational} of {data.total} services operational
                   {data.down > 0 && ` \u00b7 ${data.down} down`}
                   {data.degraded > 0 && ` \u00b7 ${data.degraded} degraded`}
@@ -179,18 +179,18 @@ export default function ServicesContent() {
             <div className="flex items-center gap-4">
               <div className="text-center">
                 <div className="text-2xl font-bold text-emerald-400">{data.operational}</div>
-                <div className="text-[10px] uppercase tracking-wider text-[#6B8A9A]">Up</div>
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Up</div>
               </div>
               {data.degraded > 0 && (
                 <div className="text-center">
                   <div className="text-2xl font-bold text-amber-400">{data.degraded}</div>
-                  <div className="text-[10px] uppercase tracking-wider text-[#6B8A9A]">Degraded</div>
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Degraded</div>
                 </div>
               )}
               {data.down > 0 && (
                 <div className="text-center">
                   <div className="text-2xl font-bold text-red-400">{data.down}</div>
-                  <div className="text-[10px] uppercase tracking-wider text-[#6B8A9A]">Down</div>
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Down</div>
                 </div>
               )}
             </div>
@@ -201,10 +201,10 @@ export default function ServicesContent() {
       {/* Loading Skeleton */}
       {loading && !data && (
         <div className="space-y-4">
-          <div className="animate-pulse bg-[#2D6A8F]/15 rounded-xl h-24" />
+          <div className="animate-pulse bg-cg-slate/15 rounded-xl h-24" />
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
             {Array.from({ length: 9 }).map((_, i) => (
-              <div key={i} className="animate-pulse bg-[#2D6A8F]/15 rounded-xl h-28" />
+              <div key={i} className="animate-pulse bg-cg-slate/15 rounded-xl h-28" />
             ))}
           </div>
         </div>

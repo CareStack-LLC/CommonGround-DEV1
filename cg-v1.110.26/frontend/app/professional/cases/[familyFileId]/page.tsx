@@ -155,7 +155,7 @@ export default function CaseDetailPage() {
         @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap');
 
         .case-page-wrapper {
-          background: linear-gradient(135deg, #F4F8F7 0%, #E8F4F0 100%);
+          background: linear-gradient(135deg, var(--background) 0%, var(--cg-sage-subtle) 100%);
           min-height: 100vh;
         }
 
@@ -173,7 +173,7 @@ export default function CaseDetailPage() {
           left: 0;
           right: 0;
           height: 3px;
-          background: linear-gradient(90deg, #1E3A4A 0%, #C8A951 50%, #1E3A4A 100%);
+          background: linear-gradient(90deg, var(--foreground) 0%, #C8A951 50%, var(--foreground) 100%);
         }
 
         .case-number-seal {
@@ -208,7 +208,7 @@ export default function CaseDetailPage() {
           left: 0;
           right: 0;
           height: 3px;
-          background: #1E3A4A;
+          background: var(--foreground);
           transform: scaleX(0);
           transition: transform 0.3s ease;
         }
@@ -229,43 +229,43 @@ export default function CaseDetailPage() {
           {/* Elegant Back Link */}
           <Link
             href="/professional/cases"
-            className="inline-flex items-center gap-2 text-sm sans font-medium text-[#1E3A4A] hover:text-[#1E3A4A] transition-colors mb-8 group"
+            className="inline-flex items-center gap-2 text-sm sans font-medium text-foreground hover:text-foreground transition-colors mb-8 group"
           >
             <ArrowLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-1" />
-            <span className="border-b border-[#1E3A4A]/20 group-hover:border-[#1E3A4A]/40">Return to Case List</span>
+            <span className="border-b border-foreground/20 group-hover:border-foreground/40">Return to Case List</span>
           </Link>
 
           {/* Distinguished Case Header */}
           <div className="mb-10 legal-border pt-6">
             <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
               <div className="flex items-start gap-6">
-                <div className="case-number-seal relative p-5 bg-gradient-to-br from-[#F4F8F7] to-[#E8F4F0] border-2 border-[#1E3A4A]/20 rounded-sm shrink-0 shadow-lg">
-                  <Briefcase className="h-10 w-10 text-[#1E3A4A]" strokeWidth={1.5} />
-                  <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-[#1E3A4A] rounded-full flex items-center justify-center">
-                    <span className="text-[10px] font-bold text-[#F4F8F7] sans">
+                <div className="case-number-seal relative p-5 bg-gradient-to-br from-background to-cg-sage-subtle border-2 border-foreground/20 rounded-sm shrink-0 shadow-lg">
+                  <Briefcase className="h-10 w-10 text-foreground" strokeWidth={1.5} />
+                  <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-foreground rounded-full flex items-center justify-center">
+                    <span className="text-[10px] font-bold text-background sans">
                       {caseData.status.charAt(0).toUpperCase()}
                     </span>
                   </div>
                 </div>
                 <div>
                   <div className="flex items-baseline gap-3 mb-2">
-                    <span className="text-xs sans font-semibold text-[#1E3A4A]/60 tracking-widest uppercase">
+                    <span className="text-xs sans font-semibold text-foreground/60 tracking-widest uppercase">
                       {caseData.family_file_number
                         ? `Case No. ${caseData.family_file_number}`
                         : "Case No."}
                     </span>
-                    <div className="h-px w-8 bg-[#1E3A4A]/20"></div>
+                    <div className="h-px w-8 bg-foreground/20"></div>
                   </div>
                   <h1 className="text-4xl lg:text-5xl serif font-bold text-slate-900 mb-3 leading-tight tracking-tight">
                     {caseData.family_file_title || caseData.family_file_number || `${familyFileId.slice(0, 8).toUpperCase()}`}
                   </h1>
                   <div className="flex flex-wrap items-center gap-3">
-                    <Badge className="bg-[#1E3A4A] text-[#F4F8F7] hover:bg-[#1E3A4A] sans font-medium px-3 py-1 text-xs rounded-sm">
+                    <Badge className="bg-foreground text-background hover:bg-foreground sans font-medium px-3 py-1 text-xs rounded-sm">
                       {caseData.status.toUpperCase()}
                     </Badge>
                     <div className="h-4 w-px bg-slate-300"></div>
                     <span className="text-sm sans text-slate-600 flex items-center gap-2">
-                      <Users className="h-4 w-4 text-[#1E3A4A]/60" strokeWidth={1.5} />
+                      <Users className="h-4 w-4 text-foreground/60" strokeWidth={1.5} />
                       {representingLabels[caseData.representing]}
                     </span>
                     <div className="h-4 w-px bg-slate-300"></div>
@@ -288,7 +288,7 @@ export default function CaseDetailPage() {
                 <Button
                   asChild
                   variant="outline"
-                  className="sans font-semibold px-5 h-11 border-2 border-[#1E3A4A]/30 text-[#1E3A4A] hover:bg-[#F4F8F7] gap-2"
+                  className="sans font-semibold px-5 h-11 border-2 border-foreground/30 text-foreground hover:bg-background gap-2"
                 >
                   <Link href={`/professional/cases/${familyFileId}/exports`}>
                     <Files className="h-4 w-4" strokeWidth={2} />
@@ -305,31 +305,31 @@ export default function CaseDetailPage() {
               <TabsList className="bg-transparent border-none p-0 h-auto w-full justify-start gap-0 overflow-x-auto">
                 <TabsTrigger
                   value="overview"
-                  className="tab-underline data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none border-none pb-4 px-6 sans font-semibold text-slate-500 data-[state=active]:text-[#1E3A4A] hover:text-slate-900 transition-colors text-sm tracking-wide"
+                  className="tab-underline data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none border-none pb-4 px-6 sans font-semibold text-slate-500 data-[state=active]:text-foreground hover:text-slate-900 transition-colors text-sm tracking-wide"
                 >
                   AT A GLANCE
                 </TabsTrigger>
                 <TabsTrigger
                   value="timeline"
-                  className="tab-underline data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none border-none pb-4 px-6 sans font-semibold text-slate-500 data-[state=active]:text-[#1E3A4A] hover:text-slate-900 transition-colors text-sm tracking-wide"
+                  className="tab-underline data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none border-none pb-4 px-6 sans font-semibold text-slate-500 data-[state=active]:text-foreground hover:text-slate-900 transition-colors text-sm tracking-wide"
                 >
                   CHRONICLE
                 </TabsTrigger>
                 <TabsTrigger
                   value="communications"
-                  className="tab-underline data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none border-none pb-4 px-6 sans font-semibold text-slate-500 data-[state=active]:text-[#1E3A4A] hover:text-slate-900 transition-colors text-sm tracking-wide"
+                  className="tab-underline data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none border-none pb-4 px-6 sans font-semibold text-slate-500 data-[state=active]:text-foreground hover:text-slate-900 transition-colors text-sm tracking-wide"
                 >
                   CLIENT CORRESPONDENCE
                 </TabsTrigger>
                 <TabsTrigger
                   value="documents"
-                  className="tab-underline data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none border-none pb-4 px-6 sans font-semibold text-slate-500 data-[state=active]:text-[#1E3A4A] hover:text-slate-900 transition-colors text-sm tracking-wide"
+                  className="tab-underline data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none border-none pb-4 px-6 sans font-semibold text-slate-500 data-[state=active]:text-foreground hover:text-slate-900 transition-colors text-sm tracking-wide"
                 >
                   EXHIBITS
                 </TabsTrigger>
                 <TabsTrigger
                   value="compliance"
-                  className="tab-underline data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none border-none pb-4 px-6 sans font-semibold text-slate-500 data-[state=active]:text-[#1E3A4A] hover:text-slate-900 transition-colors text-sm tracking-wide"
+                  className="tab-underline data-[state=active]:bg-transparent data-[state=active]:shadow-none rounded-none border-none pb-4 px-6 sans font-semibold text-slate-500 data-[state=active]:text-foreground hover:text-slate-900 transition-colors text-sm tracking-wide"
                 >
                   PORTALS
                 </TabsTrigger>
@@ -435,8 +435,8 @@ function QuickStat({
 }) {
   const colorConfig = {
     blue: "from-blue-500 to-blue-600 shadow-blue-500/20",
-    purple: "from-[#3D8DB0] to-[#2D6A8F] shadow-[#3D8DB0]/20",
-    amber: "from-[#F5A623] to-[#E09520] shadow-[#F5A623]/20",
+    purple: "from-[#3D8DB0] to-cg-slate shadow-[#3D8DB0]/20",
+    amber: "from-cg-amber to-[#E09520] shadow-cg-amber/20",
     teal: "from-teal-500 to-teal-600 shadow-teal-500/20",
     slate: "from-slate-500 to-slate-600 shadow-slate-500/20",
   };
@@ -477,15 +477,15 @@ function NavigationCard({
   const colorClasses = {
     burgundy: "bg-red-900 text-red-50 shadow-lg shadow-red-900/30",
     navy: "bg-slate-900 text-slate-50 shadow-lg shadow-slate-900/30",
-    amber: "bg-[#1E3A4A] text-[#F4F8F7] shadow-lg shadow-[#1E3A4A]/30",
-    gold: "bg-[#B8791A] text-[#FEF7ED] shadow-lg shadow-[#B8791A]/30",
+    amber: "bg-foreground text-background shadow-lg shadow-foreground/30",
+    gold: "bg-[#B8791A] text-cg-amber-subtle shadow-lg shadow-[#B8791A]/30",
     slate: "bg-slate-700 text-slate-50 shadow-lg shadow-slate-700/30",
   };
 
   const borderClasses = {
     burgundy: "border-red-900/20 hover:border-red-900/40",
     navy: "border-slate-900/20 hover:border-slate-900/40",
-    amber: "border-[#1E3A4A]/20 hover:border-[#1E3A4A]/40",
+    amber: "border-foreground/20 hover:border-foreground/40",
     gold: "border-[#B8791A]/20 hover:border-[#B8791A]/40",
     slate: "border-slate-700/20 hover:border-slate-700/40",
   };
@@ -498,8 +498,8 @@ function NavigationCard({
             <div className={`p-3.5 rounded-sm ${colorClasses[color]} transition-transform duration-300 group-hover:scale-110`}>
               {icon}
             </div>
-            <div className="h-6 w-6 border-2 border-[#1E3A4A]/20 rounded-full flex items-center justify-center group-hover:border-[#1E3A4A]/60 transition-colors">
-              <ChevronRight className="h-3.5 w-3.5 text-[#1E3A4A]/40 group-hover:text-[#1E3A4A] transition-all group-hover:translate-x-0.5" strokeWidth={2.5} />
+            <div className="h-6 w-6 border-2 border-foreground/20 rounded-full flex items-center justify-center group-hover:border-foreground/60 transition-colors">
+              <ChevronRight className="h-3.5 w-3.5 text-foreground/40 group-hover:text-foreground transition-all group-hover:translate-x-0.5" strokeWidth={2.5} />
             </div>
           </div>
           <h3 className="serif font-bold text-slate-900 text-lg leading-tight mb-2">{title}</h3>

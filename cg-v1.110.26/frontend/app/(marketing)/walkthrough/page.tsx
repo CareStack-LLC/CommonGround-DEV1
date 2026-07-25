@@ -552,8 +552,8 @@ export default function ARIADemoPage() {
                       <div className={`
                         text-xs px-3 py-2 rounded-xl mb-1
                         ${msg.role === 'user'
-                          ? 'bg-[#FEE2E2] text-[#C53030] line-through text-right'
-                          : 'bg-[#FEE2E2] text-[#C53030] line-through'
+                          ? 'bg-cg-error-subtle text-cg-error line-through text-right'
+                          : 'bg-cg-error-subtle text-cg-error line-through'
                         }
                       `}>
                         {msg.original}
@@ -632,9 +632,9 @@ export default function ARIADemoPage() {
 
                     {/* Before / After */}
                     <div className="space-y-2 mb-4">
-                      <div className="bg-[#FEE2E2] border border-[#C53030]/20 rounded-xl px-4 py-2.5">
-                        <p className="text-xs text-[#C53030] font-medium mb-1">Your message</p>
-                        <p className="text-sm text-[#C53030]">{pendingIntervention.originalText}</p>
+                      <div className="bg-cg-error-subtle border border-cg-error/20 rounded-xl px-4 py-2.5">
+                        <p className="text-xs text-cg-error font-medium mb-1">Your message</p>
+                        <p className="text-sm text-cg-error">{pendingIntervention.originalText}</p>
                       </div>
                       <div className="bg-white border border-cg-sage/20 rounded-xl px-4 py-2.5">
                         <p className="text-xs text-cg-sage font-medium mb-1">ARIA&apos;s suggestion</p>
@@ -788,10 +788,10 @@ export default function ARIADemoPage() {
               {/* Stats Grid */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
                 {[
-                  { label: 'Total Messages', value: totalMessages, color: '#2D6A8F' },
-                  { label: 'ARIA Interventions', value: totalInterventions, color: '#F5A623' },
-                  { label: 'Suggestions Accepted', value: acceptedInterventions, color: '#3DAA8A' },
-                  { label: 'Acceptance Rate', value: `${acceptanceRate}%`, color: acceptanceRate >= 50 ? '#3DAA8A' : '#C53030' },
+                  { label: 'Total Messages', value: totalMessages, color: 'var(--cg-slate)' },
+                  { label: 'ARIA Interventions', value: totalInterventions, color: 'var(--cg-amber)' },
+                  { label: 'Suggestions Accepted', value: acceptedInterventions, color: 'var(--cg-sage)' },
+                  { label: 'Acceptance Rate', value: `${acceptanceRate}%`, color: acceptanceRate >= 50 ? 'var(--cg-sage)' : 'var(--cg-error)' },
                 ].map((stat, i) => (
                   <div key={i} className="bg-gray-50 rounded-2xl p-5 text-center">
                     <p className="text-3xl font-bold mb-1" style={{ color: stat.color }}>
@@ -861,7 +861,7 @@ export default function ARIADemoPage() {
                         <XAxis dataKey="message" tick={{ fontSize: 12 }} label={{ value: 'Message #', position: 'bottom', fontSize: 12 }} />
                         <YAxis tick={{ fontSize: 12 }} domain={[0, 100]} label={{ value: 'Toxicity %', angle: -90, position: 'insideLeft', fontSize: 12 }} />
                         <Tooltip formatter={(value) => [`${value}%`, 'Toxicity']} />
-                        <Line type="monotone" dataKey="score" stroke="#C53030" strokeWidth={2} dot={{ fill: '#C53030', r: 4 }} />
+                        <Line type="monotone" dataKey="score" stroke="var(--cg-error)" strokeWidth={2} dot={{ fill: 'var(--cg-error)', r: 4 }} />
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
@@ -875,12 +875,12 @@ export default function ARIADemoPage() {
                   <div className="space-y-4">
                     {interventions.slice(0, 3).map((intervention, i) => (
                       <div key={i} className="grid md:grid-cols-2 gap-3">
-                        <div className="bg-[#FEE2E2] border border-[#C53030]/20 rounded-xl px-4 py-3">
+                        <div className="bg-cg-error-subtle border border-cg-error/20 rounded-xl px-4 py-3">
                           <div className="flex items-center gap-1.5 mb-1.5">
-                            <X className="w-3.5 h-3.5 text-[#C53030]" />
-                            <span className="text-xs text-[#C53030] font-medium">Original</span>
+                            <X className="w-3.5 h-3.5 text-cg-error" />
+                            <span className="text-xs text-cg-error font-medium">Original</span>
                           </div>
-                          <p className="text-sm text-[#C53030]">{intervention.original}</p>
+                          <p className="text-sm text-cg-error">{intervention.original}</p>
                         </div>
                         <div className="bg-cg-sage/5 border border-cg-sage/20 rounded-xl px-4 py-3">
                           <div className="flex items-center gap-1.5 mb-1.5">

@@ -40,10 +40,10 @@ export default function MetricsCards({ metrics, balanceSummary, isLoading }: Met
       {/* Balance Card */}
       <Card className="p-4">
         <div className="flex items-center gap-2 mb-2">
-          <DollarSign className="h-4 w-4 text-[#2D8A70]" />
+          <DollarSign className="h-4 w-4 text-cg-sage-dark" />
           <span className="text-sm text-gray-600">Balance</span>
         </div>
-        <p className={`text-2xl font-bold ${netBalance >= 0 ? 'text-[#2D8A70]' : 'text-[#C53030]'}`}>
+        <p className={`text-2xl font-bold ${netBalance >= 0 ? 'text-cg-sage-dark' : 'text-cg-error'}`}>
           {netBalance >= 0 ? '+' : ''}{formatCurrency(Math.abs(netBalance))}
         </p>
         <p className="text-xs text-gray-500 mt-1">
@@ -68,10 +68,10 @@ export default function MetricsCards({ metrics, balanceSummary, isLoading }: Met
       {/* This Month Card */}
       <Card className="p-4">
         <div className="flex items-center gap-2 mb-2">
-          <CheckCircle className="h-4 w-4 text-[#2D6A8F]" />
+          <CheckCircle className="h-4 w-4 text-cg-slate" />
           <span className="text-sm text-gray-600">This Month</span>
         </div>
-        <p className="text-2xl font-bold text-[#2D6A8F]">
+        <p className="text-2xl font-bold text-cg-slate">
           {formatCurrency(balanceSummary?.total_this_month)}
         </p>
         <p className="text-xs text-gray-500 mt-1">
@@ -80,12 +80,12 @@ export default function MetricsCards({ metrics, balanceSummary, isLoading }: Met
       </Card>
 
       {/* Overdue Card */}
-      <Card className={`p-4 ${metrics && metrics.total_overdue > 0 ? 'bg-[#FEE2E2] border-[#FEE2E2]' : ''}`}>
+      <Card className={`p-4 ${metrics && metrics.total_overdue > 0 ? 'bg-cg-error-subtle border-cg-error-subtle' : ''}`}>
         <div className="flex items-center gap-2 mb-2">
-          <AlertTriangle className={`h-4 w-4 ${metrics && metrics.total_overdue > 0 ? 'text-[#C53030]' : 'text-gray-400'}`} />
+          <AlertTriangle className={`h-4 w-4 ${metrics && metrics.total_overdue > 0 ? 'text-cg-error' : 'text-gray-400'}`} />
           <span className="text-sm text-gray-600">Overdue</span>
         </div>
-        <p className={`text-2xl font-bold ${metrics && metrics.total_overdue > 0 ? 'text-[#C53030]' : 'text-gray-400'}`}>
+        <p className={`text-2xl font-bold ${metrics && metrics.total_overdue > 0 ? 'text-cg-error' : 'text-gray-400'}`}>
           {metrics?.total_overdue || 0}
         </p>
         <p className="text-xs text-gray-500 mt-1">

@@ -43,9 +43,9 @@ export function HorizontalScrollRow<T>({
             onClick={onViewAll}
             className={cn(
               'flex items-center gap-1 text-sm font-semibold',
-              viewAllClassName || 'text-[#4BA8C8] hover:text-[#5BC4A0]',
+              viewAllClassName || 'text-cg-slate-light hover:text-cg-sage-light',
               'transition-colors duration-200',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4BA8C8] focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cg-slate-light focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950',
               'rounded-lg px-2 py-1'
             )}
             style={{ fontFamily: 'Inter, sans-serif' }}

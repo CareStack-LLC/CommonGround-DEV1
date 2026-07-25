@@ -225,7 +225,7 @@ export default function ARIAAssistantPage() {
       </div>
 
       {/* Disclaimer */}
-      <Card className="bg-[#E0EFF8] border-[#E0EFF8]">
+      <Card className="bg-cg-slate-subtle border-cg-slate-subtle">
         <CardContent className="p-4">
           <div className="flex items-start space-x-3">
             <span className="text-xl">ℹ️</span>
@@ -364,7 +364,7 @@ export default function ARIAAssistantPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-[#FEF7ED] border-[#FEF7ED]">
+          <Card className="bg-cg-amber-subtle border-cg-amber-subtle">
             <CardContent className="p-4">
               <div className="text-sm text-[#E09520]">
                 <p className="font-medium">What ARIA Cannot Do</p>

@@ -80,12 +80,12 @@ const DO_TOGETHER: {
 
 /* Smaller "more to love" feature cards */
 const MORE_FEATURES = [
-    { icon: BookOpen, title: 'Read together', body: 'Bedtime stories across two homes — kids pick the book, both parents can co-read.', color: 'bg-[#FEF7ED] text-[#F5A623]' },
-    { icon: PencilRuler, title: 'Shared whiteboard', body: 'Draw in real time — homework help or silly doodles on the same canvas.', color: 'bg-[#E0EFF8] text-[#2D6A8F]' },
-    { icon: CalendarDays, title: "Their own calendar", body: 'Kids see their week, school events, and which parent they’re with — less anxiety, more confidence.', color: 'bg-[#E0EFF8] text-[#2D6A8F]' },
-    { icon: Cake, title: 'Birthdays built in', body: 'Family birthdays show up automatically so no one ever misses the big day.', color: 'bg-[#FEF7ED] text-[#F5A623]' },
-    { icon: Wallet, title: 'Chores & rewards', body: 'Assign chores with an optional allowance; kids earn a wallet balance for a reward you curate.', color: 'bg-[#E8F4F0] text-[#2D8A70]' },
-    { icon: Gift, title: 'Rewards store', body: 'Kids spend earned balance on rewards you set — an ice-cream trip, a new book, your call.', color: 'bg-[#FEF7ED] text-[#F5A623]' },
+    { icon: BookOpen, title: 'Read together', body: 'Bedtime stories across two homes — kids pick the book, both parents can co-read.', color: 'bg-cg-amber-subtle text-cg-amber' },
+    { icon: PencilRuler, title: 'Shared whiteboard', body: 'Draw in real time — homework help or silly doodles on the same canvas.', color: 'bg-cg-slate-subtle text-cg-slate' },
+    { icon: CalendarDays, title: "Their own calendar", body: 'Kids see their week, school events, and which parent they’re with — less anxiety, more confidence.', color: 'bg-cg-slate-subtle text-cg-slate' },
+    { icon: Cake, title: 'Birthdays built in', body: 'Family birthdays show up automatically so no one ever misses the big day.', color: 'bg-cg-amber-subtle text-cg-amber' },
+    { icon: Wallet, title: 'Chores & rewards', body: 'Assign chores with an optional allowance; kids earn a wallet balance for a reward you curate.', color: 'bg-cg-sage-subtle text-cg-sage-dark' },
+    { icon: Gift, title: 'Rewards store', body: 'Kids spend earned balance on rewards you set — an ice-cream trip, a new book, your call.', color: 'bg-cg-amber-subtle text-cg-amber' },
 ];
 
 /* ARIA safety guarantees */
@@ -105,13 +105,13 @@ export function KidSpaceContent() {
                 <div className="max-w-6xl mx-auto px-6 grid items-center gap-10 lg:gap-14 lg:grid-cols-2">
                     <div className="text-center lg:text-left">
                         <div className="flex flex-wrap justify-center lg:justify-start gap-2.5 mb-6">
-                            <span className="inline-flex items-center gap-1.5 bg-[#E8F4F0] text-[#2D8A70] px-3 py-1 text-sm font-medium rounded-full">
+                            <span className="inline-flex items-center gap-1.5 bg-cg-sage-subtle text-cg-sage-dark px-3 py-1 text-sm font-medium rounded-full">
                                 <Shield className="w-3.5 h-3.5" /> COPPA compliant
                             </span>
-                            <span className="inline-flex items-center gap-1.5 bg-[#FEF7ED] text-[#B26A00] px-3 py-1 text-sm font-medium rounded-full">
+                            <span className="inline-flex items-center gap-1.5 bg-cg-amber-subtle text-[#B26A00] px-3 py-1 text-sm font-medium rounded-full">
                                 Ages 3–12
                             </span>
-                            <span className="inline-flex items-center gap-1.5 bg-[#E0EFF8] text-[#2D6A8F] px-3 py-1 text-sm font-medium rounded-full">
+                            <span className="inline-flex items-center gap-1.5 bg-cg-slate-subtle text-cg-slate px-3 py-1 text-sm font-medium rounded-full">
                                 <Eye className="w-3.5 h-3.5" /> Parent-controlled
                             </span>
                         </div>

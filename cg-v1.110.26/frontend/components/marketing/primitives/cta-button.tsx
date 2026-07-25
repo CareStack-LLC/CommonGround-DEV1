@@ -3,9 +3,9 @@
  *
  * Plain string constants (server-safe, zero runtime) so every primary CTA
  * uses the SAME teal + hover shade — before this, five different "darker
- * teal" hover values were in circulation (#2F8C70, #2D8A70, #2E9577,
+ * teal" hover values were in circulation (#2F8C70, var(--cg-sage-dark), #2E9577,
  * #34967a, #35957A) and the header hovered LIGHTER. Canonical pair:
- * bg-cg-sage / hover:bg-cg-sage-dark (#3DAA8A → #2D8A70).
+ * bg-cg-sage / hover:bg-cg-sage-dark (var(--cg-sage) → var(--cg-sage-dark)).
  *
  * The hover lift (`motion-safe:hover:-translate-y-0.5`) is suppressed for
  * users who prefer reduced motion.

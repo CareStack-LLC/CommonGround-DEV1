@@ -56,7 +56,7 @@ export function ComparisonTable({
   ourProduct,
   competitor,
   rows,
-  highlightColor = '#3DAA8A',
+  highlightColor = 'var(--cg-sage)',
   className = '',
 }: ComparisonTableProps) {
   return (

@@ -20,8 +20,8 @@ const TIER_LABELS: Record<string, string> = {
 };
 
 const TIER_COLORS: Record<string, string> = {
-  web_starter: '#6B8A9A',
-  plus: '#3DAA8A', complete: '#2D6A8F',
+  web_starter: 'var(--muted-foreground)',
+  plus: 'var(--cg-sage)', complete: 'var(--cg-slate)',
   professional_starter: '#8B5CF6', solo: '#7C3AED', small_firm: '#6D28D9', mid_size: '#5B21B6',
 };
 
@@ -30,7 +30,7 @@ const STATUS_COLORS: Record<string, { text: string; bg: string }> = {
   trial: { text: 'text-sky-400', bg: 'bg-sky-400/10' },
   past_due: { text: 'text-amber-400', bg: 'bg-amber-400/10' },
   cancelled: { text: 'text-red-400', bg: 'bg-red-400/10' },
-  none: { text: 'text-[#6B8A9A]', bg: 'bg-[#6B8A9A]/10' },
+  none: { text: 'text-muted-foreground', bg: 'bg-muted-foreground/10' },
 };
 
 function fmt(n: number): string {
@@ -52,7 +52,7 @@ function fmtDateTime(iso: string): string {
 /* ── Skeleton ──────────────────────────────────────────── */
 
 function Skeleton({ className = '' }: { className?: string }) {
-  return <div className={`animate-pulse bg-[#2D6A8F]/15 rounded-xl ${className}`} />;
+  return <div className={`animate-pulse bg-cg-slate/15 rounded-xl ${className}`} />;
 }
 
 /* ── Main Component ────────────────────────────────────── */
@@ -135,7 +135,7 @@ export default function BillingContent() {
           <AlertTriangle className="w-7 h-7 text-amber-400" />
         </div>
         <p className="text-[#8AACBC] mb-5 text-sm">{error}</p>
-        <button onClick={fetchData} className="px-5 py-2.5 rounded-xl bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-semibold transition-colors">
+        <button onClick={fetchData} className="px-5 py-2.5 rounded-xl bg-cg-sage hover:bg-cg-sage-light text-white text-sm font-semibold transition-colors">
           Retry
         </button>
       </div>
@@ -149,7 +149,7 @@ export default function BillingContent() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight">Revenue Command Center</h1>
-          <p className="text-sm text-[#6B8A9A] mt-1">Real-time subscription metrics powered by Stripe</p>
+          <p className="text-sm text-muted-foreground mt-1">Real-time subscription metrics powered by Stripe</p>
         </div>
         <div className="flex items-center gap-3">
           {stripeAvailable && (
@@ -177,15 +177,15 @@ export default function BillingContent() {
 
       {/* ═══ AI EXECUTIVE SNAPSHOT ═══ */}
       {aiSummary && aiSummary.length > 0 && (
-        <div className="rounded-2xl border border-[#3DAA8A]/15 bg-gradient-to-r from-[#3DAA8A]/5 via-transparent to-transparent p-5">
+        <div className="rounded-2xl border border-cg-sage/15 bg-gradient-to-r from-cg-sage/5 via-transparent to-transparent p-5">
           <div className="flex items-center gap-2 mb-3">
-            <Zap className="w-4 h-4 text-[#3DAA8A]" />
-            <h2 className="text-sm font-bold text-[#3DAA8A] tracking-tight">AI Executive Snapshot</h2>
+            <Zap className="w-4 h-4 text-cg-sage" />
+            <h2 className="text-sm font-bold text-cg-sage tracking-tight">AI Executive Snapshot</h2>
           </div>
           <ul className="space-y-1.5">
             {aiSummary.map((bullet, i) => (
               <li key={i} className="text-sm text-[#D0E4EC] flex items-start gap-2">
-                <span className="text-[#3DAA8A] mt-1">•</span>
+                <span className="text-cg-sage mt-1">•</span>
                 <span>{bullet}</span>
               </li>
             ))}
@@ -213,7 +213,7 @@ export default function BillingContent() {
             <div className="text-[10px] text-[#4A6E7F] font-medium">Admins</div>
           </div>
           <div className="rounded-xl bg-white/[0.02] border border-white/[0.04] p-3 text-center">
-            <div className="text-lg font-bold text-[#6B8A9A]">{segments.partner_staff}</div>
+            <div className="text-lg font-bold text-muted-foreground">{segments.partner_staff}</div>
             <div className="text-[10px] text-[#4A6E7F] font-medium">Partner Staff</div>
           </div>
         </div>
@@ -227,13 +227,13 @@ export default function BillingContent() {
       ) : data && (
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
           {/* MRR — Hero Card */}
-          <div className="relative overflow-hidden rounded-2xl border border-[#3DAA8A]/30 bg-gradient-to-br from-[#3DAA8A]/15 via-[#1A3648]/80 to-[#1A3648]/60 p-5">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-[#3DAA8A]/5 rounded-full -translate-y-8 translate-x-8" />
-            <DollarSign className="w-5 h-5 text-[#3DAA8A] mb-3" />
+          <div className="relative overflow-hidden rounded-2xl border border-cg-sage/30 bg-gradient-to-br from-cg-sage/15 via-[#1A3648]/80 to-[#1A3648]/60 p-5">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-cg-sage/5 rounded-full -translate-y-8 translate-x-8" />
+            <DollarSign className="w-5 h-5 text-cg-sage mb-3" />
             <div className="text-3xl font-bold text-white tracking-tight">
               {data.verified_mrr != null ? fmt(data.verified_mrr) : fmt(data.estimated_mrr ?? data.total_mrr)}
             </div>
-            <div className="text-xs text-[#3DAA8A] font-medium mt-1">
+            <div className="text-xs text-cg-sage font-medium mt-1">
               {data.verified_mrr != null ? 'Verified MRR' : 'Estimated MRR'}
             </div>
             {data.verified_mrr != null && data.estimated_mrr != null && Math.abs(data.verified_mrr - data.estimated_mrr) > 0.01 && (
@@ -281,7 +281,7 @@ export default function BillingContent() {
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Revenue by Tier — 2 cols */}
           <div className="lg:col-span-2">
-            <Section title="Revenue by Tier" icon={<BarChart3 className="w-4 h-4 text-[#3DAA8A]" />}>
+            <Section title="Revenue by Tier" icon={<BarChart3 className="w-4 h-4 text-cg-sage" />}>
               <div className="space-y-4">
                 {Object.entries(data.mrr_by_tier || {})
                   .filter(([, v]) => v.price > 0)
@@ -292,19 +292,19 @@ export default function BillingContent() {
                       <div key={tier} className="group">
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-3">
-                            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: TIER_COLORS[tier] || '#3DAA8A' }} />
+                            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: TIER_COLORS[tier] || 'var(--cg-sage)' }} />
                             <span className="text-sm text-white font-medium">{TIER_LABELS[tier] || tier}</span>
                             <span className="text-xs text-[#4A6E7F]">${info.price}/mo</span>
                           </div>
                           <div className="flex items-center gap-4">
-                            <span className="text-xs text-[#6B8A9A] tabular-nums">{info.count} active</span>
+                            <span className="text-xs text-muted-foreground tabular-nums">{info.count} active</span>
                             <span className="text-sm font-bold text-white tabular-nums w-20 text-right">{fmtExact(info.mrr)}</span>
                           </div>
                         </div>
                         <div className="h-2.5 bg-[#0D1F2D] rounded-full overflow-hidden">
                           <div
                             className="h-full rounded-full transition-all duration-700 ease-out"
-                            style={{ width: `${Math.max(pct, 3)}%`, backgroundColor: TIER_COLORS[tier] || '#3DAA8A', opacity: 0.85 }}
+                            style={{ width: `${Math.max(pct, 3)}%`, backgroundColor: TIER_COLORS[tier] || 'var(--cg-sage)', opacity: 0.85 }}
                           />
                         </div>
                       </div>
@@ -346,7 +346,7 @@ export default function BillingContent() {
               <div className="space-y-4">
                 <MetricRow icon={<Clock className="w-4 h-4 text-sky-400" />} label="Trial Users" value={data.trial_count?.toString() || '0'} color="text-sky-400" />
                 <MetricRow icon={<Percent className="w-4 h-4 text-emerald-400" />} label="Paid Conversion" value={`${conversionRate}%`} color="text-emerald-400" />
-                <MetricRow icon={<DollarSign className="w-4 h-4 text-[#3DAA8A]" />} label="ARPU (paid)" value={arpu > 0 ? fmtExact(arpu) : '—'} color="text-[#3DAA8A]" />
+                <MetricRow icon={<DollarSign className="w-4 h-4 text-cg-sage" />} label="ARPU (paid)" value={arpu > 0 ? fmtExact(arpu) : '—'} color="text-cg-sage" />
                 {stripeAvailable && stripeLive?.total_customers != null && (
                   <MetricRow icon={<CreditCard className="w-4 h-4 text-violet-400" />} label="Stripe Customers" value={stripeLive.total_customers.toString()} color="text-violet-400" />
                 )}
@@ -355,18 +355,18 @@ export default function BillingContent() {
 
             <div className="space-y-2.5">
               <button onClick={() => handleSync('full')} disabled={syncing !== null}
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#3DAA8A]/10 border border-[#3DAA8A]/20 text-sm text-[#3DAA8A] hover:text-white hover:bg-[#3DAA8A]/20 font-semibold transition-all disabled:opacity-40">
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-cg-sage/10 border border-cg-sage/20 text-sm text-cg-sage hover:text-white hover:bg-cg-sage/20 font-semibold transition-all disabled:opacity-40">
                 <RefreshCw className={`w-4 h-4 ${syncing === 'full' ? 'animate-spin' : ''}`} />
                 {syncing === 'full' ? 'Full Sync Running...' : 'Full Stripe Sync'}
               </button>
               <div className="grid grid-cols-2 gap-2">
                 <button onClick={() => handleSync('customers')} disabled={syncing !== null}
-                  className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-xs text-[#6B8A9A] hover:text-white hover:bg-white/[0.06] transition-all disabled:opacity-40">
+                  className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-xs text-muted-foreground hover:text-white hover:bg-white/[0.06] transition-all disabled:opacity-40">
                   <ArrowUpDown className={`w-3.5 h-3.5 ${syncing === 'customers' ? 'animate-spin' : ''}`} />
                   {syncing === 'customers' ? 'Syncing...' : 'Customers'}
                 </button>
                 <button onClick={() => handleSync('subscriptions')} disabled={syncing !== null}
-                  className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-xs text-[#6B8A9A] hover:text-white hover:bg-white/[0.06] transition-all disabled:opacity-40">
+                  className="flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-white/[0.03] border border-white/[0.06] text-xs text-muted-foreground hover:text-white hover:bg-white/[0.06] transition-all disabled:opacity-40">
                   <ArrowUpDown className={`w-3.5 h-3.5 ${syncing === 'subscriptions' ? 'animate-spin' : ''}`} />
                   {syncing === 'subscriptions' ? 'Syncing...' : 'Subscriptions'}
                 </button>
@@ -472,8 +472,8 @@ export default function BillingContent() {
                   <tr key={payment.id} className={`border-b border-white/[0.03] ${i % 2 === 0 ? '' : 'bg-white/[0.01]'}`}>
                     <td className="py-3.5 pl-5 text-sm text-[#D0E4EC]">{payment.customer_email || payment.customer}</td>
                     <td className="py-3.5 text-sm text-white font-semibold tabular-nums">{fmtExact(payment.amount)}</td>
-                    <td className="py-3.5 text-xs text-[#6B8A9A] hidden md:table-cell max-w-48 truncate">{payment.description || '—'}</td>
-                    <td className="py-3.5 text-xs text-[#6B8A9A]">{fmtDateTime(payment.created)}</td>
+                    <td className="py-3.5 text-xs text-muted-foreground hidden md:table-cell max-w-48 truncate">{payment.description || '—'}</td>
+                    <td className="py-3.5 text-xs text-muted-foreground">{fmtDateTime(payment.created)}</td>
                     <td className="py-3.5 pr-5">
                       <span className="inline-flex items-center gap-1 text-[11px] text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-full font-medium">
                         <CheckCircle className="w-3 h-3" /> paid
@@ -494,9 +494,9 @@ export default function BillingContent() {
           <Section title="Subscriptions by Category" icon={<Users className="w-4 h-4 text-sky-400" />}>
             {(() => {
               const TIER_GROUPS = [
-                { label: 'Standard Plans', color: 'text-[#3DAA8A]', tiers: ['plus', 'complete'] },
+                { label: 'Standard Plans', color: 'text-cg-sage', tiers: ['plus', 'complete'] },
                 { label: 'Professional Plans', color: 'text-violet-400', tiers: ['professional_starter', 'solo', 'small_firm', 'mid_size'] },
-                { label: 'Free / Starter', color: 'text-[#6B8A9A]', tiers: ['web_starter'] },
+                { label: 'Free / Starter', color: 'text-muted-foreground', tiers: ['web_starter'] },
               ];
               return (
                 <div className="space-y-6">
@@ -523,13 +523,13 @@ export default function BillingContent() {
                             return (
                               <div key={tier} className="flex items-center justify-between px-4 py-3 rounded-xl bg-white/[0.02] border border-white/[0.04] hover:bg-white/[0.04] transition-colors">
                                 <div className="flex items-center gap-3">
-                                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: TIER_COLORS[tier] || '#6B8A9A' }} />
+                                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: TIER_COLORS[tier] || 'var(--muted-foreground)' }} />
                                   <span className="text-sm text-white font-medium">{TIER_LABELS[tier] || tier}</span>
                                   {tierPrice > 0 && <span className="text-[11px] text-[#4A6E7F]">${tierPrice}/mo</span>}
                                 </div>
                                 <div className="flex items-center gap-3">
                                   {Object.entries(statuses).map(([status, count]) => (
-                                    <span key={status} className={`text-[11px] px-1.5 py-0.5 rounded ${STATUS_COLORS[status]?.bg || ''} ${STATUS_COLORS[status]?.text || 'text-[#6B8A9A]'}`}>
+                                    <span key={status} className={`text-[11px] px-1.5 py-0.5 rounded ${STATUS_COLORS[status]?.bg || ''} ${STATUS_COLORS[status]?.text || 'text-muted-foreground'}`}>
                                       {count} {status}
                                     </span>
                                   ))}
@@ -550,7 +550,7 @@ export default function BillingContent() {
           {/* Valuation + Projections */}
           <div className="space-y-6">
             {data.valuation && Object.keys(data.valuation).length > 0 && (
-              <Section title="Valuation Metrics" icon={<TrendingUp className="w-4 h-4 text-[#3DAA8A]" />} badge={<span className="text-[10px] text-emerald-500/60">Live</span>}>
+              <Section title="Valuation Metrics" icon={<TrendingUp className="w-4 h-4 text-cg-sage" />} badge={<span className="text-[10px] text-emerald-500/60">Live</span>}>
                 <div className="grid grid-cols-2 gap-3">
                   <ValuationCard label="LTV" value={fmt(data.valuation.ltv || 0)} sub={`${data.valuation.avg_lifetime_months || 0} mo avg`} />
                   <ValuationCard label="ARPU" value={fmtExact(data.valuation.arpu || 0)} sub="monthly per user" />
@@ -629,7 +629,7 @@ export default function BillingContent() {
                       <td className="py-3 pl-5 text-sm text-amber-400 font-semibold tabular-nums">{fmtExact(r.amount)}</td>
                       <td className="py-3 text-xs text-[#8AACBC] capitalize">{r.reason?.replace('_', ' ') || 'N/A'}</td>
                       <td className="py-3 text-xs text-[#8AACBC] capitalize">{r.status}</td>
-                      <td className="py-3 pr-5 text-xs text-[#6B8A9A]">{fmtDate(r.created)}</td>
+                      <td className="py-3 pr-5 text-xs text-muted-foreground">{fmtDate(r.created)}</td>
                     </tr>
                   ))}
                 </tbody>

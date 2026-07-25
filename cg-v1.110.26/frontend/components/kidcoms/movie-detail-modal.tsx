@@ -83,7 +83,7 @@ export function MovieDetailModal({
             <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${
               isPlaying
                 ? 'bg-black/40 opacity-0 group-hover:opacity-100'
-                : 'bg-gradient-to-br from-[#3DAA8A] to-[#4BA8C8] shadow-lg shadow-[#3DAA8A]/30'
+                : 'bg-gradient-to-br from-cg-sage to-cg-slate-light shadow-lg shadow-cg-sage/30'
             }`}>
               {isPlaying ? (
                 <Pause className="w-7 h-7 text-white" />
@@ -105,7 +105,7 @@ export function MovieDetailModal({
                 className="h-full rounded-full"
                 style={{
                   width: `${progressPercent}%`,
-                  background: 'linear-gradient(90deg, #3DAA8A, #4BA8C8)',
+                  background: 'linear-gradient(90deg, var(--cg-sage), var(--cg-slate-light))',
                 }}
               />
             </div>
@@ -184,7 +184,7 @@ export function MovieDetailModal({
                   className="h-full rounded-full transition-all"
                   style={{
                     width: `${progressPercent}%`,
-                    background: 'linear-gradient(90deg, #3DAA8A, #4BA8C8)',
+                    background: 'linear-gradient(90deg, var(--cg-sage), var(--cg-slate-light))',
                   }}
                 />
               </div>
@@ -201,7 +201,7 @@ export function MovieDetailModal({
               className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold text-white transition-all duration-200 hover:shadow-lg active:scale-[0.98]"
               style={{
                 fontFamily: 'Space Grotesk, sans-serif',
-                background: 'linear-gradient(135deg, #3DAA8A, #4BA8C8)',
+                background: 'linear-gradient(135deg, var(--cg-sage), var(--cg-slate-light))',
                 boxShadow: '0 4px 14px rgba(61, 170, 138, 0.3)',
               }}
             >

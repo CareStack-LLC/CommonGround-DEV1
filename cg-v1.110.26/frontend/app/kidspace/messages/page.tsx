@@ -46,8 +46,8 @@ function Bubble({
         <div
           className={`px-5 py-3 rounded-3xl shadow-md ${
             mine
-              ? 'bg-gradient-to-br from-[#4BA8C8] to-[#2D6A8F] text-white'
-              : 'bg-white text-slate-900 border-4 border-[#FEF7ED]'
+              ? 'bg-gradient-to-br from-cg-slate-light to-cg-slate text-white'
+              : 'bg-white text-slate-900 border-4 border-cg-amber-subtle'
           }`}
         >
           {message.aria_hidden ? (
@@ -185,18 +185,18 @@ export default function KidSpaceMessagesPage() {
 
   if (!userData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#E0EFF8] via-[#FEF7ED] to-[#E8F4F0] flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-[#4BA8C8]/30 border-t-[#4BA8C8] rounded-full animate-spin" />
+      <div className="min-h-screen bg-gradient-to-br from-cg-slate-subtle via-cg-amber-subtle to-cg-sage-subtle flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-cg-slate-light/30 border-t-cg-slate-light rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="h-[100dvh] bg-gradient-to-br from-[#E0EFF8] via-[#FEF7ED] to-[#E8F4F0] flex flex-col overflow-hidden">
-      <header className="flex items-center gap-3 p-4 bg-white/80 backdrop-blur-sm border-b-4 border-[#FEF7ED] shadow-md flex-shrink-0">
+    <div className="h-[100dvh] bg-gradient-to-br from-cg-slate-subtle via-cg-amber-subtle to-cg-sage-subtle flex flex-col overflow-hidden">
+      <header className="flex items-center gap-3 p-4 bg-white/80 backdrop-blur-sm border-b-4 border-cg-amber-subtle shadow-md flex-shrink-0">
         <button
           onClick={() => router.push('/my-circle/child/dashboard')}
-          className="p-2 rounded-2xl bg-gradient-to-br from-[#4BA8C8] to-[#2D6A8F] text-white shadow-md hover:shadow-lg transition-all"
+          className="p-2 rounded-2xl bg-gradient-to-br from-cg-slate-light to-cg-slate text-white shadow-md hover:shadow-lg transition-all"
           aria-label="Back"
         >
           <ArrowLeft className="h-6 w-6" />
@@ -217,10 +217,10 @@ export default function KidSpaceMessagesPage() {
       <div className="flex-1 overflow-y-auto p-4 space-y-3">
         {loading ? (
           <div className="flex items-center justify-center h-full">
-            <div className="w-12 h-12 border-4 border-[#4BA8C8]/30 border-t-[#4BA8C8] rounded-full animate-spin" />
+            <div className="w-12 h-12 border-4 border-cg-slate-light/30 border-t-cg-slate-light rounded-full animate-spin" />
           </div>
         ) : error ? (
-          <div className="p-4 rounded-2xl bg-[#FEE2E2] border-4 border-[#FEE2E2] text-base text-[#9B2C2C] font-semibold">
+          <div className="p-4 rounded-2xl bg-cg-error-subtle border-4 border-cg-error-subtle text-base text-[#9B2C2C] font-semibold">
             {error}
           </div>
         ) : messages.length === 0 ? (
@@ -248,7 +248,7 @@ export default function KidSpaceMessagesPage() {
         <div ref={bottomRef} />
       </div>
 
-      <div className="border-t-4 border-[#FEF7ED] p-3 bg-white/80 backdrop-blur-sm flex-shrink-0 shadow-inner">
+      <div className="border-t-4 border-cg-amber-subtle p-3 bg-white/80 backdrop-blur-sm flex-shrink-0 shadow-inner">
         <div className="flex items-end gap-2">
           <textarea
             value={draft}
@@ -262,13 +262,13 @@ export default function KidSpaceMessagesPage() {
             placeholder="Type a message..."
             rows={1}
             maxLength={2000}
-            className="flex-1 resize-none rounded-2xl border-4 border-[#FEF7ED] bg-white px-4 py-3 text-lg focus:border-[#4BA8C8] focus:outline-none transition-all max-h-32 font-medium"
+            className="flex-1 resize-none rounded-2xl border-4 border-cg-amber-subtle bg-white px-4 py-3 text-lg focus:border-cg-slate-light focus:outline-none transition-all max-h-32 font-medium"
             disabled={sending}
           />
           <button
             onClick={handleSend}
             disabled={!draft.trim() || sending}
-            className="p-4 rounded-2xl bg-gradient-to-br from-[#4BA8C8] to-[#2D6A8F] text-white shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            className="p-4 rounded-2xl bg-gradient-to-br from-cg-slate-light to-cg-slate text-white shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             aria-label="Send message"
           >
             <Send className="h-6 w-6" />

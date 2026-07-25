@@ -195,7 +195,7 @@ export default function CourtPortalFormsPage() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#2D6A8F] border-t-transparent mx-auto" />
+          <div className="animate-spin rounded-full h-10 w-10 border-2 border-cg-slate border-t-transparent mx-auto" />
           <p className="mt-4 text-muted-foreground">Loading...</p>
         </div>
       </div>
@@ -208,7 +208,7 @@ export default function CourtPortalFormsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <Scale className="h-6 w-6 text-[#2D6A8F]" />
+            <Scale className="h-6 w-6 text-cg-slate" />
             Court Form Workflow
           </h1>
           <p className="text-muted-foreground">
@@ -244,7 +244,7 @@ export default function CourtPortalFormsPage() {
 
       {/* Progress Overview */}
       {progress && (
-        <Card className="bg-gradient-to-r from-[#E0EFF8] to-[#E0EFF8] border-[#E0EFF8]">
+        <Card className="bg-gradient-to-r from-cg-slate-subtle to-cg-slate-subtle border-cg-slate-subtle">
           <CardHeader>
             <CardTitle>Case Workflow Status</CardTitle>
             <CardDescription>
@@ -278,7 +278,7 @@ export default function CourtPortalFormsPage() {
 
             {progress.next_action && (
               <Alert className="mt-4 bg-white/70">
-                <AlertCircle className="h-4 w-4 text-[#2D6A8F]" />
+                <AlertCircle className="h-4 w-4 text-cg-slate" />
                 <AlertDescription className="text-[#1E4E6B]">
                   <strong>Next Step:</strong> {progress.next_action}
                 </AlertDescription>
@@ -290,9 +290,9 @@ export default function CourtPortalFormsPage() {
 
       {/* Forms Needing Review */}
       {getFormsNeedingReview().length > 0 && (
-        <Card className="border-[#FEF7ED] bg-[#FEF7ED]/50">
+        <Card className="border-cg-amber-subtle bg-cg-amber-subtle/50">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-[#1E3A4A]">
+            <CardTitle className="flex items-center gap-2 text-foreground">
               <Clock className="h-5 w-5" />
               Forms Needing Review ({getFormsNeedingReview().length})
             </CardTitle>
@@ -308,7 +308,7 @@ export default function CourtPortalFormsPage() {
                     onClick={() => router.push(`/court-portal/cases/${caseId}/forms/${form.id}`)}
                   >
                     <div className="flex items-center gap-4">
-                      <div className="h-12 w-12 bg-[#FEF7ED] rounded-lg flex items-center justify-center">
+                      <div className="h-12 w-12 bg-cg-amber-subtle rounded-lg flex items-center justify-center">
                         <FileText className="h-6 w-6 text-[#E09520]" />
                       </div>
                       <div>
@@ -338,7 +338,7 @@ export default function CourtPortalFormsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-[#2D6A8F]" />
+              <Calendar className="h-5 w-5 text-cg-slate" />
               Court Hearings
             </CardTitle>
           </CardHeader>
@@ -351,12 +351,12 @@ export default function CourtPortalFormsPage() {
                 >
                   <div className="flex items-center gap-4">
                     <div className={`h-12 w-12 rounded-lg flex items-center justify-center ${
-                      hearing.outcome ? "bg-[#E8F4F0]" : "bg-[#E0EFF8]"
+                      hearing.outcome ? "bg-cg-sage-subtle" : "bg-cg-slate-subtle"
                     }`}>
                       {hearing.outcome ? (
-                        <CheckCircle className="h-6 w-6 text-[#2D8A70]" />
+                        <CheckCircle className="h-6 w-6 text-cg-sage-dark" />
                       ) : (
-                        <Calendar className="h-6 w-6 text-[#2D6A8F]" />
+                        <Calendar className="h-6 w-6 text-cg-slate" />
                       )}
                     </div>
                     <div>
@@ -369,7 +369,7 @@ export default function CourtPortalFormsPage() {
                         {hearing.department && ` • Dept. ${hearing.department}`}
                       </p>
                       {hearing.outcome && (
-                        <p className="text-sm text-[#2D8A70] mt-1">
+                        <p className="text-sm text-cg-sage-dark mt-1">
                           Outcome: {hearing.outcome.replace(/_/g, " ")}
                         </p>
                       )}
@@ -400,7 +400,7 @@ export default function CourtPortalFormsPage() {
         <CardContent>
           {isLoadingData ? (
             <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#2D6A8F] border-t-transparent mx-auto" />
+              <div className="animate-spin rounded-full h-8 w-8 border-2 border-cg-slate border-t-transparent mx-auto" />
               <p className="mt-2 text-muted-foreground">Loading forms...</p>
             </div>
           ) : forms.length === 0 ? (
@@ -422,18 +422,18 @@ export default function CourtPortalFormsPage() {
                     <div className="flex items-center gap-4">
                       <div className={`h-12 w-12 rounded-lg flex items-center justify-center ${
                         form.status === "approved" || form.status === "entered"
-                          ? "bg-[#E8F4F0]"
+                          ? "bg-cg-sage-subtle"
                           : form.status === "rejected"
-                          ? "bg-[#FEE2E2]"
+                          ? "bg-cg-error-subtle"
                           : config.actionable
-                          ? "bg-[#FEF7ED]"
+                          ? "bg-cg-amber-subtle"
                           : "bg-gray-100"
                       }`}>
                         <FileText className={`h-6 w-6 ${
                           form.status === "approved" || form.status === "entered"
-                            ? "text-[#2D8A70]"
+                            ? "text-cg-sage-dark"
                             : form.status === "rejected"
-                            ? "text-[#C53030]"
+                            ? "text-cg-error"
                             : config.actionable
                             ? "text-[#E09520]"
                             : "text-gray-600"
@@ -480,19 +480,19 @@ function StatusIndicator({
 }) {
   return (
     <div className={`p-3 rounded-lg text-center ${
-      approved ? "bg-[#E8F4F0]" : active ? "bg-[#E0EFF8]" : "bg-white/50"
+      approved ? "bg-cg-sage-subtle" : active ? "bg-cg-slate-subtle" : "bg-white/50"
     }`}>
       <div className="flex justify-center mb-1">
         {approved ? (
-          <CheckCircle className="h-5 w-5 text-[#2D8A70]" />
+          <CheckCircle className="h-5 w-5 text-cg-sage-dark" />
         ) : active ? (
-          <FileCheck className="h-5 w-5 text-[#2D6A8F]" />
+          <FileCheck className="h-5 w-5 text-cg-slate" />
         ) : (
           <div className="h-5 w-5 rounded-full border-2 border-gray-300" />
         )}
       </div>
       <p className={`text-xs font-medium ${
-        approved ? "text-[#2D8A70]" : active ? "text-[#1E4E6B]" : "text-gray-500"
+        approved ? "text-cg-sage-dark" : active ? "text-[#1E4E6B]" : "text-gray-500"
       }`}>
         {label}
       </p>

@@ -10,12 +10,12 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 // Predefined tag color palette cycling
 const TAG_COLORS = [
-    "bg-[#E0EFF8] text-[#1E4E6B] border-[#E0EFF8]",
-    "bg-[#E0EFF8] text-[#1E4E6B] border-[#C2DEF0]",
-    "bg-[#E8F4F0] text-[#2D8A70] border-[#C5E5DB]",
-    "bg-[#FEF7ED] text-[#B8791A] border-[#FBE3BF]",
-    "bg-[#FEF7ED] text-[#E09520] border-[#FEF7ED]",
-    "bg-[#E0EFF8] text-[#1E4E6B] border-[#C2DEF0]",
+    "bg-cg-slate-subtle text-[#1E4E6B] border-cg-slate-subtle",
+    "bg-cg-slate-subtle text-[#1E4E6B] border-[#C2DEF0]",
+    "bg-cg-sage-subtle text-cg-sage-dark border-[#C5E5DB]",
+    "bg-cg-amber-subtle text-[#B8791A] border-[#FBE3BF]",
+    "bg-cg-amber-subtle text-[#E09520] border-cg-amber-subtle",
+    "bg-cg-slate-subtle text-[#1E4E6B] border-[#C2DEF0]",
 ];
 
 function tagColor(tag: string) {
@@ -155,7 +155,7 @@ export function CaseTagInput({ caseId, token, allTags = [], onChange, compact = 
                         {!compact && (
                             <button aria-label="Remove"
                                 onClick={(e) => { e.stopPropagation(); removeTag(tag); }}
-                                className="hover:text-[#C53030] transition-colors"
+                                className="hover:text-cg-error transition-colors"
                             >
                                 <X className="h-2.5 w-2.5" />
                             </button>

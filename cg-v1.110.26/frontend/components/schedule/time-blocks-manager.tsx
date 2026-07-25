@@ -211,11 +211,11 @@ export default function TimeBlocksManager({
   return (
     <div className="space-y-4">
       {/* Privacy Notice */}
-      <div className="bg-[#E0EFF8] border border-[#E0EFF8] rounded-lg p-4">
+      <div className="bg-cg-slate-subtle border border-cg-slate-subtle rounded-lg p-4">
         <div className="flex items-start gap-2">
-          <Lock className="h-5 w-5 text-[#2D6A8F] mt-0.5" />
+          <Lock className="h-5 w-5 text-cg-slate mt-0.5" />
           <div className="flex-1">
-            <p className="font-semibold text-[#1E3A4A]">Private Availability Blocks</p>
+            <p className="font-semibold text-foreground">Private Availability Blocks</p>
             <p className="text-sm text-[#1E4E6B] mt-1">
               Time blocks are completely private. The co-parent will never see these details.
               They're only used by ARIA to warn about potential scheduling conflicts.
@@ -257,14 +257,14 @@ export default function TimeBlocksManager({
       </div>
 
       {error && (
-        <div className="bg-[#FEE2E2] border border-[#FEE2E2] text-[#9B2C2C] px-4 py-3 rounded">
+        <div className="bg-cg-error-subtle border border-cg-error-subtle text-[#9B2C2C] px-4 py-3 rounded">
           {error}
         </div>
       )}
 
       {/* Create/Edit Form */}
       {showForm && (
-        <Card className="p-4 border-2 border-[#E0EFF8] bg-[#E0EFF8]">
+        <Card className="p-4 border-2 border-cg-slate-subtle bg-cg-slate-subtle">
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Title */}
             <div>
@@ -378,7 +378,7 @@ export default function TimeBlocksManager({
                             onClick={() => toggleWeekday(day.value)}
                             className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                               formData.recurrence_days.includes(day.value)
-                                ? 'bg-[#2D6A8F] text-white'
+                                ? 'bg-cg-slate text-white'
                                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                             }`}
                           >
@@ -448,7 +448,7 @@ export default function TimeBlocksManager({
                   <div className="flex items-center gap-2 mb-2">
                     <h4 className="font-semibold">{block.title}</h4>
                     {block.is_recurring && (
-                      <Repeat className="h-4 w-4 text-[#2D6A8F]" />
+                      <Repeat className="h-4 w-4 text-cg-slate" />
                     )}
                   </div>
 
@@ -459,7 +459,7 @@ export default function TimeBlocksManager({
                     </p>
 
                     {block.is_recurring && (
-                      <p className="text-[#2D6A8F]">
+                      <p className="text-cg-slate">
                         Repeats {block.recurrence_pattern}
                         {block.recurrence_pattern === 'weekly' && block.recurrence_days && (
                           <span> on {formatWeekdays(block.recurrence_days)}</span>
@@ -490,7 +490,7 @@ export default function TimeBlocksManager({
                     size="sm"
                     variant="ghost"
                     onClick={() => handleDelete(block.id)}
-                    className="h-8 w-8 p-0 text-[#C53030] hover:text-[#9B2C2C] hover:bg-[#FEE2E2]"
+                    className="h-8 w-8 p-0 text-cg-error hover:text-[#9B2C2C] hover:bg-cg-error-subtle"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>

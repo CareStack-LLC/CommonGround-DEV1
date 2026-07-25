@@ -59,18 +59,18 @@ interface ChildUserData {
 }
 
 const AVATAR_COLORS = [
-  'from-[#4BA8C8] to-[#3DAA8A]',
+  'from-cg-slate-light to-cg-sage',
   'from-red-500 to-orange-500',
   'from-amber-500 to-orange-400',
-  'from-emerald-500 to-[#3DAA8A]',
+  'from-emerald-500 to-cg-sage',
 ];
 
 const CONTACT_COLORS = [
-  'from-emerald-400 to-[#3DAA8A]',
+  'from-emerald-400 to-cg-sage',
   'from-pink-400 to-rose-500',
   'from-blue-400 to-indigo-500',
   'from-amber-400 to-orange-500',
-  'from-purple-400 to-[#2D6A8F]',
+  'from-purple-400 to-cg-slate',
 ];
 
 const COMING_SOON = [
@@ -82,8 +82,8 @@ const COMING_SOON = [
 const EVENT_TYPES = [
   { key: 'movie_night' as const, emoji: '🎬', label: 'Movie Night', color: 'from-red-600 to-red-500' },
   { key: 'reading_time' as const, emoji: '📚', label: 'Reading Time', color: 'from-amber-500 to-orange-400' },
-  { key: 'game_session' as const, emoji: '🎮', label: 'Game Session', color: 'from-[#4BA8C8] to-[#3DAA8A]' },
-  { key: 'family_call' as const, emoji: '📞', label: 'Family Call', color: 'from-emerald-500 to-[#3DAA8A]' },
+  { key: 'game_session' as const, emoji: '🎮', label: 'Game Session', color: 'from-cg-slate-light to-cg-sage' },
+  { key: 'family_call' as const, emoji: '📞', label: 'Family Call', color: 'from-emerald-500 to-cg-sage' },
 ];
 
 function formatRelativeTime(dateStr: string): string {
@@ -119,7 +119,7 @@ function getEventEmoji(type: string): string {
 function getEventColor(type: string): string {
   const map: Record<string, string> = {
     movie_night: 'from-red-500 to-orange-500', reading_time: 'from-amber-500 to-yellow-400',
-    game_session: 'from-[#4BA8C8] to-[#3DAA8A]', family_call: 'from-emerald-500 to-[#3DAA8A]',
+    game_session: 'from-cg-slate-light to-cg-sage', family_call: 'from-emerald-500 to-cg-sage',
     custom: 'from-purple-500 to-indigo-500',
   };
   return map[type] || 'from-slate-500 to-slate-600';
@@ -425,8 +425,8 @@ export default function ChildDashboardPage() {
           <div
             className="relative overflow-hidden rounded-2xl p-6 border"
             style={{
-              background: 'linear-gradient(135deg, var(--portal-primary, #3DAA8A)08, var(--portal-primary, #3DAA8A)18)',
-              borderColor: 'var(--portal-primary, #3DAA8A)1a',
+              background: 'linear-gradient(135deg, var(--portal-primary, var(--cg-sage))08, var(--portal-primary, var(--cg-sage))18)',
+              borderColor: 'var(--portal-primary, var(--cg-sage))1a',
             }}
           >
             <div className="flex items-center gap-4">
@@ -451,7 +451,7 @@ export default function ChildDashboardPage() {
                   className="text-2xl font-semibold"
                   style={{
                     fontFamily: 'var(--portal-font-display, DM Serif Display), Georgia, serif',
-                    color: 'var(--portal-primary, #3DAA8A)',
+                    color: 'var(--portal-primary, var(--cg-sage))',
                   }}
                 >
                   {userData?.childName || 'friend'}
@@ -460,13 +460,13 @@ export default function ChildDashboardPage() {
             </div>
             {/* Nature SVG illustration */}
             <svg className="absolute right-2 bottom-0 w-32 h-32 opacity-[0.12]" viewBox="0 0 120 120" fill="none">
-              <path d="M90 100 Q85 70 60 60 Q35 50 30 20" stroke="var(--portal-primary, #3DAA8A)" strokeWidth="2" fill="none" />
-              <circle cx="30" cy="20" r="8" fill="var(--portal-primary, #3DAA8A)" opacity="0.4" />
-              <circle cx="60" cy="60" r="6" fill="var(--portal-accent, #F5A623)" opacity="0.5" />
-              <path d="M60 60 Q70 40 85 45" stroke="var(--portal-primary, #3DAA8A)" strokeWidth="1.5" fill="none" />
-              <circle cx="85" cy="45" r="5" fill="var(--portal-secondary, #2D6A8F)" opacity="0.3" />
-              <path d="M30 20 Q20 35 25 50" stroke="var(--portal-primary, #3DAA8A)" strokeWidth="1.5" fill="none" />
-              <circle cx="25" cy="50" r="4" fill="var(--portal-primary, #3DAA8A)" opacity="0.3" />
+              <path d="M90 100 Q85 70 60 60 Q35 50 30 20" stroke="var(--portal-primary, var(--cg-sage))" strokeWidth="2" fill="none" />
+              <circle cx="30" cy="20" r="8" fill="var(--portal-primary, var(--cg-sage))" opacity="0.4" />
+              <circle cx="60" cy="60" r="6" fill="var(--portal-accent, var(--cg-amber))" opacity="0.5" />
+              <path d="M60 60 Q70 40 85 45" stroke="var(--portal-primary, var(--cg-sage))" strokeWidth="1.5" fill="none" />
+              <circle cx="85" cy="45" r="5" fill="var(--portal-secondary, var(--cg-slate))" opacity="0.3" />
+              <path d="M30 20 Q20 35 25 50" stroke="var(--portal-primary, var(--cg-sage))" strokeWidth="1.5" fill="none" />
+              <circle cx="25" cy="50" r="4" fill="var(--portal-primary, var(--cg-sage))" opacity="0.3" />
             </svg>
           </div>
         </div>
@@ -478,7 +478,7 @@ export default function ChildDashboardPage() {
             className="w-full relative overflow-hidden rounded-2xl p-5 text-left transition-all hover:scale-[1.01] active:scale-[0.99]"
             style={{
               background:
-                'linear-gradient(135deg, #F5A623 0%, #E89514 60%, #D97706 100%)',
+                'linear-gradient(135deg, var(--cg-amber) 0%, #E89514 60%, #D97706 100%)',
               boxShadow: '0 10px 30px -10px rgba(245, 166, 35, 0.5)',
             }}
             aria-label={
@@ -536,7 +536,7 @@ export default function ChildDashboardPage() {
             onClick={() => router.push('/kidspace/calendar')}
             className="w-full relative overflow-hidden rounded-2xl p-5 text-left transition-all hover:scale-[1.01] active:scale-[0.99]"
             style={{
-              background: 'linear-gradient(135deg, #4BA8C8 0%, #3D8DB4 60%, #2D6A8F 100%)',
+              background: 'linear-gradient(135deg, var(--cg-slate-light) 0%, #3D8DB4 60%, var(--cg-slate) 100%)',
               boxShadow: '0 10px 30px -10px rgba(75, 168, 200, 0.5)',
             }}
             aria-label="My calendar"
@@ -633,7 +633,7 @@ export default function ChildDashboardPage() {
                         </div>
                         <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-white/20">
                           <div
-                            className={`h-full ${isVideo ? 'bg-[#4BA8C8]' : 'bg-amber-500'} rounded-r-full`}
+                            className={`h-full ${isVideo ? 'bg-cg-slate-light' : 'bg-amber-500'} rounded-r-full`}
                             style={{ width: `${progressPct}%` }}
                           />
                         </div>
@@ -647,7 +647,7 @@ export default function ChildDashboardPage() {
                             {isVideo ? 'Movie' : 'Book'}
                           </span>
                         </div>
-                        <span className={`${isVideo ? 'text-[#4BA8C8]' : 'text-amber-400'} text-xs font-bold flex-shrink-0`} style={{ fontFamily: 'var(--portal-font-mono)' }}>
+                        <span className={`${isVideo ? 'text-cg-slate-light' : 'text-amber-400'} text-xs font-bold flex-shrink-0`} style={{ fontFamily: 'var(--portal-font-mono)' }}>
                           {progressPct}%
                         </span>
                       </div>
@@ -668,11 +668,11 @@ export default function ChildDashboardPage() {
             {[
               { label: 'MOVIES', icon: Film, color: 'from-red-600 to-red-500', shadow: 'shadow-red-500/20', href: '/my-circle/child/movies' },
               { label: 'BOOKS', icon: BookOpen, color: 'from-amber-500 to-orange-400', shadow: 'shadow-amber-500/20', href: '/my-circle/child/library' },
-              { label: 'GAMES', icon: Gamepad2, color: 'from-[#4BA8C8] to-[#3DAA8A]', shadow: 'shadow-[#4BA8C8]/20', href: '/my-circle/child/arcade' },
-              { label: 'WALLET', icon: Wallet, color: 'from-[#3DAA8A] to-[#2D6A8F]', shadow: 'shadow-[#3DAA8A]/20', href: '/my-circle/child/wallet' },
+              { label: 'GAMES', icon: Gamepad2, color: 'from-cg-slate-light to-cg-sage', shadow: 'shadow-cg-slate-light/20', href: '/my-circle/child/arcade' },
+              { label: 'WALLET', icon: Wallet, color: 'from-cg-sage to-cg-slate', shadow: 'shadow-cg-sage/20', href: '/my-circle/child/wallet' },
               { label: 'CHORES', icon: ListChecks, color: 'from-indigo-500 to-violet-500', shadow: 'shadow-indigo-500/20', href: '/my-circle/child/chores' },
               { label: 'REWARDS', icon: GiftIcon, color: 'from-pink-500 to-rose-500', shadow: 'shadow-pink-500/20', href: '/my-circle/child/rewards' },
-              { label: 'MY CIRCLE', icon: Users, color: 'from-emerald-500 to-[#3DAA8A]', shadow: 'shadow-emerald-500/20', href: '/my-circle/child/my-circle-page' },
+              { label: 'MY CIRCLE', icon: Users, color: 'from-emerald-500 to-cg-sage', shadow: 'shadow-emerald-500/20', href: '/my-circle/child/my-circle-page' },
             ].map(({ label, icon: Icon, color, shadow, href }) => (
               <button
                 key={label}
@@ -729,7 +729,7 @@ export default function ChildDashboardPage() {
                     </div>
                     <button aria-label="Toggle camera"
                       onClick={() => router.push(`/my-circle/child/my-circle-page`)}
-                      className="w-10 h-10 rounded-full flex items-center justify-center hover:text-[#5BC4A0] transition-all"
+                      className="w-10 h-10 rounded-full flex items-center justify-center hover:text-cg-sage-light transition-all"
                       style={{ background: 'var(--portal-surface-hover, var(--portal-surface))', color: 'var(--portal-muted)' }}
                     >
                       {isVideo ? <Video className="w-4 h-4" /> : <Phone className="w-4 h-4" />}
@@ -749,7 +749,7 @@ export default function ChildDashboardPage() {
             </h2>
             <button
               onClick={() => router.push('/my-circle/child/my-circle-page')}
-              className="text-xs text-[#3DAA8A] hover:text-[#5BC4A0] font-semibold flex items-center gap-1"
+              className="text-xs text-cg-sage hover:text-cg-sage-light font-semibold flex items-center gap-1"
               style={{ fontFamily: 'var(--portal-font-body)' }}
             >
               View All <ChevronRight className="w-3 h-3" />
@@ -780,7 +780,7 @@ export default function ChildDashboardPage() {
                     <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${CONTACT_COLORS[colorIdx]} flex items-center justify-center shadow-lg transform group-hover:scale-105 transition-transform relative`}>
                       <span className="text-white font-black text-lg" style={{ fontFamily: 'var(--portal-font-heading)' }}>{initial}</span>
                       {hasUnread && (
-                        <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-[#3DAA8A] rounded-full" style={{ border: '2px solid var(--portal-background)' }} />
+                        <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-cg-sage rounded-full" style={{ border: '2px solid var(--portal-background)' }} />
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -842,7 +842,7 @@ export default function ChildDashboardPage() {
                           {date} · {time}
                         </span>
                         {event.created_by_child && (
-                          <span className="text-[#4BA8C8] text-[10px] font-medium ml-1">You created this</span>
+                          <span className="text-cg-slate-light text-[10px] font-medium ml-1">You created this</span>
                         )}
                       </div>
                     </div>
@@ -853,7 +853,7 @@ export default function ChildDashboardPage() {
             )}
             <button
               onClick={() => { setShowAddEvent(true); setEventStep('type'); setEventCreated(false); }}
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border border-dashed hover:border-[#4BA8C8]/50 hover:text-[#5BC4A0] transition-all duration-200"
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border border-dashed hover:border-cg-slate-light/50 hover:text-cg-sage-light transition-all duration-200"
               style={{ borderColor: 'var(--portal-border)', color: 'var(--portal-muted)', fontFamily: 'var(--portal-font-body)', fontSize: '14px' }}
             >
               <Plus className="w-4 h-4" /> Add new event
@@ -869,7 +869,7 @@ export default function ChildDashboardPage() {
             </h2>
             <button
               onClick={() => router.push('/my-circle/child/movies')}
-              className="flex items-center gap-1 text-sm font-semibold text-[#4BA8C8] hover:text-[#5BC4A0] transition-colors"
+              className="flex items-center gap-1 text-sm font-semibold text-cg-slate-light hover:text-cg-sage-light transition-colors"
             >
               View All <ChevronRight className="w-4 h-4" />
             </button>
@@ -882,12 +882,12 @@ export default function ChildDashboardPage() {
                     <img src={item.poster} alt="Coming soon" className="absolute inset-0 w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                     <div className="absolute top-3 left-3">
-                      <span className="px-3 py-1 rounded-full bg-[#4BA8C8] text-white text-[10px] font-bold uppercase tracking-wide shadow-lg">
+                      <span className="px-3 py-1 rounded-full bg-cg-slate-light text-white text-[10px] font-bold uppercase tracking-wide shadow-lg">
                         Coming Soon
                       </span>
                     </div>
                     <div className="absolute bottom-3 left-3 flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-[#5BC4A0]" />
+                      <Sparkles className="w-3.5 h-3.5 text-cg-sage-light" />
                       <span className="text-white/80 text-xs font-medium" style={{ fontFamily: 'var(--portal-font-body)' }}>Watch for it!</span>
                     </div>
                   </div>
@@ -901,10 +901,10 @@ export default function ChildDashboardPage() {
         {featuredAuthor && (
           <section className="px-4">
             <div className="flex items-center justify-between mb-3">
-              <p className="text-[#4BA8C8] text-xs font-semibold uppercase tracking-widest" style={{ fontFamily: 'var(--portal-font-body)' }}>
+              <p className="text-cg-slate-light text-xs font-semibold uppercase tracking-widest" style={{ fontFamily: 'var(--portal-font-body)' }}>
                 Featured Author
               </p>
-              <button onClick={() => router.push('/my-circle/child/library')} className="flex items-center gap-1 text-sm font-semibold text-[#4BA8C8] hover:text-[#5BC4A0] transition-colors">
+              <button onClick={() => router.push('/my-circle/child/library')} className="flex items-center gap-1 text-sm font-semibold text-cg-slate-light hover:text-cg-sage-light transition-colors">
                 Library <ChevronRight className="w-4 h-4" />
               </button>
             </div>
@@ -1030,7 +1030,7 @@ export default function ChildDashboardPage() {
                       value={newEventTitle}
                       onChange={e => setNewEventTitle(e.target.value)}
                       placeholder="What's happening?"
-                      className="w-full rounded-xl px-4 py-3 focus:outline-none focus:border-[#4BA8C8] transition-colors"
+                      className="w-full rounded-xl px-4 py-3 focus:outline-none focus:border-cg-slate-light transition-colors"
                       style={{ fontFamily: 'var(--portal-font-body)', background: 'var(--portal-input-bg)', border: '1px solid var(--portal-input-border)', color: 'var(--portal-text)' }}
                     />
                   </div>
@@ -1041,7 +1041,7 @@ export default function ChildDashboardPage() {
                         type="date"
                         value={newEventDate}
                         onChange={e => setNewEventDate(e.target.value)}
-                        className="w-full rounded-xl px-4 py-3 focus:outline-none focus:border-[#4BA8C8] transition-colors"
+                        className="w-full rounded-xl px-4 py-3 focus:outline-none focus:border-cg-slate-light transition-colors"
                         style={{ fontFamily: 'var(--portal-font-body)', background: 'var(--portal-input-bg)', border: '1px solid var(--portal-input-border)', color: 'var(--portal-text)' }}
                       />
                     </div>
@@ -1051,7 +1051,7 @@ export default function ChildDashboardPage() {
                         type="time"
                         value={newEventTime}
                         onChange={e => setNewEventTime(e.target.value)}
-                        className="w-full rounded-xl px-4 py-3 focus:outline-none focus:border-[#4BA8C8] transition-colors"
+                        className="w-full rounded-xl px-4 py-3 focus:outline-none focus:border-cg-slate-light transition-colors"
                         style={{ fontFamily: 'var(--portal-font-body)', background: 'var(--portal-input-bg)', border: '1px solid var(--portal-input-border)', color: 'var(--portal-text)' }}
                       />
                     </div>
@@ -1070,7 +1070,7 @@ export default function ChildDashboardPage() {
                           onClick={() => setNewEventParents(opt.value)}
                           className={`py-2.5 px-3 rounded-xl text-sm font-medium transition-all ${
                             newEventParents === opt.value
-                              ? 'bg-[#4BA8C8] text-white'
+                              ? 'bg-cg-slate-light text-white'
                               : ''
                           }`}
                           style={newEventParents !== opt.value ? { background: 'var(--portal-input-bg)', color: 'var(--portal-muted)', border: '1px solid var(--portal-input-border)', fontFamily: 'var(--portal-font-body)' } : { fontFamily: 'var(--portal-font-body)' }}
@@ -1083,7 +1083,7 @@ export default function ChildDashboardPage() {
                   <button
                     onClick={handleCreateEvent}
                     disabled={!newEventTitle || !newEventDate || !newEventTime || isCreatingEvent}
-                    className="w-full py-3.5 bg-gradient-to-r from-[#4BA8C8] to-[#3DAA8A] rounded-xl text-white font-bold shadow-lg shadow-[#4BA8C8]/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                    className="w-full py-3.5 bg-gradient-to-r from-cg-slate-light to-cg-sage rounded-xl text-white font-bold shadow-lg shadow-cg-slate-light/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                     style={{ fontFamily: 'var(--portal-font-heading)' }}
                   >
                     {isCreatingEvent ? (

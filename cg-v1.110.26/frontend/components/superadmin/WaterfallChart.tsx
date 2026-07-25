@@ -21,7 +21,7 @@ export function WaterfallChart({ items, title = 'MRR Movement', tooltip }: Water
   const maxAbs = Math.max(...items.map(i => Math.abs(i.value)), 1);
 
   return (
-    <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+    <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
       <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">
         {title}
         {tooltip && <InfoTooltip text={tooltip} />}
@@ -49,7 +49,7 @@ export function WaterfallChart({ items, title = 'MRR Movement', tooltip }: Water
               <div
                 className={`w-full rounded-t transition-all ${
                   isTotal
-                    ? 'bg-[#3DAA8A]/80 border-2 border-[#3DAA8A]/40'
+                    ? 'bg-cg-sage/80 border-2 border-cg-sage/40'
                     : isPositive
                     ? 'bg-emerald-500/60 group-hover:bg-emerald-500/80'
                     : 'bg-red-400/60 group-hover:bg-red-400/80'
@@ -58,12 +58,12 @@ export function WaterfallChart({ items, title = 'MRR Movement', tooltip }: Water
               />
 
               {/* Label */}
-              <div className="text-[10px] text-[#6B8A9A] mt-1.5 text-center leading-tight whitespace-nowrap">
+              <div className="text-[10px] text-muted-foreground mt-1.5 text-center leading-tight whitespace-nowrap">
                 {item.label}
               </div>
 
               {/* Tooltip */}
-              <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-[#1E3A4A] text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10 shadow-lg">
+              <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-foreground text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10 shadow-lg">
                 {item.label}: {formatCurrency(item.value)}
               </div>
             </div>

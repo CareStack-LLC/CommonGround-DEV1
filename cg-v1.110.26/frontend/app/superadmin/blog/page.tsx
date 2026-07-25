@@ -74,7 +74,7 @@ function CopyButton({ text, label }: { text: string; label?: string }) {
   return (
     <button
       onClick={handleCopy}
-      className="inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] bg-[#2D6A8F]/20 hover:bg-zinc-700 text-[#8AACBC] hover:text-white transition-colors"
+      className="inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] bg-cg-slate/20 hover:bg-zinc-700 text-[#8AACBC] hover:text-white transition-colors"
     >
       {copied ? <CheckCircle className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
       {label || (copied ? 'Copied!' : 'Copy')}
@@ -95,9 +95,9 @@ function MarketingTabs({ content, imageUrl }: { content: MarketingContent[]; ima
   }
 
   return (
-    <div className="border-t border-[#2D6A8F]/15">
+    <div className="border-t border-cg-slate/15">
       {/* Tab bar */}
-      <div className="flex gap-0 border-b border-[#2D6A8F]/15 overflow-x-auto">
+      <div className="flex gap-0 border-b border-cg-slate/15 overflow-x-auto">
         {content.map((mc) => {
           const meta = PLATFORM_META[mc.platform];
           if (!meta) return null;
@@ -109,7 +109,7 @@ function MarketingTabs({ content, imageUrl }: { content: MarketingContent[]; ima
               className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-medium transition-colors whitespace-nowrap border-b-2 ${
                 activeTab === mc.platform
                   ? `${meta.color} border-current`
-                  : 'text-[#6B8A9A] border-transparent hover:text-[#D0E4EC]'
+                  : 'text-muted-foreground border-transparent hover:text-[#D0E4EC]'
               }`}
             >
               <Icon className="w-3.5 h-3.5" />
@@ -125,7 +125,7 @@ function MarketingTabs({ content, imageUrl }: { content: MarketingContent[]; ima
           {/* Headline */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <span className="text-[11px] text-[#6B8A9A] uppercase tracking-wider font-medium">Headline</span>
+              <span className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Headline</span>
               <CopyButton text={active.headline} />
             </div>
             <p className="text-sm text-white font-medium">{active.headline}</p>
@@ -134,10 +134,10 @@ function MarketingTabs({ content, imageUrl }: { content: MarketingContent[]; ima
           {/* Body */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <span className="text-[11px] text-[#6B8A9A] uppercase tracking-wider font-medium">Post Copy</span>
+              <span className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Post Copy</span>
               <CopyButton text={active.body} />
             </div>
-            <div className="bg-[#2D6A8F]/15 rounded-lg p-3 text-sm text-[#D0E4EC] whitespace-pre-wrap max-h-48 overflow-y-auto">
+            <div className="bg-cg-slate/15 rounded-lg p-3 text-sm text-[#D0E4EC] whitespace-pre-wrap max-h-48 overflow-y-auto">
               {active.body}
             </div>
           </div>
@@ -146,14 +146,14 @@ function MarketingTabs({ content, imageUrl }: { content: MarketingContent[]; ima
           {active.hashtags.length > 0 && (
             <div>
               <div className="flex items-center justify-between mb-1">
-                <span className="text-[11px] text-[#6B8A9A] uppercase tracking-wider font-medium">Hashtags</span>
+                <span className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Hashtags</span>
                 <CopyButton text={active.hashtags.join(' ')} label="Copy All" />
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {active.hashtags.map((tag, i) => (
                   <span
                     key={i}
-                    className="px-2 py-0.5 rounded-full bg-[#2D6A8F]/20 text-xs text-[#8AACBC]"
+                    className="px-2 py-0.5 rounded-full bg-cg-slate/20 text-xs text-[#8AACBC]"
                   >
                     {tag.startsWith('#') ? tag : `#${tag}`}
                   </span>
@@ -164,13 +164,13 @@ function MarketingTabs({ content, imageUrl }: { content: MarketingContent[]; ima
 
           {/* CTA */}
           <div className="flex items-center gap-3">
-            <span className="text-[11px] text-[#6B8A9A] uppercase tracking-wider font-medium">CTA:</span>
-            <span className="text-sm text-[#3DAA8A] font-medium">{active.cta_text}</span>
+            <span className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">CTA:</span>
+            <span className="text-sm text-cg-sage font-medium">{active.cta_text}</span>
             <CopyButton text={active.cta_url} label="Copy Link" />
           </div>
 
           {/* Full Copy-All */}
-          <div className="pt-2 border-t border-[#2D6A8F]/15">
+          <div className="pt-2 border-t border-cg-slate/15">
             <CopyButton
               text={`${active.headline}\n\n${active.body}\n\n${active.hashtags.join(' ')}\n\n${active.cta_url}`}
               label="Copy Full Post"
@@ -412,19 +412,19 @@ export default function BlogPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-white">Blog Management</h1>
-          <p className="text-sm text-[#6B8A9A] mt-0.5">Create blog posts with auto-generated social media marketing</p>
+          <p className="text-sm text-muted-foreground mt-0.5">Create blog posts with auto-generated social media marketing</p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={fetchPosts}
             disabled={loading}
-            className="p-2 rounded-lg bg-[#2D6A8F]/20 hover:bg-[#2D6A8F]/30 text-[#8AACBC] hover:text-white transition-colors disabled:opacity-50"
+            className="p-2 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-[#8AACBC] hover:text-white transition-colors disabled:opacity-50"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
           <button
             onClick={openCreate}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-cg-sage hover:bg-cg-sage-light text-white text-sm font-medium transition-colors"
           >
             <Plus className="w-4 h-4" />
             New Post
@@ -440,7 +440,7 @@ export default function BlogPage() {
         </div>
       )}
       {successMessage && (
-        <div className="bg-emerald-500/10 border border-[#3DAA8A]/20 rounded-xl px-4 py-3 flex items-center gap-2">
+        <div className="bg-emerald-500/10 border border-cg-sage/20 rounded-xl px-4 py-3 flex items-center gap-2">
           <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0" />
           <span className="text-sm text-emerald-300">{successMessage}</span>
         </div>
@@ -450,42 +450,42 @@ export default function BlogPage() {
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-start justify-center pt-10 px-4">
           <div className="fixed inset-0 bg-black/70" onClick={() => { setShowModal(false); resetForm(); }} />
-          <div className="relative w-full max-w-3xl bg-zinc-900 border border-[#2D6A8F]/20 rounded-xl p-6 space-y-5 max-h-[85vh] overflow-y-auto">
+          <div className="relative w-full max-w-3xl bg-zinc-900 border border-cg-slate/20 rounded-xl p-6 space-y-5 max-h-[85vh] overflow-y-auto">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-white">
                 {editingPost ? 'Edit Post' : 'Create New Post'}
               </h2>
-              <button aria-label="Close" onClick={() => { setShowModal(false); resetForm(); }} className="text-[#6B8A9A] hover:text-[#D0E4EC] transition-colors">
+              <button aria-label="Close" onClick={() => { setShowModal(false); resetForm(); }} className="text-muted-foreground hover:text-[#D0E4EC] transition-colors">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* AI Generation Section */}
-            <div className="bg-violet-500/5 border border-[#3DAA8A]/20 rounded-lg p-4 space-y-3">
-              <div className="flex items-center gap-2 text-sm font-medium text-[#5BC4A0]">
+            <div className="bg-violet-500/5 border border-cg-sage/20 rounded-lg p-4 space-y-3">
+              <div className="flex items-center gap-2 text-sm font-medium text-cg-sage-light">
                 <Sparkles className="w-4 h-4" />
                 Generate Blog + Marketing with AI
               </div>
-              <p className="text-xs text-[#6B8A9A]">Generates blog post, featured image, and marketing content for Facebook, Instagram, TikTok, LinkedIn, and Newsletter.</p>
+              <p className="text-xs text-muted-foreground">Generates blog post, featured image, and marketing content for Facebook, Instagram, TikTok, LinkedIn, and Newsletter.</p>
               <div className="flex flex-col sm:flex-row gap-2">
                 <input
                   type="text"
                   value={aiTopic}
                   onChange={(e) => setAiTopic(e.target.value)}
                   placeholder="Enter a topic..."
-                  className="flex-1 px-3 py-2 bg-[#2D6A8F]/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50"
+                  className="flex-1 px-3 py-2 bg-cg-slate/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50"
                 />
                 <input
                   type="text"
                   value={aiKeywords}
                   onChange={(e) => setAiKeywords(e.target.value)}
                   placeholder="Keywords (comma-separated)"
-                  className="flex-1 px-3 py-2 bg-[#2D6A8F]/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50"
+                  className="flex-1 px-3 py-2 bg-cg-slate/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50"
                 />
                 <button
                   onClick={handleAIGenerate}
                   disabled={generating || !aiTopic.trim()}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors disabled:opacity-50 whitespace-nowrap"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-cg-sage hover:bg-cg-sage-light text-white text-sm font-medium transition-colors disabled:opacity-50 whitespace-nowrap"
                 >
                   {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
                   {generating ? 'Generating...' : 'Generate'}
@@ -496,44 +496,44 @@ export default function BlogPage() {
             {/* Form Fields */}
             <div className="space-y-4">
               <div>
-                <label className="text-xs text-[#6B8A9A] uppercase tracking-wider font-medium block mb-1.5">Title</label>
+                <label className="text-xs text-muted-foreground uppercase tracking-wider font-medium block mb-1.5">Title</label>
                 <input
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="Post title..."
-                  className="w-full px-3 py-2 bg-[#2D6A8F]/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50"
+                  className="w-full px-3 py-2 bg-cg-slate/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50"
                 />
               </div>
 
               <div>
-                <label className="text-xs text-[#6B8A9A] uppercase tracking-wider font-medium block mb-1.5">Content</label>
+                <label className="text-xs text-muted-foreground uppercase tracking-wider font-medium block mb-1.5">Content</label>
                 <textarea
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   placeholder="Write your blog post content..."
                   rows={10}
-                  className="w-full px-3 py-2 bg-[#2D6A8F]/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50 resize-y"
+                  className="w-full px-3 py-2 bg-cg-slate/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50 resize-y"
                 />
               </div>
 
               <div>
-                <label className="text-xs text-[#6B8A9A] uppercase tracking-wider font-medium block mb-1.5">Excerpt</label>
+                <label className="text-xs text-muted-foreground uppercase tracking-wider font-medium block mb-1.5">Excerpt</label>
                 <textarea
                   value={excerpt}
                   onChange={(e) => setExcerpt(e.target.value)}
                   placeholder="Short excerpt or summary..."
                   rows={2}
-                  className="w-full px-3 py-2 bg-[#2D6A8F]/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50 resize-y"
+                  className="w-full px-3 py-2 bg-cg-slate/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50 resize-y"
                 />
               </div>
 
               <div>
-                <label className="text-xs text-[#6B8A9A] uppercase tracking-wider font-medium block mb-1.5">Category</label>
+                <label className="text-xs text-muted-foreground uppercase tracking-wider font-medium block mb-1.5">Category</label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full px-3 py-2 bg-[#2D6A8F]/20 border border-zinc-700/60 rounded-lg text-sm text-white focus:outline-none focus:border-violet-500/50"
+                  className="w-full px-3 py-2 bg-cg-slate/20 border border-zinc-700/60 rounded-lg text-sm text-white focus:outline-none focus:border-violet-500/50"
                 >
                   {CATEGORIES.map(cat => (
                     <option key={cat} value={cat}>{cat}</option>
@@ -543,23 +543,23 @@ export default function BlogPage() {
 
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs text-[#6B8A9A] uppercase tracking-wider font-medium block mb-1.5">SEO Title</label>
+                  <label className="text-xs text-muted-foreground uppercase tracking-wider font-medium block mb-1.5">SEO Title</label>
                   <input
                     type="text"
                     value={seoTitle}
                     onChange={(e) => setSeoTitle(e.target.value)}
                     placeholder="SEO title..."
-                    className="w-full px-3 py-2 bg-[#2D6A8F]/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50"
+                    className="w-full px-3 py-2 bg-cg-slate/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50"
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-[#6B8A9A] uppercase tracking-wider font-medium block mb-1.5">SEO Description</label>
+                  <label className="text-xs text-muted-foreground uppercase tracking-wider font-medium block mb-1.5">SEO Description</label>
                   <input
                     type="text"
                     value={seoDescription}
                     onChange={(e) => setSeoDescription(e.target.value)}
                     placeholder="SEO description..."
-                    className="w-full px-3 py-2 bg-[#2D6A8F]/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50"
+                    className="w-full px-3 py-2 bg-cg-slate/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50"
                   />
                 </div>
               </div>
@@ -567,7 +567,7 @@ export default function BlogPage() {
 
             {/* Featured Image */}
             <div>
-              <label className="text-xs text-[#6B8A9A] uppercase tracking-wider font-medium block mb-1.5">Featured Image</label>
+              <label className="text-xs text-muted-foreground uppercase tracking-wider font-medium block mb-1.5">Featured Image</label>
               {featuredImageUrl && (
                 <div className="mb-2 rounded-lg overflow-hidden border border-zinc-700/60">
                   <img
@@ -582,7 +582,7 @@ export default function BlogPage() {
                 value={featuredImageUrl}
                 onChange={(e) => setFeaturedImageUrl(e.target.value)}
                 placeholder="Image URL (auto-generated with AI, or paste your own)..."
-                className="w-full px-3 py-2 bg-[#2D6A8F]/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50"
+                className="w-full px-3 py-2 bg-cg-slate/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50"
               />
               {!featuredImageUrl && (
                 <p className="text-xs text-[#4A6E7F] mt-1">An image will be auto-generated when you use AI generation</p>
@@ -592,20 +592,20 @@ export default function BlogPage() {
             {/* Marketing Content Preview (in modal after AI generation) */}
             {marketingContent.length > 0 && (
               <div>
-                <label className="text-xs text-[#6B8A9A] uppercase tracking-wider font-medium block mb-2">
+                <label className="text-xs text-muted-foreground uppercase tracking-wider font-medium block mb-2">
                   Generated Marketing Content ({marketingContent.length} platforms)
                 </label>
-                <div className="bg-[#2D6A8F]/10 rounded-lg border border-zinc-700/40 overflow-hidden">
+                <div className="bg-cg-slate/10 rounded-lg border border-zinc-700/40 overflow-hidden">
                   <MarketingTabs content={marketingContent} imageUrl={featuredImageUrl} />
                 </div>
               </div>
             )}
 
             {/* Action Buttons */}
-            <div className="flex justify-end gap-2 pt-2 border-t border-[#2D6A8F]/20">
+            <div className="flex justify-end gap-2 pt-2 border-t border-cg-slate/20">
               <button
                 onClick={() => { setShowModal(false); resetForm(); }}
-                className="px-4 py-2 rounded-lg text-sm text-[#8AACBC] hover:text-white hover:bg-[#2D6A8F]/20 transition-colors"
+                className="px-4 py-2 rounded-lg text-sm text-[#8AACBC] hover:text-white hover:bg-cg-slate/20 transition-colors"
               >
                 Cancel
               </button>
@@ -631,17 +631,17 @@ export default function BlogPage() {
       )}
 
       {/* Blog Posts List */}
-      <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl overflow-hidden">
+      <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden">
         {loading ? (
           <div className="p-4 space-y-3">
             {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="animate-pulse bg-[#2D6A8F]/20 rounded-lg h-14" />
+              <div key={i} className="animate-pulse bg-cg-slate/20 rounded-lg h-14" />
             ))}
           </div>
         ) : posts.length === 0 ? (
           <div className="py-16 text-center">
             <PenTool className="w-10 h-10 text-[#3A5A6A] mx-auto mb-3" />
-            <p className="text-sm text-[#6B8A9A]">No blog posts yet</p>
+            <p className="text-sm text-muted-foreground">No blog posts yet</p>
             <p className="text-xs text-[#4A6E7F] mt-1">Create your first post to get started</p>
           </div>
         ) : (
@@ -654,15 +654,15 @@ export default function BlogPage() {
                 <div key={post.id}>
                   {/* Post row */}
                   <div
-                    className={`flex items-center px-5 py-3.5 hover:bg-[#2D6A8F]/10 transition-colors ${hasMarketing ? 'cursor-pointer' : ''}`}
+                    className={`flex items-center px-5 py-3.5 hover:bg-cg-slate/10 transition-colors ${hasMarketing ? 'cursor-pointer' : ''}`}
                     onClick={() => hasMarketing && setExpandedPost(isExpanded ? null : post.id)}
                   >
                     {/* Expand icon */}
                     <div className="w-6 flex-shrink-0">
                       {hasMarketing ? (
                         isExpanded
-                          ? <ChevronDown className="w-4 h-4 text-[#6B8A9A]" />
-                          : <ChevronRight className="w-4 h-4 text-[#6B8A9A]" />
+                          ? <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                          : <ChevronRight className="w-4 h-4 text-muted-foreground" />
                       ) : (
                         <span className="w-4 h-4" />
                       )}
@@ -702,7 +702,7 @@ export default function BlogPage() {
 
                     {/* Published date */}
                     <div className="hidden md:block w-28 flex-shrink-0">
-                      <span className="text-xs text-[#6B8A9A]">{formatDate(post.published_at)}</span>
+                      <span className="text-xs text-muted-foreground">{formatDate(post.published_at)}</span>
                     </div>
 
                     {/* Actions */}
@@ -710,7 +710,7 @@ export default function BlogPage() {
                       <button aria-label="Show"
                         onClick={() => handleTogglePublish(post)}
                         disabled={toggling === post.id}
-                        className="p-1.5 rounded-lg hover:bg-[#2D6A8F]/20 text-[#6B8A9A] hover:text-[#D0E4EC] transition-colors disabled:opacity-50"
+                        className="p-1.5 rounded-lg hover:bg-cg-slate/20 text-muted-foreground hover:text-[#D0E4EC] transition-colors disabled:opacity-50"
                         title={post.status === 'published' ? 'Unpublish' : 'Publish'}
                       >
                         {toggling === post.id ? (
@@ -723,7 +723,7 @@ export default function BlogPage() {
                       </button>
                       <button aria-label="Edit"
                         onClick={() => openEdit(post)}
-                        className="p-1.5 rounded-lg hover:bg-[#2D6A8F]/20 text-[#6B8A9A] hover:text-[#D0E4EC] transition-colors"
+                        className="p-1.5 rounded-lg hover:bg-cg-slate/20 text-muted-foreground hover:text-[#D0E4EC] transition-colors"
                         title="Edit"
                       >
                         <Edit3 className="w-3.5 h-3.5" />
@@ -731,7 +731,7 @@ export default function BlogPage() {
                       <button aria-label="Delete"
                         onClick={() => handleDelete(post.id)}
                         disabled={deleting === post.id}
-                        className="p-1.5 rounded-lg hover:bg-red-500/10 text-[#6B8A9A] hover:text-red-400 transition-colors disabled:opacity-50"
+                        className="p-1.5 rounded-lg hover:bg-red-500/10 text-muted-foreground hover:text-red-400 transition-colors disabled:opacity-50"
                         title="Delete"
                       >
                         {deleting === post.id ? (
@@ -745,7 +745,7 @@ export default function BlogPage() {
 
                   {/* Expanded marketing content */}
                   {isExpanded && hasMarketing && (
-                    <div className="bg-zinc-900/80 border-t border-[#2D6A8F]/10">
+                    <div className="bg-zinc-900/80 border-t border-cg-slate/10">
                       <MarketingTabs content={post.marketing_content!} imageUrl={post.featured_image_url} />
                     </div>
                   )}

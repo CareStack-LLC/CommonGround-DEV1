@@ -30,7 +30,7 @@ export function ComplianceLineChart({ data, period = "30d" }: ComplianceLineChar
       <div className="p-6">
         <div className="flex items-start justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-gradient-to-br from-teal-500 to-[#2D6A8F] text-white rounded-xl shadow-lg shadow-teal-500/20">
+            <div className="p-3 bg-gradient-to-br from-teal-500 to-cg-slate text-white rounded-xl shadow-lg shadow-teal-500/20">
               <Shield className="h-5 w-5" />
             </div>
             <div>
@@ -42,8 +42,8 @@ export function ComplianceLineChart({ data, period = "30d" }: ComplianceLineChar
           </div>
           <div className="text-right">
             <div className="flex items-center gap-2">
-              <TrendingUp className={`h-4 w-4 ${trend >= 0 ? "text-[#2D8A70]" : "text-[#C53030] rotate-180"}`} />
-              <span className={`text-2xl font-bold ${trend >= 0 ? "text-[#2D8A70]" : "text-[#C53030]"}`}>
+              <TrendingUp className={`h-4 w-4 ${trend >= 0 ? "text-cg-sage-dark" : "text-cg-error rotate-180"}`} />
+              <span className={`text-2xl font-bold ${trend >= 0 ? "text-cg-sage-dark" : "text-cg-error"}`}>
                 {trend >= 0 ? "+" : ""}{trend.toFixed(1)}%
               </span>
             </div>
@@ -95,29 +95,29 @@ export function ComplianceLineChart({ data, period = "30d" }: ComplianceLineChar
               <Line
                 type="monotone"
                 dataKey="firm_avg"
-                stroke="#3DAA8A"
+                stroke="var(--cg-sage)"
                 strokeWidth={3}
-                dot={{ fill: "#3DAA8A", r: 4 }}
-                activeDot={{ r: 6, fill: "#3DAA8A" }}
+                dot={{ fill: "var(--cg-sage)", r: 4 }}
+                activeDot={{ r: 6, fill: "var(--cg-sage)" }}
                 animationDuration={300}
               />
               <Line
                 type="monotone"
                 dataKey="parent_a_avg"
-                stroke="#2D6A8F"
+                stroke="var(--cg-slate)"
                 strokeWidth={2}
                 strokeDasharray="5 5"
-                dot={{ fill: "#2D6A8F", r: 3 }}
+                dot={{ fill: "var(--cg-slate)", r: 3 }}
                 activeDot={{ r: 5 }}
                 animationDuration={300}
               />
               <Line
                 type="monotone"
                 dataKey="parent_b_avg"
-                stroke="#2D6A8F"
+                stroke="var(--cg-slate)"
                 strokeWidth={2}
                 strokeDasharray="5 5"
-                dot={{ fill: "#2D6A8F", r: 3 }}
+                dot={{ fill: "var(--cg-slate)", r: 3 }}
                 activeDot={{ r: 5 }}
                 animationDuration={300}
               />
@@ -134,7 +134,7 @@ export function ComplianceLineChart({ data, period = "30d" }: ComplianceLineChar
           </div>
           <div className="text-center">
             <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Peak</p>
-            <p className="text-xl font-bold text-[#2D8A70]">
+            <p className="text-xl font-bold text-cg-sage-dark">
               {Math.max(...chartData.map((d) => d.firm_avg)).toFixed(1)}%
             </p>
           </div>

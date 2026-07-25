@@ -33,7 +33,7 @@ export default function BalanceSummaryCard({ balance, className = '' }: BalanceS
         {/* Petitioner Balance */}
         <div className="p-4 bg-gray-50 rounded-lg">
           <p className="text-sm text-gray-600 mb-1">Petitioner Balance</p>
-          <p className={`text-xl font-bold ${parseFloat(balance.petitioner_balance) >= 0 ? 'text-[#2D8A70]' : 'text-[#C53030]'}`}>
+          <p className={`text-xl font-bold ${parseFloat(balance.petitioner_balance) >= 0 ? 'text-cg-sage-dark' : 'text-cg-error'}`}>
             {formatCurrency(balance.petitioner_balance)}
           </p>
           {petitionerOwes > 0 && (
@@ -47,7 +47,7 @@ export default function BalanceSummaryCard({ balance, className = '' }: BalanceS
         {/* Net Balance */}
         <div className="p-4 bg-gray-50 rounded-lg flex flex-col items-center justify-center">
           <p className="text-sm text-gray-600 mb-1">Net Balance</p>
-          <div className={`flex items-center gap-2 ${netOwed > 0 ? 'text-[#E09520]' : netOwed < 0 ? 'text-[#2D6A8F]' : 'text-[#2D8A70]'}`}>
+          <div className={`flex items-center gap-2 ${netOwed > 0 ? 'text-[#E09520]' : netOwed < 0 ? 'text-cg-slate' : 'text-cg-sage-dark'}`}>
             {netOwed > 0 ? (
               <TrendingUp className="h-5 w-5" />
             ) : netOwed < 0 ? (
@@ -65,7 +65,7 @@ export default function BalanceSummaryCard({ balance, className = '' }: BalanceS
         {/* Respondent Balance */}
         <div className="p-4 bg-gray-50 rounded-lg">
           <p className="text-sm text-gray-600 mb-1">Respondent Balance</p>
-          <p className={`text-xl font-bold ${parseFloat(balance.respondent_balance) >= 0 ? 'text-[#2D8A70]' : 'text-[#C53030]'}`}>
+          <p className={`text-xl font-bold ${parseFloat(balance.respondent_balance) >= 0 ? 'text-cg-sage-dark' : 'text-cg-error'}`}>
             {formatCurrency(balance.respondent_balance)}
           </p>
           {respondentOwes > 0 && (
@@ -80,15 +80,15 @@ export default function BalanceSummaryCard({ balance, className = '' }: BalanceS
       {/* Stats Row */}
       <div className="flex flex-wrap gap-4 mt-4 pt-4 border-t border-gray-200">
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 bg-[#F5A623] rounded-full" />
+          <span className="w-2 h-2 bg-cg-amber rounded-full" />
           <span className="text-sm text-gray-600">{balance.total_obligations_open} Open</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 bg-[#2D6A8F] rounded-full" />
+          <span className="w-2 h-2 bg-cg-slate rounded-full" />
           <span className="text-sm text-gray-600">{balance.total_obligations_funded} Funded</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="w-2 h-2 bg-[#3DAA8A] rounded-full" />
+          <span className="w-2 h-2 bg-cg-sage rounded-full" />
           <span className="text-sm text-gray-600">{balance.total_obligations_completed} Completed</span>
         </div>
         {parseFloat(balance.total_this_month) > 0 && (

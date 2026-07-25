@@ -190,14 +190,14 @@ function RulesTab() {
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <button
           onClick={() => { setCreating(true); setEditing(null); }}
-          className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors"
+          className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-cg-sage hover:bg-cg-sage-light text-white text-sm font-medium transition-colors"
         >
           <Plus className="w-4 h-4" />
           New Rule
         </button>
         <button
           onClick={fetchData}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#6B8A9A] hover:text-white border border-[#2D6A8F]/30 hover:border-[#2D6A8F]/60 rounded-lg transition-colors"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-white border border-cg-slate/30 hover:border-cg-slate/60 rounded-lg transition-colors"
         >
           <RefreshCw className="w-3 h-3" />
           Refresh
@@ -205,22 +205,22 @@ function RulesTab() {
       </div>
 
       {/* Rules table */}
-      <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl overflow-hidden">
+      <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-[#2D6A8F]/20">
-              <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">State</th>
-              <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Name</th>
-              <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Condition</th>
-              <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Last Value</th>
-              <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider hidden md:table-cell">Last Checked</th>
-              <th className="text-right px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider w-40">Actions</th>
+            <tr className="border-b border-cg-slate/20">
+              <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">State</th>
+              <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Name</th>
+              <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Condition</th>
+              <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Last Value</th>
+              <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider hidden md:table-cell">Last Checked</th>
+              <th className="text-right px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider w-40">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#2D6A8F]/10">
+          <tbody className="divide-y divide-cg-slate/10">
             {rules.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-12 text-center text-[#6B8A9A]">
+                <td colSpan={6} className="px-4 py-12 text-center text-muted-foreground">
                   No alert rules yet. Click "New Rule" to create one.
                 </td>
               </tr>
@@ -248,30 +248,30 @@ function RulesTab() {
                   <td className="px-4 py-3">
                     <div className="text-white font-medium">{r.name}</div>
                     {r.description && (
-                      <div className="text-[11px] text-[#6B8A9A] mt-0.5 max-w-xs truncate">{r.description}</div>
+                      <div className="text-[11px] text-muted-foreground mt-0.5 max-w-xs truncate">{r.description}</div>
                     )}
                   </td>
                   <td className="px-4 py-3 text-[#D0E4EC] text-xs font-mono">
-                    {r.metric_path} <span className="text-[#6B8A9A]">{COMPARISON_LABELS[r.comparison] || r.comparison}</span> {formatValue(r.threshold_value, metric?.units || 'count')}
+                    {r.metric_path} <span className="text-muted-foreground">{COMPARISON_LABELS[r.comparison] || r.comparison}</span> {formatValue(r.threshold_value, metric?.units || 'count')}
                   </td>
                   <td className="px-4 py-3 text-[#D0E4EC] text-xs">
                     {r.last_value != null ? formatValue(r.last_value, metric?.units || 'count') : '—'}
                   </td>
-                  <td className="px-4 py-3 hidden md:table-cell text-[#6B8A9A] text-xs">{formatTime(r.last_evaluated_at)}</td>
+                  <td className="px-4 py-3 hidden md:table-cell text-muted-foreground text-xs">{formatTime(r.last_evaluated_at)}</td>
                   <td className="px-4 py-3 text-right">
                     <div className="inline-flex items-center gap-1">
                       <button aria-label="Play"
                         onClick={() => handleForceEvaluate(r.id)}
                         disabled={forcingId === r.id}
                         title="Force evaluation now"
-                        className="p-1.5 rounded text-[#8AACBC] hover:bg-[#2D6A8F]/30 hover:text-white transition-colors disabled:opacity-50"
+                        className="p-1.5 rounded text-[#8AACBC] hover:bg-cg-slate/30 hover:text-white transition-colors disabled:opacity-50"
                       >
                         {forcingId === r.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5" />}
                       </button>
                       <button aria-label="Edit"
                         onClick={() => setEditing(r)}
                         title="Edit"
-                        className="p-1.5 rounded text-[#8AACBC] hover:bg-[#2D6A8F]/30 hover:text-white transition-colors"
+                        className="p-1.5 rounded text-[#8AACBC] hover:bg-cg-slate/30 hover:text-white transition-colors"
                       >
                         <Edit3 className="w-3.5 h-3.5" />
                       </button>
@@ -365,7 +365,7 @@ function RuleModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" onClick={onClose}>
       <div
-        className="bg-[#0F2533] border border-[#2D6A8F]/30 rounded-xl p-6 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto"
+        className="bg-[#0F2533] border border-cg-slate/30 rounded-xl p-6 w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between mb-4">
@@ -384,7 +384,7 @@ function RuleModal({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Error rate spike"
-              className="w-full bg-[#1A3648]/80 border border-[#2D6A8F]/30 rounded px-3 py-2 text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-[#3DAA8A]"
+              className="w-full bg-[#1A3648]/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-cg-sage"
             />
           </div>
 
@@ -395,7 +395,7 @@ function RuleModal({
               onChange={(e) => setDescription(e.target.value)}
               rows={2}
               placeholder="Why does this rule exist? What should happen when it fires?"
-              className="w-full bg-[#1A3648]/80 border border-[#2D6A8F]/30 rounded px-3 py-2 text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-[#3DAA8A] resize-none"
+              className="w-full bg-[#1A3648]/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-cg-sage resize-none"
             />
           </div>
 
@@ -407,7 +407,7 @@ function RuleModal({
             <select
               value={metricPath}
               onChange={(e) => setMetricPath(e.target.value)}
-              className="w-full bg-[#1A3648]/80 border border-[#2D6A8F]/30 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-[#3DAA8A]"
+              className="w-full bg-[#1A3648]/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-cg-sage"
             >
               {metrics.map((m) => (
                 <option key={m.path} value={m.path}>
@@ -416,7 +416,7 @@ function RuleModal({
               ))}
             </select>
             {currentMetric && (
-              <p className="text-[11px] text-[#6B8A9A] mt-1">{currentMetric.description}</p>
+              <p className="text-[11px] text-muted-foreground mt-1">{currentMetric.description}</p>
             )}
           </div>
 
@@ -426,7 +426,7 @@ function RuleModal({
               <select
                 value={comparison}
                 onChange={(e) => setComparison(e.target.value)}
-                className="w-full bg-[#1A3648]/80 border border-[#2D6A8F]/30 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-[#3DAA8A]"
+                className="w-full bg-[#1A3648]/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-cg-sage"
               >
                 {comparisons.map((c) => (
                   <option key={c} value={c}>{c} ({COMPARISON_LABELS[c] || c})</option>
@@ -440,7 +440,7 @@ function RuleModal({
                 step="any"
                 value={thresholdValue}
                 onChange={(e) => setThresholdValue(Number(e.target.value))}
-                className="w-full bg-[#1A3648]/80 border border-[#2D6A8F]/30 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-[#3DAA8A]"
+                className="w-full bg-[#1A3648]/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-cg-sage"
               />
             </div>
           </div>
@@ -451,7 +451,7 @@ function RuleModal({
               value={emailsText}
               onChange={(e) => setEmailsText(e.target.value)}
               placeholder="oncall@commonground.family, tj@..."
-              className="w-full bg-[#1A3648]/80 border border-[#2D6A8F]/30 rounded px-3 py-2 text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-[#3DAA8A]"
+              className="w-full bg-[#1A3648]/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-cg-sage"
             />
           </div>
 
@@ -461,7 +461,7 @@ function RuleModal({
                 type="checkbox"
                 checked={notifyPush}
                 onChange={(e) => setNotifyPush(e.target.checked)}
-                className="rounded border-[#2D6A8F]/40 bg-zinc-900/80 text-[#3DAA8A] focus:ring-[#3DAA8A]/30"
+                className="rounded border-cg-slate/40 bg-zinc-900/80 text-cg-sage focus:ring-cg-sage/30"
               />
               <span className="text-sm text-[#D0E4EC]">Push admin devices</span>
             </label>
@@ -470,7 +470,7 @@ function RuleModal({
                 type="checkbox"
                 checked={enabled}
                 onChange={(e) => setEnabled(e.target.checked)}
-                className="rounded border-[#2D6A8F]/40 bg-zinc-900/80 text-[#3DAA8A] focus:ring-[#3DAA8A]/30"
+                className="rounded border-cg-slate/40 bg-zinc-900/80 text-cg-sage focus:ring-cg-sage/30"
               />
               <span className="text-sm text-[#D0E4EC]">Enabled</span>
             </label>
@@ -494,7 +494,7 @@ function RuleModal({
           <button
             onClick={handleSave}
             disabled={saving || !name.trim()}
-            className="px-4 py-2 rounded bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors disabled:opacity-50 inline-flex items-center gap-2"
+            className="px-4 py-2 rounded bg-cg-sage hover:bg-cg-sage-light text-white text-sm font-medium transition-colors disabled:opacity-50 inline-flex items-center gap-2"
           >
             {saving && <Loader2 className="w-4 h-4 animate-spin" />}
             {rule ? 'Save' : 'Create'}
@@ -542,13 +542,13 @@ function HistoryTab() {
             type="checkbox"
             checked={openOnly}
             onChange={(e) => { setOpenOnly(e.target.checked); setPage(1); }}
-            className="rounded border-[#2D6A8F]/40 bg-zinc-900/80 text-[#3DAA8A] focus:ring-[#3DAA8A]/30"
+            className="rounded border-cg-slate/40 bg-zinc-900/80 text-cg-sage focus:ring-cg-sage/30"
           />
           <span className="text-sm text-[#D0E4EC]">Only unresolved</span>
         </label>
         <button
           onClick={fetchData}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#6B8A9A] hover:text-white border border-[#2D6A8F]/30 hover:border-[#2D6A8F]/60 rounded-lg transition-colors"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-white border border-cg-slate/30 hover:border-cg-slate/60 rounded-lg transition-colors"
         >
           <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
           Refresh
@@ -558,29 +558,29 @@ function HistoryTab() {
       {error && <ErrorState message={error} onRetry={fetchData} />}
 
       {!error && (
-        <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl overflow-hidden">
+        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-[#2D6A8F]/20">
-                <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Rule</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Fired</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Value</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Resolved</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Duration</th>
+              <tr className="border-b border-cg-slate/20">
+                <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Rule</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Fired</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Value</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Resolved</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Duration</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#2D6A8F]/10">
+            <tbody className="divide-y divide-cg-slate/10">
               {loading ? (
                 Array.from({ length: 6 }).map((_, i) => (
                   <tr key={i}>
                     <td colSpan={5} className="px-4 py-3">
-                      <div className="animate-pulse bg-[#2D6A8F]/20 rounded h-8" />
+                      <div className="animate-pulse bg-cg-slate/20 rounded h-8" />
                     </td>
                   </tr>
                 ))
               ) : items.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-12 text-center text-[#6B8A9A]">
+                  <td colSpan={5} className="px-4 py-12 text-center text-muted-foreground">
                     {openOnly ? 'No unresolved alerts.' : 'No alert firings yet.'}
                   </td>
                 </tr>
@@ -590,7 +590,7 @@ function HistoryTab() {
                   <tr key={h.id} className={open ? 'bg-red-500/5' : ''}>
                     <td className="px-4 py-3">
                       <div className="text-white font-medium">{h.rule_name}</div>
-                      <div className="text-[11px] text-[#6B8A9A] font-mono">{h.metric_path}</div>
+                      <div className="text-[11px] text-muted-foreground font-mono">{h.metric_path}</div>
                     </td>
                     <td className="px-4 py-3 text-[#8AACBC] text-xs">{formatTime(h.fired_at)}</td>
                     <td className="px-4 py-3 text-red-300 text-xs font-medium">
@@ -619,8 +619,8 @@ function HistoryTab() {
           </table>
 
           {total > pageSize && (
-            <div className="flex items-center justify-between px-4 py-3 border-t border-[#2D6A8F]/20">
-              <span className="text-xs text-[#6B8A9A]">
+            <div className="flex items-center justify-between px-4 py-3 border-t border-cg-slate/20">
+              <span className="text-xs text-muted-foreground">
                 Showing {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, total)} of {total}
               </span>
               <div className="flex items-center gap-1">

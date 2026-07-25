@@ -58,7 +58,7 @@ export function LeadTrackingChart({ data }: LeadTrackingChartProps) {
             <div className="p-6">
                 <div className="flex items-start justify-between mb-6">
                     <div className="flex items-center gap-3">
-                        <div className="p-3 bg-gradient-to-br from-[#F5A623] to-[#E09520] text-white rounded-xl shadow-lg shadow-[#F5A623]/20">
+                        <div className="p-3 bg-gradient-to-br from-cg-amber to-[#E09520] text-white rounded-xl shadow-lg shadow-cg-amber/20">
                             <UserPlus className="h-5 w-5" />
                         </div>
                         <div>
@@ -75,12 +75,12 @@ export function LeadTrackingChart({ data }: LeadTrackingChartProps) {
                     <div className="text-right shrink-0">
                         <div className="flex items-center justify-end gap-2">
                             {weekDelta >= 0 ? (
-                                <TrendingUp className="h-4 w-4 text-[#2D8A70]" />
+                                <TrendingUp className="h-4 w-4 text-cg-sage-dark" />
                             ) : (
-                                <TrendingDown className="h-4 w-4 text-[#C53030]" />
+                                <TrendingDown className="h-4 w-4 text-cg-error" />
                             )}
                             <span
-                                className={`text-2xl font-bold ${weekDelta >= 0 ? "text-[#2D8A70]" : "text-[#C53030]"
+                                className={`text-2xl font-bold ${weekDelta >= 0 ? "text-cg-sage-dark" : "text-cg-error"
                                     }`}
                             >
                                 {weekDelta >= 0 ? "+" : ""}
@@ -142,10 +142,10 @@ export function LeadTrackingChart({ data }: LeadTrackingChartProps) {
                                         key={index}
                                         fill={
                                             index === maxIndex
-                                                ? "#F5A623"
+                                                ? "var(--cg-amber)"
                                                 : index >= chartData.length - 4
-                                                    ? "#F5A623"
-                                                    : "#FEF7ED"
+                                                    ? "var(--cg-amber)"
+                                                    : "var(--cg-amber-subtle)"
                                         }
                                     />
                                 ))}

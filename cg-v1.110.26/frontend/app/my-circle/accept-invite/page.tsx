@@ -30,24 +30,24 @@ function CommonGroundLogo({ size = 64 }: { size?: number }) {
       <defs>
         <linearGradient id="cg-inv-bg" x1="0" y1="0" x2="512" y2="512">
           <stop stopColor="#E8F4F8" />
-          <stop offset="1" stopColor="#D6ECE8" />
+          <stop offset="1" stopColor="var(--border)" />
         </linearGradient>
         <linearGradient id="cg-inv-pa" x1="140" y1="110" x2="196" y2="186">
-          <stop stopColor="#5BC4A0" />
-          <stop offset="1" stopColor="#3DAA8A" />
+          <stop stopColor="var(--cg-sage-light)" />
+          <stop offset="1" stopColor="var(--cg-sage)" />
         </linearGradient>
         <linearGradient id="cg-inv-pb" x1="316" y1="110" x2="372" y2="186">
-          <stop stopColor="#4BA8C8" />
-          <stop offset="1" stopColor="#2D6A8F" />
+          <stop stopColor="var(--cg-slate-light)" />
+          <stop offset="1" stopColor="var(--cg-slate)" />
         </linearGradient>
       </defs>
       <circle cx="168" cy="148" r="48" fill="url(#cg-inv-pa)" />
       <path d="M120 260c0-26.5 21.5-48 48-48s48 21.5 48 48" stroke="url(#cg-inv-pa)" strokeWidth="16" fill="none" strokeLinecap="round" />
       <circle cx="344" cy="148" r="48" fill="url(#cg-inv-pb)" />
       <path d="M296 260c0-26.5 21.5-48 48-48s48 21.5 48 48" stroke="url(#cg-inv-pb)" strokeWidth="16" fill="none" strokeLinecap="round" />
-      <path d="M168 200 Q256 140 344 200" stroke="#F5A623" strokeWidth="10" fill="none" strokeLinecap="round" />
-      <circle cx="256" cy="330" r="38" fill="#F5A623" />
-      <path d="M218 410c0-21 17-38 38-38s38 17 38 38" stroke="#F5A623" strokeWidth="14" fill="none" strokeLinecap="round" />
+      <path d="M168 200 Q256 140 344 200" stroke="var(--cg-amber)" strokeWidth="10" fill="none" strokeLinecap="round" />
+      <circle cx="256" cy="330" r="38" fill="var(--cg-amber)" />
+      <path d="M218 410c0-21 17-38 38-38s38 17 38 38" stroke="var(--cg-amber)" strokeWidth="14" fill="none" strokeLinecap="round" />
     </svg>
   );
 }
@@ -145,9 +145,9 @@ function AcceptInviteContent() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <div className="fixed inset-0 bg-gradient-to-br from-[#E8F4F8] via-background to-[#D6ECE8] dark:from-[#1E3A4A]/30 dark:via-background dark:to-[#1E3A4A]/20 -z-10" />
+        <div className="fixed inset-0 bg-gradient-to-br from-[#E8F4F8] via-background to-border dark:from-foreground/30 dark:via-background dark:to-foreground/20 -z-10" />
         <div className="bg-card rounded-2xl shadow-xl border-2 border-border p-8 max-w-md w-full text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-[#3DAA8A] mx-auto mb-4" />
+          <Loader2 className="h-12 w-12 animate-spin text-cg-sage mx-auto mb-4" />
           <p className="text-muted-foreground">Loading invitation...</p>
         </div>
       </div>
@@ -157,7 +157,7 @@ function AcceptInviteContent() {
   if (error && !inviteInfo) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <div className="fixed inset-0 bg-gradient-to-br from-[#E8F4F8] via-background to-[#D6ECE8] dark:from-[#1E3A4A]/30 dark:via-background dark:to-[#1E3A4A]/20 -z-10" />
+        <div className="fixed inset-0 bg-gradient-to-br from-[#E8F4F8] via-background to-border dark:from-foreground/30 dark:via-background dark:to-foreground/20 -z-10" />
         <div className="bg-card rounded-2xl shadow-xl border-2 border-border p-8 max-w-md w-full text-center">
           <XCircle className="h-16 w-16 text-red-500 dark:text-red-400 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-foreground mb-2" style={{ fontFamily: "'DM Serif Display', serif" }}>
@@ -178,13 +178,13 @@ function AcceptInviteContent() {
   if (isSuccess) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <div className="fixed inset-0 bg-gradient-to-br from-[#E8F4F8] via-background to-[#D6ECE8] dark:from-[#1E3A4A]/30 dark:via-background dark:to-[#1E3A4A]/20 -z-10" />
+        <div className="fixed inset-0 bg-gradient-to-br from-[#E8F4F8] via-background to-border dark:from-foreground/30 dark:via-background dark:to-foreground/20 -z-10" />
         <div className="bg-card rounded-2xl shadow-xl border-2 border-border p-8 max-w-md w-full text-center">
-          <div className="w-20 h-20 bg-[#3DAA8A]/10 dark:bg-[#3DAA8A]/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <CheckCircle className="h-12 w-12 text-[#3DAA8A]" />
+          <div className="w-20 h-20 bg-cg-sage/10 dark:bg-cg-sage/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <CheckCircle className="h-12 w-12 text-cg-sage" />
           </div>
           <h1 className="text-2xl font-bold text-foreground mb-2" style={{ fontFamily: "'DM Serif Display', serif" }}>
-            Welcome to Common<span className="text-[#3DAA8A]">Ground</span>!
+            Welcome to Common<span className="text-cg-sage">Ground</span>!
           </h1>
           <p className="text-muted-foreground mb-4">
             Your account has been created successfully.
@@ -198,7 +198,7 @@ function AcceptInviteContent() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       {/* Subtle branded background gradient */}
-      <div className="fixed inset-0 bg-gradient-to-br from-[#E8F4F8] via-background to-[#D6ECE8] dark:from-[#1E3A4A]/30 dark:via-background dark:to-[#1E3A4A]/20 -z-10" />
+      <div className="fixed inset-0 bg-gradient-to-br from-[#E8F4F8] via-background to-border dark:from-foreground/30 dark:via-background dark:to-foreground/20 -z-10" />
 
       <div className="bg-card rounded-2xl shadow-xl border-2 border-border p-8 max-w-md w-full">
         {/* Header */}
@@ -207,9 +207,9 @@ function AcceptInviteContent() {
             <CommonGroundLogo size={72} />
           </div>
           <h1 className="text-2xl font-bold text-foreground mb-1" style={{ fontFamily: "'DM Serif Display', serif" }}>
-            Common<span className="text-[#3DAA8A]">Ground</span>
+            Common<span className="text-cg-sage">Ground</span>
           </h1>
-          <p className="text-lg font-semibold text-[#2D6A8F] dark:text-[#4BA8C8] mb-2" style={{ fontFamily: "'DM Serif Display', serif" }}>
+          <p className="text-lg font-semibold text-cg-slate dark:text-cg-slate-light mb-2" style={{ fontFamily: "'DM Serif Display', serif" }}>
             Join My Circle
           </p>
           <p className="text-muted-foreground text-sm">
@@ -219,9 +219,9 @@ function AcceptInviteContent() {
 
         {/* Invite Details */}
         {inviteInfo && (
-          <div className="bg-[#3DAA8A]/5 dark:bg-[#3DAA8A]/10 rounded-xl p-4 mb-6 border border-[#3DAA8A]/20">
+          <div className="bg-cg-sage/5 dark:bg-cg-sage/10 rounded-xl p-4 mb-6 border border-cg-sage/20">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-[#3DAA8A]/20 to-[#2D6A8F]/20 rounded-full flex items-center justify-center text-2xl">
+              <div className="w-12 h-12 bg-gradient-to-br from-cg-sage/20 to-cg-slate/20 rounded-full flex items-center justify-center text-2xl">
                 {'\u{1F44B}'}
               </div>
               <div>
@@ -254,7 +254,7 @@ function AcceptInviteContent() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="At least 8 characters"
-                className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:ring-2 focus:ring-[#3DAA8A] focus:border-[#3DAA8A] outline-none transition-colors text-foreground placeholder:text-muted-foreground"
+                className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:ring-2 focus:ring-cg-sage focus:border-cg-sage outline-none transition-colors text-foreground placeholder:text-muted-foreground"
                 required
                 minLength={8}
               />
@@ -278,7 +278,7 @@ function AcceptInviteContent() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="Enter password again"
-              className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:ring-2 focus:ring-[#3DAA8A] focus:border-[#3DAA8A] outline-none transition-colors text-foreground placeholder:text-muted-foreground"
+              className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:ring-2 focus:ring-cg-sage focus:border-cg-sage outline-none transition-colors text-foreground placeholder:text-muted-foreground"
               required
               minLength={8}
             />
@@ -295,7 +295,7 @@ function AcceptInviteContent() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-3 bg-gradient-to-r from-[#3DAA8A] to-[#2D6A8F] hover:from-[#349878] hover:to-[#245A7A] text-white rounded-xl font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
+            className="w-full py-3 bg-gradient-to-r from-cg-sage to-cg-slate hover:from-[#349878] hover:to-[#245A7A] text-white rounded-xl font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
           >
             {isSubmitting ? (
               <>
@@ -310,7 +310,7 @@ function AcceptInviteContent() {
 
         {/* Trust Badge */}
         <div className="mt-6 flex items-center justify-center gap-2 text-muted-foreground text-sm">
-          <Shield className="h-4 w-4 text-[#3DAA8A]" />
+          <Shield className="h-4 w-4 text-cg-sage" />
           <span>Protected by ARIA child safety monitoring</span>
         </div>
 
@@ -319,7 +319,7 @@ function AcceptInviteContent() {
           Already have an account?{' '}
           <button
             onClick={() => router.push('/my-circle/contact')}
-            className="text-[#3DAA8A] hover:text-[#2D6A8F] dark:text-[#5BC4A0] dark:hover:text-[#4BA8C8] font-medium transition-colors"
+            className="text-cg-sage hover:text-cg-slate dark:text-cg-sage-light dark:hover:text-cg-slate-light font-medium transition-colors"
           >
             Sign In
           </button>
@@ -334,7 +334,7 @@ export default function AcceptInvitePage() {
     <Suspense
       fallback={
         <div className="min-h-screen bg-background flex items-center justify-center">
-          <Loader2 className="h-12 w-12 animate-spin text-[#3DAA8A]" />
+          <Loader2 className="h-12 w-12 animate-spin text-cg-sage" />
         </div>
       }
     >

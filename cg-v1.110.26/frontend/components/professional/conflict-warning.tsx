@@ -47,7 +47,7 @@ const formatOverlap = (minutes: number): string => {
 export function ConflictWarning({ conflicts, isLoading }: ConflictWarningProps) {
   if (isLoading) {
     return (
-      <Alert className="border-[#FBE3BF] bg-[#FEF7ED]">
+      <Alert className="border-[#FBE3BF] bg-cg-amber-subtle">
         <Loader2 className="h-4 w-4 animate-spin text-[#E09520]" />
         <AlertTitle className="text-[#8F5E14]">Checking for conflicts...</AlertTitle>
         <AlertDescription className="text-[#B8791A]">
@@ -62,7 +62,7 @@ export function ConflictWarning({ conflicts, isLoading }: ConflictWarningProps) 
   }
 
   return (
-    <Alert variant="destructive" className="border-[#F8CE8A] bg-[#FEF7ED]">
+    <Alert variant="destructive" className="border-[#F8CE8A] bg-cg-amber-subtle">
       <AlertTriangle className="h-4 w-4 text-[#E09520]" />
       <AlertTitle className="text-[#8F5E14]">
         Schedule Conflict{conflicts.length > 1 ? "s" : ""} Detected

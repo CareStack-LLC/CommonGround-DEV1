@@ -107,7 +107,7 @@ export function CallInterface({ familyFileId, token, onEndCall }: CallInterfaceP
                 <Card className="border-border">
                     <CardContent className="p-4 flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                            <div className={`h-3 w-3 rounded-full ${isLive ? 'bg-[#C53030] animate-pulse' : 'bg-muted-foreground/40'}`} />
+                            <div className={`h-3 w-3 rounded-full ${isLive ? 'bg-cg-error animate-pulse' : 'bg-muted-foreground/40'}`} />
                             <div className="space-y-0.5">
                                 <h2 className="font-bold text-foreground">{isLive ? "Live Intake Session" : "Wait for Participants"}</h2>
                                 <div className="flex items-center gap-3 text-xs text-muted-foreground">
@@ -128,7 +128,7 @@ export function CallInterface({ familyFileId, token, onEndCall }: CallInterfaceP
                                     End Call
                                 </Button>
                             ) : (
-                                <Button className="bg-[#2D8A70] hover:bg-[#2D8A70] text-white h-9 px-6" onClick={startCall}>
+                                <Button className="bg-cg-sage-dark hover:bg-cg-sage-dark text-white h-9 px-6" onClick={startCall}>
                                     <Phone className="h-4 w-4 mr-2" />
                                     Join Call
                                 </Button>
@@ -142,7 +142,7 @@ export function CallInterface({ familyFileId, token, onEndCall }: CallInterfaceP
                     <div className="bg-slate-900 rounded-2xl relative overflow-hidden flex items-center justify-center border-2 border-slate-800">
                         <div className="absolute top-4 left-4 flex items-center gap-2">
                             <Badge className="bg-black/40 backdrop-blur-md border-none text-white font-medium">Parent A (Petitioner)</Badge>
-                            <div className="h-2 w-2 rounded-full bg-[#3DAA8A]" />
+                            <div className="h-2 w-2 rounded-full bg-cg-sage" />
                         </div>
                         <Users className="h-20 w-20 text-slate-700" />
                         <div className="absolute bottom-4 right-4 flex gap-2">
@@ -152,7 +152,7 @@ export function CallInterface({ familyFileId, token, onEndCall }: CallInterfaceP
                     <div className="bg-slate-900 rounded-2xl relative overflow-hidden flex items-center justify-center border-2 border-slate-800">
                         <div className="absolute top-4 left-4 flex items-center gap-2">
                             <Badge className="bg-black/40 backdrop-blur-md border-none text-white font-medium">Parent B (Respondent)</Badge>
-                            <div className="h-2 w-2 rounded-full bg-[#3DAA8A]" />
+                            <div className="h-2 w-2 rounded-full bg-cg-sage" />
                         </div>
                         <Users className="h-20 w-20 text-slate-700" />
                         <div className="absolute bottom-4 right-4 flex gap-2">
@@ -179,8 +179,8 @@ export function CallInterface({ familyFileId, token, onEndCall }: CallInterfaceP
                                     </div>
                                 ) : (
                                     transcripts.map((t, i) => (
-                                        <div key={i} className={`flex gap-3 text-sm animate-in fade-in slide-in-from-bottom-2 ${t.sender === 'ARIA' ? 'bg-[#F0F7FC] dark:bg-[#0F2836]/30 p-2 rounded-lg border border-[#E0EFF8] dark:border-[#163A50]/40' : ''}`}>
-                                            <span className={`font-bold min-w-[70px] ${t.sender === 'Parent A' ? 'text-teal-600 dark:text-teal-400' : t.sender === 'Parent B' ? 'text-[#2D6A8F] dark:text-[#4BA8C8]' : 'text-[#2D6A8F] dark:text-[#4BA8C8]'}`}>
+                                        <div key={i} className={`flex gap-3 text-sm animate-in fade-in slide-in-from-bottom-2 ${t.sender === 'ARIA' ? 'bg-[#F0F7FC] dark:bg-[#0F2836]/30 p-2 rounded-lg border border-cg-slate-subtle dark:border-[#163A50]/40' : ''}`}>
+                                            <span className={`font-bold min-w-[70px] ${t.sender === 'Parent A' ? 'text-teal-600 dark:text-teal-400' : t.sender === 'Parent B' ? 'text-cg-slate dark:text-cg-slate-light' : 'text-cg-slate dark:text-cg-slate-light'}`}>
                                                 {t.sender}:
                                             </span>
                                             <span className="text-foreground/80 leading-relaxed flex-1">{t.text}</span>
@@ -198,30 +198,30 @@ export function CallInterface({ familyFileId, token, onEndCall }: CallInterfaceP
             <div className="w-full lg:w-80 flex flex-col gap-6">
                 {/* ARIA Safety Shield */}
                 <Card className="border-[#C2DEF0] dark:border-[#163A50]/40 shadow-sm bg-gradient-to-b from-[#F0F7FC]/30 dark:from-[#0F2836]/20 to-card">
-                    <CardHeader className="pb-3 border-b border-[#E0EFF8] dark:border-[#163A50]/40 transition-colors">
+                    <CardHeader className="pb-3 border-b border-cg-slate-subtle dark:border-[#163A50]/40 transition-colors">
                         <div className="flex items-center justify-between">
                             <CardTitle className="text-sm font-bold flex items-center gap-2 text-[#163A50] dark:text-[#9BCADF]">
                                 <Shield className="h-4 w-4" />
                                 ARIA Safety Shield
                             </CardTitle>
-                            <Switch checked={isLive} disabled={!isLive} className="scale-75 data-[state=checked]:bg-[#2D6A8F]" />
+                            <Switch checked={isLive} disabled={!isLive} className="scale-75 data-[state=checked]:bg-cg-slate" />
                         </div>
                     </CardHeader>
                     <CardContent className="p-4 space-y-6">
                         <div className="space-y-3">
                             <div className="flex justify-between items-end">
                                 <span className="text-xs font-medium text-muted-foreground">Session Conflict Risk</span>
-                                <span className={`text-sm font-bold ${riskScore > 60 ? 'text-[#C53030]' : riskScore > 30 ? 'text-[#F5A623]' : 'text-[#3DAA8A]'}`}>
+                                <span className={`text-sm font-bold ${riskScore > 60 ? 'text-cg-error' : riskScore > 30 ? 'text-cg-amber' : 'text-cg-sage'}`}>
                                     {riskScore}%
                                 </span>
                             </div>
-                            <Progress value={riskScore} className={`h-2 transition-all duration-1000 ${riskScore > 60 ? '[&>div]:bg-[#C53030]' : riskScore > 30 ? '[&>div]:bg-[#F5A623]' : '[&>div]:bg-[#3DAA8A]'
+                            <Progress value={riskScore} className={`h-2 transition-all duration-1000 ${riskScore > 60 ? '[&>div]:bg-cg-error' : riskScore > 30 ? '[&>div]:bg-cg-amber' : '[&>div]:bg-cg-sage'
                                 }`} />
                         </div>
 
                         <div className="grid grid-cols-2 gap-2">
-                            <Button variant="outline" className="h-20 flex flex-col gap-2 border-border hover:bg-[#FEE2E2] dark:hover:bg-[#7A2222]/20 hover:border-[#FEE2E2] dark:hover:border-[#7A2222]/40 group">
-                                <AlertTriangle className="h-4 w-4 text-muted-foreground group-hover:text-[#C53030]" />
+                            <Button variant="outline" className="h-20 flex flex-col gap-2 border-border hover:bg-cg-error-subtle dark:hover:bg-[#7A2222]/20 hover:border-cg-error-subtle dark:hover:border-[#7A2222]/40 group">
+                                <AlertTriangle className="h-4 w-4 text-muted-foreground group-hover:text-cg-error" />
                                 <span className="text-[10px] font-bold">Intervene</span>
                             </Button>
                             <Button variant="outline" className="h-20 flex flex-col gap-2 border-border hover:bg-[#F0F7FC] dark:hover:bg-[#0F2836]/20 hover:border-[#C2DEF0] dark:hover:border-[#163A50]/40 group">
@@ -250,12 +250,12 @@ export function CallInterface({ familyFileId, token, onEndCall }: CallInterfaceP
                             <TabsContent value="agreements" className="h-full m-0">
                                 <ScrollArea className="h-[280px] p-4">
                                     <div className="space-y-3">
-                                        <div className="p-2 rounded-lg border border-[#E8F4F0] dark:border-[#1B5544]/40 bg-[#E8F4F0]/50 dark:bg-[#123A2E]/20">
+                                        <div className="p-2 rounded-lg border border-cg-sage-subtle dark:border-[#1B5544]/40 bg-cg-sage-subtle/50 dark:bg-[#123A2E]/20">
                                             <h4 className="text-xs font-bold text-[#1B5544] dark:text-[#9BD5C2] flex items-center justify-between">
                                                 Exchange Plan A-1
                                                 <ChevronRight className="h-3 w-3" />
                                             </h4>
-                                            <p className="text-[10px] text-[#2D8A70]/70 dark:text-[#5BC4A0]/70 mt-1 line-clamp-2">Exchanges at Starbucks (3rd St) every Friday at 5:00 PM.</p>
+                                            <p className="text-[10px] text-cg-sage-dark/70 dark:text-cg-sage-light/70 mt-1 line-clamp-2">Exchanges at Starbucks (3rd St) every Friday at 5:00 PM.</p>
                                         </div>
                                         <div className="p-2 rounded-lg border border-border">
                                             <h4 className="text-xs font-bold text-foreground flex items-center justify-between">
@@ -271,7 +271,7 @@ export function CallInterface({ familyFileId, token, onEndCall }: CallInterfaceP
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-1">
                                         <p className="text-[10px] font-bold text-muted-foreground uppercase">Conflict Level</p>
-                                        <Badge variant="outline" className="text-[#E09520] dark:text-[#F7B84D] bg-[#FEF7ED] dark:bg-[#3D2808]/20 border-[#FBE3BF] dark:border-[#6B460F]/40">HIGH-TEMP</Badge>
+                                        <Badge variant="outline" className="text-[#E09520] dark:text-[#F7B84D] bg-cg-amber-subtle dark:bg-[#3D2808]/20 border-[#FBE3BF] dark:border-[#6B460F]/40">HIGH-TEMP</Badge>
                                     </div>
                                     <div className="space-y-1">
                                         <p className="text-[10px] font-bold text-muted-foreground uppercase">Avg Response</p>

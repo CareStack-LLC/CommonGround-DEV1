@@ -29,11 +29,11 @@ const SEVERITY_COLORS: Record<string, string> = {
 const STATUS_COLORS: Record<string, string> = {
   draft: 'bg-zinc-700/50 text-[#8AACBC]',
   seeding: 'bg-blue-500/15 text-blue-400 border border-blue-500/20',
-  active: 'bg-[#3DAA8A]/15 text-[#3DAA8A] border border-[#3DAA8A]/20',
+  active: 'bg-cg-sage/15 text-cg-sage border border-cg-sage/20',
   completed: 'bg-purple-500/15 text-purple-400 border border-purple-500/20',
   open: 'bg-orange-500/15 text-orange-400',
   confirmed: 'bg-red-500/15 text-red-400',
-  fixed: 'bg-[#3DAA8A]/15 text-[#3DAA8A]',
+  fixed: 'bg-cg-sage/15 text-cg-sage',
   wont_fix: 'bg-zinc-700/50 text-zinc-500',
   pending: 'bg-zinc-700/50 text-[#8AACBC]',
   in_progress: 'bg-blue-500/15 text-blue-400',
@@ -44,7 +44,7 @@ const NOTE_TYPE_COLORS: Record<string, string> = {
   observation: 'bg-blue-500/15 text-blue-400',
   blocker: 'bg-red-500/15 text-red-400',
   question: 'bg-yellow-500/15 text-yellow-400',
-  resolution: 'bg-[#3DAA8A]/15 text-[#3DAA8A]',
+  resolution: 'bg-cg-sage/15 text-cg-sage',
 };
 
 const FEATURE_LABELS: Record<string, string> = {
@@ -68,10 +68,10 @@ type Tab = 'overview' | 'accounts' | 'checklist' | 'bugs' | 'feedback' | 'notes'
 
 function MetricCard({ label, value, icon: Icon }: { label: string; value: string | number; icon: React.ElementType }) {
   return (
-    <div className="bg-[#1E3A4A]/50 border border-[#2D6A8F]/20 rounded-xl p-4">
+    <div className="bg-foreground/50 border border-cg-slate/20 rounded-xl p-4">
       <div className="flex items-center gap-2 mb-1">
-        <Icon className="w-4 h-4 text-[#3DAA8A]" />
-        <span className="text-xs text-[#6B8A9A] uppercase tracking-wider">{label}</span>
+        <Icon className="w-4 h-4 text-cg-sage" />
+        <span className="text-xs text-muted-foreground uppercase tracking-wider">{label}</span>
       </div>
       <div className="text-2xl font-bold text-white">{value}</div>
     </div>
@@ -89,8 +89,8 @@ function CopyButton({ text }: { text: string }) {
     } catch { /* non-HTTPS */ }
   };
   return (
-    <button aria-label="Copy" onClick={handleCopy} className="p-1 rounded hover:bg-[#2D6A8F]/20 transition-colors" title="Copy">
-      {copied ? <Check className="w-3 h-3 text-[#3DAA8A]" /> : <Copy className="w-3 h-3 text-[#6B8A9A]" />}
+    <button aria-label="Copy" onClick={handleCopy} className="p-1 rounded hover:bg-cg-slate/20 transition-colors" title="Copy">
+      {copied ? <Check className="w-3 h-3 text-cg-sage" /> : <Copy className="w-3 h-3 text-muted-foreground" />}
     </button>
   );
 }
@@ -267,14 +267,14 @@ export default function BugHuntDetailPage() {
   if (loading && !data) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-8 h-8 text-[#3DAA8A] animate-spin" />
+        <Loader2 className="w-8 h-8 text-cg-sage animate-spin" />
       </div>
     );
   }
 
   if (!data) {
     return (
-      <div className="text-center py-20 text-[#6B8A9A]">
+      <div className="text-center py-20 text-muted-foreground">
         {error || 'Bug hunt not found'}
       </div>
     );
@@ -301,7 +301,7 @@ export default function BugHuntDetailPage() {
         <div className="flex items-center gap-3">
           <button aria-label="Back"
             onClick={() => router.push('/superadmin/bug-hunts')}
-            className="p-2 rounded-lg hover:bg-[#2D6A8F]/20 transition-colors text-[#8AACBC]"
+            className="p-2 rounded-lg hover:bg-cg-slate/20 transition-colors text-[#8AACBC]"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
@@ -312,7 +312,7 @@ export default function BugHuntDetailPage() {
                 {cohort.status}
               </span>
             </div>
-            <p className="text-sm text-[#6B8A9A] mt-0.5">
+            <p className="text-sm text-muted-foreground mt-0.5">
               {FEATURE_LABELS[cohort.target_feature] || cohort.target_feature}
               {cohort.started_at && ` \u2022 Started ${new Date(cohort.started_at).toLocaleDateString()}`}
             </p>
@@ -320,14 +320,14 @@ export default function BugHuntDetailPage() {
         </div>
         <button
           onClick={() => fetchData()}
-          className="p-2 rounded-lg hover:bg-[#2D6A8F]/20 transition-colors text-[#8AACBC]"
+          className="p-2 rounded-lg hover:bg-cg-slate/20 transition-colors text-[#8AACBC]"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
         </button>
       </div>
 
       {success && (
-        <div className="bg-[#3DAA8A]/10 border border-[#3DAA8A]/20 rounded-lg p-3 text-[#3DAA8A] text-sm flex items-center gap-2">
+        <div className="bg-cg-sage/10 border border-cg-sage/20 rounded-lg p-3 text-cg-sage text-sm flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
           {success}
           <button onClick={() => setSuccess(null)} className="ml-auto underline text-xs">dismiss</button>
@@ -341,19 +341,19 @@ export default function BugHuntDetailPage() {
       )}
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-[#1E3A4A]/50 rounded-lg p-1 overflow-x-auto">
+      <div className="flex gap-1 bg-foreground/50 rounded-lg p-1 overflow-x-auto">
         {TABS.map(t => (
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
-              tab === t.key ? 'bg-[#2D6A8F]/40 text-white' : 'text-[#6B8A9A] hover:text-[#8AACBC]'
+              tab === t.key ? 'bg-cg-slate/40 text-white' : 'text-muted-foreground hover:text-[#8AACBC]'
             }`}
           >
             <t.icon className="w-3.5 h-3.5" />
             {t.label}
             {t.count !== undefined && t.count > 0 && (
-              <span className="text-[10px] bg-[#2D6A8F]/30 px-1.5 py-0.5 rounded-full">{t.count}</span>
+              <span className="text-[10px] bg-cg-slate/30 px-1.5 py-0.5 rounded-full">{t.count}</span>
             )}
           </button>
         ))}
@@ -372,16 +372,16 @@ export default function BugHuntDetailPage() {
 
           {/* Actions */}
           {cohort.status === 'draft' && (
-            <div className="bg-[#1E3A4A]/50 border border-[#2D6A8F]/20 rounded-xl p-6 text-center">
-              <FlaskConical className="w-10 h-10 text-[#3DAA8A] mx-auto mb-3" />
+            <div className="bg-foreground/50 border border-cg-slate/20 rounded-xl p-6 text-center">
+              <FlaskConical className="w-10 h-10 text-cg-sage mx-auto mb-3" />
               <h3 className="text-lg font-medium text-white mb-2">Ready to generate test data?</h3>
-              <p className="text-sm text-[#6B8A9A] mb-4">
+              <p className="text-sm text-muted-foreground mb-4">
                 This will create {cohort.family_count} test families with accounts and seed data for {FEATURE_LABELS[cohort.target_feature]?.toLowerCase() || 'general'} testing.
               </p>
               <button
                 onClick={handleGenerate}
                 disabled={generating}
-                className="px-6 py-2.5 bg-[#3DAA8A] text-white rounded-lg hover:bg-[#3DAA8A]/80 transition-colors text-sm font-medium disabled:opacity-50"
+                className="px-6 py-2.5 bg-cg-sage text-white rounded-lg hover:bg-cg-sage/80 transition-colors text-sm font-medium disabled:opacity-50"
               >
                 {generating ? (
                   <span className="flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Generating...</span>
@@ -406,50 +406,50 @@ export default function BugHuntDetailPage() {
 
           {/* Summary (when completed) */}
           {cohort.status === 'completed' && cohort.summary_json && (
-            <div className="bg-[#1E3A4A]/50 border border-purple-500/20 rounded-xl p-5">
+            <div className="bg-foreground/50 border border-purple-500/20 rounded-xl p-5">
               <h3 className="text-sm font-medium text-purple-400 uppercase tracking-wider mb-3">Summary</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                <div><span className="text-[#6B8A9A]">Families Tested:</span> <span className="text-white ml-1">{cohort.summary_json.families_completed}/{cohort.summary_json.families_tested}</span></div>
-                <div><span className="text-[#6B8A9A]">Checklist:</span> <span className="text-white ml-1">{cohort.summary_json.checklist_completed}</span></div>
-                <div><span className="text-[#6B8A9A]">Bugs Found:</span> <span className="text-white ml-1">{cohort.summary_json.bugs_found}</span></div>
-                <div><span className="text-[#6B8A9A]">Duration:</span> <span className="text-white ml-1">{cohort.summary_json.duration_hours ? `${cohort.summary_json.duration_hours}h` : 'N/A'}</span></div>
+                <div><span className="text-muted-foreground">Families Tested:</span> <span className="text-white ml-1">{cohort.summary_json.families_completed}/{cohort.summary_json.families_tested}</span></div>
+                <div><span className="text-muted-foreground">Checklist:</span> <span className="text-white ml-1">{cohort.summary_json.checklist_completed}</span></div>
+                <div><span className="text-muted-foreground">Bugs Found:</span> <span className="text-white ml-1">{cohort.summary_json.bugs_found}</span></div>
+                <div><span className="text-muted-foreground">Duration:</span> <span className="text-white ml-1">{cohort.summary_json.duration_hours ? `${cohort.summary_json.duration_hours}h` : 'N/A'}</span></div>
               </div>
             </div>
           )}
 
           {/* Test Instructions */}
           {cohort.test_instructions && (
-            <div className="bg-[#1E3A4A]/50 border border-[#2D6A8F]/20 rounded-xl p-5">
+            <div className="bg-foreground/50 border border-cg-slate/20 rounded-xl p-5">
               <h3 className="text-sm font-medium text-[#8AACBC] uppercase tracking-wider mb-3">Test Instructions</h3>
               <pre className="text-sm text-[#D0E4EC] whitespace-pre-wrap font-mono">{cohort.test_instructions}</pre>
             </div>
           )}
 
           {/* AI Overview */}
-          <div className="bg-[#1E3A4A]/50 border border-[#2D6A8F]/20 rounded-xl p-5">
+          <div className="bg-foreground/50 border border-cg-slate/20 rounded-xl p-5">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-medium text-[#8AACBC] uppercase tracking-wider flex items-center gap-2">
-                <Brain className="w-4 h-4 text-[#3DAA8A]" />
+                <Brain className="w-4 h-4 text-cg-sage" />
                 AI Analysis
               </h3>
               <button
                 onClick={handleGenerateAI}
                 disabled={generatingAI || stats.bugs_total + stats.feedback_total + stats.checklist_completed === 0}
-                className="flex items-center gap-2 px-3 py-1.5 bg-[#3DAA8A]/20 text-[#3DAA8A] rounded-lg hover:bg-[#3DAA8A]/30 transition-colors text-xs font-medium disabled:opacity-50"
+                className="flex items-center gap-2 px-3 py-1.5 bg-cg-sage/20 text-cg-sage rounded-lg hover:bg-cg-sage/30 transition-colors text-xs font-medium disabled:opacity-50"
               >
                 {generatingAI ? <><Loader2 className="w-3 h-3 animate-spin" /> Analyzing...</> : <><Brain className="w-3 h-3" /> {aiOverview ? 'Regenerate' : 'Generate Analysis'}</>}
               </button>
             </div>
 
             {!aiOverview && !generatingAI && (
-              <p className="text-sm text-[#6B8A9A] text-center py-4">Click &quot;Generate Analysis&quot; to get an AI-powered overview of this bug hunt.</p>
+              <p className="text-sm text-muted-foreground text-center py-4">Click &quot;Generate Analysis&quot; to get an AI-powered overview of this bug hunt.</p>
             )}
 
             {aiOverview && !aiOverview.error && (
               <div className="space-y-4">
                 {/* Health indicator */}
                 <div className="flex items-center gap-2">
-                  <div className={`w-2.5 h-2.5 rounded-full ${aiOverview.overall_health === 'healthy' ? 'bg-[#3DAA8A]' : aiOverview.overall_health === 'critical' ? 'bg-red-500' : 'bg-yellow-500'}`} />
+                  <div className={`w-2.5 h-2.5 rounded-full ${aiOverview.overall_health === 'healthy' ? 'bg-cg-sage' : aiOverview.overall_health === 'critical' ? 'bg-red-500' : 'bg-yellow-500'}`} />
                   <span className="text-xs uppercase tracking-wider text-[#8AACBC]">{aiOverview.overall_health}</span>
                 </div>
 
@@ -463,7 +463,7 @@ export default function BugHuntDetailPage() {
                     <ul className="space-y-1">
                       {aiOverview.key_findings.map((f: string, i: number) => (
                         <li key={i} className="text-sm text-[#D0E4EC] flex items-start gap-2">
-                          <span className="text-[#3DAA8A] mt-1">&#x2022;</span> {f}
+                          <span className="text-cg-sage mt-1">&#x2022;</span> {f}
                         </li>
                       ))}
                     </ul>
@@ -529,7 +529,7 @@ export default function BugHuntDetailPage() {
         <div className="space-y-4">
           {/* Bulk actions bar */}
           {families.length > 0 && testers.length > 0 && (
-            <div className="flex items-center gap-3 bg-[#1E3A4A]/30 rounded-xl px-4 py-3">
+            <div className="flex items-center gap-3 bg-foreground/30 rounded-xl px-4 py-3">
               <span className="text-xs text-[#8AACBC]">
                 {testers.filter(t => t.first_accessed_at).length}/{testers.length} testers active
                 {testers.filter(t => !t.first_accessed_at && t.email_sent_at).length > 0 && (
@@ -551,7 +551,7 @@ export default function BugHuntDetailPage() {
                       setError(err instanceof Error ? err.message : 'Failed to send invitations');
                     }
                   }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-xs font-medium transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cg-sage hover:bg-cg-sage-light text-white text-xs font-medium transition-colors"
                 >
                   <Mail className="w-3.5 h-3.5" /> Send All Invitations
                 </button>
@@ -559,28 +559,28 @@ export default function BugHuntDetailPage() {
             </div>
           )}
           {families.length === 0 ? (
-            <div className="text-center py-12 text-[#6B8A9A]">
+            <div className="text-center py-12 text-muted-foreground">
               No test accounts generated yet. Generate test data from the Overview tab.
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-[#2D6A8F]/20">
-                    <th className="text-left py-3 px-3 text-[#6B8A9A] font-medium text-xs uppercase">Family</th>
-                    <th className="text-left py-3 px-3 text-[#6B8A9A] font-medium text-xs uppercase">Config</th>
-                    <th className="text-left py-3 px-3 text-[#6B8A9A] font-medium text-xs uppercase">Parent A</th>
-                    <th className="text-left py-3 px-3 text-[#6B8A9A] font-medium text-xs uppercase">Parent B</th>
-                    <th className="text-left py-3 px-3 text-[#6B8A9A] font-medium text-xs uppercase">Tester</th>
-                    <th className="text-left py-3 px-3 text-[#6B8A9A] font-medium text-xs uppercase">Status</th>
+                  <tr className="border-b border-cg-slate/20">
+                    <th className="text-left py-3 px-3 text-muted-foreground font-medium text-xs uppercase">Family</th>
+                    <th className="text-left py-3 px-3 text-muted-foreground font-medium text-xs uppercase">Config</th>
+                    <th className="text-left py-3 px-3 text-muted-foreground font-medium text-xs uppercase">Parent A</th>
+                    <th className="text-left py-3 px-3 text-muted-foreground font-medium text-xs uppercase">Parent B</th>
+                    <th className="text-left py-3 px-3 text-muted-foreground font-medium text-xs uppercase">Tester</th>
+                    <th className="text-left py-3 px-3 text-muted-foreground font-medium text-xs uppercase">Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {families.map(f => (
-                    <tr key={f.id} className="border-b border-[#2D6A8F]/10 hover:bg-[#1E3A4A]/30">
+                    <tr key={f.id} className="border-b border-cg-slate/10 hover:bg-foreground/30">
                       <td className="py-3 px-3">
                         <div className="text-white font-medium">{f.parent_a_name.split(' ').slice(1).join(' ') || f.parent_a_name} & {f.parent_b_name.split(' ').slice(1).join(' ') || f.parent_b_name}</div>
-                        <div className="text-[10px] text-[#6B8A9A] mt-0.5">{(f.children_names || []).join(', ')}</div>
+                        <div className="text-[10px] text-muted-foreground mt-0.5">{(f.children_names || []).join(', ')}</div>
                       </td>
                       <td className="py-3 px-3">
                         <div className="flex flex-col gap-1">
@@ -598,7 +598,7 @@ export default function BugHuntDetailPage() {
                           <CopyButton text={f.parent_a_email} />
                         </div>
                         <div className="flex items-center gap-1 mt-0.5">
-                          <span className="text-[#6B8A9A] font-mono text-xs">{f.parent_a_password}</span>
+                          <span className="text-muted-foreground font-mono text-xs">{f.parent_a_password}</span>
                           <CopyButton text={f.parent_a_password} />
                         </div>
                       </td>
@@ -608,7 +608,7 @@ export default function BugHuntDetailPage() {
                           <CopyButton text={f.parent_b_email} />
                         </div>
                         <div className="flex items-center gap-1 mt-0.5">
-                          <span className="text-[#6B8A9A] font-mono text-xs">{f.parent_b_password}</span>
+                          <span className="text-muted-foreground font-mono text-xs">{f.parent_b_password}</span>
                           <CopyButton text={f.parent_b_password} />
                         </div>
                       </td>
@@ -618,16 +618,16 @@ export default function BugHuntDetailPage() {
                             <div className="flex items-center gap-2">
                               <span className="text-white text-xs font-medium">{f.tester.tester_name}</span>
                               <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded-full ${
-                                f.tester.status === 'active' ? 'bg-[#3DAA8A]/15 text-[#3DAA8A]' :
+                                f.tester.status === 'active' ? 'bg-cg-sage/15 text-cg-sage' :
                                 f.tester.status === 'invited' ? 'bg-yellow-500/15 text-yellow-400' :
                                 f.tester.status === 'revoked' ? 'bg-red-500/15 text-red-400' :
                                 'bg-purple-500/15 text-purple-400'
                               }`}>{f.tester.status}</span>
                             </div>
-                            <div className="text-[10px] text-[#6B8A9A] mt-0.5">{f.tester.tester_email}</div>
+                            <div className="text-[10px] text-muted-foreground mt-0.5">{f.tester.tester_email}</div>
                             {/* Activity info */}
                             {f.tester.first_accessed_at ? (
-                              <div className="text-[10px] text-[#3DAA8A] mt-0.5">
+                              <div className="text-[10px] text-cg-sage mt-0.5">
                                 Last active: {new Date(f.tester.last_accessed_at || f.tester.first_accessed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
                               </div>
                             ) : f.tester.email_sent_at ? (
@@ -651,16 +651,16 @@ export default function BugHuntDetailPage() {
                         ) : assigningFamily === f.id ? (
                           <div className="space-y-1">
                             <input type="text" placeholder="Name" value={assignForm.tester_name} onChange={e => setAssignForm({...assignForm, tester_name: e.target.value})}
-                              className="w-full px-2 py-1 bg-[#162D3A] border border-[#2D6A8F]/30 rounded text-xs text-white placeholder-[#4A6E7F]" />
+                              className="w-full px-2 py-1 bg-[#162D3A] border border-cg-slate/30 rounded text-xs text-white placeholder-[#4A6E7F]" />
                             <input type="email" placeholder="Email" value={assignForm.tester_email} onChange={e => setAssignForm({...assignForm, tester_email: e.target.value})}
-                              className="w-full px-2 py-1 bg-[#162D3A] border border-[#2D6A8F]/30 rounded text-xs text-white placeholder-[#4A6E7F]" />
+                              className="w-full px-2 py-1 bg-[#162D3A] border border-cg-slate/30 rounded text-xs text-white placeholder-[#4A6E7F]" />
                             <div className="flex gap-1">
-                              <button onClick={() => handleAssignTester(f.id)} className="px-2 py-0.5 bg-[#3DAA8A] text-white rounded text-[10px]">Assign</button>
-                              <button onClick={() => { setAssigningFamily(null); setAssignForm({ tester_name: '', tester_email: '' }); }} className="px-2 py-0.5 text-[#6B8A9A] text-[10px]">Cancel</button>
+                              <button onClick={() => handleAssignTester(f.id)} className="px-2 py-0.5 bg-cg-sage text-white rounded text-[10px]">Assign</button>
+                              <button onClick={() => { setAssigningFamily(null); setAssignForm({ tester_name: '', tester_email: '' }); }} className="px-2 py-0.5 text-muted-foreground text-[10px]">Cancel</button>
                             </div>
                           </div>
                         ) : (
-                          <button onClick={() => setAssigningFamily(f.id)} className="flex items-center gap-1 text-xs text-[#3DAA8A] hover:text-[#5BC4A0]">
+                          <button onClick={() => setAssigningFamily(f.id)} className="flex items-center gap-1 text-xs text-cg-sage hover:text-cg-sage-light">
                             <UserPlus className="w-3.5 h-3.5" />Assign
                           </button>
                         )}
@@ -689,16 +689,16 @@ export default function BugHuntDetailPage() {
           {data?.cohort?.seed_config?.professional && (() => {
             const pro = data.cohort.seed_config.professional;
             return (
-              <div className="mt-6 rounded-lg border border-[#3DAA8A]/30 bg-[#1E3A4A]/40 p-4">
+              <div className="mt-6 rounded-lg border border-cg-sage/30 bg-foreground/40 p-4">
                 <div className="flex items-center gap-2 mb-1">
-                  <Scale className="w-4 h-4 text-[#3DAA8A]" />
+                  <Scale className="w-4 h-4 text-cg-sage" />
                   <h4 className="text-white font-semibold text-sm">Professional portal — {pro.firm_name}</h4>
                 </div>
-                <p className="text-xs text-[#6B8A9A] mb-3">
+                <p className="text-xs text-muted-foreground mb-3">
                   {pro.name} (attorney) has the case for <span className="text-[#D0E4EC]">{pro.assigned_family}</span> assigned with full access.
                   Log in below and open the Professional portal to test it.
                   {pro.kidspace_incidents_seeded && (
-                    <span className="text-[#3DAA8A]"> Includes seeded KidSpace incidents (a flagged child message + a terminated call with a recording) to test the Circle incidents view and recording requests.</span>
+                    <span className="text-cg-sage"> Includes seeded KidSpace incidents (a flagged child message + a terminated call with a recording) to test the Circle incidents view and recording requests.</span>
                   )}
                   {pro.login_works === false && (
                     <span className="text-yellow-400"> ⚠ Supabase auth wasn&apos;t created for this account — login may not work.</span>
@@ -706,14 +706,14 @@ export default function BugHuntDetailPage() {
                 </p>
                 <div className="grid sm:grid-cols-2 gap-3">
                   <div>
-                    <div className="text-[10px] uppercase text-[#6B8A9A] mb-1">Email</div>
+                    <div className="text-[10px] uppercase text-muted-foreground mb-1">Email</div>
                     <div className="flex items-center gap-1">
                       <span className="text-[#D0E4EC] font-mono text-xs">{pro.email}</span>
                       <CopyButton text={pro.email} />
                     </div>
                   </div>
                   <div>
-                    <div className="text-[10px] uppercase text-[#6B8A9A] mb-1">Password</div>
+                    <div className="text-[10px] uppercase text-muted-foreground mb-1">Password</div>
                     <div className="flex items-center gap-1">
                       <span className="text-[#D0E4EC] font-mono text-xs">{pro.password}</span>
                       <CopyButton text={pro.password} />
@@ -725,7 +725,7 @@ export default function BugHuntDetailPage() {
                     href={pro.portal_url}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-1 mt-3 text-xs text-[#3DAA8A] hover:text-[#5BC4A0]"
+                    className="inline-flex items-center gap-1 mt-3 text-xs text-cg-sage hover:text-cg-sage-light"
                   >
                     Open Professional portal →
                   </a>
@@ -741,13 +741,13 @@ export default function BugHuntDetailPage() {
         <div className="space-y-4">
           {/* Progress bar */}
           {stats.checklist_total > 0 && (
-            <div className="bg-[#1E3A4A]/50 border border-[#2D6A8F]/20 rounded-xl p-4">
+            <div className="bg-foreground/50 border border-cg-slate/20 rounded-xl p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm text-[#8AACBC]">Progress</span>
                 <span className="text-sm text-white font-medium">{stats.checklist_completed}/{stats.checklist_total} ({checklistProgress}%)</span>
               </div>
-              <div className="w-full h-2 bg-[#2D6A8F]/20 rounded-full overflow-hidden">
-                <div className="h-full bg-[#3DAA8A] rounded-full transition-all" style={{ width: `${checklistProgress}%` }} />
+              <div className="w-full h-2 bg-cg-slate/20 rounded-full overflow-hidden">
+                <div className="h-full bg-cg-sage rounded-full transition-all" style={{ width: `${checklistProgress}%` }} />
               </div>
             </div>
           )}
@@ -755,29 +755,29 @@ export default function BugHuntDetailPage() {
           {/* Items */}
           <div className="space-y-1">
             {checklist.map(item => (
-              <div key={item.id} className="flex items-start gap-3 bg-[#1E3A4A]/30 hover:bg-[#1E3A4A]/50 rounded-lg p-3 group transition-colors">
+              <div key={item.id} className="flex items-start gap-3 bg-foreground/30 hover:bg-foreground/50 rounded-lg p-3 group transition-colors">
                 <button
                   onClick={() => handleToggleChecklist(item.id)}
                   className={`mt-0.5 w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all ${
                     item.is_completed
-                      ? 'bg-[#3DAA8A] border-[#3DAA8A] text-white'
-                      : 'border-[#4A6E7F] hover:border-[#3DAA8A]'
+                      ? 'bg-cg-sage border-cg-sage text-white'
+                      : 'border-[#4A6E7F] hover:border-cg-sage'
                   }`}
                 >
                   {item.is_completed && <Check className="w-3 h-3" />}
                 </button>
                 <div className="flex-1 min-w-0">
-                  <div className={`text-sm ${item.is_completed ? 'text-[#6B8A9A] line-through' : 'text-white'}`}>
+                  <div className={`text-sm ${item.is_completed ? 'text-muted-foreground line-through' : 'text-white'}`}>
                     {item.title}
                   </div>
                   {item.description && (
-                    <div className="text-xs text-[#6B8A9A] mt-0.5">{item.description}</div>
+                    <div className="text-xs text-muted-foreground mt-0.5">{item.description}</div>
                   )}
                   {item.completed_at && (
                     <div className="text-[10px] text-[#4A6E7F] mt-1">
                       Completed {new Date(item.completed_at).toLocaleString()}
                       {item.tester_name ? (
-                        <span className="ml-1 text-[#3DAA8A]">by {item.tester_name}</span>
+                        <span className="ml-1 text-cg-sage">by {item.tester_name}</span>
                       ) : item.completed_by ? (
                         <span className="ml-1 text-[#8AACBC]">by Admin</span>
                       ) : null}
@@ -802,12 +802,12 @@ export default function BugHuntDetailPage() {
               onChange={e => setNewCheckItem(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleAddCheckItem()}
               placeholder="Add checklist item..."
-              className="flex-1 px-3 py-2 bg-[#1E3A4A] border border-[#2D6A8F]/30 rounded-lg text-white placeholder-[#4A6E7F] focus:outline-none focus:border-[#3DAA8A]/50 text-sm"
+              className="flex-1 px-3 py-2 bg-foreground border border-cg-slate/30 rounded-lg text-white placeholder-[#4A6E7F] focus:outline-none focus:border-cg-sage/50 text-sm"
             />
             <button aria-label="Add"
               onClick={handleAddCheckItem}
               disabled={!newCheckItem.trim()}
-              className="px-3 py-2 bg-[#3DAA8A]/20 text-[#3DAA8A] rounded-lg hover:bg-[#3DAA8A]/30 transition-colors disabled:opacity-50"
+              className="px-3 py-2 bg-cg-sage/20 text-cg-sage rounded-lg hover:bg-cg-sage/30 transition-colors disabled:opacity-50"
             >
               <Plus className="w-4 h-4" />
             </button>
@@ -821,7 +821,7 @@ export default function BugHuntDetailPage() {
           <div className="flex justify-end">
             <button
               onClick={() => setShowBugForm(!showBugForm)}
-              className="flex items-center gap-2 px-3 py-1.5 bg-[#3DAA8A]/20 text-[#3DAA8A] rounded-lg hover:bg-[#3DAA8A]/30 transition-colors text-sm"
+              className="flex items-center gap-2 px-3 py-1.5 bg-cg-sage/20 text-cg-sage rounded-lg hover:bg-cg-sage/30 transition-colors text-sm"
             >
               <Plus className="w-4 h-4" />
               Report Bug
@@ -830,26 +830,26 @@ export default function BugHuntDetailPage() {
 
           {/* Bug form */}
           {showBugForm && (
-            <div className="bg-[#1E3A4A]/50 border border-[#2D6A8F]/20 rounded-xl p-4 space-y-3">
+            <div className="bg-foreground/50 border border-cg-slate/20 rounded-xl p-4 space-y-3">
               <input
                 type="text"
                 value={bugForm.title}
                 onChange={e => setBugForm({ ...bugForm, title: e.target.value })}
                 placeholder="Bug title"
-                className="w-full px-3 py-2 bg-[#162D3A] border border-[#2D6A8F]/30 rounded-lg text-white placeholder-[#4A6E7F] focus:outline-none focus:border-[#3DAA8A]/50 text-sm"
+                className="w-full px-3 py-2 bg-[#162D3A] border border-cg-slate/30 rounded-lg text-white placeholder-[#4A6E7F] focus:outline-none focus:border-cg-sage/50 text-sm"
               />
               <textarea
                 value={bugForm.description}
                 onChange={e => setBugForm({ ...bugForm, description: e.target.value })}
                 placeholder="Description"
                 rows={3}
-                className="w-full px-3 py-2 bg-[#162D3A] border border-[#2D6A8F]/30 rounded-lg text-white placeholder-[#4A6E7F] focus:outline-none focus:border-[#3DAA8A]/50 text-sm resize-none"
+                className="w-full px-3 py-2 bg-[#162D3A] border border-cg-slate/30 rounded-lg text-white placeholder-[#4A6E7F] focus:outline-none focus:border-cg-sage/50 text-sm resize-none"
               />
               <div className="flex gap-3">
                 <select
                   value={bugForm.severity}
                   onChange={e => setBugForm({ ...bugForm, severity: e.target.value })}
-                  className="px-3 py-2 bg-[#162D3A] border border-[#2D6A8F]/30 rounded-lg text-white text-sm"
+                  className="px-3 py-2 bg-[#162D3A] border border-cg-slate/30 rounded-lg text-white text-sm"
                 >
                   <option value="critical">Critical</option>
                   <option value="high">High</option>
@@ -860,7 +860,7 @@ export default function BugHuntDetailPage() {
                   <select
                     value={bugForm.family_id}
                     onChange={e => setBugForm({ ...bugForm, family_id: e.target.value })}
-                    className="px-3 py-2 bg-[#162D3A] border border-[#2D6A8F]/30 rounded-lg text-white text-sm"
+                    className="px-3 py-2 bg-[#162D3A] border border-cg-slate/30 rounded-lg text-white text-sm"
                   >
                     <option value="">No family</option>
                     {families.map(f => (
@@ -874,10 +874,10 @@ export default function BugHuntDetailPage() {
                 onChange={e => setBugForm({ ...bugForm, steps_to_reproduce: e.target.value })}
                 placeholder="Steps to reproduce (optional)"
                 rows={2}
-                className="w-full px-3 py-2 bg-[#162D3A] border border-[#2D6A8F]/30 rounded-lg text-white placeholder-[#4A6E7F] focus:outline-none focus:border-[#3DAA8A]/50 text-sm resize-none font-mono"
+                className="w-full px-3 py-2 bg-[#162D3A] border border-cg-slate/30 rounded-lg text-white placeholder-[#4A6E7F] focus:outline-none focus:border-cg-sage/50 text-sm resize-none font-mono"
               />
               <div className="flex gap-2">
-                <button onClick={handleSubmitBug} className="px-4 py-2 bg-[#3DAA8A] text-white rounded-lg hover:bg-[#3DAA8A]/80 text-sm font-medium">Submit Bug</button>
+                <button onClick={handleSubmitBug} className="px-4 py-2 bg-cg-sage text-white rounded-lg hover:bg-cg-sage/80 text-sm font-medium">Submit Bug</button>
                 <button onClick={() => setShowBugForm(false)} className="px-4 py-2 text-[#8AACBC] hover:text-white text-sm">Cancel</button>
               </div>
             </div>
@@ -885,23 +885,23 @@ export default function BugHuntDetailPage() {
 
           {/* Bug list */}
           {bug_reports.length === 0 ? (
-            <div className="text-center py-12 text-[#6B8A9A]">No bugs reported yet.</div>
+            <div className="text-center py-12 text-muted-foreground">No bugs reported yet.</div>
           ) : (
             <div className="space-y-2">
               {bug_reports.map(bug => (
-                <div key={bug.id} className="bg-[#1E3A4A]/30 border border-[#2D6A8F]/10 rounded-lg overflow-hidden">
+                <div key={bug.id} className="bg-foreground/30 border border-cg-slate/10 rounded-lg overflow-hidden">
                   <button
                     onClick={() => setExpandedBugs(prev => {
                       const next = new Set(prev);
                       next.has(bug.id) ? next.delete(bug.id) : next.add(bug.id);
                       return next;
                     })}
-                    className="w-full flex items-center gap-3 p-3 text-left hover:bg-[#1E3A4A]/50 transition-colors"
+                    className="w-full flex items-center gap-3 p-3 text-left hover:bg-foreground/50 transition-colors"
                   >
-                    {expandedBugs.has(bug.id) ? <ChevronDown className="w-4 h-4 text-[#6B8A9A]" /> : <ChevronRight className="w-4 h-4 text-[#6B8A9A]" />}
+                    {expandedBugs.has(bug.id) ? <ChevronDown className="w-4 h-4 text-muted-foreground" /> : <ChevronRight className="w-4 h-4 text-muted-foreground" />}
                     <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${SEVERITY_COLORS[bug.severity]}`}>{bug.severity}</span>
                     <span className="text-sm text-white flex-1 truncate">{bug.title}</span>
-                    {bug.tester_name && <span className="text-[10px] text-[#3DAA8A] bg-[#3DAA8A]/10 px-1.5 py-0.5 rounded">by {bug.tester_name}</span>}
+                    {bug.tester_name && <span className="text-[10px] text-cg-sage bg-cg-sage/10 px-1.5 py-0.5 rounded">by {bug.tester_name}</span>}
                     <select
                       value={bug.status}
                       onChange={e => { e.stopPropagation(); handleUpdateBugStatus(bug.id, e.target.value); }}
@@ -913,20 +913,20 @@ export default function BugHuntDetailPage() {
                       <option value="fixed">Fixed</option>
                       <option value="wont_fix">Won't Fix</option>
                     </select>
-                    <span className="text-xs text-[#6B8A9A]">{new Date(bug.created_at).toLocaleDateString()}</span>
+                    <span className="text-xs text-muted-foreground">{new Date(bug.created_at).toLocaleDateString()}</span>
                   </button>
                   {expandedBugs.has(bug.id) && (
                     <div className="px-11 pb-3 space-y-3">
                       <p className="text-sm text-[#D0E4EC]">{bug.description}</p>
                       {bug.steps_to_reproduce && (
                         <div>
-                          <span className="text-xs text-[#6B8A9A] font-medium">Steps to Reproduce:</span>
+                          <span className="text-xs text-muted-foreground font-medium">Steps to Reproduce:</span>
                           <pre className="text-xs text-[#8AACBC] mt-1 whitespace-pre-wrap font-mono">{bug.steps_to_reproduce}</pre>
                         </div>
                       )}
                       {bug.screenshot_urls && bug.screenshot_urls.length > 0 && (
                         <div>
-                          <span className="text-xs text-[#6B8A9A] font-medium">Screenshots ({bug.screenshot_urls.length}):</span>
+                          <span className="text-xs text-muted-foreground font-medium">Screenshots ({bug.screenshot_urls.length}):</span>
                           <div className="flex flex-wrap gap-2 mt-2">
                             {bug.screenshot_urls.map((url, idx) => (
                               <a
@@ -934,7 +934,7 @@ export default function BugHuntDetailPage() {
                                 href={url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="block rounded-lg overflow-hidden border border-[#2D6A8F]/30 hover:border-[#3DAA8A]/50 transition-colors"
+                                className="block rounded-lg overflow-hidden border border-cg-slate/30 hover:border-cg-sage/50 transition-colors"
                               >
                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
@@ -963,7 +963,7 @@ export default function BugHuntDetailPage() {
           <div className="flex items-center justify-between">
             {stats.avg_rating !== null && (
               <div className="flex items-center gap-2">
-                <span className="text-sm text-[#6B8A9A]">Average Rating:</span>
+                <span className="text-sm text-muted-foreground">Average Rating:</span>
                 <div className="flex items-center gap-1">
                   {[1, 2, 3, 4, 5].map(s => (
                     <Star key={s} className={`w-4 h-4 ${s <= (stats.avg_rating || 0) ? 'text-yellow-400 fill-yellow-400' : 'text-[#4A6E7F]'}`} />
@@ -974,7 +974,7 @@ export default function BugHuntDetailPage() {
             )}
             <button
               onClick={() => setShowFeedbackForm(!showFeedbackForm)}
-              className="flex items-center gap-2 px-3 py-1.5 bg-[#3DAA8A]/20 text-[#3DAA8A] rounded-lg hover:bg-[#3DAA8A]/30 transition-colors text-sm"
+              className="flex items-center gap-2 px-3 py-1.5 bg-cg-sage/20 text-cg-sage rounded-lg hover:bg-cg-sage/30 transition-colors text-sm"
             >
               <Plus className="w-4 h-4" />
               Add Feedback
@@ -982,12 +982,12 @@ export default function BugHuntDetailPage() {
           </div>
 
           {showFeedbackForm && (
-            <div className="bg-[#1E3A4A]/50 border border-[#2D6A8F]/20 rounded-xl p-4 space-y-3">
+            <div className="bg-foreground/50 border border-cg-slate/20 rounded-xl p-4 space-y-3">
               <div className="flex gap-3">
                 <select
                   value={feedbackForm.category}
                   onChange={e => setFeedbackForm({ ...feedbackForm, category: e.target.value })}
-                  className="px-3 py-2 bg-[#162D3A] border border-[#2D6A8F]/30 rounded-lg text-white text-sm"
+                  className="px-3 py-2 bg-[#162D3A] border border-cg-slate/30 rounded-lg text-white text-sm"
                 >
                   <option value="ux">UX</option>
                   <option value="performance">Performance</option>
@@ -1012,21 +1012,21 @@ export default function BugHuntDetailPage() {
                 onChange={e => setFeedbackForm({ ...feedbackForm, content: e.target.value })}
                 placeholder="Feedback details..."
                 rows={3}
-                className="w-full px-3 py-2 bg-[#162D3A] border border-[#2D6A8F]/30 rounded-lg text-white placeholder-[#4A6E7F] focus:outline-none focus:border-[#3DAA8A]/50 text-sm resize-none"
+                className="w-full px-3 py-2 bg-[#162D3A] border border-cg-slate/30 rounded-lg text-white placeholder-[#4A6E7F] focus:outline-none focus:border-cg-sage/50 text-sm resize-none"
               />
               <div className="flex gap-2">
-                <button onClick={handleSubmitFeedback} className="px-4 py-2 bg-[#3DAA8A] text-white rounded-lg hover:bg-[#3DAA8A]/80 text-sm font-medium">Submit</button>
+                <button onClick={handleSubmitFeedback} className="px-4 py-2 bg-cg-sage text-white rounded-lg hover:bg-cg-sage/80 text-sm font-medium">Submit</button>
                 <button onClick={() => setShowFeedbackForm(false)} className="px-4 py-2 text-[#8AACBC] hover:text-white text-sm">Cancel</button>
               </div>
             </div>
           )}
 
           {feedback.length === 0 ? (
-            <div className="text-center py-12 text-[#6B8A9A]">No feedback yet.</div>
+            <div className="text-center py-12 text-muted-foreground">No feedback yet.</div>
           ) : (
             <div className="space-y-3">
               {feedback.map(fb => (
-                <div key={fb.id} className="bg-[#1E3A4A]/30 border border-[#2D6A8F]/10 rounded-lg p-4">
+                <div key={fb.id} className="bg-foreground/30 border border-cg-slate/10 rounded-lg p-4">
                   <div className="flex items-center gap-3 mb-2">
                     <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full bg-blue-500/15 text-blue-400">{fb.category}</span>
                     {fb.rating && (
@@ -1036,7 +1036,7 @@ export default function BugHuntDetailPage() {
                         ))}
                       </div>
                     )}
-                    <span className="text-xs text-[#6B8A9A] ml-auto">{new Date(fb.created_at).toLocaleString()}</span>
+                    <span className="text-xs text-muted-foreground ml-auto">{new Date(fb.created_at).toLocaleString()}</span>
                   </div>
                   <p className="text-sm text-[#D0E4EC]">{fb.content}</p>
                 </div>
@@ -1052,7 +1052,7 @@ export default function BugHuntDetailPage() {
           <div className="flex justify-end">
             <button
               onClick={() => setShowNoteForm(!showNoteForm)}
-              className="flex items-center gap-2 px-3 py-1.5 bg-[#3DAA8A]/20 text-[#3DAA8A] rounded-lg hover:bg-[#3DAA8A]/30 transition-colors text-sm"
+              className="flex items-center gap-2 px-3 py-1.5 bg-cg-sage/20 text-cg-sage rounded-lg hover:bg-cg-sage/30 transition-colors text-sm"
             >
               <Plus className="w-4 h-4" />
               Add Note
@@ -1060,12 +1060,12 @@ export default function BugHuntDetailPage() {
           </div>
 
           {showNoteForm && (
-            <div className="bg-[#1E3A4A]/50 border border-[#2D6A8F]/20 rounded-xl p-4 space-y-3">
+            <div className="bg-foreground/50 border border-cg-slate/20 rounded-xl p-4 space-y-3">
               <div className="flex gap-3">
                 <select
                   value={noteForm.note_type}
                   onChange={e => setNoteForm({ ...noteForm, note_type: e.target.value })}
-                  className="px-3 py-2 bg-[#162D3A] border border-[#2D6A8F]/30 rounded-lg text-white text-sm"
+                  className="px-3 py-2 bg-[#162D3A] border border-cg-slate/30 rounded-lg text-white text-sm"
                 >
                   <option value="observation">Observation</option>
                   <option value="blocker">Blocker</option>
@@ -1076,7 +1076,7 @@ export default function BugHuntDetailPage() {
                   <select
                     value={noteForm.family_id}
                     onChange={e => setNoteForm({ ...noteForm, family_id: e.target.value })}
-                    className="px-3 py-2 bg-[#162D3A] border border-[#2D6A8F]/30 rounded-lg text-white text-sm"
+                    className="px-3 py-2 bg-[#162D3A] border border-cg-slate/30 rounded-lg text-white text-sm"
                   >
                     <option value="">Cohort-level</option>
                     {families.map(f => (
@@ -1090,26 +1090,26 @@ export default function BugHuntDetailPage() {
                 onChange={e => setNoteForm({ ...noteForm, content: e.target.value })}
                 placeholder="Your observation or note..."
                 rows={3}
-                className="w-full px-3 py-2 bg-[#162D3A] border border-[#2D6A8F]/30 rounded-lg text-white placeholder-[#4A6E7F] focus:outline-none focus:border-[#3DAA8A]/50 text-sm resize-none"
+                className="w-full px-3 py-2 bg-[#162D3A] border border-cg-slate/30 rounded-lg text-white placeholder-[#4A6E7F] focus:outline-none focus:border-cg-sage/50 text-sm resize-none"
               />
               <div className="flex gap-2">
-                <button onClick={handleSubmitNote} className="px-4 py-2 bg-[#3DAA8A] text-white rounded-lg hover:bg-[#3DAA8A]/80 text-sm font-medium">Add Note</button>
+                <button onClick={handleSubmitNote} className="px-4 py-2 bg-cg-sage text-white rounded-lg hover:bg-cg-sage/80 text-sm font-medium">Add Note</button>
                 <button onClick={() => setShowNoteForm(false)} className="px-4 py-2 text-[#8AACBC] hover:text-white text-sm">Cancel</button>
               </div>
             </div>
           )}
 
           {notes.length === 0 ? (
-            <div className="text-center py-12 text-[#6B8A9A]">No notes yet.</div>
+            <div className="text-center py-12 text-muted-foreground">No notes yet.</div>
           ) : (
             <div className="space-y-2">
               {notes.map(note => (
-                <div key={note.id} className="bg-[#1E3A4A]/30 border border-[#2D6A8F]/10 rounded-lg p-4">
+                <div key={note.id} className="bg-foreground/30 border border-cg-slate/10 rounded-lg p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${NOTE_TYPE_COLORS[note.note_type] || NOTE_TYPE_COLORS.observation}`}>
                       {note.note_type}
                     </span>
-                    <span className="text-xs text-[#6B8A9A]">{new Date(note.created_at).toLocaleString()}</span>
+                    <span className="text-xs text-muted-foreground">{new Date(note.created_at).toLocaleString()}</span>
                   </div>
                   <p className="text-sm text-[#D0E4EC]">{note.content}</p>
                 </div>

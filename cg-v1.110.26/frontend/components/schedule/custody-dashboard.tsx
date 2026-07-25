@@ -116,10 +116,10 @@ function formatSchedulePattern(pattern: string | null): string {
 
 function outcomeColor(outcome: string | null): string {
   switch (outcome) {
-    case 'completed': return 'bg-[#E8F4F0] text-[#2D8A70] dark:bg-[#1E3A4A]/30 dark:text-[#5BC4A0]';
-    case 'missed': return 'bg-[#FEE2E2] text-[#9B2C2C] dark:bg-[#7A2222]/30 dark:text-[#E06B6B]';
-    case 'one_party_present': return 'bg-[#FEF7ED] text-[#E09520] dark:bg-[#1E3A4A]/30 dark:text-[#F5A623]';
-    case 'disputed': return 'bg-[#FEE2E2] text-[#9B2C2C] dark:bg-[#7A2222]/30 dark:text-[#E06B6B]';
+    case 'completed': return 'bg-cg-sage-subtle text-cg-sage-dark dark:bg-foreground/30 dark:text-cg-sage-light';
+    case 'missed': return 'bg-cg-error-subtle text-[#9B2C2C] dark:bg-[#7A2222]/30 dark:text-[#E06B6B]';
+    case 'one_party_present': return 'bg-cg-amber-subtle text-[#E09520] dark:bg-foreground/30 dark:text-cg-amber';
+    case 'disputed': return 'bg-cg-error-subtle text-[#9B2C2C] dark:bg-[#7A2222]/30 dark:text-[#E06B6B]';
     default: return 'bg-muted text-muted-foreground';
   }
 }
@@ -285,20 +285,20 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
           knows whether to trust the numbers below it. */}
       {qualityScore != null && qualityBand && (
         <div className={`flex items-center justify-between p-3 rounded-xl border ${
-          qualityBand.color === 'emerald' ? 'bg-[#E8F4F0] border-[#E8F4F0] dark:bg-[#1E3A4A]/20 dark:border-[#1E3A4A]' :
-          qualityBand.color === 'amber' ? 'bg-[#FEF7ED] border-[#FEF7ED] dark:bg-[#1E3A4A]/20 dark:border-[#E09520]' :
-          'bg-[#FEE2E2] border-[#FEE2E2] dark:bg-[#7A2222]/20 dark:border-[#9B2C2C]'
+          qualityBand.color === 'emerald' ? 'bg-cg-sage-subtle border-cg-sage-subtle dark:bg-foreground/20 dark:border-foreground' :
+          qualityBand.color === 'amber' ? 'bg-cg-amber-subtle border-cg-amber-subtle dark:bg-foreground/20 dark:border-[#E09520]' :
+          'bg-cg-error-subtle border-cg-error-subtle dark:bg-[#7A2222]/20 dark:border-[#9B2C2C]'
         }`}>
           <div className="flex items-center gap-3">
             <Shield className={`h-5 w-5 ${
-              qualityBand.color === 'emerald' ? 'text-[#2D8A70] dark:text-[#5BC4A0]' :
-              qualityBand.color === 'amber' ? 'text-[#E09520] dark:text-[#F5A623]' :
-              'text-[#C53030] dark:text-[#E06B6B]'
+              qualityBand.color === 'emerald' ? 'text-cg-sage-dark dark:text-cg-sage-light' :
+              qualityBand.color === 'amber' ? 'text-[#E09520] dark:text-cg-amber' :
+              'text-cg-error dark:text-[#E06B6B]'
             }`} />
             <div>
               <p className={`text-sm font-semibold ${
-                qualityBand.color === 'emerald' ? 'text-[#1E3A4A] dark:text-[#5BC4A0]' :
-                qualityBand.color === 'amber' ? 'text-[#E09520] dark:text-[#F5A623]' :
+                qualityBand.color === 'emerald' ? 'text-foreground dark:text-cg-sage-light' :
+                qualityBand.color === 'amber' ? 'text-[#E09520] dark:text-cg-amber' :
                 'text-[#9B2C2C] dark:text-[#FCA5A5]'
               }`}>
                 Data Quality: {qualityBand.label}
@@ -307,9 +307,9 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
             </div>
           </div>
           <span className={`px-3 py-1 rounded-full text-sm font-bold ${
-            qualityBand.color === 'emerald' ? 'bg-[#E8F4F0] text-[#2D8A70] dark:bg-[#1E3A4A]/50 dark:text-[#5BC4A0]' :
-            qualityBand.color === 'amber' ? 'bg-[#FEF7ED] text-[#E09520] dark:bg-[#1E3A4A]/50 dark:text-[#F5A623]' :
-            'bg-[#FEE2E2] text-[#9B2C2C] dark:bg-[#7A2222]/50 dark:text-[#FCA5A5]'
+            qualityBand.color === 'emerald' ? 'bg-cg-sage-subtle text-cg-sage-dark dark:bg-foreground/50 dark:text-cg-sage-light' :
+            qualityBand.color === 'amber' ? 'bg-cg-amber-subtle text-[#E09520] dark:bg-foreground/50 dark:text-cg-amber' :
+            'bg-cg-error-subtle text-[#9B2C2C] dark:bg-[#7A2222]/50 dark:text-[#FCA5A5]'
           }`}>{qualityScore}/100</span>
         </div>
       )}
@@ -333,12 +333,12 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
 
       {/* Error Banner */}
       {errors.length > 0 && (
-        <div className="bg-[#FEF7ED] dark:bg-[#1E3A4A]/20 border border-[#FEF7ED] dark:border-[#E09520] rounded-xl p-3">
+        <div className="bg-cg-amber-subtle dark:bg-foreground/20 border border-cg-amber-subtle dark:border-[#E09520] rounded-xl p-3">
           <div className="flex items-start gap-2">
-            <AlertCircle className="h-4 w-4 text-[#E09520] dark:text-[#F5A623] mt-0.5 flex-shrink-0" />
+            <AlertCircle className="h-4 w-4 text-[#E09520] dark:text-cg-amber mt-0.5 flex-shrink-0" />
             <div>
-              <p className="text-sm font-medium text-[#E09520] dark:text-[#F5A623]">Some data could not be loaded</p>
-              <ul className="text-xs text-[#E09520] dark:text-[#F5A623] mt-1 space-y-0.5">
+              <p className="text-sm font-medium text-[#E09520] dark:text-cg-amber">Some data could not be loaded</p>
+              <ul className="text-xs text-[#E09520] dark:text-cg-amber mt-1 space-y-0.5">
                 {errors.map((err) => (
                   <li key={err}>{err}</li>
                 ))}
@@ -351,29 +351,29 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
       {/* Compliance Status Badge */}
       {complianceStatus && (
         <div className={`flex items-center justify-between p-3 rounded-xl border ${
-          complianceStatus.color === 'emerald' ? 'bg-[#E8F4F0] border-[#E8F4F0] dark:bg-[#1E3A4A]/20 dark:border-[#1E3A4A]' :
-          complianceStatus.color === 'amber' ? 'bg-[#FEF7ED] border-[#FEF7ED] dark:bg-[#1E3A4A]/20 dark:border-[#E09520]' :
-          'bg-[#FEE2E2] border-[#FEE2E2] dark:bg-[#7A2222]/20 dark:border-[#9B2C2C]'
+          complianceStatus.color === 'emerald' ? 'bg-cg-sage-subtle border-cg-sage-subtle dark:bg-foreground/20 dark:border-foreground' :
+          complianceStatus.color === 'amber' ? 'bg-cg-amber-subtle border-cg-amber-subtle dark:bg-foreground/20 dark:border-[#E09520]' :
+          'bg-cg-error-subtle border-cg-error-subtle dark:bg-[#7A2222]/20 dark:border-[#9B2C2C]'
         }`}>
           <div className="flex items-center gap-2">
             {complianceStatus.color === 'emerald' ? (
-              <CheckCircle2 className="h-4 w-4 text-[#2D8A70] dark:text-[#5BC4A0]" />
+              <CheckCircle2 className="h-4 w-4 text-cg-sage-dark dark:text-cg-sage-light" />
             ) : (
-              <AlertCircle className="h-4 w-4 text-[#E09520] dark:text-[#F5A623]" />
+              <AlertCircle className="h-4 w-4 text-[#E09520] dark:text-cg-amber" />
             )}
             <div>
               <span className={`text-sm font-semibold ${
-                complianceStatus.color === 'emerald' ? 'text-[#1E3A4A] dark:text-[#5BC4A0]' :
-                complianceStatus.color === 'amber' ? 'text-[#E09520] dark:text-[#F5A623]' :
+                complianceStatus.color === 'emerald' ? 'text-foreground dark:text-cg-sage-light' :
+                complianceStatus.color === 'amber' ? 'text-[#E09520] dark:text-cg-amber' :
                 'text-[#9B2C2C] dark:text-[#FCA5A5]'
               }`}>{complianceStatus.label}</span>
               <p className="text-xs text-muted-foreground">{complianceStatus.desc}</p>
             </div>
           </div>
           <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-            complianceStatus.color === 'emerald' ? 'bg-[#E8F4F0] text-[#2D8A70] dark:bg-[#1E3A4A]/50 dark:text-[#5BC4A0]' :
-            complianceStatus.color === 'amber' ? 'bg-[#FEF7ED] text-[#E09520] dark:bg-[#1E3A4A]/50 dark:text-[#F5A623]' :
-            'bg-[#FEE2E2] text-[#9B2C2C] dark:bg-[#7A2222]/50 dark:text-[#FCA5A5]'
+            complianceStatus.color === 'emerald' ? 'bg-cg-sage-subtle text-cg-sage-dark dark:bg-foreground/50 dark:text-cg-sage-light' :
+            complianceStatus.color === 'amber' ? 'bg-cg-amber-subtle text-[#E09520] dark:bg-foreground/50 dark:text-cg-amber' :
+            'bg-cg-error-subtle text-[#9B2C2C] dark:bg-[#7A2222]/50 dark:text-[#FCA5A5]'
           }`}>Agreement Check</span>
         </div>
       )}
@@ -382,14 +382,14 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
           with a concrete explanation. Uses timeline.data_gaps so the user
           sees WHY the timeline has gaps, not just that gaps exist. */}
       {timelineData?.data_gaps && timelineData.data_gaps.length > 0 && (
-        <div className="bg-[#FEF7ED] dark:bg-[#1E3A4A]/20 border border-[#FEF7ED] dark:border-[#E09520] rounded-xl p-3">
+        <div className="bg-cg-amber-subtle dark:bg-foreground/20 border border-cg-amber-subtle dark:border-[#E09520] rounded-xl p-3">
           <div className="flex items-start gap-2">
-            <AlertCircle className="h-4 w-4 text-[#E09520] dark:text-[#F5A623] mt-0.5 flex-shrink-0" />
+            <AlertCircle className="h-4 w-4 text-[#E09520] dark:text-cg-amber mt-0.5 flex-shrink-0" />
             <div className="flex-1">
-              <p className="text-sm font-medium text-[#E09520] dark:text-[#F5A623]">
+              <p className="text-sm font-medium text-[#E09520] dark:text-cg-amber">
                 {timelineData.data_gaps.length} day{timelineData.data_gaps.length !== 1 ? 's' : ''} without signal in this period
               </p>
-              <p className="text-xs text-[#E09520] dark:text-[#F5A623] mt-0.5">
+              <p className="text-xs text-[#E09520] dark:text-cg-amber mt-0.5">
                 No check-in, completed exchange, or schedule projection on{' '}
                 {timelineData.data_gaps.length <= 3
                   ? timelineData.data_gaps.map(g => format(parseISO(g.date), 'MMM d')).join(', ')
@@ -407,8 +407,8 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
         <div className="bg-muted p-4 rounded-xl border border-border">
           <div className="flex items-center justify-between mb-2">
             <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Current Session</span>
-            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-bold bg-[#E8F4F0] text-[#2D8A70] dark:bg-[#1E3A4A]/30 dark:text-[#5BC4A0]">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#3DAA8A] animate-pulse" />
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-bold bg-cg-sage-subtle text-cg-sage-dark dark:bg-foreground/30 dark:text-cg-sage-light">
+              <span className="w-1.5 h-1.5 rounded-full bg-cg-sage animate-pulse" />
               Live
             </span>
           </div>
@@ -453,7 +453,7 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
                 <div className="text-xl font-bold text-foreground leading-tight">
                   {childStats.parent_a.percentage}%
                 </div>
-                <div className={`text-[11px] font-medium ${childStats.variance.parent_a >= 0 ? 'text-[#2D8A70] dark:text-[#5BC4A0]' : 'text-[#C53030] dark:text-[#E06B6B]'}`}>
+                <div className={`text-[11px] font-medium ${childStats.variance.parent_a >= 0 ? 'text-cg-sage-dark dark:text-cg-sage-light' : 'text-cg-error dark:text-[#E06B6B]'}`}>
                   {childStats.variance.parent_a >= 0 ? '+' : ''}{childStats.variance.parent_a}% vs target
                 </div>
               </div>
@@ -462,7 +462,7 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
                 <div className="text-xl font-bold text-foreground leading-tight">
                   {childStats.parent_b.percentage}%
                 </div>
-                <div className={`text-[11px] font-medium ${childStats.variance.parent_b >= 0 ? 'text-[#2D8A70] dark:text-[#5BC4A0]' : 'text-[#C53030] dark:text-[#E06B6B]'}`}>
+                <div className={`text-[11px] font-medium ${childStats.variance.parent_b >= 0 ? 'text-cg-sage-dark dark:text-cg-sage-light' : 'text-cg-error dark:text-[#E06B6B]'}`}>
                   {childStats.variance.parent_b >= 0 ? '+' : ''}{childStats.variance.parent_b}% vs target
                 </div>
               </div>
@@ -470,11 +470,11 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
 
             <div className="h-3 w-full bg-muted rounded-full overflow-hidden flex">
               <div
-                className="bg-[#2D6A8F] dark:bg-[#4BA8C8] h-full transition-all duration-700"
+                className="bg-cg-slate dark:bg-cg-slate-light h-full transition-all duration-700"
                 style={{ width: `${childStats.parent_a.percentage}%` }}
               />
               <div
-                className="bg-[#4BA8C8] dark:bg-[#4BA8C8] h-full transition-all duration-700"
+                className="bg-cg-slate-light dark:bg-cg-slate-light h-full transition-all duration-700"
                 style={{ width: `${childStats.parent_b.percentage}%` }}
               />
             </div>
@@ -522,11 +522,11 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
                 backfilled: 'Backfilled',
               };
               const colors: Record<string, string> = {
-                check_in: 'bg-[#E8F4F0] text-[#2D8A70] dark:bg-[#1E3A4A]/30 dark:text-[#5BC4A0]',
-                exchange_completed: 'bg-[#E8F4F0] text-[#2D8A70] dark:bg-[#1E3A4A]/30 dark:text-[#5BC4A0]',
-                scheduled: 'bg-[#E0EFF8] text-[#1E4E6B] dark:bg-[#1E3A4A]/30 dark:text-[#4BA8C8]',
-                backfilled: 'bg-[#FEF7ED] text-[#E09520] dark:bg-[#1E3A4A]/30 dark:text-[#F5A623]',
-                manual_override: 'bg-[#E0EFF8] text-[#1E4E6B] dark:bg-[#1E3A4A]/30 dark:text-[#4BA8C8]',
+                check_in: 'bg-cg-sage-subtle text-cg-sage-dark dark:bg-foreground/30 dark:text-cg-sage-light',
+                exchange_completed: 'bg-cg-sage-subtle text-cg-sage-dark dark:bg-foreground/30 dark:text-cg-sage-light',
+                scheduled: 'bg-cg-slate-subtle text-[#1E4E6B] dark:bg-foreground/30 dark:text-cg-slate-light',
+                backfilled: 'bg-cg-amber-subtle text-[#E09520] dark:bg-foreground/30 dark:text-cg-amber',
+                manual_override: 'bg-cg-slate-subtle text-[#1E4E6B] dark:bg-foreground/30 dark:text-cg-slate-light',
               };
               return (
                 <span key={method} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${colors[method] || 'bg-muted text-muted-foreground'}`}>
@@ -568,17 +568,17 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
               Total: {swapCounts.total}
             </Badge>
             {swapCounts.approved > 0 && (
-              <Badge className="text-xs bg-[#E8F4F0] text-[#2D8A70] dark:bg-[#1E3A4A]/30 dark:text-[#5BC4A0] border-0">
+              <Badge className="text-xs bg-cg-sage-subtle text-cg-sage-dark dark:bg-foreground/30 dark:text-cg-sage-light border-0">
                 Approved: {swapCounts.approved}
               </Badge>
             )}
             {swapCounts.denied > 0 && (
-              <Badge className="text-xs bg-[#FEE2E2] text-[#9B2C2C] dark:bg-[#7A2222]/30 dark:text-[#E06B6B] border-0">
+              <Badge className="text-xs bg-cg-error-subtle text-[#9B2C2C] dark:bg-[#7A2222]/30 dark:text-[#E06B6B] border-0">
                 Denied: {swapCounts.denied}
               </Badge>
             )}
             {swapCounts.pending > 0 && (
-              <Badge className="text-xs bg-[#FEF7ED] text-[#E09520] dark:bg-[#1E3A4A]/30 dark:text-[#F5A623] border-0">
+              <Badge className="text-xs bg-cg-amber-subtle text-[#E09520] dark:bg-foreground/30 dark:text-cg-amber border-0">
                 Pending: {swapCounts.pending}
               </Badge>
             )}
@@ -592,30 +592,30 @@ export function CustodyDashboard({ childId, familyFileId, familyFile }: CustodyD
       {exchangeDataGaps.length > 0 && (
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <AlertCircle className="h-4 w-4 text-[#E09520] dark:text-[#F5A623]" />
-            <span className="text-sm font-semibold text-[#E09520] dark:text-[#F5A623]">
+            <AlertCircle className="h-4 w-4 text-[#E09520] dark:text-cg-amber" />
+            <span className="text-sm font-semibold text-[#E09520] dark:text-cg-amber">
               {exchangeDataGaps.length} exchange{exchangeDataGaps.length !== 1 ? 's' : ''} excluded from totals
             </span>
           </div>
-          <div className="bg-[#FEF7ED] dark:bg-[#1E3A4A]/20 border border-[#FEF7ED] dark:border-[#1E3A4A]/40 rounded-xl p-3 space-y-2">
-            <p className="text-xs text-[#E09520] dark:text-[#F5A623]">
+          <div className="bg-cg-amber-subtle dark:bg-foreground/20 border border-cg-amber-subtle dark:border-foreground/40 rounded-xl p-3 space-y-2">
+            <p className="text-xs text-[#E09520] dark:text-cg-amber">
               These exchanges couldn&apos;t be counted toward compliance because they&apos;re missing required evidence. Fixing them improves the data quality of your court record.
             </p>
             {exchangeDataGaps.slice(0, 5).map((gap) => (
               <div
                 key={gap.instance_id}
-                className="text-xs flex items-start gap-2 pt-2 border-t border-[#FEF7ED]/70 dark:border-[#1E3A4A]/40 first:border-t-0 first:pt-0"
+                className="text-xs flex items-start gap-2 pt-2 border-t border-cg-amber-subtle/70 dark:border-foreground/40 first:border-t-0 first:pt-0"
               >
                 <span className="text-muted-foreground whitespace-nowrap">
                   {format(parseISO(gap.scheduled_time), 'MMM d')}
                 </span>
-                <span className="text-[#E09520] dark:text-[#F5A623]">
+                <span className="text-[#E09520] dark:text-cg-amber">
                   {gap.description}
                 </span>
               </div>
             ))}
             {exchangeDataGaps.length > 5 && (
-              <p className="text-xs text-muted-foreground pt-2 border-t border-[#FEF7ED]/70 dark:border-[#1E3A4A]/40">
+              <p className="text-xs text-muted-foreground pt-2 border-t border-cg-amber-subtle/70 dark:border-foreground/40">
                 +{exchangeDataGaps.length - 5} more — see court export for the full list.
               </p>
             )}
@@ -675,11 +675,11 @@ function MetricCard({
   color?: 'emerald' | 'red' | 'amber';
 }) {
   const colorClass = color === 'emerald'
-    ? 'text-[#2D8A70] dark:text-[#5BC4A0]'
+    ? 'text-cg-sage-dark dark:text-cg-sage-light'
     : color === 'red'
-      ? 'text-[#C53030] dark:text-[#E06B6B]'
+      ? 'text-cg-error dark:text-[#E06B6B]'
       : color === 'amber'
-        ? 'text-[#E09520] dark:text-[#F5A623]'
+        ? 'text-[#E09520] dark:text-cg-amber'
         : 'text-foreground';
 
   return (
@@ -771,13 +771,13 @@ function ExchangeRow({
           </span>
         )}
         {exchange.silent_handoff_enabled && anyGpsData && (
-          <span className={`flex items-center gap-1 ${bothGpsVerified ? 'text-[#2D8A70] dark:text-[#5BC4A0]' : 'text-[#E09520] dark:text-[#F5A623]'}`}>
+          <span className={`flex items-center gap-1 ${bothGpsVerified ? 'text-cg-sage-dark dark:text-cg-sage-light' : 'text-[#E09520] dark:text-cg-amber'}`}>
             <Navigation className="h-3 w-3" />
             {bothGpsVerified ? 'GPS Verified' : 'GPS Partial'}
           </span>
         )}
         {exchange.qr_confirmation.required && exchange.qr_confirmation.confirmed_at && (
-          <span className="flex items-center gap-1 text-[#2D8A70] dark:text-[#5BC4A0]">
+          <span className="flex items-center gap-1 text-cg-sage-dark dark:text-cg-sage-light">
             <CheckCircle2 className="h-3 w-3" />
             QR Confirmed
           </span>

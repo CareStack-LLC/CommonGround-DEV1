@@ -72,7 +72,7 @@ export function ProfessionalCard({ firm, onViewProfile, onInvite }: Professional
                 {/* Badges Overlay */}
                 <div className="absolute top-3 left-3 z-30 flex flex-col gap-2">
                     {firm.safety_vetted && (
-                        <Badge className="bg-[#3DAA8A] hover:bg-[#2D8A70] text-white gap-1 border-0 shadow-sm">
+                        <Badge className="bg-cg-sage hover:bg-cg-sage-dark text-white gap-1 border-0 shadow-sm">
                             <ShieldCheck className="w-3 h-3" />
                             Safety Vetted
                         </Badge>
@@ -134,7 +134,7 @@ export function ProfessionalCard({ firm, onViewProfile, onInvite }: Professional
             <CardFooter className="p-5 pt-0 mt-auto flex flex-row gap-2">
                 <Button
                     variant="default"
-                    className="flex-1 rounded-full bg-[#3DAA8A] hover:bg-[#3A5646] text-white shadow-sm transition-all duration-300 font-bold h-11"
+                    className="flex-1 rounded-full bg-cg-sage hover:bg-[#3A5646] text-white shadow-sm transition-all duration-300 font-bold h-11"
                     onClick={handleViewProfile}
                 >
                     View Profile
@@ -142,7 +142,7 @@ export function ProfessionalCard({ firm, onViewProfile, onInvite }: Professional
                 {onInvite && (
                     <Button
                         variant="outline"
-                        className="flex-shrink-0 px-6 rounded-full border-2 border-[#3DAA8A] text-[#3DAA8A] hover:bg-[#E8F0EC] font-bold h-11"
+                        className="flex-shrink-0 px-6 rounded-full border-2 border-cg-sage text-cg-sage hover:bg-[#E8F0EC] font-bold h-11"
                         onClick={(e) => { e.stopPropagation(); onInvite(firm); }}
                     >
                         Invite

@@ -73,12 +73,12 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.
     },
     review: {
         label: "Ready for Review",
-        color: "bg-[#FEF7ED] text-[#B8791A] border-[#FBE3BF]",
+        color: "bg-cg-amber-subtle text-[#B8791A] border-[#FBE3BF]",
         icon: <Eye className="h-3 w-3" />,
     },
     approved: {
         label: "Approved",
-        color: "bg-[#E8F4F0] text-[#2D8A70] border-[#C5E5DB]",
+        color: "bg-cg-sage-subtle text-cg-sage-dark border-[#C5E5DB]",
         icon: <CheckCircle2 className="h-3 w-3" />,
     },
     rejected: {
@@ -245,7 +245,7 @@ export default function OCRDocumentCenterPage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
-                        <div className="p-3 bg-gradient-to-br from-[#3D8DB0] to-[#2D6A8F] text-white rounded-xl shadow-lg shadow-[#3D8DB0]/20">
+                        <div className="p-3 bg-gradient-to-br from-[#3D8DB0] to-cg-slate text-white rounded-xl shadow-lg shadow-[#3D8DB0]/20">
                             <ScanLine className="h-6 w-6" />
                         </div>
                         Court Order OCR
@@ -256,7 +256,7 @@ export default function OCRDocumentCenterPage() {
                 </div>
                 <Button
                     onClick={() => setShowUploadForm(!showUploadForm)}
-                    className="bg-gradient-to-r from-[#2D6A8F] to-[#2D6A8F] hover:from-[#1E4E6B] hover:to-[#1E4E6B] text-white shadow-lg shadow-[#3D8DB0]/20"
+                    className="bg-gradient-to-r from-cg-slate to-cg-slate hover:from-[#1E4E6B] hover:to-[#1E4E6B] text-white shadow-lg shadow-[#3D8DB0]/20"
                 >
                     <Upload className="h-4 w-4 mr-2" />
                     Upload Court Order
@@ -268,7 +268,7 @@ export default function OCRDocumentCenterPage() {
                 <Card className="border-[#C2DEF0] bg-gradient-to-br from-[#F0F7FC]/50 to-[#F0F7FC]/50">
                     <CardHeader>
                         <CardTitle className="text-base flex items-center gap-2">
-                            <Sparkles className="h-4 w-4 text-[#2D6A8F]" />
+                            <Sparkles className="h-4 w-4 text-cg-slate" />
                             Upload New Court Order
                         </CardTitle>
                         <CardDescription>
@@ -313,7 +313,7 @@ export default function OCRDocumentCenterPage() {
                             <Button
                                 onClick={handleUpload}
                                 disabled={isUploading || !uploadForm.fileUrl || !uploadForm.filename || !uploadForm.familyFileId}
-                                className="bg-[#2D6A8F] hover:bg-[#1E4E6B]"
+                                className="bg-cg-slate hover:bg-[#1E4E6B]"
                             >
                                 {isUploading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Upload className="h-4 w-4 mr-2" />}
                                 {isUploading ? "Uploading..." : "Upload & Process"}
@@ -358,7 +358,7 @@ export default function OCRDocumentCenterPage() {
             {/* Document List */}
             {isLoading ? (
                 <div className="flex items-center justify-center py-12">
-                    <Loader2 className="h-8 w-8 animate-spin text-[#2D6A8F]" />
+                    <Loader2 className="h-8 w-8 animate-spin text-cg-slate" />
                 </div>
             ) : filteredDocs.length === 0 ? (
                 <Card>
@@ -381,9 +381,9 @@ export default function OCRDocumentCenterPage() {
                                 style={{
                                     borderLeftColor:
                                         doc.extraction_status === "approved"
-                                            ? "#3DAA8A"
+                                            ? "var(--cg-sage)"
                                             : doc.extraction_status === "review"
-                                                ? "#F5A623"
+                                                ? "var(--cg-amber)"
                                                 : doc.extraction_status === "rejected" || doc.extraction_status === "failed"
                                                     ? "#ef4444"
                                                     : doc.extraction_status === "processing"
@@ -395,8 +395,8 @@ export default function OCRDocumentCenterPage() {
                                 <CardContent className="py-4">
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-4">
-                                            <div className="p-2.5 bg-slate-100 rounded-lg group-hover:bg-[#E0EFF8] transition-colors">
-                                                <FileText className="h-5 w-5 text-slate-600 group-hover:text-[#2D6A8F]" />
+                                            <div className="p-2.5 bg-slate-100 rounded-lg group-hover:bg-cg-slate-subtle transition-colors">
+                                                <FileText className="h-5 w-5 text-slate-600 group-hover:text-cg-slate" />
                                             </div>
                                             <div>
                                                 <p className="font-medium text-slate-900">{doc.original_filename}</p>
@@ -483,8 +483,8 @@ function OCRDetailPanel({
     };
 
     const confidenceColor = (score: number) => {
-        if (score >= 0.85) return "text-[#2D8A70] bg-[#E8F4F0]";
-        if (score >= 0.5) return "text-[#E09520] bg-[#FEF7ED]";
+        if (score >= 0.85) return "text-cg-sage-dark bg-cg-sage-subtle";
+        if (score >= 0.5) return "text-[#E09520] bg-cg-amber-subtle";
         return "text-red-600 bg-red-50";
     };
 
@@ -496,7 +496,7 @@ function OCRDetailPanel({
                     <div className="flex items-center justify-between">
                         <div>
                             <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                                <ScanLine className="h-5 w-5 text-[#2D6A8F]" />
+                                <ScanLine className="h-5 w-5 text-cg-slate" />
                                 {doc.original_filename}
                             </h2>
                             <div className="flex items-center gap-3 mt-2">
@@ -539,9 +539,9 @@ function OCRDetailPanel({
                                             const confidence = doc.confidence_scores?.[field];
                                             const isLowConfidence = doc.low_confidence_fields?.includes(field);
                                             return (
-                                                <tr key={field} className={isLowConfidence ? "bg-[#FEF7ED]/50" : ""}>
+                                                <tr key={field} className={isLowConfidence ? "bg-cg-amber-subtle/50" : ""}>
                                                     <td className="px-4 py-2.5 text-sm font-medium text-slate-700">
-                                                        {isLowConfidence && <AlertTriangle className="h-3 w-3 text-[#F5A623] inline mr-1.5" />}
+                                                        {isLowConfidence && <AlertTriangle className="h-3 w-3 text-cg-amber inline mr-1.5" />}
                                                         {field.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
                                                     </td>
                                                     <td className="px-4 py-2.5 text-sm text-slate-600">
@@ -668,7 +668,7 @@ function OCRDetailPanel({
                                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCaseNumber(e.target.value)}
                                         />
                                         <Button
-                                            className="bg-[#2D8A70] hover:bg-[#2D8A70] text-white"
+                                            className="bg-cg-sage-dark hover:bg-cg-sage-dark text-white"
                                             onClick={() => onApprove(doc.id, caseNumber)}
                                             disabled={!caseNumber}
                                         >

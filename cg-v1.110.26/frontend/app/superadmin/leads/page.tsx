@@ -25,7 +25,7 @@ export default function LeadsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-xl font-bold text-white">Leads</h1>
-        <p className="text-sm text-[#6B8A9A] mt-0.5">Lead pipeline, lists, and marketing analytics</p>
+        <p className="text-sm text-muted-foreground mt-0.5">Lead pipeline, lists, and marketing analytics</p>
       </div>
 
       <TabBar tabs={TABS} activeTab={tab} onTabChange={handleTabChange} />

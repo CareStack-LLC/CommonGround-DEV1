@@ -50,7 +50,7 @@ export default function CircleContactSchedulePage() {
   }, [router]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#E8F4F8] via-white to-[#D6ECE8] pb-20">
+    <div className="min-h-screen bg-gradient-to-br from-[#E8F4F8] via-white to-border pb-20">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6">
         <Link
           href="/my-circle/contact/dashboard"
@@ -61,8 +61,8 @@ export default function CircleContactSchedulePage() {
         </Link>
 
         <div className="flex items-center gap-3 mb-6">
-          <div className="p-2.5 bg-gradient-to-br from-[#3DAA8A]/15 to-[#2D6A8F]/10 rounded-2xl shadow-md">
-            <Calendar className="w-6 h-6 text-[#2D6A8F]" />
+          <div className="p-2.5 bg-gradient-to-br from-cg-sage/15 to-cg-slate/10 rounded-2xl shadow-md">
+            <Calendar className="w-6 h-6 text-cg-slate" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
@@ -107,7 +107,7 @@ export default function CircleContactSchedulePage() {
                 key={c.child_id}
                 className="bg-white rounded-2xl shadow-lg border-2 border-slate-200 overflow-hidden"
               >
-                <div className="bg-gradient-to-r from-[#3DAA8A]/10 to-[#2D6A8F]/5 px-5 py-4 border-b-2 border-slate-100">
+                <div className="bg-gradient-to-r from-cg-sage/10 to-cg-slate/5 px-5 py-4 border-b-2 border-slate-100">
                   <h2 className="text-lg font-bold text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                     {c.child_name}
                   </h2>
@@ -146,7 +146,7 @@ export default function CircleContactSchedulePage() {
                             c.allowed_days_readable.map((d) => (
                               <span
                                 key={d}
-                                className="text-xs font-bold px-2.5 py-1 bg-[#3DAA8A]/10 text-[#2D6A8F] rounded-full"
+                                className="text-xs font-bold px-2.5 py-1 bg-cg-sage/10 text-cg-slate rounded-full"
                               >
                                 {d}
                               </span>

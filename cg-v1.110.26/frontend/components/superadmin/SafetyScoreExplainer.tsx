@@ -41,7 +41,7 @@ export function SafetyScoreExplainer({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-1 px-2 py-1 rounded-md border border-[#2D6A8F]/30 bg-[#1A3648]/60 text-[11px] text-[#8AACBC] hover:text-[#D0E4EC] hover:border-[#3DAA8A]/40 transition-colors"
+        className="inline-flex items-center gap-1 px-2 py-1 rounded-md border border-cg-slate/30 bg-[#1A3648]/60 text-[11px] text-[#8AACBC] hover:text-[#D0E4EC] hover:border-cg-sage/40 transition-colors"
         aria-label="About the health score"
       >
         <Info className="w-3 h-3" />
@@ -51,7 +51,7 @@ export function SafetyScoreExplainer({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-1 text-[11px] text-[#8AACBC] hover:text-[#5BC4A0] underline decoration-dotted underline-offset-2"
+        className="inline-flex items-center gap-1 text-[11px] text-[#8AACBC] hover:text-cg-sage-light underline decoration-dotted underline-offset-2"
       >
         <Info className="w-3 h-3" />
         About this score
@@ -67,21 +67,21 @@ export function SafetyScoreExplainer({
           onClick={() => setOpen(false)}
         >
           <div
-            className="bg-[#162D3A] border border-[#2D6A8F]/30 rounded-xl w-full max-w-md shadow-2xl"
+            className="bg-[#162D3A] border border-cg-slate/30 rounded-xl w-full max-w-md shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-start justify-between p-4 border-b border-[#2D6A8F]/20">
+            <div className="flex items-start justify-between p-4 border-b border-cg-slate/20">
               <div>
                 <h3 className="text-sm font-semibold text-white">
                   About the Health Score
                 </h3>
-                <p className="text-[11px] text-[#6B8A9A] mt-0.5">
+                <p className="text-[11px] text-muted-foreground mt-0.5">
                   0–100 scale · higher = healthier
                 </p>
               </div>
               <button
                 onClick={() => setOpen(false)}
-                className="text-[#6B8A9A] hover:text-white"
+                className="text-muted-foreground hover:text-white"
                 aria-label="Close"
               >
                 <X className="w-4 h-4" />
@@ -102,7 +102,7 @@ export function SafetyScoreExplainer({
                 <p className="text-[11px] font-semibold text-[#8AACBC] uppercase tracking-wide mb-2">
                   Formula
                 </p>
-                <p className="text-[11px] text-[#6B8A9A] mb-2">
+                <p className="text-[11px] text-muted-foreground mb-2">
                   {transparency.weighting}
                 </p>
                 <ul className="space-y-1">
@@ -114,7 +114,7 @@ export function SafetyScoreExplainer({
                       <span className="text-[#D0E4EC]">
                         {factor.replace(/_/g, " ")}
                       </span>
-                      <span className="font-mono text-[#5BC4A0]">
+                      <span className="font-mono text-cg-sage-light">
                         {Math.round(weight * 100)}%
                       </span>
                     </li>
@@ -137,7 +137,7 @@ export function SafetyScoreExplainer({
                 <p className="text-[11px] font-semibold text-[#8AACBC] uppercase tracking-wide mb-2">
                   Not included (yet)
                 </p>
-                <ul className="list-disc list-inside space-y-0.5 text-[11px] text-[#6B8A9A]">
+                <ul className="list-disc list-inside space-y-0.5 text-[11px] text-muted-foreground">
                   {transparency.not_included.map((src) => (
                     <li key={src}>{src}</li>
                   ))}

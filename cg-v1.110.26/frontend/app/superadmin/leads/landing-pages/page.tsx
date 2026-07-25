@@ -14,7 +14,7 @@ import { adminAPI } from '@/lib/admin-api';
 
 const STATUS_COLORS: Record<string, string> = {
   draft: 'bg-zinc-700/50 text-[#8AACBC]',
-  published: 'bg-emerald-500/15 text-emerald-400 border border-[#3DAA8A]/20',
+  published: 'bg-emerald-500/15 text-emerald-400 border border-cg-sage/20',
 };
 
 const PLATFORM_META: Record<string, { label: string; icon: any; color: string }> = {
@@ -195,7 +195,7 @@ export default function LandingPagesPage() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           {tab === 'detail' && (
-            <button aria-label="Back" onClick={backToList} className="p-2 rounded-lg bg-[#2D6A8F]/20 hover:bg-[#2D6A8F]/30 text-[#8AACBC] hover:text-white transition-colors">
+            <button aria-label="Back" onClick={backToList} className="p-2 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-[#8AACBC] hover:text-white transition-colors">
               <ArrowLeft className="w-4 h-4" />
             </button>
           )}
@@ -203,7 +203,7 @@ export default function LandingPagesPage() {
             <h1 className="text-xl font-bold text-white">
               {tab === 'detail' && selected ? selected.title : 'Landing Pages'}
             </h1>
-            <p className="text-sm text-[#6B8A9A] mt-0.5">
+            <p className="text-sm text-muted-foreground mt-0.5">
               {tab === 'detail' && selected
                 ? `/lp/${selected.slug}`
                 : `${pages.length} pages • AI-generated marketing pages`}
@@ -213,10 +213,10 @@ export default function LandingPagesPage() {
         <div className="flex items-center gap-2">
           {tab === 'list' && !landingPagesMissing && (
             <>
-              <button onClick={fetchPages} disabled={loading} className="p-2 rounded-lg bg-[#2D6A8F]/20 hover:bg-[#2D6A8F]/30 text-[#8AACBC] hover:text-white transition-colors disabled:opacity-50">
+              <button onClick={fetchPages} disabled={loading} className="p-2 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-[#8AACBC] hover:text-white transition-colors disabled:opacity-50">
                 <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
               </button>
-              <button onClick={() => setShowGenerate(true)} className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors">
+              <button onClick={() => setShowGenerate(true)} className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-cg-sage hover:bg-cg-sage-light text-white text-sm font-medium transition-colors">
                 <Sparkles className="w-4 h-4" /> AI Generate
               </button>
             </>
@@ -234,7 +234,7 @@ export default function LandingPagesPage() {
                   <ExternalLink className="w-4 h-4" /> View Live
                 </a>
               )}
-              <button aria-label="Delete" onClick={() => handleDelete(selected.id)} className="p-2 rounded-lg bg-[#2D6A8F]/20 hover:bg-red-500/20 text-[#8AACBC] hover:text-red-400 transition-colors">
+              <button aria-label="Delete" onClick={() => handleDelete(selected.id)} className="p-2 rounded-lg bg-cg-slate/20 hover:bg-red-500/20 text-[#8AACBC] hover:text-red-400 transition-colors">
                 <Trash2 className="w-4 h-4" />
               </button>
             </>
@@ -281,21 +281,21 @@ export default function LandingPagesPage() {
 
       {/* ============ GENERATE MODAL ============ */}
       {showGenerate && (
-        <div className="bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-xl p-6 space-y-4">
+        <div className="bg-zinc-900/80 border border-cg-slate/20 rounded-xl p-6 space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-[#3DAA8A]" /> AI Generate Landing Page
+              <Sparkles className="w-5 h-5 text-cg-sage" /> AI Generate Landing Page
             </h2>
-            <button aria-label="Close" onClick={() => setShowGenerate(false)} className="text-[#6B8A9A] hover:text-[#D0E4EC]"><X className="w-5 h-5" /></button>
+            <button aria-label="Close" onClick={() => setShowGenerate(false)} className="text-muted-foreground hover:text-[#D0E4EC]"><X className="w-5 h-5" /></button>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-xs text-[#6B8A9A] uppercase tracking-wider font-medium block mb-1">Target Audience *</label>
-              <input value={genAudience} onChange={e => setGenAudience(e.target.value)} placeholder="e.g. Military families, Single moms" className="w-full px-3 py-2 bg-[#2D6A8F]/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50" />
+              <label className="text-xs text-muted-foreground uppercase tracking-wider font-medium block mb-1">Target Audience *</label>
+              <input value={genAudience} onChange={e => setGenAudience(e.target.value)} placeholder="e.g. Military families, Single moms" className="w-full px-3 py-2 bg-cg-slate/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50" />
             </div>
             <div>
-              <label className="text-xs text-[#6B8A9A] uppercase tracking-wider font-medium block mb-1">Tone</label>
-              <select value={genTone} onChange={e => setGenTone(e.target.value)} className="w-full px-3 py-2 bg-[#2D6A8F]/20 border border-zinc-700/60 rounded-lg text-sm text-white focus:outline-none focus:border-violet-500/50">
+              <label className="text-xs text-muted-foreground uppercase tracking-wider font-medium block mb-1">Tone</label>
+              <select value={genTone} onChange={e => setGenTone(e.target.value)} className="w-full px-3 py-2 bg-cg-slate/20 border border-zinc-700/60 rounded-lg text-sm text-white focus:outline-none focus:border-violet-500/50">
                 <option value="professional">Professional</option>
                 <option value="empathetic">Empathetic</option>
                 <option value="friendly">Friendly</option>
@@ -304,15 +304,15 @@ export default function LandingPagesPage() {
             </div>
           </div>
           <div>
-            <label className="text-xs text-[#6B8A9A] uppercase tracking-wider font-medium block mb-1">Key Message *</label>
-            <textarea value={genMessage} onChange={e => setGenMessage(e.target.value)} rows={3} placeholder="What should this page communicate?" className="w-full px-3 py-2 bg-[#2D6A8F]/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50 resize-none" />
+            <label className="text-xs text-muted-foreground uppercase tracking-wider font-medium block mb-1">Key Message *</label>
+            <textarea value={genMessage} onChange={e => setGenMessage(e.target.value)} rows={3} placeholder="What should this page communicate?" className="w-full px-3 py-2 bg-cg-slate/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50 resize-none" />
           </div>
           <div>
-            <label className="text-xs text-[#6B8A9A] uppercase tracking-wider font-medium block mb-1">CTA Destination URL</label>
-            <input value={genCta} onChange={e => setGenCta(e.target.value)} className="w-full px-3 py-2 bg-[#2D6A8F]/20 border border-zinc-700/60 rounded-lg text-sm text-white focus:outline-none focus:border-violet-500/50" />
+            <label className="text-xs text-muted-foreground uppercase tracking-wider font-medium block mb-1">CTA Destination URL</label>
+            <input value={genCta} onChange={e => setGenCta(e.target.value)} className="w-full px-3 py-2 bg-cg-slate/20 border border-zinc-700/60 rounded-lg text-sm text-white focus:outline-none focus:border-violet-500/50" />
           </div>
           <div className="flex justify-end">
-            <button onClick={handleGenerate} disabled={generating || !genAudience.trim() || !genMessage.trim()} className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors disabled:opacity-50">
+            <button onClick={handleGenerate} disabled={generating || !genAudience.trim() || !genMessage.trim()} className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-cg-sage hover:bg-cg-sage-light text-white text-sm font-medium transition-colors disabled:opacity-50">
               {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
               {generating ? 'Generating (30-60s)...' : 'Generate Page'}
             </button>
@@ -323,13 +323,13 @@ export default function LandingPagesPage() {
 
       {/* ============ LIST VIEW ============ */}
       {tab === 'list' && (
-        <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl overflow-hidden">
+        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden">
           {loading ? (
-            <div className="p-4 space-y-3">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="animate-pulse bg-[#2D6A8F]/20 rounded-lg h-20" />)}</div>
+            <div className="p-4 space-y-3">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="animate-pulse bg-cg-slate/20 rounded-lg h-20" />)}</div>
           ) : pages.length === 0 ? (
             <div className="py-16 text-center">
               <Globe className="w-10 h-10 text-[#3A5A6A] mx-auto mb-3" />
-              <p className="text-sm text-[#6B8A9A]">No landing pages yet</p>
+              <p className="text-sm text-muted-foreground">No landing pages yet</p>
               <p className="text-xs text-[#4A6E7F] mt-1">Click AI Generate to create your first page</p>
             </div>
           ) : (
@@ -340,10 +340,10 @@ export default function LandingPagesPage() {
                   <button
                     key={page.id}
                     onClick={() => openDetail(page)}
-                    className="w-full flex items-center gap-4 px-5 py-4 hover:bg-[#2D6A8F]/10 transition-colors text-left"
+                    className="w-full flex items-center gap-4 px-5 py-4 hover:bg-cg-slate/10 transition-colors text-left"
                   >
                     {/* Thumbnail */}
-                    <div className="w-16 h-12 rounded-lg bg-[#2D6A8F]/20 overflow-hidden flex-shrink-0">
+                    <div className="w-16 h-12 rounded-lg bg-cg-slate/20 overflow-hidden flex-shrink-0">
                       {page.hero_image_url ? (
                         <img src={page.hero_image_url} alt="" className="w-full h-full object-cover" />
                       ) : (
@@ -358,7 +358,7 @@ export default function LandingPagesPage() {
                         </span>
                       </div>
                       <div className="flex items-center gap-3 mt-0.5">
-                        <span className="text-xs text-[#6B8A9A]">/lp/{page.slug}</span>
+                        <span className="text-xs text-muted-foreground">/lp/{page.slug}</span>
                         <span className="text-xs text-[#4A6E7F]">{page.target_audience}</span>
                         <span className="text-xs text-[#4A6E7F]">{page.view_count || 0} views</span>
                         {s?.social_posts?.length > 0 && (
@@ -379,15 +379,15 @@ export default function LandingPagesPage() {
       {tab === 'detail' && selected && (
         <div className="space-y-5">
           {/* Status + URL Bar */}
-          <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-4 flex items-center gap-3">
+          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-4 flex items-center gap-3">
             <span className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${STATUS_COLORS[selected.status] || STATUS_COLORS.draft}`}>
               {selected.status}
             </span>
-            <div className="flex-1 flex items-center gap-2 bg-[#2D6A8F]/15 rounded-lg px-3 py-1.5">
-              <Link2 className="w-3.5 h-3.5 text-[#6B8A9A]" />
+            <div className="flex-1 flex items-center gap-2 bg-cg-slate/15 rounded-lg px-3 py-1.5">
+              <Link2 className="w-3.5 h-3.5 text-muted-foreground" />
               <span className="text-sm text-[#D0E4EC] font-mono truncate">{pageUrl}</span>
             </div>
-            <button onClick={() => handleCopy(pageUrl, 'url')} className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#2D6A8F]/20 hover:bg-zinc-700/60 text-xs text-[#8AACBC] hover:text-white transition-colors">
+            <button onClick={() => handleCopy(pageUrl, 'url')} className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-cg-slate/20 hover:bg-zinc-700/60 text-xs text-[#8AACBC] hover:text-white transition-colors">
               {copiedField === 'url' ? <CheckCircle className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
               {copiedField === 'url' ? 'Copied!' : 'Copy URL'}
             </button>
@@ -395,9 +395,9 @@ export default function LandingPagesPage() {
 
           {/* Hero Image */}
           {selected.hero_image_url && (
-            <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl overflow-hidden">
-              <div className="px-4 py-3 border-b border-[#2D6A8F]/20 flex items-center gap-2">
-                <ImageIcon className="w-4 h-4 text-[#3DAA8A]" />
+            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden">
+              <div className="px-4 py-3 border-b border-cg-slate/20 flex items-center gap-2">
+                <ImageIcon className="w-4 h-4 text-cg-sage" />
                 <span className="text-sm font-medium text-[#D0E4EC]">Hero Image</span>
                 <span className="text-[11px] text-[#4A6E7F] ml-auto">AI-generated with DALL-E</span>
               </div>
@@ -406,42 +406,42 @@ export default function LandingPagesPage() {
           )}
 
           {/* Page Copy Preview */}
-          <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
             <div className="flex items-center gap-2 mb-4">
-              <FileText className="w-4 h-4 text-[#3DAA8A]" />
+              <FileText className="w-4 h-4 text-cg-sage" />
               <span className="text-sm font-semibold text-[#D0E4EC]">Page Copy</span>
             </div>
 
             {sections ? (
               <div className="space-y-4">
                 {/* Headline */}
-                <div className="bg-[#2D6A8F]/10 rounded-lg p-4">
-                  <div className="text-[11px] text-[#6B8A9A] uppercase tracking-wider font-medium mb-1">Headline</div>
+                <div className="bg-cg-slate/10 rounded-lg p-4">
+                  <div className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium mb-1">Headline</div>
                   <div className="text-lg font-bold text-white">{sections.headline || selected.headline}</div>
                   {sections.headline_accent && <div className="text-xs text-emerald-400 mt-1">Accent: &ldquo;{sections.headline_accent}&rdquo;</div>}
                 </div>
 
                 {/* Hero Label + Subheadline */}
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-[#2D6A8F]/10 rounded-lg p-3">
-                    <div className="text-[11px] text-[#6B8A9A] uppercase tracking-wider font-medium mb-1">Hero Label</div>
+                  <div className="bg-cg-slate/10 rounded-lg p-3">
+                    <div className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium mb-1">Hero Label</div>
                     <div className="text-sm text-[#D0E4EC]">{sections.hero_label || '—'}</div>
                   </div>
-                  <div className="bg-[#2D6A8F]/10 rounded-lg p-3">
-                    <div className="text-[11px] text-[#6B8A9A] uppercase tracking-wider font-medium mb-1">CTA Button</div>
+                  <div className="bg-cg-slate/10 rounded-lg p-3">
+                    <div className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium mb-1">CTA Button</div>
                     <div className="text-sm text-[#D0E4EC]">{sections.cta_text || selected.cta_text}</div>
                   </div>
                 </div>
 
-                <div className="bg-[#2D6A8F]/10 rounded-lg p-4">
-                  <div className="text-[11px] text-[#6B8A9A] uppercase tracking-wider font-medium mb-1">Subheadline</div>
+                <div className="bg-cg-slate/10 rounded-lg p-4">
+                  <div className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium mb-1">Subheadline</div>
                   <div className="text-sm text-[#D0E4EC]">{sections.subheadline || selected.subheadline}</div>
                 </div>
 
                 {/* Pain Points */}
                 {sections.pain_points?.length > 0 && (
-                  <div className="bg-[#2D6A8F]/10 rounded-lg p-4">
-                    <div className="text-[11px] text-[#6B8A9A] uppercase tracking-wider font-medium mb-3">Pain Points ({sections.pain_points.length})</div>
+                  <div className="bg-cg-slate/10 rounded-lg p-4">
+                    <div className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium mb-3">Pain Points ({sections.pain_points.length})</div>
                     <div className="space-y-2">
                       {sections.pain_points.map((pp: any, i: number) => (
                         <div key={i} className="flex gap-3 text-sm">
@@ -455,8 +455,8 @@ export default function LandingPagesPage() {
 
                 {/* Features */}
                 {sections.features?.length > 0 && (
-                  <div className="bg-[#2D6A8F]/10 rounded-lg p-4">
-                    <div className="text-[11px] text-[#6B8A9A] uppercase tracking-wider font-medium mb-3">Features ({sections.features.length})</div>
+                  <div className="bg-cg-slate/10 rounded-lg p-4">
+                    <div className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium mb-3">Features ({sections.features.length})</div>
                     <div className="grid gap-2">
                       {sections.features.map((f: any, i: number) => (
                         <div key={i} className="flex items-start gap-2">
@@ -470,25 +470,25 @@ export default function LandingPagesPage() {
 
                 {/* Testimonial */}
                 {sections.testimonial && (
-                  <div className="bg-[#2D6A8F]/10 rounded-lg p-4">
-                    <div className="text-[11px] text-[#6B8A9A] uppercase tracking-wider font-medium mb-2">Testimonial</div>
+                  <div className="bg-cg-slate/10 rounded-lg p-4">
+                    <div className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium mb-2">Testimonial</div>
                     <div className="text-sm text-[#D0E4EC] italic">&ldquo;{sections.testimonial.quote}&rdquo;</div>
-                    <div className="text-xs text-[#6B8A9A] mt-1">— {sections.testimonial.name}, {sections.testimonial.title}</div>
+                    <div className="text-xs text-muted-foreground mt-1">— {sections.testimonial.name}, {sections.testimonial.title}</div>
                   </div>
                 )}
 
                 {/* FAQs */}
                 {sections.faqs?.length > 0 && (
-                  <div className="bg-[#2D6A8F]/10 rounded-lg p-4">
-                    <div className="text-[11px] text-[#6B8A9A] uppercase tracking-wider font-medium mb-3">FAQs ({sections.faqs.length})</div>
+                  <div className="bg-cg-slate/10 rounded-lg p-4">
+                    <div className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium mb-3">FAQs ({sections.faqs.length})</div>
                     <div className="space-y-2">
                       {sections.faqs.map((faq: any, i: number) => (
                         <details key={i} className="group">
                           <summary className="cursor-pointer text-sm text-[#D0E4EC] font-medium flex items-center gap-2">
-                            <ChevronDown className="w-3 h-3 text-[#6B8A9A] transition-transform group-open:rotate-180" />
+                            <ChevronDown className="w-3 h-3 text-muted-foreground transition-transform group-open:rotate-180" />
                             {faq.q}
                           </summary>
-                          <p className="text-xs text-[#6B8A9A] mt-1 ml-5">{faq.a}</p>
+                          <p className="text-xs text-muted-foreground mt-1 ml-5">{faq.a}</p>
                         </details>
                       ))}
                     </div>
@@ -496,32 +496,32 @@ export default function LandingPagesPage() {
                 )}
               </div>
             ) : (
-              <p className="text-sm text-[#6B8A9A]">No structured content available (legacy format)</p>
+              <p className="text-sm text-muted-foreground">No structured content available (legacy format)</p>
             )}
           </div>
 
           {/* SEO Preview */}
-          <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
             <div className="flex items-center gap-2 mb-4">
-              <Search className="w-4 h-4 text-[#3DAA8A]" />
+              <Search className="w-4 h-4 text-cg-sage" />
               <span className="text-sm font-semibold text-[#D0E4EC]">SEO Preview</span>
             </div>
-            <div className="bg-[#2D6A8F]/10 rounded-lg p-4 space-y-1">
+            <div className="bg-cg-slate/10 rounded-lg p-4 space-y-1">
               <div className="text-blue-400 text-sm font-medium truncate">{selected.seo_title || selected.title}</div>
               <div className="text-emerald-500 text-xs truncate">{pageUrl}</div>
               <div className="text-xs text-[#8AACBC]">{selected.seo_description || 'No description'}</div>
             </div>
             <div className="grid grid-cols-3 gap-3 mt-3">
-              <div className="bg-[#2D6A8F]/10 rounded-lg p-3">
-                <div className="text-[11px] text-[#6B8A9A] uppercase mb-1">UTM Source</div>
+              <div className="bg-cg-slate/10 rounded-lg p-3">
+                <div className="text-[11px] text-muted-foreground uppercase mb-1">UTM Source</div>
                 <div className="text-xs text-[#D0E4EC]">{selected.utm_source || '—'}</div>
               </div>
-              <div className="bg-[#2D6A8F]/10 rounded-lg p-3">
-                <div className="text-[11px] text-[#6B8A9A] uppercase mb-1">UTM Medium</div>
+              <div className="bg-cg-slate/10 rounded-lg p-3">
+                <div className="text-[11px] text-muted-foreground uppercase mb-1">UTM Medium</div>
                 <div className="text-xs text-[#D0E4EC]">{selected.utm_medium || '—'}</div>
               </div>
-              <div className="bg-[#2D6A8F]/10 rounded-lg p-3">
-                <div className="text-[11px] text-[#6B8A9A] uppercase mb-1">UTM Campaign</div>
+              <div className="bg-cg-slate/10 rounded-lg p-3">
+                <div className="text-[11px] text-muted-foreground uppercase mb-1">UTM Campaign</div>
                 <div className="text-xs text-[#D0E4EC]">{selected.utm_campaign || '—'}</div>
               </div>
             </div>
@@ -529,9 +529,9 @@ export default function LandingPagesPage() {
 
           {/* Social Media Posts */}
           {socialPosts.length > 0 && (
-            <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
               <div className="flex items-center gap-2 mb-4">
-                <MessageSquare className="w-4 h-4 text-[#3DAA8A]" />
+                <MessageSquare className="w-4 h-4 text-cg-sage" />
                 <span className="text-sm font-semibold text-[#D0E4EC]">Social Media Posts</span>
                 <span className="text-[11px] text-[#4A6E7F] ml-auto">{socialPosts.length} platforms</span>
               </div>
@@ -542,7 +542,7 @@ export default function LandingPagesPage() {
                   const fullPost = `${post.body}\n\n${(post.hashtags || []).map((h: string) => h.startsWith('#') ? h : `#${h}`).join(' ')}\n\n${post.cta_url || pageUrl}`;
 
                   return (
-                    <div key={i} className="bg-[#2D6A8F]/10 rounded-lg p-4">
+                    <div key={i} className="bg-cg-slate/10 rounded-lg p-4">
                       <div className="flex items-center gap-2 mb-2">
                         <PIcon className={`w-4 h-4 ${meta.color}`} />
                         <span className="text-sm font-medium text-[#D0E4EC]">{meta.label}</span>
@@ -559,7 +559,7 @@ export default function LandingPagesPage() {
                       {post.hashtags?.length > 0 && (
                         <div className="mt-2 flex flex-wrap gap-1">
                           {post.hashtags.slice(0, 10).map((h: string, j: number) => (
-                            <span key={j} className="text-[11px] text-[#3DAA8A]/80">
+                            <span key={j} className="text-[11px] text-cg-sage/80">
                               {h.startsWith('#') ? h : `#${h}`}
                             </span>
                           ))}
@@ -575,17 +575,17 @@ export default function LandingPagesPage() {
 
           {/* Page Stats */}
           <div className="grid grid-cols-3 gap-3">
-            <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-4 text-center">
+            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-4 text-center">
               <div className="text-2xl font-bold text-white">{selected.view_count || 0}</div>
-              <div className="text-[11px] text-[#6B8A9A]">Page Views</div>
+              <div className="text-[11px] text-muted-foreground">Page Views</div>
             </div>
-            <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-4 text-center">
+            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-4 text-center">
               <div className="text-2xl font-bold text-white">{selected.target_audience || '—'}</div>
-              <div className="text-[11px] text-[#6B8A9A]">Target Audience</div>
+              <div className="text-[11px] text-muted-foreground">Target Audience</div>
             </div>
-            <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-4 text-center">
+            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-4 text-center">
               <div className="text-2xl font-bold text-white">{selected.created_at ? new Date(selected.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '—'}</div>
-              <div className="text-[11px] text-[#6B8A9A]">Created</div>
+              <div className="text-[11px] text-muted-foreground">Created</div>
             </div>
           </div>
         </div>

@@ -72,10 +72,10 @@ const TEMPLATE_TYPES = [
 ];
 
 const TYPE_COLORS: Record<string, string> = {
-  intake: "bg-[#3DAA8A]/10 text-[#1E3A4A]",
+  intake: "bg-cg-sage/10 text-foreground",
   agreement: "bg-blue-100 text-blue-800",
-  schedule: "bg-[#E8F4F0] text-[#236E59]",
-  financial: "bg-[#FEF7ED] text-[#8F5E14]",
+  schedule: "bg-cg-sage-subtle text-[#236E59]",
+  financial: "bg-cg-amber-subtle text-[#8F5E14]",
   custom: "bg-gray-100 text-gray-800",
 };
 
@@ -445,12 +445,12 @@ export default function FirmTemplatesPage() {
       </div>
 
       {/* Info Banner */}
-      <Card className="mb-6 bg-[#F4F8F7] border-[#3DAA8A]/10">
+      <Card className="mb-6 bg-background border-cg-sage/10">
         <CardContent className="p-4">
           <div className="flex items-start gap-3">
-            <Sparkles className="h-5 w-5 text-[#3DAA8A] mt-0.5" />
+            <Sparkles className="h-5 w-5 text-cg-sage mt-0.5" />
             <div>
-              <h4 className="font-medium text-[#1E3A4A]">Template System</h4>
+              <h4 className="font-medium text-foreground">Template System</h4>
               <p className="text-sm text-slate-600 mt-1">
                 Templates customize how ARIA handles intakes and help standardize your firm's
                 documentation. Intake templates define the questions ARIA asks, while agreement
@@ -543,7 +543,7 @@ export default function FirmTemplatesPage() {
                             {TEMPLATE_TYPES.find((t) => t.value === template.template_type)?.label || template.template_type}
                           </Badge>
                           {template.is_current && (
-                            <Badge className="text-xs bg-[#E8F4F0] text-[#236E59]">
+                            <Badge className="text-xs bg-cg-sage-subtle text-[#236E59]">
                               <CheckCircle2 className="h-3 w-3 mr-1" />
                               Current
                             </Badge>
@@ -569,7 +569,7 @@ export default function FirmTemplatesPage() {
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link href={`/professional/firm/templates/${template.id}/edit`} className="flex items-center cursor-pointer">
-                            <Sparkles className="h-4 w-4 mr-2 text-[#3DAA8A]" />
+                            <Sparkles className="h-4 w-4 mr-2 text-cg-sage" />
                             Open Builder
                           </Link>
                         </DropdownMenuItem>
@@ -825,7 +825,7 @@ export default function FirmTemplatesPage() {
               </Badge>
               <span className="text-sm text-gray-500">Version {selectedTemplate?.version}</span>
               {selectedTemplate?.is_active && (
-                <Badge className="bg-[#E8F4F0] text-[#236E59]">Active</Badge>
+                <Badge className="bg-cg-sage-subtle text-[#236E59]">Active</Badge>
               )}
             </div>
 
@@ -879,7 +879,7 @@ export default function FirmTemplatesPage() {
                 {versions.map((version) => (
                   <div
                     key={version.version}
-                    className={`flex items-center justify-between p-3 rounded-lg border ${version.is_current ? "bg-[#E8F4F0] border-[#C5E5DB]" : "bg-white"
+                    className={`flex items-center justify-between p-3 rounded-lg border ${version.is_current ? "bg-cg-sage-subtle border-[#C5E5DB]" : "bg-white"
                       }`}
                   >
                     <div className="flex items-center gap-3">
@@ -887,7 +887,7 @@ export default function FirmTemplatesPage() {
                       <div className="text-sm text-gray-500">{formatDate(version.created_at)}</div>
                     </div>
                     {version.is_current && (
-                      <Badge className="bg-[#E8F4F0] text-[#236E59]">
+                      <Badge className="bg-cg-sage-subtle text-[#236E59]">
                         <CheckCircle2 className="h-3 w-3 mr-1" />
                         Current
                       </Badge>

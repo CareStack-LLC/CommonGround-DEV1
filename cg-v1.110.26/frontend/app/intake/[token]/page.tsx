@@ -208,7 +208,7 @@ export default function IntakePage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto text-[#2D6A8F]" />
+          <Loader2 className="h-8 w-8 animate-spin mx-auto text-cg-slate" />
           <p className="mt-2 text-gray-600">Loading intake...</p>
         </div>
       </div>
@@ -220,7 +220,7 @@ export default function IntakePage() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
         <Card className="max-w-md w-full">
           <CardContent className="pt-6 text-center">
-            <AlertCircle className="h-12 w-12 text-[#C53030] mx-auto mb-4" />
+            <AlertCircle className="h-12 w-12 text-cg-error mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-gray-900 mb-2">Intake Not Available</h2>
             <p className="text-gray-600">{error}</p>
           </CardContent>
@@ -234,7 +234,7 @@ export default function IntakePage() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
         <Card className="max-w-md w-full">
           <CardContent className="pt-6 text-center">
-            <CheckCircle className="h-16 w-16 text-[#3DAA8A] mx-auto mb-4" />
+            <CheckCircle className="h-16 w-16 text-cg-sage mx-auto mb-4" />
             <h2 className="text-2xl font-semibold text-gray-900 mb-2">Intake Complete!</h2>
             <p className="text-gray-600 mb-4">
               Thank you for completing your intake. Your information has been sent to {accessInfo?.professional_name} for review.
@@ -253,8 +253,8 @@ export default function IntakePage() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
         <Card className="max-w-lg w-full">
           <CardHeader className="text-center">
-            <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-[#E0EFF8] flex items-center justify-center">
-              <MessageSquare className="h-8 w-8 text-[#2D6A8F]" />
+            <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-cg-slate-subtle flex items-center justify-center">
+              <MessageSquare className="h-8 w-8 text-cg-slate" />
             </div>
             <CardTitle className="text-2xl">Legal Intake</CardTitle>
             <CardDescription>
@@ -287,8 +287,8 @@ export default function IntakePage() {
               </div>
             </div>
 
-            <div className="bg-[#E0EFF8] rounded-lg p-4">
-              <h3 className="font-medium text-[#1E3A4A] mb-2">How This Works</h3>
+            <div className="bg-cg-slate-subtle rounded-lg p-4">
+              <h3 className="font-medium text-foreground mb-2">How This Works</h3>
               <ul className="text-sm text-[#1E4E6B] space-y-1">
                 <li>• You&apos;ll have a conversation with ARIA, an AI assistant</li>
                 <li>• Answer questions in your own words - no forms to fill out</li>
@@ -297,7 +297,7 @@ export default function IntakePage() {
               </ul>
             </div>
 
-            <div className="bg-[#FEF7ED] rounded-lg p-4">
+            <div className="bg-cg-amber-subtle rounded-lg p-4">
               <p className="text-sm text-[#E09520]">
                 <strong>Note:</strong> ARIA is an AI assistant that gathers information. It cannot and will not give legal advice. All your answers go directly to {accessInfo.professional_name}.
               </p>
@@ -332,7 +332,7 @@ export default function IntakePage() {
                 {summary || "Summary being generated..."}
               </div>
 
-              <div className="bg-[#FEF7ED] rounded-lg p-4">
+              <div className="bg-cg-amber-subtle rounded-lg p-4">
                 <p className="text-sm text-[#E09520]">
                   By confirming, you attest that the information above is accurate to the best of your knowledge.
                 </p>
@@ -394,7 +394,7 @@ export default function IntakePage() {
             >
               <div
                 className={`max-w-[80%] rounded-lg px-4 py-3 ${message.role === "user"
-                    ? "bg-[#2D6A8F] text-white"
+                    ? "bg-cg-slate text-white"
                     : "bg-white border shadow-sm"
                   }`}
               >
@@ -417,9 +417,9 @@ export default function IntakePage() {
 
       {/* Completion banner */}
       {isComplete && (
-        <div className="bg-[#E8F4F0] border-t border-[#E8F4F0] px-4 py-3">
+        <div className="bg-cg-sage-subtle border-t border-cg-sage-subtle px-4 py-3">
           <div className="max-w-3xl mx-auto flex items-center justify-between">
-            <p className="text-[#1E3A4A]">
+            <p className="text-foreground">
               <CheckCircle className="inline h-4 w-4 mr-1" />
               It looks like we&apos;ve covered everything. Ready to review?
             </p>
@@ -438,7 +438,7 @@ export default function IntakePage() {
               variant="outline"
               size="sm"
               onClick={() => setIsComplete(true)}
-              className="text-[#2D8A70] border-[#E8F4F0] hover:bg-[#E8F4F0] hover:text-[#2D8A70]"
+              className="text-cg-sage-dark border-cg-sage-subtle hover:bg-cg-sage-subtle hover:text-cg-sage-dark"
             >
               <CheckCircle className="h-3 w-3 mr-1" />
               I'm done, review now

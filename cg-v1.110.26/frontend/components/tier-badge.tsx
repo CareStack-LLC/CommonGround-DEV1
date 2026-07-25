@@ -32,7 +32,7 @@ export function TierBadge({ tier, size = 'sm', className }: TierBadgeProps) {
 
   const tierClasses = {
     plus: 'bg-[var(--portal-primary)]/10 text-[var(--portal-primary)]',
-    complete: 'bg-[#F5A623]/10 text-[#F5A623]',
+    complete: 'bg-cg-amber/10 text-cg-amber',
   };
 
   const colorClass = tierClasses[tier as keyof typeof tierClasses] || tierClasses.plus;

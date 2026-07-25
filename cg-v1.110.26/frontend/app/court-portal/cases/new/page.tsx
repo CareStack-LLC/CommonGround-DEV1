@@ -393,7 +393,7 @@ export default function NewCaseWizardPage() {
   if (isLoading || !professional) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#2D6A8F] border-t-transparent" />
+        <div className="animate-spin rounded-full h-10 w-10 border-2 border-cg-slate border-t-transparent" />
       </div>
     );
   }
@@ -426,9 +426,9 @@ export default function NewCaseWizardPage() {
             <div key={s.key} className="flex items-center">
               <div className={`flex items-center gap-2 px-4 py-2 rounded-full ${
                 isActive
-                  ? "bg-[#2D6A8F] text-white"
+                  ? "bg-cg-slate text-white"
                   : isPast
-                  ? "bg-[#E8F4F0] text-[#2D8A70]"
+                  ? "bg-cg-sage-subtle text-cg-sage-dark"
                   : "bg-gray-100 text-gray-500"
               }`}>
                 {isPast && !isActive ? (
@@ -439,7 +439,7 @@ export default function NewCaseWizardPage() {
                 <span className="text-sm font-medium hidden sm:inline">{s.label}</span>
               </div>
               {i < 3 && (
-                <div className={`w-8 h-0.5 mx-1 ${isPast ? "bg-[#5BC4A0]" : "bg-gray-200"}`} />
+                <div className={`w-8 h-0.5 mx-1 ${isPast ? "bg-cg-sage-light" : "bg-gray-200"}`} />
               )}
             </div>
           );
@@ -459,7 +459,7 @@ export default function NewCaseWizardPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Upload className="h-5 w-5 text-[#2D6A8F]" />
+              <Upload className="h-5 w-5 text-cg-slate" />
               Upload Court Forms
             </CardTitle>
             <CardDescription>
@@ -469,11 +469,11 @@ export default function NewCaseWizardPage() {
           </CardHeader>
           <CardContent className="space-y-6">
             {/* FL-300 Upload */}
-            <div className="border-2 border-dashed border-gray-200 rounded-lg p-6 hover:border-[#4BA8C8] transition-colors">
+            <div className="border-2 border-dashed border-gray-200 rounded-lg p-6 hover:border-cg-slate-light transition-colors">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="h-12 w-12 bg-[#E0EFF8] rounded-lg flex items-center justify-center">
-                    <FileText className="h-6 w-6 text-[#2D6A8F]" />
+                  <div className="h-12 w-12 bg-cg-slate-subtle rounded-lg flex items-center justify-center">
+                    <FileText className="h-6 w-6 text-cg-slate" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900">FL-300</h3>
@@ -483,8 +483,8 @@ export default function NewCaseWizardPage() {
                 <div className="flex items-center gap-3">
                   {uploadedFiles.find(f => f.formType === "FL-300") ? (
                     <div className="flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-[#2D8A70]" />
-                      <span className="text-sm text-[#2D8A70]">
+                      <CheckCircle className="h-5 w-5 text-cg-sage-dark" />
+                      <span className="text-sm text-cg-sage-dark">
                         {uploadedFiles.find(f => f.formType === "FL-300")?.file.name}
                       </span>
                     </div>
@@ -504,11 +504,11 @@ export default function NewCaseWizardPage() {
             </div>
 
             {/* FL-311 Upload */}
-            <div className="border-2 border-dashed border-gray-200 rounded-lg p-6 hover:border-[#4BA8C8] transition-colors">
+            <div className="border-2 border-dashed border-gray-200 rounded-lg p-6 hover:border-cg-slate-light transition-colors">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className="h-12 w-12 bg-[#E0EFF8] rounded-lg flex items-center justify-center">
-                    <FileText className="h-6 w-6 text-[#2D6A8F]" />
+                  <div className="h-12 w-12 bg-cg-slate-subtle rounded-lg flex items-center justify-center">
+                    <FileText className="h-6 w-6 text-cg-slate" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900">FL-311</h3>
@@ -518,8 +518,8 @@ export default function NewCaseWizardPage() {
                 <div className="flex items-center gap-3">
                   {uploadedFiles.find(f => f.formType === "FL-311") ? (
                     <div className="flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-[#2D8A70]" />
-                      <span className="text-sm text-[#2D8A70]">
+                      <CheckCircle className="h-5 w-5 text-cg-sage-dark" />
+                      <span className="text-sm text-cg-sage-dark">
                         {uploadedFiles.find(f => f.formType === "FL-311")?.file.name}
                       </span>
                     </div>
@@ -539,11 +539,11 @@ export default function NewCaseWizardPage() {
             </div>
 
             {/* Info Box */}
-            <div className="bg-[#E0EFF8] rounded-lg p-4">
+            <div className="bg-cg-slate-subtle rounded-lg p-4">
               <div className="flex items-start gap-3">
-                <Sparkles className="h-5 w-5 text-[#2D6A8F] mt-0.5" />
+                <Sparkles className="h-5 w-5 text-cg-slate mt-0.5" />
                 <div>
-                  <h4 className="font-medium text-[#1E3A4A]">ARIA-Powered Extraction</h4>
+                  <h4 className="font-medium text-foreground">ARIA-Powered Extraction</h4>
                   <p className="text-sm text-[#1E4E6B] mt-1">
                     Our AI assistant will automatically extract party information, children details,
                     custody requests, and more from the uploaded forms. You&apos;ll be able to review
@@ -558,7 +558,7 @@ export default function NewCaseWizardPage() {
               <Button
                 onClick={processWithARIA}
                 disabled={uploadedFiles.length === 0}
-                className="bg-[#2D6A8F] hover:bg-[#1E4E6B]"
+                className="bg-cg-slate hover:bg-[#1E4E6B]"
               >
                 Process with ARIA
                 <ArrowRight className="h-4 w-4 ml-2" />
@@ -573,7 +573,7 @@ export default function NewCaseWizardPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Bot className="h-5 w-5 text-[#2D6A8F]" />
+              <Bot className="h-5 w-5 text-cg-slate" />
               ARIA is Extracting Data
             </CardTitle>
             <CardDescription>
@@ -584,16 +584,16 @@ export default function NewCaseWizardPage() {
             {uploadedFiles.map((file) => (
               <div key={file.formType} className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
                 <div className={`h-10 w-10 rounded-full flex items-center justify-center ${
-                  file.status === "complete" ? "bg-[#E8F4F0]" :
-                  file.status === "error" ? "bg-[#FEE2E2]" :
-                  "bg-[#E0EFF8]"
+                  file.status === "complete" ? "bg-cg-sage-subtle" :
+                  file.status === "error" ? "bg-cg-error-subtle" :
+                  "bg-cg-slate-subtle"
                 }`}>
                   {file.status === "complete" ? (
-                    <CheckCircle className="h-5 w-5 text-[#2D8A70]" />
+                    <CheckCircle className="h-5 w-5 text-cg-sage-dark" />
                   ) : file.status === "error" ? (
-                    <XCircle className="h-5 w-5 text-[#C53030]" />
+                    <XCircle className="h-5 w-5 text-cg-error" />
                   ) : (
-                    <Loader2 className="h-5 w-5 text-[#2D6A8F] animate-spin" />
+                    <Loader2 className="h-5 w-5 text-cg-slate animate-spin" />
                   )}
                 </div>
                 <div className="flex-1">
@@ -617,7 +617,7 @@ export default function NewCaseWizardPage() {
             {/* Processing Animation */}
             <div className="flex items-center justify-center py-8">
               <div className="text-center">
-                <Bot className="h-16 w-16 text-[#2D6A8F] mx-auto mb-4 animate-pulse" />
+                <Bot className="h-16 w-16 text-cg-slate mx-auto mb-4 animate-pulse" />
                 <p className="text-lg font-medium text-gray-900">ARIA is reading the documents...</p>
                 <p className="text-sm text-gray-500 mt-1">
                   Extracting party information, children, and custody details
@@ -632,13 +632,13 @@ export default function NewCaseWizardPage() {
       {step === "review" && (
         <div className="space-y-6">
           {/* Extracted Data Summary */}
-          <Card className="bg-[#E8F4F0] border-[#E8F4F0]">
+          <Card className="bg-cg-sage-subtle border-cg-sage-subtle">
             <CardContent className="pt-6">
               <div className="flex items-start gap-3">
-                <CheckCircle className="h-5 w-5 text-[#2D8A70] mt-0.5" />
+                <CheckCircle className="h-5 w-5 text-cg-sage-dark mt-0.5" />
                 <div>
-                  <h4 className="font-medium text-[#1E3A4A]">Data Extracted Successfully</h4>
-                  <p className="text-sm text-[#2D8A70] mt-1">
+                  <h4 className="font-medium text-foreground">Data Extracted Successfully</h4>
+                  <p className="text-sm text-cg-sage-dark mt-1">
                     ARIA has extracted the following information from your forms. Please review and edit as needed.
                   </p>
                 </div>
@@ -650,7 +650,7 @@ export default function NewCaseWizardPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Scale className="h-5 w-5 text-[#2D6A8F]" />
+                <Scale className="h-5 w-5 text-cg-slate" />
                 Case Information
               </CardTitle>
             </CardHeader>
@@ -682,7 +682,7 @@ export default function NewCaseWizardPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-[#2D6A8F]" />
+                <Users className="h-5 w-5 text-cg-slate" />
                 Petitioner Information
               </CardTitle>
             </CardHeader>
@@ -716,7 +716,7 @@ export default function NewCaseWizardPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5 text-[#2D6A8F]" />
+                <Users className="h-5 w-5 text-cg-slate" />
                 Respondent Information
               </CardTitle>
             </CardHeader>
@@ -751,7 +751,7 @@ export default function NewCaseWizardPage() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
-                  <Home className="h-5 w-5 text-[#2D8A70]" />
+                  <Home className="h-5 w-5 text-cg-sage-dark" />
                   Children
                 </CardTitle>
                 <Button variant="outline" size="sm" onClick={addChild}>
@@ -788,7 +788,7 @@ export default function NewCaseWizardPage() {
                       variant="ghost"
                       size="sm"
                       onClick={() => removeChild(index)}
-                      className="text-[#C53030] hover:text-[#9B2C2C] hover:bg-[#FEE2E2]"
+                      className="text-cg-error hover:text-[#9B2C2C] hover:bg-cg-error-subtle"
                     >
                       <XCircle className="h-4 w-4" />
                     </Button>
@@ -800,9 +800,9 @@ export default function NewCaseWizardPage() {
 
           {/* Extracted Custody Details (Read-only) */}
           {(extractedData.legal_custody_request || extractedData.physical_custody_request) && (
-            <Card className="bg-[#E0EFF8]/50 border-[#E0EFF8]">
+            <Card className="bg-cg-slate-subtle/50 border-cg-slate-subtle">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-[#1E3A4A]">
+                <CardTitle className="flex items-center gap-2 text-foreground">
                   <FileText className="h-5 w-5" />
                   Extracted Custody Details (from FL-311)
                 </CardTitle>
@@ -810,19 +810,19 @@ export default function NewCaseWizardPage() {
               <CardContent className="space-y-3 text-sm">
                 {extractedData.legal_custody_request && (
                   <div>
-                    <span className="font-medium text-[#1E3A4A]">Legal Custody Request:</span>{" "}
+                    <span className="font-medium text-foreground">Legal Custody Request:</span>{" "}
                     <span className="text-[#1E4E6B]">{extractedData.legal_custody_request}</span>
                   </div>
                 )}
                 {extractedData.physical_custody_request && (
                   <div>
-                    <span className="font-medium text-[#1E3A4A]">Physical Custody Request:</span>{" "}
+                    <span className="font-medium text-foreground">Physical Custody Request:</span>{" "}
                     <span className="text-[#1E4E6B]">{extractedData.physical_custody_request}</span>
                   </div>
                 )}
                 {extractedData.visitation_schedule && (
                   <div>
-                    <span className="font-medium text-[#1E3A4A]">Visitation Schedule:</span>{" "}
+                    <span className="font-medium text-foreground">Visitation Schedule:</span>{" "}
                     <span className="text-[#1E4E6B]">{extractedData.visitation_schedule}</span>
                   </div>
                 )}
@@ -839,7 +839,7 @@ export default function NewCaseWizardPage() {
             <Button aria-label="Next"
               onClick={createCase}
               disabled={isProcessing || !formData.petitioner_name || !formData.respondent_name}
-              className="bg-[#2D6A8F] hover:bg-[#1E4E6B]"
+              className="bg-cg-slate hover:bg-[#1E4E6B]"
             >
               {isProcessing ? (
                 <>
@@ -861,12 +861,12 @@ export default function NewCaseWizardPage() {
       {step === "complete" && createdCase && (
         <div className="space-y-6">
           {/* Success Message */}
-          <Card className="bg-[#E8F4F0] border-[#E8F4F0]">
+          <Card className="bg-cg-sage-subtle border-cg-sage-subtle">
             <CardContent className="pt-6">
               <div className="text-center">
-                <CheckCircle className="h-16 w-16 text-[#2D8A70] mx-auto mb-4" />
-                <h2 className="text-2xl font-bold text-[#1E3A4A] mb-2">Case Created Successfully!</h2>
-                <p className="text-[#2D8A70]">
+                <CheckCircle className="h-16 w-16 text-cg-sage-dark mx-auto mb-4" />
+                <h2 className="text-2xl font-bold text-foreground mb-2">Case Created Successfully!</h2>
+                <p className="text-cg-sage-dark">
                   The case <strong>{createdCase.case_name}</strong> has been created.
                   {createdCase.case_number && ` Case #${createdCase.case_number}`}
                 </p>
@@ -878,7 +878,7 @@ export default function NewCaseWizardPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Mail className="h-5 w-5 text-[#2D6A8F]" />
+                <Mail className="h-5 w-5 text-cg-slate" />
                 Parent Invite Links
               </CardTitle>
               <CardDescription>
@@ -887,10 +887,10 @@ export default function NewCaseWizardPage() {
             </CardHeader>
             <CardContent className="space-y-6">
               {/* Petitioner Link */}
-              <div className="p-4 bg-[#E0EFF8] rounded-lg">
+              <div className="p-4 bg-cg-slate-subtle rounded-lg">
                 <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-medium text-[#1E3A4A]">Petitioner Invite</h4>
-                  <Badge className="bg-[#E0EFF8] text-[#1E4E6B]">
+                  <h4 className="font-medium text-foreground">Petitioner Invite</h4>
+                  <Badge className="bg-cg-slate-subtle text-[#1E4E6B]">
                     {formData.petitioner_name}
                   </Badge>
                 </div>
@@ -906,24 +906,24 @@ export default function NewCaseWizardPage() {
                     onClick={() => copyToClipboard(createdCase.petitioner_invite_url, "petitioner")}
                   >
                     {copiedField === "petitioner" ? (
-                      <Check className="h-4 w-4 text-[#2D8A70]" />
+                      <Check className="h-4 w-4 text-cg-sage-dark" />
                     ) : (
                       <Copy className="h-4 w-4" />
                     )}
                   </Button>
                 </div>
                 {formData.petitioner_email && (
-                  <p className="text-xs text-[#2D6A8F] mt-2">
+                  <p className="text-xs text-cg-slate mt-2">
                     Email: {formData.petitioner_email}
                   </p>
                 )}
               </div>
 
               {/* Respondent Link */}
-              <div className="p-4 bg-[#E0EFF8] rounded-lg">
+              <div className="p-4 bg-cg-slate-subtle rounded-lg">
                 <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-medium text-[#1E3A4A]">Respondent Invite</h4>
-                  <Badge className="bg-[#E0EFF8] text-[#1E4E6B]">
+                  <h4 className="font-medium text-foreground">Respondent Invite</h4>
+                  <Badge className="bg-cg-slate-subtle text-[#1E4E6B]">
                     {formData.respondent_name}
                   </Badge>
                 </div>
@@ -939,14 +939,14 @@ export default function NewCaseWizardPage() {
                     onClick={() => copyToClipboard(createdCase.respondent_invite_url, "respondent")}
                   >
                     {copiedField === "respondent" ? (
-                      <Check className="h-4 w-4 text-[#2D8A70]" />
+                      <Check className="h-4 w-4 text-cg-sage-dark" />
                     ) : (
                       <Copy className="h-4 w-4" />
                     )}
                   </Button>
                 </div>
                 {formData.respondent_email && (
-                  <p className="text-xs text-[#2D6A8F] mt-2">
+                  <p className="text-xs text-cg-slate mt-2">
                     Email: {formData.respondent_email}
                   </p>
                 )}
@@ -971,8 +971,8 @@ export default function NewCaseWizardPage() {
             <CardContent>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
-                  <div className="h-6 w-6 bg-[#E0EFF8] rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-xs font-bold text-[#2D6A8F]">1</span>
+                  <div className="h-6 w-6 bg-cg-slate-subtle rounded-full flex items-center justify-center flex-shrink-0">
+                    <span className="text-xs font-bold text-cg-slate">1</span>
                   </div>
                   <div>
                     <p className="font-medium text-gray-900">Send invite links to parents</p>
@@ -980,8 +980,8 @@ export default function NewCaseWizardPage() {
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className="h-6 w-6 bg-[#E0EFF8] rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-xs font-bold text-[#2D6A8F]">2</span>
+                  <div className="h-6 w-6 bg-cg-slate-subtle rounded-full flex items-center justify-center flex-shrink-0">
+                    <span className="text-xs font-bold text-cg-slate">2</span>
                   </div>
                   <div>
                     <p className="font-medium text-gray-900">Parents create accounts</p>
@@ -989,8 +989,8 @@ export default function NewCaseWizardPage() {
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
-                  <div className="h-6 w-6 bg-[#E0EFF8] rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-xs font-bold text-[#2D6A8F]">3</span>
+                  <div className="h-6 w-6 bg-cg-slate-subtle rounded-full flex items-center justify-center flex-shrink-0">
+                    <span className="text-xs font-bold text-cg-slate">3</span>
                   </div>
                   <div>
                     <p className="font-medium text-gray-900">Review submitted forms</p>
@@ -1010,7 +1010,7 @@ export default function NewCaseWizardPage() {
               </Button>
             </Link>
             <Link href={`/court-portal/cases/${createdCase.id}`}>
-              <Button className="bg-[#2D6A8F] hover:bg-[#1E4E6B]">
+              <Button className="bg-cg-slate hover:bg-[#1E4E6B]">
                 View Case
                 <ExternalLink className="h-4 w-4 ml-2" />
               </Button>

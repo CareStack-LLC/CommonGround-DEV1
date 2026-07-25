@@ -291,7 +291,7 @@ function FamilyFilesContent() {
                     {/* Features */}
                     <div className="flex flex-wrap gap-2 pt-3 border-t border-border/50">
                       {file.has_court_case && (
-                        <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-[#E0EFF8] text-[#2D6A8F] text-xs font-medium">
+                        <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-cg-slate-subtle text-cg-slate text-xs font-medium">
                           <Scale className="h-3 w-3" />
                           Court
                         </div>

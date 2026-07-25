@@ -192,7 +192,7 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
         variant="ghost"
         size="sm"
         onClick={() => onEditSection(sectionIndex)}
-        className="text-[#2D8A70] hover:text-[#2D8A70] hover:bg-[#E8F4F0]"
+        className="text-cg-sage-dark hover:text-cg-sage-dark hover:bg-cg-sage-subtle"
       >
         <Edit2 className="h-4 w-4 mr-1" />
         Edit
@@ -205,14 +205,14 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
   return (
     <div className="space-y-6">
       {/* Header Card */}
-      <Card className="border-[#E8F4F0] bg-gradient-to-br from-[#E8F4F0] to-white">
+      <Card className="border-cg-sage-subtle bg-gradient-to-br from-cg-sage-subtle to-white">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-[#2D8A70]" />
+              <Users className="h-5 w-5 text-cg-sage-dark" />
               <CardTitle className="text-lg">FL-341: Child Custody and Visitation Order Attachment</CardTitle>
             </div>
-            <Badge variant="outline" className="text-[#2D8A70] border-[#5BC4A0]">
+            <Badge variant="outline" className="text-cg-sage-dark border-cg-sage-light">
               Custody Order
             </Badge>
           </div>
@@ -242,7 +242,7 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
               <span className="text-sm text-muted-foreground">Attachment to:</span>
               <div className="flex flex-wrap gap-2 mt-1">
                 {attachments.map((att, idx) => (
-                  <Badge key={idx} variant="secondary" className="bg-[#E8F4F0] text-[#2D8A70]">
+                  <Badge key={idx} variant="secondary" className="bg-cg-sage-subtle text-cg-sage-dark">
                     {att}
                   </Badge>
                 ))}
@@ -257,7 +257,7 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Scale className="h-5 w-5 text-[#2D6A8F]" />
+              <Scale className="h-5 w-5 text-cg-slate" />
               <CardTitle className="text-base">Jurisdiction (Items 1-4)</CardTitle>
             </div>
             {renderEditButton('jurisdiction')}
@@ -267,7 +267,7 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               {formData.jurisdiction_confirmed ? (
-                <CheckCircle className="h-4 w-4 text-[#2D8A70]" />
+                <CheckCircle className="h-4 w-4 text-cg-sage-dark" />
               ) : (
                 <XCircle className="h-4 w-4 text-gray-400" />
               )}
@@ -275,21 +275,21 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
             </div>
             <div className="flex items-center gap-2">
               {formData.notice_opportunity_confirmed ? (
-                <CheckCircle className="h-4 w-4 text-[#2D8A70]" />
+                <CheckCircle className="h-4 w-4 text-cg-sage-dark" />
               ) : (
                 <XCircle className="h-4 w-4 text-gray-400" />
               )}
               <span className="text-sm">2. Notice and opportunity to be heard confirmed</span>
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-[#2D8A70]" />
+              <CheckCircle className="h-4 w-4 text-cg-sage-dark" />
               <span className="text-sm">
                 3. Habitual residence: {formData.habitual_residence_us ? 'United States' : formData.habitual_residence_other || 'Other'}
               </span>
             </div>
             <div className="flex items-center gap-2">
               {formData.penalties_acknowledged ? (
-                <CheckCircle className="h-4 w-4 text-[#2D8A70]" />
+                <CheckCircle className="h-4 w-4 text-cg-sage-dark" />
               ) : (
                 <XCircle className="h-4 w-4 text-gray-400" />
               )}
@@ -318,7 +318,7 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
                 <span className="text-sm font-medium text-[#E09520]">5. Child abduction risk identified</span>
               </div>
               {formData.fl341b_attached && (
-                <Badge variant="secondary" className="bg-[#FEF7ED] text-[#E09520]">
+                <Badge variant="secondary" className="bg-cg-amber-subtle text-[#E09520]">
                   FL-341(B) Attached
                 </Badge>
               )}
@@ -342,7 +342,7 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-[#2D8A70]" />
+              <Users className="h-5 w-5 text-cg-sage-dark" />
               <CardTitle className="text-base">Child Custody Awards (Item 7)</CardTitle>
             </div>
             {renderEditButton('custody')}
@@ -373,11 +373,11 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
               ))}
               {formData.joint_legal_custody_enabled && (
                 <div className="flex flex-wrap gap-2 pt-2">
-                  <Badge variant="outline" className="border-[#5BC4A0] text-[#2D8A70]">
+                  <Badge variant="outline" className="border-cg-sage-light text-cg-sage-dark">
                     Joint Legal Custody Specified
                   </Badge>
                   {formData.joint_legal_custody_fl341e_attached && (
-                    <Badge variant="secondary" className="bg-[#E8F4F0] text-[#2D8A70]">
+                    <Badge variant="secondary" className="bg-cg-sage-subtle text-cg-sage-dark">
                       FL-341(E) Attached
                     </Badge>
                   )}
@@ -392,11 +392,11 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
 
       {/* Abuse Allegations Section */}
       {formData.abuse_allegations_enabled && (
-        <Card className="border-[#FEE2E2]">
+        <Card className="border-cg-error-subtle">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-[#C53030]" />
+                <AlertTriangle className="h-5 w-5 text-cg-error" />
                 <CardTitle className="text-base text-[#9B2C2C]">Abuse Allegations (Item 8)</CardTitle>
               </div>
               {renderEditButton('abuse')}
@@ -455,7 +455,7 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
                 </div>
               )}
               {formData.custody_granted_despite_allegations && (
-                <div className="p-3 bg-[#FEF7ED] border border-[#FEF7ED] rounded-lg">
+                <div className="p-3 bg-cg-amber-subtle border border-cg-amber-subtle rounded-lg">
                   <p className="text-sm text-[#E09520]">
                     <strong>8c.</strong> Despite allegations, custody granted as in Item 7 (best interests finding)
                   </p>
@@ -471,7 +471,7 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Calendar className="h-5 w-5 text-[#2D6A8F]" />
+              <Calendar className="h-5 w-5 text-cg-slate" />
               <CardTitle className="text-base">Visitation Schedule (Item 9)</CardTitle>
             </div>
             {renderEditButton('visitation')}
@@ -480,7 +480,7 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
         <CardContent>
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <Badge variant="outline" className="border-[#4BA8C8] text-[#1E4E6B]">
+              <Badge variant="outline" className="border-cg-slate-light text-[#1E4E6B]">
                 {getVisitationType()}
               </Badge>
               {formData.visitation_for_party && (
@@ -528,9 +528,9 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
             )}
 
             {formData.virtual_visitation_enabled && (
-              <div className="p-3 bg-[#E0EFF8] rounded-lg">
+              <div className="p-3 bg-cg-slate-subtle rounded-lg">
                 <p className="font-medium text-sm text-[#1E4E6B] mb-1">Virtual Visitation</p>
-                <p className="text-sm text-[#2D6A8F]">{formData.virtual_visitation_details || 'Enabled'}</p>
+                <p className="text-sm text-cg-slate">{formData.virtual_visitation_details || 'Enabled'}</p>
               </div>
             )}
           </div>
@@ -539,7 +539,7 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
 
       {/* Supervised Visitation Section */}
       {formData.supervised_visitation_enabled && (
-        <Card className="border-[#FEF7ED]">
+        <Card className="border-cg-amber-subtle">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -560,7 +560,7 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
                   ? 'Until further order of the court'
                   : formData.supervised_until_other || 'Not specified'}
               </p>
-              <Badge variant="secondary" className="bg-[#FEF7ED] text-[#E09520]">
+              <Badge variant="secondary" className="bg-cg-amber-subtle text-[#E09520]">
                 FL-341(A) Attached
               </Badge>
             </div>
@@ -574,7 +574,7 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Car className="h-5 w-5 text-[#2D6A8F]" />
+                <Car className="h-5 w-5 text-cg-slate" />
                 <CardTitle className="text-base">Transportation & Exchange (Item 11)</CardTitle>
               </div>
               {renderEditButton('transportation')}
@@ -584,7 +584,7 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
             <div className="space-y-3">
               {formData.transportation_licensed_insured && (
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-[#2D8A70]" />
+                  <CheckCircle className="h-4 w-4 text-cg-sage-dark" />
                   <span className="text-sm">Licensed and insured driver required</span>
                 </div>
               )}
@@ -621,7 +621,7 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
                 </div>
               )}
               {formData.curbside_exchange && (
-                <Badge variant="outline" className="border-[#4BA8C8] text-[#1E4E6B]">
+                <Badge variant="outline" className="border-cg-slate-light text-[#1E4E6B]">
                   Curbside Exchange Required
                 </Badge>
               )}
@@ -638,7 +638,7 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
 
       {/* Travel Restrictions Section */}
       {formData.travel_restrictions_enabled && (
-        <Card className="border-[#FEF7ED]">
+        <Card className="border-cg-amber-subtle">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -656,17 +656,17 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
               <p className="text-sm text-muted-foreground">Must have written permission to take children out of:</p>
               <div className="flex flex-wrap gap-2">
                 {formData.travel_restrict_california && (
-                  <Badge variant="outline" className="border-[#F5A623] text-[#E09520]">
+                  <Badge variant="outline" className="border-cg-amber text-[#E09520]">
                     State of California
                   </Badge>
                 )}
                 {formData.travel_restrict_counties && formData.travel_allowed_counties && (
-                  <Badge variant="outline" className="border-[#F5A623] text-[#E09520]">
+                  <Badge variant="outline" className="border-cg-amber text-[#E09520]">
                     Counties: {formData.travel_allowed_counties}
                   </Badge>
                 )}
                 {formData.travel_restrict_other_places && formData.travel_other_places && (
-                  <Badge variant="outline" className="border-[#F5A623] text-[#E09520]">
+                  <Badge variant="outline" className="border-cg-amber text-[#E09520]">
                     {formData.travel_other_places}
                   </Badge>
                 )}
@@ -682,7 +682,7 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-[#2D6A8F]" />
+                <Calendar className="h-5 w-5 text-cg-slate" />
                 <CardTitle className="text-base">Holiday Schedule (Item 13)</CardTitle>
               </div>
               {renderEditButton('holiday')}
@@ -691,12 +691,12 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
           <CardContent>
             <div className="flex flex-wrap gap-2">
               {formData.holiday_schedule_below && (
-                <Badge variant="outline" className="border-[#4BA8C8] text-[#1E4E6B]">
+                <Badge variant="outline" className="border-cg-slate-light text-[#1E4E6B]">
                   Specified Below
                 </Badge>
               )}
               {formData.holiday_schedule_attached && (
-                <Badge variant="secondary" className="bg-[#E0EFF8] text-[#1E4E6B]">
+                <Badge variant="secondary" className="bg-cg-slate-subtle text-[#1E4E6B]">
                   FL-341(C) Attached
                 </Badge>
               )}
@@ -749,7 +749,7 @@ export default function FL341Summary({ formData, canEdit = false, onEditSection 
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               {formData.access_to_records_confirmed ? (
-                <CheckCircle className="h-4 w-4 text-[#2D8A70]" />
+                <CheckCircle className="h-4 w-4 text-cg-sage-dark" />
               ) : (
                 <XCircle className="h-4 w-4 text-gray-400" />
               )}

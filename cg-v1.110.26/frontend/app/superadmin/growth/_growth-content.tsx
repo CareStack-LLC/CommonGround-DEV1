@@ -65,16 +65,16 @@ export default function GrowthContent() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-white">Growth & Engagement</h1>
-          <p className="text-sm text-[#6B8A9A] mt-0.5">Platform metrics over time</p>
+          <p className="text-sm text-muted-foreground mt-0.5">Platform metrics over time</p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg p-0.5">
+          <div className="flex bg-zinc-900/80 border border-cg-slate/20 rounded-lg p-0.5">
             {[7, 14, 30, 60, 90].map(d => (
               <button
                 key={d}
                 onClick={() => setDays(d)}
                 className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                  days === d ? 'bg-[#3DAA8A] text-white' : 'text-[#8AACBC] hover:text-white'
+                  days === d ? 'bg-cg-sage text-white' : 'text-[#8AACBC] hover:text-white'
                 }`}
               >
                 {d}d
@@ -82,7 +82,7 @@ export default function GrowthContent() {
             ))}
           </div>
           <button onClick={fetchData} disabled={loading}
-            className="p-2 rounded-lg bg-[#2D6A8F]/20 hover:bg-[#2D6A8F]/30 text-[#8AACBC] hover:text-white transition-colors disabled:opacity-50">
+            className="p-2 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-[#8AACBC] hover:text-white transition-colors disabled:opacity-50">
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
         </div>
@@ -91,7 +91,7 @@ export default function GrowthContent() {
       {/* Summary Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
         {loading ? (
-          Array.from({ length: 5 }).map((_, i) => <div key={i} className="animate-pulse bg-[#2D6A8F]/20 rounded-xl h-24" />)
+          Array.from({ length: 5 }).map((_, i) => <div key={i} className="animate-pulse bg-cg-slate/20 rounded-xl h-24" />)
         ) : (
           <>
             <SummaryCard icon={Users} label="New Users" value={growth?.total_new_users || 0} trend={userTrend} color="violet" />
@@ -104,7 +104,7 @@ export default function GrowthContent() {
       </div>
 
       {/* Chart */}
-      <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+      <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
         <div className="flex items-center justify-between mb-5">
           <div className="flex gap-1">
             {[
@@ -117,8 +117,8 @@ export default function GrowthContent() {
                 onClick={() => setActiveChart(tab.key as 'users' | 'messages' | 'aria')}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                   activeChart === tab.key
-                    ? 'bg-[#3DAA8A]/15 text-[#3DAA8A]'
-                    : 'text-[#6B8A9A] hover:text-[#D0E4EC] hover:bg-[#2D6A8F]/15'
+                    ? 'bg-cg-sage/15 text-cg-sage'
+                    : 'text-muted-foreground hover:text-[#D0E4EC] hover:bg-cg-slate/15'
                 }`}
               >
                 <tab.icon className="w-3.5 h-3.5" />
@@ -130,7 +130,7 @@ export default function GrowthContent() {
         </div>
 
         {loading ? (
-          <div className="animate-pulse bg-[#2D6A8F]/20 rounded-lg h-48" />
+          <div className="animate-pulse bg-cg-slate/20 rounded-lg h-48" />
         ) : (
           <div className="flex items-end gap-[2px] h-48">
             {chartData.map((d, i) => {
@@ -140,7 +140,7 @@ export default function GrowthContent() {
                 <div key={i} className="flex-1 group relative">
                   <div
                     className={`w-full rounded-t transition-all duration-150 ${
-                      isWeekend ? 'bg-violet-500/20 group-hover:bg-[#5BC4A0]/40' : 'bg-violet-500/50 group-hover:bg-violet-400/70'
+                      isWeekend ? 'bg-violet-500/20 group-hover:bg-cg-sage-light/40' : 'bg-violet-500/50 group-hover:bg-violet-400/70'
                     }`}
                     style={{ height: `${height}%` }}
                   />
@@ -168,7 +168,7 @@ export default function GrowthContent() {
       {/* Engagement + Breakdown */}
       {engagement && (
         <div className="grid lg:grid-cols-2 gap-4">
-          <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
             <h3 className="text-sm font-semibold text-[#D0E4EC] mb-4">Feature Adoption ({days}d)</h3>
             <div className="space-y-3">
               <FeatureRow label="New Family Files" value={engagement.totals?.new_family_files ?? 0} icon={FileText} />
@@ -177,17 +177,17 @@ export default function GrowthContent() {
             </div>
           </div>
 
-          <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
             <h3 className="text-sm font-semibold text-[#D0E4EC] mb-4">Daily Breakdown</h3>
             <div className="max-h-64 overflow-y-auto space-y-0">
               {growth && [...(growth.daily_registrations || [])].reverse().slice(0, 14).map((d) => (
-                <div key={d.date} className="flex items-center justify-between py-2 border-b border-[#2D6A8F]/10 last:border-0">
-                  <span className="text-xs text-[#6B8A9A]">
+                <div key={d.date} className="flex items-center justify-between py-2 border-b border-cg-slate/10 last:border-0">
+                  <span className="text-xs text-muted-foreground">
                     {new Date(d.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
                   </span>
                   <div className="flex items-center gap-2">
                     <div className="w-20 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                      <div className="h-full rounded-full bg-[#3DAA8A]/60" style={{ width: `${(d.count / chartMax) * 100}%` }} />
+                      <div className="h-full rounded-full bg-cg-sage/60" style={{ width: `${(d.count / chartMax) * 100}%` }} />
                     </div>
                     <span className="text-xs text-[#D0E4EC] font-medium w-8 text-right">{d.count}</span>
                   </div>
@@ -213,7 +213,7 @@ export default function GrowthContent() {
             data={current}
             priorData={prior.length === halfCount && halfCount > 0 ? prior : undefined}
             valueLabel="signups"
-            color="#3DAA8A"
+            color="var(--cg-sage)"
             height={220}
             tooltip={`Toggle to overlay the prior ${halfCount} days so you can compare the same-length windows side by side.`}
           />
@@ -229,14 +229,14 @@ function SummaryCard({
   icon: React.ElementType; label: string; value: string | number; trend?: number; color: string; isText?: boolean;
 }) {
   const colors: Record<string, string> = {
-    violet: 'text-[#3DAA8A]', blue: 'text-blue-400', emerald: 'text-emerald-400',
+    violet: 'text-cg-sage', blue: 'text-blue-400', emerald: 'text-emerald-400',
     amber: 'text-amber-400', indigo: 'text-indigo-400',
   };
   return (
-    <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-4">
+    <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-4">
       <div className="flex items-center gap-2 mb-2">
         <Icon className={`w-4 h-4 ${colors[color]}`} />
-        <span className="text-[11px] text-[#6B8A9A]">{label}</span>
+        <span className="text-[11px] text-muted-foreground">{label}</span>
       </div>
       <div className="flex items-end gap-2">
         <span className={`text-xl font-bold text-white ${isText ? 'text-base' : ''}`}>
@@ -259,7 +259,7 @@ function FeatureRow({ label, value, icon: Icon }: {
   return (
     <div className="flex items-center justify-between py-2">
       <div className="flex items-center gap-2">
-        <Icon className="w-3.5 h-3.5 text-[#6B8A9A]" />
+        <Icon className="w-3.5 h-3.5 text-muted-foreground" />
         <span className="text-xs text-[#8AACBC]">{label}</span>
       </div>
       <span className="text-sm font-semibold text-white">

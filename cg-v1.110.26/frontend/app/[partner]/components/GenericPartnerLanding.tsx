@@ -92,8 +92,8 @@ export default function GenericPartnerLanding({ partner }: GenericPartnerLanding
     };
 
     // Styling derived from partner config
-    const primaryColor = partner.branding_config.primary_color || '#3DAA8A';
-    const secondaryColor = partner.branding_config.secondary_color || '#F5A623';
+    const primaryColor = partner.branding_config.primary_color || 'var(--cg-sage)';
+    const secondaryColor = partner.branding_config.secondary_color || 'var(--cg-amber)';
 
     // Dynamic text with fallbacks
     const heroTitle = partner.landing_config?.hero_title || `${partner.display_name} + CommonGround`;
@@ -103,7 +103,7 @@ export default function GenericPartnerLanding({ partner }: GenericPartnerLanding
     const ctaUrl = partner.landing_config?.call_to_action_url || "#";
 
     return (
-        <div className="min-h-screen bg-gray-900 text-white font-sans selection:bg-[#F5A623]/30"
+        <div className="min-h-screen bg-gray-900 text-white font-sans selection:bg-cg-amber/30"
             style={{ '--partner-primary': primaryColor, '--partner-secondary': secondaryColor } as React.CSSProperties}>
 
             {/* Split Hero Section */}
@@ -316,7 +316,7 @@ export default function GenericPartnerLanding({ partner }: GenericPartnerLanding
                                 </p>
                             )}
                             {codeValid && (
-                                <p className="text-[#5BC4A0] text-sm flex items-center gap-2 animate-in fade-in slide-in-from-top-1">
+                                <p className="text-cg-sage-light text-sm flex items-center gap-2 animate-in fade-in slide-in-from-top-1">
                                     <CheckCircle className="h-4 w-4" />
                                     Code verified! Redirecting...
                                 </p>

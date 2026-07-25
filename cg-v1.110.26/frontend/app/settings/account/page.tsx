@@ -198,8 +198,8 @@ export default function AccountSettingsPage() {
     <div className="space-y-6">
       {/* Page Header - matches app design system */}
       <div className="flex items-center gap-3">
-        <div className="w-12 h-12 bg-gradient-to-br from-[#2D6A8F]/10 to-[#2D6A8F]/5 rounded-2xl flex items-center justify-center shadow-md">
-          <User className="w-6 h-6 text-[#2D6A8F]" />
+        <div className="w-12 h-12 bg-gradient-to-br from-cg-slate/10 to-cg-slate/5 rounded-2xl flex items-center justify-center shadow-md">
+          <User className="w-6 h-6 text-cg-slate" />
         </div>
         <div>
           <h2 className="text-xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
@@ -213,9 +213,9 @@ export default function AccountSettingsPage() {
 
       {/* Success Alert */}
       {showSuccess && (
-        <Alert className="bg-[#E8F4F0] dark:bg-[#1E3A4A]/20 border-[#E8F4F0] dark:border-[#1E3A4A]/40 rounded-2xl shadow-lg">
-          <CheckCircle className="h-4 w-4 text-[#2D8A70]" />
-          <AlertDescription className="text-[#2D8A70] font-medium">
+        <Alert className="bg-cg-sage-subtle dark:bg-foreground/20 border-cg-sage-subtle dark:border-foreground/40 rounded-2xl shadow-lg">
+          <CheckCircle className="h-4 w-4 text-cg-sage-dark" />
+          <AlertDescription className="text-cg-sage-dark font-medium">
             Your changes have been saved successfully.
           </AlertDescription>
         </Alert>
@@ -233,8 +233,8 @@ export default function AccountSettingsPage() {
         <Card className="border-2 border-border rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-              <div className="p-2 bg-gradient-to-br from-[#2D6A8F]/10 to-[#2D6A8F]/5 rounded-xl shadow-md">
-                <User className="h-5 w-5 text-[#2D6A8F]" />
+              <div className="p-2 bg-gradient-to-br from-cg-slate/10 to-cg-slate/5 rounded-xl shadow-md">
+                <User className="h-5 w-5 text-cg-slate" />
               </div>
               Profile Information
             </CardTitle>
@@ -291,8 +291,8 @@ export default function AccountSettingsPage() {
         <Card className="border-2 border-border rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-              <div className="p-2 bg-gradient-to-br from-[#3DAA8A]/10 to-[#2D8A70]/5 rounded-xl shadow-md">
-                <Mail className="h-5 w-5 text-[#2D8A70]" />
+              <div className="p-2 bg-gradient-to-br from-cg-sage/10 to-cg-sage-dark/5 rounded-xl shadow-md">
+                <Mail className="h-5 w-5 text-cg-sage-dark" />
               </div>
               Contact Information
             </CardTitle>
@@ -366,7 +366,7 @@ export default function AccountSettingsPage() {
         <Card className="border-2 border-border rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
             <CardTitle className="flex items-center gap-3 text-lg font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-              <div className="p-2 bg-gradient-to-br from-[#F5A623]/10 to-[#E09520]/5 rounded-xl shadow-md">
+              <div className="p-2 bg-gradient-to-br from-cg-amber/10 to-[#E09520]/5 rounded-xl shadow-md">
                 <MapPin className="h-5 w-5 text-[#E09520]" />
               </div>
               Address
@@ -483,7 +483,7 @@ export default function AccountSettingsPage() {
           <button
             type="submit"
             disabled={isSaving}
-            className="px-6 py-2.5 bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white rounded-xl font-bold hover:shadow-lg transition-all duration-300 disabled:opacity-50"
+            className="px-6 py-2.5 bg-gradient-to-r from-[var(--portal-primary)] to-cg-slate text-white rounded-xl font-bold hover:shadow-lg transition-all duration-300 disabled:opacity-50"
           >
             {isSaving ? (
               <span className="flex items-center gap-2">
@@ -519,7 +519,7 @@ export default function AccountSettingsPage() {
                 Get a JSON file with your profile, agreements, messages, schedules, and financial records.
               </p>
               {exportStatus === 'done' && (
-                <p className="text-xs text-[#2D8A70] font-semibold mt-1.5">
+                <p className="text-xs text-cg-sage-dark font-semibold mt-1.5">
                   Download started — check your browser's downloads folder.
                 </p>
               )}
@@ -548,9 +548,9 @@ export default function AccountSettingsPage() {
           </div>
 
           {/* Delete */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl border-2 border-[#FEF7ED] bg-[#FEF7ED]/40">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl border-2 border-cg-amber-subtle bg-cg-amber-subtle/40">
             <div className="flex-1">
-              <p className="font-bold text-[#1E3A4A]">Delete my account</p>
+              <p className="font-bold text-foreground">Delete my account</p>
               <p className="text-sm text-[#E09520]/80 font-medium">
                 Schedules your account for deletion in 30 days. You can cancel by contacting
                 support before then. This is permanent once the grace period ends.
@@ -564,7 +564,7 @@ export default function AccountSettingsPage() {
                 setDeleteConfirmText('');
                 setDeleteError(null);
               }}
-              className="shrink-0 inline-flex items-center gap-2 px-4 py-2.5 bg-white border-2 border-[#F5A623] text-[#E09520] rounded-xl font-bold hover:bg-[#FEF7ED] hover:border-[#F5A623] transition-all"
+              className="shrink-0 inline-flex items-center gap-2 px-4 py-2.5 bg-white border-2 border-cg-amber text-[#E09520] rounded-xl font-bold hover:bg-cg-amber-subtle hover:border-cg-amber transition-all"
             >
               <Trash2 className="h-4 w-4" />
               Delete account
@@ -585,12 +585,12 @@ export default function AccountSettingsPage() {
             onClick={(e) => e.stopPropagation()}
             className="bg-card rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border-2 border-border"
           >
-            <div className="bg-[#FEF7ED] border-b-2 border-[#FEF7ED] p-5 flex items-start gap-3">
-              <div className="p-2 bg-[#FEF7ED] rounded-xl">
+            <div className="bg-cg-amber-subtle border-b-2 border-cg-amber-subtle p-5 flex items-start gap-3">
+              <div className="p-2 bg-cg-amber-subtle rounded-xl">
                 <AlertTriangle className="h-6 w-6 text-[#E09520]" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-[#1E3A4A]" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
+                <h3 className="text-lg font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   Delete your CommonGround account?
                 </h3>
                 <p className="text-sm text-[#E09520]/90 mt-1 font-medium">
@@ -602,7 +602,7 @@ export default function AccountSettingsPage() {
             <div className="p-5 space-y-4">
               {deleteStatus === 'done' ? (
                 <div className="flex flex-col items-center gap-3 py-4">
-                  <CheckCircle className="h-12 w-12 text-[#3DAA8A]" />
+                  <CheckCircle className="h-12 w-12 text-cg-sage" />
                   <p className="font-bold text-foreground text-center">Deletion scheduled</p>
                   <p className="text-sm text-muted-foreground text-center">
                     We've sent a confirmation email. Your data will be removed in 30 days

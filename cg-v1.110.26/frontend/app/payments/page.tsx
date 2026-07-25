@@ -69,7 +69,7 @@ function Currency({
   const isPositive = positive !== undefined ? positive : amount >= 0;
 
   return (
-    <span className={`font-mono tabular-nums font-semibold ${sizeClasses[size]} ${isPositive ? 'text-[#2D8A70]' : 'text-[#C53030]'}`}>
+    <span className={`font-mono tabular-nums font-semibold ${sizeClasses[size]} ${isPositive ? 'text-cg-sage-dark' : 'text-cg-error'}`}>
       {isPositive ? '' : '-'}${Math.abs(amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
     </span>
   );
@@ -118,7 +118,7 @@ function NetBalanceCard({
 
   return (
     <div className="bg-card rounded-2xl border-2 border-border shadow-lg overflow-hidden">
-      <div className="h-2 bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F]" />
+      <div className="h-2 bg-gradient-to-r from-[var(--portal-primary)] to-cg-slate" />
       <div className="p-5">
         <div className="flex items-start justify-between">
           <div>
@@ -127,9 +127,9 @@ function NetBalanceCard({
               <Currency amount={Math.abs(netBalance)} size="xl" positive={isOwed} />
               <span className={`text-sm font-bold px-3 py-1 rounded-full ${
                 isOwed
-                  ? 'bg-[#E8F4F0] text-[#2D8A70]'
+                  ? 'bg-cg-sage-subtle text-cg-sage-dark'
                   : netBalance < 0
-                  ? 'bg-[#FEE2E2] text-[#9B2C2C]'
+                  ? 'bg-cg-error-subtle text-[#9B2C2C]'
                   : 'bg-muted text-muted-foreground'
               }`}>
                 {netBalance === 0 ? 'Balanced' : isOwed ? 'Owed to You' : 'You Owe'}
@@ -138,15 +138,15 @@ function NetBalanceCard({
           </div>
           <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-md ${
             isOwed
-              ? 'bg-gradient-to-br from-[#E8F4F0] to-[#E8F4F0]'
+              ? 'bg-gradient-to-br from-cg-sage-subtle to-cg-sage-subtle'
               : netBalance < 0
-              ? 'bg-gradient-to-br from-[#FEE2E2] to-[#FEE2E2]'
+              ? 'bg-gradient-to-br from-cg-error-subtle to-cg-error-subtle'
               : 'bg-gradient-to-br from-muted to-muted/50'
           }`}>
             {isOwed ? (
-              <TrendingUp className={`h-7 w-7 text-[#2D8A70]`} />
+              <TrendingUp className={`h-7 w-7 text-cg-sage-dark`} />
             ) : netBalance < 0 ? (
-              <TrendingDown className={`h-7 w-7 text-[#C53030]`} />
+              <TrendingDown className={`h-7 w-7 text-cg-error`} />
             ) : (
               <DollarSign className={`h-7 w-7 text-muted-foreground`} />
             )}
@@ -159,13 +159,13 @@ function NetBalanceCard({
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
           <div>
             <p className="text-xs text-muted-foreground mb-1.5 font-semibold">Owed to You</p>
-            <p className="font-mono text-lg text-[#2D8A70] tabular-nums font-bold">
+            <p className="font-mono text-lg text-cg-sage-dark tabular-nums font-bold">
               ${totalOwedToUser.toLocaleString('en-US', { minimumFractionDigits: 2 })}
             </p>
           </div>
           <div>
             <p className="text-xs text-muted-foreground mb-1.5 font-semibold">You Owe</p>
-            <p className="font-mono text-lg text-[#C53030] tabular-nums font-bold">
+            <p className="font-mono text-lg text-cg-error tabular-nums font-bold">
               ${totalUserOwes.toLocaleString('en-US', { minimumFractionDigits: 2 })}
             </p>
           </div>
@@ -177,7 +177,7 @@ function NetBalanceCard({
           </div>
           <div>
             <p className="text-xs text-muted-foreground mb-1.5 font-semibold">Overdue</p>
-            <p className={`font-mono text-lg tabular-nums font-bold ${overdue > 0 ? 'text-[#C53030]' : 'text-foreground'}`}>
+            <p className={`font-mono text-lg tabular-nums font-bold ${overdue > 0 ? 'text-cg-error' : 'text-foreground'}`}>
               ${overdue.toLocaleString('en-US', { minimumFractionDigits: 2 })}
             </p>
           </div>
@@ -227,15 +227,15 @@ function MetricsRow({
       label: 'Completed',
       value: metrics?.total_completed || 0,
       icon: CheckCircle,
-      bg: 'bg-[#E8F4F0]',
-      text: 'text-[#2D8A70]',
+      bg: 'bg-cg-sage-subtle',
+      text: 'text-cg-sage-dark',
     },
     {
       label: 'Overdue',
       value: metrics?.total_overdue || 0,
       icon: AlertTriangle,
-      bg: 'bg-[#FEE2E2]',
-      text: 'text-[#C53030]',
+      bg: 'bg-cg-error-subtle',
+      text: 'text-cg-error',
       isOverdue: true,
     },
   ];
@@ -261,7 +261,7 @@ function MetricsRow({
                 {hasOverdue && (
                   <span className="absolute -top-1 -right-1 flex h-4 w-4">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#E06B6B] opacity-75" />
-                    <span className="relative inline-flex rounded-full h-4 w-4 bg-[#C53030] items-center justify-center text-[9px] text-white font-bold">
+                    <span className="relative inline-flex rounded-full h-4 w-4 bg-cg-error items-center justify-center text-[9px] text-white font-bold">
                       {stat.value}
                     </span>
                   </span>
@@ -503,7 +503,7 @@ function PaymentsContent() {
               </p>
               <button
                 onClick={() => router.push('/family-files')}
-                className="bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white px-8 py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-3"
+                className="bg-gradient-to-r from-[var(--portal-primary)] to-cg-slate text-white px-8 py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-3"
               >
                 <Users className="w-5 h-5" />
                 Go to Family Files
@@ -575,7 +575,7 @@ function PaymentsContent() {
           {/* Add Expense Button */}
           <button
             onClick={() => router.push('/payments/new')}
-            className="bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white px-5 py-3 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center gap-2"
+            className="bg-gradient-to-r from-[var(--portal-primary)] to-cg-slate text-white px-5 py-3 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 flex items-center gap-2"
           >
             <Plus className="h-5 w-5" />
             <span className="hidden sm:inline">Add</span>
@@ -608,7 +608,7 @@ function PaymentsContent() {
               </div>
               <button
                 onClick={() => router.push('/wallet')}
-                className="bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white px-5 py-3 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-2 whitespace-nowrap"
+                className="bg-gradient-to-r from-[var(--portal-primary)] to-cg-slate text-white px-5 py-3 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-2 whitespace-nowrap"
               >
                 <Wallet className="h-4 w-4" />
                 {wallet ? 'Continue Setup' : 'Set Up Wallet'}
@@ -622,8 +622,8 @@ function PaymentsContent() {
         {wallet?.onboarding_completed && (
           <div className="flex items-center justify-between p-5 bg-card rounded-2xl border-2 border-border shadow-lg">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-gradient-to-br from-[#E8F4F0] to-[#E8F4F0] rounded-2xl flex items-center justify-center shadow-md">
-                <Wallet className="w-6 h-6 text-[#2D8A70]" />
+              <div className="w-14 h-14 bg-gradient-to-br from-cg-sage-subtle to-cg-sage-subtle rounded-2xl flex items-center justify-center shadow-md">
+                <Wallet className="w-6 h-6 text-cg-sage-dark" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground font-semibold">Wallet Balance</p>
@@ -688,7 +688,7 @@ function PaymentsContent() {
                         style={{ width: `${petPct}%` }}
                       />
                       <div
-                        className="bg-[#F5A623] rounded-r-full transition-all duration-500"
+                        className="bg-cg-amber rounded-r-full transition-all duration-500"
                         style={{ width: `${100 - petPct}%` }}
                       />
                     </div>
@@ -741,7 +741,7 @@ function PaymentsContent() {
               group flex items-center gap-2 px-4 py-3 text-sm font-bold rounded-xl
               transition-all duration-300 whitespace-nowrap flex-shrink-0
               ${activeTab === 'pending'
-                ? 'bg-gradient-to-r from-[#F5A623] to-[#E09520] text-white shadow-md'
+                ? 'bg-gradient-to-r from-cg-amber to-[#E09520] text-white shadow-md'
                 : 'text-muted-foreground hover:text-foreground hover:bg-muted'
               }
             `}
@@ -762,7 +762,7 @@ function PaymentsContent() {
               group flex items-center gap-2 px-4 py-3 text-sm font-bold rounded-xl
               transition-all duration-300 whitespace-nowrap flex-shrink-0
               ${activeTab === 'active'
-                ? 'bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white shadow-md'
+                ? 'bg-gradient-to-r from-[var(--portal-primary)] to-cg-slate text-white shadow-md'
                 : 'text-muted-foreground hover:text-foreground hover:bg-muted'
               }
             `}
@@ -783,7 +783,7 @@ function PaymentsContent() {
               group flex items-center gap-2 px-4 py-3 text-sm font-bold rounded-xl
               transition-all duration-300 whitespace-nowrap flex-shrink-0
               ${activeTab === 'completed'
-                ? 'bg-gradient-to-r from-[#3DAA8A] to-[#2D8A70] text-white shadow-md'
+                ? 'bg-gradient-to-r from-cg-sage to-cg-sage-dark text-white shadow-md'
                 : 'text-muted-foreground hover:text-foreground hover:bg-muted'
               }
             `}
@@ -797,7 +797,7 @@ function PaymentsContent() {
               group flex items-center gap-2 px-4 py-3 text-sm font-bold rounded-xl
               transition-all duration-300 whitespace-nowrap flex-shrink-0
               ${activeTab === 'ledger'
-                ? 'bg-gradient-to-r from-[#2D6A8F] to-[#2D6A8F] text-white shadow-md'
+                ? 'bg-gradient-to-r from-cg-slate to-cg-slate text-white shadow-md'
                 : 'text-muted-foreground hover:text-foreground hover:bg-muted'
               }
             `}
@@ -834,7 +834,7 @@ function PaymentsContent() {
                   {activeTab === 'pending' && (
                     <button
                       onClick={() => router.push('/payments/new')}
-                      className="bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white px-8 py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-3"
+                      className="bg-gradient-to-r from-[var(--portal-primary)] to-cg-slate text-white px-8 py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-3"
                     >
                       <Plus className="h-5 w-5" />
                       Add Expense
@@ -853,8 +853,8 @@ function PaymentsContent() {
             </div>
           ) : (
             <div className="p-12 text-center">
-              <div className="w-20 h-20 bg-gradient-to-br from-[#E0EFF8] to-[#E0EFF8] rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-                <BarChart3 className="w-10 h-10 text-[#2D6A8F]" />
+              <div className="w-20 h-20 bg-gradient-to-br from-cg-slate-subtle to-cg-slate-subtle rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <BarChart3 className="w-10 h-10 text-cg-slate" />
               </div>
               <h3 className="font-bold text-foreground mb-2 text-lg" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                 Transaction Ledger
@@ -864,7 +864,7 @@ function PaymentsContent() {
               </p>
               <button
                 onClick={() => router.push(`/payments/ledger?case_id=${selectedFamilyFile.id}`)}
-                className="bg-gradient-to-r from-[#2D6A8F] to-[#2D6A8F] text-white px-8 py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-3"
+                className="bg-gradient-to-r from-cg-slate to-cg-slate text-white px-8 py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-3"
               >
                 <FileText className="h-5 w-5" />
                 View Full Ledger

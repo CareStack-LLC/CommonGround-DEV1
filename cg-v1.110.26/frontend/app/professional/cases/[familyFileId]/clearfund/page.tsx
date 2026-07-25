@@ -163,11 +163,11 @@ export default function CaseClearFundPage() {
   const getStatusBadge = (status: string) => {
     const statusConfig: Record<string, { color: string; icon: typeof CheckCircle2 }> = {
       open: { color: "bg-blue-100 text-blue-800", icon: Clock },
-      partially_funded: { color: "bg-[#FEF7ED] text-[#8F5E14]", icon: TrendingUp },
-      funded: { color: "bg-[#E8F4F0] text-[#236E59]", icon: CheckCircle2 },
-      authorized: { color: "bg-[#E0EFF8] text-[#1E4E6B]", icon: CreditCard },
-      pending_verification: { color: "bg-[#FEF7ED] text-[#8F5E14]", icon: Receipt },
-      verified: { color: "bg-[#E8F4F0] text-[#236E59]", icon: CheckCircle2 },
+      partially_funded: { color: "bg-cg-amber-subtle text-[#8F5E14]", icon: TrendingUp },
+      funded: { color: "bg-cg-sage-subtle text-[#236E59]", icon: CheckCircle2 },
+      authorized: { color: "bg-cg-slate-subtle text-[#1E4E6B]", icon: CreditCard },
+      pending_verification: { color: "bg-cg-amber-subtle text-[#8F5E14]", icon: Receipt },
+      verified: { color: "bg-cg-sage-subtle text-[#236E59]", icon: CheckCircle2 },
       completed: { color: "bg-slate-100 text-slate-800", icon: CheckCircle2 },
       expired: { color: "bg-red-100 text-red-800", icon: AlertCircle },
       cancelled: { color: "bg-gray-100 text-gray-800", icon: XCircle },
@@ -203,7 +203,7 @@ export default function CaseClearFundPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2D8A70]" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cg-sage-dark" />
       </div>
     );
   }
@@ -222,7 +222,7 @@ export default function CaseClearFundPage() {
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="p-4 bg-[#E8F4F0] text-[#2D8A70] rounded-xl">
+          <div className="p-4 bg-cg-sage-subtle text-cg-sage-dark rounded-xl">
             <DollarSign className="h-8 w-8" />
           </div>
           <div>
@@ -257,7 +257,7 @@ export default function CaseClearFundPage() {
                   <p className="text-xs text-muted-foreground">Amount Funded</p>
                   <p className="text-xl font-bold mt-1">{formatCurrency(stats.amount_funded)}</p>
                 </div>
-                <div className="p-2 bg-[#E8F4F0] text-[#2D8A70] rounded-lg">
+                <div className="p-2 bg-cg-sage-subtle text-cg-sage-dark rounded-lg">
                   <CheckCircle2 className="h-5 w-5" />
                 </div>
               </div>
@@ -270,7 +270,7 @@ export default function CaseClearFundPage() {
                   <p className="text-xs text-muted-foreground">Verified</p>
                   <p className="text-xl font-bold mt-1">{formatCurrency(stats.amount_verified)}</p>
                 </div>
-                <div className="p-2 bg-[#F0F7FC] text-[#2D6A8F] rounded-lg">
+                <div className="p-2 bg-[#F0F7FC] text-cg-slate rounded-lg">
                   <Receipt className="h-5 w-5" />
                 </div>
               </div>
@@ -283,7 +283,7 @@ export default function CaseClearFundPage() {
                   <p className="text-xs text-muted-foreground">Pending</p>
                   <p className="text-xl font-bold mt-1">{stats.pending_count}</p>
                 </div>
-                <div className="p-2 bg-[#FEF7ED] text-[#E09520] rounded-lg">
+                <div className="p-2 bg-cg-amber-subtle text-[#E09520] rounded-lg">
                   <Clock className="h-5 w-5" />
                 </div>
               </div>
@@ -303,7 +303,7 @@ export default function CaseClearFundPage() {
                   {(stats.top_category || "None").replace("_", " ")}
                 </p>
               </div>
-              <div className="p-2 bg-[#F0F7FC] text-[#2D6A8F] rounded-lg">
+              <div className="p-2 bg-[#F0F7FC] text-cg-slate rounded-lg">
                 <TrendingUp className="h-5 w-5" />
               </div>
             </CardContent>
@@ -474,7 +474,7 @@ function ObligationCard({
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           {/* Left: Info */}
           <div className="flex items-start gap-4 flex-1">
-            <div className="p-3 bg-[#E8F4F0] text-[#2D8A70] rounded-lg">
+            <div className="p-3 bg-cg-sage-subtle text-cg-sage-dark rounded-lg">
               <DollarSign className="h-5 w-5" />
             </div>
             <div className="flex-1">
@@ -583,14 +583,14 @@ function ObligationDetailModal({
               <p className="text-sm text-muted-foreground">Total Amount</p>
               <p className="text-2xl font-bold">{formatCurrency(obligation.total_amount)}</p>
             </div>
-            <div className="p-4 bg-[#E8F4F0] rounded-lg text-center">
-              <p className="text-sm text-[#2D8A70]">Amount Funded</p>
-              <p className="text-2xl font-bold text-[#2D8A70]">
+            <div className="p-4 bg-cg-sage-subtle rounded-lg text-center">
+              <p className="text-sm text-cg-sage-dark">Amount Funded</p>
+              <p className="text-2xl font-bold text-cg-sage-dark">
                 {formatCurrency(obligation.amount_funded)}
               </p>
             </div>
             <div className="p-4 bg-[#F0F7FC] rounded-lg text-center">
-              <p className="text-sm text-[#2D6A8F]">Amount Verified</p>
+              <p className="text-sm text-cg-slate">Amount Verified</p>
               <p className="text-2xl font-bold text-[#1E4E6B]">
                 {formatCurrency(obligation.amount_verified)}
               </p>
@@ -613,7 +613,7 @@ function ObligationDetailModal({
                   </span>
                 </div>
               </div>
-              <div className="p-4 bg-[#E8F4F0] rounded-lg">
+              <div className="p-4 bg-cg-sage-subtle rounded-lg">
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-medium text-[#236E59]">
                     Respondent ({Math.round(100 - obligation.petitioner_percentage)}%)
@@ -640,9 +640,9 @@ function ObligationDetailModal({
                   >
                     <div className="flex items-center gap-2">
                       {record.is_fully_funded ? (
-                        <CheckCircle2 className="h-4 w-4 text-[#3DAA8A]" />
+                        <CheckCircle2 className="h-4 w-4 text-cg-sage" />
                       ) : (
-                        <Clock className="h-4 w-4 text-[#F5A623]" />
+                        <Clock className="h-4 w-4 text-cg-amber" />
                       )}
                       <span className="text-sm">{record.parent_name || "Parent"}</span>
                     </div>
@@ -675,7 +675,7 @@ function ObligationDetailModal({
                     className="flex items-center justify-between p-3 bg-[#F0F7FC] rounded-lg"
                   >
                     <div className="flex items-center gap-3">
-                      <Receipt className="h-5 w-5 text-[#2D6A8F]" />
+                      <Receipt className="h-5 w-5 text-cg-slate" />
                       <div>
                         <p className="text-sm font-medium">{artifact.vendor_name || "Receipt"}</p>
                         <p className="text-xs text-muted-foreground capitalize">

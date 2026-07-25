@@ -60,16 +60,16 @@ export default function ChildWalletPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#0D1B24] via-[#1E3A4A] to-[#0D1B24] flex items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin text-[#3DAA8A]" />
+      <div className="min-h-screen bg-gradient-to-b from-[#0D1B24] via-foreground to-[#0D1B24] flex items-center justify-center">
+        <Loader2 className="h-10 w-10 animate-spin text-cg-sage" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0D1B24] via-[#1E3A4A] to-[#0D1B24] text-white">
+    <div className="min-h-screen bg-gradient-to-b from-[#0D1B24] via-foreground to-[#0D1B24] text-white">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-[#0D1B24]/80 backdrop-blur-md border-b border-[#3DAA8A]/10">
+      <header className="sticky top-0 z-10 bg-[#0D1B24]/80 backdrop-blur-md border-b border-cg-sage/10">
         <div className="max-w-3xl mx-auto flex items-center justify-between px-4 py-3">
           <button
             onClick={() => router.push('/my-circle/child/dashboard')}
@@ -107,7 +107,7 @@ export default function ChildWalletPage() {
           <>
             {/* Hero balance card */}
             <section
-              className="relative overflow-hidden rounded-3xl p-6 bg-gradient-to-br from-[#3DAA8A] to-[#2D6A8F] shadow-lg shadow-[#3DAA8A]/20"
+              className="relative overflow-hidden rounded-3xl p-6 bg-gradient-to-br from-cg-sage to-cg-slate shadow-lg shadow-cg-sage/20"
               aria-live="polite"
             >
               <div className="flex items-start justify-between">
@@ -163,9 +163,9 @@ export default function ChildWalletPage() {
                   {wallet.recent_contributions.map((gift) => (
                     <li
                       key={gift.id}
-                      className="rounded-2xl border border-[#3DAA8A]/15 bg-[#1E3A4A]/60 px-4 py-3 flex items-start gap-3"
+                      className="rounded-2xl border border-cg-sage/15 bg-foreground/60 px-4 py-3 flex items-start gap-3"
                     >
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#F5A623] to-[#E8941E] flex items-center justify-center flex-shrink-0">
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cg-amber to-[#E8941E] flex items-center justify-center flex-shrink-0">
                         <Heart className="h-4 w-4 text-white" />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -177,7 +177,7 @@ export default function ChildWalletPage() {
                             {gift.contributor_name || 'A friend'}
                           </p>
                           <p
-                            className="text-[#3DAA8A] font-bold"
+                            className="text-cg-sage font-bold"
                             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
                           >
                             +{safeCurrency(gift.net_amount ?? gift.amount)}
@@ -206,7 +206,7 @@ export default function ChildWalletPage() {
                   ))}
                 </ul>
               ) : (
-                <div className="rounded-2xl border border-[#3DAA8A]/15 bg-[#1E3A4A]/40 px-4 py-8 text-center">
+                <div className="rounded-2xl border border-cg-sage/15 bg-foreground/40 px-4 py-8 text-center">
                   <Gift className="h-8 w-8 text-white/40 mx-auto mb-2" />
                   <p className="text-white/70 text-sm">
                     No gifts yet — share your family file link so grandparents

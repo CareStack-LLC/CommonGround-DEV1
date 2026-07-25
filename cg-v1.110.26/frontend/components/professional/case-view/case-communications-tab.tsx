@@ -123,7 +123,7 @@ export function CaseCommunicationsTab({ familyFileId, token }: { familyFileId: s
                         variant={filterFlagged ? "default" : "outline"}
                         size="sm"
                         onClick={() => setFilterFlagged(!filterFlagged)}
-                        className={filterFlagged ? "bg-[#C53030] hover:bg-[#9B2C2C] h-9" : "h-9"}
+                        className={filterFlagged ? "bg-cg-error hover:bg-[#9B2C2C] h-9" : "h-9"}
                     >
                         <AlertTriangle className="h-4 w-4 mr-2" />
                         Flagged
@@ -157,7 +157,7 @@ export function CaseCommunicationsTab({ familyFileId, token }: { familyFileId: s
 
 function MessageCard({ message }: { message: Message }) {
     return (
-        <Card className={`overflow-hidden border-slate-100 hover:border-[#E0EFF8] transition-colors ${message.flagged_by_aria ? 'border-l-4 border-l-[#C53030]' : ''}`}>
+        <Card className={`overflow-hidden border-slate-100 hover:border-cg-slate-subtle transition-colors ${message.flagged_by_aria ? 'border-l-4 border-l-cg-error' : ''}`}>
             <CardContent className="p-4">
                 <div className="flex items-start justify-between gap-4 mb-3">
                     <div className="flex items-center gap-3">
@@ -179,7 +179,7 @@ function MessageCard({ message }: { message: Message }) {
                         </div>
                     </div>
                     {message.flagged_by_aria && (
-                        <Badge className="bg-[#FEE2E2] text-[#9B2C2C] hover:bg-[#FEE2E2] border-[#FEE2E2] text-[10px] py-0 h-5">
+                        <Badge className="bg-cg-error-subtle text-[#9B2C2C] hover:bg-cg-error-subtle border-cg-error-subtle text-[10px] py-0 h-5">
                             ARIA Flag: {message.aria_flag_category || "Inappropriate"}
                         </Badge>
                     )}
@@ -193,11 +193,11 @@ function MessageCard({ message }: { message: Message }) {
                     <div className="mt-3 flex items-center gap-2">
                         <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                             <div
-                                className="h-full bg-[#C53030]"
+                                className="h-full bg-cg-error"
                                 style={{ width: `${message.aria_risk_score * 10}%` }}
                             />
                         </div>
-                        <span className="text-[10px] font-bold text-[#C53030]">Risk Score: {message.aria_risk_score}/10</span>
+                        <span className="text-[10px] font-bold text-cg-error">Risk Score: {message.aria_risk_score}/10</span>
                     </div>
                 )}
             </CardContent>

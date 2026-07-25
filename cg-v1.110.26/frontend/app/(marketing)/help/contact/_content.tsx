@@ -37,7 +37,7 @@ const inquiryTypes = [
     icon: MessageSquare,
     label: 'Technical Support',
     description: 'Help with your account',
-    color: '#F5A623',
+    color: 'var(--cg-amber)',
   },
   {
     id: 'professional',
@@ -51,7 +51,7 @@ const inquiryTypes = [
     icon: Gavel,
     label: 'Court/Enterprise',
     description: 'Organizational access',
-    color: '#F5A623',
+    color: 'var(--cg-amber)',
   },
   {
     id: 'security',

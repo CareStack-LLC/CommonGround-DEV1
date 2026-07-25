@@ -40,7 +40,7 @@ function Bubble({
         <div
           className={`px-4 py-2.5 rounded-2xl shadow-sm ${
             mine
-              ? 'bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] text-white'
+              ? 'bg-gradient-to-br from-[var(--portal-primary)] to-cg-slate text-white'
               : 'bg-card text-foreground border-2 border-border'
           }`}
         >
@@ -83,7 +83,7 @@ function Bubble({
               className={`mt-2 pt-2 border-t flex items-center gap-1.5 text-xs ${
                 mine
                   ? 'border-white/20 text-white/80'
-                  : 'border-[#FEF7ED] text-[#E09520]'
+                  : 'border-cg-amber-subtle text-[#E09520]'
               }`}
             >
               {message.aria_hidden ? (
@@ -219,7 +219,7 @@ function ThreadDetailContent() {
               <div className="w-10 h-10 border-3 border-[var(--portal-primary)]/20 border-t-[var(--portal-primary)] rounded-full animate-spin" />
             </div>
           ) : error ? (
-            <div className="p-4 rounded-xl bg-[#FEE2E2] border-2 border-[#FEE2E2] text-sm text-[#9B2C2C]">
+            <div className="p-4 rounded-xl bg-cg-error-subtle border-2 border-cg-error-subtle text-sm text-[#9B2C2C]">
               {error}
             </div>
           ) : messages.length === 0 ? (

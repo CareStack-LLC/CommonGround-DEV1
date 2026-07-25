@@ -124,23 +124,23 @@ const TABS = [
 
 /* ── Recharts dark theme ───────────────────────────────────────────── */
 
-const GRID_PROPS = { strokeDasharray: '3 3', stroke: '#2D6A8F', opacity: 0.2 } as const;
-const AXIS_PROPS = { stroke: '#4A6E7F', tick: { fill: '#6B8A9A', fontSize: 10 } } as const;
+const GRID_PROPS = { strokeDasharray: '3 3', stroke: 'var(--cg-slate)', opacity: 0.2 } as const;
+const AXIS_PROPS = { stroke: '#4A6E7F', tick: { fill: 'var(--muted-foreground)', fontSize: 10 } } as const;
 const TOOLTIP_STYLE = {
-  backgroundColor: '#1E3A4A',
-  border: '1px solid #2D6A8F',
+  backgroundColor: 'var(--foreground)',
+  border: '1px solid var(--cg-slate)',
   borderRadius: 8,
   color: '#D0E4EC',
   fontSize: 12,
 };
 
-const CHART_COLORS = ['#3DAA8A', '#3b82f6', '#f59e0b', '#8b5cf6', '#ef4444'];
+const CHART_COLORS = ['var(--cg-sage)', '#3b82f6', '#f59e0b', '#8b5cf6', '#ef4444'];
 
 /* ── Shared card wrapper ───────────────────────────────────────────── */
 
 function Card({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5 ${className}`}>
+    <div className={`bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5 ${className}`}>
       {children}
     </div>
   );
@@ -152,7 +152,7 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
 
 function EmptyData({ message = 'No data yet' }: { message?: string }) {
   return (
-    <div className="flex items-center justify-center py-12 text-[#6B8A9A] text-sm">
+    <div className="flex items-center justify-center py-12 text-muted-foreground text-sm">
       {message}
     </div>
   );
@@ -245,29 +245,29 @@ function ContentTab() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#2D6A8F]/20">
-                  <th className="text-left py-2 pr-4 text-[#6B8A9A] font-medium">Title</th>
-                  <th className="text-right py-2 px-3 text-[#6B8A9A] font-medium">
+                <tr className="border-b border-cg-slate/20">
+                  <th className="text-left py-2 pr-4 text-muted-foreground font-medium">Title</th>
+                  <th className="text-right py-2 px-3 text-muted-foreground font-medium">
                     <span className="inline-flex items-center gap-1"><Eye className="w-3 h-3" />Views</span>
                   </th>
-                  <th className="text-right py-2 px-3 text-[#6B8A9A] font-medium">
+                  <th className="text-right py-2 px-3 text-muted-foreground font-medium">
                     <span className="inline-flex items-center gap-1"><Clock className="w-3 h-3" />Avg Duration</span>
                   </th>
-                  <th className="text-right py-2 px-3 text-[#6B8A9A] font-medium">
+                  <th className="text-right py-2 px-3 text-muted-foreground font-medium">
                     <span className="inline-flex items-center gap-1"><MousePointerClick className="w-3 h-3" />CTR</span>
                   </th>
-                  <th className="text-right py-2 pl-3 text-[#6B8A9A] font-medium">
+                  <th className="text-right py-2 pl-3 text-muted-foreground font-medium">
                     <span className="inline-flex items-center gap-1"><ArrowRightLeft className="w-3 h-3" />Conversions</span>
                   </th>
                 </tr>
               </thead>
               <tbody>
                 {posts.map((post, i) => (
-                  <tr key={i} className="border-b border-[#2D6A8F]/10 last:border-0 hover:bg-[#2D6A8F]/10 transition-colors">
+                  <tr key={i} className="border-b border-cg-slate/10 last:border-0 hover:bg-cg-slate/10 transition-colors">
                     <td className="py-2.5 pr-4 text-[#D0E4EC] font-medium max-w-[280px] truncate">{post.title}</td>
                     <td className="py-2.5 px-3 text-right text-[#D0E4EC]">{formatNumber(post.views)}</td>
                     <td className="py-2.5 px-3 text-right text-[#D0E4EC]">{post.avg_duration}s</td>
-                    <td className="py-2.5 px-3 text-right text-[#3DAA8A]">{(post.ctr * 100).toFixed(1)}%</td>
+                    <td className="py-2.5 px-3 text-right text-cg-sage">{(post.ctr * 100).toFixed(1)}%</td>
                     <td className="py-2.5 pl-3 text-right text-[#D0E4EC]">{formatNumber(post.conversions)}</td>
                   </tr>
                 ))}
@@ -297,7 +297,7 @@ function ContentTab() {
             data={current}
             priorData={prior.length === half && half > 0 ? prior : undefined}
             valueLabel="views"
-            color="#3DAA8A"
+            color="var(--cg-sage)"
             height={280}
             tooltip="Daily page views from GA4. Toggle 'Compare' to overlay the previous same-length window."
           />
@@ -359,22 +359,22 @@ function SEOTab() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#2D6A8F]/20">
-                  <th className="text-left py-2 pr-4 text-[#6B8A9A] font-medium">Query</th>
-                  <th className="text-right py-2 px-3 text-[#6B8A9A] font-medium">Position</th>
-                  <th className="text-right py-2 px-3 text-[#6B8A9A] font-medium">Impressions</th>
-                  <th className="text-right py-2 px-3 text-[#6B8A9A] font-medium">Clicks</th>
-                  <th className="text-right py-2 pl-3 text-[#6B8A9A] font-medium">CTR</th>
+                <tr className="border-b border-cg-slate/20">
+                  <th className="text-left py-2 pr-4 text-muted-foreground font-medium">Query</th>
+                  <th className="text-right py-2 px-3 text-muted-foreground font-medium">Position</th>
+                  <th className="text-right py-2 px-3 text-muted-foreground font-medium">Impressions</th>
+                  <th className="text-right py-2 px-3 text-muted-foreground font-medium">Clicks</th>
+                  <th className="text-right py-2 pl-3 text-muted-foreground font-medium">CTR</th>
                 </tr>
               </thead>
               <tbody>
                 {queries.map((q, i) => (
-                  <tr key={i} className="border-b border-[#2D6A8F]/10 last:border-0 hover:bg-[#2D6A8F]/10 transition-colors">
+                  <tr key={i} className="border-b border-cg-slate/10 last:border-0 hover:bg-cg-slate/10 transition-colors">
                     <td className="py-2.5 pr-4 text-[#D0E4EC] font-medium max-w-[280px] truncate">{q.query}</td>
                     <td className="py-2.5 px-3 text-right text-[#D0E4EC]">{q.position.toFixed(1)}</td>
                     <td className="py-2.5 px-3 text-right text-[#D0E4EC]">{formatNumber(q.impressions)}</td>
                     <td className="py-2.5 px-3 text-right text-[#D0E4EC]">{formatNumber(q.clicks)}</td>
-                    <td className="py-2.5 pl-3 text-right text-[#3DAA8A]">{(q.ctr * 100).toFixed(1)}%</td>
+                    <td className="py-2.5 pl-3 text-right text-cg-sage">{(q.ctr * 100).toFixed(1)}%</td>
                   </tr>
                 ))}
               </tbody>
@@ -392,22 +392,22 @@ function SEOTab() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#2D6A8F]/20">
-                  <th className="text-left py-2 pr-4 text-[#6B8A9A] font-medium">Page</th>
-                  <th className="text-right py-2 px-3 text-[#6B8A9A] font-medium">Position</th>
-                  <th className="text-right py-2 px-3 text-[#6B8A9A] font-medium">Impressions</th>
-                  <th className="text-right py-2 px-3 text-[#6B8A9A] font-medium">Clicks</th>
-                  <th className="text-right py-2 pl-3 text-[#6B8A9A] font-medium">CTR</th>
+                <tr className="border-b border-cg-slate/20">
+                  <th className="text-left py-2 pr-4 text-muted-foreground font-medium">Page</th>
+                  <th className="text-right py-2 px-3 text-muted-foreground font-medium">Position</th>
+                  <th className="text-right py-2 px-3 text-muted-foreground font-medium">Impressions</th>
+                  <th className="text-right py-2 px-3 text-muted-foreground font-medium">Clicks</th>
+                  <th className="text-right py-2 pl-3 text-muted-foreground font-medium">CTR</th>
                 </tr>
               </thead>
               <tbody>
                 {topPages.map((p, i) => (
-                  <tr key={i} className="border-b border-[#2D6A8F]/10 last:border-0 hover:bg-[#2D6A8F]/10 transition-colors">
+                  <tr key={i} className="border-b border-cg-slate/10 last:border-0 hover:bg-cg-slate/10 transition-colors">
                     <td className="py-2.5 pr-4 text-[#D0E4EC] font-medium max-w-[320px] truncate">{p.page}</td>
                     <td className="py-2.5 px-3 text-right text-[#D0E4EC]">{p.position.toFixed(1)}</td>
                     <td className="py-2.5 px-3 text-right text-[#D0E4EC]">{formatNumber(p.impressions)}</td>
                     <td className="py-2.5 px-3 text-right text-[#D0E4EC]">{formatNumber(p.clicks)}</td>
-                    <td className="py-2.5 pl-3 text-right text-[#3DAA8A]">{(p.ctr * 100).toFixed(1)}%</td>
+                    <td className="py-2.5 pl-3 text-right text-cg-sage">{(p.ctr * 100).toFixed(1)}%</td>
                   </tr>
                 ))}
               </tbody>
@@ -505,31 +505,31 @@ function SocialTab() {
                     live
                   </span>
                 ) : (
-                  <span className="text-[10px] font-medium text-[#6B8A9A] bg-[#0F2533]/80 border border-[#2D6A8F]/20 rounded px-1.5 py-0.5">
+                  <span className="text-[10px] font-medium text-muted-foreground bg-[#0F2533]/80 border border-cg-slate/20 rounded px-1.5 py-0.5">
                     no data
                   </span>
                 )}
               </div>
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-xs text-[#6B8A9A]">Followers</span>
+                  <span className="text-xs text-muted-foreground">Followers</span>
                   <span className="text-sm font-medium text-[#D0E4EC]">{formatNumber(p.followers)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-xs text-[#6B8A9A]">Impressions</span>
+                  <span className="text-xs text-muted-foreground">Impressions</span>
                   <span className="text-sm font-medium text-[#D0E4EC]">{formatNumber(p.impressions)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-xs text-[#6B8A9A]">Engagement</span>
-                  <span className="text-sm font-medium text-[#3DAA8A]">{formatNumber(p.engagement)}</span>
+                  <span className="text-xs text-muted-foreground">Engagement</span>
+                  <span className="text-sm font-medium text-cg-sage">{formatNumber(p.engagement)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-xs text-[#6B8A9A]">Referral Clicks</span>
+                  <span className="text-xs text-muted-foreground">Referral Clicks</span>
                   <span className="text-sm font-medium text-[#D0E4EC]">{formatNumber(p.referral_clicks)}</span>
                 </div>
-                <div className="flex justify-between pt-1 border-t border-[#2D6A8F]/20">
-                  <span className="text-xs text-[#6B8A9A]">Leads Generated</span>
-                  <span className="text-sm font-medium text-[#3DAA8A]">{formatNumber(p.leads_generated)}</span>
+                <div className="flex justify-between pt-1 border-t border-cg-slate/20">
+                  <span className="text-xs text-muted-foreground">Leads Generated</span>
+                  <span className="text-sm font-medium text-cg-sage">{formatNumber(p.leads_generated)}</span>
                 </div>
               </div>
             </Card>
@@ -549,7 +549,7 @@ function SocialTab() {
               <XAxis dataKey="platform" {...AXIS_PROPS} />
               <YAxis {...AXIS_PROPS} />
               <Tooltip contentStyle={TOOLTIP_STYLE} />
-              <Bar dataKey="visits" fill="#3DAA8A" radius={[4, 4, 0, 0]} name="Visits" />
+              <Bar dataKey="visits" fill="var(--cg-sage)" radius={[4, 4, 0, 0]} name="Visits" />
             </BarChart>
           </ResponsiveContainer>
         )}
@@ -593,20 +593,20 @@ function AttributionTab() {
       {/* Summary strip */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <Card>
-          <div className="text-xs text-[#6B8A9A] mb-1">Window</div>
+          <div className="text-xs text-muted-foreground mb-1">Window</div>
           <div className="text-lg font-semibold text-white">
             {data.period_days ?? 90} days
           </div>
         </Card>
         <Card>
-          <div className="text-xs text-[#6B8A9A] mb-1">Total Conversions</div>
+          <div className="text-xs text-muted-foreground mb-1">Total Conversions</div>
           <div className="text-lg font-semibold text-white">
             {formatNumber(data.total_conversions ?? 0)}
           </div>
         </Card>
         <Card>
-          <div className="text-xs text-[#6B8A9A] mb-1">Attributed MRR</div>
-          <div className="text-lg font-semibold text-[#3DAA8A]">
+          <div className="text-xs text-muted-foreground mb-1">Attributed MRR</div>
+          <div className="text-lg font-semibold text-cg-sage">
             ${formatNumber(Math.round(data.total_attributed_mrr ?? 0))}
           </div>
         </Card>
@@ -625,7 +625,7 @@ function AttributionTab() {
                 <XAxis type="number" {...AXIS_PROPS} />
                 <YAxis type="category" dataKey="channel" {...AXIS_PROPS} width={90} />
                 <Tooltip contentStyle={TOOLTIP_STYLE} />
-                <Bar dataKey="value" fill="#3DAA8A" radius={[0, 4, 4, 0]} name="Conversions" />
+                <Bar dataKey="value" fill="var(--cg-sage)" radius={[0, 4, 4, 0]} name="Conversions" />
               </BarChart>
             </ResponsiveContainer>
           )}
@@ -658,25 +658,25 @@ function AttributionTab() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#2D6A8F]/20">
-                  <th className="text-left py-2 pr-4 text-[#6B8A9A] font-medium">Channel</th>
-                  <th className="text-right py-2 px-3 text-[#6B8A9A] font-medium">Total Leads</th>
-                  <th className="text-right py-2 px-3 text-[#6B8A9A] font-medium">First Touch</th>
-                  <th className="text-right py-2 px-3 text-[#6B8A9A] font-medium">Last Touch</th>
-                  <th className="text-right py-2 px-3 text-[#6B8A9A] font-medium">Assisted</th>
-                  <th className="text-right py-2 px-3 text-[#6B8A9A] font-medium">Conv. Rate</th>
-                  <th className="text-right py-2 pl-3 text-[#6B8A9A] font-medium">Attr. MRR</th>
+                <tr className="border-b border-cg-slate/20">
+                  <th className="text-left py-2 pr-4 text-muted-foreground font-medium">Channel</th>
+                  <th className="text-right py-2 px-3 text-muted-foreground font-medium">Total Leads</th>
+                  <th className="text-right py-2 px-3 text-muted-foreground font-medium">First Touch</th>
+                  <th className="text-right py-2 px-3 text-muted-foreground font-medium">Last Touch</th>
+                  <th className="text-right py-2 px-3 text-muted-foreground font-medium">Assisted</th>
+                  <th className="text-right py-2 px-3 text-muted-foreground font-medium">Conv. Rate</th>
+                  <th className="text-right py-2 pl-3 text-muted-foreground font-medium">Attr. MRR</th>
                 </tr>
               </thead>
               <tbody>
                 {channels.map((ch, i) => (
-                  <tr key={i} className="border-b border-[#2D6A8F]/10 last:border-0 hover:bg-[#2D6A8F]/10 transition-colors">
+                  <tr key={i} className="border-b border-cg-slate/10 last:border-0 hover:bg-cg-slate/10 transition-colors">
                     <td className="py-2.5 pr-4 text-[#D0E4EC] font-medium">{ch.channel}</td>
                     <td className="py-2.5 px-3 text-right text-[#D0E4EC]">{formatNumber(ch.total_leads ?? 0)}</td>
                     <td className="py-2.5 px-3 text-right text-[#D0E4EC]">{formatNumber(ch.first_touch)}</td>
                     <td className="py-2.5 px-3 text-right text-[#D0E4EC]">{formatNumber(ch.last_touch)}</td>
                     <td className="py-2.5 px-3 text-right text-[#D0E4EC]">{formatNumber(ch.assisted)}</td>
-                    <td className="py-2.5 px-3 text-right text-[#3DAA8A]">{(ch.conversion_rate * 100).toFixed(1)}%</td>
+                    <td className="py-2.5 px-3 text-right text-cg-sage">{(ch.conversion_rate * 100).toFixed(1)}%</td>
                     <td className="py-2.5 pl-3 text-right text-[#D0E4EC]">${formatNumber(Math.round(ch.attributed_mrr ?? 0))}</td>
                   </tr>
                 ))}
@@ -716,15 +716,15 @@ function AIInsightsTab() {
   if (!generated) {
     return (
       <Card className="flex flex-col items-center justify-center py-16">
-        <Sparkles className="w-10 h-10 text-[#3DAA8A] mb-4" />
+        <Sparkles className="w-10 h-10 text-cg-sage mb-4" />
         <p className="text-[#D0E4EC] text-sm mb-1">Generate AI-powered marketing insights</p>
-        <p className="text-[#6B8A9A] text-xs mb-6 max-w-md text-center">
+        <p className="text-muted-foreground text-xs mb-6 max-w-md text-center">
           Analyze your marketing data to get content ideas, campaign suggestions, audience insights, and timing recommendations.
         </p>
         <button
           onClick={generate}
           disabled={loading}
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#3DAA8A] hover:bg-[#2E8B6E] text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-cg-sage hover:bg-[#2E8B6E] text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50"
         >
           {loading ? (
             <>
@@ -745,9 +745,9 @@ function AIInsightsTab() {
   if (loading) {
     return (
       <Card className="flex flex-col items-center justify-center py-16">
-        <Loader2 className="w-8 h-8 text-[#3DAA8A] animate-spin mb-4" />
+        <Loader2 className="w-8 h-8 text-cg-sage animate-spin mb-4" />
         <p className="text-[#D0E4EC] text-sm">Analyzing your marketing data...</p>
-        <p className="text-[#6B8A9A] text-xs mt-1">This may take a moment</p>
+        <p className="text-muted-foreground text-xs mt-1">This may take a moment</p>
       </Card>
     );
   }
@@ -764,7 +764,7 @@ function AIInsightsTab() {
       {/* Context + regenerate */}
       <div className="flex items-start justify-between gap-4 flex-wrap">
         {data.context && (
-          <div className="text-xs text-[#6B8A9A] bg-[#0F2533]/60 border border-[#2D6A8F]/20 rounded-lg px-3 py-2 flex-1 min-w-[280px]">
+          <div className="text-xs text-muted-foreground bg-[#0F2533]/60 border border-cg-slate/20 rounded-lg px-3 py-2 flex-1 min-w-[280px]">
             <span className="font-medium text-[#D0E4EC]">Grounded on: </span>
             {data.context.recent_signups_30d ?? 0} signups (30d),
             {' '}growth {data.context.growth_pct != null && data.context.growth_pct >= 0 ? '+' : ''}{data.context.growth_pct?.toFixed(1) ?? '0'}%
@@ -779,7 +779,7 @@ function AIInsightsTab() {
         <button
           onClick={generate}
           disabled={loading}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#6B8A9A] hover:text-white border border-[#2D6A8F]/30 hover:border-[#2D6A8F]/60 rounded-lg transition-colors disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-white border border-cg-slate/30 hover:border-cg-slate/60 rounded-lg transition-colors disabled:opacity-50"
         >
           <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
           Regenerate
@@ -798,7 +798,7 @@ function AIInsightsTab() {
           <ul className="space-y-2">
             {contentIdeas.map((idea, i) => (
               <li key={i} className="flex items-start gap-2 text-sm text-[#D0E4EC]">
-                <span className="text-[#3DAA8A] mt-0.5 shrink-0">-</span>
+                <span className="text-cg-sage mt-0.5 shrink-0">-</span>
                 {idea}
               </li>
             ))}
@@ -819,10 +819,10 @@ function AIInsightsTab() {
             {campaignSuggestions.map((s, i) => (
               <div
                 key={i}
-                className="bg-[#0F2533]/60 border border-[#2D6A8F]/15 rounded-lg p-4"
+                className="bg-[#0F2533]/60 border border-cg-slate/15 rounded-lg p-4"
               >
                 <h4 className="text-sm font-medium text-white mb-1">{s.title}</h4>
-                <p className="text-xs text-[#6B8A9A] leading-relaxed">{s.description}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">{s.description}</p>
               </div>
             ))}
           </div>
@@ -852,7 +852,7 @@ function AIInsightsTab() {
       {/* Timing Recommendations */}
       <Card>
         <div className="flex items-center gap-2 mb-4">
-          <CalendarClock className="w-4 h-4 text-[#3DAA8A]" />
+          <CalendarClock className="w-4 h-4 text-cg-sage" />
           <SectionTitle>Timing Recommendations</SectionTitle>
         </div>
         {timingRecs.length === 0 ? (
@@ -861,7 +861,7 @@ function AIInsightsTab() {
           <ul className="space-y-2">
             {timingRecs.map((rec, i) => (
               <li key={i} className="flex items-start gap-2 text-sm text-[#D0E4EC]">
-                <span className="text-[#3DAA8A] mt-0.5 shrink-0">-</span>
+                <span className="text-cg-sage mt-0.5 shrink-0">-</span>
                 {rec}
               </li>
             ))}
@@ -890,27 +890,27 @@ interface Ga4Status {
  */
 function ConnectGa4Card({ connectUrl, message }: { connectUrl?: string; message?: string }) {
   return (
-    <div className="rounded-xl border border-[#2D6A8F]/30 bg-gradient-to-br from-[#1A3648]/80 to-[#0F2533]/60 p-8 max-w-2xl mx-auto text-center">
-      <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[#3DAA8A]/10 border border-[#3DAA8A]/30 mb-4">
-        <PlugZap className="w-7 h-7 text-[#3DAA8A]" />
+    <div className="rounded-xl border border-cg-slate/30 bg-gradient-to-br from-[#1A3648]/80 to-[#0F2533]/60 p-8 max-w-2xl mx-auto text-center">
+      <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-cg-sage/10 border border-cg-sage/30 mb-4">
+        <PlugZap className="w-7 h-7 text-cg-sage" />
       </div>
       <h2 className="text-lg font-semibold text-white mb-2">
         Connect Google Analytics 4
       </h2>
-      <p className="text-sm text-[#6B8A9A] leading-relaxed mb-5">
+      <p className="text-sm text-muted-foreground leading-relaxed mb-5">
         {message ||
           'This page reads real content, SEO, social, and attribution data from GA4. Link your Google account to populate the tabs with live numbers — otherwise every tab shows sample data.'}
       </p>
       {connectUrl ? (
         <a
           href={connectUrl}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#3DAA8A] hover:bg-[#2E8A6E] text-white text-sm font-semibold transition-colors"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-cg-sage hover:bg-[#2E8A6E] text-white text-sm font-semibold transition-colors"
         >
           <Link2 className="w-4 h-4" />
           Connect GA4
         </a>
       ) : (
-        <p className="text-xs text-[#6B8A9A]">
+        <p className="text-xs text-muted-foreground">
           Ask an engineer to set <code className="text-[#D0E4EC]">GA4_*</code> env vars and restart the API.
         </p>
       )}
@@ -996,7 +996,7 @@ export default function MarketingAnalyticsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-xl font-bold text-white">Marketing Analytics</h1>
-        <p className="text-sm text-[#6B8A9A] mt-0.5">
+        <p className="text-sm text-muted-foreground mt-0.5">
           Content performance, SEO insights, social tracking, and attribution analysis
         </p>
       </div>
@@ -1005,7 +1005,7 @@ export default function MarketingAnalyticsPage() {
         <div
           className={`rounded-lg px-4 py-2.5 text-sm ${
             ga4Banner.kind === 'success'
-              ? 'bg-[#3DAA8A]/10 border border-[#3DAA8A]/40 text-[#9BD8C3]'
+              ? 'bg-cg-sage/10 border border-cg-sage/40 text-[#9BD8C3]'
               : 'bg-[#C15B5B]/10 border border-[#C15B5B]/40 text-[#E8A8A8]'
           }`}
         >
@@ -1014,7 +1014,7 @@ export default function MarketingAnalyticsPage() {
       )}
 
       {ga4Loading ? (
-        <div className="flex items-center gap-2 text-[#6B8A9A] text-sm py-12 justify-center">
+        <div className="flex items-center gap-2 text-muted-foreground text-sm py-12 justify-center">
           <Loader2 className="w-4 h-4 animate-spin" /> Checking GA4 connection…
         </div>
       ) : notConnected ? (

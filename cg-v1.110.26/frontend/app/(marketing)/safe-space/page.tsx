@@ -73,7 +73,7 @@ const features: {
     tagline: 'Exchanges without interaction',
     description:
       'GPS-verified custody exchanges with QR check-in. Both parents confirm the handoff happened — without needing to see, speak to, or text each other. Location, time, and confirmation are logged automatically for court.',
-    accent: '#3DAA8A',
+    accent: 'var(--cg-sage)',
   },
   {
     brandIcon: 'aria',
@@ -81,7 +81,7 @@ const features: {
     tagline: 'Communication without contact',
     description:
       'All messages stay inside CommonGround. No phone numbers exchanged. No direct contact. ARIA monitors for threatening language, documents patterns, and helps you respond to child-related logistics without engaging with manipulation.',
-    accent: '#2D6A8F',
+    accent: 'var(--cg-slate)',
   },
   {
     brandIcon: 'export',
@@ -89,7 +89,7 @@ const features: {
     tagline: 'Documentation that protects',
     description:
       'Every exchange, message, missed pickup, and schedule change is timestamped and exportable. When your attorney needs evidence of non-compliance or concerning behavior, you have a clean, organized record — not a shoebox of screenshots.',
-    accent: '#F5A623',
+    accent: 'var(--cg-amber)',
   },
 ];
 
@@ -260,14 +260,14 @@ export default function SafeSpacePage() {
       {/* ═══════════════════════════════════════════════════
           STORY — A short narrative that captivates
       ═══════════════════════════════════════════════════ */}
-      <section className="relative overflow-hidden py-20 lg:py-28 bg-gradient-to-b from-[#F4F8F7] to-white">
+      <section className="relative overflow-hidden py-20 lg:py-28 bg-gradient-to-b from-background to-white">
         <div className="max-w-3xl mx-auto px-6">
           <div className="text-center mb-16">
-            <p className="font-medium mb-3 tracking-wide uppercase text-sm" style={{ color: '#2D6A8F' }}>
+            <p className="font-medium mb-3 tracking-wide uppercase text-sm" style={{ color: 'var(--cg-slate)' }}>
               A day in the life
             </p>
             <h2
-              className="text-3xl sm:text-4xl lg:text-[2.75rem] text-[#1E3A4A] leading-[1.15]"
+              className="text-3xl sm:text-4xl lg:text-[2.75rem] text-foreground leading-[1.15]"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               The exchange where she
@@ -275,15 +275,15 @@ export default function SafeSpacePage() {
             </h2>
           </div>
           <div className="relative">
-            <div className="absolute left-[19px] top-3 bottom-3 w-px bg-gradient-to-b from-[#E85D75]/40 via-[#F5A623]/40 to-[#3DAA8A]/50" />
+            <div className="absolute left-[19px] top-3 bottom-3 w-px bg-gradient-to-b from-[#E85D75]/40 via-cg-amber/40 to-cg-sage/50" />
             <div className="space-y-10">
               {story.map((beat, i) => {
                 const dot =
                   beat.tone === 'before'
                     ? '#E85D75'
                     : beat.tone === 'turn'
-                    ? '#F5A623'
-                    : '#3DAA8A';
+                    ? 'var(--cg-amber)'
+                    : 'var(--cg-sage)';
                 return (
                   <div key={i} className="relative pl-14">
                     <div className="absolute left-0 top-0.5">
@@ -302,7 +302,7 @@ export default function SafeSpacePage() {
                     </span>
                     {beat.kicker ? (
                       <p
-                        className="text-xl sm:text-2xl text-[#1E3A4A] leading-relaxed"
+                        className="text-xl sm:text-2xl text-foreground leading-relaxed"
                         style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
                       >
                         {beat.text}

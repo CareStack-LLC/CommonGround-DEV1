@@ -142,7 +142,7 @@ function ListEditor({
         {items.map((item, index) => (
           <span
             key={index}
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#F4F8F7] text-[#1E3A4A] text-xs font-medium border border-[#3DAA8A]/20"
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-background text-foreground text-xs font-medium border border-cg-sage/20"
           >
             {item}
             <button aria-label="Remove"
@@ -159,7 +159,7 @@ function ListEditor({
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           placeholder={placeholder}
-          className="h-9 text-sm border-slate-200 focus:border-[#3DAA8A] focus:ring-[#3DAA8A]/20"
+          className="h-9 text-sm border-slate-200 focus:border-cg-sage focus:ring-cg-sage/20"
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               e.preventDefault();
@@ -174,7 +174,7 @@ function ListEditor({
           type="button"
           size="sm"
           variant="outline"
-          className="h-9 px-4 border-slate-200 hover:bg-[#F4F8F7] hover:border-[#3DAA8A]/30 text-sm"
+          className="h-9 px-4 border-slate-200 hover:bg-background hover:border-cg-sage/30 text-sm"
           onClick={() => {
             if (inputValue.trim()) {
               onAdd(inputValue.trim());
@@ -211,7 +211,7 @@ function ComplexListEditor<T extends Record<string, any>>({
         {items.map((item, index) => (
           <div
             key={index}
-            className="flex items-center justify-between p-3 bg-[#F4F8F7]/50 rounded-xl border border-slate-100"
+            className="flex items-center justify-between p-3 bg-background/50 rounded-xl border border-slate-100"
           >
             <div className="text-sm">
               {fields.map((f, i) => (
@@ -247,14 +247,14 @@ function ComplexListEditor<T extends Record<string, any>>({
                 setNewValues((v) => ({ ...v, [f.key]: e.target.value }))
               }
               placeholder={f.placeholder}
-              className="h-8 text-xs border-slate-200 focus:border-[#3DAA8A]"
+              className="h-8 text-xs border-slate-200 focus:border-cg-sage"
             />
           </div>
         ))}
         <div className="flex items-end">
           <Button
             size="sm"
-            className="w-full h-8 bg-[#1E3A4A] hover:bg-[#2D6A8F] text-white text-xs"
+            className="w-full h-8 bg-foreground hover:bg-cg-slate text-white text-xs"
             onClick={() => {
               if (Object.values(newValues).some((v) => v)) {
                 onAdd(newValues);
@@ -294,7 +294,7 @@ function SocialLinksEditor({
             value={links[sn.id] || ""}
             onChange={(e) => onChange({ ...links, [sn.id]: e.target.value })}
             placeholder={`${sn.label} URL`}
-            className="pl-10 h-10 border-slate-200 focus:border-[#3DAA8A] focus:ring-[#3DAA8A]/20 text-sm"
+            className="pl-10 h-10 border-slate-200 focus:border-cg-sage focus:ring-cg-sage/20 text-sm"
           />
         </div>
       ))}
@@ -353,7 +353,7 @@ function DirectoryCardPreview({
         {/* Badges */}
         <div className="absolute top-3 left-3 z-30 flex flex-col gap-2">
           {firmFormData.safety_vetted && (
-            <Badge className="bg-[#3DAA8A] text-white gap-1 border-0 shadow-sm text-[10px]">
+            <Badge className="bg-cg-sage text-white gap-1 border-0 shadow-sm text-[10px]">
               <ShieldCheck className="w-3 h-3" />
               Safety Vetted
             </Badge>
@@ -371,13 +371,13 @@ function DirectoryCardPreview({
             {firmName || "Your Firm Name"}
           </h3>
           {firmFormData.headline && (
-            <p className="text-[11px] font-bold text-[#3DAA8A] mb-2 mt-1 tracking-wide uppercase">
+            <p className="text-[11px] font-bold text-cg-sage mb-2 mt-1 tracking-wide uppercase">
               {firmFormData.headline}
             </p>
           )}
           {firmFormData.service_location && (
             <div className="flex items-center gap-1.5 text-xs text-slate-500 font-medium mb-3">
-              <MapPin className="w-3 h-3 text-[#3DAA8A]" />
+              <MapPin className="w-3 h-3 text-cg-sage" />
               <span>{firmFormData.service_location}</span>
             </div>
           )}
@@ -392,7 +392,7 @@ function DirectoryCardPreview({
             {firmFormData.practice_areas.slice(0, 3).map((area) => (
               <span
                 key={area}
-                className="px-2.5 py-0.5 rounded-full bg-[#F4F8F7] text-[#3DAA8A] text-[10px] font-bold border border-[#3DAA8A]/10"
+                className="px-2.5 py-0.5 rounded-full bg-background text-cg-sage text-[10px] font-bold border border-cg-sage/10"
               >
                 {area}
               </span>
@@ -407,7 +407,7 @@ function DirectoryCardPreview({
       </CardContent>
 
       <CardFooter className="p-5 pt-0 mt-auto">
-        <div className="w-full rounded-full bg-[#3DAA8A] text-white text-center py-2.5 text-sm font-bold opacity-60 cursor-default">
+        <div className="w-full rounded-full bg-cg-sage text-white text-center py-2.5 text-sm font-bold opacity-60 cursor-default">
           View Profile
         </div>
       </CardFooter>
@@ -429,7 +429,7 @@ function TeamMemberPreview({
 
   return (
     <div className="flex items-start gap-3 p-3 rounded-xl bg-white border border-slate-100">
-      <div className="w-11 h-11 rounded-full bg-[#F4F8F7] flex items-center justify-center shrink-0 overflow-hidden border border-slate-200">
+      <div className="w-11 h-11 rounded-full bg-background flex items-center justify-center shrink-0 overflow-hidden border border-slate-200">
         {formData.headshot_url ? (
           <img
             src={formData.headshot_url.startsWith("http") ? formData.headshot_url : `${API_BASE}${formData.headshot_url}`}
@@ -444,7 +444,7 @@ function TeamMemberPreview({
         <p className="text-sm font-semibold text-slate-900 truncate">{displayName || "Your Name"}</p>
         <p className="text-[11px] text-slate-500">{typeInfo?.label}</p>
         {formData.headline && (
-          <p className="text-[11px] text-[#3DAA8A] mt-0.5 truncate">{formData.headline}</p>
+          <p className="text-[11px] text-cg-sage mt-0.5 truncate">{formData.headline}</p>
         )}
       </div>
     </div>
@@ -466,9 +466,9 @@ function FormSection({
 }) {
   return (
     <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
-      <div className="px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-[#F4F8F7]/60 to-white">
+      <div className="px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-background/60 to-white">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-[#1E3A4A] flex items-center justify-center">
+          <div className="w-8 h-8 rounded-lg bg-foreground flex items-center justify-center">
             <Icon className="h-4 w-4 text-white" />
           </div>
           <div>
@@ -663,7 +663,7 @@ export default function ProfilePage() {
   if (!profile) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <Loader2 className="h-8 w-8 animate-spin text-[#3DAA8A]" />
+        <Loader2 className="h-8 w-8 animate-spin text-cg-sage" />
       </div>
     );
   }
@@ -683,9 +683,9 @@ export default function ProfilePage() {
               Manage how parents find and see you in the CommonGround directory
             </p>
           </div>
-          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#F4F8F7] border border-[#3DAA8A]/20">
-            <Eye className="h-3.5 w-3.5 text-[#3DAA8A]" />
-            <span className="text-xs font-medium text-[#1E3A4A]">Live Preview</span>
+          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-background border border-cg-sage/20">
+            <Eye className="h-3.5 w-3.5 text-cg-sage" />
+            <span className="text-xs font-medium text-foreground">Live Preview</span>
           </div>
         </div>
       </div>
@@ -696,7 +696,7 @@ export default function ProfilePage() {
           onClick={() => setActiveTab("profile")}
           className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all ${
             activeTab === "profile"
-              ? "bg-white text-[#1E3A4A] shadow-sm"
+              ? "bg-white text-foreground shadow-sm"
               : "text-slate-500 hover:text-slate-700"
           }`}
         >
@@ -707,7 +707,7 @@ export default function ProfilePage() {
           onClick={() => setActiveTab("firm")}
           className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all ${
             activeTab === "firm"
-              ? "bg-white text-[#1E3A4A] shadow-sm"
+              ? "bg-white text-foreground shadow-sm"
               : "text-slate-500 hover:text-slate-700"
           }`}
         >
@@ -751,7 +751,7 @@ export default function ProfilePage() {
                         value={formData.headline}
                         onChange={(e) => setFormData((prev) => ({ ...prev, headline: e.target.value }))}
                         placeholder="e.g. Board Certified Family Law Specialist"
-                        className="border-slate-200 focus:border-[#3DAA8A] focus:ring-[#3DAA8A]/20"
+                        className="border-slate-200 focus:border-cg-sage focus:ring-cg-sage/20"
                         maxLength={150}
                       />
                       <p className="text-[11px] text-slate-400">Appears below your name on the team page</p>
@@ -764,7 +764,7 @@ export default function ProfilePage() {
                           value={formData.years_experience}
                           onChange={(e) => setFormData((prev) => ({ ...prev, years_experience: e.target.value }))}
                           placeholder="0"
-                          className="border-slate-200 focus:border-[#3DAA8A]"
+                          className="border-slate-200 focus:border-cg-sage"
                         />
                       </div>
                       <div className="space-y-2">
@@ -773,7 +773,7 @@ export default function ProfilePage() {
                           value={formData.service_location}
                           onChange={(e) => setFormData((prev) => ({ ...prev, service_location: e.target.value }))}
                           placeholder="e.g. Los Angeles, CA"
-                          className="border-slate-200 focus:border-[#3DAA8A]"
+                          className="border-slate-200 focus:border-cg-sage"
                         />
                       </div>
                     </div>
@@ -787,7 +787,7 @@ export default function ProfilePage() {
                   value={formData.bio}
                   onChange={(e) => setFormData((prev) => ({ ...prev, bio: e.target.value }))}
                   placeholder="Tell parents about your approach to family law, your experience with high-conflict cases, and what makes your practice different..."
-                  className="min-h-[140px] border-slate-200 focus:border-[#3DAA8A] focus:ring-[#3DAA8A]/20 text-sm leading-relaxed resize-y"
+                  className="min-h-[140px] border-slate-200 focus:border-cg-sage focus:ring-cg-sage/20 text-sm leading-relaxed resize-y"
                 />
               </FormSection>
 
@@ -800,8 +800,8 @@ export default function ProfilePage() {
                       onClick={() => togglePracticeArea(area)}
                       className={`px-3.5 py-2 rounded-full text-sm font-medium transition-all capitalize ${
                         formData.practice_areas.includes(area)
-                          ? "bg-[#1E3A4A] text-white shadow-sm"
-                          : "bg-slate-50 text-slate-600 border border-slate-200 hover:border-[#3DAA8A]/40 hover:bg-[#F4F8F7]"
+                          ? "bg-foreground text-white shadow-sm"
+                          : "bg-slate-50 text-slate-600 border border-slate-200 hover:border-cg-sage/40 hover:bg-background"
                       }`}
                     >
                       {area.replace(/_/g, " ")}
@@ -858,7 +858,7 @@ export default function ProfilePage() {
                 <Button
                   onClick={handleSaveProfile}
                   disabled={isSaving}
-                  className="bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white px-8 h-11 rounded-xl shadow-sm font-semibold"
+                  className="bg-cg-sage hover:bg-[#2D8A6E] text-white px-8 h-11 rounded-xl shadow-sm font-semibold"
                 >
                   {isSaving ? (
                     <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Saving...</>
@@ -867,7 +867,7 @@ export default function ProfilePage() {
                   )}
                 </Button>
                 {saveSuccess && (
-                  <span className="text-sm font-medium text-[#3DAA8A] flex items-center gap-1.5 animate-in fade-in">
+                  <span className="text-sm font-medium text-cg-sage flex items-center gap-1.5 animate-in fade-in">
                     <CheckCircle2 className="h-4 w-4" /> Saved
                   </span>
                 )}
@@ -914,7 +914,7 @@ export default function ProfilePage() {
                             value={firmFormData.headline}
                             onChange={(e) => setFirmFormData((p) => ({ ...p, headline: e.target.value }))}
                             placeholder="e.g. Leading Family Law Firm in California"
-                            className="border-slate-200 focus:border-[#3DAA8A] focus:ring-[#3DAA8A]/20"
+                            className="border-slate-200 focus:border-cg-sage focus:ring-cg-sage/20"
                           />
                           <p className="text-[11px] text-slate-400">Appears below your firm name on the directory card</p>
                         </div>
@@ -924,7 +924,7 @@ export default function ProfilePage() {
                             value={firmFormData.service_location}
                             onChange={(e) => setFirmFormData((p) => ({ ...p, service_location: e.target.value }))}
                             placeholder="e.g. Greater Los Angeles Area"
-                            className="border-slate-200 focus:border-[#3DAA8A]"
+                            className="border-slate-200 focus:border-cg-sage"
                           />
                         </div>
                       </div>
@@ -937,7 +937,7 @@ export default function ProfilePage() {
                       value={firmFormData.description}
                       onChange={(e) => setFirmFormData((p) => ({ ...p, description: e.target.value }))}
                       placeholder="Describe your firm's approach to family law, specializations, and what sets you apart..."
-                      className="min-h-[120px] border-slate-200 focus:border-[#3DAA8A] focus:ring-[#3DAA8A]/20 text-sm leading-relaxed resize-y"
+                      className="min-h-[120px] border-slate-200 focus:border-cg-sage focus:ring-cg-sage/20 text-sm leading-relaxed resize-y"
                     />
                   </FormSection>
 
@@ -950,8 +950,8 @@ export default function ProfilePage() {
                           onClick={() => toggleFirmPracticeArea(area)}
                           className={`px-3.5 py-2 rounded-full text-sm font-medium transition-all ${
                             firmFormData.practice_areas.includes(area)
-                              ? "bg-[#1E3A4A] text-white shadow-sm"
-                              : "bg-slate-50 text-slate-600 border border-slate-200 hover:border-[#3DAA8A]/40 hover:bg-[#F4F8F7]"
+                              ? "bg-foreground text-white shadow-sm"
+                              : "bg-slate-50 text-slate-600 border border-slate-200 hover:border-cg-sage/40 hover:bg-background"
                           }`}
                         >
                           {area}
@@ -977,7 +977,7 @@ export default function ProfilePage() {
                       ].map((item) => (
                         <label
                           key={item.key}
-                          className="flex items-center justify-between p-4 rounded-xl bg-[#F4F8F7]/50 border border-slate-100 hover:border-[#3DAA8A]/20 transition-colors cursor-pointer"
+                          className="flex items-center justify-between p-4 rounded-xl bg-background/50 border border-slate-100 hover:border-cg-sage/20 transition-colors cursor-pointer"
                         >
                           <div>
                             <p className="text-sm font-semibold text-slate-800">{item.label}</p>
@@ -989,7 +989,7 @@ export default function ProfilePage() {
                             onChange={(e) =>
                               setFirmFormData((p) => ({ ...p, [item.key]: e.target.checked }))
                             }
-                            className="h-5 w-5 rounded border-slate-300 text-[#3DAA8A] focus:ring-[#3DAA8A]/20"
+                            className="h-5 w-5 rounded border-slate-300 text-cg-sage focus:ring-cg-sage/20"
                           />
                         </label>
                       ))}
@@ -1001,7 +1001,7 @@ export default function ProfilePage() {
                     <Button
                       onClick={handleSaveFirm}
                       disabled={isSavingFirm}
-                      className="bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white px-8 h-11 rounded-xl shadow-sm font-semibold"
+                      className="bg-cg-sage hover:bg-[#2D8A6E] text-white px-8 h-11 rounded-xl shadow-sm font-semibold"
                     >
                       {isSavingFirm ? (
                         <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Saving...</>
@@ -1010,7 +1010,7 @@ export default function ProfilePage() {
                       )}
                     </Button>
                     {firmSaveSuccess && (
-                      <span className="text-sm font-medium text-[#3DAA8A] flex items-center gap-1.5 animate-in fade-in">
+                      <span className="text-sm font-medium text-cg-sage flex items-center gap-1.5 animate-in fade-in">
                         <CheckCircle2 className="h-4 w-4" /> Published to directory
                       </span>
                     )}
@@ -1027,7 +1027,7 @@ export default function ProfilePage() {
             {/* Preview Header */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-[#3DAA8A] animate-pulse" />
+                <div className="w-2 h-2 rounded-full bg-cg-sage animate-pulse" />
                 <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                   Live Preview
                 </span>
@@ -1055,11 +1055,11 @@ export default function ProfilePage() {
             </div>
 
             {/* Tip */}
-            <div className="p-4 rounded-xl bg-[#F4F8F7] border border-[#3DAA8A]/10">
+            <div className="p-4 rounded-xl bg-background border border-cg-sage/10">
               <div className="flex gap-3">
-                <Sparkles className="h-4 w-4 text-[#3DAA8A] shrink-0 mt-0.5" />
+                <Sparkles className="h-4 w-4 text-cg-sage shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-xs font-semibold text-[#1E3A4A]">Profile completeness matters</p>
+                  <p className="text-xs font-semibold text-foreground">Profile completeness matters</p>
                   <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">
                     Firms with a logo, headline, description, and practice areas get 3x more views from parents.
                   </p>

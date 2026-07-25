@@ -9,7 +9,7 @@ const COLORS = [
   { name: 'Orange', value: '#F97316' },
   { name: 'Yellow', value: '#EAB308' },
   { name: 'Green', value: '#22C55E' },
-  { name: 'Cyan', value: '#4BA8C8' },
+  { name: 'Cyan', value: 'var(--cg-slate-light)' },
   { name: 'Blue', value: '#3B82F6' },
   { name: 'Purple', value: '#A855F7' },
   { name: 'Pink', value: '#EC4899' },
@@ -139,9 +139,9 @@ export function DrawingPad() {
                   onClick={() => setBrushSize(size.value)}
                   className={cn(
                     'w-8 h-8 rounded-lg text-xs font-bold transition-all duration-200',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4BA8C8]',
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cg-slate-light',
                     brushSize === size.value
-                      ? 'bg-[#4BA8C8] text-white shadow-lg shadow-[#4BA8C8]/30'
+                      ? 'bg-cg-slate-light text-white shadow-lg shadow-cg-slate-light/30'
                       : ''
                   )}
                 >
@@ -189,8 +189,8 @@ export function DrawingPad() {
                   className={cn(
                     'w-9 h-9 rounded-full transition-all duration-200',
                     'hover:scale-110 active:scale-95',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4BA8C8]',
-                    currentColor === color.value && 'ring-2 ring-[#4BA8C8] ring-offset-2 ring-offset-slate-800'
+                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cg-slate-light',
+                    currentColor === color.value && 'ring-2 ring-cg-slate-light ring-offset-2 ring-offset-slate-800'
                   )}
                   style={{ backgroundColor: color.value }}
                   aria-label={color.name}

@@ -174,8 +174,8 @@ export default function EventSilentHandoffCheckIn({
                 <Card className="w-full max-w-md max-h-[90vh] bg-background flex flex-col">
                     <CardContent className="p-6 overflow-y-auto">
                         <div className="text-center">
-                            <div className="mx-auto w-16 h-16 rounded-full bg-[#E8F4F0] dark:bg-[#1E3A4A]/30 flex items-center justify-center mb-4">
-                                <CheckCircle className="h-8 w-8 text-[#2D8A70]" />
+                            <div className="mx-auto w-16 h-16 rounded-full bg-cg-sage-subtle dark:bg-foreground/30 flex items-center justify-center mb-4">
+                                <CheckCircle className="h-8 w-8 text-cg-sage-dark" />
                             </div>
 
                             <h2 className="text-xl font-bold text-foreground mb-2">Check-in Successful</h2>
@@ -201,7 +201,7 @@ export default function EventSilentHandoffCheckIn({
                     {/* Header */}
                     <div className="flex items-center justify-between mb-6">
                         <div className="flex items-center gap-2">
-                            <Navigation className="h-6 w-6 text-[#2D6A8F]" />
+                            <Navigation className="h-6 w-6 text-cg-slate" />
                             <h2 className="text-xl font-bold text-foreground">Silent Handoff Check-in</h2>
                         </div>
                         <button aria-label="Close"
@@ -217,12 +217,12 @@ export default function EventSilentHandoffCheckIn({
                         <p className="font-semibold text-foreground text-lg">{event.title}</p>
                         {event.location && (
                             <p className="text-sm text-foreground flex items-center gap-2">
-                                <MapPin className="h-4 w-4 flex-shrink-0 text-[#2D6A8F]" />
+                                <MapPin className="h-4 w-4 flex-shrink-0 text-cg-slate" />
                                 {event.location}
                             </p>
                         )}
                         <p className="text-sm text-foreground flex items-center gap-2">
-                            <Clock className="h-4 w-4 flex-shrink-0 text-[#2D6A8F]" />
+                            <Clock className="h-4 w-4 flex-shrink-0 text-cg-slate" />
                             {formatTime(event.start_time)}
                         </p>
                     </div>
@@ -231,25 +231,25 @@ export default function EventSilentHandoffCheckIn({
                     {windowStatus && (
                         <div className="mb-6">
                             {windowStatus.is_within_window ? (
-                                <div className="bg-[#E8F4F0] dark:bg-[#1E3A4A]/30 border border-[#5BC4A0] dark:border-[#2D8A70] rounded-lg p-3">
-                                    <p className="text-[#1E3A4A] dark:text-[#5BC4A0] font-medium">
+                                <div className="bg-cg-sage-subtle dark:bg-foreground/30 border border-cg-sage-light dark:border-cg-sage-dark rounded-lg p-3">
+                                    <p className="text-foreground dark:text-cg-sage-light font-medium">
                                         Check-in window is open
                                     </p>
-                                    <p className="text-sm text-[#2D8A70] dark:text-[#5BC4A0]">
+                                    <p className="text-sm text-cg-sage-dark dark:text-cg-sage-light">
                                         {formatMinutesHumanReadable(windowStatus.minutes_remaining)} remaining
                                     </p>
                                 </div>
                             ) : windowStatus.is_before_window ? (
-                                <div className="bg-[#FEF7ED] dark:bg-[#1E3A4A]/30 border border-[#F5A623] dark:border-[#E09520] rounded-lg p-3">
-                                    <p className="text-[#E09520] dark:text-[#F5A623] font-medium">
+                                <div className="bg-cg-amber-subtle dark:bg-foreground/30 border border-cg-amber dark:border-[#E09520] rounded-lg p-3">
+                                    <p className="text-[#E09520] dark:text-cg-amber font-medium">
                                         Check-in window opens soon
                                     </p>
-                                    <p className="text-sm text-[#E09520] dark:text-[#F5A623]">
+                                    <p className="text-sm text-[#E09520] dark:text-cg-amber">
                                         In {formatMinutesHumanReadable(windowStatus.minutes_until_window)}
                                     </p>
                                 </div>
                             ) : (
-                                <div className="bg-[#FEE2E2] dark:bg-[#7A2222]/30 border border-[#FCA5A5] dark:border-[#9B2C2C] rounded-lg p-3">
+                                <div className="bg-cg-error-subtle dark:bg-[#7A2222]/30 border border-[#FCA5A5] dark:border-[#9B2C2C] rounded-lg p-3">
                                     <p className="text-[#9B2C2C] dark:text-[#FCA5A5] font-medium">
                                         Check-in window has closed
                                     </p>
@@ -260,7 +260,7 @@ export default function EventSilentHandoffCheckIn({
 
                     {/* Geolocation Support */}
                     {!isSupported && (
-                        <div className="bg-[#FEE2E2] dark:bg-[#7A2222]/30 border border-[#FCA5A5] dark:border-[#9B2C2C] rounded-lg p-3 mb-6">
+                        <div className="bg-cg-error-subtle dark:bg-[#7A2222]/30 border border-[#FCA5A5] dark:border-[#9B2C2C] rounded-lg p-3 mb-6">
                             <p className="text-[#9B2C2C] dark:text-[#FCA5A5]">
                                 GPS location is not supported in your browser.
                             </p>
@@ -269,14 +269,14 @@ export default function EventSilentHandoffCheckIn({
 
                     {/* GPS Error */}
                     {geoError && (
-                        <div className="bg-[#FEE2E2] dark:bg-[#7A2222]/30 border border-[#FCA5A5] dark:border-[#9B2C2C] rounded-lg p-3 mb-6">
+                        <div className="bg-cg-error-subtle dark:bg-[#7A2222]/30 border border-[#FCA5A5] dark:border-[#9B2C2C] rounded-lg p-3 mb-6">
                             <p className="text-[#9B2C2C] dark:text-[#FCA5A5]">{geoError.message}</p>
                         </div>
                     )}
 
                     {/* Check-in Error */}
                     {checkInError && (
-                        <div className="bg-[#FEE2E2] dark:bg-[#7A2222]/30 border border-[#FCA5A5] dark:border-[#9B2C2C] rounded-lg p-3 mb-6">
+                        <div className="bg-cg-error-subtle dark:bg-[#7A2222]/30 border border-[#FCA5A5] dark:border-[#9B2C2C] rounded-lg p-3 mb-6">
                             <p className="text-[#9B2C2C] dark:text-[#FCA5A5]">{checkInError}</p>
                         </div>
                     )}
@@ -316,7 +316,7 @@ export default function EventSilentHandoffCheckIn({
                             <Button
                                 onClick={handleCheckIn}
                                 disabled={!isSupported || isCheckingIn || geoLoading || (windowStatus !== null && !windowStatus.is_within_window)}
-                                className="flex-1 bg-[#2D6A8F] hover:bg-[#1E4E6B]"
+                                className="flex-1 bg-cg-slate hover:bg-[#1E4E6B]"
                             >
                                 {isCheckingIn || geoLoading ? (
                                     <>
@@ -358,7 +358,7 @@ export default function EventSilentHandoffCheckIn({
                                 }}
                                 disabled={isCheckingIn || (windowStatus !== null && !windowStatus.is_within_window)}
                                 variant="outline"
-                                className="w-full border-[#F5A623] text-[#E09520] hover:bg-[#FEF7ED]"
+                                className="w-full border-cg-amber text-[#E09520] hover:bg-cg-amber-subtle"
                             >
                                 🧪 Test: Check In at Event Location
                             </Button>

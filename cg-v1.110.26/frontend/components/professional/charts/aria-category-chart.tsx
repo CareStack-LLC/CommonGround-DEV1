@@ -16,11 +16,11 @@ interface ARIACategoryChartProps {
 }
 
 const CATEGORY_COLORS: Record<string, string> = {
-  hostility: "#C53030",
-  blame: "#F5A623",
-  "passive-aggressive": "#F5A623",
-  profanity: "#C53030",
-  dismissive: "#F5A623",
+  hostility: "var(--cg-error)",
+  blame: "var(--cg-amber)",
+  "passive-aggressive": "var(--cg-amber)",
+  profanity: "var(--cg-error)",
+  dismissive: "var(--cg-amber)",
   controlling: "#E09520",
   threatening: "#9B2C2C",
   sarcasm: "#F7B84D",
@@ -54,7 +54,7 @@ export function ARIACategoryChart({ data, totalMessages = 0 }: ARIACategoryChart
       <div className="p-6">
         <div className="flex items-start justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-gradient-to-br from-[#F5A623] to-[#E09520] text-white rounded-xl shadow-lg shadow-[#F5A623]/20">
+            <div className="p-3 bg-gradient-to-br from-cg-amber to-[#E09520] text-white rounded-xl shadow-lg shadow-cg-amber/20">
               <AlertTriangle className="h-5 w-5" />
             </div>
             <div>

@@ -145,7 +145,7 @@ export default function ContactParentChatPage() {
           </p>
         </div>
         {unreadBadge > 0 && (
-          <span className="ml-2 min-w-[20px] h-5 px-1.5 rounded-full bg-[#3DAA8A] text-white text-[10px] font-semibold flex items-center justify-center">
+          <span className="ml-2 min-w-[20px] h-5 px-1.5 rounded-full bg-cg-sage text-white text-[10px] font-semibold flex items-center justify-center">
             {unreadBadge}
           </span>
         )}
@@ -207,7 +207,7 @@ export default function ContactParentChatPage() {
             }
             maxLength={2000}
             disabled={isSending || isClosed}
-            className="flex-1 px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:ring-2 focus:ring-[#3DAA8A] focus:border-transparent outline-none transition-colors disabled:opacity-50"
+            className="flex-1 px-4 py-3 rounded-xl border border-border bg-background text-foreground focus:ring-2 focus:ring-cg-sage focus:border-transparent outline-none transition-colors disabled:opacity-50"
           />
           <button
             onClick={() => handleSend()}
@@ -215,7 +215,7 @@ export default function ContactParentChatPage() {
             className={cn(
               'p-3 rounded-xl transition-all',
               newMessage.trim() && !isClosed && !isSending
-                ? 'bg-[#3DAA8A] text-white hover:bg-[#2D6A8F] active:scale-95'
+                ? 'bg-cg-sage text-white hover:bg-cg-slate active:scale-95'
                 : 'bg-muted text-muted-foreground cursor-not-allowed'
             )}
             aria-label="Send message"
@@ -254,7 +254,7 @@ function Bubble({
       <div className={cn('flex', isMine ? 'justify-end' : 'justify-start')}>
         <div className="max-w-[75%] px-4 py-2.5 rounded-2xl bg-muted border border-border">
           <div className="flex items-center gap-1.5">
-            <Shield className="w-3.5 h-3.5 text-[#3DAA8A]" />
+            <Shield className="w-3.5 h-3.5 text-cg-sage" />
             <p className="text-sm italic text-muted-foreground">
               ARIA filtered this message
             </p>
@@ -273,13 +273,13 @@ function Bubble({
         className={cn(
           'max-w-[75%] px-4 py-2.5 rounded-2xl',
           isMine
-            ? 'bg-[#3DAA8A] text-white'
+            ? 'bg-cg-sage text-white'
             : 'bg-muted text-foreground border border-border'
         )}
       >
         {!isMine && (
           <p
-            className="text-xs font-semibold mb-0.5 text-[#3DAA8A]"
+            className="text-xs font-semibold mb-0.5 text-cg-sage"
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
           >
             {message.sender_name}

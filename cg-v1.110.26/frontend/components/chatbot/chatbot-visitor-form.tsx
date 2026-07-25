@@ -29,7 +29,7 @@ export function ChatbotVisitorForm({ onSubmit, onSkip }: ChatbotVisitorFormProps
           placeholder="Your name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="h-8 text-sm px-3 rounded-md border border-gray-300 bg-white text-gray-800 placeholder:text-gray-400 outline-none focus:border-[#3DAA8A] focus:ring-1 focus:ring-[#3DAA8A]/30"
+          className="h-8 text-sm px-3 rounded-md border border-gray-300 bg-white text-gray-800 placeholder:text-gray-400 outline-none focus:border-cg-sage focus:ring-1 focus:ring-cg-sage/30"
           required
         />
         <input
@@ -37,7 +37,7 @@ export function ChatbotVisitorForm({ onSubmit, onSkip }: ChatbotVisitorFormProps
           placeholder="Email address"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="h-8 text-sm px-3 rounded-md border border-gray-300 bg-white text-gray-800 placeholder:text-gray-400 outline-none focus:border-[#3DAA8A] focus:ring-1 focus:ring-[#3DAA8A]/30"
+          className="h-8 text-sm px-3 rounded-md border border-gray-300 bg-white text-gray-800 placeholder:text-gray-400 outline-none focus:border-cg-sage focus:ring-1 focus:ring-cg-sage/30"
           required
         />
         <input
@@ -45,13 +45,13 @@ export function ChatbotVisitorForm({ onSubmit, onSkip }: ChatbotVisitorFormProps
           placeholder="Phone (optional)"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          className="h-8 text-sm px-3 rounded-md border border-gray-300 bg-white text-gray-800 placeholder:text-gray-400 outline-none focus:border-[#3DAA8A] focus:ring-1 focus:ring-[#3DAA8A]/30"
+          className="h-8 text-sm px-3 rounded-md border border-gray-300 bg-white text-gray-800 placeholder:text-gray-400 outline-none focus:border-cg-sage focus:ring-1 focus:ring-cg-sage/30"
         />
         <div className="flex gap-2 mt-1">
           <Button
             type="submit"
             size="sm"
-            className="flex-1 h-8 text-xs bg-[#3DAA8A] hover:bg-[#35977a] text-white"
+            className="flex-1 h-8 text-xs bg-cg-sage hover:bg-[#35977a] text-white"
           >
             Submit
           </Button>

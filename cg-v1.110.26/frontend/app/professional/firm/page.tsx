@@ -195,10 +195,10 @@ export default function FirmSettingsPage() {
           <p className="text-sm text-slate-500 mt-1">Manage your firm profile and preferences</p>
         </div>
         <div className="flex items-center gap-2">
-          <Badge className="bg-[#3DAA8A]/10 text-[#1E3A4A] border-0 text-xs font-medium">
+          <Badge className="bg-cg-sage/10 text-foreground border-0 text-xs font-medium">
             {firm?.subscription_tier === "professional" ? "Professional" : firm?.subscription_tier}
           </Badge>
-          <Badge className={`text-xs ${firm?.subscription_status === "active" ? "bg-[#E8F4F0] text-[#2D8A70] border-0" : "bg-slate-100 text-slate-600 border-0"}`}>
+          <Badge className={`text-xs ${firm?.subscription_status === "active" ? "bg-cg-sage-subtle text-cg-sage-dark border-0" : "bg-slate-100 text-slate-600 border-0"}`}>
             {firm?.subscription_status || "trial"}
           </Badge>
         </div>
@@ -208,12 +208,12 @@ export default function FirmSettingsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {[
           { href: "/professional/firm/team", icon: Users, label: "Team Members", desc: `${firm?.member_count || 0} members`, color: "text-blue-600 bg-blue-50" },
-          { href: "/professional/firm/templates", icon: FileText, label: "Templates", desc: "Intake & agreement templates", color: "text-[#2D6A8F] bg-[#F0F7FC]" },
-          { href: "/professional/firm/analytics", icon: BarChart3, label: "Analytics", desc: "Firm performance & trends", color: "text-[#3DAA8A] bg-[#F4F8F7]" },
-          { href: "/professional/firm/queue", icon: Inbox, label: "Case Queue", desc: "Assign incoming cases", color: "text-[#1E3A4A] bg-slate-100" },
+          { href: "/professional/firm/templates", icon: FileText, label: "Templates", desc: "Intake & agreement templates", color: "text-cg-slate bg-[#F0F7FC]" },
+          { href: "/professional/firm/analytics", icon: BarChart3, label: "Analytics", desc: "Firm performance & trends", color: "text-cg-sage bg-background" },
+          { href: "/professional/firm/queue", icon: Inbox, label: "Case Queue", desc: "Assign incoming cases", color: "text-foreground bg-slate-100" },
         ].map((item) => (
           <Link key={item.href} href={item.href}>
-            <Card className="border border-slate-200 hover:border-[#3DAA8A]/30 hover:shadow-sm transition-all cursor-pointer rounded-xl">
+            <Card className="border border-slate-200 hover:border-cg-sage/30 hover:shadow-sm transition-all cursor-pointer rounded-xl">
               <CardContent className="p-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className={`p-2 rounded-lg ${item.color}`}>
@@ -315,7 +315,7 @@ export default function FirmSettingsPage() {
       <Card className="mb-6 border border-slate-200 rounded-2xl">
         <CardHeader className="border-b border-slate-100">
           <CardTitle className="text-slate-900">
-            <MapPin className="h-5 w-5 inline mr-2 text-[#1E3A4A]" />
+            <MapPin className="h-5 w-5 inline mr-2 text-foreground" />
             Address
           </CardTitle>
         </CardHeader>
@@ -375,7 +375,7 @@ export default function FirmSettingsPage() {
       <Card className="mb-6 border border-slate-200 rounded-2xl">
         <CardHeader className="border-b border-slate-100">
           <CardTitle className="text-slate-900">
-            <Palette className="h-5 w-5 inline mr-2 text-[#1E3A4A]" />
+            <Palette className="h-5 w-5 inline mr-2 text-foreground" />
             Branding & Visibility
           </CardTitle>
         </CardHeader>
@@ -419,7 +419,7 @@ export default function FirmSettingsPage() {
       <Card className="mb-6 border border-slate-200 rounded-2xl">
         <CardHeader className="border-b border-slate-100">
           <CardTitle className="text-slate-900">
-            <Clock className="h-5 w-5 inline mr-2 text-[#1E3A4A]" />
+            <Clock className="h-5 w-5 inline mr-2 text-foreground" />
             Recent Activity
           </CardTitle>
           <CardDescription className="sans">Audit log of firm actions for compliance</CardDescription>
@@ -431,7 +431,7 @@ export default function FirmSettingsPage() {
 
       {/* Save Button */}
       <div className="flex justify-end">
-        <Button onClick={handleSave} disabled={isSaving} className="bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm font-semibold">
+        <Button onClick={handleSave} disabled={isSaving} className="bg-cg-sage hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm font-semibold">
           <Save className="h-4 w-4 mr-2" />
           {isSaving ? "Saving..." : "Save Changes"}
         </Button>

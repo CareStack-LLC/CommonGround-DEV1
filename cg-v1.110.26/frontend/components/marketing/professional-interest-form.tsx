@@ -187,7 +187,7 @@ export function ProfessionalInterestForm({
         </button>
       </form>
 
-      {error && <p className="text-sm text-[#C53030] mt-3 text-center">{error}</p>}
+      {error && <p className="text-sm text-cg-error mt-3 text-center">{error}</p>}
 
       <div className="flex items-center justify-center gap-4 mt-4 text-xs text-gray-500">
         <span className="flex items-center gap-1">

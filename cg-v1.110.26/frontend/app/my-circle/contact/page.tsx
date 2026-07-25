@@ -22,15 +22,15 @@ function CommonGroundLogo({ size = 64 }: { size?: number }) {
       <defs>
         <linearGradient id="cg-bg" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stopColor="#E8F4F8" />
-          <stop offset="100%" stopColor="#D6ECE8" />
+          <stop offset="100%" stopColor="var(--border)" />
         </linearGradient>
         <linearGradient id="cg-parent-a" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#5BC4A0" />
-          <stop offset="100%" stopColor="#3DAA8A" />
+          <stop offset="0%" stopColor="var(--cg-sage-light)" />
+          <stop offset="100%" stopColor="var(--cg-sage)" />
         </linearGradient>
         <linearGradient id="cg-parent-b" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#4BA8C8" />
-          <stop offset="100%" stopColor="#2D6A8F" />
+          <stop offset="0%" stopColor="var(--cg-slate-light)" />
+          <stop offset="100%" stopColor="var(--cg-slate)" />
         </linearGradient>
       </defs>
       <rect width="512" height="512" rx="120" fill="url(#cg-bg)" />
@@ -41,10 +41,10 @@ function CommonGroundLogo({ size = 64 }: { size?: number }) {
       <circle cx="344" cy="148" r="48" fill="url(#cg-parent-b)" />
       <path d="M294 218 Q344 258 394 218" stroke="url(#cg-parent-b)" strokeWidth="16" strokeLinecap="round" fill="none" />
       {/* Golden arch */}
-      <path d="M218 168 Q256 104 294 168" stroke="#F5A623" strokeWidth="10" strokeLinecap="round" fill="none" opacity="0.95" />
+      <path d="M218 168 Q256 104 294 168" stroke="var(--cg-amber)" strokeWidth="10" strokeLinecap="round" fill="none" opacity="0.95" />
       {/* Child */}
-      <circle cx="256" cy="330" r="38" fill="#F5A623" />
-      <path d="M218 382 Q256 414 294 382" stroke="#F5A623" strokeWidth="12" strokeLinecap="round" fill="none" />
+      <circle cx="256" cy="330" r="38" fill="var(--cg-amber)" />
+      <path d="M218 382 Q256 414 294 382" stroke="var(--cg-amber)" strokeWidth="12" strokeLinecap="round" fill="none" />
     </svg>
   );
 }
@@ -111,7 +111,7 @@ function CircleContactLoginContent() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       {/* Subtle branded background gradient */}
-      <div className="fixed inset-0 bg-gradient-to-br from-[#E8F4F8] via-background to-[#D6ECE8] dark:from-[#1E3A4A]/30 dark:via-background dark:to-[#1E3A4A]/20 -z-10" />
+      <div className="fixed inset-0 bg-gradient-to-br from-[#E8F4F8] via-background to-border dark:from-foreground/30 dark:via-background dark:to-foreground/20 -z-10" />
 
       <div className="bg-card rounded-2xl shadow-xl border-2 border-border p-8 max-w-md w-full">
         {/* Header */}
@@ -123,9 +123,9 @@ function CircleContactLoginContent() {
 
           {/* Brand Name */}
           <h1 className="text-2xl font-bold text-foreground mb-1" style={{ fontFamily: "'DM Serif Display', serif" }}>
-            Common<span className="text-[#3DAA8A]">Ground</span>
+            Common<span className="text-cg-sage">Ground</span>
           </h1>
-          <p className="text-lg font-semibold text-[#2D6A8F] dark:text-[#4BA8C8]" style={{ fontFamily: "'DM Serif Display', serif" }}>
+          <p className="text-lg font-semibold text-cg-slate dark:text-cg-slate-light" style={{ fontFamily: "'DM Serif Display', serif" }}>
             My Circle
           </p>
           <p className="text-muted-foreground mt-2 text-sm">
@@ -145,7 +145,7 @@ function CircleContactLoginContent() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="your@email.com"
-              className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:ring-2 focus:ring-[#3DAA8A] focus:border-[#3DAA8A] outline-none transition-colors text-foreground placeholder:text-muted-foreground"
+              className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:ring-2 focus:ring-cg-sage focus:border-cg-sage outline-none transition-colors text-foreground placeholder:text-muted-foreground"
               required
             />
           </div>
@@ -161,7 +161,7 @@ function CircleContactLoginContent() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
-                className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:ring-2 focus:ring-[#3DAA8A] focus:border-[#3DAA8A] outline-none transition-colors text-foreground placeholder:text-muted-foreground"
+                className="w-full px-4 py-3 bg-background border border-border rounded-xl focus:ring-2 focus:ring-cg-sage focus:border-cg-sage outline-none transition-colors text-foreground placeholder:text-muted-foreground"
                 required
               />
               <button aria-label="Show"
@@ -185,7 +185,7 @@ function CircleContactLoginContent() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3 bg-gradient-to-r from-[#3DAA8A] to-[#2D6A8F] hover:from-[#349878] hover:to-[#245A7A] text-white rounded-xl font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
+            className="w-full py-3 bg-gradient-to-r from-cg-sage to-cg-slate hover:from-[#349878] hover:to-[#245A7A] text-white rounded-xl font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
           >
             {isLoading ? (
               <>
@@ -202,7 +202,7 @@ function CircleContactLoginContent() {
         <div className="mt-4 text-center">
           <button
             onClick={() => router.push('/my-circle/contact/forgot-password')}
-            className="text-sm text-[#3DAA8A] hover:text-[#2D6A8F] dark:text-[#5BC4A0] dark:hover:text-[#4BA8C8] font-medium transition-colors"
+            className="text-sm text-cg-sage hover:text-cg-slate dark:text-cg-sage-light dark:hover:text-cg-slate-light font-medium transition-colors"
           >
             Forgot your password?
           </button>
@@ -210,7 +210,7 @@ function CircleContactLoginContent() {
 
         {/* Trust Badge */}
         <div className="mt-6 flex items-center justify-center gap-2 text-muted-foreground text-sm">
-          <Shield className="h-4 w-4 text-[#3DAA8A]" />
+          <Shield className="h-4 w-4 text-cg-sage" />
           <span>Protected by ARIA child safety monitoring</span>
         </div>
 
@@ -222,7 +222,7 @@ function CircleContactLoginContent() {
           <p className="mt-2">
             <button
               onClick={() => router.push('/')}
-              className="text-[#3DAA8A] hover:text-[#2D6A8F] dark:text-[#5BC4A0] dark:hover:text-[#4BA8C8] font-medium transition-colors"
+              className="text-cg-sage hover:text-cg-slate dark:text-cg-sage-light dark:hover:text-cg-slate-light font-medium transition-colors"
             >
               Return to Home
             </button>
@@ -237,7 +237,7 @@ export default function CircleContactLoginPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-[#3DAA8A]" />
+        <Loader2 className="h-8 w-8 animate-spin text-cg-sage" />
       </div>
     }>
       <CircleContactLoginContent />

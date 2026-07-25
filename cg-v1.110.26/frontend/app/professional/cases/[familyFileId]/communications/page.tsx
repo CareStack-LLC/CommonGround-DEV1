@@ -236,7 +236,7 @@ export default function CommunicationsPage() {
     switch (trend) {
       case "improving":
       case "increasing":
-        return <TrendingUp className="h-4 w-4 text-[#3DAA8A]" />;
+        return <TrendingUp className="h-4 w-4 text-cg-sage" />;
       case "declining":
       case "decreasing":
         return <TrendingDown className="h-4 w-4 text-red-500" />;
@@ -260,7 +260,7 @@ export default function CommunicationsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-3">
-            <div className="p-2 bg-[#E0EFF8] text-[#2D6A8F] rounded-lg">
+            <div className="p-2 bg-cg-slate-subtle text-cg-slate rounded-lg">
               <MessageSquare className="h-6 w-6" />
             </div>
             Parent Communications
@@ -277,7 +277,7 @@ export default function CommunicationsPage() {
 
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2D8A70]" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cg-sage-dark" />
         </div>
       ) : (
         <>
@@ -461,7 +461,7 @@ export default function CommunicationsPage() {
                       <div>
                         <div className="flex justify-between text-sm mb-1">
                           <span>Parent A</span>
-                          <span className={`font-medium ${stats.good_faith_scores.parent_a >= 0.7 ? "text-[#2D8A70]" :
+                          <span className={`font-medium ${stats.good_faith_scores.parent_a >= 0.7 ? "text-cg-sage-dark" :
                             stats.good_faith_scores.parent_a >= 0.4 ? "text-[#E09520]" : "text-red-600"
                             }`}>
                             {Math.round(stats.good_faith_scores.parent_a * 100)}%
@@ -469,8 +469,8 @@ export default function CommunicationsPage() {
                         </div>
                         <div className="h-2 bg-muted rounded-full overflow-hidden">
                           <div
-                            className={`h-full rounded-full ${stats.good_faith_scores.parent_a >= 0.7 ? "bg-[#3DAA8A]" :
-                              stats.good_faith_scores.parent_a >= 0.4 ? "bg-[#F5A623]" : "bg-red-500"
+                            className={`h-full rounded-full ${stats.good_faith_scores.parent_a >= 0.7 ? "bg-cg-sage" :
+                              stats.good_faith_scores.parent_a >= 0.4 ? "bg-cg-amber" : "bg-red-500"
                               }`}
                             style={{ width: `${stats.good_faith_scores.parent_a * 100}%` }}
                           />
@@ -479,7 +479,7 @@ export default function CommunicationsPage() {
                       <div>
                         <div className="flex justify-between text-sm mb-1">
                           <span>Parent B</span>
-                          <span className={`font-medium ${stats.good_faith_scores.parent_b >= 0.7 ? "text-[#2D8A70]" :
+                          <span className={`font-medium ${stats.good_faith_scores.parent_b >= 0.7 ? "text-cg-sage-dark" :
                             stats.good_faith_scores.parent_b >= 0.4 ? "text-[#E09520]" : "text-red-600"
                             }`}>
                             {Math.round(stats.good_faith_scores.parent_b * 100)}%
@@ -487,8 +487,8 @@ export default function CommunicationsPage() {
                         </div>
                         <div className="h-2 bg-muted rounded-full overflow-hidden">
                           <div
-                            className={`h-full rounded-full ${stats.good_faith_scores.parent_b >= 0.7 ? "bg-[#3DAA8A]" :
-                              stats.good_faith_scores.parent_b >= 0.4 ? "bg-[#F5A623]" : "bg-red-500"
+                            className={`h-full rounded-full ${stats.good_faith_scores.parent_b >= 0.7 ? "bg-cg-sage" :
+                              stats.good_faith_scores.parent_b >= 0.4 ? "bg-cg-amber" : "bg-red-500"
                               }`}
                             style={{ width: `${stats.good_faith_scores.parent_b * 100}%` }}
                           />
@@ -615,7 +615,7 @@ export default function CommunicationsPage() {
                               {thread.subject || "General"}
                             </span>
                             {thread.has_interventions && (
-                              <Bot className="h-3.5 w-3.5 text-[#F5A623]" />
+                              <Bot className="h-3.5 w-3.5 text-cg-amber" />
                             )}
                           </div>
                           <div className="flex items-center justify-between">
@@ -690,13 +690,13 @@ export default function CommunicationsPage() {
                                 {message.sender_name}
                               </Badge>
                               {message.was_flagged && (
-                                <Badge className="bg-[#FEF7ED] text-[#8F5E14]">
+                                <Badge className="bg-cg-amber-subtle text-[#8F5E14]">
                                   <AlertTriangle className="h-3 w-3 mr-1" />
                                   {message.flag_category || "Flagged"}
                                 </Badge>
                               )}
                               {message.was_rewritten && (
-                                <Badge className="bg-[#E0EFF8] text-[#1E4E6B]">
+                                <Badge className="bg-cg-slate-subtle text-[#1E4E6B]">
                                   <Bot className="h-3 w-3 mr-1" />
                                   ARIA Rewritten
                                 </Badge>

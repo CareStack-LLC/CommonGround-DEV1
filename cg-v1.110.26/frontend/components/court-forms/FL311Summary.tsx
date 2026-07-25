@@ -520,10 +520,10 @@ export default function FL311Summary({ formData, canEdit, onEditSection }: FL311
   return (
     <div className="space-y-6">
       {/* Progress Card */}
-      <Card className="border-[#E0EFF8] bg-gradient-to-br from-[#E0EFF8] to-white">
+      <Card className="border-cg-slate-subtle bg-gradient-to-br from-cg-slate-subtle to-white">
         <CardHeader>
           <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-[#2D6A8F]" />
+            <Sparkles className="h-5 w-5 text-cg-slate" />
             <CardTitle className="text-lg">FL-311 Summary</CardTitle>
           </div>
           <CardDescription>
@@ -541,7 +541,7 @@ export default function FL311Summary({ formData, canEdit, onEditSection }: FL311
             </div>
             <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
               <div
-                className="h-full bg-[#2D6A8F] rounded-full transition-all duration-500"
+                className="h-full bg-cg-slate rounded-full transition-all duration-500"
                 style={{ width: `${completionPercentage}%` }}
               />
             </div>
@@ -584,7 +584,7 @@ export default function FL311Summary({ formData, canEdit, onEditSection }: FL311
                   key={section.id}
                   className={`rounded-lg border transition-colors ${
                     isComplete
-                      ? 'bg-[#E8F4F0]/50 border-[#E8F4F0]'
+                      ? 'bg-cg-sage-subtle/50 border-cg-sage-subtle'
                       : 'bg-gray-50/50 border-gray-200'
                   }`}
                 >
@@ -596,7 +596,7 @@ export default function FL311Summary({ formData, canEdit, onEditSection }: FL311
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         {isComplete ? (
-                          <CheckCircle className="h-4 w-4 text-[#2D8A70] flex-shrink-0" />
+                          <CheckCircle className="h-4 w-4 text-cg-sage-dark flex-shrink-0" />
                         ) : (
                           <div className="h-4 w-4 rounded-full border-2 border-gray-300 flex-shrink-0" />
                         )}
@@ -623,7 +623,7 @@ export default function FL311Summary({ formData, canEdit, onEditSection }: FL311
                         Items {section.formItems.join(', ')}
                       </Badge>
                       {isComplete && (
-                        <Badge variant="default" className="bg-[#E8F4F0] text-[#2D8A70]">
+                        <Badge variant="default" className="bg-cg-sage-subtle text-cg-sage-dark">
                           Complete
                         </Badge>
                       )}
@@ -634,7 +634,7 @@ export default function FL311Summary({ formData, canEdit, onEditSection }: FL311
                           e.stopPropagation();
                           toggleSection(section.id);
                         }}
-                        className="text-[#2D6A8F] hover:text-[#1E4E6B]"
+                        className="text-cg-slate hover:text-[#1E4E6B]"
                       >
                         <Eye className="h-3.5 w-3.5 mr-1" />
                         {isExpanded ? 'Hide' : 'View'}

@@ -24,19 +24,19 @@ const QUICK_CREATE_ITEMS = [
         href: "/professional/intake/new",
         label: "Send ARIA Intake",
         description: "Email intake link to a client",
-        icon: <Bot className="h-4 w-4 text-[#2D6A8F]" />,
+        icon: <Bot className="h-4 w-4 text-cg-slate" />,
     },
     {
         href: "/professional/documents/ocr",
         label: "Upload Court Order",
         description: "OCR: Auto-extract & lock fields from court order",
-        icon: <Upload className="h-4 w-4 text-[#2D6A8F]" />,
+        icon: <Upload className="h-4 w-4 text-cg-slate" />,
     },
     {
         href: "/professional/calendar?new=1",
         label: "Schedule Court Event",
         description: "Add a hearing, deadline, or meeting",
-        icon: <Calendar className="h-4 w-4 text-[#2D6A8F]" />,
+        icon: <Calendar className="h-4 w-4 text-cg-slate" />,
     },
 ];
 
@@ -103,7 +103,7 @@ export function QuickCreateMenu({ onCreateTask }: QuickCreateMenuProps) {
                                     className="w-full flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 transition-colors group text-left"
                                 >
                                     <div className="p-1.5 bg-slate-100 rounded-lg group-hover:bg-white transition-colors shrink-0 mt-0.5">
-                                        <CheckSquare className="h-4 w-4 text-[#2D8A70]" />
+                                        <CheckSquare className="h-4 w-4 text-cg-sage-dark" />
                                     </div>
                                     <div>
                                         <p className="text-sm font-semibold text-slate-800">Create Task</p>

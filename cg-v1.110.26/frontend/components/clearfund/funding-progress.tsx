@@ -29,10 +29,10 @@ export default function FundingProgress({
   };
 
   const getProgressColor = () => {
-    if (percentage >= 100) return 'bg-[#3DAA8A]';
-    if (percentage >= 75) return 'bg-[#2D6A8F]';
-    if (percentage >= 50) return 'bg-[#F5A623]';
-    return 'bg-[#F5A623]';
+    if (percentage >= 100) return 'bg-cg-sage';
+    if (percentage >= 75) return 'bg-cg-slate';
+    if (percentage >= 50) return 'bg-cg-amber';
+    return 'bg-cg-amber';
   };
 
   return (

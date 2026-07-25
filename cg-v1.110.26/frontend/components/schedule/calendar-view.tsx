@@ -234,9 +234,9 @@ export default function CalendarView({
 
   const getEventColor = (event: EventV2): string => {
     const isProfessional = event.is_professional_event || !!event.professional_id;
-    if (isProfessional) return '#2D6A8F';
+    if (isProfessional) return 'var(--cg-slate)';
     const collection = calendarData?.my_collections.find(c => c.id === event.collection_id);
-    return event.is_owner ? (collection?.color || '#3DAA8A') : '#64748B';
+    return event.is_owner ? (collection?.color || 'var(--cg-sage)') : '#64748B';
   };
 
   // --- Header text ---
@@ -439,8 +439,8 @@ export default function CalendarView({
                           {isProfessional && <span className="flex-shrink-0">⚖</span>}
                           {rsvpIndicator && (
                             <span className={`flex-shrink-0 ${
-                              rsvpStatus === 'going' ? 'text-[#E8F4F0]' :
-                              rsvpStatus === 'not_going' ? 'text-[#FEE2E2]' : 'text-[#FEF7ED]'
+                              rsvpStatus === 'going' ? 'text-cg-sage-subtle' :
+                              rsvpStatus === 'not_going' ? 'text-cg-error-subtle' : 'text-cg-amber-subtle'
                             }`}>{rsvpIndicator}</span>
                           )}
                           <span className="truncate">
@@ -484,8 +484,8 @@ export default function CalendarView({
                           <Gavel className="h-2.5 w-2.5 sm:h-3 sm:w-3 flex-shrink-0" />
                           {RsvpIcon && (
                             <RsvpIcon className={`h-2.5 w-2.5 sm:h-3 sm:w-3 flex-shrink-0 ${
-                              rsvpStatus === 'attending' ? 'text-[#5BC4A0]' :
-                              rsvpStatus === 'not_attending' ? 'text-[#FCA5A5]' : 'text-[#F5A623]'
+                              rsvpStatus === 'attending' ? 'text-cg-sage-light' :
+                              rsvpStatus === 'not_attending' ? 'text-[#FCA5A5]' : 'text-cg-amber'
                             }`} />
                           )}
                           <span className="truncate">

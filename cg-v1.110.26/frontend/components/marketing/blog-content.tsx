@@ -255,7 +255,7 @@ function CommunicationProgress() {
         </p>
         <div className="mx-auto max-w-sm rounded-[2rem] border border-gray-200 bg-white shadow-xl overflow-hidden">
           {/* Phone header */}
-          <div className="flex items-center gap-3 px-5 py-3 bg-gradient-to-b from-[#F4F8F7] to-white border-b border-gray-100">
+          <div className="flex items-center gap-3 px-5 py-3 bg-gradient-to-b from-background to-white border-b border-gray-100">
             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-cg-sage to-cg-slate flex items-center justify-center text-white text-xs font-bold">
               CP
             </div>
@@ -270,14 +270,14 @@ function CommunicationProgress() {
             {/* Reactive message — don't send */}
             <div>
               <div className="flex justify-end">
-                <div className="max-w-[85%] bg-[#C53030] text-white rounded-2xl rounded-br-md px-4 py-2.5 text-[15px] leading-snug shadow-sm">
+                <div className="max-w-[85%] bg-cg-error text-white rounded-2xl rounded-br-md px-4 py-2.5 text-[15px] leading-snug shadow-sm">
                   You ALWAYS change plans at the last minute! I&apos;m so sick of you never
                   thinking about anyone but yourself. The kids were looking forward to this
                   all week. But of course, your schedule is more important than theirs. This
                   is exactly why we got divorced.
                 </div>
               </div>
-              <p className="flex items-center justify-end gap-1 text-right text-[11px] font-medium text-[#C53030] mt-1.5 pr-1">
+              <p className="flex items-center justify-end gap-1 text-right text-[11px] font-medium text-cg-error mt-1.5 pr-1">
                 <XCircle className="w-3.5 h-3.5" /> Reactive — invites a fight
               </p>
             </div>
@@ -558,15 +558,15 @@ function WrittenAgreements() {
 
       <div className="bg-white rounded-xl p-6 my-6 border border-gray-200 not-prose">
         <div className="grid gap-4">
-          <div className="bg-[#FEE2E2] dark:bg-[#7A2222]/20 rounded-lg p-4">
+          <div className="bg-cg-error-subtle dark:bg-[#7A2222]/20 rounded-lg p-4">
             <p className="text-sm font-medium text-[#9B2C2C] dark:text-[#E06B6B] mb-2">Vague (problematic):</p>
             <p className="text-[#9B2C2C] dark:text-[#FCA5A5] italic">
               &quot;Parents will share holidays fairly.&quot;
             </p>
           </div>
-          <div className="bg-[#E8F4F0] dark:bg-[#1E3A4A]/20 rounded-lg p-4">
-            <p className="text-sm font-medium text-[#2D8A70] dark:text-[#5BC4A0] mb-2">Specific (better):</p>
-            <p className="text-[#2D8A70] dark:text-[#5BC4A0] italic">
+          <div className="bg-cg-sage-subtle dark:bg-foreground/20 rounded-lg p-4">
+            <p className="text-sm font-medium text-cg-sage-dark dark:text-cg-sage-light mb-2">Specific (better):</p>
+            <p className="text-cg-sage-dark dark:text-cg-sage-light italic">
               &quot;Thanksgiving: Parent A has children from Wednesday at 5:00 PM until Friday
               at 5:00 PM in odd-numbered years. Parent B has the same schedule in
               even-numbered years. The parent without Thanksgiving will have the children
@@ -647,7 +647,7 @@ function HighConflictGuide() {
         better&quot; may not work. This guide is for parents who need different strategies.
       </p>
 
-      <div className="bg-[#FEF7ED] dark:bg-[#1E3A4A]/20 rounded-xl p-6 my-8 not-prose border border-[#FEF7ED] dark:border-[#1E3A4A]">
+      <div className="bg-cg-amber-subtle dark:bg-foreground/20 rounded-xl p-6 my-8 not-prose border border-cg-amber-subtle dark:border-foreground">
         <div className="flex items-start gap-3">
           <AlertTriangle className="w-6 h-6 text-[#E09520] flex-shrink-0 mt-0.5" />
           <div>
@@ -757,14 +757,14 @@ function HighConflictGuide() {
         <h3 className="text-lg font-semibold text-foreground mb-4">BIFF Response Examples</h3>
         <div className="space-y-4">
           <div>
-            <p className="text-sm font-medium text-[#C53030] dark:text-[#E06B6B] mb-1">Incoming hostile message:</p>
+            <p className="text-sm font-medium text-cg-error dark:text-[#E06B6B] mb-1">Incoming hostile message:</p>
             <p className="text-gray-600 italic text-sm">
               &quot;You&apos;re ALWAYS doing this. You don&apos;t care about the kids at all.
               I&apos;m done trying to work with you. You&apos;re going to hear from my lawyer.&quot;
             </p>
           </div>
           <div>
-            <p className="text-sm font-medium text-[#2D8A70] dark:text-[#5BC4A0] mb-1">BIFF response:</p>
+            <p className="text-sm font-medium text-cg-sage-dark dark:text-cg-sage-light mb-1">BIFF response:</p>
             <p className="text-gray-600 italic text-sm">
               &quot;I received your message. If you have specific concerns about Saturday&apos;s
               pickup time, I&apos;m happy to discuss. Let me know. Thanks.&quot;
@@ -1031,12 +1031,12 @@ function ChildrenFirst() {
         <div className="space-y-4">
           {comparisons.map((item, index) => (
             <div key={index} className="grid sm:grid-cols-2 gap-3">
-              <div className="flex items-start gap-2 bg-[#E8F4F0] dark:bg-[#1E3A4A]/20 rounded-lg p-3">
-                <CheckCircle className="w-4 h-4 text-[#2D8A70] flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-[#2D8A70] dark:text-[#5BC4A0]">{item.right}</p>
+              <div className="flex items-start gap-2 bg-cg-sage-subtle dark:bg-foreground/20 rounded-lg p-3">
+                <CheckCircle className="w-4 h-4 text-cg-sage-dark flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-cg-sage-dark dark:text-cg-sage-light">{item.right}</p>
               </div>
-              <div className="flex items-start gap-2 bg-[#FEE2E2] dark:bg-[#7A2222]/20 rounded-lg p-3">
-                <XCircle className="w-4 h-4 text-[#C53030] flex-shrink-0 mt-0.5" />
+              <div className="flex items-start gap-2 bg-cg-error-subtle dark:bg-[#7A2222]/20 rounded-lg p-3">
+                <XCircle className="w-4 h-4 text-cg-error flex-shrink-0 mt-0.5" />
                 <p className="text-sm text-[#9B2C2C] dark:text-[#FCA5A5]">{item.wrong}</p>
               </div>
             </div>
@@ -1702,7 +1702,7 @@ function DifficultEx() {
           BIFF in Action
         </p>
         <div className="mx-auto max-w-sm rounded-[2rem] border border-gray-200 bg-white shadow-xl overflow-hidden">
-          <div className="flex items-center gap-3 px-5 py-3 bg-gradient-to-b from-[#F4F8F7] to-white border-b border-gray-100">
+          <div className="flex items-center gap-3 px-5 py-3 bg-gradient-to-b from-background to-white border-b border-gray-100">
             <div className="w-9 h-9 rounded-full bg-gradient-to-br from-cg-sage to-cg-slate flex items-center justify-center text-white text-xs font-bold">
               CP
             </div>
@@ -1714,11 +1714,11 @@ function DifficultEx() {
           <div className="px-4 py-5 space-y-6 bg-[#FBFCFC]">
             <div>
               <div className="flex justify-end">
-                <div className="max-w-[85%] bg-[#C53030] text-white rounded-2xl rounded-br-md px-4 py-2.5 text-[15px] leading-snug shadow-sm">
+                <div className="max-w-[85%] bg-cg-error text-white rounded-2xl rounded-br-md px-4 py-2.5 text-[15px] leading-snug shadow-sm">
                   You&apos;re always late and clearly don&apos;t care about the kids. Don&apos;t even bother showing up Friday if you can&apos;t be on time for once.
                 </div>
               </div>
-              <p className="flex items-center justify-end gap-1 text-right text-[11px] font-medium text-[#C53030] mt-1.5 pr-1">
+              <p className="flex items-center justify-end gap-1 text-right text-[11px] font-medium text-cg-error mt-1.5 pr-1">
                 <XCircle className="w-3.5 h-3.5" /> Reactive &mdash; takes the bait
               </p>
             </div>

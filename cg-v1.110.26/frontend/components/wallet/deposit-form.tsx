@@ -45,8 +45,8 @@ const cardElementOptions = {
       },
     },
     invalid: {
-      color: '#C53030',
-      iconColor: '#C53030',
+      color: 'var(--cg-error)',
+      iconColor: 'var(--cg-error)',
     },
   },
   hidePostalCode: false,

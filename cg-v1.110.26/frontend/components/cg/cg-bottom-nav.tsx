@@ -130,18 +130,18 @@ export function CGChildBottomNav({ items, className }: CGChildBottomNavProps) {
   const navItems = items || defaultItems;
 
   const colorClasses = {
-    purple: 'bg-[#E0EFF8] text-[#2D6A8F]',
-    blue: 'bg-[#E0EFF8] text-[#2D6A8F]',
-    green: 'bg-[#E8F4F0] text-[#2D8A70]',
-    pink: 'bg-[#FEF7ED] text-[#E09520]',
-    amber: 'bg-[#FEF7ED] text-[#E09520]',
+    purple: 'bg-cg-slate-subtle text-cg-slate',
+    blue: 'bg-cg-slate-subtle text-cg-slate',
+    green: 'bg-cg-sage-subtle text-cg-sage-dark',
+    pink: 'bg-cg-amber-subtle text-[#E09520]',
+    amber: 'bg-cg-amber-subtle text-[#E09520]',
   };
 
   return (
     <nav
       className={cn(
         'fixed bottom-0 left-0 right-0 z-50',
-        'bg-white/95 backdrop-blur-lg border-t-4 border-[#E0EFF8]',
+        'bg-white/95 backdrop-blur-lg border-t-4 border-cg-slate-subtle',
         'safe-area-bottom',
         className
       )}

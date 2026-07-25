@@ -18,11 +18,11 @@ interface KidDashboardCardProps {
 // Modern color palette for pre-teens (cooler, more sophisticated)
 const colorStyles = {
   cyan: {
-    border: 'hover:border-[#4BA8C8]',
-    shadow: 'hover:shadow-[#4BA8C8]/20',
-    text: 'text-[#349878] dark:text-[#4BA8C8]',
+    border: 'hover:border-cg-slate-light',
+    shadow: 'hover:shadow-cg-slate-light/20',
+    text: 'text-[#349878] dark:text-cg-slate-light',
     bg: 'bg-gradient-to-br from-cyan-50 to-teal-50 dark:from-cyan-950/50 dark:to-teal-950/50',
-    accent: 'bg-[#4BA8C8]'
+    accent: 'bg-cg-slate-light'
   },
   green: {
     border: 'hover:border-emerald-500',
@@ -53,11 +53,11 @@ const colorStyles = {
     accent: 'bg-amber-500'
   },
   teal: {
-    border: 'hover:border-[#3DAA8A]',
-    shadow: 'hover:shadow-[#3DAA8A]/20',
-    text: 'text-[#349878] dark:text-[#3DAA8A]',
+    border: 'hover:border-cg-sage',
+    shadow: 'hover:shadow-cg-sage/20',
+    text: 'text-[#349878] dark:text-cg-sage',
     bg: 'bg-gradient-to-br from-teal-50 to-cyan-50 dark:from-teal-950/50 dark:to-cyan-950/50',
-    accent: 'bg-[#3DAA8A]'
+    accent: 'bg-cg-sage'
   },
   red: {
     border: 'hover:border-red-500',
@@ -110,7 +110,7 @@ export function KidDashboardCard({
         disabled && "opacity-50 cursor-not-allowed",
 
         // Focus state for accessibility - modern teal ring
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3DAA8A] focus-visible:ring-offset-2",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cg-sage focus-visible:ring-offset-2",
 
         className
       )}

@@ -16,7 +16,7 @@ interface KidGameCardProps {
 }
 
 const COLOR_GRADIENTS = {
-  cyan: 'from-[#7DD8B8] to-[#4BA8C8]',
+  cyan: 'from-[#7DD8B8] to-cg-slate-light',
   green: 'from-green-300 to-green-500',
   blue: 'from-blue-300 to-blue-500',
   pink: 'from-pink-300 to-pink-500',

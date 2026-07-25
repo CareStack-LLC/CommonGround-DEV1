@@ -26,11 +26,11 @@ interface MetricCardProps {
 }
 
 const COLOR_MAP = {
-  sage: { icon: "text-[#3DAA8A]", bg: "bg-[#3DAA8A]/10", border: "border-[#3DAA8A]/20" },
-  ocean: { icon: "text-[#2D6A8F]", bg: "bg-[#2D6A8F]/10", border: "border-[#2D6A8F]/20" },
-  gold: { icon: "text-[#F5A623]", bg: "bg-[#F5A623]/10", border: "border-[#F5A623]/20" },
-  sky: { icon: "text-[#4BA8C8]", bg: "bg-[#4BA8C8]/10", border: "border-[#4BA8C8]/20" },
-  coral: { icon: "text-[#C53030]", bg: "bg-[#C53030]/10", border: "border-[#C53030]/20" },
+  sage: { icon: "text-cg-sage", bg: "bg-cg-sage/10", border: "border-cg-sage/20" },
+  ocean: { icon: "text-cg-slate", bg: "bg-cg-slate/10", border: "border-cg-slate/20" },
+  gold: { icon: "text-cg-amber", bg: "bg-cg-amber/10", border: "border-cg-amber/20" },
+  sky: { icon: "text-cg-slate-light", bg: "bg-cg-slate-light/10", border: "border-cg-slate-light/20" },
+  coral: { icon: "text-cg-error", bg: "bg-cg-error/10", border: "border-cg-error/20" },
   neutral: { icon: "text-[#8AACBC]", bg: "bg-[#8AACBC]/10", border: "border-[#8AACBC]/20" },
 };
 
@@ -90,7 +90,7 @@ export function MetricCard({
   return (
     <div
       className={`rounded-xl border ${compact ? "p-3" : "p-4"} transition-colors ${c.bg} ${c.border} ${
-        alert ? "ring-1 ring-[#F5A623]/40" : ""
+        alert ? "ring-1 ring-cg-amber/40" : ""
       }`}
     >
       <div className="flex items-start justify-between">
@@ -111,11 +111,11 @@ export function MetricCard({
       </div>
       <div className={`${compact ? "text-xl" : "text-2xl"} font-bold text-white`}>{value}</div>
       <div className="flex items-center gap-2 mt-1 flex-wrap">
-        {sub && <span className={`${compact ? "text-[10px]" : "text-[11px]"} text-[#6B8A9A]`}>{sub}</span>}
+        {sub && <span className={`${compact ? "text-[10px]" : "text-[11px]"} text-muted-foreground`}>{sub}</span>}
         {trend !== undefined && trend !== 0 && (
           <span
             className={`flex items-center gap-0.5 text-[11px] font-medium ${
-              trend > 0 ? "text-[#3DAA8A]" : "text-[#C53030]"
+              trend > 0 ? "text-cg-sage" : "text-cg-error"
             }`}
           >
             {trend > 0 ? (
@@ -129,12 +129,12 @@ export function MetricCard({
         {comparisonPct !== undefined && comparisonPct !== 0 && (
           <span
             className={`flex items-center gap-0.5 text-[11px] font-medium ${
-              comparisonPct > 0 ? "text-[#3DAA8A]" : "text-[#C53030]"
+              comparisonPct > 0 ? "text-cg-sage" : "text-cg-error"
             }`}
           >
             {comparisonPct > 0 ? <TrendingUp className="w-3 h-3" /> : <TrendingDown className="w-3 h-3" />}
             {comparisonPct > 0 ? "+" : ""}{comparisonPct}%
-            {trendLabel ? <span className="text-[#6B8A9A] ml-0.5">vs prior {trendLabel}</span> : null}
+            {trendLabel ? <span className="text-muted-foreground ml-0.5">vs prior {trendLabel}</span> : null}
           </span>
         )}
       </div>
@@ -157,10 +157,10 @@ export function SmallMetric({
   tooltip?: string;
 }) {
   return (
-    <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-3 flex items-center gap-3">
-      <Icon className="w-4 h-4 text-[#6B8A9A] flex-shrink-0" />
+    <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-3 flex items-center gap-3">
+      <Icon className="w-4 h-4 text-muted-foreground flex-shrink-0" />
       <div>
-        <div className="text-[11px] text-[#6B8A9A]">
+        <div className="text-[11px] text-muted-foreground">
           {label}
           {tooltip && <InfoTooltip text={tooltip} />}
         </div>

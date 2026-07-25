@@ -75,16 +75,16 @@ function Logo({ className = '', onClick }: { className?: string; onClick?: () =>
       <svg width="36" height="36" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" className="flex-shrink-0">
         <defs>
           <linearGradient id="nav-bg" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#E0EFF8" />
-            <stop offset="100%" stopColor="#D6ECE8" />
+            <stop offset="0%" stopColor="var(--cg-slate-subtle)" />
+            <stop offset="100%" stopColor="var(--border)" />
           </linearGradient>
           <linearGradient id="nav-lf" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#5BC4A0" />
-            <stop offset="100%" stopColor="#3DAA8A" />
+            <stop offset="0%" stopColor="var(--cg-sage-light)" />
+            <stop offset="100%" stopColor="var(--cg-sage)" />
           </linearGradient>
           <linearGradient id="nav-rf" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#4BA8C8" />
-            <stop offset="100%" stopColor="#2D6A8F" />
+            <stop offset="0%" stopColor="var(--cg-slate-light)" />
+            <stop offset="100%" stopColor="var(--cg-slate)" />
           </linearGradient>
         </defs>
         <rect width="512" height="512" rx="120" fill="url(#nav-bg)" />
@@ -95,10 +95,10 @@ function Logo({ className = '', onClick }: { className?: string; onClick?: () =>
         <circle cx="344" cy="148" r="48" fill="url(#nav-rf)" />
         <path d="M294 218 Q344 258 394 218" stroke="url(#nav-rf)" strokeWidth="16" strokeLinecap="round" fill="none" />
         {/* Golden arch */}
-        <path d="M218 168 Q256 104 294 168" stroke="#F5A623" strokeWidth="10" strokeLinecap="round" fill="none" opacity="0.95" />
+        <path d="M218 168 Q256 104 294 168" stroke="var(--cg-amber)" strokeWidth="10" strokeLinecap="round" fill="none" opacity="0.95" />
         {/* Child */}
-        <circle cx="256" cy="330" r="38" fill="#F5A623" />
-        <path d="M218 382 Q256 414 294 382" stroke="#F5A623" strokeWidth="12" strokeLinecap="round" fill="none" />
+        <circle cx="256" cy="330" r="38" fill="var(--cg-amber)" />
+        <path d="M218 382 Q256 414 294 382" stroke="var(--cg-amber)" strokeWidth="12" strokeLinecap="round" fill="none" />
       </svg>
       <span className="text-lg text-white" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
         <span className="font-bold">Common</span><span className="font-normal opacity-90">Ground</span>
@@ -219,7 +219,7 @@ export function Navigation() {
                       <div className="relative w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
                         <span className="text-sm font-medium text-white">{initials}</span>
                         {unreadCount > 0 && (
-                          <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-[#C53030] rounded-full border-2 border-[var(--portal-primary)] dark:border-[#0F1D27]" />
+                          <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-cg-error rounded-full border-2 border-[var(--portal-primary)] dark:border-[#0F1D27]" />
                         )}
                       </div>
                       <ChevronDown

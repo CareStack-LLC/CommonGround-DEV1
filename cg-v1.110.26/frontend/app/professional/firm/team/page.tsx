@@ -34,16 +34,16 @@ const FIRM_ROLES = [
 ];
 
 const ROLE_COLORS: Record<string, string> = {
-  owner: "bg-[#3DAA8A]/10 text-[#1E3A4A] border-0",
+  owner: "bg-cg-sage/10 text-foreground border-0",
   admin: "bg-blue-50 text-blue-700 border-0",
-  attorney: "bg-[#E8F4F0] text-[#2D8A70] border-0",
+  attorney: "bg-cg-sage-subtle text-cg-sage-dark border-0",
   paralegal: "bg-[#F0F7FC] text-[#1E4E6B] border-0",
-  intake: "bg-[#FEF7ED] text-[#B8791A] border-0",
+  intake: "bg-cg-amber-subtle text-[#B8791A] border-0",
   readonly: "bg-slate-100 text-slate-600 border-0",
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  active: "bg-[#E8F4F0] text-[#2D8A70] border-0",
+  active: "bg-cg-sage-subtle text-cg-sage-dark border-0",
   invited: "bg-blue-50 text-blue-700 border-0",
   suspended: "bg-red-50 text-red-700 border-0",
   removed: "bg-slate-100 text-slate-500 border-0",
@@ -175,7 +175,7 @@ export default function TeamManagementPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <Link href="/professional/firm" className="inline-flex items-center gap-1.5 text-xs text-[#3DAA8A] hover:text-[#2D8A6E] font-medium mb-2">
+          <Link href="/professional/firm" className="inline-flex items-center gap-1.5 text-xs text-cg-sage hover:text-[#2D8A6E] font-medium mb-2">
             <ArrowLeft className="h-3.5 w-3.5" /> Firm Settings
           </Link>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Team Members</h1>
@@ -183,7 +183,7 @@ export default function TeamManagementPage() {
         </div>
         <Dialog open={showInviteDialog} onOpenChange={setShowInviteDialog}>
           <DialogTrigger asChild>
-            <Button className="bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm gap-2">
+            <Button className="bg-cg-sage hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm gap-2">
               <UserPlus className="h-4 w-4" /> Invite Member
             </Button>
           </DialogTrigger>
@@ -197,7 +197,7 @@ export default function TeamManagementPage() {
                 <Label className="text-xs text-slate-500">Email Address</Label>
                 <Input type="email" placeholder="colleague@example.com" value={inviteData.email}
                   onChange={(e) => setInviteData({ ...inviteData, email: e.target.value })}
-                  className="border-slate-200 focus:border-[#3DAA8A]" />
+                  className="border-slate-200 focus:border-cg-sage" />
               </div>
               <div className="space-y-1.5">
                 <Label className="text-xs text-slate-500">Role</Label>
@@ -216,7 +216,7 @@ export default function TeamManagementPage() {
             <DialogFooter>
               <Button variant="outline" onClick={() => setShowInviteDialog(false)} className="rounded-lg">Cancel</Button>
               <Button onClick={handleInvite} disabled={isInviting || !inviteData.email}
-                className="bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white rounded-lg">
+                className="bg-cg-sage hover:bg-[#2D8A6E] text-white rounded-lg">
                 {isInviting ? <><Loader2 className="h-4 w-4 animate-spin mr-1.5" />Sending...</> : "Send Invitation"}
               </Button>
             </DialogFooter>
@@ -227,7 +227,7 @@ export default function TeamManagementPage() {
       {/* Members List */}
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-[#3DAA8A]" />
+          <Loader2 className="h-8 w-8 animate-spin text-cg-sage" />
         </div>
       ) : members.length === 0 ? (
         <Card className="rounded-2xl border border-slate-200">
@@ -235,7 +235,7 @@ export default function TeamManagementPage() {
             <Users className="h-10 w-10 mx-auto text-slate-300 mb-3" />
             <h2 className="text-base font-semibold text-slate-900">No Team Members Yet</h2>
             <p className="text-sm text-slate-500 mt-1 mb-4">Invite colleagues to collaborate on cases.</p>
-            <Button onClick={() => setShowInviteDialog(true)} className="bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white rounded-xl gap-2">
+            <Button onClick={() => setShowInviteDialog(true)} className="bg-cg-sage hover:bg-[#2D8A6E] text-white rounded-xl gap-2">
               <UserPlus className="h-4 w-4" /> Invite Your First Member
             </Button>
           </CardContent>
@@ -247,7 +247,7 @@ export default function TeamManagementPage() {
               {members.map((member) => (
                 <div key={member.id} className="flex items-center justify-between p-4 hover:bg-slate-50/50 transition-colors">
                   <div className="flex items-center gap-3.5">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#3DAA8A]/20 to-[#2D6A8F]/20 flex items-center justify-center text-sm font-bold text-[#1E3A4A]">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cg-sage/20 to-cg-slate/20 flex items-center justify-center text-sm font-bold text-foreground">
                       {getInitials(member.professional_name, member.professional_email || member.invite_email)}
                     </div>
                     <div>

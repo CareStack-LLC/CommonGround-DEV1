@@ -78,7 +78,7 @@ export default function AcceptInvitationPage() {
                 <CardHeader className="text-center">
                     <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
                         {status === 'loading' && <Loader2 className="h-6 w-6 text-primary animate-spin" />}
-                        {status === 'success' && <CheckCircle className="h-6 w-6 text-[#2D8A70]" />}
+                        {status === 'success' && <CheckCircle className="h-6 w-6 text-cg-sage-dark" />}
                         {status === 'error' && <AlertCircle className="h-6 w-6 text-destructive" />}
                     </div>
                     <CardTitle>Family File Invitation</CardTitle>
@@ -90,8 +90,8 @@ export default function AcceptInvitationPage() {
                 </CardHeader>
                 <CardContent>
                     {status === 'success' && (
-                        <Alert className="bg-[#E8F4F0] text-[#2D8A70] border-[#E8F4F0]">
-                            <CheckCircle className="h-4 w-4 text-[#2D8A70]" />
+                        <Alert className="bg-cg-sage-subtle text-cg-sage-dark border-cg-sage-subtle">
+                            <CheckCircle className="h-4 w-4 text-cg-sage-dark" />
                             <AlertDescription>{message}</AlertDescription>
                         </Alert>
                     )}

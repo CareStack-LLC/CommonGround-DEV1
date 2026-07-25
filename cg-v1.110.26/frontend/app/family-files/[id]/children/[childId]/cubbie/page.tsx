@@ -147,7 +147,7 @@ function ChildCubbiePageContent() {
           </div>
           <Button
             onClick={() => router.push(`/family-files/${familyFileId}/children/${childId}/cubbie/new`)}
-            className="bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white hover:shadow-lg hover:scale-105 transition-all duration-200 rounded-xl"
+            className="bg-gradient-to-r from-[var(--portal-primary)] to-cg-slate text-white hover:shadow-lg hover:scale-105 transition-all duration-200 rounded-xl"
           >
             <Plus className="h-4 w-4 mr-2" />
             Add Item
@@ -230,7 +230,7 @@ function ChildCubbiePageContent() {
                     </span>
                     <span
                       className={`text-[10px] uppercase tracking-wider font-bold px-2 py-1 rounded-full ${item.current_location === 'child_traveling'
-                        ? 'bg-[#FEF7ED] text-[#E09520]'
+                        ? 'bg-cg-amber-subtle text-[#E09520]'
                         : 'bg-muted text-muted-foreground'
                         }`}
                     >
@@ -254,7 +254,7 @@ function ChildCubbiePageContent() {
             </p>
             <Button
               onClick={() => router.push(`/family-files/${familyFileId}/children/${childId}/cubbie/new`)}
-              className="bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white px-8 py-6 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
+              className="bg-gradient-to-r from-[var(--portal-primary)] to-cg-slate text-white px-8 py-6 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
             >
               <Plus className="h-5 w-5 mr-2" />
               Add First Item

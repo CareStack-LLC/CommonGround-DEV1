@@ -59,13 +59,13 @@ function statusLabel(status: Chore['status']) {
 function statusBadgeClass(status: Chore['status']) {
   switch (status) {
     case 'pending':
-      return 'bg-[#3DAA8A]/10 text-[#2F8569] border border-[#3DAA8A]/30';
+      return 'bg-cg-sage/10 text-[#2F8569] border border-cg-sage/30';
     case 'completed':
-      return 'bg-[#FEF7ED] text-[#E09520] border border-[#FEF7ED]';
+      return 'bg-cg-amber-subtle text-[#E09520] border border-cg-amber-subtle';
     case 'approved':
-      return 'bg-[#E8F4F0] text-[#2D8A70] border border-[#E8F4F0]';
+      return 'bg-cg-sage-subtle text-cg-sage-dark border border-cg-sage-subtle';
     case 'rejected':
-      return 'bg-[#FEF7ED] text-[#E09520] border border-[#FEF7ED]';
+      return 'bg-cg-amber-subtle text-[#E09520] border border-cg-amber-subtle';
     case 'cancelled':
       return 'bg-muted text-muted-foreground border border-border';
   }
@@ -189,8 +189,8 @@ export default function ParentChoresPage() {
                 className="text-3xl font-bold text-foreground flex items-center gap-3"
                 style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
               >
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#3DAA8A]/10 to-[#2D6A8F]/5 flex items-center justify-center shadow-md">
-                  <ClipboardList className="h-6 w-6 text-[#3DAA8A]" />
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cg-sage/10 to-cg-slate/5 flex items-center justify-center shadow-md">
+                  <ClipboardList className="h-6 w-6 text-cg-sage" />
                 </div>
                 Chores &amp; Tasks
               </h1>
@@ -216,9 +216,9 @@ export default function ParentChoresPage() {
           </div>
 
           {error && (
-            <div className="mb-6 bg-[#FEE2E2] border-2 border-[#FEE2E2] rounded-2xl p-4">
+            <div className="mb-6 bg-cg-error-subtle border-2 border-cg-error-subtle rounded-2xl p-4">
               <div className="flex items-center gap-3">
-                <XCircle className="h-5 w-5 text-[#C53030]" />
+                <XCircle className="h-5 w-5 text-cg-error" />
                 <p className="text-[#9B2C2C] font-medium">{error}</p>
               </div>
             </div>
@@ -226,7 +226,7 @@ export default function ParentChoresPage() {
 
           {loading ? (
             <div className="flex justify-center py-20">
-              <Loader2 className="h-10 w-10 animate-spin text-[#3DAA8A]" />
+              <Loader2 className="h-10 w-10 animate-spin text-cg-sage" />
             </div>
           ) : children.length === 0 ? (
             <div className="bg-card border-2 border-border rounded-2xl p-8 text-center">
@@ -255,7 +255,7 @@ export default function ParentChoresPage() {
                   <CheckCircle2 className="h-5 w-5 text-[#E09520]" />
                   Needs your review
                   {reviewQueue.length > 0 && (
-                    <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-[#FEF7ED] text-[#E09520] border border-[#FEF7ED]">
+                    <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-cg-amber-subtle text-[#E09520] border border-cg-amber-subtle">
                       {reviewQueue.length}
                     </span>
                   )}
@@ -272,7 +272,7 @@ export default function ParentChoresPage() {
                       return (
                         <li
                           key={chore.id}
-                          className="rounded-xl border-2 border-[#FEF7ED] bg-[#FEF7ED]/50 p-4"
+                          className="rounded-xl border-2 border-cg-amber-subtle bg-cg-amber-subtle/50 p-4"
                         >
                           <div className="flex items-start justify-between gap-3 mb-2">
                             <div className="min-w-0">
@@ -287,7 +287,7 @@ export default function ParentChoresPage() {
                             </div>
                             {chore.reward_amount &&
                               Number(chore.reward_amount) > 0 && (
-                                <span className="text-sm font-bold text-[#3DAA8A] flex-shrink-0">
+                                <span className="text-sm font-bold text-cg-sage flex-shrink-0">
                                   {safeCurrency(chore.reward_amount)}
                                 </span>
                               )}
@@ -309,7 +309,7 @@ export default function ParentChoresPage() {
                                       title: chore.title,
                                     })
                                   }
-                                  className="relative group rounded-lg overflow-hidden border-2 border-[#FEF7ED] flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/40"
+                                  className="relative group rounded-lg overflow-hidden border-2 border-cg-amber-subtle flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-cg-sage/40"
                                   aria-label="View full photo"
                                 >
                                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -338,13 +338,13 @@ export default function ParentChoresPage() {
                                 onChange={(e) => setRejectReason(e.target.value)}
                                 rows={2}
                                 placeholder="What still needs doing? (optional)"
-                                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/40"
+                                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cg-sage/40"
                               />
                               <div className="flex gap-2">
                                 <button
                                   onClick={() => submitReject(chore)}
                                   disabled={busy}
-                                  className="flex-1 bg-[#F5A623] hover:bg-[#E09520] text-white text-sm font-semibold py-2 rounded-lg disabled:opacity-50"
+                                  className="flex-1 bg-cg-amber hover:bg-[#E09520] text-white text-sm font-semibold py-2 rounded-lg disabled:opacity-50"
                                 >
                                   {busy ? 'Sending...' : 'Send back'}
                                 </button>
@@ -364,7 +364,7 @@ export default function ParentChoresPage() {
                               <button
                                 onClick={() => handleApprove(chore)}
                                 disabled={busy}
-                                className="flex-1 flex items-center justify-center gap-1.5 bg-[#3DAA8A] hover:bg-[#2D8A70] text-white text-sm font-semibold py-2 rounded-lg disabled:opacity-50"
+                                className="flex-1 flex items-center justify-center gap-1.5 bg-cg-sage hover:bg-cg-sage-dark text-white text-sm font-semibold py-2 rounded-lg disabled:opacity-50"
                               >
                                 {busy ? (
                                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -379,7 +379,7 @@ export default function ParentChoresPage() {
                                   setRejectReason('');
                                 }}
                                 disabled={busy}
-                                className="flex-1 flex items-center justify-center gap-1.5 border-2 border-[#F5A623] bg-white hover:bg-[#FEF7ED] text-[#E09520] text-sm font-semibold py-2 rounded-lg disabled:opacity-50"
+                                className="flex-1 flex items-center justify-center gap-1.5 border-2 border-cg-amber bg-white hover:bg-cg-amber-subtle text-[#E09520] text-sm font-semibold py-2 rounded-lg disabled:opacity-50"
                               >
                                 <X className="h-4 w-4" />
                                 Reject
@@ -465,7 +465,7 @@ export default function ParentChoresPage() {
                           <div className="flex items-center gap-2 flex-shrink-0">
                             {chore.reward_amount &&
                               Number(chore.reward_amount) > 0 && (
-                                <span className="text-xs font-bold text-[#3DAA8A]">
+                                <span className="text-xs font-bold text-cg-sage">
                                   {safeCurrency(chore.reward_amount)}
                                 </span>
                               )}
@@ -589,18 +589,18 @@ function ChoreRow({
 
   if (isEditing) {
     return (
-      <li className="rounded-xl border-2 border-[#3DAA8A]/30 bg-[#3DAA8A]/5 p-4 space-y-2">
+      <li className="rounded-xl border-2 border-cg-sage/30 bg-cg-sage/5 p-4 space-y-2">
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/40"
+          className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-cg-sage/40"
         />
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           rows={2}
           placeholder="Description (optional)"
-          className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/40"
+          className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cg-sage/40"
         />
         <input
           type="number"
@@ -609,14 +609,14 @@ function ChoreRow({
           value={reward}
           onChange={(e) => setReward(e.target.value)}
           placeholder="Reward (optional)"
-          className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/40"
+          className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cg-sage/40"
         />
-        {err && <p className="text-xs text-[#C53030]">{err}</p>}
+        {err && <p className="text-xs text-cg-error">{err}</p>}
         <div className="flex gap-2">
           <button
             onClick={save}
             disabled={saving || !title.trim()}
-            className="flex-1 bg-[#3DAA8A] hover:bg-[#3DAA8A]/90 text-white text-sm font-semibold py-2 rounded-lg disabled:opacity-50"
+            className="flex-1 bg-cg-sage hover:bg-cg-sage/90 text-white text-sm font-semibold py-2 rounded-lg disabled:opacity-50"
           >
             {saving ? 'Saving...' : 'Save'}
           </button>
@@ -652,14 +652,14 @@ function ChoreRow({
             <p className="text-sm text-foreground/80 mt-1">{chore.description}</p>
           )}
           {chore.status === 'rejected' && chore.rejection_reason && (
-            <p className="mt-1 text-xs text-[#E09520] bg-[#FEF7ED] border border-[#FEF7ED] rounded-md px-2 py-1 inline-block">
+            <p className="mt-1 text-xs text-[#E09520] bg-cg-amber-subtle border border-cg-amber-subtle rounded-md px-2 py-1 inline-block">
               Sent back: {chore.rejection_reason}
             </p>
           )}
         </div>
         <div className="flex flex-col items-end gap-2 flex-shrink-0">
           {chore.reward_amount && Number(chore.reward_amount) > 0 && (
-            <span className="text-sm font-bold text-[#3DAA8A]">
+            <span className="text-sm font-bold text-cg-sage">
               {safeCurrency(chore.reward_amount)}
             </span>
           )}
@@ -675,7 +675,7 @@ function ChoreRow({
             <button
               onClick={onCancel}
               disabled={busy}
-              className="p-1.5 rounded-md hover:bg-[#FEE2E2] text-[#C53030]"
+              className="p-1.5 rounded-md hover:bg-cg-error-subtle text-cg-error"
               aria-label="Cancel chore"
             >
               {busy ? (
@@ -773,7 +773,7 @@ function CreateChoreModal({
             <select
               value={childId}
               onChange={(e) => setChildId(e.target.value)}
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/40"
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cg-sage/40"
             >
               {children.map((c) => (
                 <option key={c.id} value={c.id}>
@@ -791,7 +791,7 @@ function CreateChoreModal({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Take out the trash"
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/40"
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cg-sage/40"
             />
           </div>
 
@@ -804,7 +804,7 @@ function CreateChoreModal({
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
               placeholder="Any details or instructions"
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/40"
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cg-sage/40"
             />
           </div>
 
@@ -820,7 +820,7 @@ function CreateChoreModal({
                 value={reward}
                 onChange={(e) => setReward(e.target.value)}
                 placeholder="0.00"
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/40"
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cg-sage/40"
               />
             </div>
             <div>
@@ -831,13 +831,13 @@ function CreateChoreModal({
                 type="datetime-local"
                 value={dueAt}
                 onChange={(e) => setDueAt(e.target.value)}
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/40"
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cg-sage/40"
               />
             </div>
           </div>
 
           {err && (
-            <div className="bg-[#FEE2E2] border border-[#FEE2E2] text-[#9B2C2C] rounded-lg px-3 py-2 text-sm">
+            <div className="bg-cg-error-subtle border border-cg-error-subtle text-[#9B2C2C] rounded-lg px-3 py-2 text-sm">
               {err}
             </div>
           )}

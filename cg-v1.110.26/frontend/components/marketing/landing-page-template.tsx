@@ -188,7 +188,7 @@ export function LandingPageTemplate({
                     <span className="text-xs font-semibold uppercase tracking-wider text-gray-600 mb-2 block">
                       The reality
                     </span>
-                    <p className="text-gray-600 line-through decoration-[#C53030]/40 decoration-2">
+                    <p className="text-gray-600 line-through decoration-cg-error/40 decoration-2">
                       {point.old}
                     </p>
                   </div>

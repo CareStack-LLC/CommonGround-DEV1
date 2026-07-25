@@ -32,7 +32,7 @@ export function ChatbotWindow({
   return (
     <div className="fixed z-[40] flex flex-col bottom-24 left-3 right-3 h-[70vh] max-h-[520px] sm:right-auto sm:left-5 sm:w-[380px] sm:h-[520px] rounded-2xl bg-white border border-gray-200 shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-300">
       {/* Header */}
-      <div className="flex items-center justify-between bg-gradient-to-r from-[#3DAA8A] to-[#2D6A8F] px-4 py-3 text-white shrink-0 rounded-t-2xl">
+      <div className="flex items-center justify-between bg-gradient-to-r from-cg-sage to-cg-slate px-4 py-3 text-white shrink-0 rounded-t-2xl">
         <div>
           <h3 className="font-semibold text-sm">Aria</h3>
           <p className="text-xs text-white/80">CommonGround Assistant</p>

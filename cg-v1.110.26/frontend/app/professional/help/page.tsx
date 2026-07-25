@@ -124,8 +124,8 @@ function getEmbedUrl(url: string): string | null {
 }
 
 const CATEGORY_CONFIG = {
-    "getting-started": { label: "Getting Started", icon: <Compass className="h-4 w-4" />, color: "text-[#2D8A70] bg-[#E8F4F0] border-[#C5E5DB]" },
-    features: { label: "Features", icon: <Sparkles className="h-4 w-4" />, color: "text-[#2D6A8F] bg-[#F0F7FC] border-[#C2DEF0]" },
+    "getting-started": { label: "Getting Started", icon: <Compass className="h-4 w-4" />, color: "text-cg-sage-dark bg-cg-sage-subtle border-[#C5E5DB]" },
+    features: { label: "Features", icon: <Sparkles className="h-4 w-4" />, color: "text-cg-slate bg-[#F0F7FC] border-[#C2DEF0]" },
     faqs: { label: "FAQs", icon: <MessageCircleQuestion className="h-4 w-4" />, color: "text-blue-600 bg-blue-50 border-blue-200" },
 };
 
@@ -250,7 +250,7 @@ export default function HelpCenterPage() {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
-                        <div className="p-3 bg-gradient-to-br from-[#3DAA8A] to-[#1E3A4A] text-white rounded-xl shadow-lg shadow-[#3DAA8A]/20">
+                        <div className="p-3 bg-gradient-to-br from-cg-sage to-foreground text-white rounded-xl shadow-lg shadow-cg-sage/20">
                             <HelpCircle className="h-6 w-6" />
                         </div>
                         Help Center
@@ -266,7 +266,7 @@ export default function HelpCenterPage() {
                     placeholder="Search help articles..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="pl-10 border-slate-200 focus:border-[#3DAA8A]"
+                    className="pl-10 border-slate-200 focus:border-cg-sage"
                 />
             </div>
 
@@ -282,7 +282,7 @@ export default function HelpCenterPage() {
                         key={tab.id}
                         onClick={() => { setActiveCategory(tab.id); setSearch(""); }}
                         className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium border transition-all ${activeCategory === tab.id
-                            ? "bg-[#3DAA8A] text-white border-[#3DAA8A] shadow-sm"
+                            ? "bg-cg-sage text-white border-cg-sage shadow-sm"
                             : "bg-white text-slate-600 border-slate-200 hover:border-slate-300"
                             }`}
                     >
@@ -312,7 +312,7 @@ export default function HelpCenterPage() {
                                     onClick={() => setSelectedArticle(article)}
                                     className="w-full text-left group"
                                 >
-                                    <Card className="border-slate-200 hover:shadow-md hover:border-[#3DAA8A]/30 transition-all">
+                                    <Card className="border-slate-200 hover:shadow-md hover:border-cg-sage/30 transition-all">
                                         <CardContent className="pt-4 pb-4">
                                             <div className="flex items-start gap-3">
                                                 <div className={`p-2 rounded-lg border shrink-0 ${cfg.color}`}>
@@ -341,7 +341,7 @@ export default function HelpCenterPage() {
                                                         </Badge>
                                                     </div>
                                                 </div>
-                                                <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-[#5BC4A0] transition-colors shrink-0 mt-1" />
+                                                <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-cg-sage-light transition-colors shrink-0 mt-1" />
                                             </div>
                                         </CardContent>
                                     </Card>
@@ -354,7 +354,7 @@ export default function HelpCenterPage() {
                 {/* Tours sidebar */}
                 <div className="space-y-3">
                     <h2 className="text-sm font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                        <div className="h-1 w-6 bg-[#3DAA8A] rounded-full" />
+                        <div className="h-1 w-6 bg-cg-sage rounded-full" />
                         In-App Tours
                     </h2>
                     {TOURS.map(tour => {
@@ -363,7 +363,7 @@ export default function HelpCenterPage() {
                             <Card key={tour.id} className="border-slate-200">
                                 <CardContent className="pt-4 pb-4">
                                     <div className="flex items-start gap-3">
-                                        <div className={`p-2 rounded-lg shrink-0 ${isDone ? "bg-[#E8F4F0] text-[#2D8A70]" : "bg-[#E8F4F0] text-[#3DAA8A]"}`}>
+                                        <div className={`p-2 rounded-lg shrink-0 ${isDone ? "bg-cg-sage-subtle text-cg-sage-dark" : "bg-cg-sage-subtle text-cg-sage"}`}>
                                             <PlayCircle className="h-4 w-4" />
                                         </div>
                                         <div className="flex-1 min-w-0">
@@ -375,8 +375,8 @@ export default function HelpCenterPage() {
                                     <Button
                                         size="sm"
                                         className={`w-full mt-3 gap-1.5 text-xs ${isDone
-                                            ? "bg-[#E8F4F0] text-[#2D8A70] hover:bg-[#E8F4F0] border border-[#C5E5DB]"
-                                            : "bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white"
+                                            ? "bg-cg-sage-subtle text-cg-sage-dark hover:bg-cg-sage-subtle border border-[#C5E5DB]"
+                                            : "bg-cg-sage hover:bg-[#2D8A6E] text-white"
                                             }`}
                                         onClick={() => startTour(tour)}
                                     >

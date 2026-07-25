@@ -62,8 +62,8 @@ function CheckInPill({
                 disabled
                     ? 'bg-[var(--portal-primary)] opacity-40 cursor-not-allowed'
                     : pulse
-                        ? 'bg-gradient-to-r from-cg-amber to-[#F5A623] animate-pulse hover:shadow-md'
-                        : 'bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] hover:shadow-md hover:scale-105'
+                        ? 'bg-gradient-to-r from-cg-amber to-cg-amber animate-pulse hover:shadow-md'
+                        : 'bg-gradient-to-r from-[var(--portal-primary)] to-cg-slate hover:shadow-md hover:scale-105'
             } ${loading ? 'opacity-80 cursor-wait' : ''}`}
         >
             {loading ? (
@@ -301,7 +301,7 @@ export function DashboardCustodyCard({
                         <div
                             className={`h-full rounded-full transition-all duration-700 ${
                                 isWithYou
-                                    ? 'bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F]'
+                                    ? 'bg-gradient-to-r from-[var(--portal-primary)] to-cg-slate'
                                     : hasCurrentSession
                                         ? 'bg-cg-slate/60'
                                         : 'bg-cg-amber/40'

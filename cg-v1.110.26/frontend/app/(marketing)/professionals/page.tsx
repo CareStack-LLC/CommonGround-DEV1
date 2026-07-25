@@ -166,7 +166,7 @@ const story = [
 
 export default function ProfessionalsPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9]">
+    <div className="min-h-screen bg-gradient-to-b from-background via-white to-[#F5F9F9]">
       <SectionTracker page="professionals" />
       <JsonLd
         data={{
@@ -184,17 +184,17 @@ export default function ProfessionalsPage() {
         <div className="max-w-5xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#1E3A4A]/10 rounded-full mb-6">
-                <Eye className="w-4 h-4 text-[#1E3A4A]" />
-                <span className="text-sm font-medium text-[#1E3A4A]">For Family Law Professionals</span>
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-foreground/10 rounded-full mb-6">
+                <Eye className="w-4 h-4 text-foreground" />
+                <span className="text-sm font-medium text-foreground">For Family Law Professionals</span>
               </div>
               <h1
-                className="text-4xl sm:text-5xl lg:text-6xl text-[#1E3A4A] mb-6 leading-[1.1]"
+                className="text-4xl sm:text-5xl lg:text-6xl text-foreground mb-6 leading-[1.1]"
                 style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
               >
                 Open a clean case file,
                 <br />
-                <span className="text-[#3DAA8A]">not a box of screenshots</span>
+                <span className="text-cg-sage">not a box of screenshots</span>
               </h1>
               <p className="text-lg sm:text-xl text-gray-600 mb-6 leading-relaxed">
                 CommonGround hands you verified, timestamped co-parenting activity — messages,
@@ -206,14 +206,14 @@ export default function ProfessionalsPage() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <a
                   href="#demo"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-[#1E3A4A] text-white font-semibold rounded-full hover:bg-[#2D6A8F] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 group"
+                  className="inline-flex items-center justify-center px-8 py-4 bg-foreground text-white font-semibold rounded-full hover:bg-cg-slate transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 group"
                 >
                   Request a Demo
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </a>
                 <Link
                   href="/features"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-white text-[#1E3A4A] font-semibold rounded-full border-2 border-[#1E3A4A]/20 hover:border-[#1E3A4A]/40 hover:bg-[#1E3A4A]/5 transition-all"
+                  className="inline-flex items-center justify-center px-8 py-4 bg-white text-foreground font-semibold rounded-full border-2 border-foreground/20 hover:border-foreground/40 hover:bg-foreground/5 transition-all"
                 >
                   See what your clients get
                 </Link>
@@ -256,10 +256,10 @@ export default function ProfessionalsPage() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2
-              className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+              className="text-3xl sm:text-4xl text-foreground mb-4"
               style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
             >
-              Built for every family law <span className="text-[#3DAA8A]">professional</span>
+              Built for every family law <span className="text-cg-sage">professional</span>
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Whether you represent a parent, evaluate a family, or mediate a dispute — CommonGround
@@ -273,18 +273,18 @@ export default function ProfessionalsPage() {
               return (
                 <div
                   key={item.role}
-                  className="flex flex-col bg-gradient-to-br from-[#F5F9F9] to-white rounded-2xl p-6 border-2 border-[#1E3A4A]/8 hover:border-[#3DAA8A]/30 transition-all hover:shadow-md"
+                  className="flex flex-col bg-gradient-to-br from-[#F5F9F9] to-white rounded-2xl p-6 border-2 border-foreground/8 hover:border-cg-sage/30 transition-all hover:shadow-md"
                 >
                   <div className="flex items-start gap-4 mb-3">
-                    <div className="w-12 h-12 rounded-xl bg-[#3DAA8A]/10 flex items-center justify-center flex-shrink-0">
+                    <div className="w-12 h-12 rounded-xl bg-cg-sage/10 flex items-center justify-center flex-shrink-0">
                       {item.brandIcon ? (
                         <BrandIcon name={item.brandIcon} size={24} />
                       ) : Icon ? (
-                        <Icon className="w-6 h-6 text-[#3DAA8A]" />
+                        <Icon className="w-6 h-6 text-cg-sage" />
                       ) : null}
                     </div>
                     <div>
-                      <h3 className="font-semibold text-[#1E3A4A] mb-1">{item.role}</h3>
+                      <h3 className="font-semibold text-foreground mb-1">{item.role}</h3>
                       <p className="text-sm text-gray-600">{item.description}</p>
                     </div>
                   </div>
@@ -302,15 +302,15 @@ export default function ProfessionalsPage() {
       </section>
 
       {/* Professional Interest Form — Demo CTA */}
-      <section className="py-16 sm:py-24 bg-gradient-to-b from-[#F4F8F7] to-white" id="demo" data-section="demo-form">
+      <section className="py-16 sm:py-24 bg-gradient-to-b from-background to-white" id="demo" data-section="demo-form">
         <div className="max-w-4xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-10 items-start">
             <div>
               <h2
-                className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+                className="text-3xl sm:text-4xl text-foreground mb-4"
                 style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
               >
-                Better data makes for <span className="text-[#3DAA8A]">better outcomes</span>
+                Better data makes for <span className="text-cg-sage">better outcomes</span>
               </h2>
               <p className="text-lg text-gray-600 mb-6">
                 See how CommonGround gives family law professionals the verified, organized data
@@ -324,7 +324,7 @@ export default function ProfessionalsPage() {
                   'No software to install',
                 ].map((item) => (
                   <li key={item} className="flex items-center gap-3 text-gray-700">
-                    <div className="w-5 h-5 rounded-full bg-[#3DAA8A] flex items-center justify-center flex-shrink-0">
+                    <div className="w-5 h-5 rounded-full bg-cg-sage flex items-center justify-center flex-shrink-0">
                       <Check className="w-3 h-3 text-white" />
                     </div>
                     {item}
@@ -333,7 +333,7 @@ export default function ProfessionalsPage() {
               </ul>
               <Link
                 href="/early-access"
-                className="inline-flex items-center gap-2 text-[#3DAA8A] font-medium hover:underline"
+                className="inline-flex items-center gap-2 text-cg-sage font-medium hover:underline"
               >
                 Or recommend CommonGround to a client
                 <ArrowRight className="w-4 h-4" />
@@ -347,14 +347,14 @@ export default function ProfessionalsPage() {
       {/* ═══════════════════════════════════════════════════
           STORY — A short narrative that captivates
       ═══════════════════════════════════════════════════ */}
-      <section className="relative overflow-hidden py-20 lg:py-28 bg-gradient-to-b from-[#F4F8F7] to-white">
+      <section className="relative overflow-hidden py-20 lg:py-28 bg-gradient-to-b from-background to-white">
         <div className="max-w-3xl mx-auto px-6">
           <div className="text-center mb-16">
-            <p className="font-medium mb-3 tracking-wide uppercase text-sm" style={{ color: '#2D6A8F' }}>
+            <p className="font-medium mb-3 tracking-wide uppercase text-sm" style={{ color: 'var(--cg-slate)' }}>
               From the case file
             </p>
             <h2
-              className="text-3xl sm:text-4xl lg:text-[2.75rem] text-[#1E3A4A] leading-[1.15]"
+              className="text-3xl sm:text-4xl lg:text-[2.75rem] text-foreground leading-[1.15]"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               The custody case that
@@ -362,15 +362,15 @@ export default function ProfessionalsPage() {
             </h2>
           </div>
           <div className="relative">
-            <div className="absolute left-[19px] top-3 bottom-3 w-px bg-gradient-to-b from-[#E85D75]/40 via-[#F5A623]/40 to-[#3DAA8A]/50" />
+            <div className="absolute left-[19px] top-3 bottom-3 w-px bg-gradient-to-b from-[#E85D75]/40 via-cg-amber/40 to-cg-sage/50" />
             <div className="space-y-10">
               {story.map((beat, i) => {
                 const dot =
                   beat.tone === 'before'
                     ? '#E85D75'
                     : beat.tone === 'turn'
-                    ? '#F5A623'
-                    : '#3DAA8A';
+                    ? 'var(--cg-amber)'
+                    : 'var(--cg-sage)';
                 return (
                   <div key={i} className="relative pl-14">
                     <div className="absolute left-0 top-0.5">
@@ -389,7 +389,7 @@ export default function ProfessionalsPage() {
                     </span>
                     {beat.kicker ? (
                       <p
-                        className="text-xl sm:text-2xl text-[#1E3A4A] leading-relaxed"
+                        className="text-xl sm:text-2xl text-foreground leading-relaxed"
                         style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
                       >
                         {beat.text}
@@ -413,15 +413,15 @@ export default function ProfessionalsPage() {
       <section className="py-16 sm:py-24 bg-white" data-section="data-access">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#3DAA8A]/10 rounded-full mb-6">
-              <ClipboardCheck className="w-4 h-4 text-[#3DAA8A]" />
-              <span className="text-sm font-medium text-[#3DAA8A]">What You&apos;ll See</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-cg-sage/10 rounded-full mb-6">
+              <ClipboardCheck className="w-4 h-4 text-cg-sage" />
+              <span className="text-sm font-medium text-cg-sage">What You&apos;ll See</span>
             </div>
             <h2
-              className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+              className="text-3xl sm:text-4xl text-foreground mb-4"
               style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
             >
-              A complete window into <span className="text-[#3DAA8A]">family activity</span>
+              A complete window into <span className="text-cg-sage">family activity</span>
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               When a parent invites you to their case, you get read access to verified, timestamped
@@ -435,17 +435,17 @@ export default function ProfessionalsPage() {
               return (
                 <div
                   key={item.title}
-                  className="bg-white rounded-2xl p-6 border-2 border-gray-100 hover:border-[#3DAA8A]/30 hover:shadow-lg transition-all group"
+                  className="bg-white rounded-2xl p-6 border-2 border-gray-100 hover:border-cg-sage/30 hover:shadow-lg transition-all group"
                 >
-                  <div className="h-12 w-12 rounded-xl bg-[#1E3A4A]/8 flex items-center justify-center mb-4 group-hover:bg-[#3DAA8A]/10 transition-colors">
+                  <div className="h-12 w-12 rounded-xl bg-foreground/8 flex items-center justify-center mb-4 group-hover:bg-cg-sage/10 transition-colors">
                     {item.brandIcon ? (
                       <BrandIcon name={item.brandIcon} size={24} />
                     ) : Icon ? (
-                      <Icon className="h-6 w-6 text-[#1E3A4A] group-hover:text-[#3DAA8A] transition-colors" />
+                      <Icon className="h-6 w-6 text-foreground group-hover:text-cg-sage transition-colors" />
                     ) : null}
                   </div>
                   <h3
-                    className="text-lg font-semibold text-[#1E3A4A] mb-2"
+                    className="text-lg font-semibold text-foreground mb-2"
                     style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
                   >
                     {item.title}
@@ -476,14 +476,14 @@ export default function ProfessionalsPage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 sm:py-24 bg-[#F4F8F7]" data-section="how-it-works">
+      <section className="py-16 sm:py-24 bg-background" data-section="how-it-works">
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2
-              className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+              className="text-3xl sm:text-4xl text-foreground mb-4"
               style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
             >
-              Simple to <span className="text-[#3DAA8A]">get started</span>
+              Simple to <span className="text-cg-sage">get started</span>
             </h2>
             <p className="text-lg text-gray-600 max-w-xl mx-auto">
               No complex onboarding. No software to install. Access verified family data in minutes.
@@ -493,12 +493,12 @@ export default function ProfessionalsPage() {
           <div className="space-y-8">
             {steps.map((item) => (
               <div key={item.step} className="flex gap-6 items-start">
-                <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-[#1E3A4A] flex items-center justify-center">
+                <div className="flex-shrink-0 w-14 h-14 rounded-2xl bg-foreground flex items-center justify-center">
                   <span className="text-lg font-bold text-white">{item.step}</span>
                 </div>
                 <div className="flex-1 pt-1">
                   <h3
-                    className="text-xl font-semibold text-[#1E3A4A] mb-2"
+                    className="text-xl font-semibold text-foreground mb-2"
                     style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
                   >
                     {item.title}
@@ -514,7 +514,7 @@ export default function ProfessionalsPage() {
       {/* Security & Trust */}
       <section className="py-16 sm:py-24 bg-white" data-section="security">
         <div className="max-w-6xl mx-auto px-6">
-          <div className="bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F] rounded-3xl p-8 sm:p-12 text-white">
+          <div className="bg-gradient-to-br from-foreground to-cg-slate rounded-3xl p-8 sm:p-12 text-white">
             <div className="grid lg:grid-cols-2 gap-10 items-center">
               <div>
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/15 rounded-full mb-6">
@@ -544,7 +544,7 @@ export default function ProfessionalsPage() {
                     key={feature}
                     className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/10"
                   >
-                    <Check className="w-5 h-5 text-[#3DAA8A] mb-2" />
+                    <Check className="w-5 h-5 text-cg-sage mb-2" />
                     <div className="text-sm font-medium text-white/90">{feature}</div>
                   </div>
                 ))}
@@ -559,10 +559,10 @@ export default function ProfessionalsPage() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-10">
             <h2
-              className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+              className="text-3xl sm:text-4xl text-foreground mb-4"
               style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
             >
-              What professionals <span className="text-[#3DAA8A]">are saying</span>
+              What professionals <span className="text-cg-sage">are saying</span>
             </h2>
             <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
               Attorneys, mediators, and GALs reach for CommonGround when a case needs clean evidence fast.
@@ -614,17 +614,17 @@ export default function ProfessionalsPage() {
       </section>
 
       {/* FAQ — Questions Professionals Ask */}
-      <section className="py-16 sm:py-24 bg-[#F4F8F7]" data-section="faq">
+      <section className="py-16 sm:py-24 bg-background" data-section="faq">
         <FaqJsonLd
           items={objections.map((o) => ({ question: o.question, answer: o.answer }))}
         />
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2
-              className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+              className="text-3xl sm:text-4xl text-foreground mb-4"
               style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
             >
-              Common <span className="text-[#3DAA8A]">questions</span>
+              Common <span className="text-cg-sage">questions</span>
             </h2>
           </div>
 
@@ -637,11 +637,11 @@ export default function ProfessionalsPage() {
                   className="bg-white rounded-2xl p-6 border border-gray-100"
                 >
                   <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-[#1E3A4A]/8 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Icon className="w-5 h-5 text-[#1E3A4A]" />
+                    <div className="w-10 h-10 rounded-xl bg-foreground/8 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Icon className="w-5 h-5 text-foreground" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-[#1E3A4A] mb-2">{obj.question}</h3>
+                      <h3 className="font-semibold text-foreground mb-2">{obj.question}</h3>
                       <p className="text-gray-600 leading-relaxed">{obj.answer}</p>
                     </div>
                   </div>
@@ -654,7 +654,7 @@ export default function ProfessionalsPage() {
           <div className="text-center mt-12">
             <a
               href="#demo"
-              className="inline-flex items-center justify-center px-8 py-4 bg-[#1E3A4A] text-white font-semibold rounded-full hover:bg-[#2D6A8F] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 group"
+              className="inline-flex items-center justify-center px-8 py-4 bg-foreground text-white font-semibold rounded-full hover:bg-cg-slate transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 group"
             >
               Request a Demo
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />

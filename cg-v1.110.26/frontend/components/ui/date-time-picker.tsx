@@ -157,7 +157,7 @@ export function DateTimePicker({
                 <Label>
                     <Clock className="h-4 w-4 inline mr-1" />
                     {label}
-                    {required && <span className="text-[#C53030] ml-1">*</span>}
+                    {required && <span className="text-cg-error ml-1">*</span>}
                 </Label>
             )}
 

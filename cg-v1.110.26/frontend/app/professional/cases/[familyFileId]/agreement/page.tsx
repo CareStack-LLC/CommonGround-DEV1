@@ -209,13 +209,13 @@ export default function CaseAgreementPage() {
 
   const getStatusBadge = (status: string) => {
     const statusConfig: Record<string, { color: string; icon: typeof CheckCircle2 }> = {
-      active: { color: "bg-[#E8F4F0] text-[#236E59]", icon: CheckCircle2 },
-      pending_approval: { color: "bg-[#FEF7ED] text-[#8F5E14]", icon: Clock },
+      active: { color: "bg-cg-sage-subtle text-[#236E59]", icon: CheckCircle2 },
+      pending_approval: { color: "bg-cg-amber-subtle text-[#8F5E14]", icon: Clock },
       draft: { color: "bg-gray-100 text-gray-800", icon: FileText },
       superseded: { color: "bg-slate-100 text-slate-800", icon: History },
       completed: { color: "bg-blue-100 text-blue-800", icon: CheckCircle2 },
       revoked: { color: "bg-red-100 text-red-800", icon: AlertCircle },
-      expired: { color: "bg-[#FEF7ED] text-[#8F5E14]", icon: AlertCircle },
+      expired: { color: "bg-cg-amber-subtle text-[#8F5E14]", icon: AlertCircle },
     };
     const config = statusConfig[status] || statusConfig.draft;
     const Icon = config.icon;
@@ -231,7 +231,7 @@ export default function CaseAgreementPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2D8A70]" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cg-sage-dark" />
       </div>
     );
   }
@@ -303,11 +303,11 @@ export default function CaseAgreementPage() {
                 <span className="text-sm text-muted-foreground flex items-center gap-1">
                   <Users className="h-4 w-4" /> Parent B
                 </span>
-                <span className="text-lg font-bold text-[#2D8A70]">
+                <span className="text-lg font-bold text-cg-sage-dark">
                   {Math.round(compliance.parent_b_compliance * 100)}%
                 </span>
               </div>
-              <Progress value={compliance.parent_b_compliance * 100} className="h-2 bg-[#E8F4F0]" />
+              <Progress value={compliance.parent_b_compliance * 100} className="h-2 bg-cg-sage-subtle" />
             </CardContent>
           </Card>
         </div>
@@ -378,16 +378,16 @@ export default function CaseAgreementPage() {
                         </p>
                       )}
                     </div>
-                    <div className="p-3 bg-[#E8F4F0] rounded-lg">
+                    <div className="p-3 bg-cg-sage-subtle rounded-lg">
                       <p className="text-sm font-medium text-[#236E59] mb-1">Respondent Approval</p>
                       {agreement.respondent_approved ? (
-                        <p className="text-sm text-[#2D8A70] flex items-center gap-1">
+                        <p className="text-sm text-cg-sage-dark flex items-center gap-1">
                           <CheckCircle2 className="h-4 w-4" />
                           Approved {agreement.respondent_approved_at &&
                             `on ${new Date(agreement.respondent_approved_at).toLocaleDateString()}`}
                         </p>
                       ) : (
-                        <p className="text-sm text-[#2D8A70] flex items-center gap-1">
+                        <p className="text-sm text-cg-sage-dark flex items-center gap-1">
                           <Clock className="h-4 w-4" />
                           Pending
                         </p>
@@ -406,11 +406,11 @@ export default function CaseAgreementPage() {
 
               {/* AI Quick Summary */}
               {(isSummaryLoading || summary) && (
-                <Card className="border-[#E0EFF8] bg-[#F0F7FC]/30 overflow-hidden mt-6">
-                  <CardHeader className="pb-3 border-b border-[#E0EFF8]/50 bg-white/50">
+                <Card className="border-cg-slate-subtle bg-[#F0F7FC]/30 overflow-hidden mt-6">
+                  <CardHeader className="pb-3 border-b border-cg-slate-subtle/50 bg-white/50">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <div className="p-1.5 bg-[#E0EFF8] text-[#2D6A8F] rounded-md">
+                        <div className="p-1.5 bg-cg-slate-subtle text-cg-slate rounded-md">
                           <Sparkles className="h-4 w-4" />
                         </div>
                         <div>
@@ -423,9 +423,9 @@ export default function CaseAgreementPage() {
                   <CardContent className="pt-6 space-y-6">
                     {isSummaryLoading ? (
                       <div className="space-y-4 animate-pulse">
-                        <div className="h-4 bg-[#E0EFF8] rounded w-3/4"></div>
-                        <div className="h-4 bg-[#E0EFF8] rounded w-5/6"></div>
-                        <div className="h-4 bg-[#E0EFF8] rounded w-1/2"></div>
+                        <div className="h-4 bg-cg-slate-subtle rounded w-3/4"></div>
+                        <div className="h-4 bg-cg-slate-subtle rounded w-5/6"></div>
+                        <div className="h-4 bg-cg-slate-subtle rounded w-1/2"></div>
                       </div>
                     ) : (
                       <>
@@ -436,10 +436,10 @@ export default function CaseAgreementPage() {
                         </div>
 
                         {summary?.key_points && summary.key_points.length > 0 && (
-                          <div className="grid sm:grid-cols-2 gap-3 pt-4 border-t border-[#E0EFF8]/50">
+                          <div className="grid sm:grid-cols-2 gap-3 pt-4 border-t border-cg-slate-subtle/50">
                             {summary.key_points.map((point, idx) => (
                               <div key={idx} className="flex items-start gap-2 text-sm text-slate-600">
-                                <div className="mt-1 w-1.5 h-1.5 rounded-full bg-[#4BA8C8] shrink-0" />
+                                <div className="mt-1 w-1.5 h-1.5 rounded-full bg-cg-slate-light shrink-0" />
                                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{point}</ReactMarkdown>
                               </div>
                             ))}
@@ -500,11 +500,11 @@ export default function CaseAgreementPage() {
                                 </p>
                               </div>
                               {section.is_completed ? (
-                                <Badge className="ml-auto mr-4 bg-[#E8F4F0] text-[#2D8A70] border-[#E8F4F0]">
+                                <Badge className="ml-auto mr-4 bg-cg-sage-subtle text-cg-sage-dark border-cg-sage-subtle">
                                   Complete
                                 </Badge>
                               ) : (
-                                <Badge className="ml-auto mr-4 bg-[#FEF7ED] text-[#B8791A] border-[#FEF7ED]">
+                                <Badge className="ml-auto mr-4 bg-cg-amber-subtle text-[#B8791A] border-cg-amber-subtle">
                                   In Progress
                                 </Badge>
                               )}
@@ -591,7 +591,7 @@ export default function CaseAgreementPage() {
                   <CardContent className="pt-4">
                     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                       <div className="flex items-start gap-4">
-                        <div className="p-3 bg-[#E0EFF8] text-[#2D6A8F] rounded-lg">
+                        <div className="p-3 bg-cg-slate-subtle text-cg-slate rounded-lg">
                           <Handshake className="h-5 w-5" />
                         </div>
                         <div>
@@ -611,7 +611,7 @@ export default function CaseAgreementPage() {
                       <div className="flex flex-col items-end gap-2">
                         <div className="flex items-center gap-4 text-sm">
                           <span
-                            className={`flex items-center gap-1 ${accord.parent_a_approved ? "text-[#2D8A70]" : "text-[#E09520]"
+                            className={`flex items-center gap-1 ${accord.parent_a_approved ? "text-cg-sage-dark" : "text-[#E09520]"
                               }`}
                           >
                             {accord.parent_a_approved ? (
@@ -622,7 +622,7 @@ export default function CaseAgreementPage() {
                             Parent A
                           </span>
                           <span
-                            className={`flex items-center gap-1 ${accord.parent_b_approved ? "text-[#2D8A70]" : "text-[#E09520]"
+                            className={`flex items-center gap-1 ${accord.parent_b_approved ? "text-cg-sage-dark" : "text-[#E09520]"
                               }`}
                           >
                             {accord.parent_b_approved ? (
@@ -674,14 +674,14 @@ export default function CaseAgreementPage() {
               {versions.map((version, index) => (
                 <Card
                   key={version.id}
-                  className={index === 0 ? "border-[#C5E5DB] bg-[#E8F4F0]/30" : ""}
+                  className={index === 0 ? "border-[#C5E5DB] bg-cg-sage-subtle/30" : ""}
                 >
                   <CardContent className="pt-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div
                           className={`w-10 h-10 rounded-full flex items-center justify-center ${index === 0
-                            ? "bg-[#E8F4F0] text-[#2D8A70]"
+                            ? "bg-cg-sage-subtle text-cg-sage-dark"
                             : "bg-slate-100 text-slate-600"
                             }`}
                         >
@@ -691,7 +691,7 @@ export default function CaseAgreementPage() {
                           <p className="font-medium flex items-center gap-2">
                             Version {version.version_number}
                             {index === 0 && (
-                              <Badge className="bg-[#E8F4F0] text-[#236E59]">Current</Badge>
+                              <Badge className="bg-cg-sage-subtle text-[#236E59]">Current</Badge>
                             )}
                           </p>
                           <p className="text-sm text-muted-foreground">
@@ -702,7 +702,7 @@ export default function CaseAgreementPage() {
                       </div>
                       <div className="flex items-center gap-4 text-sm">
                         <span
-                          className={`flex items-center gap-1 ${version.petitioner_approved ? "text-[#2D8A70]" : "text-muted-foreground"
+                          className={`flex items-center gap-1 ${version.petitioner_approved ? "text-cg-sage-dark" : "text-muted-foreground"
                             }`}
                         >
                           {version.petitioner_approved ? (
@@ -713,7 +713,7 @@ export default function CaseAgreementPage() {
                           Petitioner
                         </span>
                         <span
-                          className={`flex items-center gap-1 ${version.respondent_approved ? "text-[#2D8A70]" : "text-muted-foreground"
+                          className={`flex items-center gap-1 ${version.respondent_approved ? "text-cg-sage-dark" : "text-muted-foreground"
                             }`}
                         >
                           {version.respondent_approved ? (

@@ -105,7 +105,7 @@ export function DateTimeInput({
     <div className={`space-y-1 ${className}`}>
       <Label htmlFor={inputId}>
         {displayLabel}
-        {required && <span className="text-[#C53030] ml-1">*</span>}
+        {required && <span className="text-cg-error ml-1">*</span>}
       </Label>
       <Input
         type="datetime-local"
@@ -116,9 +116,9 @@ export function DateTimeInput({
         disabled={disabled}
         min={localMin}
         max={localMax}
-        className={error ? 'border-[#C53030]' : ''}
+        className={error ? 'border-cg-error' : ''}
       />
-      {error && <p className="text-sm text-[#C53030]">{error}</p>}
+      {error && <p className="text-sm text-cg-error">{error}</p>}
     </div>
   );
 }
@@ -213,7 +213,7 @@ export function DateInput({
     <div className={`space-y-1 ${className}`}>
       <Label htmlFor={inputId}>
         {displayLabel}
-        {required && <span className="text-[#C53030] ml-1">*</span>}
+        {required && <span className="text-cg-error ml-1">*</span>}
       </Label>
       <Input
         type="date"
@@ -224,9 +224,9 @@ export function DateInput({
         disabled={disabled}
         min={localMin}
         max={localMax}
-        className={error ? 'border-[#C53030]' : ''}
+        className={error ? 'border-cg-error' : ''}
       />
-      {error && <p className="text-sm text-[#C53030]">{error}</p>}
+      {error && <p className="text-sm text-cg-error">{error}</p>}
     </div>
   );
 }
@@ -295,7 +295,7 @@ export function TimeInput({
     <div className={`space-y-1 ${className}`}>
       <Label htmlFor={inputId}>
         {displayLabel}
-        {required && <span className="text-[#C53030] ml-1">*</span>}
+        {required && <span className="text-cg-error ml-1">*</span>}
       </Label>
       <Input
         type="time"
@@ -304,9 +304,9 @@ export function TimeInput({
         onChange={handleChange}
         required={required}
         disabled={disabled}
-        className={error ? 'border-[#C53030]' : ''}
+        className={error ? 'border-cg-error' : ''}
       />
-      {error && <p className="text-sm text-[#C53030]">{error}</p>}
+      {error && <p className="text-sm text-cg-error">{error}</p>}
     </div>
   );
 }

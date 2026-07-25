@@ -106,7 +106,7 @@ function GameCard({
 
         {/* High score */}
         <div className="flex items-center justify-center gap-2 bg-white/20 rounded-xl py-2 px-4">
-          <span className="text-[#F5A623]">🏆</span>
+          <span className="text-cg-amber">🏆</span>
           <span className="text-white font-bold">High Score: {game.highScore}</span>
         </div>
 
@@ -117,7 +117,7 @@ function GameCard({
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: delay + 0.2, type: "spring" }}
-              className="px-3 py-1 bg-[#C53030] text-white text-xs font-bold rounded-full shadow-lg"
+              className="px-3 py-1 bg-cg-error text-white text-xs font-bold rounded-full shadow-lg"
             >
               NEW!
             </motion.div>
@@ -127,7 +127,7 @@ function GameCard({
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: delay + 0.3, type: "spring" }}
-              className="px-3 py-1 bg-[#2D6A8F] text-white text-xs font-bold rounded-full shadow-lg"
+              className="px-3 py-1 bg-cg-slate text-white text-xs font-bold rounded-full shadow-lg"
             >
               2 PLAYERS
             </motion.div>
@@ -215,7 +215,7 @@ function MemoryGame({ onClose, onScore }: { onClose: () => void, onScore: (score
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-gradient-to-br from-[#E09520] via-[#2D6A8F] to-[#2D6A8F] z-50 flex flex-col"
+      className="fixed inset-0 bg-gradient-to-br from-[#E09520] via-cg-slate to-cg-slate z-50 flex flex-col"
     >
       {/* Header */}
       <div className="flex items-center justify-between p-4">
@@ -251,7 +251,7 @@ function MemoryGame({ onClose, onScore }: { onClose: () => void, onScore: (score
               className={`w-16 h-16 md:w-20 md:h-20 rounded-2xl text-4xl flex items-center justify-center shadow-lg transition-all ${
                 card.flipped || card.matched
                   ? 'bg-white'
-                  : 'bg-gradient-to-br from-[#F5A623] to-[#F5A623]'
+                  : 'bg-gradient-to-br from-cg-amber to-cg-amber'
               } ${card.matched ? 'opacity-50' : ''}`}
             >
               {(card.flipped || card.matched) ? card.emoji : '❓'}
@@ -276,14 +276,14 @@ function MemoryGame({ onClose, onScore }: { onClose: () => void, onScore: (score
               <span className="text-8xl">🎉</span>
               <h2 className="text-3xl font-black text-gray-900 mt-4">You Won!</h2>
               <p className="text-gray-600 mt-2">Completed in {moves} moves!</p>
-              <p className="text-2xl font-bold text-[#2D6A8F] mt-2">
+              <p className="text-2xl font-bold text-cg-slate mt-2">
                 Score: {Math.max(0, 100 - moves * 5)} points!
               </p>
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={onClose}
-                className="mt-6 px-8 py-4 bg-gradient-to-r from-[#F5A623] to-[#2D6A8F] text-white font-bold rounded-2xl"
+                className="mt-6 px-8 py-4 bg-gradient-to-r from-cg-amber to-cg-slate text-white font-bold rounded-2xl"
               >
                 Back to Arcade
               </motion.button>
@@ -361,7 +361,7 @@ function CatchGame({ onClose, onScore }: { onClose: () => void, onScore: (score:
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-gradient-to-b from-[#4BA8C8] via-[#2D6A8F] to-[#2D6A8F] z-50 overflow-hidden"
+      className="fixed inset-0 bg-gradient-to-b from-cg-slate-light via-cg-slate to-cg-slate z-50 overflow-hidden"
     >
       {/* Header */}
       <div className="absolute top-0 left-0 right-0 flex items-center justify-between p-4 z-10">
@@ -377,7 +377,7 @@ function CatchGame({ onClose, onScore }: { onClose: () => void, onScore: (score:
           <div className="px-4 py-2 bg-white/20 rounded-full text-white font-bold">
             ⏰ {timeLeft}s
           </div>
-          <div className="px-4 py-2 bg-[#F5A623] rounded-full text-[#1E3A4A] font-bold">
+          <div className="px-4 py-2 bg-cg-amber rounded-full text-foreground font-bold">
             ⭐ {score}
           </div>
         </div>
@@ -421,14 +421,14 @@ function CatchGame({ onClose, onScore }: { onClose: () => void, onScore: (score:
             >
               <span className="text-8xl">🎮</span>
               <h2 className="text-3xl font-black text-gray-900 mt-4">Time's Up!</h2>
-              <p className="text-2xl font-bold text-[#2D6A8F] mt-2">
+              <p className="text-2xl font-bold text-cg-slate mt-2">
                 Score: {score} points!
               </p>
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={onClose}
-                className="mt-6 px-8 py-4 bg-gradient-to-r from-[#2D6A8F] to-[#2D6A8F] text-white font-bold rounded-2xl"
+                className="mt-6 px-8 py-4 bg-gradient-to-r from-cg-slate to-cg-slate text-white font-bold rounded-2xl"
               >
                 Back to Arcade
               </motion.button>
@@ -443,12 +443,12 @@ function CatchGame({ onClose, onScore }: { onClose: () => void, onScore: (score:
 // Color Match Game
 function ColorMatchGame({ onClose, onScore }: { onClose: () => void, onScore: (score: number) => void }) {
   const colors = [
-    { name: 'Red', color: 'bg-[#C53030]' },
-    { name: 'Blue', color: 'bg-[#2D6A8F]' },
-    { name: 'Green', color: 'bg-[#3DAA8A]' },
-    { name: 'Yellow', color: 'bg-[#F5A623]' },
-    { name: 'Purple', color: 'bg-[#2D6A8F]' },
-    { name: 'Orange', color: 'bg-[#F5A623]' },
+    { name: 'Red', color: 'bg-cg-error' },
+    { name: 'Blue', color: 'bg-cg-slate' },
+    { name: 'Green', color: 'bg-cg-sage' },
+    { name: 'Yellow', color: 'bg-cg-amber' },
+    { name: 'Purple', color: 'bg-cg-slate' },
+    { name: 'Orange', color: 'bg-cg-amber' },
   ]
 
   const [score, setScore] = useState(0)
@@ -502,7 +502,7 @@ function ColorMatchGame({ onClose, onScore }: { onClose: () => void, onScore: (s
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-gradient-to-br from-[#2D6A8F] via-[#2D6A8F] to-fuchsia-600 z-50 flex flex-col"
+      className="fixed inset-0 bg-gradient-to-br from-cg-slate via-cg-slate to-fuchsia-600 z-50 flex flex-col"
     >
       {/* Header */}
       <div className="flex items-center justify-between p-4">
@@ -518,7 +518,7 @@ function ColorMatchGame({ onClose, onScore }: { onClose: () => void, onScore: (s
           <div className="px-4 py-2 bg-white/20 rounded-full text-white font-bold">
             Round {round}/10
           </div>
-          <div className="px-4 py-2 bg-[#F5A623] rounded-full text-[#1E3A4A] font-bold">
+          <div className="px-4 py-2 bg-cg-amber rounded-full text-foreground font-bold">
             ⭐ {score}
           </div>
         </div>
@@ -547,7 +547,7 @@ function ColorMatchGame({ onClose, onScore }: { onClose: () => void, onScore: (s
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className="text-[#F5A623] font-bold mb-4"
+            className="text-cg-amber font-bold mb-4"
           >
             🔥 {streak} streak!
           </motion.div>
@@ -559,7 +559,7 @@ function ColorMatchGame({ onClose, onScore }: { onClose: () => void, onScore: (s
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => handleAnswer(true)}
-            className="px-8 py-4 bg-[#3DAA8A] text-white font-bold rounded-2xl shadow-lg text-xl"
+            className="px-8 py-4 bg-cg-sage text-white font-bold rounded-2xl shadow-lg text-xl"
           >
             ✓ MATCH
           </motion.button>
@@ -567,7 +567,7 @@ function ColorMatchGame({ onClose, onScore }: { onClose: () => void, onScore: (s
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => handleAnswer(false)}
-            className="px-8 py-4 bg-[#C53030] text-white font-bold rounded-2xl shadow-lg text-xl"
+            className="px-8 py-4 bg-cg-error text-white font-bold rounded-2xl shadow-lg text-xl"
           >
             ✕ NO MATCH
           </motion.button>
@@ -589,14 +589,14 @@ function ColorMatchGame({ onClose, onScore }: { onClose: () => void, onScore: (s
             >
               <span className="text-8xl">🎨</span>
               <h2 className="text-3xl font-black text-gray-900 mt-4">Great Job!</h2>
-              <p className="text-2xl font-bold text-[#2D6A8F] mt-2">
+              <p className="text-2xl font-bold text-cg-slate mt-2">
                 Final Score: {score} points!
               </p>
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={onClose}
-                className="mt-6 px-8 py-4 bg-gradient-to-r from-[#2D6A8F] to-[#2D6A8F] text-white font-bold rounded-2xl"
+                className="mt-6 px-8 py-4 bg-gradient-to-r from-cg-slate to-cg-slate text-white font-bold rounded-2xl"
               >
                 Back to Arcade
               </motion.button>
@@ -617,7 +617,7 @@ export default function ArcadePage() {
       id: 'memory',
       title: 'Memory Match',
       icon: '🧠',
-      color: 'bg-gradient-to-br from-[#F5A623] to-[#E09520]',
+      color: 'bg-gradient-to-br from-cg-amber to-[#E09520]',
       shadowColor: '#9B2C2C',
       description: 'Match the pairs!',
       highScore: 85,
@@ -627,7 +627,7 @@ export default function ArcadePage() {
       id: 'catch',
       title: 'Star Catcher',
       icon: '⭐',
-      color: 'bg-gradient-to-br from-[#2D6A8F] to-[#2D6A8F]',
+      color: 'bg-gradient-to-br from-cg-slate to-cg-slate',
       shadowColor: '#1E4E6B',
       description: 'Catch falling stars!',
       highScore: 120,
@@ -637,7 +637,7 @@ export default function ArcadePage() {
       id: 'color',
       title: 'Color Match',
       icon: '🎨',
-      color: 'bg-gradient-to-br from-[#2D6A8F] to-[#2D6A8F]',
+      color: 'bg-gradient-to-br from-cg-slate to-cg-slate',
       shadowColor: '#1E4E6B',
       description: 'Match colors fast!',
       highScore: 95,
@@ -647,7 +647,7 @@ export default function ArcadePage() {
       id: 'puzzle',
       title: 'Puzzle Time',
       icon: '🧩',
-      color: 'bg-gradient-to-br from-[#F5A623] to-[#E09520]',
+      color: 'bg-gradient-to-br from-cg-amber to-[#E09520]',
       shadowColor: '#E09520',
       description: 'Solve fun puzzles!',
       highScore: 0,
@@ -658,8 +658,8 @@ export default function ArcadePage() {
       id: 'quiz',
       title: 'Trivia Quest',
       icon: '❓',
-      color: 'bg-gradient-to-br from-[#3DAA8A] to-[#2D8A70]',
-      shadowColor: '#2D8A70',
+      color: 'bg-gradient-to-br from-cg-sage to-cg-sage-dark',
+      shadowColor: 'var(--cg-sage-dark)',
       description: 'Test your knowledge!',
       highScore: 75,
       isMultiplayer: true
@@ -668,7 +668,7 @@ export default function ArcadePage() {
       id: 'draw',
       title: 'Doodle Dash',
       icon: '✏️',
-      color: 'bg-gradient-to-br from-[#C53030] to-[#E09520]',
+      color: 'bg-gradient-to-br from-cg-error to-[#E09520]',
       shadowColor: '#9B2C2C',
       description: 'Draw and guess!',
       highScore: 50,
@@ -700,7 +700,7 @@ export default function ArcadePage() {
   const totalHighScore = games.reduce((sum, g) => sum + g.highScore, 0)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F5A623] via-[#C53030] to-[#E09520] relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-cg-amber via-cg-error to-[#E09520] relative overflow-hidden">
       {/* Floating elements */}
       <FloatingGameElements />
 
@@ -723,7 +723,7 @@ export default function ArcadePage() {
             </motion.button>
             <div>
               <h1 className="text-4xl font-black text-white">Arcade</h1>
-              <p className="text-[#FEF7ED]">Play awesome games!</p>
+              <p className="text-cg-amber-subtle">Play awesome games!</p>
             </div>
           </div>
 
@@ -732,10 +732,10 @@ export default function ArcadePage() {
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: 0.2, type: "spring" }}
-            className="bg-[#F5A623] px-6 py-3 rounded-2xl shadow-lg"
+            className="bg-cg-amber px-6 py-3 rounded-2xl shadow-lg"
           >
-            <div className="text-[#1E3A4A] font-bold text-sm">TOTAL SCORE</div>
-            <div className="text-[#1E3A4A] font-black text-2xl flex items-center gap-2">
+            <div className="text-foreground font-bold text-sm">TOTAL SCORE</div>
+            <div className="text-foreground font-black text-2xl flex items-center gap-2">
               <span>🏆</span> {totalHighScore}
             </div>
           </motion.div>

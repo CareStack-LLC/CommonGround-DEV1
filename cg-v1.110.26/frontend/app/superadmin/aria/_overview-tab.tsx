@@ -18,7 +18,7 @@ export default function OverviewTab({ data }: { data: AriaInsights }) {
   return (
     <div className="space-y-4">
       {/* Daily Interventions Chart */}
-      <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+      <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
         <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">
           Daily Interventions ({data.days}d)
         </h2>
@@ -64,7 +64,7 @@ export default function OverviewTab({ data }: { data: AriaInsights }) {
 
       {/* Sentiment + Intervention Levels */}
       <div className="grid lg:grid-cols-2 gap-4">
-        <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
           <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">Sentiment Distribution</h2>
           {sentimentData.length > 0 && sentimentData.some((d) => d.value > 0) ? (
             <ResponsiveContainer width="100%" height={260}>
@@ -101,7 +101,7 @@ export default function OverviewTab({ data }: { data: AriaInsights }) {
           )}
         </div>
 
-        <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
           <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">Intervention Levels</h2>
           {data.intervention_levels?.length ? (
             <div className="space-y-3 pt-2">
@@ -135,7 +135,7 @@ export default function OverviewTab({ data }: { data: AriaInsights }) {
 
       {/* Processing Time + Circle/Call Summary */}
       <div className="grid lg:grid-cols-3 gap-4">
-        <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
           <h2 className="text-sm font-semibold text-[#D0E4EC] mb-3">Processing Time</h2>
           <div className="space-y-3">
             {[
@@ -144,36 +144,36 @@ export default function OverviewTab({ data }: { data: AriaInsights }) {
               { label: 'Max', value: `${data.processing_time?.max_ms || 0}ms` },
             ].map((item) => (
               <div key={item.label} className="flex justify-between items-center">
-                <span className="text-xs text-[#6B8A9A]">{item.label}</span>
+                <span className="text-xs text-muted-foreground">{item.label}</span>
                 <span className="text-sm font-medium text-white">{item.value}</span>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
           <h2 className="text-sm font-semibold text-[#D0E4EC] mb-3">Circle (KidComs)</h2>
           <div className="space-y-3">
             <div className="flex justify-between items-center">
-              <span className="text-xs text-[#6B8A9A]">Analyzed</span>
+              <span className="text-xs text-muted-foreground">Analyzed</span>
               <span className="text-sm font-medium text-white">
                 {formatNumber(data.circle_data?.total_analyzed || 0)}
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-xs text-[#6B8A9A]">Flagged</span>
+              <span className="text-xs text-muted-foreground">Flagged</span>
               <span className="text-sm font-medium text-red-400">
                 {formatNumber(data.circle_data?.total_flagged || 0)}
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-xs text-[#6B8A9A]">Flag Rate</span>
+              <span className="text-xs text-muted-foreground">Flag Rate</span>
               <span className="text-sm font-medium text-white">
                 {data.circle_data?.intervention_rate || 0}%
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-xs text-[#6B8A9A]">Avg Response</span>
+              <span className="text-xs text-muted-foreground">Avg Response</span>
               <span className="text-sm font-medium text-white">
                 {Math.round(data.circle_data?.avg_response_time_ms || 0)}ms
               </span>
@@ -181,29 +181,29 @@ export default function OverviewTab({ data }: { data: AriaInsights }) {
           </div>
         </div>
 
-        <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
           <h2 className="text-sm font-semibold text-[#D0E4EC] mb-3">Call Safety</h2>
           <div className="space-y-3">
             <div className="flex justify-between items-center">
-              <span className="text-xs text-[#6B8A9A]">Sessions</span>
+              <span className="text-xs text-muted-foreground">Sessions</span>
               <span className="text-sm font-medium text-white">
                 {formatNumber(data.call_data?.total_sessions || 0)}
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-xs text-[#6B8A9A]">Interventions</span>
+              <span className="text-xs text-muted-foreground">Interventions</span>
               <span className="text-sm font-medium text-amber-400">
                 {formatNumber(data.call_data?.total_interventions || 0)}
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-xs text-[#6B8A9A]">Terminated</span>
+              <span className="text-xs text-muted-foreground">Terminated</span>
               <span className="text-sm font-medium text-red-400">
                 {formatNumber(data.call_data?.terminated_count || 0)}
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-xs text-[#6B8A9A]">Avg Safety Score</span>
+              <span className="text-xs text-muted-foreground">Avg Safety Score</span>
               <span className="text-sm font-medium text-white">
                 {data.call_data?.avg_safety_score || 0}
               </span>

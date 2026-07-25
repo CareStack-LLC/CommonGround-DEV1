@@ -55,15 +55,15 @@ function CommonGroundLogo({ size = 48 }: { size?: number }) {
       <defs>
         <linearGradient id="cg-dash-bg" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0%" stopColor="#E8F4F8" />
-          <stop offset="100%" stopColor="#D6ECE8" />
+          <stop offset="100%" stopColor="var(--border)" />
         </linearGradient>
         <linearGradient id="cg-dash-pa" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#5BC4A0" />
-          <stop offset="100%" stopColor="#3DAA8A" />
+          <stop offset="0%" stopColor="var(--cg-sage-light)" />
+          <stop offset="100%" stopColor="var(--cg-sage)" />
         </linearGradient>
         <linearGradient id="cg-dash-pb" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#4BA8C8" />
-          <stop offset="100%" stopColor="#2D6A8F" />
+          <stop offset="0%" stopColor="var(--cg-slate-light)" />
+          <stop offset="100%" stopColor="var(--cg-slate)" />
         </linearGradient>
       </defs>
       <rect width="512" height="512" rx="120" fill="url(#cg-dash-bg)" />
@@ -74,10 +74,10 @@ function CommonGroundLogo({ size = 48 }: { size?: number }) {
       <circle cx="344" cy="148" r="48" fill="url(#cg-dash-pb)" />
       <path d="M294 218 Q344 258 394 218" stroke="url(#cg-dash-pb)" strokeWidth="16" strokeLinecap="round" fill="none" />
       {/* Golden arch */}
-      <path d="M218 168 Q256 104 294 168" stroke="#F5A623" strokeWidth="10" strokeLinecap="round" fill="none" opacity="0.95" />
+      <path d="M218 168 Q256 104 294 168" stroke="var(--cg-amber)" strokeWidth="10" strokeLinecap="round" fill="none" opacity="0.95" />
       {/* Child */}
-      <circle cx="256" cy="330" r="38" fill="#F5A623" />
-      <path d="M218 382 Q256 414 294 382" stroke="#F5A623" strokeWidth="12" strokeLinecap="round" fill="none" />
+      <circle cx="256" cy="330" r="38" fill="var(--cg-amber)" />
+      <path d="M218 382 Q256 414 294 382" stroke="var(--cg-amber)" strokeWidth="12" strokeLinecap="round" fill="none" />
     </svg>
   );
 }
@@ -541,10 +541,10 @@ export default function CircleContactDashboardPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="fixed inset-0 bg-gradient-to-br from-[#E8F4F8] via-background to-[#D6ECE8] dark:from-[#0D1B24] dark:via-background dark:to-[#0D1B24] -z-10" />
+        <div className="fixed inset-0 bg-gradient-to-br from-[#E8F4F8] via-background to-border dark:from-[#0D1B24] dark:via-background dark:to-[#0D1B24] -z-10" />
         <div className="flex flex-col items-center gap-5">
           <div className="relative">
-            <div className="absolute inset-0 bg-[#3DAA8A]/20 rounded-full blur-2xl animate-pulse" />
+            <div className="absolute inset-0 bg-cg-sage/20 rounded-full blur-2xl animate-pulse" />
             <CommonGroundLogo size={80} />
           </div>
           <div className="text-center">
@@ -563,7 +563,7 @@ export default function CircleContactDashboardPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Branded Background */}
-      <div className="fixed inset-0 bg-gradient-to-br from-[#E8F4F8]/50 via-background to-[#D6ECE8]/30 dark:from-[#0D1B24]/80 dark:via-background dark:to-[#0D1B24]/60 -z-10" />
+      <div className="fixed inset-0 bg-gradient-to-br from-[#E8F4F8]/50 via-background to-border/30 dark:from-[#0D1B24]/80 dark:via-background dark:to-[#0D1B24]/60 -z-10" />
 
       {/* Incoming Call Alert */}
       {incomingCall && (
@@ -585,9 +585,9 @@ export default function CircleContactDashboardPage() {
               <CommonGroundLogo size={40} />
               <div>
                 <h1 className="text-lg font-bold text-foreground leading-tight" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                  Common<span className="text-[#3DAA8A]">Ground</span>
+                  Common<span className="text-cg-sage">Ground</span>
                 </h1>
-                <p className="text-xs text-[#2D6A8F] dark:text-[#4BA8C8] font-medium" style={{ fontFamily: "'Inter', sans-serif" }}>
+                <p className="text-xs text-cg-slate dark:text-cg-slate-light font-medium" style={{ fontFamily: "'Inter', sans-serif" }}>
                   My Circle
                 </p>
               </div>
@@ -603,7 +603,7 @@ export default function CircleContactDashboardPage() {
                 aria-label="Edit your profile"
                 title="Edit your profile"
               >
-                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#3DAA8A] to-[#2D6A8F] flex items-center justify-center text-white text-sm font-bold overflow-hidden shadow-sm ring-2 ring-transparent group-hover/profile:ring-[#3DAA8A]/40 transition-all">
+                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-cg-sage to-cg-slate flex items-center justify-center text-white text-sm font-bold overflow-hidden shadow-sm ring-2 ring-transparent group-hover/profile:ring-cg-sage/40 transition-all">
                   {contactProfile.photoDataUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={contactProfile.photoDataUrl} alt={getContactDisplayName()} className="w-full h-full object-cover" />
@@ -611,13 +611,13 @@ export default function CircleContactDashboardPage() {
                     getContactDisplayName().charAt(0).toUpperCase()
                   )}
                 </div>
-                <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-[#3DAA8A] flex items-center justify-center border-2 border-card">
+                <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full bg-cg-sage flex items-center justify-center border-2 border-card">
                   <Pencil className="w-2 h-2 text-white" />
                 </div>
               </button>
               <button
                 onClick={() => router.push('/my-circle/contact/schedule')}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#2D6A8F] hover:text-[#3DAA8A] rounded-lg hover:bg-[#3DAA8A]/5 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-cg-slate hover:text-cg-sage rounded-lg hover:bg-cg-sage/5 transition-colors"
                 style={{ fontFamily: "'Inter', sans-serif" }}
                 aria-label="See when you can call"
                 title="When can I call?"
@@ -641,12 +641,12 @@ export default function CircleContactDashboardPage() {
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 py-8">
         {/* Greeting Card — matches parent dashboard style */}
-        <div className="mb-8 relative overflow-hidden bg-gradient-to-br from-[#3DAA8A]/5 to-[#3DAA8A]/10 dark:from-[#3DAA8A]/10 dark:to-[#2D6A8F]/10 rounded-2xl p-6 border border-[#3DAA8A]/10">
+        <div className="mb-8 relative overflow-hidden bg-gradient-to-br from-cg-sage/5 to-cg-sage/10 dark:from-cg-sage/10 dark:to-cg-slate/10 rounded-2xl p-6 border border-cg-sage/10">
           <div className="relative z-10 flex items-center gap-4">
             {/* Profile photo in greeting */}
             {contactProfile.photoDataUrl && (
               <button onClick={openProfileEdit} className="flex-shrink-0 group/greet">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden shadow-lg ring-2 ring-white/50 dark:ring-white/20 group-hover/greet:ring-[#3DAA8A]/60 transition-all">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden shadow-lg ring-2 ring-white/50 dark:ring-white/20 group-hover/greet:ring-cg-sage/60 transition-all">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={contactProfile.photoDataUrl} alt={getContactDisplayName()} className="w-full h-full object-cover" />
                 </div>
@@ -656,18 +656,18 @@ export default function CircleContactDashboardPage() {
               <h1 className="text-2xl sm:text-3xl font-semibold text-foreground" style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}>
                 {new Date().getHours() < 12 ? 'Good Morning' : new Date().getHours() < 17 ? 'Good Afternoon' : 'Good Evening'},
               </h1>
-              <h2 className="text-2xl sm:text-3xl font-semibold text-[#3DAA8A]" style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}>
+              <h2 className="text-2xl sm:text-3xl font-semibold text-cg-sage" style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}>
                 {getContactDisplayName()}
               </h2>
             </div>
           </div>
           {/* Calming nature illustration — same as parent dashboard */}
           <svg className="absolute right-2 bottom-0 w-32 h-32 sm:w-40 sm:h-40 opacity-15" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M160 180c-20-40-60-60-100-50 30-20 70-15 90 10-10-30-40-55-75-55 25-10 55 5 70 35-5-25-20-45-45-55 20 0 40 15 50 40 0-20-10-40-30-50 15 5 30 20 35 40 5-15 0-35-15-45 10 10 20 25 20 45" stroke="#3DAA8A" strokeWidth="2" strokeLinecap="round" fill="none"/>
-            <path d="M140 190c-10-50-40-80-80-85 20-5 45 10 55 35-5-25-25-45-50-50 15 0 35 15 45 35 0-20-15-35-30-40 15 5 25 20 30 35" stroke="#3DAA8A" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.6"/>
-            <circle cx="155" cy="65" r="3" fill="#3DAA8A" opacity="0.3"/>
-            <circle cx="170" cy="85" r="2" fill="#3DAA8A" opacity="0.2"/>
-            <circle cx="130" cy="100" r="2.5" fill="#3DAA8A" opacity="0.25"/>
+            <path d="M160 180c-20-40-60-60-100-50 30-20 70-15 90 10-10-30-40-55-75-55 25-10 55 5 70 35-5-25-20-45-45-55 20 0 40 15 50 40 0-20-10-40-30-50 15 5 30 20 35 40 5-15 0-35-15-45 10 10 20 25 20 45" stroke="var(--cg-sage)" strokeWidth="2" strokeLinecap="round" fill="none"/>
+            <path d="M140 190c-10-50-40-80-80-85 20-5 45 10 55 35-5-25-25-45-50-50 15 0 35 15 45 35 0-20-15-35-30-40 15 5 25 20 30 35" stroke="var(--cg-sage)" strokeWidth="1.5" strokeLinecap="round" fill="none" opacity="0.6"/>
+            <circle cx="155" cy="65" r="3" fill="var(--cg-sage)" opacity="0.3"/>
+            <circle cx="170" cy="85" r="2" fill="var(--cg-sage)" opacity="0.2"/>
+            <circle cx="130" cy="100" r="2.5" fill="var(--cg-sage)" opacity="0.25"/>
           </svg>
         </div>
 
@@ -689,14 +689,14 @@ export default function CircleContactDashboardPage() {
               disabled={!parentThread.is_active || !parentThread.is_verified}
               className={cn(
                 'w-full bg-card rounded-2xl border border-border p-5 text-left transition-all',
-                'hover:border-[#3DAA8A]/40 hover:shadow-lg hover:shadow-[#3DAA8A]/5',
+                'hover:border-cg-sage/40 hover:shadow-lg hover:shadow-cg-sage/5',
                 (!parentThread.is_active || !parentThread.is_verified) &&
                   'opacity-60 cursor-not-allowed hover:border-border hover:shadow-none'
               )}
             >
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#3DAA8A]/20 to-[#2D6A8F]/20 dark:from-[#3DAA8A]/30 dark:to-[#2D6A8F]/30 flex items-center justify-center flex-shrink-0">
-                  <MessageCircle className="h-6 w-6 text-[#3DAA8A]" />
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cg-sage/20 to-cg-slate/20 dark:from-cg-sage/30 dark:to-cg-slate/30 flex items-center justify-center flex-shrink-0">
+                  <MessageCircle className="h-6 w-6 text-cg-sage" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
@@ -707,7 +707,7 @@ export default function CircleContactDashboardPage() {
                       Message {parentThread.parent_name}
                     </h4>
                     {parentThreadUnread > 0 && (
-                      <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-[#3DAA8A] text-white text-[10px] font-semibold flex items-center justify-center">
+                      <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-cg-sage text-white text-[10px] font-semibold flex items-center justify-center">
                         {parentThreadUnread}
                       </span>
                     )}
@@ -732,8 +732,8 @@ export default function CircleContactDashboardPage() {
         {/* Connection Section Header */}
         <div className="mb-5">
           <div className="flex items-center gap-2.5 mb-1.5">
-            <div className="w-8 h-8 rounded-lg bg-[#3DAA8A]/10 dark:bg-[#3DAA8A]/20 flex items-center justify-center">
-              <HandHeart className="h-4 w-4 text-[#3DAA8A]" />
+            <div className="w-8 h-8 rounded-lg bg-cg-sage/10 dark:bg-cg-sage/20 flex items-center justify-center">
+              <HandHeart className="h-4 w-4 text-cg-sage" />
             </div>
             <h3 className="text-xl font-bold text-foreground" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
               Your Connections
@@ -747,8 +747,8 @@ export default function CircleContactDashboardPage() {
         {/* Empty State */}
         {children.length === 0 ? (
           <div className="bg-card rounded-2xl border border-border p-10 text-center shadow-sm">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#E8F4F8] to-[#D6ECE8] dark:from-[#3DAA8A]/20 dark:to-[#2D6A8F]/20 flex items-center justify-center mx-auto mb-5">
-              <Users className="h-10 w-10 text-[#3DAA8A]" />
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#E8F4F8] to-border dark:from-cg-sage/20 dark:to-cg-slate/20 flex items-center justify-center mx-auto mb-5">
+              <Users className="h-10 w-10 text-cg-sage" />
             </div>
             <h3 className="text-xl font-bold text-foreground mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
               Awaiting Connections
@@ -757,7 +757,7 @@ export default function CircleContactDashboardPage() {
               Once a parent adds you to their circle and approves your access,
               you&apos;ll see the children you can connect with here.
             </p>
-            <p className="text-sm text-[#3DAA8A] dark:text-[#5BC4A0] mt-4 font-medium" style={{ fontFamily: "'Inter', sans-serif" }}>
+            <p className="text-sm text-cg-sage dark:text-cg-sage-light mt-4 font-medium" style={{ fontFamily: "'Inter', sans-serif" }}>
               Your patience and presence mean everything.
             </p>
           </div>
@@ -775,7 +775,7 @@ export default function CircleContactDashboardPage() {
                   key={child.child_id}
                   className={cn(
                     'group bg-card rounded-2xl border border-border p-5 cursor-pointer transition-all duration-300',
-                    'hover:border-[#3DAA8A]/40 hover:shadow-lg hover:shadow-[#3DAA8A]/5',
+                    'hover:border-cg-sage/40 hover:shadow-lg hover:shadow-cg-sage/5',
                     !status.allowed && 'opacity-60 cursor-not-allowed hover:border-border hover:shadow-none'
                   )}
                   onClick={() => status.allowed && setSelectedChild(child)}
@@ -790,7 +790,7 @@ export default function CircleContactDashboardPage() {
                       className="relative flex-shrink-0 group/avatar"
                       aria-label={`Edit ${displayName}`}
                     >
-                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#E8F4F8] to-[#F5A623]/20 dark:from-[#3DAA8A]/20 dark:to-[#F5A623]/10 flex items-center justify-center text-4xl shadow-sm overflow-hidden">
+                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#E8F4F8] to-cg-amber/20 dark:from-cg-sage/20 dark:to-cg-amber/10 flex items-center justify-center text-4xl shadow-sm overflow-hidden">
                         {photoUrl ? (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img src={photoUrl} alt={displayName} className="w-full h-full object-cover" />
@@ -803,7 +803,7 @@ export default function CircleContactDashboardPage() {
                         <Pencil className="w-4 h-4 text-white" />
                       </div>
                       {status.allowed && (
-                        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-[#3DAA8A] rounded-full border-2 border-card flex items-center justify-center">
+                        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-cg-sage rounded-full border-2 border-card flex items-center justify-center">
                           <div className="w-2 h-2 bg-white rounded-full" />
                         </div>
                       )}
@@ -818,7 +818,7 @@ export default function CircleContactDashboardPage() {
                         <span className={cn(
                           'px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full',
                           status.allowed
-                            ? 'bg-[#3DAA8A]/10 text-[#3DAA8A] dark:bg-[#3DAA8A]/20 dark:text-[#5BC4A0]'
+                            ? 'bg-cg-sage/10 text-cg-sage dark:bg-cg-sage/20 dark:text-cg-sage-light'
                             : 'bg-muted text-muted-foreground'
                         )} style={{ fontFamily: "var(--font-mono)" }}>
                           {status.allowed ? 'Online' : 'Offline'}
@@ -826,7 +826,7 @@ export default function CircleContactDashboardPage() {
                       </div>
 
                       {overrides[child.child_id]?.nickname && (
-                        <p className="text-[10px] text-[#3DAA8A] dark:text-[#5BC4A0] mb-1" style={{ fontFamily: "'Inter', sans-serif" }}>
+                        <p className="text-[10px] text-cg-sage dark:text-cg-sage-light mb-1" style={{ fontFamily: "'Inter', sans-serif" }}>
                           ✏️ Custom name
                         </p>
                       )}
@@ -834,23 +834,23 @@ export default function CircleContactDashboardPage() {
                       {/* Permission Icons */}
                       <div className="flex gap-1.5 mb-2.5">
                         {child.permissions.can_video_call && (
-                          <div className="p-1.5 bg-[#3DAA8A]/10 dark:bg-[#3DAA8A]/20 rounded-lg" title="Video Calls">
-                            <Video className="h-3.5 w-3.5 text-[#3DAA8A]" />
+                          <div className="p-1.5 bg-cg-sage/10 dark:bg-cg-sage/20 rounded-lg" title="Video Calls">
+                            <Video className="h-3.5 w-3.5 text-cg-sage" />
                           </div>
                         )}
                         {child.permissions.can_voice_call && (
-                          <div className="p-1.5 bg-[#2D6A8F]/10 dark:bg-[#2D6A8F]/20 rounded-lg" title="Voice Calls">
-                            <Phone className="h-3.5 w-3.5 text-[#2D6A8F] dark:text-[#4BA8C8]" />
+                          <div className="p-1.5 bg-cg-slate/10 dark:bg-cg-slate/20 rounded-lg" title="Voice Calls">
+                            <Phone className="h-3.5 w-3.5 text-cg-slate dark:text-cg-slate-light" />
                           </div>
                         )}
                         {child.permissions.can_chat && (
-                          <div className="p-1.5 bg-[#F5A623]/10 dark:bg-[#F5A623]/20 rounded-lg" title="Chat">
-                            <MessageCircle className="h-3.5 w-3.5 text-[#F5A623]" />
+                          <div className="p-1.5 bg-cg-amber/10 dark:bg-cg-amber/20 rounded-lg" title="Chat">
+                            <MessageCircle className="h-3.5 w-3.5 text-cg-amber" />
                           </div>
                         )}
                         {child.permissions.can_theater && (
-                          <div className="p-1.5 bg-[#1E3A4A]/10 dark:bg-[#4BA8C8]/15 rounded-lg" title="Watch Together">
-                            <Film className="h-3.5 w-3.5 text-[#1E3A4A] dark:text-[#4BA8C8]" />
+                          <div className="p-1.5 bg-foreground/10 dark:bg-cg-slate-light/15 rounded-lg" title="Watch Together">
+                            <Film className="h-3.5 w-3.5 text-foreground dark:text-cg-slate-light" />
                           </div>
                         )}
                         <span className="text-[10px] text-muted-foreground self-center ml-1" style={{ fontFamily: "var(--font-mono)" }}>
@@ -880,7 +880,7 @@ export default function CircleContactDashboardPage() {
 
                       {/* Unavailable Reason */}
                       {!status.allowed && status.reason && (
-                        <p className="mt-2 text-xs text-[#F5A623] font-medium" style={{ fontFamily: "'Inter', sans-serif" }}>
+                        <p className="mt-2 text-xs text-cg-amber font-medium" style={{ fontFamily: "'Inter', sans-serif" }}>
                           {status.reason}
                         </p>
                       )}
@@ -888,7 +888,7 @@ export default function CircleContactDashboardPage() {
 
                     {/* Arrow */}
                     {status.allowed && (
-                      <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-[#3DAA8A] transition-colors flex-shrink-0 mt-1" />
+                      <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-cg-sage transition-colors flex-shrink-0 mt-1" />
                     )}
                   </div>
                 </div>
@@ -899,9 +899,9 @@ export default function CircleContactDashboardPage() {
 
         {/* Encouraging Message — moved below connections */}
         <div className="mt-8 mb-8 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#3DAA8A]/10 dark:bg-[#3DAA8A]/20 rounded-full mb-4 border border-[#3DAA8A]/20">
-            <Star className="h-4 w-4 text-[#F5A623]" />
-            <span className="text-sm font-semibold text-[#2D6A8F] dark:text-[#4BA8C8]" style={{ fontFamily: "'Inter', sans-serif" }}>
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-cg-sage/10 dark:bg-cg-sage/20 rounded-full mb-4 border border-cg-sage/20">
+            <Star className="h-4 w-4 text-cg-amber" />
+            <span className="text-sm font-semibold text-cg-slate dark:text-cg-slate-light" style={{ fontFamily: "'Inter', sans-serif" }}>
               You&apos;re Part of Something Special
             </span>
           </div>
@@ -910,9 +910,9 @@ export default function CircleContactDashboardPage() {
           </h3>
           <p className="text-muted-foreground max-w-xl mx-auto mb-3 leading-relaxed" style={{ fontFamily: "'Inter', sans-serif" }}>
             You&apos;re part of a trusted circle helping to keep a child grounded in love and connection.
-            In times of change, <span className="text-[#3DAA8A] dark:text-[#5BC4A0] font-medium">you are their constant</span>.
+            In times of change, <span className="text-cg-sage dark:text-cg-sage-light font-medium">you are their constant</span>.
           </p>
-          <p className="text-sm text-[#3DAA8A] dark:text-[#5BC4A0] italic flex items-center justify-center gap-2" style={{ fontFamily: "'Inter', sans-serif" }}>
+          <p className="text-sm text-cg-sage dark:text-cg-sage-light italic flex items-center justify-center gap-2" style={{ fontFamily: "'Inter', sans-serif" }}>
             <Sparkles className="h-4 w-4" />
             {encouragingMessage}
           </p>
@@ -922,8 +922,8 @@ export default function CircleContactDashboardPage() {
         <div className="mt-4 mb-8">
           <div className="bg-card rounded-2xl p-6 border border-border shadow-sm">
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-xl bg-[#3DAA8A]/10 dark:bg-[#3DAA8A]/20 flex items-center justify-center shadow-sm flex-shrink-0">
-                <Shield className="h-6 w-6 text-[#3DAA8A]" />
+              <div className="w-12 h-12 rounded-xl bg-cg-sage/10 dark:bg-cg-sage/20 flex items-center justify-center shadow-sm flex-shrink-0">
+                <Shield className="h-6 w-6 text-cg-sage" />
               </div>
               <div className="flex-1">
                 <h4 className="font-bold text-foreground mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
@@ -935,8 +935,8 @@ export default function CircleContactDashboardPage() {
                 </p>
                 <div className="grid sm:grid-cols-3 gap-4">
                   <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#2D6A8F]/10 dark:bg-[#2D6A8F]/20 flex items-center justify-center flex-shrink-0">
-                      <Eye className="h-4 w-4 text-[#2D6A8F] dark:text-[#4BA8C8]" />
+                    <div className="w-8 h-8 rounded-lg bg-cg-slate/10 dark:bg-cg-slate/20 flex items-center justify-center flex-shrink-0">
+                      <Eye className="h-4 w-4 text-cg-slate dark:text-cg-slate-light" />
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-foreground" style={{ fontFamily: "'Inter', sans-serif" }}>Monitored</p>
@@ -946,8 +946,8 @@ export default function CircleContactDashboardPage() {
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#F5A623]/10 dark:bg-[#F5A623]/20 flex items-center justify-center flex-shrink-0">
-                      <Lock className="h-4 w-4 text-[#F5A623]" />
+                    <div className="w-8 h-8 rounded-lg bg-cg-amber/10 dark:bg-cg-amber/20 flex items-center justify-center flex-shrink-0">
+                      <Lock className="h-4 w-4 text-cg-amber" />
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-foreground" style={{ fontFamily: "'Inter', sans-serif" }}>Approved</p>
@@ -957,7 +957,7 @@ export default function CircleContactDashboardPage() {
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-[#3DAA8A]/10 dark:bg-[#3DAA8A]/20 flex items-center justify-center flex-shrink-0">
+                    <div className="w-8 h-8 rounded-lg bg-cg-sage/10 dark:bg-cg-sage/20 flex items-center justify-center flex-shrink-0">
                       <CommonGroundLogo size={16} />
                     </div>
                     <div>
@@ -976,11 +976,11 @@ export default function CircleContactDashboardPage() {
         {/* Footer */}
         <div className="text-center py-6">
           <p className="text-sm text-muted-foreground mb-1.5" style={{ fontFamily: "'Inter', sans-serif" }}>
-            <span className="text-[#2D6A8F] dark:text-[#4BA8C8] font-semibold">&quot;It takes a village to raise a child&quot;</span>
+            <span className="text-cg-slate dark:text-cg-slate-light font-semibold">&quot;It takes a village to raise a child&quot;</span>
           </p>
           <p className="text-xs text-muted-foreground" style={{ fontFamily: "'Inter', sans-serif" }}>
             Thank you for being part of this child&apos;s village.
-            Your love and consistency help them find their <span className="font-semibold text-[#3DAA8A] dark:text-[#5BC4A0]">common ground</span>.
+            Your love and consistency help them find their <span className="font-semibold text-cg-sage dark:text-cg-sage-light">common ground</span>.
           </p>
         </div>
       </main>
@@ -998,7 +998,7 @@ export default function CircleContactDashboardPage() {
             <div className="p-8 text-center">
               {/* Avatar */}
               <div className="relative inline-block mb-6">
-                <div className="w-28 h-28 rounded-3xl bg-gradient-to-br from-[#E8F4F8] to-[#F5A623]/20 dark:from-[#3DAA8A]/20 dark:to-[#F5A623]/10 flex items-center justify-center text-7xl mx-auto shadow-lg overflow-hidden">
+                <div className="w-28 h-28 rounded-3xl bg-gradient-to-br from-[#E8F4F8] to-cg-amber/20 dark:from-cg-sage/20 dark:to-cg-amber/10 flex items-center justify-center text-7xl mx-auto shadow-lg overflow-hidden">
                   {getDisplayPhoto(selectedChild) ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={getDisplayPhoto(selectedChild)!} alt={getDisplayName(selectedChild)} className="w-full h-full object-cover" />
@@ -1007,7 +1007,7 @@ export default function CircleContactDashboardPage() {
                   )}
                 </div>
                 <div className="absolute -bottom-2 left-1/2 -translate-x-1/2">
-                  <span className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full bg-[#3DAA8A]/10 text-[#3DAA8A] dark:bg-[#3DAA8A]/20 dark:text-[#5BC4A0] border border-[#3DAA8A]/20 shadow-sm" style={{ fontFamily: "var(--font-mono)" }}>
+                  <span className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full bg-cg-sage/10 text-cg-sage dark:bg-cg-sage/20 dark:text-cg-sage-light border border-cg-sage/20 shadow-sm" style={{ fontFamily: "var(--font-mono)" }}>
                     Ready to Connect
                   </span>
                 </div>
@@ -1020,7 +1020,7 @@ export default function CircleContactDashboardPage() {
               <p className="text-muted-foreground mb-1 text-sm" style={{ fontFamily: "'Inter', sans-serif" }}>
                 is excited to hear from you!
               </p>
-              <p className="text-sm text-[#3DAA8A] dark:text-[#5BC4A0] mb-6 font-medium" style={{ fontFamily: "'Inter', sans-serif" }}>
+              <p className="text-sm text-cg-sage dark:text-cg-sage-light mb-6 font-medium" style={{ fontFamily: "'Inter', sans-serif" }}>
                 Choose how to connect
               </p>
 
@@ -1032,18 +1032,18 @@ export default function CircleContactDashboardPage() {
                     disabled={isStartingCall}
                     className={cn(
                       'flex flex-col items-center gap-2.5 p-5 rounded-2xl transition-all duration-200',
-                      'bg-gradient-to-br from-[#3DAA8A]/10 to-[#3DAA8A]/20 hover:from-[#3DAA8A]/20 hover:to-[#3DAA8A]/30 active:scale-95',
-                      'dark:from-[#3DAA8A]/20 dark:to-[#3DAA8A]/10 dark:hover:from-[#3DAA8A]/30 dark:hover:to-[#3DAA8A]/20',
-                      'border border-[#3DAA8A]/20 hover:border-[#3DAA8A]/40',
+                      'bg-gradient-to-br from-cg-sage/10 to-cg-sage/20 hover:from-cg-sage/20 hover:to-cg-sage/30 active:scale-95',
+                      'dark:from-cg-sage/20 dark:to-cg-sage/10 dark:hover:from-cg-sage/30 dark:hover:to-cg-sage/20',
+                      'border border-cg-sage/20 hover:border-cg-sage/40',
                       'disabled:opacity-50 disabled:active:scale-100'
                     )}
                   >
                     {isStartingCall ? (
-                      <Loader2 className="h-10 w-10 text-[#3DAA8A] animate-spin" />
+                      <Loader2 className="h-10 w-10 text-cg-sage animate-spin" />
                     ) : (
-                      <Video className="h-10 w-10 text-[#3DAA8A]" />
+                      <Video className="h-10 w-10 text-cg-sage" />
                     )}
-                    <span className="font-bold text-[#3DAA8A] dark:text-[#5BC4A0] text-sm" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                    <span className="font-bold text-cg-sage dark:text-cg-sage-light text-sm" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                       Video Call
                     </span>
                   </button>
@@ -1054,18 +1054,18 @@ export default function CircleContactDashboardPage() {
                     disabled={isStartingCall}
                     className={cn(
                       'flex flex-col items-center gap-2.5 p-5 rounded-2xl transition-all duration-200',
-                      'bg-gradient-to-br from-[#2D6A8F]/10 to-[#2D6A8F]/20 hover:from-[#2D6A8F]/20 hover:to-[#2D6A8F]/30 active:scale-95',
-                      'dark:from-[#2D6A8F]/20 dark:to-[#2D6A8F]/10 dark:hover:from-[#2D6A8F]/30 dark:hover:to-[#2D6A8F]/20',
-                      'border border-[#2D6A8F]/20 hover:border-[#2D6A8F]/40',
+                      'bg-gradient-to-br from-cg-slate/10 to-cg-slate/20 hover:from-cg-slate/20 hover:to-cg-slate/30 active:scale-95',
+                      'dark:from-cg-slate/20 dark:to-cg-slate/10 dark:hover:from-cg-slate/30 dark:hover:to-cg-slate/20',
+                      'border border-cg-slate/20 hover:border-cg-slate/40',
                       'disabled:opacity-50 disabled:active:scale-100'
                     )}
                   >
                     {isStartingCall ? (
-                      <Loader2 className="h-10 w-10 text-[#2D6A8F] dark:text-[#4BA8C8] animate-spin" />
+                      <Loader2 className="h-10 w-10 text-cg-slate dark:text-cg-slate-light animate-spin" />
                     ) : (
-                      <Phone className="h-10 w-10 text-[#2D6A8F] dark:text-[#4BA8C8]" />
+                      <Phone className="h-10 w-10 text-cg-slate dark:text-cg-slate-light" />
                     )}
-                    <span className="font-bold text-[#2D6A8F] dark:text-[#4BA8C8] text-sm" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                    <span className="font-bold text-cg-slate dark:text-cg-slate-light text-sm" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                       Voice Call
                     </span>
                   </button>
@@ -1083,15 +1083,15 @@ export default function CircleContactDashboardPage() {
                       }}
                       className={cn(
                         'flex flex-col items-center gap-2 p-4 rounded-2xl transition-all duration-200',
-                        'bg-gradient-to-br from-[#F5A623]/10 to-[#F5A623]/20',
-                        'hover:from-[#F5A623]/20 hover:to-[#F5A623]/30',
-                        'dark:from-[#F5A623]/15 dark:to-[#F5A623]/10',
-                        'dark:hover:from-[#F5A623]/25 dark:hover:to-[#F5A623]/15',
-                        'active:scale-95 border border-[#F5A623]/20 hover:border-[#F5A623]/40',
+                        'bg-gradient-to-br from-cg-amber/10 to-cg-amber/20',
+                        'hover:from-cg-amber/20 hover:to-cg-amber/30',
+                        'dark:from-cg-amber/15 dark:to-cg-amber/10',
+                        'dark:hover:from-cg-amber/25 dark:hover:to-cg-amber/15',
+                        'active:scale-95 border border-cg-amber/20 hover:border-cg-amber/40',
                       )}
                     >
-                      <MessageCircle className="h-8 w-8 text-[#F5A623]" />
-                      <span className="font-bold text-sm text-[#F5A623]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Chat</span>
+                      <MessageCircle className="h-8 w-8 text-cg-amber" />
+                      <span className="font-bold text-sm text-cg-amber" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Chat</span>
                     </button>
                   )}
                   {selectedChild.permissions.can_theater && (
@@ -1147,7 +1147,7 @@ export default function CircleContactDashboardPage() {
                 className="relative group"
                 aria-label="Change photo"
               >
-                <div className="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-[#E8F4F8] to-[#F5A623]/20 dark:from-[#3DAA8A]/20 dark:to-[#F5A623]/10 flex items-center justify-center shadow-xl">
+                <div className="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-[#E8F4F8] to-cg-amber/20 dark:from-cg-sage/20 dark:to-cg-amber/10 flex items-center justify-center shadow-xl">
                   {editPhoto ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={editPhoto} alt="Preview" className="w-full h-full object-cover" />
@@ -1159,7 +1159,7 @@ export default function CircleContactDashboardPage() {
                 <div className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                   <Camera className="w-8 h-8 text-white" />
                 </div>
-                <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-[#3DAA8A] flex items-center justify-center shadow-lg border-2 border-card">
+                <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-cg-sage flex items-center justify-center shadow-lg border-2 border-card">
                   <Camera className="w-4 h-4 text-white" />
                 </div>
               </button>
@@ -1182,7 +1182,7 @@ export default function CircleContactDashboardPage() {
                 value={editName}
                 onChange={e => setEditName(e.target.value)}
                 placeholder={editChild.child_name}
-                className="w-full px-4 py-3 rounded-xl text-base bg-muted border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-[#3DAA8A] focus:border-transparent transition-all"
+                className="w-full px-4 py-3 rounded-xl text-base bg-muted border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-cg-sage focus:border-transparent transition-all"
                 style={{ fontFamily: "'Space Grotesk', sans-serif" }}
                 maxLength={30}
               />
@@ -1199,7 +1199,7 @@ export default function CircleContactDashboardPage() {
               </button>
               <button
                 onClick={saveEdit}
-                className="flex-1 py-3 rounded-xl bg-gradient-to-r from-[#3DAA8A] to-[#2D6A8F] text-white font-semibold text-sm flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all shadow-lg shadow-[#3DAA8A]/20"
+                className="flex-1 py-3 rounded-xl bg-gradient-to-r from-cg-sage to-cg-slate text-white font-semibold text-sm flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all shadow-lg shadow-cg-sage/20"
                 style={{ fontFamily: "'Inter', sans-serif" }}
               >
                 <Check className="w-4 h-4" /> Save
@@ -1253,7 +1253,7 @@ export default function CircleContactDashboardPage() {
                 className="relative group"
                 aria-label="Change profile photo"
               >
-                <div className="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-[#3DAA8A] to-[#2D6A8F] flex items-center justify-center shadow-xl text-white text-4xl font-bold">
+                <div className="w-24 h-24 rounded-full overflow-hidden bg-gradient-to-br from-cg-sage to-cg-slate flex items-center justify-center shadow-xl text-white text-4xl font-bold">
                   {profileEditPhoto ? (
                     // eslint-disable-next-line @next/next/no-img-element
                     <img src={profileEditPhoto} alt="Preview" className="w-full h-full object-cover" />
@@ -1265,7 +1265,7 @@ export default function CircleContactDashboardPage() {
                 <div className="absolute inset-0 rounded-full bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                   <Camera className="w-8 h-8 text-white" />
                 </div>
-                <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-[#3DAA8A] flex items-center justify-center shadow-lg border-2 border-card">
+                <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-cg-sage flex items-center justify-center shadow-lg border-2 border-card">
                   <Camera className="w-4 h-4 text-white" />
                 </div>
               </button>
@@ -1288,7 +1288,7 @@ export default function CircleContactDashboardPage() {
                 value={profileEditName}
                 onChange={e => setProfileEditName(e.target.value)}
                 placeholder={userData?.contactName || 'Your name'}
-                className="w-full px-4 py-3 rounded-xl text-base bg-muted border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-[#3DAA8A] focus:border-transparent transition-all"
+                className="w-full px-4 py-3 rounded-xl text-base bg-muted border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-cg-sage focus:border-transparent transition-all"
                 style={{ fontFamily: "'Space Grotesk', sans-serif" }}
                 maxLength={40}
               />
@@ -1305,7 +1305,7 @@ export default function CircleContactDashboardPage() {
               </button>
               <button
                 onClick={saveProfileEdit}
-                className="flex-1 py-3 rounded-xl bg-gradient-to-r from-[#3DAA8A] to-[#2D6A8F] text-white font-semibold text-sm flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all shadow-lg shadow-[#3DAA8A]/20"
+                className="flex-1 py-3 rounded-xl bg-gradient-to-r from-cg-sage to-cg-slate text-white font-semibold text-sm flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all shadow-lg shadow-cg-sage/20"
                 style={{ fontFamily: "'Inter', sans-serif" }}
               >
                 <Check className="w-4 h-4" /> Save

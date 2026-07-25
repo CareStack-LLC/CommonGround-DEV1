@@ -272,7 +272,7 @@ export default function MoviesPage() {
                 key={key}
                 onClick={() => setSelectedCategory(key as any)}
                 className={`flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold transition-all duration-200 ${selectedCategory === key
-                  ? 'bg-gradient-to-r from-[#3DAA8A] to-[#349878] text-white shadow-lg shadow-[#3DAA8A]/30'
+                  ? 'bg-gradient-to-r from-cg-sage to-[#349878] text-white shadow-lg shadow-cg-sage/30'
                   : ''
                   }`}
                 style={selectedCategory !== key
@@ -410,7 +410,7 @@ export default function MoviesPage() {
                   {/* Glowing border effect for originals */}
                   <div
                     className="absolute -inset-[2px] rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-sm"
-                    style={{ background: 'linear-gradient(135deg, #3DAA8A, #4BA8C8, #3DAA8A)' }}
+                    style={{ background: 'linear-gradient(135deg, var(--cg-sage), var(--cg-slate-light), var(--cg-sage))' }}
                   />
                   <div className="relative rounded-xl overflow-hidden" style={{ border: '2px solid transparent', background: 'var(--portal-surface)' }}>
                     <button
@@ -530,7 +530,7 @@ export default function MoviesPage() {
                 <div
                   className="flex-shrink-0 w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg"
                   style={{
-                    background: 'linear-gradient(135deg, #4BA8C8, #3DAA8A)',
+                    background: 'linear-gradient(135deg, var(--cg-slate-light), var(--cg-sage))',
                     boxShadow: '0 8px 32px rgba(75, 168, 200, 0.3)',
                   }}
                 >
@@ -560,7 +560,7 @@ export default function MoviesPage() {
                     className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white transition-all duration-200 hover:scale-105 active:scale-95 shadow-lg"
                     style={{
                       fontFamily: 'Space Grotesk, sans-serif',
-                      background: 'linear-gradient(135deg, #4BA8C8, #3DAA8A)',
+                      background: 'linear-gradient(135deg, var(--cg-slate-light), var(--cg-sage))',
                       boxShadow: '0 4px 16px rgba(75, 168, 200, 0.3)',
                     }}
                   >
@@ -636,7 +636,7 @@ export default function MoviesPage() {
                   Watch Together 🎬
                 </h3>
                 <p className="text-xs truncate max-w-[240px]" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>
-                  Invite someone to watch <span className="text-[#4BA8C8] font-bold">{watchTogetherMovie.title}</span>
+                  Invite someone to watch <span className="text-cg-slate-light font-bold">{watchTogetherMovie.title}</span>
                 </p>
               </div>
               <button
@@ -659,7 +659,7 @@ export default function MoviesPage() {
                 </div>
               ) : (
                 contacts.map(contact => {
-                  const avatarColor = ['from-[#3DAA8A] to-emerald-500', 'from-[#4BA8C8] to-[#3DAA8A]', 'from-amber-500 to-orange-400', 'from-red-500 to-orange-500', 'from-pink-500 to-rose-500', 'from-[#2D6A8F] to-purple-500'][contact.display_name.length % 6];
+                  const avatarColor = ['from-cg-sage to-emerald-500', 'from-cg-slate-light to-cg-sage', 'from-amber-500 to-orange-400', 'from-red-500 to-orange-500', 'from-pink-500 to-rose-500', 'from-cg-slate to-purple-500'][contact.display_name.length % 6];
 
                   return (
                     <button
@@ -680,7 +680,7 @@ export default function MoviesPage() {
                           {contact.relationship?.replace('_', ' ') || 'Circle Member'}
                         </p>
                       </div>
-                      <div className="w-10 h-10 rounded-full bg-[#4BA8C8]/10 flex items-center justify-center text-[#4BA8C8] group-hover:bg-[#4BA8C8] group-hover:text-white transition-colors">
+                      <div className="w-10 h-10 rounded-full bg-cg-slate-light/10 flex items-center justify-center text-cg-slate-light group-hover:bg-cg-slate-light group-hover:text-white transition-colors">
                         <Video className="w-5 h-5" />
                       </div>
                     </button>
@@ -707,7 +707,7 @@ export default function MoviesPage() {
       {isStartingCall && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-[60]">
           <div className="text-center space-y-6">
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#4BA8C8] to-[#3DAA8A] flex items-center justify-center mx-auto animate-pulse shadow-2xl shadow-[#4BA8C8]/20">
+            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-cg-slate-light to-cg-sage flex items-center justify-center mx-auto animate-pulse shadow-2xl shadow-cg-slate-light/20">
               <Video className="w-12 h-12 text-white" />
             </div>
             <div>

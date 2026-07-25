@@ -9,7 +9,7 @@
  *     data={currentSeries}         // [{date, value}]
  *     priorData={priorSeries}      // [{date, prior_value}] (optional)
  *     valueLabel="signups"
- *     color="#3DAA8A"
+ *     color="var(--cg-sage)"
  *     height={260}
  *   />
  *
@@ -55,8 +55,8 @@ interface Props {
 }
 
 const TOOLTIP_STYLE = {
-  backgroundColor: '#1E3A4A',
-  border: '1px solid #2D6A8F',
+  backgroundColor: 'var(--foreground)',
+  border: '1px solid var(--cg-slate)',
   borderRadius: 8,
   color: '#D0E4EC',
   fontSize: 12,
@@ -64,13 +64,13 @@ const TOOLTIP_STYLE = {
 
 const AXIS_PROPS = {
   stroke: '#4A6E7F',
-  tick: { fill: '#6B8A9A', fontSize: 10 },
+  tick: { fill: 'var(--muted-foreground)', fontSize: 10 },
   tickLine: false,
 } as const;
 
 const GRID_PROPS = {
   strokeDasharray: '3 3',
-  stroke: '#2D6A8F',
+  stroke: 'var(--cg-slate)',
   opacity: 0.2,
 } as const;
 
@@ -79,7 +79,7 @@ export function CompareToggleChart({
   priorData,
   title,
   valueLabel = 'value',
-  color = '#3DAA8A',
+  color = 'var(--cg-sage)',
   height = 260,
   formatValue,
   tooltip,
@@ -99,7 +99,7 @@ export function CompareToggleChart({
   const fmt = formatValue ?? ((n: number) => n.toLocaleString());
 
   return (
-    <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+    <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
       {(title || hasPrior || !hasPrior) && (
         <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
           <h3 className="text-sm font-semibold text-[#D0E4EC]">
@@ -110,8 +110,8 @@ export function CompareToggleChart({
             onClick={() => setCompareOn((v) => !v)}
             className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium border transition-colors ${
               compareOn
-                ? 'bg-[#3DAA8A]/15 border-[#3DAA8A]/30 text-[#5BC4A0]'
-                : 'bg-[#0F2533]/60 border-[#2D6A8F]/20 text-[#8AACBC] hover:text-white hover:border-[#2D6A8F]/50'
+                ? 'bg-cg-sage/15 border-cg-sage/30 text-cg-sage-light'
+                : 'bg-[#0F2533]/60 border-cg-slate/20 text-[#8AACBC] hover:text-white hover:border-cg-slate/50'
             }`}
             title="Overlay the prior period for side-by-side comparison"
           >

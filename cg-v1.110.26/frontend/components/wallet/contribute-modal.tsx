@@ -186,8 +186,8 @@ export default function ContributeModal({
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
         <div className="bg-card rounded-2xl shadow-xl max-w-md w-full p-8 text-center">
-          <div className="w-16 h-16 rounded-full bg-[#E0EFF8] flex items-center justify-center mx-auto mb-4">
-            <Heart className="h-8 w-8 text-[#2D6A8F]" />
+          <div className="w-16 h-16 rounded-full bg-cg-slate-subtle flex items-center justify-center mx-auto mb-4">
+            <Heart className="h-8 w-8 text-cg-slate" />
           </div>
           <h3 className="text-xl font-semibold text-foreground mb-2">Thank You!</h3>
           <p className="text-muted-foreground mb-2">
@@ -208,11 +208,11 @@ export default function ContributeModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 overflow-y-auto">
       <div className="bg-card rounded-2xl shadow-xl max-w-md w-full overflow-hidden my-8">
         {/* Header */}
-        <div className="p-6 border-b border-border bg-[#E0EFF8] dark:bg-[#1E3A4A]/30">
+        <div className="p-6 border-b border-border bg-cg-slate-subtle dark:bg-foreground/30">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-[#E0EFF8] dark:bg-[#1E3A4A]/30 flex items-center justify-center">
-                <Gift className="h-5 w-5 text-[#2D6A8F] dark:text-[#4BA8C8]" />
+              <div className="w-10 h-10 rounded-lg bg-cg-slate-subtle dark:bg-foreground/30 flex items-center justify-center">
+                <Gift className="h-5 w-5 text-cg-slate dark:text-cg-slate-light" />
               </div>
               <div>
                 <h2 className="font-semibold text-foreground">Send Money</h2>
@@ -223,7 +223,7 @@ export default function ContributeModal({
             </div>
             <button aria-label="Close"
               onClick={onClose}
-              className="p-2 hover:bg-[#E0EFF8] dark:hover:bg-[#1E3A4A]/30 rounded-lg transition-colors"
+              className="p-2 hover:bg-cg-slate-subtle dark:hover:bg-foreground/30 rounded-lg transition-colors"
             >
               <X className="h-5 w-5 text-muted-foreground" />
             </button>
@@ -235,7 +235,7 @@ export default function ContributeModal({
           {circleSession && (
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                <Users className="h-4 w-4 inline mr-1" style={{ color: '#3DAA8A' }} />
+                <Users className="h-4 w-4 inline mr-1" style={{ color: 'var(--cg-sage)' }} />
                 Which kid?
               </label>
               {childrenLoading ? (
@@ -253,7 +253,7 @@ export default function ContributeModal({
                     boxShadow: 'none',
                   }}
                   onFocus={(e) => {
-                    e.currentTarget.style.borderColor = '#3DAA8A';
+                    e.currentTarget.style.borderColor = 'var(--cg-sage)';
                     e.currentTarget.style.boxShadow = '0 0 0 2px rgba(61, 170, 138, 0.2)';
                   }}
                   onBlur={(e) => {
@@ -298,7 +298,7 @@ export default function ContributeModal({
                   value={contributorName}
                   onChange={(e) => setContributorName(e.target.value)}
                   placeholder="Enter your name"
-                  className="w-full px-4 py-2.5 bg-card border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2D6A8F]/20 focus:border-[#2D6A8F]"
+                  className="w-full px-4 py-2.5 bg-card border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-cg-slate/20 focus:border-cg-slate"
                 />
               </div>
               <div>
@@ -311,7 +311,7 @@ export default function ContributeModal({
                   value={contributorEmail}
                   onChange={(e) => setContributorEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="w-full px-4 py-2.5 bg-card border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2D6A8F]/20 focus:border-[#2D6A8F]"
+                  className="w-full px-4 py-2.5 bg-card border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-cg-slate/20 focus:border-cg-slate"
                 />
               </div>
             </div>
@@ -330,7 +330,7 @@ export default function ContributeModal({
                 value={amount}
                 onChange={(e) => handleAmountChange(e.target.value)}
                 placeholder="0.00"
-                className="w-full pl-10 pr-4 py-3 text-xl font-mono bg-card border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2D6A8F]/20 focus:border-[#2D6A8F]"
+                className="w-full pl-10 pr-4 py-3 text-xl font-mono bg-card border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-cg-slate/20 focus:border-cg-slate"
               />
             </div>
             <div className="flex gap-2 mt-3">
@@ -341,7 +341,7 @@ export default function ContributeModal({
                   onClick={() => setAmount(preset.toString())}
                   className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     amount === preset.toString()
-                      ? 'bg-[#2D6A8F] text-white'
+                      ? 'bg-cg-slate text-white'
                       : 'bg-muted text-foreground hover:bg-muted/80'
                   }`}
                 >
@@ -359,7 +359,7 @@ export default function ContributeModal({
             <select
               value={purpose}
               onChange={(e) => setPurpose(e.target.value)}
-              className="w-full px-4 py-2.5 bg-card border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2D6A8F]/20 focus:border-[#2D6A8F] appearance-none"
+              className="w-full px-4 py-2.5 bg-card border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-cg-slate/20 focus:border-cg-slate appearance-none"
             >
               <option value="">Select a purpose...</option>
               {PURPOSES.map((p) => (
@@ -379,7 +379,7 @@ export default function ContributeModal({
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Write a message for the child..."
               rows={3}
-              className="w-full px-4 py-2.5 bg-card border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#2D6A8F]/20 focus:border-[#2D6A8F] resize-none"
+              className="w-full px-4 py-2.5 bg-card border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-cg-slate/20 focus:border-cg-slate resize-none"
             />
           </div>
 
@@ -403,7 +403,7 @@ export default function ContributeModal({
             </button>
             <button
               type="submit"
-              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#2D6A8F] text-white rounded-xl font-medium hover:bg-[#1E4E6B] transition-colors disabled:opacity-50"
+              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-cg-slate text-white rounded-xl font-medium hover:bg-[#1E4E6B] transition-colors disabled:opacity-50"
               disabled={isLoading || !amount}
             >
               {isLoading ? (

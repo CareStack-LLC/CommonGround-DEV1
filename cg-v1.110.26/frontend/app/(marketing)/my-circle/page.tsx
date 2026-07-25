@@ -70,7 +70,7 @@ const features: {
     tagline: 'Face time that matters',
     description:
       'Video calls designed for kids and family. Read a bedtime story. Watch a movie together. Just talk about their day. Parents control access and can end calls anytime — but you get real quality time, not a rushed phone handoff.',
-    accent: '#3DAA8A',
+    accent: 'var(--cg-sage)',
   },
   {
     icon: BookOpen,
@@ -78,7 +78,7 @@ const features: {
     tagline: 'More than just a call',
     description:
       'Read stories together with the built-in library. Watch movies side by side. It\'s not just screen time — it\'s bonding time. Kids can show you their drawings, share what they\'re learning, and feel your presence even when you\'re miles away.',
-    accent: '#F5A623',
+    accent: 'var(--cg-amber)',
   },
   {
     icon: Gamepad2,

@@ -243,7 +243,7 @@ export function CaseOverviewTab({ familyFileId, token }: CaseOverviewTabProps) {
                 }
 
                 .exchange-date-box {
-                    background: linear-gradient(135deg, #FEF7ED 0%, #FEF7ED 100%);
+                    background: linear-gradient(135deg, var(--cg-amber-subtle) 0%, var(--cg-amber-subtle) 100%);
                     border: 2px solid #8F5E14;
                 }
 
@@ -253,7 +253,7 @@ export function CaseOverviewTab({ familyFileId, token }: CaseOverviewTabProps) {
                 }
 
                 .task-checkbox:hover {
-                    background: #FEF7ED;
+                    background: var(--cg-amber-subtle);
                     transform: scale(1.1);
                 }
 
@@ -275,14 +275,14 @@ export function CaseOverviewTab({ familyFileId, token }: CaseOverviewTabProps) {
 
             {/* I. AGREEMENT ABSTRACT - Featured Section */}
             <div className="animate-fade-in-up">
-                <Card className="border-2 border-[#6B460F]/30 bg-gradient-to-br from-white via-[#FEF7ED]/30 to-white shadow-2xl overflow-hidden">
+                <Card className="border-2 border-[#6B460F]/30 bg-gradient-to-br from-white via-cg-amber-subtle/30 to-white shadow-2xl overflow-hidden">
                     <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#6B460F] via-[#E09520] to-[#6B460F]"></div>
 
                     <CardHeader className="pb-4 border-b-2 border-[#6B460F]/10">
                         <div className="flex items-start justify-between">
                             <div className="flex items-center gap-4">
                                 <div className="p-3 bg-[#6B460F] rounded-sm shadow-lg">
-                                    <Landmark className="h-7 w-7 text-[#FEF7ED]" strokeWidth={1.5} />
+                                    <Landmark className="h-7 w-7 text-cg-amber-subtle" strokeWidth={1.5} />
                                 </div>
                                 <div>
                                     <div className="flex items-baseline gap-3 mb-1">
@@ -302,7 +302,7 @@ export function CaseOverviewTab({ familyFileId, token }: CaseOverviewTabProps) {
                             <Button
                                 variant="ghost"
                                 size="sm"
-                                className="sans text-[#6B460F] hover:text-[#3D2808] hover:bg-[#FEF7ED] font-semibold border border-[#6B460F]/20 hover:border-[#6B460F]/40"
+                                className="sans text-[#6B460F] hover:text-[#3D2808] hover:bg-cg-amber-subtle font-semibold border border-[#6B460F]/20 hover:border-[#6B460F]/40"
                                 asChild
                             >
                                 <Link href={`/professional/cases/${familyFileId}/agreement`}>
@@ -333,7 +333,7 @@ export function CaseOverviewTab({ familyFileId, token }: CaseOverviewTabProps) {
                                         <div className="grid sm:grid-cols-2 gap-4">
                                             {agreementSummary.key_points.slice(0, 4).map((point: string, idx: number) => (
                                                 <div key={idx} className="flex items-start gap-3 group">
-                                                    <div className="mt-1 p-1.5 bg-[#FEF7ED] rounded-sm shrink-0">
+                                                    <div className="mt-1 p-1.5 bg-cg-amber-subtle rounded-sm shrink-0">
                                                         <Sparkles className="h-3.5 w-3.5 text-[#B8791A]" strokeWidth={2} />
                                                     </div>
                                                     <span className="sans text-sm text-slate-700 leading-relaxed">{point}</span>
@@ -347,7 +347,7 @@ export function CaseOverviewTab({ familyFileId, token }: CaseOverviewTabProps) {
                             {/* Compliance Sidebar */}
                             <div className="lg:col-span-2 space-y-6">
                                 {/* Compliance Metrics */}
-                                <div className="p-6 bg-gradient-to-br from-[#FEF7ED] to-[#FEF7ED]/50 border-2 border-[#6B460F]/20 rounded-sm">
+                                <div className="p-6 bg-gradient-to-br from-cg-amber-subtle to-cg-amber-subtle/50 border-2 border-[#6B460F]/20 rounded-sm">
                                     <h4 className="sans text-xs font-bold text-[#6B460F] tracking-[0.15em] uppercase mb-5 flex items-center gap-2">
                                         <div className="h-px flex-1 bg-[#6B460F]/30"></div>
                                         Adherence Metrics
@@ -375,14 +375,14 @@ export function CaseOverviewTab({ familyFileId, token }: CaseOverviewTabProps) {
                                                     <span className="sans text-[10px] text-slate-500 uppercase tracking-wider block mb-2">
                                                         Petitioner
                                                     </span>
-                                                    <div className="h-2 bg-gradient-to-r from-[#2D6A8F] to-[#2D6A8F] rounded-full shadow-sm"></div>
+                                                    <div className="h-2 bg-gradient-to-r from-cg-slate to-cg-slate rounded-full shadow-sm"></div>
                                                     <span className="sans text-xs font-bold text-slate-700 mt-1 block">100%</span>
                                                 </div>
                                                 <div>
                                                     <span className="sans text-[10px] text-slate-500 uppercase tracking-wider block mb-2">
                                                         Respondent
                                                     </span>
-                                                    <div className="h-2 bg-gradient-to-r from-[#2D8A70] to-[#3DAA8A] rounded-full shadow-sm" style={{ width: '85%' }}></div>
+                                                    <div className="h-2 bg-gradient-to-r from-cg-sage-dark to-cg-sage rounded-full shadow-sm" style={{ width: '85%' }}></div>
                                                     <span className="sans text-xs font-bold text-slate-700 mt-1 block">85%</span>
                                                 </div>
                                             </div>
@@ -393,7 +393,7 @@ export function CaseOverviewTab({ familyFileId, token }: CaseOverviewTabProps) {
                                 {/* Alert Notice */}
                                 <div className="p-5 bg-white border-2 border-[#7A2222]/20 rounded-sm shadow-md">
                                     <div className="flex items-start gap-4">
-                                        <div className="p-2.5 bg-[#FEE2E2] border border-[#7A2222]/20 rounded-sm shrink-0">
+                                        <div className="p-2.5 bg-cg-error-subtle border border-[#7A2222]/20 rounded-sm shrink-0">
                                             <AlertTriangle className="h-5 w-5 text-[#7A2222]" strokeWidth={2} />
                                         </div>
                                         <div>
@@ -443,7 +443,7 @@ export function CaseOverviewTab({ familyFileId, token }: CaseOverviewTabProps) {
                             {exchanges.length > 0 ? (
                                 <div className="divide-y divide-slate-100">
                                     {exchanges.map((ex: any, idx: number) => (
-                                        <div key={ex.id} className="p-5 flex items-center justify-between hover:bg-[#FEF7ED]/30 transition-colors group">
+                                        <div key={ex.id} className="p-5 flex items-center justify-between hover:bg-cg-amber-subtle/30 transition-colors group">
                                             <div className="flex items-center gap-5">
                                                 <div className="exchange-date-box flex flex-col items-center justify-center w-16 h-16 rounded-sm shadow-md">
                                                     <span className="sans text-[9px] uppercase font-bold text-[#6B460F] tracking-wider">
@@ -469,10 +469,10 @@ export function CaseOverviewTab({ familyFileId, token }: CaseOverviewTabProps) {
                                             </div>
                                             <Badge className={
                                                 ex.status === "completed"
-                                                    ? "bg-[#E8F4F0] text-[#1B5544] border-2 border-[#1B5544]/30 sans font-semibold"
+                                                    ? "bg-cg-sage-subtle text-[#1B5544] border-2 border-[#1B5544]/30 sans font-semibold"
                                                     : ex.status === "missed"
-                                                    ? "bg-[#FEE2E2] text-[#7A2222] border-2 border-[#7A2222]/30 sans font-semibold"
-                                                    : "bg-[#E0EFF8] text-[#1E3A4A] border-2 border-[#1E3A4A]/30 sans font-semibold"
+                                                    ? "bg-cg-error-subtle text-[#7A2222] border-2 border-[#7A2222]/30 sans font-semibold"
+                                                    : "bg-cg-slate-subtle text-foreground border-2 border-foreground/30 sans font-semibold"
                                             }>
                                                 {ex.status.charAt(0).toUpperCase() + ex.status.slice(1)}
                                             </Badge>
@@ -491,7 +491,7 @@ export function CaseOverviewTab({ familyFileId, token }: CaseOverviewTabProps) {
                     {/* III. FINANCIAL OVERVIEW - Two Column Cards */}
                     <div className="grid sm:grid-cols-2 gap-6">
                         {/* ClearFund Summary */}
-                        <Card className="border-2 border-[#1B5544]/30 bg-gradient-to-br from-[#E8F4F0] to-white shadow-lg metric-card">
+                        <Card className="border-2 border-[#1B5544]/30 bg-gradient-to-br from-cg-sage-subtle to-white shadow-lg metric-card">
                             <CardHeader className="pb-3">
                                 <div className="flex items-baseline gap-2 mb-2">
                                     <span className="text-[10px] sans font-bold text-[#1B5544]/60 tracking-[0.2em] uppercase">
@@ -598,17 +598,17 @@ export function CaseOverviewTab({ familyFileId, token }: CaseOverviewTabProps) {
                         </CardHeader>
                         <CardContent className="pt-5 space-y-3">
                             <Button
-                                className="w-full justify-start sans text-sm h-11 bg-white border-2 border-[#1E3A4A]/20 hover:bg-[#E0EFF8] hover:border-[#1E3A4A]/40 text-slate-900 font-medium shadow-sm transition-all"
+                                className="w-full justify-start sans text-sm h-11 bg-white border-2 border-foreground/20 hover:bg-cg-slate-subtle hover:border-foreground/40 text-slate-900 font-medium shadow-sm transition-all"
                                 variant="outline"
                                 asChild
                             >
                                 <Link href={`/professional/cases/${familyFileId}/messages`}>
-                                    <MessageSquare className="h-4 w-4 mr-3 text-[#1E3A4A]" strokeWidth={2} />
+                                    <MessageSquare className="h-4 w-4 mr-3 text-foreground" strokeWidth={2} />
                                     Message Client
                                 </Link>
                             </Button>
                             <Button
-                                className="w-full justify-start sans text-sm h-11 bg-white border-2 border-[#6B460F]/20 hover:bg-[#FEF7ED] hover:border-[#6B460F]/40 text-slate-900 font-medium shadow-sm transition-all"
+                                className="w-full justify-start sans text-sm h-11 bg-white border-2 border-[#6B460F]/20 hover:bg-cg-amber-subtle hover:border-[#6B460F]/40 text-slate-900 font-medium shadow-sm transition-all"
                                 variant="outline"
                                 onClick={() => setShowAddEvent(true)}
                             >
@@ -616,7 +616,7 @@ export function CaseOverviewTab({ familyFileId, token }: CaseOverviewTabProps) {
                                 Schedule Court Event
                             </Button>
                             <Button
-                                className="w-full justify-start sans text-sm h-11 bg-white border-2 border-[#1B5544]/20 hover:bg-[#E8F4F0] hover:border-[#1B5544]/40 text-slate-900 font-medium shadow-sm transition-all"
+                                className="w-full justify-start sans text-sm h-11 bg-white border-2 border-[#1B5544]/20 hover:bg-cg-sage-subtle hover:border-[#1B5544]/40 text-slate-900 font-medium shadow-sm transition-all"
                                 variant="outline"
                                 onClick={() => setShowAddTask(true)}
                             >
@@ -648,7 +648,7 @@ export function CaseOverviewTab({ familyFileId, token }: CaseOverviewTabProps) {
                                 </div>
                                 <button
                                     onClick={() => setShowAddTask(true)}
-                                    className="p-2 hover:bg-[#FEF7ED] rounded-sm border border-transparent hover:border-[#6B460F]/20 transition-all"
+                                    className="p-2 hover:bg-cg-amber-subtle rounded-sm border border-transparent hover:border-[#6B460F]/20 transition-all"
                                 >
                                     <Plus className="h-4 w-4 text-[#6B460F]" strokeWidth={2.5} />
                                 </button>

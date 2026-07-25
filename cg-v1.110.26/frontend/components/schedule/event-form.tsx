@@ -414,12 +414,12 @@ export default function EventForm({
                     <div className="flex items-center justify-between mb-3">
                       <Label className="text-sm font-medium text-foreground">Event Location GPS</Label>
                       {formData.location_lat && formData.location_lng ? (
-                        <span className="text-xs bg-[#E8F4F0] text-[#2D8A70] px-2.5 py-1 rounded-full flex items-center gap-1.5 font-medium border border-[#E8F4F0]">
+                        <span className="text-xs bg-cg-sage-subtle text-cg-sage-dark px-2.5 py-1 rounded-full flex items-center gap-1.5 font-medium border border-cg-sage-subtle">
                           <Navigation className="w-3.5 h-3.5" />
                           Verified
                         </span>
                       ) : (
-                        <span className="text-xs bg-[#FEF7ED] text-[#E09520] px-2.5 py-1 rounded-full flex items-center gap-1.5 font-medium border border-[#FEF7ED]">
+                        <span className="text-xs bg-cg-amber-subtle text-[#E09520] px-2.5 py-1 rounded-full flex items-center gap-1.5 font-medium border border-cg-amber-subtle">
                           <AlertTriangle className="w-3.5 h-3.5" />
                           Required
                         </span>

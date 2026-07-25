@@ -11,7 +11,7 @@ import { adminAPI, type BugHuntCohort } from '@/lib/admin-api';
 const STATUS_COLORS: Record<string, string> = {
   draft: 'bg-zinc-700/50 text-[#8AACBC]',
   seeding: 'bg-blue-500/15 text-blue-400 border border-blue-500/20',
-  active: 'bg-[#3DAA8A]/15 text-[#3DAA8A] border border-[#3DAA8A]/20',
+  active: 'bg-cg-sage/15 text-cg-sage border border-cg-sage/20',
   completed: 'bg-purple-500/15 text-purple-400 border border-purple-500/20',
   archived: 'bg-zinc-700/50 text-zinc-500',
 };
@@ -19,7 +19,7 @@ const STATUS_COLORS: Record<string, string> = {
 const FEATURE_COLORS: Record<string, string> = {
   exchange: 'bg-orange-500/15 text-orange-400',
   messaging: 'bg-blue-500/15 text-blue-400',
-  agreement: 'bg-[#3DAA8A]/15 text-[#3DAA8A]',
+  agreement: 'bg-cg-sage/15 text-cg-sage',
   custody_tracking: 'bg-yellow-500/15 text-yellow-400',
   clearfund: 'bg-purple-500/15 text-purple-400',
   general: 'bg-zinc-700/50 text-[#8AACBC]',
@@ -86,22 +86,22 @@ export default function BugHuntsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white flex items-center gap-3">
-            <FlaskConical className="w-7 h-7 text-[#3DAA8A]" />
+            <FlaskConical className="w-7 h-7 text-cg-sage" />
             Bug Hunt Cohorts
           </h1>
-          <p className="text-sm text-[#6B8A9A] mt-1">Organized QA testing sessions with generated test data</p>
+          <p className="text-sm text-muted-foreground mt-1">Organized QA testing sessions with generated test data</p>
         </div>
         <div className="flex items-center gap-3">
           <button
             onClick={() => fetchCohorts()}
-            className="p-2 rounded-lg hover:bg-[#2D6A8F]/20 transition-colors text-[#8AACBC]"
+            className="p-2 rounded-lg hover:bg-cg-slate/20 transition-colors text-[#8AACBC]"
             title="Refresh"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
           <button
             onClick={() => router.push('/superadmin/bug-hunts/new')}
-            className="flex items-center gap-2 px-4 py-2 bg-[#3DAA8A] text-white rounded-lg hover:bg-[#3DAA8A]/80 transition-colors text-sm font-medium"
+            className="flex items-center gap-2 px-4 py-2 bg-cg-sage text-white rounded-lg hover:bg-cg-sage/80 transition-colors text-sm font-medium"
           >
             <Plus className="w-4 h-4" />
             New Bug Hunt
@@ -110,15 +110,15 @@ export default function BugHuntsPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-[#1E3A4A]/50 rounded-lg p-1 w-fit">
+      <div className="flex gap-1 bg-foreground/50 rounded-lg p-1 w-fit">
         {(['active', 'completed', 'all'] as FilterTab[]).map(t => (
           <button
             key={t}
             onClick={() => setTab(t)}
             className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
               tab === t
-                ? 'bg-[#2D6A8F]/40 text-white'
-                : 'text-[#6B8A9A] hover:text-[#8AACBC]'
+                ? 'bg-cg-slate/40 text-white'
+                : 'text-muted-foreground hover:text-[#8AACBC]'
             }`}
           >
             {t === 'active' ? 'Active' : t === 'completed' ? 'Completed' : 'All'}
@@ -137,20 +137,20 @@ export default function BugHuntsPage() {
       {loading && (
         <div className="space-y-3">
           {[1, 2, 3].map(i => (
-            <div key={i} className="h-20 bg-[#1E3A4A]/50 rounded-lg animate-pulse" />
+            <div key={i} className="h-20 bg-foreground/50 rounded-lg animate-pulse" />
           ))}
         </div>
       )}
 
       {/* Empty state */}
       {!loading && !error && cohorts.length === 0 && (
-        <div className="text-center py-16 bg-[#1E3A4A]/30 rounded-xl border border-[#2D6A8F]/20">
+        <div className="text-center py-16 bg-foreground/30 rounded-xl border border-cg-slate/20">
           <FlaskConical className="w-12 h-12 text-[#4A6E7F] mx-auto mb-4" />
           <h3 className="text-lg font-medium text-[#8AACBC] mb-2">No bug hunts yet</h3>
-          <p className="text-sm text-[#6B8A9A] mb-6">Create your first organized testing session</p>
+          <p className="text-sm text-muted-foreground mb-6">Create your first organized testing session</p>
           <button
             onClick={() => router.push('/superadmin/bug-hunts/new')}
-            className="px-4 py-2 bg-[#3DAA8A] text-white rounded-lg hover:bg-[#3DAA8A]/80 transition-colors text-sm font-medium"
+            className="px-4 py-2 bg-cg-sage text-white rounded-lg hover:bg-cg-sage/80 transition-colors text-sm font-medium"
           >
             Create Bug Hunt
           </button>
@@ -164,7 +164,7 @@ export default function BugHuntsPage() {
             <button
               key={cohort.id}
               onClick={() => router.push(`/superadmin/bug-hunts/${cohort.id}`)}
-              className="w-full text-left bg-[#1E3A4A]/50 hover:bg-[#1E3A4A]/70 border border-[#2D6A8F]/20 hover:border-[#2D6A8F]/40 rounded-xl p-4 transition-all group"
+              className="w-full text-left bg-foreground/50 hover:bg-foreground/70 border border-cg-slate/20 hover:border-cg-slate/40 rounded-xl p-4 transition-all group"
             >
               <div className="flex items-center justify-between">
                 <div className="flex-1 min-w-0">
@@ -183,9 +183,9 @@ export default function BugHuntsPage() {
                     ))}
                   </div>
                   {cohort.description && (
-                    <p className="text-sm text-[#6B8A9A] truncate mb-2">{cohort.description}</p>
+                    <p className="text-sm text-muted-foreground truncate mb-2">{cohort.description}</p>
                   )}
-                  <div className="flex items-center gap-4 text-xs text-[#6B8A9A]">
+                  <div className="flex items-center gap-4 text-xs text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <Users className="w-3 h-3" />
                       {cohort.families_count ?? cohort.family_count} families
@@ -208,9 +208,9 @@ export default function BugHuntsPage() {
                 </div>
                 <div className="flex items-center gap-3">
                   {cohort.checklist_progress !== undefined && cohort.checklist_progress > 0 && (
-                    <div className="w-20 h-1.5 bg-[#2D6A8F]/20 rounded-full overflow-hidden">
+                    <div className="w-20 h-1.5 bg-cg-slate/20 rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-[#3DAA8A] rounded-full transition-all"
+                        className="h-full bg-cg-sage rounded-full transition-all"
                         style={{ width: `${cohort.checklist_progress}%` }}
                       />
                     </div>

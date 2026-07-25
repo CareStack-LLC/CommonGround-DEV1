@@ -89,16 +89,16 @@ export function ExpandableRowsTable<T>({
   const colSpanForExpanded = columns.length + 1;
 
   return (
-    <div className={`bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl overflow-hidden ${className}`}>
+    <div className={`bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden ${className}`}>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-[#2D6A8F]/20">
+            <tr className="border-b border-cg-slate/20">
               <th className="w-8" />
               {columns.map((col) => (
                 <th
                   key={col.key}
-                  className={`text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider ${col.headerClassName ?? ''}`}
+                  className={`text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider ${col.headerClassName ?? ''}`}
                 >
                   {col.label}
                 </th>
@@ -108,7 +108,7 @@ export function ExpandableRowsTable<T>({
           <tbody className="divide-y divide-zinc-800/40">
             {rows.length === 0 ? (
               <tr>
-                <td colSpan={colSpanForExpanded} className="px-4 py-10 text-center text-[#6B8A9A]">
+                <td colSpan={colSpanForExpanded} className="px-4 py-10 text-center text-muted-foreground">
                   {emptyMessage}
                 </td>
               </tr>
@@ -119,13 +119,13 @@ export function ExpandableRowsTable<T>({
                 return (
                   <React.Fragment key={key}>
                     <tr
-                      className={`transition-colors ${open ? 'bg-[#2D6A8F]/10' : 'hover:bg-[#2D6A8F]/10'}`}
+                      className={`transition-colors ${open ? 'bg-cg-slate/10' : 'hover:bg-cg-slate/10'}`}
                     >
                       <td className="w-8 px-2 py-3">
                         <button aria-label="Next"
                           onClick={() => toggle(row)}
                           onKeyDown={(e) => handleKey(e, row)}
-                          className="p-1 rounded text-[#8AACBC] hover:text-white hover:bg-[#2D6A8F]/30 transition-colors"
+                          className="p-1 rounded text-[#8AACBC] hover:text-white hover:bg-cg-slate/30 transition-colors"
                           title={open ? 'Collapse row' : 'Expand row'}
                           aria-expanded={open}
                         >
@@ -148,7 +148,7 @@ export function ExpandableRowsTable<T>({
                       ))}
                     </tr>
                     {open && (
-                      <tr className="bg-[#0F2533]/40 border-t border-[#2D6A8F]/10">
+                      <tr className="bg-[#0F2533]/40 border-t border-cg-slate/10">
                         <td colSpan={colSpanForExpanded} className="px-6 py-4">
                           {renderExpanded(row)}
                         </td>

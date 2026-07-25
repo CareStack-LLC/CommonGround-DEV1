@@ -65,8 +65,8 @@ const TABS = [
 const HEALTH_RANGES = [
   { label: '0-20', min: 0, max: 20, color: '#EF4444' },
   { label: '20-40', min: 20, max: 40, color: '#F97316' },
-  { label: '40-60', min: 40, max: 60, color: '#F5A623' },
-  { label: '60-80', min: 60, max: 80, color: '#3DAA8A' },
+  { label: '40-60', min: 40, max: 60, color: 'var(--cg-amber)' },
+  { label: '60-80', min: 60, max: 80, color: 'var(--cg-sage)' },
   { label: '80-100', min: 80, max: 100, color: '#22C55E' },
 ];
 
@@ -155,7 +155,7 @@ function OverviewTab() {
       </div>
 
       {/* Health Distribution Chart */}
-      <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+      <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-sm font-semibold text-[#D0E4EC]">Health Score Distribution</h3>
           <SafetyScoreExplainer scoring={scoring} variant="inline" />
@@ -163,7 +163,7 @@ function OverviewTab() {
         <div className="space-y-3">
           {distribution.map((range) => (
             <div key={range.label} className="flex items-center gap-3">
-              <span className="text-xs text-[#6B8A9A] w-12 text-right font-mono">{range.label}</span>
+              <span className="text-xs text-muted-foreground w-12 text-right font-mono">{range.label}</span>
               <div className="flex-1 bg-[#162D3A] rounded-full h-6 overflow-hidden">
                 <div
                   className="h-full rounded-full transition-all duration-500 flex items-center justify-end pr-2"
@@ -184,16 +184,16 @@ function OverviewTab() {
       </div>
 
       {/* Recent Interventions Feed */}
-      <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+      <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
         <h3 className="text-sm font-semibold text-[#D0E4EC] mb-4">Recent Interventions</h3>
         {interventions.length === 0 ? (
           <p className="text-xs text-[#4A6E7F] py-4 text-center">No interventions recorded yet.</p>
         ) : (
           <div className="space-y-3">
             {interventions.map((iv) => (
-              <div key={iv.id} className="flex items-start gap-3 py-2 border-b border-[#2D6A8F]/10 last:border-0">
+              <div key={iv.id} className="flex items-start gap-3 py-2 border-b border-cg-slate/10 last:border-0">
                 <div className="mt-0.5">
-                  <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-medium border ${TYPE_COLORS[iv.type] || 'bg-[#2D6A8F]/15 text-[#8AACBC] border-[#2D6A8F]/30'}`}>
+                  <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-medium border ${TYPE_COLORS[iv.type] || 'bg-cg-slate/15 text-[#8AACBC] border-cg-slate/30'}`}>
                     {iv.type}
                   </span>
                 </div>
@@ -202,7 +202,7 @@ function OverviewTab() {
                     {iv.user_name || iv.user_email || iv.user_id}
                   </p>
                   {iv.notes && (
-                    <p className="text-[11px] text-[#6B8A9A] truncate mt-0.5">{iv.notes}</p>
+                    <p className="text-[11px] text-muted-foreground truncate mt-0.5">{iv.notes}</p>
                   )}
                 </div>
                 <span className="text-[10px] text-[#4A6E7F] whitespace-nowrap">
@@ -263,7 +263,7 @@ function HealthScoresTab() {
     <div className="space-y-4">
       {/* Explainer row — so admins understand what "25" actually means. */}
       <div className="flex items-center justify-between">
-        <p className="text-xs text-[#6B8A9A]">
+        <p className="text-xs text-muted-foreground">
           {total} account{total === 1 ? '' : 's'} · sorted by newest
         </p>
         <SafetyScoreExplainer scoring={scoring} variant="badge" />
@@ -277,22 +277,22 @@ function HealthScoresTab() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search by name or email..."
-          className="w-full bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-lg pl-9 pr-4 py-2.5 text-sm text-[#D0E4EC] placeholder-[#4A6E7F] outline-none focus:border-[#3DAA8A]/40"
+          className="w-full bg-[#1A3648]/60 border border-cg-slate/20 rounded-lg pl-9 pr-4 py-2.5 text-sm text-[#D0E4EC] placeholder-[#4A6E7F] outline-none focus:border-cg-sage/40"
         />
       </div>
 
       {/* Table */}
-      <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl overflow-hidden">
+      <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-[#2D6A8F]/20">
-                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B8A9A]">User</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B8A9A]">Email</th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-[#6B8A9A]">Score</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B8A9A]">Risk Level</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B8A9A]">Tier</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-[#6B8A9A]">Last Active</th>
+              <tr className="border-b border-cg-slate/20">
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">User</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Email</th>
+                <th className="px-4 py-3 text-center text-xs font-medium text-muted-foreground">Score</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Risk Level</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Tier</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground">Last Active</th>
               </tr>
             </thead>
             <tbody>
@@ -310,7 +310,7 @@ function HealthScoresTab() {
                 </tr>
               ) : (
                 filtered.map((entry) => (
-                  <tr key={entry.user_id} className="border-b border-[#2D6A8F]/10 hover:bg-[#2D6A8F]/10 transition-colors">
+                  <tr key={entry.user_id} className="border-b border-cg-slate/10 hover:bg-cg-slate/10 transition-colors">
                     <td className="px-4 py-3 text-sm text-[#D0E4EC]">
                       {entry.first_name} {entry.last_name}
                     </td>
@@ -332,7 +332,7 @@ function HealthScoresTab() {
                     <td className="px-4 py-3 text-xs text-[#8AACBC] capitalize">
                       {entry.subscription_tier || '-'}
                     </td>
-                    <td className="px-4 py-3 text-xs text-[#6B8A9A]">
+                    <td className="px-4 py-3 text-xs text-muted-foreground">
                       {entry.last_active ? timeAgo(entry.last_active) : '-'}
                     </td>
                   </tr>
@@ -344,22 +344,22 @@ function HealthScoresTab() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-[#2D6A8F]/20">
-            <span className="text-xs text-[#6B8A9A]">
+          <div className="flex items-center justify-between px-4 py-3 border-t border-cg-slate/20">
+            <span className="text-xs text-muted-foreground">
               Page {currentPage} of {totalPages} ({formatNumber(total)} total)
             </span>
             <div className="flex gap-1">
               <button aria-label="Previous"
                 onClick={() => setOffset(Math.max(0, offset - limit))}
                 disabled={offset === 0}
-                className="p-1.5 rounded-lg text-[#6B8A9A] hover:text-white hover:bg-[#2D6A8F]/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="p-1.5 rounded-lg text-muted-foreground hover:text-white hover:bg-cg-slate/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
               <button aria-label="Next"
                 onClick={() => setOffset(offset + limit)}
                 disabled={offset + limit >= total}
-                className="p-1.5 rounded-lg text-[#6B8A9A] hover:text-white hover:bg-[#2D6A8F]/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="p-1.5 rounded-lg text-muted-foreground hover:text-white hover:bg-cg-slate/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -428,7 +428,7 @@ function AtRiskTab() {
         return (
           <div
             key={entry.user_id}
-            className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-4 hover:border-[#2D6A8F]/40 transition-colors"
+            className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-4 hover:border-cg-slate/40 transition-colors"
           >
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-center gap-3 min-w-0">
@@ -437,7 +437,7 @@ function AtRiskTab() {
                   <p className="text-sm font-medium text-[#D0E4EC] truncate">
                     {entry.first_name} {entry.last_name}
                   </p>
-                  <p className="text-xs text-[#6B8A9A] truncate">{entry.email}</p>
+                  <p className="text-xs text-muted-foreground truncate">{entry.email}</p>
                   {daysSinceActive !== null && (
                     <p className="text-[11px] text-[#4A6E7F] mt-1 flex items-center gap-1">
                       <Clock className="w-3 h-3" />
@@ -450,7 +450,7 @@ function AtRiskTab() {
               <button
                 onClick={() => handleTakeAction(entry)}
                 disabled={creating === entry.user_id}
-                className="px-3 py-1.5 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] disabled:bg-[#3DAA8A]/30 disabled:cursor-not-allowed text-white text-xs font-medium transition-colors whitespace-nowrap"
+                className="px-3 py-1.5 rounded-lg bg-cg-sage hover:bg-cg-sage-light disabled:bg-cg-sage/30 disabled:cursor-not-allowed text-white text-xs font-medium transition-colors whitespace-nowrap"
               >
                 {creating === entry.user_id ? 'Creating...' : 'Take Action'}
               </button>
@@ -458,7 +458,7 @@ function AtRiskTab() {
 
             {/* Risk factors */}
             {entry.factors && Object.keys(entry.factors).length > 0 && (
-              <div className="flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-[#2D6A8F]/10">
+              <div className="flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-cg-slate/10">
                 {Object.entries(entry.factors).map(([factor, score]) => (
                   <span
                     key={factor}
@@ -543,12 +543,12 @@ function InterventionsTab() {
     <div className="space-y-4">
       {/* Filter bar */}
       <div className="flex items-center gap-2">
-        <Filter className="w-4 h-4 text-[#6B8A9A]" />
+        <Filter className="w-4 h-4 text-muted-foreground" />
         <div className="flex gap-1 flex-wrap">
           <button
             onClick={() => setTypeFilter('')}
             className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
-              !typeFilter ? 'bg-[#3DAA8A]/15 text-[#5BC4A0]' : 'text-[#6B8A9A] hover:text-white hover:bg-[#2D6A8F]/15'
+              !typeFilter ? 'bg-cg-sage/15 text-cg-sage-light' : 'text-muted-foreground hover:text-white hover:bg-cg-slate/15'
             }`}
           >
             All
@@ -558,7 +558,7 @@ function InterventionsTab() {
               key={type}
               onClick={() => setTypeFilter(type)}
               className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors capitalize ${
-                typeFilter === type ? 'bg-[#3DAA8A]/15 text-[#5BC4A0]' : 'text-[#6B8A9A] hover:text-white hover:bg-[#2D6A8F]/15'
+                typeFilter === type ? 'bg-cg-sage/15 text-cg-sage-light' : 'text-muted-foreground hover:text-white hover:bg-cg-slate/15'
               }`}
             >
               {type}
@@ -568,7 +568,7 @@ function InterventionsTab() {
       </div>
 
       {/* Timeline */}
-      <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+      <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
         {loading ? (
           <SkeletonRows count={5} />
         ) : interventions.length === 0 ? (
@@ -579,16 +579,16 @@ function InterventionsTab() {
               <div key={iv.id} className="relative flex gap-4 pb-6 last:pb-0">
                 {/* Timeline line */}
                 {idx < interventions.length - 1 && (
-                  <div className="absolute left-[11px] top-6 bottom-0 w-px bg-[#2D6A8F]/20" />
+                  <div className="absolute left-[11px] top-6 bottom-0 w-px bg-cg-slate/20" />
                 )}
                 {/* Timeline dot */}
-                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-[#162D3A] border-2 border-[#2D6A8F]/30 flex items-center justify-center mt-0.5">
-                  <div className="w-2 h-2 rounded-full bg-[#3DAA8A]" />
+                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-[#162D3A] border-2 border-cg-slate/30 flex items-center justify-center mt-0.5">
+                  <div className="w-2 h-2 rounded-full bg-cg-sage" />
                 </div>
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-medium border ${TYPE_COLORS[iv.type] || 'bg-[#2D6A8F]/15 text-[#8AACBC] border-[#2D6A8F]/30'}`}>
+                    <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-medium border ${TYPE_COLORS[iv.type] || 'bg-cg-slate/15 text-[#8AACBC] border-cg-slate/30'}`}>
                       {iv.type}
                     </span>
                     <span className="text-xs text-[#D0E4EC] font-medium">
@@ -598,14 +598,14 @@ function InterventionsTab() {
                       <span className={`text-[10px] px-1.5 py-0.5 rounded ${
                         iv.outcome === 'resolved' ? 'bg-emerald-500/10 text-emerald-400' :
                         iv.outcome === 'failed' ? 'bg-red-500/10 text-red-400' :
-                        'bg-[#2D6A8F]/15 text-[#8AACBC]'
+                        'bg-cg-slate/15 text-[#8AACBC]'
                       }`}>
                         {iv.outcome}
                       </span>
                     )}
                   </div>
                   {iv.notes && (
-                    <p className="text-xs text-[#6B8A9A] mt-1">{iv.notes}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{iv.notes}</p>
                   )}
                   <p className="text-[10px] text-[#4A6E7F] mt-1">{timeAgo(iv.created_at)}</p>
                 </div>
@@ -616,22 +616,22 @@ function InterventionsTab() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between pt-4 mt-4 border-t border-[#2D6A8F]/20">
-            <span className="text-xs text-[#6B8A9A]">
+          <div className="flex items-center justify-between pt-4 mt-4 border-t border-cg-slate/20">
+            <span className="text-xs text-muted-foreground">
               Page {currentPage} of {totalPages}
             </span>
             <div className="flex gap-1">
               <button aria-label="Previous"
                 onClick={() => setOffset(Math.max(0, offset - limit))}
                 disabled={offset === 0}
-                className="p-1.5 rounded-lg text-[#6B8A9A] hover:text-white hover:bg-[#2D6A8F]/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="p-1.5 rounded-lg text-muted-foreground hover:text-white hover:bg-cg-slate/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
               <button aria-label="Next"
                 onClick={() => setOffset(offset + limit)}
                 disabled={offset + limit >= total}
-                className="p-1.5 rounded-lg text-[#6B8A9A] hover:text-white hover:bg-[#2D6A8F]/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="p-1.5 rounded-lg text-muted-foreground hover:text-white hover:bg-cg-slate/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -658,7 +658,7 @@ function PageInner() {
     <div className="space-y-6">
       <div>
         <h1 className="text-xl font-bold text-white">Customer Success</h1>
-        <p className="text-sm text-[#6B8A9A] mt-0.5">Health scores, at-risk accounts, and AI-powered interventions</p>
+        <p className="text-sm text-muted-foreground mt-0.5">Health scores, at-risk accounts, and AI-powered interventions</p>
       </div>
 
       <TabBar tabs={TABS} activeTab={tab} onTabChange={handleTabChange} />

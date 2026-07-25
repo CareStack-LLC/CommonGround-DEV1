@@ -104,7 +104,7 @@ export default function NewFirmPage() {
 
             {/* Header */}
             <div className="flex items-center gap-4 mb-8">
-                <div className="p-3 bg-gradient-to-br from-[#3D8DB0] to-[#2D6A8F] text-white rounded-xl shadow-lg">
+                <div className="p-3 bg-gradient-to-br from-[#3D8DB0] to-cg-slate text-white rounded-xl shadow-lg">
                     <Building2 className="h-7 w-7" />
                 </div>
                 <div>
@@ -368,7 +368,7 @@ export default function NewFirmPage() {
                         <Button
                             onClick={handleCreate}
                             disabled={loading}
-                            className="bg-[#2D8A70] hover:bg-[#2D8A70] text-white gap-2"
+                            className="bg-cg-sage-dark hover:bg-cg-sage-dark text-white gap-2"
                         >
                             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Building2 className="h-4 w-4" />}
                             {loading ? "Creating..." : "Create Firm"}

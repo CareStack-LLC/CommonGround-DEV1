@@ -25,7 +25,7 @@ const ACTION_FILTERS = [
 ];
 
 const ACTION_COLORS: Record<string, string> = {
-  'admin:view_dashboard': 'bg-[#3DAA8A]/15 text-[#3DAA8A]',
+  'admin:view_dashboard': 'bg-cg-sage/15 text-cg-sage',
   'admin:search_users': 'bg-blue-500/15 text-blue-400',
   'admin:view_user': 'bg-blue-500/15 text-blue-400',
   'admin:update_user_status': 'bg-amber-500/15 text-amber-400',
@@ -40,10 +40,10 @@ const ACTION_COLORS: Record<string, string> = {
 // --- Platform Events constants ---
 
 const EVENT_BADGE_COLORS: Record<string, string> = {
-  message_sent: 'bg-blue-500/15 text-blue-400 border-[#2D6A8F]/20',
-  exchange_created: 'bg-emerald-500/15 text-emerald-400 border-[#3DAA8A]/20',
-  report_generated: 'bg-[#3DAA8A]/15 text-[#3DAA8A] border-[#3DAA8A]/20',
-  agreement_signed: 'bg-amber-500/15 text-amber-400 border-[#F5A623]/20',
+  message_sent: 'bg-blue-500/15 text-blue-400 border-cg-slate/20',
+  exchange_created: 'bg-emerald-500/15 text-emerald-400 border-cg-sage/20',
+  report_generated: 'bg-cg-sage/15 text-cg-sage border-cg-sage/20',
+  agreement_signed: 'bg-amber-500/15 text-amber-400 border-cg-amber/20',
   payment_made: 'bg-green-500/15 text-green-400 border-green-500/20',
   call_started: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/20',
   aria_intervention: 'bg-red-500/15 text-red-400 border-red-500/20',
@@ -87,7 +87,7 @@ function formatAction(action: string): string {
 }
 
 function Skeleton({ className = '' }: { className?: string }) {
-  return <div className={`animate-pulse bg-[#2D6A8F]/20 rounded-lg ${className}`} />;
+  return <div className={`animate-pulse bg-cg-slate/20 rounded-lg ${className}`} />;
 }
 
 const PAGE_SIZE = 50;
@@ -202,7 +202,7 @@ export default function ActivityLogContent() {
     <div className="space-y-5">
       <div>
         <h1 className="text-xl font-bold text-white">Activity Log</h1>
-        <p className="text-sm text-[#6B8A9A] mt-0.5">
+        <p className="text-sm text-muted-foreground mt-0.5">
           {activeTab === 'admin'
             ? `${adminTotal.toLocaleString()} admin actions recorded`
             : `Platform-wide event feed`}
@@ -210,13 +210,13 @@ export default function ActivityLogContent() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-lg p-1">
+      <div className="flex gap-1 bg-[#1A3648]/60 border border-cg-slate/20 rounded-lg p-1">
         <button
           onClick={() => setActiveTab('admin')}
           className={`flex items-center gap-1.5 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
             activeTab === 'admin'
-              ? 'bg-[#3DAA8A]/15 text-[#5BC4A0]'
-              : 'text-[#8AACBC] hover:text-white hover:bg-[#2D6A8F]/20'
+              ? 'bg-cg-sage/15 text-cg-sage-light'
+              : 'text-[#8AACBC] hover:text-white hover:bg-cg-slate/20'
           }`}
         >
           <ScrollText className="w-4 h-4" />
@@ -226,8 +226,8 @@ export default function ActivityLogContent() {
           onClick={() => setActiveTab('platform')}
           className={`flex items-center gap-1.5 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
             activeTab === 'platform'
-              ? 'bg-[#3DAA8A]/15 text-[#5BC4A0]'
-              : 'text-[#8AACBC] hover:text-white hover:bg-[#2D6A8F]/20'
+              ? 'bg-cg-sage/15 text-cg-sage-light'
+              : 'text-[#8AACBC] hover:text-white hover:bg-cg-slate/20'
           }`}
         >
           <Radio className="w-4 h-4" />
@@ -243,46 +243,46 @@ export default function ActivityLogContent() {
             <select
               value={actionFilter}
               onChange={(e) => setActionFilter(e.target.value)}
-              className="px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-[#D0E4EC] focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer"
+              className="px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-[#D0E4EC] focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer"
             >
               {ACTION_FILTERS.map(f => <option key={f.value} value={f.value}>{f.label}</option>)}
             </select>
             <div className="relative flex-1">
-              <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B8A9A]" />
+              <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input
                 type="text"
                 placeholder="Filter by admin email..."
                 value={adminEmailFilter}
                 onChange={(e) => setAdminEmailFilter(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50"
+                className="w-full pl-10 pr-4 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50"
               />
             </div>
           </div>
 
           {/* Table */}
-          <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl overflow-hidden">
+          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-[#2D6A8F]/20">
-                    <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Time</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Action</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider hidden md:table-cell">Admin</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider hidden lg:table-cell">Target</th>
-                    <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider hidden xl:table-cell">Details</th>
+                  <tr className="border-b border-cg-slate/20">
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Time</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Action</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider hidden md:table-cell">Admin</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider hidden lg:table-cell">Target</th>
+                    <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider hidden xl:table-cell">Details</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-800/40">
                   {adminLoading ? (
                     Array.from({ length: 10 }).map((_, i) => (
-                      <tr key={i}><td colSpan={5} className="px-4 py-3"><div className="animate-pulse bg-[#2D6A8F]/20 rounded h-6" /></td></tr>
+                      <tr key={i}><td colSpan={5} className="px-4 py-3"><div className="animate-pulse bg-cg-slate/20 rounded h-6" /></td></tr>
                     ))
                   ) : adminLogs?.length === 0 ? (
-                    <tr><td colSpan={5} className="px-4 py-12 text-center text-[#6B8A9A]">No audit log entries found.</td></tr>
+                    <tr><td colSpan={5} className="px-4 py-12 text-center text-muted-foreground">No audit log entries found.</td></tr>
                   ) : adminLogs?.map((log) => (
-                    <tr key={log.id} className="hover:bg-[#2D6A8F]/10 transition-colors">
+                    <tr key={log.id} className="hover:bg-cg-slate/10 transition-colors">
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <div className="flex items-center gap-1.5 text-xs text-[#6B8A9A]">
+                        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                           <Clock className="w-3 h-3" />
                           {formatDate(log.created_at)}
                         </div>
@@ -298,7 +298,7 @@ export default function ActivityLogContent() {
                         <span className="text-xs text-[#8AACBC]">{log.user_email || '\u2014'}</span>
                       </td>
                       <td className="px-4 py-3 hidden lg:table-cell">
-                        <span className="text-xs text-[#6B8A9A]">
+                        <span className="text-xs text-muted-foreground">
                           {log.resource_type}
                           {log.resource_id && <span className="ml-1 text-[#4A6E7F] font-mono">{log.resource_id.slice(0, 8)}</span>}
                         </span>
@@ -313,18 +313,18 @@ export default function ActivityLogContent() {
             </div>
 
             {adminTotal > PAGE_SIZE && (
-              <div className="flex items-center justify-between px-4 py-3 border-t border-[#2D6A8F]/20">
-                <span className="text-xs text-[#6B8A9A]">
+              <div className="flex items-center justify-between px-4 py-3 border-t border-cg-slate/20">
+                <span className="text-xs text-muted-foreground">
                   {adminPage * PAGE_SIZE + 1}&ndash;{Math.min((adminPage + 1) * PAGE_SIZE, adminTotal)} of {adminTotal}
                 </span>
                 <div className="flex items-center gap-1">
                   <button aria-label="Previous" disabled={adminPage === 0} onClick={() => setAdminPage(adminPage - 1)}
-                    className="p-1.5 rounded-lg hover:bg-[#2D6A8F]/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+                    className="p-1.5 rounded-lg hover:bg-cg-slate/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
                     <ChevronLeft className="w-4 h-4" />
                   </button>
                   <span className="text-xs text-[#8AACBC] px-2">{adminPage + 1} / {adminTotalPages}</span>
                   <button aria-label="Next" disabled={adminPage >= adminTotalPages - 1} onClick={() => setAdminPage(adminPage + 1)}
-                    className="p-1.5 rounded-lg hover:bg-[#2D6A8F]/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+                    className="p-1.5 rounded-lg hover:bg-cg-slate/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -343,8 +343,8 @@ export default function ActivityLogContent() {
               onClick={() => setAutoRefresh(!autoRefresh)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 autoRefresh
-                  ? 'bg-emerald-500/15 text-emerald-400 border border-[#3DAA8A]/20'
-                  : 'bg-[#2D6A8F]/20 text-[#8AACBC] hover:text-white hover:bg-zinc-800'
+                  ? 'bg-emerald-500/15 text-emerald-400 border border-cg-sage/20'
+                  : 'bg-cg-slate/20 text-[#8AACBC] hover:text-white hover:bg-zinc-800'
               }`}
             >
               <Radio className={`w-3 h-3 ${autoRefresh ? 'animate-pulse' : ''}`} />
@@ -353,7 +353,7 @@ export default function ActivityLogContent() {
             <button
               onClick={() => fetchPlatformEvents()}
               disabled={platformLoading}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#2D6A8F]/20 hover:bg-[#2D6A8F]/30 text-[#8AACBC] hover:text-white text-xs font-medium transition-colors disabled:opacity-50"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-[#8AACBC] hover:text-white text-xs font-medium transition-colors disabled:opacity-50"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${platformLoading ? 'animate-spin' : ''}`} />
               Refresh
@@ -361,11 +361,11 @@ export default function ActivityLogContent() {
           </div>
 
           {/* Filters */}
-          <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-4">
+          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-4">
             <div className="flex flex-wrap items-center gap-3">
               {/* Event Type Dropdown */}
               <div className="flex items-center gap-2">
-                <Filter className="w-3.5 h-3.5 text-[#6B8A9A]" />
+                <Filter className="w-3.5 h-3.5 text-muted-foreground" />
                 <select
                   value={eventType}
                   onChange={(e) => { setEventType(e.target.value); handlePlatformFilterChange(); }}
@@ -379,7 +379,7 @@ export default function ActivityLogContent() {
 
               {/* Email Search */}
               <div className="flex items-center gap-2 flex-1 min-w-[200px] max-w-sm">
-                <Search className="w-3.5 h-3.5 text-[#6B8A9A]" />
+                <Search className="w-3.5 h-3.5 text-muted-foreground" />
                 <input
                   type="text"
                   placeholder="Search by email..."
@@ -396,7 +396,7 @@ export default function ActivityLogContent() {
                     key={r.days}
                     onClick={() => { setDateRange(r.days); handlePlatformFilterChange(); }}
                     className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                      dateRange === r.days ? 'bg-[#3DAA8A] text-white' : 'text-[#8AACBC] hover:text-white'
+                      dateRange === r.days ? 'bg-cg-sage text-white' : 'text-[#8AACBC] hover:text-white'
                     }`}
                   >
                     {r.label}
@@ -411,7 +411,7 @@ export default function ActivityLogContent() {
             <div className="flex flex-col items-center justify-center py-20">
               <AlertTriangle className="w-10 h-10 text-amber-500 mb-3" />
               <p className="text-[#8AACBC] mb-4">{platformError}</p>
-              <button onClick={() => fetchPlatformEvents()} className="px-4 py-2 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors">
+              <button onClick={() => fetchPlatformEvents()} className="px-4 py-2 rounded-lg bg-cg-sage hover:bg-cg-sage-light text-white text-sm font-medium transition-colors">
                 Retry
               </button>
             </div>
@@ -419,7 +419,7 @@ export default function ActivityLogContent() {
 
           {/* Events Table */}
           {!platformError && (
-            <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl overflow-hidden">
+            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden">
               {platformLoading ? (
                 <div className="p-5 space-y-2">
                   {Array.from({ length: 10 }).map((_, i) => <Skeleton key={i} className="h-10" />)}
@@ -428,18 +428,18 @@ export default function ActivityLogContent() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
-                      <tr className="border-b border-[#2D6A8F]/20 bg-zinc-900/80">
-                        <th className="text-left text-xs text-[#6B8A9A] font-medium py-3 px-4">Timestamp</th>
-                        <th className="text-left text-xs text-[#6B8A9A] font-medium py-3 px-4">Event Type</th>
-                        <th className="text-left text-xs text-[#6B8A9A] font-medium py-3 px-4">User</th>
-                        <th className="text-left text-xs text-[#6B8A9A] font-medium py-3 px-4">Target ID</th>
-                        <th className="text-left text-xs text-[#6B8A9A] font-medium py-3 px-4">Metadata</th>
+                      <tr className="border-b border-cg-slate/20 bg-zinc-900/80">
+                        <th className="text-left text-xs text-muted-foreground font-medium py-3 px-4">Timestamp</th>
+                        <th className="text-left text-xs text-muted-foreground font-medium py-3 px-4">Event Type</th>
+                        <th className="text-left text-xs text-muted-foreground font-medium py-3 px-4">User</th>
+                        <th className="text-left text-xs text-muted-foreground font-medium py-3 px-4">Target ID</th>
+                        <th className="text-left text-xs text-muted-foreground font-medium py-3 px-4">Metadata</th>
                       </tr>
                     </thead>
                     <tbody>
                       {events?.map((event) => (
-                        <tr key={event.id} className="border-b border-[#2D6A8F]/10 last:border-0 hover:bg-[#2D6A8F]/10 transition-colors">
-                          <td className="py-2.5 px-4 text-xs text-[#6B8A9A] whitespace-nowrap">
+                        <tr key={event.id} className="border-b border-cg-slate/10 last:border-0 hover:bg-cg-slate/10 transition-colors">
+                          <td className="py-2.5 px-4 text-xs text-muted-foreground whitespace-nowrap">
                             {new Date(event.timestamp).toLocaleString('en-US', {
                               month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit',
                             })}
@@ -452,7 +452,7 @@ export default function ActivityLogContent() {
                             </span>
                           </td>
                           <td className="py-2.5 px-4 text-xs text-[#D0E4EC] font-mono">{event.user_email || '---'}</td>
-                          <td className="py-2.5 px-4 text-xs text-[#6B8A9A] font-mono truncate max-w-[140px]">
+                          <td className="py-2.5 px-4 text-xs text-muted-foreground font-mono truncate max-w-[140px]">
                             {event.target_id || '---'}
                           </td>
                           <td className="py-2.5 px-4 text-xs text-[#4A6E7F] truncate max-w-[200px]">
@@ -466,31 +466,31 @@ export default function ActivityLogContent() {
               ) : (
                 <div className="flex flex-col items-center justify-center py-16">
                   <Filter className="w-8 h-8 text-[#3A5A6A] mb-3" />
-                  <p className="text-[#6B8A9A] text-sm">No events found matching your filters</p>
+                  <p className="text-muted-foreground text-sm">No events found matching your filters</p>
                 </div>
               )}
 
               {/* Pagination */}
               {platformTotalPages > 1 && (
-                <div className="flex items-center justify-between px-4 py-3 border-t border-[#2D6A8F]/20">
-                  <span className="text-xs text-[#6B8A9A]">
+                <div className="flex items-center justify-between px-4 py-3 border-t border-cg-slate/20">
+                  <span className="text-xs text-muted-foreground">
                     Showing {platformPage * PAGE_SIZE + 1}--{Math.min((platformPage + 1) * PAGE_SIZE, platformTotal)} of {platformTotal.toLocaleString()} events
                   </span>
                   <div className="flex items-center gap-1">
                     <button aria-label="Previous"
                       onClick={() => setPlatformPage(Math.max(0, platformPage - 1))}
                       disabled={platformPage === 0}
-                      className="p-1.5 rounded-lg hover:bg-[#2D6A8F]/30 text-[#8AACBC] hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                      className="p-1.5 rounded-lg hover:bg-cg-slate/30 text-[#8AACBC] hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                     >
                       <ChevronLeft className="w-4 h-4" />
                     </button>
-                    <span className="text-xs text-[#6B8A9A] px-2">
+                    <span className="text-xs text-muted-foreground px-2">
                       Page {platformPage + 1} of {platformTotalPages}
                     </span>
                     <button aria-label="Next"
                       onClick={() => setPlatformPage(Math.min(platformTotalPages - 1, platformPage + 1))}
                       disabled={platformPage >= platformTotalPages - 1}
-                      className="p-1.5 rounded-lg hover:bg-[#2D6A8F]/30 text-[#8AACBC] hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                      className="p-1.5 rounded-lg hover:bg-cg-slate/30 text-[#8AACBC] hover:text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                     >
                       <ChevronRight className="w-4 h-4" />
                     </button>

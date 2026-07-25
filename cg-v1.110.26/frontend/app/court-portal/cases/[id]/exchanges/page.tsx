@@ -105,7 +105,7 @@ export default function ExchangeCompliancePage() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#2D6A8F] border-t-transparent mx-auto" />
+          <div className="animate-spin rounded-full h-10 w-10 border-2 border-cg-slate border-t-transparent mx-auto" />
           <p className="mt-4 text-muted-foreground">Loading...</p>
         </div>
       </div>
@@ -116,7 +116,7 @@ export default function ExchangeCompliancePage() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#2D6A8F] border-t-transparent mx-auto" />
+          <div className="animate-spin rounded-full h-10 w-10 border-2 border-cg-slate border-t-transparent mx-auto" />
           <p className="mt-4 text-muted-foreground">Loading exchange data...</p>
         </div>
       </div>
@@ -124,10 +124,10 @@ export default function ExchangeCompliancePage() {
   }
 
   const statusConfig = {
-    excellent: { label: "Excellent", color: "bg-[#E8F4F0] text-[#1E3A4A] border-[#E8F4F0]", icon: "text-[#2D8A70]" },
-    good: { label: "Good", color: "bg-[#E0EFF8] text-[#1E4E6B] border-[#E0EFF8]", icon: "text-[#2D6A8F]" },
-    needs_improvement: { label: "Needs Improvement", color: "bg-[#FEF7ED] text-[#E09520] border-[#FEF7ED]", icon: "text-[#E09520]" },
-    concerning: { label: "Concerning", color: "bg-[#FEE2E2] text-[#9B2C2C] border-[#FEE2E2]", icon: "text-[#C53030]" },
+    excellent: { label: "Excellent", color: "bg-cg-sage-subtle text-foreground border-cg-sage-subtle", icon: "text-cg-sage-dark" },
+    good: { label: "Good", color: "bg-cg-slate-subtle text-[#1E4E6B] border-cg-slate-subtle", icon: "text-cg-slate" },
+    needs_improvement: { label: "Needs Improvement", color: "bg-cg-amber-subtle text-[#E09520] border-cg-amber-subtle", icon: "text-[#E09520]" },
+    concerning: { label: "Concerning", color: "bg-cg-error-subtle text-[#9B2C2C] border-cg-error-subtle", icon: "text-cg-error" },
     no_data: { label: "No Data", color: "bg-gray-100 text-gray-800 border-gray-200", icon: "text-gray-600" },
   };
 
@@ -147,7 +147,7 @@ export default function ExchangeCompliancePage() {
           </Button>
           <div>
             <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-              <Navigation className="h-6 w-6 text-[#2D6A8F]" />
+              <Navigation className="h-6 w-6 text-cg-slate" />
               Exchange GPS Verification
             </h1>
             <p className="text-muted-foreground">
@@ -171,20 +171,20 @@ export default function ExchangeCompliancePage() {
         <>
           {/* Overall Status Card */}
           <Card className={`border-2 ${
-            status === "excellent" ? "border-[#E8F4F0] bg-[#E8F4F0]/50" :
-            status === "good" ? "border-[#E0EFF8] bg-[#E0EFF8]/50" :
-            status === "needs_improvement" ? "border-[#FEF7ED] bg-[#FEF7ED]/50" :
-            status === "concerning" ? "border-[#FEE2E2] bg-[#FEE2E2]/50" :
+            status === "excellent" ? "border-cg-sage-subtle bg-cg-sage-subtle/50" :
+            status === "good" ? "border-cg-slate-subtle bg-cg-slate-subtle/50" :
+            status === "needs_improvement" ? "border-cg-amber-subtle bg-cg-amber-subtle/50" :
+            status === "concerning" ? "border-cg-error-subtle bg-cg-error-subtle/50" :
             "border-gray-200 bg-gray-50/50"
           }`}>
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className={`p-2 rounded-full ${
-                    status === "excellent" ? "bg-[#E8F4F0]" :
-                    status === "good" ? "bg-[#E0EFF8]" :
-                    status === "needs_improvement" ? "bg-[#FEF7ED]" :
-                    status === "concerning" ? "bg-[#FEE2E2]" :
+                    status === "excellent" ? "bg-cg-sage-subtle" :
+                    status === "good" ? "bg-cg-slate-subtle" :
+                    status === "needs_improvement" ? "bg-cg-amber-subtle" :
+                    status === "concerning" ? "bg-cg-error-subtle" :
                     "bg-gray-100"
                   }`}>
                     <Target className={`h-5 w-5 ${statusInfo.icon}`} />
@@ -283,7 +283,7 @@ export default function ExchangeCompliancePage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Clock className="h-5 w-5 text-[#2D6A8F]" />
+                <Clock className="h-5 w-5 text-cg-slate" />
                 Recent Exchange Instances
               </CardTitle>
               <CardDescription>
@@ -317,7 +317,7 @@ export default function ExchangeCompliancePage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <MapPin className="h-5 w-5 text-[#2D6A8F]" />
+                  <MapPin className="h-5 w-5 text-cg-slate" />
                   Exchange Details with GPS Data
                 </CardTitle>
                 <CardDescription>
@@ -337,9 +337,9 @@ export default function ExchangeCompliancePage() {
       )}
 
       {/* Privacy Notice */}
-      <Alert className="bg-[#E0EFF8] border-[#E0EFF8]">
-        <MapPin className="h-4 w-4 text-[#2D6A8F]" />
-        <AlertDescription className="text-[#1E3A4A]">
+      <Alert className="bg-cg-slate-subtle border-cg-slate-subtle">
+        <MapPin className="h-4 w-4 text-cg-slate" />
+        <AlertDescription className="text-foreground">
           <span className="font-medium">Privacy Notice:</span>{" "}
           <span className="text-[#1E4E6B]">
             GPS coordinates are captured only at the moment of check-in. No continuous tracking is performed.
@@ -366,20 +366,20 @@ function MetricCard({
 }) {
   const colorClasses = {
     default: "bg-secondary/50",
-    purple: "bg-[#E0EFF8] border border-[#E0EFF8]",
-    green: "bg-[#E8F4F0] border border-[#E8F4F0]",
-    blue: "bg-[#E0EFF8] border border-[#E0EFF8]",
-    amber: "bg-[#FEF7ED] border border-[#FEF7ED]",
-    red: "bg-[#FEE2E2] border border-[#FEE2E2]",
+    purple: "bg-cg-slate-subtle border border-cg-slate-subtle",
+    green: "bg-cg-sage-subtle border border-cg-sage-subtle",
+    blue: "bg-cg-slate-subtle border border-cg-slate-subtle",
+    amber: "bg-cg-amber-subtle border border-cg-amber-subtle",
+    red: "bg-cg-error-subtle border border-cg-error-subtle",
   };
 
   const iconColors = {
     default: "text-muted-foreground",
-    purple: "text-[#2D6A8F]",
-    green: "text-[#2D8A70]",
-    blue: "text-[#2D6A8F]",
+    purple: "text-cg-slate",
+    green: "text-cg-sage-dark",
+    blue: "text-cg-slate",
     amber: "text-[#E09520]",
-    red: "text-[#C53030]",
+    red: "text-cg-error",
   };
 
   return (
@@ -405,10 +405,10 @@ function OutcomeCard({
   color: "green" | "red" | "amber" | "orange";
 }) {
   const colorClasses = {
-    green: "bg-[#E8F4F0] border-[#E8F4F0] text-[#2D8A70]",
-    red: "bg-[#FEE2E2] border-[#FEE2E2] text-[#C53030]",
-    amber: "bg-[#FEF7ED] border-[#FEF7ED] text-[#E09520]",
-    orange: "bg-[#FEF7ED] border-[#FEF7ED] text-[#E09520]",
+    green: "bg-cg-sage-subtle border-cg-sage-subtle text-cg-sage-dark",
+    red: "bg-cg-error-subtle border-cg-error-subtle text-cg-error",
+    amber: "bg-cg-amber-subtle border-cg-amber-subtle text-[#E09520]",
+    orange: "bg-cg-amber-subtle border-cg-amber-subtle text-[#E09520]",
   };
 
   return (
@@ -459,8 +459,8 @@ function ParentMetricsCard({
           </div>
           <div className="text-center p-3 bg-secondary/50 rounded-lg">
             <div className={`text-xl font-bold ${
-              metrics.geofence_hit_rate >= 90 ? "text-[#2D8A70]" :
-              metrics.geofence_hit_rate >= 70 ? "text-[#2D6A8F]" : "text-[#E09520]"
+              metrics.geofence_hit_rate >= 90 ? "text-cg-sage-dark" :
+              metrics.geofence_hit_rate >= 70 ? "text-cg-slate" : "text-[#E09520]"
             }`}>
               {metrics.geofence_hit_rate.toFixed(0)}%
             </div>
@@ -468,8 +468,8 @@ function ParentMetricsCard({
           </div>
           <div className="text-center p-3 bg-secondary/50 rounded-lg">
             <div className={`text-xl font-bold ${
-              metrics.on_time_rate >= 90 ? "text-[#2D8A70]" :
-              metrics.on_time_rate >= 70 ? "text-[#2D6A8F]" : "text-[#E09520]"
+              metrics.on_time_rate >= 90 ? "text-cg-sage-dark" :
+              metrics.on_time_rate >= 70 ? "text-cg-slate" : "text-[#E09520]"
             }`}>
               {metrics.on_time_rate.toFixed(0)}%
             </div>
@@ -552,7 +552,7 @@ function ParentCheckInBadge({
 
   if (inGeofence === true) {
     return (
-      <Badge className="bg-[#E8F4F0] text-[#1E3A4A] border-[#E8F4F0] text-xs">
+      <Badge className="bg-cg-sage-subtle text-foreground border-cg-sage-subtle text-xs">
         {label}: In geofence
       </Badge>
     );
@@ -560,14 +560,14 @@ function ParentCheckInBadge({
 
   if (inGeofence === false) {
     return (
-      <Badge className="bg-[#FEF7ED] text-[#E09520] border-[#FEF7ED] text-xs">
+      <Badge className="bg-cg-amber-subtle text-[#E09520] border-cg-amber-subtle text-xs">
         {label}: Outside geofence
       </Badge>
     );
   }
 
   return (
-    <Badge className="bg-[#E0EFF8] text-[#1E4E6B] border-[#E0EFF8] text-xs">
+    <Badge className="bg-cg-slate-subtle text-[#1E4E6B] border-cg-slate-subtle text-xs">
       {label}: Checked in
     </Badge>
   );
@@ -575,11 +575,11 @@ function ParentCheckInBadge({
 
 function StatusBadge({ status }: { status: string }) {
   const config: Record<string, { color: string; label: string }> = {
-    completed: { color: "bg-[#E8F4F0] text-[#1E3A4A]", label: "Completed" },
-    missed: { color: "bg-[#FEE2E2] text-[#9B2C2C]", label: "Missed" },
-    one_party_present: { color: "bg-[#FEF7ED] text-[#E09520]", label: "One Party" },
-    disputed: { color: "bg-[#FEF7ED] text-[#E09520]", label: "Disputed" },
-    scheduled: { color: "bg-[#E0EFF8] text-[#1E4E6B]", label: "Scheduled" },
+    completed: { color: "bg-cg-sage-subtle text-foreground", label: "Completed" },
+    missed: { color: "bg-cg-error-subtle text-[#9B2C2C]", label: "Missed" },
+    one_party_present: { color: "bg-cg-amber-subtle text-[#E09520]", label: "One Party" },
+    disputed: { color: "bg-cg-amber-subtle text-[#E09520]", label: "Disputed" },
+    scheduled: { color: "bg-cg-slate-subtle text-[#1E4E6B]", label: "Scheduled" },
     cancelled: { color: "bg-gray-100 text-gray-800", label: "Cancelled" },
   };
 
@@ -684,7 +684,7 @@ function ParentGPSInfo({
           {data.gps && (
             <>
               {data.gps.in_geofence !== null && (
-                <div className={`flex items-center gap-1 ${data.gps.in_geofence ? "text-[#2D8A70]" : "text-[#E09520]"}`}>
+                <div className={`flex items-center gap-1 ${data.gps.in_geofence ? "text-cg-sage-dark" : "text-[#E09520]"}`}>
                   <Target className="h-3 w-3" />
                   {data.gps.in_geofence ? "Within geofence" : "Outside geofence"}
                 </div>

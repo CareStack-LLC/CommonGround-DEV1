@@ -275,7 +275,7 @@ function SettingsContent() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-8 w-8 animate-spin text-[#3DAA8A]" />
+        <Loader2 className="h-8 w-8 animate-spin text-cg-sage" />
       </div>
     );
   }
@@ -302,8 +302,8 @@ function SettingsContent() {
                   onClick={() => handleTabChange(tab.id)}
                   className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
                     isActive
-                      ? "bg-[#3DAA8A] text-white shadow-sm"
-                      : "bg-white text-slate-600 border border-slate-200 hover:border-[#3DAA8A]/30"
+                      ? "bg-cg-sage text-white shadow-sm"
+                      : "bg-white text-slate-600 border border-slate-200 hover:border-cg-sage/30"
                   }`}
                 >
                   <Icon className="h-4 w-4" />
@@ -324,11 +324,11 @@ function SettingsContent() {
                   onClick={() => handleTabChange(tab.id)}
                   className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-left ${
                     isActive
-                      ? "bg-[#F4F8F7] text-[#1E3A4A] border-l-[3px] border-l-[#3DAA8A]"
+                      ? "bg-background text-foreground border-l-[3px] border-l-cg-sage"
                       : "text-slate-600 hover:bg-slate-50 border-l-[3px] border-l-transparent"
                   }`}
                 >
-                  <Icon className={`h-4 w-4 ${isActive ? "text-[#3DAA8A]" : "text-slate-400"}`} />
+                  <Icon className={`h-4 w-4 ${isActive ? "text-cg-sage" : "text-slate-400"}`} />
                   {tab.label}
                 </button>
               );
@@ -448,15 +448,15 @@ function AccountTab({ profile }: { profile: any }) {
               </div>
               <ChevronRight className="h-4 w-4 text-slate-400 group-hover:text-slate-600" />
             </Link>
-            <div className="flex items-center justify-between p-3 rounded-xl bg-[#F4F8F7]">
+            <div className="flex items-center justify-between p-3 rounded-xl bg-background">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-white rounded-lg"><Shield className="h-4 w-4 text-[#3DAA8A]" /></div>
+                <div className="p-2 bg-white rounded-lg"><Shield className="h-4 w-4 text-cg-sage" /></div>
                 <div>
                   <p className="text-sm font-medium text-slate-900">Data & Privacy</p>
                   <p className="text-xs text-slate-500">HIPAA compliant, all actions logged</p>
                 </div>
               </div>
-              <Badge className="bg-[#3DAA8A]/10 text-[#3DAA8A] border-0 text-xs">Protected</Badge>
+              <Badge className="bg-cg-sage/10 text-cg-sage border-0 text-xs">Protected</Badge>
             </div>
           </div>
         </CardContent>
@@ -491,12 +491,12 @@ function SubscriptionTab({
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="text-sm font-medium text-slate-700 flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-[#3DAA8A]" /> Choose Your Plan
+              <TrendingUp className="h-4 w-4 text-cg-sage" /> Choose Your Plan
             </CardTitle>
             <div className="flex items-center gap-1 bg-slate-100 rounded-full p-0.5">
               {(["monthly", "annual"] as const).map((cycle) => (
                 <button key={cycle} onClick={() => setBillingCycle(cycle)}
-                  className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${billingCycle === cycle ? "bg-[#3DAA8A] text-white shadow-sm" : "text-slate-600"}`}>
+                  className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${billingCycle === cycle ? "bg-cg-sage text-white shadow-sm" : "text-slate-600"}`}>
                   {cycle === "monthly" ? "Monthly" : "Annual (Save 20%)"}
                 </button>
               ))}
@@ -511,24 +511,24 @@ function SubscriptionTab({
               const price = billingCycle === "monthly" ? plan.monthlyPrice : plan.annualPrice;
               const canCheckout = tierKey !== "starter" && !plan.isEnterprise;
               return (
-                <div key={tierKey} className={`relative rounded-xl border p-4 flex flex-col ${isCurrent ? "border-[#3DAA8A] bg-[#F4F8F7] ring-1 ring-[#3DAA8A]/20" : "border-slate-200 hover:border-[#3DAA8A]/30"}`}>
-                  {isCurrent && <Badge className="absolute -top-2 left-1/2 -translate-x-1/2 bg-[#3DAA8A] text-white border-0 text-[10px] px-2">Current</Badge>}
-                  <h3 className="text-sm font-bold text-[#1E3A4A]">{plan.name}</h3>
+                <div key={tierKey} className={`relative rounded-xl border p-4 flex flex-col ${isCurrent ? "border-cg-sage bg-background ring-1 ring-cg-sage/20" : "border-slate-200 hover:border-cg-sage/30"}`}>
+                  {isCurrent && <Badge className="absolute -top-2 left-1/2 -translate-x-1/2 bg-cg-sage text-white border-0 text-[10px] px-2">Current</Badge>}
+                  <h3 className="text-sm font-bold text-foreground">{plan.name}</h3>
                   <p className="text-lg font-bold text-slate-900 mt-1">{price}</p>
                   <div className="mt-3 space-y-1.5 text-xs text-slate-600 flex-1">
-                    <div className="flex items-center gap-1.5"><FolderOpen className="h-3 w-3 text-[#3DAA8A]" />{plan.cases} cases</div>
-                    <div className="flex items-center gap-1.5"><Users className="h-3 w-3 text-[#3DAA8A]" />{plan.team === 0 ? "Solo" : `${plan.team} members`}</div>
-                    <div className="flex items-center gap-1.5"><CheckCircle2 className="h-3 w-3 text-[#3DAA8A]" />{plan.featureCount}/21 features</div>
+                    <div className="flex items-center gap-1.5"><FolderOpen className="h-3 w-3 text-cg-sage" />{plan.cases} cases</div>
+                    <div className="flex items-center gap-1.5"><Users className="h-3 w-3 text-cg-sage" />{plan.team === 0 ? "Solo" : `${plan.team} members`}</div>
+                    <div className="flex items-center gap-1.5"><CheckCircle2 className="h-3 w-3 text-cg-sage" />{plan.featureCount}/21 features</div>
                   </div>
                   <div className="mt-3">
                     {isCurrent ? (
                       <Button disabled variant="outline" size="sm" className="w-full text-xs h-8 rounded-lg">Current</Button>
                     ) : plan.isEnterprise ? (
-                      <Button asChild size="sm" className="w-full bg-[#1E3A4A] hover:bg-[#162E3C] text-white text-xs h-8 rounded-lg">
+                      <Button asChild size="sm" className="w-full bg-foreground hover:bg-[#162E3C] text-white text-xs h-8 rounded-lg">
                         <a href="mailto:sales@find-commonground.com?subject=Enterprise%20Inquiry"><Mail className="h-3 w-3 mr-1" />Contact</a>
                       </Button>
                     ) : canCheckout ? (
-                      <Button onClick={() => handleCheckout(tierKey)} disabled={checkoutLoading === tierKey} size="sm" className="w-full bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white text-xs h-8 rounded-lg">
+                      <Button onClick={() => handleCheckout(tierKey)} disabled={checkoutLoading === tierKey} size="sm" className="w-full bg-cg-sage hover:bg-[#2D8A6E] text-white text-xs h-8 rounded-lg">
                         {checkoutLoading === tierKey ? <Loader2 className="h-3 w-3 animate-spin" /> : <>Switch</>}
                       </Button>
                     ) : (
@@ -552,7 +552,7 @@ function SubscriptionTab({
               </span>
               <span className="text-sm font-semibold">{usage.cases.active} / {usage.cases.max >= 999999 ? "\u221E" : usage.cases.max}</span>
             </div>
-            <Progress value={casePercent} className={`h-2 ${isNearLimit ? "[&>div]:bg-[#F5A623]" : ""}`} />
+            <Progress value={casePercent} className={`h-2 ${isNearLimit ? "[&>div]:bg-cg-amber" : ""}`} />
             <p className="text-xs text-slate-500 mt-2">{usage.cases.remaining >= 999999 ? "Unlimited" : `${usage.cases.remaining} remaining`}</p>
           </CardContent>
         </Card>
@@ -583,7 +583,7 @@ function SubscriptionTab({
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-1.5">
             {Object.entries(usage.features).map(([feature, enabled]) => (
               <div key={feature} className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs ${enabled ? "text-slate-700" : "text-slate-400"}`}>
-                {enabled ? <CheckCircle2 className="h-3.5 w-3.5 text-[#3DAA8A] shrink-0" /> : <XCircle className="h-3.5 w-3.5 text-slate-300 shrink-0" />}
+                {enabled ? <CheckCircle2 className="h-3.5 w-3.5 text-cg-sage shrink-0" /> : <XCircle className="h-3.5 w-3.5 text-slate-300 shrink-0" />}
                 {FEATURE_LABELS[feature] || feature.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase())}
               </div>
             ))}
@@ -613,7 +613,7 @@ function SubscriptionTab({
           ) : (
             <div className="space-y-2">
               {/* Current subscription info */}
-              <div className="flex items-center justify-between p-3 rounded-xl bg-[#F4F8F7]">
+              <div className="flex items-center justify-between p-3 rounded-xl bg-background">
                 <div>
                   <p className="text-sm font-medium text-slate-900">{currentPlan.name} Plan</p>
                   <p className="text-xs text-slate-500">
@@ -647,7 +647,7 @@ function SubscriptionTab({
                       console.error("Portal error:", err);
                     }
                   }}
-                  className="text-[#3DAA8A] hover:underline font-medium"
+                  className="text-cg-sage hover:underline font-medium"
                 >
                   open billing portal
                 </button>.
@@ -675,7 +675,7 @@ function FirmTab({
           <h3 className="text-sm font-semibold text-slate-900">No Firm Created</h3>
           <p className="text-xs text-slate-500 mt-1 mb-4">Create a firm to manage your team and directory presence.</p>
           <Link href="/professional/firm/new">
-            <Button className="bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white rounded-xl">Create Firm</Button>
+            <Button className="bg-cg-sage hover:bg-[#2D8A6E] text-white rounded-xl">Create Firm</Button>
           </Link>
         </CardContent>
       </Card>
@@ -698,7 +698,7 @@ function FirmTab({
                 <Button variant="outline" size="sm" className="rounded-lg border-slate-200 text-xs" onClick={() => { setFirmEditing(false); setFirmDraft(firm); }}>
                   Cancel
                 </Button>
-                <Button size="sm" className="rounded-lg bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white text-xs" onClick={handleFirmSave} disabled={firmSaving}>
+                <Button size="sm" className="rounded-lg bg-cg-sage hover:bg-[#2D8A6E] text-white text-xs" onClick={handleFirmSave} disabled={firmSaving}>
                   {firmSaving ? <Loader2 className="h-3 w-3 animate-spin" /> : "Save"}
                 </Button>
               </div>
@@ -761,20 +761,20 @@ function FirmTab({
           )}
 
           {/* Directory listing */}
-          <div className="flex items-center justify-between p-3 rounded-xl bg-[#F4F8F7]">
+          <div className="flex items-center justify-between p-3 rounded-xl bg-background">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-white rounded-lg"><Globe className="h-4 w-4 text-[#3DAA8A]" /></div>
+              <div className="p-2 bg-white rounded-lg"><Globe className="h-4 w-4 text-cg-sage" /></div>
               <div>
                 <p className="text-sm font-medium text-slate-900">Directory Listing</p>
                 <p className="text-xs text-slate-500">Visible to parents searching for professionals</p>
               </div>
             </div>
-            <Badge className={`text-xs ${firm.directory_listed ? "bg-[#3DAA8A]/10 text-[#3DAA8A]" : "bg-slate-100 text-slate-500"}`}>
+            <Badge className={`text-xs ${firm.directory_listed ? "bg-cg-sage/10 text-cg-sage" : "bg-slate-100 text-slate-500"}`}>
               {firm.directory_listed ? "Listed" : "Hidden"}
             </Badge>
           </div>
 
-          <Link href="/professional/firm" className="inline-flex items-center gap-1.5 text-xs text-[#3DAA8A] hover:text-[#2D8A6E] font-medium">
+          <Link href="/professional/firm" className="inline-flex items-center gap-1.5 text-xs text-cg-sage hover:text-[#2D8A6E] font-medium">
             View full firm settings <ExternalLink className="h-3 w-3" />
           </Link>
         </CardContent>
@@ -786,7 +786,7 @@ function FirmTab({
           <div className="flex items-center justify-between">
             <CardTitle className="text-base text-slate-900">Team Members</CardTitle>
             {usage?.team_members?.max > 0 && (
-              <Button size="sm" className="rounded-lg bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white text-xs gap-1.5"
+              <Button size="sm" className="rounded-lg bg-cg-sage hover:bg-[#2D8A6E] text-white text-xs gap-1.5"
                 onClick={() => setShowInvite(!showInvite)}>
                 <UserPlus className="h-3.5 w-3.5" /> Invite
               </Button>
@@ -796,7 +796,7 @@ function FirmTab({
         <CardContent>
           {/* Invite Form */}
           {showInvite && (
-            <div className="p-4 rounded-xl bg-[#F4F8F7] border border-[#3DAA8A]/10 mb-4 space-y-3">
+            <div className="p-4 rounded-xl bg-background border border-cg-sage/10 mb-4 space-y-3">
               <div className="grid sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <Label className="text-xs text-slate-500">Email</Label>
@@ -811,7 +811,7 @@ function FirmTab({
                 </div>
               </div>
               <div className="flex gap-2">
-                <Button size="sm" className="rounded-lg bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white text-xs" onClick={handleInvite} disabled={inviting || !inviteEmail}>
+                <Button size="sm" className="rounded-lg bg-cg-sage hover:bg-[#2D8A6E] text-white text-xs" onClick={handleInvite} disabled={inviting || !inviteEmail}>
                   {inviting ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Mail className="h-3 w-3 mr-1" />} Send Invite
                 </Button>
                 <Button variant="outline" size="sm" className="rounded-lg border-slate-200 text-xs" onClick={() => setShowInvite(false)}>Cancel</Button>
@@ -831,7 +831,7 @@ function FirmTab({
               {members.map((m: TeamMember) => (
                 <div key={m.id} className="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 transition-colors">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-[#3DAA8A]/10 flex items-center justify-center text-xs font-bold text-[#3DAA8A]">
+                    <div className="w-8 h-8 rounded-full bg-cg-sage/10 flex items-center justify-center text-xs font-bold text-cg-sage">
                       {(m.first_name?.[0] || "").toUpperCase()}{(m.last_name?.[0] || "").toUpperCase()}
                     </div>
                     <div>
@@ -840,7 +840,7 @@ function FirmTab({
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge className={`text-[10px] ${m.status === "active" ? "bg-[#E8F4F0] text-[#2D8A70]" : m.status === "invited" ? "bg-blue-50 text-blue-700" : "bg-slate-100 text-slate-600"}`}>
+                    <Badge className={`text-[10px] ${m.status === "active" ? "bg-cg-sage-subtle text-cg-sage-dark" : m.status === "invited" ? "bg-blue-50 text-blue-700" : "bg-slate-100 text-slate-600"}`}>
                       {m.status}
                     </Badge>
                     <Badge className="text-[10px] bg-slate-100 text-slate-600 border-0">
@@ -869,8 +869,8 @@ function IntegrationsTab() {
 
   return (
     <div className="space-y-4">
-      <div className="p-4 rounded-xl bg-[#F4F8F7] border border-[#3DAA8A]/10">
-        <p className="text-sm text-[#1E3A4A] font-medium">Integrations are coming soon</p>
+      <div className="p-4 rounded-xl bg-background border border-cg-sage/10">
+        <p className="text-sm text-foreground font-medium">Integrations are coming soon</p>
         <p className="text-xs text-slate-500 mt-1">We're building connections with the tools you already use. Stay tuned for Q3 2026.</p>
       </div>
       <div className="grid sm:grid-cols-2 gap-3">
@@ -904,7 +904,7 @@ function IntegrationsTab() {
 
 export default function SettingsPage() {
   return (
-    <Suspense fallback={<div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-[#3DAA8A]" /></div>}>
+    <Suspense fallback={<div className="flex items-center justify-center py-20"><Loader2 className="h-8 w-8 animate-spin text-cg-sage" /></div>}>
       <SettingsContent />
     </Suspense>
   );

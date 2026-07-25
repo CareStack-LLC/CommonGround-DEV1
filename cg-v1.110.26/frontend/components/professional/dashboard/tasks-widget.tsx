@@ -45,9 +45,9 @@ interface Task {
 }
 
 const PRIORITY_COLORS: Record<string, string> = {
-    urgent: "bg-[#FEE2E2] text-[#9B2C2C] border-[#FEE2E2]",
-    high: "bg-[#FEF7ED] text-[#B8791A] border-[#FBE3BF]",
-    medium: "bg-[#E0EFF8] text-[#1E4E6B] border-[#E0EFF8]",
+    urgent: "bg-cg-error-subtle text-[#9B2C2C] border-cg-error-subtle",
+    high: "bg-cg-amber-subtle text-[#B8791A] border-[#FBE3BF]",
+    medium: "bg-cg-slate-subtle text-[#1E4E6B] border-cg-slate-subtle",
     low: "bg-slate-100 text-slate-600 border-slate-200",
 };
 
@@ -56,7 +56,7 @@ function formatDueDate(dateStr?: string) {
     const d = new Date(dateStr);
     const now = new Date();
     const diffDays = Math.ceil((d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-    if (diffDays < 0) return { label: "Overdue", color: "text-[#C53030]" };
+    if (diffDays < 0) return { label: "Overdue", color: "text-cg-error" };
     if (diffDays === 0) return { label: "Due today", color: "text-[#E09520]" };
     if (diffDays === 1) return { label: "Due tomorrow", color: "text-[#E09520]" };
     return {
@@ -116,7 +116,7 @@ function AddTaskModal({ open, onClose, onCreated, token }: AddTaskModalProps) {
                 </DialogHeader>
                 <div className="space-y-4 py-2">
                     {error && (
-                        <div className="flex items-center gap-2 text-[#C53030] text-sm bg-[#FEE2E2] p-3 rounded-lg">
+                        <div className="flex items-center gap-2 text-cg-error text-sm bg-cg-error-subtle p-3 rounded-lg">
                             <AlertCircle className="h-4 w-4 shrink-0" />
                             {error}
                         </div>

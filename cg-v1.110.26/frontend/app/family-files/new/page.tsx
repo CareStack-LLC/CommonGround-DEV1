@@ -272,9 +272,9 @@ function NewFamilyFileContent() {
                   <button aria-label="Delete"
                     type="button"
                     onClick={() => removeChild(index)}
-                    className="w-8 h-8 rounded-lg hover:bg-[#FEE2E2] flex items-center justify-center transition-colors"
+                    className="w-8 h-8 rounded-lg hover:bg-cg-error-subtle flex items-center justify-center transition-colors"
                   >
-                    <Trash2 className="h-4 w-4 text-[#C53030]" />
+                    <Trash2 className="h-4 w-4 text-cg-error" />
                   </button>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-2">

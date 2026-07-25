@@ -41,11 +41,11 @@ interface FormSubmission {
 }
 
 const FORM_LABELS: Record<string, { name: string; color: string }> = {
-  "FL-300": { name: "Request for Order", color: "bg-[#E0EFF8] text-[#1E4E6B]" },
-  "FL-311": { name: "Child Custody Application", color: "bg-[#E0EFF8] text-[#1E4E6B]" },
-  "FL-320": { name: "Responsive Declaration", color: "bg-[#E0EFF8] text-[#1E4E6B]" },
-  "FL-340": { name: "Findings and Order", color: "bg-[#FEF7ED] text-[#E09520]" },
-  "FL-341": { name: "Custody Order Attachment", color: "bg-[#E8F4F0] text-[#2D8A70]" },
+  "FL-300": { name: "Request for Order", color: "bg-cg-slate-subtle text-[#1E4E6B]" },
+  "FL-311": { name: "Child Custody Application", color: "bg-cg-slate-subtle text-[#1E4E6B]" },
+  "FL-320": { name: "Responsive Declaration", color: "bg-cg-slate-subtle text-[#1E4E6B]" },
+  "FL-340": { name: "Findings and Order", color: "bg-cg-amber-subtle text-[#E09520]" },
+  "FL-341": { name: "Custody Order Attachment", color: "bg-cg-sage-subtle text-cg-sage-dark" },
   "FL-342": { name: "Child Support Attachment", color: "bg-teal-100 text-teal-700" },
 };
 
@@ -150,7 +150,7 @@ export default function FormsQueuePage() {
   if (isLoading || !professional) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#2D6A8F] border-t-transparent" />
+        <div className="animate-spin rounded-full h-10 w-10 border-2 border-cg-slate border-t-transparent" />
       </div>
     );
   }
@@ -161,7 +161,7 @@ export default function FormsQueuePage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <FileText className="h-6 w-6 text-[#2D6A8F]" />
+            <FileText className="h-6 w-6 text-cg-slate" />
             Form Review Queue
           </h1>
           <p className="text-muted-foreground">
@@ -212,41 +212,41 @@ export default function FormsQueuePage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="bg-gradient-to-br from-[#FEE2E2] to-white border-[#FEE2E2]">
+        <Card className="bg-gradient-to-br from-cg-error-subtle to-white border-cg-error-subtle">
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-[#C53030] font-medium">Urgent</p>
+                <p className="text-sm text-cg-error font-medium">Urgent</p>
                 <p className="text-2xl font-bold text-[#9B2C2C]">{urgentForms.length}</p>
-                <p className="text-xs text-[#C53030]">Older than 48h</p>
+                <p className="text-xs text-cg-error">Older than 48h</p>
               </div>
               <AlertCircle className="h-8 w-8 text-[#E06B6B]" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-[#FEF7ED] to-white border-[#FEF7ED]">
+        <Card className="bg-gradient-to-br from-cg-amber-subtle to-white border-cg-amber-subtle">
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-[#E09520] font-medium">Recent</p>
                 <p className="text-2xl font-bold text-[#E09520]">{recentForms.length}</p>
-                <p className="text-xs text-[#F5A623]">Last 48 hours</p>
+                <p className="text-xs text-cg-amber">Last 48 hours</p>
               </div>
-              <Clock className="h-8 w-8 text-[#F5A623]" />
+              <Clock className="h-8 w-8 text-cg-amber" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-[#E8F4F0] to-white border-[#E8F4F0]">
+        <Card className="bg-gradient-to-br from-cg-sage-subtle to-white border-cg-sage-subtle">
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-[#2D8A70] font-medium">Total Pending</p>
-                <p className="text-2xl font-bold text-[#2D8A70]">{filteredForms.length}</p>
-                <p className="text-xs text-[#3DAA8A]">Awaiting review</p>
+                <p className="text-sm text-cg-sage-dark font-medium">Total Pending</p>
+                <p className="text-2xl font-bold text-cg-sage-dark">{filteredForms.length}</p>
+                <p className="text-xs text-cg-sage">Awaiting review</p>
               </div>
-              <FileText className="h-8 w-8 text-[#5BC4A0]" />
+              <FileText className="h-8 w-8 text-cg-sage-light" />
             </div>
           </CardContent>
         </Card>
@@ -257,7 +257,7 @@ export default function FormsQueuePage() {
         <Card>
           <CardContent className="py-12">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#2D6A8F] border-t-transparent mx-auto" />
+              <div className="animate-spin rounded-full h-10 w-10 border-2 border-cg-slate border-t-transparent mx-auto" />
               <p className="mt-4 text-muted-foreground">Loading pending forms...</p>
             </div>
           </CardContent>
@@ -266,13 +266,13 @@ export default function FormsQueuePage() {
 
       {/* Urgent Forms */}
       {!isLoadingData && urgentForms.length > 0 && (
-        <Card className="border-[#FEE2E2]">
-          <CardHeader className="bg-[#FEE2E2]/50">
+        <Card className="border-cg-error-subtle">
+          <CardHeader className="bg-cg-error-subtle/50">
             <CardTitle className="text-[#7A2222] flex items-center gap-2">
               <AlertCircle className="h-5 w-5" />
               Urgent - Needs Immediate Attention
             </CardTitle>
-            <CardDescription className="text-[#C53030]">
+            <CardDescription className="text-cg-error">
               These forms have been waiting more than 48 hours
             </CardDescription>
           </CardHeader>
@@ -291,7 +291,7 @@ export default function FormsQueuePage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Clock className="h-5 w-5 text-[#2D6A8F]" />
+              <Clock className="h-5 w-5 text-cg-slate" />
               Recent Submissions
             </CardTitle>
             <CardDescription>
@@ -313,7 +313,7 @@ export default function FormsQueuePage() {
         <Card>
           <CardContent className="py-12">
             <div className="text-center">
-              <CheckCircle className="h-12 w-12 mx-auto text-[#3DAA8A] mb-4" />
+              <CheckCircle className="h-12 w-12 mx-auto text-cg-sage mb-4" />
               <h3 className="text-lg font-semibold text-foreground mb-2">
                 All Caught Up!
               </h3>

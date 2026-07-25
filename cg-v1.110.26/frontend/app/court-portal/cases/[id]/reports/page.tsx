@@ -58,12 +58,12 @@ const REPORT_ICONS: Record<string, React.ReactNode> = {
 };
 
 const REPORT_COLORS: Record<string, string> = {
-  "green": "bg-[#E8F4F0] text-[#2D8A70] border-[#E8F4F0] hover:bg-[#E8F4F0]",
-  "blue": "bg-[#E0EFF8] text-[#1E4E6B] border-[#E0EFF8] hover:bg-[#E0EFF8]",
-  "purple": "bg-[#E0EFF8] text-[#1E4E6B] border-[#E0EFF8] hover:bg-[#E0EFF8]",
-  "red": "bg-[#FEE2E2] text-[#9B2C2C] border-[#FEE2E2] hover:bg-[#FEE2E2]",
-  "indigo": "bg-[#E0EFF8] text-[#1E4E6B] border-[#E0EFF8] hover:bg-[#E0EFF8]",
-  "amber": "bg-[#FEF7ED] text-[#E09520] border-[#FEF7ED] hover:bg-[#FEF7ED]",
+  "green": "bg-cg-sage-subtle text-cg-sage-dark border-cg-sage-subtle hover:bg-cg-sage-subtle",
+  "blue": "bg-cg-slate-subtle text-[#1E4E6B] border-cg-slate-subtle hover:bg-cg-slate-subtle",
+  "purple": "bg-cg-slate-subtle text-[#1E4E6B] border-cg-slate-subtle hover:bg-cg-slate-subtle",
+  "red": "bg-cg-error-subtle text-[#9B2C2C] border-cg-error-subtle hover:bg-cg-error-subtle",
+  "indigo": "bg-cg-slate-subtle text-[#1E4E6B] border-cg-slate-subtle hover:bg-cg-slate-subtle",
+  "amber": "bg-cg-amber-subtle text-[#E09520] border-cg-amber-subtle hover:bg-cg-amber-subtle",
   "teal": "bg-teal-100 text-teal-700 border-teal-200 hover:bg-teal-200",
   "gray": "bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200",
 };
@@ -347,12 +347,12 @@ export default function ReportsPage() {
 
       {/* Quick Select Template Selector */}
       {showQuickSelect && (
-        <Card className="border-2 border-[#E0EFF8] bg-[#E0EFF8]/50">
+        <Card className="border-2 border-cg-slate-subtle bg-cg-slate-subtle/50">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-[#2D6A8F]" />
+                  <FileText className="h-5 w-5 text-cg-slate" />
                   Quick Select Report
                 </CardTitle>
                 <CardDescription>
@@ -403,7 +403,7 @@ export default function ReportsPage() {
                       setShowQuickSelect(false);
                       setShowGenerator(true);
                     }}
-                    className="p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-md bg-white border-slate-200 hover:border-[#4BA8C8]"
+                    className="p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-md bg-white border-slate-200 hover:border-cg-slate-light"
                   >
                     <div className="flex items-center gap-2 mb-2">
                       <span className="text-xl">{type.icon}</span>
@@ -420,7 +420,7 @@ export default function ReportsPage() {
 
       {/* Report Generator */}
       {showGenerator && (
-        <Card className="border-2 border-[#E0EFF8] bg-[#E0EFF8]">
+        <Card className="border-2 border-cg-slate-subtle bg-cg-slate-subtle">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
@@ -486,8 +486,8 @@ export default function ReportsPage() {
                       onClick={() => setSelectedType(type.id)}
                       className={`p-3 border rounded-lg cursor-pointer transition ${
                         selectedType === type.id
-                          ? "border-[#2D6A8F] bg-[#E0EFF8]"
-                          : "border-slate-200 bg-white hover:border-[#4BA8C8]"
+                          ? "border-cg-slate bg-cg-slate-subtle"
+                          : "border-slate-200 bg-white hover:border-cg-slate-light"
                       }`}
                     >
                       <div className="flex items-center space-x-2">
@@ -553,7 +553,7 @@ export default function ReportsPage() {
 
       {/* Error Display */}
       {error && (
-        <div className="bg-[#FEE2E2] border border-[#FEE2E2] text-[#9B2C2C] px-4 py-3 rounded">
+        <div className="bg-cg-error-subtle border border-cg-error-subtle text-[#9B2C2C] px-4 py-3 rounded">
           {error}
         </div>
       )}
@@ -659,7 +659,7 @@ export default function ReportsPage() {
             </Button>
           </div>
           {verifyResult && (
-            <div className={`mt-3 p-3 rounded ${verifyResult.is_valid ? 'bg-[#E8F4F0] text-[#2D8A70]' : 'bg-[#FEE2E2] text-[#9B2C2C]'}`}>
+            <div className={`mt-3 p-3 rounded ${verifyResult.is_valid ? 'bg-cg-sage-subtle text-cg-sage-dark' : 'bg-cg-error-subtle text-[#9B2C2C]'}`}>
               <div className="flex items-center gap-2">
                 <span>{verifyResult.is_valid ? '✅' : '❌'}</span>
                 <span>{verifyResult.message}</span>

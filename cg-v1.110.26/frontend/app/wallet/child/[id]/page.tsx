@@ -97,7 +97,7 @@ function ChildWalletContent() {
         <Navigation />
         <div className="flex items-center justify-center h-[calc(100vh-4rem)]">
           <div className="text-center">
-            <Loader2 className="h-12 w-12 text-[#2D6A8F] animate-spin mx-auto" />
+            <Loader2 className="h-12 w-12 text-cg-slate animate-spin mx-auto" />
             <p className="mt-4 text-muted-foreground">Loading...</p>
           </div>
         </div>
@@ -139,7 +139,7 @@ function ChildWalletContent() {
       <Navigation />
 
       {/* Header */}
-      <header className="border-b border-border bg-[#E0EFF8]">
+      <header className="border-b border-border bg-cg-slate-subtle">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <button
             onClick={() => router.back()}
@@ -150,8 +150,8 @@ function ChildWalletContent() {
           </button>
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-xl bg-[#E0EFF8] flex items-center justify-center">
-                <PiggyBank className="h-7 w-7 text-[#2D6A8F]" />
+              <div className="w-14 h-14 rounded-xl bg-cg-slate-subtle flex items-center justify-center">
+                <PiggyBank className="h-7 w-7 text-cg-slate" />
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-foreground">
@@ -162,7 +162,7 @@ function ChildWalletContent() {
             </div>
             <button
               onClick={() => setShowContributeModal(true)}
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#2D6A8F] text-white rounded-xl font-medium hover:bg-[#1E4E6B] transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-cg-slate text-white rounded-xl font-medium hover:bg-[#1E4E6B] transition-colors"
             >
               <Gift className="h-4 w-4" />
               Send Money
@@ -173,8 +173,8 @@ function ChildWalletContent() {
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         {/* Balance Card */}
-        <div className="cg-card-elevated p-6 bg-gradient-to-br from-[#E0EFF8] to-[#FEF7ED] border-[#E0EFF8]">
-          <p className="text-sm text-[#2D6A8F] mb-2">Current Balance</p>
+        <div className="cg-card-elevated p-6 bg-gradient-to-br from-cg-slate-subtle to-cg-amber-subtle border-cg-slate-subtle">
+          <p className="text-sm text-cg-slate mb-2">Current Balance</p>
           <p className="text-4xl font-bold text-[#1E4E6B] font-mono tabular-nums">
             {formatCurrency(balance)}
           </p>
@@ -203,14 +203,14 @@ function ChildWalletContent() {
         {/* Contributions List */}
         <div className="cg-card p-6">
           <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-            <Heart className="h-5 w-5 text-[#F5A623]" />
+            <Heart className="h-5 w-5 text-cg-amber" />
             Contributions
           </h2>
 
           {contributions.length === 0 ? (
             <div className="text-center py-12">
-              <div className="w-16 h-16 rounded-full bg-[#E0EFF8] flex items-center justify-center mx-auto mb-4">
-                <Gift className="h-8 w-8 text-[#2D6A8F]" />
+              <div className="w-16 h-16 rounded-full bg-cg-slate-subtle flex items-center justify-center mx-auto mb-4">
+                <Gift className="h-8 w-8 text-cg-slate" />
               </div>
               <h3 className="font-semibold text-foreground mb-2">No Contributions Yet</h3>
               <p className="text-muted-foreground mb-4 max-w-sm mx-auto">
@@ -218,7 +218,7 @@ function ChildWalletContent() {
               </p>
               <button
                 onClick={() => setShowContributeModal(true)}
-                className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#2D6A8F] text-white rounded-xl font-medium hover:bg-[#1E4E6B] transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2.5 bg-cg-slate text-white rounded-xl font-medium hover:bg-[#1E4E6B] transition-colors"
               >
                 <Gift className="h-4 w-4" />
                 Send Money
@@ -233,8 +233,8 @@ function ChildWalletContent() {
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-full bg-[#FEF7ED] flex items-center justify-center flex-shrink-0">
-                        <Heart className="h-5 w-5 text-[#F5A623]" />
+                      <div className="w-10 h-10 rounded-full bg-cg-amber-subtle flex items-center justify-center flex-shrink-0">
+                        <Heart className="h-5 w-5 text-cg-amber" />
                       </div>
                       <div>
                         <p className="font-medium text-foreground">
@@ -260,7 +260,7 @@ function ChildWalletContent() {
                         </p>
                       </div>
                     </div>
-                    <p className="font-mono text-lg font-medium text-[#2D6A8F]">
+                    <p className="font-mono text-lg font-medium text-cg-slate">
                       +{formatCurrency(contribution.amount)}
                     </p>
                   </div>

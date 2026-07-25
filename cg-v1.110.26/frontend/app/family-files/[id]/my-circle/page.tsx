@@ -39,16 +39,16 @@ interface PageParams {
 }
 
 const ROOM_COLORS = [
-  'bg-[#FEE2E2] dark:bg-[#7A2222]/30 border-[#FCA5A5] dark:border-[#9B2C2C] text-[#9B2C2C] dark:text-[#FCA5A5]',
-  'bg-[#FEF7ED] dark:bg-[#1E3A4A]/30 border-[#F5A623] dark:border-[#E09520] text-[#E09520] dark:text-[#F5A623]',
-  'bg-[#FEF7ED] dark:bg-[#1E3A4A]/30 border-[#F5A623] dark:border-[#E09520] text-[#E09520] dark:text-[#F5A623]',
-  'bg-[#FEF7ED] dark:bg-[#1E3A4A]/30 border-[#F5A623] dark:border-[#E09520] text-[#E09520] dark:text-[#F5A623]',
+  'bg-cg-error-subtle dark:bg-[#7A2222]/30 border-[#FCA5A5] dark:border-[#9B2C2C] text-[#9B2C2C] dark:text-[#FCA5A5]',
+  'bg-cg-amber-subtle dark:bg-foreground/30 border-cg-amber dark:border-[#E09520] text-[#E09520] dark:text-cg-amber',
+  'bg-cg-amber-subtle dark:bg-foreground/30 border-cg-amber dark:border-[#E09520] text-[#E09520] dark:text-cg-amber',
+  'bg-cg-amber-subtle dark:bg-foreground/30 border-cg-amber dark:border-[#E09520] text-[#E09520] dark:text-cg-amber',
   'bg-lime-100 dark:bg-lime-900/30 border-lime-300 dark:border-lime-700 text-lime-700 dark:text-lime-300',
-  'bg-[#E8F4F0] dark:bg-[#1E3A4A]/30 border-[#5BC4A0] dark:border-[#2D8A70] text-[#2D8A70] dark:text-[#5BC4A0]',
+  'bg-cg-sage-subtle dark:bg-foreground/30 border-cg-sage-light dark:border-cg-sage-dark text-cg-sage-dark dark:text-cg-sage-light',
   'bg-teal-100 dark:bg-teal-900/30 border-teal-300 dark:border-teal-700 text-teal-700 dark:text-teal-300',
-  'bg-[#E0EFF8] dark:bg-[#1E3A4A]/30 border-[#4BA8C8] dark:border-[#1E4E6B] text-[#1E4E6B] dark:text-[#4BA8C8]',
-  'bg-[#E0EFF8] dark:bg-[#1E3A4A]/30 border-[#4BA8C8] dark:border-[#1E4E6B] text-[#1E4E6B] dark:text-[#4BA8C8]',
-  'bg-[#FEF7ED] dark:bg-[#1E3A4A]/30 border-[#F5A623] dark:border-[#E09520] text-[#E09520] dark:text-[#F5A623]',
+  'bg-cg-slate-subtle dark:bg-foreground/30 border-cg-slate-light dark:border-[#1E4E6B] text-[#1E4E6B] dark:text-cg-slate-light',
+  'bg-cg-slate-subtle dark:bg-foreground/30 border-cg-slate-light dark:border-[#1E4E6B] text-[#1E4E6B] dark:text-cg-slate-light',
+  'bg-cg-amber-subtle dark:bg-foreground/30 border-cg-amber dark:border-[#E09520] text-[#E09520] dark:text-cg-amber',
 ];
 
 const RELATIONSHIP_OPTIONS = [
@@ -421,15 +421,15 @@ function MyCircleContent({ params }: PageParams) {
             </div>
 
             {error && (
-              <div className="bg-[#FEE2E2] border-2 border-[#FEE2E2] rounded-2xl p-4">
+              <div className="bg-cg-error-subtle border-2 border-cg-error-subtle rounded-2xl p-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-[#FEE2E2] flex items-center justify-center flex-shrink-0">
-                    <X className="h-5 w-5 text-[#C53030]" />
+                  <div className="w-10 h-10 rounded-lg bg-cg-error-subtle flex items-center justify-center flex-shrink-0">
+                    <X className="h-5 w-5 text-cg-error" />
                   </div>
                   <p className="text-[#9B2C2C] font-medium flex-1">{error}</p>
                   <button aria-label="Dismiss"
                     onClick={() => setError(null)}
-                    className="text-[#C53030] hover:text-[#9B2C2C]"
+                    className="text-cg-error hover:text-[#9B2C2C]"
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -489,10 +489,10 @@ function MyCircleContent({ params }: PageParams) {
 
               <button
                 onClick={() => setShowChildSetupModal(true)}
-                className="bg-card border-2 border-border rounded-2xl shadow-lg hover:shadow-xl hover:border-[#3DAA8A]/40 transition-all p-6 flex items-center gap-4 group"
+                className="bg-card border-2 border-border rounded-2xl shadow-lg hover:shadow-xl hover:border-cg-sage/40 transition-all p-6 flex items-center gap-4 group"
               >
-                <div className="p-3 bg-gradient-to-br from-[#3DAA8A]/10 to-[#2D6A8F]/5 rounded-xl group-hover:from-[#3DAA8A]/20 group-hover:to-[#2D6A8F]/10 transition-all">
-                  <Users className="h-6 w-6 text-[#3DAA8A]" />
+                <div className="p-3 bg-gradient-to-br from-cg-sage/10 to-cg-slate/5 rounded-xl group-hover:from-cg-sage/20 group-hover:to-cg-slate/10 transition-all">
+                  <Users className="h-6 w-6 text-cg-sage" />
                 </div>
                 <div className="text-left">
                   <h3 className="font-bold text-foreground">Setup Child</h3>
@@ -653,7 +653,7 @@ function MyCircleContent({ params }: PageParams) {
                               contact.can_communicate
                                 ? 'bg-cg-success-subtle text-cg-success'
                                 : contact.is_partially_approved
-                                  ? 'bg-[#FEF7ED] text-[#E09520]'
+                                  ? 'bg-cg-amber-subtle text-[#E09520]'
                                   : 'bg-muted text-muted-foreground'
                             }`}>
                               {contact.can_communicate
@@ -672,7 +672,7 @@ function MyCircleContent({ params }: PageParams) {
                               disabled={!contact.can_communicate}
                               className={`p-2 rounded-lg transition-colors ${
                                 contact.can_communicate
-                                  ? 'bg-[#E0EFF8] text-[#2D6A8F] hover:bg-[#E0EFF8]'
+                                  ? 'bg-cg-slate-subtle text-cg-slate hover:bg-cg-slate-subtle'
                                   : 'bg-muted text-muted-foreground cursor-not-allowed'
                               }`}
                               title="Voice Call"
@@ -690,7 +690,7 @@ function MyCircleContent({ params }: PageParams) {
                                 navigator.clipboard.writeText(loginUrl);
                                 alert('Login link copied to clipboard!');
                               }}
-                              className="p-2 text-[#3DAA8A] bg-[#3DAA8A]/10 hover:bg-[#3DAA8A]/20 rounded-lg transition-colors"
+                              className="p-2 text-cg-sage bg-cg-sage/10 hover:bg-cg-sage/20 rounded-lg transition-colors"
                               title="Copy login link"
                             >
                               <Link2 className="h-4 w-4" />
@@ -699,7 +699,7 @@ function MyCircleContent({ params }: PageParams) {
                             {/* Edit Contact Details */}
                             <button aria-label="Edit"
                               onClick={() => openEditContactModal(contact)}
-                              className="p-2 text-[#F5A623] bg-[#F5A623]/10 hover:bg-[#F5A623]/20 rounded-lg transition-colors"
+                              className="p-2 text-cg-amber bg-cg-amber/10 hover:bg-cg-amber/20 rounded-lg transition-colors"
                               title="Edit contact name & photo"
                             >
                               <Edit2 className="h-4 w-4" />
@@ -946,11 +946,11 @@ function MyCircleContent({ params }: PageParams) {
               {/* Photo Upload */}
               <div className="flex flex-col items-center mb-6">
                 <label className="cursor-pointer group">
-                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#3DAA8A]/20 to-[#2D6A8F]/20 flex items-center justify-center overflow-hidden border-2 border-border group-hover:border-[#3DAA8A] transition-colors">
+                  <div className="w-20 h-20 rounded-full bg-gradient-to-br from-cg-sage/20 to-cg-slate/20 flex items-center justify-center overflow-hidden border-2 border-border group-hover:border-cg-sage transition-colors">
                     {editPhotoPreview ? (
                       <img src={editPhotoPreview} alt="Contact" className="w-full h-full object-cover" />
                     ) : (
-                      <span className="text-2xl font-bold text-[#3DAA8A]">{editContactName.charAt(0).toUpperCase()}</span>
+                      <span className="text-2xl font-bold text-cg-sage">{editContactName.charAt(0).toUpperCase()}</span>
                     )}
                   </div>
                   <input
@@ -976,7 +976,7 @@ function MyCircleContent({ params }: PageParams) {
                   type="text"
                   value={editContactName}
                   onChange={(e) => setEditContactName(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-border rounded-xl bg-background text-foreground focus:ring-2 focus:ring-[#3DAA8A] focus:border-[#3DAA8A] transition-all"
+                  className="w-full px-4 py-2.5 border border-border rounded-xl bg-background text-foreground focus:ring-2 focus:ring-cg-sage focus:border-cg-sage transition-all"
                   placeholder="Enter name..."
                 />
               </div>
@@ -987,7 +987,7 @@ function MyCircleContent({ params }: PageParams) {
                 <select
                   value={editRelationship}
                   onChange={(e) => setEditRelationship(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-border rounded-xl bg-background text-foreground focus:ring-2 focus:ring-[#3DAA8A] focus:border-[#3DAA8A] transition-all"
+                  className="w-full px-4 py-2.5 border border-border rounded-xl bg-background text-foreground focus:ring-2 focus:ring-cg-sage focus:border-cg-sage transition-all"
                 >
                   <option value="">Select relationship...</option>
                   <option value="grandparent">Grandparent</option>
@@ -1013,7 +1013,7 @@ function MyCircleContent({ params }: PageParams) {
                 <button
                   onClick={handleSaveContactEdit}
                   disabled={isSavingContact || !editContactName.trim()}
-                  className="flex-1 py-2.5 bg-[#3DAA8A] text-white rounded-xl font-semibold hover:bg-[#2D8A6E] disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
+                  className="flex-1 py-2.5 bg-cg-sage text-white rounded-xl font-semibold hover:bg-[#2D8A6E] disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
                 >
                   {isSavingContact ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
                   {isSavingContact ? 'Saving...' : 'Save'}
@@ -1163,7 +1163,7 @@ function MyCircleContent({ params }: PageParams) {
                   <select
                     value={selectedChildId}
                     onChange={(e) => setSelectedChildId(e.target.value)}
-                    className="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-[#3DAA8A] focus:border-[#3DAA8A] bg-background text-foreground"
+                    className="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-cg-sage focus:border-cg-sage bg-background text-foreground"
                   >
                     <option value="">Select a child...</option>
                     {children.map((child) => (
@@ -1183,7 +1183,7 @@ function MyCircleContent({ params }: PageParams) {
                     value={childSetupName}
                     onChange={(e) => setChildSetupName(e.target.value)}
                     placeholder="e.g., Emma"
-                    className="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-[#3DAA8A] focus:border-[#3DAA8A] bg-background text-foreground"
+                    className="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-cg-sage focus:border-cg-sage bg-background text-foreground"
                   />
                 </div>
 
@@ -1197,7 +1197,7 @@ function MyCircleContent({ params }: PageParams) {
                     value={childSetupPin}
                     onChange={(e) => setChildSetupPin(e.target.value.replace(/\D/g, ''))}
                     placeholder="1234"
-                    className="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-[#3DAA8A] focus:border-[#3DAA8A] bg-background text-foreground text-center text-2xl tracking-widest"
+                    className="w-full px-4 py-2 border border-border rounded-xl focus:ring-2 focus:ring-cg-sage focus:border-cg-sage bg-background text-foreground text-center text-2xl tracking-widest"
                   />
                   <p className="text-xs text-muted-foreground mt-1">Make it easy for your child to remember</p>
                 </div>
@@ -1226,7 +1226,7 @@ function MyCircleContent({ params }: PageParams) {
                         onClick={() => setChildSetupAvatar(avatar.id)}
                         className={`p-2 text-2xl rounded-xl border-2 transition-colors ${
                           childSetupAvatar === avatar.id
-                            ? 'border-[#3DAA8A] bg-[#3DAA8A]/10'
+                            ? 'border-cg-sage bg-cg-sage/10'
                             : 'border-border hover:border-muted-foreground'
                         }`}
                       >
@@ -1247,7 +1247,7 @@ function MyCircleContent({ params }: PageParams) {
                 <button
                   onClick={handleSetupChildUser}
                   disabled={isSettingUpChild}
-                  className="flex-1 py-3 bg-[#3DAA8A] text-white rounded-xl font-semibold hover:bg-[#2D8A6E] disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
+                  className="flex-1 py-3 bg-cg-sage text-white rounded-xl font-semibold hover:bg-[#2D8A6E] disabled:opacity-50 flex items-center justify-center gap-2 transition-colors"
                 >
                   {isSettingUpChild ? (
                     <>
@@ -1416,7 +1416,7 @@ function MessagesSection({ familyFileId, children: childrenList, contacts }: Mes
           >
             <div className="flex items-center gap-3">
               {/* Avatar */}
-              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-[#3DAA8A]/10 to-[#2D6A8F]/10 flex items-center justify-center text-lg flex-shrink-0">
+              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-cg-sage/10 to-cg-slate/10 flex items-center justify-center text-lg flex-shrink-0">
                 {convo.contactRelationship === 'grandparent' ? '👴' :
                  convo.contactRelationship === 'aunt' ? '👩' :
                  convo.contactRelationship === 'uncle' ? '👨' : '💜'}

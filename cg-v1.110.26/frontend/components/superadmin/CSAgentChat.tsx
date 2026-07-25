@@ -64,11 +64,11 @@ export function CSAgentChat({ onSend, onSearchUser, loading }: CSAgentChatProps)
   };
 
   return (
-    <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl overflow-hidden flex flex-col h-[600px]">
+    <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden flex flex-col h-[600px]">
       {/* User selector */}
-      <div className="px-4 py-3 border-b border-[#2D6A8F]/20">
+      <div className="px-4 py-3 border-b border-cg-slate/20">
         <div className="flex items-center gap-2">
-          <Search className="w-4 h-4 text-[#6B8A9A]" />
+          <Search className="w-4 h-4 text-muted-foreground" />
           {selectedUser ? (
             <div className="flex items-center gap-2 flex-1">
               <span className="text-sm text-[#D0E4EC]">
@@ -77,7 +77,7 @@ export function CSAgentChat({ onSend, onSearchUser, loading }: CSAgentChatProps)
               <span className="text-xs text-[#4A6E7F]">{selectedUser.email}</span>
               <button
                 onClick={() => { setSelectedUser(null); setUserId(null); }}
-                className="text-xs text-[#6B8A9A] hover:text-red-400 ml-auto"
+                className="text-xs text-muted-foreground hover:text-red-400 ml-auto"
               >
                 Clear
               </button>
@@ -92,12 +92,12 @@ export function CSAgentChat({ onSend, onSearchUser, loading }: CSAgentChatProps)
                 className="w-full bg-transparent text-sm text-[#D0E4EC] placeholder-[#4A6E7F] outline-none"
               />
               {searchResults.length > 0 && (
-                <div className="absolute top-8 left-0 right-0 bg-[#1E3A4A] border border-[#2D6A8F]/30 rounded-lg shadow-xl z-20 max-h-40 overflow-y-auto">
+                <div className="absolute top-8 left-0 right-0 bg-foreground border border-cg-slate/30 rounded-lg shadow-xl z-20 max-h-40 overflow-y-auto">
                   {searchResults.map((user: any) => (
                     <button
                       key={user.id}
                       onClick={() => selectUser(user)}
-                      className="w-full text-left px-3 py-2 hover:bg-[#2D6A8F]/20 flex items-center gap-2"
+                      className="w-full text-left px-3 py-2 hover:bg-cg-slate/20 flex items-center gap-2"
                     >
                       <span className="text-xs text-[#D0E4EC]">{user.first_name} {user.last_name}</span>
                       <span className="text-[10px] text-[#4A6E7F]">{user.email}</span>
@@ -114,8 +114,8 @@ export function CSAgentChat({ onSend, onSearchUser, loading }: CSAgentChatProps)
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 && (
           <div className="text-center py-12">
-            <Bot className="w-10 h-10 text-[#3DAA8A]/40 mx-auto mb-3" />
-            <p className="text-sm text-[#6B8A9A]">AI Customer Success Agent</p>
+            <Bot className="w-10 h-10 text-cg-sage/40 mx-auto mb-3" />
+            <p className="text-sm text-muted-foreground">AI Customer Success Agent</p>
             <p className="text-xs text-[#4A6E7F] mt-1">
               Describe a customer issue to get analysis, resolution suggestions, and draft communications.
             </p>
@@ -125,20 +125,20 @@ export function CSAgentChat({ onSend, onSearchUser, loading }: CSAgentChatProps)
         {messages.map((msg, i) => (
           <div key={i} className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : ''}`}>
             {msg.role === 'assistant' && (
-              <div className="w-7 h-7 rounded-full bg-[#3DAA8A]/20 flex items-center justify-center flex-shrink-0">
-                <Bot className="w-3.5 h-3.5 text-[#3DAA8A]" />
+              <div className="w-7 h-7 rounded-full bg-cg-sage/20 flex items-center justify-center flex-shrink-0">
+                <Bot className="w-3.5 h-3.5 text-cg-sage" />
               </div>
             )}
             <div className={`max-w-[80%] rounded-xl px-4 py-3 ${
               msg.role === 'user'
-                ? 'bg-[#3DAA8A]/20 text-[#D0E4EC]'
-                : 'bg-[#1E3A4A] text-[#8AACBC]'
+                ? 'bg-cg-sage/20 text-[#D0E4EC]'
+                : 'bg-foreground text-[#8AACBC]'
             }`}>
               <div className="text-xs whitespace-pre-wrap leading-relaxed">{msg.content}</div>
             </div>
             {msg.role === 'user' && (
-              <div className="w-7 h-7 rounded-full bg-[#2D6A8F]/30 flex items-center justify-center flex-shrink-0">
-                <User className="w-3.5 h-3.5 text-[#6B8A9A]" />
+              <div className="w-7 h-7 rounded-full bg-cg-slate/30 flex items-center justify-center flex-shrink-0">
+                <User className="w-3.5 h-3.5 text-muted-foreground" />
               </div>
             )}
           </div>
@@ -146,16 +146,16 @@ export function CSAgentChat({ onSend, onSearchUser, loading }: CSAgentChatProps)
 
         {sending && (
           <div className="flex gap-3">
-            <div className="w-7 h-7 rounded-full bg-[#3DAA8A]/20 flex items-center justify-center">
-              <Loader2 className="w-3.5 h-3.5 text-[#3DAA8A] animate-spin" />
+            <div className="w-7 h-7 rounded-full bg-cg-sage/20 flex items-center justify-center">
+              <Loader2 className="w-3.5 h-3.5 text-cg-sage animate-spin" />
             </div>
-            <div className="bg-[#1E3A4A] rounded-xl px-4 py-3">
-              <div className="flex items-center gap-2 text-xs text-[#6B8A9A]">
+            <div className="bg-foreground rounded-xl px-4 py-3">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <span>Analyzing</span>
                 <span className="flex gap-0.5">
-                  <span className="w-1 h-1 bg-[#3DAA8A] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                  <span className="w-1 h-1 bg-[#3DAA8A] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                  <span className="w-1 h-1 bg-[#3DAA8A] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                  <span className="w-1 h-1 bg-cg-sage rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <span className="w-1 h-1 bg-cg-sage rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <span className="w-1 h-1 bg-cg-sage rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                 </span>
               </div>
             </div>
@@ -164,7 +164,7 @@ export function CSAgentChat({ onSend, onSearchUser, loading }: CSAgentChatProps)
       </div>
 
       {/* Input */}
-      <div className="px-4 py-3 border-t border-[#2D6A8F]/20">
+      <div className="px-4 py-3 border-t border-cg-slate/20">
         <div className="flex gap-2">
           <input
             type="text"
@@ -172,13 +172,13 @@ export function CSAgentChat({ onSend, onSearchUser, loading }: CSAgentChatProps)
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
             placeholder="Describe the customer issue..."
-            className="flex-1 bg-[#1E3A4A] border border-[#2D6A8F]/20 rounded-lg px-3 py-2 text-sm text-[#D0E4EC] placeholder-[#4A6E7F] outline-none focus:border-[#3DAA8A]/40"
+            className="flex-1 bg-foreground border border-cg-slate/20 rounded-lg px-3 py-2 text-sm text-[#D0E4EC] placeholder-[#4A6E7F] outline-none focus:border-cg-sage/40"
             disabled={sending}
           />
           <button aria-label="Send message"
             onClick={handleSend}
             disabled={!input.trim() || sending}
-            className="px-3 py-2 bg-[#3DAA8A] hover:bg-[#3DAA8A]/80 disabled:bg-[#3DAA8A]/30 disabled:cursor-not-allowed rounded-lg transition-colors"
+            className="px-3 py-2 bg-cg-sage hover:bg-cg-sage/80 disabled:bg-cg-sage/30 disabled:cursor-not-allowed rounded-lg transition-colors"
           >
             <Send className="w-4 h-4 text-white" />
           </button>

@@ -45,13 +45,13 @@ export function OnlineIndicator({
         <div
           className={`${sizeClasses[size]} rounded-full ${
             isOnline
-              ? 'bg-[#3DAA8A] shadow-sm shadow-[#3DAA8A]/50'
+              ? 'bg-cg-sage shadow-sm shadow-cg-sage/50'
               : 'bg-gray-300'
           } transition-colors duration-300`}
         />
         {isOnline && (
           <div
-            className={`absolute inset-0 ${sizeClasses[size]} rounded-full bg-[#3DAA8A] animate-ping opacity-75`}
+            className={`absolute inset-0 ${sizeClasses[size]} rounded-full bg-cg-sage animate-ping opacity-75`}
           />
         )}
       </div>
@@ -59,7 +59,7 @@ export function OnlineIndicator({
         <span className={`${textSizeClasses[size]} text-gray-600`}>
           {isOnline ? (
             <>
-              <span className="font-medium text-[#2D8A70]">
+              <span className="font-medium text-cg-sage-dark">
                 {userName || 'User'}
               </span>
               {' '}
@@ -91,7 +91,7 @@ export function OnlineBadge({ userId, size = 'md' }: { userId: string; size?: 's
 
   return (
     <div
-      className={`absolute bottom-0 right-0 ${sizeClasses[size]} bg-[#3DAA8A] border-white rounded-full shadow-sm`}
+      className={`absolute bottom-0 right-0 ${sizeClasses[size]} bg-cg-sage border-white rounded-full shadow-sm`}
     />
   );
 }

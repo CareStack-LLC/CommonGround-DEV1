@@ -52,16 +52,16 @@ const STATUS_CONFIG: Record<
 > = {
     new_lead: {
         label: "New Lead",
-        color: "bg-[#F4F8F7] text-[#1E3A4A] border-[#3DAA8A]/30",
-        dotColor: "bg-[#3DAA8A]",
-        barColor: "bg-[#3DAA8A]",
+        color: "bg-background text-foreground border-cg-sage/30",
+        dotColor: "bg-cg-sage",
+        barColor: "bg-cg-sage",
         icon: <CircleDot className="h-3.5 w-3.5" />,
     },
     intake: {
         label: "Intake",
-        color: "bg-[#E0EFF8] text-[#1E4E6B] border-[#E0EFF8]",
-        dotColor: "bg-[#4BA8C8]",
-        barColor: "bg-[#4BA8C8]",
+        color: "bg-cg-slate-subtle text-[#1E4E6B] border-cg-slate-subtle",
+        dotColor: "bg-cg-slate-light",
+        barColor: "bg-cg-slate-light",
         icon: <UserCheck className="h-3.5 w-3.5" />,
     },
     active: {
@@ -74,7 +74,7 @@ const STATUS_CONFIG: Record<
     court_prep: {
         label: "Court Prep",
         color: "bg-[#F0F7FC] text-[#1E4E6B] border-[#C2DEF0]",
-        dotColor: "bg-[#4BA8C8]",
+        dotColor: "bg-cg-slate-light",
         barColor: "bg-[#3D8DB0]",
         icon: <Gavel className="h-3.5 w-3.5" />,
     },
@@ -98,9 +98,9 @@ function getDaysOpen(createdAt?: string): number {
 }
 
 function getComplianceColor(score: number) {
-    if (score >= 80) return "text-[#2D8A70] bg-[#E8F4F0] border-[#C5E5DB]";
-    if (score >= 60) return "text-[#B8791A] bg-[#FEF7ED] border-[#FBE3BF]";
-    return "text-[#9B2C2C] bg-[#FEE2E2] border-[#FEE2E2]";
+    if (score >= 80) return "text-cg-sage-dark bg-cg-sage-subtle border-[#C5E5DB]";
+    if (score >= 60) return "text-[#B8791A] bg-cg-amber-subtle border-[#FBE3BF]";
+    return "text-[#9B2C2C] bg-cg-error-subtle border-cg-error-subtle";
 }
 
 function getCaseName(c: CaseData): string {
@@ -231,7 +231,7 @@ export function LeadPipeline({ cases }: LeadPipelineProps) {
                                         </span>
                                     )}
                                     {nextEventLabel && (
-                                        <span className="flex items-center gap-1 text-[10px] font-semibold text-[#2D6A8F] bg-[#F0F7FC] px-1.5 py-0.5 rounded-full">
+                                        <span className="flex items-center gap-1 text-[10px] font-semibold text-cg-slate bg-[#F0F7FC] px-1.5 py-0.5 rounded-full">
                                             <Calendar className="h-2.5 w-2.5" />
                                             {nextEventLabel}
                                         </span>

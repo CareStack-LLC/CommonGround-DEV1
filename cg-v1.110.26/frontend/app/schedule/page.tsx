@@ -63,8 +63,8 @@ function QuickActionCard({
       iconColor: 'text-[var(--portal-primary)]',
     },
     purple: {
-      iconBg: 'bg-[#E0EFF8]',
-      iconColor: 'text-[#2D6A8F]',
+      iconBg: 'bg-cg-slate-subtle',
+      iconColor: 'text-cg-slate',
     },
     amber: {
       iconBg: 'bg-cg-amber-subtle',
@@ -105,15 +105,15 @@ function CustodyLegend() {
         <span className="text-foreground font-semibold whitespace-nowrap">Their Events</span>
       </div>
       <div className="flex items-center gap-1.5 flex-shrink-0">
-        <div className="w-2.5 h-2.5 rounded-full bg-[#F5A623] shadow-sm" />
+        <div className="w-2.5 h-2.5 rounded-full bg-cg-amber shadow-sm" />
         <span className="text-foreground font-semibold whitespace-nowrap">(Kids) Events</span>
       </div>
       <div className="flex items-center gap-1.5 flex-shrink-0">
-        <div className="w-2.5 h-2.5 rounded-full bg-[#2D6A8F] shadow-sm" />
+        <div className="w-2.5 h-2.5 rounded-full bg-cg-slate shadow-sm" />
         <span className="text-foreground font-semibold whitespace-nowrap">Professional Events</span>
       </div>
       <div className="flex items-center gap-1.5 flex-shrink-0">
-        <div className="w-2.5 h-2.5 rounded-full bg-[#2D6A8F] shadow-sm" />
+        <div className="w-2.5 h-2.5 rounded-full bg-cg-slate shadow-sm" />
         <span className="text-foreground font-semibold whitespace-nowrap">Exchanges/Swaps</span>
       </div>
     </div>
@@ -357,7 +357,7 @@ function ScheduleContent() {
               </p>
               <button
                 onClick={() => router.push('/family-files')}
-                className="bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white px-8 py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-3"
+                className="bg-gradient-to-r from-[var(--portal-primary)] to-cg-slate text-white px-8 py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-3"
               >
                 <Users className="w-5 h-5" />
                 Go to Family Files

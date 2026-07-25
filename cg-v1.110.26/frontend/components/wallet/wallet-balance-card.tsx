@@ -64,7 +64,7 @@ export default function WalletBalanceCard({
               {onSetupWallet && (
                 <button
                   onClick={onSetupWallet}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white rounded-xl font-bold shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[var(--portal-primary)] to-cg-slate text-white rounded-xl font-bold shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
                 >
                   <CreditCard className="h-4 w-4" />
                   Connect Bank Account
@@ -83,7 +83,7 @@ export default function WalletBalanceCard({
       <div className="bg-card rounded-2xl border-2 border-border shadow-lg overflow-hidden">
         <div className="p-6">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 bg-gradient-to-br from-[#FEF7ED] to-[#FEF7ED] dark:from-[#1E3A4A]/30 dark:to-[#1E3A4A]/20 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md">
+            <div className="w-14 h-14 bg-gradient-to-br from-cg-amber-subtle to-cg-amber-subtle dark:from-foreground/30 dark:to-foreground/20 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md">
               <Clock className="h-6 w-6 text-[#E09520]" />
             </div>
             <div className="flex-1">
@@ -94,7 +94,7 @@ export default function WalletBalanceCard({
               {onSetupWallet && (
                 <button
                   onClick={onSetupWallet}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white rounded-xl font-bold shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
+                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[var(--portal-primary)] to-cg-slate text-white rounded-xl font-bold shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
                 >
                   <ExternalLink className="h-4 w-4" />
                   Continue Setup
@@ -103,7 +103,7 @@ export default function WalletBalanceCard({
             </div>
           </div>
         </div>
-        <div className="border-t-2 border-[#FEF7ED] bg-[#FEF7ED] dark:bg-[#1E3A4A]/30 dark:border-[#E09520] px-6 py-3">
+        <div className="border-t-2 border-cg-amber-subtle bg-cg-amber-subtle dark:bg-foreground/30 dark:border-[#E09520] px-6 py-3">
           <p className="text-xs text-[#E09520] flex items-center gap-2 font-bold">
             <AlertCircle className="h-4 w-4" />
             Bank verification pending
@@ -124,8 +124,8 @@ export default function WalletBalanceCard({
       <div className="p-6">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 bg-gradient-to-br from-[#E8F4F0] to-[#E8F4F0] dark:from-[#1E3A4A]/30 dark:to-[#1E3A4A]/20 rounded-2xl flex items-center justify-center shadow-md">
-              <Wallet className="h-6 w-6 text-[#2D8A70]" />
+            <div className="w-14 h-14 bg-gradient-to-br from-cg-sage-subtle to-cg-sage-subtle dark:from-foreground/30 dark:to-foreground/20 rounded-2xl flex items-center justify-center shadow-md">
+              <Wallet className="h-6 w-6 text-cg-sage-dark" />
             </div>
             <div>
               <p className="text-sm text-muted-foreground font-medium">Available Balance</p>
@@ -136,7 +136,7 @@ export default function WalletBalanceCard({
           </div>
           <div className="flex items-center gap-2">
             {wallet.charges_enabled && wallet.payouts_enabled && (
-              <span className="flex items-center gap-1 text-xs text-[#2D8A70] dark:text-[#5BC4A0] bg-[#E8F4F0] dark:bg-[#1E3A4A]/30 border-2 border-[#E8F4F0] dark:border-[#1E3A4A] px-2.5 py-1 rounded-full font-bold">
+              <span className="flex items-center gap-1 text-xs text-cg-sage-dark dark:text-cg-sage-light bg-cg-sage-subtle dark:bg-foreground/30 border-2 border-cg-sage-subtle dark:border-foreground px-2.5 py-1 rounded-full font-bold">
                 <CheckCircle className="h-3 w-3" />
                 Active
               </span>
@@ -149,7 +149,7 @@ export default function WalletBalanceCard({
           {onAddFunds && (
             <button
               onClick={onAddFunds}
-              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white rounded-xl font-bold shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
+              className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-[var(--portal-primary)] to-cg-slate text-white rounded-xl font-bold shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
             >
               <TrendingUp className="h-4 w-4" />
               Add Funds

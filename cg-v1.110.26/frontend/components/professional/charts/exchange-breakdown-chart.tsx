@@ -17,9 +17,9 @@ interface ExchangeBreakdownChartProps {
 
 export function ExchangeBreakdownChart({ data }: ExchangeBreakdownChartProps) {
   const chartData = [
-    { name: "On Time", value: data.on_time, color: "#3DAA8A", icon: CheckCircle2 },
-    { name: "Late", value: data.late, color: "#F5A623", icon: Clock },
-    { name: "Missed", value: data.missed, color: "#C53030", icon: XCircle },
+    { name: "On Time", value: data.on_time, color: "var(--cg-sage)", icon: CheckCircle2 },
+    { name: "Late", value: data.late, color: "var(--cg-amber)", icon: Clock },
+    { name: "Missed", value: data.missed, color: "var(--cg-error)", icon: XCircle },
   ].filter((item) => item.value > 0);
 
   const onTimeRate = data.total > 0 ? ((data.on_time / data.total) * 100).toFixed(1) : "0.0";
@@ -29,7 +29,7 @@ export function ExchangeBreakdownChart({ data }: ExchangeBreakdownChartProps) {
       <div className="p-6">
         <div className="flex items-start justify-between mb-6">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-gradient-to-br from-[#F5A623] to-[#E09520] text-white rounded-xl shadow-lg shadow-[#F5A623]/20">
+            <div className="p-3 bg-gradient-to-br from-cg-amber to-[#E09520] text-white rounded-xl shadow-lg shadow-cg-amber/20">
               <Calendar className="h-5 w-5" />
             </div>
             <div>
@@ -131,7 +131,7 @@ export function ExchangeBreakdownChart({ data }: ExchangeBreakdownChartProps) {
             <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
               Completion
             </p>
-            <p className="text-xl font-bold text-[#2D8A70]">
+            <p className="text-xl font-bold text-cg-sage-dark">
               {data.total > 0
                 ? (((data.on_time + data.late) / data.total) * 100).toFixed(0)
                 : 0}

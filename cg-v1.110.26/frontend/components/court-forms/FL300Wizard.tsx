@@ -406,9 +406,9 @@ export default function FL300Wizard({
               onClick={() => setCurrentSection(idx)}
               className={`flex-1 h-2 rounded-full transition-colors ${
                 idx === currentSection
-                  ? 'bg-[#2D6A8F]'
+                  ? 'bg-cg-slate'
                   : idx < currentSection
-                  ? 'bg-[#3DAA8A]'
+                  ? 'bg-cg-sage'
                   : 'bg-gray-200'
               }`}
               title={section.title}
@@ -428,7 +428,7 @@ export default function FL300Wizard({
           <div className="flex items-center gap-3">
             {(() => {
               const Icon = WIZARD_SECTIONS[currentSection].icon;
-              return <Icon className="h-6 w-6 text-[#2D6A8F]" />;
+              return <Icon className="h-6 w-6 text-cg-slate" />;
             })()}
             <div>
               <CardTitle>{WIZARD_SECTIONS[currentSection].title}</CardTitle>
@@ -510,7 +510,7 @@ function HeaderSection({
 }) {
   return (
     <div className="space-y-6">
-      <Alert className="bg-[#E0EFF8] border-[#E0EFF8]">
+      <Alert className="bg-cg-slate-subtle border-cg-slate-subtle">
         <FileText className="h-4 w-4" />
         <AlertDescription>
           FL-300 is used to request court orders for child custody, visitation, support, and other family law matters.
@@ -532,7 +532,7 @@ function HeaderSection({
                 value={option.value}
                 checked={formData.filing_party === option.value}
                 onChange={(e) => updateField('filing_party', e.target.value as any)}
-                className="h-4 w-4 text-[#2D6A8F]"
+                className="h-4 w-4 text-cg-slate"
               />
               <span>{option.label}</span>
             </label>
@@ -639,7 +639,7 @@ function RequestTypeSection({
                 type="checkbox"
                 checked={formData.is_request_for_order}
                 onChange={(e) => updateField('is_request_for_order', e.target.checked)}
-                className="h-4 w-4 text-[#2D6A8F]"
+                className="h-4 w-4 text-cg-slate"
               />
               <span>Request for Order</span>
             </label>
@@ -648,7 +648,7 @@ function RequestTypeSection({
                 type="checkbox"
                 checked={formData.is_change_request}
                 onChange={(e) => updateField('is_change_request', e.target.checked)}
-                className="h-4 w-4 text-[#2D6A8F]"
+                className="h-4 w-4 text-cg-slate"
               />
               <span>Request to change current court order</span>
             </label>
@@ -657,7 +657,7 @@ function RequestTypeSection({
                 type="checkbox"
                 checked={formData.is_temporary_emergency}
                 onChange={(e) => updateField('is_temporary_emergency', e.target.checked)}
-                className="h-4 w-4 text-[#2D6A8F]"
+                className="h-4 w-4 text-cg-slate"
               />
               <span>Request for Temporary Emergency Orders</span>
             </label>
@@ -674,7 +674,7 @@ function RequestTypeSection({
                 type="checkbox"
                 checked={formData.request_child_custody}
                 onChange={(e) => updateField('request_child_custody', e.target.checked)}
-                className="h-4 w-4 text-[#2D6A8F]"
+                className="h-4 w-4 text-cg-slate"
               />
               <span>Child Custody</span>
             </label>
@@ -683,7 +683,7 @@ function RequestTypeSection({
                 type="checkbox"
                 checked={formData.request_child_visitation}
                 onChange={(e) => updateField('request_child_visitation', e.target.checked)}
-                className="h-4 w-4 text-[#2D6A8F]"
+                className="h-4 w-4 text-cg-slate"
               />
               <span>Child Visitation (Parenting Time)</span>
             </label>
@@ -692,7 +692,7 @@ function RequestTypeSection({
                 type="checkbox"
                 checked={formData.request_child_support}
                 onChange={(e) => updateField('request_child_support', e.target.checked)}
-                className="h-4 w-4 text-[#2D6A8F]"
+                className="h-4 w-4 text-cg-slate"
               />
               <span>Child Support</span>
             </label>
@@ -701,7 +701,7 @@ function RequestTypeSection({
                 type="checkbox"
                 checked={formData.request_spousal_support}
                 onChange={(e) => updateField('request_spousal_support', e.target.checked)}
-                className="h-4 w-4 text-[#2D6A8F]"
+                className="h-4 w-4 text-cg-slate"
               />
               <span>Spousal or Domestic Partner Support</span>
             </label>
@@ -710,7 +710,7 @@ function RequestTypeSection({
                 type="checkbox"
                 checked={formData.request_property_control}
                 onChange={(e) => updateField('request_property_control', e.target.checked)}
-                className="h-4 w-4 text-[#2D6A8F]"
+                className="h-4 w-4 text-cg-slate"
               />
               <span>Property Control</span>
             </label>
@@ -719,7 +719,7 @@ function RequestTypeSection({
                 type="checkbox"
                 checked={formData.request_attorney_fees}
                 onChange={(e) => updateField('request_attorney_fees', e.target.checked)}
-                className="h-4 w-4 text-[#2D6A8F]"
+                className="h-4 w-4 text-cg-slate"
               />
               <span>Attorney's Fees and Costs</span>
             </label>
@@ -728,7 +728,7 @@ function RequestTypeSection({
                 type="checkbox"
                 checked={formData.request_other}
                 onChange={(e) => updateField('request_other', e.target.checked)}
-                className="h-4 w-4 mt-1 text-[#2D6A8F]"
+                className="h-4 w-4 mt-1 text-cg-slate"
               />
               <div className="flex-1">
                 <span>Other</span>
@@ -779,7 +779,7 @@ function RestrainingSection({
           type="checkbox"
           checked={restrainingInfo.has_existing_orders}
           onChange={(e) => updateRestrainingInfo({ has_existing_orders: e.target.checked })}
-          className="h-4 w-4 text-[#2D6A8F]"
+          className="h-4 w-4 text-cg-slate"
         />
         <span className="font-medium">There are existing restraining orders in effect</span>
       </label>
@@ -803,7 +803,7 @@ function RestrainingSection({
                           updateRestrainingInfo({ between_parties: current.filter((p) => p !== party) });
                         }
                       }}
-                      className="h-4 w-4 text-[#2D6A8F]"
+                      className="h-4 w-4 text-cg-slate"
                     />
                     <span className="capitalize">{party.replace(/_/g, ' ')}</span>
                   </label>
@@ -889,8 +889,8 @@ function RestrainingSection({
       )}
 
       {!restrainingInfo.has_existing_orders && (
-        <Alert className="bg-[#E8F4F0] border-[#E8F4F0]">
-          <AlertDescription className="text-[#1E3A4A]">
+        <Alert className="bg-cg-sage-subtle border-cg-sage-subtle">
+          <AlertDescription className="text-foreground">
             No restraining orders indicated. You may proceed to the next section.
           </AlertDescription>
         </Alert>
@@ -955,7 +955,7 @@ function CustodySection({
           type="checkbox"
           checked={formData.custody_request_temporary_emergency}
           onChange={(e) => updateField('custody_request_temporary_emergency', e.target.checked)}
-          className="h-4 w-4 text-[#2D6A8F]"
+          className="h-4 w-4 text-cg-slate"
         />
         <span className="font-medium">Request temporary emergency orders</span>
       </label>
@@ -1051,7 +1051,7 @@ function CustodySection({
                     value={type}
                     checked={formData.custody_orders_for === type}
                     onChange={(e) => updateField('custody_orders_for', e.target.value)}
-                    className="h-4 w-4 text-[#2D6A8F]"
+                    className="h-4 w-4 text-cg-slate"
                   />
                   <span className="capitalize">{type.replace('_', ' ')}</span>
                 </label>
@@ -1064,7 +1064,7 @@ function CustodySection({
               type="checkbox"
               checked={formData.custody_orders_in_attached_forms}
               onChange={(e) => updateField('custody_orders_in_attached_forms', e.target.checked)}
-              className="h-4 w-4 text-[#2D6A8F]"
+              className="h-4 w-4 text-cg-slate"
             />
             <span>Orders are in attached forms</span>
           </label>
@@ -1083,7 +1083,7 @@ function CustodySection({
                         updateField('custody_attached_forms', formData.custody_attached_forms.filter((f) => f !== form));
                       }
                     }}
-                    className="h-4 w-4 text-[#2D6A8F]"
+                    className="h-4 w-4 text-cg-slate"
                   />
                   <span>{form}</span>
                 </label>
@@ -1096,7 +1096,7 @@ function CustodySection({
               type="checkbox"
               checked={formData.custody_orders_as_follows}
               onChange={(e) => updateField('custody_orders_as_follows', e.target.checked)}
-              className="h-4 w-4 mt-1 text-[#2D6A8F]"
+              className="h-4 w-4 mt-1 text-cg-slate"
             />
             <div className="flex-1">
               <span>Orders are as follows:</span>
@@ -1132,7 +1132,7 @@ function CustodySection({
           type="checkbox"
           checked={formData.custody_is_change}
           onChange={(e) => updateField('custody_is_change', e.target.checked)}
-          className="h-4 w-4 mt-1 text-[#2D6A8F]"
+          className="h-4 w-4 mt-1 text-cg-slate"
         />
         <div className="flex-1">
           <span className="font-medium">2d. This is a request to change a current custody/visitation order</span>
@@ -1257,7 +1257,7 @@ function ChildSupportSection({
                     type="checkbox"
                     checked={request.use_guideline}
                     onChange={(e) => updateSupportRequest(index, 'use_guideline', e.target.checked)}
-                    className="h-4 w-4 text-[#2D6A8F]"
+                    className="h-4 w-4 text-cg-slate"
                   />
                   <span className="text-sm">Use guideline support amount</span>
                 </label>
@@ -1276,7 +1276,7 @@ function ChildSupportSection({
           type="checkbox"
           checked={formData.child_support_is_change}
           onChange={(e) => updateField('child_support_is_change', e.target.checked)}
-          className="h-4 w-4 mt-1 text-[#2D6A8F]"
+          className="h-4 w-4 mt-1 text-cg-slate"
         />
         <div className="flex-1">
           <span className="font-medium">3b. Change current child support order</span>
@@ -1302,7 +1302,7 @@ function ChildSupportSection({
             type="checkbox"
             checked={formData.child_support_income_declaration_filed}
             onChange={(e) => updateField('child_support_income_declaration_filed', e.target.checked)}
-            className="h-4 w-4 text-[#2D6A8F]"
+            className="h-4 w-4 text-cg-slate"
           />
           <span>Income and Expense Declaration (FL-150) has been filed</span>
         </label>
@@ -1311,7 +1311,7 @@ function ChildSupportSection({
             type="checkbox"
             checked={formData.child_support_financial_statement_filed}
             onChange={(e) => updateField('child_support_financial_statement_filed', e.target.checked)}
-            className="h-4 w-4 text-[#2D6A8F]"
+            className="h-4 w-4 text-cg-slate"
           />
           <span>Financial Statement (FL-155) has been filed</span>
         </label>
@@ -1386,7 +1386,7 @@ function SpousalSupportSection({
               type="checkbox"
               checked={formData.spousal_support_change}
               onChange={(e) => updateField('spousal_support_change', e.target.checked)}
-              className="h-4 w-4 text-[#2D6A8F]"
+              className="h-4 w-4 text-cg-slate"
             />
             <span>Change current spousal support order</span>
           </label>
@@ -1395,7 +1395,7 @@ function SpousalSupportSection({
               type="checkbox"
               checked={formData.spousal_support_end}
               onChange={(e) => updateField('spousal_support_end', e.target.checked)}
-              className="h-4 w-4 text-[#2D6A8F]"
+              className="h-4 w-4 text-cg-slate"
             />
             <span>End (terminate) current spousal support order</span>
           </label>
@@ -1431,7 +1431,7 @@ function SpousalSupportSection({
           type="checkbox"
           checked={formData.spousal_support_post_judgment}
           onChange={(e) => updateField('spousal_support_post_judgment', e.target.checked)}
-          className="h-4 w-4 text-[#2D6A8F]"
+          className="h-4 w-4 text-cg-slate"
         />
         <span>4c. This is a post-judgment modification request (FL-157 attached)</span>
       </label>
@@ -1442,7 +1442,7 @@ function SpousalSupportSection({
           type="checkbox"
           checked={formData.spousal_support_income_declaration_filed}
           onChange={(e) => updateField('spousal_support_income_declaration_filed', e.target.checked)}
-          className="h-4 w-4 text-[#2D6A8F]"
+          className="h-4 w-4 text-cg-slate"
         />
         <span>4d. Income and Expense Declaration (FL-150) has been filed</span>
       </label>
@@ -1511,7 +1511,7 @@ function PropertySection({
           type="checkbox"
           checked={formData.property_request_temporary_emergency}
           onChange={(e) => updateField('property_request_temporary_emergency', e.target.checked)}
-          className="h-4 w-4 text-[#2D6A8F]"
+          className="h-4 w-4 text-cg-slate"
         />
         <span className="font-medium">Request temporary emergency orders</span>
       </label>
@@ -1533,7 +1533,7 @@ function PropertySection({
                     value={party}
                     checked={formData.property_exclusive_use_party === party}
                     onChange={(e) => updateField('property_exclusive_use_party', e.target.value)}
-                    className="h-4 w-4 text-[#2D6A8F]"
+                    className="h-4 w-4 text-cg-slate"
                   />
                   <span className="capitalize">{party.replace(/_/g, ' ')}</span>
                 </label>
@@ -1555,7 +1555,7 @@ function PropertySection({
                     value={opt.value}
                     checked={formData.property_type === opt.value}
                     onChange={(e) => updateField('property_type', e.target.value)}
-                    className="h-4 w-4 text-[#2D6A8F]"
+                    className="h-4 w-4 text-cg-slate"
                   />
                   <span>{opt.label}</span>
                 </label>
@@ -1633,7 +1633,7 @@ function PropertySection({
           type="checkbox"
           checked={formData.property_is_change}
           onChange={(e) => updateField('property_is_change', e.target.checked)}
-          className="h-4 w-4 mt-1 text-[#2D6A8F]"
+          className="h-4 w-4 mt-1 text-cg-slate"
         />
         <div className="flex-1">
           <span className="font-medium">5c. Change current property order</span>
@@ -1714,7 +1714,7 @@ function AttorneyFeesSection({
             type="checkbox"
             checked={formData.attorney_fees_income_declaration_filed}
             onChange={(e) => updateField('attorney_fees_income_declaration_filed', e.target.checked)}
-            className="h-4 w-4 text-[#2D6A8F]"
+            className="h-4 w-4 text-cg-slate"
           />
           <span>Income and Expense Declaration (FL-150) has been filed</span>
         </label>
@@ -1723,7 +1723,7 @@ function AttorneyFeesSection({
             type="checkbox"
             checked={formData.attorney_fees_fl319_attached}
             onChange={(e) => updateField('attorney_fees_fl319_attached', e.target.checked)}
-            className="h-4 w-4 text-[#2D6A8F]"
+            className="h-4 w-4 text-cg-slate"
           />
           <span>Request for Attorney's Fees (FL-319) is attached</span>
         </label>
@@ -1732,7 +1732,7 @@ function AttorneyFeesSection({
             type="checkbox"
             checked={formData.attorney_fees_fl158_attached}
             onChange={(e) => updateField('attorney_fees_fl158_attached', e.target.checked)}
-            className="h-4 w-4 text-[#2D6A8F]"
+            className="h-4 w-4 text-cg-slate"
           />
           <span>Supporting Declaration (FL-158) is attached</span>
         </label>
@@ -1762,7 +1762,7 @@ function OtherOrdersSection({
           type="checkbox"
           checked={formData.other_orders_enabled}
           onChange={(e) => updateField('other_orders_enabled', e.target.checked)}
-          className="h-4 w-4 text-[#2D6A8F]"
+          className="h-4 w-4 text-cg-slate"
         />
         <span className="font-medium">I am requesting other orders</span>
       </label>
@@ -1782,7 +1782,7 @@ function OtherOrdersSection({
               type="checkbox"
               checked={formData.other_orders_attachment_7}
               onChange={(e) => updateField('other_orders_attachment_7', e.target.checked)}
-              className="h-4 w-4 text-[#2D6A8F]"
+              className="h-4 w-4 text-cg-slate"
             />
             <span className="text-sm">Continued on Attachment 7</span>
           </label>
@@ -1813,13 +1813,13 @@ function UrgencySection({
           type="checkbox"
           checked={formData.urgency_enabled}
           onChange={(e) => updateField('urgency_enabled', e.target.checked)}
-          className="h-4 w-4 text-[#2D6A8F]"
+          className="h-4 w-4 text-cg-slate"
         />
         <span className="font-medium">I am requesting shortened time for service or earlier hearing</span>
       </label>
 
       {formData.urgency_enabled && (
-        <Card className="bg-[#FEF7ED] border-[#FEF7ED]">
+        <Card className="bg-cg-amber-subtle border-cg-amber-subtle">
           <CardContent className="pt-6 space-y-4">
             <div>
               <Label>Number of days for service (instead of standard 16 court days):</Label>
@@ -1859,7 +1859,7 @@ function UrgencySection({
                   type="checkbox"
                   checked={formData.urgency_attachment_8}
                   onChange={(e) => updateField('urgency_attachment_8', e.target.checked)}
-                  className="h-4 w-4 text-[#2D6A8F]"
+                  className="h-4 w-4 text-cg-slate"
                 />
                 <span className="text-sm">Continued on Attachment 8</span>
               </label>
@@ -1887,7 +1887,7 @@ function FactsSection({
         </AlertDescription>
       </Alert>
 
-      <Alert className="bg-[#FEF7ED] border-[#FEF7ED]">
+      <Alert className="bg-cg-amber-subtle border-cg-amber-subtle">
         <AlertTriangle className="h-4 w-4 text-[#E09520]" />
         <AlertDescription className="text-[#E09520]">
           <strong>Important:</strong> This is your declaration under penalty of perjury. State only facts you know to be true.
@@ -1917,7 +1917,7 @@ Example: 'On January 15, 2025, respondent informed me that... Since that time, t
             type="checkbox"
             checked={formData.facts_attachment_9}
             onChange={(e) => updateField('facts_attachment_9', e.target.checked)}
-            className="h-4 w-4 text-[#2D6A8F]"
+            className="h-4 w-4 text-cg-slate"
           />
           <span className="text-sm">Continued on Attachment 9</span>
         </label>
@@ -1947,9 +1947,9 @@ Example: 'On January 15, 2025, respondent informed me that... Since that time, t
         </CardContent>
       </Card>
 
-      <Alert className="bg-[#E8F4F0] border-[#E8F4F0]">
-        <Check className="h-4 w-4 text-[#2D8A70]" />
-        <AlertDescription className="text-[#1E3A4A]">
+      <Alert className="bg-cg-sage-subtle border-cg-sage-subtle">
+        <Check className="h-4 w-4 text-cg-sage-dark" />
+        <AlertDescription className="text-foreground">
           You have completed all sections of the FL-300. Click "Review & Submit" to review your entries before submission.
         </AlertDescription>
       </Alert>

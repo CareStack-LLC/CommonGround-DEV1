@@ -161,7 +161,7 @@ export default function CourtHelpPage() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#2D6A8F] border-t-transparent mx-auto" />
+          <div className="animate-spin rounded-full h-10 w-10 border-2 border-cg-slate border-t-transparent mx-auto" />
           <p className="mt-4 text-muted-foreground">Loading...</p>
         </div>
       </div>
@@ -182,8 +182,8 @@ export default function CourtHelpPage() {
     <div className="space-y-6 max-w-4xl">
       {/* Header */}
       <div className="text-center">
-        <div className="inline-flex p-3 bg-[#E0EFF8] rounded-full mb-4">
-          <HelpCircle className="h-8 w-8 text-[#2D6A8F]" />
+        <div className="inline-flex p-3 bg-cg-slate-subtle rounded-full mb-4">
+          <HelpCircle className="h-8 w-8 text-cg-slate" />
         </div>
         <h1 className="text-2xl font-bold text-foreground">Help Center</h1>
         <p className="text-muted-foreground">
@@ -232,7 +232,7 @@ export default function CourtHelpPage() {
           variant={selectedCategory === null ? "default" : "outline"}
           size="sm"
           onClick={() => setSelectedCategory(null)}
-          className={selectedCategory === null ? "bg-[#2D6A8F] hover:bg-[#1E4E6B]" : ""}
+          className={selectedCategory === null ? "bg-cg-slate hover:bg-[#1E4E6B]" : ""}
         >
           All Topics
         </Button>
@@ -242,7 +242,7 @@ export default function CourtHelpPage() {
             variant={selectedCategory === category ? "default" : "outline"}
             size="sm"
             onClick={() => setSelectedCategory(category)}
-            className={selectedCategory === category ? "bg-[#2D6A8F] hover:bg-[#1E4E6B]" : ""}
+            className={selectedCategory === category ? "bg-cg-slate hover:bg-[#1E4E6B]" : ""}
           >
             {category}
           </Button>
@@ -282,7 +282,7 @@ export default function CourtHelpPage() {
                   />
                 </button>
                 {expandedFaq === index && (
-                  <div className="mt-3 text-sm text-muted-foreground pl-0 border-l-2 border-[#E0EFF8] ml-0 pl-4">
+                  <div className="mt-3 text-sm text-muted-foreground pl-0 border-l-2 border-cg-slate-subtle ml-0 pl-4">
                     {faq.answer}
                   </div>
                 )}
@@ -296,7 +296,7 @@ export default function CourtHelpPage() {
       <Card id="access">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Shield className="h-5 w-5 text-[#2D6A8F]" />
+            <Shield className="h-5 w-5 text-cg-slate" />
             Access Guidelines
           </CardTitle>
         </CardHeader>
@@ -330,7 +330,7 @@ export default function CourtHelpPage() {
       <Card id="contact">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <MessageCircle className="h-5 w-5 text-[#2D6A8F]" />
+            <MessageCircle className="h-5 w-5 text-cg-slate" />
             Contact Support
           </CardTitle>
           <CardDescription>
@@ -340,19 +340,19 @@ export default function CourtHelpPage() {
         <CardContent>
           <div className="grid md:grid-cols-2 gap-4">
             <div className="flex items-center gap-3 p-4 bg-secondary/50 rounded-lg">
-              <Mail className="h-5 w-5 text-[#2D6A8F]" />
+              <Mail className="h-5 w-5 text-cg-slate" />
               <div>
                 <div className="font-medium">Email Support</div>
                 <a
                   href="mailto:court-support@find-commonground.com"
-                  className="text-sm text-[#2D6A8F] hover:underline"
+                  className="text-sm text-cg-slate hover:underline"
                 >
                   court-support@find-commonground.com
                 </a>
               </div>
             </div>
             <div className="flex items-center gap-3 p-4 bg-secondary/50 rounded-lg">
-              <Phone className="h-5 w-5 text-[#2D6A8F]" />
+              <Phone className="h-5 w-5 text-cg-slate" />
               <div>
                 <div className="font-medium">Phone Support</div>
                 <div className="text-sm text-muted-foreground">
@@ -384,9 +384,9 @@ function QuickLink({
   return (
     <a
       href={href}
-      className="flex items-center gap-2 p-3 rounded-lg border border-border hover:bg-[#E0EFF8] hover:border-[#E0EFF8] transition-colors text-sm font-medium"
+      className="flex items-center gap-2 p-3 rounded-lg border border-border hover:bg-cg-slate-subtle hover:border-cg-slate-subtle transition-colors text-sm font-medium"
     >
-      <div className="text-[#2D6A8F]">{icon}</div>
+      <div className="text-cg-slate">{icon}</div>
       <span>{label}</span>
     </a>
   );
@@ -403,8 +403,8 @@ function GuidelineCard({
   icon: React.ReactNode;
 }) {
   return (
-    <div className="flex items-start gap-3 p-4 bg-[#E0EFF8]/50 rounded-lg border border-[#E0EFF8]">
-      <div className="p-2 bg-[#E0EFF8] rounded-lg text-[#2D6A8F] flex-shrink-0">
+    <div className="flex items-start gap-3 p-4 bg-cg-slate-subtle/50 rounded-lg border border-cg-slate-subtle">
+      <div className="p-2 bg-cg-slate-subtle rounded-lg text-cg-slate flex-shrink-0">
         {icon}
       </div>
       <div>

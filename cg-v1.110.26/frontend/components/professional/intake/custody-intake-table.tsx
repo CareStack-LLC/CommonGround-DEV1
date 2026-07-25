@@ -61,22 +61,22 @@ interface CustodyIntakeTableProps {
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
     pending: {
         label: "Pending",
-        color: "bg-[#FEF7ED] text-[#B8791A] border-[#FBE3BF]",
+        color: "bg-cg-amber-subtle text-[#B8791A] border-[#FBE3BF]",
         icon: <Clock className="h-3.5 w-3.5" />,
     },
     active: {
         label: "In Progress",
-        color: "bg-[#E0EFF8] text-[#1E4E6B] border-[#E0EFF8]",
+        color: "bg-cg-slate-subtle text-[#1E4E6B] border-cg-slate-subtle",
         icon: <Eye className="h-3.5 w-3.5" />,
     },
     completed: {
         label: "Completed",
-        color: "bg-[#E8F4F0] text-[#2D8A70] border-[#C5E5DB]",
+        color: "bg-cg-sage-subtle text-cg-sage-dark border-[#C5E5DB]",
         icon: <CheckCircle2 className="h-3.5 w-3.5" />,
     },
     reviewed: {
         label: "Reviewed",
-        color: "bg-[#E8F4F0] text-[#2D8A70] border-[#C5E5DB]",
+        color: "bg-cg-sage-subtle text-cg-sage-dark border-[#C5E5DB]",
         icon: <CheckCircle2 className="h-3.5 w-3.5" />,
     },
     cancelled: {
@@ -86,7 +86,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.
     },
     expired: {
         label: "Expired",
-        color: "bg-[#FEE2E2] text-[#C53030] border-[#FEE2E2]",
+        color: "bg-cg-error-subtle text-cg-error border-cg-error-subtle",
         icon: <AlertCircle className="h-3.5 w-3.5" />,
     },
 };
@@ -194,7 +194,7 @@ export function CustodyIntakeTable({ data, isLoading, onRefresh }: CustodyIntake
                                     <span className="text-sm text-muted-foreground">{formatDate(row.created_at)}</span>
                                 </TableCell>
                                 <TableCell>
-                                    <span className={`text-sm ${expired ? "text-[#C53030] font-medium" : "text-muted-foreground"}`}>
+                                    <span className={`text-sm ${expired ? "text-cg-error font-medium" : "text-muted-foreground"}`}>
                                         {row.expires_at ? formatDate(row.expires_at) : "Never"}
                                     </span>
                                 </TableCell>
@@ -208,7 +208,7 @@ export function CustodyIntakeTable({ data, isLoading, onRefresh }: CustodyIntake
                                             title="Copy Link"
                                         >
                                             {copiedId === row.id ? (
-                                                <CheckCircle2 className="h-4 w-4 text-[#2D8A70]" />
+                                                <CheckCircle2 className="h-4 w-4 text-cg-sage-dark" />
                                             ) : (
                                                 <Copy className="h-4 w-4" />
                                             )}
@@ -235,7 +235,7 @@ export function CustodyIntakeTable({ data, isLoading, onRefresh }: CustodyIntake
                                                 </DropdownMenuItem>
                                                 <DropdownMenuSeparator />
                                                 <DropdownMenuItem
-                                                    className="text-[#C53030]"
+                                                    className="text-cg-error"
                                                     disabled={row.status === 'completed' || row.status === 'cancelled'}
                                                 >
                                                     <Trash2 className="mr-2 h-4 w-4" />

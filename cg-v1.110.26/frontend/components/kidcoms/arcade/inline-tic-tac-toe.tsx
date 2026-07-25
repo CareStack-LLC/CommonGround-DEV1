@@ -304,13 +304,13 @@ export function InlineTicTacToe({
   return (
     <div className="p-4 pb-8">
       <div className="max-w-lg mx-auto mb-5">
-        <div className="rounded-2xl p-5 bg-[#1E3A4A]/60 border border-[#3DAA8A]/20">
+        <div className="rounded-2xl p-5 bg-foreground/60 border border-cg-sage/20">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2 text-sm font-medium text-white">
               {opponent === 'participant' ? (
-                <Users className="h-4 w-4 text-[#3DAA8A]" />
+                <Users className="h-4 w-4 text-cg-sage" />
               ) : (
-                <Cpu className="h-4 w-4 text-[#3DAA8A]" />
+                <Cpu className="h-4 w-4 text-cg-sage" />
               )}
               <span>
                 {connecting
@@ -328,7 +328,7 @@ export function InlineTicTacToe({
             </div>
             <button
               onClick={handleReset}
-              className="flex items-center gap-1 text-xs text-[#CBD8E0]/80 hover:text-white px-2 py-1 rounded-md bg-[#0D1B24] border border-[#3DAA8A]/20"
+              className="flex items-center gap-1 text-xs text-[#CBD8E0]/80 hover:text-white px-2 py-1 rounded-md bg-[#0D1B24] border border-cg-sage/20"
             >
               <RotateCcw className="h-3.5 w-3.5" />
               Reset
@@ -338,17 +338,17 @@ export function InlineTicTacToe({
           <div className="grid grid-cols-2 gap-3 text-xs">
             <div className="flex items-center justify-between bg-[#0D1B24]/60 px-3 py-2 rounded-lg">
               <div className="flex items-center gap-2">
-                <UserIcon className="h-4 w-4 text-[#3DAA8A]" />
+                <UserIcon className="h-4 w-4 text-cg-sage" />
                 <span className="text-white font-medium truncate">{userName || 'You'}</span>
               </div>
-              <span className="text-[#3DAA8A] font-bold">{localScore}</span>
+              <span className="text-cg-sage font-bold">{localScore}</span>
             </div>
             <div className="flex items-center justify-between bg-[#0D1B24]/60 px-3 py-2 rounded-lg">
               <div className="flex items-center gap-2">
-                <OpponentIcon className="h-4 w-4 text-[#F5A623]" />
+                <OpponentIcon className="h-4 w-4 text-cg-amber" />
                 <span className="text-white font-medium truncate">{opponentLabel}</span>
               </div>
-              <span className="text-[#F5A623] font-bold">{remoteScore}</span>
+              <span className="text-cg-amber font-bold">{remoteScore}</span>
             </div>
           </div>
         </div>
@@ -364,23 +364,23 @@ export function InlineTicTacToe({
               disabled={!!winner || cell !== null || !isLocalTurn}
               className={cn(
                 'aspect-square rounded-2xl flex items-center justify-center transition-all',
-                'bg-[#1E3A4A]/60 border border-[#3DAA8A]/20',
-                'hover:bg-[#1E3A4A] disabled:hover:bg-[#1E3A4A]/60',
+                'bg-foreground/60 border border-cg-sage/20',
+                'hover:bg-foreground disabled:hover:bg-foreground/60',
                 'disabled:cursor-not-allowed',
-                isWinning && 'bg-[#3DAA8A]/20 border-[#3DAA8A]/60',
+                isWinning && 'bg-cg-sage/20 border-cg-sage/60',
               )}
               aria-label={`Cell ${idx + 1}`}
             >
-              {cell === 'X' && <XIcon className="h-12 w-12 text-[#3DAA8A]" strokeWidth={3} />}
-              {cell === 'O' && <Circle className="h-12 w-12 text-[#F5A623]" strokeWidth={3} />}
+              {cell === 'X' && <XIcon className="h-12 w-12 text-cg-sage" strokeWidth={3} />}
+              {cell === 'O' && <Circle className="h-12 w-12 text-cg-amber" strokeWidth={3} />}
             </button>
           );
         })}
       </div>
 
       {winner && (
-        <div className="max-w-lg mx-auto mt-5 rounded-2xl p-4 bg-[#3DAA8A]/10 border border-[#3DAA8A]/30 flex items-center gap-3">
-          <Trophy className="h-5 w-5 text-[#F5A623]" />
+        <div className="max-w-lg mx-auto mt-5 rounded-2xl p-4 bg-cg-sage/10 border border-cg-sage/30 flex items-center gap-3">
+          <Trophy className="h-5 w-5 text-cg-amber" />
           <span className="text-white text-sm">
             {winner === 'draw'
               ? 'Nobody wins — play again?'
@@ -390,7 +390,7 @@ export function InlineTicTacToe({
           </span>
           <button
             onClick={handleReset}
-            className="ml-auto text-xs px-3 py-1.5 rounded-lg bg-[#3DAA8A] text-white hover:bg-[#3DAA8A]/90"
+            className="ml-auto text-xs px-3 py-1.5 rounded-lg bg-cg-sage text-white hover:bg-cg-sage/90"
           >
             Play again
           </button>

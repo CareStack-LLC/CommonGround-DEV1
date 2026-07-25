@@ -47,21 +47,21 @@ function iconFor(eventType: string): {
 } {
   const t = (eventType || 'custom').toLowerCase();
   if (t.includes('birthday') || t.includes('party')) {
-    return { Icon: PartyPopper, label: 'Celebration', accent: 'from-[#F5A623] to-[#F5A623]' };
+    return { Icon: PartyPopper, label: 'Celebration', accent: 'from-cg-amber to-cg-amber' };
   }
   if (t.includes('school') || t.includes('class')) {
-    return { Icon: GraduationCap, label: 'School', accent: 'from-[#4BA8C8] to-[#2D6A8F]' };
+    return { Icon: GraduationCap, label: 'School', accent: 'from-cg-slate-light to-cg-slate' };
   }
   if (t.includes('medical') || t.includes('doctor') || t.includes('appointment')) {
-    return { Icon: Stethoscope, label: 'Appointment', accent: 'from-[#5BC4A0] to-teal-500' };
+    return { Icon: Stethoscope, label: 'Appointment', accent: 'from-cg-sage-light to-teal-500' };
   }
   if (t.includes('sport') || t.includes('game') || t.includes('practice')) {
-    return { Icon: Trophy, label: 'Sports', accent: 'from-[#F5A623] to-[#F5A623]' };
+    return { Icon: Trophy, label: 'Sports', accent: 'from-cg-amber to-cg-amber' };
   }
   if (t.includes('exchange') || t.includes('pickup') || t.includes('dropoff')) {
-    return { Icon: UsersIcon, label: 'With a grown-up', accent: 'from-[#4BA8C8] to-[#2D6A8F]' };
+    return { Icon: UsersIcon, label: 'With a grown-up', accent: 'from-cg-slate-light to-cg-slate' };
   }
-  return { Icon: CalendarDays, label: 'Event', accent: 'from-[#F5A623] to-[#3DAA8A]' };
+  return { Icon: CalendarDays, label: 'Event', accent: 'from-cg-amber to-cg-sage' };
 }
 
 function formatTime(iso: string): string {
@@ -146,25 +146,25 @@ export default function KidSpaceCalendarPage() {
 
   if (!userData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#E0EFF8] via-[#FEF7ED] to-[#E8F4F0] flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-[#4BA8C8]/30 border-t-[#4BA8C8] rounded-full animate-spin" />
+      <div className="min-h-screen bg-gradient-to-br from-cg-slate-subtle via-cg-amber-subtle to-cg-sage-subtle flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-cg-slate-light/30 border-t-cg-slate-light rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-[100dvh] bg-gradient-to-br from-[#E0EFF8] via-[#FEF7ED] to-[#E8F4F0]">
-      <header className="flex items-center gap-3 p-4 bg-white/80 backdrop-blur-sm border-b-4 border-[#FEF7ED] shadow-md sticky top-0 z-20">
+    <div className="min-h-[100dvh] bg-gradient-to-br from-cg-slate-subtle via-cg-amber-subtle to-cg-sage-subtle">
+      <header className="flex items-center gap-3 p-4 bg-white/80 backdrop-blur-sm border-b-4 border-cg-amber-subtle shadow-md sticky top-0 z-20">
         <button
           onClick={() => router.push('/my-circle/child/dashboard')}
-          className="p-2 rounded-2xl bg-gradient-to-br from-[#4BA8C8] to-[#2D6A8F] text-white shadow-md hover:shadow-lg transition-all"
+          className="p-2 rounded-2xl bg-gradient-to-br from-cg-slate-light to-cg-slate text-white shadow-md hover:shadow-lg transition-all"
           aria-label="Back to dashboard"
         >
           <ArrowLeft className="h-5 w-5" />
         </button>
         <div className="flex-1">
           <h1 className="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
-            <CalendarDays className="h-6 w-6 text-[#4BA8C8]" />
+            <CalendarDays className="h-6 w-6 text-cg-slate-light" />
             My Calendar
           </h1>
           <p className="text-sm text-slate-600 font-medium">
@@ -176,18 +176,18 @@ export default function KidSpaceCalendarPage() {
       <main className="p-4 space-y-6 pb-24">
         {loading && (
           <div className="flex items-center justify-center py-16">
-            <div className="w-10 h-10 border-4 border-[#4BA8C8]/30 border-t-[#4BA8C8] rounded-full animate-spin" />
+            <div className="w-10 h-10 border-4 border-cg-slate-light/30 border-t-cg-slate-light rounded-full animate-spin" />
           </div>
         )}
 
         {!loading && error && (
-          <div className="bg-white border-4 border-[#F5A623] rounded-3xl p-5 shadow-md">
+          <div className="bg-white border-4 border-cg-amber rounded-3xl p-5 shadow-md">
             <p className="text-base text-slate-900 font-medium">
               {error}
             </p>
             <button
               onClick={loadEvents}
-              className="mt-3 px-4 py-2 rounded-2xl bg-[#4BA8C8] text-white font-bold shadow hover:shadow-lg"
+              className="mt-3 px-4 py-2 rounded-2xl bg-cg-slate-light text-white font-bold shadow hover:shadow-lg"
             >
               Try again
             </button>
@@ -195,8 +195,8 @@ export default function KidSpaceCalendarPage() {
         )}
 
         {!loading && !error && events.length === 0 && (
-          <div className="bg-white border-4 border-[#FEF7ED] rounded-3xl p-8 shadow-md text-center">
-            <Sparkles className="h-10 w-10 text-[#F5A623] mx-auto mb-3" />
+          <div className="bg-white border-4 border-cg-amber-subtle rounded-3xl p-8 shadow-md text-center">
+            <Sparkles className="h-10 w-10 text-cg-amber mx-auto mb-3" />
             <p className="text-xl font-extrabold text-slate-900 mb-1">
               Nothing coming up
             </p>
@@ -219,7 +219,7 @@ export default function KidSpaceCalendarPage() {
                 return (
                   <article
                     key={ev.id}
-                    className="bg-white border-4 border-[#FEF7ED] rounded-3xl p-4 shadow-md"
+                    className="bg-white border-4 border-cg-amber-subtle rounded-3xl p-4 shadow-md"
                   >
                     <div className="flex items-start gap-3">
                       <div
@@ -245,7 +245,7 @@ export default function KidSpaceCalendarPage() {
                             {formatTime(ev.start_time)}
                           </span>
                           {ev.created_by_child && (
-                            <span className="inline-flex items-center gap-1 text-[#2D8A70]">
+                            <span className="inline-flex items-center gap-1 text-cg-sage-dark">
                               <Sparkles className="h-4 w-4" />
                               You added this
                             </span>

@@ -125,7 +125,7 @@ export default function ProfessionalProfilePage() {
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pb-20">
             {/* Hero Section */}
-            <div className="relative h-72 md:h-80 w-full overflow-hidden bg-gradient-to-br from-[#3DAA8A] via-[#3DAA8A]/95 to-[#1a4746]">
+            <div className="relative h-72 md:h-80 w-full overflow-hidden bg-gradient-to-br from-cg-sage via-cg-sage/95 to-[#1a4746]">
                 {firm.video_url && (
                     <div className="absolute inset-0">
                         {/* Use actual HTML5 video for autoplay background */}
@@ -173,7 +173,7 @@ export default function ProfessionalProfilePage() {
                             <div className="flex items-center gap-3 mb-2">
                                 <h1 className="text-3xl md:text-5xl font-bold tracking-tight" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{firm.name}</h1>
                                 {firm.safety_vetted && (
-                                    <Badge className="bg-[#3DAA8A] text-white border-0">
+                                    <Badge className="bg-cg-sage text-white border-0">
                                         <ShieldCheck className="w-3 h-3 mr-1" /> Vetted
                                     </Badge>
                                 )}
@@ -202,7 +202,7 @@ export default function ProfessionalProfilePage() {
                             {familyFileId ? (
                                 <Button
                                     size="lg"
-                                    className="bg-[#3DAA8A] hover:bg-[#3A5646] text-white border-2 border-white/20 shadow-xl rounded-full font-bold px-8"
+                                    className="bg-cg-sage hover:bg-[#3A5646] text-white border-2 border-white/20 shadow-xl rounded-full font-bold px-8"
                                     onClick={handleInviteKey}
                                     disabled={inviting}
                                 >
@@ -314,12 +314,12 @@ export default function ProfessionalProfilePage() {
                                                         {pro.headshot_url ? (
                                                             <AvatarImage src={getImageUrl(pro.headshot_url) || undefined} />
                                                         ) : null}
-                                                        <AvatarFallback className="bg-[#E8F0EC] text-[#3DAA8A] text-3xl font-bold font-serif">
+                                                        <AvatarFallback className="bg-[#E8F0EC] text-cg-sage text-3xl font-bold font-serif">
                                                             {pro.user_first_name?.charAt(0)}{pro.user_last_name?.charAt(0)}
                                                         </AvatarFallback>
                                                     </Avatar>
                                                     {pro.license_verified && (
-                                                        <Badge variant="outline" className="bg-white text-[#2D8A70] border-[#E8F4F0] text-[10px] gap-1 px-2">
+                                                        <Badge variant="outline" className="bg-white text-cg-sage-dark border-cg-sage-subtle text-[10px] gap-1 px-2">
                                                             <CheckCircle2 className="w-3 h-3" /> Licensed
                                                         </Badge>
                                                     )}
@@ -330,7 +330,7 @@ export default function ProfessionalProfilePage() {
                                                             <h3 className="font-bold text-2xl text-slate-900" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                                                                 {pro.user_first_name} {pro.user_last_name}
                                                             </h3>
-                                                            <p className="text-sm text-[#3DAA8A] font-bold tracking-wide uppercase mt-1">{pro.headline || pro.professional_type.replace('_', ' ')}</p>
+                                                            <p className="text-sm text-cg-sage font-bold tracking-wide uppercase mt-1">{pro.headline || pro.professional_type.replace('_', ' ')}</p>
                                                         </div>
                                                         {pro.hourly_rate && (
                                                             <div className="text-right">
@@ -359,7 +359,7 @@ export default function ProfessionalProfilePage() {
                                                         )}
                                                         {pro.awards && pro.awards.length > 0 && (
                                                             <div className="flex items-center gap-1.5">
-                                                                <Award className="w-4 h-4 text-[#F5A623]" />
+                                                                <Award className="w-4 h-4 text-cg-amber" />
                                                                 {pro.awards.length} Awards
                                                             </div>
                                                         )}
@@ -458,14 +458,14 @@ export default function ProfessionalProfilePage() {
                             <div className="pt-6 mt-2 border-t border-slate-100">
                                 {familyFileId ? (
                                     <Button
-                                        className="w-full bg-[#3DAA8A] hover:bg-[#3A5646] text-white rounded-full font-bold h-12 shadow-md"
+                                        className="w-full bg-cg-sage hover:bg-[#3A5646] text-white rounded-full font-bold h-12 shadow-md"
                                         onClick={handleInviteKey}
                                         disabled={inviting}
                                     >
                                         {inviting ? "Sending..." : "Invite to Case"}
                                     </Button>
                                 ) : (
-                                    <Button className="w-full rounded-full font-bold h-12 shadow-md border-2 border-[#3DAA8A] text-[#3DAA8A] bg-transparent hover:bg-[#E8F0EC]">
+                                    <Button className="w-full rounded-full font-bold h-12 shadow-md border-2 border-cg-sage text-cg-sage bg-transparent hover:bg-[#E8F0EC]">
                                         Send Message
                                     </Button>
                                 )}
@@ -475,10 +475,10 @@ export default function ProfessionalProfilePage() {
 
                     <Card className="bg-[#E8F0EC]/50 border-2 border-[#E8F0EC] rounded-3xl shadow-sm">
                         <CardContent className="p-5 flex items-start gap-4">
-                            <ShieldCheck className="w-6 h-6 text-[#3DAA8A] shrink-0 mt-0.5" />
+                            <ShieldCheck className="w-6 h-6 text-cg-sage shrink-0 mt-0.5" />
                             <div className="text-sm">
                                 <h4 className="font-bold text-[#2D3A35] mb-1">Data Protection</h4>
-                                <p className="text-[#3DAA8A] font-medium text-xs leading-relaxed">
+                                <p className="text-cg-sage font-medium text-xs leading-relaxed">
                                     This firm is bound by confidentiality agreements. Communications via CommonGround are encrypted.
                                 </p>
                             </div>
@@ -491,14 +491,14 @@ export default function ProfessionalProfilePage() {
             <div className="md:hidden fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-md border-t border-slate-200 shadow-2xl z-40">
                 {familyFileId ? (
                     <Button
-                        className="w-full bg-[#3DAA8A] hover:bg-[#3A5646] text-white rounded-full font-bold h-12 shadow-lg"
+                        className="w-full bg-cg-sage hover:bg-[#3A5646] text-white rounded-full font-bold h-12 shadow-lg"
                         onClick={handleInviteKey}
                         disabled={inviting}
                     >
                         {inviting ? "Sending..." : "Invite to Case"}
                     </Button>
                 ) : (
-                    <Button className="w-full rounded-full font-bold h-12 shadow-lg bg-[#3DAA8A] hover:bg-[#3A5646] text-white">
+                    <Button className="w-full rounded-full font-bold h-12 shadow-lg bg-cg-sage hover:bg-[#3A5646] text-white">
                         Contact Firm
                     </Button>
                 )}

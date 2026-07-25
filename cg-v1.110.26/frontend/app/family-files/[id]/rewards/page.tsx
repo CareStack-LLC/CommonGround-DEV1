@@ -58,9 +58,9 @@ function redemptionStatusLabel(status: RewardRedemption['status']) {
 function redemptionStatusBadgeClass(status: RewardRedemption['status']) {
   switch (status) {
     case 'requested':
-      return 'bg-[#FEF7ED] text-[#E09520] border border-[#FEF7ED]';
+      return 'bg-cg-amber-subtle text-[#E09520] border border-cg-amber-subtle';
     case 'fulfilled':
-      return 'bg-[#E8F4F0] text-[#2D8A70] border border-[#E8F4F0]';
+      return 'bg-cg-sage-subtle text-cg-sage-dark border border-cg-sage-subtle';
     case 'cancelled':
       return 'bg-muted text-muted-foreground border border-border';
   }
@@ -197,8 +197,8 @@ export default function ParentRewardsPage() {
                 className="text-3xl font-bold text-foreground flex items-center gap-3"
                 style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
               >
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#3DAA8A]/10 to-[#2D6A8F]/5 flex items-center justify-center shadow-md">
-                  <Gift className="h-6 w-6 text-[#3DAA8A]" />
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cg-sage/10 to-cg-slate/5 flex items-center justify-center shadow-md">
+                  <Gift className="h-6 w-6 text-cg-sage" />
                 </div>
                 Rewards Store
               </h1>
@@ -224,9 +224,9 @@ export default function ParentRewardsPage() {
           </div>
 
           {error && (
-            <div className="mb-6 bg-[#FEE2E2] border-2 border-[#FEE2E2] rounded-2xl p-4">
+            <div className="mb-6 bg-cg-error-subtle border-2 border-cg-error-subtle rounded-2xl p-4">
               <div className="flex items-center gap-3">
-                <XCircle className="h-5 w-5 text-[#C53030]" />
+                <XCircle className="h-5 w-5 text-cg-error" />
                 <p className="text-[#9B2C2C] font-medium">{error}</p>
               </div>
             </div>
@@ -234,7 +234,7 @@ export default function ParentRewardsPage() {
 
           {loading ? (
             <div className="flex justify-center py-20">
-              <Loader2 className="h-10 w-10 animate-spin text-[#3DAA8A]" />
+              <Loader2 className="h-10 w-10 animate-spin text-cg-sage" />
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -244,7 +244,7 @@ export default function ParentRewardsPage() {
                   className="text-lg font-bold text-foreground mb-4 flex items-center gap-2"
                   style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
                 >
-                  <Store className="h-5 w-5 text-[#3DAA8A]" />
+                  <Store className="h-5 w-5 text-cg-sage" />
                   Catalog
                   <span className="ml-auto text-xs font-medium text-muted-foreground">
                     {rewards.filter((r) => r.is_active).length} active
@@ -301,7 +301,7 @@ export default function ParentRewardsPage() {
                   <Package className="h-5 w-5 text-[#E09520]" />
                   To fulfill
                   {pendingRedemptions.length > 0 && (
-                    <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-[#FEF7ED] text-[#E09520] border border-[#FEF7ED]">
+                    <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-cg-amber-subtle text-[#E09520] border border-cg-amber-subtle">
                       {pendingRedemptions.length}
                     </span>
                   )}
@@ -320,10 +320,10 @@ export default function ParentRewardsPage() {
                       return (
                         <li
                           key={red.id}
-                          className="rounded-xl border-2 border-[#FEF7ED] bg-[#FEF7ED]/50 p-4"
+                          className="rounded-xl border-2 border-cg-amber-subtle bg-cg-amber-subtle/50 p-4"
                         >
                           <div className="flex items-start gap-3 mb-3">
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#F5A623] to-[#E8941E] flex items-center justify-center text-xl flex-shrink-0">
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cg-amber to-[#E8941E] flex items-center justify-center text-xl flex-shrink-0">
                               {reward?.image_emoji || '🎁'}
                             </div>
                             <div className="flex-1 min-w-0">
@@ -338,7 +338,7 @@ export default function ParentRewardsPage() {
                                 • {new Date(red.created_at).toLocaleDateString()}
                               </p>
                             </div>
-                            <span className="text-sm font-bold text-[#3DAA8A] flex-shrink-0">
+                            <span className="text-sm font-bold text-cg-sage flex-shrink-0">
                               {safeCurrency(red.cost_at_redemption)}
                             </span>
                           </div>
@@ -346,7 +346,7 @@ export default function ParentRewardsPage() {
                             <button
                               onClick={() => fulfill(red)}
                               disabled={busy}
-                              className="flex-1 flex items-center justify-center gap-1.5 bg-[#3DAA8A] hover:bg-[#2D8A70] text-white text-sm font-semibold py-2 rounded-lg disabled:opacity-50"
+                              className="flex-1 flex items-center justify-center gap-1.5 bg-cg-sage hover:bg-cg-sage-dark text-white text-sm font-semibold py-2 rounded-lg disabled:opacity-50"
                             >
                               {busy ? (
                                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -358,7 +358,7 @@ export default function ParentRewardsPage() {
                             <button
                               onClick={() => cancelRedemption(red)}
                               disabled={busy}
-                              className="flex items-center justify-center gap-1.5 border-2 border-[#F5A623] bg-white hover:bg-[#FEF7ED] text-[#E09520] text-sm font-semibold px-3 py-2 rounded-lg disabled:opacity-50"
+                              className="flex items-center justify-center gap-1.5 border-2 border-cg-amber bg-white hover:bg-cg-amber-subtle text-[#E09520] text-sm font-semibold px-3 py-2 rounded-lg disabled:opacity-50"
                             >
                               <X className="h-4 w-4" />
                               Cancel &amp; refund
@@ -412,7 +412,7 @@ export default function ParentRewardsPage() {
                             </div>
                           </div>
                           <div className="flex items-center gap-2 flex-shrink-0">
-                            <span className="text-xs font-bold text-[#3DAA8A]">
+                            <span className="text-xs font-bold text-cg-sage">
                               {safeCurrency(red.cost_at_redemption)}
                             </span>
                             <span
@@ -485,7 +485,7 @@ function RewardCard({
       className={`rounded-xl border-2 p-4 ${reward.is_active ? 'border-border bg-muted/30' : 'border-dashed border-border bg-muted/10 opacity-70'}`}
     >
       <div className="flex items-start gap-3">
-        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#F5A623] to-[#E8941E] flex items-center justify-center text-2xl flex-shrink-0">
+        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cg-amber to-[#E8941E] flex items-center justify-center text-2xl flex-shrink-0">
           {reward.image_emoji || '🎁'}
         </div>
         <div className="flex-1 min-w-0">
@@ -497,7 +497,7 @@ function RewardCard({
               </span>
             )}
           </div>
-          <p className="text-sm font-bold text-[#3DAA8A]">
+          <p className="text-sm font-bold text-cg-sage">
             {safeCurrency(reward.cost_amount)}
           </p>
           {reward.description && (
@@ -523,7 +523,7 @@ function RewardCard({
           <button
             onClick={onToggle}
             disabled={busy}
-            className={`p-1.5 rounded-md hover:bg-muted ${reward.is_active ? 'text-[#3DAA8A]' : 'text-muted-foreground'}`}
+            className={`p-1.5 rounded-md hover:bg-muted ${reward.is_active ? 'text-cg-sage' : 'text-muted-foreground'}`}
             aria-label={reward.is_active ? 'Hide reward' : 'Show reward'}
             title={reward.is_active ? 'Hide from children' : 'Show to children'}
           >
@@ -536,7 +536,7 @@ function RewardCard({
           <button
             onClick={onDelete}
             disabled={busy}
-            className="p-1.5 rounded-md hover:bg-[#FEE2E2] text-[#C53030]"
+            className="p-1.5 rounded-md hover:bg-cg-error-subtle text-cg-error"
             aria-label="Delete reward"
           >
             <Trash2 className="h-3.5 w-3.5" />
@@ -603,13 +603,13 @@ function RewardFormInline({
   };
 
   return (
-    <div className="rounded-xl border-2 border-[#3DAA8A]/30 bg-[#3DAA8A]/5 p-4 space-y-3">
+    <div className="rounded-xl border-2 border-cg-sage/30 bg-cg-sage/5 p-4 space-y-3">
       <div className="flex flex-wrap gap-1.5">
         {EMOJI_CHOICES.map((e) => (
           <button
             key={e}
             onClick={() => setEmoji(e)}
-            className={`w-9 h-9 rounded-lg text-xl transition-all ${emoji === e ? 'bg-[#3DAA8A] ring-2 ring-[#3DAA8A]' : 'bg-white border border-border hover:border-[#3DAA8A]/50'}`}
+            className={`w-9 h-9 rounded-lg text-xl transition-all ${emoji === e ? 'bg-cg-sage ring-2 ring-cg-sage' : 'bg-white border border-border hover:border-cg-sage/50'}`}
             type="button"
           >
             {e}
@@ -620,14 +620,14 @@ function RewardFormInline({
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         placeholder="Title"
-        className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/40"
+        className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-cg-sage/40"
       />
       <textarea
         value={description}
         onChange={(e) => setDescription(e.target.value)}
         rows={2}
         placeholder="Description (optional)"
-        className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/40"
+        className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cg-sage/40"
       />
       <div className="grid grid-cols-2 gap-2">
         <input
@@ -637,7 +637,7 @@ function RewardFormInline({
           value={cost}
           onChange={(e) => setCost(e.target.value)}
           placeholder="Cost"
-          className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/40"
+          className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cg-sage/40"
         />
         <input
           type="number"
@@ -646,15 +646,15 @@ function RewardFormInline({
           value={stock}
           onChange={(e) => setStock(e.target.value)}
           placeholder="Stock (optional)"
-          className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/40"
+          className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cg-sage/40"
         />
       </div>
-      {err && <p className="text-xs text-[#C53030]">{err}</p>}
+      {err && <p className="text-xs text-cg-error">{err}</p>}
       <div className="flex gap-2">
         <button
           onClick={save}
           disabled={saving}
-          className="flex-1 bg-[#3DAA8A] hover:bg-[#3DAA8A]/90 text-white text-sm font-semibold py-2 rounded-lg disabled:opacity-50"
+          className="flex-1 bg-cg-sage hover:bg-cg-sage/90 text-white text-sm font-semibold py-2 rounded-lg disabled:opacity-50"
         >
           {saving ? 'Saving...' : 'Save'}
         </button>
@@ -758,7 +758,7 @@ function RewardFormModal({
                 <button
                   key={e}
                   onClick={() => setEmoji(e)}
-                  className={`w-10 h-10 rounded-lg text-2xl transition-all ${emoji === e ? 'bg-[#3DAA8A]/20 ring-2 ring-[#3DAA8A]' : 'bg-muted border border-border hover:border-[#3DAA8A]/50'}`}
+                  className={`w-10 h-10 rounded-lg text-2xl transition-all ${emoji === e ? 'bg-cg-sage/20 ring-2 ring-cg-sage' : 'bg-muted border border-border hover:border-cg-sage/50'}`}
                   type="button"
                 >
                   {e}
@@ -775,7 +775,7 @@ function RewardFormModal({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Extra screen time"
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/40"
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cg-sage/40"
             />
           </div>
 
@@ -788,7 +788,7 @@ function RewardFormModal({
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
               placeholder="e.g. 30 extra minutes after homework"
-              className="w-full rounded-lg border border-border bg-background px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/40"
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cg-sage/40"
             />
           </div>
 
@@ -804,7 +804,7 @@ function RewardFormModal({
                 value={cost}
                 onChange={(e) => setCost(e.target.value)}
                 placeholder="5.00"
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/40"
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cg-sage/40"
               />
             </div>
             <div>
@@ -818,13 +818,13 @@ function RewardFormModal({
                 value={stock}
                 onChange={(e) => setStock(e.target.value)}
                 placeholder="Unlimited"
-                className="w-full rounded-lg border border-border bg-background px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/40"
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 focus:outline-none focus:ring-2 focus:ring-cg-sage/40"
               />
             </div>
           </div>
 
           {err && (
-            <div className="bg-[#FEE2E2] border border-[#FEE2E2] text-[#9B2C2C] rounded-lg px-3 py-2 text-sm">
+            <div className="bg-cg-error-subtle border border-cg-error-subtle text-[#9B2C2C] rounded-lg px-3 py-2 text-sm">
               {err}
             </div>
           )}

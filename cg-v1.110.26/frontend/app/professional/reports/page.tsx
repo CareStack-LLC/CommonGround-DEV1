@@ -28,10 +28,10 @@ const REPORT_TYPES = [
     title: "Full Compliance Report",
     description: "Complete overview of parenting plan adherence across all areas",
     icon: FileText,
-    color: "from-[#3DAA8A] to-[#2D6A8F]",
-    bgColor: "bg-[#F4F8F7]",
-    borderColor: "border-[#3DAA8A]/20",
-    textColor: "text-[#1E3A4A]",
+    color: "from-cg-sage to-cg-slate",
+    bgColor: "bg-background",
+    borderColor: "border-cg-sage/20",
+    textColor: "text-foreground",
     roles: ["Attorney", "GAL", "Mediator"],
     includes: [
       "Exchange compliance (on-time rates, GPS verification)",
@@ -45,8 +45,8 @@ const REPORT_TYPES = [
     title: "Communication Analysis",
     description: "Detailed communication patterns with before/after ARIA intervention examples",
     icon: MessageCircle,
-    color: "from-[#F5A623] to-[#E09520]",
-    bgColor: "bg-[#FEF7ED]",
+    color: "from-cg-amber to-[#E09520]",
+    bgColor: "bg-cg-amber-subtle",
     borderColor: "border-[#FBE3BF]",
     textColor: "text-[#B8791A]",
     roles: ["Attorney", "GAL", "Parenting Coordinator"],
@@ -62,10 +62,10 @@ const REPORT_TYPES = [
     title: "Exchange Compliance Report",
     description: "Custody exchange patterns, GPS tracking, and schedule adherence",
     icon: RefreshCw,
-    color: "from-[#3DAA8A] to-[#5BC4A0]",
-    bgColor: "bg-[#F4F8F7]",
-    borderColor: "border-[#3DAA8A]/20",
-    textColor: "text-[#1E3A4A]",
+    color: "from-cg-sage to-cg-sage-light",
+    bgColor: "bg-background",
+    borderColor: "border-cg-sage/20",
+    textColor: "text-foreground",
     roles: ["Attorney", "GAL"],
     includes: [
       "On-time vs late vs missed exchanges",
@@ -79,10 +79,10 @@ const REPORT_TYPES = [
     title: "Financial Compliance Report",
     description: "Support payment history, arrears tracking, and transaction records",
     icon: DollarSign,
-    color: "from-[#1E3A4A] to-[#2D6A8F]",
+    color: "from-foreground to-cg-slate",
     bgColor: "bg-slate-50",
     borderColor: "border-slate-200",
-    textColor: "text-[#1E3A4A]",
+    textColor: "text-foreground",
     roles: ["Attorney", "Mediator"],
     includes: [
       "Payment history (on-time, late, missed)",
@@ -96,10 +96,10 @@ const REPORT_TYPES = [
     title: "ARIA Assessment",
     description: "AI-powered good-faith scoring and cooperation analysis per parent",
     icon: Shield,
-    color: "from-[#3DAA8A] to-[#2D6A8F]",
-    bgColor: "bg-[#E8F4F0]",
-    borderColor: "border-[#3DAA8A]/30",
-    textColor: "text-[#1E3A4A]",
+    color: "from-cg-sage to-cg-slate",
+    bgColor: "bg-cg-sage-subtle",
+    borderColor: "border-cg-sage/30",
+    textColor: "text-foreground",
     roles: ["GAL", "Parenting Coordinator", "Mediator"],
     includes: [
       "Good-faith scores per parent",
@@ -238,7 +238,7 @@ export default function ReportsPage() {
                     {reportType.roles && (
                       <div className="flex flex-wrap gap-1 mt-2">
                         {reportType.roles.map((role) => (
-                          <span key={role} className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#F4F8F7] text-[#1E3A4A] border border-[#3DAA8A]/15">
+                          <span key={role} className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-background text-foreground border border-cg-sage/15">
                             {role}
                           </span>
                         ))}
@@ -256,7 +256,7 @@ export default function ReportsPage() {
                   <ul className="space-y-1.5">
                     {reportType.includes.map((item, index) => (
                       <li key={index} className="flex items-start gap-2 text-sm text-slate-700">
-                        <CheckCircle2 className="h-4 w-4 mt-0.5 shrink-0 text-[#3DAA8A]" />
+                        <CheckCircle2 className="h-4 w-4 mt-0.5 shrink-0 text-cg-sage" />
                         <span>{item}</span>
                       </li>
                     ))}
@@ -266,7 +266,7 @@ export default function ReportsPage() {
                 {/* Generate Button */}
                 <div className="flex items-center gap-2">
                   <Link href={`/professional/reports/generate?type=${reportType.id}`} className="flex-1">
-                    <Button className="w-full bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm font-semibold">
+                    <Button className="w-full bg-cg-sage hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm font-semibold">
                       Generate Report
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
@@ -289,7 +289,7 @@ export default function ReportsPage() {
           <h2 className="text-lg font-semibold text-slate-900">
             Recent Reports
           </h2>
-          <Button variant="outline" size="sm" onClick={fetchRecentReports} disabled={isLoading} className="border-slate-200 hover:bg-[#F4F8F7] rounded-xl h-9">
+          <Button variant="outline" size="sm" onClick={fetchRecentReports} disabled={isLoading} className="border-slate-200 hover:bg-background rounded-xl h-9">
             <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
           </Button>
         </div>
@@ -297,8 +297,8 @@ export default function ReportsPage() {
         {recentReports.length === 0 ? (
           <Card className="border border-dashed border-slate-200 bg-white rounded-2xl">
             <CardContent className="py-16 flex flex-col items-center justify-center text-center">
-              <div className="p-4 bg-[#F4F8F7] rounded-2xl mb-5">
-                <FileText className="h-10 w-10 text-[#3DAA8A]" />
+              <div className="p-4 bg-background rounded-2xl mb-5">
+                <FileText className="h-10 w-10 text-cg-sage" />
               </div>
               <p className="text-lg font-semibold text-slate-900 mb-1.5">No reports generated yet</p>
               <p className="text-sm text-slate-500 max-w-sm">
@@ -350,7 +350,7 @@ export default function ReportsPage() {
                     <div className="flex items-center gap-2">
                       <Button
                         size="sm"
-                        className="flex-1 text-xs bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white rounded-lg shadow-sm"
+                        className="flex-1 text-xs bg-cg-sage hover:bg-[#2D8A6E] text-white rounded-lg shadow-sm"
                         onClick={() => downloadReport(report.id)}
                       >
                         <Download className="h-3.5 w-3.5 mr-1.5" />
@@ -370,11 +370,11 @@ export default function ReportsPage() {
         )}
 
         {/* SHA-256 Info Box */}
-        <div className="mt-6 p-4 rounded-2xl bg-[#F4F8F7] border border-[#3DAA8A]/10">
+        <div className="mt-6 p-4 rounded-2xl bg-background border border-cg-sage/10">
           <div className="flex items-start gap-3">
-            <Shield className="h-5 w-5 text-[#3DAA8A] mt-0.5 shrink-0" />
+            <Shield className="h-5 w-5 text-cg-sage mt-0.5 shrink-0" />
             <div>
-              <p className="text-sm font-semibold text-[#1E3A4A]">SHA-256 Verification</p>
+              <p className="text-sm font-semibold text-foreground">SHA-256 Verification</p>
               <p className="text-xs text-slate-600 mt-1 leading-relaxed">
                 Every report is cryptographically signed with a SHA-256 hash. Any modification after export
                 invalidates the hash, ensuring tamper-evident documents that can be verified at any time.

@@ -26,7 +26,7 @@ export function ChatbotMessage({ role, content }: ChatbotMessageProps) {
         className={cn(
           "max-w-[85%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed",
           isUser
-            ? "bg-[#3DAA8A] text-white rounded-br-md"
+            ? "bg-cg-sage text-white rounded-br-md"
             : "bg-gray-100 text-gray-800 rounded-bl-md"
         )}
       >

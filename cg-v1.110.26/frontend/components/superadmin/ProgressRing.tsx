@@ -10,10 +10,10 @@ interface ProgressRingProps {
 }
 
 function getDefaultColor(value: number): string {
-  if (value >= 80) return '#3DAA8A';
-  if (value >= 60) return '#4BA8C8';
-  if (value >= 40) return '#F5A623';
-  return '#C53030';
+  if (value >= 80) return 'var(--cg-sage)';
+  if (value >= 60) return 'var(--cg-slate-light)';
+  if (value >= 40) return 'var(--cg-amber)';
+  return 'var(--cg-error)';
 }
 
 export function ProgressRing({
@@ -39,7 +39,7 @@ export function ProgressRing({
             cy={size / 2}
             r={radius}
             fill="none"
-            stroke="#1E3A4A"
+            stroke="var(--foreground)"
             strokeWidth={strokeWidth}
           />
           {/* Progress ring */}

@@ -34,7 +34,7 @@ export function ReviewSection({ onPrevious }: ReviewSectionProps) {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <span className="flex items-center justify-center w-8 h-8 rounded-full bg-[#2D8A70]/10 text-[#2D8A70] text-sm font-bold">
+          <span className="flex items-center justify-center w-8 h-8 rounded-full bg-cg-sage-dark/10 text-cg-sage-dark text-sm font-bold">
             <Check className="w-4 h-4" />
           </span>
           Review & Finalize
@@ -44,9 +44,9 @@ export function ReviewSection({ onPrevious }: ReviewSectionProps) {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="bg-[#2D8A70]/10 border border-[#2D8A70]/20 rounded-lg p-6">
+        <div className="bg-cg-sage-dark/10 border border-cg-sage-dark/20 rounded-lg p-6">
           <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
-            <CheckCircle className="w-5 h-5 text-[#2D8A70]" />
+            <CheckCircle className="w-5 h-5 text-cg-sage-dark" />
             Agreement Draft Complete!
           </h3>
           <p className="text-muted-foreground mb-3">

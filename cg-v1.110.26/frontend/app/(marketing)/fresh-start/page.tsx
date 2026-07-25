@@ -73,7 +73,7 @@ const features: {
     tagline: 'Agreements that stick',
     description:
       'Set up parenting agreements in minutes — not months. Both parents review, sign digitally, and get a copy. Holiday schedules, pickup rules, communication boundaries. Everything documented, nothing forgotten.',
-    accent: '#F5A623',
+    accent: 'var(--cg-amber)',
   },
   {
     brandIcon: 'timebridge',
@@ -81,7 +81,7 @@ const features: {
     tagline: 'Autopilot for your schedule',
     description:
       'Enter your custody arrangement once. TimeBridge creates recurring events, sends reminders to both parents, and handles holiday rotations. The system runs itself so you don\'t have to coordinate anything.',
-    accent: '#3DAA8A',
+    accent: 'var(--cg-sage)',
   },
   {
     brandIcon: 'clearfund',
@@ -89,7 +89,7 @@ const features: {
     tagline: 'Expenses on autopilot',
     description:
       'Set percentage splits for shared costs. Upload receipts. ClearFund calculates who owes what and sends reminders. No awkward money conversations. No chasing payments. Just clear, documented records.',
-    accent: '#F5A623',
+    accent: 'var(--cg-amber)',
   },
 ];
 
@@ -259,14 +259,14 @@ export default function FreshStartPage() {
       {/* ═══════════════════════════════════════════════════
           STORY — A short narrative that captivates
       ═══════════════════════════════════════════════════ */}
-      <section className="relative overflow-hidden py-20 lg:py-28 bg-gradient-to-b from-[#F4F8F7] to-white">
+      <section className="relative overflow-hidden py-20 lg:py-28 bg-gradient-to-b from-background to-white">
         <div className="max-w-3xl mx-auto px-6">
           <div className="text-center mb-16">
             <p className="font-medium mb-3 tracking-wide uppercase text-sm" style={{ color: '#E85D75' }}>
               A day in the life
             </p>
             <h2
-              className="text-3xl sm:text-4xl lg:text-[2.75rem] text-[#1E3A4A] leading-[1.15]"
+              className="text-3xl sm:text-4xl lg:text-[2.75rem] text-foreground leading-[1.15]"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               The first week that
@@ -274,15 +274,15 @@ export default function FreshStartPage() {
             </h2>
           </div>
           <div className="relative">
-            <div className="absolute left-[19px] top-3 bottom-3 w-px bg-gradient-to-b from-[#E85D75]/40 via-[#F5A623]/40 to-[#3DAA8A]/50" />
+            <div className="absolute left-[19px] top-3 bottom-3 w-px bg-gradient-to-b from-[#E85D75]/40 via-cg-amber/40 to-cg-sage/50" />
             <div className="space-y-10">
               {story.map((beat, i) => {
                 const dot =
                   beat.tone === 'before'
                     ? '#E85D75'
                     : beat.tone === 'turn'
-                    ? '#F5A623'
-                    : '#3DAA8A';
+                    ? 'var(--cg-amber)'
+                    : 'var(--cg-sage)';
                 return (
                   <div key={i} className="relative pl-14">
                     <div className="absolute left-0 top-0.5">
@@ -301,7 +301,7 @@ export default function FreshStartPage() {
                     </span>
                     {beat.kicker ? (
                       <p
-                        className="text-xl sm:text-2xl text-[#1E3A4A] leading-relaxed"
+                        className="text-xl sm:text-2xl text-foreground leading-relaxed"
                         style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
                       >
                         {beat.text}

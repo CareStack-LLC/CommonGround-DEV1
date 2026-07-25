@@ -32,9 +32,9 @@ function StatCard({ label, value, icon: Icon, color }: {
 
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
-    active: 'bg-emerald-500/10 text-emerald-400 border-[#3DAA8A]/20',
+    active: 'bg-emerald-500/10 text-emerald-400 border-cg-sage/20',
     closed: 'bg-zinc-500/10 text-[#8AACBC] border-zinc-500/20',
-    escalated: 'bg-amber-500/10 text-amber-400 border-[#F5A623]/20',
+    escalated: 'bg-amber-500/10 text-amber-400 border-cg-amber/20',
   };
   return (
     <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${styles[status] || styles.closed}`}>
@@ -232,7 +232,7 @@ export default function ChatbotAdminPage() {
           <div className="bg-[#1A3648]/60 border border-zinc-800 rounded-xl p-6 space-y-6">
             <div>
               <h3 className="text-zinc-100 font-semibold text-lg mb-1">System Prompt</h3>
-              <p className="text-[#6B8A9A] text-sm mb-3">
+              <p className="text-muted-foreground text-sm mb-3">
                 This controls how Aria responds. Edit to change personality, knowledge, and rules.
                 Leave empty to use the default built-in prompt.
               </p>
@@ -247,7 +247,7 @@ export default function ChatbotAdminPage() {
 
             <div>
               <h3 className="text-zinc-100 font-semibold text-lg mb-1">Active Promotions & Deals</h3>
-              <p className="text-[#6B8A9A] text-sm mb-3">
+              <p className="text-muted-foreground text-sm mb-3">
                 Add current promotions, discounts, or special offers. Aria will mention these when relevant.
                 One per line works best.
               </p>
@@ -291,7 +291,7 @@ export default function ChatbotAdminPage() {
       {/* Filters */}
       {activeTab === 'conversations' && <div className="flex flex-wrap gap-3 items-center">
         <div className="relative flex-1 min-w-[200px] max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#6B8A9A]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search by name or email..."
@@ -331,13 +331,13 @@ export default function ChatbotAdminPage() {
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i} className="border-b border-zinc-800/50">
                     <td colSpan={5} className="px-4 py-3">
-                      <div className="h-4 bg-[#2D6A8F]/20 rounded animate-pulse" />
+                      <div className="h-4 bg-cg-slate/20 rounded animate-pulse" />
                     </td>
                   </tr>
                 ))
               ) : sessions.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-[#6B8A9A]">
+                  <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
                     No chatbot conversations yet.
                   </td>
                 </tr>
@@ -346,7 +346,7 @@ export default function ChatbotAdminPage() {
                   <tr
                     key={s.id}
                     onClick={() => openDetail(s.id)}
-                    className="border-b border-zinc-800/50 hover:bg-[#2D6A8F]/10 cursor-pointer transition-colors"
+                    className="border-b border-zinc-800/50 hover:bg-cg-slate/10 cursor-pointer transition-colors"
                   >
                     <td className="px-4 py-3 text-white">{s.visitor_name || 'Anonymous'}</td>
                     <td className="px-4 py-3 text-[#8AACBC]">{s.visitor_email || '—'}</td>
@@ -363,7 +363,7 @@ export default function ChatbotAdminPage() {
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex items-center justify-between px-4 py-3 border-t border-zinc-800">
-            <p className="text-[#6B8A9A] text-xs">{total} total sessions</p>
+            <p className="text-muted-foreground text-xs">{total} total sessions</p>
             <div className="flex gap-2">
               <button
                 disabled={page <= 1}
@@ -372,7 +372,7 @@ export default function ChatbotAdminPage() {
               >
                 Previous
               </button>
-              <span className="text-[#6B8A9A] text-xs flex items-center">{page} / {totalPages}</span>
+              <span className="text-muted-foreground text-xs flex items-center">{page} / {totalPages}</span>
               <button
                 disabled={page >= totalPages}
                 onClick={() => setPage(page + 1)}
@@ -398,7 +398,7 @@ export default function ChatbotAdminPage() {
             {detailLoading ? (
               <div className="p-6 space-y-4">
                 {Array.from({ length: 6 }).map((_, i) => (
-                  <div key={i} className="h-8 bg-[#2D6A8F]/20 rounded animate-pulse" />
+                  <div key={i} className="h-8 bg-cg-slate/20 rounded animate-pulse" />
                 ))}
               </div>
             ) : selectedSession ? (
@@ -415,7 +415,7 @@ export default function ChatbotAdminPage() {
                   </div>
                   <button aria-label="Close"
                     onClick={() => setSelectedSession(null)}
-                    className="p-2 rounded-lg hover:bg-[#2D6A8F]/30 text-[#8AACBC]"
+                    className="p-2 rounded-lg hover:bg-cg-slate/30 text-[#8AACBC]"
                   >
                     <X className="h-5 w-5" />
                   </button>
@@ -424,23 +424,23 @@ export default function ChatbotAdminPage() {
                 {/* Visitor Info */}
                 <div className="px-5 py-4 border-b border-zinc-800 space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-[#6B8A9A]">Phone</span>
+                    <span className="text-muted-foreground">Phone</span>
                     <span className="text-[#D0E4EC]">{selectedSession.visitor.phone || '—'}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#6B8A9A]">Source Page</span>
+                    <span className="text-muted-foreground">Source Page</span>
                     <span className="text-[#D0E4EC] text-right truncate max-w-[200px]">{selectedSession.visitor.source_page || '—'}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#6B8A9A]">Started</span>
+                    <span className="text-muted-foreground">Started</span>
                     <span className="text-[#D0E4EC]">{formatDate(selectedSession.started_at)} {formatTime(selectedSession.started_at)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#6B8A9A]">Messages</span>
+                    <span className="text-muted-foreground">Messages</span>
                     <span className="text-[#D0E4EC]">{selectedSession.message_count}</span>
                   </div>
                   {selectedSession.escalation_reason && (
-                    <div className="bg-amber-500/10 border border-[#F5A623]/20 rounded-lg p-3 mt-2">
+                    <div className="bg-amber-500/10 border border-cg-amber/20 rounded-lg p-3 mt-2">
                       <p className="text-amber-400 text-xs font-medium">Escalation Reason</p>
                       <p className="text-[#D0E4EC] text-sm mt-1">{selectedSession.escalation_reason}</p>
                     </div>
@@ -469,7 +469,7 @@ export default function ChatbotAdminPage() {
                           msg.role === 'user'
                             ? 'bg-emerald-600/20 text-emerald-200'
                             : msg.role === 'system'
-                            ? 'bg-[#2D6A8F]/20 text-[#6B8A9A] text-xs text-center w-full'
+                            ? 'bg-cg-slate/20 text-muted-foreground text-xs text-center w-full'
                             : 'bg-zinc-800 text-[#D0E4EC]'
                         }`}
                       >

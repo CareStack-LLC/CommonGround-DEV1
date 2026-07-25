@@ -401,9 +401,9 @@ export default function FL311Wizard({
               onClick={() => setCurrentSection(idx)}
               className={`flex-1 h-2 rounded-full transition-colors ${
                 idx === currentSection
-                  ? 'bg-[#2D6A8F]'
+                  ? 'bg-cg-slate'
                   : idx < currentSection
-                  ? 'bg-[#3DAA8A]'
+                  ? 'bg-cg-sage'
                   : 'bg-gray-200'
               }`}
               title={section.title}
@@ -423,7 +423,7 @@ export default function FL311Wizard({
           <div className="flex items-center gap-3">
             {(() => {
               const Icon = WIZARD_SECTIONS[currentSection].icon;
-              return <Icon className="h-6 w-6 text-[#2D6A8F]" />;
+              return <Icon className="h-6 w-6 text-cg-slate" />;
             })()}
             <div>
               <CardTitle>{WIZARD_SECTIONS[currentSection].title}</CardTitle>
@@ -505,7 +505,7 @@ function HeaderSection({
 }) {
   return (
     <div className="space-y-6">
-      <Alert className="bg-[#E0EFF8] border-[#E0EFF8]">
+      <Alert className="bg-cg-slate-subtle border-cg-slate-subtle">
         <FileText className="h-4 w-4" />
         <AlertDescription>
           This form is attached to your court filing. Select which document this FL-311 accompanies.
@@ -568,7 +568,7 @@ function HeaderSection({
                 value={option.value}
                 checked={formData.attachment_type === option.value}
                 onChange={(e) => updateField('attachment_type', e.target.value as any)}
-                className="h-4 w-4 text-[#2D6A8F]"
+                className="h-4 w-4 text-cg-slate"
               />
               <span>{option.label}</span>
             </label>
@@ -713,7 +713,7 @@ function CustodySection({
                   value={option.value}
                   checked={formData.physical_custody_to === option.value}
                   onChange={(e) => updateField('physical_custody_to', e.target.value as any)}
-                  className="h-4 w-4 text-[#2D6A8F]"
+                  className="h-4 w-4 text-cg-slate"
                 />
                 <span>{option.label}</span>
               </label>
@@ -732,7 +732,7 @@ function CustodySection({
                   value={option.value}
                   checked={formData.legal_custody_to === option.value}
                   onChange={(e) => updateField('legal_custody_to', e.target.value as any)}
-                  className="h-4 w-4 text-[#2D6A8F]"
+                  className="h-4 w-4 text-cg-slate"
                 />
                 <span>{option.label}</span>
               </label>
@@ -746,7 +746,7 @@ function CustodySection({
               type="checkbox"
               checked={formData.has_abuse_allegations}
               onChange={(e) => updateField('has_abuse_allegations', e.target.checked)}
-              className="h-4 w-4 mt-1 text-[#2D6A8F]"
+              className="h-4 w-4 mt-1 text-cg-slate"
             />
             <div>
               <span className="font-medium">
@@ -829,7 +829,7 @@ function VisitationTypeSection({
               key={option.value}
               className={`flex items-start gap-3 p-4 border rounded-lg cursor-pointer transition-colors ${
                 formData.visitation_type === option.value
-                  ? 'border-[#2D6A8F] bg-[#E0EFF8]'
+                  ? 'border-cg-slate bg-cg-slate-subtle'
                   : 'border-gray-200 hover:border-gray-300'
               }`}
             >
@@ -839,7 +839,7 @@ function VisitationTypeSection({
                 value={option.value}
                 checked={formData.visitation_type === option.value}
                 onChange={(e) => updateField('visitation_type', e.target.value as any)}
-                className="h-4 w-4 mt-1 text-[#2D6A8F]"
+                className="h-4 w-4 mt-1 text-cg-slate"
               />
               <div>
                 <span className="font-medium">{option.label}</span>
@@ -872,7 +872,7 @@ function VisitationTypeSection({
         </div>
       )}
 
-      <Alert className="bg-[#FEF7ED] border-[#FEF7ED]">
+      <Alert className="bg-cg-amber-subtle border-cg-amber-subtle">
         <AlertTriangle className="h-4 w-4 text-[#E09520]" />
         <AlertDescription className="text-[#E09520]">
           <strong>Note:</strong> Unless specifically ordered, a child's holiday schedule order has
@@ -953,7 +953,7 @@ function WeekendScheduleRow({
   const days = ['Friday', 'Saturday', 'Sunday', 'Monday'];
 
   return (
-    <div className={`grid grid-cols-12 gap-2 p-3 rounded-lg border ${entry.enabled ? 'bg-[#E0EFF8] border-[#E0EFF8]' : 'bg-gray-50'}`}>
+    <div className={`grid grid-cols-12 gap-2 p-3 rounded-lg border ${entry.enabled ? 'bg-cg-slate-subtle border-cg-slate-subtle' : 'bg-gray-50'}`}>
       {/* Weekend checkbox */}
       <div className="col-span-2 flex items-center">
         <label className="flex items-center gap-2">
@@ -961,7 +961,7 @@ function WeekendScheduleRow({
             type="checkbox"
             checked={entry.enabled}
             onChange={(e) => onChange({ ...entry, enabled: e.target.checked })}
-            className="h-4 w-4 text-[#2D6A8F]"
+            className="h-4 w-4 text-cg-slate"
           />
           <span className="font-medium text-sm">{weekend}</span>
         </label>
@@ -1063,7 +1063,7 @@ function ScheduleSection({
       </Alert>
 
       {/* Whose schedule */}
-      <div className="p-4 bg-[#E0EFF8] rounded-lg border border-[#E0EFF8]">
+      <div className="p-4 bg-cg-slate-subtle rounded-lg border border-cg-slate-subtle">
         <Label className="text-base font-medium">4. The following schedule describes:</Label>
         <div className="mt-3 flex flex-wrap gap-4">
           {partyOptions.map((option) => (
@@ -1074,7 +1074,7 @@ function ScheduleSection({
                 value={option.value}
                 checked={formData.schedule_for_party === option.value}
                 onChange={(e) => updateField('schedule_for_party', e.target.value as any)}
-                className="h-4 w-4 text-[#2D6A8F]"
+                className="h-4 w-4 text-cg-slate"
               />
               <span>{option.label}'s visitation (parenting time) with the minor children</span>
             </label>
@@ -1097,7 +1097,7 @@ function ScheduleSection({
                   type="checkbox"
                   checked={formData.specific_weekends_enabled}
                   onChange={(e) => updateField('specific_weekends_enabled', e.target.checked)}
-                  className="h-4 w-4 text-[#2D6A8F]"
+                  className="h-4 w-4 text-cg-slate"
                 />
                 <span className="font-medium">(1) The weekends of each month</span>
               </label>
@@ -1135,7 +1135,7 @@ function ScheduleSection({
 
                 {/* 5th Weekend Handling */}
                 {formData.weekend_schedules.find(w => w.weekend === '5th')?.enabled && (
-                  <div className="mt-4 p-4 bg-[#FEF7ED] border border-[#FEF7ED] rounded-lg">
+                  <div className="mt-4 p-4 bg-cg-amber-subtle border border-cg-amber-subtle rounded-lg">
                     <Label className="font-medium text-[#E09520]">5th Weekend Handling:</Label>
                     <div className="mt-3 space-y-3">
                       <label className="flex items-start gap-2">
@@ -1145,7 +1145,7 @@ function ScheduleSection({
                           value="alternating"
                           checked={formData.fifth_weekend_handling.type === 'alternating'}
                           onChange={() => updateField('fifth_weekend_handling', { ...formData.fifth_weekend_handling, type: 'alternating' })}
-                          className="h-4 w-4 mt-0.5 text-[#2D6A8F]"
+                          className="h-4 w-4 mt-0.5 text-cg-slate"
                         />
                         <div>
                           <span className="font-medium">(a) The parties will alternate the 5th weekend</span>
@@ -1183,7 +1183,7 @@ function ScheduleSection({
                           value="specific"
                           checked={formData.fifth_weekend_handling.type === 'specific'}
                           onChange={() => updateField('fifth_weekend_handling', { ...formData.fifth_weekend_handling, type: 'specific' })}
-                          className="h-4 w-4 mt-0.5 text-[#2D6A8F]"
+                          className="h-4 w-4 mt-0.5 text-cg-slate"
                         />
                         <div>
                           <span className="font-medium">(b) The 5th weekend will be with</span>
@@ -1236,7 +1236,7 @@ function ScheduleSection({
                   type="checkbox"
                   checked={formData.alternate_weekends_enabled}
                   onChange={(e) => updateField('alternate_weekends_enabled', e.target.checked)}
-                  className="h-4 w-4 text-[#2D6A8F]"
+                  className="h-4 w-4 text-cg-slate"
                 />
                 <span className="font-medium">(2) Alternate weekends</span>
               </label>
@@ -1301,7 +1301,7 @@ function ScheduleSection({
                   type="checkbox"
                   checked={formData.weekdays_enabled}
                   onChange={(e) => updateField('weekdays_enabled', e.target.checked)}
-                  className="h-4 w-4 text-[#2D6A8F]"
+                  className="h-4 w-4 text-cg-slate"
                 />
                 <span className="font-medium">(3) Weekdays</span>
               </label>
@@ -1330,7 +1330,7 @@ function ScheduleSection({
                         onClick={() => toggleWeekday(day)}
                         className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                           (formData.weekday_days || []).includes(day)
-                            ? 'bg-[#2D6A8F] text-white'
+                            ? 'bg-cg-slate text-white'
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                         }`}
                       >
@@ -1362,7 +1362,7 @@ function ScheduleSection({
                 type="checkbox"
                 checked={formData.other_inperson_in_attachment}
                 onChange={(e) => updateField('other_inperson_in_attachment', e.target.checked)}
-                className="h-4 w-4 text-[#2D6A8F]"
+                className="h-4 w-4 text-cg-slate"
               />
               <span className="font-medium">(4) Other days (in Attachment 4a(4))</span>
             </label>
@@ -1393,7 +1393,7 @@ function ScheduleSection({
               type="checkbox"
               checked={formData.virtual_visitation_enabled}
               onChange={(e) => updateField('virtual_visitation_enabled', e.target.checked)}
-              className="h-4 w-4 text-[#2D6A8F]"
+              className="h-4 w-4 text-cg-slate"
             />
             <span className="font-medium">I request virtual visitation</span>
           </label>
@@ -1404,7 +1404,7 @@ function ScheduleSection({
                   type="checkbox"
                   checked={formData.virtual_visitation_in_attachment}
                   onChange={(e) => updateField('virtual_visitation_in_attachment', e.target.checked)}
-                  className="h-4 w-4 text-[#2D6A8F]"
+                  className="h-4 w-4 text-cg-slate"
                 />
                 <span>Schedule is in Attachment 4b</span>
               </label>
@@ -1465,8 +1465,8 @@ function AbuseSection({
 
   return (
     <div className="space-y-6">
-      <Alert className="bg-[#FEE2E2] border-[#FEE2E2]">
-        <AlertTriangle className="h-4 w-4 text-[#C53030]" />
+      <Alert className="bg-cg-error-subtle border-cg-error-subtle">
+        <AlertTriangle className="h-4 w-4 text-cg-error" />
         <AlertDescription className="text-[#9B2C2C]">
           <strong>Item 5:</strong> This section is required because you indicated abuse or substance
           abuse allegations in Item 2c.
@@ -1501,7 +1501,7 @@ function AbuseSection({
                         );
                       }
                     }}
-                    className="h-4 w-4 text-[#2D6A8F]"
+                    className="h-4 w-4 text-cg-slate"
                   />
                   <span className="capitalize">{party.replace('_', ' ')}</span>
                 </label>
@@ -1531,7 +1531,7 @@ function AbuseSection({
                         );
                       }
                     }}
-                    className="h-4 w-4 text-[#2D6A8F]"
+                    className="h-4 w-4 text-cg-slate"
                   />
                   <span className="capitalize">{party.replace('_', ' ')}</span>
                 </label>
@@ -1552,7 +1552,7 @@ function AbuseSection({
               type="checkbox"
               checked={formData.request_no_custody_due_to_allegations}
               onChange={(e) => updateField('request_no_custody_due_to_allegations', e.target.checked)}
-              className="h-4 w-4 mt-1 text-[#2D6A8F]"
+              className="h-4 w-4 mt-1 text-cg-slate"
             />
             <span>
               <strong>5b(1):</strong> I ask that the court NOT order sole or joint custody to the
@@ -1565,7 +1565,7 @@ function AbuseSection({
               type="checkbox"
               checked={formData.custody_despite_allegations}
               onChange={(e) => updateField('custody_despite_allegations', e.target.checked)}
-              className="h-4 w-4 mt-1 text-[#2D6A8F]"
+              className="h-4 w-4 mt-1 text-cg-slate"
             />
             <span>
               <strong>5b(2):</strong> Even though there are allegations, I ask that the court make
@@ -1590,7 +1590,7 @@ function AbuseSection({
               type="checkbox"
               checked={formData.request_supervised_visitation}
               onChange={(e) => updateField('request_supervised_visitation', e.target.checked)}
-              className="h-4 w-4 mt-1 text-[#2D6A8F]"
+              className="h-4 w-4 mt-1 text-cg-slate"
             />
             <span>
               <strong>5c(1):</strong> I ask that the court order supervised visitation as specified
@@ -1603,7 +1603,7 @@ function AbuseSection({
               type="checkbox"
               checked={formData.request_unsupervised_despite_allegations}
               onChange={(e) => updateField('request_unsupervised_despite_allegations', e.target.checked)}
-              className="h-4 w-4 mt-1 text-[#2D6A8F]"
+              className="h-4 w-4 mt-1 text-cg-slate"
             />
             <span>
               <strong>5c(2):</strong> Even though there are allegations, I request unsupervised
@@ -1649,7 +1649,7 @@ function SupervisedSection({
 
   return (
     <div className="space-y-6">
-      <Alert className="bg-[#E0EFF8] border-[#E0EFF8]">
+      <Alert className="bg-cg-slate-subtle border-cg-slate-subtle">
         <Shield className="h-4 w-4" />
         <AlertDescription>
           <strong>Item 6:</strong> Complete this section because you requested supervised visitation.
@@ -1671,7 +1671,7 @@ function SupervisedSection({
                 value={option.value}
                 checked={formData.supervised_party === option.value}
                 onChange={(e) => updateField('supervised_party', e.target.value as any)}
-                className="h-4 w-4 text-[#2D6A8F]"
+                className="h-4 w-4 text-cg-slate"
               />
               <span>{option.label}</span>
             </label>
@@ -1724,7 +1724,7 @@ function SupervisedSection({
                   value="professional"
                   checked={formData.supervisor_type === 'professional'}
                   onChange={(e) => updateField('supervisor_type', e.target.value as any)}
-                  className="h-4 w-4 mt-1 text-[#2D6A8F]"
+                  className="h-4 w-4 mt-1 text-cg-slate"
                 />
                 <div className="flex-1">
                   <span className="font-medium">Professional provider</span>
@@ -1733,7 +1733,7 @@ function SupervisedSection({
               </label>
 
               {formData.supervisor_type === 'professional' && (
-                <div className="ml-6 p-4 bg-[#E0EFF8] rounded-lg border border-[#E0EFF8]">
+                <div className="ml-6 p-4 bg-cg-slate-subtle rounded-lg border border-cg-slate-subtle">
                   <Label className="font-medium text-[#1E4E6B] mb-3 block">Fee Split (must total 100%):</Label>
                   <div className="grid grid-cols-3 gap-4">
                     <div>
@@ -1798,7 +1798,7 @@ function SupervisedSection({
                   value="nonprofessional"
                   checked={formData.supervisor_type === 'nonprofessional'}
                   onChange={(e) => updateField('supervisor_type', e.target.value as any)}
-                  className="h-4 w-4 mt-1 text-[#2D6A8F]"
+                  className="h-4 w-4 mt-1 text-cg-slate"
                 />
                 <div>
                   <span className="font-medium">Nonprofessional provider</span>
@@ -1825,7 +1825,7 @@ function SupervisedSection({
                 value={option.value}
                 checked={formData.supervised_location === option.value}
                 onChange={(e) => updateField('supervised_location', e.target.value as any)}
-                className="h-4 w-4 text-[#2D6A8F]"
+                className="h-4 w-4 text-cg-slate"
               />
               <span>{option.label}</span>
             </label>
@@ -1857,7 +1857,7 @@ function SupervisedSection({
                 value={option.value}
                 checked={formData.supervised_frequency === option.value}
                 onChange={(e) => updateField('supervised_frequency', e.target.value as any)}
-                className="h-4 w-4 text-[#2D6A8F]"
+                className="h-4 w-4 text-cg-slate"
               />
               <span>{option.label}</span>
             </label>
@@ -1952,7 +1952,7 @@ function TransportationSection({
           type="checkbox"
           checked={formData.curbside_exchange}
           onChange={(e) => updateField('curbside_exchange', e.target.checked)}
-          className="h-4 w-4 mt-1 text-[#2D6A8F]"
+          className="h-4 w-4 mt-1 text-cg-slate"
         />
         <span>
           <strong>7f.</strong> During exchanges, the party driving the children will wait in the car
@@ -2002,7 +2002,7 @@ function TravelSection({
               type="checkbox"
               checked={formData.travel_restrictions_enabled}
               onChange={(e) => updateField('travel_restrictions_enabled', e.target.checked)}
-              className="h-4 w-4 text-[#2D6A8F]"
+              className="h-4 w-4 text-cg-slate"
             />
             <span className="font-medium">
               I request travel restrictions on the petitioner/respondent/other parent
@@ -2021,7 +2021,7 @@ function TravelSection({
                   type="checkbox"
                   checked={formData.restrict_out_of_state}
                   onChange={(e) => updateField('restrict_out_of_state', e.target.checked)}
-                  className="h-4 w-4 text-[#2D6A8F]"
+                  className="h-4 w-4 text-cg-slate"
                 />
                 <span>8a. The state of California</span>
               </label>
@@ -2031,7 +2031,7 @@ function TravelSection({
                   type="checkbox"
                   checked={formData.restrict_counties}
                   onChange={(e) => updateField('restrict_counties', e.target.checked)}
-                  className="h-4 w-4 text-[#2D6A8F]"
+                  className="h-4 w-4 text-cg-slate"
                 />
                 <span>8b. The following counties:</span>
               </label>
@@ -2068,7 +2068,7 @@ function TravelSection({
               type="checkbox"
               checked={formData.abduction_prevention_enabled}
               onChange={(e) => updateField('abduction_prevention_enabled', e.target.checked)}
-              className="h-4 w-4 mt-1 text-[#2D6A8F]"
+              className="h-4 w-4 mt-1 text-cg-slate"
             />
             <div>
               <span className="font-medium">
@@ -2114,7 +2114,7 @@ function MediationSection({
               type="checkbox"
               checked={formData.mediation_requested}
               onChange={(e) => updateField('mediation_requested', e.target.checked)}
-              className="h-4 w-4 text-[#2D6A8F]"
+              className="h-4 w-4 text-cg-slate"
             />
             <span className="font-medium">
               I request an order for the parties to go to child custody mediation
@@ -2150,7 +2150,7 @@ function MediationSection({
             </div>
           )}
 
-          <Alert className="bg-[#FEF7ED] border-[#FEF7ED]">
+          <Alert className="bg-cg-amber-subtle border-cg-amber-subtle">
             <AlertTriangle className="h-4 w-4 text-[#E09520]" />
             <AlertDescription className="text-[#E09520] text-sm">
               <strong>Note:</strong> A party who alleges domestic violence in a written declaration
@@ -2191,7 +2191,7 @@ function AdditionalSection({
               type="checkbox"
               checked={formData.holiday_schedule_enabled}
               onChange={(e) => updateField('holiday_schedule_enabled', e.target.checked)}
-              className="h-4 w-4 text-[#2D6A8F]"
+              className="h-4 w-4 text-cg-slate"
             />
             <span className="font-medium">I request a holiday and vacation schedule</span>
           </label>
@@ -2207,7 +2207,7 @@ function AdditionalSection({
                     updateField('holiday_schedule_in_form', true);
                     updateField('holiday_schedule_on_fl341c', false);
                   }}
-                  className="h-4 w-4 text-[#2D6A8F]"
+                  className="h-4 w-4 text-cg-slate"
                 />
                 <span>Described below in this form</span>
               </label>
@@ -2220,7 +2220,7 @@ function AdditionalSection({
                     updateField('holiday_schedule_in_form', false);
                     updateField('holiday_schedule_on_fl341c', true);
                   }}
-                  className="h-4 w-4 text-[#2D6A8F]"
+                  className="h-4 w-4 text-cg-slate"
                 />
                 <span>On attached form FL-341(C) (Children's Holiday Schedule Attachment)</span>
               </label>
@@ -2252,7 +2252,7 @@ function AdditionalSection({
               type="checkbox"
               checked={formData.additional_provisions_enabled}
               onChange={(e) => updateField('additional_provisions_enabled', e.target.checked)}
-              className="h-4 w-4 text-[#2D6A8F]"
+              className="h-4 w-4 text-cg-slate"
             />
             <span className="font-medium">I request additional orders for custody</span>
           </label>

@@ -130,10 +130,10 @@ function formatParty(party: string | undefined): string {
 // Get response type badge
 function getResponseBadge(consented: boolean, doNotConsent: boolean): { label: string; color: string } {
   if (consented) {
-    return { label: 'Consented', color: 'bg-[#E8F4F0] text-[#2D8A70]' };
+    return { label: 'Consented', color: 'bg-cg-sage-subtle text-cg-sage-dark' };
   }
   if (doNotConsent) {
-    return { label: 'Counter-Proposed', color: 'bg-[#FEF7ED] text-[#E09520]' };
+    return { label: 'Counter-Proposed', color: 'bg-cg-amber-subtle text-[#E09520]' };
   }
   return { label: 'Pending', color: 'bg-gray-100 text-gray-500' };
 }
@@ -591,10 +591,10 @@ export default function FL320Summary({ formData, fl300Data, canEdit, onEditSecti
   return (
     <div className="space-y-6">
       {/* Progress Card */}
-      <Card className="border-[#E0EFF8] bg-gradient-to-br from-[#E0EFF8] to-white">
+      <Card className="border-cg-slate-subtle bg-gradient-to-br from-cg-slate-subtle to-white">
         <CardHeader>
           <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-[#2D6A8F]" />
+            <Sparkles className="h-5 w-5 text-cg-slate" />
             <CardTitle className="text-lg">FL-320 Summary</CardTitle>
           </div>
           <CardDescription>Responsive Declaration to Request for Order</CardDescription>
@@ -610,7 +610,7 @@ export default function FL320Summary({ formData, fl300Data, canEdit, onEditSecti
             </div>
             <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
               <div
-                className="h-full bg-[#2D6A8F] rounded-full transition-all duration-500"
+                className="h-full bg-cg-slate rounded-full transition-all duration-500"
                 style={{ width: `${completionPercentage}%` }}
               />
             </div>
@@ -622,11 +622,11 @@ export default function FL320Summary({ formData, fl300Data, canEdit, onEditSecti
               <div className="text-sm font-medium text-gray-700 mb-2">Response Summary</div>
               <div className="flex gap-4 text-sm">
                 <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-full bg-[#3DAA8A]" />
+                  <div className="h-3 w-3 rounded-full bg-cg-sage" />
                   <span>Consented: {consentStats.consented}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-full bg-[#F5A623]" />
+                  <div className="h-3 w-3 rounded-full bg-cg-amber" />
                   <span>Counter-Proposed: {consentStats.counterProposed}</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -712,7 +712,7 @@ export default function FL320Summary({ formData, fl300Data, canEdit, onEditSecti
                     !isApplicable
                       ? 'bg-gray-50/30 border-gray-100 opacity-60'
                       : isComplete
-                      ? 'bg-[#E8F4F0]/50 border-[#E8F4F0]'
+                      ? 'bg-cg-sage-subtle/50 border-cg-sage-subtle'
                       : 'bg-gray-50/50 border-gray-200'
                   }`}
                 >
@@ -724,7 +724,7 @@ export default function FL320Summary({ formData, fl300Data, canEdit, onEditSecti
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         {isComplete ? (
-                          <CheckCircle className="h-4 w-4 text-[#2D8A70] flex-shrink-0" />
+                          <CheckCircle className="h-4 w-4 text-cg-sage-dark flex-shrink-0" />
                         ) : (
                           <div className="h-4 w-4 rounded-full border-2 border-gray-300 flex-shrink-0" />
                         )}
@@ -761,7 +761,7 @@ export default function FL320Summary({ formData, fl300Data, canEdit, onEditSecti
                         </Badge>
                       )}
                       {isComplete && isApplicable && !['custody', 'child_support', 'spousal_support', 'property', 'attorney_fees', 'other_orders', 'time_service'].includes(section.id) && (
-                        <Badge variant="default" className="bg-[#E8F4F0] text-[#2D8A70]">
+                        <Badge variant="default" className="bg-cg-sage-subtle text-cg-sage-dark">
                           Complete
                         </Badge>
                       )}
@@ -778,7 +778,7 @@ export default function FL320Summary({ formData, fl300Data, canEdit, onEditSecti
                             e.stopPropagation();
                             toggleSection(section.id);
                           }}
-                          className="text-[#2D6A8F] hover:text-[#1E4E6B]"
+                          className="text-cg-slate hover:text-[#1E4E6B]"
                         >
                           <Eye className="h-3.5 w-3.5 mr-1" />
                           {isExpanded ? 'Hide' : 'View'}

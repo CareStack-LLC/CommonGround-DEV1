@@ -222,19 +222,19 @@ export default function IntakePage() {
                 <TabsList className="grid w-full grid-cols-2 max-w-md bg-slate-100/80 rounded-xl p-1">
                     <TabsTrigger
                         value="invitations"
-                        className="relative text-sm font-semibold data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-[#1E3A4A] rounded-lg"
+                        className="relative text-sm font-semibold data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-foreground rounded-lg"
                     >
                         <Scale className="h-4 w-4 mr-2" />
                         Invitations
                         {pendingInvitations.length > 0 && (
-                            <Badge className="ml-2 bg-[#3DAA8A] text-white px-1.5 py-0 text-[10px] min-w-[20px]">
+                            <Badge className="ml-2 bg-cg-sage text-white px-1.5 py-0 text-[10px] min-w-[20px]">
                                 {pendingInvitations.length}
                             </Badge>
                         )}
                     </TabsTrigger>
                     <TabsTrigger
                         value="aria"
-                        className="text-sm font-semibold data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-[#1E3A4A] rounded-lg"
+                        className="text-sm font-semibold data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:text-foreground rounded-lg"
                     >
                         <FileText className="h-4 w-4 mr-2" />
                         ARIA Sessions
@@ -254,7 +254,7 @@ export default function IntakePage() {
                             size="sm"
                             onClick={fetchInvitations}
                             disabled={invitationsLoading}
-                            className="border-slate-200 hover:bg-[#F4F8F7] rounded-xl h-9"
+                            className="border-slate-200 hover:bg-background rounded-xl h-9"
                         >
                             <RefreshCw className={`h-4 w-4 ${invitationsLoading ? "animate-spin" : ""}`} />
                         </Button>
@@ -262,13 +262,13 @@ export default function IntakePage() {
 
                     {invitationsLoading ? (
                         <div className="flex items-center justify-center min-h-[40vh]">
-                            <Loader2 className="h-8 w-8 animate-spin text-[#3DAA8A]" />
+                            <Loader2 className="h-8 w-8 animate-spin text-cg-sage" />
                         </div>
                     ) : pendingInvitations.length === 0 ? (
                         <Card className="border border-dashed border-slate-200 bg-white rounded-2xl">
                             <CardContent className="py-20 flex flex-col items-center justify-center text-center">
-                                <div className="p-4 bg-[#F4F8F7] rounded-2xl mb-5">
-                                    <Bell className="h-10 w-10 text-[#3DAA8A]" />
+                                <div className="p-4 bg-background rounded-2xl mb-5">
+                                    <Bell className="h-10 w-10 text-cg-sage" />
                                 </div>
                                 <p className="text-lg font-semibold text-slate-900 mb-1.5">No Pending Invitations</p>
                                 <p className="text-sm text-slate-500 max-w-sm">
@@ -308,13 +308,13 @@ export default function IntakePage() {
                                     fetchLinks();
                                     fetchStats();
                                 }}
-                                className="border-slate-200 hover:bg-[#F4F8F7] rounded-xl h-9"
+                                className="border-slate-200 hover:bg-background rounded-xl h-9"
                             >
                                 <RefreshCw className="h-4 w-4" />
                             </Button>
                             <Button
                                 onClick={() => router.push("/professional/intake/new")}
-                                className="bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm font-semibold"
+                                className="bg-cg-sage hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm font-semibold"
                             >
                                 <Plus className="h-4 w-4 mr-2" />
                                 New ARIA Intake
@@ -331,7 +331,7 @@ export default function IntakePage() {
                             <p className="text-2xl font-bold text-slate-900 mt-1">{stats.total}</p>
                         </CardContent>
                     </Card>
-                    <Card className="border border-[#FBE3BF] bg-[#FEF7ED]/50 shadow-sm rounded-2xl">
+                    <Card className="border border-[#FBE3BF] bg-cg-amber-subtle/50 shadow-sm rounded-2xl">
                         <CardContent className="pt-4">
                             <p className="text-xs font-semibold text-[#E09520]/70 uppercase tracking-wide">Pending</p>
                             <p className="text-2xl font-bold text-[#B8791A] mt-1">{stats.pending}</p>
@@ -343,19 +343,19 @@ export default function IntakePage() {
                             <p className="text-2xl font-bold text-blue-700 mt-1">{stats.active}</p>
                         </CardContent>
                     </Card>
-                    <Card className="border border-[#C5E5DB] bg-[#E8F4F0]/50 shadow-sm rounded-2xl">
+                    <Card className="border border-[#C5E5DB] bg-cg-sage-subtle/50 shadow-sm rounded-2xl">
                         <CardContent className="pt-4">
-                            <p className="text-xs font-semibold text-[#2D8A70]/70 uppercase tracking-wide">Completed</p>
-                            <p className="text-2xl font-bold text-[#2D8A70] mt-1">{stats.completed}</p>
+                            <p className="text-xs font-semibold text-cg-sage-dark/70 uppercase tracking-wide">Completed</p>
+                            <p className="text-2xl font-bold text-cg-sage-dark mt-1">{stats.completed}</p>
                         </CardContent>
                     </Card>
-                    <Card className="border border-[#3DAA8A]/20 bg-[#F4F8F7]/50 shadow-sm rounded-2xl">
+                    <Card className="border border-cg-sage/20 bg-background/50 shadow-sm rounded-2xl">
                         <CardContent className="pt-4">
                             <div className="flex items-center justify-between mb-1">
                                 <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">Completion</p>
-                                <TrendingUp className="h-3.5 w-3.5 text-[#3DAA8A]" />
+                                <TrendingUp className="h-3.5 w-3.5 text-cg-sage" />
                             </div>
-                            <p className="text-2xl font-bold text-[#1E3A4A] mt-1">{completionRate}%</p>
+                            <p className="text-2xl font-bold text-foreground mt-1">{completionRate}%</p>
                             <Progress value={completionRate} className="h-1.5 mt-1 bg-slate-200" />
                         </CardContent>
                     </Card>
@@ -373,8 +373,8 @@ export default function IntakePage() {
                         onClick={() => setStatusFilter(s)}
                         className={
                             statusFilter === s
-                                ? "bg-[#1E3A4A] text-white rounded-lg shadow-sm text-xs"
-                                : "border-slate-200 text-slate-600 hover:bg-[#F4F8F7] rounded-lg text-xs"
+                                ? "bg-foreground text-white rounded-lg shadow-sm text-xs"
+                                : "border-slate-200 text-slate-600 hover:bg-background rounded-lg text-xs"
                         }
                     >
                         {s === "all" ? "All" : s.charAt(0).toUpperCase() + s.slice(1)}

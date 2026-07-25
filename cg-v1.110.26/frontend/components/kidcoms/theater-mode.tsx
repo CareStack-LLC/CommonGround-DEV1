@@ -444,7 +444,7 @@ export function TheaterMode({
   const remoteParticipants = participantList.filter((p) => !p.isLocal);
 
   return (
-    <div className="fixed inset-0 z-40 bg-gradient-to-b from-[#0D1B24] via-[#1E3A4A]/95 to-[#0D1B24] flex flex-col">
+    <div className="fixed inset-0 z-40 bg-gradient-to-b from-[#0D1B24] via-foreground/95 to-[#0D1B24] flex flex-col">
       {presenterDisconnected && (
         <div
           className="bg-amber-500/95 text-[#0D1B24] text-sm font-medium px-4 py-2 text-center"
@@ -455,10 +455,10 @@ export function TheaterMode({
         </div>
       )}
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2.5 bg-[#0D1B24]/90 backdrop-blur-sm border-b border-[#3DAA8A]/10">
+      <div className="flex items-center justify-between px-4 py-2.5 bg-[#0D1B24]/90 backdrop-blur-sm border-b border-cg-sage/10">
         <div className="flex items-center space-x-3">
           <span
-            className="text-[#3DAA8A] text-sm font-semibold px-3 py-1 bg-[#3DAA8A]/10 rounded-lg border border-[#3DAA8A]/20"
+            className="text-cg-sage text-sm font-semibold px-3 py-1 bg-cg-sage/10 rounded-lg border border-cg-sage/20"
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
           >
             Theater Mode
@@ -472,7 +472,7 @@ export function TheaterMode({
         <div className="flex items-center space-x-2">
           <button
             onClick={() => setShowLibrary(true)}
-            className="flex items-center space-x-2 px-3 py-1.5 bg-[#3DAA8A] hover:bg-[#3DAA8A]/90 text-white rounded-lg transition-colors text-sm font-medium"
+            className="flex items-center space-x-2 px-3 py-1.5 bg-cg-sage hover:bg-cg-sage/90 text-white rounded-lg transition-colors text-sm font-medium"
             style={{ fontFamily: "'Inter', sans-serif" }}
           >
             <Library className="h-4 w-4" />
@@ -496,7 +496,7 @@ export function TheaterMode({
           {remoteParticipants.slice(0, 1).map((participant) => (
             <div
               key={participant.odId}
-              className="w-24 h-32 rounded-xl overflow-hidden shadow-2xl border-2 border-[#3DAA8A]/50 bg-[#1E3A4A]"
+              className="w-24 h-32 rounded-xl overflow-hidden shadow-2xl border-2 border-cg-sage/50 bg-foreground"
             >
               <PiPVideoTile participant={participant} />
             </div>
@@ -508,14 +508,14 @@ export function TheaterMode({
           {remoteParticipants.slice(0, 1).map((participant) => (
             <div
               key={participant.odId}
-              className="w-40 h-28 rounded-xl overflow-hidden shadow-2xl border-2 border-[#3DAA8A]/50 bg-[#1E3A4A]"
+              className="w-40 h-28 rounded-xl overflow-hidden shadow-2xl border-2 border-cg-sage/50 bg-foreground"
             >
               <PiPVideoTile participant={participant} />
             </div>
           ))}
 
           {localParticipant && (
-            <div className="w-40 h-28 rounded-xl overflow-hidden shadow-2xl border-2 border-[#2D6A8F]/50 bg-[#1E3A4A]">
+            <div className="w-40 h-28 rounded-xl overflow-hidden shadow-2xl border-2 border-cg-slate/50 bg-foreground">
               <PiPVideoTile participant={localParticipant} />
             </div>
           )}
@@ -527,8 +527,8 @@ export function TheaterMode({
             <div className="flex-1 flex flex-col items-center justify-center">
               <div className="text-center px-4">
                 <div className="relative mb-6">
-                  <div className="absolute inset-0 bg-[#3DAA8A] rounded-full blur-2xl opacity-10" />
-                  <Library className="relative h-16 w-16 md:h-20 md:w-20 text-[#3DAA8A] mx-auto" />
+                  <div className="absolute inset-0 bg-cg-sage rounded-full blur-2xl opacity-10" />
+                  <Library className="relative h-16 w-16 md:h-20 md:w-20 text-cg-sage mx-auto" />
                 </div>
                 <h2
                   className="text-lg md:text-xl text-white mb-2 font-bold"
@@ -541,7 +541,7 @@ export function TheaterMode({
                 </p>
                 <button
                   onClick={() => setShowLibrary(true)}
-                  className="px-6 py-3 bg-[#3DAA8A] hover:bg-[#3DAA8A]/90 text-white rounded-xl font-semibold transition-all shadow-lg shadow-[#3DAA8A]/20 hover:shadow-[#3DAA8A]/30"
+                  className="px-6 py-3 bg-cg-sage hover:bg-cg-sage/90 text-white rounded-xl font-semibold transition-all shadow-lg shadow-cg-sage/20 hover:shadow-cg-sage/30"
                   style={{ fontFamily: "'Inter', sans-serif" }}
                 >
                   Open Library
@@ -589,13 +589,13 @@ export function TheaterMode({
       </div>
 
       {/* Bottom Controls */}
-      <div className="px-4 py-3 bg-[#0D1B24] safe-area-bottom border-t border-[#3DAA8A]/10 shadow-lg">
+      <div className="px-4 py-3 bg-[#0D1B24] safe-area-bottom border-t border-cg-sage/10 shadow-lg">
         <div className="flex items-center justify-center space-x-3">
           <button aria-label="Toggle microphone"
             onClick={onToggleAudio}
             className={`p-3 rounded-full transition-all duration-200 ${
               isAudioOn
-                ? 'bg-[#1E3A4A] hover:bg-[#1E3A4A]/80 text-white hover:scale-105'
+                ? 'bg-foreground hover:bg-foreground/80 text-white hover:scale-105'
                 : 'bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/25'
             }`}
           >
@@ -605,7 +605,7 @@ export function TheaterMode({
             onClick={onToggleVideo}
             className={`p-3 rounded-full transition-all duration-200 ${
               isVideoOn
-                ? 'bg-[#1E3A4A] hover:bg-[#1E3A4A]/80 text-white hover:scale-105'
+                ? 'bg-foreground hover:bg-foreground/80 text-white hover:scale-105'
                 : 'bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/25'
             }`}
           >
@@ -670,7 +670,7 @@ function PiPVideoTile({ participant }: { participant: VideoParticipant }) {
           className="w-full h-full object-cover"
         />
       ) : (
-        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#3DAA8A] to-[#2D6A8F]">
+        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-cg-sage to-cg-slate">
           <div
             className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white text-lg font-bold shadow-lg"
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
@@ -686,7 +686,7 @@ function PiPVideoTile({ participant }: { participant: VideoParticipant }) {
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#0D1B24]/90 to-transparent px-2 py-1">
         <span className="text-white text-xs truncate block drop-shadow-lg" style={{ fontFamily: "'Inter', sans-serif" }}>
           {participant.odName}
-          {participant.isLocal && <span className="text-[#F5A623]"> (You)</span>}
+          {participant.isLocal && <span className="text-cg-amber"> (You)</span>}
         </span>
       </div>
 

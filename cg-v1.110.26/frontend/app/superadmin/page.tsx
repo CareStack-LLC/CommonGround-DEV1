@@ -29,8 +29,8 @@ const TABS = [
   { key: 'support', label: 'Support' },
 ];
 
-const CHART_COLORS = ['#3DAA8A', '#4BA8C8', '#2D6A8F', '#F5A623', '#E8834A', '#C53030'];
-const RECHARTS_TOOLTIP = { backgroundColor: '#1E3A4A', border: '1px solid #2D6A8F', borderRadius: 8, color: '#D0E4EC', fontSize: 12 };
+const CHART_COLORS = ['var(--cg-sage)', 'var(--cg-slate-light)', 'var(--cg-slate)', 'var(--cg-amber)', '#E8834A', 'var(--cg-error)'];
+const RECHARTS_TOOLTIP = { backgroundColor: 'var(--foreground)', border: '1px solid var(--cg-slate)', borderRadius: 8, color: '#D0E4EC', fontSize: 12 };
 
 function DashboardInner() {
   const router = useRouter();
@@ -274,12 +274,12 @@ function DashboardInner() {
           activeTab === 'glance' ? (
             <div className="flex items-center gap-1.5">
               {/* Density toggle — glance tab only */}
-              <div className="hidden md:flex items-center gap-0.5 p-0.5 rounded-lg bg-[#0F2533]/60 border border-[#2D6A8F]/20">
+              <div className="hidden md:flex items-center gap-0.5 p-0.5 rounded-lg bg-[#0F2533]/60 border border-cg-slate/20">
                 <button
                   onClick={() => setDensity('comfortable')}
                   className={`px-2 py-0.5 text-[11px] font-medium rounded transition-colors ${
                     density === 'comfortable'
-                      ? 'bg-[#2D6A8F]/40 text-white'
+                      ? 'bg-cg-slate/40 text-white'
                       : 'text-[#8AACBC] hover:text-white'
                   }`}
                   title="Comfortable spacing"
@@ -290,7 +290,7 @@ function DashboardInner() {
                   onClick={() => setDensity('compact')}
                   className={`px-2 py-0.5 text-[11px] font-medium rounded transition-colors ${
                     density === 'compact'
-                      ? 'bg-[#2D6A8F]/40 text-white'
+                      ? 'bg-cg-slate/40 text-white'
                       : 'text-[#8AACBC] hover:text-white'
                   }`}
                   title="Dense, information-packed layout"
@@ -300,7 +300,7 @@ function DashboardInner() {
               </div>
               <button
                 onClick={() => setCustomizeOpen(true)}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#0F2533]/60 border border-[#2D6A8F]/20 hover:border-[#2D6A8F]/50 text-xs text-[#8AACBC] hover:text-white transition-colors"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-[#0F2533]/60 border border-cg-slate/20 hover:border-cg-slate/50 text-xs text-[#8AACBC] hover:text-white transition-colors"
                 title="Customize dashboard"
               >
                 <Settings2 className="w-3.5 h-3.5" />
@@ -334,10 +334,10 @@ function DashboardInner() {
         <div className="space-y-6">
           {/* Executive Pulse — top of dashboard */}
           {isWidgetVisible('executive_pulse') && aiSummary?.summary && aiSummary.generated && (
-            <div className="bg-gradient-to-br from-[#3DAA8A]/10 via-[#2D6A8F]/5 to-transparent border border-[#3DAA8A]/20 rounded-2xl p-6">
+            <div className="bg-gradient-to-br from-cg-sage/10 via-cg-slate/5 to-transparent border border-cg-sage/20 rounded-2xl p-6">
               <div className="flex items-center gap-2.5 mb-4">
-                <div className="w-7 h-7 rounded-lg bg-[#3DAA8A]/15 flex items-center justify-center">
-                  <Brain className="w-4 h-4 text-[#3DAA8A]" />
+                <div className="w-7 h-7 rounded-lg bg-cg-sage/15 flex items-center justify-center">
+                  <Brain className="w-4 h-4 text-cg-sage" />
                 </div>
                 <div>
                   <h2 className="text-sm font-bold text-[#D0E4EC] tracking-tight">Executive Pulse</h2>
@@ -351,27 +351,27 @@ function DashboardInner() {
               {/* Key metric chips */}
               {aiSummary.metrics && (
                 <div className="flex flex-wrap gap-2 mb-4">
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#3DAA8A]/10 border border-[#3DAA8A]/15 text-xs font-medium text-[#5BC4A0]">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-cg-sage/10 border border-cg-sage/15 text-xs font-medium text-cg-sage-light">
                     <Users className="w-3 h-3" /> {formatNumber(aiSummary.metrics.total_users)} users
                   </span>
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#2D6A8F]/15 border border-[#2D6A8F]/20 text-xs font-medium text-[#4BA8C8]">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-cg-slate/15 border border-cg-slate/20 text-xs font-medium text-cg-slate-light">
                     <DollarSign className="w-3 h-3" /> {formatCurrency(aiSummary.metrics.mrr)} MRR
                   </span>
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#3DAA8A]/10 border border-[#3DAA8A]/15 text-xs font-medium text-[#5BC4A0]">
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-cg-sage/10 border border-cg-sage/15 text-xs font-medium text-cg-sage-light">
                     <Activity className="w-3 h-3" /> {aiSummary.metrics.dau_mau_ratio ?? (aiSummary.metrics.mau > 0 ? Math.round(aiSummary.metrics.dau / aiSummary.metrics.mau * 100) : 0)}% DAU/MAU
                   </span>
                   {aiSummary.metrics.paying_users > 0 && (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#F5A623]/10 border border-[#F5A623]/15 text-xs font-medium text-[#F5A623]">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-cg-amber/10 border border-cg-amber/15 text-xs font-medium text-cg-amber">
                       <CreditCard className="w-3 h-3" /> {aiSummary.metrics.paying_users} paying
                     </span>
                   )}
                   {aiSummary.metrics.messages_7d > 0 && (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#2D6A8F]/15 border border-[#2D6A8F]/20 text-xs font-medium text-[#4BA8C8]">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-cg-slate/15 border border-cg-slate/20 text-xs font-medium text-cg-slate-light">
                       <MessageSquare className="w-3 h-3" /> {formatNumber(aiSummary.metrics.messages_7d)} msgs (7d)
                     </span>
                   )}
                   {aiSummary.metrics.active_family_files > 0 && (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#3DAA8A]/10 border border-[#3DAA8A]/15 text-xs font-medium text-[#5BC4A0]">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-cg-sage/10 border border-cg-sage/15 text-xs font-medium text-cg-sage-light">
                       <FileText className="w-3 h-3" /> {aiSummary.metrics.active_family_files} family files
                     </span>
                   )}
@@ -382,7 +382,7 @@ function DashboardInner() {
               <ul className={`grid gap-x-6 gap-y-2 ${aiSummary.summary.length > 4 ? 'lg:grid-cols-2' : 'grid-cols-1'}`}>
                 {aiSummary.summary.map((bullet: string, i: number) => (
                   <li key={i} className="flex gap-2 text-[13px] text-[#8AACBC] leading-relaxed">
-                    <span className="text-[#3DAA8A] mt-0.5 flex-shrink-0">•</span>
+                    <span className="text-cg-sage mt-0.5 flex-shrink-0">•</span>
                     <span>{bullet}</span>
                   </li>
                 ))}
@@ -454,13 +454,13 @@ function DashboardInner() {
           {isWidgetVisible('charts_row') && (
           <div className="grid lg:grid-cols-3 gap-4">
             {/* User Growth Chart */}
-            <div className="lg:col-span-2 bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+            <div className="lg:col-span-2 bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-sm font-semibold text-[#D0E4EC]">
                   User Growth (14 days)
                   <InfoTooltip text="Daily new user registrations. Weekend days are shown lighter." />
                 </h2>
-                <button onClick={() => router.push('/superadmin/growth')} className="text-xs text-[#3DAA8A] hover:text-[#5BC4A0] flex items-center gap-1">
+                <button onClick={() => router.push('/superadmin/growth')} className="text-xs text-cg-sage hover:text-cg-sage-light flex items-center gap-1">
                   View details <ExternalLink className="w-3 h-3" />
                 </button>
               </div>
@@ -474,10 +474,10 @@ function DashboardInner() {
                       return (
                         <div key={i} className="flex-1 group relative">
                           <div
-                            className={`w-full rounded-t transition-all ${isWeekend ? 'bg-[#3DAA8A]/25' : 'bg-[#3DAA8A]/60 group-hover:bg-[#5BC4A0]/80'}`}
+                            className={`w-full rounded-t transition-all ${isWeekend ? 'bg-cg-sage/25' : 'bg-cg-sage/60 group-hover:bg-cg-sage-light/80'}`}
                             style={{ height: `${height}%` }}
                           />
-                          <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[#1E3A4A] text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10 shadow-lg">
+                          <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-foreground text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10 shadow-lg">
                             {d.count} users • {new Date(d.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                           </div>
                         </div>
@@ -495,13 +495,13 @@ function DashboardInner() {
             </div>
 
             {/* Revenue Split */}
-            <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-sm font-semibold text-[#D0E4EC]">
                   Revenue Split
                   <InfoTooltip text="Subscription breakdown by tier as percentage of total users" />
                 </h2>
-                <button onClick={() => router.push('/superadmin/billing')} className="text-xs text-[#3DAA8A] hover:text-[#5BC4A0] flex items-center gap-1">
+                <button onClick={() => router.push('/superadmin/billing')} className="text-xs text-cg-sage hover:text-cg-sage-light flex items-center gap-1">
                   Details <ExternalLink className="w-3 h-3" />
                 </button>
               </div>
@@ -520,10 +520,10 @@ function DashboardInner() {
                         <div key={tier}>
                           <div className="flex justify-between text-xs mb-1">
                             <span className="text-[#8AACBC] capitalize">{tier.replace('_', ' ')}</span>
-                            <span className="text-[#6B8A9A]">{count as number} ({pct}%)</span>
+                            <span className="text-muted-foreground">{count as number} ({pct}%)</span>
                           </div>
-                          <div className="h-1.5 bg-[#1E3A4A] rounded-full overflow-hidden">
-                            <div className="h-full rounded-full bg-gradient-to-r from-[#3DAA8A] to-[#5BC4A0] transition-all duration-500" style={{ width: `${pct}%` }} />
+                          <div className="h-1.5 bg-foreground rounded-full overflow-hidden">
+                            <div className="h-full rounded-full bg-gradient-to-r from-cg-sage to-cg-sage-light transition-all duration-500" style={{ width: `${pct}%` }} />
                           </div>
                         </div>
                       );
@@ -538,10 +538,10 @@ function DashboardInner() {
           {isWidgetVisible('activity_feeds') && (
           <div className="grid lg:grid-cols-2 gap-4">
             {/* Recent Signups */}
-            <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-sm font-semibold text-[#D0E4EC]">Recent Signups</h2>
-                <button onClick={() => router.push('/superadmin/users')} className="text-xs text-[#3DAA8A] hover:text-[#5BC4A0] flex items-center gap-1">
+                <button onClick={() => router.push('/superadmin/users')} className="text-xs text-cg-sage hover:text-cg-sage-light flex items-center gap-1">
                   All users <ExternalLink className="w-3 h-3" />
                 </button>
               </div>
@@ -550,8 +550,8 @@ function DashboardInner() {
               ) : (
                 <div className="space-y-1">
                   {(dashboard?.recent_signups || []).map((s) => (
-                    <div key={s.id} role="button" tabIndex={0} onClick={() => router.push(`/superadmin/users/${s.id}`)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); router.push(`/superadmin/users/${s.id}`); } }} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#2D6A8F]/15 cursor-pointer transition-colors">
-                      <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#3DAA8A]/40 to-[#2D6A8F]/40 flex items-center justify-center text-xs font-medium text-[#5BC4A0]">
+                    <div key={s.id} role="button" tabIndex={0} onClick={() => router.push(`/superadmin/users/${s.id}`)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); router.push(`/superadmin/users/${s.id}`); } }} className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-cg-slate/15 cursor-pointer transition-colors">
+                      <div className="w-7 h-7 rounded-full bg-gradient-to-br from-cg-sage/40 to-cg-slate/40 flex items-center justify-center text-xs font-medium text-cg-sage-light">
                         {s.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -565,10 +565,10 @@ function DashboardInner() {
             </div>
 
             {/* Admin Activity */}
-            <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-sm font-semibold text-[#D0E4EC]">Admin Activity</h2>
-                <button onClick={() => router.push('/superadmin/users?tab=activity')} className="text-xs text-[#3DAA8A] hover:text-[#5BC4A0] flex items-center gap-1">
+                <button onClick={() => router.push('/superadmin/users?tab=activity')} className="text-xs text-cg-sage hover:text-cg-sage-light flex items-center gap-1">
                   Full log <ExternalLink className="w-3 h-3" />
                 </button>
               </div>
@@ -577,8 +577,8 @@ function DashboardInner() {
               ) : (
                 <div className="space-y-1">
                   {(dashboard?.recent_admin_actions || []).map((a) => (
-                    <div key={a.id} className="flex items-start gap-3 px-3 py-2 rounded-lg hover:bg-[#2D6A8F]/15 transition-colors">
-                      <div className="w-1.5 h-1.5 rounded-full bg-[#3DAA8A]/60 mt-2 flex-shrink-0" />
+                    <div key={a.id} className="flex items-start gap-3 px-3 py-2 rounded-lg hover:bg-cg-slate/15 transition-colors">
+                      <div className="w-1.5 h-1.5 rounded-full bg-cg-sage/60 mt-2 flex-shrink-0" />
                       <div className="flex-1 min-w-0">
                         <div className="text-xs text-[#8AACBC]">
                           <span className="text-[#D0E4EC] font-medium">{a.action.replace('admin:', '').replace(/_/g, ' ')}</span>
@@ -623,21 +623,21 @@ function DashboardInner() {
 
           {/* MRR Trend Chart */}
           {revenueData?.mrr_trend && revenueData.mrr_trend.length > 0 && (
-            <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
               <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">MRR Trend <InfoTooltip text="Monthly recurring revenue over time" /></h2>
               <ResponsiveContainer width="100%" height={200}>
                 <AreaChart data={revenueData.mrr_trend}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#2D6A8F" opacity={0.2} />
-                  <XAxis dataKey="date" stroke="#4A6E7F" tick={{ fill: '#6B8A9A', fontSize: 10 }} tickFormatter={(v) => new Date(v).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} />
-                  <YAxis stroke="#4A6E7F" tick={{ fill: '#6B8A9A', fontSize: 10 }} tickFormatter={(v) => `$${v}`} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--cg-slate)" opacity={0.2} />
+                  <XAxis dataKey="date" stroke="#4A6E7F" tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }} tickFormatter={(v) => new Date(v).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} />
+                  <YAxis stroke="#4A6E7F" tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }} tickFormatter={(v) => `$${v}`} />
                   <Tooltip contentStyle={RECHARTS_TOOLTIP} formatter={(v) => [`$${Number(v ?? 0).toFixed(2)}`, 'MRR']} />
                   <defs>
                     <linearGradient id="mrrGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#3DAA8A" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#3DAA8A" stopOpacity={0} />
+                      <stop offset="5%" stopColor="var(--cg-sage)" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="var(--cg-sage)" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <Area type="monotone" dataKey="mrr" stroke="#3DAA8A" fill="url(#mrrGrad)" strokeWidth={2} />
+                  <Area type="monotone" dataKey="mrr" stroke="var(--cg-sage)" fill="url(#mrrGrad)" strokeWidth={2} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -647,7 +647,7 @@ function DashboardInner() {
           <div className="grid lg:grid-cols-2 gap-4">
             {/* Revenue by Tier */}
             {revenueData?.breakdown && (
-              <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+              <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
                 <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">Revenue by Tier <InfoTooltip text="Monthly revenue contribution by subscription tier" /></h2>
                 <ResponsiveContainer width="100%" height={200}>
                   <PieChart>
@@ -664,7 +664,7 @@ function DashboardInner() {
 
             {/* Unit Economics Summary */}
             {unitEcon && (
-              <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+              <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
                 <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">Unit Economics <InfoTooltip text="Key SaaS metrics for financial health" /></h2>
                 <div className="space-y-3">
                   {[
@@ -719,15 +719,15 @@ function DashboardInner() {
 
           {/* Retention Curve */}
           {retentionCurve?.curve && retentionCurve.curve.length > 0 && (
-            <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
               <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">Retention Curve <InfoTooltip text="Percentage of users retained over days since signup" /></h2>
               <ResponsiveContainer width="100%" height={200}>
                 <LineChart data={retentionCurve.curve.filter((_: any, i: number) => i % 3 === 0 || i <= 7)}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#2D6A8F" opacity={0.2} />
-                  <XAxis dataKey="day" stroke="#4A6E7F" tick={{ fill: '#6B8A9A', fontSize: 10 }} label={{ value: 'Days', position: 'insideBottom', offset: -5, fill: '#6B8A9A', fontSize: 10 }} />
-                  <YAxis stroke="#4A6E7F" tick={{ fill: '#6B8A9A', fontSize: 10 }} domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--cg-slate)" opacity={0.2} />
+                  <XAxis dataKey="day" stroke="#4A6E7F" tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }} label={{ value: 'Days', position: 'insideBottom', offset: -5, fill: 'var(--muted-foreground)', fontSize: 10 }} />
+                  <YAxis stroke="#4A6E7F" tick={{ fill: 'var(--muted-foreground)', fontSize: 10 }} domain={[0, 100]} tickFormatter={(v) => `${v}%`} />
                   <Tooltip contentStyle={RECHARTS_TOOLTIP} formatter={(v) => [`${Number(v ?? 0)}%`, 'Retained']} />
-                  <Line type="monotone" dataKey="pct" stroke="#3DAA8A" strokeWidth={2} dot={{ r: 2, fill: '#3DAA8A' }} />
+                  <Line type="monotone" dataKey="pct" stroke="var(--cg-sage)" strokeWidth={2} dot={{ r: 2, fill: 'var(--cg-sage)' }} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -777,14 +777,14 @@ function DashboardInner() {
 
           {/* Service Health Grid */}
           {systemStatus?.services && (
-            <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
               <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">
                 Service Health
                 <InfoTooltip text="Real-time status of all backend services and integrations" />
               </h2>
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
                 {systemStatus.services.map((s: any) => (
-                  <div key={s.name} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-[#2D6A8F]/10 border border-[#2D6A8F]/15">
+                  <div key={s.name} className="flex items-center gap-2 px-3 py-2 rounded-lg bg-cg-slate/10 border border-cg-slate/15">
                     <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
                       s.status === 'operational' ? 'bg-emerald-400 animate-pulse' :
                       s.status === 'degraded' ? 'bg-amber-400' : 'bg-red-400'
@@ -799,7 +799,7 @@ function DashboardInner() {
 
           {/* API Endpoints Table */}
           {perfData?.transactions && (
-            <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
               <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">
                 Top API Endpoints
                 <InfoTooltip text="Busiest endpoints by request volume with latency and failure metrics" />
@@ -807,7 +807,7 @@ function DashboardInner() {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="text-xs text-[#6B8A9A] border-b border-[#2D6A8F]/20">
+                    <tr className="text-xs text-muted-foreground border-b border-cg-slate/20">
                       <th className="text-left py-2 font-medium">Endpoint</th>
                       <th className="text-right py-2 font-medium">Requests</th>
                       <th className="text-right py-2 font-medium">p75</th>
@@ -817,7 +817,7 @@ function DashboardInner() {
                   </thead>
                   <tbody>
                     {perfData.transactions.slice(0, 10).map((t: any, i: number) => (
-                      <tr key={i} className="border-b border-[#2D6A8F]/10 hover:bg-[#2D6A8F]/10">
+                      <tr key={i} className="border-b border-cg-slate/10 hover:bg-cg-slate/10">
                         <td className="py-2 text-[#D0E4EC] font-mono text-xs truncate max-w-xs">{t.transaction}</td>
                         <td className="py-2 text-right text-[#8AACBC]">{t.count}</td>
                         <td className="py-2 text-right text-[#8AACBC]">{t.p75_ms}ms</td>
@@ -862,31 +862,31 @@ function DashboardInner() {
 
           {/* Chatbot + Inbox Summary */}
           <div className="grid lg:grid-cols-2 gap-4">
-            <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-sm font-semibold text-[#D0E4EC]">Chatbot Overview</h2>
-                <button onClick={() => router.push('/superadmin/chatbot')} className="text-xs text-[#3DAA8A] hover:text-[#5BC4A0] flex items-center gap-1">
+                <button onClick={() => router.push('/superadmin/chatbot')} className="text-xs text-cg-sage hover:text-cg-sage-light flex items-center gap-1">
                   Manage <ExternalLink className="w-3 h-3" />
                 </button>
               </div>
               {chatbotStats ? (
                 <div className="space-y-3">
                   <div className="flex justify-between text-sm">
-                    <span className="text-[#6B8A9A]">Total Sessions</span>
+                    <span className="text-muted-foreground">Total Sessions</span>
                     <span className="text-[#D0E4EC]">{chatbotStats.total_sessions ?? 0}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-[#6B8A9A]">Avg Messages/Session</span>
+                    <span className="text-muted-foreground">Avg Messages/Session</span>
                     <span className="text-[#D0E4EC]">{chatbotStats.avg_messages ?? '—'}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-[#6B8A9A]">Escalation Rate</span>
+                    <span className="text-muted-foreground">Escalation Rate</span>
                     <span className={`${chatbotStats.escalation_rate > 20 ? 'text-amber-400' : 'text-[#D0E4EC]'}`}>
                       {chatbotStats.escalation_rate ?? 0}%
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-[#6B8A9A]">Unique Visitors</span>
+                    <span className="text-muted-foreground">Unique Visitors</span>
                     <span className="text-[#D0E4EC]">{chatbotStats.unique_visitors ?? 0}</span>
                   </div>
                 </div>
@@ -895,31 +895,31 @@ function DashboardInner() {
               )}
             </div>
 
-            <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-sm font-semibold text-[#D0E4EC]">Inbox Summary</h2>
-                <button onClick={() => router.push('/superadmin/inbox')} className="text-xs text-[#3DAA8A] hover:text-[#5BC4A0] flex items-center gap-1">
+                <button onClick={() => router.push('/superadmin/inbox')} className="text-xs text-cg-sage hover:text-cg-sage-light flex items-center gap-1">
                   Open inbox <ExternalLink className="w-3 h-3" />
                 </button>
               </div>
               {inboxStats ? (
                 <div className="space-y-3">
                   <div className="flex justify-between text-sm">
-                    <span className="text-[#6B8A9A]">Total Emails</span>
+                    <span className="text-muted-foreground">Total Emails</span>
                     <span className="text-[#D0E4EC]">{inboxStats.total ?? 0}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-[#6B8A9A]">Urgent</span>
+                    <span className="text-muted-foreground">Urgent</span>
                     <span className={`${inboxStats.urgent_pending > 0 ? 'text-amber-400 font-medium' : 'text-[#D0E4EC]'}`}>
                       {inboxStats.urgent_pending ?? 0}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-[#6B8A9A]">Support</span>
+                    <span className="text-muted-foreground">Support</span>
                     <span className="text-[#D0E4EC]">{inboxStats.by_category?.support ?? 0}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-[#6B8A9A]">Sales</span>
+                    <span className="text-muted-foreground">Sales</span>
                     <span className="text-[#D0E4EC]">{inboxStats.by_category?.sales ?? 0}</span>
                   </div>
                 </div>
@@ -945,7 +945,7 @@ function DashboardInner() {
           onClick={() => setCustomizeOpen(false)}
         >
           <div
-            className="bg-[#0F2533] border border-[#2D6A8F]/30 rounded-xl p-6 w-full max-w-md shadow-2xl"
+            className="bg-[#0F2533] border border-cg-slate/30 rounded-xl p-6 w-full max-w-md shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between mb-4">
@@ -964,11 +964,11 @@ function DashboardInner() {
             {/* Density */}
             <div className="mb-4">
               <label className="block text-xs font-medium text-[#8AACBC] mb-2">Density</label>
-              <div className="flex items-center gap-0.5 p-0.5 rounded bg-[#1A3648]/60 border border-[#2D6A8F]/20">
+              <div className="flex items-center gap-0.5 p-0.5 rounded bg-[#1A3648]/60 border border-cg-slate/20">
                 <button
                   onClick={() => setDensity('comfortable')}
                   className={`flex-1 px-2 py-1 text-xs font-medium rounded transition-colors ${
-                    density === 'comfortable' ? 'bg-[#2D6A8F]/40 text-white' : 'text-[#8AACBC] hover:text-white'
+                    density === 'comfortable' ? 'bg-cg-slate/40 text-white' : 'text-[#8AACBC] hover:text-white'
                   }`}
                 >
                   Comfortable
@@ -976,7 +976,7 @@ function DashboardInner() {
                 <button
                   onClick={() => setDensity('compact')}
                   className={`flex-1 px-2 py-1 text-xs font-medium rounded transition-colors ${
-                    density === 'compact' ? 'bg-[#2D6A8F]/40 text-white' : 'text-[#8AACBC] hover:text-white'
+                    density === 'compact' ? 'bg-cg-slate/40 text-white' : 'text-[#8AACBC] hover:text-white'
                   }`}
                 >
                   Compact
@@ -994,11 +994,11 @@ function DashboardInner() {
                 return (
                   <div
                     key={id}
-                    className="flex items-center justify-between gap-2 px-3 py-2 rounded bg-[#1A3648]/60 border border-[#2D6A8F]/20"
+                    className="flex items-center justify-between gap-2 px-3 py-2 rounded bg-[#1A3648]/60 border border-cg-slate/20"
                   >
                     <button
                       onClick={() => toggleWidgetHidden(id)}
-                      className={`flex items-center gap-2 flex-1 text-left ${visible ? 'text-white' : 'text-[#6B8A9A]'}`}
+                      className={`flex items-center gap-2 flex-1 text-left ${visible ? 'text-white' : 'text-muted-foreground'}`}
                     >
                       {visible ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
                       <span className="text-xs font-medium">{w.label}</span>
@@ -1033,13 +1033,13 @@ function DashboardInner() {
               </button>
               <button
                 onClick={() => setCustomizeOpen(false)}
-                className="px-4 py-2 rounded bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors"
+                className="px-4 py-2 rounded bg-cg-sage hover:bg-cg-sage-light text-white text-sm font-medium transition-colors"
               >
                 Done
               </button>
             </div>
 
-            <p className="text-[10px] text-[#6B8A9A] mt-3">
+            <p className="text-[10px] text-muted-foreground mt-3">
               Note: reordering is best-effort — widgets render in the saved order
               when the page layout supports it. Changes persist to your admin
               profile + this browser.
@@ -1056,13 +1056,13 @@ function QuickLink({ icon: Icon, label, badge, badgeColor, onClick }: {
   icon: React.ElementType; label: string; badge?: number; badgeColor?: string; onClick: () => void;
 }) {
   return (
-    <button onClick={onClick} className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl px-4 py-3 flex items-center gap-3 hover:bg-[#2D6A8F]/15 hover:border-zinc-700/60 transition-all text-left group">
-      <Icon className="w-4 h-4 text-[#6B8A9A] group-hover:text-[#3DAA8A] transition-colors" />
+    <button onClick={onClick} className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl px-4 py-3 flex items-center gap-3 hover:bg-cg-slate/15 hover:border-zinc-700/60 transition-all text-left group">
+      <Icon className="w-4 h-4 text-muted-foreground group-hover:text-cg-sage transition-colors" />
       <span className="text-sm text-[#8AACBC] group-hover:text-white transition-colors">{label}</span>
       {badge !== undefined && badge > 0 && (
         <span className={`text-xs font-medium ml-auto ${badgeColor || 'text-[#8AACBC]'}`}>{badge}</span>
       )}
-      <ArrowUpRight className="w-3.5 h-3.5 text-[#3A5A6A] group-hover:text-[#6B8A9A] ml-auto transition-colors" />
+      <ArrowUpRight className="w-3.5 h-3.5 text-[#3A5A6A] group-hover:text-muted-foreground ml-auto transition-colors" />
     </button>
   );
 }

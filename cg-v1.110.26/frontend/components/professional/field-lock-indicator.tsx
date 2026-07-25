@@ -66,7 +66,7 @@ export function FieldLockIndicator({
             {/* Lock Badge */}
             <div className="group relative inline-flex items-center">
                 <Badge
-                    className="bg-[#FEF7ED] text-[#8F5E14] border border-[#FBE3BF] hover:bg-[#FEF7ED] 
+                    className="bg-cg-amber-subtle text-[#8F5E14] border border-[#FBE3BF] hover:bg-cg-amber-subtle 
                      transition-colors cursor-default text-xs font-medium gap-1.5 py-1 px-2.5
                      shadow-sm"
                 >
@@ -104,7 +104,7 @@ export function FieldLockIndicator({
                 <Button
                     variant="ghost"
                     size="sm"
-                    className="ml-2 h-6 text-xs text-slate-500 hover:text-[#B8791A] hover:bg-[#FEF7ED] px-2"
+                    className="ml-2 h-6 text-xs text-slate-500 hover:text-[#B8791A] hover:bg-cg-amber-subtle px-2"
                     onClick={() => setShowUnlockDialog(true)}
                 >
                     <Unlock className="h-3 w-3 mr-1" />
@@ -117,7 +117,7 @@ export function FieldLockIndicator({
                 <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center">
                     <div className="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md mx-4">
                         <div className="flex items-center gap-3 mb-4">
-                            <div className="p-2 bg-[#FEF7ED] rounded-lg">
+                            <div className="p-2 bg-cg-amber-subtle rounded-lg">
                                 <AlertTriangle className="h-5 w-5 text-[#E09520]" />
                             </div>
                             <div>
@@ -128,7 +128,7 @@ export function FieldLockIndicator({
                             </div>
                         </div>
 
-                        <div className="bg-[#FEF7ED] border border-[#FBE3BF] rounded-lg p-3 mb-4">
+                        <div className="bg-cg-amber-subtle border border-[#FBE3BF] rounded-lg p-3 mb-4">
                             <p className="text-sm text-[#8F5E14]">
                                 <strong>Field:</strong> {fieldPath.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
                             </p>
@@ -139,7 +139,7 @@ export function FieldLockIndicator({
 
                         <div className="mb-4">
                             <label className="text-sm font-medium text-slate-700 block mb-1.5">
-                                Reason for unlocking <span className="text-[#C53030]">*</span>
+                                Reason for unlocking <span className="text-cg-error">*</span>
                             </label>
                             <Input
                                 placeholder="e.g., New court order filed, superseding previous..."
@@ -208,7 +208,7 @@ export function FieldLockSummary({ locks, onUnlock, canUnlock = false }: FieldLo
                 {activeLocks.map((lock) => (
                     <div
                         key={lock.id}
-                        className="flex items-center justify-between px-3 py-2 bg-[#FEF7ED]/60 border border-[#FEF7ED] rounded-lg"
+                        className="flex items-center justify-between px-3 py-2 bg-cg-amber-subtle/60 border border-cg-amber-subtle rounded-lg"
                     >
                         <div className="flex items-center gap-2">
                             <Lock className="h-3.5 w-3.5 text-[#E09520]" />

@@ -277,7 +277,7 @@ function CubbieItemDetailPageContent() {
 
         {/* Success/Error Messages */}
         {success && (
-          <div className="mb-4 p-3 bg-[#E8F4F0] dark:bg-[#1E3A4A]/20 border border-[#E8F4F0] dark:border-[#1E3A4A] rounded-md text-[#2D8A70] dark:text-[#5BC4A0] text-sm flex items-center gap-2">
+          <div className="mb-4 p-3 bg-cg-sage-subtle dark:bg-foreground/20 border border-cg-sage-subtle dark:border-foreground rounded-md text-cg-sage-dark dark:text-cg-sage-light text-sm flex items-center gap-2">
             <CheckCircle className="h-4 w-4" />
             {success}
           </div>
@@ -525,7 +525,7 @@ function CubbieItemDetailPageContent() {
                   <span
                     className={`text-sm px-4 py-2 rounded-full ${
                       item.current_location === 'child_traveling'
-                        ? 'bg-[#FEF7ED] text-[#E09520] dark:bg-[#1E3A4A]/30 dark:text-[#F5A623]'
+                        ? 'bg-cg-amber-subtle text-[#E09520] dark:bg-foreground/30 dark:text-cg-amber'
                         : 'bg-secondary text-muted-foreground'
                     }`}
                   >

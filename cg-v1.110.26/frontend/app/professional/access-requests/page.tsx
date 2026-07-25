@@ -318,17 +318,17 @@ export default function AccessRequestsPage() {
       />
 
       {/* Header */}
-      <div className="relative overflow-hidden rounded-sm bg-gradient-to-br from-[#1E3A4A] via-[#2D6A8F] to-[#3DAA8A] px-8 py-8 shadow-2xl border-2 border-[#1E3A4A]/40 mb-6">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#2D6A8F] via-[#D4AF37] to-[#2D6A8F]" />
+      <div className="relative overflow-hidden rounded-sm bg-gradient-to-br from-foreground via-cg-slate to-cg-sage px-8 py-8 shadow-2xl border-2 border-foreground/40 mb-6">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cg-slate via-[#D4AF37] to-cg-slate" />
         <div className="flex items-start gap-5">
-          <div className="p-4 bg-[#F4F8F7] border-2 border-[#1E3A4A]/20 rounded-sm shadow-xl shrink-0">
-            <UserPlus className="h-8 w-8 text-[#1E3A4A]" strokeWidth={1.5} />
+          <div className="p-4 bg-background border-2 border-foreground/20 rounded-sm shadow-xl shrink-0">
+            <UserPlus className="h-8 w-8 text-foreground" strokeWidth={1.5} />
           </div>
           <div>
             <h1 className="serif text-3xl lg:text-4xl font-bold text-white leading-tight tracking-tight">
               Access Requests
             </h1>
-            <p className="sans text-sm text-[#E8F4F0] mt-2">
+            <p className="sans text-sm text-cg-sage-subtle mt-2">
               Review and respond to case access invitations from parents
             </p>
           </div>
@@ -338,10 +338,10 @@ export default function AccessRequestsPage() {
       {/* Pending Requests */}
       <div className="mb-8">
         <h2 className="serif text-lg font-bold flex items-center gap-2 mb-4 text-slate-900">
-          <Clock className="h-5 w-5 text-[#1E3A4A]" />
+          <Clock className="h-5 w-5 text-foreground" />
           Pending Invitations
           {pendingRequests.length > 0 && (
-            <Badge className="bg-[#F4F8F7] text-[#1E3A4A] border-2 border-[#1E3A4A]/30 sans font-semibold">{pendingRequests.length}</Badge>
+            <Badge className="bg-background text-foreground border-2 border-foreground/30 sans font-semibold">{pendingRequests.length}</Badge>
           )}
         </h2>
 
@@ -369,7 +369,7 @@ export default function AccessRequestsPage() {
               size="sm"
               disabled={isProcessing || selectedIds.size === 0}
               onClick={() => handleBulkAccept(Array.from(selectedIds))}
-              className="bg-[#2D8A70] hover:bg-[#2D8A70]"
+              className="bg-cg-sage-dark hover:bg-cg-sage-dark"
             >
               <Check className="h-4 w-4 mr-2" />
               {isProcessing
@@ -380,8 +380,8 @@ export default function AccessRequestsPage() {
         )}
 
         {pendingRequests.length === 0 ? (
-          <Card className="border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/20 to-white shadow-sm relative">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A4A] via-[#3DAA8A] to-[#1E3A4A]"></div>
+          <Card className="border-2 border-foreground/30 bg-gradient-to-br from-white via-background/20 to-white shadow-sm relative">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-foreground via-cg-sage to-foreground"></div>
             <CardContent className="p-8 text-center">
               <Check className="h-12 w-12 mx-auto text-[#1B5544] mb-4" />
               <h3 className="serif text-lg font-bold mb-2 text-slate-900">All Caught Up</h3>
@@ -393,13 +393,13 @@ export default function AccessRequestsPage() {
             {pendingRequests.map((request) => (
               <Card
                 key={request.id}
-                className={`border-2 border-l-4 bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white shadow-lg relative ${
+                className={`border-2 border-l-4 bg-gradient-to-br from-white via-background/30 to-white shadow-lg relative ${
                   isExpiringSoon(request.expires_at)
-                    ? "border-l-[#F5A623] border-[#1E3A4A]/40"
-                    : "border-l-blue-500 border-[#1E3A4A]/30"
+                    ? "border-l-cg-amber border-foreground/40"
+                    : "border-l-blue-500 border-foreground/30"
                 }`}
               >
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A4A] via-[#3DAA8A] to-[#1E3A4A]"></div>
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-foreground via-cg-sage to-foreground"></div>
                 <CardContent className="p-6">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -412,16 +412,16 @@ export default function AccessRequestsPage() {
                           aria-label={selectedIds.has(request.id) ? "Deselect" : "Select"}
                         >
                           {selectedIds.has(request.id) ? (
-                            <CheckSquare className="h-5 w-5 text-[#1E3A4A]" strokeWidth={2} />
+                            <CheckSquare className="h-5 w-5 text-foreground" strokeWidth={2} />
                           ) : (
-                            <Square className="h-5 w-5 text-slate-300 hover:text-[#1E3A4A]" strokeWidth={2} />
+                            <Square className="h-5 w-5 text-slate-300 hover:text-foreground" strokeWidth={2} />
                           )}
                         </button>
                         <h3 className="serif font-bold text-lg text-slate-900">
                           {request.family_name || "Family Case"}
                         </h3>
                         {isExpiringSoon(request.expires_at) && (
-                          <Badge className="bg-[#FEF7ED] text-[#6B460F] border-2 border-[#6B460F]/30 sans">
+                          <Badge className="bg-cg-amber-subtle text-[#6B460F] border-2 border-[#6B460F]/30 sans">
                             <AlertCircle className="h-3 w-3 mr-1" />
                             Expires soon
                           </Badge>
@@ -434,7 +434,7 @@ export default function AccessRequestsPage() {
                           className={`mb-4 rounded-md border p-3 text-sm ${
                             isBlocked(request.id)
                               ? "border-red-300 bg-red-50 text-red-900"
-                              : "border-[#F8CE8A] bg-[#FEF7ED] text-[#6B460F]"
+                              : "border-[#F8CE8A] bg-cg-amber-subtle text-[#6B460F]"
                           }`}
                         >
                           <div className="flex items-center gap-2 font-semibold mb-1">
@@ -498,21 +498,21 @@ export default function AccessRequestsPage() {
                       <div className="flex items-center gap-4 text-sm">
                         <div className="flex items-center gap-1">
                           {request.parent_a_approved ? (
-                            <Check className="h-4 w-4 text-[#3DAA8A]" />
+                            <Check className="h-4 w-4 text-cg-sage" />
                           ) : (
                             <Clock className="h-4 w-4 text-gray-400" />
                           )}
-                          <span className={request.parent_a_approved ? "text-[#2D8A70]" : "text-gray-500"}>
+                          <span className={request.parent_a_approved ? "text-cg-sage-dark" : "text-gray-500"}>
                             Parent A {request.parent_a_approved ? "approved" : "pending"}
                           </span>
                         </div>
                         <div className="flex items-center gap-1">
                           {request.parent_b_approved ? (
-                            <Check className="h-4 w-4 text-[#3DAA8A]" />
+                            <Check className="h-4 w-4 text-cg-sage" />
                           ) : (
                             <Clock className="h-4 w-4 text-gray-400" />
                           )}
-                          <span className={request.parent_b_approved ? "text-[#2D8A70]" : "text-gray-500"}>
+                          <span className={request.parent_b_approved ? "text-cg-sage-dark" : "text-gray-500"}>
                             Parent B {request.parent_b_approved ? "approved" : "pending"}
                           </span>
                         </div>
@@ -525,7 +525,7 @@ export default function AccessRequestsPage() {
                         onClick={() => handleAccept(request.id)}
                         disabled={isProcessing || isBlocked(request.id)}
                         title={isBlocked(request.id) ? "Blocked by a conflict of interest" : undefined}
-                        className="bg-[#2D8A70] hover:bg-[#2D8A70]"
+                        className="bg-cg-sage-dark hover:bg-cg-sage-dark"
                       >
                         <Check className="h-4 w-4 mr-2" />
                         Accept
@@ -575,7 +575,7 @@ export default function AccessRequestsPage() {
                     <Badge
                       className={
                         request.status === "approved"
-                          ? "bg-[#E8F4F0] text-[#236E59]"
+                          ? "bg-cg-sage-subtle text-[#236E59]"
                           : request.status === "declined"
                           ? "bg-red-100 text-red-800"
                           : "bg-gray-100 text-gray-800"

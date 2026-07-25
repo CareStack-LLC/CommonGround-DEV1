@@ -51,9 +51,9 @@ interface CreatedSession {
 function StepIndicator({ current }: { current: 1 | 2 }) {
   return (
     <div className="flex items-center gap-2">
-      <div className={`flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold ${current >= 1 ? "bg-[#3DAA8A] text-white" : "bg-slate-200 text-slate-500"}`}>1</div>
-      <div className={`w-12 h-0.5 rounded-full ${current >= 2 ? "bg-[#3DAA8A]" : "bg-slate-200"}`} />
-      <div className={`flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold ${current >= 2 ? "bg-[#3DAA8A] text-white" : "bg-slate-200 text-slate-500"}`}>2</div>
+      <div className={`flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold ${current >= 1 ? "bg-cg-sage text-white" : "bg-slate-200 text-slate-500"}`}>1</div>
+      <div className={`w-12 h-0.5 rounded-full ${current >= 2 ? "bg-cg-sage" : "bg-slate-200"}`} />
+      <div className={`flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold ${current >= 2 ? "bg-cg-sage text-white" : "bg-slate-200 text-slate-500"}`}>2</div>
     </div>
   );
 }
@@ -81,23 +81,23 @@ function TemplateCard({
       className={`
         relative w-full text-left rounded-2xl border p-4 transition-all duration-200
         ${isSelected
-          ? "border-[#3DAA8A] bg-[#F4F8F7] shadow-sm ring-1 ring-[#3DAA8A]/20"
+          ? "border-cg-sage bg-background shadow-sm ring-1 ring-cg-sage/20"
           : isLocked
             ? "border-slate-100 bg-slate-50/50 opacity-60 cursor-not-allowed"
-            : "border-slate-200 hover:border-[#3DAA8A]/30 hover:bg-[#F4F8F7]/30 cursor-pointer"
+            : "border-slate-200 hover:border-cg-sage/30 hover:bg-background/30 cursor-pointer"
         }
       `}
     >
       {isLocked && (
         <div className="absolute top-3 right-3">
-          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#B8791A] bg-[#FEF7ED] border border-[#FBE3BF]/60 rounded-full px-2 py-0.5">
+          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#B8791A] bg-cg-amber-subtle border border-[#FBE3BF]/60 rounded-full px-2 py-0.5">
             <Crown className="h-2.5 w-2.5" /> Pro
           </span>
         </div>
       )}
       {isSelected && (
         <div className="absolute top-3 right-3">
-          <CheckCircle2 className="h-5 w-5 text-[#3DAA8A]" />
+          <CheckCircle2 className="h-5 w-5 text-cg-sage" />
         </div>
       )}
 
@@ -138,10 +138,10 @@ function TemplateCard({
 
           {/* Expandable sections */}
           {isSelected && (
-            <div className="mt-3 pt-3 border-t border-[#3DAA8A]/15">
+            <div className="mt-3 pt-3 border-t border-cg-sage/15">
               <button
                 type="button"
-                className="flex items-center gap-1 text-[11px] font-medium text-[#3DAA8A] hover:text-[#2D8A6E]"
+                className="flex items-center gap-1 text-[11px] font-medium text-cg-sage hover:text-[#2D8A6E]"
                 onClick={(e) => { e.stopPropagation(); setExpanded(!expanded); }}
               >
                 {expanded ? <><ChevronUp className="h-3 w-3" /> Hide sections</> : <><ChevronDown className="h-3 w-3" /> View {template.sections.length} sections</>}
@@ -150,9 +150,9 @@ function TemplateCard({
                 <ul className="mt-2 space-y-1">
                   {template.sections.map((s) => (
                     <li key={s.id} className="flex items-center gap-2 text-[11px] text-slate-600">
-                      <span className="w-1 h-1 rounded-full bg-[#3DAA8A] shrink-0" />
+                      <span className="w-1 h-1 rounded-full bg-cg-sage shrink-0" />
                       <span className="flex-1">{s.title}</span>
-                      <span className={`text-[9px] font-medium ${s.required ? "text-[#3DAA8A]" : "text-slate-400"}`}>
+                      <span className={`text-[9px] font-medium ${s.required ? "text-cg-sage" : "text-slate-400"}`}>
                         {s.required ? "Required" : "Optional"}
                       </span>
                     </li>
@@ -255,22 +255,22 @@ export default function NewIntakePage() {
   if (createdSession) {
     return (
       <div className="max-w-lg mx-auto space-y-6">
-        <Link href="/professional/intake" className="inline-flex items-center gap-1.5 text-xs text-[#3DAA8A] hover:text-[#2D8A6E] font-medium">
+        <Link href="/professional/intake" className="inline-flex items-center gap-1.5 text-xs text-cg-sage hover:text-[#2D8A6E] font-medium">
           <ArrowLeft className="h-3.5 w-3.5" /> Back to Intake Center
         </Link>
 
-        <div className="rounded-2xl border border-[#3DAA8A]/20 bg-[#F4F8F7] p-8 text-center">
-          <div className="mx-auto w-14 h-14 bg-white text-[#3DAA8A] rounded-2xl flex items-center justify-center mb-4 shadow-sm border border-[#3DAA8A]/10">
+        <div className="rounded-2xl border border-cg-sage/20 bg-background p-8 text-center">
+          <div className="mx-auto w-14 h-14 bg-white text-cg-sage rounded-2xl flex items-center justify-center mb-4 shadow-sm border border-cg-sage/10">
             <CheckCircle2 className="h-7 w-7" />
           </div>
-          <h2 className="text-lg font-bold text-[#1E3A4A]">Intake Created</h2>
+          <h2 className="text-lg font-bold text-foreground">Intake Created</h2>
           <p className="text-sm text-slate-500 mt-1.5">
             {formData.send_email
               ? `Email sent to ${createdSession.client_email}`
               : "Share the link below with your client"}
           </p>
           {selectedTemplate && (
-            <p className="text-xs text-[#3DAA8A] font-medium mt-2">
+            <p className="text-xs text-cg-sage font-medium mt-2">
               {selectedTemplate.icon} {selectedTemplate.name} · ~{selectedTemplate.estimatedTime} min
             </p>
           )}
@@ -290,7 +290,7 @@ export default function NewIntakePage() {
 
           <div className="flex justify-center gap-3 mt-6">
             <Button variant="outline" onClick={resetForm} className="rounded-xl border-slate-200">Create Another</Button>
-            <Button onClick={() => router.push(`/professional/intake/${createdSession.id}`)} className="bg-[#3DAA8A] hover:bg-[#2D8A6E] rounded-xl">View Session</Button>
+            <Button onClick={() => router.push(`/professional/intake/${createdSession.id}`)} className="bg-cg-sage hover:bg-[#2D8A6E] rounded-xl">View Session</Button>
           </div>
         </div>
       </div>
@@ -305,7 +305,7 @@ export default function NewIntakePage() {
 
     return (
       <div className="max-w-3xl mx-auto space-y-6">
-        <Link href="/professional/intake" className="inline-flex items-center gap-1.5 text-xs text-[#3DAA8A] hover:text-[#2D8A6E] font-medium">
+        <Link href="/professional/intake" className="inline-flex items-center gap-1.5 text-xs text-cg-sage hover:text-[#2D8A6E] font-medium">
           <ArrowLeft className="h-3.5 w-3.5" /> Back to Intake Center
         </Link>
 
@@ -321,7 +321,7 @@ export default function NewIntakePage() {
         {/* Free Templates */}
         <div>
           <div className="flex items-center gap-2 mb-3">
-            <Sparkles className="h-4 w-4 text-[#3DAA8A]" />
+            <Sparkles className="h-4 w-4 text-cg-sage" />
             <h2 className="text-sm font-semibold text-slate-900">Intake Templates</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -338,7 +338,7 @@ export default function NewIntakePage() {
               <Crown className="h-4 w-4 text-[#D4AF37]" />
               <h2 className="text-sm font-semibold text-slate-900">Professional Templates</h2>
               {!isPaid && (
-                <Badge className="text-[10px] bg-[#FEF7ED] text-[#B8791A] border border-[#FBE3BF]/60 font-semibold">
+                <Badge className="text-[10px] bg-cg-amber-subtle text-[#B8791A] border border-[#FBE3BF]/60 font-semibold">
                   Upgrade Required
                 </Badge>
               )}
@@ -354,7 +354,7 @@ export default function NewIntakePage() {
         {/* Continue */}
         <div className="flex justify-end gap-3 pt-2">
           <Button variant="outline" onClick={() => router.push("/professional/intake")} className="rounded-xl border-slate-200">Cancel</Button>
-          <Button onClick={() => setStep(2)} className="bg-[#3DAA8A] hover:bg-[#2D8A6E] rounded-xl gap-2">
+          <Button onClick={() => setStep(2)} className="bg-cg-sage hover:bg-[#2D8A6E] rounded-xl gap-2">
             Continue <ArrowRight className="h-4 w-4" />
           </Button>
         </div>
@@ -366,7 +366,7 @@ export default function NewIntakePage() {
 
   return (
     <div className="max-w-xl mx-auto space-y-6">
-      <button type="button" onClick={() => setStep(1)} className="inline-flex items-center gap-1.5 text-xs text-[#3DAA8A] hover:text-[#2D8A6E] font-medium">
+      <button type="button" onClick={() => setStep(1)} className="inline-flex items-center gap-1.5 text-xs text-cg-sage hover:text-[#2D8A6E] font-medium">
         <ArrowLeft className="h-3.5 w-3.5" /> Back to Templates
       </button>
 
@@ -381,18 +381,18 @@ export default function NewIntakePage() {
 
       {/* Selected template chip */}
       {selectedTemplate && (
-        <div className="flex items-center justify-between rounded-xl bg-[#F4F8F7] border border-[#3DAA8A]/10 px-4 py-3">
+        <div className="flex items-center justify-between rounded-xl bg-background border border-cg-sage/10 px-4 py-3">
           <div className="flex items-center gap-2.5">
             <span className="text-lg">{selectedTemplate.icon}</span>
             <div>
-              <p className="text-sm font-semibold text-[#1E3A4A]">{selectedTemplate.name}</p>
+              <p className="text-sm font-semibold text-foreground">{selectedTemplate.name}</p>
               <p className="text-[11px] text-slate-500">
                 {selectedTemplate.estimatedTime} min · {selectedTemplate.sections.length} sections
                 {selectedTemplate.formTargets.length > 0 && ` · ${selectedTemplate.formTargets.join(", ")}`}
               </p>
             </div>
           </div>
-          <Button variant="ghost" size="sm" onClick={() => setStep(1)} className="text-xs text-[#3DAA8A] hover:text-[#2D8A6E] hover:bg-[#3DAA8A]/5 rounded-lg h-8">
+          <Button variant="ghost" size="sm" onClick={() => setStep(1)} className="text-xs text-cg-sage hover:text-[#2D8A6E] hover:bg-cg-sage/5 rounded-lg h-8">
             Change
           </Button>
         </div>
@@ -413,7 +413,7 @@ export default function NewIntakePage() {
                 onChange={(e) => setFormData((prev) => ({ ...prev, client_name: e.target.value }))}
                 placeholder="Jane Smith"
                 required
-                className="border-slate-200 focus:border-[#3DAA8A] focus:ring-[#3DAA8A]/20 rounded-lg"
+                className="border-slate-200 focus:border-cg-sage focus:ring-cg-sage/20 rounded-lg"
               />
             </div>
             <div className="space-y-1.5">
@@ -427,7 +427,7 @@ export default function NewIntakePage() {
                 onChange={(e) => setFormData((prev) => ({ ...prev, client_email: e.target.value }))}
                 placeholder="jane@example.com"
                 required
-                className="border-slate-200 focus:border-[#3DAA8A] focus:ring-[#3DAA8A]/20 rounded-lg"
+                className="border-slate-200 focus:border-cg-sage focus:ring-cg-sage/20 rounded-lg"
               />
             </div>
           </div>
@@ -443,7 +443,7 @@ export default function NewIntakePage() {
               value={formData.client_phone}
               onChange={(e) => setFormData((prev) => ({ ...prev, client_phone: e.target.value }))}
               placeholder="(555) 123-4567"
-              className="border-slate-200 focus:border-[#3DAA8A] focus:ring-[#3DAA8A]/20 rounded-lg"
+              className="border-slate-200 focus:border-cg-sage focus:ring-cg-sage/20 rounded-lg"
             />
           </div>
 
@@ -458,7 +458,7 @@ export default function NewIntakePage() {
               onChange={(e) => setFormData((prev) => ({ ...prev, notes: e.target.value }))}
               placeholder="Notes for your team about this intake..."
               rows={3}
-              className="border-slate-200 focus:border-[#3DAA8A] focus:ring-[#3DAA8A]/20 rounded-lg resize-none"
+              className="border-slate-200 focus:border-cg-sage focus:ring-cg-sage/20 rounded-lg resize-none"
             />
             <p className="text-[10px] text-slate-400">Not shared with the client.</p>
           </div>
@@ -477,11 +477,11 @@ export default function NewIntakePage() {
         </div>
 
         {/* ARIA info */}
-        <div className="rounded-xl bg-[#F4F8F7] border border-[#3DAA8A]/10 p-4">
+        <div className="rounded-xl bg-background border border-cg-sage/10 p-4">
           <div className="flex items-start gap-3">
-            <Sparkles className="h-4 w-4 text-[#3DAA8A] mt-0.5 shrink-0" />
+            <Sparkles className="h-4 w-4 text-cg-sage mt-0.5 shrink-0" />
             <div>
-              <p className="text-xs font-semibold text-[#1E3A4A]">Powered by ARIA Pro</p>
+              <p className="text-xs font-semibold text-foreground">Powered by ARIA Pro</p>
               <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
                 Your client will have a guided conversation with ARIA using <strong>{selectedTemplate?.name}</strong>.
                 You'll receive a summary, extracted data, and recommended next steps.
@@ -496,7 +496,7 @@ export default function NewIntakePage() {
           <Button aria-label="Send message"
             type="submit"
             disabled={isSubmitting || !formData.client_name || !formData.client_email}
-            className="bg-[#3DAA8A] hover:bg-[#2D8A6E] rounded-xl gap-2 min-w-[140px]"
+            className="bg-cg-sage hover:bg-[#2D8A6E] rounded-xl gap-2 min-w-[140px]"
           >
             {isSubmitting ? <><Loader2 className="h-4 w-4 animate-spin" /> Creating...</> : <><Send className="h-4 w-4" /> Create Intake</>}
           </Button>

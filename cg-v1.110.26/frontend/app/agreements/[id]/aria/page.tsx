@@ -342,7 +342,7 @@ Either way, I'll organize everything into a clear agreement for you to review. W
                 <Button
                   onClick={handleGenerateSummary}
                   disabled={isGeneratingSummary}
-                  className="bg-[#2D8A70] hover:bg-[#2D8A70] text-white"
+                  className="bg-cg-sage-dark hover:bg-cg-sage-dark text-white"
                 >
                   {isGeneratingSummary ? 'Reviewing...' : 'Review & Create Agreement'}
                 </Button>
@@ -360,7 +360,7 @@ Either way, I'll organize everything into a clear agreement for you to review. W
         {/* Summary View */}
         {showSummary && summary && (
           <>
-            <Card className="mb-6 border-[#E0EFF8] bg-[#E0EFF8]">
+            <Card className="mb-6 border-cg-slate-subtle bg-cg-slate-subtle">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle>Agreement Summary</CardTitle>
@@ -381,10 +381,10 @@ Either way, I'll organize everything into a clear agreement for you to review. W
 
             {/* Extraction Preview - What ARIA Will Map */}
             {extractionPreview && Object.keys(extractionPreview).length > 0 && (
-              <Card className="mb-6 border-[#E8F4F0] bg-[#E8F4F0]">
+              <Card className="mb-6 border-cg-sage-subtle bg-cg-sage-subtle">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <span className="text-[#2D8A70]">✓</span>
+                    <span className="text-cg-sage-dark">✓</span>
                     What ARIA Extracted
                   </CardTitle>
                   <CardDescription>
@@ -394,7 +394,7 @@ Either way, I'll organize everything into a clear agreement for you to review. W
                 <CardContent>
                   <div className="space-y-4">
                     {Object.entries(extractionPreview).map(([sectionName, fields]: [string, any]) => (
-                      <div key={sectionName} className="border-l-4 border-[#3DAA8A] pl-4">
+                      <div key={sectionName} className="border-l-4 border-cg-sage pl-4">
                         <h4 className="font-semibold text-foreground mb-2">{humanizeSectionName(sectionName)}</h4>
                         <div className="space-y-1">
                           {Array.isArray(fields) ? fields.map((item: any, idx: number) => (
@@ -418,7 +418,7 @@ Either way, I'll organize everything into a clear agreement for you to review. W
                     <Button
                       onClick={handleFinalize}
                       disabled={isFinalizing}
-                      className="bg-[#2D8A70] hover:bg-[#2D8A70]"
+                      className="bg-cg-sage-dark hover:bg-cg-sage-dark"
                     >
                       {isFinalizing ? 'Finalizing...' : 'Looks Good - Create Agreement'}
                     </Button>
@@ -435,7 +435,7 @@ Either way, I'll organize everything into a clear agreement for you to review. W
 
             {/* No extraction */}
             {extractionPreview && Object.keys(extractionPreview).length === 0 && (
-              <Card className="mb-6 border-[#FEF7ED] bg-[#FEF7ED]">
+              <Card className="mb-6 border-cg-amber-subtle bg-cg-amber-subtle">
                 <CardContent className="pt-6">
                   <p className="text-[#E09520]">
                     I couldn't extract specific details yet. Click "Continue Editing" to provide more information about your custody arrangement.
@@ -465,13 +465,13 @@ Either way, I'll organize everything into a clear agreement for you to review. W
                   <div
                     className={`max-w-[80%] rounded-lg px-4 py-3 ${
                       message.role === 'user'
-                        ? 'bg-[#2D6A8F] text-white'
+                        ? 'bg-cg-slate text-white'
                         : 'bg-muted text-foreground'
                     }`}
                   >
                     {message.role === 'assistant' && (
                       <div className="flex items-center gap-2 mb-2">
-                        <div className="w-6 h-6 bg-[#2D6A8F] rounded-full flex items-center justify-center text-white text-xs font-bold">
+                        <div className="w-6 h-6 bg-cg-slate rounded-full flex items-center justify-center text-white text-xs font-bold">
                           A
                         </div>
                         <span className="text-xs font-semibold text-muted-foreground">ARIA</span>
@@ -483,10 +483,10 @@ Either way, I'll organize everything into a clear agreement for you to review. W
                         message.role === 'user' ? 'bg-[#1E4E6B]/50' : 'bg-background'
                       }`}>
                         <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                          message.role === 'user' ? 'bg-[#2D6A8F]' : 'bg-[#E0EFF8]'
+                          message.role === 'user' ? 'bg-cg-slate' : 'bg-cg-slate-subtle'
                         }`}>
                           <FileText className={`w-5 h-5 ${
-                            message.role === 'user' ? 'text-white' : 'text-[#2D6A8F]'
+                            message.role === 'user' ? 'text-white' : 'text-cg-slate'
                           }`} />
                         </div>
                         <div className="min-w-0 flex-1">
@@ -496,7 +496,7 @@ Either way, I'll organize everything into a clear agreement for you to review. W
                             {message.attachment.filename}
                           </p>
                           <p className={`text-xs ${
-                            message.role === 'user' ? 'text-[#E0EFF8]' : 'text-muted-foreground'
+                            message.role === 'user' ? 'text-cg-slate-subtle' : 'text-muted-foreground'
                           }`}>
                             {formatFileSize(message.attachment.file_size)}
                             {message.attachment.text_length > 0 && (
@@ -555,7 +555,7 @@ Either way, I'll organize everything into a clear agreement for you to review. W
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Type your message... (Press Enter to send, Shift+Enter for new line)"
-                  className="flex-1 px-4 py-3 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-[#2D6A8F]"
+                  className="flex-1 px-4 py-3 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-cg-slate"
                   rows={3}
                   disabled={isLoading || isUploading}
                 />
@@ -568,7 +568,7 @@ Either way, I'll organize everything into a clear agreement for you to review. W
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground mt-2">
-                Speak naturally — or <button type="button" onClick={() => fileInputRef.current?.click()} className="text-[#2D6A8F] hover:underline" disabled={isLoading || isUploading}>upload an existing agreement</button> for ARIA to review.
+                Speak naturally — or <button type="button" onClick={() => fileInputRef.current?.click()} className="text-cg-slate hover:underline" disabled={isLoading || isUploading}>upload an existing agreement</button> for ARIA to review.
               </p>
             </div>
           </Card>

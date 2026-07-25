@@ -102,7 +102,7 @@ export function ExportWizard({ caseId, caseName, onSuccess, onCancel }: ExportWi
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
                 index <= currentIndex
-                  ? 'bg-[#2D6A8F] text-white'
+                  ? 'bg-cg-slate text-white'
                   : 'bg-gray-200 text-gray-500'
               }`}
             >
@@ -118,7 +118,7 @@ export function ExportWizard({ caseId, caseName, onSuccess, onCancel }: ExportWi
             {index < steps.length - 1 && (
               <div
                 className={`w-12 h-0.5 mx-4 ${
-                  index < currentIndex ? 'bg-[#2D6A8F]' : 'bg-gray-200'
+                  index < currentIndex ? 'bg-cg-slate' : 'bg-gray-200'
                 }`}
               />
             )}
@@ -136,7 +136,7 @@ export function ExportWizard({ caseId, caseName, onSuccess, onCancel }: ExportWi
           <Card
             className={`cursor-pointer transition-all ${
               packageType === 'court'
-                ? 'ring-2 ring-[#2D6A8F] bg-[#E0EFF8]'
+                ? 'ring-2 ring-cg-slate bg-cg-slate-subtle'
                 : 'hover:bg-gray-50'
             }`}
             onClick={() => setPackageType('court')}
@@ -163,7 +163,7 @@ export function ExportWizard({ caseId, caseName, onSuccess, onCancel }: ExportWi
           <Card
             className={`cursor-pointer transition-all ${
               packageType === 'investigation'
-                ? 'ring-2 ring-[#2D6A8F] bg-[#E0EFF8]'
+                ? 'ring-2 ring-cg-slate bg-cg-slate-subtle'
                 : 'hover:bg-gray-50'
             }`}
             onClick={() => setPackageType('investigation')}
@@ -205,7 +205,7 @@ export function ExportWizard({ caseId, caseName, onSuccess, onCancel }: ExportWi
       <h3 className="text-lg font-medium">Export Details</h3>
 
       {packageType === 'investigation' && (
-        <div className="space-y-4 p-4 bg-[#FEF7ED] rounded-lg border border-[#FEF7ED]">
+        <div className="space-y-4 p-4 bg-cg-amber-subtle rounded-lg border border-cg-amber-subtle">
           <div>
             <Label htmlFor="claimType">Claim Type *</Label>
             <select
@@ -268,7 +268,7 @@ export function ExportWizard({ caseId, caseName, onSuccess, onCancel }: ExportWi
             <label
               key={option.value}
               className={`flex items-start p-3 border rounded-lg cursor-pointer ${
-                redactionLevel === option.value ? 'border-[#2D6A8F] bg-[#E0EFF8]' : 'border-gray-200'
+                redactionLevel === option.value ? 'border-cg-slate bg-cg-slate-subtle' : 'border-gray-200'
               }`}
             >
               <input
@@ -343,7 +343,7 @@ export function ExportWizard({ caseId, caseName, onSuccess, onCancel }: ExportWi
             key={section.value}
             className={`flex items-start p-3 border rounded-lg cursor-pointer ${
               selectedSections.includes(section.value)
-                ? 'border-[#2D6A8F] bg-[#E0EFF8]'
+                ? 'border-cg-slate bg-cg-slate-subtle'
                 : 'border-gray-200 hover:bg-gray-50'
             }`}
           >
@@ -423,9 +423,9 @@ export function ExportWizard({ caseId, caseName, onSuccess, onCancel }: ExportWi
         </CardContent>
       </Card>
 
-      <Card className="bg-[#E0EFF8] border-[#E0EFF8]">
+      <Card className="bg-cg-slate-subtle border-cg-slate-subtle">
         <CardContent className="pt-6">
-          <h4 className="font-medium text-[#1E3A4A] mb-2">What happens next?</h4>
+          <h4 className="font-medium text-foreground mb-2">What happens next?</h4>
           <ul className="text-sm text-[#1E4E6B] space-y-1">
             <li>&#x2022; Your export will be generated (this may take a moment)</li>
             <li>&#x2022; A PDF will be created with all selected sections</li>
@@ -436,7 +436,7 @@ export function ExportWizard({ caseId, caseName, onSuccess, onCancel }: ExportWi
       </Card>
 
       {error && (
-        <Card className="bg-[#FEE2E2] border-[#FEE2E2]">
+        <Card className="bg-cg-error-subtle border-cg-error-subtle">
           <CardContent className="pt-6">
             <p className="text-[#9B2C2C]">{error}</p>
           </CardContent>

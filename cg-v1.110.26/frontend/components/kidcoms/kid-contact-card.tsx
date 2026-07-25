@@ -82,7 +82,7 @@ export function KidContactCard({
             className="relative group"
             aria-label={`Edit ${displayName}`}
           >
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#4BA8C8] to-[#3DAA8A] flex items-center justify-center shadow-md overflow-hidden">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-cg-slate-light to-cg-sage flex items-center justify-center shadow-md overflow-hidden">
               {avatarContent}
             </div>
             {/* Edit overlay on hover */}
@@ -91,7 +91,7 @@ export function KidContactCard({
             </div>
           </button>
         ) : (
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#4BA8C8] to-[#3DAA8A] flex items-center justify-center shadow-md overflow-hidden">
+          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-cg-slate-light to-cg-sage flex items-center justify-center shadow-md overflow-hidden">
             {avatarContent}
           </div>
         )}
@@ -114,7 +114,7 @@ export function KidContactCard({
           </p>
         )}
         {hasCustomName && (
-          <p className="text-[10px] mt-0.5" style={{ fontFamily: 'var(--portal-font-body)', color: 'var(--portal-primary, #3DAA8A)' }}>
+          <p className="text-[10px] mt-0.5" style={{ fontFamily: 'var(--portal-font-body)', color: 'var(--portal-primary, var(--cg-sage))' }}>
             ✏️ Custom name
           </p>
         )}
@@ -151,10 +151,10 @@ export function KidContactCard({
           className={cn(
             'w-12 h-12 rounded-full flex items-center justify-center',
             'transition-all duration-200',
-            'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#4BA8C8] focus-visible:ring-offset-2',
+            'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-cg-slate-light focus-visible:ring-offset-2',
             contact.can_video_call
               ? [
-                  'bg-[#4BA8C8] hover:bg-[#349878]',
+                  'bg-cg-slate-light hover:bg-[#349878]',
                   'shadow-lg hover:shadow-xl',
                   'hover:scale-110 active:scale-95',
                 ]

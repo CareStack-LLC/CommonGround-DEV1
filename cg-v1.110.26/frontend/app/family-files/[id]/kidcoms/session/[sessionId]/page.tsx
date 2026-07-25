@@ -316,7 +316,7 @@ export default function SessionPage() {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-900">
         <div className="text-center">
-          <AlertCircle className="h-12 w-12 text-[#C53030] mx-auto mb-4" />
+          <AlertCircle className="h-12 w-12 text-cg-error mx-auto mb-4" />
           <p className="text-white mb-4">{error || 'Session not found'}</p>
           <button
             onClick={() => router.push(`/family-files/${familyFileId}/kidcoms`)}
@@ -355,7 +355,7 @@ export default function SessionPage() {
               </p>
             </div>
           </div>
-          <span className={`px-2 py-1 rounded text-xs ${isCallJoined ? 'bg-[#3DAA8A]/20 text-[#5BC4A0]' : 'bg-[#F5A623]/20 text-[#F5A623]'
+          <span className={`px-2 py-1 rounded text-xs ${isCallJoined ? 'bg-cg-sage/20 text-cg-sage-light' : 'bg-cg-amber/20 text-cg-amber'
             }`}>
             {participantList.length} in call
           </span>
@@ -440,7 +440,7 @@ export default function SessionPage() {
               disabled={!isCallJoined}
               className={`p-4 md:p-3 rounded-full transition-colors ${isAudioOn
                 ? 'bg-gray-700 hover:bg-gray-600 text-white'
-                : 'bg-[#C53030] hover:bg-[#9B2C2C] text-white'
+                : 'bg-cg-error hover:bg-[#9B2C2C] text-white'
                 } ${!isCallJoined ? 'opacity-50 cursor-not-allowed' : ''}`}
               title={isAudioOn ? 'Mute' : 'Unmute'}
             >
@@ -453,7 +453,7 @@ export default function SessionPage() {
               disabled={!isCallJoined}
               className={`p-4 md:p-3 rounded-full transition-colors ${isVideoOn
                 ? 'bg-gray-700 hover:bg-gray-600 text-white'
-                : 'bg-[#C53030] hover:bg-[#9B2C2C] text-white'
+                : 'bg-cg-error hover:bg-[#9B2C2C] text-white'
                 } ${!isCallJoined ? 'opacity-50 cursor-not-allowed' : ''}`}
               title={isVideoOn ? 'Turn off camera' : 'Turn on camera'}
             >
@@ -463,7 +463,7 @@ export default function SessionPage() {
             {/* End Call */}
             <button aria-label="End call"
               onClick={handleEndCall}
-              className="p-4 md:p-3 rounded-full bg-[#C53030] hover:bg-[#9B2C2C] text-white"
+              className="p-4 md:p-3 rounded-full bg-cg-error hover:bg-[#9B2C2C] text-white"
               title="Leave Call"
             >
               <PhoneOff className="h-6 w-6 md:h-5 md:w-5" />
@@ -552,7 +552,7 @@ export default function SessionPage() {
                     messages.map((msg) => (
                       <div
                         key={msg.id}
-                        className={`p-3 rounded-lg ${msg.aria_flagged ? 'bg-[#1E3A4A]/30 border border-[#E09520]' : 'bg-gray-700'
+                        className={`p-3 rounded-lg ${msg.aria_flagged ? 'bg-foreground/30 border border-[#E09520]' : 'bg-gray-700'
                           }`}
                       >
                         <div className="flex items-center justify-between mb-1">
@@ -606,7 +606,7 @@ export default function SessionPage() {
                       </p>
                     </div>
                     {participant.joined_at && (
-                      <span className="w-2 h-2 bg-[#3DAA8A] rounded-full" />
+                      <span className="w-2 h-2 bg-cg-sage rounded-full" />
                     )}
                   </div>
                 ))}
@@ -713,7 +713,7 @@ function VideoTile({ participant, isFullScreen, isCompact }: VideoTileProps) {
         )}
         {/* Small mute indicator */}
         {!participant.audioOn && (
-          <div className="absolute bottom-1 right-1 p-1 bg-[#C53030] rounded-full">
+          <div className="absolute bottom-1 right-1 p-1 bg-cg-error rounded-full">
             <MicOff className="h-3 w-3 text-white" />
           </div>
         )}
@@ -749,12 +749,12 @@ function VideoTile({ participant, isFullScreen, isCompact }: VideoTileProps) {
         {/* Status indicators */}
         <div className="absolute bottom-20 right-4 flex items-center space-x-2">
           {!participant.audioOn && (
-            <div className="p-2 bg-[#C53030]/80 rounded-full">
+            <div className="p-2 bg-cg-error/80 rounded-full">
               <MicOff className="h-4 w-4 text-white" />
             </div>
           )}
           {!participant.videoOn && (
-            <div className="p-2 bg-[#C53030]/80 rounded-full">
+            <div className="p-2 bg-cg-error/80 rounded-full">
               <VideoOff className="h-4 w-4 text-white" />
             </div>
           )}

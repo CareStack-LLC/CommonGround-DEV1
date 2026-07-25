@@ -130,7 +130,7 @@ export default function PartnerDashboardPage() {
     if (error) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-6 text-center">
-                <AlertCircle className="h-12 w-12 text-[#C53030] mb-4" />
+                <AlertCircle className="h-12 w-12 text-cg-error mb-4" />
                 <h1 className="text-xl font-semibold text-gray-900 mb-2">{error}</h1>
                 <p className="text-gray-600 max-w-sm">
                     We couldn't retrieve the impact data for this partner. Please check the URL or try again later.

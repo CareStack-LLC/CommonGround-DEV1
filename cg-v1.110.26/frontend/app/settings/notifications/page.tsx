@@ -258,7 +258,7 @@ export default function NotificationSettingsPage() {
     <div className="space-y-6">
       {/* Page Header - matches app design system */}
       <div className="flex items-center gap-3">
-        <div className="w-12 h-12 bg-gradient-to-br from-[#F5A623]/10 to-[#E09520]/5 rounded-2xl flex items-center justify-center shadow-md">
+        <div className="w-12 h-12 bg-gradient-to-br from-cg-amber/10 to-[#E09520]/5 rounded-2xl flex items-center justify-center shadow-md">
           <Bell className="w-6 h-6 text-[#E09520]" />
         </div>
         <div>
@@ -274,8 +274,8 @@ export default function NotificationSettingsPage() {
       {/* Error Alert */}
       {error && (
         <Alert className="bg-destructive/10 border-destructive/20 rounded-2xl shadow-lg">
-          <AlertCircle className="h-4 w-4 text-[#C53030]" />
-          <AlertDescription className="text-[#C53030] font-medium">
+          <AlertCircle className="h-4 w-4 text-cg-error" />
+          <AlertDescription className="text-cg-error font-medium">
             {error}
           </AlertDescription>
         </Alert>
@@ -283,9 +283,9 @@ export default function NotificationSettingsPage() {
 
       {/* Success Alert */}
       {showSuccess && (
-        <Alert className="bg-[#E8F4F0] dark:bg-[#1E3A4A]/20 border-[#E8F4F0] dark:border-[#1E3A4A]/40 rounded-2xl shadow-lg">
-          <CheckCircle className="h-4 w-4 text-[#2D8A70]" />
-          <AlertDescription className="text-[#2D8A70] font-medium">
+        <Alert className="bg-cg-sage-subtle dark:bg-foreground/20 border-cg-sage-subtle dark:border-foreground/40 rounded-2xl shadow-lg">
+          <CheckCircle className="h-4 w-4 text-cg-sage-dark" />
+          <AlertDescription className="text-cg-sage-dark font-medium">
             Your notification preferences have been saved.
           </AlertDescription>
         </Alert>

@@ -128,14 +128,14 @@ export default function CompliancePage() {
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return "text-[#2D8A70]";
+    if (score >= 80) return "text-cg-sage-dark";
     if (score >= 60) return "text-[#E09520]";
     return "text-red-600";
   };
 
   const getScoreBgColor = (score: number) => {
-    if (score >= 80) return "bg-[#E8F4F0]";
-    if (score >= 60) return "bg-[#FEF7ED]";
+    if (score >= 80) return "bg-cg-sage-subtle";
+    if (score >= 60) return "bg-cg-amber-subtle";
     return "bg-red-100";
   };
 
@@ -161,7 +161,7 @@ export default function CompliancePage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-3">
-            <div className="p-2 bg-[#E8F4F0] text-[#2D8A70] rounded-lg">
+            <div className="p-2 bg-cg-sage-subtle text-cg-sage-dark rounded-lg">
               <Shield className="h-6 w-6" />
             </div>
             Compliance Dashboard
@@ -191,7 +191,7 @@ export default function CompliancePage() {
 
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2D8A70]" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cg-sage-dark" />
         </div>
       ) : dashboard ? (
         <>
@@ -202,7 +202,7 @@ export default function CompliancePage() {
           />
 
           {/* Overall Score Card (keep for additional details) */}
-          <Card className="bg-gradient-to-br from-[#E8F4F0] to-teal-50 border-[#C5E5DB]">
+          <Card className="bg-gradient-to-br from-cg-sage-subtle to-teal-50 border-[#C5E5DB]">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -297,7 +297,7 @@ export default function CompliancePage() {
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-sm flex items-center gap-2">
-                            <CheckCircle2 className="h-4 w-4 text-[#3DAA8A]" />
+                            <CheckCircle2 className="h-4 w-4 text-cg-sage" />
                             On Time
                           </span>
                           <span className="font-medium">{dashboard.exchange_compliance.completed_on_time}</span>
@@ -316,7 +316,7 @@ export default function CompliancePage() {
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-sm flex items-center gap-2">
-                            <Clock className="h-4 w-4 text-[#F5A623]" />
+                            <Clock className="h-4 w-4 text-cg-amber" />
                             Late
                           </span>
                           <span className="font-medium">{dashboard.exchange_compliance.completed_late}</span>
@@ -327,7 +327,7 @@ export default function CompliancePage() {
                               dashboard.exchange_compliance.total_exchanges) *
                             100
                           }
-                          className="h-2 [&>div]:bg-[#F5A623]"
+                          className="h-2 [&>div]:bg-cg-amber"
                         />
                       </div>
                     </div>
@@ -415,7 +415,7 @@ export default function CompliancePage() {
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-sm flex items-center gap-2">
-                            <CheckCircle2 className="h-4 w-4 text-[#3DAA8A]" />
+                            <CheckCircle2 className="h-4 w-4 text-cg-sage" />
                             Paid On Time
                           </span>
                           <span className="font-medium">{dashboard.financial_compliance.paid_on_time}</span>
@@ -434,7 +434,7 @@ export default function CompliancePage() {
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-1">
                           <span className="text-sm flex items-center gap-2">
-                            <Clock className="h-4 w-4 text-[#F5A623]" />
+                            <Clock className="h-4 w-4 text-cg-amber" />
                             Paid Late
                           </span>
                           <span className="font-medium">{dashboard.financial_compliance.paid_late}</span>
@@ -445,7 +445,7 @@ export default function CompliancePage() {
                               dashboard.financial_compliance.total_obligations) *
                             100
                           }
-                          className="h-2 [&>div]:bg-[#F5A623]"
+                          className="h-2 [&>div]:bg-cg-amber"
                         />
                       </div>
                     </div>
@@ -485,7 +485,7 @@ export default function CompliancePage() {
                     <div className="flex justify-between">
                       <div>
                         <p className="text-xs text-muted-foreground">Paid</p>
-                        <p className="text-lg font-bold text-[#2D8A70]">
+                        <p className="text-lg font-bold text-cg-sage-dark">
                           {dashboard.financial_compliance.by_parent.parent_a.paid}
                         </p>
                       </div>
@@ -509,7 +509,7 @@ export default function CompliancePage() {
                     <div className="flex justify-between">
                       <div>
                         <p className="text-xs text-muted-foreground">Paid</p>
-                        <p className="text-lg font-bold text-[#2D8A70]">
+                        <p className="text-lg font-bold text-cg-sage-dark">
                           {dashboard.financial_compliance.by_parent.parent_b.paid}
                         </p>
                       </div>
@@ -691,8 +691,8 @@ function MetricCard({
   color: "green" | "amber" | "red" | "blue" | "slate";
 }) {
   const colorClasses = {
-    green: "bg-[#E8F4F0] text-[#2D8A70]",
-    amber: "bg-[#FEF7ED] text-[#E09520]",
+    green: "bg-cg-sage-subtle text-cg-sage-dark",
+    amber: "bg-cg-amber-subtle text-[#E09520]",
     red: "bg-red-100 text-red-600",
     blue: "bg-blue-100 text-blue-600",
     slate: "bg-slate-100 text-slate-600",
@@ -740,16 +740,16 @@ function ParentComplianceCard({
         <div className="space-y-3">
           <div className="flex justify-between items-center">
             <span className="text-sm text-muted-foreground">On-Time Rate</span>
-            <span className={`font-bold ${onTimeRate >= 80 ? "text-[#2D8A70]" : "text-[#E09520]"}`}>
+            <span className={`font-bold ${onTimeRate >= 80 ? "text-cg-sage-dark" : "text-[#E09520]"}`}>
               {onTimeRate.toFixed(0)}%
             </span>
           </div>
           <div className="grid grid-cols-3 gap-2 text-center">
-            <div className="p-2 bg-[#E8F4F0] rounded">
-              <p className="text-lg font-bold text-[#2D8A70]">{data.on_time}</p>
+            <div className="p-2 bg-cg-sage-subtle rounded">
+              <p className="text-lg font-bold text-cg-sage-dark">{data.on_time}</p>
               <p className="text-xs text-muted-foreground">On Time</p>
             </div>
-            <div className="p-2 bg-[#FEF7ED] rounded">
+            <div className="p-2 bg-cg-amber-subtle rounded">
               <p className="text-lg font-bold text-[#E09520]">{data.late}</p>
               <p className="text-xs text-muted-foreground">Late</p>
             </div>
@@ -841,10 +841,10 @@ function ReportGenerationSection({
   };
 
   return (
-    <Card className="border-[#C5E5DB] bg-gradient-to-br from-[#E8F4F0]/30 to-teal-50/30">
+    <Card className="border-[#C5E5DB] bg-gradient-to-br from-cg-sage-subtle/30 to-teal-50/30">
       <CardHeader>
         <CardTitle className="text-base flex items-center gap-2">
-          <FileText className="h-4 w-4 text-[#2D8A70]" />
+          <FileText className="h-4 w-4 text-cg-sage-dark" />
           Generate Compliance Report
         </CardTitle>
         <CardDescription>
@@ -871,7 +871,7 @@ function ReportGenerationSection({
           <Button
             onClick={generateReport}
             disabled={isGenerating}
-            className="bg-[#2D8A70] hover:bg-[#2D8A70] text-white"
+            className="bg-cg-sage-dark hover:bg-cg-sage-dark text-white"
           >
             {isGenerating ? (
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -897,9 +897,9 @@ function ReportGenerationSection({
 
         {/* Verification Hash */}
         {verificationHash && (
-          <div className="mt-4 p-3 bg-white border border-[#E8F4F0] rounded-lg">
+          <div className="mt-4 p-3 bg-white border border-cg-sage-subtle rounded-lg">
             <div className="flex items-center gap-2 mb-1.5">
-              <Hash className="h-3.5 w-3.5 text-[#2D8A70]" />
+              <Hash className="h-3.5 w-3.5 text-cg-sage-dark" />
               <span className="text-xs font-semibold text-slate-700">
                 SHA-256 Verification Hash
               </span>

@@ -129,15 +129,15 @@ interface CalendarSummary {
 // Event type configuration
 const EVENT_TYPE_CONFIG: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
   court_hearing: { label: "Court Date", color: "#DC2626", icon: <Scale className="h-4 w-4" /> },
-  filing_deadline: { label: "Filing Deadline", color: "#F5A623", icon: <FileText className="h-4 w-4" /> },
+  filing_deadline: { label: "Filing Deadline", color: "var(--cg-amber)", icon: <FileText className="h-4 w-4" /> },
   meeting: { label: "Client Meeting", color: "#3B82F6", icon: <Users className="h-4 w-4" /> },
-  custody_exchange: { label: "Custody Exchange", color: "#3DAA8A", icon: <CalendarIcon className="h-4 w-4" /> },
-  intake_session: { label: "Intake Session", color: "#3DAA8A", icon: <Briefcase className="h-4 w-4" /> },
-  video_call: { label: "Video Call", color: "#3DAA8A", icon: <Video className="h-4 w-4" /> },
-  document_deadline: { label: "Document Deadline", color: "#F5A623", icon: <FileText className="h-4 w-4" /> },
-  consultation: { label: "Consultation", color: "#2D6A8F", icon: <Briefcase className="h-4 w-4" /> },
-  deposition: { label: "Deposition", color: "#1E3A4A", icon: <Scale className="h-4 w-4" /> },
-  mediation: { label: "Mediation", color: "#2D6A8F", icon: <Users className="h-4 w-4" /> },
+  custody_exchange: { label: "Custody Exchange", color: "var(--cg-sage)", icon: <CalendarIcon className="h-4 w-4" /> },
+  intake_session: { label: "Intake Session", color: "var(--cg-sage)", icon: <Briefcase className="h-4 w-4" /> },
+  video_call: { label: "Video Call", color: "var(--cg-sage)", icon: <Video className="h-4 w-4" /> },
+  document_deadline: { label: "Document Deadline", color: "var(--cg-amber)", icon: <FileText className="h-4 w-4" /> },
+  consultation: { label: "Consultation", color: "var(--cg-slate)", icon: <Briefcase className="h-4 w-4" /> },
+  deposition: { label: "Deposition", color: "var(--foreground)", icon: <Scale className="h-4 w-4" /> },
+  mediation: { label: "Mediation", color: "var(--cg-slate)", icon: <Users className="h-4 w-4" /> },
   other: { label: "Other", color: "#6B7280", icon: <CalendarIcon className="h-4 w-4" /> },
 };
 
@@ -386,7 +386,7 @@ export default function ProfessionalCalendarPage() {
             Events, meetings & important deadlines
           </p>
         </div>
-        <Button onClick={() => setShowEventForm(true)} className="bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white font-semibold px-5 h-10 rounded-xl shadow-sm">
+        <Button onClick={() => setShowEventForm(true)} className="bg-cg-sage hover:bg-[#2D8A6E] text-white font-semibold px-5 h-10 rounded-xl shadow-sm">
           <Plus className="h-4 w-4 mr-2" />
           New Event
         </Button>
@@ -417,9 +417,9 @@ export default function ProfessionalCalendarPage() {
               <div className="text-xs text-blue-600/70 uppercase font-semibold tracking-wide mt-1">Meetings</div>
             </CardContent>
           </Card>
-          <Card className="border border-[#3DAA8A]/20 bg-[#F4F8F7]/50 shadow-sm rounded-2xl">
+          <Card className="border border-cg-sage/20 bg-background/50 shadow-sm rounded-2xl">
             <CardContent className="pt-4">
-              <div className="text-2xl font-bold text-[#1E3A4A]">
+              <div className="text-2xl font-bold text-foreground">
                 {summary.events_by_type?.document_deadline || 0}
               </div>
               <div className="text-xs text-slate-500 uppercase font-semibold tracking-wide mt-1">Deadlines</div>
@@ -433,7 +433,7 @@ export default function ProfessionalCalendarPage() {
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-3">
-              <Button variant="outline" size="icon" aria-label="Previous period" onClick={prevPeriod} className="border-slate-200 hover:bg-[#F4F8F7] rounded-lg h-9 w-9">
+              <Button variant="outline" size="icon" aria-label="Previous period" onClick={prevPeriod} className="border-slate-200 hover:bg-background rounded-lg h-9 w-9">
                 <ChevronLeft className="h-4 w-4" />
               </Button>
               <h2 className="text-lg font-semibold text-slate-900 min-w-[160px] text-center">
@@ -443,7 +443,7 @@ export default function ProfessionalCalendarPage() {
                     ? `${weekDates[0].toLocaleDateString("en-US", { month: "short", day: "numeric" })} – ${weekDates[6].toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}`
                     : `${monthName} ${year}`}
               </h2>
-              <Button variant="outline" size="icon" aria-label="Next period" onClick={nextPeriod} className="border-slate-200 hover:bg-[#F4F8F7] rounded-lg h-9 w-9">
+              <Button variant="outline" size="icon" aria-label="Next period" onClick={nextPeriod} className="border-slate-200 hover:bg-background rounded-lg h-9 w-9">
                 <ChevronRight className="h-4 w-4" />
               </Button>
               <Input
@@ -457,7 +457,7 @@ export default function ProfessionalCalendarPage() {
                 }}
                 className="w-auto border-slate-200 rounded-lg"
               />
-              <Button variant="outline" onClick={goToToday} className="border-slate-200 hover:bg-[#F4F8F7] rounded-lg">
+              <Button variant="outline" onClick={goToToday} className="border-slate-200 hover:bg-background rounded-lg">
                 Today
               </Button>
             </div>
@@ -466,7 +466,7 @@ export default function ProfessionalCalendarPage() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setView("month")}
-                className={view === "month" ? "bg-white text-[#1E3A4A] shadow-sm rounded-md" : "text-slate-500 hover:text-slate-700 rounded-md"}
+                className={view === "month" ? "bg-white text-foreground shadow-sm rounded-md" : "text-slate-500 hover:text-slate-700 rounded-md"}
               >
                 Month
               </Button>
@@ -474,7 +474,7 @@ export default function ProfessionalCalendarPage() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setView("week")}
-                className={view === "week" ? "bg-white text-[#1E3A4A] shadow-sm rounded-md" : "text-slate-500 hover:text-slate-700 rounded-md"}
+                className={view === "week" ? "bg-white text-foreground shadow-sm rounded-md" : "text-slate-500 hover:text-slate-700 rounded-md"}
               >
                 Week
               </Button>
@@ -482,7 +482,7 @@ export default function ProfessionalCalendarPage() {
                 variant="ghost"
                 size="sm"
                 onClick={() => setView("day")}
-                className={view === "day" ? "bg-white text-[#1E3A4A] shadow-sm rounded-md" : "text-slate-500 hover:text-slate-700 rounded-md"}
+                className={view === "day" ? "bg-white text-foreground shadow-sm rounded-md" : "text-slate-500 hover:text-slate-700 rounded-md"}
               >
                 Day
               </Button>
@@ -493,13 +493,13 @@ export default function ProfessionalCalendarPage() {
         <CardContent>
           {loading ? (
             <div className="flex items-center justify-center h-96">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3DAA8A]" />
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cg-sage" />
             </div>
           ) : view === "month" ? (
             /* ── Month View ── */
             <div className="grid grid-cols-7 gap-px bg-slate-200 rounded-xl overflow-hidden">
               {weekDays.map((day) => (
-                <div key={day} className="bg-[#F4F8F7] p-2 text-center text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                <div key={day} className="bg-background p-2 text-center text-xs font-semibold text-slate-500 uppercase tracking-wide">
                   {day}
                 </div>
               ))}
@@ -510,12 +510,12 @@ export default function ProfessionalCalendarPage() {
                 return (
                   <div
                     key={index}
-                    className={`min-h-[100px] bg-white p-1.5 cursor-pointer hover:bg-[#F4F8F7]/50 transition-colors ${!day ? "bg-slate-50/50" : ""} ${isSelected ? "ring-2 ring-[#3DAA8A] ring-inset" : ""}`}
+                    className={`min-h-[100px] bg-white p-1.5 cursor-pointer hover:bg-background/50 transition-colors ${!day ? "bg-slate-50/50" : ""} ${isSelected ? "ring-2 ring-cg-sage ring-inset" : ""}`}
                     onClick={() => day && setSelectedDate(new Date(year, month, day))}
                   >
                     {day && (
                       <>
-                        <div className={`text-sm font-semibold w-7 h-7 flex items-center justify-center rounded-full ${isToday ? "bg-[#3DAA8A] text-white" : "text-slate-900"}`}>
+                        <div className={`text-sm font-semibold w-7 h-7 flex items-center justify-center rounded-full ${isToday ? "bg-cg-sage text-white" : "text-slate-900"}`}>
                           {day}
                         </div>
                         <div className="space-y-1 mt-1">
@@ -540,13 +540,13 @@ export default function ProfessionalCalendarPage() {
             /* ── Week View ── */
             <div className="grid grid-cols-8 gap-px bg-slate-200 rounded-xl overflow-hidden">
               {/* Time gutter header */}
-              <div className="bg-[#F4F8F7] p-2" />
+              <div className="bg-background p-2" />
               {weekDates.map((d, i) => {
                 const isToday = isSameDay(d, today);
                 return (
-                  <div key={i} className="bg-[#F4F8F7] p-2 text-center">
+                  <div key={i} className="bg-background p-2 text-center">
                     <div className="text-xs font-semibold text-slate-500 uppercase">{weekDays[i]}</div>
-                    <div className={`text-lg font-bold mt-0.5 ${isToday ? "text-[#3DAA8A]" : "text-slate-900"}`}>{d.getDate()}</div>
+                    <div className={`text-lg font-bold mt-0.5 ${isToday ? "text-cg-sage" : "text-slate-900"}`}>{d.getDate()}</div>
                   </div>
                 );
               })}
@@ -563,7 +563,7 @@ export default function ProfessionalCalendarPage() {
                       return h === hour;
                     });
                     return (
-                      <div key={i} className="bg-white min-h-[48px] p-0.5 border-b border-slate-50 hover:bg-[#F4F8F7]/30 cursor-pointer"
+                      <div key={i} className="bg-white min-h-[48px] p-0.5 border-b border-slate-50 hover:bg-background/30 cursor-pointer"
                         onClick={() => { setSelectedDate(d); setView("day"); }}>
                         {dayEvents.map((event) => {
                           const config = EVENT_TYPE_CONFIG[event.event_type] || EVENT_TYPE_CONFIG.other;
@@ -594,7 +594,7 @@ export default function ProfessionalCalendarPage() {
                     <div className="w-20 shrink-0 p-2 text-right text-xs text-slate-400 font-medium border-r border-slate-100">
                       {hour > 12 ? `${hour - 12}:00 PM` : hour === 12 ? "12:00 PM" : `${hour}:00 AM`}
                     </div>
-                    <div className="flex-1 p-1 hover:bg-[#F4F8F7]/30 transition-colors">
+                    <div className="flex-1 p-1 hover:bg-background/30 transition-colors">
                       {hourEvents.map((event) => {
                         const config = EVENT_TYPE_CONFIG[event.event_type] || EVENT_TYPE_CONFIG.other;
                         return (
@@ -724,9 +724,9 @@ export default function ProfessionalCalendarPage() {
                   )}
 
                   {/* Date & Time card */}
-                  <div className="bg-[#F4F8F7]/50 rounded-xl p-4 space-y-3 border border-slate-100">
+                  <div className="bg-background/50 rounded-xl p-4 space-y-3 border border-slate-100">
                     <div className="flex items-center gap-3">
-                      <CalendarIcon className="h-4 w-4 text-[#3DAA8A] shrink-0" />
+                      <CalendarIcon className="h-4 w-4 text-cg-sage shrink-0" />
                       <div>
                         <p className="text-sm font-medium text-slate-900">
                           {new Date(selectedEvent.start_time).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
@@ -741,16 +741,16 @@ export default function ProfessionalCalendarPage() {
 
                     {selectedEvent.location && (
                       <div className="flex items-center gap-3">
-                        <MapPin className="h-4 w-4 text-[#3DAA8A] shrink-0" />
+                        <MapPin className="h-4 w-4 text-cg-sage shrink-0" />
                         <p className="text-sm text-slate-700">{selectedEvent.location}</p>
                       </div>
                     )}
 
                     {selectedEvent.virtual_meeting_url && (
                       <div className="flex items-center gap-3">
-                        <Video className="h-4 w-4 text-[#3DAA8A] shrink-0" />
+                        <Video className="h-4 w-4 text-cg-sage shrink-0" />
                         <a href={selectedEvent.virtual_meeting_url} target="_blank" rel="noopener noreferrer"
-                          className="text-sm text-[#3DAA8A] font-medium hover:underline">
+                          className="text-sm text-cg-sage font-medium hover:underline">
                           Join Video Call →
                         </a>
                       </div>
@@ -773,15 +773,15 @@ export default function ProfessionalCalendarPage() {
 
                   {/* Linked Case */}
                   {selectedEvent.family_file_title && (
-                    <Link href={`/professional/cases/${selectedEvent.family_file_id}`} className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:border-[#3DAA8A]/30 hover:bg-[#F4F8F7]/30 transition-colors group">
-                      <div className="w-8 h-8 rounded-lg bg-[#3DAA8A]/10 flex items-center justify-center shrink-0">
-                        <Briefcase className="h-4 w-4 text-[#3DAA8A]" />
+                    <Link href={`/professional/cases/${selectedEvent.family_file_id}`} className="flex items-center gap-3 p-3 rounded-xl border border-slate-200 hover:border-cg-sage/30 hover:bg-background/30 transition-colors group">
+                      <div className="w-8 h-8 rounded-lg bg-cg-sage/10 flex items-center justify-center shrink-0">
+                        <Briefcase className="h-4 w-4 text-cg-sage" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="text-xs text-slate-500">Linked Case</p>
-                        <p className="text-sm font-medium text-slate-900 truncate group-hover:text-[#3DAA8A] transition-colors">{selectedEvent.family_file_title}</p>
+                        <p className="text-sm font-medium text-slate-900 truncate group-hover:text-cg-sage transition-colors">{selectedEvent.family_file_title}</p>
                       </div>
-                      <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-[#3DAA8A] transition-colors" />
+                      <ChevronRight className="h-4 w-4 text-slate-300 group-hover:text-cg-sage transition-colors" />
                     </Link>
                   )}
 
@@ -807,7 +807,7 @@ export default function ProfessionalCalendarPage() {
                       <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Attendees</p>
                       <div className="flex flex-wrap gap-1.5">
                         {selectedEvent.attendee_emails.map((email, i) => (
-                          <span key={i} className="text-xs px-2.5 py-1 rounded-full bg-[#F4F8F7] text-[#1E3A4A] border border-[#3DAA8A]/15 font-medium">
+                          <span key={i} className="text-xs px-2.5 py-1 rounded-full bg-background text-foreground border border-cg-sage/15 font-medium">
                             {email}
                           </span>
                         ))}

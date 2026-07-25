@@ -397,11 +397,11 @@ function CircleContactCallContent() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#0D1B24] via-[#1E3A4A] to-[#0D1B24] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-[#0D1B24] via-foreground to-[#0D1B24] flex items-center justify-center">
         <div className="text-center">
           <div className="relative">
-            <div className="absolute inset-0 bg-[#3DAA8A]/20 rounded-full blur-2xl animate-pulse" />
-            <Loader2 className="relative h-16 w-16 animate-spin mx-auto mb-4 text-[#3DAA8A]" />
+            <div className="absolute inset-0 bg-cg-sage/20 rounded-full blur-2xl animate-pulse" />
+            <Loader2 className="relative h-16 w-16 animate-spin mx-auto mb-4 text-cg-sage" />
           </div>
           <p className="text-xl font-bold text-white" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Connecting your call...</p>
           <p className="text-[#CBD8E0]/60 mt-2" style={{ fontFamily: "'Inter', sans-serif" }}>Getting everything ready!</p>
@@ -412,14 +412,14 @@ function CircleContactCallContent() {
 
   if (error || !callSession) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#0D1B24] via-[#1E3A4A] to-[#0D1B24] flex items-center justify-center p-4">
-        <div className="bg-[#1E3A4A]/80 backdrop-blur-sm rounded-3xl shadow-lg border border-[#3DAA8A]/20 p-8 max-w-md w-full text-center">
+      <div className="min-h-screen bg-gradient-to-b from-[#0D1B24] via-foreground to-[#0D1B24] flex items-center justify-center p-4">
+        <div className="bg-foreground/80 backdrop-blur-sm rounded-3xl shadow-lg border border-cg-sage/20 p-8 max-w-md w-full text-center">
           <div className="text-6xl mb-4">😕</div>
           <h1 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Oops!</h1>
           <p className="text-[#CBD8E0]/70 mb-6" style={{ fontFamily: "'Inter', sans-serif" }}>{error || 'Something went wrong'}</p>
           <button
             onClick={handleGoBack}
-            className="px-6 py-3 bg-[#3DAA8A] text-white rounded-full font-semibold hover:bg-[#3DAA8A]/90 transition-colors"
+            className="px-6 py-3 bg-cg-sage text-white rounded-full font-semibold hover:bg-cg-sage/90 transition-colors"
             style={{ fontFamily: "'Inter', sans-serif" }}
           >
             Go Back
@@ -431,8 +431,8 @@ function CircleContactCallContent() {
 
   if (callEnded) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#0D1B24] via-[#1E3A4A] to-[#0D1B24] flex items-center justify-center p-4">
-        <div className="bg-[#1E3A4A]/80 backdrop-blur-sm rounded-3xl shadow-lg border border-[#3DAA8A]/20 p-8 max-w-md w-full text-center">
+      <div className="min-h-screen bg-gradient-to-b from-[#0D1B24] via-foreground to-[#0D1B24] flex items-center justify-center p-4">
+        <div className="bg-foreground/80 backdrop-blur-sm rounded-3xl shadow-lg border border-cg-sage/20 p-8 max-w-md w-full text-center">
           <div className="text-6xl mb-4">{getChildAvatar(callSession.childAvatar)}</div>
           <h1 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Call Ended</h1>
           <p className="text-[#CBD8E0]/70 mb-4" style={{ fontFamily: "'Inter', sans-serif" }}>
@@ -453,9 +453,9 @@ function CircleContactCallContent() {
       {/* ARIA Warning Overlay */}
       {ariaWarning && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-[#1E3A4A] rounded-3xl p-8 mx-4 max-w-md text-center shadow-2xl border border-[#3DAA8A]/20">
+          <div className="bg-foreground rounded-3xl p-8 mx-4 max-w-md text-center shadow-2xl border border-cg-sage/20">
             <div className="w-16 h-16 rounded-full bg-amber-500/10 flex items-center justify-center mx-auto mb-4">
-              <AlertTriangle className="h-8 w-8 text-[#F5A623]" />
+              <AlertTriangle className="h-8 w-8 text-cg-amber" />
             </div>
             <h2 className="text-xl font-bold text-white mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
               {ariaWarning.type === 'terminate' ? 'Call Ending' : 'Friendly Reminder'}
@@ -464,7 +464,7 @@ function CircleContactCallContent() {
             {ariaWarning.type !== 'terminate' && (
               <button
                 onClick={() => setAriaWarning(null)}
-                className="px-6 py-2 bg-[#3DAA8A] text-white rounded-full font-semibold hover:bg-[#3DAA8A]/90"
+                className="px-6 py-2 bg-cg-sage text-white rounded-full font-semibold hover:bg-cg-sage/90"
                 style={{ fontFamily: "'Inter', sans-serif" }}
               >
                 I Understand
@@ -477,11 +477,11 @@ function CircleContactCallContent() {
       {/* Main Video Area */}
       <div className="flex-1 flex flex-col">
         {/* Header - Desktop */}
-        <header className="hidden md:flex bg-[#0D1B24]/90 backdrop-blur-sm border-b border-[#3DAA8A]/10 px-4 py-2 items-center justify-between">
+        <header className="hidden md:flex bg-[#0D1B24]/90 backdrop-blur-sm border-b border-cg-sage/10 px-4 py-2 items-center justify-between">
           <div className="flex items-center space-x-3">
             <button aria-label="Back"
               onClick={handleGoBack}
-              className="p-1.5 text-[#CBD8E0]/60 hover:text-[#3DAA8A] hover:bg-[#1E3A4A] rounded-lg transition-colors"
+              className="p-1.5 text-[#CBD8E0]/60 hover:text-cg-sage hover:bg-foreground rounded-lg transition-colors"
             >
               <ArrowLeft className="h-5 w-5" />
             </button>
@@ -494,7 +494,7 @@ function CircleContactCallContent() {
                 <p className="text-xs text-[#CBD8E0]/50 flex items-center gap-1" style={{ fontFamily: "'Inter', sans-serif" }}>
                   {callSession.sessionType === 'video_call' ? '📹 Video Call' : '📞 Voice Call'}
                   {isARIAMonitoring && (
-                    <span className="inline-flex items-center gap-1 ml-2 text-[#3DAA8A]">
+                    <span className="inline-flex items-center gap-1 ml-2 text-cg-sage">
                       <Shield className="h-3 w-3" /> Protected
                     </span>
                   )}
@@ -503,7 +503,7 @@ function CircleContactCallContent() {
             </div>
           </div>
           <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-            isCallJoined ? 'bg-[#3DAA8A]/20 text-[#3DAA8A]' : 'bg-[#F5A623]/20 text-[#F5A623]'
+            isCallJoined ? 'bg-cg-sage/20 text-cg-sage' : 'bg-cg-amber/20 text-cg-amber'
           }`} style={{ fontFamily: "var(--font-mono)" }}>
             {participantList.length} {participantList.length === 1 ? 'person' : 'people'}
           </span>
@@ -512,12 +512,12 @@ function CircleContactCallContent() {
         {/* Video Area */}
         <div className="flex-1 relative">
           {!isCallJoined ? (
-            <div className="h-full bg-gradient-to-br from-[#1E3A4A] to-[#0D1B24] flex items-center justify-center">
+            <div className="h-full bg-gradient-to-br from-foreground to-[#0D1B24] flex items-center justify-center">
               <div className="text-center">
                 <div className="text-6xl mb-4">{getChildAvatar(callSession.childAvatar)}</div>
                 <div className="relative">
-                  <div className="absolute inset-0 bg-[#3DAA8A]/20 rounded-full blur-2xl animate-pulse" />
-                  <Loader2 className="relative h-12 w-12 animate-spin text-[#3DAA8A] mx-auto mb-4" />
+                  <div className="absolute inset-0 bg-cg-sage/20 rounded-full blur-2xl animate-pulse" />
+                  <Loader2 className="relative h-12 w-12 animate-spin text-cg-sage mx-auto mb-4" />
                 </div>
                 <p className="text-white text-xl font-bold" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                   {isJoiningCall ? 'Joining...' : 'Connecting...'}
@@ -532,7 +532,7 @@ function CircleContactCallContent() {
                 {remoteParticipants.length > 0 ? (
                   <VideoTile participant={remoteParticipants[0]} isFullScreen childAvatar={callSession.childAvatar} />
                 ) : (
-                  <div className="h-full bg-gradient-to-br from-[#1E3A4A] to-[#0D1B24] flex items-center justify-center">
+                  <div className="h-full bg-gradient-to-br from-foreground to-[#0D1B24] flex items-center justify-center">
                     <div className="text-center">
                       <div className="text-7xl mb-4">{getChildAvatar(callSession.childAvatar)}</div>
                       <p className="text-white text-lg font-bold" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Waiting for {callSession.childName}...</p>
@@ -543,7 +543,7 @@ function CircleContactCallContent() {
 
                 {/* Local participant PiP */}
                 {localParticipant && (
-                  <div className="absolute top-4 right-4 w-28 h-40 rounded-2xl overflow-hidden shadow-2xl border-2 border-[#3DAA8A]/50 z-10">
+                  <div className="absolute top-4 right-4 w-28 h-40 rounded-2xl overflow-hidden shadow-2xl border-2 border-cg-sage/50 z-10">
                     <VideoTile participant={localParticipant} isCompact />
                   </div>
                 )}
@@ -551,7 +551,7 @@ function CircleContactCallContent() {
                 {/* Mobile back button */}
                 <button aria-label="Back"
                   onClick={handleGoBack}
-                  className="absolute top-4 left-4 z-10 p-2 bg-[#0D1B24]/80 backdrop-blur-sm text-white rounded-full border border-[#3DAA8A]/20"
+                  className="absolute top-4 left-4 z-10 p-2 bg-[#0D1B24]/80 backdrop-blur-sm text-white rounded-full border border-cg-sage/20"
                 >
                   <ArrowLeft className="h-5 w-5" />
                 </button>
@@ -580,7 +580,7 @@ function CircleContactCallContent() {
         </div>
 
         {/* Controls Bar */}
-        <div className="bg-[#0D1B24] px-4 py-4 absolute md:relative bottom-0 left-0 right-0 safe-area-bottom border-t border-[#3DAA8A]/10">
+        <div className="bg-[#0D1B24] px-4 py-4 absolute md:relative bottom-0 left-0 right-0 safe-area-bottom border-t border-cg-sage/10">
           <div className="flex items-center justify-center space-x-3 md:space-x-4">
             {/* Audio Toggle */}
             <button aria-label="Toggle microphone"
@@ -588,7 +588,7 @@ function CircleContactCallContent() {
               disabled={!isCallJoined}
               className={`p-4 rounded-full transition-all transform hover:scale-105 ${
                 isAudioOn
-                  ? 'bg-[#1E3A4A] hover:bg-[#1E3A4A]/80 text-white'
+                  ? 'bg-foreground hover:bg-foreground/80 text-white'
                   : 'bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/25'
               } ${!isCallJoined ? 'opacity-50 cursor-not-allowed' : ''}`}
               title={isAudioOn ? 'Mute' : 'Unmute'}
@@ -602,7 +602,7 @@ function CircleContactCallContent() {
               disabled={!isCallJoined}
               className={`p-4 rounded-full transition-all transform hover:scale-105 ${
                 isVideoOn
-                  ? 'bg-[#1E3A4A] hover:bg-[#1E3A4A]/80 text-white'
+                  ? 'bg-foreground hover:bg-foreground/80 text-white'
                   : 'bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/25'
               } ${!isCallJoined ? 'opacity-50 cursor-not-allowed' : ''}`}
               title={isVideoOn ? 'Turn off camera' : 'Turn on camera'}
@@ -620,15 +620,15 @@ function CircleContactCallContent() {
             </button>
 
             {/* Divider */}
-            <div className="hidden md:block w-px h-10 bg-[#3DAA8A]/20" />
+            <div className="hidden md:block w-px h-10 bg-cg-sage/20" />
 
             {/* Chat Toggle - Desktop only */}
             <button aria-label="Open chat"
               onClick={() => setActivePanel(activePanel === 'chat' ? null : 'chat')}
               className={`hidden md:flex p-3 rounded-full transition-all ${
                 activePanel === 'chat'
-                  ? 'bg-[#3DAA8A] text-white'
-                  : 'bg-[#1E3A4A] hover:bg-[#1E3A4A]/80 text-[#CBD8E0]'
+                  ? 'bg-cg-sage text-white'
+                  : 'bg-foreground hover:bg-foreground/80 text-[#CBD8E0]'
               }`}
               title="Chat"
             >
@@ -640,8 +640,8 @@ function CircleContactCallContent() {
               onClick={() => setActivePanel(activePanel === 'participants' ? null : 'participants')}
               className={`hidden md:flex p-3 rounded-full transition-all ${
                 activePanel === 'participants'
-                  ? 'bg-[#3DAA8A] text-white'
-                  : 'bg-[#1E3A4A] hover:bg-[#1E3A4A]/80 text-[#CBD8E0]'
+                  ? 'bg-cg-sage text-white'
+                  : 'bg-foreground hover:bg-foreground/80 text-[#CBD8E0]'
               }`}
               title="Participants"
             >
@@ -654,8 +654,8 @@ function CircleContactCallContent() {
               disabled={!isCallJoined}
               className={`p-4 md:p-3 rounded-full transition-all transform hover:scale-105 ${
                 !isCallJoined
-                  ? 'bg-[#1E3A4A]/50 text-[#CBD8E0]/30 opacity-50 cursor-not-allowed'
-                  : 'bg-[#F5A623] hover:bg-[#F5A623]/90 text-white shadow-lg shadow-[#F5A623]/20'
+                  ? 'bg-foreground/50 text-[#CBD8E0]/30 opacity-50 cursor-not-allowed'
+                  : 'bg-cg-amber hover:bg-cg-amber/90 text-white shadow-lg shadow-cg-amber/20'
               }`}
               title="Watch Together!"
             >
@@ -667,8 +667,8 @@ function CircleContactCallContent() {
 
       {/* Side Panel */}
       {activePanel && (
-        <div className="w-80 bg-[#0D1B24] border-l border-[#3DAA8A]/10 flex flex-col">
-          <div className="p-4 border-b border-[#3DAA8A]/10">
+        <div className="w-80 bg-[#0D1B24] border-l border-cg-sage/10 flex flex-col">
+          <div className="p-4 border-b border-cg-sage/10">
             <h3 className="text-white font-bold text-lg capitalize flex items-center gap-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
               {activePanel === 'chat' ? '💬' : '👥'} {activePanel}
             </h3>
@@ -686,9 +686,9 @@ function CircleContactCallContent() {
                     </div>
                   ) : (
                     messages.map((msg) => (
-                      <div key={msg.id} className="p-3 bg-[#1E3A4A]/60 rounded-xl border border-[#3DAA8A]/10">
+                      <div key={msg.id} className="p-3 bg-foreground/60 rounded-xl border border-cg-sage/10">
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm font-bold text-[#3DAA8A]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{msg.sender}</span>
+                          <span className="text-sm font-bold text-cg-sage" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{msg.sender}</span>
                           <span className="text-xs text-[#CBD8E0]/40" style={{ fontFamily: "var(--font-mono)" }}>
                             {msg.time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </span>
@@ -699,7 +699,7 @@ function CircleContactCallContent() {
                   )}
                 </div>
 
-                <div className="p-4 border-t border-[#3DAA8A]/10">
+                <div className="p-4 border-t border-cg-sage/10">
                   <div className="flex space-x-2">
                     <input
                       type="text"
@@ -707,13 +707,13 @@ function CircleContactCallContent() {
                       onChange={(e) => setNewMessage(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                       placeholder="Type a message..."
-                      className="flex-1 bg-[#1E3A4A]/60 text-white rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/50 border border-[#3DAA8A]/10 placeholder-[#CBD8E0]/30"
+                      className="flex-1 bg-foreground/60 text-white rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cg-sage/50 border border-cg-sage/10 placeholder-[#CBD8E0]/30"
                       style={{ fontFamily: "'Inter', sans-serif" }}
                     />
                     <button aria-label="Send message"
                       onClick={handleSendMessage}
                       disabled={!newMessage.trim()}
-                      className="p-2 bg-[#3DAA8A] hover:bg-[#3DAA8A]/90 text-white rounded-xl disabled:opacity-50 transition-colors"
+                      className="p-2 bg-cg-sage hover:bg-cg-sage/90 text-white rounded-xl disabled:opacity-50 transition-colors"
                     >
                       <Send className="h-5 w-5" />
                     </button>
@@ -727,9 +727,9 @@ function CircleContactCallContent() {
                 {participantList.map((participant) => (
                   <div
                     key={participant.odId}
-                    className="flex items-center space-x-3 p-3 bg-[#1E3A4A]/60 rounded-xl border border-[#3DAA8A]/10"
+                    className="flex items-center space-x-3 p-3 bg-foreground/60 rounded-xl border border-cg-sage/10"
                   >
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#3DAA8A] to-[#2D6A8F] flex items-center justify-center text-white text-lg font-bold shadow-lg shadow-[#3DAA8A]/20">
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cg-sage to-cg-slate flex items-center justify-center text-white text-lg font-bold shadow-lg shadow-cg-sage/20">
                       {participant.odName[0]?.toUpperCase() || '?'}
                     </div>
                     <div className="flex-1">
@@ -745,7 +745,7 @@ function CircleContactCallContent() {
                       {!participant.audioOn && <MicOff className="h-4 w-4 text-red-400" />}
                       {!participant.videoOn && <VideoOff className="h-4 w-4 text-red-400" />}
                       {participant.audioOn && participant.videoOn && (
-                        <span className="w-2 h-2 bg-[#3DAA8A] rounded-full" />
+                        <span className="w-2 h-2 bg-cg-sage rounded-full" />
                       )}
                     </div>
                   </div>
@@ -836,7 +836,7 @@ function VideoTile({ participant, isFullScreen, isCompact, childAvatar }: VideoT
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#3DAA8A] to-[#2D6A8F]">
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-cg-sage to-cg-slate">
             <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-white text-lg font-bold" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
               {participant.odName[0]?.toUpperCase() || '?'}
             </div>
@@ -865,7 +865,7 @@ function VideoTile({ participant, isFullScreen, isCompact, childAvatar }: VideoT
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F]">
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-foreground to-cg-slate">
             <div className="text-8xl">
               {!participant.isLocal ? getChildAvatar(childAvatar) : participant.odName[0]?.toUpperCase() || '?'}
             </div>
@@ -897,7 +897,7 @@ function VideoTile({ participant, isFullScreen, isCompact, childAvatar }: VideoT
 
   // Default grid tile mode for desktop
   return (
-    <div className="relative bg-[#1E3A4A] rounded-2xl overflow-hidden h-full">
+    <div className="relative bg-foreground rounded-2xl overflow-hidden h-full">
       {participant.videoOn && participant.videoTrack ? (
         <video
           ref={videoRef}
@@ -907,7 +907,7 @@ function VideoTile({ participant, isFullScreen, isCompact, childAvatar }: VideoT
           className="w-full h-full object-cover"
         />
       ) : (
-        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#3DAA8A] to-[#2D6A8F]">
+        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-cg-sage to-cg-slate">
           <div className="w-24 h-24 rounded-full bg-white/20 flex items-center justify-center text-white text-4xl font-bold" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
             {participant.odName[0]?.toUpperCase() || '?'}
           </div>
@@ -939,7 +939,7 @@ export default function CircleContactCallPage() {
       fallback={
         <div className="min-h-screen bg-[#0D1B24] flex items-center justify-center">
           <div className="text-center">
-            <Loader2 className="h-16 w-16 animate-spin mx-auto mb-4 text-[#3DAA8A]" />
+            <Loader2 className="h-16 w-16 animate-spin mx-auto mb-4 text-cg-sage" />
             <p className="text-xl font-bold text-white" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Loading...</p>
           </div>
         </div>

@@ -15,8 +15,8 @@ export default function MedicalFields({ data, onChange }: MedicalFieldsProps) {
   };
 
   return (
-    <div className="space-y-4 p-4 bg-[#E0EFF8] rounded-lg border border-[#E0EFF8]">
-      <h4 className="font-medium text-[#1E3A4A]">Medical Appointment Details</h4>
+    <div className="space-y-4 p-4 bg-cg-slate-subtle rounded-lg border border-cg-slate-subtle">
+      <h4 className="font-medium text-foreground">Medical Appointment Details</h4>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>

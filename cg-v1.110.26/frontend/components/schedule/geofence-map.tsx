@@ -72,7 +72,7 @@ const geofenceFillStyle: FillLayer = {
   type: 'fill',
   source: 'geofence',
   paint: {
-    'fill-color': '#3DAA8A',
+    'fill-color': 'var(--cg-sage)',
     'fill-opacity': 0.1,
   },
 };
@@ -82,7 +82,7 @@ const geofenceLineStyle: LineLayer = {
   type: 'line',
   source: 'geofence',
   paint: {
-    'line-color': '#3DAA8A',
+    'line-color': 'var(--cg-sage)',
     'line-width': 2,
     'line-dasharray': [3, 2],
   },
@@ -141,7 +141,7 @@ export default function GeofenceMap({
         {/* Center marker (exchange location) */}
         <Marker longitude={center.lng} latitude={center.lat} anchor="center">
           <div className="flex items-center justify-center w-6 h-6">
-            <div className="w-3 h-3 bg-[#2D6A8F] rounded-full border-2 border-white shadow-md" />
+            <div className="w-3 h-3 bg-cg-slate rounded-full border-2 border-white shadow-md" />
           </div>
         </Marker>
 
@@ -152,8 +152,8 @@ export default function GeofenceMap({
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg ${
                   parent.inGeofence
-                    ? 'bg-[#3DAA8A] border-2 border-[#5BC4A0]'
-                    : 'bg-[#F5A623] border-2 border-[#F5A623]'
+                    ? 'bg-cg-sage border-2 border-cg-sage-light'
+                    : 'bg-cg-amber border-2 border-cg-amber'
                 }`}
               >
                 {parent.name.charAt(0).toUpperCase()}
@@ -161,8 +161,8 @@ export default function GeofenceMap({
               <div
                 className={`mt-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium whitespace-nowrap shadow-sm ${
                   parent.inGeofence
-                    ? 'bg-[#E8F4F0] text-[#1E3A4A]'
-                    : 'bg-[#FEF7ED] text-[#E09520]'
+                    ? 'bg-cg-sage-subtle text-foreground'
+                    : 'bg-cg-amber-subtle text-[#E09520]'
                 }`}
               >
                 {parent.name.split(' ')[0]}

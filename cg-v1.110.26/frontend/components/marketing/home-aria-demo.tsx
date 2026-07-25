@@ -89,11 +89,11 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
-  hostility: '#C53030', blame: '#F5A623', passive_aggressive: '#F5A623',
-  manipulation: '#4BA8C8', dismissive: '#6b7280', threatening: '#C53030',
-  profanity: '#C53030', custody_weaponization: '#9B2C2C', financial_coercion: '#E09520',
+  hostility: 'var(--cg-error)', blame: 'var(--cg-amber)', passive_aggressive: 'var(--cg-amber)',
+  manipulation: 'var(--cg-slate-light)', dismissive: '#6b7280', threatening: 'var(--cg-error)',
+  profanity: 'var(--cg-error)', custody_weaponization: '#9B2C2C', financial_coercion: '#E09520',
   hate_speech: '#7A2222', sexual_harassment: '#9B2C2C', insult: '#E09520',
-  sarcasm: '#a3a3a3', all_caps: '#F5A623',
+  sarcasm: '#a3a3a3', all_caps: 'var(--cg-amber)',
 };
 
 const TAUNTS = [
@@ -288,7 +288,7 @@ export function HomeARIADemo() {
               className={`
                 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all
                 ${ariaEnabled
-                  ? 'bg-cg-sage/30 text-[#5BC4A0] border border-cg-sage/40'
+                  ? 'bg-cg-sage/30 text-cg-sage-light border border-cg-sage/40'
                   : 'bg-white/10 text-white/50 border border-white/20'
                 }
               `}
@@ -304,14 +304,14 @@ export function HomeARIADemo() {
               <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className="max-w-[85%] space-y-1">
                   {msg.original && (
-                    <div className={`text-[11px] px-2.5 py-1.5 rounded-lg mb-0.5 bg-[#C53030]/20 text-[#FCA5A5] line-through ${msg.role === 'user' ? 'text-right' : ''}`}>
+                    <div className={`text-[11px] px-2.5 py-1.5 rounded-lg mb-0.5 bg-cg-error/20 text-[#FCA5A5] line-through ${msg.role === 'user' ? 'text-right' : ''}`}>
                       {msg.original}
                     </div>
                   )}
                   <div className={`
                     px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed
                     ${msg.role === 'user'
-                      ? 'bg-[#2D8A70] text-white rounded-br-md'
+                      ? 'bg-cg-sage-dark text-white rounded-br-md'
                       : 'bg-white/10 text-white/90 rounded-bl-md border border-white/10'
                     }
                   `}>
@@ -371,7 +371,7 @@ export function HomeARIADemo() {
 
                   {/* Before/After compact */}
                   <div className="space-y-1.5 mb-3">
-                    <div className="bg-[#C53030]/15 rounded-lg px-3 py-2 border border-[#C53030]/20">
+                    <div className="bg-cg-error/15 rounded-lg px-3 py-2 border border-cg-error/20">
                       <p className="text-[10px] text-[#E06B6B] font-medium mb-0.5">Your message</p>
                       <p className="text-xs text-[#FCA5A5] line-clamp-2">{pendingIntervention.originalText}</p>
                     </div>

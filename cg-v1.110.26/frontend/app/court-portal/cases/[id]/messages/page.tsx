@@ -181,9 +181,9 @@ export default function MessagesPage() {
 
   const getToxicityColor = (score: number | null) => {
     if (score === null) return "bg-gray-100 text-gray-700";
-    if (score < 0.3) return "bg-[#E8F4F0] text-[#2D8A70]";
-    if (score < 0.6) return "bg-[#FEF7ED] text-[#E09520]";
-    return "bg-[#FEE2E2] text-[#9B2C2C]";
+    if (score < 0.3) return "bg-cg-sage-subtle text-cg-sage-dark";
+    if (score < 0.6) return "bg-cg-amber-subtle text-[#E09520]";
+    return "bg-cg-error-subtle text-[#9B2C2C]";
   };
 
   // Sort messages by date (newest first)
@@ -268,13 +268,13 @@ export default function MessagesPage() {
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-[#C53030]">{messages.filter(m => m.was_flagged).length}</div>
+                <div className="text-2xl font-bold text-cg-error">{messages.filter(m => m.was_flagged).length}</div>
                 <div className="text-xs text-slate-500">ARIA Flagged</div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-[#2D8A70]">
+                <div className="text-2xl font-bold text-cg-sage-dark">
                   {messages.filter(m => m.was_flagged && m.suggestion_accepted).length}
                 </div>
                 <div className="text-xs text-slate-500">Suggestions Accepted</div>
@@ -301,7 +301,7 @@ export default function MessagesPage() {
             <CardContent>
               {isLoadingMessages ? (
                 <div className="flex items-center justify-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#2D6A8F] border-t-transparent" />
+                  <div className="animate-spin rounded-full h-8 w-8 border-2 border-cg-slate border-t-transparent" />
                 </div>
               ) : sortedMessages.length === 0 ? (
                 <div className="text-center py-8 text-slate-500">
@@ -314,15 +314,15 @@ export default function MessagesPage() {
                   <div
                     key={msg.id}
                     className={`border rounded-lg p-4 ${
-                      msg.was_flagged ? "border-[#FEE2E2] bg-[#FEE2E2]" : ""
+                      msg.was_flagged ? "border-cg-error-subtle bg-cg-error-subtle" : ""
                     }`}
                   >
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center space-x-2">
                         <span className={`px-2 py-0.5 rounded text-xs font-medium ${
                           msg.sender_role === "petitioner"
-                            ? "bg-[#E0EFF8] text-[#1E4E6B]"
-                            : "bg-[#E0EFF8] text-[#1E4E6B]"
+                            ? "bg-cg-slate-subtle text-[#1E4E6B]"
+                            : "bg-cg-slate-subtle text-[#1E4E6B]"
                         }`}>
                           {msg.sender_role === "petitioner" ? "Petitioner" : "Respondent"}
                         </span>
@@ -343,13 +343,13 @@ export default function MessagesPage() {
                     <p className="text-slate-700">{msg.content}</p>
 
                     {msg.was_flagged && (
-                      <div className="mt-3 pt-3 border-t border-[#FEE2E2]">
+                      <div className="mt-3 pt-3 border-t border-cg-error-subtle">
                         <div className="flex items-center space-x-2 mb-2">
-                          <span className="text-[#C53030] font-medium text-sm">ARIA Intervention</span>
+                          <span className="text-cg-error font-medium text-sm">ARIA Intervention</span>
                           {msg.aria_categories && (
                             <div className="flex space-x-1">
                               {msg.aria_categories.map((cat: string) => (
-                                <span key={cat} className="px-1.5 py-0.5 bg-[#FEE2E2] text-[#C53030] text-xs rounded">
+                                <span key={cat} className="px-1.5 py-0.5 bg-cg-error-subtle text-cg-error text-xs rounded">
                                   {cat}
                                 </span>
                               ))}
@@ -361,7 +361,7 @@ export default function MessagesPage() {
                             <span className="font-medium">Original:</span>{" "}
                             <span className="line-through">{msg.original_content}</span>
                           </div>
-                          <div className={`${msg.suggestion_accepted ? "text-[#2D8A70]" : "text-[#E09520]"}`}>
+                          <div className={`${msg.suggestion_accepted ? "text-cg-sage-dark" : "text-[#E09520]"}`}>
                             <span className="font-medium">
                               {msg.suggestion_accepted ? "Accepted suggestion" : "Sent original anyway"}
                             </span>
@@ -389,7 +389,7 @@ export default function MessagesPage() {
 
           {/* Compose Form */}
           {showComposeForm && (
-            <Card className="border-2 border-[#E0EFF8] bg-[#E0EFF8]">
+            <Card className="border-2 border-cg-slate-subtle bg-cg-slate-subtle">
               <CardHeader>
                 <CardTitle>Send Court Message</CardTitle>
                 <CardDescription>
@@ -411,7 +411,7 @@ export default function MessagesPage() {
                     value={messageContent}
                     onChange={(e) => setMessageContent(e.target.value)}
                     placeholder="Enter your message to both parents..."
-                    className="w-full min-h-[120px] p-3 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-[#2D6A8F]"
+                    className="w-full min-h-[120px] p-3 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-cg-slate"
                   />
                 </div>
                 <div className="flex space-x-3">
@@ -458,17 +458,17 @@ export default function MessagesPage() {
                         <div className="flex space-x-2 text-xs">
                           <span className="text-slate-500">Read by:</span>
                           {msg.read_by.includes("petitioner") && (
-                            <span className="px-1.5 py-0.5 bg-[#E8F4F0] text-[#2D8A70] rounded">Petitioner</span>
+                            <span className="px-1.5 py-0.5 bg-cg-sage-subtle text-cg-sage-dark rounded">Petitioner</span>
                           )}
                           {msg.read_by.includes("respondent") && (
-                            <span className="px-1.5 py-0.5 bg-[#E8F4F0] text-[#2D8A70] rounded">Respondent</span>
+                            <span className="px-1.5 py-0.5 bg-cg-sage-subtle text-cg-sage-dark rounded">Respondent</span>
                           )}
                           {msg.read_by.length === 0 && (
                             <span className="text-slate-400">Not yet read</span>
                           )}
                         </div>
                         {msg.delivery_confirmed && (
-                          <span className="text-xs text-[#2D8A70]">Delivered</span>
+                          <span className="text-xs text-cg-sage-dark">Delivered</span>
                         )}
                       </div>
                     </div>

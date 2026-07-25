@@ -263,7 +263,7 @@ function UpcomingEventItem({ event }: { event: UpcomingEvent }) {
         </p>
       </div>
       <div className="flex flex-col items-end gap-1 flex-shrink-0">
-        <span className="text-xs font-bold text-white bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] px-3 py-1 rounded-full shadow-md">
+        <span className="text-xs font-bold text-white bg-gradient-to-r from-[var(--portal-primary)] to-cg-slate px-3 py-1 rounded-full shadow-md">
           {timeRemaining}
         </span>
         <span className="text-xs text-muted-foreground font-semibold">{dayLabel}</span>
@@ -305,7 +305,7 @@ function UpcomingEventsList({ events }: { events?: UpcomingEvent[] }) {
         <div className="p-3 border-t-2 border-border bg-muted">
           <button
             onClick={() => router.push('/schedule')}
-            className="w-full text-center text-sm text-[var(--portal-primary)] hover:text-[#2D6A8F] font-bold py-2 transition-all duration-200 hover:scale-105"
+            className="w-full text-center text-sm text-[var(--portal-primary)] hover:text-cg-slate font-bold py-2 transition-all duration-200 hover:scale-105"
           >
             View full schedule →
           </button>
@@ -639,7 +639,7 @@ function DashboardContent() {
                 </p>
                 <button
                   onClick={() => router.push('/family-files/new')}
-                  className="bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white px-8 py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-3"
+                  className="bg-gradient-to-r from-[var(--portal-primary)] to-cg-slate text-white px-8 py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 inline-flex items-center gap-3"
                 >
                   Create Family File
                   <ArrowRight className="w-5 h-5" />
@@ -934,7 +934,7 @@ function DashboardContent() {
                     </h3>
                     <button
                       onClick={() => router.push('/family-files')}
-                      className="text-sm font-medium text-[var(--portal-primary)] hover:text-[#2D6A8F] transition-colors flex items-center gap-1"
+                      className="text-sm font-medium text-[var(--portal-primary)] hover:text-cg-slate transition-colors flex items-center gap-1"
                     >
                       View all
                       <ChevronRight className="h-4 w-4" />
@@ -993,7 +993,7 @@ function DashboardContent() {
                                 {activeAgreement ? (
                                   <>Active: <span className="text-foreground">{activeAgreement.title}</span></>
                                 ) : pendingCount > 0 ? (
-                                  <span className="text-[#E09520] dark:text-[#F5A623]">{pendingCount} pending agreement{pendingCount > 1 ? 's' : ''}</span>
+                                  <span className="text-[#E09520] dark:text-cg-amber">{pendingCount} pending agreement{pendingCount > 1 ? 's' : ''}</span>
                                 ) : (
                                   <span className="text-muted-foreground">No agreements</span>
                                 )}
@@ -1015,7 +1015,7 @@ function DashboardContent() {
                   </h3>
                   <button
                     onClick={() => router.push('/activities')}
-                    className="text-sm font-medium text-[var(--portal-primary)] hover:text-[#2D6A8F] transition-colors flex items-center gap-1"
+                    className="text-sm font-medium text-[var(--portal-primary)] hover:text-cg-slate transition-colors flex items-center gap-1"
                   >
                     View all
                     <ChevronRight className="h-4 w-4" />

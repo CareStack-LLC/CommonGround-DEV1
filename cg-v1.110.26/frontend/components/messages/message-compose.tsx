@@ -437,7 +437,7 @@ export function MessageCompose({
                 return (
                   <div
                     key={attachment.id}
-                    className="relative group bg-card border-2 border-border rounded-lg p-2 pr-8 hover:border-[#3DAA8A] transition-colors shadow-sm"
+                    className="relative group bg-card border-2 border-border rounded-lg p-2 pr-8 hover:border-cg-sage transition-colors shadow-sm"
                   >
                     <div className="flex items-center gap-2">
                       {attachment.preview ? (
@@ -459,16 +459,16 @@ export function MessageCompose({
                           {formatFileSize(attachment.file.size)}
                         </p>
                         {attachment.uploading && (
-                          <p className="text-xs text-[#2D6A8F] flex items-center gap-1">
+                          <p className="text-xs text-cg-slate flex items-center gap-1">
                             <Loader2 className="w-3 h-3 animate-spin" />
                             Uploading...
                           </p>
                         )}
                         {attachment.uploaded && (
-                          <p className="text-xs text-[#2D8A70]">Uploaded</p>
+                          <p className="text-xs text-cg-sage-dark">Uploaded</p>
                         )}
                         {attachment.error && (
-                          <p className="text-xs text-[#C53030]">{attachment.error}</p>
+                          <p className="text-xs text-cg-error">{attachment.error}</p>
                         )}
                       </div>
                     </div>
@@ -476,9 +476,9 @@ export function MessageCompose({
                       <button aria-label="Remove"
                         type="button"
                         onClick={() => removeAttachment(attachment.id)}
-                        className="absolute top-1 right-1 p-1 bg-card border border-border rounded-full hover:bg-[#FEE2E2] hover:border-[#FCA5A5] transition-colors"
+                        className="absolute top-1 right-1 p-1 bg-card border border-border rounded-full hover:bg-cg-error-subtle hover:border-[#FCA5A5] transition-colors"
                       >
-                        <X className="w-3 h-3 text-muted-foreground hover:text-[#C53030]" />
+                        <X className="w-3 h-3 text-muted-foreground hover:text-cg-error" />
                       </button>
                     )}
                   </div>
@@ -506,16 +506,16 @@ export function MessageCompose({
             {isAnalyzing && (
               <div className="absolute inset-0 z-10 flex items-center justify-center bg-card/50 backdrop-blur-[1px] rounded-xl">
                 <div className="flex flex-col items-center animate-in fade-in zoom-in duration-300">
-                  <div className="w-10 h-10 bg-gradient-to-br from-[#3DAA8A]/10 to-[#3DAA8A]/5 rounded-xl flex items-center justify-center shadow-sm mb-2">
-                    <Shield className="h-5 w-5 text-[#3DAA8A] animate-pulse" />
+                  <div className="w-10 h-10 bg-gradient-to-br from-cg-sage/10 to-cg-sage/5 rounded-xl flex items-center justify-center shadow-sm mb-2">
+                    <Shield className="h-5 w-5 text-cg-sage animate-pulse" />
                   </div>
                   <h4 className="text-lg font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                     ARIA Checking...
                   </h4>
                   <div className="flex gap-1 mt-1">
-                    <div className="w-1.5 h-1.5 bg-[#3DAA8A] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                    <div className="w-1.5 h-1.5 bg-[#3DAA8A] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                    <div className="w-1.5 h-1.5 bg-[#3DAA8A] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                    <div className="w-1.5 h-1.5 bg-cg-sage rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                    <div className="w-1.5 h-1.5 bg-cg-sage rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                    <div className="w-1.5 h-1.5 bg-cg-sage rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
                   </div>
                 </div>
               </div>

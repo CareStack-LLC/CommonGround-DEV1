@@ -189,7 +189,7 @@ export default function IntakeTranscriptPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2D8A70]" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cg-sage-dark" />
       </div>
     );
   }
@@ -208,7 +208,7 @@ export default function IntakeTranscriptPage() {
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 print:block">
         <div className="flex items-center gap-4">
-          <div className="p-3 bg-[#E0EFF8] text-[#2D6A8F] rounded-xl print:hidden">
+          <div className="p-3 bg-cg-slate-subtle text-cg-slate rounded-xl print:hidden">
             <MessageSquare className="h-8 w-8" />
           </div>
           <div>
@@ -306,7 +306,7 @@ export default function IntakeTranscriptPage() {
         <Card>
           <CardContent className="pt-4">
             <p className="text-xs text-muted-foreground">ARIA Messages</p>
-            <p className="text-2xl font-bold text-[#2D6A8F]">
+            <p className="text-2xl font-bold text-cg-slate">
               {messages.filter((m) => m.role === "assistant").length}
             </p>
           </CardContent>
@@ -351,7 +351,7 @@ export default function IntakeTranscriptPage() {
                       <AvatarFallback
                         className={
                           message.role === "assistant"
-                            ? "bg-[#E0EFF8] text-[#2D6A8F]"
+                            ? "bg-cg-slate-subtle text-cg-slate"
                             : "bg-blue-100 text-blue-600"
                         }
                       >

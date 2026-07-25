@@ -41,7 +41,7 @@ const plans = [
       'PDF court exports',
       'Mobile apps (coming soon)',
     ],
-    color: '#F5A623',
+    color: 'var(--cg-amber)',
     cta: 'Start 14-Day Trial',
   },
   {
@@ -205,17 +205,17 @@ export default function PricingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F4F8F7]">
+    <div className="min-h-screen bg-background">
       {/* Hero */}
       <section className="relative pt-24 pb-16 px-6 overflow-hidden">
         <div className="absolute inset-0 opacity-5">
           <div className="absolute top-0 left-1/4 w-96 h-96 bg-[var(--portal-primary)] rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#F5A623] rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-cg-amber rounded-full blur-3xl" />
         </div>
 
         <div className="relative max-w-4xl mx-auto text-center">
           <h1
-            className="text-5xl sm:text-6xl lg:text-7xl font-serif text-[#1E3A4A] mb-6 leading-[1.05]"
+            className="text-5xl sm:text-6xl lg:text-7xl font-serif text-foreground mb-6 leading-[1.05]"
             style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
             Start free.
@@ -250,7 +250,7 @@ export default function PricingPage() {
               }`}
             >
               Annual
-              <span className="ml-2 text-xs text-[#F5A623] font-bold">Save 17%</span>
+              <span className="ml-2 text-xs text-cg-amber font-bold">Save 17%</span>
             </button>
           </div>
         </div>
@@ -264,12 +264,12 @@ export default function PricingPage() {
               <div
                 key={plan.code}
                 className={`relative bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 ${
-                  plan.popular ? 'ring-2 ring-[#F5A623] scale-105' : ''
+                  plan.popular ? 'ring-2 ring-cg-amber scale-105' : ''
                 }`}
               >
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <span className="bg-[#F5A623] text-white text-sm font-medium px-4 py-1 rounded-full">
+                    <span className="bg-cg-amber text-white text-sm font-medium px-4 py-1 rounded-full">
                       Most Popular
                     </span>
                   </div>
@@ -285,7 +285,7 @@ export default function PricingPage() {
 
                 <div className="text-center mb-6">
                   <h2
-                    className="text-3xl font-serif text-[#1E3A4A] mb-2"
+                    className="text-3xl font-serif text-foreground mb-2"
                     style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
                   >
                     {plan.name}
@@ -300,7 +300,7 @@ export default function PricingPage() {
                   </div>
 
                   {getSavings(plan) && (
-                    <div className="text-sm text-[#F5A623] font-medium">{getSavings(plan)}</div>
+                    <div className="text-sm text-cg-amber font-medium">{getSavings(plan)}</div>
                   )}
                 </div>
 
@@ -346,10 +346,10 @@ export default function PricingPage() {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
             <h2
-              className="text-3xl sm:text-4xl font-serif text-[#1E3A4A] mb-4"
+              className="text-3xl sm:text-4xl font-serif text-foreground mb-4"
               style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
             >
-              Compare every <span className="text-[#3DAA8A]">feature</span>
+              Compare every <span className="text-cg-sage">feature</span>
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               See exactly what&apos;s included in each plan.
@@ -360,14 +360,14 @@ export default function PricingPage() {
           <div className="hidden md:block bg-white rounded-2xl border-2 border-gray-100 overflow-hidden shadow-sm">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-[#1E3A4A] text-white">
+                <tr className="bg-foreground text-white">
                   <th className="text-left py-4 px-6 font-semibold">Feature</th>
                   <th className="text-center py-4 px-4 font-semibold w-[110px]">
                     <div>Web Starter</div>
                     <div className="text-xs font-normal text-white/60 mt-0.5">Free</div>
                   </th>
-                  <th className="text-center py-4 px-4 font-semibold w-[110px] bg-[#F5A623]/20">
-                    <div className="text-[#F5A623]">Plus</div>
+                  <th className="text-center py-4 px-4 font-semibold w-[110px] bg-cg-amber/20">
+                    <div className="text-cg-amber">Plus</div>
                     <div className="text-xs font-normal text-white/60 mt-0.5">$17.99/mo</div>
                   </th>
                   <th className="text-center py-4 px-4 font-semibold w-[110px]">
@@ -381,7 +381,7 @@ export default function PricingPage() {
                   <tr>
                     <td
                       colSpan={4}
-                      className="py-3 px-6 bg-[#F4F8F7] font-semibold text-[#1E3A4A] text-xs uppercase tracking-wide border-t border-gray-200"
+                      className="py-3 px-6 bg-background font-semibold text-foreground text-xs uppercase tracking-wide border-t border-gray-200"
                     >
                       {category.name}
                     </td>
@@ -393,7 +393,7 @@ export default function PricingPage() {
                     >
                       <td className="py-3 px-6 text-gray-700">{feature.name}</td>
                       <td className="py-3 px-4 text-center">{renderCheckmark(feature.free)}</td>
-                      <td className="py-3 px-4 text-center bg-[#F5A623]/[0.03]">
+                      <td className="py-3 px-4 text-center bg-cg-amber/[0.03]">
                         {renderCheckmark(feature.plus)}
                       </td>
                       <td className="py-3 px-4 text-center">{renderCheckmark(feature.complete)}</td>
@@ -408,8 +408,8 @@ export default function PricingPage() {
           <div className="md:hidden space-y-6">
             {comparisonCategories.map((category) => (
               <div key={category.name} className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
-                <div className="bg-[#F4F8F7] py-3 px-4 border-b border-gray-200">
-                  <h3 className="font-semibold text-[#1E3A4A] text-xs uppercase tracking-wide">
+                <div className="bg-background py-3 px-4 border-b border-gray-200">
+                  <h3 className="font-semibold text-foreground text-xs uppercase tracking-wide">
                     {category.name}
                   </h3>
                 </div>
@@ -422,8 +422,8 @@ export default function PricingPage() {
                           <span className="text-gray-600 font-medium">Free</span>
                           {renderCheckmark(feature.free)}
                         </div>
-                        <div className="flex flex-col items-center gap-1 rounded-lg bg-[#F5A623]/5 py-1.5 ring-1 ring-[#F5A623]/20">
-                          <span className="text-[#F5A623] font-medium">Plus</span>
+                        <div className="flex flex-col items-center gap-1 rounded-lg bg-cg-amber/5 py-1.5 ring-1 ring-cg-amber/20">
+                          <span className="text-cg-amber font-medium">Plus</span>
                           {renderCheckmark(feature.plus)}
                         </div>
                         <div className="flex flex-col items-center gap-1 rounded-lg bg-gray-50 py-1.5">
@@ -444,10 +444,10 @@ export default function PricingPage() {
       <section className="py-16 px-6 bg-gradient-to-br from-[#E8F4F8] to-white">
         <div className="max-w-4xl mx-auto text-center">
           <h2
-            className="text-3xl sm:text-4xl font-serif text-[#1E3A4A] mb-4"
+            className="text-3xl sm:text-4xl font-serif text-foreground mb-4"
             style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
-            ARIA messaging. <span className="text-[#3DAA8A]">Included free.</span>
+            ARIA messaging. <span className="text-cg-sage">Included free.</span>
           </h2>
           <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
             Most co-parenting apps charge for AI features. CommonGround includes ARIA messaging in the free tier &mdash; no ads, no message limits, no expiring trial.
@@ -473,22 +473,22 @@ export default function PricingPage() {
       <section className="py-16 px-6 bg-white">
         <div className="max-w-4xl mx-auto text-center">
           <h2
-            className="text-3xl sm:text-4xl font-serif text-[#1E3A4A] mb-4"
+            className="text-3xl sm:text-4xl font-serif text-foreground mb-4"
             style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
-            The cost of <span className="text-[#F5A623]">not</span> having CommonGround
+            The cost of <span className="text-cg-amber">not</span> having CommonGround
           </h2>
           <p className="text-lg text-gray-600 mb-10 max-w-2xl mx-auto">
             One heated text in court. One missed exchange. One undocumented conversation. The cost adds up fast.
           </p>
 
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-[#FEF7ED] rounded-xl p-6 border border-[#F5A623]/10">
-              <div className="h-12 w-12 rounded-xl bg-[#F5A623]/10 flex items-center justify-center mx-auto mb-3">
-                <Scale className="h-6 w-6 text-[#F5A623]" />
+            <div className="bg-cg-amber-subtle rounded-xl p-6 border border-cg-amber/10">
+              <div className="h-12 w-12 rounded-xl bg-cg-amber/10 flex items-center justify-center mx-auto mb-3">
+                <Scale className="h-6 w-6 text-cg-amber" />
               </div>
               <p className="text-sm text-gray-600 mb-1">Avg. attorney hour</p>
-              <p className="text-3xl font-bold text-[#1E3A4A]">$300+</p>
+              <p className="text-3xl font-bold text-foreground">$300+</p>
               <p className="text-xs text-gray-600 mt-2">1 hour saved = 8 months of Complete</p>
             </div>
             <div className="bg-[#E8F4F8] rounded-xl p-6 border border-[var(--portal-primary)]/10">
@@ -496,15 +496,15 @@ export default function PricingPage() {
                 <DollarSign className="h-6 w-6 text-[var(--portal-primary)]" />
               </div>
               <p className="text-sm text-gray-600 mb-1">Avg. mediation session</p>
-              <p className="text-3xl font-bold text-[#1E3A4A]">$200–500</p>
+              <p className="text-3xl font-bold text-foreground">$200–500</p>
               <p className="text-xs text-gray-600 mt-2">Calmer messages mean fewer sessions</p>
             </div>
-            <div className="bg-[#FEF7ED] rounded-xl p-6 border border-[#F5A623]/10">
-              <div className="h-12 w-12 rounded-xl bg-[#F5A623]/10 flex items-center justify-center mx-auto mb-3">
-                <Clock className="h-6 w-6 text-[#F5A623]" />
+            <div className="bg-cg-amber-subtle rounded-xl p-6 border border-cg-amber/10">
+              <div className="h-12 w-12 rounded-xl bg-cg-amber/10 flex items-center justify-center mx-auto mb-3">
+                <Clock className="h-6 w-6 text-cg-amber" />
               </div>
               <p className="text-sm text-gray-600 mb-1">Hours spent coordinating</p>
-              <p className="text-3xl font-bold text-[#1E3A4A]">Countless</p>
+              <p className="text-3xl font-bold text-foreground">Countless</p>
               <p className="text-xs text-gray-600 mt-2">Time you could spend with your kids</p>
             </div>
           </div>
@@ -516,10 +516,10 @@ export default function PricingPage() {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-10">
             <h2
-              className="text-3xl sm:text-4xl font-serif text-[#1E3A4A] mb-3"
+              className="text-3xl sm:text-4xl font-serif text-foreground mb-3"
               style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
             >
-              How CommonGround <span className="text-[#3DAA8A]">stacks up</span>
+              How CommonGround <span className="text-cg-sage">stacks up</span>
             </h2>
             <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
               A side-by-side look at what each app includes at the subscription tier families actually pay for.
@@ -527,7 +527,7 @@ export default function PricingPage() {
           </div>
 
           <div className="mb-12">
-            <h3 className="font-serif text-xl sm:text-2xl text-[#1E3A4A] mb-4 text-center">
+            <h3 className="font-serif text-xl sm:text-2xl text-foreground mb-4 text-center">
               CommonGround vs OurFamilyWizard
             </h3>
             <ComparisonTable
@@ -538,7 +538,7 @@ export default function PricingPage() {
           </div>
 
           <div className="mb-6">
-            <h3 className="font-serif text-xl sm:text-2xl text-[#1E3A4A] mb-4 text-center">
+            <h3 className="font-serif text-xl sm:text-2xl text-foreground mb-4 text-center">
               CommonGround vs TalkingParents
             </h3>
             <ComparisonTable
@@ -557,9 +557,9 @@ export default function PricingPage() {
       {/* Professional Pricing */}
       <section className="py-12 px-6">
         <div className="max-w-6xl mx-auto">
-          <div className="bg-gradient-to-br from-[#1E3A4A]/5 to-white rounded-2xl p-8 border-2 border-[var(--portal-primary)]/10 text-center">
+          <div className="bg-gradient-to-br from-foreground/5 to-white rounded-2xl p-8 border-2 border-[var(--portal-primary)]/10 text-center">
             <h3
-              className="text-2xl font-serif text-[#1E3A4A] mb-3"
+              className="text-2xl font-serif text-foreground mb-3"
               style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
             >
               For Family Law Professionals
@@ -569,7 +569,7 @@ export default function PricingPage() {
             </p>
             <button
               onClick={() => router.push('/professionals')}
-              className="px-6 py-3 bg-[var(--portal-primary)] text-white rounded-xl font-medium hover:bg-[#2D6A8F] transition-all duration-200 shadow-md hover:shadow-lg"
+              className="px-6 py-3 bg-[var(--portal-primary)] text-white rounded-xl font-medium hover:bg-cg-slate transition-all duration-200 shadow-md hover:shadow-lg"
             >
               Schedule a Demo
             </button>
@@ -582,7 +582,7 @@ export default function PricingPage() {
         <FaqJsonLd items={PRICING_FAQ_ITEMS} />
         <div className="max-w-3xl mx-auto">
           <h2
-            className="text-4xl font-serif text-[#1E3A4A] mb-12 text-center"
+            className="text-4xl font-serif text-foreground mb-12 text-center"
             style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
           >
             Common questions
@@ -591,7 +591,7 @@ export default function PricingPage() {
           <div className="space-y-6">
             {PRICING_FAQ_ITEMS.map((faq) => (
               <details key={faq.question} className="group bg-gray-50 rounded-xl p-6">
-                <summary className="cursor-pointer list-none flex items-center justify-between font-medium text-[#1E3A4A]">
+                <summary className="cursor-pointer list-none flex items-center justify-between font-medium text-foreground">
                   {faq.question}
                   <span className="text-gray-600 group-open:rotate-180 transition-transform">▼</span>
                 </summary>
@@ -617,7 +617,7 @@ export default function PricingPage() {
       <section className="py-20 px-6 bg-gradient-to-br from-[var(--portal-primary)] to-[#234846] text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#F5A623] rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-cg-amber rounded-full blur-3xl" />
         </div>
         <div className="relative max-w-4xl mx-auto text-center">
           <h2

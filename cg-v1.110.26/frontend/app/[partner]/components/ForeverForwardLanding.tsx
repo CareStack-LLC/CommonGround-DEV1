@@ -67,17 +67,17 @@ export default function ForeverForwardLanding({ partnerSlug }: ForeverForwardLan
     };
 
     return (
-        <div className="min-h-screen bg-gray-900 text-white font-sans selection:bg-[#F5A623]/30">
+        <div className="min-h-screen bg-gray-900 text-white font-sans selection:bg-cg-amber/30">
             {/* Split Hero Section */}
             <div className="grid lg:grid-cols-2 min-h-[90vh]">
                 {/* Left: Content */}
                 <div className="relative flex flex-col justify-center p-8 lg:p-16 xl:p-24 order-2 lg:order-1">
-                    <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-[#F5A623]/10 via-gray-900 to-gray-900 -z-10" />
+                    <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-cg-amber/10 via-gray-900 to-gray-900 -z-10" />
 
                     {/* Logos */}
                     <div className="flex items-center gap-6 mb-12">
                         <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 bg-[#F5A623] rounded-lg flex items-center justify-center font-bold text-gray-900">FF</div>
+                            <div className="h-10 w-10 bg-cg-amber rounded-lg flex items-center justify-center font-bold text-gray-900">FF</div>
                             <span className="font-bold tracking-tight">FOREVER FORWARD</span>
                         </div>
                         <div className="h-8 w-px bg-gray-700" />
@@ -90,7 +90,7 @@ export default function ForeverForwardLanding({ partnerSlug }: ForeverForwardLan
                     <h1 className="text-5xl md:text-6xl font-black text-white mb-6 leading-[1.1] tracking-tight">
                         Strong fathers. <br />
                         Safer families. <br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F5A623] to-[#F5A623]">
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-cg-amber to-cg-amber">
                             Calmer co-parenting.
                         </span>
                     </h1>
@@ -102,7 +102,7 @@ export default function ForeverForwardLanding({ partnerSlug }: ForeverForwardLan
                     <div className="flex flex-col sm:flex-row gap-4 mb-8">
                         <Button
                             onClick={scrollToGrant}
-                            className="bg-[#F5A623] hover:bg-[#E09520] text-gray-900 font-bold h-14 px-8 text-lg"
+                            className="bg-cg-amber hover:bg-[#E09520] text-gray-900 font-bold h-14 px-8 text-lg"
                         >
                             Get a Grant Code
                         </Button>
@@ -133,14 +133,14 @@ export default function ForeverForwardLanding({ partnerSlug }: ForeverForwardLan
 
             {/* Why This Partnership Exists */}
             <section className="py-24 px-6 bg-gray-900 border-t border-gray-800 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#F5A623]/5 rounded-full blur-[120px] translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+                <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-cg-amber/5 rounded-full blur-[120px] translate-x-1/2 -translate-y-1/2 pointer-events-none" />
 
                 <div className="max-w-4xl mx-auto text-center mb-16">
                     <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
                         Why Forever Forward × CommonGround works
                     </h2>
                     <p className="text-xl text-gray-400 leading-relaxed mb-8">
-                        Forever Forward helps fathers build <strong className="text-[#F5A623]">strength, safety, and smart skills</strong>—because the digital era is moving fast, and families deserve leaders who aren't getting left behind.
+                        Forever Forward helps fathers build <strong className="text-cg-amber">strength, safety, and smart skills</strong>—because the digital era is moving fast, and families deserve leaders who aren't getting left behind.
                     </p>
                     <p className="text-lg text-gray-400 leading-relaxed max-w-3xl mx-auto">
                         But even the strongest dads can get pulled into chaos when co-parenting turns into constant arguments, misunderstandings, and stress. <br /><br />
@@ -172,22 +172,22 @@ export default function ForeverForwardLanding({ partnerSlug }: ForeverForwardLan
                                 icon: MessageSquare,
                                 title: "Calm messaging support",
                                 desc: "So conversations don't spiral.",
-                                color: "text-[#F5A623]",
-                                bg: "bg-[#F5A623]/10"
+                                color: "text-cg-amber",
+                                bg: "bg-cg-amber/10"
                             },
                             {
                                 icon: Clock,
                                 title: "Shared scheduling",
                                 desc: "So pickups, school, and routines stay clear.",
-                                color: "text-[#F5A623]",
-                                bg: "bg-[#F5A623]/10"
+                                color: "text-cg-amber",
+                                bg: "bg-cg-amber/10"
                             },
                             {
                                 icon: Scale,
                                 title: "Expenses & responsibilities",
                                 desc: "So money doesn't become another fight.",
-                                color: "text-[#F5A623]",
-                                bg: "bg-[#F5A623]/10"
+                                color: "text-cg-amber",
+                                bg: "bg-cg-amber/10"
                             },
                             {
                                 icon: CheckCircle,
@@ -197,7 +197,7 @@ export default function ForeverForwardLanding({ partnerSlug }: ForeverForwardLan
                                 bg: "bg-gray-700/50"
                             }
                         ].map((item, idx) => (
-                            <Card key={idx} className="bg-gray-800 border-gray-700 hover:border-[#F5A623]/50 transition-colors group">
+                            <Card key={idx} className="bg-gray-800 border-gray-700 hover:border-cg-amber/50 transition-colors group">
                                 <CardContent className="pt-8 p-8 h-full flex flex-col">
                                     <div className={`w-12 h-12 rounded-xl ${item.bg} flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
                                         <item.icon className={`h-6 w-6 ${item.color}`} />
@@ -232,7 +232,7 @@ export default function ForeverForwardLanding({ partnerSlug }: ForeverForwardLan
                                 "Tools that support stability at home while dads level up in life"
                             ].map((item, i) => (
                                 <li key={i} className="flex items-start gap-3">
-                                    <CheckCircle className="h-5 w-5 text-[#F5A623] shrink-0 mt-0.5" />
+                                    <CheckCircle className="h-5 w-5 text-cg-amber shrink-0 mt-0.5" />
                                     <span className="text-gray-300">{item}</span>
                                 </li>
                             ))}
@@ -240,7 +240,7 @@ export default function ForeverForwardLanding({ partnerSlug }: ForeverForwardLan
 
                         <div className="bg-gray-900 rounded-xl p-6 border border-gray-700">
                             <h4 className="text-white font-bold mb-4 flex items-center gap-2">
-                                <ArrowRight className="h-4 w-4 text-[#F5A623]" />
+                                <ArrowRight className="h-4 w-4 text-cg-amber" />
                                 How it works
                             </h4>
                             <div className="flex items-center justify-between text-sm text-gray-400">
@@ -255,12 +255,12 @@ export default function ForeverForwardLanding({ partnerSlug }: ForeverForwardLan
 
                     {/* Logic Box */}
                     <div className="bg-gray-900 border border-gray-700 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-[#F5A623]/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2" />
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-cg-amber/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2" />
 
                         <h3 className="text-xl font-bold text-white mb-6 relative z-10">Have a code? Activate it now.</h3>
 
                         <div className="space-y-4 relative z-10">
-                            <label className="block text-sm font-medium text-[#F5A623] uppercase tracking-wider">
+                            <label className="block text-sm font-medium text-cg-amber uppercase tracking-wider">
                                 Enter Member Grant Code
                             </label>
                             <div className="flex gap-2">
@@ -273,13 +273,13 @@ export default function ForeverForwardLanding({ partnerSlug }: ForeverForwardLan
                                         setCodeError(null);
                                         setCodeValid(false);
                                     }}
-                                    className="bg-gray-800 border-gray-600 text-white placeholder:text-gray-600 h-12 text-lg font-mono focus:border-[#F5A623] transition-colors"
+                                    className="bg-gray-800 border-gray-600 text-white placeholder:text-gray-600 h-12 text-lg font-mono focus:border-cg-amber transition-colors"
                                     disabled={validating || codeValid}
                                 />
                                 <Button aria-label="Next"
                                     onClick={handleValidateCode}
                                     disabled={validating || codeValid}
-                                    className="bg-[#F5A623] hover:bg-[#E09520] text-gray-900 font-bold h-12 px-6"
+                                    className="bg-cg-amber hover:bg-[#E09520] text-gray-900 font-bold h-12 px-6"
                                 >
                                     {validating ? <Loader2 className="animate-spin" /> : <ArrowRight />}
                                 </Button>
@@ -292,7 +292,7 @@ export default function ForeverForwardLanding({ partnerSlug }: ForeverForwardLan
                                 </p>
                             )}
                             {codeValid && (
-                                <p className="text-[#5BC4A0] text-sm flex items-center gap-2 animate-in fade-in slide-in-from-top-1">
+                                <p className="text-cg-sage-light text-sm flex items-center gap-2 animate-in fade-in slide-in-from-top-1">
                                     <CheckCircle className="h-4 w-4" />
                                     Code verified! Redirecting...
                                 </p>
@@ -351,8 +351,8 @@ export default function ForeverForwardLanding({ partnerSlug }: ForeverForwardLan
                                 "Serious about growth—and willing to use tools to keep things respectful"
                             ].map((item, i) => (
                                 <div key={i} className="flex gap-3">
-                                    <div className="h-8 w-8 rounded-full bg-[#F5A623]/10 flex items-center justify-center shrink-0">
-                                        <span className="text-[#F5A623] font-bold text-sm">{i + 1}</span>
+                                    <div className="h-8 w-8 rounded-full bg-cg-amber/10 flex items-center justify-center shrink-0">
+                                        <span className="text-cg-amber font-bold text-sm">{i + 1}</span>
                                     </div>
                                     <p className="text-gray-300 text-sm">{item}</p>
                                 </div>
@@ -371,7 +371,7 @@ export default function ForeverForwardLanding({ partnerSlug }: ForeverForwardLan
                     </p>
                     <div className="flex flex-col sm:flex-row justify-center gap-4 mb-12">
                         <Button
-                            className="bg-[#F5A623] hover:bg-[#E09520] text-gray-900 font-bold h-14 px-8 text-lg rounded-xl"
+                            className="bg-cg-amber hover:bg-[#E09520] text-gray-900 font-bold h-14 px-8 text-lg rounded-xl"
                             onClick={() => window.open('https://4everforward.net', '_blank')}
                         >
                             Apply for a Grant Code

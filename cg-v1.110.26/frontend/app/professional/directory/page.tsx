@@ -50,10 +50,10 @@ interface DirectoryProfile {
 }
 
 const PROFESSIONAL_TYPE_INFO: Record<string, { label: string; color: string }> = {
-    attorney: { label: "Attorney", color: "bg-[#F4F8F7] text-[#1E3A4A] border-2 border-[#1E3A4A]/30" },
+    attorney: { label: "Attorney", color: "bg-background text-foreground border-2 border-foreground/30" },
     paralegal: { label: "Paralegal", color: "bg-blue-50 text-blue-900 border-2 border-blue-900/30" },
     mediator: { label: "Mediator", color: "bg-[#F0F7FC] text-[#163A50] border-2 border-[#163A50]/30" },
-    parenting_coordinator: { label: "Parenting Coordinator", color: "bg-[#E8F4F0] text-[#1B5544] border-2 border-[#1B5544]/30" },
+    parenting_coordinator: { label: "Parenting Coordinator", color: "bg-cg-sage-subtle text-[#1B5544] border-2 border-[#1B5544]/30" },
     intake_coordinator: { label: "Intake Coordinator", color: "bg-[#F0F7FC] text-[#163A50] border-2 border-[#163A50]/30" },
     practice_admin: { label: "Practice Admin", color: "bg-slate-50 text-slate-900 border-2 border-slate-900/30" },
 };
@@ -113,17 +113,17 @@ export default function ProfessionalDirectoryPage() {
             `}</style>
 
             {/* Header */}
-            <div className="relative overflow-hidden rounded-sm bg-gradient-to-br from-[#1E3A4A] via-[#2D6A8F] to-[#3DAA8A] px-8 py-8 shadow-2xl border-2 border-[#1E3A4A]/40">
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#2D6A8F] via-[#D4AF37] to-[#2D6A8F]" />
+            <div className="relative overflow-hidden rounded-sm bg-gradient-to-br from-foreground via-cg-slate to-cg-sage px-8 py-8 shadow-2xl border-2 border-foreground/40">
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cg-slate via-[#D4AF37] to-cg-slate" />
                 <div className="flex items-start gap-5">
-                    <div className="p-4 bg-[#F4F8F7] border-2 border-[#1E3A4A]/20 rounded-sm shadow-xl shrink-0">
-                        <Scale className="h-8 w-8 text-[#1E3A4A]" strokeWidth={1.5} />
+                    <div className="p-4 bg-background border-2 border-foreground/20 rounded-sm shadow-xl shrink-0">
+                        <Scale className="h-8 w-8 text-foreground" strokeWidth={1.5} />
                     </div>
                     <div>
                         <h1 className="serif text-3xl lg:text-4xl font-bold text-white leading-tight tracking-tight">
                             Professional Directory
                         </h1>
-                        <p className="sans text-[#E8F4F0] mt-2 text-sm tracking-wide leading-relaxed">
+                        <p className="sans text-cg-sage-subtle mt-2 text-sm tracking-wide leading-relaxed">
                             Verified Family Law Practitioners & Specialists
                         </p>
                     </div>
@@ -133,27 +133,27 @@ export default function ProfessionalDirectoryPage() {
             {/* Search Bar */}
             <div className="flex gap-3">
                 <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#1E3A4A]/60" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground/60" />
                     <Input
                         placeholder="Search by name, headline, or specialty..."
-                        className="pl-10 h-11 border-2 border-slate-300 focus:border-[#1E3A4A] focus:ring-[#1E3A4A] sans"
+                        className="pl-10 h-11 border-2 border-slate-300 focus:border-foreground focus:ring-foreground sans"
                         value={searchQuery}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
                     />
                 </div>
                 <Button
                     variant="outline"
-                    className={`border-2 sans ${showFilters ? "bg-[#F4F8F7] border-[#1E3A4A]/30" : "border-slate-300 hover:bg-[#F4F8F7]"}`}
+                    className={`border-2 sans ${showFilters ? "bg-background border-foreground/30" : "border-slate-300 hover:bg-background"}`}
                     onClick={() => setShowFilters(!showFilters)}
                 >
                     <Filter className="h-4 w-4 mr-2" />
                     Filters {showFilters ? "▴" : "▾"}
                 </Button>
-                <div className="hidden sm:flex border-2 border-[#1E3A4A]/20 rounded-sm overflow-hidden">
+                <div className="hidden sm:flex border-2 border-foreground/20 rounded-sm overflow-hidden">
                     <Button
                         variant="ghost"
                         size="sm"
-                        className={`rounded-none px-3 ${viewMode === "grid" ? "bg-[#F4F8F7]" : ""}`}
+                        className={`rounded-none px-3 ${viewMode === "grid" ? "bg-background" : ""}`}
                         onClick={() => setViewMode("grid")}
                     >
                         <LayoutGrid className="h-4 w-4" />
@@ -161,7 +161,7 @@ export default function ProfessionalDirectoryPage() {
                     <Button
                         variant="ghost"
                         size="sm"
-                        className={`rounded-none px-3 ${viewMode === "list" ? "bg-[#F4F8F7]" : ""}`}
+                        className={`rounded-none px-3 ${viewMode === "list" ? "bg-background" : ""}`}
                         onClick={() => setViewMode("list")}
                     >
                         <ListIcon className="h-4 w-4" />
@@ -171,11 +171,11 @@ export default function ProfessionalDirectoryPage() {
 
             {/* Filters */}
             {showFilters && (
-                <Card className="border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white shadow-md">
+                <Card className="border-2 border-foreground/30 bg-gradient-to-br from-white via-background/30 to-white shadow-md">
                     <CardContent className="pt-4 pb-4">
                         <div className="grid sm:grid-cols-4 gap-3">
                             <div>
-                                <label className="sans text-xs font-bold text-[#1E3A4A]/60 block mb-1.5 tracking-[0.1em] uppercase">License State</label>
+                                <label className="sans text-xs font-bold text-foreground/60 block mb-1.5 tracking-[0.1em] uppercase">License State</label>
                                 <Select value={stateFilter} onValueChange={setStateFilter}>
                                     <SelectTrigger className="bg-white border-2 border-slate-300 sans"><SelectValue placeholder="All states" /></SelectTrigger>
                                     <SelectContent>
@@ -187,7 +187,7 @@ export default function ProfessionalDirectoryPage() {
                                 </Select>
                             </div>
                             <div>
-                                <label className="sans text-xs font-bold text-[#1E3A4A]/60 block mb-1.5 tracking-[0.1em] uppercase">Professional Type</label>
+                                <label className="sans text-xs font-bold text-foreground/60 block mb-1.5 tracking-[0.1em] uppercase">Professional Type</label>
                                 <Select value={typeFilter} onValueChange={setTypeFilter}>
                                     <SelectTrigger className="bg-white border-2 border-slate-300 sans"><SelectValue placeholder="All types" /></SelectTrigger>
                                     <SelectContent>
@@ -202,7 +202,7 @@ export default function ProfessionalDirectoryPage() {
                                 <Button
                                     variant={featuredOnly ? "default" : "outline"}
                                     size="sm"
-                                    className={featuredOnly ? "bg-[#1E3A4A] hover:bg-[#1E3A4A] text-[#F4F8F7] border-2 border-[#1E3A4A]/40 shadow-md sans" : "border-2 border-slate-300 hover:bg-[#F4F8F7] sans"}
+                                    className={featuredOnly ? "bg-foreground hover:bg-foreground text-background border-2 border-foreground/40 shadow-md sans" : "border-2 border-slate-300 hover:bg-background sans"}
                                     onClick={() => setFeaturedOnly(!featuredOnly)}
                                 >
                                     <Star className="h-3.5 w-3.5 mr-1.5" strokeWidth={2} />
@@ -276,7 +276,7 @@ function ProfileCard({ profile }: { profile: DirectoryProfile }) {
     };
 
     return (
-        <Card className={`group hover:shadow-lg transition-all ${profile.is_featured ? "ring-2 ring-[#D4AF37] bg-gradient-to-br from-[#F4F8F7]/30 to-white" : ""}`}>
+        <Card className={`group hover:shadow-lg transition-all ${profile.is_featured ? "ring-2 ring-[#D4AF37] bg-gradient-to-br from-background/30 to-white" : ""}`}>
             <CardContent className="pt-5">
                 {/* Featured Badge */}
                 {profile.is_featured && (
@@ -319,7 +319,7 @@ function ProfileCard({ profile }: { profile: DirectoryProfile }) {
                             <MapPin className="h-3 w-3 text-slate-400 flex-shrink-0" />
                             <span>{profile.license_state}</span>
                             {profile.license_verified && (
-                                <span className="flex items-center gap-0.5 text-[#2D8A70]">
+                                <span className="flex items-center gap-0.5 text-cg-sage-dark">
                                     <CheckCircle2 className="h-3 w-3" /> Verified
                                 </span>
                             )}
@@ -388,7 +388,7 @@ function ProfileListItem({ profile }: { profile: DirectoryProfile }) {
     };
 
     return (
-        <Card className={`hover:shadow-md transition-all ${profile.is_featured ? "ring-1 ring-[#D4AF37]/50 bg-[#F4F8F7]/30" : ""}`}>
+        <Card className={`hover:shadow-md transition-all ${profile.is_featured ? "ring-1 ring-[#D4AF37]/50 bg-background/30" : ""}`}>
             <CardContent className="py-4">
                 <div className="flex items-center gap-4">
                     <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center text-slate-500 flex-shrink-0">
@@ -403,7 +403,7 @@ function ProfileListItem({ profile }: { profile: DirectoryProfile }) {
                                 </Badge>
                             )}
                             {profile.license_verified && (
-                                <span className="flex items-center gap-0.5 text-[10px] text-[#2D8A70]">
+                                <span className="flex items-center gap-0.5 text-[10px] text-cg-sage-dark">
                                     <CheckCircle2 className="h-3 w-3" /> Verified
                                 </span>
                             )}

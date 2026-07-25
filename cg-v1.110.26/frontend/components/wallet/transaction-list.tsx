@@ -90,9 +90,9 @@ function getTransactionColor(type: string): { bg: string; text: string } {
     case 'fee':
       return { bg: 'bg-cg-error-subtle', text: 'text-cg-error' };
     case 'gift_received':
-      return { bg: 'bg-[#E0EFF8] dark:bg-[#1E3A4A]/30', text: 'text-[#2D6A8F] dark:text-[#4BA8C8]' };
+      return { bg: 'bg-cg-slate-subtle dark:bg-foreground/30', text: 'text-cg-slate dark:text-cg-slate-light' };
     case 'refund':
-      return { bg: 'bg-[#E0EFF8] dark:bg-[#1E3A4A]/30', text: 'text-[#2D6A8F] dark:text-[#4BA8C8]' };
+      return { bg: 'bg-cg-slate-subtle dark:bg-foreground/30', text: 'text-cg-slate dark:text-cg-slate-light' };
     default:
       return { bg: 'bg-muted', text: 'text-muted-foreground' };
   }
@@ -185,7 +185,7 @@ export default function TransactionList({
                     {/* Amount */}
                     <div className="text-right flex-shrink-0">
                       <p className={`font-mono text-lg tabular-nums font-bold ${
-                        credit ? 'text-[#2D8A70]' : 'text-foreground'
+                        credit ? 'text-cg-sage-dark' : 'text-foreground'
                       }`}>
                         {credit ? '+' : '-'}{formatCurrency(tx.amount)}
                       </p>

@@ -267,14 +267,14 @@ export default function HighConflictPage() {
       {/* ═══════════════════════════════════════════════════
           STORY — A short narrative that captivates
       ═══════════════════════════════════════════════════ */}
-      <section className="relative overflow-hidden py-20 lg:py-28 bg-gradient-to-b from-[#F4F8F7] to-white">
+      <section className="relative overflow-hidden py-20 lg:py-28 bg-gradient-to-b from-background to-white">
         <div className="max-w-3xl mx-auto px-6">
           <div className="text-center mb-16">
-            <p className="font-medium mb-3 tracking-wide uppercase text-sm" style={{ color: '#C53030' }}>
+            <p className="font-medium mb-3 tracking-wide uppercase text-sm" style={{ color: 'var(--cg-error)' }}>
               A day in the life
             </p>
             <h2
-              className="text-3xl sm:text-4xl lg:text-[2.75rem] text-[#1E3A4A] leading-[1.15]"
+              className="text-3xl sm:text-4xl lg:text-[2.75rem] text-foreground leading-[1.15]"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               The message that
@@ -282,15 +282,15 @@ export default function HighConflictPage() {
             </h2>
           </div>
           <div className="relative">
-            <div className="absolute left-[19px] top-3 bottom-3 w-px bg-gradient-to-b from-[#C53030]/40 via-[#F5A623]/40 to-[#3DAA8A]/50" />
+            <div className="absolute left-[19px] top-3 bottom-3 w-px bg-gradient-to-b from-cg-error/40 via-cg-amber/40 to-cg-sage/50" />
             <div className="space-y-10">
               {story.map((beat, i) => {
                 const dot =
                   beat.tone === 'before'
-                    ? '#C53030'
+                    ? 'var(--cg-error)'
                     : beat.tone === 'turn'
-                    ? '#F5A623'
-                    : '#3DAA8A';
+                    ? 'var(--cg-amber)'
+                    : 'var(--cg-sage)';
                 return (
                   <div key={i} className="relative pl-14">
                     <div className="absolute left-0 top-0.5">
@@ -309,7 +309,7 @@ export default function HighConflictPage() {
                     </span>
                     {beat.kicker ? (
                       <p
-                        className="text-xl sm:text-2xl text-[#1E3A4A] leading-relaxed"
+                        className="text-xl sm:text-2xl text-foreground leading-relaxed"
                         style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
                       >
                         {beat.text}

@@ -78,7 +78,7 @@ export function NewsletterForm({ source, className = '' }: NewsletterFormProps) 
         </button>
       </form>
       {error && (
-        <p className="text-sm text-[#C53030] mt-2 text-center">{error}</p>
+        <p className="text-sm text-cg-error mt-2 text-center">{error}</p>
       )}
     </div>
   );

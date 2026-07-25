@@ -14,7 +14,7 @@ export function OriginalsBadge({ className, size = 'sm' }: OriginalsBadgeProps) 
     <div
       className={cn(
         'inline-flex items-center gap-1 rounded-full',
-        'bg-gradient-to-r from-[#3DAA8A]/90 to-[#4BA8C8]/90 backdrop-blur-sm',
+        'bg-gradient-to-r from-cg-sage/90 to-cg-slate-light/90 backdrop-blur-sm',
         isSmall ? 'px-2 py-0.5' : 'px-3 py-1',
         className
       )}
@@ -30,8 +30,8 @@ export function OriginalsBadge({ className, size = 'sm' }: OriginalsBadgeProps) 
       >
         <circle cx="168" cy="180" r="40" fill="rgba(255,255,255,0.9)" />
         <circle cx="344" cy="180" r="40" fill="rgba(255,255,255,0.7)" />
-        <path d="M218 200 Q256 140 294 200" stroke="#F5A623" strokeWidth="12" strokeLinecap="round" fill="none" />
-        <circle cx="256" cy="330" r="32" fill="#F5A623" />
+        <path d="M218 200 Q256 140 294 200" stroke="var(--cg-amber)" strokeWidth="12" strokeLinecap="round" fill="none" />
+        <circle cx="256" cy="330" r="32" fill="var(--cg-amber)" />
       </svg>
       <span
         className={cn(

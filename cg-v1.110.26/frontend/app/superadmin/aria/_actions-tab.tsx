@@ -36,7 +36,7 @@ export default function ActionsTab({ data }: { data: AriaInsights }) {
     { label: 'Modified Suggestion', key: 'modified', icon: MessageSquare, color: 'text-blue-400', desc: 'User edited the rewrite' },
     { label: 'Rejected Suggestion', key: 'rejected', icon: XCircle, color: 'text-amber-400', desc: 'User dismissed the suggestion' },
     { label: 'Sent Anyway', key: 'sent_anyway', icon: Send, color: 'text-red-400', desc: 'User overrode ARIA and sent original' },
-    { label: 'Cancelled', key: 'cancelled', icon: PhoneOff, color: 'text-[#6B8A9A]', desc: 'User cancelled the message entirely' },
+    { label: 'Cancelled', key: 'cancelled', icon: PhoneOff, color: 'text-muted-foreground', desc: 'User cancelled the message entirely' },
   ];
 
   return (
@@ -54,7 +54,7 @@ export default function ActionsTab({ data }: { data: AriaInsights }) {
 
       <div className="grid lg:grid-cols-2 gap-4">
         {/* Action breakdown bar chart */}
-        <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
           <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">User Response Actions</h2>
           {actionData.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
@@ -88,18 +88,18 @@ export default function ActionsTab({ data }: { data: AriaInsights }) {
         </div>
 
         {/* Action summary cards */}
-        <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
           <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">Action Summary</h2>
           <div className="space-y-3">
             {ACTION_ITEMS.map(({ label, key, icon: Icon, color, desc }) => (
               <div
                 key={key}
-                className="flex items-center gap-3 p-3 rounded-lg bg-[#2D6A8F]/10"
+                className="flex items-center gap-3 p-3 rounded-lg bg-cg-slate/10"
               >
                 <Icon className={`w-5 h-5 ${color} flex-shrink-0`} />
                 <div className="flex-1">
                   <div className="text-sm text-white font-medium">{label}</div>
-                  <div className="text-xs text-[#6B8A9A]">{desc}</div>
+                  <div className="text-xs text-muted-foreground">{desc}</div>
                 </div>
                 <div className="text-lg font-bold text-zinc-100">
                   {formatNumber(data.action_breakdown?.[key] ?? 0)}
@@ -112,7 +112,7 @@ export default function ActionsTab({ data }: { data: AriaInsights }) {
 
       {/* Acceptance Rate Trend */}
       {trendData.length > 1 && (
-        <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
           <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">
             Weekly Acceptance Rate Trend
           </h2>
@@ -152,7 +152,7 @@ export default function ActionsTab({ data }: { data: AriaInsights }) {
 
       {/* Circle action breakdown */}
       {data.circle_data?.action_breakdown && Object.keys(data.circle_data.action_breakdown).length > 0 && (
-        <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
           <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">
             Circle (KidComs) Actions
           </h2>
@@ -160,7 +160,7 @@ export default function ActionsTab({ data }: { data: AriaInsights }) {
             {Object.entries(data.circle_data.action_breakdown).map(([action, count]) => (
               <div
                 key={action}
-                className="p-3 bg-[#2D6A8F]/10 rounded-lg text-center"
+                className="p-3 bg-cg-slate/10 rounded-lg text-center"
               >
                 <div
                   className="text-lg font-bold"
@@ -168,7 +168,7 @@ export default function ActionsTab({ data }: { data: AriaInsights }) {
                 >
                   {count}
                 </div>
-                <div className="text-[11px] text-[#6B8A9A] capitalize mt-0.5">
+                <div className="text-[11px] text-muted-foreground capitalize mt-0.5">
                   {action.replace(/_/g, ' ')}
                 </div>
               </div>

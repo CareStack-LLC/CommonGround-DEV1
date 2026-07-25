@@ -90,7 +90,7 @@ export function MediaUpload({
 
             <div className={cn(
                 "relative flex flex-col items-center justify-center border-2 border-dashed rounded-lg overflow-hidden transition-all group",
-                value ? "border-[#E8F4F0] bg-slate-50" : "border-slate-300 hover:border-[#5BC4A0] bg-slate-50 cursor-pointer",
+                value ? "border-cg-sage-subtle bg-slate-50" : "border-slate-300 hover:border-cg-sage-light bg-slate-50 cursor-pointer",
                 getAspectClass()
             )}
                 onClick={() => !value && fileInputRef.current?.click()}>
@@ -122,11 +122,11 @@ export function MediaUpload({
                         </div>
                     </>
                 ) : (
-                    <div className="flex flex-col items-center justify-center w-full h-full p-4 text-slate-500 hover:text-[#2D8A70] transition-colors">
+                    <div className="flex flex-col items-center justify-center w-full h-full p-4 text-slate-500 hover:text-cg-sage-dark transition-colors">
                         {isUploading ? (
                             <div className="flex flex-col items-center gap-2">
-                                <Loader2 className="w-8 h-8 animate-spin text-[#3DAA8A]" />
-                                <span className="text-xs font-medium text-[#2D8A70] animate-pulse">Uploading...</span>
+                                <Loader2 className="w-8 h-8 animate-spin text-cg-sage" />
+                                <span className="text-xs font-medium text-cg-sage-dark animate-pulse">Uploading...</span>
                             </div>
                         ) : (
                             <>

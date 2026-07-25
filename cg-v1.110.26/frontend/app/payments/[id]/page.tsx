@@ -60,7 +60,7 @@ const statusColors: Record<string, string> = {
   open: 'bg-cg-warning-subtle text-cg-warning',
   partially_funded: 'bg-cg-amber-subtle text-cg-amber',
   funded: 'bg-cg-sage-subtle text-cg-sage',
-  pending_verification: 'bg-[#E0EFF8] text-[#1E4E6B]',
+  pending_verification: 'bg-cg-slate-subtle text-[#1E4E6B]',
   verified: 'bg-cg-success-subtle text-cg-success',
   completed: 'bg-cg-success-subtle text-cg-success',
   expired: 'bg-muted text-muted-foreground',
@@ -334,7 +334,7 @@ function ObligationDetailContent() {
         {/* Transaction Ledger */}
         <div className="cg-card p-6">
           <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-            <Receipt className="h-5 w-5 text-[#2D6A8F]" />
+            <Receipt className="h-5 w-5 text-cg-slate" />
             Transaction Ledger
           </h2>
 
@@ -492,14 +492,14 @@ function ObligationDetailContent() {
         {attestation && (
           <div className="cg-card p-6">
             <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-              <Shield className="h-5 w-5 text-[#2D6A8F]" />
+              <Shield className="h-5 w-5 text-cg-slate" />
               Attestation
             </h2>
 
-            <div className="bg-[#E0EFF8] rounded-xl p-4 border border-[#E0EFF8]">
+            <div className="bg-cg-slate-subtle rounded-xl p-4 border border-cg-slate-subtle">
               <p className="text-sm text-[#1E4E6B] font-medium mb-2">Sworn Statement</p>
-              <p className="text-[#1E3A4A]">{attestation.attestation_text}</p>
-              <p className="text-sm text-[#2D6A8F] mt-2">
+              <p className="text-foreground">{attestation.attestation_text}</p>
+              <p className="text-sm text-cg-slate mt-2">
                 Attested on {formatDate(attestation.attested_at)}
               </p>
             </div>
@@ -519,10 +519,10 @@ function ObligationDetailContent() {
                 const isUploader = artifact.verified_by === user?.id;
                 const canReview = !isUploader && (!artifact.review_status || artifact.review_status === 'pending');
                 const reviewStatusBadge = artifact.review_status === 'acknowledged'
-                  ? { label: 'Acknowledged', bg: 'bg-[#E8F4F0] text-[#2D8A70] border-[#E8F4F0]' }
+                  ? { label: 'Acknowledged', bg: 'bg-cg-sage-subtle text-cg-sage-dark border-cg-sage-subtle' }
                   : artifact.review_status === 'disputed'
-                  ? { label: 'Disputed', bg: 'bg-[#FEE2E2] text-[#9B2C2C] border-[#FEE2E2]' }
-                  : { label: 'Pending Review', bg: 'bg-[#FEF7ED] text-[#E09520] border-[#FEF7ED]' };
+                  ? { label: 'Disputed', bg: 'bg-cg-error-subtle text-[#9B2C2C] border-cg-error-subtle' }
+                  : { label: 'Pending Review', bg: 'bg-cg-amber-subtle text-[#E09520] border-cg-amber-subtle' };
 
                 return (
                   <div key={artifact.id} className="p-4 bg-muted/30 rounded-xl border border-border">
@@ -585,7 +585,7 @@ function ObligationDetailContent() {
                               setReviewingArtifact(null);
                             }
                           }}
-                          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-bold text-[#2D8A70] bg-[#E8F4F0] border border-[#E8F4F0] rounded-lg hover:bg-[#E8F4F0] transition-all duration-200"
+                          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-bold text-cg-sage-dark bg-cg-sage-subtle border border-cg-sage-subtle rounded-lg hover:bg-cg-sage-subtle transition-all duration-200"
                         >
                           <CheckCircle className="h-3.5 w-3.5" />
                           Looks Good
@@ -611,7 +611,7 @@ function ObligationDetailContent() {
                               setReviewingArtifact(null);
                             }
                           }}
-                          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-bold text-[#9B2C2C] bg-[#FEE2E2] border border-[#FEE2E2] rounded-lg hover:bg-[#FEE2E2] transition-all duration-200"
+                          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-bold text-[#9B2C2C] bg-cg-error-subtle border border-cg-error-subtle rounded-lg hover:bg-cg-error-subtle transition-all duration-200"
                         >
                           <AlertTriangle className="h-3.5 w-3.5" />
                           Dispute

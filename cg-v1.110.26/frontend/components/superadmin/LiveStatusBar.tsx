@@ -69,9 +69,9 @@ export function LiveStatusBar() {
   // Color for the pulse dot matching the layout header's healthColor logic
   const healthColor =
     health?.status === 'healthy'
-      ? 'bg-[#3DAA8A]'
+      ? 'bg-cg-sage'
       : health?.status === 'degraded'
-        ? 'bg-[#F5A623]'
+        ? 'bg-cg-amber'
         : health?.status === 'critical'
           ? 'bg-red-500'
           : 'bg-[#4A6E7F]';
@@ -82,14 +82,14 @@ export function LiveStatusBar() {
   // these render "—". Hook point: extend the backend's platform-health
   // endpoint to surface those and replace the "—" below.
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-30 h-9 bg-[#0F2533]/95 backdrop-blur-md border-t border-[#2D6A8F]/20 flex items-center px-4 text-xs">
+    <div className="fixed bottom-0 left-0 right-0 z-30 h-9 bg-[#0F2533]/95 backdrop-blur-md border-t border-cg-slate/20 flex items-center px-4 text-xs">
       <div className="flex items-center gap-2 mr-4">
         <div className={`relative flex items-center justify-center w-2 h-2`}>
           <span className={`absolute inline-flex h-full w-full rounded-full ${healthColor} ${health?.status === 'healthy' ? 'animate-pulse' : ''} opacity-75`} />
           <span className={`relative inline-flex rounded-full h-1.5 w-1.5 ${healthColor}`} />
         </div>
-        <Radio className="w-3 h-3 text-[#5BC4A0]" />
-        <span className="text-[#5BC4A0]/90 font-medium">Live</span>
+        <Radio className="w-3 h-3 text-cg-sage-light" />
+        <span className="text-cg-sage-light/90 font-medium">Live</span>
       </div>
 
       <div className="hidden sm:flex items-center gap-1.5 mr-4 text-[#8AACBC]">
@@ -124,7 +124,7 @@ export function LiveStatusBar() {
 
       <div className="flex-1" />
 
-      <div className="hidden sm:block text-[#6B8A9A]">
+      <div className="hidden sm:block text-muted-foreground">
         Checked {timeAgo(lastCheck)}
       </div>
     </div>

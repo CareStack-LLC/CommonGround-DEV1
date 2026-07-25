@@ -72,15 +72,15 @@ const TEMPLATE_ICONS: Record<string, React.ReactNode> = {
 };
 
 const TEMPLATE_COLORS: Record<string, string> = {
-  "red": "bg-[#FEE2E2] text-[#9B2C2C] border-[#FEE2E2]",
-  "orange": "bg-[#FEF7ED] text-[#E09520] border-[#FEF7ED]",
-  "green": "bg-[#E8F4F0] text-[#2D8A70] border-[#E8F4F0]",
-  "blue": "bg-[#E0EFF8] text-[#1E4E6B] border-[#E0EFF8]",
-  "purple": "bg-[#E0EFF8] text-[#1E4E6B] border-[#E0EFF8]",
-  "amber": "bg-[#FEF7ED] text-[#E09520] border-[#FEF7ED]",
+  "red": "bg-cg-error-subtle text-[#9B2C2C] border-cg-error-subtle",
+  "orange": "bg-cg-amber-subtle text-[#E09520] border-cg-amber-subtle",
+  "green": "bg-cg-sage-subtle text-cg-sage-dark border-cg-sage-subtle",
+  "blue": "bg-cg-slate-subtle text-[#1E4E6B] border-cg-slate-subtle",
+  "purple": "bg-cg-slate-subtle text-[#1E4E6B] border-cg-slate-subtle",
+  "amber": "bg-cg-amber-subtle text-[#E09520] border-cg-amber-subtle",
   "gray": "bg-gray-100 text-gray-700 border-gray-200",
   "teal": "bg-teal-100 text-teal-700 border-teal-200",
-  "indigo": "bg-[#E0EFF8] text-[#1E4E6B] border-[#E0EFF8]",
+  "indigo": "bg-cg-slate-subtle text-[#1E4E6B] border-cg-slate-subtle",
 };
 
 const EVENT_TYPES = [
@@ -266,21 +266,21 @@ export default function EventsPage() {
 
   const getAttendanceBadge = (attended: boolean | undefined) => {
     if (attended === true) {
-      return <span className="px-2 py-0.5 bg-[#E8F4F0] text-[#2D8A70] rounded text-xs">Attended</span>;
+      return <span className="px-2 py-0.5 bg-cg-sage-subtle text-cg-sage-dark rounded text-xs">Attended</span>;
     } else if (attended === false) {
-      return <span className="px-2 py-0.5 bg-[#FEE2E2] text-[#9B2C2C] rounded text-xs">Missed</span>;
+      return <span className="px-2 py-0.5 bg-cg-error-subtle text-[#9B2C2C] rounded text-xs">Missed</span>;
     }
-    return <span className="px-2 py-0.5 bg-[#FEF7ED] text-[#E09520] rounded text-xs">Pending</span>;
+    return <span className="px-2 py-0.5 bg-cg-amber-subtle text-[#E09520] rounded text-xs">Pending</span>;
   };
 
   const getRsvpBadge = (status: string | undefined) => {
     switch (status) {
       case "attending":
-        return <span className="px-2 py-0.5 bg-[#E8F4F0] text-[#2D8A70] rounded text-xs">✓ Attending</span>;
+        return <span className="px-2 py-0.5 bg-cg-sage-subtle text-cg-sage-dark rounded text-xs">✓ Attending</span>;
       case "not_attending":
-        return <span className="px-2 py-0.5 bg-[#FEE2E2] text-[#9B2C2C] rounded text-xs">✗ Declined</span>;
+        return <span className="px-2 py-0.5 bg-cg-error-subtle text-[#9B2C2C] rounded text-xs">✗ Declined</span>;
       case "maybe":
-        return <span className="px-2 py-0.5 bg-[#FEF7ED] text-[#E09520] rounded text-xs">? Maybe</span>;
+        return <span className="px-2 py-0.5 bg-cg-amber-subtle text-[#E09520] rounded text-xs">? Maybe</span>;
       default:
         return <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">No Response</span>;
     }
@@ -327,12 +327,12 @@ export default function EventsPage() {
 
       {/* Template Selector */}
       {showTemplateSelector && (
-        <Card className="border-2 border-[#E0EFF8] bg-[#E0EFF8]/50">
+        <Card className="border-2 border-cg-slate-subtle bg-cg-slate-subtle/50">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5 text-[#2D6A8F]" />
+                  <FileText className="h-5 w-5 text-cg-slate" />
                   Quick Event Templates
                 </CardTitle>
                 <CardDescription>
@@ -378,7 +378,7 @@ export default function EventsPage() {
 
       {/* Error Display */}
       {error && (
-        <div className="bg-[#FEE2E2] border border-[#FEE2E2] text-[#9B2C2C] px-4 py-3 rounded">
+        <div className="bg-cg-error-subtle border border-cg-error-subtle text-[#9B2C2C] px-4 py-3 rounded">
           {error}
         </div>
       )}
@@ -392,7 +392,7 @@ export default function EventsPage() {
 
       {/* Create Event Form */}
       {showCreateForm && (
-        <Card className="border-2 border-[#E0EFF8] bg-[#E0EFF8]">
+        <Card className="border-2 border-cg-slate-subtle bg-cg-slate-subtle">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
@@ -437,8 +437,8 @@ export default function EventsPage() {
                     onClick={() => setEventType(type.id)}
                     className={`p-2 border rounded-lg text-sm flex items-center space-x-2 ${
                       eventType === type.id
-                        ? "border-[#2D6A8F] bg-[#E0EFF8]"
-                        : "border-slate-200 bg-white hover:border-[#4BA8C8]"
+                        ? "border-cg-slate bg-cg-slate-subtle"
+                        : "border-slate-200 bg-white hover:border-cg-slate-light"
                     }`}
                   >
                     <span>{type.icon}</span>
@@ -551,7 +551,7 @@ export default function EventsPage() {
               {upcomingEvents.map((event) => (
                 <div
                   key={event.id}
-                  className={`border rounded-lg p-4 hover:bg-slate-50 transition ${event.is_mandatory ? 'border-l-4 border-l-[#C53030]' : ''}`}
+                  className={`border rounded-lg p-4 hover:bg-slate-50 transition ${event.is_mandatory ? 'border-l-4 border-l-cg-error' : ''}`}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-start space-x-3">
@@ -560,7 +560,7 @@ export default function EventsPage() {
                         <div className="flex items-center gap-2">
                           <h3 className="font-semibold text-slate-900">{event.title}</h3>
                           {event.is_mandatory && (
-                            <span className="px-2 py-0.5 bg-[#FEE2E2] text-[#9B2C2C] text-xs rounded">Mandatory</span>
+                            <span className="px-2 py-0.5 bg-cg-error-subtle text-[#9B2C2C] text-xs rounded">Mandatory</span>
                           )}
                         </div>
                         {event.description && (
@@ -608,7 +608,7 @@ export default function EventsPage() {
                     </div>
                   </div>
                   {event.shared_notes && (
-                    <div className="mt-3 p-2 bg-[#FEF7ED] rounded text-sm text-[#E09520]">
+                    <div className="mt-3 p-2 bg-cg-amber-subtle rounded text-sm text-[#E09520]">
                       <span className="font-medium">Note:</span> {event.shared_notes}
                     </div>
                   )}

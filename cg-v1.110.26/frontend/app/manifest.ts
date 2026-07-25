@@ -20,8 +20,8 @@ export default function manifest(): MetadataRoute.Manifest {
     display: 'standalone',
     display_override: ['standalone', 'minimal-ui'],
     orientation: 'portrait',
-    background_color: '#F4F8F7',
-    theme_color: '#1E3A4A',
+    background_color: 'var(--background)',
+    theme_color: 'var(--foreground)',
     categories: ['lifestyle', 'productivity', 'parenting', 'social'],
     icons: [
       // Scalable brand mark — Chrome/Android render SVG at any size.

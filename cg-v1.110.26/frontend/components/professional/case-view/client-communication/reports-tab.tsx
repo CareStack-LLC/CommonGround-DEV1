@@ -161,7 +161,7 @@ export function ReportsTab({ familyFileId, token }: { familyFileId: string, toke
                             <Card key={report.id} className="overflow-hidden border-border hover:border-[#C5E5DB] transition-colors group">
                                 <div className="p-4 flex items-center justify-between">
                                     <div className="flex items-center gap-4">
-                                        <div className="h-10 w-10 rounded-lg bg-[#E8F4F0] flex items-center justify-center text-[#3DAA8A]">
+                                        <div className="h-10 w-10 rounded-lg bg-cg-sage-subtle flex items-center justify-center text-cg-sage">
                                             <FileText className="h-5 w-5" />
                                         </div>
                                         <div>
@@ -184,7 +184,7 @@ export function ReportsTab({ familyFileId, token }: { familyFileId: string, toke
                                             <Button aria-label="Download"
                                                 size="icon"
                                                 variant="ghost"
-                                                className="h-8 w-8 text-[#2D6A8F]"
+                                                className="h-8 w-8 text-cg-slate"
                                                 onClick={() => handleDownloadReport(report.id, `Report-${report.id.slice(0, 8)}.${report.export_format === 'excel' ? 'csv' : 'pdf'}`)}
                                             >
                                                 <Download className="h-4 w-4" />
@@ -205,7 +205,7 @@ export function ReportsTab({ familyFileId, token }: { familyFileId: string, toke
                         <p className="text-muted-foreground font-medium">No reports generated yet.</p>
                         <Button
                             variant="link"
-                            className="text-[#2D6A8F]"
+                            className="text-cg-slate"
                             onClick={() => setIsGenReportOpen(true)}
                         >
                             Generate case report
@@ -274,7 +274,7 @@ export function ReportsTab({ familyFileId, token }: { familyFileId: string, toke
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setIsGenReportOpen(false)}>Cancel</Button>
-                        <Button onClick={handleGenerateReport} className="bg-[#2D6A8F] hover:bg-[#1E4E6B]">
+                        <Button onClick={handleGenerateReport} className="bg-cg-slate hover:bg-[#1E4E6B]">
                             Generate PDF
                         </Button>
                     </DialogFooter>

@@ -381,7 +381,7 @@ export default function FL340Wizard({
       case 'hearing':
         return (
           <div className="space-y-6">
-            <div className="bg-[#FEF7ED] border border-[#FEF7ED] rounded-lg p-4">
+            <div className="bg-cg-amber-subtle border border-cg-amber-subtle rounded-lg p-4">
               <p className="text-[#E09520] text-sm">
                 <strong>Item 1:</strong> This proceeding was heard on the date, time, and location specified below.
               </p>
@@ -476,7 +476,7 @@ export default function FL340Wizard({
       case 'attendance':
         return (
           <div className="space-y-6">
-            <div className="bg-[#FEF7ED] border border-[#FEF7ED] rounded-lg p-4">
+            <div className="bg-cg-amber-subtle border border-cg-amber-subtle rounded-lg p-4">
               <p className="text-[#E09520] text-sm">
                 <strong>Items 1a-c:</strong> Record attendance at the hearing.
               </p>
@@ -586,7 +586,7 @@ export default function FL340Wizard({
       case 'custody':
         return (
           <div className="space-y-6">
-            <div className="bg-[#FEF7ED] border border-[#FEF7ED] rounded-lg p-4">
+            <div className="bg-cg-amber-subtle border border-cg-amber-subtle rounded-lg p-4">
               <p className="text-[#E09520] text-sm">
                 <strong>Item 2:</strong> Custody and visitation/parenting time orders.
               </p>
@@ -598,7 +598,7 @@ export default function FL340Wizard({
       case 'child_support':
         return (
           <div className="space-y-6">
-            <div className="bg-[#FEF7ED] border border-[#FEF7ED] rounded-lg p-4">
+            <div className="bg-cg-amber-subtle border border-cg-amber-subtle rounded-lg p-4">
               <p className="text-[#E09520] text-sm">
                 <strong>Item 3:</strong> Child support orders.
               </p>
@@ -610,7 +610,7 @@ export default function FL340Wizard({
       case 'spousal_support':
         return (
           <div className="space-y-6">
-            <div className="bg-[#FEF7ED] border border-[#FEF7ED] rounded-lg p-4">
+            <div className="bg-cg-amber-subtle border border-cg-amber-subtle rounded-lg p-4">
               <p className="text-[#E09520] text-sm">
                 <strong>Item 4:</strong> Spousal or family support orders.
               </p>
@@ -622,7 +622,7 @@ export default function FL340Wizard({
       case 'property':
         return (
           <div className="space-y-6">
-            <div className="bg-[#FEF7ED] border border-[#FEF7ED] rounded-lg p-4">
+            <div className="bg-cg-amber-subtle border border-cg-amber-subtle rounded-lg p-4">
               <p className="text-[#E09520] text-sm">
                 <strong>Item 5:</strong> Property orders.
               </p>
@@ -634,7 +634,7 @@ export default function FL340Wizard({
       case 'attorney_fees':
         return (
           <div className="space-y-6">
-            <div className="bg-[#FEF7ED] border border-[#FEF7ED] rounded-lg p-4">
+            <div className="bg-cg-amber-subtle border border-cg-amber-subtle rounded-lg p-4">
               <p className="text-[#E09520] text-sm">
                 <strong>Item 6:</strong> Attorney&apos;s fees orders.
               </p>
@@ -646,7 +646,7 @@ export default function FL340Wizard({
       case 'other_orders':
         return (
           <div className="space-y-6">
-            <div className="bg-[#FEF7ED] border border-[#FEF7ED] rounded-lg p-4">
+            <div className="bg-cg-amber-subtle border border-cg-amber-subtle rounded-lg p-4">
               <p className="text-[#E09520] text-sm">
                 <strong>Items 7-8:</strong> Other orders and reserved issues.
               </p>
@@ -717,7 +717,7 @@ export default function FL340Wizard({
       case 'reschedule':
         return (
           <div className="space-y-6">
-            <div className="bg-[#FEF7ED] border border-[#FEF7ED] rounded-lg p-4">
+            <div className="bg-cg-amber-subtle border border-cg-amber-subtle rounded-lg p-4">
               <p className="text-[#E09520] text-sm">
                 <strong>Item 9:</strong> If the matter is rescheduled for further hearing.
               </p>
@@ -781,7 +781,7 @@ export default function FL340Wizard({
       case 'signatures':
         return (
           <div className="space-y-6">
-            <div className="bg-[#FEF7ED] border border-[#FEF7ED] rounded-lg p-4">
+            <div className="bg-cg-amber-subtle border border-cg-amber-subtle rounded-lg p-4">
               <p className="text-[#E09520] text-sm">
                 <strong>Signatures:</strong> Judicial officer and attorney signatures.
               </p>
@@ -891,14 +891,14 @@ export default function FL340Wizard({
   return (
     <div className="space-y-6">
       {/* Progress Header */}
-      <Card className="border-[#FEF7ED] bg-gradient-to-br from-[#FEF7ED] to-white">
+      <Card className="border-cg-amber-subtle bg-gradient-to-br from-cg-amber-subtle to-white">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Scale className="h-5 w-5 text-[#E09520]" />
               <CardTitle className="text-lg">FL-340: Findings and Order After Hearing</CardTitle>
             </div>
-            <Badge variant="outline" className="text-[#E09520] border-[#F5A623]">
+            <Badge variant="outline" className="text-[#E09520] border-cg-amber">
               Court Form
             </Badge>
           </div>
@@ -931,9 +931,9 @@ export default function FL340Wizard({
                   onClick={() => setCurrentSection(idx)}
                   className={`flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors ${
                     idx === currentSection
-                      ? 'bg-[#FEF7ED] text-[#E09520] font-medium'
+                      ? 'bg-cg-amber-subtle text-[#E09520] font-medium'
                       : idx < currentSection
-                      ? 'bg-[#E8F4F0] text-[#2D8A70]'
+                      ? 'bg-cg-sage-subtle text-cg-sage-dark'
                       : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
                   }`}
                 >

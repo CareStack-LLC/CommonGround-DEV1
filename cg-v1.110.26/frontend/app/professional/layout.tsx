@@ -106,11 +106,11 @@ export function useProfessionalAuth() {
 
 // Professional type display info
 const PROFESSIONAL_TYPE_INFO: Record<string, { label: string; color: string }> = {
-  attorney: { label: "Attorney", color: "bg-[#E8F4F0] text-[#236E59]" },
+  attorney: { label: "Attorney", color: "bg-cg-sage-subtle text-[#236E59]" },
   paralegal: { label: "Paralegal", color: "bg-blue-100 text-blue-800" },
-  mediator: { label: "Mediator", color: "bg-[#E0EFF8] text-[#1E4E6B]" },
-  parenting_coordinator: { label: "Parenting Coordinator", color: "bg-[#FEF7ED] text-[#8F5E14]" },
-  intake_coordinator: { label: "Intake Coordinator", color: "bg-[#E0EFF8] text-[#1E4E6B]" },
+  mediator: { label: "Mediator", color: "bg-cg-slate-subtle text-[#1E4E6B]" },
+  parenting_coordinator: { label: "Parenting Coordinator", color: "bg-cg-amber-subtle text-[#8F5E14]" },
+  intake_coordinator: { label: "Intake Coordinator", color: "bg-cg-slate-subtle text-[#1E4E6B]" },
   practice_admin: { label: "Practice Admin", color: "bg-slate-100 text-slate-800" },
 };
 
@@ -311,15 +311,15 @@ export default function ProfessionalPortalLayout({
                     <defs>
                       <linearGradient id="pro-bg" x1="0" y1="0" x2="1" y2="1">
                         <stop offset="0%" stopColor="#E8F4F8" />
-                        <stop offset="100%" stopColor="#D6ECE8" />
+                        <stop offset="100%" stopColor="var(--border)" />
                       </linearGradient>
                       <linearGradient id="pro-lf" x1="0" y1="0" x2="1" y2="1">
-                        <stop offset="0%" stopColor="#5BC4A0" />
-                        <stop offset="100%" stopColor="#3DAA8A" />
+                        <stop offset="0%" stopColor="var(--cg-sage-light)" />
+                        <stop offset="100%" stopColor="var(--cg-sage)" />
                       </linearGradient>
                       <linearGradient id="pro-rf" x1="0" y1="0" x2="1" y2="1">
-                        <stop offset="0%" stopColor="#4BA8C8" />
-                        <stop offset="100%" stopColor="#2D6A8F" />
+                        <stop offset="0%" stopColor="var(--cg-slate-light)" />
+                        <stop offset="100%" stopColor="var(--cg-slate)" />
                       </linearGradient>
                     </defs>
                     <rect width="512" height="512" rx="120" fill="url(#pro-bg)" />
@@ -327,13 +327,13 @@ export default function ProfessionalPortalLayout({
                     <path d="M118 218 Q168 258 218 218" stroke="url(#pro-lf)" strokeWidth="16" strokeLinecap="round" fill="none" />
                     <circle cx="344" cy="148" r="48" fill="url(#pro-rf)" />
                     <path d="M294 218 Q344 258 394 218" stroke="url(#pro-rf)" strokeWidth="16" strokeLinecap="round" fill="none" />
-                    <path d="M218 168 Q256 104 294 168" stroke="#F5A623" strokeWidth="10" strokeLinecap="round" fill="none" opacity="0.95" />
-                    <circle cx="256" cy="330" r="38" fill="#F5A623" />
-                    <path d="M218 382 Q256 414 294 382" stroke="#F5A623" strokeWidth="12" strokeLinecap="round" fill="none" />
+                    <path d="M218 168 Q256 104 294 168" stroke="var(--cg-amber)" strokeWidth="10" strokeLinecap="round" fill="none" opacity="0.95" />
+                    <circle cx="256" cy="330" r="38" fill="var(--cg-amber)" />
+                    <path d="M218 382 Q256 414 294 382" stroke="var(--cg-amber)" strokeWidth="12" strokeLinecap="round" fill="none" />
                   </svg>
                   <div className="flex items-center gap-2.5">
                     <span className="text-xl tracking-tight" style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}>
-                      <span className="font-bold text-white">Common</span><span className="font-normal text-[#3DAA8A]">Ground</span>
+                      <span className="font-bold text-white">Common</span><span className="font-normal text-cg-sage">Ground</span>
                     </span>
                     <Badge className="text-[10px] font-semibold bg-[var(--portal-primary)]/20 text-[var(--portal-accent)] border border-[var(--portal-primary)]/30 hover:bg-[var(--portal-primary)]/30">
                       Professional
@@ -535,7 +535,7 @@ function ProfessionalNavigation({
             <div className="flex items-center gap-2.5">
               {dashboardData?.pending_firm_invitations > 0 && (
                 <Link href="/professional/intake?tab=invitations">
-                  <Badge className="text-xs bg-[#FEF7ED] text-[#B8791A] border border-[#FBE3BF] hover:bg-[#FEF7ED] cursor-pointer transition-colors font-medium">
+                  <Badge className="text-xs bg-cg-amber-subtle text-[#B8791A] border border-[#FBE3BF] hover:bg-cg-amber-subtle cursor-pointer transition-colors font-medium">
                     {dashboardData.pending_firm_invitations} case invitation{dashboardData.pending_firm_invitations !== 1 ? "s" : ""}
                   </Badge>
                 </Link>

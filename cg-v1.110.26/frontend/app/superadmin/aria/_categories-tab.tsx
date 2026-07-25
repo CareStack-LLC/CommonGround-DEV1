@@ -16,7 +16,7 @@ export default function CategoriesTab({ data }: { data: AriaInsights }) {
     <div className="space-y-4">
       <div className="grid lg:grid-cols-2 gap-4">
         {/* Actual category breakdown */}
-        <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
           <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">
             Detected Categories ({data.days}d)
           </h2>
@@ -49,7 +49,7 @@ export default function CategoriesTab({ data }: { data: AriaInsights }) {
         </div>
 
         {/* Severity distribution */}
-        <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
           <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">By Severity</h2>
           {severityData.length ? (
             <ResponsiveContainer width="100%" height={300}>
@@ -85,7 +85,7 @@ export default function CategoriesTab({ data }: { data: AriaInsights }) {
 
       {/* Circle categories */}
       {data.circle_data?.categories?.length > 0 && (
-        <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
           <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">
             Circle (KidComs) Categories
           </h2>
@@ -93,7 +93,7 @@ export default function CategoriesTab({ data }: { data: AriaInsights }) {
             {data.circle_data.categories.map((cat) => (
               <div
                 key={cat.category}
-                className="flex items-center justify-between p-3 bg-[#2D6A8F]/10 rounded-lg"
+                className="flex items-center justify-between p-3 bg-cg-slate/10 rounded-lg"
               >
                 <span className="text-xs text-[#8AACBC] capitalize">
                   {cat.category.replace(/_/g, ' ')}
@@ -107,13 +107,13 @@ export default function CategoriesTab({ data }: { data: AriaInsights }) {
 
       {/* Call flag severity */}
       {data.call_data?.flag_severity?.length > 0 && (
-        <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
           <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">Call Flag Severity</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {data.call_data.flag_severity.map((item) => (
               <div
                 key={item.severity}
-                className="flex items-center justify-between p-3 bg-[#2D6A8F]/10 rounded-lg"
+                className="flex items-center justify-between p-3 bg-cg-slate/10 rounded-lg"
               >
                 <span
                   className="text-xs font-medium capitalize"

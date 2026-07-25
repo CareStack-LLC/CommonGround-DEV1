@@ -141,8 +141,8 @@ export default function NewChildPage() {
             </div>
 
             {/* Info Box */}
-            <div className="bg-[#E0EFF8] border border-[#E0EFF8] rounded-md p-4">
-              <h4 className="font-medium text-[#1E3A4A] mb-2">What happens next?</h4>
+            <div className="bg-cg-slate-subtle border border-cg-slate-subtle rounded-md p-4">
+              <h4 className="font-medium text-foreground mb-2">What happens next?</h4>
               <ol className="text-sm text-[#1E4E6B] space-y-1 list-decimal list-inside">
                 <li>This child profile will be created with "Pending Approval" status</li>
                 <li>The other parent will be notified and can review the information</li>
@@ -152,7 +152,7 @@ export default function NewChildPage() {
             </div>
 
             {error && (
-              <div className="p-3 bg-[#FEE2E2] border border-[#FEE2E2] rounded-md text-[#C53030] text-sm">
+              <div className="p-3 bg-cg-error-subtle border border-cg-error-subtle rounded-md text-cg-error text-sm">
                 {error}
               </div>
             )}

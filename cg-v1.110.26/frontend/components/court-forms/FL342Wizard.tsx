@@ -337,7 +337,7 @@ export default function FL342Wizard({
                       variant="ghost"
                       size="sm"
                       onClick={() => removeChild(index)}
-                      className="text-[#C53030] hover:text-[#9B2C2C]"
+                      className="text-cg-error hover:text-[#9B2C2C]"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -588,7 +588,7 @@ export default function FL342Wizard({
             </div>
 
             <div className="grid grid-cols-2 gap-6">
-              <div className="space-y-4 p-4 bg-[#E0EFF8] rounded-lg">
+              <div className="space-y-4 p-4 bg-cg-slate-subtle rounded-lg">
                 <h5 className="font-medium text-[#1E4E6B]">Petitioner&apos;s Income</h5>
                 <div>
                   <Label>Gross Monthly Income ($)</Label>
@@ -622,7 +622,7 @@ export default function FL342Wizard({
                 </div>
               </div>
 
-              <div className="space-y-4 p-4 bg-[#E0EFF8] rounded-lg">
+              <div className="space-y-4 p-4 bg-cg-slate-subtle rounded-lg">
                 <h5 className="font-medium text-[#1E4E6B]">Respondent&apos;s Income</h5>
                 <div>
                   <Label>Gross Monthly Income ($)</Label>
@@ -1029,7 +1029,7 @@ export default function FL342Wizard({
               </p>
             </div>
 
-            <div className="p-4 bg-[#FEF7ED] border border-[#FEF7ED] rounded-lg">
+            <div className="p-4 bg-cg-amber-subtle border border-cg-amber-subtle rounded-lg">
               <p className="text-sm text-[#E09520]">
                 <strong>Note:</strong> Earnings assignment (wage garnishment) is mandatory under California law
                 unless the court finds good cause to stay the assignment, or the parties agree to an alternative
@@ -1323,7 +1323,7 @@ export default function FL342Wizard({
             <Button aria-label="Send message"
               onClick={handleSubmit}
               disabled={isLoading}
-              className="bg-[#2D8A70] hover:bg-[#2D8A70]"
+              className="bg-cg-sage-dark hover:bg-cg-sage-dark"
             >
               {isLoading ? (
                 <>

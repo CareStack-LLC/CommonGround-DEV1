@@ -44,7 +44,7 @@ function ExportsPageContent() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2D6A8F]" />
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cg-slate" />
       </div>
     );
   }
@@ -52,7 +52,7 @@ function ExportsPageContent() {
   if (error || !caseData) {
     return (
       <div className="min-h-screen bg-gray-50 p-8">
-        <Card className="max-w-lg mx-auto bg-[#FEE2E2] border-[#FEE2E2]">
+        <Card className="max-w-lg mx-auto bg-cg-error-subtle border-cg-error-subtle">
           <CardContent className="pt-6">
             <p className="text-[#9B2C2C]">{error || 'Case not found'}</p>
             <Button variant="outline" onClick={() => router.push('/cases')} className="mt-4">
@@ -70,7 +70,7 @@ function ExportsPageContent() {
       <div className="min-h-screen bg-gray-50 p-8">
         <div className="max-w-2xl mx-auto">
           <div className="mb-6">
-            <Link href={`/cases/${caseId}`} className="text-sm text-gray-500 hover:text-[#2D6A8F]">
+            <Link href={`/cases/${caseId}`} className="text-sm text-gray-500 hover:text-cg-slate">
               ← Back to {caseData.case_name}
             </Link>
           </div>
@@ -92,9 +92,9 @@ function ExportsPageContent() {
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
-            <Link href="/cases" className="hover:text-[#2D6A8F]">Cases</Link>
+            <Link href="/cases" className="hover:text-cg-slate">Cases</Link>
             <span>/</span>
-            <Link href={`/cases/${caseId}`} className="hover:text-[#2D6A8F]">{caseData.case_name}</Link>
+            <Link href={`/cases/${caseId}`} className="hover:text-cg-slate">{caseData.case_name}</Link>
             <span>/</span>
             <span className="text-gray-900">CaseExport</span>
           </div>
@@ -113,9 +113,9 @@ function ExportsPageContent() {
       {/* Content */}
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Info Card */}
-        <Card className="mb-8 bg-[#E0EFF8] border-[#E0EFF8]">
+        <Card className="mb-8 bg-cg-slate-subtle border-cg-slate-subtle">
           <CardContent className="pt-6">
-            <h3 className="font-medium text-[#1E3A4A] mb-2">About CaseExport</h3>
+            <h3 className="font-medium text-foreground mb-2">About CaseExport</h3>
             <p className="text-sm text-[#1E4E6B] mb-3">
               CaseExport generates court-ready PDF packages that compile your case data into professional,
               verifiable documents. Each export includes:

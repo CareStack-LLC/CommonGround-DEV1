@@ -49,7 +49,7 @@ function ThreadCard({ thread }: { thread: ParentChildThreadSummary }) {
           </span>
         )}
         {thread.unread_count > 0 && (
-          <span className="absolute -top-1 -right-1 min-w-[22px] h-[22px] px-1.5 rounded-full bg-[#C53030] text-white text-xs font-bold flex items-center justify-center shadow-md">
+          <span className="absolute -top-1 -right-1 min-w-[22px] h-[22px] px-1.5 rounded-full bg-cg-error text-white text-xs font-bold flex items-center justify-center shadow-md">
             {thread.unread_count > 99 ? '99+' : thread.unread_count}
           </span>
         )}
@@ -135,7 +135,7 @@ function ParentChildInboxContent() {
             <div className="w-10 h-10 border-3 border-[var(--portal-primary)]/20 border-t-[var(--portal-primary)] rounded-full animate-spin" />
           </div>
         ) : error ? (
-          <div className="p-4 rounded-xl bg-[#FEE2E2] border-2 border-[#FEE2E2] text-sm text-[#9B2C2C]">
+          <div className="p-4 rounded-xl bg-cg-error-subtle border-2 border-cg-error-subtle text-sm text-[#9B2C2C]">
             {error}
           </div>
         ) : threads.length === 0 ? (

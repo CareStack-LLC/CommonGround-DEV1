@@ -184,11 +184,11 @@ export function WhiteboardMode({
   if (!isActive) return null;
 
   return (
-    <div className="fixed inset-0 z-40 bg-gradient-to-b from-[#0D1B24] via-[#1E3A4A]/95 to-[#0D1B24] flex flex-col">
-      <div className="flex items-center justify-between px-4 py-2.5 bg-[#0D1B24]/90 backdrop-blur-sm border-b border-[#3DAA8A]/10">
+    <div className="fixed inset-0 z-40 bg-gradient-to-b from-[#0D1B24] via-foreground/95 to-[#0D1B24] flex flex-col">
+      <div className="flex items-center justify-between px-4 py-2.5 bg-[#0D1B24]/90 backdrop-blur-sm border-b border-cg-sage/10">
         <div className="flex items-center space-x-3">
           <span
-            className="text-[#3DAA8A] text-sm font-semibold px-3 py-1 bg-[#3DAA8A]/10 rounded-lg border border-[#3DAA8A]/20"
+            className="text-cg-sage text-sm font-semibold px-3 py-1 bg-cg-sage/10 rounded-lg border border-cg-sage/20"
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
           >
             Whiteboard

@@ -36,7 +36,7 @@ function NewExportPageContent() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2D6A8F]" />
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cg-slate" />
       </div>
     );
   }
@@ -45,10 +45,10 @@ function NewExportPageContent() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-[#C53030] mb-4">{error || 'Case not found'}</p>
+          <p className="text-cg-error mb-4">{error || 'Case not found'}</p>
           <button
             onClick={() => router.push('/cases')}
-            className="text-[#2D6A8F] hover:underline"
+            className="text-cg-slate hover:underline"
           >
             Back to Cases
           </button>
@@ -63,11 +63,11 @@ function NewExportPageContent() {
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
-            <Link href="/cases" className="hover:text-[#2D6A8F]">Cases</Link>
+            <Link href="/cases" className="hover:text-cg-slate">Cases</Link>
             <span>/</span>
-            <Link href={`/cases/${caseId}`} className="hover:text-[#2D6A8F]">{caseData.case_name}</Link>
+            <Link href={`/cases/${caseId}`} className="hover:text-cg-slate">{caseData.case_name}</Link>
             <span>/</span>
-            <Link href={`/cases/${caseId}/exports`} className="hover:text-[#2D6A8F]">Exports</Link>
+            <Link href={`/cases/${caseId}/exports`} className="hover:text-cg-slate">Exports</Link>
             <span>/</span>
             <span className="text-gray-900">New</span>
           </div>

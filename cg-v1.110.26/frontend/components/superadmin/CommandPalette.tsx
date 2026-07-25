@@ -235,7 +235,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
     if (items.length === 0) return null;
     return (
       <div className="mb-1">
-        <div className="px-3 py-1 text-[10px] uppercase tracking-wider text-[#6B8A9A] font-semibold">
+        <div className="px-3 py-1 text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
           {label}
         </div>
         {items.map((r) => {
@@ -247,15 +247,15 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
               onClick={() => activate(r)}
               onMouseEnter={() => setHighlightedIdx(myIdx)}
               className={`w-full flex items-center gap-3 px-3 py-2 text-left rounded transition-colors ${
-                active ? 'bg-[#3DAA8A]/15 text-white' : 'text-[#D0E4EC] hover:bg-[#2D6A8F]/20'
+                active ? 'bg-cg-sage/15 text-white' : 'text-[#D0E4EC] hover:bg-cg-slate/20'
               }`}
             >
               {iconKind === 'page' && r.kind === 'page' && (
-                <r.item.icon className="w-4 h-4 flex-shrink-0 text-[#6B8A9A]" />
+                <r.item.icon className="w-4 h-4 flex-shrink-0 text-muted-foreground" />
               )}
-              {iconKind === 'recent' && <Clock className="w-4 h-4 flex-shrink-0 text-[#6B8A9A]" />}
-              {iconKind === 'user' && <UserCircle className="w-4 h-4 flex-shrink-0 text-[#6B8A9A]" />}
-              {iconKind === 'runbook' && <BookOpen className="w-4 h-4 flex-shrink-0 text-[#6B8A9A]" />}
+              {iconKind === 'recent' && <Clock className="w-4 h-4 flex-shrink-0 text-muted-foreground" />}
+              {iconKind === 'user' && <UserCircle className="w-4 h-4 flex-shrink-0 text-muted-foreground" />}
+              {iconKind === 'runbook' && <BookOpen className="w-4 h-4 flex-shrink-0 text-muted-foreground" />}
               <span className="flex-1 min-w-0 truncate">
                 {r.kind === 'page' && r.item.label}
                 {r.kind === 'recent' && r.item.label}
@@ -264,17 +264,17 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
                     <span className="text-white">
                       {r.item.first_name} {r.item.last_name}
                     </span>
-                    <span className="text-[#6B8A9A] text-xs ml-2">{r.item.email}</span>
+                    <span className="text-muted-foreground text-xs ml-2">{r.item.email}</span>
                   </>
                 )}
                 {r.kind === 'runbook' && (
                   <>
                     <span className="text-white">{r.item.title}</span>
-                    <span className="text-[#6B8A9A] text-xs ml-2 capitalize">{r.item.category}</span>
+                    <span className="text-muted-foreground text-xs ml-2 capitalize">{r.item.category}</span>
                   </>
                 )}
               </span>
-              <ArrowRight className={`w-3.5 h-3.5 flex-shrink-0 ${active ? 'text-[#3DAA8A]' : 'text-[#4A6E7F]'}`} />
+              <ArrowRight className={`w-3.5 h-3.5 flex-shrink-0 ${active ? 'text-cg-sage' : 'text-[#4A6E7F]'}`} />
             </button>
           );
         })}
@@ -289,12 +289,12 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
       onKeyDown={handleKeyDown}
     >
       <div
-        className="w-[600px] max-w-full bg-[#1A3648] border border-[#2D6A8F]/30 rounded-xl shadow-2xl overflow-hidden"
+        className="w-[600px] max-w-full bg-[#1A3648] border border-cg-slate/30 rounded-xl shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
         onKeyDown={handleKeyDown}
       >
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-[#2D6A8F]/20">
-          <Search className="w-4 h-4 text-[#6B8A9A] flex-shrink-0" />
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-cg-slate/20">
+          <Search className="w-4 h-4 text-muted-foreground flex-shrink-0" />
           <input
             ref={inputRef}
             type="text"
@@ -307,11 +307,11 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
             className="flex-1 bg-transparent text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none"
           />
           {userLoading && (
-            <span className="text-[10px] text-[#6B8A9A]">searching…</span>
+            <span className="text-[10px] text-muted-foreground">searching…</span>
           )}
           <button aria-label="Close"
             onClick={onClose}
-            className="p-1 text-[#6B8A9A] hover:text-white transition-colors"
+            className="p-1 text-muted-foreground hover:text-white transition-colors"
             title="Close (Esc)"
           >
             <X className="w-4 h-4" />
@@ -320,7 +320,7 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
 
         <div className="max-h-[60vh] overflow-y-auto py-2 px-1">
           {!query && recentResults.length === 0 && (
-            <div className="px-3 py-8 text-center text-xs text-[#6B8A9A]">
+            <div className="px-3 py-8 text-center text-xs text-muted-foreground">
               <LayoutDashboard className="w-6 h-6 mx-auto mb-2 opacity-40" />
               Tip: <span className="font-mono text-[#8AACBC]">Cmd+K</span> from anywhere.
               Start typing to find pages, users, or runbooks.
@@ -331,17 +331,17 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps) {
           {query && renderGroup('Users', userResults, 'user')}
           {query && renderGroup('Runbooks', runbookResults, 'runbook')}
           {query && results.length === 0 && !userLoading && (
-            <div className="px-3 py-8 text-center text-xs text-[#6B8A9A]">
+            <div className="px-3 py-8 text-center text-xs text-muted-foreground">
               No results for &ldquo;{query}&rdquo;.
             </div>
           )}
         </div>
 
-        <div className="px-3 py-2 border-t border-[#2D6A8F]/20 flex items-center justify-between text-[10px] text-[#6B8A9A]">
+        <div className="px-3 py-2 border-t border-cg-slate/20 flex items-center justify-between text-[10px] text-muted-foreground">
           <div className="flex items-center gap-3">
-            <span><kbd className="font-mono bg-[#0F2533] border border-[#2D6A8F]/30 px-1 rounded">↑↓</kbd> navigate</span>
-            <span><kbd className="font-mono bg-[#0F2533] border border-[#2D6A8F]/30 px-1 rounded">↵</kbd> open</span>
-            <span><kbd className="font-mono bg-[#0F2533] border border-[#2D6A8F]/30 px-1 rounded">esc</kbd> close</span>
+            <span><kbd className="font-mono bg-[#0F2533] border border-cg-slate/30 px-1 rounded">↑↓</kbd> navigate</span>
+            <span><kbd className="font-mono bg-[#0F2533] border border-cg-slate/30 px-1 rounded">↵</kbd> open</span>
+            <span><kbd className="font-mono bg-[#0F2533] border border-cg-slate/30 px-1 rounded">esc</kbd> close</span>
           </div>
           <span>{results.length} result{results.length === 1 ? '' : 's'}</span>
         </div>

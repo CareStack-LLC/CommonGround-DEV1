@@ -29,10 +29,10 @@ interface CaseSummaryAlertProps {
 export function CaseSummaryAlert({ data }: CaseSummaryAlertProps) {
   const healthColors = {
     excellent: {
-      bg: "bg-gradient-to-r from-[#E8F4F0] to-teal-50",
+      bg: "bg-gradient-to-r from-cg-sage-subtle to-teal-50",
       border: "border-[#C5E5DB]",
-      text: "text-[#2D8A70]",
-      badge: "bg-[#E8F4F0] text-[#2D8A70] border-[#C5E5DB]",
+      text: "text-cg-sage-dark",
+      badge: "bg-cg-sage-subtle text-cg-sage-dark border-[#C5E5DB]",
     },
     good: {
       bg: "bg-gradient-to-r from-teal-50 to-[#F0F7FC]",
@@ -41,16 +41,16 @@ export function CaseSummaryAlert({ data }: CaseSummaryAlertProps) {
       badge: "bg-teal-100 text-teal-700 border-teal-200",
     },
     fair: {
-      bg: "bg-gradient-to-r from-[#FEF7ED] to-[#FEF7ED]",
+      bg: "bg-gradient-to-r from-cg-amber-subtle to-cg-amber-subtle",
       border: "border-[#FBE3BF]",
       text: "text-[#B8791A]",
-      badge: "bg-[#FEF7ED] text-[#B8791A] border-[#FBE3BF]",
+      badge: "bg-cg-amber-subtle text-[#B8791A] border-[#FBE3BF]",
     },
     concerning: {
-      bg: "bg-gradient-to-r from-[#FEF7ED] to-[#FEE2E2]",
-      border: "border-[#FEF7ED]",
+      bg: "bg-gradient-to-r from-cg-amber-subtle to-cg-error-subtle",
+      border: "border-cg-amber-subtle",
       text: "text-[#E09520]",
-      badge: "bg-[#FEF7ED] text-[#E09520] border-[#FEF7ED]",
+      badge: "bg-cg-amber-subtle text-[#E09520] border-cg-amber-subtle",
     },
   };
 
@@ -80,10 +80,10 @@ export function CaseSummaryAlert({ data }: CaseSummaryAlertProps) {
               <Shield className={`h-5 w-5 ${colors.text}`} />
               <span className={`text-3xl font-bold ${colors.text}`}>{data.compliance_score}%</span>
               {data.compliance_trend === "up" && (
-                <TrendingUp className="h-5 w-5 text-[#2D8A70]" />
+                <TrendingUp className="h-5 w-5 text-cg-sage-dark" />
               )}
               {data.compliance_trend === "down" && (
-                <TrendingDown className="h-5 w-5 text-[#C53030]" />
+                <TrendingDown className="h-5 w-5 text-cg-error" />
               )}
             </div>
             <p className="text-xs text-slate-500 mt-1">Compliance Score</p>
@@ -94,7 +94,7 @@ export function CaseSummaryAlert({ data }: CaseSummaryAlertProps) {
           {/* Key Insights */}
           <div className="space-y-2">
             <div className="flex items-center gap-2 mb-3">
-              <div className="h-1 w-6 bg-[#2D6A8F] rounded-full" />
+              <div className="h-1 w-6 bg-cg-slate rounded-full" />
               <h4 className="text-sm font-bold text-slate-700 uppercase tracking-wider">
                 Key Insights
               </h4>
@@ -105,7 +105,7 @@ export function CaseSummaryAlert({ data }: CaseSummaryAlertProps) {
                   key={index}
                   className="flex items-start gap-2 p-3 bg-white/70 backdrop-blur-sm rounded-lg border border-slate-200/50 shadow-sm"
                 >
-                  <CheckCircle2 className="h-4 w-4 text-[#2D6A8F] mt-0.5 shrink-0" />
+                  <CheckCircle2 className="h-4 w-4 text-cg-slate mt-0.5 shrink-0" />
                   <p className="text-sm text-slate-700 leading-snug">{insight}</p>
                 </div>
               ))}
@@ -115,7 +115,7 @@ export function CaseSummaryAlert({ data }: CaseSummaryAlertProps) {
           {/* Action Items */}
           <div className="space-y-2">
             <div className="flex items-center gap-2 mb-3">
-              <div className={`h-1 w-6 ${data.action_items.length > 0 ? "bg-[#F5A623]" : "bg-[#3DAA8A]"} rounded-full`} />
+              <div className={`h-1 w-6 ${data.action_items.length > 0 ? "bg-cg-amber" : "bg-cg-sage"} rounded-full`} />
               <h4 className="text-sm font-bold text-slate-700 uppercase tracking-wider">
                 {data.action_items.length > 0 ? "Action Required" : "All Clear"}
               </h4>
@@ -133,8 +133,8 @@ export function CaseSummaryAlert({ data }: CaseSummaryAlertProps) {
                 ))
               ) : (
                 <div className="flex items-center gap-2 p-3 bg-white/70 backdrop-blur-sm rounded-lg border border-[#C5E5DB] shadow-sm">
-                  <CheckCircle2 className="h-4 w-4 text-[#2D8A70]" />
-                  <p className="text-sm text-[#2D8A70] font-medium">
+                  <CheckCircle2 className="h-4 w-4 text-cg-sage-dark" />
+                  <p className="text-sm text-cg-sage-dark font-medium">
                     No urgent actions required. Case is on track.
                   </p>
                 </div>

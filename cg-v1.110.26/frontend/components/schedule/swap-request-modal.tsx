@@ -273,7 +273,7 @@ export default function SwapRequestModal({
                             </div>
                         ) : (
                             <div className="p-4 bg-cg-amber-subtle border border-cg-amber/30 rounded-lg">
-                                <p className="text-sm text-[#E09520] dark:text-[#F5A623]">
+                                <p className="text-sm text-[#E09520] dark:text-cg-amber">
                                     No children found. Please add children to your family file first.
                                 </p>
                             </div>
@@ -330,7 +330,7 @@ export default function SwapRequestModal({
                                 </Button>
                             </div>
                             {formData.location_lat && formData.location_lng && (
-                                <p className="text-xs text-[#2D8A70] mt-1">
+                                <p className="text-xs text-cg-sage-dark mt-1">
                                     ✓ Address verified — GPS: {formData.location_lat.toFixed(4)}, {formData.location_lng.toFixed(4)}
                                 </p>
                             )}
@@ -401,7 +401,7 @@ export default function SwapRequestModal({
                             <Button
                                 type="submit"
                                 disabled={isLoading}
-                                className="flex-1 bg-[var(--portal-primary)] hover:bg-[#2D6A8F]"
+                                className="flex-1 bg-[var(--portal-primary)] hover:bg-cg-slate"
                             >
                                 {isLoading ? (
                                     <>

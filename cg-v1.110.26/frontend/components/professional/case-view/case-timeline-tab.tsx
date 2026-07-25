@@ -108,7 +108,7 @@ export function CaseTimelineTab({ familyFileId, token }: { familyFileId: string,
                             variant={selectedTypes.includes(type.value) ? "default" : "outline"}
                             size="sm"
                             onClick={() => toggleEventType(type.value)}
-                            className={selectedTypes.includes(type.value) ? "bg-[#2D6A8F] hover:bg-[#1E4E6B]" : "h-8"}
+                            className={selectedTypes.includes(type.value) ? "bg-cg-slate hover:bg-[#1E4E6B]" : "h-8"}
                         >
                             <type.icon className="h-3.5 w-3.5 mr-1.5" />
                             {type.label}
@@ -167,11 +167,11 @@ function TimelineItem({ event }: { event: TimelineEvent }) {
 
     const getEventColor = (type: string) => {
         const colorMap: Record<string, string> = {
-            message: "bg-[#F0F7FC] text-[#2D6A8F] border-[#E0EFF8]",
-            exchange: "bg-[#FEF7ED] text-[#E09520] border-[#FEF7ED]",
+            message: "bg-[#F0F7FC] text-cg-slate border-cg-slate-subtle",
+            exchange: "bg-cg-amber-subtle text-[#E09520] border-cg-amber-subtle",
             agreement: "bg-slate-50 text-slate-600 border-slate-100",
-            court: "bg-[#E0EFF8] text-[#2D6A8F] border-[#E0EFF8]",
-            aria: "bg-[#E8F4F0] text-[#2D8A70] border-[#E8F4F0]",
+            court: "bg-cg-slate-subtle text-cg-slate border-cg-slate-subtle",
+            aria: "bg-cg-sage-subtle text-cg-sage-dark border-cg-sage-subtle",
         };
         return colorMap[type] || "bg-slate-50 text-slate-600 border-slate-100";
     };
@@ -189,7 +189,7 @@ function TimelineItem({ event }: { event: TimelineEvent }) {
             </div>
 
             {/* Content */}
-            <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl border border-slate-100 bg-white shadow-sm transition-all group-hover:shadow-md group-hover:border-[#E0EFF8] duration-300">
+            <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl border border-slate-100 bg-white shadow-sm transition-all group-hover:shadow-md group-hover:border-cg-slate-subtle duration-300">
                 <div className="flex items-center justify-between mb-1">
                     <time className="text-xs font-bold text-[#3D8DB0]">
                         {new Date(event.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

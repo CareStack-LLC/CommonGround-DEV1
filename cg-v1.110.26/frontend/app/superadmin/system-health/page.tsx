@@ -25,7 +25,7 @@ export default function SystemHealthPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-xl font-bold text-white">System Health</h1>
-        <p className="text-sm text-[#6B8A9A] mt-0.5">Monitor services, API performance, and AI usage</p>
+        <p className="text-sm text-muted-foreground mt-0.5">Monitor services, API performance, and AI usage</p>
       </div>
 
       <TabBar tabs={TABS} activeTab={tab} onTabChange={handleTabChange} />

@@ -144,11 +144,11 @@ export function IncomingCallNotification() {
         {/* Caller Avatar */}
         <div className="flex flex-col items-center mb-6">
           <div className="relative">
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#3DAA8A] to-[#3DAA8A]/70 flex items-center justify-center shadow-xl">
+            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-cg-sage to-cg-sage/70 flex items-center justify-center shadow-xl">
               <User className="h-12 w-12 text-white" />
             </div>
             {/* Pulsing ring animation */}
-            <div className="absolute inset-0 rounded-full border-4 border-[#3DAA8A] animate-ping opacity-30" />
+            <div className="absolute inset-0 rounded-full border-4 border-cg-sage animate-ping opacity-30" />
           </div>
         </div>
 
@@ -177,7 +177,7 @@ export function IncomingCallNotification() {
           {/* Decline Button */}
           <button aria-label="End call"
             onClick={handleDecline}
-            className="w-16 h-16 rounded-full bg-[#C53030] hover:bg-[#C53030] transition-all shadow-lg flex items-center justify-center"
+            className="w-16 h-16 rounded-full bg-cg-error hover:bg-cg-error transition-all shadow-lg flex items-center justify-center"
             title="Decline"
           >
             <PhoneOff className="h-7 w-7 text-white" />
@@ -186,7 +186,7 @@ export function IncomingCallNotification() {
           {/* Accept Button */}
           <button aria-label="Toggle camera"
             onClick={handleAccept}
-            className="w-16 h-16 rounded-full bg-[#3DAA8A] hover:bg-[#2D8A70] transition-all shadow-lg flex items-center justify-center animate-pulse"
+            className="w-16 h-16 rounded-full bg-cg-sage hover:bg-cg-sage-dark transition-all shadow-lg flex items-center justify-center animate-pulse"
             title="Accept"
           >
             {incomingCall.call_type === 'video' ? (

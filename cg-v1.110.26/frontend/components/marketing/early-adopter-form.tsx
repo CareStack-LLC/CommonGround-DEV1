@@ -88,7 +88,7 @@ export function EarlyAdopterForm({ source, className = '' }: EarlyAdopterFormPro
           value={firstName}
           onChange={(e) => setFirstName(e.target.value)}
           placeholder="First name (optional)"
-          className="w-full px-4 py-3 rounded-lg border border-cg-sage/20 bg-white text-foreground placeholder:text-[#6B8A9A] focus:outline-none focus:ring-2 focus:ring-cg-sage/40 focus:border-transparent"
+          className="w-full px-4 py-3 rounded-lg border border-cg-sage/20 bg-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-cg-sage/40 focus:border-transparent"
         />
         <input aria-label="Email address"
           type="email"
@@ -96,7 +96,7 @@ export function EarlyAdopterForm({ source, className = '' }: EarlyAdopterFormPro
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Your email address"
           required
-          className="w-full px-4 py-3 rounded-lg border border-cg-sage/20 bg-white text-foreground placeholder:text-[#6B8A9A] focus:outline-none focus:ring-2 focus:ring-cg-sage/40 focus:border-transparent"
+          className="w-full px-4 py-3 rounded-lg border border-cg-sage/20 bg-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-cg-sage/40 focus:border-transparent"
         />
         <button
           type="submit"
@@ -108,7 +108,7 @@ export function EarlyAdopterForm({ source, className = '' }: EarlyAdopterFormPro
       </form>
 
       {error && (
-        <p className="text-sm text-[#C53030] mt-3 text-center">{error}</p>
+        <p className="text-sm text-cg-error mt-3 text-center">{error}</p>
       )}
 
       <div className="flex items-center justify-center gap-4 mt-4 text-xs text-muted-foreground">

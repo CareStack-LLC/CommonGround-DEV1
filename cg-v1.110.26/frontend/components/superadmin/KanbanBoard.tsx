@@ -23,8 +23,8 @@ interface KanbanBoardProps {
 }
 
 const COLUMNS = [
-  { key: 'todo', label: 'To Do', icon: Clock, color: 'border-[#6B8A9A]' },
-  { key: 'in_progress', label: 'In Progress', icon: Loader2, color: 'border-[#4BA8C8]' },
+  { key: 'todo', label: 'To Do', icon: Clock, color: 'border-muted-foreground' },
+  { key: 'in_progress', label: 'In Progress', icon: Loader2, color: 'border-cg-slate-light' },
   { key: 'done', label: 'Done', icon: CheckCircle, color: 'border-emerald-500' },
   { key: 'blocked', label: 'Blocked', icon: XCircle, color: 'border-red-400' },
 ];
@@ -32,8 +32,8 @@ const COLUMNS = [
 const SEVERITY_COLORS: Record<string, string> = {
   critical: 'bg-red-500/20 text-red-300',
   high: 'bg-amber-500/20 text-amber-300',
-  medium: 'bg-[#4BA8C8]/20 text-[#4BA8C8]',
-  low: 'bg-[#6B8A9A]/20 text-[#6B8A9A]',
+  medium: 'bg-cg-slate-light/20 text-cg-slate-light',
+  low: 'bg-muted-foreground/20 text-muted-foreground',
 };
 
 export function KanbanBoard({ items, onStatusChange, loading }: KanbanBoardProps) {
@@ -62,10 +62,10 @@ export function KanbanBoard({ items, onStatusChange, loading }: KanbanBoardProps
             onDrop={() => handleDrop(col.key)}
           >
             {/* Column header */}
-            <div className="flex items-center gap-2 px-3 py-2.5 border-b border-[#2D6A8F]/15">
-              <Icon className="w-3.5 h-3.5 text-[#6B8A9A]" />
+            <div className="flex items-center gap-2 px-3 py-2.5 border-b border-cg-slate/15">
+              <Icon className="w-3.5 h-3.5 text-muted-foreground" />
               <span className="text-xs font-semibold text-[#8AACBC]">{col.label}</span>
-              <span className="ml-auto text-[10px] text-[#4A6E7F] bg-[#1E3A4A] px-1.5 py-0.5 rounded">
+              <span className="ml-auto text-[10px] text-[#4A6E7F] bg-foreground px-1.5 py-0.5 rounded">
                 {colItems.length}
               </span>
             </div>
@@ -74,7 +74,7 @@ export function KanbanBoard({ items, onStatusChange, loading }: KanbanBoardProps
             <div className="p-2 space-y-2">
               {loading ? (
                 Array.from({ length: 2 }).map((_, i) => (
-                  <div key={i} className="h-16 bg-[#1E3A4A]/50 rounded-lg animate-pulse" />
+                  <div key={i} className="h-16 bg-foreground/50 rounded-lg animate-pulse" />
                 ))
               ) : (
                 colItems.map(item => (
@@ -83,7 +83,7 @@ export function KanbanBoard({ items, onStatusChange, loading }: KanbanBoardProps
                     draggable
                     onDragStart={() => handleDragStart(item.id)}
                     onDragEnd={handleDragEnd}
-                    className={`bg-[#1E3A4A]/60 border border-[#2D6A8F]/15 rounded-lg p-2.5 cursor-grab active:cursor-grabbing hover:border-[#3DAA8A]/30 transition-colors ${
+                    className={`bg-foreground/60 border border-cg-slate/15 rounded-lg p-2.5 cursor-grab active:cursor-grabbing hover:border-cg-sage/30 transition-colors ${
                       dragItem === item.id ? 'opacity-50' : ''
                     }`}
                   >
@@ -97,7 +97,7 @@ export function KanbanBoard({ items, onStatusChange, loading }: KanbanBoardProps
                         </span>
                       )}
                       {item.platform && (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#2D6A8F]/20 text-[#6B8A9A]">
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-cg-slate/20 text-muted-foreground">
                           {item.platform}
                         </span>
                       )}

@@ -46,7 +46,7 @@ function WelcomeDisclaimer({ onAccept }: { onAccept: () => void }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div className="bg-card rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden animate-in fade-in zoom-in duration-300">
         {/* Header */}
-        <div className="bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] p-6 text-center">
+        <div className="bg-gradient-to-br from-[var(--portal-primary)] to-cg-slate p-6 text-center">
           <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <Shield className="w-8 h-8 text-white" />
           </div>
@@ -101,7 +101,7 @@ function WelcomeDisclaimer({ onAccept }: { onAccept: () => void }) {
           <div className="pt-4 border-t border-border">
             <button
               onClick={onAccept}
-              className="w-full py-3 px-6 bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white font-bold rounded-xl hover:shadow-lg transition-all duration-300"
+              className="w-full py-3 px-6 bg-gradient-to-r from-[var(--portal-primary)] to-cg-slate text-white font-bold rounded-xl hover:shadow-lg transition-all duration-300"
             >
               I Understand, Let's Go
             </button>
@@ -132,10 +132,10 @@ interface FamilyFileWithAgreements {
 // ARIA Guardian indicator component
 function ARIAGuardianBadge() {
   return (
-    <div className="flex items-center gap-1.5 sm:gap-2 px-2 py-1.5 sm:px-3 sm:py-2 bg-gradient-to-r from-[#F5A623]/10 to-[#E09520]/5 border border-[#F5A623]/20 rounded-xl shadow-md">
+    <div className="flex items-center gap-1.5 sm:gap-2 px-2 py-1.5 sm:px-3 sm:py-2 bg-gradient-to-r from-cg-amber/10 to-[#E09520]/5 border border-cg-amber/20 rounded-xl shadow-md">
       <div className="relative">
-        <div className="w-2 h-2 bg-[#F5A623] rounded-full" />
-        <div className="absolute inset-0 w-2 h-2 bg-[#F5A623] rounded-full animate-ping opacity-50" />
+        <div className="w-2 h-2 bg-cg-amber rounded-full" />
+        <div className="absolute inset-0 w-2 h-2 bg-cg-amber rounded-full animate-ping opacity-50" />
       </div>
       <span className="text-xs font-bold text-[#E09520] hidden sm:inline">ARIA Protected</span>
       <span className="text-xs font-bold text-[#E09520] sm:hidden">ARIA</span>
@@ -170,7 +170,7 @@ function MessageBubble({
     <div className={`flex gap-2 sm:gap-3 ${isOwn ? 'flex-row-reverse' : ''}`}>
       {/* Avatar */}
       {showAvatar && (
-        <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center flex-shrink-0 shadow-md ${isOwn ? 'bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F]' : 'bg-muted-foreground'
+        <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center flex-shrink-0 shadow-md ${isOwn ? 'bg-gradient-to-br from-[var(--portal-primary)] to-cg-slate' : 'bg-muted-foreground'
           }`}>
           <span className="text-xs font-bold text-white">
             {isOwn ? 'You' : (userName?.charAt(0) || 'P')}
@@ -182,7 +182,7 @@ function MessageBubble({
       {/* Bubble */}
       <div className={`max-w-[80%] sm:max-w-[75%] ${isOwn ? 'items-end' : 'items-start'}`}>
         <div className={`relative group ${isOwn
-          ? 'bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] text-white px-3 py-2.5 sm:px-4 sm:py-3 rounded-2xl shadow-lg'
+          ? 'bg-gradient-to-br from-[var(--portal-primary)] to-cg-slate text-white px-3 py-2.5 sm:px-4 sm:py-3 rounded-2xl shadow-lg'
           : 'bg-card text-foreground px-3 py-2.5 sm:px-4 sm:py-3 rounded-2xl shadow-lg border-2 border-border'
           }`}>
           {/* ARIA Review Badge */}
@@ -287,14 +287,14 @@ function MessageBubble({
           }`}>
           <span>{formatTime(message.sent_at)}</span>
           {isOwn && message.acknowledged_at && (
-            <div className="flex items-center gap-1 text-[#2D8A70]">
+            <div className="flex items-center gap-1 text-cg-sage-dark">
               <ThumbsUp className="h-3 w-3" />
               <span className="text-xs font-medium">Acknowledged</span>
             </div>
           )}
           {isOwn && !message.acknowledged_at && <CheckCheck className="h-3 w-3 text-[var(--portal-primary)]" />}
           {!isOwn && message.acknowledged_at && (
-            <div className="flex items-center gap-1 text-[#2D8A70]">
+            <div className="flex items-center gap-1 text-cg-sage-dark">
               <ThumbsUp className="h-3 w-3" />
               <span className="text-xs font-medium">Acknowledged</span>
             </div>
@@ -378,7 +378,7 @@ function ChatHeader({
               <div className="flex items-center gap-2">
                 <h2 className="text-base sm:text-lg font-bold text-foreground truncate" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>{familyFileName}</h2>
                 {isCoParentOnline && (
-                  <span className="text-xs text-[#2D8A70] font-medium hidden sm:inline">Online</span>
+                  <span className="text-xs text-cg-sage-dark font-medium hidden sm:inline">Online</span>
                 )}
               </div>
               <div className="flex items-center gap-1">
@@ -634,10 +634,10 @@ function ChildThreadsShortcut() {
         href="/messages/child"
         className="flex items-center gap-3 p-4 hover:bg-[var(--portal-primary)]/5 transition-colors"
       >
-        <div className="relative w-12 h-12 rounded-full bg-gradient-to-br from-[#F5A623]/20 to-[#E09520]/10 flex items-center justify-center flex-shrink-0 shadow-sm">
+        <div className="relative w-12 h-12 rounded-full bg-gradient-to-br from-cg-amber/20 to-[#E09520]/10 flex items-center justify-center flex-shrink-0 shadow-sm">
           <Heart className="h-5 w-5 text-[#E09520]" />
           {totalUnread > 0 && (
-            <span className="absolute -top-1 -right-1 min-w-[22px] h-[22px] px-1.5 rounded-full bg-[#C53030] text-white text-xs font-bold flex items-center justify-center shadow-md">
+            <span className="absolute -top-1 -right-1 min-w-[22px] h-[22px] px-1.5 rounded-full bg-cg-error text-white text-xs font-bold flex items-center justify-center shadow-md">
               {totalUnread > 99 ? '99+' : totalUnread}
             </span>
           )}
@@ -1072,8 +1072,8 @@ function MessagesContent() {
                     <>
                       {/* ARIA Welcome Message */}
                       <div className="flex justify-center mb-4 sm:mb-6">
-                        <div className="bg-gradient-to-r from-[#F5A623]/10 to-[#E09520]/5 border-2 border-[#F5A623]/20 rounded-2xl px-3 py-3 sm:px-5 sm:py-4 flex items-center gap-2 sm:gap-3 max-w-md shadow-lg">
-                          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#F5A623]/20 to-[#E09520]/10 flex items-center justify-center flex-shrink-0 shadow-md">
+                        <div className="bg-gradient-to-r from-cg-amber/10 to-[#E09520]/5 border-2 border-cg-amber/20 rounded-2xl px-3 py-3 sm:px-5 sm:py-4 flex items-center gap-2 sm:gap-3 max-w-md shadow-lg">
+                          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-cg-amber/20 to-[#E09520]/10 flex items-center justify-center flex-shrink-0 shadow-md">
                             <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-[#E09520]" />
                           </div>
                           <p className="text-xs sm:text-sm font-bold text-foreground leading-relaxed">
@@ -1150,7 +1150,7 @@ function MessagesContent() {
                         onStopTyping={stopTyping}
                       />
                     ) : (
-                      <div className="bg-[#FEF7ED] border-2 border-[#FEF7ED] rounded-2xl p-3 sm:p-4 flex items-center gap-2 sm:gap-3 shadow-md">
+                      <div className="bg-cg-amber-subtle border-2 border-cg-amber-subtle rounded-2xl p-3 sm:p-4 flex items-center gap-2 sm:gap-3 shadow-md">
                         <AlertTriangle className="h-5 w-5 text-[#E09520] flex-shrink-0" />
                         <div>
                           <p className="font-bold text-foreground text-sm sm:text-base">Waiting for co-parent</p>

@@ -19,7 +19,7 @@ function getColor(pct: number): string {
   if (pct >= 40) return 'bg-amber-500/50';
   if (pct >= 20) return 'bg-amber-500/30';
   if (pct > 0) return 'bg-red-400/30';
-  return 'bg-[#1E3A4A]';
+  return 'bg-foreground';
 }
 
 export function CohortHeatmap({ cohorts, title = 'Cohort Retention' }: CohortHeatmapProps) {
@@ -28,7 +28,7 @@ export function CohortHeatmap({ cohorts, title = 'Cohort Retention' }: CohortHea
   const maxMonths = Math.max(...cohorts.map(c => c.retention.length));
 
   return (
-    <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+    <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
       <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">
         {title}
         <InfoTooltip text="Monthly cohort retention rates. Each row is a signup month, columns show % retained in subsequent months." />
@@ -38,10 +38,10 @@ export function CohortHeatmap({ cohorts, title = 'Cohort Retention' }: CohortHea
         <table className="w-full text-xs">
           <thead>
             <tr>
-              <th className="text-left py-1.5 font-medium text-[#6B8A9A] w-20">Cohort</th>
-              <th className="text-right py-1.5 font-medium text-[#6B8A9A] w-14">Size</th>
+              <th className="text-left py-1.5 font-medium text-muted-foreground w-20">Cohort</th>
+              <th className="text-right py-1.5 font-medium text-muted-foreground w-14">Size</th>
               {Array.from({ length: maxMonths }).map((_, i) => (
-                <th key={i} className="text-center py-1.5 font-medium text-[#6B8A9A] w-12">
+                <th key={i} className="text-center py-1.5 font-medium text-muted-foreground w-12">
                   M{i}
                 </th>
               ))}
@@ -49,9 +49,9 @@ export function CohortHeatmap({ cohorts, title = 'Cohort Retention' }: CohortHea
           </thead>
           <tbody>
             {cohorts.map((cohort) => (
-              <tr key={cohort.month} className="border-t border-[#2D6A8F]/10">
+              <tr key={cohort.month} className="border-t border-cg-slate/10">
                 <td className="py-1 text-[#8AACBC] font-mono">{cohort.month}</td>
-                <td className="py-1 text-right text-[#6B8A9A]">{cohort.size}</td>
+                <td className="py-1 text-right text-muted-foreground">{cohort.size}</td>
                 {Array.from({ length: maxMonths }).map((_, i) => {
                   const val = cohort.retention[i];
                   return (
@@ -61,12 +61,12 @@ export function CohortHeatmap({ cohorts, title = 'Cohort Retention' }: CohortHea
                           <div className={`w-10 h-6 rounded flex items-center justify-center text-[10px] font-medium text-white/90 ${getColor(val)}`}>
                             {val}%
                           </div>
-                          <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-[#1E3A4A] text-white text-[10px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10 shadow-lg">
+                          <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-foreground text-white text-[10px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-10 shadow-lg">
                             {cohort.month} → Month {i}: {val}%
                           </div>
                         </div>
                       ) : (
-                        <div className="w-10 h-6 rounded bg-[#1E3A4A]/30" />
+                        <div className="w-10 h-6 rounded bg-foreground/30" />
                       )}
                     </td>
                   );

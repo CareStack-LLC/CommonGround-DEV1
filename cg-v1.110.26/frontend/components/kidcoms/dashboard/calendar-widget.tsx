@@ -21,7 +21,7 @@ interface CalendarWidgetProps {
 const eventTypeColors = {
   school: { bg: 'bg-blue-50', text: 'text-blue-700', dot: 'bg-blue-500' },
   activity: { bg: 'bg-purple-50', text: 'text-purple-700', dot: 'bg-purple-500' },
-  family: { bg: 'bg-teal-50', text: 'text-teal-700', dot: 'bg-[#3DAA8A]' },
+  family: { bg: 'bg-teal-50', text: 'text-teal-700', dot: 'bg-cg-sage' },
   other: { bg: 'bg-slate-50', text: 'text-slate-700', dot: 'bg-slate-500' },
 };
 
@@ -96,7 +96,7 @@ export function CalendarWidget({ events, onEventClick, className }: CalendarWidg
                 className={cn(
                   'w-full px-4 py-3 flex gap-3',
                   'hover:bg-slate-50 transition-colors duration-150',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#3DAA8A]'
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-cg-sage'
                 )}
               >
                 {/* Date Circle */}
@@ -113,7 +113,7 @@ export function CalendarWidget({ events, onEventClick, className }: CalendarWidg
                     </div>
                   )}
                   {isTomorrow(event.date) && (
-                    <div className="text-xs font-bold text-[#2D6A8F]" style={{ fontFamily: 'Inter, sans-serif' }}>
+                    <div className="text-xs font-bold text-cg-slate" style={{ fontFamily: 'Inter, sans-serif' }}>
                       Tomorrow
                     </div>
                   )}
@@ -158,7 +158,7 @@ export function CalendarWidget({ events, onEventClick, className }: CalendarWidg
         <div className="px-4 py-3 border-t border-slate-200 bg-slate-50">
           <button
             onClick={() => onEventClick?.('view_calendar')}
-            className="text-sm font-medium text-[#349878] hover:text-[#3DAA8A] transition-colors"
+            className="text-sm font-medium text-[#349878] hover:text-cg-sage transition-colors"
             style={{ fontFamily: 'Inter, sans-serif' }}
           >
             View full calendar

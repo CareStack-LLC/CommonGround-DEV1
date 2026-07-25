@@ -16,12 +16,12 @@ interface FunnelChartProps {
 }
 
 const DEFAULT_COLORS = [
-  'bg-[#3DAA8A]',
-  'bg-[#4BA8C8]',
-  'bg-[#2D6A8F]',
-  'bg-[#F5A623]',
+  'bg-cg-sage',
+  'bg-cg-slate-light',
+  'bg-cg-slate',
+  'bg-cg-amber',
   'bg-[#E8834A]',
-  'bg-[#C53030]',
+  'bg-cg-error',
 ];
 
 export function FunnelChart({ stages, title = 'Conversion Funnel', tooltip }: FunnelChartProps) {
@@ -30,7 +30,7 @@ export function FunnelChart({ stages, title = 'Conversion Funnel', tooltip }: Fu
   const maxVal = stages[0]?.count || 1;
 
   return (
-    <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+    <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
       <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">
         {title}
         {tooltip && <InfoTooltip text={tooltip} />}
@@ -51,11 +51,11 @@ export function FunnelChart({ stages, title = 'Conversion Funnel', tooltip }: Fu
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-medium text-[#D0E4EC]">{formatNumber(stage.count)}</span>
                   {convRate && (
-                    <span className="text-[10px] text-[#6B8A9A]">({convRate}%)</span>
+                    <span className="text-[10px] text-muted-foreground">({convRate}%)</span>
                   )}
                 </div>
               </div>
-              <div className="h-6 bg-[#1E3A4A] rounded-lg overflow-hidden relative">
+              <div className="h-6 bg-foreground rounded-lg overflow-hidden relative">
                 <div
                   className={`h-full rounded-lg ${colorClass} transition-all duration-700 ease-out`}
                   style={{ width: `${Math.max(pct, 2)}%` }}

@@ -209,7 +209,7 @@ export function ARIAControlsPanel({
                     How aggressively ARIA filters and rewrites messages
                   </p>
                 </div>
-                <Badge className="bg-[#FEF7ED] text-[#6B460F] border-[#6B460F]/30">
+                <Badge className="bg-cg-amber-subtle text-[#6B460F] border-[#6B460F]/30">
                   {getStrictnessLabel(settings.rewrite_strictness)}
                 </Badge>
               </div>
@@ -234,9 +234,9 @@ export function ARIAControlsPanel({
                 </div>
               </div>
 
-              <Card className="border-2 border-[#1E3A4A]/20 bg-[#E0EFF8]/30">
+              <Card className="border-2 border-foreground/20 bg-cg-slate-subtle/30">
                 <CardContent className="py-3">
-                  <p className="text-xs text-[#1E3A4A]">
+                  <p className="text-xs text-foreground">
                     {getStrictnessDescription(settings.rewrite_strictness)}
                   </p>
                 </CardContent>
@@ -302,7 +302,7 @@ export function ARIAControlsPanel({
               <Card className="border-2 border-slate-200">
                 <CardContent className="py-4 flex items-start justify-between gap-4">
                   <div className="flex items-start gap-3">
-                    <MessageSquare className="h-5 w-5 text-[#1E3A4A] mt-0.5" />
+                    <MessageSquare className="h-5 w-5 text-foreground mt-0.5" />
                     <div>
                       <p className="text-sm font-semibold text-slate-900">
                         Structured-Only Mode
@@ -368,7 +368,7 @@ export function ARIAControlsPanel({
 
             {/* Warning for High-Risk Settings */}
             {(settings.structured_only_mode || settings.rewrite_strictness >= 9) && (
-              <Card className="border-2 border-[#6B460F]/30 bg-[#FEF7ED]/30">
+              <Card className="border-2 border-[#6B460F]/30 bg-cg-amber-subtle/30">
                 <CardContent className="py-3 flex items-start gap-2">
                   <AlertTriangle className="h-5 w-5 text-[#6B460F] shrink-0 mt-0.5" />
                   <div>
@@ -407,7 +407,7 @@ export function ARIAControlsPanel({
                         {interventionStats.trend || "Stable"}
                       </p>
                       {interventionStats.trend === "Increasing" && (
-                        <TrendingUp className="h-5 w-5 text-[#C53030]" />
+                        <TrendingUp className="h-5 w-5 text-cg-error" />
                       )}
                     </div>
                   </CardContent>

@@ -124,7 +124,7 @@ export default function RunbookPage() {
         actions={
           <button
             onClick={() => { setCreating(true); setEditing(null); }}
-            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors"
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-cg-sage hover:bg-cg-sage-light text-white text-sm font-medium transition-colors"
           >
             <Plus className="w-4 h-4" />
             New Runbook
@@ -137,13 +137,13 @@ export default function RunbookPage() {
       {!error && (
         <div className="grid grid-cols-1 lg:grid-cols-[320px_1fr] gap-6">
           {/* Sidebar */}
-          <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-3 space-y-2 lg:max-h-[calc(100vh-12rem)] lg:overflow-y-auto">
+          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-3 space-y-2 lg:max-h-[calc(100vh-12rem)] lg:overflow-y-auto">
             <div className="flex items-center gap-2">
-              <Filter className="w-3.5 h-3.5 text-[#6B8A9A]" />
+              <Filter className="w-3.5 h-3.5 text-muted-foreground" />
               <select
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="flex-1 bg-[#0F2533]/60 border border-[#2D6A8F]/30 rounded px-2 py-1.5 text-xs text-[#D0E4EC] focus:outline-none focus:border-[#3DAA8A]"
+                className="flex-1 bg-[#0F2533]/60 border border-cg-slate/30 rounded px-2 py-1.5 text-xs text-[#D0E4EC] focus:outline-none focus:border-cg-sage"
               >
                 {CATEGORIES.map((c) => (
                   <option key={c.value} value={c.value}>{c.label}</option>
@@ -154,11 +154,11 @@ export default function RunbookPage() {
             {loading ? (
               <div className="space-y-2 pt-2">
                 {Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="h-14 bg-[#2D6A8F]/15 animate-pulse rounded" />
+                  <div key={i} className="h-14 bg-cg-slate/15 animate-pulse rounded" />
                 ))}
               </div>
             ) : runbooks.length === 0 ? (
-              <div className="text-xs text-[#6B8A9A] text-center py-8">
+              <div className="text-xs text-muted-foreground text-center py-8">
                 No runbooks yet. Click "New Runbook" to create one.
               </div>
             ) : (
@@ -169,19 +169,19 @@ export default function RunbookPage() {
                     onClick={() => handleSelect(r.id)}
                     className={`w-full text-left p-2.5 rounded transition-colors ${
                       selectedId === r.id
-                        ? 'bg-[#3DAA8A]/15 border border-[#3DAA8A]/30'
-                        : 'hover:bg-[#2D6A8F]/15 border border-transparent'
+                        ? 'bg-cg-sage/15 border border-cg-sage/30'
+                        : 'hover:bg-cg-slate/15 border border-transparent'
                     }`}
                   >
                     <div className="flex items-center gap-1.5 mb-1">
                       <span className={`inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium border ${CATEGORY_COLORS[r.category] || CATEGORY_COLORS.other}`}>
                         {r.category}
                       </span>
-                      {!r.enabled && <span className="text-[10px] text-[#6B8A9A]">disabled</span>}
+                      {!r.enabled && <span className="text-[10px] text-muted-foreground">disabled</span>}
                     </div>
                     <div className="text-sm font-medium text-white">{r.title}</div>
                     {r.summary && (
-                      <div className="text-[11px] text-[#6B8A9A] mt-0.5 line-clamp-2">
+                      <div className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">
                         {r.summary}
                       </div>
                     )}
@@ -192,9 +192,9 @@ export default function RunbookPage() {
           </div>
 
           {/* Detail pane */}
-          <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-6">
+          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-6">
             {!selected ? (
-              <div className="flex flex-col items-center justify-center py-20 text-[#6B8A9A]">
+              <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
                 <BookOpen className="w-10 h-10 mb-3 opacity-40" />
                 <p className="text-sm">Select a runbook to view its steps</p>
               </div>
@@ -207,7 +207,7 @@ export default function RunbookPage() {
                         {selected.category}
                       </span>
                       {selected.tags.map((t) => (
-                        <span key={t} className="inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#2D6A8F]/20 text-[#8AACBC]">
+                        <span key={t} className="inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium bg-cg-slate/20 text-[#8AACBC]">
                           {t}
                         </span>
                       ))}
@@ -221,7 +221,7 @@ export default function RunbookPage() {
                     <button aria-label="Edit"
                       onClick={() => { setEditing(selected); setCreating(false); }}
                       title="Edit"
-                      className="p-2 rounded text-[#8AACBC] hover:bg-[#2D6A8F]/30 hover:text-white transition-colors"
+                      className="p-2 rounded text-[#8AACBC] hover:bg-cg-slate/30 hover:text-white transition-colors"
                     >
                       <Edit3 className="w-4 h-4" />
                     </button>
@@ -237,17 +237,17 @@ export default function RunbookPage() {
 
                 {/* Steps */}
                 <div className="space-y-3">
-                  <h3 className="text-xs font-semibold text-[#6B8A9A] uppercase tracking-wider">Steps</h3>
+                  <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Steps</h3>
                   {selected.steps.length === 0 ? (
-                    <p className="text-sm text-[#6B8A9A] italic">No steps yet. Click Edit to add them.</p>
+                    <p className="text-sm text-muted-foreground italic">No steps yet. Click Edit to add them.</p>
                   ) : (
                     selected.steps.map((step, i) => (
                       <div
                         key={i}
-                        className="bg-[#0F2533]/60 border border-[#2D6A8F]/20 rounded-lg p-4"
+                        className="bg-[#0F2533]/60 border border-cg-slate/20 rounded-lg p-4"
                       >
                         <div className="flex items-start gap-3">
-                          <span className="flex items-center justify-center w-6 h-6 rounded-full bg-[#3DAA8A]/20 text-[#3DAA8A] text-xs font-semibold shrink-0">
+                          <span className="flex items-center justify-center w-6 h-6 rounded-full bg-cg-sage/20 text-cg-sage text-xs font-semibold shrink-0">
                             {i + 1}
                           </span>
                           <div className="flex-1 min-w-0">
@@ -258,8 +258,8 @@ export default function RunbookPage() {
                               </p>
                             )}
                             {step.expected_outcome && (
-                              <div className="mt-2 pt-2 border-t border-[#2D6A8F]/15">
-                                <span className="text-[11px] text-[#6B8A9A] uppercase tracking-wider">Expected: </span>
+                              <div className="mt-2 pt-2 border-t border-cg-slate/15">
+                                <span className="text-[11px] text-muted-foreground uppercase tracking-wider">Expected: </span>
                                 <span className="text-xs text-emerald-300">{step.expected_outcome}</span>
                               </div>
                             )}
@@ -272,8 +272,8 @@ export default function RunbookPage() {
 
                 {/* Notes */}
                 {selected.notes && (
-                  <div className="mt-6 pt-4 border-t border-[#2D6A8F]/15">
-                    <h3 className="text-xs font-semibold text-[#6B8A9A] uppercase tracking-wider mb-2">Notes</h3>
+                  <div className="mt-6 pt-4 border-t border-cg-slate/15">
+                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Notes</h3>
                     <p className="text-sm text-[#D0E4EC] whitespace-pre-wrap leading-relaxed">{selected.notes}</p>
                   </div>
                 )}
@@ -371,7 +371,7 @@ function RunbookModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" onClick={onClose}>
       <div
-        className="bg-[#0F2533] border border-[#2D6A8F]/30 rounded-xl p-6 w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto"
+        className="bg-[#0F2533] border border-cg-slate/30 rounded-xl p-6 w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between mb-4">
@@ -391,7 +391,7 @@ function RunbookModal({
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g. Stripe webhook 5xx spike"
-                className="w-full bg-[#1A3648]/80 border border-[#2D6A8F]/30 rounded px-3 py-2 text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-[#3DAA8A]"
+                className="w-full bg-[#1A3648]/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-cg-sage"
               />
             </div>
             <div>
@@ -399,7 +399,7 @@ function RunbookModal({
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full bg-[#1A3648]/80 border border-[#2D6A8F]/30 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-[#3DAA8A]"
+                className="w-full bg-[#1A3648]/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-cg-sage"
               >
                 {CATEGORIES.slice(1).map((c) => (
                   <option key={c.value} value={c.value}>{c.label}</option>
@@ -415,7 +415,7 @@ function RunbookModal({
               onChange={(e) => setSummary(e.target.value)}
               rows={2}
               placeholder="When should an admin use this runbook?"
-              className="w-full bg-[#1A3648]/80 border border-[#2D6A8F]/30 rounded px-3 py-2 text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-[#3DAA8A] resize-none"
+              className="w-full bg-[#1A3648]/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-cg-sage resize-none"
             />
           </div>
 
@@ -425,7 +425,7 @@ function RunbookModal({
               value={tagsText}
               onChange={(e) => setTagsText(e.target.value)}
               placeholder="stripe, webhook, billing"
-              className="w-full bg-[#1A3648]/80 border border-[#2D6A8F]/30 rounded px-3 py-2 text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-[#3DAA8A]"
+              className="w-full bg-[#1A3648]/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-cg-sage"
             />
           </div>
 
@@ -435,7 +435,7 @@ function RunbookModal({
               <label className="block text-xs font-medium text-[#8AACBC]">Steps</label>
               <button
                 onClick={addStep}
-                className="text-xs text-[#3DAA8A] hover:text-[#5BC4A0] inline-flex items-center gap-1"
+                className="text-xs text-cg-sage hover:text-cg-sage-light inline-flex items-center gap-1"
               >
                 <Plus className="w-3 h-3" />
                 Add step
@@ -445,10 +445,10 @@ function RunbookModal({
               {steps.map((step, i) => (
                 <div
                   key={i}
-                  className="bg-[#1A3648]/40 border border-[#2D6A8F]/20 rounded p-3 space-y-2"
+                  className="bg-[#1A3648]/40 border border-cg-slate/20 rounded p-3 space-y-2"
                 >
                   <div className="flex items-center gap-2">
-                    <span className="text-[11px] text-[#6B8A9A] font-medium">Step {i + 1}</span>
+                    <span className="text-[11px] text-muted-foreground font-medium">Step {i + 1}</span>
                     <div className="flex-1" />
                     <button
                       onClick={() => moveStep(i, -1)}
@@ -475,20 +475,20 @@ function RunbookModal({
                     value={step.title}
                     onChange={(e) => updateStep(i, { title: e.target.value })}
                     placeholder="Step title"
-                    className="w-full bg-[#0F2533]/60 border border-[#2D6A8F]/20 rounded px-2 py-1.5 text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-[#3DAA8A]"
+                    className="w-full bg-[#0F2533]/60 border border-cg-slate/20 rounded px-2 py-1.5 text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-cg-sage"
                   />
                   <textarea
                     value={step.body}
                     onChange={(e) => updateStep(i, { body: e.target.value })}
                     rows={3}
                     placeholder="What to do (markdown supported). Use SQL snippets / CLI commands as needed."
-                    className="w-full bg-[#0F2533]/60 border border-[#2D6A8F]/20 rounded px-2 py-1.5 text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-[#3DAA8A] resize-none font-mono"
+                    className="w-full bg-[#0F2533]/60 border border-cg-slate/20 rounded px-2 py-1.5 text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-cg-sage resize-none font-mono"
                   />
                   <input
                     value={step.expected_outcome || ''}
                     onChange={(e) => updateStep(i, { expected_outcome: e.target.value })}
                     placeholder="Expected outcome (optional)"
-                    className="w-full bg-[#0F2533]/60 border border-[#2D6A8F]/20 rounded px-2 py-1.5 text-xs text-emerald-200 placeholder:text-[#4A6E7F] focus:outline-none focus:border-[#3DAA8A]"
+                    className="w-full bg-[#0F2533]/60 border border-cg-slate/20 rounded px-2 py-1.5 text-xs text-emerald-200 placeholder:text-[#4A6E7F] focus:outline-none focus:border-cg-sage"
                   />
                 </div>
               ))}
@@ -502,7 +502,7 @@ function RunbookModal({
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
               placeholder="SLAs, escalation contacts, related dashboards, etc."
-              className="w-full bg-[#1A3648]/80 border border-[#2D6A8F]/30 rounded px-3 py-2 text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-[#3DAA8A] resize-none"
+              className="w-full bg-[#1A3648]/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-cg-sage resize-none"
             />
           </div>
 
@@ -511,7 +511,7 @@ function RunbookModal({
               type="checkbox"
               checked={enabled}
               onChange={(e) => setEnabled(e.target.checked)}
-              className="rounded border-[#2D6A8F]/40 bg-zinc-900/80 text-[#3DAA8A] focus:ring-[#3DAA8A]/30"
+              className="rounded border-cg-slate/40 bg-zinc-900/80 text-cg-sage focus:ring-cg-sage/30"
             />
             <span className="text-sm text-[#D0E4EC]">Enabled (show in the list)</span>
           </label>
@@ -534,7 +534,7 @@ function RunbookModal({
           <button
             onClick={handleSave}
             disabled={saving || !title.trim()}
-            className="px-4 py-2 rounded bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors disabled:opacity-50 inline-flex items-center gap-2"
+            className="px-4 py-2 rounded bg-cg-sage hover:bg-cg-sage-light text-white text-sm font-medium transition-colors disabled:opacity-50 inline-flex items-center gap-2"
           >
             {saving && <Loader2 className="w-4 h-4 animate-spin" />}
             {runbook ? 'Save' : 'Create'}

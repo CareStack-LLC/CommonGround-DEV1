@@ -42,8 +42,8 @@ const steps: {
     icon: Users,
     title: 'Invite your co-parent',
     description: 'They get a secure link. You both have equal access from day one.',
-    color: 'from-[#F5A623]/10 to-[#F5A623]/5',
-    iconColor: 'text-[#F5A623]',
+    color: 'from-cg-amber/10 to-cg-amber/5',
+    iconColor: 'text-cg-amber',
   },
   {
     number: '03',
@@ -58,8 +58,8 @@ const steps: {
     brandIcon: 'aria',
     title: 'Communicate through ARIA',
     description: 'AI supports clarity and calm in every message. Communicate with confidence.',
-    color: 'from-[#F5A623]/10 to-[#F5A623]/5',
-    iconColor: 'text-[#F5A623]',
+    color: 'from-cg-amber/10 to-cg-amber/5',
+    iconColor: 'text-cg-amber',
   },
   {
     number: '05',
@@ -79,7 +79,7 @@ const benefits = [
 
 export function HowItWorksContent() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#F4F8F7] via-white to-[#F5F9F9]">
+    <div className="min-h-screen bg-gradient-to-b from-background via-white to-[#F5F9F9]">
       {/* Hero */}
       <section className="pt-24 pb-16 sm:pt-32 sm:pb-24">
         <div className="max-w-6xl mx-auto px-6">
@@ -87,12 +87,12 @@ export function HowItWorksContent() {
             {/* Text */}
             <div className="text-center lg:text-left">
               <h1
-                className="text-5xl sm:text-6xl lg:text-7xl font-serif text-[#1E3A4A] mb-6 leading-[1.05]"
+                className="text-5xl sm:text-6xl lg:text-7xl font-serif text-foreground mb-6 leading-[1.05]"
                 style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
               >
                 From setup to
                 <br />
-                <span className="text-[#F5A623]">peace in 5 steps</span>
+                <span className="text-cg-amber">peace in 5 steps</span>
               </h1>
               <p className="text-xl sm:text-2xl text-gray-600 mb-8 max-w-2xl mx-auto lg:mx-0">
                 Sign up, invite your co-parent, and let CommonGround
@@ -102,7 +102,7 @@ export function HowItWorksContent() {
               <div className="mb-8 flex justify-center lg:justify-start">
                 <Link
                   href="/early-access"
-                  className="group inline-flex items-center justify-center px-8 py-4 bg-[var(--portal-primary)] text-white font-semibold rounded-full hover:bg-[#2D6A8F] transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                  className="group inline-flex items-center justify-center px-8 py-4 bg-[var(--portal-primary)] text-white font-semibold rounded-full hover:bg-cg-slate transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
                 >
                   Start free &mdash; no card needed
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
@@ -169,7 +169,7 @@ export function HowItWorksContent() {
                     {/* Content */}
                     <div className="flex-1">
                       <h3
-                        className="text-2xl font-semibold text-[#1E3A4A] mb-2"
+                        className="text-2xl font-semibold text-foreground mb-2"
                         style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
                       >
                         {step.title}
@@ -192,7 +192,7 @@ export function HowItWorksContent() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 sm:py-28 bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] text-white">
+      <section className="py-20 sm:py-28 bg-gradient-to-br from-[var(--portal-primary)] to-cg-slate text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2
             className="text-4xl sm:text-5xl font-serif mb-6"
@@ -205,7 +205,7 @@ export function HowItWorksContent() {
           </p>
           <Link
             href="/early-access"
-            className="inline-flex items-center justify-center px-10 py-5 bg-[#F5A623] text-white font-bold text-lg rounded-full hover:bg-[#E0951A] transition-all shadow-2xl hover:-translate-y-1 group"
+            className="inline-flex items-center justify-center px-10 py-5 bg-cg-amber text-white font-bold text-lg rounded-full hover:bg-[#E0951A] transition-all shadow-2xl hover:-translate-y-1 group"
           >
             Start free &mdash; no card needed
             <ArrowRight className="ml-2 h-6 w-6 group-hover:translate-x-2 transition-transform" />

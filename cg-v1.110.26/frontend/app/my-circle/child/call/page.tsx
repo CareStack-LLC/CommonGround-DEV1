@@ -402,11 +402,11 @@ function ChildCallContent() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#0D1B24] via-[#1E3A4A] to-[#0D1B24] flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-b from-[#0D1B24] via-foreground to-[#0D1B24] flex items-center justify-center">
         <div className="text-center">
           <div className="relative">
-            <div className="absolute inset-0 bg-[#3DAA8A]/20 rounded-full blur-2xl animate-pulse" />
-            <Loader2 className="relative h-16 w-16 animate-spin mx-auto mb-4 text-[#3DAA8A]" />
+            <div className="absolute inset-0 bg-cg-sage/20 rounded-full blur-2xl animate-pulse" />
+            <Loader2 className="relative h-16 w-16 animate-spin mx-auto mb-4 text-cg-sage" />
           </div>
           <p className="text-xl font-bold text-white" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Connecting your call...</p>
           <p className="text-[#CBD8E0]/60 mt-2" style={{ fontFamily: "'Inter', sans-serif" }}>Getting everything ready!</p>
@@ -417,14 +417,14 @@ function ChildCallContent() {
 
   if (error || !callSession) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#0D1B24] via-[#1E3A4A] to-[#0D1B24] flex items-center justify-center p-4">
-        <div className="bg-[#1E3A4A]/80 backdrop-blur-sm rounded-3xl shadow-lg border border-[#3DAA8A]/20 p-8 max-w-md w-full text-center">
+      <div className="min-h-screen bg-gradient-to-b from-[#0D1B24] via-foreground to-[#0D1B24] flex items-center justify-center p-4">
+        <div className="bg-foreground/80 backdrop-blur-sm rounded-3xl shadow-lg border border-cg-sage/20 p-8 max-w-md w-full text-center">
           <div className="text-6xl mb-4">😕</div>
           <h1 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Oops!</h1>
           <p className="text-[#CBD8E0]/70 mb-6" style={{ fontFamily: "'Inter', sans-serif" }}>{error || 'Something went wrong'}</p>
           <button
             onClick={handleGoBack}
-            className="px-6 py-3 bg-[#3DAA8A] text-white rounded-full font-semibold hover:bg-[#3DAA8A]/90 transition-all hover:scale-105"
+            className="px-6 py-3 bg-cg-sage text-white rounded-full font-semibold hover:bg-cg-sage/90 transition-all hover:scale-105"
             style={{ fontFamily: "'Inter', sans-serif" }}
           >
             Go Back
@@ -436,8 +436,8 @@ function ChildCallContent() {
 
   if (callEnded) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#0D1B24] via-[#1E3A4A] to-[#0D1B24] flex items-center justify-center p-4">
-        <div className="bg-[#1E3A4A]/80 backdrop-blur-sm rounded-3xl shadow-lg border border-[#3DAA8A]/20 p-8 max-w-md w-full text-center">
+      <div className="min-h-screen bg-gradient-to-b from-[#0D1B24] via-foreground to-[#0D1B24] flex items-center justify-center p-4">
+        <div className="bg-foreground/80 backdrop-blur-sm rounded-3xl shadow-lg border border-cg-sage/20 p-8 max-w-md w-full text-center">
           <div className="text-6xl mb-4">👋</div>
           <h1 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Call Ended</h1>
           <p className="text-[#CBD8E0]/70 mb-4" style={{ fontFamily: "'Inter', sans-serif" }}>
@@ -458,9 +458,9 @@ function ChildCallContent() {
       {/* ARIA Warning Overlay */}
       {ariaWarning && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-[#1E3A4A] rounded-3xl p-8 mx-4 max-w-md text-center shadow-2xl border border-[#3DAA8A]/20">
+          <div className="bg-foreground rounded-3xl p-8 mx-4 max-w-md text-center shadow-2xl border border-cg-sage/20">
             <div className="w-16 h-16 rounded-full bg-amber-500/10 flex items-center justify-center mx-auto mb-4">
-              <AlertTriangle className="h-8 w-8 text-[#F5A623]" />
+              <AlertTriangle className="h-8 w-8 text-cg-amber" />
             </div>
             <h2 className="text-xl font-bold text-white mb-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
               {ariaWarning.type === 'terminate' ? 'Call Ending' : 'Friendly Reminder'}
@@ -469,7 +469,7 @@ function ChildCallContent() {
             {ariaWarning.type !== 'terminate' && (
               <button
                 onClick={() => setAriaWarning(null)}
-                className="px-6 py-2 bg-[#3DAA8A] text-white rounded-full font-semibold hover:bg-[#3DAA8A]/90"
+                className="px-6 py-2 bg-cg-sage text-white rounded-full font-semibold hover:bg-cg-sage/90"
                 style={{ fontFamily: "'Inter', sans-serif" }}
               >
                 I Understand
@@ -482,11 +482,11 @@ function ChildCallContent() {
       {/* Main Video Area */}
       <div className="flex-1 flex flex-col">
         {/* Header - Desktop */}
-        <header className="hidden md:flex bg-[#0D1B24]/90 backdrop-blur-sm border-b border-[#3DAA8A]/10 px-4 py-2 items-center justify-between">
+        <header className="hidden md:flex bg-[#0D1B24]/90 backdrop-blur-sm border-b border-cg-sage/10 px-4 py-2 items-center justify-between">
           <div className="flex items-center space-x-3">
             <button aria-label="Back"
               onClick={handleGoBack}
-              className="p-1.5 text-[#CBD8E0]/60 hover:text-[#3DAA8A] hover:bg-[#1E3A4A] rounded-lg transition-colors"
+              className="p-1.5 text-[#CBD8E0]/60 hover:text-cg-sage hover:bg-foreground rounded-lg transition-colors"
             >
               <ArrowLeft className="h-5 w-5" />
             </button>
@@ -497,14 +497,14 @@ function ChildCallContent() {
               <p className="text-xs text-[#CBD8E0]/50 flex items-center gap-1" style={{ fontFamily: "'Inter', sans-serif" }}>
                 {callSession.callType === 'video' ? '📹 Video Call' : '📞 Voice Call'}
                 {isARIAMonitoring && (
-                  <span className="inline-flex items-center gap-1 ml-2 text-[#3DAA8A]">
+                  <span className="inline-flex items-center gap-1 ml-2 text-cg-sage">
                     <Shield className="h-3 w-3" /> Protected
                   </span>
                 )}
               </p>
             </div>
           </div>
-          <span className={`px-3 py-1 rounded-full text-xs font-bold ${isCallJoined ? 'bg-[#3DAA8A]/20 text-[#3DAA8A]' : 'bg-[#F5A623]/20 text-[#F5A623]'
+          <span className={`px-3 py-1 rounded-full text-xs font-bold ${isCallJoined ? 'bg-cg-sage/20 text-cg-sage' : 'bg-cg-amber/20 text-cg-amber'
             }`} style={{ fontFamily: "var(--font-mono)" }}>
             {participantList.length} {participantList.length === 1 ? 'person' : 'people'}
           </span>
@@ -513,11 +513,11 @@ function ChildCallContent() {
         {/* Video Area */}
         <div className="flex-1 relative overflow-hidden">
           {!isCallJoined ? (
-            <div className="h-full bg-gradient-to-br from-[#1E3A4A] to-[#0D1B24] flex items-center justify-center">
+            <div className="h-full bg-gradient-to-br from-foreground to-[#0D1B24] flex items-center justify-center">
               <div className="text-center">
                 <div className="relative">
-                  <div className="absolute inset-0 bg-[#3DAA8A]/20 rounded-full blur-2xl animate-pulse" />
-                  <Loader2 className="relative h-16 w-16 animate-spin text-[#3DAA8A] mx-auto mb-4" />
+                  <div className="absolute inset-0 bg-cg-sage/20 rounded-full blur-2xl animate-pulse" />
+                  <Loader2 className="relative h-16 w-16 animate-spin text-cg-sage mx-auto mb-4" />
                 </div>
                 <p className="text-white text-xl font-bold" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                   {isJoiningCall ? 'Joining...' : 'Connecting...'}
@@ -532,7 +532,7 @@ function ChildCallContent() {
                 {remoteParticipants.length > 0 ? (
                   <VideoTile participant={remoteParticipants[0]} isFullScreen />
                 ) : (
-                  <div className="h-full bg-gradient-to-br from-[#1E3A4A] to-[#0D1B24] flex items-center justify-center">
+                  <div className="h-full bg-gradient-to-br from-foreground to-[#0D1B24] flex items-center justify-center">
                     <div className="text-center">
                       <div className="text-6xl mb-4">⏳</div>
                       <p className="text-white text-lg font-bold" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Waiting for {callSession.contactName}...</p>
@@ -542,7 +542,7 @@ function ChildCallContent() {
 
                 {/* Local participant PiP */}
                 {localParticipant && (
-                  <div className="absolute top-4 right-4 w-28 h-40 rounded-2xl overflow-hidden shadow-2xl border-2 border-[#3DAA8A]/50 z-10">
+                  <div className="absolute top-4 right-4 w-28 h-40 rounded-2xl overflow-hidden shadow-2xl border-2 border-cg-sage/50 z-10">
                     <VideoTile participant={localParticipant} isCompact />
                   </div>
                 )}
@@ -550,7 +550,7 @@ function ChildCallContent() {
                 {/* Mobile back button */}
                 <button aria-label="Back"
                   onClick={handleGoBack}
-                  className="absolute top-4 left-4 z-10 p-2 bg-[#0D1B24]/80 backdrop-blur-sm text-white rounded-full shadow-lg border border-[#3DAA8A]/20"
+                  className="absolute top-4 left-4 z-10 p-2 bg-[#0D1B24]/80 backdrop-blur-sm text-white rounded-full shadow-lg border border-cg-sage/20"
                 >
                   <ArrowLeft className="h-5 w-5" />
                 </button>
@@ -579,14 +579,14 @@ function ChildCallContent() {
         </div>
 
         {/* Controls Bar */}
-        <div className="bg-[#0D1B24] px-4 py-4 absolute md:relative bottom-0 left-0 right-0 safe-area-bottom shadow-lg border-t border-[#3DAA8A]/10">
+        <div className="bg-[#0D1B24] px-4 py-4 absolute md:relative bottom-0 left-0 right-0 safe-area-bottom shadow-lg border-t border-cg-sage/10">
           <div className="flex items-center justify-center space-x-3 md:space-x-4">
             {/* Audio Toggle */}
             <button aria-label="Toggle microphone"
               onClick={toggleAudio}
               disabled={!isCallJoined}
               className={`p-4 rounded-full transition-all transform hover:scale-105 ${isAudioOn
-                ? 'bg-[#1E3A4A] hover:bg-[#1E3A4A]/80 text-white'
+                ? 'bg-foreground hover:bg-foreground/80 text-white'
                 : 'bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/25'
                 } ${!isCallJoined ? 'opacity-50 cursor-not-allowed' : ''}`}
               title={isAudioOn ? 'Mute' : 'Unmute'}
@@ -599,7 +599,7 @@ function ChildCallContent() {
               onClick={toggleVideo}
               disabled={!isCallJoined}
               className={`p-4 rounded-full transition-all transform hover:scale-105 ${isVideoOn
-                ? 'bg-[#1E3A4A] hover:bg-[#1E3A4A]/80 text-white'
+                ? 'bg-foreground hover:bg-foreground/80 text-white'
                 : 'bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/25'
                 } ${!isCallJoined ? 'opacity-50 cursor-not-allowed' : ''}`}
               title={isVideoOn ? 'Turn off camera' : 'Turn on camera'}
@@ -617,14 +617,14 @@ function ChildCallContent() {
             </button>
 
             {/* Divider */}
-            <div className="hidden md:block w-px h-10 bg-[#3DAA8A]/20" />
+            <div className="hidden md:block w-px h-10 bg-cg-sage/20" />
 
             {/* Chat Toggle - Desktop only */}
             <button aria-label="Open chat"
               onClick={() => setActivePanel(activePanel === 'chat' ? null : 'chat')}
               className={`hidden md:flex p-3 rounded-full transition-all ${activePanel === 'chat'
-                ? 'bg-[#3DAA8A] text-white'
-                : 'bg-[#1E3A4A] hover:bg-[#1E3A4A]/80 text-[#CBD8E0]'
+                ? 'bg-cg-sage text-white'
+                : 'bg-foreground hover:bg-foreground/80 text-[#CBD8E0]'
                 }`}
               title="Chat"
             >
@@ -635,8 +635,8 @@ function ChildCallContent() {
             <button
               onClick={() => setActivePanel(activePanel === 'participants' ? null : 'participants')}
               className={`hidden md:flex p-3 rounded-full transition-all ${activePanel === 'participants'
-                ? 'bg-[#3DAA8A] text-white'
-                : 'bg-[#1E3A4A] hover:bg-[#1E3A4A]/80 text-[#CBD8E0]'
+                ? 'bg-cg-sage text-white'
+                : 'bg-foreground hover:bg-foreground/80 text-[#CBD8E0]'
                 }`}
               title="Participants"
             >
@@ -648,8 +648,8 @@ function ChildCallContent() {
               onClick={() => setIsTheaterMode(true)}
               disabled={!isCallJoined}
               className={`p-4 md:p-3 rounded-full transition-all transform hover:scale-105 ${!isCallJoined
-                ? 'bg-[#1E3A4A]/50 text-[#CBD8E0]/30 opacity-50 cursor-not-allowed'
-                : 'bg-[#F5A623] hover:bg-[#F5A623]/90 text-white shadow-lg shadow-[#F5A623]/20'
+                ? 'bg-foreground/50 text-[#CBD8E0]/30 opacity-50 cursor-not-allowed'
+                : 'bg-cg-amber hover:bg-cg-amber/90 text-white shadow-lg shadow-cg-amber/20'
                 }`}
               title="Watch Together!"
             >
@@ -661,8 +661,8 @@ function ChildCallContent() {
               onClick={() => setIsArcadeMode(true)}
               disabled={!isCallJoined}
               className={`p-4 md:p-3 flex rounded-full transition-all ${!isCallJoined
-                ? 'bg-[#1E3A4A]/50 text-[#CBD8E0]/30 opacity-50 cursor-not-allowed'
-                : 'bg-[#1E3A4A] hover:bg-[#1E3A4A]/80 text-white'
+                ? 'bg-foreground/50 text-[#CBD8E0]/30 opacity-50 cursor-not-allowed'
+                : 'bg-foreground hover:bg-foreground/80 text-white'
                 }`}
               title="Arcade Games"
             >
@@ -674,8 +674,8 @@ function ChildCallContent() {
               onClick={() => setIsWhiteboardMode(true)}
               disabled={!isCallJoined}
               className={`hidden md:flex p-3 rounded-full transition-all ${!isCallJoined
-                ? 'bg-[#1E3A4A]/50 text-[#CBD8E0]/30 opacity-50 cursor-not-allowed'
-                : 'bg-[#1E3A4A] hover:bg-[#1E3A4A]/80 text-white'
+                ? 'bg-foreground/50 text-[#CBD8E0]/30 opacity-50 cursor-not-allowed'
+                : 'bg-foreground hover:bg-foreground/80 text-white'
                 }`}
               title="Draw Together"
             >
@@ -687,8 +687,8 @@ function ChildCallContent() {
 
       {/* Side Panel */}
       {activePanel && (
-        <div className="w-80 bg-[#0D1B24] border-l border-[#3DAA8A]/10 flex flex-col">
-          <div className="p-4 border-b border-[#3DAA8A]/10">
+        <div className="w-80 bg-[#0D1B24] border-l border-cg-sage/10 flex flex-col">
+          <div className="p-4 border-b border-cg-sage/10">
             <h3 className="text-white font-bold text-lg capitalize flex items-center gap-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
               {activePanel === 'chat' ? '💬' : '👥'} {activePanel}
             </h3>
@@ -706,9 +706,9 @@ function ChildCallContent() {
                     </div>
                   ) : (
                     messages.map((msg) => (
-                      <div key={msg.id} className="p-3 bg-[#1E3A4A]/60 rounded-xl border border-[#3DAA8A]/10">
+                      <div key={msg.id} className="p-3 bg-foreground/60 rounded-xl border border-cg-sage/10">
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm font-bold text-[#3DAA8A]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{msg.sender}</span>
+                          <span className="text-sm font-bold text-cg-sage" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{msg.sender}</span>
                           <span className="text-xs text-[#CBD8E0]/40" style={{ fontFamily: "var(--font-mono)" }}>
                             {msg.time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </span>
@@ -719,7 +719,7 @@ function ChildCallContent() {
                   )}
                 </div>
 
-                <div className="p-4 border-t border-[#3DAA8A]/10">
+                <div className="p-4 border-t border-cg-sage/10">
                   <div className="flex space-x-2">
                     <input
                       type="text"
@@ -727,13 +727,13 @@ function ChildCallContent() {
                       onChange={(e) => setNewMessage(e.target.value)}
                       onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                       placeholder="Type a message..."
-                      className="flex-1 bg-[#1E3A4A] text-white rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#3DAA8A] border border-[#3DAA8A]/20 placeholder-[#CBD8E0]/40"
+                      className="flex-1 bg-foreground text-white rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-cg-sage border border-cg-sage/20 placeholder-[#CBD8E0]/40"
                       style={{ fontFamily: "'Inter', sans-serif" }}
                     />
                     <button aria-label="Send message"
                       onClick={handleSendMessage}
                       disabled={!newMessage.trim()}
-                      className="p-2 bg-[#3DAA8A] hover:bg-[#3DAA8A]/90 text-white rounded-xl disabled:opacity-50"
+                      className="p-2 bg-cg-sage hover:bg-cg-sage/90 text-white rounded-xl disabled:opacity-50"
                     >
                       <Send className="h-5 w-5" />
                     </button>
@@ -747,9 +747,9 @@ function ChildCallContent() {
                 {participantList.map((participant) => (
                   <div
                     key={participant.odId}
-                    className="flex items-center space-x-3 p-3 bg-[#1E3A4A]/60 rounded-xl border border-[#3DAA8A]/10"
+                    className="flex items-center space-x-3 p-3 bg-foreground/60 rounded-xl border border-cg-sage/10"
                   >
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#3DAA8A] to-[#2D6A8F] flex items-center justify-center text-white text-lg font-bold" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cg-sage to-cg-slate flex items-center justify-center text-white text-lg font-bold" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                       {participant.odName[0]?.toUpperCase() || '?'}
                     </div>
                     <div className="flex-1">
@@ -765,7 +765,7 @@ function ChildCallContent() {
                       {!participant.audioOn && <MicOff className="h-4 w-4 text-red-400" />}
                       {!participant.videoOn && <VideoOff className="h-4 w-4 text-red-400" />}
                       {participant.audioOn && participant.videoOn && (
-                        <span className="w-2 h-2 bg-[#3DAA8A] rounded-full" />
+                        <span className="w-2 h-2 bg-cg-sage rounded-full" />
                       )}
                     </div>
                   </div>
@@ -856,7 +856,7 @@ function VideoTile({ participant, isFullScreen, isCompact }: VideoTileProps) {
   // Compact mode for PiP
   if (isCompact) {
     return (
-      <div className="relative h-full w-full bg-[#1E3A4A]">
+      <div className="relative h-full w-full bg-foreground">
         {participant.videoOn && participant.videoTrack ? (
           <video
             ref={videoRef}
@@ -866,7 +866,7 @@ function VideoTile({ participant, isFullScreen, isCompact }: VideoTileProps) {
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#3DAA8A] to-[#2D6A8F]">
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-cg-sage to-cg-slate">
             <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center text-white text-lg font-bold" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
               {participant.odName[0]?.toUpperCase() || '?'}
             </div>
@@ -895,15 +895,15 @@ function VideoTile({ participant, isFullScreen, isCompact }: VideoTileProps) {
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1E3A4A] to-[#0D1B24]">
-            <div className="w-32 h-32 rounded-full bg-gradient-to-br from-[#3DAA8A] to-[#2D6A8F] flex items-center justify-center text-white text-5xl font-bold shadow-2xl shadow-[#3DAA8A]/20" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-foreground to-[#0D1B24]">
+            <div className="w-32 h-32 rounded-full bg-gradient-to-br from-cg-sage to-cg-slate flex items-center justify-center text-white text-5xl font-bold shadow-2xl shadow-cg-sage/20" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
               {participant.odName[0]?.toUpperCase() || '?'}
             </div>
           </div>
         )}
         {/* Name overlay */}
         <div className="absolute bottom-24 left-0 right-0 text-center">
-          <span className="text-white text-xl font-bold bg-[#0D1B24]/80 px-6 py-2 rounded-full backdrop-blur-sm border border-[#3DAA8A]/20" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+          <span className="text-white text-xl font-bold bg-[#0D1B24]/80 px-6 py-2 rounded-full backdrop-blur-sm border border-cg-sage/20" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
             {participant.odName}
           </span>
         </div>
@@ -927,7 +927,7 @@ function VideoTile({ participant, isFullScreen, isCompact }: VideoTileProps) {
 
   // Default grid tile mode for desktop
   return (
-    <div className="relative bg-[#1E3A4A]/50 rounded-2xl overflow-hidden h-full ring-1 ring-[#3DAA8A]/10">
+    <div className="relative bg-foreground/50 rounded-2xl overflow-hidden h-full ring-1 ring-cg-sage/10">
       {participant.videoOn && participant.videoTrack ? (
         <video
           ref={videoRef}
@@ -937,8 +937,8 @@ function VideoTile({ participant, isFullScreen, isCompact }: VideoTileProps) {
           className="w-full h-full object-cover"
         />
       ) : (
-        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1E3A4A] to-[#0D1B24]">
-          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#3DAA8A] to-[#2D6A8F] flex items-center justify-center text-white text-4xl font-bold shadow-lg shadow-[#3DAA8A]/20" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-foreground to-[#0D1B24]">
+          <div className="w-24 h-24 rounded-full bg-gradient-to-br from-cg-sage to-cg-slate flex items-center justify-center text-white text-4xl font-bold shadow-lg shadow-cg-sage/20" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
             {participant.odName[0]?.toUpperCase() || '?'}
           </div>
         </div>
@@ -949,7 +949,7 @@ function VideoTile({ participant, isFullScreen, isCompact }: VideoTileProps) {
         <div className="flex items-center justify-between">
           <span className="text-white font-bold" style={{ fontFamily: "'Inter', sans-serif" }}>
             {participant.odName}
-            {participant.isLocal && <span className="text-[#3DAA8A] ml-1">(You)</span>}
+            {participant.isLocal && <span className="text-cg-sage ml-1">(You)</span>}
           </span>
           <div className="flex items-center space-x-2">
             {!participant.audioOn && <MicOff className="h-4 w-4 text-red-400" />}
@@ -969,7 +969,7 @@ export default function ChildCallPage() {
       fallback={
         <div className="min-h-screen bg-[#0D1B24] flex items-center justify-center">
           <div className="text-center">
-            <Loader2 className="h-16 w-16 animate-spin mx-auto mb-4 text-[#3DAA8A]" />
+            <Loader2 className="h-16 w-16 animate-spin mx-auto mb-4 text-cg-sage" />
             <p className="text-xl font-bold text-white" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Loading...</p>
           </div>
         </div>

@@ -70,7 +70,7 @@ function formatNumber(n: number | null | undefined): string {
 }
 
 function Skeleton({ className = '' }: { className?: string }) {
-  return <div className={`animate-pulse bg-[#2D6A8F]/20 rounded-lg ${className}`} />;
+  return <div className={`animate-pulse bg-cg-slate/20 rounded-lg ${className}`} />;
 }
 
 const CustomTooltipStyle = {
@@ -137,7 +137,7 @@ export default function KidSpaceContent() {
       <div className="flex flex-col items-center justify-center py-20">
         <AlertTriangle className="w-10 h-10 text-amber-500 mb-3" />
         <p className="text-[#8AACBC] mb-4">{error}</p>
-        <button onClick={fetchData} className="px-4 py-2 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors">Retry</button>
+        <button onClick={fetchData} className="px-4 py-2 rounded-lg bg-cg-sage hover:bg-cg-sage-light text-white text-sm font-medium transition-colors">Retry</button>
       </div>
     );
   }
@@ -146,7 +146,7 @@ export default function KidSpaceContent() {
     return (
       <div className="space-y-6">
         <Header loading={false} onRefresh={fetchData} />
-        <div className="flex flex-col items-center justify-center py-20 bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl">
+        <div className="flex flex-col items-center justify-center py-20 bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl">
           <Gamepad2 className="w-12 h-12 text-[#4A6E7F] mb-4" />
           <p className="text-[#8AACBC] text-lg font-medium">No KidSpace data available yet</p>
           <p className="text-[#4A6E7F] text-sm mt-1">Analytics will populate as families use KidSpace features.</p>
@@ -185,15 +185,15 @@ export default function KidSpaceContent() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-1">
+      <div className="flex gap-1 bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-1">
         {tabs.map((t) => (
           <button
             key={t.key}
             onClick={() => setTab(t.key)}
             className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-medium transition-colors ${
               tab === t.key
-                ? 'bg-violet-500/20 text-[#5BC4A0] border border-violet-500/30'
-                : 'text-[#6B8A9A] hover:text-[#D0E4EC] hover:bg-[#2D6A8F]/20'
+                ? 'bg-violet-500/20 text-cg-sage-light border border-violet-500/30'
+                : 'text-muted-foreground hover:text-[#D0E4EC] hover:bg-cg-slate/20'
             }`}
           >
             <t.icon className="w-3.5 h-3.5" />
@@ -205,7 +205,7 @@ export default function KidSpaceContent() {
       {tab === 'overview' && (
         <div className="space-y-4">
           {/* Daily Usage Chart */}
-          <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
             <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">Daily Usage Trends (30 days)</h2>
             {data?.daily_usage?.length ? (
               <ResponsiveContainer width="100%" height={280}>
@@ -226,7 +226,7 @@ export default function KidSpaceContent() {
 
           {/* COPPA + Session Averages */}
           <div className="grid lg:grid-cols-2 gap-4">
-            <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
               <div className="flex items-center gap-2 mb-4">
                 <ShieldCheck className="w-4 h-4 text-emerald-400" />
                 <h2 className="text-sm font-semibold text-[#D0E4EC]">COPPA Consent Status</h2>
@@ -251,7 +251,7 @@ export default function KidSpaceContent() {
               ) : null}
             </div>
 
-            <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
               <div className="flex items-center gap-2 mb-4">
                 <Timer className="w-4 h-4 text-blue-400" />
                 <h2 className="text-sm font-semibold text-[#D0E4EC]">Avg Session Duration</h2>
@@ -279,7 +279,7 @@ export default function KidSpaceContent() {
       {tab === 'content' && (
         <div className="grid lg:grid-cols-2 gap-4">
           {/* Most Played */}
-          <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
             <div className="flex items-center gap-2 mb-4">
               <Trophy className="w-4 h-4 text-amber-400" />
               <h2 className="text-sm font-semibold text-[#D0E4EC]">Most Played</h2>
@@ -287,7 +287,7 @@ export default function KidSpaceContent() {
             {data?.most_played?.length ? (
               <div className="space-y-0">
                 {data.most_played.slice(0, 10).map((item, i) => (
-                  <div key={i} className="flex items-center gap-3 py-2.5 border-b border-[#2D6A8F]/10 last:border-0 hover:bg-[#2D6A8F]/10 transition-colors px-2 rounded">
+                  <div key={i} className="flex items-center gap-3 py-2.5 border-b border-cg-slate/10 last:border-0 hover:bg-cg-slate/10 transition-colors px-2 rounded">
                     <span className="w-6 text-center">
                       {i === 0 ? (
                         <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 text-[10px] font-bold">#1</span>
@@ -309,7 +309,7 @@ export default function KidSpaceContent() {
           </div>
 
           {/* Most Read */}
-          <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
             <div className="flex items-center gap-2 mb-4">
               <BookOpen className="w-4 h-4 text-emerald-400" />
               <h2 className="text-sm font-semibold text-[#D0E4EC]">Most Read</h2>
@@ -317,7 +317,7 @@ export default function KidSpaceContent() {
             {data?.most_read?.length ? (
               <div className="space-y-0">
                 {data.most_read.slice(0, 10).map((item, i) => (
-                  <div key={i} className="flex items-center gap-3 py-2.5 border-b border-[#2D6A8F]/10 last:border-0 hover:bg-[#2D6A8F]/10 transition-colors px-2 rounded">
+                  <div key={i} className="flex items-center gap-3 py-2.5 border-b border-cg-slate/10 last:border-0 hover:bg-cg-slate/10 transition-colors px-2 rounded">
                     <span className="w-6 text-center">
                       {i === 0 ? (
                         <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 text-[10px] font-bold">#1</span>
@@ -353,7 +353,7 @@ export default function KidSpaceContent() {
               <div key={label} className={`bg-gradient-to-b from-${color}-600/20 to-${color}-600/5 border border-${color}-500/20 rounded-xl p-4`}>
                 <Icon className={`w-4 h-4 text-${color}-400 mb-1.5`} />
                 <div className="text-lg font-bold text-white">{sessions}</div>
-                <span className="text-[11px] text-[#6B8A9A]">{label}</span>
+                <span className="text-[11px] text-muted-foreground">{label}</span>
                 {sub && <div className="text-[11px] text-[#4A6E7F] mt-0.5">{sub}</div>}
               </div>
             ))}
@@ -361,13 +361,13 @@ export default function KidSpaceContent() {
 
           {/* Session averages table */}
           {data?.session_averages?.length ? (
-            <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl overflow-hidden">
+            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden">
               <div className="px-5 py-4 border-b border-zinc-800">
                 <h2 className="text-sm font-semibold text-white">Session Type Breakdown</h2>
               </div>
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-zinc-800 text-[#6B8A9A] text-xs">
+                  <tr className="border-b border-zinc-800 text-muted-foreground text-xs">
                     <th className="text-left px-5 py-3 font-medium">Type</th>
                     <th className="text-right px-5 py-3 font-medium">Total Sessions</th>
                     <th className="text-right px-5 py-3 font-medium">Avg Duration</th>
@@ -375,7 +375,7 @@ export default function KidSpaceContent() {
                 </thead>
                 <tbody>
                   {data.session_averages.map((sa, i) => (
-                    <tr key={i} className="border-b border-zinc-800/50 hover:bg-[#2D6A8F]/10">
+                    <tr key={i} className="border-b border-zinc-800/50 hover:bg-cg-slate/10">
                       <td className="px-5 py-3 text-white capitalize">{sa.type.replace('_', ' ')}</td>
                       <td className="px-5 py-3 text-right text-[#D0E4EC]">{formatNumber(sa.total_sessions)}</td>
                       <td className="px-5 py-3 text-right text-[#D0E4EC]">{sa.avg_minutes} min</td>
@@ -396,10 +396,10 @@ function Header({ loading, onRefresh }: { loading: boolean; onRefresh: () => voi
     <div className="flex items-center justify-between">
       <div>
         <h1 className="text-xl font-bold text-white">KidSpace Analytics</h1>
-        <p className="text-sm text-[#6B8A9A] mt-0.5">Usage stats, content leaderboards &amp; session details</p>
+        <p className="text-sm text-muted-foreground mt-0.5">Usage stats, content leaderboards &amp; session details</p>
       </div>
       <button onClick={onRefresh} disabled={loading}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#2D6A8F]/20 hover:bg-[#2D6A8F]/30 text-[#8AACBC] hover:text-white text-xs font-medium transition-colors disabled:opacity-50">
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-[#8AACBC] hover:text-white text-xs font-medium transition-colors disabled:opacity-50">
         <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
         Refresh
       </button>
@@ -411,15 +411,15 @@ function MetricCard({ icon: Icon, label, value, color }: {
   icon: React.ElementType; label: string; value: string; color: string;
 }) {
   const colorMap: Record<string, string> = {
-    violet: 'from-[#3DAA8A]/20 to-[#3DAA8A]/5 border-[#3DAA8A]/20',
-    blue: 'from-[#2D6A8F]/20 to-[#2D6A8F]/5 border-[#2D6A8F]/20',
-    emerald: 'from-[#3DAA8A]/20 to-[#3DAA8A]/5 border-[#3DAA8A]/20',
-    amber: 'from-[#F5A623]/20 to-[#F5A623]/5 border-[#F5A623]/20',
+    violet: 'from-cg-sage/20 to-cg-sage/5 border-cg-sage/20',
+    blue: 'from-cg-slate/20 to-cg-slate/5 border-cg-slate/20',
+    emerald: 'from-cg-sage/20 to-cg-sage/5 border-cg-sage/20',
+    amber: 'from-cg-amber/20 to-cg-amber/5 border-cg-amber/20',
     teal: 'from-teal-600/20 to-teal-600/5 border-teal-500/20',
     rose: 'from-rose-600/20 to-rose-600/5 border-rose-500/20',
   };
   const iconColorMap: Record<string, string> = {
-    violet: 'text-[#3DAA8A]', blue: 'text-blue-400',
+    violet: 'text-cg-sage', blue: 'text-blue-400',
     emerald: 'text-emerald-400', amber: 'text-amber-400',
     teal: 'text-teal-400', rose: 'text-rose-400',
   };
@@ -427,7 +427,7 @@ function MetricCard({ icon: Icon, label, value, color }: {
     <div className={`bg-gradient-to-b ${colorMap[color]} border rounded-xl p-4`}>
       <Icon className={`w-4 h-4 ${iconColorMap[color]} mb-1.5`} />
       <div className="text-xl font-bold text-white tracking-tight">{value}</div>
-      <span className="text-[11px] text-[#6B8A9A]">{label}</span>
+      <span className="text-[11px] text-muted-foreground">{label}</span>
     </div>
   );
 }

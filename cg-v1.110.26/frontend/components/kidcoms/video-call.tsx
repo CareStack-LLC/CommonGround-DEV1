@@ -268,7 +268,7 @@ export default function VideoCall({
 
   if (error) {
     return (
-      <div className="h-full flex items-center justify-center bg-[#0D1B24] rounded-2xl border border-[#1E3A4A]/50">
+      <div className="h-full flex items-center justify-center bg-[#0D1B24] rounded-2xl border border-foreground/50">
         <div className="text-center p-8">
           <div className="w-20 h-20 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4">
             <VideoOff className="h-10 w-10 text-red-400" />
@@ -281,7 +281,7 @@ export default function VideoCall({
           </p>
           <button
             onClick={onLeave}
-            className="px-6 py-2.5 bg-[#1E3A4A] hover:bg-[#1E3A4A]/80 text-white rounded-xl font-medium transition-colors border border-[#3DAA8A]/20"
+            className="px-6 py-2.5 bg-foreground hover:bg-foreground/80 text-white rounded-xl font-medium transition-colors border border-cg-sage/20"
             style={{ fontFamily: "'Inter', sans-serif" }}
           >
             Go Back
@@ -293,11 +293,11 @@ export default function VideoCall({
 
   if (isJoining) {
     return (
-      <div className="h-full flex items-center justify-center bg-[#0D1B24] rounded-2xl border border-[#1E3A4A]/50">
+      <div className="h-full flex items-center justify-center bg-[#0D1B24] rounded-2xl border border-foreground/50">
         <div className="text-center">
           <div className="relative">
-            <div className="absolute inset-0 bg-[#3DAA8A] rounded-full blur-xl opacity-20 animate-pulse" />
-            <Loader2 className="relative h-12 w-12 animate-spin text-[#3DAA8A] mx-auto mb-4" />
+            <div className="absolute inset-0 bg-cg-sage rounded-full blur-xl opacity-20 animate-pulse" />
+            <Loader2 className="relative h-12 w-12 animate-spin text-cg-sage mx-auto mb-4" />
           </div>
           <p className="text-white font-semibold" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
             Connecting to call...
@@ -313,14 +313,14 @@ export default function VideoCall({
   const participantList = Array.from(participants.values());
 
   return (
-    <div className="h-full flex flex-col bg-[#0D1B24] rounded-2xl overflow-hidden border border-[#1E3A4A]/50">
+    <div className="h-full flex flex-col bg-[#0D1B24] rounded-2xl overflow-hidden border border-foreground/50">
       {/* Video Grid */}
       <div className="flex-1 p-3">
         {participantList.length === 0 ? (
           <div className="h-full flex items-center justify-center">
             <div className="text-center">
-              <div className="w-16 h-16 rounded-full bg-[#3DAA8A]/10 flex items-center justify-center mx-auto mb-4">
-                <Video className="h-8 w-8 text-[#3DAA8A]" />
+              <div className="w-16 h-16 rounded-full bg-cg-sage/10 flex items-center justify-center mx-auto mb-4">
+                <Video className="h-8 w-8 text-cg-sage" />
               </div>
               <p className="text-[#CBD8E0]/60" style={{ fontFamily: "'Inter', sans-serif" }}>
                 Waiting for others to join...
@@ -351,12 +351,12 @@ export default function VideoCall({
       </div>
 
       {/* Controls */}
-      <div className="bg-[#1E3A4A]/60 backdrop-blur-sm px-6 py-4 flex items-center justify-center space-x-3 border-t border-[#3DAA8A]/10">
+      <div className="bg-foreground/60 backdrop-blur-sm px-6 py-4 flex items-center justify-center space-x-3 border-t border-cg-sage/10">
         <button aria-label="Toggle microphone"
           onClick={toggleAudio}
           className={`p-4 rounded-full transition-all duration-200 ${
             isAudioOn
-              ? 'bg-[#1E3A4A] hover:bg-[#1E3A4A]/80 text-white hover:scale-105'
+              ? 'bg-foreground hover:bg-foreground/80 text-white hover:scale-105'
               : 'bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/25'
           }`}
           title={isAudioOn ? 'Mute microphone' : 'Unmute microphone'}
@@ -368,7 +368,7 @@ export default function VideoCall({
           onClick={toggleVideo}
           className={`p-4 rounded-full transition-all duration-200 ${
             isVideoOn
-              ? 'bg-[#1E3A4A] hover:bg-[#1E3A4A]/80 text-white hover:scale-105'
+              ? 'bg-foreground hover:bg-foreground/80 text-white hover:scale-105'
               : 'bg-red-500 hover:bg-red-600 text-white shadow-lg shadow-red-500/25'
           }`}
           title={isVideoOn ? 'Turn off camera' : 'Turn on camera'}
@@ -409,7 +409,7 @@ function VideoTile({ participant, isLarge = false }: VideoTileProps) {
   return (
     <div
       data-participant-id={participant.sessionId}
-      className={`relative bg-[#1E3A4A]/50 rounded-xl overflow-hidden ring-1 ring-[#3DAA8A]/10 ${
+      className={`relative bg-foreground/50 rounded-xl overflow-hidden ring-1 ring-cg-sage/10 ${
         isLarge ? 'aspect-video' : ''
       }`}
     >
@@ -422,8 +422,8 @@ function VideoTile({ participant, isLarge = false }: VideoTileProps) {
           className="w-full h-full object-cover"
         />
       ) : (
-        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#1E3A4A] to-[#0D1B24]">
-          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#3DAA8A] to-[#2D6A8F] flex items-center justify-center text-white text-2xl font-bold shadow-lg shadow-[#3DAA8A]/20" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-foreground to-[#0D1B24]">
+          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-cg-sage to-cg-slate flex items-center justify-center text-white text-2xl font-bold shadow-lg shadow-cg-sage/20" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
             {participant.userName[0]?.toUpperCase() || '?'}
           </div>
         </div>
@@ -435,7 +435,7 @@ function VideoTile({ participant, isLarge = false }: VideoTileProps) {
           <span className="text-white text-sm font-medium drop-shadow-lg" style={{ fontFamily: "'Inter', sans-serif" }}>
             {participant.userName}
             {participant.isLocal && (
-              <span className="text-[#3DAA8A] ml-1">(You)</span>
+              <span className="text-cg-sage ml-1">(You)</span>
             )}
           </span>
           <div className="flex items-center space-x-2">

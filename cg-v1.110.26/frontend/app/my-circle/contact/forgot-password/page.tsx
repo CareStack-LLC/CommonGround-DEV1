@@ -37,7 +37,7 @@ export default function CircleForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-[#E8F4F8] via-white to-[#D6ECE8]">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-[#E8F4F8] via-white to-border">
       <div className="w-full max-w-md">
         <Link
           href="/my-circle/contact"
@@ -48,7 +48,7 @@ export default function CircleForgotPasswordPage() {
         </Link>
 
         <div className="bg-white rounded-3xl shadow-2xl border-2 border-slate-200 overflow-hidden">
-          <div className="bg-gradient-to-br from-[#3DAA8A] to-[#2D6A8F] text-white p-6">
+          <div className="bg-gradient-to-br from-cg-sage to-cg-slate text-white p-6">
             <div className="flex items-center gap-3 mb-2">
               <div className="p-2 bg-white/20 rounded-xl">
                 <Mail className="w-6 h-6" />
@@ -96,7 +96,7 @@ export default function CircleForgotPasswordPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     disabled={status === 'working'}
                     placeholder="you@example.com"
-                    className="w-full border-2 border-slate-200 rounded-xl p-3 text-sm focus:border-[#3DAA8A] focus:ring-0 outline-none transition"
+                    className="w-full border-2 border-slate-200 rounded-xl p-3 text-sm focus:border-cg-sage focus:ring-0 outline-none transition"
                   />
                 </label>
 
@@ -107,7 +107,7 @@ export default function CircleForgotPasswordPage() {
                 <button
                   type="submit"
                   disabled={status === 'working' || !email.trim()}
-                  className="w-full bg-gradient-to-r from-[#3DAA8A] to-[#2D6A8F] text-white font-bold py-3.5 rounded-xl shadow-lg hover:shadow-xl transition disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full bg-gradient-to-r from-cg-sage to-cg-slate text-white font-bold py-3.5 rounded-xl shadow-lg hover:shadow-xl transition disabled:opacity-50 flex items-center justify-center gap-2"
                   style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
                 >
                   {status === 'working' ? (

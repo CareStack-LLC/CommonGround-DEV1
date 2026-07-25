@@ -190,7 +190,7 @@ export default function CourtRegisterPage() {
               Your account has been created and verified. You can now log in to access the Court Portal.
             </p>
             <div className="space-y-3">
-              <Button asChild className="w-full bg-[#2D6A8F] hover:bg-[#1E4E6B]">
+              <Button asChild className="w-full bg-cg-slate hover:bg-[#1E4E6B]">
                 <Link href="/court-portal/login">
                   Continue to Login
                   <ArrowRight className="h-4 w-4 ml-2" />
@@ -210,8 +210,8 @@ export default function CourtRegisterPage() {
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-8">
       <Card className="w-full max-w-lg">
         <CardHeader className="text-center pb-2">
-          <div className="mx-auto w-16 h-16 bg-[#E0EFF8] rounded-2xl flex items-center justify-center mb-4">
-            <Scale className="h-8 w-8 text-[#2D6A8F]" />
+          <div className="mx-auto w-16 h-16 bg-cg-slate-subtle rounded-2xl flex items-center justify-center mb-4">
+            <Scale className="h-8 w-8 text-cg-slate" />
           </div>
           <CardTitle className="text-2xl">Professional Registration</CardTitle>
           <CardDescription>
@@ -304,14 +304,14 @@ export default function CourtRegisterPage() {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full bg-[#2D6A8F] hover:bg-[#1E4E6B]">
+              <Button type="submit" className="w-full bg-cg-slate hover:bg-[#1E4E6B]">
                 Continue
                 <ArrowRight className="h-4 w-4 ml-2" />
               </Button>
 
               <p className="text-center text-sm text-muted-foreground">
                 Already have an account?{" "}
-                <Link href="/court-portal/login" className="text-[#2D6A8F] hover:underline">
+                <Link href="/court-portal/login" className="text-cg-slate hover:underline">
                   Log in
                 </Link>
               </p>
@@ -410,7 +410,7 @@ export default function CourtRegisterPage() {
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back
                 </Button>
-                <Button type="submit" className="flex-1 bg-[#2D6A8F] hover:bg-[#1E4E6B]">
+                <Button type="submit" className="flex-1 bg-cg-slate hover:bg-[#1E4E6B]">
                   Continue
                   <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
@@ -461,9 +461,9 @@ export default function CourtRegisterPage() {
                 </dl>
               </div>
 
-              <div className="p-3 bg-[#E0EFF8] rounded-lg">
+              <div className="p-3 bg-cg-slate-subtle rounded-lg">
                 <div className="flex items-start gap-2">
-                  <Shield className="h-4 w-4 text-[#2D6A8F] mt-0.5 flex-shrink-0" />
+                  <Shield className="h-4 w-4 text-cg-slate mt-0.5 flex-shrink-0" />
                   <div className="text-sm text-[#1E4E6B]">
                     <p className="font-medium">Professional Verification</p>
                     <p className="text-[#1E4E6B] text-xs mt-1">
@@ -488,7 +488,7 @@ export default function CourtRegisterPage() {
                 </Button>
                 <Button
                   type="submit"
-                  className="flex-1 bg-[#2D6A8F] hover:bg-[#1E4E6B]"
+                  className="flex-1 bg-cg-slate hover:bg-[#1E4E6B]"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? (
@@ -542,7 +542,7 @@ function StepIndicator({
           complete
             ? "bg-cg-success text-white"
             : current
-            ? "bg-[#2D6A8F] text-white"
+            ? "bg-cg-slate text-white"
             : "bg-secondary text-muted-foreground"
         }`}
       >

@@ -170,7 +170,7 @@ function FormEditContent() {
   if (isLoading || !professional) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#2D6A8F] border-t-transparent" />
+        <div className="animate-spin rounded-full h-10 w-10 border-2 border-cg-slate border-t-transparent" />
       </div>
     );
   }
@@ -179,7 +179,7 @@ function FormEditContent() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#2D6A8F] border-t-transparent mx-auto" />
+          <div className="animate-spin rounded-full h-10 w-10 border-2 border-cg-slate border-t-transparent mx-auto" />
           <p className="mt-4 text-muted-foreground">Loading form...</p>
         </div>
       </div>
@@ -240,9 +240,9 @@ function FormEditContent() {
       )}
 
       {success && (
-        <Alert className="bg-[#E8F4F0] border-[#E8F4F0]">
-          <AlertCircle className="h-4 w-4 text-[#2D8A70]" />
-          <AlertDescription className="text-[#2D8A70]">{success}</AlertDescription>
+        <Alert className="bg-cg-sage-subtle border-cg-sage-subtle">
+          <AlertCircle className="h-4 w-4 text-cg-sage-dark" />
+          <AlertDescription className="text-cg-sage-dark">{success}</AlertDescription>
         </Alert>
       )}
 
@@ -356,7 +356,7 @@ function FormWizardDisplay({
     default:
       return (
         <div className="p-8 text-center">
-          <AlertCircle className="h-12 w-12 text-[#F5A623] mx-auto mb-4" />
+          <AlertCircle className="h-12 w-12 text-cg-amber mx-auto mb-4" />
           <h3 className="text-lg font-semibold">Unknown Form Type</h3>
           <p className="text-muted-foreground mt-2">
             No editor available for form type: {formType}
@@ -371,7 +371,7 @@ export default function CourtPortalFormEditPage() {
     <Suspense
       fallback={
         <div className="flex items-center justify-center h-64">
-          <Loader2 className="h-10 w-10 animate-spin text-[#2D6A8F]" />
+          <Loader2 className="h-10 w-10 animate-spin text-cg-slate" />
         </div>
       }
     >

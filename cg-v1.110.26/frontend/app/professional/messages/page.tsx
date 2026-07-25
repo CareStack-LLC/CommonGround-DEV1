@@ -215,11 +215,11 @@ export default function MessagesPage() {
           <p className="text-sm text-slate-500 mt-1">Secure client communications</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={fetchMessages} className="border-slate-200 text-slate-700 hover:bg-[#F4F8F7] rounded-xl h-9">
+          <Button variant="outline" size="sm" onClick={fetchMessages} className="border-slate-200 text-slate-700 hover:bg-background rounded-xl h-9">
             <RefreshCw className="h-3.5 w-3.5 mr-2" />
             Refresh
           </Button>
-          <Button onClick={() => setShowCompose(true)} className="bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white rounded-xl h-9 shadow-sm font-semibold">
+          <Button onClick={() => setShowCompose(true)} className="bg-cg-sage hover:bg-[#2D8A6E] text-white rounded-xl h-9 shadow-sm font-semibold">
             <Plus className="h-4 w-4 mr-2" />
             New Message
           </Button>
@@ -238,7 +238,7 @@ export default function MessagesPage() {
             onClick={() => setReadFilter(stat.key)}
             className={`p-4 rounded-2xl text-left transition-all ${
               readFilter === stat.key
-                ? "bg-white border-2 border-[#3DAA8A]/30 shadow-sm"
+                ? "bg-white border-2 border-cg-sage/30 shadow-sm"
                 : "bg-white border border-slate-200 hover:border-slate-300"
             }`}
           >
@@ -247,7 +247,7 @@ export default function MessagesPage() {
                 <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
                 <p className="text-xs text-slate-500 uppercase font-semibold tracking-wide mt-1">{stat.label}</p>
               </div>
-              <div className={`p-2.5 rounded-xl ${readFilter === stat.key ? "bg-[#3DAA8A]/10 text-[#3DAA8A]" : "bg-slate-100 text-slate-400"}`}>
+              <div className={`p-2.5 rounded-xl ${readFilter === stat.key ? "bg-cg-sage/10 text-cg-sage" : "bg-slate-100 text-slate-400"}`}>
                 <stat.icon className="h-5 w-5" />
               </div>
             </div>
@@ -265,7 +265,7 @@ export default function MessagesPage() {
                 placeholder="Search messages..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 border-slate-200 focus:border-[#3DAA8A] focus:ring-[#3DAA8A]/20"
+                className="pl-10 border-slate-200 focus:border-cg-sage focus:ring-cg-sage/20"
               />
             </div>
             <Select value={readFilter} onValueChange={setReadFilter}>
@@ -302,13 +302,13 @@ export default function MessagesPage() {
                 key={message.id}
                 className={`group flex items-start gap-4 p-4 rounded-2xl border transition-all cursor-pointer ${
                   !message.is_read && !isSentByMe
-                    ? "bg-[#F4F8F7]/50 border-[#3DAA8A]/20 hover:border-[#3DAA8A]/40 shadow-sm"
+                    ? "bg-background/50 border-cg-sage/20 hover:border-cg-sage/40 shadow-sm"
                     : "bg-white border-slate-200 hover:border-slate-300 hover:shadow-sm"
                 }`}
                 onClick={() => message.family_file_id && router.push(`/professional/cases/${message.family_file_id}/messages`)}
               >
-                <Avatar className={`h-10 w-10 shrink-0 ${!message.is_read && !isSentByMe ? "ring-2 ring-[#3DAA8A]/20" : ""}`}>
-                  <AvatarFallback className={`text-xs font-semibold ${!message.is_read && !isSentByMe ? "bg-[#1E3A4A] text-white" : "bg-slate-100 text-slate-600"}`}>
+                <Avatar className={`h-10 w-10 shrink-0 ${!message.is_read && !isSentByMe ? "ring-2 ring-cg-sage/20" : ""}`}>
+                  <AvatarFallback className={`text-xs font-semibold ${!message.is_read && !isSentByMe ? "bg-foreground text-white" : "bg-slate-100 text-slate-600"}`}>
                     {contactInitials}
                   </AvatarFallback>
                 </Avatar>
@@ -320,13 +320,13 @@ export default function MessagesPage() {
                         {contactName || "Unknown"}
                       </h3>
                       {isSentByMe && (
-                        <Badge className="bg-[#F4F8F7] text-[#3DAA8A] border border-[#3DAA8A]/20 shrink-0 text-[10px] font-semibold">
+                        <Badge className="bg-background text-cg-sage border border-cg-sage/20 shrink-0 text-[10px] font-semibold">
                           <Send className="h-2.5 w-2.5 mr-1" />
                           Sent
                         </Badge>
                       )}
                       {!message.is_read && !isSentByMe && (
-                        <span className="w-2 h-2 rounded-full bg-[#3DAA8A] shrink-0" />
+                        <span className="w-2 h-2 rounded-full bg-cg-sage shrink-0" />
                       )}
                     </div>
                     <span className="text-xs text-slate-400 shrink-0">
@@ -384,8 +384,8 @@ export default function MessagesPage() {
       ) : (
         <Card className="border border-dashed border-slate-200 bg-white rounded-2xl">
           <CardContent className="py-20 flex flex-col items-center justify-center text-center">
-            <div className="p-4 bg-[#F4F8F7] rounded-2xl mb-5">
-              <MessageSquare className="h-10 w-10 text-[#3DAA8A]" />
+            <div className="p-4 bg-background rounded-2xl mb-5">
+              <MessageSquare className="h-10 w-10 text-cg-sage" />
             </div>
             <p className="text-lg font-semibold text-slate-900 mb-1.5">No Messages</p>
             <p className="text-sm text-slate-500 max-w-sm">
@@ -394,7 +394,7 @@ export default function MessagesPage() {
                 : "Messages from your cases will appear here. Start a conversation with a client below."}
             </p>
             {!searchQuery && readFilter === "all" && (
-              <Button onClick={() => setShowCompose(true)} className="mt-5 bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm font-semibold">
+              <Button onClick={() => setShowCompose(true)} className="mt-5 bg-cg-sage hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm font-semibold">
                 <Plus className="h-4 w-4 mr-2" /> New Message
               </Button>
             )}
@@ -469,8 +469,8 @@ function ComposeDialog({
       <DialogContent className="max-w-lg border border-slate-200 rounded-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-lg font-semibold text-slate-900">
-            <div className="w-8 h-8 rounded-lg bg-[#3DAA8A]/10 flex items-center justify-center">
-              <Send className="h-4 w-4 text-[#3DAA8A]" />
+            <div className="w-8 h-8 rounded-lg bg-cg-sage/10 flex items-center justify-center">
+              <Send className="h-4 w-4 text-cg-sage" />
             </div>
             New Message
           </DialogTitle>
@@ -483,7 +483,7 @@ function ComposeDialog({
           <div className="space-y-2">
             <Label className="text-sm font-medium text-slate-700">Case</Label>
             <Select value={selectedCaseId} onValueChange={setSelectedCaseId}>
-              <SelectTrigger className="border-slate-200 focus:border-[#3DAA8A]">
+              <SelectTrigger className="border-slate-200 focus:border-cg-sage">
                 <SelectValue placeholder="Select a case..." />
               </SelectTrigger>
               <SelectContent>
@@ -506,7 +506,7 @@ function ComposeDialog({
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
               placeholder="Message subject..."
-              className="border-slate-200 focus:border-[#3DAA8A] focus:ring-[#3DAA8A]/20"
+              className="border-slate-200 focus:border-cg-sage focus:ring-cg-sage/20"
             />
           </div>
 
@@ -516,7 +516,7 @@ function ComposeDialog({
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="Type your message..."
-              className="min-h-[140px] border-slate-200 focus:border-[#3DAA8A] focus:ring-[#3DAA8A]/20 text-sm leading-relaxed resize-y"
+              className="min-h-[140px] border-slate-200 focus:border-cg-sage focus:ring-cg-sage/20 text-sm leading-relaxed resize-y"
             />
           </div>
         </div>
@@ -528,7 +528,7 @@ function ComposeDialog({
           <Button aria-label="Send message"
             onClick={handleSend}
             disabled={!content.trim() || !selectedCaseId || isSending}
-            className="bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm font-semibold"
+            className="bg-cg-sage hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm font-semibold"
           >
             {isSending ? (
               <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Sending...</>

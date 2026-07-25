@@ -91,9 +91,9 @@ export function ARIAInterventionAlert({
       <div
         className={cn(
           'rounded-xl shadow-2xl border-2 p-4',
-          isWarning && 'bg-[#FEF7ED] border-[#F5A623]',
-          isMute && 'bg-[#FEF7ED] border-[#F5A623]',
-          isTerminate && 'bg-[#FEE2E2] border-[#C53030]'
+          isWarning && 'bg-cg-amber-subtle border-cg-amber',
+          isMute && 'bg-cg-amber-subtle border-cg-amber',
+          isTerminate && 'bg-cg-error-subtle border-cg-error'
         )}
       >
         {/* Header */}
@@ -101,14 +101,14 @@ export function ARIAInterventionAlert({
           <div
             className={cn(
               'p-2 rounded-full',
-              isWarning && 'bg-[#FEF7ED]',
-              isMute && 'bg-[#FEF7ED]',
-              isTerminate && 'bg-[#FEE2E2]'
+              isWarning && 'bg-cg-amber-subtle',
+              isMute && 'bg-cg-amber-subtle',
+              isTerminate && 'bg-cg-error-subtle'
             )}
           >
             {isWarning && <AlertTriangle className="w-6 h-6 text-[#E09520]" />}
             {isMute && <MicOff className="w-6 h-6 text-[#E09520]" />}
-            {isTerminate && <PhoneOff className="w-6 h-6 text-[#C53030]" />}
+            {isTerminate && <PhoneOff className="w-6 h-6 text-cg-error" />}
           </div>
 
           <div className="flex-1">
@@ -129,7 +129,7 @@ export function ARIAInterventionAlert({
               {isWarning && (
                 <button aria-label="Close"
                   onClick={onDismiss}
-                  className="p-1 rounded-full hover:bg-[#FEF7ED] transition-colors"
+                  className="p-1 rounded-full hover:bg-cg-amber-subtle transition-colors"
                 >
                   <X className="w-4 h-4 text-[#E09520]" />
                 </button>
@@ -150,9 +150,9 @@ export function ARIAInterventionAlert({
             {/* Termination countdown */}
             {isTerminate && terminationCountdown !== null && (
               <div className="mt-3 flex items-center gap-2">
-                <div className="flex-1 bg-[#FEE2E2] rounded-full h-2 overflow-hidden">
+                <div className="flex-1 bg-cg-error-subtle rounded-full h-2 overflow-hidden">
                   <div
-                    className="bg-[#C53030] h-full transition-all duration-1000 ease-linear"
+                    className="bg-cg-error h-full transition-all duration-1000 ease-linear"
                     style={{
                       width: `${(terminationCountdown / (intervention.termination_delay || 10)) * 100}%`,
                     }}

@@ -121,7 +121,7 @@ function AuthSyncContent() {
                     <p className="text-gray-600 mb-6">{error}</p>
                     <button
                         onClick={() => router.push('/login')}
-                        className="w-full px-4 py-2 bg-[#2D6A8F] text-white rounded-md hover:bg-[#1E4E6B] transition-colors"
+                        className="w-full px-4 py-2 bg-cg-slate text-white rounded-md hover:bg-[#1E4E6B] transition-colors"
                     >
                         Return to Login
                     </button>
@@ -133,7 +133,7 @@ function AuthSyncContent() {
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
             <div className="max-w-md w-full p-8 bg-white rounded-lg shadow-lg text-center">
-                <Loader2 className="mx-auto h-10 w-10 animate-spin text-[#2D6A8F] mb-4" />
+                <Loader2 className="mx-auto h-10 w-10 animate-spin text-cg-slate mb-4" />
                 <h2 className="text-xl font-semibold text-gray-900">{status}</h2>
                 <p className="mt-2 text-gray-600">Please wait while we complete your sign in.</p>
             </div>
@@ -146,7 +146,7 @@ export default function AuthSyncPage() {
         <Suspense
             fallback={
                 <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                    <Loader2 className="h-10 w-10 animate-spin text-[#2D6A8F]" />
+                    <Loader2 className="h-10 w-10 animate-spin text-cg-slate" />
                 </div>
             }
         >

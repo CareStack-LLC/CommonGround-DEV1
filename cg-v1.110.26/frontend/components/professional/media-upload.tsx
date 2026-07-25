@@ -122,7 +122,7 @@ export function MediaUpload({
       </div>
 
       {error && (
-        <p className="text-sm text-[#C53030]">{error}</p>
+        <p className="text-sm text-cg-error">{error}</p>
       )}
     </div>
   );

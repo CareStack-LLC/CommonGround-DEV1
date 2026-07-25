@@ -96,10 +96,10 @@ interface ExtractedData {
 }
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
-  pending: { label: "Pending", color: "bg-[#FEF7ED] text-[#8F5E14]" },
+  pending: { label: "Pending", color: "bg-cg-amber-subtle text-[#8F5E14]" },
   in_progress: { label: "In Progress", color: "bg-blue-100 text-blue-800" },
-  completed: { label: "Completed", color: "bg-[#E8F4F0] text-[#236E59]" },
-  reviewed: { label: "Reviewed", color: "bg-[#E0EFF8] text-[#1E4E6B]" },
+  completed: { label: "Completed", color: "bg-cg-sage-subtle text-[#236E59]" },
+  reviewed: { label: "Reviewed", color: "bg-cg-slate-subtle text-[#1E4E6B]" },
   cancelled: { label: "Cancelled", color: "bg-gray-100 text-gray-800" },
 };
 
@@ -238,7 +238,7 @@ export default function IntakeDetailPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2D8A70]" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cg-sage-dark" />
       </div>
     );
   }
@@ -268,17 +268,17 @@ export default function IntakeDetailPage() {
       {/* Back Link */}
       <Link
         href="/professional/intake"
-        className="inline-flex items-center gap-2 text-sm text-[#1E3A4A] hover:text-[#1E3A4A] font-medium border-b-2 border-transparent hover:border-[#1E3A4A] transition-colors"
+        className="inline-flex items-center gap-2 text-sm text-foreground hover:text-foreground font-medium border-b-2 border-transparent hover:border-foreground transition-colors"
       >
         <ArrowLeft className="h-4 w-4" strokeWidth={2} />
         <span className="sans tracking-wide">Return to Intake Center</span>
       </Link>
 
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white shadow-xl rounded-sm p-6">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A4A] via-[#C8A951] to-[#1E3A4A]"></div>
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-2 border-foreground/30 bg-gradient-to-br from-white via-background/30 to-white shadow-xl rounded-sm p-6">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-foreground via-[#C8A951] to-foreground"></div>
         <div className="flex items-center gap-4">
-          <div className="p-4 bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F] text-[#F4F8F7] rounded-sm shadow-lg border-2 border-[#1E3A4A]/40">
+          <div className="p-4 bg-gradient-to-br from-foreground to-cg-slate text-background rounded-sm shadow-lg border-2 border-foreground/40">
             <Gavel className="h-8 w-8" strokeWidth={1.5} />
           </div>
           <div>
@@ -287,14 +287,14 @@ export default function IntakeDetailPage() {
             </h1>
             <div className="flex flex-wrap items-center gap-2 mt-2">
               <Badge className={`${statusConfig.color} border-2 sans tracking-wide`}>{statusConfig.label}</Badge>
-              <span className="text-[#1E3A4A]/30">|</span>
+              <span className="text-foreground/30">|</span>
               <span className="sans text-sm text-slate-600 flex items-center gap-1">
                 <Mail className="h-3.5 w-3.5" />
                 {session.client_email}
               </span>
               {session.client_phone && (
                 <>
-                  <span className="text-[#1E3A4A]/30">|</span>
+                  <span className="text-foreground/30">|</span>
                   <span className="sans text-sm text-slate-600 flex items-center gap-1">
                     <Phone className="h-3.5 w-3.5" />
                     {session.client_phone}
@@ -310,7 +310,7 @@ export default function IntakeDetailPage() {
           {(session.status === "completed" || session.status === "reviewed") && (
             <Button
               size="sm"
-              className="bg-[#1E3A4A] hover:bg-[#1E3A4A] text-[#F4F8F7] border-2 border-[#1E3A4A]/40 shadow-lg gap-2 sans"
+              className="bg-foreground hover:bg-foreground text-background border-2 border-foreground/40 shadow-lg gap-2 sans"
               onClick={() => setShowConvertModal(true)}
             >
               <Scale className="h-4 w-4" strokeWidth={1.5} />
@@ -323,7 +323,7 @@ export default function IntakeDetailPage() {
               variant="outline"
               size="sm"
               onClick={() => window.open(session.intake_link, "_blank")}
-              className="border-2 border-[#1E3A4A]/20 hover:bg-[#F4F8F7] sans"
+              className="border-2 border-foreground/20 hover:bg-background sans"
             >
               <ExternalLink className="h-4 w-4 mr-2" />
               Open Intake Form
@@ -334,24 +334,24 @@ export default function IntakeDetailPage() {
               variant="outline"
               size="sm"
               onClick={markAsReviewed}
-              className="border-2 border-[#1B5544]/20 hover:bg-[#E8F4F0] text-[#1B5544] sans"
+              className="border-2 border-[#1B5544]/20 hover:bg-cg-sage-subtle text-[#1B5544] sans"
             >
               <CheckCircle2 className="h-4 w-4 mr-2" />
               Mark Reviewed
             </Button>
           )}
           {session.status === "reviewed" && (
-            <div className="flex items-center gap-1.5 text-sm text-[#1B5544] font-medium bg-[#E8F4F0] border-2 border-[#C5E5DB] rounded-sm px-3 py-1.5 sans">
+            <div className="flex items-center gap-1.5 text-sm text-[#1B5544] font-medium bg-cg-sage-subtle border-2 border-[#C5E5DB] rounded-sm px-3 py-1.5 sans">
               <CheckCircle2 className="h-4 w-4" />
               Review Complete
             </div>
           )}
 
-          <Button variant="outline" size="sm" onClick={copyIntakeLink} className="border-2 border-slate-300 hover:bg-[#F4F8F7] sans">
+          <Button variant="outline" size="sm" onClick={copyIntakeLink} className="border-2 border-slate-300 hover:bg-background sans">
             <Copy className="h-4 w-4 mr-2" />
             Copy Link
           </Button>
-          <Button variant="outline" size="sm" onClick={refreshSummary} disabled={isRefreshing} className="border-2 border-slate-300 hover:bg-[#F4F8F7] sans">
+          <Button variant="outline" size="sm" onClick={refreshSummary} disabled={isRefreshing} className="border-2 border-slate-300 hover:bg-background sans">
             <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`} />
             {isRefreshing ? "Regenerating..." : "Refresh"}
           </Button>
@@ -398,24 +398,24 @@ export default function IntakeDetailPage() {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="bg-[#F4F8F7]/50 border-2 border-[#1E3A4A]/10 p-1">
+        <TabsList className="bg-background/50 border-2 border-foreground/10 p-1">
           <TabsTrigger
             value="overview"
-            className="serif data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#1E3A4A]/20 data-[state=active]:text-[#1E3A4A]"
+            className="serif data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-foreground/20 data-[state=active]:text-foreground"
           >
             <Sparkles className="h-4 w-4 mr-2" strokeWidth={1.5} />
             AI Summary
           </TabsTrigger>
           <TabsTrigger
             value="transcript"
-            className="serif data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#1E3A4A]/20 data-[state=active]:text-[#1E3A4A]"
+            className="serif data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-foreground/20 data-[state=active]:text-foreground"
           >
             <MessageSquare className="h-4 w-4 mr-2" strokeWidth={1.5} />
             Transcript
           </TabsTrigger>
           <TabsTrigger
             value="extracted"
-            className="serif data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-[#1E3A4A]/20 data-[state=active]:text-[#1E3A4A]"
+            className="serif data-[state=active]:bg-white data-[state=active]:shadow-sm data-[state=active]:border data-[state=active]:border-foreground/20 data-[state=active]:text-foreground"
           >
             <FileCheck className="h-4 w-4 mr-2" strokeWidth={1.5} />
             Extracted Data
@@ -427,8 +427,8 @@ export default function IntakeDetailPage() {
           {summary ? (
             <div className="grid lg:grid-cols-2 gap-4">
               {/* Case Overview */}
-              <Card className="border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white shadow-lg">
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A4A] via-[#C8A951] to-[#1E3A4A]"></div>
+              <Card className="border-2 border-foreground/30 bg-gradient-to-br from-white via-background/30 to-white shadow-lg">
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-foreground via-[#C8A951] to-foreground"></div>
                 <CardHeader>
                   <CardTitle className="serif text-lg font-bold text-slate-900">Case Overview</CardTitle>
                 </CardHeader>
@@ -438,8 +438,8 @@ export default function IntakeDetailPage() {
               </Card>
 
               {/* Current Situation */}
-              <Card className="border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white shadow-lg">
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A4A] via-[#C8A951] to-[#1E3A4A]"></div>
+              <Card className="border-2 border-foreground/30 bg-gradient-to-br from-white via-background/30 to-white shadow-lg">
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-foreground via-[#C8A951] to-foreground"></div>
                 <CardHeader>
                   <CardTitle className="serif text-lg font-bold text-slate-900">Current Situation</CardTitle>
                 </CardHeader>
@@ -450,8 +450,8 @@ export default function IntakeDetailPage() {
 
               {/* Children */}
               {summary.children && summary.children.length > 0 && (
-                <Card className="border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white shadow-lg">
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A4A] via-[#C8A951] to-[#1E3A4A]"></div>
+                <Card className="border-2 border-foreground/30 bg-gradient-to-br from-white via-background/30 to-white shadow-lg">
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-foreground via-[#C8A951] to-foreground"></div>
                   <CardHeader>
                     <CardTitle className="serif text-lg font-bold text-slate-900 flex items-center gap-2">
                       <Users className="h-5 w-5" strokeWidth={1.5} />
@@ -463,7 +463,7 @@ export default function IntakeDetailPage() {
                       {summary.children.map((child, index) => (
                         <div
                           key={index}
-                          className="flex items-center justify-between p-3 bg-[#F4F8F7]/50 border border-[#1E3A4A]/10 rounded-sm"
+                          className="flex items-center justify-between p-3 bg-background/50 border border-foreground/10 rounded-sm"
                         >
                           <span className="serif font-bold text-slate-900">{child.name}</span>
                           <span className="sans text-sm text-slate-600">
@@ -477,8 +477,8 @@ export default function IntakeDetailPage() {
               )}
 
               {/* Goals */}
-              <Card className="border-2 border-[#1B5544]/30 bg-gradient-to-br from-white via-[#E8F4F0]/30 to-white shadow-lg">
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1B5544] via-[#2D8A70] to-[#1B5544]"></div>
+              <Card className="border-2 border-[#1B5544]/30 bg-gradient-to-br from-white via-cg-sage-subtle/30 to-white shadow-lg">
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1B5544] via-cg-sage-dark to-[#1B5544]"></div>
                 <CardHeader>
                   <CardTitle className="serif text-lg font-bold text-[#1B5544]">Client Goals</CardTitle>
                 </CardHeader>
@@ -486,7 +486,7 @@ export default function IntakeDetailPage() {
                   <ul className="space-y-2">
                     {summary.goals.map((goal, index) => (
                       <li key={index} className="flex items-start gap-2 sans text-sm text-slate-700">
-                        <CheckCircle2 className="h-4 w-4 text-[#2D8A70] mt-0.5 shrink-0" strokeWidth={2} />
+                        <CheckCircle2 className="h-4 w-4 text-cg-sage-dark mt-0.5 shrink-0" strokeWidth={2} />
                         {goal}
                       </li>
                     ))}
@@ -495,10 +495,10 @@ export default function IntakeDetailPage() {
               </Card>
 
               {/* Concerns */}
-              <Card className="border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white shadow-lg">
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A4A] via-[#C8A951] to-[#1E3A4A]"></div>
+              <Card className="border-2 border-foreground/30 bg-gradient-to-br from-white via-background/30 to-white shadow-lg">
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-foreground via-[#C8A951] to-foreground"></div>
                 <CardHeader>
-                  <CardTitle className="serif text-lg font-bold text-[#1E3A4A]">Key Concerns</CardTitle>
+                  <CardTitle className="serif text-lg font-bold text-foreground">Key Concerns</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2">
@@ -513,10 +513,10 @@ export default function IntakeDetailPage() {
               </Card>
 
               {/* Recommended Actions */}
-              <Card className="lg:col-span-2 border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white shadow-lg">
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A4A] via-[#C8A951] to-[#1E3A4A]"></div>
+              <Card className="lg:col-span-2 border-2 border-foreground/30 bg-gradient-to-br from-white via-background/30 to-white shadow-lg">
+                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-foreground via-[#C8A951] to-foreground"></div>
                 <CardHeader>
-                  <CardTitle className="serif text-lg font-bold text-[#1E3A4A]">
+                  <CardTitle className="serif text-lg font-bold text-foreground">
                     Recommended Next Steps
                   </CardTitle>
                 </CardHeader>
@@ -525,9 +525,9 @@ export default function IntakeDetailPage() {
                     {summary.recommended_actions.map((action, index) => (
                       <div
                         key={index}
-                        className="flex items-start gap-3 p-3 bg-[#F4F8F7]border border-[#1E3A4A]/20 rounded-sm sans text-sm text-slate-700"
+                        className="flex items-start gap-3 p-3 bg-backgroundborder border-foreground/20 rounded-sm sans text-sm text-slate-700"
                       >
-                        <span className="serif font-bold text-[#1E3A4A] min-w-[24px]">{index + 1}.</span>
+                        <span className="serif font-bold text-foreground min-w-[24px]">{index + 1}.</span>
                         {action}
                       </div>
                     ))}
@@ -536,21 +536,21 @@ export default function IntakeDetailPage() {
               </Card>
 
               {/* Confidence Score */}
-              <Card className="lg:col-span-2 border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-[#F4F8F7] to-[#E8F4F0]/50 shadow-md">
+              <Card className="lg:col-span-2 border-2 border-foreground/30 bg-gradient-to-br from-background to-cg-sage-subtle/50 shadow-md">
                 <CardContent className="pt-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Sparkles className="h-5 w-5 text-[#1E3A4A]" strokeWidth={2} />
-                      <span className="sans text-sm font-bold text-[#1E3A4A] tracking-[0.1em] uppercase">AI Confidence Score</span>
+                      <Sparkles className="h-5 w-5 text-foreground" strokeWidth={2} />
+                      <span className="sans text-sm font-bold text-foreground tracking-[0.1em] uppercase">AI Confidence Score</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="w-32 h-2 bg-[#1E3A4A]/20 rounded-full overflow-hidden">
+                      <div className="w-32 h-2 bg-foreground/20 rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-[#1E3A4A] rounded-full"
+                          className="h-full bg-foreground rounded-full"
                           style={{ width: `${summary.confidence_score * 100}%` }}
                         />
                       </div>
-                      <span className="serif text-sm font-bold text-[#1E3A4A]">
+                      <span className="serif text-sm font-bold text-foreground">
                         {Math.round(summary.confidence_score * 100)}%
                       </span>
                     </div>
@@ -559,9 +559,9 @@ export default function IntakeDetailPage() {
               </Card>
             </div>
           ) : (
-            <Card className="border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white shadow-lg">
+            <Card className="border-2 border-foreground/30 bg-gradient-to-br from-white via-background/30 to-white shadow-lg">
               <CardContent className="py-12 text-center">
-                <Sparkles className="h-12 w-12 mx-auto text-[#1E3A4A]/30 mb-4" />
+                <Sparkles className="h-12 w-12 mx-auto text-foreground/30 mb-4" />
                 <h3 className="serif text-lg font-bold text-slate-900 mb-2">
                   Summary Not Available
                 </h3>
@@ -577,8 +577,8 @@ export default function IntakeDetailPage() {
 
         {/* Transcript Tab */}
         <TabsContent value="transcript" className="mt-4">
-          <Card className="border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white shadow-lg">
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A4A] via-[#C8A951] to-[#1E3A4A]"></div>
+          <Card className="border-2 border-foreground/30 bg-gradient-to-br from-white via-background/30 to-white shadow-lg">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-foreground via-[#C8A951] to-foreground"></div>
             <CardHeader>
               <CardTitle className="serif text-lg font-bold text-slate-900">Conversation Transcript</CardTitle>
               <CardDescription className="sans text-slate-600">
@@ -599,7 +599,7 @@ export default function IntakeDetailPage() {
                           <AvatarFallback
                             className={
                               message.role === "assistant"
-                                ? "bg-[#E0EFF8] text-[#2D6A8F]"
+                                ? "bg-cg-slate-subtle text-cg-slate"
                                 : "bg-blue-100 text-blue-600"
                             }
                           >
@@ -648,13 +648,13 @@ export default function IntakeDetailPage() {
             <div className="space-y-4">
               {/* Parties */}
               {extractedData.parties && (
-                <Card className="border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white shadow-lg">
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A4A] via-[#C8A951] to-[#1E3A4A]"></div>
+                <Card className="border-2 border-foreground/30 bg-gradient-to-br from-white via-background/30 to-white shadow-lg">
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-foreground via-[#C8A951] to-foreground"></div>
                   <CardHeader>
                     <CardTitle className="serif text-lg font-bold text-slate-900">Party Information</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <pre className="text-xs bg-[#F4F8F7]/50 border border-[#1E3A4A]/10 p-3 rounded-sm overflow-auto sans">
+                    <pre className="text-xs bg-background/50 border border-foreground/10 p-3 rounded-sm overflow-auto sans">
                       {JSON.stringify(extractedData.parties, null, 2)}
                     </pre>
                   </CardContent>
@@ -663,13 +663,13 @@ export default function IntakeDetailPage() {
 
               {/* Children */}
               {extractedData.children && extractedData.children.length > 0 && (
-                <Card className="border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white shadow-lg">
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A4A] via-[#C8A951] to-[#1E3A4A]"></div>
+                <Card className="border-2 border-foreground/30 bg-gradient-to-br from-white via-background/30 to-white shadow-lg">
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-foreground via-[#C8A951] to-foreground"></div>
                   <CardHeader>
                     <CardTitle className="serif text-lg font-bold text-slate-900">Children</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <pre className="text-xs bg-[#F4F8F7]/50 border border-[#1E3A4A]/10 p-3 rounded-sm overflow-auto sans">
+                    <pre className="text-xs bg-background/50 border border-foreground/10 p-3 rounded-sm overflow-auto sans">
                       {JSON.stringify(extractedData.children, null, 2)}
                     </pre>
                   </CardContent>
@@ -678,13 +678,13 @@ export default function IntakeDetailPage() {
 
               {/* Custody Preferences */}
               {extractedData.custody_preferences && (
-                <Card className="border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white shadow-lg">
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A4A] via-[#C8A951] to-[#1E3A4A]"></div>
+                <Card className="border-2 border-foreground/30 bg-gradient-to-br from-white via-background/30 to-white shadow-lg">
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-foreground via-[#C8A951] to-foreground"></div>
                   <CardHeader>
                     <CardTitle className="serif text-lg font-bold text-slate-900">Custody Preferences</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <pre className="text-xs bg-[#F4F8F7]/50 border border-[#1E3A4A]/10 p-3 rounded-sm overflow-auto sans">
+                    <pre className="text-xs bg-background/50 border border-foreground/10 p-3 rounded-sm overflow-auto sans">
                       {JSON.stringify(extractedData.custody_preferences, null, 2)}
                     </pre>
                   </CardContent>
@@ -693,13 +693,13 @@ export default function IntakeDetailPage() {
 
               {/* Schedule Preferences */}
               {extractedData.schedule_preferences && (
-                <Card className="border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white shadow-lg">
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A4A] via-[#C8A951] to-[#1E3A4A]"></div>
+                <Card className="border-2 border-foreground/30 bg-gradient-to-br from-white via-background/30 to-white shadow-lg">
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-foreground via-[#C8A951] to-foreground"></div>
                   <CardHeader>
                     <CardTitle className="serif text-lg font-bold text-slate-900">Schedule Preferences</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <pre className="text-xs bg-[#F4F8F7]/50 border border-[#1E3A4A]/10 p-3 rounded-sm overflow-auto sans">
+                    <pre className="text-xs bg-background/50 border border-foreground/10 p-3 rounded-sm overflow-auto sans">
                       {JSON.stringify(extractedData.schedule_preferences, null, 2)}
                     </pre>
                   </CardContent>
@@ -709,8 +709,8 @@ export default function IntakeDetailPage() {
               {/* Special Considerations */}
               {extractedData.special_considerations &&
                 extractedData.special_considerations.length > 0 && (
-                  <Card className="border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white shadow-lg">
-                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1E3A4A] via-[#C8A951] to-[#1E3A4A]"></div>
+                  <Card className="border-2 border-foreground/30 bg-gradient-to-br from-white via-background/30 to-white shadow-lg">
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-foreground via-[#C8A951] to-foreground"></div>
                     <CardHeader>
                       <CardTitle className="serif text-lg font-bold text-slate-900">Special Considerations</CardTitle>
                     </CardHeader>
@@ -719,7 +719,7 @@ export default function IntakeDetailPage() {
                         {extractedData.special_considerations.map((item, index) => (
                           <li
                             key={index}
-                            className="flex items-start gap-2 sans text-sm p-3 bg-[#F4F8F7]border border-[#1E3A4A]/20 rounded-sm"
+                            className="flex items-start gap-2 sans text-sm p-3 bg-backgroundborder border-foreground/20 rounded-sm"
                           >
                             <AlertCircle className="h-4 w-4 text-[#E09520] mt-0.5" strokeWidth={2} />
                             {item}
@@ -731,15 +731,15 @@ export default function IntakeDetailPage() {
                 )}
 
               {/* Download Button */}
-              <Button variant="outline" className="w-full border-2 border-[#1E3A4A]/30 hover:bg-[#F4F8F7] sans">
+              <Button variant="outline" className="w-full border-2 border-foreground/30 hover:bg-background sans">
                 <Download className="h-4 w-4 mr-2" />
                 Export Extracted Data (JSON)
               </Button>
             </div>
           ) : (
-            <Card className="border-2 border-[#1E3A4A]/30 bg-gradient-to-br from-white via-[#F4F8F7]/30 to-white shadow-lg">
+            <Card className="border-2 border-foreground/30 bg-gradient-to-br from-white via-background/30 to-white shadow-lg">
               <CardContent className="py-12 text-center">
-                <FileCheck className="h-12 w-12 mx-auto text-[#1E3A4A]/30 mb-4" />
+                <FileCheck className="h-12 w-12 mx-auto text-foreground/30 mb-4" />
                 <h3 className="serif text-lg font-bold text-slate-900 mb-2">
                   No Extracted Data
                 </h3>
@@ -768,7 +768,7 @@ function InfoCard({
   return (
     <Card className="border-2 border-slate-300 bg-white shadow-sm">
       <CardContent className="pt-4">
-        <div className="flex items-center gap-2 text-[#1E3A4A]/60 mb-1">
+        <div className="flex items-center gap-2 text-foreground/60 mb-1">
           {icon}
           <span className="sans text-xs font-bold tracking-[0.1em] uppercase">{label}</span>
         </div>

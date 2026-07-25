@@ -72,8 +72,8 @@ export function ExportCsvButton({
 
   const variantClasses =
     variant === 'primary'
-      ? 'bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white border-transparent'
-      : 'bg-zinc-900/80 hover:bg-[#2D6A8F]/20 text-[#D0E4EC] border-[#2D6A8F]/20 hover:border-[#2D6A8F]/50';
+      ? 'bg-cg-sage hover:bg-cg-sage-light text-white border-transparent'
+      : 'bg-zinc-900/80 hover:bg-cg-slate/20 text-[#D0E4EC] border-cg-slate/20 hover:border-cg-slate/50';
 
   return (
     <div className="inline-flex flex-col items-stretch">

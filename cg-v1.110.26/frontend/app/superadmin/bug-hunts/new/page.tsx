@@ -53,16 +53,16 @@ export default function NewBugHuntPage() {
       <div className="flex items-center gap-3">
         <button aria-label="Back"
           onClick={() => router.push('/superadmin/bug-hunts')}
-          className="p-2 rounded-lg hover:bg-[#2D6A8F]/20 transition-colors text-[#8AACBC]"
+          className="p-2 rounded-lg hover:bg-cg-slate/20 transition-colors text-[#8AACBC]"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div>
           <h1 className="text-2xl font-bold text-white flex items-center gap-3">
-            <FlaskConical className="w-7 h-7 text-[#3DAA8A]" />
+            <FlaskConical className="w-7 h-7 text-cg-sage" />
             New Bug Hunt
           </h1>
-          <p className="text-sm text-[#6B8A9A] mt-1">Set up a new organized testing session</p>
+          <p className="text-sm text-muted-foreground mt-1">Set up a new organized testing session</p>
         </div>
       </div>
 
@@ -81,7 +81,7 @@ export default function NewBugHuntPage() {
             value={name}
             onChange={e => setName(e.target.value)}
             placeholder="e.g., Exchange System Verification Q1"
-            className="w-full px-3 py-2 bg-[#1E3A4A] border border-[#2D6A8F]/30 rounded-lg text-white placeholder-[#4A6E7F] focus:outline-none focus:border-[#3DAA8A]/50 text-sm"
+            className="w-full px-3 py-2 bg-foreground border border-cg-slate/30 rounded-lg text-white placeholder-[#4A6E7F] focus:outline-none focus:border-cg-sage/50 text-sm"
             required
           />
         </div>
@@ -94,7 +94,7 @@ export default function NewBugHuntPage() {
             onChange={e => setDescription(e.target.value)}
             placeholder="What are we testing and why?"
             rows={2}
-            className="w-full px-3 py-2 bg-[#1E3A4A] border border-[#2D6A8F]/30 rounded-lg text-white placeholder-[#4A6E7F] focus:outline-none focus:border-[#3DAA8A]/50 text-sm resize-none"
+            className="w-full px-3 py-2 bg-foreground border border-cg-slate/30 rounded-lg text-white placeholder-[#4A6E7F] focus:outline-none focus:border-cg-sage/50 text-sm resize-none"
           />
         </div>
 
@@ -109,12 +109,12 @@ export default function NewBugHuntPage() {
                 onClick={() => setTargetFeature(f.value)}
                 className={`text-left p-3 rounded-lg border transition-all ${
                   targetFeature === f.value
-                    ? 'bg-[#3DAA8A]/10 border-[#3DAA8A]/40 text-white'
-                    : 'bg-[#1E3A4A]/50 border-[#2D6A8F]/20 text-[#8AACBC] hover:border-[#2D6A8F]/40'
+                    ? 'bg-cg-sage/10 border-cg-sage/40 text-white'
+                    : 'bg-foreground/50 border-cg-slate/20 text-[#8AACBC] hover:border-cg-slate/40'
                 }`}
               >
                 <div className="text-sm font-medium">{f.label}</div>
-                <div className="text-xs text-[#6B8A9A] mt-0.5">{f.desc}</div>
+                <div className="text-xs text-muted-foreground mt-0.5">{f.desc}</div>
               </button>
             ))}
           </div>
@@ -132,14 +132,14 @@ export default function NewBugHuntPage() {
               max={20}
               value={familyCount}
               onChange={e => setFamilyCount(Number(e.target.value))}
-              className="flex-1 accent-[#3DAA8A]"
+              className="flex-1 accent-cg-sage"
             />
             <span className="text-white font-mono text-lg w-8 text-center">{familyCount}</span>
           </div>
-          <p className="text-xs text-[#6B8A9A] mt-1">
+          <p className="text-xs text-muted-foreground mt-1">
             Each family gets 2 parent accounts + 1-2 children with test credentials
           </p>
-          <div className="mt-2 p-2.5 bg-[#2D6A8F]/10 border border-[#2D6A8F]/20 rounded-lg">
+          <div className="mt-2 p-2.5 bg-cg-slate/10 border border-cg-slate/20 rounded-lg">
             <p className="text-xs text-[#8AACBC]">
               Families auto-rotate through agreement types and subscription tiers:
             </p>
@@ -147,7 +147,7 @@ export default function NewBugHuntPage() {
               <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400">Good Faith</span>
               <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-500/15 text-blue-400">Co-operative</span>
               <span className="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/15 text-purple-400">Comprehensive</span>
-              <span className="text-[10px] text-[#6B8A9A] self-center mx-1">&times;</span>
+              <span className="text-[10px] text-muted-foreground self-center mx-1">&times;</span>
               <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-600/30 text-zinc-400">Web Starter</span>
               <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-400">Plus</span>
               <span className="text-[10px] px-1.5 py-0.5 rounded bg-rose-500/15 text-rose-400">Complete</span>
@@ -158,14 +158,14 @@ export default function NewBugHuntPage() {
         {/* Test Instructions */}
         <div>
           <label className="block text-sm font-medium text-[#D0E4EC] mb-1.5">
-            Test Instructions <span className="text-[#6B8A9A] font-normal">(optional)</span>
+            Test Instructions <span className="text-muted-foreground font-normal">(optional)</span>
           </label>
           <textarea
             value={testInstructions}
             onChange={e => setTestInstructions(e.target.value)}
             placeholder="Step-by-step instructions for testers..."
             rows={4}
-            className="w-full px-3 py-2 bg-[#1E3A4A] border border-[#2D6A8F]/30 rounded-lg text-white placeholder-[#4A6E7F] focus:outline-none focus:border-[#3DAA8A]/50 text-sm resize-none font-mono"
+            className="w-full px-3 py-2 bg-foreground border border-cg-slate/30 rounded-lg text-white placeholder-[#4A6E7F] focus:outline-none focus:border-cg-sage/50 text-sm resize-none font-mono"
           />
         </div>
 
@@ -174,7 +174,7 @@ export default function NewBugHuntPage() {
           <button
             type="submit"
             disabled={creating || !name.trim()}
-            className="flex items-center gap-2 px-6 py-2.5 bg-[#3DAA8A] text-white rounded-lg hover:bg-[#3DAA8A]/80 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-6 py-2.5 bg-cg-sage text-white rounded-lg hover:bg-cg-sage/80 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {creating ? (
               <>

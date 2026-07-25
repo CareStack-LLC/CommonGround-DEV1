@@ -186,7 +186,7 @@ export default function MoviePlayerPage() {
           <h1 className="text-2xl font-bold mb-4">Video not found</h1>
           <button
             onClick={() => router.push('/my-circle/child/movies')}
-            className="bg-[#2D6A8F] hover:bg-[#349878] text-white px-6 py-3 rounded-full font-bold"
+            className="bg-cg-slate hover:bg-[#349878] text-white px-6 py-3 rounded-full font-bold"
           >
             Back to Movies
           </button>
@@ -228,7 +228,7 @@ export default function MoviePlayerPage() {
           <MuxPlayer
             playbackId={video.muxPlaybackId}
             streamType="on-demand"
-            accentColor="#3DAA8A"
+            accentColor="var(--cg-sage)"
             poster={video.thumbnail || undefined}
             metadata={{
               video_id: video.id,
@@ -265,7 +265,7 @@ export default function MoviePlayerPage() {
           <div className="absolute inset-0 flex items-center justify-center">
             <button
               onClick={togglePlay}
-              className="w-20 h-20 rounded-full bg-gradient-to-br from-[#3DAA8A] to-[#4BA8C8] flex items-center justify-center shadow-2xl shadow-[#3DAA8A]/30 transition-all hover:scale-110 active:scale-95"
+              className="w-20 h-20 rounded-full bg-gradient-to-br from-cg-sage to-cg-slate-light flex items-center justify-center shadow-2xl shadow-cg-sage/30 transition-all hover:scale-110 active:scale-95"
               aria-label="Play video"
             >
               <Play className="w-10 h-10 text-white ml-1" fill="white" />
@@ -292,7 +292,7 @@ export default function MoviePlayerPage() {
               onChange={handleSeek}
               className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer slider"
               style={{
-                background: `linear-gradient(to right, #3DAA8A 0%, #4BA8C8 ${
+                background: `linear-gradient(to right, var(--cg-sage) 0%, var(--cg-slate-light) ${
                   (currentTime / duration) * 100
                 }%, #4B5563 ${(currentTime / duration) * 100}%, #4B5563 100%)`,
               }}
@@ -309,7 +309,7 @@ export default function MoviePlayerPage() {
               {/* Play/Pause */}
               <button
                 onClick={togglePlay}
-                className="text-white hover:text-[#4BA8C8] transition-colors"
+                className="text-white hover:text-cg-slate-light transition-colors"
                 aria-label={isPlaying ? 'Pause' : 'Play'}
               >
                 {isPlaying ? (
@@ -323,7 +323,7 @@ export default function MoviePlayerPage() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={toggleMute}
-                  className="text-white hover:text-[#4BA8C8] transition-colors"
+                  className="text-white hover:text-cg-slate-light transition-colors"
                   aria-label={isMuted ? 'Unmute' : 'Mute'}
                 >
                   {isMuted || volume === 0 ? (
@@ -348,7 +348,7 @@ export default function MoviePlayerPage() {
               {/* Fullscreen */}
               <button
                 onClick={toggleFullscreen}
-                className="text-white hover:text-[#4BA8C8] transition-colors"
+                className="text-white hover:text-cg-slate-light transition-colors"
                 aria-label="Fullscreen"
               >
                 <Maximize className="w-6 h-6" />

@@ -118,13 +118,13 @@ export function UserHoverCard({ userId, children, disabled }: Props) {
   // Card content — separated so error/loading can share the frame
   const card = (
     <div
-      className="fixed z-[60] w-[288px] bg-[#1A3648] border border-[#2D6A8F]/30 rounded-xl shadow-2xl p-4"
+      className="fixed z-[60] w-[288px] bg-[#1A3648] border border-cg-slate/30 rounded-xl shadow-2xl p-4"
       style={{ left: coords?.x ?? 0, top: coords?.y ?? 0 }}
       onPointerEnter={() => clearTimers()}
       onPointerLeave={onLeave}
     >
       {status === 'loading' && (
-        <div className="text-xs text-[#6B8A9A] animate-pulse">Loading profile…</div>
+        <div className="text-xs text-muted-foreground animate-pulse">Loading profile…</div>
       )}
       {status === 'error' && (
         <div>
@@ -134,7 +134,7 @@ export function UserHoverCard({ userId, children, disabled }: Props) {
           </div>
           <Link
             href={`/superadmin/users/${userId}`}
-            className="text-xs text-[#3DAA8A] hover:text-[#5BC4A0]"
+            className="text-xs text-cg-sage hover:text-cg-sage-light"
           >
             View full profile →
           </Link>
@@ -143,7 +143,7 @@ export function UserHoverCard({ userId, children, disabled }: Props) {
       {status === 'ready' && data && (
         <>
           <div className="flex items-start gap-3 mb-3">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#3DAA8A]/15 border border-[#3DAA8A]/30 flex items-center justify-center text-sm font-semibold text-[#5BC4A0]">
+            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-cg-sage/15 border border-cg-sage/30 flex items-center justify-center text-sm font-semibold text-cg-sage-light">
               {initials}
             </div>
             <div className="flex-1 min-w-0">
@@ -152,10 +152,10 @@ export function UserHoverCard({ userId, children, disabled }: Props) {
                   {data.first_name} {data.last_name}
                 </span>
                 {data.is_admin && (
-                  <Shield className="w-3 h-3 text-[#3DAA8A] flex-shrink-0" />
+                  <Shield className="w-3 h-3 text-cg-sage flex-shrink-0" />
                 )}
               </div>
-              <div className="flex items-center gap-1 text-xs text-[#6B8A9A] truncate">
+              <div className="flex items-center gap-1 text-xs text-muted-foreground truncate">
                 <Mail className="w-3 h-3 flex-shrink-0" />
                 <span className="truncate">{data.email}</span>
               </div>
@@ -164,7 +164,7 @@ export function UserHoverCard({ userId, children, disabled }: Props) {
 
           <div className="flex items-center gap-2 mb-2">
             {data.profile?.subscription_tier && (
-              <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium capitalize bg-[#3DAA8A]/15 text-[#5BC4A0] border border-[#3DAA8A]/20">
+              <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium capitalize bg-cg-sage/15 text-cg-sage-light border border-cg-sage/20">
                 {data.profile.subscription_tier.replace(/_/g, ' ')}
               </span>
             )}
@@ -182,15 +182,15 @@ export function UserHoverCard({ userId, children, disabled }: Props) {
 
           <div className="space-y-1.5 text-xs text-[#8AACBC] mb-3">
             <div className="flex items-center gap-1.5">
-              <Clock className="w-3 h-3 text-[#6B8A9A]" />
+              <Clock className="w-3 h-3 text-muted-foreground" />
               <span>Joined {timeAgo(data.created_at)}</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <Clock className="w-3 h-3 text-[#6B8A9A]" />
+              <Clock className="w-3 h-3 text-muted-foreground" />
               <span>Last active {timeAgo(data.last_active || data.last_login)}</span>
             </div>
             {data.family_file_count > 0 && (
-              <div className="text-[#6B8A9A]">
+              <div className="text-muted-foreground">
                 {data.family_file_count} case{data.family_file_count === 1 ? '' : 's'}
               </div>
             )}
@@ -198,7 +198,7 @@ export function UserHoverCard({ userId, children, disabled }: Props) {
 
           <Link
             href={`/superadmin/users/${userId}`}
-            className="block w-full text-center py-1.5 rounded text-xs font-medium bg-[#3DAA8A]/10 hover:bg-[#3DAA8A]/20 text-[#5BC4A0] transition-colors"
+            className="block w-full text-center py-1.5 rounded text-xs font-medium bg-cg-sage/10 hover:bg-cg-sage/20 text-cg-sage-light transition-colors"
           >
             View full profile →
           </Link>

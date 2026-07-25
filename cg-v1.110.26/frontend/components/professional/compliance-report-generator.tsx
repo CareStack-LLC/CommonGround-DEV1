@@ -224,7 +224,7 @@ export function ComplianceReportGenerator({
                     key={section.id}
                     className={`cursor-pointer transition-all ${
                       includeSections.has(section.id)
-                        ? "border-2 border-[#6B460F]/40 bg-[#FEF7ED]/30"
+                        ? "border-2 border-[#6B460F]/40 bg-cg-amber-subtle/30"
                         : "border-2 border-slate-200 hover:border-slate-300"
                     }`}
                     onClick={() => toggleSection(section.id)}
@@ -266,7 +266,7 @@ export function ComplianceReportGenerator({
             </div>
 
             {/* SHA-256 Verification */}
-            <Card className="border-2 border-[#1B5544]/30 bg-[#E8F4F0]/30">
+            <Card className="border-2 border-[#1B5544]/30 bg-cg-sage-subtle/30">
               <CardContent className="py-3 flex items-start gap-3">
                 <Checkbox
                   checked={includeSHA256}
@@ -302,7 +302,7 @@ export function ComplianceReportGenerator({
             )}
 
             {error && (
-              <div className="p-3 bg-[#FEE2E2] border border-[#7A2222]/30 rounded-lg flex items-start gap-2">
+              <div className="p-3 bg-cg-error-subtle border border-[#7A2222]/30 rounded-lg flex items-start gap-2">
                 <XCircle className="h-5 w-5 text-[#7A2222] shrink-0 mt-0.5" />
                 <p className="text-sm text-[#7A2222]">{error}</p>
               </div>
@@ -311,9 +311,9 @@ export function ComplianceReportGenerator({
         ) : (
           <div className="space-y-4">
             {/* Success Message */}
-            <Card className="border-2 border-[#1B5544]/30 bg-[#E8F4F0]/30">
+            <Card className="border-2 border-[#1B5544]/30 bg-cg-sage-subtle/30">
               <CardContent className="py-6 text-center space-y-3">
-                <div className="p-4 bg-[#E8F4F0] rounded-full w-fit mx-auto">
+                <div className="p-4 bg-cg-sage-subtle rounded-full w-fit mx-auto">
                   <CheckCircle2 className="h-8 w-8 text-[#1B5544]" />
                 </div>
                 <div>
@@ -337,7 +337,7 @@ export function ComplianceReportGenerator({
                       {generatedReport.file_name}
                     </p>
                   </div>
-                  <Badge className="bg-[#FEF7ED] text-[#6B460F] border-[#6B460F]/30">
+                  <Badge className="bg-cg-amber-subtle text-[#6B460F] border-[#6B460F]/30">
                     {format.toUpperCase()}
                   </Badge>
                 </div>

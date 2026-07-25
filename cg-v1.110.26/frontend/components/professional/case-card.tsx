@@ -35,9 +35,9 @@ interface CaseCardProps {
 
 export function CaseCard({ caseData }: CaseCardProps) {
     const getUrgencyColor = (score: number) => {
-        if (score >= 80) return "text-[#C53030] bg-[#FEE2E2] border-[#FEE2E2]";
-        if (score >= 50) return "text-[#E09520] bg-[#FEF7ED] border-[#FBE3BF]";
-        return "text-[#2D8A70] bg-[#E8F4F0] border-[#C5E5DB]";
+        if (score >= 80) return "text-cg-error bg-cg-error-subtle border-cg-error-subtle";
+        if (score >= 50) return "text-[#E09520] bg-cg-amber-subtle border-[#FBE3BF]";
+        return "text-cg-sage-dark bg-cg-sage-subtle border-[#C5E5DB]";
     };
 
     const getUrgencyBadge = (score: number) => {
@@ -71,8 +71,8 @@ export function CaseCard({ caseData }: CaseCardProps) {
         : 0;
 
     const getTrendColor = (score: number) => {
-        if (score < 70) return "#F5A623"; // [#F5A623]
-        return "#3DAA8A"; // teal-500
+        if (score < 70) return "var(--cg-amber)"; // cg-amber
+        return "var(--cg-sage)"; // teal-500
     };
 
     return (
@@ -114,7 +114,7 @@ export function CaseCard({ caseData }: CaseCardProps) {
                                 <ShieldAlert className="h-3 w-3" />
                                 Compliance
                                 {trendDirection !== 0 && (
-                                    <span className={`flex items-center gap-0.5 text-[10px] font-bold ${trendDirection > 0 ? 'text-[#2D8A70]' : 'text-[#C53030]'}`}>
+                                    <span className={`flex items-center gap-0.5 text-[10px] font-bold ${trendDirection > 0 ? 'text-cg-sage-dark' : 'text-cg-error'}`}>
                                         {trendDirection > 0 ? (
                                             <TrendingUp className="h-3 w-3" />
                                         ) : (
@@ -128,7 +128,7 @@ export function CaseCard({ caseData }: CaseCardProps) {
                         </div>
                         <Progress
                             value={caseData.compliance_score}
-                            className={`h-1.5 ${caseData.compliance_score < 70 ? '[&>div]:bg-[#F5A623]' : '[&>div]:bg-[var(--portal-primary)]'}`}
+                            className={`h-1.5 ${caseData.compliance_score < 70 ? '[&>div]:bg-cg-amber' : '[&>div]:bg-[var(--portal-primary)]'}`}
                         />
 
                         {/* Sparkline */}
@@ -151,14 +151,14 @@ export function CaseCard({ caseData }: CaseCardProps) {
                     {/* Quick Stats Grid */}
                     <div className="grid grid-cols-2 gap-3">
                         <div className="flex items-center gap-2 text-slate-600 bg-slate-50 p-2 rounded-lg">
-                            <MessageSquare className="h-4 w-4 text-[#2D6A8F]" />
+                            <MessageSquare className="h-4 w-4 text-cg-slate" />
                             <div className="flex flex-col">
                                 <span className="text-[10px] text-slate-400 font-medium leading-none mb-1 text-center">MESSAGES</span>
                                 <span className="text-sm font-bold leading-none text-center">{caseData.message_count}</span>
                             </div>
                         </div>
                         <div className="flex items-center gap-2 text-slate-600 bg-slate-50 p-2 rounded-lg">
-                            <AlertTriangle className="h-4 w-4 text-[#F5A623]" />
+                            <AlertTriangle className="h-4 w-4 text-cg-amber" />
                             <div className="flex flex-col">
                                 <span className="text-[10px] text-slate-400 font-medium leading-none mb-1 text-center">FLAGGED</span>
                                 <span className="text-sm font-bold leading-none text-center">{caseData.flagged_count}</span>

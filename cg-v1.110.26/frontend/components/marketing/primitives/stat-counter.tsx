@@ -25,8 +25,8 @@ export interface StatCounterProps {
 }
 
 const ACCENT_COLOR: Record<'teal' | 'gold', string> = {
-  teal: '#3DAA8A',
-  gold: '#F5A623',
+  teal: 'var(--cg-sage)',
+  gold: 'var(--cg-amber)',
 };
 
 // Try to split a value like "1,200+" or "$29" into:

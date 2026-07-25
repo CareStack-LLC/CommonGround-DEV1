@@ -149,7 +149,7 @@ export function CallsTab({ familyFileId, token }: { familyFileId: string, token:
                     </Button>
                     <Button
                         onClick={() => setIsLiveMode(true)}
-                        className="bg-[#2D6A8F] hover:bg-[#1E4E6B] text-white shadow-md shadow-[#E0EFF8]"
+                        className="bg-cg-slate hover:bg-[#1E4E6B] text-white shadow-md shadow-cg-slate-subtle"
                     >
                         <Phone className="h-4 w-4 mr-2" />
                         Start Live Call
@@ -161,7 +161,7 @@ export function CallsTab({ familyFileId, token }: { familyFileId: string, token:
                 <div className="animate-in zoom-in-95 duration-300">
                     <div className="flex items-center justify-between mb-4 bg-slate-900 text-white p-3 rounded-xl">
                         <div className="flex items-center gap-3">
-                            <Badge className="bg-[#C53030] animate-pulse border-none">LIVE SESSION</Badge>
+                            <Badge className="bg-cg-error animate-pulse border-none">LIVE SESSION</Badge>
                             <span className="text-sm font-medium opacity-80">ARIA Safety Shield Active</span>
                         </div>
                         <Button
@@ -225,7 +225,7 @@ export function CallsTab({ familyFileId, token }: { familyFileId: string, token:
                                         {call.recording_url && (
                                             <DropdownMenuItem className="text-xs">Listen Recording</DropdownMenuItem>
                                         )}
-                                        <DropdownMenuItem className="text-xs text-[#C53030]">Delete</DropdownMenuItem>
+                                        <DropdownMenuItem className="text-xs text-cg-error">Delete</DropdownMenuItem>
                                     </DropdownMenuContent>
                                 </DropdownMenu>
                             </div>
@@ -238,7 +238,7 @@ export function CallsTab({ familyFileId, token }: { familyFileId: string, token:
                     <p className="text-muted-foreground font-medium">No calls logged yet.</p>
                     <Button
                         variant="link"
-                        className="text-[#2D6A8F]"
+                        className="text-cg-slate"
                         onClick={() => setIsLogCallOpen(true)}
                     >
                         Log your first call
@@ -297,7 +297,7 @@ export function CallsTab({ familyFileId, token }: { familyFileId: string, token:
                     </div>
                     <DialogFooter>
                         <Button variant="outline" onClick={() => setIsLogCallOpen(false)}>Cancel</Button>
-                        <Button onClick={handleLogCall} className="bg-[#2D6A8F] hover:bg-[#1E4E6B]">Save Log Entry</Button>
+                        <Button onClick={handleLogCall} className="bg-cg-slate hover:bg-[#1E4E6B]">Save Log Entry</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

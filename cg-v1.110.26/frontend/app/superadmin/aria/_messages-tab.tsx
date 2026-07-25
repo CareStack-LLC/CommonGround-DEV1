@@ -93,7 +93,7 @@ export default function MessagesTab({
   }, [days, messages.length]);
 
   return (
-    <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+    <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h2 className="text-sm font-semibold text-[#D0E4EC]">Recent Flagged Messages</h2>
@@ -101,7 +101,7 @@ export default function MessagesTab({
             Metadata only — no message content shown for privacy compliance
           </p>
         </div>
-        <span className="text-xs text-[#6B8A9A]">
+        <span className="text-xs text-muted-foreground">
           {messages.length} result{messages.length !== 1 ? 's' : ''}
         </span>
       </div>
@@ -111,26 +111,26 @@ export default function MessagesTab({
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#2D6A8F]/20">
-                  <th className="text-left text-xs text-[#6B8A9A] font-medium pb-3 pr-4">
+                <tr className="border-b border-cg-slate/20">
+                  <th className="text-left text-xs text-muted-foreground font-medium pb-3 pr-4">
                     Timestamp
                   </th>
-                  <th className="text-left text-xs text-[#6B8A9A] font-medium pb-3 pr-4">
+                  <th className="text-left text-xs text-muted-foreground font-medium pb-3 pr-4">
                     Severity
                   </th>
-                  <th className="text-left text-xs text-[#6B8A9A] font-medium pb-3 pr-4">
+                  <th className="text-left text-xs text-muted-foreground font-medium pb-3 pr-4">
                     Categories
                   </th>
-                  <th className="text-left text-xs text-[#6B8A9A] font-medium pb-3 pr-4">
+                  <th className="text-left text-xs text-muted-foreground font-medium pb-3 pr-4">
                     Toxicity
                   </th>
-                  <th className="text-left text-xs text-[#6B8A9A] font-medium pb-3 pr-4">
+                  <th className="text-left text-xs text-muted-foreground font-medium pb-3 pr-4">
                     Action
                   </th>
-                  <th className="text-left text-xs text-[#6B8A9A] font-medium pb-3 pr-4">
+                  <th className="text-left text-xs text-muted-foreground font-medium pb-3 pr-4">
                     Level
                   </th>
-                  <th className="text-left text-xs text-[#6B8A9A] font-medium pb-3">
+                  <th className="text-left text-xs text-muted-foreground font-medium pb-3">
                     Sender
                   </th>
                 </tr>
@@ -139,9 +139,9 @@ export default function MessagesTab({
                 {messages.map((msg, i) => (
                   <tr
                     key={i}
-                    className="border-b border-[#2D6A8F]/10 last:border-0 hover:bg-[#2D6A8F]/10 transition-colors"
+                    className="border-b border-cg-slate/10 last:border-0 hover:bg-cg-slate/10 transition-colors"
                   >
-                    <td className="py-2.5 pr-4 text-xs text-[#6B8A9A] whitespace-nowrap">
+                    <td className="py-2.5 pr-4 text-xs text-muted-foreground whitespace-nowrap">
                       {msg.timestamp
                         ? new Date(msg.timestamp).toLocaleString('en-US', {
                             month: 'short',
@@ -159,13 +159,13 @@ export default function MessagesTab({
                         {(msg.categories || []).slice(0, 3).map((cat) => (
                           <span
                             key={cat}
-                            className="inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#2D6A8F]/20 text-[#8AACBC] capitalize"
+                            className="inline-flex px-1.5 py-0.5 rounded text-[10px] font-medium bg-cg-slate/20 text-[#8AACBC] capitalize"
                           >
                             {cat.replace(/_/g, ' ')}
                           </span>
                         ))}
                         {(msg.categories || []).length > 3 && (
-                          <span className="text-[10px] text-[#6B8A9A]">
+                          <span className="text-[10px] text-muted-foreground">
                             +{msg.categories.length - 3}
                           </span>
                         )}
@@ -180,7 +180,7 @@ export default function MessagesTab({
                     <td className="py-2.5 pr-4 text-xs text-[#8AACBC] text-center">
                       {msg.intervention_level || '—'}
                     </td>
-                    <td className="py-2.5 text-xs text-[#6B8A9A] font-mono">
+                    <td className="py-2.5 text-xs text-muted-foreground font-mono">
                       {msg.sender_id || '—'}
                     </td>
                   </tr>
@@ -194,7 +194,7 @@ export default function MessagesTab({
               <button
                 onClick={loadMore}
                 disabled={loadingMore}
-                className="px-4 py-2 rounded-lg bg-[#2D6A8F]/20 hover:bg-[#2D6A8F]/30 text-[#8AACBC] hover:text-white text-xs font-medium transition-colors disabled:opacity-50"
+                className="px-4 py-2 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-[#8AACBC] hover:text-white text-xs font-medium transition-colors disabled:opacity-50"
               >
                 {loadingMore ? 'Loading...' : 'Load More'}
               </button>

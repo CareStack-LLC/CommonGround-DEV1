@@ -84,7 +84,7 @@ const features = [
     tagline: 'Your words, protected',
     description:
       'ARIA monitors conversations for manipulative patterns — guilt-tripping, gaslighting, gatekeeping. It flags what\'s happening so you can see it clearly, respond calmly, and build a documented record over time.',
-    accent: '#F5A623',
+    accent: 'var(--cg-amber)',
   },
   {
     icon: Video,
@@ -92,7 +92,7 @@ const features = [
     tagline: 'Bond without barriers',
     description:
       'Video calls, shared movies, storytime, and games — all in a safe, monitored space. Your kids see Dad, not a phone screen controlled by someone else. She doesn\'t need to be involved for you to be present.',
-    accent: '#3DAA8A',
+    accent: 'var(--cg-sage)',
   },
   {
     icon: FileText,
@@ -100,7 +100,7 @@ const features = [
     tagline: 'Documentation that speaks for itself',
     description:
       'Every message, schedule change, missed pickup, and financial transaction is timestamped and exportable. When your attorney asks for records, you hand them a clean, organized file — not a folder of screenshots.',
-    accent: '#2D6A8F',
+    accent: 'var(--cg-slate)',
   },
 ];
 
@@ -165,20 +165,20 @@ export default function ForDadsPage() {
 
       {/* HERO */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#F4F8F7] via-[#F4F8F7] to-white" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-white" />
 
         <div className="relative max-w-6xl mx-auto px-6 pt-16 pb-20 lg:pt-24 lg:pb-28">
           <div className="grid items-center gap-10 lg:gap-14 lg:grid-cols-2">
             <div className="text-center lg:text-left">
-              <p className="text-[#2D6A8F] font-medium mb-4 tracking-wide uppercase text-sm">
+              <p className="text-cg-slate font-medium mb-4 tracking-wide uppercase text-sm">
                 For dads who refuse to disappear
               </p>
               <h1
-                className="text-4xl sm:text-5xl lg:text-[3.4rem] text-[#1E3A4A] mb-6 leading-[1.1] tracking-tight"
+                className="text-4xl sm:text-5xl lg:text-[3.4rem] text-foreground mb-6 leading-[1.1] tracking-tight"
                 style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
               >
                 Being a Good Dad Shouldn&apos;t Mean{' '}
-                <span className="text-[#3DAA8A]">Walking on Eggshells</span>
+                <span className="text-cg-sage">Walking on Eggshells</span>
               </h1>
               <p className="text-lg text-gray-600 leading-relaxed mb-8 max-w-xl mx-auto lg:mx-0">
                 Every text gets twisted. You play nice because the alternative is
@@ -188,7 +188,7 @@ export default function ForDadsPage() {
               </p>
               <a
                 href="#early-adopter"
-                className="inline-flex items-center gap-2 bg-[#3DAA8A] text-white font-semibold px-8 py-4 rounded-xl transition-all duration-200 hover:bg-[#2E9577] hover:shadow-lg hover:shadow-[#3DAA8A]/20 text-base"
+                className="inline-flex items-center gap-2 bg-cg-sage text-white font-semibold px-8 py-4 rounded-xl transition-all duration-200 hover:bg-[#2E9577] hover:shadow-lg hover:shadow-cg-sage/20 text-base"
               >
                 Lock in 30% off for 3 years
                 <ArrowDown className="w-4 h-4" />
@@ -200,7 +200,7 @@ export default function ForDadsPage() {
                     key={item}
                     className="flex items-center gap-1.5 text-sm text-gray-600"
                   >
-                    <CheckCircle className="w-4 h-4 text-[#3DAA8A] flex-shrink-0" />
+                    <CheckCircle className="w-4 h-4 text-cg-sage flex-shrink-0" />
                     {item}
                   </li>
                 ))}
@@ -229,14 +229,14 @@ export default function ForDadsPage() {
       {/* ═══════════════════════════════════════════════════
           STORY — A short narrative that captivates
       ═══════════════════════════════════════════════════ */}
-      <section className="relative overflow-hidden py-20 lg:py-28 bg-gradient-to-b from-[#F4F8F7] to-white">
+      <section className="relative overflow-hidden py-20 lg:py-28 bg-gradient-to-b from-background to-white">
         <div className="max-w-3xl mx-auto px-6">
           <div className="text-center mb-16">
-            <p className="font-medium mb-3 tracking-wide uppercase text-sm" style={{ color: '#2D6A8F' }}>
+            <p className="font-medium mb-3 tracking-wide uppercase text-sm" style={{ color: 'var(--cg-slate)' }}>
               A day in the life
             </p>
             <h2
-              className="text-3xl sm:text-4xl lg:text-[2.75rem] text-[#1E3A4A] leading-[1.15]"
+              className="text-3xl sm:text-4xl lg:text-[2.75rem] text-foreground leading-[1.15]"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               The season Marcus stopped
@@ -244,15 +244,15 @@ export default function ForDadsPage() {
             </h2>
           </div>
           <div className="relative">
-            <div className="absolute left-[19px] top-3 bottom-3 w-px bg-gradient-to-b from-[#E85D75]/40 via-[#F5A623]/40 to-[#3DAA8A]/50" />
+            <div className="absolute left-[19px] top-3 bottom-3 w-px bg-gradient-to-b from-[#E85D75]/40 via-cg-amber/40 to-cg-sage/50" />
             <div className="space-y-10">
               {story.map((beat, i) => {
                 const dot =
                   beat.tone === 'before'
                     ? '#E85D75'
                     : beat.tone === 'turn'
-                    ? '#F5A623'
-                    : '#3DAA8A';
+                    ? 'var(--cg-amber)'
+                    : 'var(--cg-sage)';
                 return (
                   <div key={i} className="relative pl-14">
                     <div className="absolute left-0 top-0.5">
@@ -271,7 +271,7 @@ export default function ForDadsPage() {
                     </span>
                     {beat.kicker ? (
                       <p
-                        className="text-xl sm:text-2xl text-[#1E3A4A] leading-relaxed"
+                        className="text-xl sm:text-2xl text-foreground leading-relaxed"
                         style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
                       >
                         {beat.text}
@@ -292,14 +292,14 @@ export default function ForDadsPage() {
       </section>
 
       {/* FEATURES */}
-      <section className="py-20 lg:py-28 bg-gradient-to-b from-white to-[#F4F8F7]">
+      <section className="py-20 lg:py-28 bg-gradient-to-b from-white to-background">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-14">
-            <p className="text-[#3DAA8A] font-medium mb-3 tracking-wide uppercase text-sm">
+            <p className="text-cg-sage font-medium mb-3 tracking-wide uppercase text-sm">
               Your corner
             </p>
             <h2
-              className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+              className="text-3xl sm:text-4xl text-foreground mb-4"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               Tools That Have Your Back
@@ -331,7 +331,7 @@ export default function ForDadsPage() {
                     {feature.name}
                   </span>
                   <h3
-                    className="text-xl text-[#1E3A4A] mb-3"
+                    className="text-xl text-foreground mb-3"
                     style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
                   >
                     {feature.tagline}
@@ -347,7 +347,7 @@ export default function ForDadsPage() {
       </section>
 
       {/* OUTCOME / TRANSFORMATION */}
-      <section className="py-20 lg:py-28 bg-[#F4F8F7]">
+      <section className="py-20 lg:py-28 bg-background">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid items-center gap-10 lg:gap-14 lg:grid-cols-2">
             <div className="relative order-last lg:order-first mx-auto w-full max-w-xl lg:max-w-none">
@@ -361,11 +361,11 @@ export default function ForDadsPage() {
             </div>
 
             <div className="text-center lg:text-left">
-              <p className="text-[#2D6A8F] font-medium mb-3 tracking-wide uppercase text-sm">
+              <p className="text-cg-slate font-medium mb-3 tracking-wide uppercase text-sm">
                 Get back in the game
               </p>
               <h2
-                className="text-3xl sm:text-4xl text-[#1E3A4A] mb-5 leading-tight"
+                className="text-3xl sm:text-4xl text-foreground mb-5 leading-tight"
                 style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
               >
                 Show Up — And Have the Receipts
@@ -384,9 +384,9 @@ export default function ForDadsPage() {
                         className="flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center mt-0.5"
                         style={{ backgroundColor: '#3DAA8A15' }}
                       >
-                        <Icon className="w-5 h-5 text-[#3DAA8A]" />
+                        <Icon className="w-5 h-5 text-cg-sage" />
                       </span>
-                      <p className="text-[#1E3A4A] leading-relaxed pt-1">
+                      <p className="text-foreground leading-relaxed pt-1">
                         {outcome.text}
                       </p>
                     </li>
@@ -396,7 +396,7 @@ export default function ForDadsPage() {
 
               <a
                 href="#early-adopter"
-                className="mt-8 inline-flex items-center gap-2 bg-[#3DAA8A] text-white font-semibold px-8 py-4 rounded-xl transition-all duration-200 hover:bg-[#2E9577] hover:shadow-lg hover:shadow-[#3DAA8A]/20 text-base"
+                className="mt-8 inline-flex items-center gap-2 bg-cg-sage text-white font-semibold px-8 py-4 rounded-xl transition-all duration-200 hover:bg-[#2E9577] hover:shadow-lg hover:shadow-cg-sage/20 text-base"
               >
                 Get set up in 2 minutes &mdash; free
                 <ArrowDown className="w-4 h-4" />
@@ -415,9 +415,9 @@ export default function ForDadsPage() {
               return (
                 <li
                   key={item.label}
-                  className="flex items-center gap-2 text-sm font-medium text-[#1E3A4A]"
+                  className="flex items-center gap-2 text-sm font-medium text-foreground"
                 >
-                  <Icon className="w-5 h-5 text-[#3DAA8A] flex-shrink-0" />
+                  <Icon className="w-5 h-5 text-cg-sage flex-shrink-0" />
                   {item.label}
                 </li>
               );
@@ -427,14 +427,14 @@ export default function ForDadsPage() {
       </section>
 
       {/* SOCIAL PROOF — two dad voices */}
-      <section className="py-20 lg:py-24 bg-[#F4F8F7]">
+      <section className="py-20 lg:py-24 bg-background">
         <div className="max-w-5xl mx-auto px-6">
           <div className="grid gap-6 lg:gap-8 md:grid-cols-2">
             {/* Marcus */}
             <div className="relative bg-white rounded-3xl p-8 sm:p-10 shadow-sm border border-gray-100 overflow-hidden">
-              <Quote className="w-10 h-10 text-[#3DAA8A]/20 mb-6" />
+              <Quote className="w-10 h-10 text-cg-sage/20 mb-6" />
               <blockquote
-                className="text-xl text-[#1E3A4A] leading-relaxed mb-8"
+                className="text-xl text-foreground leading-relaxed mb-8"
                 style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
               >
                 My son stopped asking &ldquo;is Mom mad?&rdquo; because the tension
@@ -442,26 +442,26 @@ export default function ForDadsPage() {
                 night every Wednesday — even on weeks when we&apos;re apart.
               </blockquote>
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-[#2D6A8F]/10 flex items-center justify-center flex-shrink-0">
-                  <span className="text-[#2D6A8F] font-semibold text-lg">M</span>
+                <div className="w-12 h-12 rounded-full bg-cg-slate/10 flex items-center justify-center flex-shrink-0">
+                  <span className="text-cg-slate font-semibold text-lg">M</span>
                 </div>
                 <div>
-                  <p className="font-semibold text-[#1E3A4A]">Marcus</p>
+                  <p className="font-semibold text-foreground">Marcus</p>
                   <p className="text-sm text-gray-600">
                     4Ever Forward Foundation Grant Program
                   </p>
                 </div>
               </div>
               <div className="absolute top-0 right-0 w-32 h-32 overflow-hidden rounded-tr-3xl pointer-events-none">
-                <div className="absolute -top-16 -right-16 w-32 h-32 rounded-full border-2 border-[#F5A623]/10" />
+                <div className="absolute -top-16 -right-16 w-32 h-32 rounded-full border-2 border-cg-amber/10" />
               </div>
             </div>
 
             {/* Second dad voice */}
             <div className="relative bg-white rounded-3xl p-8 sm:p-10 shadow-sm border border-gray-100 overflow-hidden">
-              <Quote className="w-10 h-10 text-[#3DAA8A]/20 mb-6" />
+              <Quote className="w-10 h-10 text-cg-sage/20 mb-6" />
               <blockquote
-                className="text-xl text-[#1E3A4A] leading-relaxed mb-8"
+                className="text-xl text-foreground leading-relaxed mb-8"
                 style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
               >
                 When the schedule got disputed, I didn&apos;t panic — I exported
@@ -470,18 +470,18 @@ export default function ForDadsPage() {
                 real midweek time with my daughter.
               </blockquote>
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-[#3DAA8A]/10 flex items-center justify-center flex-shrink-0">
-                  <span className="text-[#3DAA8A] font-semibold text-lg">D</span>
+                <div className="w-12 h-12 rounded-full bg-cg-sage/10 flex items-center justify-center flex-shrink-0">
+                  <span className="text-cg-sage font-semibold text-lg">D</span>
                 </div>
                 <div>
-                  <p className="font-semibold text-[#1E3A4A]">Derek</p>
+                  <p className="font-semibold text-foreground">Derek</p>
                   <p className="text-sm text-gray-600">
                     Dad of one, 14 months on CommonGround
                   </p>
                 </div>
               </div>
               <div className="absolute top-0 right-0 w-32 h-32 overflow-hidden rounded-tr-3xl pointer-events-none">
-                <div className="absolute -top-16 -right-16 w-32 h-32 rounded-full border-2 border-[#3DAA8A]/10" />
+                <div className="absolute -top-16 -right-16 w-32 h-32 rounded-full border-2 border-cg-sage/10" />
               </div>
             </div>
           </div>
@@ -492,11 +492,11 @@ export default function ForDadsPage() {
       <section id="early-adopter" className="py-20 lg:py-28 bg-white scroll-mt-20">
         <div className="max-w-2xl mx-auto px-6">
           <div className="text-center mb-10">
-            <p className="text-[#F5A623] font-medium mb-3 tracking-wide uppercase text-sm">
+            <p className="text-cg-amber font-medium mb-3 tracking-wide uppercase text-sm">
               Early Adopter Offer
             </p>
             <h2
-              className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+              className="text-3xl sm:text-4xl text-foreground mb-4"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               Your Kids Need You Present
@@ -511,10 +511,10 @@ export default function ForDadsPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-20 lg:py-24 bg-[#F4F8F7]">
+      <section className="py-20 lg:py-24 bg-background">
         <div className="max-w-3xl mx-auto px-6">
           <h2
-            className="text-3xl sm:text-4xl text-[#1E3A4A] mb-12 text-center"
+            className="text-3xl sm:text-4xl text-foreground mb-12 text-center"
             style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
           >
             Questions You Might Have
@@ -526,7 +526,7 @@ export default function ForDadsPage() {
                 className="group bg-white rounded-xl border border-gray-100 overflow-hidden"
               >
                 <summary className="flex items-center justify-between gap-4 p-6 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
-                  <h3 className="font-semibold text-[#1E3A4A] text-left">{faq.q}</h3>
+                  <h3 className="font-semibold text-foreground text-left">{faq.q}</h3>
                   <ChevronDown className="w-5 h-5 text-gray-600 flex-shrink-0 transition-transform duration-200 group-open:rotate-180" />
                 </summary>
                 <div className="px-6 pb-6 -mt-1">
@@ -538,7 +538,7 @@ export default function ForDadsPage() {
           <div className="text-center mt-14">
             <a
               href="#early-adopter"
-              className="inline-flex items-center gap-2 text-[#3DAA8A] font-semibold hover:text-[#2E9577] transition-colors"
+              className="inline-flex items-center gap-2 text-cg-sage font-semibold hover:text-[#2E9577] transition-colors"
             >
               <Shield className="w-4 h-4" />
               Claim your early adopter spot

@@ -357,7 +357,7 @@ function NewCubbieItemPageContent() {
                 <Button
                   type="submit"
                   disabled={submitting}
-                  className="flex-1 bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white hover:shadow-lg hover:scale-[1.02] transition-all duration-200 rounded-xl font-bold"
+                  className="flex-1 bg-gradient-to-r from-[var(--portal-primary)] to-cg-slate text-white hover:shadow-lg hover:scale-[1.02] transition-all duration-200 rounded-xl font-bold"
                 >
                   {submitting ? (
                     <>

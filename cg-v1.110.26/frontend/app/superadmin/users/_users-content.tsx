@@ -26,13 +26,13 @@ const TIERS = [
 
 const TIER_COLORS: Record<string, string> = {
   web_starter: 'bg-zinc-700/50 text-[#8AACBC]',
-  plus: 'bg-blue-500/15 text-blue-400 border border-[#2D6A8F]/20',
-  complete: 'bg-[#3DAA8A]/15 text-[#3DAA8A] border border-[#3DAA8A]/20',
+  plus: 'bg-blue-500/15 text-blue-400 border border-cg-slate/20',
+  complete: 'bg-cg-sage/15 text-cg-sage border border-cg-sage/20',
   professional_starter: 'bg-teal-500/15 text-teal-400 border border-teal-500/20',
-  solo: 'bg-emerald-500/15 text-emerald-400 border border-[#3DAA8A]/20',
-  small_firm: 'bg-amber-500/15 text-amber-400 border border-[#F5A623]/20',
+  solo: 'bg-emerald-500/15 text-emerald-400 border border-cg-sage/20',
+  small_firm: 'bg-amber-500/15 text-amber-400 border border-cg-amber/20',
   mid_size: 'bg-rose-500/15 text-rose-400 border border-rose-500/20',
-  none: 'bg-zinc-800 text-[#6B8A9A]',
+  none: 'bg-zinc-800 text-muted-foreground',
 };
 
 const PIE_COLORS = ['#8b5cf6', '#3b82f6', '#10b981', '#14b8a6', '#f59e0b', '#ec4899', '#ef4444', '#71717a'];
@@ -261,7 +261,7 @@ export default function UsersContent() {
     <div className="space-y-5">
       <div>
         <h1 className="text-xl font-bold text-white">User Management</h1>
-        <p className="text-sm text-[#6B8A9A] mt-0.5">{data ? `${(data.total ?? 0).toLocaleString()} total users` : 'Loading...'}</p>
+        <p className="text-sm text-muted-foreground mt-0.5">{data ? `${(data.total ?? 0).toLocaleString()} total users` : 'Loading...'}</p>
       </div>
 
       {/* Summary Cards */}
@@ -277,9 +277,9 @@ export default function UsersContent() {
 
       {/* Tier Breakdown Chart */}
       {tierPieData.length > 0 && (
-        <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
           <div className="flex items-center gap-2 mb-4">
-            <PieChartIcon className="w-4 h-4 text-[#3DAA8A]" />
+            <PieChartIcon className="w-4 h-4 text-cg-sage" />
             <h2 className="text-sm font-semibold text-[#D0E4EC]">Subscription Tier Distribution</h2>
           </div>
           <ResponsiveContainer width="100%" height={220}>
@@ -314,27 +314,27 @@ export default function UsersContent() {
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6B8A9A]" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search by name or email..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 transition-colors"
+            className="w-full pl-10 pr-4 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 transition-colors"
           />
         </div>
         <div className="flex gap-2 flex-wrap">
           <select
             value={tier}
             onChange={(e) => setTier(e.target.value)}
-            className="px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-[#D0E4EC] focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer"
+            className="px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-[#D0E4EC] focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer"
           >
             {TIERS.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
           </select>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2.5 bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-lg text-sm text-[#D0E4EC] focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer"
+            className="px-3 py-2.5 bg-zinc-900/80 border border-cg-slate/20 rounded-lg text-sm text-[#D0E4EC] focus:outline-none focus:border-violet-500/50 appearance-none cursor-pointer"
           >
             <option value="all">All status</option>
             <option value="active">Active</option>
@@ -359,9 +359,9 @@ export default function UsersContent() {
 
       {/* Bulk action toolbar — visible when 1+ rows are selected */}
       {selected.size > 0 && (
-        <div className="flex items-center justify-between gap-3 px-4 py-3 bg-[#3DAA8A]/10 border border-[#3DAA8A]/30 rounded-lg">
+        <div className="flex items-center justify-between gap-3 px-4 py-3 bg-cg-sage/10 border border-cg-sage/30 rounded-lg">
           <div className="flex items-center gap-3">
-            <CheckSquare className="w-4 h-4 text-[#3DAA8A]" />
+            <CheckSquare className="w-4 h-4 text-cg-sage" />
             <span className="text-sm text-white font-medium">
               {selected.size} user{selected.size === 1 ? '' : 's'} selected
             </span>
@@ -399,67 +399,67 @@ export default function UsersContent() {
       )}
 
       {/* Table */}
-      <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl overflow-hidden">
+      <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-[#2D6A8F]/20">
+              <tr className="border-b border-cg-slate/20">
                 <th className="w-10 px-4 py-3">
                   <button
                     onClick={toggleSelectAll}
-                    className="text-[#6B8A9A] hover:text-[#3DAA8A] transition-colors"
+                    className="text-muted-foreground hover:text-cg-sage transition-colors"
                     title="Select all on this page"
                   >
                     {(data?.users && data.users.length > 0 && data.users.every(u => selected.has(u.id)))
-                      ? <CheckSquare className="w-4 h-4 text-[#3DAA8A]" />
+                      ? <CheckSquare className="w-4 h-4 text-cg-sage" />
                       : <Square className="w-4 h-4" />}
                   </button>
                 </th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">
+                <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">
                   <button onClick={() => toggleSort('first_name')} className="flex items-center gap-1 hover:text-[#D0E4EC] transition-colors">
                     User <ArrowUpDown className="w-3 h-3" />
                   </button>
                 </th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Tier</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider hidden lg:table-cell">
+                <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Tier</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider hidden lg:table-cell">
                   <button onClick={() => toggleSort('created_at')} className="flex items-center gap-1 hover:text-[#D0E4EC] transition-colors">
                     Joined <ArrowUpDown className="w-3 h-3" />
                   </button>
                 </th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider hidden md:table-cell">
+                <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider hidden md:table-cell">
                   <button onClick={() => toggleSort('last_active')} className="flex items-center gap-1 hover:text-[#D0E4EC] transition-colors">
                     Last Active <ArrowUpDown className="w-3 h-3" />
                   </button>
                 </th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Status</th>
-                <th className="text-right px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider w-28">Actions</th>
+                <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Status</th>
+                <th className="text-right px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider w-28">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-800/40">
               {loading ? (
                 Array.from({ length: 10 }).map((_, i) => (
                   <tr key={i}>
-                    <td colSpan={7} className="px-4 py-3"><div className="animate-pulse bg-[#2D6A8F]/20 rounded h-8" /></td>
+                    <td colSpan={7} className="px-4 py-3"><div className="animate-pulse bg-cg-slate/20 rounded h-8" /></td>
                   </tr>
                 ))
               ) : data?.users?.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-4 py-12 text-center text-[#6B8A9A]">No users found matching your criteria.</td>
+                  <td colSpan={7} className="px-4 py-12 text-center text-muted-foreground">No users found matching your criteria.</td>
                 </tr>
               ) : data?.users?.map((user) => (
                 <tr
                   key={user.id}
-                  className={`transition-colors ${selected.has(user.id) ? 'bg-[#3DAA8A]/5' : 'hover:bg-[#2D6A8F]/10'}`}
+                  className={`transition-colors ${selected.has(user.id) ? 'bg-cg-sage/5' : 'hover:bg-cg-slate/10'}`}
                 >
                   <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                     <button
                       onClick={(e) => { e.stopPropagation(); toggleSelect(user.id); }}
-                      className="text-[#6B8A9A] hover:text-[#3DAA8A] transition-colors"
+                      className="text-muted-foreground hover:text-cg-sage transition-colors"
                       disabled={user.is_admin}
                       title={user.is_admin ? 'Cannot bulk-select admin users' : 'Select'}
                     >
                       {selected.has(user.id)
-                        ? <CheckSquare className="w-4 h-4 text-[#3DAA8A]" />
+                        ? <CheckSquare className="w-4 h-4 text-cg-sage" />
                         : <Square className={`w-4 h-4 ${user.is_admin ? 'opacity-30' : ''}`} />}
                     </button>
                   </td>
@@ -474,10 +474,10 @@ export default function UsersContent() {
                       <div className="min-w-0">
                         <div className="text-white font-medium truncate flex items-center gap-1.5">
                           {user.first_name} {user.last_name}
-                          {user.is_admin && <Shield className="w-3 h-3 text-[#3DAA8A]" />}
+                          {user.is_admin && <Shield className="w-3 h-3 text-cg-sage" />}
                         </div>
                         <UserHoverCard userId={user.id}>
-                          <span className="text-xs text-[#6B8A9A] truncate">{user.email}</span>
+                          <span className="text-xs text-muted-foreground truncate">{user.email}</span>
                         </UserHoverCard>
                       </div>
                     </div>
@@ -486,18 +486,18 @@ export default function UsersContent() {
                     className="px-4 py-3 cursor-pointer"
                     onClick={() => router.push(`/superadmin/users/${user.id}`)}
                   >
-                    <span className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium capitalize ${TIER_COLORS[user.subscription_tier || ''] || 'bg-zinc-800 text-[#6B8A9A]'}`}>
+                    <span className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium capitalize ${TIER_COLORS[user.subscription_tier || ''] || 'bg-zinc-800 text-muted-foreground'}`}>
                       {(user.subscription_tier || 'free').replace('_', ' ')}
                     </span>
                   </td>
                   <td
-                    className="px-4 py-3 hidden lg:table-cell text-[#6B8A9A] text-xs cursor-pointer"
+                    className="px-4 py-3 hidden lg:table-cell text-muted-foreground text-xs cursor-pointer"
                     onClick={() => router.push(`/superadmin/users/${user.id}`)}
                   >
                     {user.created_at ? new Date(user.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' }) : '\u2014'}
                   </td>
                   <td
-                    className="px-4 py-3 hidden md:table-cell text-[#6B8A9A] text-xs cursor-pointer"
+                    className="px-4 py-3 hidden md:table-cell text-muted-foreground text-xs cursor-pointer"
                     onClick={() => router.push(`/superadmin/users/${user.id}`)}
                   >
                     {timeAgo(user.last_active)}
@@ -520,7 +520,7 @@ export default function UsersContent() {
                           onClick={(e) => { e.stopPropagation(); startImpersonation(user.id, user.email); }}
                           disabled={impersonating === user.id}
                           title="View the app as this user (audit-logged)"
-                          className="p-1.5 rounded text-[#8AACBC] hover:bg-[#3DAA8A]/20 hover:text-[#3DAA8A] transition-colors disabled:opacity-50"
+                          className="p-1.5 rounded text-[#8AACBC] hover:bg-cg-sage/20 hover:text-cg-sage transition-colors disabled:opacity-50"
                         >
                           {impersonating === user.id
                             ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -530,7 +530,7 @@ export default function UsersContent() {
                       <button aria-label="Show"
                         onClick={() => router.push(`/superadmin/users/${user.id}`)}
                         title="Open detail"
-                        className="p-1.5 rounded text-[#4A6E7F] hover:bg-[#2D6A8F]/30 hover:text-[#D0E4EC] transition-colors"
+                        className="p-1.5 rounded text-[#4A6E7F] hover:bg-cg-slate/30 hover:text-[#D0E4EC] transition-colors"
                       >
                         <Eye className="w-3.5 h-3.5" />
                       </button>
@@ -544,16 +544,16 @@ export default function UsersContent() {
 
         {/* Pagination */}
         {data && data.total > PAGE_SIZE && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-[#2D6A8F]/20">
-            <span className="text-xs text-[#6B8A9A]">
+          <div className="flex items-center justify-between px-4 py-3 border-t border-cg-slate/20">
+            <span className="text-xs text-muted-foreground">
               Showing {page * PAGE_SIZE + 1}\u2013{Math.min((page + 1) * PAGE_SIZE, data.total)} of {data.total}
             </span>
             <div className="flex items-center gap-1">
-              <button aria-label="Previous" disabled={page === 0} onClick={() => setPage(page - 1)} className="p-1.5 rounded-lg hover:bg-[#2D6A8F]/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+              <button aria-label="Previous" disabled={page === 0} onClick={() => setPage(page - 1)} className="p-1.5 rounded-lg hover:bg-cg-slate/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
                 <ChevronLeft className="w-4 h-4" />
               </button>
               <span className="text-xs text-[#8AACBC] px-2">{page + 1} / {totalPages}</span>
-              <button aria-label="Next" disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)} className="p-1.5 rounded-lg hover:bg-[#2D6A8F]/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+              <button aria-label="Next" disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)} className="p-1.5 rounded-lg hover:bg-cg-slate/20 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>
@@ -568,7 +568,7 @@ export default function UsersContent() {
           onClick={closeBulkModal}
         >
           <div
-            className="bg-[#0F2533] border border-[#2D6A8F]/30 rounded-xl p-6 w-full max-w-md shadow-2xl"
+            className="bg-[#0F2533] border border-cg-slate/30 rounded-xl p-6 w-full max-w-md shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between mb-4">
@@ -579,7 +579,7 @@ export default function UsersContent() {
               </h3>
               <button aria-label="Close"
                 onClick={closeBulkModal}
-                className="p-1 rounded text-[#8AACBC] hover:bg-[#2D6A8F]/30 hover:text-white transition-colors"
+                className="p-1 rounded text-[#8AACBC] hover:bg-cg-slate/30 hover:text-white transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -600,7 +600,7 @@ export default function UsersContent() {
                 <select
                   value={bulkTierChoice}
                   onChange={(e) => setBulkTierChoice(e.target.value)}
-                  className="w-full bg-[#1A3648]/80 border border-[#2D6A8F]/30 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-[#3DAA8A]"
+                  className="w-full bg-[#1A3648]/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white focus:outline-none focus:border-cg-sage"
                 >
                   {TIERS.filter(t => t.value).map((t) => (
                     <option key={t.value} value={t.value}>{t.label}</option>
@@ -612,14 +612,14 @@ export default function UsersContent() {
             <div className="mb-4">
               <label className="block text-xs font-medium text-[#8AACBC] mb-2">
                 Reason <span className="text-red-400">*</span>
-                <span className="ml-1 text-[#6B8A9A] font-normal">(min 3 chars, recorded in audit log)</span>
+                <span className="ml-1 text-muted-foreground font-normal">(min 3 chars, recorded in audit log)</span>
               </label>
               <textarea
                 value={bulkReason}
                 onChange={(e) => setBulkReason(e.target.value)}
                 placeholder="Why are you making this change?"
                 rows={3}
-                className="w-full bg-[#1A3648]/80 border border-[#2D6A8F]/30 rounded px-3 py-2 text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-[#3DAA8A] resize-none"
+                className="w-full bg-[#1A3648]/80 border border-cg-slate/30 rounded px-3 py-2 text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-cg-sage resize-none"
               />
             </div>
 
@@ -656,7 +656,7 @@ export default function UsersContent() {
               <button
                 onClick={runBulkAction}
                 disabled={bulkRunning || bulkReason.trim().length < 3}
-                className="px-4 py-2 rounded bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors disabled:opacity-50 inline-flex items-center gap-2"
+                className="px-4 py-2 rounded bg-cg-sage hover:bg-cg-sage-light text-white text-sm font-medium transition-colors disabled:opacity-50 inline-flex items-center gap-2"
               >
                 {bulkRunning && <Loader2 className="w-4 h-4 animate-spin" />}
                 Confirm
@@ -673,21 +673,21 @@ function SummaryCard({ icon: Icon, label, value, color }: {
   icon: React.ElementType; label: string; value: string; color: string;
 }) {
   const colorMap: Record<string, string> = {
-    emerald: 'from-[#3DAA8A]/20 to-[#3DAA8A]/5 border-[#3DAA8A]/20',
+    emerald: 'from-cg-sage/20 to-cg-sage/5 border-cg-sage/20',
     red: 'from-red-600/20 to-red-600/5 border-red-500/20',
-    violet: 'from-[#3DAA8A]/20 to-[#3DAA8A]/5 border-[#3DAA8A]/20',
-    blue: 'from-[#2D6A8F]/20 to-[#2D6A8F]/5 border-[#2D6A8F]/20',
+    violet: 'from-cg-sage/20 to-cg-sage/5 border-cg-sage/20',
+    blue: 'from-cg-slate/20 to-cg-slate/5 border-cg-slate/20',
     teal: 'from-teal-600/20 to-teal-600/5 border-teal-500/20',
   };
   const iconColorMap: Record<string, string> = {
     emerald: 'text-emerald-400', red: 'text-red-400',
-    violet: 'text-[#3DAA8A]', blue: 'text-blue-400', teal: 'text-teal-400',
+    violet: 'text-cg-sage', blue: 'text-blue-400', teal: 'text-teal-400',
   };
   return (
     <div className={`bg-gradient-to-b ${colorMap[color]} border rounded-xl p-4`}>
       <Icon className={`w-4 h-4 ${iconColorMap[color]} mb-1.5`} />
       <div className="text-xl font-bold text-white tracking-tight">{value}</div>
-      <span className="text-[11px] text-[#6B8A9A]">{label}</span>
+      <span className="text-[11px] text-muted-foreground">{label}</span>
     </div>
   );
 }

@@ -85,7 +85,7 @@ const SYSTEM_VIEWS: SavedView[] = [
 
 const URGENCY_COLORS: Record<string, string> = {
   urgent: "text-red-900 bg-red-50 border-2 border-red-900/30",
-  high: "text-[#6B460F] bg-[#FEF7ED] border-2 border-[#6B460F]/30",
+  high: "text-[#6B460F] bg-cg-amber-subtle border-2 border-[#6B460F]/30",
   medium: "text-blue-900 bg-blue-50 border-2 border-blue-900/30",
   low: "text-slate-600 bg-slate-50 border-2 border-slate-300",
 };
@@ -93,7 +93,7 @@ const URGENCY_COLORS: Record<string, string> = {
 const RISK_ICONS: Record<string, React.JSX.Element> = {
   high: <AlertCircle className="h-4 w-4 text-red-700" strokeWidth={2} />,
   medium: <Zap className="h-4 w-4 text-[#B8791A]" strokeWidth={2} />,
-  low: <CheckCircle2 className="h-4 w-4 text-[#2D8A70]" strokeWidth={2} />,
+  low: <CheckCircle2 className="h-4 w-4 text-cg-sage-dark" strokeWidth={2} />,
 };
 
 // Bulk case operations (select + assign/tag/export/archive) are not wired to a
@@ -232,8 +232,8 @@ export default function CasesListPage() {
   };
 
   const statusColors: Record<string, string> = {
-    active: "bg-[#F4F8F7] text-[#1E3A4A] border border-[#3DAA8A]/20",
-    on_hold: "bg-[#FEF7ED] text-[#B8791A] border border-[#FBE3BF]",
+    active: "bg-background text-foreground border border-cg-sage/20",
+    on_hold: "bg-cg-amber-subtle text-[#B8791A] border border-[#FBE3BF]",
     completed: "bg-blue-50 text-blue-700 border border-blue-200",
     withdrawn: "bg-slate-50 text-slate-500 border border-slate-200",
   };
@@ -244,7 +244,7 @@ export default function CasesListPage() {
         @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&display=swap');
 
         .cases-wrapper {
-          background: linear-gradient(135deg, #F4F8F7 0%, #E8F4F0 100%);
+          background: linear-gradient(135deg, var(--background) 0%, var(--cg-sage-subtle) 100%);
           min-height: 100vh;
         }
 
@@ -268,7 +268,7 @@ export default function CasesListPage() {
               {/* Professionals don't create family cases — they request access
                   to a family's case (with dual-parent consent). */}
               <Link href="/professional/access-requests">
-                <Button className="bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white font-semibold px-5 h-10 rounded-xl shadow-sm">
+                <Button className="bg-cg-sage hover:bg-[#2D8A6E] text-white font-semibold px-5 h-10 rounded-xl shadow-sm">
                   <FolderOpen className="h-4 w-4 mr-2" />
                   Request Case Access
                 </Button>
@@ -296,7 +296,7 @@ export default function CasesListPage() {
                     placeholder="Search by file number, name, or firm..."
                     value={searchQuery}
                     onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }}
-                    className="pl-10 border-slate-200 focus:border-[#3DAA8A] focus:ring-[#3DAA8A]/20"
+                    className="pl-10 border-slate-200 focus:border-cg-sage focus:ring-cg-sage/20"
                   />
                 </div>
                 <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v); setPage(1); }}>
@@ -368,11 +368,11 @@ export default function CasesListPage() {
 
           {/* Bulk Actions Bar */}
           {ENABLE_BULK && selectedIds.size > 0 && (
-            <div className="flex items-center gap-3 px-5 py-4 bg-[#E8F4F0] border-2 border-[#1E3A4A]/30 rounded-sm shadow-md">
-              <span className="sans text-sm font-bold text-[#1E3A4A]">
+            <div className="flex items-center gap-3 px-5 py-4 bg-cg-sage-subtle border-2 border-foreground/30 rounded-sm shadow-md">
+              <span className="sans text-sm font-bold text-foreground">
                 {selectedIds.size} file{selectedIds.size !== 1 ? "s" : ""} selected
               </span>
-              <div className="h-5 w-px bg-[#1E3A4A]/20" />
+              <div className="h-5 w-px bg-foreground/20" />
               <Button size="sm" variant="outline" className="gap-1.5 sans font-medium border-2" onClick={() => bulkAction("assign")}>
                 <Users className="h-3.5 w-3.5" strokeWidth={2} />
                 Assign
@@ -401,7 +401,7 @@ export default function CasesListPage() {
               {ENABLE_BULK && (
                 <button onClick={toggleAll} className="shrink-0">
                   {allSelected
-                    ? <CheckSquare className="h-4.5 w-4.5 text-[#1E3A4A]" strokeWidth={2} />
+                    ? <CheckSquare className="h-4.5 w-4.5 text-foreground" strokeWidth={2} />
                     : <Square className="h-4.5 w-4.5 text-slate-400" strokeWidth={2} />}
                 </button>
               )}
@@ -443,8 +443,8 @@ export default function CasesListPage() {
           ) : (
             <Card className="border border-dashed border-slate-200 bg-white rounded-2xl">
               <CardContent className="py-24 flex flex-col items-center justify-center text-center">
-                <div className="p-4 bg-[#F4F8F7] rounded-2xl w-fit mb-5">
-                  <Briefcase className="h-10 w-10 text-[#3DAA8A]" strokeWidth={1.5} />
+                <div className="p-4 bg-background rounded-2xl w-fit mb-5">
+                  <Briefcase className="h-10 w-10 text-cg-sage" strokeWidth={1.5} />
                 </div>
                 <h3 className="text-lg font-semibold text-slate-900 mb-1.5">No cases found</h3>
                 <p className="text-sm text-slate-500 max-w-sm">
@@ -507,7 +507,7 @@ function CaseRow({
   statusColors: Record<string, string>;
 }) {
   const statusAccent: Record<string, string> = {
-    active: "border-l-[#2D8A70]",
+    active: "border-l-cg-sage-dark",
     on_hold: "border-l-[#B8791A]",
     completed: "border-l-blue-700",
     withdrawn: "border-l-slate-400",
@@ -516,7 +516,7 @@ function CaseRow({
   return (
     <div
       className={`group flex items-center gap-4 p-5 bg-white rounded-sm border-2 border-slate-300 border-l-4 transition-all hover:shadow-xl ${statusAccent[caseItem.status] || "border-l-slate-300"
-        } ${selected ? "ring-2 ring-[#1E3A4A]/30 border-[#1E3A4A]/40" : ""}`}
+        } ${selected ? "ring-2 ring-foreground/30 border-foreground/40" : ""}`}
     >
       {ENABLE_BULK && (
         <button
@@ -524,13 +524,13 @@ function CaseRow({
           className="shrink-0 transition-colors"
         >
           {selected
-            ? <CheckSquare className="h-5 w-5 text-[#1E3A4A]" strokeWidth={2} />
-            : <Square className="h-5 w-5 text-slate-300 hover:text-[#1E3A4A]" strokeWidth={2} />}
+            ? <CheckSquare className="h-5 w-5 text-foreground" strokeWidth={2} />
+            : <Square className="h-5 w-5 text-slate-300 hover:text-foreground" strokeWidth={2} />}
         </button>
       )}
 
       <Link href={`/professional/cases/${caseItem.family_file_id}`} className="flex-1 min-w-0 flex items-center gap-4">
-        <div className="p-3 bg-gradient-to-br from-[#1E3A4A] to-[#2D6A8F] text-[#F4F8F7] rounded-sm shadow-md border border-[#1E3A4A]/40 shrink-0">
+        <div className="p-3 bg-gradient-to-br from-foreground to-cg-slate text-background rounded-sm shadow-md border border-foreground/40 shrink-0">
           <Scale className="h-5 w-5" strokeWidth={1.5} />
         </div>
         <div className="flex-1 min-w-0">
@@ -582,7 +582,7 @@ function CaseRow({
 
       <div className="hidden md:flex items-center gap-2 shrink-0">
         {caseItem.can_control_aria && (
-          <div className="p-1.5 bg-[#F4F8F7] text-[#3DAA8A] rounded-sm border border-[#3DAA8A]/20" title="ARIA Control">
+          <div className="p-1.5 bg-background text-cg-sage rounded-sm border border-cg-sage/20" title="ARIA Control">
             <Bot className="h-3.5 w-3.5" strokeWidth={2} />
           </div>
         )}
@@ -592,7 +592,7 @@ function CaseRow({
           </div>
         )}
         {caseItem.access_scopes?.includes("schedule") && (
-          <div className="p-1.5 bg-[#FEF7ED] text-[#E09520] rounded-sm border border-[#FBE3BF]" title="Schedule Access">
+          <div className="p-1.5 bg-cg-amber-subtle text-[#E09520] rounded-sm border border-[#FBE3BF]" title="Schedule Access">
             <Calendar className="h-3.5 w-3.5" strokeWidth={2} />
           </div>
         )}

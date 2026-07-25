@@ -40,10 +40,10 @@ interface Notification {
 // Helpers
 // ─────────────────────────────────────────────
 const TYPE_ICONS: Record<string, React.ReactNode> = {
-    intake_pending: <FileText className="h-4 w-4 text-[#F5A623]" />,
+    intake_pending: <FileText className="h-4 w-4 text-cg-amber" />,
     access_request: <Users className="h-4 w-4 text-blue-500" />,
     court_event: <Calendar className="h-4 w-4 text-[#3D8DB0]" />,
-    message: <MessageSquare className="h-4 w-4 text-[#3DAA8A]" />,
+    message: <MessageSquare className="h-4 w-4 text-cg-sage" />,
     compliance: <Shield className="h-4 w-4 text-red-500" />,
     task_due: <Clock className="h-4 w-4 text-[#F7B84D]" />,
     system: <Bot className="h-4 w-4 text-slate-400" />,
@@ -52,7 +52,7 @@ const TYPE_ICONS: Record<string, React.ReactNode> = {
 const SEVERITY_DOT: Record<string, string> = {
     error: "bg-red-500",
     warning: "bg-[#F7B84D]",
-    success: "bg-[#3DAA8A]",
+    success: "bg-cg-sage",
     info: "bg-blue-500",
 };
 
@@ -105,7 +105,7 @@ function NotificationItem({
         <div
             className={`group flex items-start gap-3 p-4 rounded-xl border transition-all cursor-pointer ${notification.is_read
                     ? "bg-white border-slate-200 hover:shadow-sm"
-                    : "bg-[#F4F8F7] border-[#3DAA8A]/20 hover:border-[#3DAA8A]/40 shadow-sm"
+                    : "bg-background border-cg-sage/20 hover:border-cg-sage/40 shadow-sm"
                 }`}
             onClick={handleClick}
         >
@@ -115,7 +115,7 @@ function NotificationItem({
                     {TYPE_ICONS[notification.type] || TYPE_ICONS.system}
                 </div>
                 {!notification.is_read && (
-                    <div className={`absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white ${SEVERITY_DOT[notification.severity] || "bg-[#F5A623]"}`} />
+                    <div className={`absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white ${SEVERITY_DOT[notification.severity] || "bg-cg-amber"}`} />
                 )}
             </div>
 
@@ -136,7 +136,7 @@ function NotificationItem({
                     <button
                         onClick={(e) => { e.stopPropagation(); onMarkRead(notification.id); }}
                         title="Mark read"
-                        className="p-1.5 text-slate-400 hover:text-[#1B5544] hover:bg-[#E8F4F0] rounded-sm transition-all border-2 border-transparent hover:border-[#1B5544]/20"
+                        className="p-1.5 text-slate-400 hover:text-[#1B5544] hover:bg-cg-sage-subtle rounded-sm transition-all border-2 border-transparent hover:border-[#1B5544]/20"
                     >
                         <Check className="h-3.5 w-3.5" />
                     </button>
@@ -149,7 +149,7 @@ function NotificationItem({
                     <Trash2 className="h-3.5 w-3.5" />
                 </button>
                 {notification.action_url && (
-                    <div className="p-1.5 text-[#1E3A4A]/40">
+                    <div className="p-1.5 text-foreground/40">
                         <ChevronRight className="h-3.5 w-3.5" />
                     </div>
                 )}
@@ -253,20 +253,20 @@ export default function NotificationsPage() {
                     <h1 className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-3">
                         Notifications
                         {unreadCount > 0 && (
-                            <Badge className="bg-[#3DAA8A]/10 text-[#3DAA8A] border border-[#3DAA8A]/20 text-xs font-semibold">{unreadCount} new</Badge>
+                            <Badge className="bg-cg-sage/10 text-cg-sage border border-cg-sage/20 text-xs font-semibold">{unreadCount} new</Badge>
                         )}
                     </h1>
                     <p className="text-sm text-slate-500 mt-1">Your activity history and alerts</p>
                 </div>
                 <div className="flex items-center gap-2">
                     {unreadCount > 0 && (
-                        <Button variant="outline" size="sm" onClick={markAllRead} className="gap-1.5 text-xs border-slate-200 text-slate-700 hover:bg-[#F4F8F7] rounded-xl h-9">
+                        <Button variant="outline" size="sm" onClick={markAllRead} className="gap-1.5 text-xs border-slate-200 text-slate-700 hover:bg-background rounded-xl h-9">
                             <CheckCheck className="h-3.5 w-3.5" />
                             Mark All Read
                         </Button>
                     )}
                     <Link href="/professional/notifications/preferences">
-                        <Button variant="outline" size="sm" className="gap-1.5 text-xs border-slate-200 text-slate-700 hover:bg-[#F4F8F7] rounded-xl h-9">
+                        <Button variant="outline" size="sm" className="gap-1.5 text-xs border-slate-200 text-slate-700 hover:bg-background rounded-xl h-9">
                             <Settings className="h-3.5 w-3.5" />
                             Preferences
                         </Button>
@@ -326,7 +326,7 @@ export default function NotificationsPage() {
                 <div className="space-y-6">
                     {GROUP_ORDER.filter(g => grouped[g]?.length > 0).map(group => (
                         <div key={group}>
-                            <h3 className="sans text-xs font-bold text-[#1E3A4A]/60 uppercase tracking-widest mb-2 px-1">{group}</h3>
+                            <h3 className="sans text-xs font-bold text-foreground/60 uppercase tracking-widest mb-2 px-1">{group}</h3>
                             <div className="space-y-2">
                                 {grouped[group].map(n => (
                                     <NotificationItem

@@ -129,11 +129,11 @@ export default function EventDetails({
   const getRsvpBadgeColor = (status: string) => {
     switch (status) {
       case 'going':
-        return 'bg-[#E8F4F0] text-[#1E3A4A] dark:bg-[#1E3A4A]/30 dark:text-[#5BC4A0]';
+        return 'bg-cg-sage-subtle text-foreground dark:bg-foreground/30 dark:text-cg-sage-light';
       case 'not_going':
-        return 'bg-[#FEE2E2] text-[#9B2C2C] dark:bg-[#7A2222]/30 dark:text-[#E06B6B]';
+        return 'bg-cg-error-subtle text-[#9B2C2C] dark:bg-[#7A2222]/30 dark:text-[#E06B6B]';
       case 'maybe':
-        return 'bg-[#FEF7ED] text-[#E09520] dark:bg-[#1E3A4A]/30 dark:text-[#F5A623]';
+        return 'bg-cg-amber-subtle text-[#E09520] dark:bg-foreground/30 dark:text-cg-amber';
       default:
         return 'bg-muted text-muted-foreground';
     }
@@ -250,7 +250,7 @@ export default function EventDetails({
             <div className="flex items-center gap-2">
               <span className={`text-xs px-2 py-1 rounded-full ${event.visibility === 'private'
                 ? 'bg-muted text-muted-foreground'
-                : 'bg-[#E8F4F0] text-[#2D8A70] dark:bg-[#1E3A4A]/30 dark:text-[#5BC4A0]'
+                : 'bg-cg-sage-subtle text-cg-sage-dark dark:bg-foreground/30 dark:text-cg-sage-light'
                 }`}>
                 {event.visibility === 'private' ? 'Private' : 'Shared with Co-parent'}
               </span>
@@ -258,10 +258,10 @@ export default function EventDetails({
 
             {/* Category-specific details */}
             {event.event_category && event.event_category !== 'general' && event.category_data && (
-              <div className={`p-3 rounded-lg border ${event.event_category === 'medical' ? 'bg-[#E0EFF8] border-[#E0EFF8] dark:bg-[#1E3A4A]/20 dark:border-[#1E3A4A]/40' :
-                event.event_category === 'school' ? 'bg-[#E8F4F0] border-[#E8F4F0] dark:bg-[#1E3A4A]/20 dark:border-[#1E3A4A]/40' :
-                  event.event_category === 'sports' ? 'bg-[#FEF7ED] border-[#FEF7ED] dark:bg-[#1E3A4A]/20 dark:border-[#1E3A4A]/40' :
-                    'bg-[#E0EFF8] border-[#E0EFF8] dark:bg-[#1E3A4A]/20 dark:border-[#1E3A4A]/40'
+              <div className={`p-3 rounded-lg border ${event.event_category === 'medical' ? 'bg-cg-slate-subtle border-cg-slate-subtle dark:bg-foreground/20 dark:border-foreground/40' :
+                event.event_category === 'school' ? 'bg-cg-sage-subtle border-cg-sage-subtle dark:bg-foreground/20 dark:border-foreground/40' :
+                  event.event_category === 'sports' ? 'bg-cg-amber-subtle border-cg-amber-subtle dark:bg-foreground/20 dark:border-foreground/40' :
+                    'bg-cg-slate-subtle border-cg-slate-subtle dark:bg-foreground/20 dark:border-foreground/40'
                 }`}>
                 <div className="flex items-center gap-2 mb-2">
                   {event.event_category === 'medical' && <Stethoscope className="h-4 w-4" />}
@@ -285,7 +285,7 @@ export default function EventDetails({
                         {data.appointment_reason && <p><span className="text-muted-foreground">Reason:</span> {data.appointment_reason}</p>}
                         {data.address && <p><span className="text-muted-foreground">Address:</span> {data.address}</p>}
                         {data.phone && <p><span className="text-muted-foreground">Phone:</span> {data.phone}</p>}
-                        {data.follow_up_needed && <p className="text-[#1E4E6B] dark:text-[#4BA8C8]">Follow-up needed</p>}
+                        {data.follow_up_needed && <p className="text-[#1E4E6B] dark:text-cg-slate-light">Follow-up needed</p>}
                       </>
                     );
                   })()}
@@ -297,7 +297,7 @@ export default function EventDetails({
                         {data.activity_type && <p><span className="text-muted-foreground">Activity:</span> {data.activity_type}</p>}
                         {data.teacher_name && <p><span className="text-muted-foreground">Teacher:</span> {data.teacher_name}</p>}
                         {data.teacher_contact && <p><span className="text-muted-foreground">Contact:</span> {data.teacher_contact}</p>}
-                        {data.is_required && <p className="text-[#2D8A70] dark:text-[#5BC4A0]">Required attendance</p>}
+                        {data.is_required && <p className="text-cg-sage-dark dark:text-cg-sage-light">Required attendance</p>}
                       </>
                     );
                   })()}
@@ -336,11 +336,11 @@ export default function EventDetails({
               <div className="mt-4 p-3 bg-muted border border-border rounded-lg">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <Smartphone className="h-4 w-4 text-[#2D6A8F] dark:text-[#4BA8C8]" />
+                    <Smartphone className="h-4 w-4 text-cg-slate dark:text-cg-slate-light" />
                     <h3 className="font-semibold text-sm text-foreground">Check-in Required</h3>
                   </div>
                   {myCheckIn && (
-                    <span className="text-xs bg-[#E8F4F0] text-[#1E3A4A] dark:bg-[#1E3A4A]/30 dark:text-[#5BC4A0] px-2 py-0.5 rounded-full flex items-center">
+                    <span className="text-xs bg-cg-sage-subtle text-foreground dark:bg-foreground/30 dark:text-cg-sage-light px-2 py-0.5 rounded-full flex items-center">
                       <Check className="h-3 w-3 mr-1" />
                       Checked In
                     </span>
@@ -359,7 +359,7 @@ export default function EventDetails({
                     </p>
                     <Button
                       size="sm"
-                      className="w-full bg-[#2D6A8F] hover:bg-[#1E4E6B] text-white"
+                      className="w-full bg-cg-slate hover:bg-[#1E4E6B] text-white"
                       onClick={() => setShowCheckInModal(true)}
                     >
                       <MapPin className="h-4 w-4 mr-2" />
@@ -411,7 +411,7 @@ export default function EventDetails({
                     <Button
                       onClick={() => handleSwapResponse(true)}
                       disabled={isUpdating || event.status !== 'pending'}
-                      className="flex-1 bg-[#2D8A70] hover:bg-[#2D8A70]"
+                      className="flex-1 bg-cg-sage-dark hover:bg-cg-sage-dark"
                     >
                       <Check className="h-4 w-4 mr-1" />
                       Approve Swap
@@ -419,7 +419,7 @@ export default function EventDetails({
                     <Button
                       onClick={() => handleSwapResponse(false)}
                       disabled={isUpdating || event.status !== 'pending'}
-                      className="flex-1 bg-[#C53030] hover:bg-[#9B2C2C]"
+                      className="flex-1 bg-cg-error hover:bg-[#9B2C2C]"
                     >
                       <XIcon className="h-4 w-4 mr-1" />
                       Deny Request
@@ -432,7 +432,7 @@ export default function EventDetails({
                       onClick={() => handleRsvp('going')}
                       disabled={isUpdating}
                       className={`flex-1 ${currentRsvp === 'going'
-                        ? 'bg-[#2D8A70] hover:bg-[#2D8A70]'
+                        ? 'bg-cg-sage-dark hover:bg-cg-sage-dark'
                         : ''
                         }`}
                       variant={currentRsvp === 'going' ? 'default' : 'outline'}
@@ -456,7 +456,7 @@ export default function EventDetails({
                       onClick={() => handleRsvp('not_going')}
                       disabled={isUpdating}
                       className={`flex-1 ${currentRsvp === 'not_going'
-                        ? 'bg-[#C53030] hover:bg-[#9B2C2C]'
+                        ? 'bg-cg-error hover:bg-[#9B2C2C]'
                         : ''
                         }`}
                       variant={currentRsvp === 'not_going' ? 'default' : 'outline'}

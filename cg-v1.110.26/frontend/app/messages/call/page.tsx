@@ -710,13 +710,13 @@ function ParentCallContent() {
             <div className="flex items-center gap-4 mb-8">
               <button aria-label="Back"
                 onClick={() => router.push('/messages')}
-                className="p-2.5 rounded-xl bg-card border-2 border-border hover:border-[#3DAA8A]/30 hover:shadow-lg transition-all duration-300"
+                className="p-2.5 rounded-xl bg-card border-2 border-border hover:border-cg-sage/30 hover:shadow-lg transition-all duration-300"
               >
                 <ArrowLeft className="w-5 h-5 text-muted-foreground" />
               </button>
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-[#C53030]/10 to-[#C53030]/5 rounded-2xl flex items-center justify-center shadow-md">
-                  <Phone className="w-6 h-6 text-[#C53030]" />
+                <div className="w-12 h-12 bg-gradient-to-br from-cg-error/10 to-cg-error/5 rounded-2xl flex items-center justify-center shadow-md">
+                  <Phone className="w-6 h-6 text-cg-error" />
                 </div>
                 <div>
                   <h1 className="text-xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
@@ -729,8 +729,8 @@ function ParentCallContent() {
 
             <Card className="border-2 border-border rounded-2xl shadow-lg">
               <CardContent className="pt-8 pb-8 text-center">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#C53030]/10 to-[#C53030]/5 flex items-center justify-center mx-auto mb-6 shadow-md">
-                  <AlertTriangle className="h-10 w-10 text-[#C53030]" />
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-cg-error/10 to-cg-error/5 flex items-center justify-center mx-auto mb-6 shadow-md">
+                  <AlertTriangle className="h-10 w-10 text-cg-error" />
                 </div>
                 <h2 className="text-2xl font-bold text-foreground mb-3" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   Something Went Wrong
@@ -738,7 +738,7 @@ function ParentCallContent() {
                 <p className="text-muted-foreground mb-8 max-w-sm mx-auto">{error}</p>
                 <button
                   onClick={() => router.push('/messages')}
-                  className="px-8 py-3.5 bg-gradient-to-r from-[#3DAA8A] to-[#2D6A8F] text-white rounded-xl font-bold hover:shadow-lg transition-all duration-300"
+                  className="px-8 py-3.5 bg-gradient-to-r from-cg-sage to-cg-slate text-white rounded-xl font-bold hover:shadow-lg transition-all duration-300"
                 >
                   Back to Messages
                 </button>
@@ -761,13 +761,13 @@ function ParentCallContent() {
             <div className="flex items-center gap-4 mb-8">
               <button aria-label="Back"
                 onClick={() => router.push('/messages')}
-                className="p-2.5 rounded-xl bg-card border-2 border-border hover:border-[#3DAA8A]/30 hover:shadow-lg transition-all duration-300"
+                className="p-2.5 rounded-xl bg-card border-2 border-border hover:border-cg-sage/30 hover:shadow-lg transition-all duration-300"
               >
                 <ArrowLeft className="w-5 h-5 text-muted-foreground" />
               </button>
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-[#F5A623]/10 to-[#E09520]/5 rounded-2xl flex items-center justify-center shadow-md">
-                  <PhoneOff className="w-6 h-6 text-[#F5A623]" />
+                <div className="w-12 h-12 bg-gradient-to-br from-cg-amber/10 to-[#E09520]/5 rounded-2xl flex items-center justify-center shadow-md">
+                  <PhoneOff className="w-6 h-6 text-cg-amber" />
                 </div>
                 <div>
                   <h1 className="text-xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
@@ -780,8 +780,8 @@ function ParentCallContent() {
 
             <Card className="border-2 border-border rounded-2xl shadow-lg">
               <CardContent className="pt-8 pb-8 text-center">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#F5A623]/10 to-[#E09520]/5 flex items-center justify-center mx-auto mb-6 shadow-md">
-                  <PhoneOff className="h-10 w-10 text-[#F5A623]" />
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-cg-amber/10 to-[#E09520]/5 flex items-center justify-center mx-auto mb-6 shadow-md">
+                  <PhoneOff className="h-10 w-10 text-cg-amber" />
                 </div>
                 <h2 className="text-2xl font-bold text-foreground mb-3" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   Call Not Accepted
@@ -792,13 +792,13 @@ function ParentCallContent() {
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <button
                     onClick={() => router.push('/messages')}
-                    className="px-8 py-3.5 bg-gradient-to-r from-[#3DAA8A] to-[#2D6A8F] text-white rounded-xl font-bold hover:shadow-lg transition-all duration-300"
+                    className="px-8 py-3.5 bg-gradient-to-r from-cg-sage to-cg-slate text-white rounded-xl font-bold hover:shadow-lg transition-all duration-300"
                   >
                     Send a Message
                   </button>
                   <button
                     onClick={() => window.location.reload()}
-                    className="px-8 py-3.5 bg-card border-2 border-border text-foreground rounded-xl font-bold hover:border-[#3DAA8A]/30 hover:shadow-lg transition-all duration-300"
+                    className="px-8 py-3.5 bg-card border-2 border-border text-foreground rounded-xl font-bold hover:border-cg-sage/30 hover:shadow-lg transition-all duration-300"
                   >
                     Try Again
                   </button>
@@ -822,7 +822,7 @@ function ParentCallContent() {
             <div className="flex items-center gap-4 mb-8">
               <button aria-label="Back"
                 onClick={() => router.push('/messages')}
-                className="p-2.5 rounded-xl bg-card border-2 border-border hover:border-[#3DAA8A]/30 hover:shadow-lg transition-all duration-300"
+                className="p-2.5 rounded-xl bg-card border-2 border-border hover:border-cg-sage/30 hover:shadow-lg transition-all duration-300"
               >
                 <ArrowLeft className="w-5 h-5 text-muted-foreground" />
               </button>
@@ -853,13 +853,13 @@ function ParentCallContent() {
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <button
                     onClick={() => router.push('/messages')}
-                    className="px-8 py-3.5 bg-gradient-to-r from-[#3DAA8A] to-[#2D6A8F] text-white rounded-xl font-bold hover:shadow-lg transition-all duration-300"
+                    className="px-8 py-3.5 bg-gradient-to-r from-cg-sage to-cg-slate text-white rounded-xl font-bold hover:shadow-lg transition-all duration-300"
                   >
                     Send a Message
                   </button>
                   <button
                     onClick={() => window.location.reload()}
-                    className="px-8 py-3.5 bg-card border-2 border-border text-foreground rounded-xl font-bold hover:border-[#3DAA8A]/30 hover:shadow-lg transition-all duration-300"
+                    className="px-8 py-3.5 bg-card border-2 border-border text-foreground rounded-xl font-bold hover:border-cg-sage/30 hover:shadow-lg transition-all duration-300"
                   >
                     Try Again
                   </button>
@@ -882,16 +882,16 @@ function ParentCallContent() {
             <div className="flex items-center gap-4 mb-8">
               <button aria-label="Back"
                 onClick={() => router.push('/messages')}
-                className="p-2.5 rounded-xl bg-card border-2 border-border hover:border-[#3DAA8A]/30 hover:shadow-lg transition-all duration-300"
+                className="p-2.5 rounded-xl bg-card border-2 border-border hover:border-cg-sage/30 hover:shadow-lg transition-all duration-300"
               >
                 <ArrowLeft className="w-5 h-5 text-muted-foreground" />
               </button>
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-[#3DAA8A]/10 to-[#3DAA8A]/5 rounded-2xl flex items-center justify-center shadow-md">
+                <div className="w-12 h-12 bg-gradient-to-br from-cg-sage/10 to-cg-sage/5 rounded-2xl flex items-center justify-center shadow-md">
                   {callType === 'video' ? (
-                    <Video className="w-6 h-6 text-[#3DAA8A]" />
+                    <Video className="w-6 h-6 text-cg-sage" />
                   ) : (
-                    <Phone className="w-6 h-6 text-[#3DAA8A]" />
+                    <Phone className="w-6 h-6 text-cg-sage" />
                   )}
                 </div>
                 <div>
@@ -905,7 +905,7 @@ function ParentCallContent() {
 
             <Card className="border-2 border-border rounded-2xl shadow-lg">
               <CardContent className="pt-12 pb-12 text-center">
-                <div className="w-20 h-20 border-4 border-[#3DAA8A]/20 border-t-[#3DAA8A] rounded-full animate-spin mx-auto mb-8"></div>
+                <div className="w-20 h-20 border-4 border-cg-sage/20 border-t-cg-sage rounded-full animate-spin mx-auto mb-8"></div>
                 <h2 className="text-2xl font-bold text-foreground mb-3" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
                   {callType === 'audio' ? 'Starting Audio Call...' : 'Starting Video Call...'}
                 </h2>
@@ -927,8 +927,8 @@ function ParentCallContent() {
           <div className="max-w-lg mx-auto pt-8">
             {/* Header */}
             <div className="flex items-center gap-4 mb-8">
-              <div className="w-12 h-12 bg-gradient-to-br from-[#3DAA8A]/10 to-[#3DAA8A]/5 rounded-2xl flex items-center justify-center shadow-md">
-                <Shield className="w-6 h-6 text-[#3DAA8A]" />
+              <div className="w-12 h-12 bg-gradient-to-br from-cg-sage/10 to-cg-sage/5 rounded-2xl flex items-center justify-center shadow-md">
+                <Shield className="w-6 h-6 text-cg-sage" />
               </div>
               <div>
                 <h1 className="text-xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
@@ -954,9 +954,9 @@ function ParentCallContent() {
                 {/* Loading indicator */}
                 <div className="flex justify-center mb-4">
                   <div className="flex gap-1">
-                    <div className="w-2 h-2 bg-[#3DAA8A] rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                    <div className="w-2 h-2 bg-[#3DAA8A] rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                    <div className="w-2 h-2 bg-[#3DAA8A] rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                    <div className="w-2 h-2 bg-cg-sage rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                    <div className="w-2 h-2 bg-cg-sage rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                    <div className="w-2 h-2 bg-cg-sage rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
                   </div>
                 </div>
 
@@ -970,14 +970,14 @@ function ParentCallContent() {
                 {/* Status indicators */}
                 <div className="bg-muted rounded-xl p-4 text-left space-y-3 border-2 border-border">
                   <div className="flex items-center gap-3 text-sm">
-                    <div className="w-6 h-6 rounded-full bg-[#E8F4F0] flex items-center justify-center">
-                      <div className="w-2.5 h-2.5 rounded-full bg-[#3DAA8A]"></div>
+                    <div className="w-6 h-6 rounded-full bg-cg-sage-subtle flex items-center justify-center">
+                      <div className="w-2.5 h-2.5 rounded-full bg-cg-sage"></div>
                     </div>
-                    <span className="text-[#2D8A70] font-medium">Call connected</span>
+                    <span className="text-cg-sage-dark font-medium">Call connected</span>
                   </div>
                   <div className="flex items-center gap-3 text-sm">
-                    <div className="w-6 h-6 rounded-full bg-[#FEF7ED] flex items-center justify-center">
-                      <div className="w-2.5 h-2.5 rounded-full bg-[#F5A623] animate-pulse"></div>
+                    <div className="w-6 h-6 rounded-full bg-cg-amber-subtle flex items-center justify-center">
+                      <div className="w-2.5 h-2.5 rounded-full bg-cg-amber animate-pulse"></div>
                     </div>
                     <span className="text-[#E09520] font-medium">Initializing ARIA monitoring...</span>
                   </div>
@@ -1016,7 +1016,7 @@ function ParentCallContent() {
             {/* Show placeholder when no video */}
             {!remoteParticipant?.video && (
               <div className="flex flex-col items-center justify-center">
-                <div className="w-32 h-32 rounded-full bg-gradient-to-br from-[#3DAA8A] to-[#3DAA8A]/70 flex items-center justify-center mb-4 shadow-2xl">
+                <div className="w-32 h-32 rounded-full bg-gradient-to-br from-cg-sage to-cg-sage/70 flex items-center justify-center mb-4 shadow-2xl">
                   <User className="h-16 w-16 text-white" />
                 </div>
                 <p className="text-white text-xl font-medium" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
@@ -1031,7 +1031,7 @@ function ParentCallContent() {
         ) : (
           // Audio-only call UI
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <div className="w-36 h-36 rounded-full bg-gradient-to-br from-[#3DAA8A] to-[#3DAA8A]/70 flex items-center justify-center mb-6 shadow-2xl">
+            <div className="w-36 h-36 rounded-full bg-gradient-to-br from-cg-sage to-cg-sage/70 flex items-center justify-center mb-6 shadow-2xl">
               <Phone className="h-16 w-16 text-white" />
             </div>
             <h2 className="text-2xl font-semibold text-white mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
@@ -1068,10 +1068,10 @@ function ParentCallContent() {
         <div className="absolute top-4 left-4 right-4 md:left-1/2 md:-translate-x-1/2 md:right-auto md:w-full md:max-w-lg z-50">
           <div className={`rounded-2xl p-5 shadow-2xl backdrop-blur-sm ${
             ariaWarning.severity === 'severe'
-              ? 'bg-gradient-to-r from-[#C53030]/95 to-[#F5A623]/95'
+              ? 'bg-gradient-to-r from-cg-error/95 to-cg-amber/95'
               : ariaWarning.should_mute
-              ? 'bg-gradient-to-r from-[#2D6A8F]/95 to-[#2D6A8F]/95'
-              : 'bg-gradient-to-r from-[#F5A623]/95 to-[#F5A623]/95'
+              ? 'bg-gradient-to-r from-cg-slate/95 to-cg-slate/95'
+              : 'bg-gradient-to-r from-cg-amber/95 to-cg-amber/95'
           } text-white relative`}>
             {/* Close button - only show for non-terminating warnings */}
             {!ariaWarning.should_terminate && (
@@ -1116,7 +1116,7 @@ function ParentCallContent() {
       {/* ARIA Muted Indicator - Persistent overlay when muted by ARIA */}
       {isMutedByARIA && (
         <div className="absolute bottom-32 left-1/2 -translate-x-1/2 z-40">
-          <div className="bg-[#2D6A8F]/90 backdrop-blur-sm text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 animate-pulse">
+          <div className="bg-cg-slate/90 backdrop-blur-sm text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 animate-pulse">
             <MicOff className="h-4 w-4" />
             <span className="text-sm font-medium">Muted by ARIA</span>
           </div>
@@ -1133,8 +1133,8 @@ function ParentCallContent() {
               <span className="text-2xl font-bold text-white tabular-nums">{formatDuration(callDuration)}</span>
             </div>
             <div className="flex items-center justify-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-[#5BC4A0] animate-pulse"></div>
-              <Shield className="h-4 w-4 text-[#3DAA8A]" />
+              <div className="w-2 h-2 rounded-full bg-cg-sage-light animate-pulse"></div>
+              <Shield className="h-4 w-4 text-cg-sage" />
               <span className="text-sm text-white/70">ARIA Guardian Active</span>
             </div>
           </div>
@@ -1147,7 +1147,7 @@ function ParentCallContent() {
               className={`w-14 h-14 md:w-16 md:h-16 rounded-full transition-all shadow-lg flex items-center justify-center ${
                 isAudioOn
                   ? 'bg-white/15 hover:bg-white/25 border-2 border-white/20'
-                  : 'bg-[#C53030] hover:bg-[#C53030] border-2 border-[#E06B6B]'
+                  : 'bg-cg-error hover:bg-cg-error border-2 border-[#E06B6B]'
               }`}
               title={isAudioOn ? 'Mute' : 'Unmute'}
             >
@@ -1161,7 +1161,7 @@ function ParentCallContent() {
             {/* End Call */}
             <button aria-label="End call"
               onClick={handleEndCall}
-              className="w-16 h-16 md:w-18 md:h-18 rounded-full bg-[#C53030] hover:bg-[#C53030] transition-all shadow-xl flex items-center justify-center border-2 border-[#E06B6B]"
+              className="w-16 h-16 md:w-18 md:h-18 rounded-full bg-cg-error hover:bg-cg-error transition-all shadow-xl flex items-center justify-center border-2 border-[#E06B6B]"
               title="End call"
             >
               <PhoneOff className="h-7 w-7 md:h-8 md:w-8 text-white" />
@@ -1174,7 +1174,7 @@ function ParentCallContent() {
                 className={`w-14 h-14 md:w-16 md:h-16 rounded-full transition-all shadow-lg flex items-center justify-center ${
                   isVideoOn
                     ? 'bg-white/15 hover:bg-white/25 border-2 border-white/20'
-                    : 'bg-[#C53030] hover:bg-[#C53030] border-2 border-[#E06B6B]'
+                    : 'bg-cg-error hover:bg-cg-error border-2 border-[#E06B6B]'
                 }`}
                 title={isVideoOn ? 'Turn off camera' : 'Turn on camera'}
               >
@@ -1205,7 +1205,7 @@ export default function ParentCallPage() {
       <Suspense fallback={
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-800 via-slate-900 to-slate-950">
           <div className="text-center">
-            <div className="w-20 h-20 border-4 border-[#3DAA8A]/30 border-t-[#3DAA8A] rounded-full animate-spin mx-auto mb-6"></div>
+            <div className="w-20 h-20 border-4 border-cg-sage/30 border-t-cg-sage rounded-full animate-spin mx-auto mb-6"></div>
             <h2 className="text-white text-xl font-semibold mb-2" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Preparing Call...</h2>
             <p className="text-muted-foreground text-sm">Setting up secure connection</p>
           </div>

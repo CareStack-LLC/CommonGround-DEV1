@@ -119,7 +119,7 @@ export default function ImpersonationAuditPage() {
               type="checkbox"
               checked={openOnly}
               onChange={(e) => { setOpenOnly(e.target.checked); setPage(1); }}
-              className="rounded border-[#2D6A8F]/40 bg-zinc-900/80 text-[#3DAA8A] focus:ring-[#3DAA8A]/30"
+              className="rounded border-cg-slate/40 bg-zinc-900/80 text-cg-sage focus:ring-cg-sage/30"
             />
             <span className="text-sm text-[#D0E4EC]">Only show open sessions</span>
           </label>
@@ -133,7 +133,7 @@ export default function ImpersonationAuditPage() {
         <button
           onClick={fetchSessions}
           disabled={loading}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#6B8A9A] hover:text-white border border-[#2D6A8F]/30 hover:border-[#2D6A8F]/60 rounded-lg transition-colors disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-white border border-cg-slate/30 hover:border-cg-slate/60 rounded-lg transition-colors disabled:opacity-50"
         >
           <RefreshCw className={`w-3 h-3 ${loading ? 'animate-spin' : ''}`} />
           Refresh
@@ -145,33 +145,33 @@ export default function ImpersonationAuditPage() {
 
       {/* Table */}
       {!error && (
-        <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl overflow-hidden">
+        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#2D6A8F]/20">
-                  <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">State</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Superadmin</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Target</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Started</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Ended</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider">Duration</th>
-                  <th className="text-left px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider hidden md:table-cell">IP</th>
-                  <th className="text-right px-4 py-3 text-xs font-medium text-[#6B8A9A] uppercase tracking-wider w-32">Actions</th>
+                <tr className="border-b border-cg-slate/20">
+                  <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">State</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Superadmin</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Target</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Started</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Ended</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Duration</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider hidden md:table-cell">IP</th>
+                  <th className="text-right px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider w-32">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#2D6A8F]/10">
+              <tbody className="divide-y divide-cg-slate/10">
                 {loading ? (
                   Array.from({ length: 8 }).map((_, i) => (
                     <tr key={i}>
                       <td colSpan={8} className="px-4 py-3">
-                        <div className="animate-pulse bg-[#2D6A8F]/20 rounded h-8" />
+                        <div className="animate-pulse bg-cg-slate/20 rounded h-8" />
                       </td>
                     </tr>
                   ))
                 ) : sessions.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="px-4 py-12 text-center text-[#6B8A9A]">
+                    <td colSpan={8} className="px-4 py-12 text-center text-muted-foreground">
                       {openOnly
                         ? 'No open impersonation sessions.'
                         : 'No impersonation sessions yet.'}
@@ -201,7 +201,7 @@ export default function ImpersonationAuditPage() {
                         <UserHoverCard userId={s.target_user_id}>
                           <Link
                             href={`/superadmin/users/${s.target_user_id}`}
-                            className="inline-flex items-center gap-1 text-[#3DAA8A] hover:text-[#5BC4A0] transition-colors"
+                            className="inline-flex items-center gap-1 text-cg-sage hover:text-cg-sage-light transition-colors"
                           >
                             {s.target_email || s.target_user_id.slice(0, 8)}
                             <ExternalLink className="w-3 h-3" />
@@ -214,7 +214,7 @@ export default function ImpersonationAuditPage() {
                         {s.end_reason && <span className="block text-[10px] opacity-75">{s.end_reason.replace(/_/g, ' ')}</span>}
                       </td>
                       <td className="px-4 py-3 text-[#D0E4EC] text-xs">{formatDuration(s.duration_seconds)}</td>
-                      <td className="px-4 py-3 text-[#6B8A9A] text-xs hidden md:table-cell">{s.ip_address || '\u2014'}</td>
+                      <td className="px-4 py-3 text-muted-foreground text-xs hidden md:table-cell">{s.ip_address || '\u2014'}</td>
                       <td className="px-4 py-3 text-right">
                         {isOpen && (
                           <button
@@ -238,8 +238,8 @@ export default function ImpersonationAuditPage() {
 
           {/* Pagination */}
           {total > pageSize && (
-            <div className="flex items-center justify-between px-4 py-3 border-t border-[#2D6A8F]/20">
-              <span className="text-xs text-[#6B8A9A]">
+            <div className="flex items-center justify-between px-4 py-3 border-t border-cg-slate/20">
+              <span className="text-xs text-muted-foreground">
                 Showing {(page - 1) * pageSize + 1}\u2013{Math.min(page * pageSize, total)} of {total}
               </span>
               <div className="flex items-center gap-1">

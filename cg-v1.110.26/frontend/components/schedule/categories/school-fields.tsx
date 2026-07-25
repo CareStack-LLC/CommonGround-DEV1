@@ -15,8 +15,8 @@ export default function SchoolFields({ data, onChange }: SchoolFieldsProps) {
   };
 
   return (
-    <div className="space-y-4 p-4 bg-[#E8F4F0] rounded-lg border border-[#E8F4F0]">
-      <h4 className="font-medium text-[#1E3A4A]">School Activity Details</h4>
+    <div className="space-y-4 p-4 bg-cg-sage-subtle rounded-lg border border-cg-sage-subtle">
+      <h4 className="font-medium text-foreground">School Activity Details</h4>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>

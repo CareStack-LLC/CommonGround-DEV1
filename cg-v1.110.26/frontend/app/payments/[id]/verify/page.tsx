@@ -227,8 +227,8 @@ function VerifyReceiptContent() {
           </button>
 
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#E0EFF8] flex items-center justify-center">
-              <Upload className="h-5 w-5 text-[#2D6A8F]" />
+            <div className="w-10 h-10 rounded-xl bg-cg-slate-subtle flex items-center justify-center">
+              <Upload className="h-5 w-5 text-cg-slate" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-foreground">Upload Receipt</h1>
@@ -297,8 +297,8 @@ function VerifyReceiptContent() {
                   </div>
                 ) : receiptFile ? (
                   <div className="py-4">
-                    <div className="w-16 h-16 rounded-xl bg-[#E0EFF8] flex items-center justify-center mx-auto mb-3">
-                      <FileText className="h-8 w-8 text-[#2D6A8F]" />
+                    <div className="w-16 h-16 rounded-xl bg-cg-slate-subtle flex items-center justify-center mx-auto mb-3">
+                      <FileText className="h-8 w-8 text-cg-slate" />
                     </div>
                     <p className="font-medium text-foreground">{receiptFile.name}</p>
                     <p className="text-sm text-muted-foreground mt-1">

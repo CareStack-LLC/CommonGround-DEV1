@@ -306,7 +306,7 @@ export default function NewCubbieItemPage() {
             </div>
 
             {error && (
-              <div className="p-3 bg-[#FEE2E2] border border-[#FEE2E2] rounded-md text-[#C53030] text-sm">
+              <div className="p-3 bg-cg-error-subtle border border-cg-error-subtle rounded-md text-cg-error text-sm">
                 {error}
               </div>
             )}

@@ -144,21 +144,21 @@ export function CourtOrderUpload({
   const getConfidenceBadge = (confidence: number) => {
     if (confidence >= 0.95) {
       return (
-        <Badge className="bg-[#E8F4F0] text-[#2D8A70] border border-[#C5E5DB]">
+        <Badge className="bg-cg-sage-subtle text-cg-sage-dark border border-[#C5E5DB]">
           <CheckCircle2 className="h-3 w-3 mr-1" />
           High Confidence
         </Badge>
       );
     } else if (confidence >= 0.75) {
       return (
-        <Badge className="bg-[#FEF7ED] text-[#B8791A] border border-[#FBE3BF]">
+        <Badge className="bg-cg-amber-subtle text-[#B8791A] border border-[#FBE3BF]">
           <AlertCircle className="h-3 w-3 mr-1" />
           Medium — Verify
         </Badge>
       );
     } else {
       return (
-        <Badge className="bg-[#FEE2E2] text-[#9B2C2C] border border-[#FEE2E2]">
+        <Badge className="bg-cg-error-subtle text-[#9B2C2C] border border-cg-error-subtle">
           <AlertCircle className="h-3 w-3 mr-1" />
           Low — Review Required
         </Badge>
@@ -171,7 +171,7 @@ export function CourtOrderUpload({
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto border border-slate-200 rounded-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-xl font-bold text-slate-900">
-            <FileText className="h-6 w-6 text-[#3DAA8A]" />
+            <FileText className="h-6 w-6 text-cg-sage" />
             Import Document
           </DialogTitle>
           <DialogDescription>
@@ -183,7 +183,7 @@ export function CourtOrderUpload({
         {step === "upload" && (
           <div className="space-y-4">
             {/* File Upload Area */}
-            <div className="border-2 border-dashed border-slate-200 rounded-2xl p-8 text-center hover:border-[#3DAA8A]/40 hover:bg-[#F4F8F7]/30 transition-colors">
+            <div className="border-2 border-dashed border-slate-200 rounded-2xl p-8 text-center hover:border-cg-sage/40 hover:bg-background/30 transition-colors">
               <input
                 type="file"
                 id="court-order-file"
@@ -196,8 +196,8 @@ export function CourtOrderUpload({
                 htmlFor="court-order-file"
                 className="cursor-pointer flex flex-col items-center gap-3"
               >
-                <div className="p-4 bg-[#F4F8F7] rounded-2xl">
-                  <Upload className="h-8 w-8 text-[#3DAA8A]" />
+                <div className="p-4 bg-background rounded-2xl">
+                  <Upload className="h-8 w-8 text-cg-sage" />
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-slate-900 mb-1">
@@ -209,9 +209,9 @@ export function CourtOrderUpload({
             </div>
 
             {file && (
-              <Card className="border border-[#3DAA8A]/20 bg-[#F4F8F7]/30 rounded-xl">
+              <Card className="border border-cg-sage/20 bg-background/30 rounded-xl">
                 <CardContent className="py-3 flex items-center gap-3">
-                  <FileText className="h-5 w-5 text-[#3DAA8A]" />
+                  <FileText className="h-5 w-5 text-cg-sage" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-slate-900 truncate">
                       {file.name}
@@ -247,8 +247,8 @@ export function CourtOrderUpload({
             )}
 
             {error && (
-              <div className="p-3 bg-[#FEE2E2] border border-[#FEE2E2] rounded-xl flex items-start gap-2">
-                <AlertCircle className="h-5 w-5 text-[#C53030] shrink-0 mt-0.5" />
+              <div className="p-3 bg-cg-error-subtle border border-cg-error-subtle rounded-xl flex items-start gap-2">
+                <AlertCircle className="h-5 w-5 text-cg-error shrink-0 mt-0.5" />
                 <p className="text-sm text-[#9B2C2C]">{error}</p>
               </div>
             )}
@@ -257,8 +257,8 @@ export function CourtOrderUpload({
 
         {step === "review" && extractedData && (
           <div className="space-y-4">
-            <div className="p-3 bg-[#F4F8F7] border border-[#3DAA8A]/20 rounded-xl">
-              <p className="text-sm text-[#1E3A4A]">
+            <div className="p-3 bg-background border border-cg-sage/20 rounded-xl">
+              <p className="text-sm text-foreground">
                 <strong>Review extracted data:</strong> Green highlights indicate high
                 confidence. Yellow/red require manual verification.
               </p>
@@ -356,10 +356,10 @@ export function CourtOrderUpload({
               )}
 
               {/* Court-Ordered Terms */}
-              <Card className="border border-[#2D6A8F]/20 bg-[#2D6A8F]/5 rounded-xl">
+              <Card className="border border-cg-slate/20 bg-cg-slate/5 rounded-xl">
                 <CardContent className="py-4 space-y-3">
                   <div className="flex items-center gap-2">
-                    <Lock className="h-4 w-4 text-[#2D6A8F]" />
+                    <Lock className="h-4 w-4 text-cg-slate" />
                     <h3 className="font-semibold text-sm text-slate-900">
                       Protected Fields
                     </h3>
@@ -403,7 +403,7 @@ export function CourtOrderUpload({
             <Button aria-label="Upload"
               onClick={handleUploadAndExtract}
               disabled={!file || uploading || extracting}
-              className="bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm font-semibold"
+              className="bg-cg-sage hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm font-semibold"
             >
               {uploading || extracting ? (
                 <>Processing...</>
@@ -419,7 +419,7 @@ export function CourtOrderUpload({
           {step === "review" && (
             <Button
               onClick={handleConfirm}
-              className="bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm font-semibold"
+              className="bg-cg-sage hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm font-semibold"
             >
               <CheckCircle2 className="h-4 w-4 mr-2" />
               Confirm & Create Case

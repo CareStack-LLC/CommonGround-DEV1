@@ -292,9 +292,9 @@ export default function FL320Wizard({
               onClick={() => setCurrentSection(idx)}
               className={`flex-1 h-2 rounded-full transition-colors ${
                 idx === currentSection
-                  ? 'bg-[#2D6A8F]'
+                  ? 'bg-cg-slate'
                   : idx < currentSection
-                  ? 'bg-[#3DAA8A]'
+                  ? 'bg-cg-sage'
                   : 'bg-gray-200'
               }`}
               title={section.title}
@@ -309,7 +309,7 @@ export default function FL320Wizard({
           <div className="flex items-center gap-3">
             {(() => {
               const Icon = WIZARD_SECTIONS[currentSection].icon;
-              return <Icon className="h-6 w-6 text-[#2D6A8F]" />;
+              return <Icon className="h-6 w-6 text-cg-slate" />;
             })()}
             <div>
               <CardTitle>{WIZARD_SECTIONS[currentSection].title}</CardTitle>
@@ -393,7 +393,7 @@ function HeaderSection({
 }) {
   return (
     <div className="space-y-6">
-      <Alert className="bg-[#E0EFF8] border-[#E0EFF8]">
+      <Alert className="bg-cg-slate-subtle border-cg-slate-subtle">
         <FileText className="h-4 w-4" />
         <AlertDescription>
           FL-320 is your response to the FL-300 Request for Order filed by the other party.
@@ -402,7 +402,7 @@ function HeaderSection({
       </Alert>
 
       {fl300Data && (
-        <Card className="bg-[#E0EFF8] border-[#E0EFF8]">
+        <Card className="bg-cg-slate-subtle border-cg-slate-subtle">
           <CardHeader>
             <CardTitle className="text-lg">Responding to FL-300</CardTitle>
           </CardHeader>
@@ -520,7 +520,7 @@ function RestrainingSection({
               updateField('restraining_no_orders_in_effect', true);
               updateField('restraining_orders_in_effect', false);
             }}
-            className="h-4 w-4 text-[#2D6A8F]"
+            className="h-4 w-4 text-cg-slate"
           />
           <div>
             <span className="font-medium">1a. No domestic violence restraining/protective orders are now in effect</span>
@@ -537,7 +537,7 @@ function RestrainingSection({
               updateField('restraining_no_orders_in_effect', false);
               updateField('restraining_orders_in_effect', true);
             }}
-            className="h-4 w-4 text-[#2D6A8F]"
+            className="h-4 w-4 text-cg-slate"
           />
           <div>
             <span className="font-medium">1b. I agree that one or more domestic violence restraining/protective orders are in effect</span>
@@ -585,19 +585,19 @@ function CustodySection({
           type="checkbox"
           checked={formData.custody_enabled}
           onChange={(e) => updateField('custody_enabled', e.target.checked)}
-          className="h-4 w-4 text-[#2D6A8F]"
+          className="h-4 w-4 text-cg-slate"
         />
         <span className="font-medium">This section applies to me</span>
       </label>
 
       {formData.custody_enabled && (
-        <div className="space-y-4 pl-4 border-l-4 border-[#E0EFF8]">
+        <div className="space-y-4 pl-4 border-l-4 border-cg-slate-subtle">
           <label className="flex items-center gap-3 p-4 border rounded-lg hover:bg-gray-50 cursor-pointer">
             <input
               type="checkbox"
               checked={formData.custody_consent_legal_physical}
               onChange={(e) => updateField('custody_consent_legal_physical', e.target.checked)}
-              className="h-4 w-4 text-[#2D6A8F]"
+              className="h-4 w-4 text-cg-slate"
             />
             <div>
               <span className="font-medium">2a. I consent to the order requested for child custody (legal and physical)</span>
@@ -609,7 +609,7 @@ function CustodySection({
               type="checkbox"
               checked={formData.custody_consent_visitation}
               onChange={(e) => updateField('custody_consent_visitation', e.target.checked)}
-              className="h-4 w-4 text-[#2D6A8F]"
+              className="h-4 w-4 text-cg-slate"
             />
             <div>
               <span className="font-medium">2b. I consent to the order requested for visitation (parenting time)</span>
@@ -622,7 +622,7 @@ function CustodySection({
                 type="checkbox"
                 checked={formData.custody_do_not_consent}
                 onChange={(e) => updateField('custody_do_not_consent', e.target.checked)}
-                className="h-4 w-4 mt-1 text-[#2D6A8F]"
+                className="h-4 w-4 mt-1 text-cg-slate"
               />
               <div className="flex-1">
                 <span className="font-medium">2c. I do not consent to the order requested for:</span>
@@ -633,7 +633,7 @@ function CustodySection({
                         type="checkbox"
                         checked={formData.custody_do_not_consent_custody}
                         onChange={(e) => updateField('custody_do_not_consent_custody', e.target.checked)}
-                        className="h-4 w-4 text-[#2D6A8F]"
+                        className="h-4 w-4 text-cg-slate"
                       />
                       <span>Child custody</span>
                     </label>
@@ -642,7 +642,7 @@ function CustodySection({
                         type="checkbox"
                         checked={formData.custody_do_not_consent_visitation}
                         onChange={(e) => updateField('custody_do_not_consent_visitation', e.target.checked)}
-                        className="h-4 w-4 text-[#2D6A8F]"
+                        className="h-4 w-4 text-cg-slate"
                       />
                       <span>Visitation (parenting time)</span>
                     </label>
@@ -701,19 +701,19 @@ function ChildSupportSection({
           type="checkbox"
           checked={formData.child_support_enabled}
           onChange={(e) => updateField('child_support_enabled', e.target.checked)}
-          className="h-4 w-4 text-[#2D6A8F]"
+          className="h-4 w-4 text-cg-slate"
         />
         <span className="font-medium">This section applies to me</span>
       </label>
 
       {formData.child_support_enabled && (
-        <div className="space-y-4 pl-4 border-l-4 border-[#E0EFF8]">
+        <div className="space-y-4 pl-4 border-l-4 border-cg-slate-subtle">
           <label className="flex items-center gap-3 p-4 border rounded-lg hover:bg-gray-50 cursor-pointer">
             <input
               type="checkbox"
               checked={formData.child_support_income_declaration_filed}
               onChange={(e) => updateField('child_support_income_declaration_filed', e.target.checked)}
-              className="h-4 w-4 text-[#2D6A8F]"
+              className="h-4 w-4 text-cg-slate"
             />
             <div>
               <span className="font-medium">3a. I have completed and filed a current Income and Expense Declaration (FL-150)</span>
@@ -726,7 +726,7 @@ function ChildSupportSection({
               type="checkbox"
               checked={formData.child_support_consent}
               onChange={(e) => updateField('child_support_consent', e.target.checked)}
-              className="h-4 w-4 text-[#2D6A8F]"
+              className="h-4 w-4 text-cg-slate"
             />
             <span className="font-medium">3b. I consent to the order requested</span>
           </label>
@@ -736,7 +736,7 @@ function ChildSupportSection({
               type="checkbox"
               checked={formData.child_support_consent_guideline}
               onChange={(e) => updateField('child_support_consent_guideline', e.target.checked)}
-              className="h-4 w-4 text-[#2D6A8F]"
+              className="h-4 w-4 text-cg-slate"
             />
             <span className="font-medium">3c. I consent to guideline support</span>
           </label>
@@ -747,7 +747,7 @@ function ChildSupportSection({
                 type="checkbox"
                 checked={formData.child_support_do_not_consent}
                 onChange={(e) => updateField('child_support_do_not_consent', e.target.checked)}
-                className="h-4 w-4 mt-1 text-[#2D6A8F]"
+                className="h-4 w-4 mt-1 text-cg-slate"
               />
               <div className="flex-1">
                 <span className="font-medium">3d. I do not consent to the order requested</span>
@@ -806,19 +806,19 @@ function SpousalSupportSection({
           type="checkbox"
           checked={formData.spousal_support_enabled}
           onChange={(e) => updateField('spousal_support_enabled', e.target.checked)}
-          className="h-4 w-4 text-[#2D6A8F]"
+          className="h-4 w-4 text-cg-slate"
         />
         <span className="font-medium">This section applies to me</span>
       </label>
 
       {formData.spousal_support_enabled && (
-        <div className="space-y-4 pl-4 border-l-4 border-[#E0EFF8]">
+        <div className="space-y-4 pl-4 border-l-4 border-cg-slate-subtle">
           <label className="flex items-center gap-3 p-4 border rounded-lg hover:bg-gray-50 cursor-pointer">
             <input
               type="checkbox"
               checked={formData.spousal_support_income_declaration_filed}
               onChange={(e) => updateField('spousal_support_income_declaration_filed', e.target.checked)}
-              className="h-4 w-4 text-[#2D6A8F]"
+              className="h-4 w-4 text-cg-slate"
             />
             <span className="font-medium">4a. I have completed and filed a current Income and Expense Declaration (FL-150)</span>
           </label>
@@ -828,7 +828,7 @@ function SpousalSupportSection({
               type="checkbox"
               checked={formData.spousal_support_consent}
               onChange={(e) => updateField('spousal_support_consent', e.target.checked)}
-              className="h-4 w-4 text-[#2D6A8F]"
+              className="h-4 w-4 text-cg-slate"
             />
             <span className="font-medium">4b. I consent to the order requested</span>
           </label>
@@ -839,7 +839,7 @@ function SpousalSupportSection({
                 type="checkbox"
                 checked={formData.spousal_support_do_not_consent}
                 onChange={(e) => updateField('spousal_support_do_not_consent', e.target.checked)}
-                className="h-4 w-4 mt-1 text-[#2D6A8F]"
+                className="h-4 w-4 mt-1 text-cg-slate"
               />
               <div className="flex-1">
                 <span className="font-medium">4c. I do not consent to the order requested</span>
@@ -898,19 +898,19 @@ function PropertySection({
           type="checkbox"
           checked={formData.property_control_enabled}
           onChange={(e) => updateField('property_control_enabled', e.target.checked)}
-          className="h-4 w-4 text-[#2D6A8F]"
+          className="h-4 w-4 text-cg-slate"
         />
         <span className="font-medium">This section applies to me</span>
       </label>
 
       {formData.property_control_enabled && (
-        <div className="space-y-4 pl-4 border-l-4 border-[#E0EFF8]">
+        <div className="space-y-4 pl-4 border-l-4 border-cg-slate-subtle">
           <label className="flex items-center gap-3 p-4 border rounded-lg hover:bg-gray-50 cursor-pointer">
             <input
               type="checkbox"
               checked={formData.property_control_consent}
               onChange={(e) => updateField('property_control_consent', e.target.checked)}
-              className="h-4 w-4 text-[#2D6A8F]"
+              className="h-4 w-4 text-cg-slate"
             />
             <span className="font-medium">5a. I consent to the order requested</span>
           </label>
@@ -921,7 +921,7 @@ function PropertySection({
                 type="checkbox"
                 checked={formData.property_control_do_not_consent}
                 onChange={(e) => updateField('property_control_do_not_consent', e.target.checked)}
-                className="h-4 w-4 mt-1 text-[#2D6A8F]"
+                className="h-4 w-4 mt-1 text-cg-slate"
               />
               <div className="flex-1">
                 <span className="font-medium">5b. I do not consent to the order requested</span>
@@ -980,19 +980,19 @@ function AttorneyFeesSection({
           type="checkbox"
           checked={formData.attorney_fees_enabled}
           onChange={(e) => updateField('attorney_fees_enabled', e.target.checked)}
-          className="h-4 w-4 text-[#2D6A8F]"
+          className="h-4 w-4 text-cg-slate"
         />
         <span className="font-medium">This section applies to me</span>
       </label>
 
       {formData.attorney_fees_enabled && (
-        <div className="space-y-4 pl-4 border-l-4 border-[#E0EFF8]">
+        <div className="space-y-4 pl-4 border-l-4 border-cg-slate-subtle">
           <label className="flex items-center gap-3 p-4 border rounded-lg hover:bg-gray-50 cursor-pointer">
             <input
               type="checkbox"
               checked={formData.attorney_fees_income_declaration_filed}
               onChange={(e) => updateField('attorney_fees_income_declaration_filed', e.target.checked)}
-              className="h-4 w-4 text-[#2D6A8F]"
+              className="h-4 w-4 text-cg-slate"
             />
             <span className="font-medium">6a. I have completed and filed a current Income and Expense Declaration (FL-150)</span>
           </label>
@@ -1002,7 +1002,7 @@ function AttorneyFeesSection({
               type="checkbox"
               checked={formData.attorney_fees_fl158_attached}
               onChange={(e) => updateField('attorney_fees_fl158_attached', e.target.checked)}
-              className="h-4 w-4 text-[#2D6A8F]"
+              className="h-4 w-4 text-cg-slate"
             />
             <span className="font-medium">6b. I have completed and filed FL-158 (Supporting Declaration)</span>
           </label>
@@ -1012,7 +1012,7 @@ function AttorneyFeesSection({
               type="checkbox"
               checked={formData.attorney_fees_consent}
               onChange={(e) => updateField('attorney_fees_consent', e.target.checked)}
-              className="h-4 w-4 text-[#2D6A8F]"
+              className="h-4 w-4 text-cg-slate"
             />
             <span className="font-medium">6c. I consent to the order requested</span>
           </label>
@@ -1023,7 +1023,7 @@ function AttorneyFeesSection({
                 type="checkbox"
                 checked={formData.attorney_fees_do_not_consent}
                 onChange={(e) => updateField('attorney_fees_do_not_consent', e.target.checked)}
-                className="h-4 w-4 mt-1 text-[#2D6A8F]"
+                className="h-4 w-4 mt-1 text-cg-slate"
               />
               <div className="flex-1">
                 <span className="font-medium">6d. I do not consent to the order requested</span>
@@ -1082,19 +1082,19 @@ function OtherOrdersSection({
           type="checkbox"
           checked={formData.other_orders_enabled}
           onChange={(e) => updateField('other_orders_enabled', e.target.checked)}
-          className="h-4 w-4 text-[#2D6A8F]"
+          className="h-4 w-4 text-cg-slate"
         />
         <span className="font-medium">This section applies to me</span>
       </label>
 
       {formData.other_orders_enabled && (
-        <div className="space-y-4 pl-4 border-l-4 border-[#E0EFF8]">
+        <div className="space-y-4 pl-4 border-l-4 border-cg-slate-subtle">
           <label className="flex items-center gap-3 p-4 border rounded-lg hover:bg-gray-50 cursor-pointer">
             <input
               type="checkbox"
               checked={formData.other_orders_consent}
               onChange={(e) => updateField('other_orders_consent', e.target.checked)}
-              className="h-4 w-4 text-[#2D6A8F]"
+              className="h-4 w-4 text-cg-slate"
             />
             <span className="font-medium">7a. I consent to the order requested</span>
           </label>
@@ -1105,7 +1105,7 @@ function OtherOrdersSection({
                 type="checkbox"
                 checked={formData.other_orders_do_not_consent}
                 onChange={(e) => updateField('other_orders_do_not_consent', e.target.checked)}
-                className="h-4 w-4 mt-1 text-[#2D6A8F]"
+                className="h-4 w-4 mt-1 text-cg-slate"
               />
               <div className="flex-1">
                 <span className="font-medium">7b. I do not consent to the order requested</span>
@@ -1164,19 +1164,19 @@ function TimeServiceSection({
           type="checkbox"
           checked={formData.time_service_enabled}
           onChange={(e) => updateField('time_service_enabled', e.target.checked)}
-          className="h-4 w-4 text-[#2D6A8F]"
+          className="h-4 w-4 text-cg-slate"
         />
         <span className="font-medium">This section applies to me</span>
       </label>
 
       {formData.time_service_enabled && (
-        <div className="space-y-4 pl-4 border-l-4 border-[#E0EFF8]">
+        <div className="space-y-4 pl-4 border-l-4 border-cg-slate-subtle">
           <label className="flex items-center gap-3 p-4 border rounded-lg hover:bg-gray-50 cursor-pointer">
             <input
               type="checkbox"
               checked={formData.time_service_consent}
               onChange={(e) => updateField('time_service_consent', e.target.checked)}
-              className="h-4 w-4 text-[#2D6A8F]"
+              className="h-4 w-4 text-cg-slate"
             />
             <span className="font-medium">8a. I consent to the order requested</span>
           </label>
@@ -1187,7 +1187,7 @@ function TimeServiceSection({
                 type="checkbox"
                 checked={formData.time_service_do_not_consent}
                 onChange={(e) => updateField('time_service_do_not_consent', e.target.checked)}
-                className="h-4 w-4 mt-1 text-[#2D6A8F]"
+                className="h-4 w-4 mt-1 text-cg-slate"
               />
               <div className="flex-1">
                 <span className="font-medium">8b. I do not consent to the order requested</span>
@@ -1228,7 +1228,7 @@ function FactsSection({
         </AlertDescription>
       </Alert>
 
-      <Alert className="bg-[#FEF7ED] border-[#FEF7ED]">
+      <Alert className="bg-cg-amber-subtle border-cg-amber-subtle">
         <AlertTriangle className="h-4 w-4 text-[#E09520]" />
         <AlertDescription className="text-[#E09520]">
           <strong>Important:</strong> This is your declaration under penalty of perjury. State only facts you know to be true.
@@ -1256,7 +1256,7 @@ Be specific and include dates, names, and details that support your response."
             type="checkbox"
             checked={formData.facts_attachment_9}
             onChange={(e) => updateField('facts_attachment_9', e.target.checked)}
-            className="h-4 w-4 text-[#2D6A8F]"
+            className="h-4 w-4 text-cg-slate"
           />
           <span className="text-sm">Continued on Attachment 9</span>
         </label>
@@ -1286,9 +1286,9 @@ Be specific and include dates, names, and details that support your response."
         </CardContent>
       </Card>
 
-      <Alert className="bg-[#E8F4F0] border-[#E8F4F0]">
-        <Check className="h-4 w-4 text-[#2D8A70]" />
-        <AlertDescription className="text-[#1E3A4A]">
+      <Alert className="bg-cg-sage-subtle border-cg-sage-subtle">
+        <Check className="h-4 w-4 text-cg-sage-dark" />
+        <AlertDescription className="text-foreground">
           You have completed all sections of the FL-320. Click "Review & Submit" to review your entries before submission.
         </AlertDescription>
       </Alert>

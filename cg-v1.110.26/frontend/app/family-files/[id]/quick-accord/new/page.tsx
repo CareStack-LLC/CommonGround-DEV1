@@ -192,8 +192,8 @@ function NewQuickAccordContent() {
           <ArrowLeft className="w-5 h-5 text-muted-foreground" />
         </button>
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-gradient-to-br from-[#F5A623]/10 to-[#E09520]/5 rounded-2xl flex items-center justify-center shadow-md">
-            <Zap className="w-6 h-6 text-[#F5A623]" />
+          <div className="w-12 h-12 bg-gradient-to-br from-cg-amber/10 to-[#E09520]/5 rounded-2xl flex items-center justify-center shadow-md">
+            <Zap className="w-6 h-6 text-cg-amber" />
           </div>
           <div>
             <h1 className="text-xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
@@ -227,47 +227,47 @@ function NewQuickAccordContent() {
           <CardContent>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               <button
-                className="group h-auto py-5 px-4 flex flex-col items-center gap-2 bg-card border-2 border-border rounded-xl hover:border-[#2D6A8F]/30 hover:shadow-lg transition-all duration-300"
+                className="group h-auto py-5 px-4 flex flex-col items-center gap-2 bg-card border-2 border-border rounded-xl hover:border-cg-slate/30 hover:shadow-lg transition-all duration-300"
                 onClick={() => selectCategory('travel')}
               >
-                <div className="p-2.5 bg-gradient-to-br from-[#2D6A8F]/10 to-[#2D6A8F]/5 rounded-xl shadow-sm group-hover:shadow-md group-hover:scale-110 transition-all duration-300">
-                  <Plane className="h-5 w-5 text-[#2D6A8F]" />
+                <div className="p-2.5 bg-gradient-to-br from-cg-slate/10 to-cg-slate/5 rounded-xl shadow-sm group-hover:shadow-md group-hover:scale-110 transition-all duration-300">
+                  <Plane className="h-5 w-5 text-cg-slate" />
                 </div>
                 <span className="font-bold text-sm text-foreground">Travel</span>
               </button>
               <button
-                className="group h-auto py-5 px-4 flex flex-col items-center gap-2 bg-card border-2 border-border rounded-xl hover:border-[#3DAA8A]/30 hover:shadow-lg transition-all duration-300"
+                className="group h-auto py-5 px-4 flex flex-col items-center gap-2 bg-card border-2 border-border rounded-xl hover:border-cg-sage/30 hover:shadow-lg transition-all duration-300"
                 onClick={() => selectCategory('schedule_swap')}
               >
-                <div className="p-2.5 bg-gradient-to-br from-[#3DAA8A]/10 to-[#2D8A70]/5 rounded-xl shadow-sm group-hover:shadow-md group-hover:scale-110 transition-all duration-300">
-                  <CalendarSync className="h-5 w-5 text-[#3DAA8A]" />
+                <div className="p-2.5 bg-gradient-to-br from-cg-sage/10 to-cg-sage-dark/5 rounded-xl shadow-sm group-hover:shadow-md group-hover:scale-110 transition-all duration-300">
+                  <CalendarSync className="h-5 w-5 text-cg-sage" />
                 </div>
                 <span className="font-bold text-sm text-foreground">Schedule Swap</span>
               </button>
               <button
-                className="group h-auto py-5 px-4 flex flex-col items-center gap-2 bg-card border-2 border-border rounded-xl hover:border-[#2D6A8F]/30 hover:shadow-lg transition-all duration-300"
+                className="group h-auto py-5 px-4 flex flex-col items-center gap-2 bg-card border-2 border-border rounded-xl hover:border-cg-slate/30 hover:shadow-lg transition-all duration-300"
                 onClick={() => selectCategory('special_event')}
               >
-                <div className="p-2.5 bg-gradient-to-br from-[#2D6A8F]/10 to-[#2D6A8F]/5 rounded-xl shadow-sm group-hover:shadow-md group-hover:scale-110 transition-all duration-300">
-                  <PartyPopper className="h-5 w-5 text-[#2D6A8F]" />
+                <div className="p-2.5 bg-gradient-to-br from-cg-slate/10 to-cg-slate/5 rounded-xl shadow-sm group-hover:shadow-md group-hover:scale-110 transition-all duration-300">
+                  <PartyPopper className="h-5 w-5 text-cg-slate" />
                 </div>
                 <span className="font-bold text-sm text-foreground">Special Event</span>
               </button>
               <button
-                className="group h-auto py-5 px-4 flex flex-col items-center gap-2 bg-card border-2 border-border rounded-xl hover:border-[#2D6A8F]/30 hover:shadow-lg transition-all duration-300"
+                className="group h-auto py-5 px-4 flex flex-col items-center gap-2 bg-card border-2 border-border rounded-xl hover:border-cg-slate/30 hover:shadow-lg transition-all duration-300"
                 onClick={() => selectCategory('overnight')}
               >
-                <div className="p-2.5 bg-gradient-to-br from-[#2D6A8F]/10 to-[#2D6A8F]/5 rounded-xl shadow-sm group-hover:shadow-md group-hover:scale-110 transition-all duration-300">
-                  <Moon className="h-5 w-5 text-[#2D6A8F]" />
+                <div className="p-2.5 bg-gradient-to-br from-cg-slate/10 to-cg-slate/5 rounded-xl shadow-sm group-hover:shadow-md group-hover:scale-110 transition-all duration-300">
+                  <Moon className="h-5 w-5 text-cg-slate" />
                 </div>
                 <span className="font-bold text-sm text-foreground">Overnight</span>
               </button>
               <button
-                className="group h-auto py-5 px-4 flex flex-col items-center gap-2 bg-card border-2 border-border rounded-xl hover:border-[#3DAA8A]/30 hover:shadow-lg transition-all duration-300"
+                className="group h-auto py-5 px-4 flex flex-col items-center gap-2 bg-card border-2 border-border rounded-xl hover:border-cg-sage/30 hover:shadow-lg transition-all duration-300"
                 onClick={() => selectCategory('expense')}
               >
-                <div className="p-2.5 bg-gradient-to-br from-[#3DAA8A]/10 to-[#2D8A70]/5 rounded-xl shadow-sm group-hover:shadow-md group-hover:scale-110 transition-all duration-300">
-                  <DollarSign className="h-5 w-5 text-[#3DAA8A]" />
+                <div className="p-2.5 bg-gradient-to-br from-cg-sage/10 to-cg-sage-dark/5 rounded-xl shadow-sm group-hover:shadow-md group-hover:scale-110 transition-all duration-300">
+                  <DollarSign className="h-5 w-5 text-cg-sage" />
                 </div>
                 <span className="font-bold text-sm text-foreground">Expense</span>
               </button>
@@ -327,14 +327,14 @@ function NewQuickAccordContent() {
               <div
                 className={`max-w-[80%] rounded-2xl px-4 py-3 shadow-md ${
                   message.role === 'user'
-                    ? 'bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] text-white'
+                    ? 'bg-gradient-to-br from-[var(--portal-primary)] to-cg-slate text-white'
                     : 'bg-card border-2 border-border text-foreground'
                 }`}
               >
                 <p className="whitespace-pre-wrap text-sm font-medium">{message.content}</p>
               </div>
               {message.role === 'user' && (
-                <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-[var(--portal-primary)] to-[#2D6A8F] flex items-center justify-center flex-shrink-0 shadow-sm">
+                <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-[var(--portal-primary)] to-cg-slate flex items-center justify-center flex-shrink-0 shadow-sm">
                   <User className="h-4 w-4 text-white" />
                 </div>
               )}
@@ -362,9 +362,9 @@ function NewQuickAccordContent() {
         {/* Input */}
         <div className="border-t-2 border-border p-4 bg-card">
           {isReady && (
-            <Alert className="mb-4 bg-[#E8F4F0] dark:bg-[#1E3A4A]/20 border-2 border-[#E8F4F0] dark:border-[#1E3A4A]/40 rounded-xl">
-              <CheckCircle className="h-4 w-4 text-[#2D8A70] dark:text-[#5BC4A0]" />
-              <AlertDescription className="text-[#2D8A70] dark:text-[#5BC4A0] font-medium">
+            <Alert className="mb-4 bg-cg-sage-subtle dark:bg-foreground/20 border-2 border-cg-sage-subtle dark:border-foreground/40 rounded-xl">
+              <CheckCircle className="h-4 w-4 text-cg-sage-dark dark:text-cg-sage-light" />
+              <AlertDescription className="text-cg-sage-dark dark:text-cg-sage-light font-medium">
                 Ready to create! Review the summary above and click "Create QuickAccord" when you're satisfied.
               </AlertDescription>
             </Alert>
@@ -383,7 +383,7 @@ function NewQuickAccordContent() {
               <Button
                 onClick={startConversation}
                 disabled={!inputValue.trim() || isSending}
-                className="bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white font-bold px-6 rounded-xl hover:shadow-lg transition-all duration-300"
+                className="bg-gradient-to-r from-[var(--portal-primary)] to-cg-slate text-white font-bold px-6 rounded-xl hover:shadow-lg transition-all duration-300"
               >
                 Start
               </Button>
@@ -391,7 +391,7 @@ function NewQuickAccordContent() {
               <Button
                 onClick={createQuickAccord}
                 disabled={isCreating}
-                className="bg-gradient-to-r from-[#2D8A70] to-[#2D8A70] text-white font-bold px-4 rounded-xl hover:shadow-lg transition-all duration-300"
+                className="bg-gradient-to-r from-cg-sage-dark to-cg-sage-dark text-white font-bold px-4 rounded-xl hover:shadow-lg transition-all duration-300"
               >
                 {isCreating ? 'Creating...' : 'Create QuickAccord'}
               </Button>
@@ -399,7 +399,7 @@ function NewQuickAccordContent() {
               <Button aria-label="Send message"
                 onClick={sendMessage}
                 disabled={!inputValue.trim() || isSending}
-                className="bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white font-bold px-4 rounded-xl hover:shadow-lg transition-all duration-300"
+                className="bg-gradient-to-r from-[var(--portal-primary)] to-cg-slate text-white font-bold px-4 rounded-xl hover:shadow-lg transition-all duration-300"
               >
                 <Send className="h-4 w-4" />
               </Button>
@@ -413,8 +413,8 @@ function NewQuickAccordContent() {
         <Card className="border-2 border-border rounded-2xl shadow-lg">
           <CardHeader className="pb-4">
             <CardTitle className="text-lg font-bold flex items-center gap-3" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-              <div className="p-2 bg-gradient-to-br from-[#3DAA8A]/10 to-[#2D8A70]/5 rounded-xl shadow-md">
-                <CheckCircle className="h-5 w-5 text-[#2D8A70] dark:text-[#5BC4A0]" />
+              <div className="p-2 bg-gradient-to-br from-cg-sage/10 to-cg-sage-dark/5 rounded-xl shadow-md">
+                <CheckCircle className="h-5 w-5 text-cg-sage-dark dark:text-cg-sage-light" />
               </div>
               Extracted Information
             </CardTitle>
@@ -465,15 +465,15 @@ function NewQuickAccordContent() {
               {extractedData.has_shared_expense && (
                 <div className="flex justify-between items-center py-2 border-b border-border">
                   <span className="text-muted-foreground font-medium">Shared Expense</span>
-                  <span className="font-bold text-[#2D8A70] dark:text-[#5BC4A0]">
+                  <span className="font-bold text-cg-sage-dark dark:text-cg-sage-light">
                     ${extractedData.estimated_amount || 'TBD'}
                   </span>
                 </div>
               )}
               {extractedData.missing_info?.length > 0 && (
-                <div className="mt-2 pt-3 border-t-2 border-[#FEF7ED] dark:border-[#1E3A4A]/40 bg-[#FEF7ED]/50 dark:bg-[#1E3A4A]/20 -mx-6 px-6 pb-2 rounded-b-xl">
+                <div className="mt-2 pt-3 border-t-2 border-cg-amber-subtle dark:border-foreground/40 bg-cg-amber-subtle/50 dark:bg-foreground/20 -mx-6 px-6 pb-2 rounded-b-xl">
                   <span className="text-muted-foreground font-medium">Still needed: </span>
-                  <span className="text-[#E09520] dark:text-[#F5A623] font-bold">{extractedData.missing_info.join(', ')}</span>
+                  <span className="text-[#E09520] dark:text-cg-amber font-bold">{extractedData.missing_info.join(', ')}</span>
                 </div>
               )}
             </div>

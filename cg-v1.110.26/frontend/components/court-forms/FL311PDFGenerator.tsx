@@ -346,7 +346,7 @@ export function generateFL311PDF(formData: FL311FormData, caseData: CaseData) {
     /* Note boxes */
     .note-box {
       border: 1px solid #000;
-      background: #FEF7ED;
+      background: var(--cg-amber-subtle);
       padding: 6px 8px;
       font-size: 9pt;
       margin: 8px 0;
@@ -430,7 +430,7 @@ export function generateFL311PDF(formData: FL311FormData, caseData: CaseData) {
     </div>
 
     <!-- California Public Policy Info Box -->
-    <div class="note-box" style="background: #E0EFF8; border: 2px solid #2D6A8F; margin-bottom: 12px;">
+    <div class="note-box" style="background: var(--cg-slate-subtle); border: 2px solid var(--cg-slate); margin-bottom: 12px;">
       <p style="font-size: 9pt; margin-bottom: 6px;">
         <strong>NOTICE (California Family Code § 3020):</strong>
       </p>
@@ -446,7 +446,7 @@ export function generateFL311PDF(formData: FL311FormData, caseData: CaseData) {
 
     ${formData.legal_custody_to === 'joint' ? `
     <!-- FL-341(E) Note for Joint Legal Custody -->
-    <div class="note-box" style="background: #FEF7ED; border: 2px solid #E09520;">
+    <div class="note-box" style="background: var(--cg-amber-subtle); border: 2px solid #E09520;">
       <p style="font-size: 9pt;">
         <strong>JOINT LEGAL CUSTODY NOTE:</strong> If joint legal custody is ordered, the parents must consult with each
         other on major decisions relating to the health, education, and welfare of the children. Consider completing and
@@ -612,7 +612,7 @@ export function generateFL311PDF(formData: FL311FormData, caseData: CaseData) {
           </table>
 
           ${formData.fifth_weekend_handling && formData.fifth_weekend_handling.type !== 'none' ? `
-          <div style="margin-top: 8px; padding: 6px; border: 1px solid #000; background: #FEF7ED;">
+          <div style="margin-top: 8px; padding: 6px; border: 1px solid #000; background: var(--cg-amber-subtle);">
             <strong>5th Weekend:</strong>
             ${formData.fifth_weekend_handling.type === 'alternating' ? `
               (a) The parties will alternate the 5th weekend, with ${formatParty(formData.fifth_weekend_handling.alternating_initial_party)}

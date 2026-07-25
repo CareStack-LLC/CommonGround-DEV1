@@ -17,10 +17,10 @@ export function CaseHealthGauge({
   subtitle = "Overall case health"
 }: CaseHealthGaugeProps) {
   const getHealthStatus = (score: number) => {
-    if (score >= 90) return { label: "Excellent", color: "#3DAA8A", bg: "from-[#3DAA8A] to-teal-600" };
-    if (score >= 75) return { label: "Good", color: "#3DAA8A", bg: "from-teal-500 to-[#2D6A8F]" };
-    if (score >= 60) return { label: "Fair", color: "#F5A623", bg: "from-[#F5A623] to-[#E09520]" };
-    return { label: "Concerning", color: "#C53030", bg: "from-[#C53030] to-[#E09520]" };
+    if (score >= 90) return { label: "Excellent", color: "var(--cg-sage)", bg: "from-cg-sage to-teal-600" };
+    if (score >= 75) return { label: "Good", color: "var(--cg-sage)", bg: "from-teal-500 to-cg-slate" };
+    if (score >= 60) return { label: "Fair", color: "var(--cg-amber)", bg: "from-cg-amber to-[#E09520]" };
+    return { label: "Concerning", color: "var(--cg-error)", bg: "from-cg-error to-[#E09520]" };
   };
 
   const health = getHealthStatus(score);
@@ -28,8 +28,8 @@ export function CaseHealthGauge({
   const offset = circumference - (score / 100) * circumference;
 
   const getTrendIcon = () => {
-    if (trend === "up") return <TrendingUp className="h-4 w-4 text-[#2D8A70]" />;
-    if (trend === "down") return <TrendingDown className="h-4 w-4 text-[#C53030]" />;
+    if (trend === "up") return <TrendingUp className="h-4 w-4 text-cg-sage-dark" />;
+    if (trend === "down") return <TrendingDown className="h-4 w-4 text-cg-error" />;
     return <Minus className="h-4 w-4 text-slate-400" />;
   };
 
@@ -91,7 +91,7 @@ export function CaseHealthGauge({
             <p className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider mb-1">
               Excellent
             </p>
-            <div className="h-1.5 bg-[#3DAA8A] rounded-full" />
+            <div className="h-1.5 bg-cg-sage rounded-full" />
           </div>
           <div className="text-center p-2 bg-slate-50 rounded-lg">
             <p className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider mb-1">
@@ -103,13 +103,13 @@ export function CaseHealthGauge({
             <p className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider mb-1">
               Fair
             </p>
-            <div className="h-1.5 bg-[#F5A623] rounded-full" />
+            <div className="h-1.5 bg-cg-amber rounded-full" />
           </div>
           <div className="text-center p-2 bg-slate-50 rounded-lg">
             <p className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider mb-1">
               Poor
             </p>
-            <div className="h-1.5 bg-[#C53030] rounded-full" />
+            <div className="h-1.5 bg-cg-error rounded-full" />
           </div>
         </div>
       </div>

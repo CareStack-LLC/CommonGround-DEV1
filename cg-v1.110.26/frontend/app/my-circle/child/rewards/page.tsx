@@ -54,7 +54,7 @@ function redemptionStatusLabel(status: RewardRedemption['status']) {
 function redemptionStatusClass(status: RewardRedemption['status']) {
   switch (status) {
     case 'requested':
-      return 'bg-[#2D6A8F]/30 text-[#4BA8C8]';
+      return 'bg-cg-slate/30 text-cg-slate-light';
     case 'fulfilled':
       return 'bg-emerald-500/20 text-emerald-300';
     case 'cancelled':
@@ -134,9 +134,9 @@ export default function ChildRewardsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0D1B24] via-[#1E3A4A] to-[#0D1B24] text-white">
+    <div className="min-h-screen bg-gradient-to-b from-[#0D1B24] via-foreground to-[#0D1B24] text-white">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-[#0D1B24]/80 backdrop-blur-md border-b border-[#3DAA8A]/10">
+      <header className="sticky top-0 z-10 bg-[#0D1B24]/80 backdrop-blur-md border-b border-cg-sage/10">
         <div className="max-w-3xl mx-auto flex items-center justify-between px-4 py-3">
           <button
             onClick={() => router.push('/my-circle/child/dashboard')}
@@ -167,7 +167,7 @@ export default function ChildRewardsPage() {
               onClick={() => setTab(t)}
               className={`px-3 py-1.5 rounded-full font-medium transition-colors flex items-center gap-1.5 ${
                 tab === t
-                  ? 'bg-[#3DAA8A] text-white'
+                  ? 'bg-cg-sage text-white'
                   : 'bg-white/10 text-white/70 hover:bg-white/20'
               }`}
             >
@@ -191,7 +191,7 @@ export default function ChildRewardsPage() {
         {/* Celebratory banner */}
         {celebrate && (
           <div
-            className="rounded-2xl bg-gradient-to-br from-[#3DAA8A] to-[#2D6A8F] px-4 py-3 flex items-center gap-3 shadow-lg shadow-[#3DAA8A]/20"
+            className="rounded-2xl bg-gradient-to-br from-cg-sage to-cg-slate px-4 py-3 flex items-center gap-3 shadow-lg shadow-cg-sage/20"
             aria-live="polite"
           >
             <PartyPopper className="h-5 w-5 text-white flex-shrink-0" />
@@ -207,8 +207,8 @@ export default function ChildRewardsPage() {
 
         {/* Wallet summary */}
         {wallet && (
-          <section className="rounded-2xl border border-[#3DAA8A]/15 bg-[#1E3A4A]/60 px-4 py-3 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#3DAA8A] to-[#2D6A8F] flex items-center justify-center">
+          <section className="rounded-2xl border border-cg-sage/15 bg-foreground/60 px-4 py-3 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cg-sage to-cg-slate flex items-center justify-center">
               <WalletIcon className="h-5 w-5 text-white" />
             </div>
             <div className="flex-1 min-w-0">
@@ -238,7 +238,7 @@ export default function ChildRewardsPage() {
 
         {loading ? (
           <div className="flex justify-center py-10">
-            <Loader2 className="h-8 w-8 animate-spin text-[#3DAA8A]" />
+            <Loader2 className="h-8 w-8 animate-spin text-cg-sage" />
           </div>
         ) : tab === 'shop' ? (
           <ShopTab
@@ -273,7 +273,7 @@ function ShopTab({
 }) {
   if (catalog.length === 0) {
     return (
-      <div className="rounded-2xl border border-[#3DAA8A]/15 bg-[#1E3A4A]/40 px-4 py-10 text-center">
+      <div className="rounded-2xl border border-cg-sage/15 bg-foreground/40 px-4 py-10 text-center">
         <Store className="h-8 w-8 text-white/40 mx-auto mb-2" />
         <p className="text-white/70 text-sm">
           No rewards yet — ask a parent to add some!
@@ -297,10 +297,10 @@ function ShopTab({
         return (
           <div
             key={reward.id}
-            className="rounded-2xl border border-[#3DAA8A]/15 bg-[#1E3A4A]/60 px-4 py-4 flex flex-col"
+            className="rounded-2xl border border-cg-sage/15 bg-foreground/60 px-4 py-4 flex flex-col"
           >
             <div className="flex items-start gap-3 mb-3">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#F5A623] to-[#E8941E] flex items-center justify-center text-2xl flex-shrink-0">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cg-amber to-[#E8941E] flex items-center justify-center text-2xl flex-shrink-0">
                 {reward.image_emoji || '🎁'}
               </div>
               <div className="flex-1 min-w-0">
@@ -310,7 +310,7 @@ function ShopTab({
                 >
                   {reward.title}
                 </h3>
-                <p className="text-[#3DAA8A] font-bold text-sm">
+                <p className="text-cg-sage font-bold text-sm">
                   {safeCurrency(reward.cost_amount)}
                 </p>
                 {reward.stock_limit !== null && reward.stock_limit !== undefined && (
@@ -330,7 +330,7 @@ function ShopTab({
             <button
               onClick={() => onRedeem(reward)}
               disabled={disabled}
-              className="mt-auto w-full flex items-center justify-center gap-2 bg-[#3DAA8A] hover:bg-[#3DAA8A]/90 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold text-sm py-2.5 rounded-xl transition-colors"
+              className="mt-auto w-full flex items-center justify-center gap-2 bg-cg-sage hover:bg-cg-sage/90 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold text-sm py-2.5 rounded-xl transition-colors"
             >
               {isRedeeming ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -361,7 +361,7 @@ function MyRedemptionsTab({
 }) {
   if (redemptions.length === 0) {
     return (
-      <div className="rounded-2xl border border-[#3DAA8A]/15 bg-[#1E3A4A]/40 px-4 py-10 text-center">
+      <div className="rounded-2xl border border-cg-sage/15 bg-foreground/40 px-4 py-10 text-center">
         <Gift className="h-8 w-8 text-white/40 mx-auto mb-2" />
         <p className="text-white/70 text-sm">
           Nothing redeemed yet. Pick something from the shop!
@@ -380,9 +380,9 @@ function MyRedemptionsTab({
         return (
           <li
             key={r.id}
-            className="rounded-2xl border border-[#3DAA8A]/15 bg-[#1E3A4A]/60 px-4 py-3 flex items-start gap-3"
+            className="rounded-2xl border border-cg-sage/15 bg-foreground/60 px-4 py-3 flex items-start gap-3"
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#F5A623] to-[#E8941E] flex items-center justify-center text-xl flex-shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cg-amber to-[#E8941E] flex items-center justify-center text-xl flex-shrink-0">
               {reward?.image_emoji || '🎁'}
             </div>
             <div className="flex-1 min-w-0">
@@ -399,7 +399,7 @@ function MyRedemptionsTab({
                   {redemptionStatusLabel(r.status)}
                 </span>
               </div>
-              <p className="text-[#3DAA8A] text-xs font-bold mt-0.5">
+              <p className="text-cg-sage text-xs font-bold mt-0.5">
                 {safeCurrency(r.cost_at_redemption)}
               </p>
               <p className="text-white/50 text-xs mt-0.5 flex items-center gap-1">

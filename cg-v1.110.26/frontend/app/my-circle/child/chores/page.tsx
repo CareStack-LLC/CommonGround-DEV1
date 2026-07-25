@@ -161,8 +161,8 @@ export default function ChildChoresPage() {
       : chores.filter((c) => statusGroup(c.status) === filter);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0D1B24] via-[#1E3A4A] to-[#0D1B24] text-white">
-      <header className="sticky top-0 z-10 bg-[#0D1B24]/80 backdrop-blur-md border-b border-[#3DAA8A]/10">
+    <div className="min-h-screen bg-gradient-to-b from-[#0D1B24] via-foreground to-[#0D1B24] text-white">
+      <header className="sticky top-0 z-10 bg-[#0D1B24]/80 backdrop-blur-md border-b border-cg-sage/10">
         <div className="max-w-3xl mx-auto flex items-center justify-between px-4 py-3">
           <button
             onClick={() => router.push('/my-circle/child/dashboard')}
@@ -190,7 +190,7 @@ export default function ChildChoresPage() {
               onClick={() => setFilter(f)}
               className={`px-3 py-1.5 rounded-full font-medium transition-colors ${
                 filter === f
-                  ? 'bg-[#3DAA8A] text-white'
+                  ? 'bg-cg-sage text-white'
                   : 'bg-white/10 text-white/70 hover:bg-white/20'
               }`}
             >
@@ -209,10 +209,10 @@ export default function ChildChoresPage() {
 
         {loading ? (
           <div className="flex justify-center py-10">
-            <Loader2 className="h-8 w-8 animate-spin text-[#3DAA8A]" />
+            <Loader2 className="h-8 w-8 animate-spin text-cg-sage" />
           </div>
         ) : visible.length === 0 ? (
-          <div className="rounded-2xl border border-[#3DAA8A]/15 bg-[#1E3A4A]/40 px-4 py-10 text-center">
+          <div className="rounded-2xl border border-cg-sage/15 bg-foreground/40 px-4 py-10 text-center">
             <Star className="h-8 w-8 text-white/40 mx-auto mb-2" />
             <p className="text-white/70 text-sm">
               {filter === 'active'
@@ -227,7 +227,7 @@ export default function ChildChoresPage() {
             return (
               <div
                 key={chore.id}
-                className="rounded-2xl border border-[#3DAA8A]/15 bg-[#1E3A4A]/60 px-4 py-4"
+                className="rounded-2xl border border-cg-sage/15 bg-foreground/60 px-4 py-4"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1 min-w-0">
@@ -245,10 +245,10 @@ export default function ChildChoresPage() {
                             : chore.status === 'rejected'
                               ? 'bg-amber-500/20 text-amber-300'
                               : chore.status === 'completed'
-                                ? 'bg-[#2D6A8F]/30 text-[#4BA8C8]'
+                                ? 'bg-cg-slate/30 text-cg-slate-light'
                                 : chore.status === 'cancelled'
                                   ? 'bg-white/10 text-white/50'
-                                  : 'bg-[#3DAA8A]/20 text-[#3DAA8A]'
+                                  : 'bg-cg-sage/20 text-cg-sage'
                         }`}
                       >
                         {statusLabel(chore.status)}
@@ -272,7 +272,7 @@ export default function ChildChoresPage() {
                   {chore.reward_amount && Number(chore.reward_amount) > 0 && (
                     <div className="text-right flex-shrink-0">
                       <p className="text-xs text-white/50">Reward</p>
-                      <p className="text-[#3DAA8A] font-bold">
+                      <p className="text-cg-sage font-bold">
                         {safeCurrency(chore.reward_amount)}
                       </p>
                     </div>
@@ -283,7 +283,7 @@ export default function ChildChoresPage() {
                   <button
                     onClick={() => setProofChore(chore)}
                     disabled={isCompleting}
-                    className="mt-3 w-full flex items-center justify-center gap-2 bg-[#3DAA8A] hover:bg-[#3DAA8A]/90 disabled:opacity-60 disabled:cursor-wait text-white font-semibold text-sm py-2.5 rounded-xl transition-colors"
+                    className="mt-3 w-full flex items-center justify-center gap-2 bg-cg-sage hover:bg-cg-sage/90 disabled:opacity-60 disabled:cursor-wait text-white font-semibold text-sm py-2.5 rounded-xl transition-colors"
                   >
                     {isCompleting ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -317,7 +317,7 @@ export default function ChildChoresPage() {
 
                 {chore.status === 'completed' && (
                   <div className="mt-3 flex items-center gap-2 text-xs text-[#CBD8E0]/80">
-                    <Loader2 className="h-3.5 w-3.5 animate-spin text-[#4BA8C8]" />
+                    <Loader2 className="h-3.5 w-3.5 animate-spin text-cg-slate-light" />
                     A parent will check it soon.
                   </div>
                 )}
@@ -424,7 +424,7 @@ function ProofSheet({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md bg-[#1E3A4A] border-t sm:border border-[#3DAA8A]/20 rounded-t-3xl sm:rounded-3xl p-5 space-y-4 text-white"
+        className="w-full max-w-md bg-foreground border-t sm:border border-cg-sage/20 rounded-t-3xl sm:rounded-3xl p-5 space-y-4 text-white"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between gap-3">
@@ -479,7 +479,7 @@ function ProofSheet({
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={preparing}
-            className="w-full flex items-center justify-center gap-2 border-2 border-dashed border-white/20 hover:border-[#3DAA8A]/60 hover:bg-[#3DAA8A]/5 rounded-2xl py-6 text-white/70 hover:text-white transition-colors"
+            className="w-full flex items-center justify-center gap-2 border-2 border-dashed border-white/20 hover:border-cg-sage/60 hover:bg-cg-sage/5 rounded-2xl py-6 text-white/70 hover:text-white transition-colors"
           >
             {preparing ? (
               <Loader2 className="h-5 w-5 animate-spin" />
@@ -511,7 +511,7 @@ function ProofSheet({
             onChange={(e) => setNote(e.target.value.slice(0, 500))}
             rows={2}
             placeholder="e.g. did dishes AND floor"
-            className="w-full rounded-xl bg-black/20 border border-white/10 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-[#3DAA8A]/40"
+            className="w-full rounded-xl bg-black/20 border border-white/10 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-cg-sage/40"
           />
         </div>
 
@@ -525,7 +525,7 @@ function ProofSheet({
           <button
             onClick={submit}
             disabled={submitting || preparing}
-            className="flex-1 flex items-center justify-center gap-2 bg-[#3DAA8A] hover:bg-[#3DAA8A]/90 disabled:opacity-60 text-white font-semibold text-sm py-3 rounded-xl transition-colors"
+            className="flex-1 flex items-center justify-center gap-2 bg-cg-sage hover:bg-cg-sage/90 disabled:opacity-60 text-white font-semibold text-sm py-3 rounded-xl transition-colors"
           >
             {submitting ? (
               <Loader2 className="h-4 w-4 animate-spin" />

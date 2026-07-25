@@ -95,10 +95,10 @@ function QRCameraScanner({
 
   if (cameraError) {
     return (
-      <div className="bg-[#FEF7ED] dark:bg-[#1E3A4A]/20 border border-[#FEF7ED] dark:border-[#E09520] rounded-lg p-4 mb-4">
+      <div className="bg-cg-amber-subtle dark:bg-foreground/20 border border-cg-amber-subtle dark:border-[#E09520] rounded-lg p-4 mb-4">
         <div className="flex items-start gap-2">
           <AlertTriangle className="h-5 w-5 text-[#E09520] mt-0.5 shrink-0" />
-          <p className="text-sm text-[#E09520] dark:text-[#F5A623]">{cameraError}</p>
+          <p className="text-sm text-[#E09520] dark:text-cg-amber">{cameraError}</p>
         </div>
       </div>
     );
@@ -202,8 +202,8 @@ export default function QRConfirmation({
         <Card className="w-full max-w-md bg-background">
           <CardContent className="p-6">
             <div className="text-center">
-              <div className="mx-auto w-16 h-16 rounded-full bg-[#E8F4F0] dark:bg-[#1E3A4A]/30 flex items-center justify-center mb-4">
-                <CheckCircle className="h-8 w-8 text-[#2D8A70]" />
+              <div className="mx-auto w-16 h-16 rounded-full bg-cg-sage-subtle dark:bg-foreground/30 flex items-center justify-center mb-4">
+                <CheckCircle className="h-8 w-8 text-cg-sage-dark" />
               </div>
 
               <h2 className="text-xl font-bold text-foreground mb-2">Exchange Confirmed!</h2>
@@ -229,7 +229,7 @@ export default function QRConfirmation({
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
-              <QrCode className="h-6 w-6 text-[#2D6A8F]" />
+              <QrCode className="h-6 w-6 text-cg-slate" />
               <h2 className="text-xl font-bold text-foreground">QR Confirmation</h2>
             </div>
             <button aria-label="Close"
@@ -263,13 +263,13 @@ export default function QRConfirmation({
           {/* Loading */}
           {isLoading && (
             <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-[#2D6A8F]" />
+              <Loader2 className="h-8 w-8 animate-spin text-cg-slate" />
             </div>
           )}
 
           {/* Error */}
           {error && !isLoading && (
-            <div className="bg-[#FEE2E2] dark:bg-[#7A2222]/30 border border-[#FCA5A5] dark:border-[#9B2C2C] rounded-lg p-4 mb-6">
+            <div className="bg-cg-error-subtle dark:bg-[#7A2222]/30 border border-[#FCA5A5] dark:border-[#9B2C2C] rounded-lg p-4 mb-6">
               <p className="text-[#9B2C2C] dark:text-[#FCA5A5]">{error}</p>
             </div>
           )}
@@ -305,7 +305,7 @@ export default function QRConfirmation({
                   onClick={copyToken}
                 >
                   {copied ? (
-                    <Check className="h-4 w-4 text-[#2D8A70]" />
+                    <Check className="h-4 w-4 text-cg-sage-dark" />
                   ) : (
                     <Copy className="h-4 w-4" />
                   )}
@@ -323,7 +323,7 @@ export default function QRConfirmation({
                   onClick={() => setScanMode('camera')}
                   className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                     scanMode === 'camera'
-                      ? 'bg-[#E0EFF8] dark:bg-[#1E3A4A]/30 text-[#1E4E6B] dark:text-[#4BA8C8] border border-[#4BA8C8] dark:border-[#1E4E6B]'
+                      ? 'bg-cg-slate-subtle dark:bg-foreground/30 text-[#1E4E6B] dark:text-cg-slate-light border border-cg-slate-light dark:border-[#1E4E6B]'
                       : 'bg-secondary text-muted-foreground hover:text-foreground'
                   }`}
                 >
@@ -334,7 +334,7 @@ export default function QRConfirmation({
                   onClick={() => setScanMode('manual')}
                   className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                     scanMode === 'manual'
-                      ? 'bg-[#E0EFF8] dark:bg-[#1E3A4A]/30 text-[#1E4E6B] dark:text-[#4BA8C8] border border-[#4BA8C8] dark:border-[#1E4E6B]'
+                      ? 'bg-cg-slate-subtle dark:bg-foreground/30 text-[#1E4E6B] dark:text-cg-slate-light border border-cg-slate-light dark:border-[#1E4E6B]'
                       : 'bg-secondary text-muted-foreground hover:text-foreground'
                   }`}
                 >
@@ -376,7 +376,7 @@ export default function QRConfirmation({
               <Button
                 onClick={() => handleConfirmQR()}
                 disabled={isConfirming || (!scanToken.trim() && scanMode === 'manual')}
-                className="w-full bg-[#2D6A8F] hover:bg-[#1E4E6B]"
+                className="w-full bg-cg-slate hover:bg-[#1E4E6B]"
               >
                 {isConfirming ? (
                   <>

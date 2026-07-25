@@ -15,7 +15,7 @@ export function Skeleton({ className = "", variant }: SkeletonProps) {
 
   return (
     <div
-      className={`animate-pulse bg-[#2D6A8F]/20 rounded-lg ${variantClass} ${className}`}
+      className={`animate-pulse bg-cg-slate/20 rounded-lg ${variantClass} ${className}`}
     />
   );
 }

@@ -72,12 +72,12 @@ function MovieCard({
   delay?: number
 }) {
   const genreColors: Record<string, string> = {
-    'Adventure': 'from-[#F5A623] to-[#F5A623]',
-    'Comedy': 'from-[#F5A623] to-[#F5A623]',
-    'Animation': 'from-[#F5A623] to-[#2D6A8F]',
-    'Fantasy': 'from-[#4BA8C8] to-[#2D6A8F]',
-    'Musical': 'from-[#F5A623] to-[#F5A623]',
-    'Family': 'from-teal-400 to-[#2D6A8F]',
+    'Adventure': 'from-cg-amber to-cg-amber',
+    'Comedy': 'from-cg-amber to-cg-amber',
+    'Animation': 'from-cg-amber to-cg-slate',
+    'Fantasy': 'from-cg-slate-light to-cg-slate',
+    'Musical': 'from-cg-amber to-cg-amber',
+    'Family': 'from-teal-400 to-cg-slate',
   }
 
   return (
@@ -125,7 +125,7 @@ function MovieCard({
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: delay + 0.2, type: "spring" }}
-            className="absolute top-3 left-3 px-3 py-1 bg-[#C53030] text-white text-sm font-bold rounded-full shadow-lg"
+            className="absolute top-3 left-3 px-3 py-1 bg-cg-error text-white text-sm font-bold rounded-full shadow-lg"
           >
             NEW!
           </motion.div>
@@ -154,7 +154,7 @@ function MovieCard({
       <div className="mt-4 px-2">
         <h3 className="text-xl font-bold text-white truncate">{movie.title}</h3>
         <div className="flex items-center gap-2 mt-1">
-          <span className="text-[#F5A623]">⭐ {movie.rating}</span>
+          <span className="text-cg-amber">⭐ {movie.rating}</span>
           <span className="text-white/60">•</span>
           <span className="text-white/80">{movie.genre}</span>
         </div>
@@ -196,14 +196,14 @@ function WatchPartyModal({
         initial={{ scale: 0.8, y: 50 }}
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.8, y: 50 }}
-        className="w-full max-w-lg bg-gradient-to-br from-[#1E3A4A] via-[#1E3A4A] to-[#1E3A4A] rounded-[2rem] p-8 shadow-2xl border-4 border-[#4BA8C8]/50"
+        className="w-full max-w-lg bg-gradient-to-br from-foreground via-foreground to-foreground rounded-[2rem] p-8 shadow-2xl border-4 border-cg-slate-light/50"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="text-center mb-6">
           <span className="text-6xl">{movie.poster}</span>
           <h2 className="text-2xl font-black text-white mt-4">Watch Party!</h2>
-          <p className="text-[#E0EFF8] mt-2">Who do you want to watch "{movie.title}" with?</p>
+          <p className="text-cg-slate-subtle mt-2">Who do you want to watch "{movie.title}" with?</p>
         </div>
 
         {/* Contact selection */}
@@ -222,21 +222,21 @@ function WatchPartyModal({
               }}
               className={`relative p-4 rounded-2xl border-3 transition-all ${
                 selectedContacts.includes(contact.id)
-                  ? 'bg-[#2D6A8F]/50 border-[#4BA8C8]'
+                  ? 'bg-cg-slate/50 border-cg-slate-light'
                   : 'bg-white/10 border-transparent'
               } ${!contact.online ? 'opacity-50' : ''}`}
               disabled={!contact.online}
             >
               <div className="text-4xl mb-2">{contact.emoji}</div>
               <div className="text-white font-bold">{contact.name}</div>
-              <div className={`text-sm ${contact.online ? 'text-[#5BC4A0]' : 'text-gray-400'}`}>
+              <div className={`text-sm ${contact.online ? 'text-cg-sage-light' : 'text-gray-400'}`}>
                 {contact.online ? '🟢 Online' : '⚫ Offline'}
               </div>
               {selectedContacts.includes(contact.id) && (
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="absolute -top-2 -right-2 w-8 h-8 bg-[#3DAA8A] rounded-full flex items-center justify-center"
+                  className="absolute -top-2 -right-2 w-8 h-8 bg-cg-sage rounded-full flex items-center justify-center"
                 >
                   <span className="text-white text-lg">✓</span>
                 </motion.div>
@@ -262,7 +262,7 @@ function WatchPartyModal({
             disabled={selectedContacts.length === 0}
             className={`flex-1 py-4 font-bold rounded-2xl shadow-lg ${
               selectedContacts.length > 0
-                ? 'bg-gradient-to-r from-[#F5A623] to-[#2D6A8F] text-white'
+                ? 'bg-gradient-to-r from-cg-amber to-cg-slate text-white'
                 : 'bg-gray-500/50 text-gray-300 cursor-not-allowed'
             }`}
           >
@@ -275,7 +275,7 @@ function WatchPartyModal({
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => onStart([])}
-          className="w-full mt-4 py-3 text-[#E0EFF8] hover:text-white transition-colors"
+          className="w-full mt-4 py-3 text-cg-slate-subtle hover:text-white transition-colors"
         >
           Or watch by myself →
         </motion.button>
@@ -375,11 +375,11 @@ function VideoPlayer({
           <div className="absolute top-4 right-4 flex gap-2">
             {watchParty.map((id, i) => (
               <motion.div key={id} initial={{ scale: 0, x: 20 }} animate={{ scale: 1, x: 0 }} transition={{ delay: i * 0.1 }}
-                className="w-14 h-14 rounded-full bg-[#2D6A8F] border-3 border-white flex items-center justify-center">
+                className="w-14 h-14 rounded-full bg-cg-slate border-3 border-white flex items-center justify-center">
                 <span className="text-2xl">{id === '1' ? '👩' : id === '2' ? '👨' : id === '3' ? '👵' : '👴'}</span>
               </motion.div>
             ))}
-            <div className="ml-2 px-4 py-2 bg-[#3DAA8A]/90 rounded-full text-white font-bold flex items-center gap-2">
+            <div className="ml-2 px-4 py-2 bg-cg-sage/90 rounded-full text-white font-bold flex items-center gap-2">
               <span className="w-2 h-2 bg-white rounded-full animate-pulse" /> Watching Together!
             </div>
           </div>
@@ -401,7 +401,7 @@ function VideoPlayer({
                 videoRef.current.currentTime = pct * videoRef.current.duration
               }
             }}>
-            <motion.div className="h-full bg-gradient-to-r from-[#F5A623] to-[#2D6A8F] rounded-full" animate={{ width: `${progress}%` }} />
+            <motion.div className="h-full bg-gradient-to-r from-cg-amber to-cg-slate rounded-full" animate={{ width: `${progress}%` }} />
           </div>
           <div className="flex items-center justify-center gap-6">
             <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={() => seek(-10)}
@@ -460,7 +460,7 @@ function CategoryTabs({
           onClick={() => onSelect(cat.id)}
           className={`flex items-center gap-2 px-5 py-3 rounded-2xl font-bold whitespace-nowrap transition-all ${
             selected === cat.id
-              ? 'bg-white text-[#1E3A4A] shadow-lg'
+              ? 'bg-white text-foreground shadow-lg'
               : 'bg-white/20 text-white hover:bg-white/30'
           }`}
         >
@@ -563,7 +563,7 @@ export default function TheaterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1E3A4A] via-[#1E3A4A] to-[#1E3A4A] relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-foreground via-foreground to-foreground relative overflow-hidden">
       {/* Floating decorations */}
       <FloatingDecorations />
 
@@ -586,7 +586,7 @@ export default function TheaterPage() {
             </motion.button>
             <div>
               <h1 className="text-4xl font-black text-white">Theater</h1>
-              <p className="text-[#E0EFF8]">Watch movies with family!</p>
+              <p className="text-cg-slate-subtle">Watch movies with family!</p>
             </div>
           </div>
 
@@ -625,7 +625,7 @@ export default function TheaterPage() {
           >
             <span className="text-8xl">🎞️</span>
             <h3 className="text-2xl font-bold text-white mt-4">No movies here yet!</h3>
-            <p className="text-[#E0EFF8] mt-2">Check back soon for more awesome movies!</p>
+            <p className="text-cg-slate-subtle mt-2">Check back soon for more awesome movies!</p>
           </motion.div>
         )}
       </div>

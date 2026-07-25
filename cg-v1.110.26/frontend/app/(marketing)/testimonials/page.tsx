@@ -73,8 +73,8 @@ const stories: Story[] = [
     highlight:
       'Marcus went from fifteen hostile texts a day to a standing movie night with his son.',
     icon: MessageCircle,
-    gradientFrom: '#1E3A4A',
-    gradientTo: '#2D6A8F',
+    gradientFrom: 'var(--foreground)',
+    gradientTo: 'var(--cg-slate)',
   },
   {
     id: 'diana',
@@ -90,8 +90,8 @@ const stories: Story[] = [
     highlight:
       'Diana went from bracing for the next fight to planning the next adventure with her daughter.',
     icon: Heart,
-    gradientFrom: '#3DAA8A',
-    gradientTo: '#2D6A8F',
+    gradientFrom: 'var(--cg-sage)',
+    gradientTo: 'var(--cg-slate)',
   },
   {
     id: 'riveras',
@@ -107,8 +107,8 @@ const stories: Story[] = [
     highlight:
       'A breakthrough after two years — and two children who finally had parents working together.',
     icon: Users,
-    gradientFrom: '#F5A623',
-    gradientTo: '#3DAA8A',
+    gradientFrom: 'var(--cg-amber)',
+    gradientTo: 'var(--cg-sage)',
   },
   {
     id: 'keisha',
@@ -141,8 +141,8 @@ const stories: Story[] = [
     highlight:
       'Now a standard recommendation for every high-conflict case in her practice.',
     icon: Scale,
-    gradientFrom: '#2D6A8F',
-    gradientTo: '#1E3A4A',
+    gradientFrom: 'var(--cg-slate)',
+    gradientTo: 'var(--foreground)',
   },
 ];
 

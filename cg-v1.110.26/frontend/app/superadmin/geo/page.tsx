@@ -84,7 +84,7 @@ export default function GeoPage() {
               <StateBubbleMap
                 counts={data?.users_by_state ?? {}}
                 label="users"
-                color="#3DAA8A"
+                color="var(--cg-sage)"
                 height={520}
                 footerNote={
                   (data?.users_unknown_state_count ?? 0) > 0
@@ -95,7 +95,7 @@ export default function GeoPage() {
               <TopStatesTable
                 counts={data?.users_by_state ?? {}}
                 label="users"
-                color="#3DAA8A"
+                color="var(--cg-sage)"
               />
             </div>
           )}
@@ -105,7 +105,7 @@ export default function GeoPage() {
               <StateBubbleMap
                 counts={data?.professionals_by_state ?? {}}
                 label="professionals"
-                color="#4BA8C8"
+                color="var(--cg-slate-light)"
                 height={520}
                 footerNote={
                   (data?.professionals_unknown_state_count ?? 0) > 0
@@ -116,7 +116,7 @@ export default function GeoPage() {
               <TopStatesTable
                 counts={data?.professionals_by_state ?? {}}
                 label="professionals"
-                color="#4BA8C8"
+                color="var(--cg-slate-light)"
               />
             </div>
           )}
@@ -124,15 +124,15 @@ export default function GeoPage() {
           {tab === 'exchanges' && (
             <div className="space-y-4">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-xs text-[#6B8A9A]">Window:</span>
+                <span className="text-xs text-muted-foreground">Window:</span>
                 {[7, 14, 30, 60, 90].map((d) => (
                   <button
                     key={d}
                     onClick={() => setExchangeDays(d)}
                     className={`px-2.5 py-1 rounded text-xs font-medium transition-colors ${
                       exchangeDays === d
-                        ? 'bg-[#3DAA8A] text-white'
-                        : 'bg-[#1A3648]/60 text-[#8AACBC] hover:text-white border border-[#2D6A8F]/20'
+                        ? 'bg-cg-sage text-white'
+                        : 'bg-[#1A3648]/60 text-[#8AACBC] hover:text-white border border-cg-slate/20'
                     }`}
                   >
                     {d}d
@@ -144,7 +144,7 @@ export default function GeoPage() {
                 label="check-ins"
                 height={520}
               />
-              <p className="text-[11px] text-[#6B8A9A]">
+              <p className="text-[11px] text-muted-foreground">
                 Showing last {data?.exchange_window_days ?? exchangeDays} days of custody-exchange
                 GPS check-ins. Silent handoffs and manual check-ins without coordinates
                 aren&apos;t plotted.
@@ -169,9 +169,9 @@ function TopStatesTable({
   if (entries.length === 0) return null;
 
   return (
-    <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-4">
+    <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-4">
       <h3 className="text-sm font-semibold text-[#D0E4EC] mb-3 flex items-center gap-2">
-        <Globe className="w-3.5 h-3.5 text-[#6B8A9A]" />
+        <Globe className="w-3.5 h-3.5 text-muted-foreground" />
         Top 10 states by {label}
       </h3>
       <div className="space-y-1.5">
@@ -189,7 +189,7 @@ function TopStatesTable({
               <span className="w-20 text-right text-[#D0E4EC] font-medium">
                 {count.toLocaleString()}
               </span>
-              <span className="w-12 text-right text-[#6B8A9A]">
+              <span className="w-12 text-right text-muted-foreground">
                 {pct.toFixed(1)}%
               </span>
             </div>

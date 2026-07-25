@@ -231,7 +231,7 @@ export function TheaterVideoPlayer({
             ref={videoRef as any}
             playbackId={muxPlaybackId}
             streamType="on-demand"
-            accentColor="#3DAA8A"
+            accentColor="var(--cg-sage)"
             style={
               {
                 '--controls': 'none',

@@ -140,7 +140,7 @@ function CourtFormsPageContent() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2D6A8F]" />
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cg-slate" />
       </div>
     );
   }
@@ -148,7 +148,7 @@ function CourtFormsPageContent() {
   if (error || !caseData) {
     return (
       <div className="min-h-screen bg-gray-50 p-8">
-        <Card className="max-w-lg mx-auto bg-[#FEE2E2] border-[#FEE2E2]">
+        <Card className="max-w-lg mx-auto bg-cg-error-subtle border-cg-error-subtle">
           <CardContent className="pt-6">
             <p className="text-[#9B2C2C]">{error || 'Case not found'}</p>
             <Button variant="outline" onClick={() => router.push('/cases')} className="mt-4">
@@ -166,11 +166,11 @@ function CourtFormsPageContent() {
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
-            <Link href="/cases" className="hover:text-[#2D6A8F]">
+            <Link href="/cases" className="hover:text-cg-slate">
               Cases
             </Link>
             <span>/</span>
-            <Link href={`/cases/${caseId}`} className="hover:text-[#2D6A8F]">
+            <Link href={`/cases/${caseId}`} className="hover:text-cg-slate">
               {caseData.case_name}
             </Link>
             <span>/</span>
@@ -195,9 +195,9 @@ function CourtFormsPageContent() {
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
         {/* Progress Overview */}
         {progress && (
-          <Card className="bg-gradient-to-r from-[#E0EFF8] to-[#E0EFF8] border-[#E0EFF8]">
+          <Card className="bg-gradient-to-r from-cg-slate-subtle to-cg-slate-subtle border-cg-slate-subtle">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-[#1E3A4A]">
+              <CardTitle className="flex items-center gap-2 text-foreground">
                 <Scale className="h-5 w-5" />
                 Case Progress
               </CardTitle>
@@ -205,13 +205,13 @@ function CourtFormsPageContent() {
             <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="bg-white/50 rounded-lg p-3 text-center">
-                  <p className="text-2xl font-bold text-[#2D6A8F]">
+                  <p className="text-2xl font-bold text-cg-slate">
                     {progress.total_forms}
                   </p>
                   <p className="text-sm text-gray-600">Total Forms</p>
                 </div>
                 <div className="bg-white/50 rounded-lg p-3 text-center">
-                  <p className="text-2xl font-bold text-[#2D8A70]">
+                  <p className="text-2xl font-bold text-cg-sage-dark">
                     {progress.approved_forms}
                   </p>
                   <p className="text-sm text-gray-600">Approved</p>
@@ -233,7 +233,7 @@ function CourtFormsPageContent() {
               {/* Next Steps */}
               {progress.next_action && (
                 <Alert className="mt-4 bg-white/70">
-                  <AlertCircle className="h-4 w-4 text-[#2D6A8F]" />
+                  <AlertCircle className="h-4 w-4 text-cg-slate" />
                   <AlertDescription className="text-[#1E4E6B]">
                     <strong>Next Step:</strong> {progress.next_action}
                   </AlertDescription>
@@ -244,9 +244,9 @@ function CourtFormsPageContent() {
         )}
 
         {/* Info Card */}
-        <Card className="bg-[#E0EFF8] border-[#E0EFF8]">
+        <Card className="bg-cg-slate-subtle border-cg-slate-subtle">
           <CardContent className="pt-6">
-            <h3 className="font-medium text-[#1E3A4A] mb-2">
+            <h3 className="font-medium text-foreground mb-2">
               California Family Court Forms
             </h3>
             <p className="text-sm text-[#1E4E6B] mb-3">
@@ -306,8 +306,8 @@ function CourtFormsPageContent() {
                       onClick={() => router.push(`/cases/${caseId}/court-forms/${form.id}`)}
                     >
                       <div className="flex items-center gap-4">
-                        <div className="h-12 w-12 bg-[#E0EFF8] rounded-lg flex items-center justify-center">
-                          <Icon className="h-6 w-6 text-[#2D6A8F]" />
+                        <div className="h-12 w-12 bg-cg-slate-subtle rounded-lg flex items-center justify-center">
+                          <Icon className="h-6 w-6 text-cg-slate" />
                         </div>
                         <div>
                           <div className="flex items-center gap-2">

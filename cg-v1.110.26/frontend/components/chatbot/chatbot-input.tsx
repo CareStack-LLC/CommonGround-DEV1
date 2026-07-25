@@ -56,7 +56,7 @@ export function ChatbotInput({ onSend, disabled }: ChatbotInputProps) {
         size="icon"
         onClick={handleSend}
         disabled={disabled || !value.trim()}
-        className="h-8 w-8 shrink-0 rounded-full bg-[#3DAA8A] hover:bg-[#35977a] text-white"
+        className="h-8 w-8 shrink-0 rounded-full bg-cg-sage hover:bg-[#35977a] text-white"
       >
         <Send className="h-4 w-4" />
       </Button>

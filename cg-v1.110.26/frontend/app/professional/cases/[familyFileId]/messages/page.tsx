@@ -235,7 +235,7 @@ export default function ClientMessagingPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-3">
-            <div className="p-2 bg-[#E0EFF8] text-[#2D6A8F] rounded-lg">
+            <div className="p-2 bg-cg-slate-subtle text-cg-slate rounded-lg">
               <MessageSquare className="h-6 w-6" />
             </div>
             Client Messages
@@ -252,7 +252,7 @@ export default function ClientMessagingPage() {
 
       {isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2D8A70]" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cg-sage-dark" />
         </div>
       ) : threads.length > 0 ? (
         <div className="grid lg:grid-cols-3 gap-4 h-[calc(100vh-280px)] min-h-[500px]">
@@ -278,13 +278,13 @@ export default function ClientMessagingPage() {
                       onClick={() => setSelectedThread(thread.id)}
                       className={`w-full p-3 rounded-lg text-left transition-colors ${
                         selectedThread === thread.id
-                          ? "bg-[#E8F4F0] border border-[#C5E5DB]"
+                          ? "bg-cg-sage-subtle border border-[#C5E5DB]"
                           : "hover:bg-muted/50"
                       }`}
                     >
                       <div className="flex items-start gap-3">
                         <Avatar className="h-10 w-10">
-                          <AvatarFallback className="bg-[#E0EFF8] text-[#2D6A8F]">
+                          <AvatarFallback className="bg-cg-slate-subtle text-cg-slate">
                             {thread.participant_name
                               .split(" ")
                               .map((n) => n[0])
@@ -306,7 +306,7 @@ export default function ClientMessagingPage() {
                               {thread.last_message}
                             </p>
                             {thread.unread_count > 0 && (
-                              <Badge className="h-5 min-w-[20px] shrink-0 bg-[#3DAA8A]">
+                              <Badge className="h-5 min-w-[20px] shrink-0 bg-cg-sage">
                                 {thread.unread_count}
                               </Badge>
                             )}
@@ -332,7 +332,7 @@ export default function ClientMessagingPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <Avatar className="h-10 w-10">
-                        <AvatarFallback className="bg-[#E0EFF8] text-[#2D6A8F]">
+                        <AvatarFallback className="bg-cg-slate-subtle text-cg-slate">
                           {selectedThreadData.participant_name
                             .split(" ")
                             .map((n) => n[0])
@@ -401,7 +401,7 @@ export default function ClientMessagingPage() {
                     <Button aria-label="Send message"
                       onClick={sendMessage}
                       disabled={!newMessage.trim() || isSending}
-                      className="bg-[#2D8A70] hover:bg-[#2D8A70] shrink-0"
+                      className="bg-cg-sage-dark hover:bg-cg-sage-dark shrink-0"
                     >
                       <Send className="h-4 w-4" />
                     </Button>
@@ -458,7 +458,7 @@ function MessageBubble({
       <div
         className={`max-w-[75%] ${
           isOwn
-            ? "bg-[#2D8A70] text-white rounded-2xl rounded-br-sm"
+            ? "bg-cg-sage-dark text-white rounded-2xl rounded-br-sm"
             : "bg-muted rounded-2xl rounded-bl-sm"
         } px-4 py-2.5`}
       >
@@ -473,7 +473,7 @@ function MessageBubble({
         <p className="text-sm whitespace-pre-wrap">{message.content}</p>
         <div
           className={`flex items-center justify-end gap-1 mt-1 ${
-            isOwn ? "text-[#E8F4F0]" : "text-muted-foreground"
+            isOwn ? "text-cg-sage-subtle" : "text-muted-foreground"
           }`}
         >
           <span className="text-[10px]">{formatMessageTime(message.sent_at)}</span>

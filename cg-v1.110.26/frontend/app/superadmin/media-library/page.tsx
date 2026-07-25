@@ -437,8 +437,8 @@ export default function MediaLibraryPage() {
   const topMovie = movies.length > 0 ? movies.reduce((max, m) => m.view_count > max.view_count ? m : max, movies[0]) : null;
   const topBook = books.length > 0 ? books.reduce((max, b) => b.read_count > max.read_count ? b : max, books[0]) : null;
 
-  const inputCls = "w-full px-3 py-2 bg-[#2D6A8F]/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50";
-  const labelCls = "text-xs text-[#6B8A9A] uppercase tracking-wider font-medium block mb-1.5";
+  const inputCls = "w-full px-3 py-2 bg-cg-slate/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50";
+  const labelCls = "text-xs text-muted-foreground uppercase tracking-wider font-medium block mb-1.5";
 
   return (
     <div className="space-y-5">
@@ -446,19 +446,19 @@ export default function MediaLibraryPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-white">Media Library</h1>
-          <p className="text-sm text-[#6B8A9A] mt-0.5">Manage KidSpace movies, books, authors & genres</p>
+          <p className="text-sm text-muted-foreground mt-0.5">Manage KidSpace movies, books, authors & genres</p>
         </div>
         <button
           onClick={fetchData}
           disabled={loading}
-          className="p-2 rounded-lg bg-[#2D6A8F]/20 hover:bg-[#2D6A8F]/30 text-[#8AACBC] hover:text-white transition-colors disabled:opacity-50"
+          className="p-2 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-[#8AACBC] hover:text-white transition-colors disabled:opacity-50"
         >
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
         </button>
       </div>
 
       {successMessage && (
-        <div className="bg-emerald-500/10 border border-[#3DAA8A]/20 rounded-xl px-4 py-3 flex items-center gap-2">
+        <div className="bg-emerald-500/10 border border-cg-sage/20 rounded-xl px-4 py-3 flex items-center gap-2">
           <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0" />
           <span className="text-sm text-emerald-300">{successMessage}</span>
         </div>
@@ -472,15 +472,15 @@ export default function MediaLibraryPage() {
       )}
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-1">
+      <div className="flex gap-1 bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-1">
         {TABS.map(tab => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className={`flex items-center gap-2 flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
               activeTab === tab.key
-                ? 'bg-[#3DAA8A]/15 text-[#5BC4A0] shadow-sm'
-                : 'text-[#8AACBC] hover:bg-[#2D6A8F]/20 hover:text-white'
+                ? 'bg-cg-sage/15 text-cg-sage-light shadow-sm'
+                : 'text-[#8AACBC] hover:bg-cg-slate/20 hover:text-white'
             }`}
           >
             <tab.icon className="w-4 h-4" />
@@ -492,7 +492,7 @@ export default function MediaLibraryPage() {
       {loading ? (
         <div className="p-4 space-y-3">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="animate-pulse bg-[#2D6A8F]/20 rounded-lg h-32" />
+            <div key={i} className="animate-pulse bg-cg-slate/20 rounded-lg h-32" />
           ))}
         </div>
       ) : (
@@ -501,21 +501,21 @@ export default function MediaLibraryPage() {
           {activeTab === 'movies' && (
             <div className="space-y-4">
               <div className="flex justify-end">
-                <button onClick={openMovieCreate} className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors">
+                <button onClick={openMovieCreate} className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-cg-sage hover:bg-cg-sage-light text-white text-sm font-medium transition-colors">
                   <Plus className="w-4 h-4" /> Add Movie
                 </button>
               </div>
 
               {movies.length === 0 ? (
-                <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl py-16 text-center">
+                <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl py-16 text-center">
                   <Film className="w-10 h-10 text-[#3A5A6A] mx-auto mb-3" />
-                  <p className="text-sm text-[#6B8A9A]">No movies yet</p>
+                  <p className="text-sm text-muted-foreground">No movies yet</p>
                 </div>
               ) : (
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   {movies.map(movie => (
-                    <div key={movie.id} className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl overflow-hidden group">
-                      <div className="relative aspect-[2/3] bg-[#2D6A8F]/15">
+                    <div key={movie.id} className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden group">
+                      <div className="relative aspect-[2/3] bg-cg-slate/15">
                         {movie.poster_url ? (
                           <img src={movie.poster_url} alt={movie.title} className="w-full h-full object-cover" />
                         ) : (
@@ -539,7 +539,7 @@ export default function MediaLibraryPage() {
                       </div>
                       <div className="p-3 space-y-1.5">
                         <h3 className="text-sm font-medium text-white line-clamp-1">{movie.title}</h3>
-                        <div className="flex items-center gap-3 text-[11px] text-[#6B8A9A]">
+                        <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
                           <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{movie.duration}m</span>
                           <span className="flex items-center gap-1"><Eye className="w-3 h-3" />{movie.view_count}</span>
                         </div>
@@ -558,21 +558,21 @@ export default function MediaLibraryPage() {
           {activeTab === 'books' && (
             <div className="space-y-4">
               <div className="flex justify-end">
-                <button onClick={openBookCreate} className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors">
+                <button onClick={openBookCreate} className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-cg-sage hover:bg-cg-sage-light text-white text-sm font-medium transition-colors">
                   <Plus className="w-4 h-4" /> Add Book
                 </button>
               </div>
 
               {books.length === 0 ? (
-                <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl py-16 text-center">
+                <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl py-16 text-center">
                   <BookOpen className="w-10 h-10 text-[#3A5A6A] mx-auto mb-3" />
-                  <p className="text-sm text-[#6B8A9A]">No books yet</p>
+                  <p className="text-sm text-muted-foreground">No books yet</p>
                 </div>
               ) : (
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                   {books.map(book => (
-                    <div key={book.id} className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl overflow-hidden group">
-                      <div className="relative aspect-[2/3] bg-[#2D6A8F]/15">
+                    <div key={book.id} className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden group">
+                      <div className="relative aspect-[2/3] bg-cg-slate/15">
                         {book.cover_url ? (
                           <img src={book.cover_url} alt={book.title} className="w-full h-full object-cover" />
                         ) : (
@@ -596,8 +596,8 @@ export default function MediaLibraryPage() {
                       </div>
                       <div className="p-3 space-y-1.5">
                         <h3 className="text-sm font-medium text-white line-clamp-1">{book.title}</h3>
-                        <p className="text-[11px] text-[#6B8A9A]">{book.author_name || 'Unknown author'}</p>
-                        <div className="flex items-center gap-3 text-[11px] text-[#6B8A9A]">
+                        <p className="text-[11px] text-muted-foreground">{book.author_name || 'Unknown author'}</p>
+                        <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
                           <span className="flex items-center gap-1"><BookOpenCheck className="w-3 h-3" />{book.read_count} reads</span>
                           <span>{book.total_pages_turned} pages</span>
                         </div>
@@ -613,21 +613,21 @@ export default function MediaLibraryPage() {
           {activeTab === 'authors' && (
             <div className="space-y-4">
               <div className="flex justify-end">
-                <button onClick={openAuthorCreate} className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors">
+                <button onClick={openAuthorCreate} className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-cg-sage hover:bg-cg-sage-light text-white text-sm font-medium transition-colors">
                   <Plus className="w-4 h-4" /> Add Author
                 </button>
               </div>
 
               {authors.length === 0 ? (
-                <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl py-16 text-center">
+                <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl py-16 text-center">
                   <Users2 className="w-10 h-10 text-[#3A5A6A] mx-auto mb-3" />
-                  <p className="text-sm text-[#6B8A9A]">No authors yet</p>
+                  <p className="text-sm text-muted-foreground">No authors yet</p>
                 </div>
               ) : (
-                <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl divide-y divide-zinc-800/40">
+                <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl divide-y divide-zinc-800/40">
                   {authors.map(author => (
-                    <div key={author.id} className="flex items-center gap-4 px-5 py-4 hover:bg-[#2D6A8F]/10 transition-colors">
-                      <div className="w-12 h-12 rounded-full bg-[#2D6A8F]/20 flex-shrink-0 overflow-hidden">
+                    <div key={author.id} className="flex items-center gap-4 px-5 py-4 hover:bg-cg-slate/10 transition-colors">
+                      <div className="w-12 h-12 rounded-full bg-cg-slate/20 flex-shrink-0 overflow-hidden">
                         {author.photo_url ? (
                           <img src={author.photo_url} alt={author.name} className="w-full h-full object-cover" />
                         ) : (
@@ -645,13 +645,13 @@ export default function MediaLibraryPage() {
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-[#6B8A9A] mt-0.5 line-clamp-1">{author.bio || 'No bio'}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{author.bio || 'No bio'}</p>
                       </div>
                       <div className="flex items-center gap-1 flex-shrink-0">
-                        <button aria-label="Edit" onClick={() => openAuthorEdit(author)} className="p-1.5 rounded-lg hover:bg-[#2D6A8F]/20 text-[#6B8A9A] hover:text-[#D0E4EC] transition-colors">
+                        <button aria-label="Edit" onClick={() => openAuthorEdit(author)} className="p-1.5 rounded-lg hover:bg-cg-slate/20 text-muted-foreground hover:text-[#D0E4EC] transition-colors">
                           <Edit3 className="w-3.5 h-3.5" />
                         </button>
-                        <button aria-label="Delete" onClick={() => handleDeleteAuthor(author.id)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-[#6B8A9A] hover:text-red-400 transition-colors">
+                        <button aria-label="Delete" onClick={() => handleDeleteAuthor(author.id)} className="p-1.5 rounded-lg hover:bg-red-500/10 text-muted-foreground hover:text-red-400 transition-colors">
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
@@ -670,10 +670,10 @@ export default function MediaLibraryPage() {
       {showMovieModal && (
         <div className="fixed inset-0 z-50 flex items-start justify-center pt-10 px-4">
           <div className="fixed inset-0 bg-black/70" onClick={() => { setShowMovieModal(false); resetMovieForm(); }} />
-          <div className="relative w-full max-w-2xl bg-zinc-900 border border-[#2D6A8F]/20 rounded-xl p-6 space-y-4 max-h-[85vh] overflow-y-auto">
+          <div className="relative w-full max-w-2xl bg-zinc-900 border border-cg-slate/20 rounded-xl p-6 space-y-4 max-h-[85vh] overflow-y-auto">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-white">{editingMovie ? 'Edit Movie' : 'Add Movie'}</h2>
-              <button aria-label="Close" onClick={() => { setShowMovieModal(false); resetMovieForm(); }} className="text-[#6B8A9A] hover:text-[#D0E4EC]"><X className="w-5 h-5" /></button>
+              <button aria-label="Close" onClick={() => { setShowMovieModal(false); resetMovieForm(); }} className="text-muted-foreground hover:text-[#D0E4EC]"><X className="w-5 h-5" /></button>
             </div>
 
             <div className="space-y-3">
@@ -698,16 +698,16 @@ export default function MediaLibraryPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className={labelCls}>Video File (.mp4)</label>
-                  <label className="flex items-center gap-2 px-3 py-2.5 bg-[#2D6A8F]/20 border border-zinc-700/60 rounded-lg cursor-pointer hover:border-zinc-600/60 transition-colors">
-                    <Upload className="w-4 h-4 text-[#6B8A9A]" />
+                  <label className="flex items-center gap-2 px-3 py-2.5 bg-cg-slate/20 border border-zinc-700/60 rounded-lg cursor-pointer hover:border-zinc-600/60 transition-colors">
+                    <Upload className="w-4 h-4 text-muted-foreground" />
                     <span className="text-sm text-[#8AACBC] truncate">{movieVideoFile ? movieVideoFile.name : 'Choose video...'}</span>
                     <input type="file" accept="video/mp4" className="hidden" onChange={e => setMovieVideoFile(e.target.files?.[0] || null)} />
                   </label>
                 </div>
                 <div>
                   <label className={labelCls}>Poster Image</label>
-                  <label className="flex items-center gap-2 px-3 py-2.5 bg-[#2D6A8F]/20 border border-zinc-700/60 rounded-lg cursor-pointer hover:border-zinc-600/60 transition-colors">
-                    <Upload className="w-4 h-4 text-[#6B8A9A]" />
+                  <label className="flex items-center gap-2 px-3 py-2.5 bg-cg-slate/20 border border-zinc-700/60 rounded-lg cursor-pointer hover:border-zinc-600/60 transition-colors">
+                    <Upload className="w-4 h-4 text-muted-foreground" />
                     <span className="text-sm text-[#8AACBC] truncate">{moviePosterFile ? moviePosterFile.name : 'Choose image...'}</span>
                     <input type="file" accept="image/*" className="hidden" onChange={e => setMoviePosterFile(e.target.files?.[0] || null)} />
                   </label>
@@ -726,9 +726,9 @@ export default function MediaLibraryPage() {
               </div>
             </div>
 
-            <div className="flex justify-end gap-2 pt-2 border-t border-[#2D6A8F]/20">
-              <button onClick={() => { setShowMovieModal(false); resetMovieForm(); }} className="px-4 py-2 rounded-lg text-sm text-[#8AACBC] hover:text-white hover:bg-[#2D6A8F]/20 transition-colors">Cancel</button>
-              <button onClick={handleSaveMovie} disabled={saving || !movieTitle.trim()} className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors disabled:opacity-50">
+            <div className="flex justify-end gap-2 pt-2 border-t border-cg-slate/20">
+              <button onClick={() => { setShowMovieModal(false); resetMovieForm(); }} className="px-4 py-2 rounded-lg text-sm text-[#8AACBC] hover:text-white hover:bg-cg-slate/20 transition-colors">Cancel</button>
+              <button onClick={handleSaveMovie} disabled={saving || !movieTitle.trim()} className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-cg-sage hover:bg-cg-sage-light text-white text-sm font-medium transition-colors disabled:opacity-50">
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
                 {editingMovie ? 'Update Movie' : 'Add Movie'}
               </button>
@@ -741,10 +741,10 @@ export default function MediaLibraryPage() {
       {showBookModal && (
         <div className="fixed inset-0 z-50 flex items-start justify-center pt-10 px-4">
           <div className="fixed inset-0 bg-black/70" onClick={() => { setShowBookModal(false); resetBookForm(); }} />
-          <div className="relative w-full max-w-2xl bg-zinc-900 border border-[#2D6A8F]/20 rounded-xl p-6 space-y-4 max-h-[85vh] overflow-y-auto">
+          <div className="relative w-full max-w-2xl bg-zinc-900 border border-cg-slate/20 rounded-xl p-6 space-y-4 max-h-[85vh] overflow-y-auto">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-white">{editingBook ? 'Edit Book' : 'Add Book'}</h2>
-              <button aria-label="Close" onClick={() => { setShowBookModal(false); resetBookForm(); }} className="text-[#6B8A9A] hover:text-[#D0E4EC]"><X className="w-5 h-5" /></button>
+              <button aria-label="Close" onClick={() => { setShowBookModal(false); resetBookForm(); }} className="text-muted-foreground hover:text-[#D0E4EC]"><X className="w-5 h-5" /></button>
             </div>
 
             <div className="space-y-3">
@@ -773,16 +773,16 @@ export default function MediaLibraryPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className={labelCls}>PDF File</label>
-                  <label className="flex items-center gap-2 px-3 py-2.5 bg-[#2D6A8F]/20 border border-zinc-700/60 rounded-lg cursor-pointer hover:border-zinc-600/60 transition-colors">
-                    <Upload className="w-4 h-4 text-[#6B8A9A]" />
+                  <label className="flex items-center gap-2 px-3 py-2.5 bg-cg-slate/20 border border-zinc-700/60 rounded-lg cursor-pointer hover:border-zinc-600/60 transition-colors">
+                    <Upload className="w-4 h-4 text-muted-foreground" />
                     <span className="text-sm text-[#8AACBC] truncate">{bookPdfFile ? bookPdfFile.name : 'Choose PDF...'}</span>
                     <input type="file" accept=".pdf" className="hidden" onChange={e => setBookPdfFile(e.target.files?.[0] || null)} />
                   </label>
                 </div>
                 <div>
                   <label className={labelCls}>Cover Image</label>
-                  <label className="flex items-center gap-2 px-3 py-2.5 bg-[#2D6A8F]/20 border border-zinc-700/60 rounded-lg cursor-pointer hover:border-zinc-600/60 transition-colors">
-                    <Upload className="w-4 h-4 text-[#6B8A9A]" />
+                  <label className="flex items-center gap-2 px-3 py-2.5 bg-cg-slate/20 border border-zinc-700/60 rounded-lg cursor-pointer hover:border-zinc-600/60 transition-colors">
+                    <Upload className="w-4 h-4 text-muted-foreground" />
                     <span className="text-sm text-[#8AACBC] truncate">{bookCoverFile ? bookCoverFile.name : 'Choose image...'}</span>
                     <input type="file" accept="image/*" className="hidden" onChange={e => setBookCoverFile(e.target.files?.[0] || null)} />
                   </label>
@@ -801,9 +801,9 @@ export default function MediaLibraryPage() {
               </div>
             </div>
 
-            <div className="flex justify-end gap-2 pt-2 border-t border-[#2D6A8F]/20">
-              <button onClick={() => { setShowBookModal(false); resetBookForm(); }} className="px-4 py-2 rounded-lg text-sm text-[#8AACBC] hover:text-white hover:bg-[#2D6A8F]/20 transition-colors">Cancel</button>
-              <button onClick={handleSaveBook} disabled={saving || !bookTitle.trim()} className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors disabled:opacity-50">
+            <div className="flex justify-end gap-2 pt-2 border-t border-cg-slate/20">
+              <button onClick={() => { setShowBookModal(false); resetBookForm(); }} className="px-4 py-2 rounded-lg text-sm text-[#8AACBC] hover:text-white hover:bg-cg-slate/20 transition-colors">Cancel</button>
+              <button onClick={handleSaveBook} disabled={saving || !bookTitle.trim()} className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-cg-sage hover:bg-cg-sage-light text-white text-sm font-medium transition-colors disabled:opacity-50">
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
                 {editingBook ? 'Update Book' : 'Add Book'}
               </button>
@@ -816,10 +816,10 @@ export default function MediaLibraryPage() {
       {showAuthorModal && (
         <div className="fixed inset-0 z-50 flex items-start justify-center pt-10 px-4">
           <div className="fixed inset-0 bg-black/70" onClick={() => { setShowAuthorModal(false); resetAuthorForm(); }} />
-          <div className="relative w-full max-w-lg bg-zinc-900 border border-[#2D6A8F]/20 rounded-xl p-6 space-y-4 max-h-[85vh] overflow-y-auto">
+          <div className="relative w-full max-w-lg bg-zinc-900 border border-cg-slate/20 rounded-xl p-6 space-y-4 max-h-[85vh] overflow-y-auto">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-white">{editingAuthor ? 'Edit Author' : 'Add Author'}</h2>
-              <button aria-label="Close" onClick={() => { setShowAuthorModal(false); resetAuthorForm(); }} className="text-[#6B8A9A] hover:text-[#D0E4EC]"><X className="w-5 h-5" /></button>
+              <button aria-label="Close" onClick={() => { setShowAuthorModal(false); resetAuthorForm(); }} className="text-muted-foreground hover:text-[#D0E4EC]"><X className="w-5 h-5" /></button>
             </div>
 
             <div className="space-y-3">
@@ -827,8 +827,8 @@ export default function MediaLibraryPage() {
               <div><label className={labelCls}>Bio</label><textarea value={authorBio} onChange={e => setAuthorBio(e.target.value)} placeholder="Author bio..." rows={4} className={`${inputCls} resize-y`} /></div>
               <div>
                 <label className={labelCls}>Photo</label>
-                <label className="flex items-center gap-2 px-3 py-2.5 bg-[#2D6A8F]/20 border border-zinc-700/60 rounded-lg cursor-pointer hover:border-zinc-600/60 transition-colors">
-                  <Upload className="w-4 h-4 text-[#6B8A9A]" />
+                <label className="flex items-center gap-2 px-3 py-2.5 bg-cg-slate/20 border border-zinc-700/60 rounded-lg cursor-pointer hover:border-zinc-600/60 transition-colors">
+                  <Upload className="w-4 h-4 text-muted-foreground" />
                   <span className="text-sm text-[#8AACBC] truncate">{authorPhotoFile ? authorPhotoFile.name : 'Choose photo...'}</span>
                   <input type="file" accept="image/*" className="hidden" onChange={e => setAuthorPhotoFile(e.target.files?.[0] || null)} />
                 </label>
@@ -846,9 +846,9 @@ export default function MediaLibraryPage() {
               </label>
             </div>
 
-            <div className="flex justify-end gap-2 pt-2 border-t border-[#2D6A8F]/20">
-              <button onClick={() => { setShowAuthorModal(false); resetAuthorForm(); }} className="px-4 py-2 rounded-lg text-sm text-[#8AACBC] hover:text-white hover:bg-[#2D6A8F]/20 transition-colors">Cancel</button>
-              <button onClick={handleSaveAuthor} disabled={saving || !authorName.trim()} className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors disabled:opacity-50">
+            <div className="flex justify-end gap-2 pt-2 border-t border-cg-slate/20">
+              <button onClick={() => { setShowAuthorModal(false); resetAuthorForm(); }} className="px-4 py-2 rounded-lg text-sm text-[#8AACBC] hover:text-white hover:bg-cg-slate/20 transition-colors">Cancel</button>
+              <button onClick={handleSaveAuthor} disabled={saving || !authorName.trim()} className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-cg-sage hover:bg-cg-sage-light text-white text-sm font-medium transition-colors disabled:opacity-50">
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
                 {editingAuthor ? 'Update Author' : 'Add Author'}
               </button>

@@ -152,7 +152,7 @@ function NewCourtFormPageContent() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2D6A8F]" />
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cg-slate" />
       </div>
     );
   }
@@ -160,7 +160,7 @@ function NewCourtFormPageContent() {
   if (error && !caseData) {
     return (
       <div className="min-h-screen bg-gray-50 p-8">
-        <Card className="max-w-lg mx-auto bg-[#FEE2E2] border-[#FEE2E2]">
+        <Card className="max-w-lg mx-auto bg-cg-error-subtle border-cg-error-subtle">
           <CardContent className="pt-6">
             <p className="text-[#9B2C2C]">{error || 'Case not found'}</p>
             <Button variant="outline" onClick={() => router.push('/cases')} className="mt-4">
@@ -178,15 +178,15 @@ function NewCourtFormPageContent() {
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
-            <Link href="/cases" className="hover:text-[#2D6A8F]">
+            <Link href="/cases" className="hover:text-cg-slate">
               Cases
             </Link>
             <span>/</span>
-            <Link href={`/cases/${caseId}`} className="hover:text-[#2D6A8F]">
+            <Link href={`/cases/${caseId}`} className="hover:text-cg-slate">
               {caseData?.case_name}
             </Link>
             <span>/</span>
-            <Link href={`/cases/${caseId}/court-forms`} className="hover:text-[#2D6A8F]">
+            <Link href={`/cases/${caseId}/court-forms`} className="hover:text-cg-slate">
               Court Forms
             </Link>
             <span>/</span>
@@ -221,7 +221,7 @@ function NewCourtFormPageContent() {
                 className={`transition-all ${
                   isDisabled
                     ? 'opacity-50 bg-gray-50'
-                    : 'hover:border-[#4BA8C8] hover:shadow-md cursor-pointer'
+                    : 'hover:border-cg-slate-light hover:shadow-md cursor-pointer'
                 }`}
                 onClick={() => !isDisabled && handleSelectForm(option.type)}
               >
@@ -230,8 +230,8 @@ function NewCourtFormPageContent() {
                     <div
                       className={`h-14 w-14 rounded-xl flex items-center justify-center ${
                         option.role === 'petitioner'
-                          ? 'bg-[#E0EFF8] text-[#2D6A8F]'
-                          : 'bg-[#E0EFF8] text-[#2D6A8F]'
+                          ? 'bg-cg-slate-subtle text-cg-slate'
+                          : 'bg-cg-slate-subtle text-cg-slate'
                       }`}
                     >
                       <Icon className="h-7 w-7" />
@@ -307,16 +307,16 @@ function NewCourtFormPageContent() {
               <button
                 onClick={() => createForm(showBuilderChoice, true)}
                 disabled={isCreating}
-                className="w-full p-6 border-2 border-[#E0EFF8] rounded-lg hover:border-[#4BA8C8] hover:bg-[#E0EFF8] transition-all text-left group disabled:opacity-50"
+                className="w-full p-6 border-2 border-cg-slate-subtle rounded-lg hover:border-cg-slate-light hover:bg-cg-slate-subtle transition-all text-left group disabled:opacity-50"
               >
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-[#2D6A8F] rounded-full flex items-center justify-center text-white flex-shrink-0">
+                  <div className="w-12 h-12 bg-cg-slate rounded-full flex items-center justify-center text-white flex-shrink-0">
                     <Sparkles className="h-6 w-6" />
                   </div>
                   <div className="flex-1">
                     <h3 className="text-lg font-semibold text-gray-900 mb-2 flex items-center gap-2">
                       Talk to ARIA
-                      <span className="px-2 py-0.5 bg-[#E0EFF8] text-[#1E4E6B] text-xs rounded-full">
+                      <span className="px-2 py-0.5 bg-cg-slate-subtle text-[#1E4E6B] text-xs rounded-full">
                         Recommended
                       </span>
                     </h3>
@@ -380,7 +380,7 @@ function NewCourtFormPageContent() {
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
           <Card className="p-8">
             <div className="flex items-center gap-4">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2D6A8F]" />
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cg-slate" />
               <p className="text-lg text-gray-700">Creating your form...</p>
             </div>
           </Card>

@@ -54,7 +54,7 @@ function CircleResetPasswordInner() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-[#E8F4F8] via-white to-[#D6ECE8]">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-[#E8F4F8] via-white to-border">
       <div className="w-full max-w-md">
         <Link
           href="/my-circle/contact"
@@ -65,7 +65,7 @@ function CircleResetPasswordInner() {
         </Link>
 
         <div className="bg-white rounded-3xl shadow-2xl border-2 border-slate-200 overflow-hidden">
-          <div className="bg-gradient-to-br from-[#3DAA8A] to-[#2D6A8F] text-white p-6">
+          <div className="bg-gradient-to-br from-cg-sage to-cg-slate text-white p-6">
             <div className="flex items-center gap-3 mb-2">
               <div className="p-2 bg-white/20 rounded-xl">
                 <KeyRound className="w-6 h-6" />
@@ -88,7 +88,7 @@ function CircleResetPasswordInner() {
                 </p>
                 <Link
                   href="/my-circle/forgot-password"
-                  className="inline-block mt-2 px-5 py-2.5 bg-[#3DAA8A] hover:bg-[#2D6A8F] text-white rounded-xl font-bold transition"
+                  className="inline-block mt-2 px-5 py-2.5 bg-cg-sage hover:bg-cg-slate text-white rounded-xl font-bold transition"
                 >
                   Request a new link
                 </Link>
@@ -117,7 +117,7 @@ function CircleResetPasswordInner() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       disabled={status === 'working'}
-                      className="w-full border-2 border-slate-200 rounded-xl p-3 pr-11 text-sm focus:border-[#3DAA8A] focus:ring-0 outline-none transition"
+                      className="w-full border-2 border-slate-200 rounded-xl p-3 pr-11 text-sm focus:border-cg-sage focus:ring-0 outline-none transition"
                     />
                     <button
                       type="button"
@@ -142,7 +142,7 @@ function CircleResetPasswordInner() {
                     value={confirm}
                     onChange={(e) => setConfirm(e.target.value)}
                     disabled={status === 'working'}
-                    className="w-full border-2 border-slate-200 rounded-xl p-3 text-sm focus:border-[#3DAA8A] focus:ring-0 outline-none transition"
+                    className="w-full border-2 border-slate-200 rounded-xl p-3 text-sm focus:border-cg-sage focus:ring-0 outline-none transition"
                   />
                 </label>
 
@@ -153,7 +153,7 @@ function CircleResetPasswordInner() {
                 <button
                   type="submit"
                   disabled={status === 'working'}
-                  className="w-full bg-gradient-to-r from-[#3DAA8A] to-[#2D6A8F] text-white font-bold py-3.5 rounded-xl shadow-lg hover:shadow-xl transition disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full bg-gradient-to-r from-cg-sage to-cg-slate text-white font-bold py-3.5 rounded-xl shadow-lg hover:shadow-xl transition disabled:opacity-50 flex items-center justify-center gap-2"
                   style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
                 >
                   {status === 'working' ? (

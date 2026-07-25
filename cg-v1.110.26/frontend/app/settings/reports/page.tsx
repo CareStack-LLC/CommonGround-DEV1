@@ -427,13 +427,13 @@ export default function ReportsSettingsPage() {
       {/* Self-Service Reports Section */}
       <div>
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-gradient-to-br from-[#3DAA8A]/10 to-[#2D8A70]/5 rounded-xl shadow-md">
-            <Download className="h-5 w-5 text-[#2D8A70]" />
+          <div className="p-2 bg-gradient-to-br from-cg-sage/10 to-cg-sage-dark/5 rounded-xl shadow-md">
+            <Download className="h-5 w-5 text-cg-sage-dark" />
           </div>
           <h3 className="text-xl font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
             Self-Service Reports
           </h3>
-          <span className="text-xs bg-[#3DAA8A]/10 text-[#2D8A70] font-bold px-3 py-1 rounded-full shadow-sm">
+          <span className="text-xs bg-cg-sage/10 text-cg-sage-dark font-bold px-3 py-1 rounded-full shadow-sm">
             Free
           </span>
         </div>
@@ -450,17 +450,17 @@ export default function ReportsSettingsPage() {
             return (
               <Card key={report.id} className="relative border-2 border-border rounded-2xl shadow-lg hover:shadow-xl hover:border-[var(--portal-primary)]/30 transition-all duration-300">
                 {isSuccess && (
-                  <div className="absolute inset-0 bg-[#3DAA8A]/10 rounded-2xl flex items-center justify-center z-10">
+                  <div className="absolute inset-0 bg-cg-sage/10 rounded-2xl flex items-center justify-center z-10">
                     <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 shadow-xl flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-[#2D8A70]" />
-                      <span className="font-bold text-[#2D8A70]">Downloaded!</span>
+                      <CheckCircle className="h-5 w-5 text-cg-sage-dark" />
+                      <span className="font-bold text-cg-sage-dark">Downloaded!</span>
                     </div>
                   </div>
                 )}
                 <CardHeader className="pb-4">
                   <CardTitle className="text-lg flex items-center gap-3 font-bold" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
-                    <div className="p-2 bg-gradient-to-br from-[#2D6A8F]/10 to-[#2D6A8F]/5 rounded-xl shadow-md">
-                      <Icon className="h-5 w-5 text-[#2D6A8F]" />
+                    <div className="p-2 bg-gradient-to-br from-cg-slate/10 to-cg-slate/5 rounded-xl shadow-md">
+                      <Icon className="h-5 w-5 text-cg-slate" />
                     </div>
                     {report.title}
                   </CardTitle>
@@ -503,7 +503,7 @@ export default function ReportsSettingsPage() {
       {/* Professional Reports Section */}
       <div>
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 bg-gradient-to-br from-[#F5A623]/10 to-[#E09520]/5 rounded-xl shadow-md">
+          <div className="p-2 bg-gradient-to-br from-cg-amber/10 to-[#E09520]/5 rounded-xl shadow-md">
             <Scale className="h-5 w-5 text-[#E09520]" />
           </div>
           <h3 className="text-xl font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>
@@ -527,17 +527,17 @@ export default function ReportsSettingsPage() {
             return (
               <Card key={report.id} className="relative border-2 border-border rounded-2xl shadow-lg hover:shadow-xl hover:border-[#E09520]/30 transition-all duration-300">
                 {isSuccess && (
-                  <div className="absolute inset-0 bg-[#3DAA8A]/10 rounded-2xl flex items-center justify-center z-10">
+                  <div className="absolute inset-0 bg-cg-sage/10 rounded-2xl flex items-center justify-center z-10">
                     <div className="bg-white dark:bg-gray-900 rounded-2xl p-4 shadow-xl flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-[#2D8A70]" />
-                      <span className="font-bold text-[#2D8A70]">Request submitted!</span>
+                      <CheckCircle className="h-5 w-5 text-cg-sage-dark" />
+                      <span className="font-bold text-cg-sage-dark">Request submitted!</span>
                     </div>
                   </div>
                 )}
                 <CardHeader className="pb-4">
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-3">
-                      <div className="p-3 rounded-2xl bg-gradient-to-br from-[#F5A623]/10 to-[#E09520]/5 shadow-md">
+                      <div className="p-3 rounded-2xl bg-gradient-to-br from-cg-amber/10 to-[#E09520]/5 shadow-md">
                         <Icon className="h-6 w-6 text-[#E09520]" />
                       </div>
                       <div>
@@ -562,7 +562,7 @@ export default function ReportsSettingsPage() {
                     <ul className="grid gap-2 text-sm text-muted-foreground">
                       {report.features.map((feature, idx) => (
                         <li key={idx} className="flex items-center gap-2 font-medium">
-                          <CheckCircle className="h-4 w-4 text-[#2D8A70] flex-shrink-0" />
+                          <CheckCircle className="h-4 w-4 text-cg-sage-dark flex-shrink-0" />
                           {feature}
                         </li>
                       ))}

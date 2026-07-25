@@ -36,15 +36,15 @@ export function KidComsLogo({ className, showText = true, size = 'md', variant =
           <defs>
             <linearGradient id={`${id}-bg`} x1="0" y1="0" x2="1" y2="1">
               <stop offset="0%" stopColor="#E8F4F8" />
-              <stop offset="100%" stopColor="#D6ECE8" />
+              <stop offset="100%" stopColor="var(--border)" />
             </linearGradient>
             <linearGradient id={`${id}-lf`} x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#5BC4A0" />
-              <stop offset="100%" stopColor="#3DAA8A" />
+              <stop offset="0%" stopColor="var(--cg-sage-light)" />
+              <stop offset="100%" stopColor="var(--cg-sage)" />
             </linearGradient>
             <linearGradient id={`${id}-rf`} x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#4BA8C8" />
-              <stop offset="100%" stopColor="#2D6A8F" />
+              <stop offset="0%" stopColor="var(--cg-slate-light)" />
+              <stop offset="100%" stopColor="var(--cg-slate)" />
             </linearGradient>
           </defs>
           <rect width="512" height="512" rx="120" fill={`url(#${id}-bg)`} />
@@ -55,10 +55,10 @@ export function KidComsLogo({ className, showText = true, size = 'md', variant =
           <circle cx="344" cy="148" r="48" fill={`url(#${id}-rf)`} />
           <path d="M294 218 Q344 258 394 218" stroke={`url(#${id}-rf)`} strokeWidth="16" strokeLinecap="round" fill="none" />
           {/* Golden arch */}
-          <path d="M218 168 Q256 104 294 168" stroke="#F5A623" strokeWidth="10" strokeLinecap="round" fill="none" opacity="0.95" />
+          <path d="M218 168 Q256 104 294 168" stroke="var(--cg-amber)" strokeWidth="10" strokeLinecap="round" fill="none" opacity="0.95" />
           {/* Child */}
-          <circle cx="256" cy="330" r="38" fill="#F5A623" />
-          <path d="M218 382 Q256 414 294 382" stroke="#F5A623" strokeWidth="12" strokeLinecap="round" fill="none" />
+          <circle cx="256" cy="330" r="38" fill="var(--cg-amber)" />
+          <path d="M218 382 Q256 414 294 382" stroke="var(--cg-amber)" strokeWidth="12" strokeLinecap="round" fill="none" />
         </svg>
       </div>
 
@@ -69,8 +69,8 @@ export function KidComsLogo({ className, showText = true, size = 'md', variant =
             className={sizeClasses.text}
             style={{ fontFamily: 'var(--portal-font-display, DM Serif Display), Georgia, serif' }}
           >
-            <span className="font-bold" style={{ color: '#3DAA8A' }}>Kid</span>
-            <span className="font-normal" style={{ color: '#4BA8C8' }}>Space</span>
+            <span className="font-bold" style={{ color: 'var(--cg-sage)' }}>Kid</span>
+            <span className="font-normal" style={{ color: 'var(--cg-slate-light)' }}>Space</span>
           </span>
         ) : (
           <span

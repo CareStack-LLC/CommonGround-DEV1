@@ -70,13 +70,13 @@ function WeeklyMetricCard({
   growth?: number | null; color: string;
 }) {
   const colorMap: Record<string, string> = {
-    violet: 'from-[#3DAA8A]/20 to-[#3DAA8A]/5 border-[#3DAA8A]/20',
-    emerald: 'from-[#3DAA8A]/20 to-[#3DAA8A]/5 border-[#3DAA8A]/20',
-    blue: 'from-[#2D6A8F]/20 to-[#2D6A8F]/5 border-[#2D6A8F]/20',
-    amber: 'from-[#F5A623]/20 to-[#F5A623]/5 border-[#F5A623]/20',
+    violet: 'from-cg-sage/20 to-cg-sage/5 border-cg-sage/20',
+    emerald: 'from-cg-sage/20 to-cg-sage/5 border-cg-sage/20',
+    blue: 'from-cg-slate/20 to-cg-slate/5 border-cg-slate/20',
+    amber: 'from-cg-amber/20 to-cg-amber/5 border-cg-amber/20',
   };
   const iconColorMap: Record<string, string> = {
-    violet: 'text-[#3DAA8A]', emerald: 'text-emerald-400',
+    violet: 'text-cg-sage', emerald: 'text-emerald-400',
     blue: 'text-blue-400', amber: 'text-amber-400',
   };
   return (
@@ -84,7 +84,7 @@ function WeeklyMetricCard({
       <Icon className={`w-5 h-5 ${iconColorMap[color]} mb-2`} />
       <div className="text-2xl font-bold text-white tracking-tight">{value}</div>
       <div className="flex items-center gap-2 mt-1">
-        <span className="text-xs text-[#6B8A9A]">{label}</span>
+        <span className="text-xs text-muted-foreground">{label}</span>
         {growth !== undefined && growth !== null && growth !== 0 && <GrowthBadge value={growth} />}
       </div>
       {sub && <div className="text-[11px] text-[#4A6E7F] mt-0.5">{sub}</div>}
@@ -232,7 +232,7 @@ export default function ReportsContent() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-white">Reports</h1>
-          <p className="text-sm text-[#6B8A9A] mt-0.5">
+          <p className="text-sm text-muted-foreground mt-0.5">
             {activeTab === 'reports'
               ? 'Request and download admin reports'
               : weeklyReport
@@ -246,13 +246,13 @@ export default function ReportsContent() {
               <button
                 onClick={fetchReports}
                 disabled={loading}
-                className="p-2 rounded-lg bg-[#2D6A8F]/20 hover:bg-[#2D6A8F]/30 text-[#8AACBC] hover:text-white transition-colors disabled:opacity-50"
+                className="p-2 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-[#8AACBC] hover:text-white transition-colors disabled:opacity-50"
               >
                 <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
               </button>
               <button
                 onClick={() => setShowCreate(true)}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-cg-sage hover:bg-cg-sage-light text-white text-sm font-medium transition-colors"
               >
                 <Plus className="w-4 h-4" />
                 New Report
@@ -263,7 +263,7 @@ export default function ReportsContent() {
               <button
                 onClick={generateWeeklyReport}
                 disabled={weeklyLoading}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors disabled:opacity-50"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-cg-sage hover:bg-cg-sage-light text-white text-sm font-medium transition-colors disabled:opacity-50"
               >
                 <RefreshCw className={`w-4 h-4 ${weeklyLoading ? 'animate-spin' : ''}`} />
                 Generate Now
@@ -282,15 +282,15 @@ export default function ReportsContent() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-lg p-1">
+      <div className="flex gap-1 bg-[#1A3648]/60 border border-cg-slate/20 rounded-lg p-1">
         {PAGE_TABS.map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`flex items-center gap-1.5 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
               activeTab === tab.id
-                ? 'bg-[#3DAA8A]/15 text-[#5BC4A0]'
-                : 'text-[#8AACBC] hover:text-white hover:bg-[#2D6A8F]/20'
+                ? 'bg-cg-sage/15 text-cg-sage-light'
+                : 'text-[#8AACBC] hover:text-white hover:bg-cg-slate/20'
             }`}
           >
             <tab.icon className="w-4 h-4" />
@@ -304,7 +304,7 @@ export default function ReportsContent() {
         <>
           {/* Success Message */}
           {successMessage && (
-            <div className="bg-emerald-500/10 border border-[#3DAA8A]/20 rounded-xl px-4 py-3 flex items-center gap-2">
+            <div className="bg-emerald-500/10 border border-cg-sage/20 rounded-xl px-4 py-3 flex items-center gap-2">
               <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0" />
               <span className="text-sm text-emerald-300">{successMessage}</span>
             </div>
@@ -312,15 +312,15 @@ export default function ReportsContent() {
 
           {/* Create Report Modal */}
           {showCreate && (
-            <div className="bg-zinc-900/80 border border-[#2D6A8F]/20 rounded-xl p-6 space-y-5">
+            <div className="bg-zinc-900/80 border border-cg-slate/20 rounded-xl p-6 space-y-5">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-semibold text-white">Request New Report</h2>
-                <button onClick={() => setShowCreate(false)} className="text-[#6B8A9A] hover:text-[#D0E4EC] text-sm">Cancel</button>
+                <button onClick={() => setShowCreate(false)} className="text-muted-foreground hover:text-[#D0E4EC] text-sm">Cancel</button>
               </div>
 
               {/* Report Type Selection */}
               <div className="space-y-2">
-                <label className="text-xs text-[#6B8A9A] uppercase tracking-wider font-medium">Report Type</label>
+                <label className="text-xs text-muted-foreground uppercase tracking-wider font-medium">Report Type</label>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
                   {REPORT_TYPES.map(type => (
                     <button
@@ -329,14 +329,14 @@ export default function ReportsContent() {
                       className={`text-left p-3 rounded-lg border transition-all ${
                         selectedType === type.value
                           ? 'border-violet-500/40 bg-violet-500/10'
-                          : 'border-[#2D6A8F]/20 bg-[#2D6A8F]/10 hover:border-zinc-700/60'
+                          : 'border-cg-slate/20 bg-cg-slate/10 hover:border-zinc-700/60'
                       }`}
                     >
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-lg">{type.icon}</span>
                         <span className="text-sm font-medium text-white">{type.label}</span>
                       </div>
-                      <p className="text-[11px] text-[#6B8A9A] leading-relaxed">{type.description}</p>
+                      <p className="text-[11px] text-muted-foreground leading-relaxed">{type.description}</p>
                     </button>
                   ))}
                 </div>
@@ -345,7 +345,7 @@ export default function ReportsContent() {
               {/* Date Range */}
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex-1">
-                  <label className="text-xs text-[#6B8A9A] uppercase tracking-wider font-medium block mb-2">Date Range</label>
+                  <label className="text-xs text-muted-foreground uppercase tracking-wider font-medium block mb-2">Date Range</label>
                   <div className="flex gap-2">
                     {[7, 14, 30, 60, 90].map(d => (
                       <button
@@ -353,8 +353,8 @@ export default function ReportsContent() {
                         onClick={() => setDateRange(d)}
                         className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                           dateRange === d
-                            ? 'bg-violet-500/20 text-[#3DAA8A] border border-violet-500/30'
-                            : 'bg-[#2D6A8F]/15 text-[#8AACBC] hover:bg-[#2D6A8F]/20 border border-transparent'
+                            ? 'bg-violet-500/20 text-cg-sage border border-violet-500/30'
+                            : 'bg-cg-slate/15 text-[#8AACBC] hover:bg-cg-slate/20 border border-transparent'
                         }`}
                       >
                         {d}d
@@ -363,13 +363,13 @@ export default function ReportsContent() {
                   </div>
                 </div>
                 <div className="flex-1">
-                  <label className="text-xs text-[#6B8A9A] uppercase tracking-wider font-medium block mb-2">Notes (optional)</label>
+                  <label className="text-xs text-muted-foreground uppercase tracking-wider font-medium block mb-2">Notes (optional)</label>
                   <input
                     type="text"
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     placeholder="Any additional context..."
-                    className="w-full px-3 py-2 bg-[#2D6A8F]/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50"
+                    className="w-full px-3 py-2 bg-cg-slate/20 border border-zinc-700/60 rounded-lg text-sm text-white placeholder:text-[#4A6E7F] focus:outline-none focus:border-violet-500/50"
                   />
                 </div>
               </div>
@@ -379,7 +379,7 @@ export default function ReportsContent() {
                 <button
                   onClick={handleCreate}
                   disabled={creating}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#3DAA8A] hover:bg-[#5BC4A0] text-white text-sm font-medium transition-colors disabled:opacity-50"
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-cg-sage hover:bg-cg-sage-light text-white text-sm font-medium transition-colors disabled:opacity-50"
                 >
                   {creating ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
                   {creating ? 'Generating...' : 'Generate Report'}
@@ -396,8 +396,8 @@ export default function ReportsContent() {
                 onClick={() => setStatusFilter(s)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                   statusFilter === s
-                    ? 'bg-violet-500/20 text-[#3DAA8A] border border-violet-500/30'
-                    : 'bg-[#2D6A8F]/15 text-[#8AACBC] hover:bg-[#2D6A8F]/20 border border-transparent'
+                    ? 'bg-violet-500/20 text-cg-sage border border-violet-500/30'
+                    : 'bg-cg-slate/15 text-[#8AACBC] hover:bg-cg-slate/20 border border-transparent'
                 }`}
               >
                 {s === '' ? 'All' : s.charAt(0).toUpperCase() + s.slice(1)}
@@ -409,15 +409,15 @@ export default function ReportsContent() {
           <ValuationKPIs />
 
           {/* Reports List */}
-          <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl overflow-hidden">
+          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl overflow-hidden">
             {loading ? (
               <div className="p-4 space-y-3">
-                {Array.from({ length: 5 }).map((_, i) => <div key={i} className="animate-pulse bg-[#2D6A8F]/20 rounded-lg h-16" />)}
+                {Array.from({ length: 5 }).map((_, i) => <div key={i} className="animate-pulse bg-cg-slate/20 rounded-lg h-16" />)}
               </div>
             ) : reports.length === 0 ? (
               <div className="py-16 text-center">
                 <FileText className="w-10 h-10 text-[#3A5A6A] mx-auto mb-3" />
-                <p className="text-sm text-[#6B8A9A]">No reports found</p>
+                <p className="text-sm text-muted-foreground">No reports found</p>
                 <p className="text-xs text-[#4A6E7F] mt-1">Request your first report to get started</p>
               </div>
             ) : (
@@ -432,7 +432,7 @@ export default function ReportsContent() {
                   const isCompleted = report.status === 'completed' || report.status === 'success';
 
                   return (
-                    <div key={report.id} className="flex items-center gap-4 px-5 py-4 hover:bg-[#2D6A8F]/10 transition-colors">
+                    <div key={report.id} className="flex items-center gap-4 px-5 py-4 hover:bg-cg-slate/10 transition-colors">
                       <div className={`w-10 h-10 rounded-lg ${statusCfg.bg} flex items-center justify-center flex-shrink-0`}>
                         <StatusIcon className={`w-5 h-5 ${statusCfg.color} ${report.status === 'processing' ? 'animate-spin' : ''}`} />
                       </div>
@@ -449,7 +449,7 @@ export default function ReportsContent() {
                             <span className="text-[11px] text-[#4A6E7F]">{rowCount} rows</span>
                           )}
                         </div>
-                        <div className="text-xs text-[#6B8A9A] mt-0.5 truncate">
+                        <div className="text-xs text-muted-foreground mt-0.5 truncate">
                           {report.description || 'No description'}
                         </div>
                       </div>
@@ -460,7 +460,7 @@ export default function ReportsContent() {
                           <button
                             onClick={() => handleDownload(report.id, 'csv')}
                             disabled={downloading === `${report.id}-csv`}
-                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#2D6A8F]/20 hover:bg-zinc-700/60 text-xs text-[#8AACBC] hover:text-white transition-colors disabled:opacity-50"
+                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-cg-slate/20 hover:bg-zinc-700/60 text-xs text-[#8AACBC] hover:text-white transition-colors disabled:opacity-50"
                             title="Download CSV"
                           >
                             {downloading === `${report.id}-csv` ? <Loader2 className="w-3 h-3 animate-spin" /> : <FileSpreadsheet className="w-3 h-3" />}
@@ -469,7 +469,7 @@ export default function ReportsContent() {
                           <button
                             onClick={() => handleDownload(report.id, 'json')}
                             disabled={downloading === `${report.id}-json`}
-                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#2D6A8F]/20 hover:bg-zinc-700/60 text-xs text-[#8AACBC] hover:text-white transition-colors disabled:opacity-50"
+                            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-cg-slate/20 hover:bg-zinc-700/60 text-xs text-[#8AACBC] hover:text-white transition-colors disabled:opacity-50"
                             title="Download JSON"
                           >
                             {downloading === `${report.id}-json` ? <Loader2 className="w-3 h-3 animate-spin" /> : <FileJson className="w-3 h-3" />}
@@ -489,8 +489,8 @@ export default function ReportsContent() {
             )}
 
             {total > reports.length && (
-              <div className="px-5 py-3 border-t border-[#2D6A8F]/20 text-center">
-                <span className="text-xs text-[#6B8A9A]">Showing {reports.length} of {total} reports</span>
+              <div className="px-5 py-3 border-t border-cg-slate/20 text-center">
+                <span className="text-xs text-muted-foreground">Showing {reports.length} of {total} reports</span>
               </div>
             )}
           </div>
@@ -516,7 +516,7 @@ export default function ReportsContent() {
           {/* Loading State */}
           {weeklyLoading && !weeklyReport && (
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-              {Array.from({ length: 8 }).map((_, i) => <div key={i} className="animate-pulse bg-[#2D6A8F]/20 rounded-lg h-28" />)}
+              {Array.from({ length: 8 }).map((_, i) => <div key={i} className="animate-pulse bg-cg-slate/20 rounded-lg h-28" />)}
             </div>
           )}
 
@@ -547,52 +547,52 @@ export default function ReportsContent() {
 
               {/* Secondary Metrics */}
               <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl px-4 py-3 flex items-center gap-3">
-                  <Activity className="w-4 h-4 text-[#6B8A9A] flex-shrink-0" />
+                <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl px-4 py-3 flex items-center gap-3">
+                  <Activity className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                   <div>
                     <div className="text-lg font-semibold text-white">{formatNumber(weeklyReport?.users?.active_30d ?? 0)}</div>
-                    <div className="text-[11px] text-[#6B8A9A]">Active (30d)</div>
+                    <div className="text-[11px] text-muted-foreground">Active (30d)</div>
                   </div>
                 </div>
-                <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl px-4 py-3 flex items-center gap-3">
-                  <Bug className="w-4 h-4 text-[#6B8A9A] flex-shrink-0" />
+                <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl px-4 py-3 flex items-center gap-3">
+                  <Bug className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                   <div>
                     <div className="text-lg font-semibold text-white">{weeklyReport?.bugs?.open_sentry_issues ?? 0}</div>
-                    <div className="text-[11px] text-[#6B8A9A]">Open Bugs</div>
+                    <div className="text-[11px] text-muted-foreground">Open Bugs</div>
                   </div>
                 </div>
-                <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl px-4 py-3 flex items-center gap-3">
-                  <FileBarChart className="w-4 h-4 text-[#6B8A9A] flex-shrink-0" />
+                <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl px-4 py-3 flex items-center gap-3">
+                  <FileBarChart className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                   <div>
                     <div className="text-lg font-semibold text-white">{weeklyReport?.platform?.active_family_files ?? 0}</div>
-                    <div className="text-[11px] text-[#6B8A9A]">Active Family Files</div>
+                    <div className="text-[11px] text-muted-foreground">Active Family Files</div>
                   </div>
                 </div>
-                <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl px-4 py-3 flex items-center gap-3">
-                  <Shield className="w-4 h-4 text-[#6B8A9A] flex-shrink-0" />
+                <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl px-4 py-3 flex items-center gap-3">
+                  <Shield className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                   <div>
                     <div className="text-lg font-semibold text-white">{weeklyReport?.platform?.total_professionals ?? 0}</div>
-                    <div className="text-[11px] text-[#6B8A9A]">Professionals</div>
+                    <div className="text-[11px] text-muted-foreground">Professionals</div>
                   </div>
                 </div>
               </div>
 
               {/* Engagement Section */}
-              <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+              <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
                 <h2 className="text-sm font-semibold text-[#D0E4EC] mb-4">Engagement Summary</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="border border-[#2D6A8F]/20 rounded-lg p-4">
-                    <div className="text-xs text-[#6B8A9A] mb-1">Messages This Week</div>
+                  <div className="border border-cg-slate/20 rounded-lg p-4">
+                    <div className="text-xs text-muted-foreground mb-1">Messages This Week</div>
                     <div className="text-2xl font-bold text-white">{formatNumber(weeklyReport?.engagement?.messages_this_week ?? 0)}</div>
                     <GrowthBadge value={weeklyReport?.engagement?.message_growth_pct} />
                   </div>
-                  <div className="border border-[#2D6A8F]/20 rounded-lg p-4">
-                    <div className="text-xs text-[#6B8A9A] mb-1">ARIA Flags</div>
+                  <div className="border border-cg-slate/20 rounded-lg p-4">
+                    <div className="text-xs text-muted-foreground mb-1">ARIA Flags</div>
                     <div className="text-2xl font-bold text-white">{weeklyReport?.engagement?.aria_flags_this_week ?? 0}</div>
                     <span className="text-xs text-[#4A6E7F]">interventions triggered</span>
                   </div>
-                  <div className="border border-[#2D6A8F]/20 rounded-lg p-4">
-                    <div className="text-xs text-[#6B8A9A] mb-1">Revenue Breakdown</div>
+                  <div className="border border-cg-slate/20 rounded-lg p-4">
+                    <div className="text-xs text-muted-foreground mb-1">Revenue Breakdown</div>
                     <div className="space-y-1.5 mt-2">
                       {Object.entries(weeklyReport?.revenue?.tier_breakdown ?? {}).map(([tier, count]) => (
                         <div key={tier} className="flex justify-between text-xs">
@@ -616,7 +616,7 @@ export default function ReportsContent() {
           {!weeklyReport && !weeklyLoading && (
             <div className="flex flex-col items-center justify-center py-20">
               <FileBarChart className="w-12 h-12 text-[#3A5A6A] mb-4" />
-              <p className="text-[#6B8A9A] text-sm mb-1">No report generated yet</p>
+              <p className="text-muted-foreground text-sm mb-1">No report generated yet</p>
               <p className="text-[#4A6E7F] text-xs">Click &ldquo;Generate Now&rdquo; to create the weekly platform snapshot</p>
             </div>
           )}
@@ -641,43 +641,43 @@ function ValuationKPIs() {
   const fmtC = (n: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(n);
 
   return (
-    <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+    <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
       <div className="flex items-center gap-2 mb-4">
-        <Target className="w-4 h-4 text-[#3DAA8A]" />
+        <Target className="w-4 h-4 text-cg-sage" />
         <h2 className="text-sm font-semibold text-[#D0E4EC]">Key Valuation Metrics</h2>
         <span className="text-[11px] text-emerald-500/70 ml-auto">{val ? 'Live from data' : 'Loading...'}</span>
       </div>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <div className="bg-[#2D6A8F]/10 rounded-lg p-4">
+        <div className="bg-cg-slate/10 rounded-lg p-4">
           <div className="flex items-center gap-1.5 mb-1">
             <DollarSign className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="text-[11px] text-[#6B8A9A] uppercase tracking-wider font-medium">Est. LTV</span>
+            <span className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Est. LTV</span>
           </div>
           <div className="text-xl font-bold text-white">{val ? fmtC(val.ltv || 0) : '...'}</div>
           <div className="text-[11px] text-[#4A6E7F] mt-0.5">{val?.avg_lifetime_months ? `${val.avg_lifetime_months} mo avg lifetime` : 'avg lifetime value per user'}</div>
         </div>
-        <div className="bg-[#2D6A8F]/10 rounded-lg p-4">
+        <div className="bg-cg-slate/10 rounded-lg p-4">
           <div className="flex items-center gap-1.5 mb-1">
             <DollarSign className="w-3.5 h-3.5 text-blue-400" />
-            <span className="text-[11px] text-[#6B8A9A] uppercase tracking-wider font-medium">ARPU</span>
+            <span className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">ARPU</span>
           </div>
           <div className="text-xl font-bold text-white">{val ? fmtC(val.arpu || 0) : '...'}</div>
           <div className="text-[11px] text-[#4A6E7F] mt-0.5">monthly per paying user</div>
         </div>
-        <div className="bg-[#2D6A8F]/10 rounded-lg p-4">
+        <div className="bg-cg-slate/10 rounded-lg p-4">
           <div className="flex items-center gap-1.5 mb-1">
-            <TrendingUp className="w-3.5 h-3.5 text-[#3DAA8A]" />
-            <span className="text-[11px] text-[#6B8A9A] uppercase tracking-wider font-medium">LTV:CAC</span>
+            <TrendingUp className="w-3.5 h-3.5 text-cg-sage" />
+            <span className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">LTV:CAC</span>
           </div>
           <div className={`text-xl font-bold ${val && val.ltv_cac_ratio >= 3 ? 'text-emerald-400' : 'text-white'}`}>
             {val ? `${val.ltv_cac_ratio || 0}x` : '...'}
           </div>
           <div className="text-[11px] text-[#4A6E7F] mt-0.5">{val && val.ltv_cac_ratio >= 3 ? 'Healthy (>3x target)' : 'target: >3x'}</div>
         </div>
-        <div className="bg-[#2D6A8F]/10 rounded-lg p-4">
+        <div className="bg-cg-slate/10 rounded-lg p-4">
           <div className="flex items-center gap-1.5 mb-1">
             <RefreshCw className="w-3.5 h-3.5 text-amber-400" />
-            <span className="text-[11px] text-[#6B8A9A] uppercase tracking-wider font-medium">Retention</span>
+            <span className="text-[11px] text-muted-foreground uppercase tracking-wider font-medium">Retention</span>
           </div>
           <div className={`text-xl font-bold ${val && val.retention_rate_pct >= 90 ? 'text-emerald-400' : 'text-white'}`}>
             {val ? `${val.retention_rate_pct || 0}%` : '...'}

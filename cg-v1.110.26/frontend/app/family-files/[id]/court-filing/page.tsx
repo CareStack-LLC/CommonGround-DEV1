@@ -177,9 +177,9 @@ function CourtFilingContent() {
           <ChevronLeft className="h-4 w-4 mr-1 group-hover:-translate-x-1 transition-transform duration-300" />
           Back to Family Files
         </button>
-        <div className="bg-[#FEE2E2] border-2 border-[#FEE2E2] rounded-2xl p-6 shadow-lg">
+        <div className="bg-cg-error-subtle border-2 border-cg-error-subtle rounded-2xl p-6 shadow-lg">
           <div className="flex items-center gap-3">
-            <AlertCircle className="h-5 w-5 text-[#C53030]" />
+            <AlertCircle className="h-5 w-5 text-cg-error" />
             <p className="text-[#9B2C2C] font-medium">{error}</p>
           </div>
         </div>
@@ -211,8 +211,8 @@ function CourtFilingContent() {
 
         <div className="bg-white rounded-2xl border-2 border-slate-200 shadow-lg p-8">
           <div className="text-center space-y-4">
-            <div className="w-14 h-14 bg-gradient-to-br from-[#E8F4F0] to-[#E8F4F0] rounded-2xl flex items-center justify-center mx-auto shadow-md">
-              <CheckCircle className="h-7 w-7 text-[#2D8A70]" />
+            <div className="w-14 h-14 bg-gradient-to-br from-cg-sage-subtle to-cg-sage-subtle rounded-2xl flex items-center justify-center mx-auto shadow-md">
+              <CheckCircle className="h-7 w-7 text-cg-sage-dark" />
             </div>
             <h2 className="text-xl font-semibold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Already Linked to Court</h2>
             <p className="text-muted-foreground max-w-md mx-auto font-medium">
@@ -220,7 +220,7 @@ function CourtFilingContent() {
             </p>
             <button
               onClick={() => router.push(`/family-files/${id}`)}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white rounded-xl font-bold shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[var(--portal-primary)] to-cg-slate text-white rounded-xl font-bold shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02]"
             >
               Return to Family File
             </button>
@@ -255,7 +255,7 @@ function CourtFilingContent() {
       </div>
 
       {/* Important Notice */}
-      <div className="bg-[#FEF7ED] border-2 border-[#FEF7ED] rounded-2xl p-4 shadow-lg">
+      <div className="bg-cg-amber-subtle border-2 border-cg-amber-subtle rounded-2xl p-4 shadow-lg">
         <div className="flex items-start gap-3">
           <Info className="h-5 w-5 text-[#E09520] flex-shrink-0 mt-0.5" />
           <div>
@@ -268,9 +268,9 @@ function CourtFilingContent() {
       </div>
 
       {error && (
-        <div className="bg-[#FEE2E2] border-2 border-[#FEE2E2] rounded-2xl p-4 shadow-lg">
+        <div className="bg-cg-error-subtle border-2 border-cg-error-subtle rounded-2xl p-4 shadow-lg">
           <div className="flex items-center gap-3">
-            <AlertCircle className="h-5 w-5 text-[#C53030]" />
+            <AlertCircle className="h-5 w-5 text-cg-error" />
             <p className="text-[#9B2C2C] font-medium">{error}</p>
           </div>
         </div>
@@ -300,7 +300,7 @@ function CourtFilingContent() {
                   >
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm ${
                       step.status === 'completed'
-                        ? 'bg-gradient-to-br from-[#3DAA8A] to-[#2D8A70] text-white'
+                        ? 'bg-gradient-to-br from-cg-sage to-cg-sage-dark text-white'
                         : step.status === 'in_progress'
                         ? 'bg-gradient-to-br from-[var(--portal-primary)]/10 to-[var(--portal-primary)]/5 text-[var(--portal-primary)]'
                         : 'bg-slate-100 text-slate-500'
@@ -378,7 +378,7 @@ function CourtFilingContent() {
               <button
                 onClick={handleCreateCourtCase}
                 disabled={isSubmitting || !caseNumber.trim()}
-                className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-[var(--portal-primary)] to-[#2D6A8F] text-white rounded-xl font-bold shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-[var(--portal-primary)] to-cg-slate text-white rounded-xl font-bold shadow-md hover:shadow-xl transition-all duration-300 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 {isSubmitting ? (
                   <>
@@ -468,8 +468,8 @@ function CourtFilingContent() {
                 <span className="text-muted-foreground font-medium">Co-Parent</span>
                 <span className={`text-xs px-2.5 py-1 rounded-full font-bold border-2 ${
                   familyFile?.is_complete
-                    ? 'bg-[#E8F4F0] text-[#2D8A70] border-[#E8F4F0]'
-                    : 'bg-[#FEF7ED] text-[#E09520] border-[#FEF7ED]'
+                    ? 'bg-cg-sage-subtle text-cg-sage-dark border-cg-sage-subtle'
+                    : 'bg-cg-amber-subtle text-[#E09520] border-cg-amber-subtle'
                 }`}>
                   {familyFile?.is_complete ? 'Joined' : 'Pending'}
                 </span>

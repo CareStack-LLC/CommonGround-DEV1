@@ -420,12 +420,12 @@ function FamilyFileDetailContent() {
           <ArrowLeft className="h-4 w-4" />
           Back
         </button>
-        <div className="bg-card border-2 border-[#FEE2E2] rounded-2xl shadow-lg p-6">
+        <div className="bg-card border-2 border-cg-error-subtle rounded-2xl shadow-lg p-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#C53030]/10 to-[#C53030]/5 flex items-center justify-center shadow-md">
-              <AlertCircle className="h-5 w-5 text-[#C53030]" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cg-error/10 to-cg-error/5 flex items-center justify-center shadow-md">
+              <AlertCircle className="h-5 w-5 text-cg-error" />
             </div>
-            <p className="text-[#C53030] font-bold">{error || 'Family File not found'}</p>
+            <p className="text-cg-error font-bold">{error || 'Family File not found'}</p>
           </div>
         </div>
       </div>
@@ -544,10 +544,10 @@ function FamilyFileDetailContent() {
                 </p>
                 <button
                   onClick={() => router.push(`/family-files/${id}/court-filing`)}
-                  className="w-full flex items-center gap-3 p-3 rounded-xl border-2 border-[#E0EFF8] bg-[#E0EFF8] hover:bg-[#E0EFF8] hover:border-[#4BA8C8] transition-all text-left"
+                  className="w-full flex items-center gap-3 p-3 rounded-xl border-2 border-cg-slate-subtle bg-cg-slate-subtle hover:bg-cg-slate-subtle hover:border-cg-slate-light transition-all text-left"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2D6A8F]/10 to-[#2D6A8F]/5 flex items-center justify-center shadow-md">
-                    <Gavel className="h-5 w-5 text-[#2D6A8F]" />
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cg-slate/10 to-cg-slate/5 flex items-center justify-center shadow-md">
+                    <Gavel className="h-5 w-5 text-cg-slate" />
                   </div>
                   <span className="font-bold text-foreground">Send Family File to Court</span>
                 </button>
@@ -560,7 +560,7 @@ function FamilyFileDetailContent() {
 
                   <div className="space-y-4">
                     <div>
-                      <Label className="text-sm font-medium text-[#C53030]">Danger Zone</Label>
+                      <Label className="text-sm font-medium text-cg-error">Danger Zone</Label>
                       <p className="text-sm text-muted-foreground font-medium mt-1">
                         These actions cannot be undone.
                       </p>
@@ -572,9 +572,9 @@ function FamilyFileDetailContent() {
                         {!showRemoveConfirm ? (
                           <button
                             onClick={() => setShowRemoveConfirm(true)}
-                            className="w-full flex items-center gap-3 p-3 rounded-xl border-2 border-[#FEF7ED] bg-[#FEF7ED] hover:bg-[#FEF7ED] hover:border-[#F5A623] transition-all text-left"
+                            className="w-full flex items-center gap-3 p-3 rounded-xl border-2 border-cg-amber-subtle bg-cg-amber-subtle hover:bg-cg-amber-subtle hover:border-cg-amber transition-all text-left"
                           >
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#F5A623]/10 to-[#E09520]/5 flex items-center justify-center shadow-md">
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cg-amber/10 to-[#E09520]/5 flex items-center justify-center shadow-md">
                               <UserMinus className="h-5 w-5 text-[#E09520]" />
                             </div>
                             <div>
@@ -585,7 +585,7 @@ function FamilyFileDetailContent() {
                             </div>
                           </button>
                         ) : (
-                          <div className="p-4 rounded-xl border-2 border-[#F5A623] bg-[#FEF7ED] space-y-3">
+                          <div className="p-4 rounded-xl border-2 border-cg-amber bg-cg-amber-subtle space-y-3">
                             <p className="text-sm text-foreground font-bold">
                               Are you sure you want to remove the co-parent?
                             </p>
@@ -618,9 +618,9 @@ function FamilyFileDetailContent() {
                         {!showRemoveProfConfirm ? (
                           <button
                             onClick={() => setShowRemoveProfConfirm(true)}
-                            className="w-full flex items-center gap-3 p-3 rounded-xl border-2 border-[#FEF7ED] bg-[#FEF7ED] hover:bg-[#FEF7ED] hover:border-[#F5A623] transition-all text-left"
+                            className="w-full flex items-center gap-3 p-3 rounded-xl border-2 border-cg-amber-subtle bg-cg-amber-subtle hover:bg-cg-amber-subtle hover:border-cg-amber transition-all text-left"
                           >
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#F5A623]/10 to-[#E09520]/5 flex items-center justify-center shadow-md">
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cg-amber/10 to-[#E09520]/5 flex items-center justify-center shadow-md">
                               <Briefcase className="h-5 w-5 text-[#E09520]" />
                             </div>
                             <div>
@@ -631,7 +631,7 @@ function FamilyFileDetailContent() {
                             </div>
                           </button>
                         ) : (
-                          <div className="p-4 rounded-xl border-2 border-[#F5A623] bg-[#FEF7ED] space-y-3">
+                          <div className="p-4 rounded-xl border-2 border-cg-amber bg-cg-amber-subtle space-y-3">
                             <p className="text-sm text-foreground font-bold">
                               Remove legal professional access?
                             </p>
@@ -670,20 +670,20 @@ function FamilyFileDetailContent() {
                         {!showDeleteConfirm ? (
                           <button
                             onClick={() => setShowDeleteConfirm(true)}
-                            className="w-full flex items-center gap-3 p-3 rounded-xl border-2 border-[#FEE2E2] bg-[#FEE2E2] hover:bg-[#FEE2E2] hover:border-[#FCA5A5] transition-all text-left"
+                            className="w-full flex items-center gap-3 p-3 rounded-xl border-2 border-cg-error-subtle bg-cg-error-subtle hover:bg-cg-error-subtle hover:border-[#FCA5A5] transition-all text-left"
                           >
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#C53030]/10 to-[#C53030]/5 flex items-center justify-center shadow-md">
-                              <Trash2 className="h-5 w-5 text-[#C53030]" />
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cg-error/10 to-cg-error/5 flex items-center justify-center shadow-md">
+                              <Trash2 className="h-5 w-5 text-cg-error" />
                             </div>
                             <div>
-                              <div className="font-bold text-[#C53030]">Delete Family File</div>
+                              <div className="font-bold text-cg-error">Delete Family File</div>
                               <div className="text-sm text-muted-foreground font-medium">
                                 Permanently delete this family file and all data
                               </div>
                             </div>
                           </button>
                         ) : (
-                          <div className="p-4 rounded-xl border-2 border-[#FCA5A5] bg-[#FEE2E2] space-y-3">
+                          <div className="p-4 rounded-xl border-2 border-[#FCA5A5] bg-cg-error-subtle space-y-3">
                             <p className="text-sm text-foreground font-bold">
                               Are you absolutely sure?
                             </p>
@@ -694,7 +694,7 @@ function FamilyFileDetailContent() {
                               <button
                                 onClick={handleDelete}
                                 disabled={isDeleting}
-                                className="px-4 py-2 rounded-lg bg-[#C53030] text-white font-medium hover:bg-[#9B2C2C] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                className="px-4 py-2 rounded-lg bg-cg-error text-white font-medium hover:bg-[#9B2C2C] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                               >
                                 {isDeleting ? 'Deleting...' : 'Yes, Delete Everything'}
                               </button>
@@ -713,8 +713,8 @@ function FamilyFileDetailContent() {
                     {/* Court Case Warning */}
                     {familyFile?.has_court_case && (
                       <div className="p-4 rounded-xl bg-muted border-2 border-border flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2D6A8F]/10 to-[#2D6A8F]/5 flex items-center justify-center shadow-md flex-shrink-0">
-                          <Scale className="h-5 w-5 text-[#2D6A8F]" />
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cg-slate/10 to-cg-slate/5 flex items-center justify-center shadow-md flex-shrink-0">
+                          <Scale className="h-5 w-5 text-cg-slate" />
                         </div>
                         <p className="text-sm text-muted-foreground font-medium">
                           Removal and deletion are disabled because this family file is linked to a court case.
@@ -731,10 +731,10 @@ function FamilyFileDetailContent() {
 
       {/* Status Alert */}
       {!familyFile.is_complete && (
-        <div className="bg-card border-2 border-[#F5A623]/30 rounded-2xl shadow-lg p-6">
+        <div className="bg-card border-2 border-cg-amber/30 rounded-2xl shadow-lg p-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#F5A623]/10 to-[#F5A623]/5 flex items-center justify-center shadow-md">
-              <Clock className="h-5 w-5 text-[#F5A623]" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cg-amber/10 to-cg-amber/5 flex items-center justify-center shadow-md">
+              <Clock className="h-5 w-5 text-cg-amber" />
             </div>
             <p className="text-foreground font-medium">
               {familyFile.parent_b_email ? (
@@ -761,8 +761,8 @@ function FamilyFileDetailContent() {
                   onClick={() => router.push(`/payments/new?familyFileId=${id}`)}
                   className="flex items-start gap-4 p-4 rounded-xl border-2 border-border bg-card hover:bg-muted hover:border-[var(--portal-primary)]/30 hover:shadow-md transition-all text-left group"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#3DAA8A]/10 to-[#2D8A70]/5 flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
-                    <DollarSign className="h-5 w-5 text-[#2D8A70]" />
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cg-sage/10 to-cg-sage-dark/5 flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
+                    <DollarSign className="h-5 w-5 text-cg-sage-dark" />
                   </div>
                   <div>
                     <div className="font-bold text-foreground">ClearFund Request</div>
@@ -776,13 +776,13 @@ function FamilyFileDetailContent() {
                   onClick={() => router.push(`/family-files/${id}/child-support`)}
                   className="flex items-start gap-4 p-4 rounded-xl border-2 border-border bg-card hover:bg-muted hover:border-[var(--portal-primary)]/30 hover:shadow-md transition-all text-left group"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#F5A623]/10 to-[#E09520]/5 flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cg-amber/10 to-[#E09520]/5 flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
                     <Scale className="h-5 w-5 text-[#E09520]" />
                   </div>
                   <div>
                     <div className="font-bold text-foreground flex items-center gap-1.5">
                       Child Support
-                      <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-[#FEF7ED] text-[#E09520] uppercase tracking-wide">SDU</span>
+                      <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-cg-amber-subtle text-[#E09520] uppercase tracking-wide">SDU</span>
                     </div>
                     <div className="text-sm text-muted-foreground font-medium">
                       Log state disbursement payments
@@ -794,8 +794,8 @@ function FamilyFileDetailContent() {
                   onClick={() => router.push(`/schedule?familyFileId=${id}&action=new-event`)}
                   className="flex items-start gap-4 p-4 rounded-xl border-2 border-border bg-card hover:bg-muted hover:border-[var(--portal-primary)]/30 hover:shadow-md transition-all text-left group"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2D6A8F]/10 to-[#2D6A8F]/5 flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
-                    <CalendarPlus className="h-5 w-5 text-[#2D6A8F]" />
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cg-slate/10 to-cg-slate/5 flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
+                    <CalendarPlus className="h-5 w-5 text-cg-slate" />
                   </div>
                   <div>
                     <div className="font-bold text-foreground">New Event</div>
@@ -825,8 +825,8 @@ function FamilyFileDetailContent() {
                     onClick={() => router.push(`/family-files/${id}/kidcoms`)}
                     className="flex items-start gap-4 p-4 rounded-xl border-2 border-border bg-card hover:bg-muted hover:border-[var(--portal-primary)]/30 hover:shadow-md transition-all text-left group"
                   >
-                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2D6A8F]/10 to-[#2D6A8F]/5 flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
-                      <Video className="h-5 w-5 text-[#2D6A8F]" />
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cg-slate/10 to-cg-slate/5 flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
+                      <Video className="h-5 w-5 text-cg-slate" />
                     </div>
                     <div>
                       <div className="font-bold text-foreground">KidSpace</div>
@@ -860,8 +860,8 @@ function FamilyFileDetailContent() {
                   onClick={() => router.push(`/family-files/${id}/chores`)}
                   className="flex items-start gap-4 p-4 rounded-xl border-2 border-border bg-card hover:bg-muted hover:border-[var(--portal-primary)]/30 hover:shadow-md transition-all text-left group"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#2D6A8F]/10 to-[#2D6A8F]/5 flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
-                    <ListChecks className="h-5 w-5 text-[#2D6A8F]" />
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cg-slate/10 to-cg-slate/5 flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
+                    <ListChecks className="h-5 w-5 text-cg-slate" />
                   </div>
                   <div>
                     <div className="font-bold text-foreground">Chores</div>
@@ -875,7 +875,7 @@ function FamilyFileDetailContent() {
                   onClick={() => router.push(`/family-files/${id}/rewards`)}
                   className="flex items-start gap-4 p-4 rounded-xl border-2 border-border bg-card hover:bg-muted hover:border-[var(--portal-primary)]/30 hover:shadow-md transition-all text-left group"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#F5A623]/10 to-[#F5A623]/5 flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cg-amber/10 to-cg-amber/5 flex items-center justify-center flex-shrink-0 shadow-md group-hover:scale-105 transition-transform">
                     <Gift className="h-5 w-5 text-[#E09520]" />
                   </div>
                   <div>
@@ -963,8 +963,8 @@ function FamilyFileDetailContent() {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#F5A623]/10 to-[#F5A623]/5 flex items-center justify-center shadow-md">
-                    <Zap className="h-5 w-5 text-[#F5A623]" />
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cg-amber/10 to-cg-amber/5 flex items-center justify-center shadow-md">
+                    <Zap className="h-5 w-5 text-cg-amber" />
                   </div>
                   <div>
                     <h2 className="text-xl font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>QuickAccords</h2>
@@ -1228,7 +1228,7 @@ function FamilyFileDetailContent() {
                               `/family-files/${familyFile.id}/library?childId=${child.id}`,
                             );
                           }}
-                          className="flex items-center gap-1.5 flex-shrink-0 px-3 py-2 rounded-xl bg-[#F5A623]/10 text-[#E09520] hover:bg-[#F5A623]/20 transition-colors text-xs font-semibold"
+                          className="flex items-center gap-1.5 flex-shrink-0 px-3 py-2 rounded-xl bg-cg-amber/10 text-[#E09520] hover:bg-cg-amber/20 transition-colors text-xs font-semibold"
                           aria-label={`Read together with ${childDisplayName}`}
                           title={`Read a book together with ${childDisplayName}`}
                         >
@@ -1301,8 +1301,8 @@ function FamilyFileDetailContent() {
           <div className="bg-card border-2 border-border rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#3DAA8A]/10 to-[#2D8A70]/5 flex items-center justify-center shadow-md">
-                  <Briefcase className="h-5 w-5 text-[#2D8A70]" />
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cg-sage/10 to-cg-sage-dark/5 flex items-center justify-center shadow-md">
+                  <Briefcase className="h-5 w-5 text-cg-sage-dark" />
                 </div>
                 <h2 className="text-xl font-bold text-foreground" style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}>Legal Team</h2>
               </div>
@@ -1315,7 +1315,7 @@ function FamilyFileDetailContent() {
                 <DialogContent className="sm:max-w-md">
                   <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
-                      <Briefcase className="h-5 w-5 text-[#2D8A70]" />
+                      <Briefcase className="h-5 w-5 text-cg-sage-dark" />
                       Invite a Professional
                     </DialogTitle>
                     <DialogDescription>
@@ -1331,7 +1331,7 @@ function FamilyFileDetailContent() {
                         type="email"
                         value={profEmail}
                         onChange={(e) => setProfEmail(e.target.value)}
-                        className="focus-visible:ring-[#2D8A70]"
+                        className="focus-visible:ring-cg-sage-dark"
                       />
                     </div>
                     <button
@@ -1351,8 +1351,8 @@ function FamilyFileDetailContent() {
                       </Alert>
                     )}
                     {profInviteSuccess && (
-                      <Alert className="bg-[#E8F4F0] text-[#2D8A70] border-[#E8F4F0]">
-                        <CheckCircle className="h-4 w-4 text-[#2D8A70]" />
+                      <Alert className="bg-cg-sage-subtle text-cg-sage-dark border-cg-sage-subtle">
+                        <CheckCircle className="h-4 w-4 text-cg-sage-dark" />
                         <AlertDescription>{profInviteSuccess}</AlertDescription>
                       </Alert>
                     )}
@@ -1363,7 +1363,7 @@ function FamilyFileDetailContent() {
                     </CGButton>
                     <CGButton
                       variant="secondary"
-                      className="bg-[#2D8A70] text-white hover:bg-[#2D8A70]"
+                      className="bg-cg-sage-dark text-white hover:bg-cg-sage-dark"
                       onClick={handleInviteProfessional}
                       disabled={isInvitingProf || !!profInviteSuccess}
                     >
@@ -1393,10 +1393,10 @@ function FamilyFileDetailContent() {
                   {pendingRequests.map((request) => (
                     <div
                       key={request.id}
-                      className="flex items-center justify-between p-3 rounded-xl border border-[#FEF7ED] bg-[#FEF7ED]"
+                      className="flex items-center justify-between p-3 rounded-xl border border-cg-amber-subtle bg-cg-amber-subtle"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-[#FEF7ED] flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-full bg-cg-amber-subtle flex items-center justify-center">
                           <Briefcase className="h-4 w-4 text-[#E09520]" />
                         </div>
                         <div>
@@ -1413,14 +1413,14 @@ function FamilyFileDetailContent() {
                       </div>
                       <div className="flex items-center gap-1">
                         <button
-                          className="h-7 w-7 p-0 text-[#2D8A70] hover:bg-[#E8F4F0] rounded transition-colors disabled:opacity-50"
+                          className="h-7 w-7 p-0 text-cg-sage-dark hover:bg-cg-sage-subtle rounded transition-colors disabled:opacity-50"
                           onClick={() => handleApproveRequest(request.id)}
                           disabled={isProcessingRequest === request.id}
                         >
                           <CheckCircle2 className="h-4 w-4" />
                         </button>
                         <button aria-label="Close"
-                          className="h-7 w-7 p-0 text-[#C53030] hover:bg-[#FEE2E2] rounded transition-colors disabled:opacity-50"
+                          className="h-7 w-7 p-0 text-cg-error hover:bg-cg-error-subtle rounded transition-colors disabled:opacity-50"
                           onClick={() => handleDeclineRequest(request.id)}
                           disabled={isProcessingRequest === request.id}
                         >
@@ -1448,8 +1448,8 @@ function FamilyFileDetailContent() {
                       className="flex items-center justify-between p-3 rounded-xl hover:bg-muted/50 transition-colors group"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-[#E8F4F0] flex items-center justify-center">
-                          <Briefcase className="h-4 w-4 text-[#2D8A70]" />
+                        <div className="w-8 h-8 rounded-full bg-cg-sage-subtle flex items-center justify-center">
+                          <Briefcase className="h-4 w-4 text-cg-sage-dark" />
                         </div>
                         <div className="min-w-0">
                           <div className="font-medium text-foreground text-sm truncate">
@@ -1462,7 +1462,7 @@ function FamilyFileDetailContent() {
                         </div>
                       </div>
                       <button aria-label="Close"
-                        className="h-7 w-7 p-0 text-muted-foreground hover:text-[#C53030] opacity-0 group-hover:opacity-100 transition-all rounded disabled:opacity-50"
+                        className="h-7 w-7 p-0 text-muted-foreground hover:text-cg-error opacity-0 group-hover:opacity-100 transition-all rounded disabled:opacity-50"
                         onClick={() => handleRevokeProfessionalAccess(prof.assignment_id)}
                         disabled={isRevokingAccess === prof.assignment_id}
                       >

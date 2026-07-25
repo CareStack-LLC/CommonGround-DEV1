@@ -10,14 +10,14 @@ import { adminAPI } from '@/lib/admin-api';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 function Skeleton({ className = '' }: { className?: string }) {
-  return <div className={`animate-pulse bg-[#2D6A8F]/20 rounded-lg ${className}`} />;
+  return <div className={`animate-pulse bg-cg-slate/20 rounded-lg ${className}`} />;
 }
 
 const SOURCE_COLORS: Record<string, string> = {
-  newsletter: 'bg-blue-500/15 text-blue-400 border-[#2D6A8F]/20',
-  blog: 'bg-emerald-500/15 text-emerald-400 border-[#3DAA8A]/20',
-  contact_form: 'bg-amber-500/15 text-amber-400 border-[#F5A623]/20',
-  import: 'bg-[#3DAA8A]/15 text-[#3DAA8A] border-[#3DAA8A]/20',
+  newsletter: 'bg-blue-500/15 text-blue-400 border-cg-slate/20',
+  blog: 'bg-emerald-500/15 text-emerald-400 border-cg-sage/20',
+  contact_form: 'bg-amber-500/15 text-amber-400 border-cg-amber/20',
+  import: 'bg-cg-sage/15 text-cg-sage border-cg-sage/20',
   manual: 'bg-zinc-700/50 text-[#8AACBC] border-zinc-700/40',
   landing_page: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/20',
   social: 'bg-pink-500/15 text-pink-400 border-pink-500/20',
@@ -75,9 +75,9 @@ export default function AnalyticsContent() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-white">Marketing Analytics</h1>
-          <p className="text-sm text-[#6B8A9A] mt-0.5">Cross-channel performance overview</p>
+          <p className="text-sm text-muted-foreground mt-0.5">Cross-channel performance overview</p>
         </div>
-        <button onClick={fetchAll} disabled={loading} className="p-2 rounded-lg bg-[#2D6A8F]/20 hover:bg-[#2D6A8F]/30 text-[#8AACBC] hover:text-white transition-colors disabled:opacity-50">
+        <button onClick={fetchAll} disabled={loading} className="p-2 rounded-lg bg-cg-slate/20 hover:bg-cg-slate/30 text-[#8AACBC] hover:text-white transition-colors disabled:opacity-50">
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
         </button>
       </div>
@@ -104,9 +104,9 @@ export default function AnalyticsContent() {
           </div>
 
           {/* Conversion Funnel */}
-          <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
             <div className="flex items-center gap-2 mb-4">
-              <BarChart3 className="w-4 h-4 text-[#3DAA8A]" />
+              <BarChart3 className="w-4 h-4 text-cg-sage" />
               <h2 className="text-sm font-semibold text-[#D0E4EC]">Conversion Funnel</h2>
             </div>
             <div className="flex items-center gap-2">
@@ -118,7 +118,7 @@ export default function AnalyticsContent() {
               ].map((step, i) => (
                 <div key={step.label} className="flex items-center gap-2 flex-1">
                   <div className="flex-1">
-                    <div className="text-xs text-[#6B8A9A] mb-1">{step.label}</div>
+                    <div className="text-xs text-muted-foreground mb-1">{step.label}</div>
                     <div className="text-2xl font-bold text-white">{step.count}</div>
                     <div className="mt-2 h-2 rounded-full bg-zinc-800 overflow-hidden">
                       <div
@@ -137,7 +137,7 @@ export default function AnalyticsContent() {
           </div>
 
           {/* Source Attribution */}
-          <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
             <div className="flex items-center gap-2 mb-4">
               <TrendingUp className="w-4 h-4 text-emerald-400" />
               <h2 className="text-sm font-semibold text-[#D0E4EC]">Lead Source Attribution</h2>
@@ -164,7 +164,7 @@ export default function AnalyticsContent() {
           </div>
 
           {/* Campaign Performance */}
-          <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
             <div className="flex items-center gap-2 mb-4">
               <Mail className="w-4 h-4 text-blue-400" />
               <h2 className="text-sm font-semibold text-[#D0E4EC]">Campaign Performance</h2>
@@ -175,7 +175,7 @@ export default function AnalyticsContent() {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="text-xs text-[#6B8A9A] border-b border-[#2D6A8F]/20">
+                    <tr className="text-xs text-muted-foreground border-b border-cg-slate/20">
                       <th className="text-left pb-2 font-medium">Campaign</th>
                       <th className="text-right pb-2 font-medium">Status</th>
                       <th className="text-right pb-2 font-medium">Sent</th>
@@ -192,7 +192,7 @@ export default function AnalyticsContent() {
                       const openRate = delivered > 0 ? ((opens / delivered) * 100).toFixed(1) : '—';
                       const clickRate = delivered > 0 ? ((clicks / delivered) * 100).toFixed(1) : '—';
                       return (
-                        <tr key={c.id} className="border-b border-[#2D6A8F]/10 last:border-0">
+                        <tr key={c.id} className="border-b border-cg-slate/10 last:border-0">
                           <td className="py-2 text-white">{c.name}</td>
                           <td className="py-2 text-right">
                             <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/15 text-emerald-400">{c.status}</span>
@@ -210,7 +210,7 @@ export default function AnalyticsContent() {
           </div>
 
           {/* Landing Page Performance */}
-          <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+          <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
             <div className="flex items-center gap-2 mb-4">
               <Globe className="w-4 h-4 text-cyan-400" />
               <h2 className="text-sm font-semibold text-[#D0E4EC]">Landing Page Performance</h2>
@@ -221,7 +221,7 @@ export default function AnalyticsContent() {
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="text-xs text-[#6B8A9A] border-b border-[#2D6A8F]/20">
+                    <tr className="text-xs text-muted-foreground border-b border-cg-slate/20">
                       <th className="text-left pb-2 font-medium">Page</th>
                       <th className="text-left pb-2 font-medium">Audience</th>
                       <th className="text-left pb-2 font-medium">Status</th>
@@ -231,10 +231,10 @@ export default function AnalyticsContent() {
                   </thead>
                   <tbody>
                     {landingPages.map(lp => (
-                      <tr key={lp.id} className="border-b border-[#2D6A8F]/10 last:border-0">
+                      <tr key={lp.id} className="border-b border-cg-slate/10 last:border-0">
                         <td className="py-2">
                           <div className="text-white">{lp.title}</div>
-                          <div className="text-[11px] text-[#6B8A9A]">/lp/{lp.slug}</div>
+                          <div className="text-[11px] text-muted-foreground">/lp/{lp.slug}</div>
                         </td>
                         <td className="py-2 text-[#8AACBC] text-xs capitalize">{lp.target_audience}</td>
                         <td className="py-2">
@@ -243,7 +243,7 @@ export default function AnalyticsContent() {
                           }`}>{lp.status}</span>
                         </td>
                         <td className="py-2 text-right text-[#D0E4EC] font-medium">{(lp.view_count || 0).toLocaleString()}</td>
-                        <td className="py-2 text-right text-xs text-[#6B8A9A]">{lp.utm_campaign || '—'}</td>
+                        <td className="py-2 text-right text-xs text-muted-foreground">{lp.utm_campaign || '—'}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -254,7 +254,7 @@ export default function AnalyticsContent() {
 
           {/* Recent Conversions */}
           {pipeline?.recent_conversions?.length > 0 && (
-            <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+            <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
               <div className="flex items-center gap-2 mb-4">
                 <Users className="w-4 h-4 text-emerald-400" />
                 <h2 className="text-sm font-semibold text-[#D0E4EC]">Recent Conversions</h2>
@@ -271,7 +271,7 @@ export default function AnalyticsContent() {
                         {conv.source}
                       </span>
                     </div>
-                    <span className="text-xs text-[#6B8A9A]">
+                    <span className="text-xs text-muted-foreground">
                       {conv.converted_at ? new Date(conv.converted_at).toLocaleDateString() : '—'}
                     </span>
                   </div>
@@ -289,20 +289,20 @@ function KpiCard({ icon: Icon, label, value, color }: {
   icon: any; label: string; value: string | number; color: string;
 }) {
   const colorMap: Record<string, string> = {
-    violet: 'from-[#3DAA8A]/20 to-[#3DAA8A]/5 border-[#3DAA8A]/20',
-    emerald: 'from-[#3DAA8A]/20 to-[#3DAA8A]/5 border-[#3DAA8A]/20',
-    blue: 'from-[#2D6A8F]/20 to-[#2D6A8F]/5 border-[#2D6A8F]/20',
+    violet: 'from-cg-sage/20 to-cg-sage/5 border-cg-sage/20',
+    emerald: 'from-cg-sage/20 to-cg-sage/5 border-cg-sage/20',
+    blue: 'from-cg-slate/20 to-cg-slate/5 border-cg-slate/20',
     cyan: 'from-cyan-600/20 to-cyan-600/5 border-cyan-500/20',
   };
   const iconMap: Record<string, string> = {
-    violet: 'text-[#3DAA8A]', emerald: 'text-emerald-400',
+    violet: 'text-cg-sage', emerald: 'text-emerald-400',
     blue: 'text-blue-400', cyan: 'text-cyan-400',
   };
   return (
     <div className={`bg-gradient-to-b ${colorMap[color]} border rounded-xl p-4`}>
       <Icon className={`w-5 h-5 ${iconMap[color]} mb-2`} />
       <div className="text-2xl font-bold text-white tracking-tight">{value}</div>
-      <div className="text-xs text-[#6B8A9A] mt-1">{label}</div>
+      <div className="text-xs text-muted-foreground mt-1">{label}</div>
     </div>
   );
 }

@@ -91,23 +91,23 @@ export default function CustodyOverrideBanner({ onRefresh }: CustodyOverrideBann
           <div
             key={eventKey}
             role="alert"
-            className="bg-[#FEF7ED] dark:bg-[#1E3A4A]/20 border border-[#FEF7ED] dark:border-[#E09520] rounded-xl p-4 shadow-md animate-in slide-in-from-top duration-300"
+            className="bg-cg-amber-subtle dark:bg-foreground/20 border border-cg-amber-subtle dark:border-[#E09520] rounded-xl p-4 shadow-md animate-in slide-in-from-top duration-300"
           >
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#FEF7ED] dark:bg-[#1E3A4A]/50 flex items-center justify-center shrink-0">
-                <Hand className="h-5 w-5 text-[#E09520] dark:text-[#F5A623]" />
+              <div className="w-10 h-10 rounded-full bg-cg-amber-subtle dark:bg-foreground/50 flex items-center justify-center shrink-0">
+                <Hand className="h-5 w-5 text-[#E09520] dark:text-cg-amber" />
               </div>
 
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-[#1E3A4A] dark:text-[#FEF7ED] text-sm">
+                <p className="font-semibold text-foreground dark:text-cg-amber-subtle text-sm">
                   {event.message}
                 </p>
                 {event.notes && (
-                  <p className="text-xs text-[#E09520] dark:text-[#F5A623] mt-0.5">
+                  <p className="text-xs text-[#E09520] dark:text-cg-amber mt-0.5">
                     Note: {event.notes}
                   </p>
                 )}
-                <p className="text-xs text-[#E09520] dark:text-[#F5A623] mt-1">
+                <p className="text-xs text-[#E09520] dark:text-cg-amber mt-1">
                   {new Date(event.timestamp).toLocaleTimeString('en-US', {
                     hour: 'numeric',
                     minute: '2-digit',
@@ -121,7 +121,7 @@ export default function CustodyOverrideBanner({ onRefresh }: CustodyOverrideBann
                       onClick={() => handleAcknowledge(event)}
                       disabled={isProcessing}
                       size="sm"
-                      className="bg-[#2D8A70] hover:bg-[#2D8A70] text-white"
+                      className="bg-cg-sage-dark hover:bg-cg-sage-dark text-white"
                     >
                       {isProcessing ? (
                         <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -137,7 +137,7 @@ export default function CustodyOverrideBanner({ onRefresh }: CustodyOverrideBann
                       disabled={isProcessing}
                       size="sm"
                       variant="outline"
-                      className="border-[#FCA5A5] text-[#9B2C2C] hover:bg-[#FEE2E2] dark:border-[#9B2C2C] dark:text-[#E06B6B]"
+                      className="border-[#FCA5A5] text-[#9B2C2C] hover:bg-cg-error-subtle dark:border-[#9B2C2C] dark:text-[#E06B6B]"
                     >
                       <AlertTriangle className="h-3.5 w-3.5 mr-1" />
                       Dispute
@@ -153,14 +153,14 @@ export default function CustodyOverrideBanner({ onRefresh }: CustodyOverrideBann
                       onChange={(e) => setDisputeNotes(e.target.value)}
                       placeholder="Optional: Explain why you are disputing this claim..."
                       rows={2}
-                      className="w-full px-3 py-2 border border-[#FEE2E2] dark:border-[#9B2C2C] rounded-md bg-background text-foreground placeholder:text-muted-foreground text-sm"
+                      className="w-full px-3 py-2 border border-cg-error-subtle dark:border-[#9B2C2C] rounded-md bg-background text-foreground placeholder:text-muted-foreground text-sm"
                     />
                     <div className="flex gap-2">
                       <Button
                         onClick={() => handleDispute(event)}
                         disabled={isProcessing}
                         size="sm"
-                        className="bg-[#C53030] hover:bg-[#9B2C2C] text-white"
+                        className="bg-cg-error hover:bg-[#9B2C2C] text-white"
                       >
                         {isProcessing ? (
                           <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -185,7 +185,7 @@ export default function CustodyOverrideBanner({ onRefresh }: CustodyOverrideBann
 
               <button aria-label="Close"
                 onClick={() => dismissEvent(event)}
-                className="text-[#F5A623] hover:text-[#E09520] shrink-0"
+                className="text-cg-amber hover:text-[#E09520] shrink-0"
               >
                 <X className="h-4 w-4" />
               </button>

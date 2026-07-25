@@ -186,12 +186,12 @@ export default function GenerateReportPage() {
                 Loading cases...
               </div>
             ) : cases.length === 0 ? (
-              <div className="p-4 rounded-xl bg-[#F4F8F7] border border-[#3DAA8A]/10">
+              <div className="p-4 rounded-xl bg-background border border-cg-sage/10">
                 <p className="text-sm text-slate-600">No active cases found. Create a case first to generate reports.</p>
               </div>
             ) : (
               <Select value={familyFileId} onValueChange={setFamilyFileId}>
-                <SelectTrigger className="border-slate-200 focus:border-[#3DAA8A] focus:ring-[#3DAA8A]/20">
+                <SelectTrigger className="border-slate-200 focus:border-cg-sage focus:ring-cg-sage/20">
                   <SelectValue placeholder="Select a case..." />
                 </SelectTrigger>
                 <SelectContent>
@@ -209,7 +209,7 @@ export default function GenerateReportPage() {
           <div className="space-y-2">
             <Label className="text-sm font-medium text-slate-700">Report Type</Label>
             <Select value={reportType} onValueChange={setReportType}>
-              <SelectTrigger className="border-slate-200 focus:border-[#3DAA8A] focus:ring-[#3DAA8A]/20">
+              <SelectTrigger className="border-slate-200 focus:border-cg-sage focus:ring-cg-sage/20">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -230,7 +230,7 @@ export default function GenerateReportPage() {
                   type="date"
                   value={dateRangeStart}
                   onChange={(e) => setDateRangeStart(e.target.value)}
-                  className="border-slate-200 focus:border-[#3DAA8A]"
+                  className="border-slate-200 focus:border-cg-sage"
                 />
               </div>
               <div className="space-y-1.5">
@@ -239,7 +239,7 @@ export default function GenerateReportPage() {
                   type="date"
                   value={dateRangeEnd}
                   onChange={(e) => setDateRangeEnd(e.target.value)}
-                  className="border-slate-200 focus:border-[#3DAA8A]"
+                  className="border-slate-200 focus:border-cg-sage"
                 />
               </div>
             </div>
@@ -258,10 +258,10 @@ export default function GenerateReportPage() {
 
           {/* Success */}
           {generatedReportId && (
-            <div className="flex items-center gap-3 p-4 bg-[#F4F8F7] border border-[#3DAA8A]/20 rounded-xl">
-              <CheckCircle2 className="h-5 w-5 text-[#3DAA8A] shrink-0" />
+            <div className="flex items-center gap-3 p-4 bg-background border border-cg-sage/20 rounded-xl">
+              <CheckCircle2 className="h-5 w-5 text-cg-sage shrink-0" />
               <div className="flex-1">
-                <p className="text-sm font-semibold text-[#1E3A4A]">Report generated successfully</p>
+                <p className="text-sm font-semibold text-foreground">Report generated successfully</p>
                 <p className="text-xs text-slate-500 mt-0.5">Your {selectedReportLabel} is ready</p>
               </div>
               {generatedReportId !== "downloaded" && (
@@ -280,7 +280,7 @@ export default function GenerateReportPage() {
 
           {/* Generate Button */}
           <Button
-            className="w-full bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm font-semibold h-11"
+            className="w-full bg-cg-sage hover:bg-[#2D8A6E] text-white rounded-xl shadow-sm font-semibold h-11"
             onClick={handleGenerate}
             disabled={isGenerating || !familyFileId}
           >
@@ -294,11 +294,11 @@ export default function GenerateReportPage() {
       </Card>
 
       {/* Info tip */}
-      <div className="p-4 rounded-xl bg-[#F4F8F7] border border-[#3DAA8A]/10">
+      <div className="p-4 rounded-xl bg-background border border-cg-sage/10">
         <div className="flex gap-3">
-          <FileText className="h-4 w-4 text-[#3DAA8A] shrink-0 mt-0.5" />
+          <FileText className="h-4 w-4 text-cg-sage shrink-0 mt-0.5" />
           <div>
-            <p className="text-xs font-semibold text-[#1E3A4A]">SHA-256 verified</p>
+            <p className="text-xs font-semibold text-foreground">SHA-256 verified</p>
             <p className="text-[11px] text-slate-600 mt-0.5 leading-relaxed">
               Every report is cryptographically signed for tamper-evident verification.
             </p>

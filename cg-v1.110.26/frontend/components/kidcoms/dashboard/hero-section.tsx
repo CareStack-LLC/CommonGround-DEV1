@@ -21,7 +21,7 @@ export function HeroSection({ childName, avatarUrl, className }: HeroSectionProp
 
   return (
     <div className={cn(
-      "relative bg-gradient-to-br from-[#3DAA8A] via-[#2D6A8F] to-[#2D6A8F] rounded-2xl p-6 overflow-hidden shadow-lg",
+      "relative bg-gradient-to-br from-cg-sage via-cg-slate to-cg-slate rounded-2xl p-6 overflow-hidden shadow-lg",
       className
     )}>
       {/* Decorative background pattern */}

@@ -440,7 +440,7 @@ export default function ExchangeForm({
               </div>
             ) : (
               <div className="p-4 bg-cg-amber-subtle border border-cg-amber/30 rounded-lg">
-                <p className="text-sm text-[#E09520] dark:text-[#F5A623]">
+                <p className="text-sm text-[#E09520] dark:text-cg-amber">
                   No children found. Please add children to your family file first.
                 </p>
               </div>
@@ -508,7 +508,7 @@ export default function ExchangeForm({
                 />
               </div>
               {formData.location_lat && formData.location_lng && (
-                <p className="text-xs text-[#2D8A70] mt-1">
+                <p className="text-xs text-cg-sage-dark mt-1">
                   GPS: {formData.location_lat.toFixed(6)}, {formData.location_lng.toFixed(6)}
                 </p>
               )}
@@ -638,9 +638,9 @@ export default function ExchangeForm({
 
             {/* KidsCubbie Items Selector */}
             {!isLoadingItems && getRelevantCubbieItems().length > 0 && (
-              <div className="p-4 bg-[#3DAA8A]/10 rounded-lg border border-[#3DAA8A]/30">
+              <div className="p-4 bg-cg-sage/10 rounded-lg border border-cg-sage/30">
                 <div className="flex items-center gap-2 mb-3">
-                  <Box className="h-5 w-5 text-[#2D8A70]" />
+                  <Box className="h-5 w-5 text-cg-sage-dark" />
                   <Label className="text-foreground font-medium">KidsCubbie Items to Transfer</Label>
                 </div>
                 <p className="text-xs text-muted-foreground mb-3">
@@ -660,12 +660,12 @@ export default function ExchangeForm({
                               type="button"
                               onClick={() => toggleCubbieItem(item.id)}
                               className={`flex items-center gap-3 p-3 rounded-lg border-2 text-left transition-all ${isSelected
-                                ? 'border-[#3DAA8A] bg-[#3DAA8A]/20'
-                                : 'border-border bg-background hover:border-[#3DAA8A]/50'
+                                ? 'border-cg-sage bg-cg-sage/20'
+                                : 'border-border bg-background hover:border-cg-sage/50'
                                 }`}
                             >
                               {isSelected ? (
-                                <CheckCircle className="h-5 w-5 text-[#2D8A70] flex-shrink-0" />
+                                <CheckCircle className="h-5 w-5 text-cg-sage-dark flex-shrink-0" />
                               ) : (
                                 <span className="text-lg flex-shrink-0">{CATEGORY_ICONS[item.category] || '📦'}</span>
                               )}
@@ -684,8 +684,8 @@ export default function ExchangeForm({
                   ))}
                 </div>
                 {formData.selected_cubbie_items.length > 0 && (
-                  <div className="mt-3 pt-3 border-t border-[#3DAA8A]/30">
-                    <p className="text-sm text-[#2D8A70] dark:text-[#5BC4A0]">
+                  <div className="mt-3 pt-3 border-t border-cg-sage/30">
+                    <p className="text-sm text-cg-sage-dark dark:text-cg-sage-light">
                       ✓ {formData.selected_cubbie_items.length} item{formData.selected_cubbie_items.length !== 1 ? 's' : ''} will be tracked in this exchange
                     </p>
                   </div>

@@ -246,7 +246,7 @@ export default function ExportsPage() {
     switch (status) {
       case "completed":
         return (
-          <Badge className="bg-[#E8F4F0] text-[#236E59]">
+          <Badge className="bg-cg-sage-subtle text-[#236E59]">
             <CheckCircle2 className="h-3 w-3 mr-1" />
             Ready
           </Badge>
@@ -260,7 +260,7 @@ export default function ExportsPage() {
         );
       case "pending":
         return (
-          <Badge className="bg-[#FEF7ED] text-[#8F5E14]">
+          <Badge className="bg-cg-amber-subtle text-[#8F5E14]">
             <Clock className="h-3 w-3 mr-1" />
             Pending
           </Badge>
@@ -363,7 +363,7 @@ export default function ExportsPage() {
           <Card className="border-dashed hover:shadow-md transition-shadow">
             <CardContent className="pt-6">
               <div className="flex items-start gap-4">
-                <div className="p-3 bg-[#E0EFF8] text-[#2D6A8F] rounded-lg">
+                <div className="p-3 bg-cg-slate-subtle text-cg-slate rounded-lg">
                   <FileCheck className="h-6 w-6" />
                 </div>
                 <div className="flex-1">
@@ -394,7 +394,7 @@ export default function ExportsPage() {
         <h2 className="text-lg font-semibold">Export History</h2>
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2D8A70]" />
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cg-sage-dark" />
           </div>
         ) : history.length === 0 ? (
           <Card>
@@ -524,7 +524,7 @@ export default function ExportsPage() {
                       key={section.id}
                       className={`flex items-center gap-2 p-3 rounded-lg border cursor-pointer transition-colors ${
                         selectedSections.includes(section.id)
-                          ? "border-[#3DAA8A] bg-[#E8F4F0]"
+                          ? "border-cg-sage bg-cg-sage-subtle"
                           : "border-muted hover:bg-muted/50"
                       }`}
                       onClick={() => toggleSection(section.id)}

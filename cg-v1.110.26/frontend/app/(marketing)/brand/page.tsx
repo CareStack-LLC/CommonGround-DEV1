@@ -10,27 +10,27 @@ export const metadata: Metadata = {
 };
 
 const CORE = [
-  { hex: '#3DAA8A', name: 'Calm Teal', token: '--primary', note: 'Trust · primary · Parent A', ink: '#FFFFFF' },
-  { hex: '#2D6A8F', name: 'Ocean Blue', token: '--secondary', note: 'Stability · Parent B · pro', ink: '#FFFFFF' },
-  { hex: '#F5A623', name: 'Child Gold', token: '--cg-amber', note: 'The child · warmth · the arch', ink: '#1E3A4A' },
-  { hex: '#1E3A4A', name: 'Deep Navy', token: '--foreground', note: 'Headings · authority · ink', ink: '#FFFFFF' },
-  { hex: '#F4F8F7', name: 'Soft White', token: '--background', note: 'App background', ink: '#1E3A4A' },
-  { hex: '#FFFFFF', name: 'Pure White', token: '--card', note: 'Cards · surfaces', ink: '#1E3A4A' },
+  { hex: 'var(--cg-sage)', name: 'Calm Teal', token: '--primary', note: 'Trust · primary · Parent A', ink: '#FFFFFF' },
+  { hex: 'var(--cg-slate)', name: 'Ocean Blue', token: '--secondary', note: 'Stability · Parent B · pro', ink: '#FFFFFF' },
+  { hex: 'var(--cg-amber)', name: 'Child Gold', token: '--cg-amber', note: 'The child · warmth · the arch', ink: 'var(--foreground)' },
+  { hex: 'var(--foreground)', name: 'Deep Navy', token: '--foreground', note: 'Headings · authority · ink', ink: '#FFFFFF' },
+  { hex: 'var(--background)', name: 'Soft White', token: '--background', note: 'App background', ink: 'var(--foreground)' },
+  { hex: '#FFFFFF', name: 'Pure White', token: '--card', note: 'Cards · surfaces', ink: 'var(--foreground)' },
 ];
 
 const SUPPORT = [
-  { hex: '#5BC4A0', name: 'Soft Teal', ink: '#1E3A4A' },
-  { hex: '#4BA8C8', name: 'Sky Blue', ink: '#1E3A4A' },
-  { hex: '#E8F4F0', name: 'Teal wash', ink: '#1E3A4A' },
-  { hex: '#E0EFF8', name: 'Blue wash', ink: '#1E3A4A' },
-  { hex: '#FEF7ED', name: 'Gold wash', ink: '#1E3A4A' },
-  { hex: '#D6ECE8', name: 'Border', ink: '#1E3A4A' },
+  { hex: 'var(--cg-sage-light)', name: 'Soft Teal', ink: 'var(--foreground)' },
+  { hex: 'var(--cg-slate-light)', name: 'Sky Blue', ink: 'var(--foreground)' },
+  { hex: 'var(--cg-sage-subtle)', name: 'Teal wash', ink: 'var(--foreground)' },
+  { hex: 'var(--cg-slate-subtle)', name: 'Blue wash', ink: 'var(--foreground)' },
+  { hex: 'var(--cg-amber-subtle)', name: 'Gold wash', ink: 'var(--foreground)' },
+  { hex: 'var(--border)', name: 'Border', ink: 'var(--foreground)' },
 ];
 
 const STATUS = [
-  { hex: '#3DAA8A', name: 'Success', ink: '#FFFFFF' },
-  { hex: '#F5A623', name: 'Warning', ink: '#1E3A4A' },
-  { hex: '#C53030', name: 'Error', ink: '#FFFFFF' },
+  { hex: 'var(--cg-sage)', name: 'Success', ink: '#FFFFFF' },
+  { hex: 'var(--cg-amber)', name: 'Warning', ink: 'var(--foreground)' },
+  { hex: 'var(--cg-error)', name: 'Error', ink: '#FFFFFF' },
   { hex: '#0284C7', name: 'Info', ink: '#FFFFFF' },
 ];
 
@@ -99,11 +99,11 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="mx-auto max-w-6xl px-6 py-14 border-t border-[#D6ECE8]">
-      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#3DAA8A]">
+    <section className="mx-auto max-w-6xl px-6 py-14 border-t border-border">
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cg-sage">
         {eyebrow}
       </p>
-      <h2 className="mt-2 text-3xl md:text-4xl text-[#1E3A4A]" style={serif}>
+      <h2 className="mt-2 text-3xl md:text-4xl text-foreground" style={serif}>
         {title}
       </h2>
       <div className="mt-8">{children}</div>
@@ -113,7 +113,7 @@ function Section({
 
 export default function BrandPage() {
   return (
-    <div className="bg-[#F4F8F7] text-[#1E3A4A]">
+    <div className="bg-background text-foreground">
       {/* Hero */}
       <header className="mx-auto max-w-6xl px-6 pt-16 pb-10 text-center">
         <div className="mx-auto mb-8 flex h-28 w-28 items-center justify-center rounded-[26px] bg-white shadow-[0_1px_3px_rgba(0,0,0,0.05)]">
@@ -128,13 +128,13 @@ export default function BrandPage() {
           and icon exists to lower the temperature for families in conflict.
         </p>
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3 text-sm">
-          <span className="rounded-full bg-[#E8F4F0] px-4 py-1.5 font-medium text-[#2D8A70]">
+          <span className="rounded-full bg-cg-sage-subtle px-4 py-1.5 font-medium text-cg-sage-dark">
             Version 1.0
           </span>
-          <span className="rounded-full bg-[#E0EFF8] px-4 py-1.5 font-medium text-[#2D6A8F]">
+          <span className="rounded-full bg-cg-slate-subtle px-4 py-1.5 font-medium text-cg-slate">
             Light-locked
           </span>
-          <span className="rounded-full bg-[#FEF7ED] px-4 py-1.5 font-medium text-[#B8791A]">
+          <span className="rounded-full bg-cg-amber-subtle px-4 py-1.5 font-medium text-[#B8791A]">
             30 brand icons
           </span>
         </div>
@@ -143,32 +143,32 @@ export default function BrandPage() {
       {/* Logo */}
       <Section eyebrow="Identity" title="The logo is a family">
         <div className="grid gap-8 md:grid-cols-3">
-          <div className="rounded-2xl border border-[#D6ECE8] bg-white p-8">
-            <div className="flex h-40 items-center justify-center rounded-xl bg-[#F4F8F7]">
+          <div className="rounded-2xl border border-border bg-white p-8">
+            <div className="flex h-40 items-center justify-center rounded-xl bg-background">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/icon.svg" alt="Primary mark" width={120} height={120} />
             </div>
             <p className="mt-4 text-sm text-[#4A4A47]">
-              Two parents — <span className="font-semibold text-[#3DAA8A]">teal</span> and{' '}
-              <span className="font-semibold text-[#2D6A8F]">ocean blue</span> — held together by a{' '}
+              Two parents — <span className="font-semibold text-cg-sage">teal</span> and{' '}
+              <span className="font-semibold text-cg-slate">ocean blue</span> — held together by a{' '}
               <span className="font-semibold text-[#C98A12]">gold arch</span> above their{' '}
               <span className="font-semibold text-[#C98A12]">child</span>.
             </p>
           </div>
-          <div className="rounded-2xl border border-[#D6ECE8] bg-white p-8">
-            <div className="flex h-40 items-center justify-center gap-6 rounded-xl bg-[#1E3A4A]">
+          <div className="rounded-2xl border border-border bg-white p-8">
+            <div className="flex h-40 items-center justify-center gap-6 rounded-xl bg-foreground">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/brand/icons/logo-glyph.svg" alt="Glyph on navy" width={64} height={64} />
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/icon.svg" alt="Icon small" width={40} height={40} />
             </div>
             <p className="mt-4 text-sm text-[#4A4A47]">
-              The <code className="rounded bg-[#F4F8F7] px-1">logo-glyph</code> works inline and on
+              The <code className="rounded bg-background px-1">logo-glyph</code> works inline and on
               dark. Min 24px glyph / 32px full icon. Keep ¼-mark clear space.
             </p>
           </div>
-          <div className="rounded-2xl border border-[#D6ECE8] bg-white p-8">
-            <p className="text-sm font-semibold text-[#C53030]">Don't</p>
+          <div className="rounded-2xl border border-border bg-white p-8">
+            <p className="text-sm font-semibold text-cg-error">Don't</p>
             <ul className="mt-3 space-y-2 text-sm text-[#4A4A47]">
               <li>· Recolor the two parents to one hue</li>
               <li>· Make the arch or child anything but gold</li>
@@ -183,7 +183,7 @@ export default function BrandPage() {
       <Section eyebrow="Color" title="Semantic, never decorative">
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
           {CORE.map((c) => (
-            <div key={c.hex} className="overflow-hidden rounded-2xl border border-[#D6ECE8] bg-white">
+            <div key={c.hex} className="overflow-hidden rounded-2xl border border-border bg-white">
               <div
                 className="flex h-24 items-end p-3"
                 style={{ backgroundColor: c.hex, color: c.ink }}
@@ -192,7 +192,7 @@ export default function BrandPage() {
               </div>
               <div className="p-3">
                 <p className="text-sm font-semibold">{c.name}</p>
-                <p className="font-mono text-[11px] text-[#6B8A9A]">{c.token}</p>
+                <p className="font-mono text-[11px] text-muted-foreground">{c.token}</p>
                 <p className="mt-1 text-xs text-[#4A4A47]">{c.note}</p>
               </div>
             </div>
@@ -201,21 +201,21 @@ export default function BrandPage() {
 
         <div className="mt-10 grid gap-8 md:grid-cols-2">
           <div>
-            <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-[#6B8A9A]">
+            <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
               Supporting & tints
             </h3>
             <div className="grid grid-cols-3 gap-3">
               {SUPPORT.map((c) => (
-                <div key={c.hex} className="rounded-xl border border-[#D6ECE8] bg-white p-2">
+                <div key={c.hex} className="rounded-xl border border-border bg-white p-2">
                   <div className="h-12 rounded-lg" style={{ backgroundColor: c.hex }} />
                   <p className="mt-2 text-xs font-medium">{c.name}</p>
-                  <p className="font-mono text-[10px] text-[#6B8A9A]">{c.hex}</p>
+                  <p className="font-mono text-[10px] text-muted-foreground">{c.hex}</p>
                 </div>
               ))}
             </div>
           </div>
           <div>
-            <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-[#6B8A9A]">
+            <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
               Status — earned, never emotional
             </h3>
             <div className="grid grid-cols-2 gap-3">
@@ -240,14 +240,14 @@ export default function BrandPage() {
       {/* Typography */}
       <Section eyebrow="Typography" title="Readable under stress">
         <div className="grid gap-8 md:grid-cols-2">
-          <div className="rounded-2xl border border-[#D6ECE8] bg-white p-8">
-            <p className="text-xs font-semibold uppercase tracking-wide text-[#6B8A9A]">
+          <div className="rounded-2xl border border-border bg-white p-8">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               DM Serif Display · headings
             </p>
             <p className="mt-3 text-5xl leading-tight" style={serif}>
               A calmer way to co-parent
             </p>
-            <p className="mt-6 text-xs font-semibold uppercase tracking-wide text-[#6B8A9A]">
+            <p className="mt-6 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               DM Sans · body — 17px base, 1.6 line-height
             </p>
             <p className="mt-3 text-[17px] leading-[1.6] text-[#4A4A47]">
@@ -255,12 +255,12 @@ export default function BrandPage() {
               often tired and anxious. Short sentences. Plain language. Warmth
               over cleverness.
             </p>
-            <p className="mt-6 font-mono text-sm text-[#2D6A8F]">
+            <p className="mt-6 font-mono text-sm text-cg-slate">
               DM Mono · $1,240.00 · custody 57% / 43%
             </p>
           </div>
-          <div className="rounded-2xl border border-[#D6ECE8] bg-white p-8">
-            <p className="text-xs font-semibold uppercase tracking-wide text-[#6B8A9A]">
+          <div className="rounded-2xl border border-border bg-white p-8">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Type scale
             </p>
             <div className="mt-4 space-y-2">
@@ -275,10 +275,10 @@ export default function BrandPage() {
                 ['xs', '13', 'Caption'],
               ].map(([tok, px, use]) => (
                 <div key={tok} className="flex items-baseline gap-4 border-b border-[#EEF6F4] pb-1">
-                  <span className="w-12 font-mono text-xs text-[#6B8A9A]">{tok}</span>
-                  <span className="w-10 font-mono text-xs text-[#6B8A9A]">{px}px</span>
+                  <span className="w-12 font-mono text-xs text-muted-foreground">{tok}</span>
+                  <span className="w-10 font-mono text-xs text-muted-foreground">{px}px</span>
                   <span
-                    className="truncate text-[#1E3A4A]"
+                    className="truncate text-foreground"
                     style={{ fontSize: `${px}px`, lineHeight: 1.2 }}
                   >
                     {use}
@@ -296,19 +296,19 @@ export default function BrandPage() {
           Duotone, brand-colored icons in the logo's rounded-line + gold-arch
           language. Use these for features, portals, and hero moments; keep Lucide
           for generic UI. Rendered via{' '}
-          <code className="rounded bg-white px-1 py-0.5 text-[#2D6A8F]">&lt;BrandIcon /&gt;</code>.
+          <code className="rounded bg-white px-1 py-0.5 text-cg-slate">&lt;BrandIcon /&gt;</code>.
         </p>
         <div className="space-y-8">
           {ICON_GROUPS.map((group) => (
             <div key={group.title}>
-              <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-[#6B8A9A]">
+              <h3 className="mb-4 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
                 {group.title}
               </h3>
               <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-7">
                 {group.icons.map((icon) => (
                   <div
                     key={icon.name}
-                    className="flex flex-col items-center gap-2 rounded-2xl border border-[#D6ECE8] bg-white p-4 transition-shadow hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)]"
+                    className="flex flex-col items-center gap-2 rounded-2xl border border-border bg-white p-4 transition-shadow hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)]"
                   >
                     <BrandIcon name={icon.name as never} size={34} />
                     <span className="text-center text-[11px] leading-tight text-[#4A4A47]">
@@ -327,31 +327,31 @@ export default function BrandPage() {
         <div className="grid gap-6 md:grid-cols-2">
           <ul className="space-y-3 text-[15px] leading-relaxed text-[#4A4A47]">
             <li>
-              <span className="font-semibold text-[#1E3A4A]">Real &amp; multicultural.</span> Diverse
+              <span className="font-semibold text-foreground">Real &amp; multicultural.</span> Diverse
               ages, ethnicities, and family shapes — deliberate, never tokenized.
             </li>
             <li>
-              <span className="font-semibold text-[#1E3A4A]">Warm natural light.</span> Soft daylight,
+              <span className="font-semibold text-foreground">Warm natural light.</span> Soft daylight,
               golden hour, teal-green shadows and warm highlights.
             </li>
             <li>
-              <span className="font-semibold text-[#1E3A4A]">Candid, not stock-posed.</span> Genuine
+              <span className="font-semibold text-foreground">Candid, not stock-posed.</span> Genuine
               moments — a laugh, a piggyback, a relieved exhale.
             </li>
             <li>
-              <span className="font-semibold text-[#1E3A4A]">Show the calm after.</span> No conflict,
+              <span className="font-semibold text-foreground">Show the calm after.</span> No conflict,
               no courtrooms, no tears. Hopeful and bright.
             </li>
             <li>
-              <span className="font-semibold text-[#1E3A4A]">Light-locked &amp; clean.</span> No dark or
+              <span className="font-semibold text-foreground">Light-locked &amp; clean.</span> No dark or
               glass treatments, no baked-in text, no logos.
             </li>
           </ul>
-          <div className="rounded-2xl border border-[#D6ECE8] bg-white p-6">
-            <p className="text-xs font-semibold uppercase tracking-wide text-[#6B8A9A]">
+          <div className="rounded-2xl border border-border bg-white p-6">
+            <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Higgsfield style suffix
             </p>
-            <p className="mt-3 rounded-xl bg-[#F4F8F7] p-4 text-[13px] italic leading-relaxed text-[#4A4A47]">
+            <p className="mt-3 rounded-xl bg-background p-4 text-[13px] italic leading-relaxed text-[#4A4A47]">
               Natural candid lifestyle photography, warm soft natural daylight,
               gentle film-like color grading with calm teal-green and warm golden
               tones, shallow depth of field, authentic and emotionally warm,
@@ -362,12 +362,12 @@ export default function BrandPage() {
         </div>
       </Section>
 
-      <footer className="mx-auto max-w-6xl px-6 py-12 border-t border-[#D6ECE8] text-sm text-[#6B8A9A]">
+      <footer className="mx-auto max-w-6xl px-6 py-12 border-t border-border text-sm text-muted-foreground">
         Living document · maintained alongside{' '}
-        <code className="text-[#2D6A8F]">globals.css</code>,{' '}
-        <code className="text-[#2D6A8F]">design-tokens.ts</code>, and{' '}
-        <code className="text-[#2D6A8F]">public/brand/icons</code>. See{' '}
-        <code className="text-[#2D6A8F]">docs/brand/BRAND_GUIDE.md</code> for the full reference.
+        <code className="text-cg-slate">globals.css</code>,{' '}
+        <code className="text-cg-slate">design-tokens.ts</code>, and{' '}
+        <code className="text-cg-slate">public/brand/icons</code>. See{' '}
+        <code className="text-cg-slate">docs/brand/BRAND_GUIDE.md</code> for the full reference.
       </footer>
     </div>
   );

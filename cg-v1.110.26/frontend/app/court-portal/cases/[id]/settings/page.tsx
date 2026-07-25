@@ -214,9 +214,9 @@ export default function SettingsPage() {
   }, {} as Record<string, typeof SETTING_DEFINITIONS>);
 
   const impactColors = {
-    high: "bg-[#FEE2E2] text-[#9B2C2C]",
-    medium: "bg-[#FEF7ED] text-[#E09520]",
-    low: "bg-[#E0EFF8] text-[#1E4E6B]",
+    high: "bg-cg-error-subtle text-[#9B2C2C]",
+    medium: "bg-cg-amber-subtle text-[#E09520]",
+    low: "bg-cg-slate-subtle text-[#1E4E6B]",
   };
 
   return (
@@ -251,21 +251,21 @@ export default function SettingsPage() {
 
       {/* Error Message */}
       {error && (
-        <div className="bg-[#FEE2E2] border border-[#FEE2E2] text-[#9B2C2C] px-4 py-3 rounded">
+        <div className="bg-cg-error-subtle border border-cg-error-subtle text-[#9B2C2C] px-4 py-3 rounded">
           {error}
         </div>
       )}
 
       {/* Success Message */}
       {saveSuccess && (
-        <div className="bg-[#E8F4F0] border border-[#E8F4F0] text-[#2D8A70] px-4 py-3 rounded">
+        <div className="bg-cg-sage-subtle border border-cg-sage-subtle text-cg-sage-dark px-4 py-3 rounded">
           Settings saved successfully! Changes are now active for this case.
         </div>
       )}
 
       {/* Pending Changes Warning */}
       {hasChanges && (
-        <Card className="border-2 border-[#F5A623] bg-[#FEF7ED]">
+        <Card className="border-2 border-cg-amber bg-cg-amber-subtle">
           <CardContent className="p-4">
             <div className="flex items-center space-x-3">
               <span className="text-xl">⚠️</span>
@@ -297,7 +297,7 @@ export default function SettingsPage() {
                 <div
                   key={setting.key}
                   className={`flex items-center justify-between p-4 rounded-lg border ${
-                    hasChanged ? "border-[#F5A623] bg-[#FEF7ED]" : "border-slate-200"
+                    hasChanged ? "border-cg-amber bg-cg-amber-subtle" : "border-slate-200"
                   }`}
                 >
                   <div className="flex-1">
@@ -309,7 +309,7 @@ export default function SettingsPage() {
                         {setting.impact} impact
                       </span>
                       {hasChanged && (
-                        <span className="px-2 py-0.5 rounded text-xs bg-[#FEF7ED] text-[#E09520]">
+                        <span className="px-2 py-0.5 rounded text-xs bg-cg-amber-subtle text-[#E09520]">
                           modified
                         </span>
                       )}

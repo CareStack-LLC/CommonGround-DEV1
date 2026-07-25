@@ -915,9 +915,9 @@ function AgreementDetailsContent() {
                           <strong>Shared Expenses:</strong> {summary.shared_expenses_table.split}
                         </p>
                         <div className="grid grid-cols-2 gap-3 text-xs">
-                          <div className="bg-[#E8F4F0] dark:bg-[#1E3A4A]/10 rounded-lg p-3 border border-[#E8F4F0] dark:border-[#1E3A4A]">
-                            <p className="font-semibold text-[#1E3A4A] dark:text-[#E8F4F0] mb-2">✓ Covered</p>
-                            <ul className="space-y-1.5 text-[#1E3A4A] dark:text-[#E8F4F0]">
+                          <div className="bg-cg-sage-subtle dark:bg-foreground/10 rounded-lg p-3 border border-cg-sage-subtle dark:border-foreground">
+                            <p className="font-semibold text-foreground dark:text-cg-sage-subtle mb-2">✓ Covered</p>
+                            <ul className="space-y-1.5 text-foreground dark:text-cg-sage-subtle">
                               {summary.shared_expenses_table.covered?.map((item: string, idx: number) => (
                                 <li key={idx}>• {item}</li>
                               ))}
@@ -926,9 +926,9 @@ function AgreementDetailsContent() {
                               )}
                             </ul>
                           </div>
-                          <div className="bg-[#FEE2E2] dark:bg-[#7A2222]/10 rounded-lg p-3 border border-[#FEE2E2] dark:border-[#9B2C2C]">
-                            <p className="font-semibold text-[#7A2222] dark:text-[#FEE2E2] mb-2">✗ Not Covered</p>
-                            <ul className="space-y-1.5 text-[#9B2C2C] dark:text-[#FEE2E2]">
+                          <div className="bg-cg-error-subtle dark:bg-[#7A2222]/10 rounded-lg p-3 border border-cg-error-subtle dark:border-[#9B2C2C]">
+                            <p className="font-semibold text-[#7A2222] dark:text-cg-error-subtle mb-2">✗ Not Covered</p>
+                            <ul className="space-y-1.5 text-[#9B2C2C] dark:text-cg-error-subtle">
                               {summary.shared_expenses_table.not_covered?.map((item: string, idx: number) => (
                                 <li key={idx}>• {item}</li>
                               ))}
@@ -959,27 +959,27 @@ function AgreementDetailsContent() {
                     {/* Summary stats */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                       {activationSummary.summary.custody_exchanges > 0 && (
-                        <div className="p-3 rounded-xl bg-[#E0EFF8] dark:bg-[#1E3A4A]/30 text-center">
-                          <div className="text-2xl font-bold text-[#2D6A8F]">{activationSummary.summary.custody_exchanges}</div>
-                          <div className="text-xs text-[#2D6A8F]/70">Exchanges</div>
+                        <div className="p-3 rounded-xl bg-cg-slate-subtle dark:bg-foreground/30 text-center">
+                          <div className="text-2xl font-bold text-cg-slate">{activationSummary.summary.custody_exchanges}</div>
+                          <div className="text-xs text-cg-slate/70">Exchanges</div>
                         </div>
                       )}
                       {activationSummary.summary.holiday_events > 0 && (
-                        <div className="p-3 rounded-xl bg-[#FEF7ED] dark:bg-[#1E3A4A]/30 text-center">
+                        <div className="p-3 rounded-xl bg-cg-amber-subtle dark:bg-foreground/30 text-center">
                           <div className="text-2xl font-bold text-[#E09520]">{activationSummary.summary.holiday_events}</div>
                           <div className="text-xs text-[#E09520]/70">Holidays</div>
                         </div>
                       )}
                       {activationSummary.summary.activity_events > 0 && (
-                        <div className="p-3 rounded-xl bg-[#E8F4F0] dark:bg-[#1E3A4A]/30 text-center">
-                          <div className="text-2xl font-bold text-[#2D8A70]">{activationSummary.summary.activity_events}</div>
-                          <div className="text-xs text-[#2D8A70]/70">Activities</div>
+                        <div className="p-3 rounded-xl bg-cg-sage-subtle dark:bg-foreground/30 text-center">
+                          <div className="text-2xl font-bold text-cg-sage-dark">{activationSummary.summary.activity_events}</div>
+                          <div className="text-xs text-cg-sage-dark/70">Activities</div>
                         </div>
                       )}
                       {activationSummary.summary.obligation_templates > 0 && (
-                        <div className="p-3 rounded-xl bg-[#E0EFF8] dark:bg-[#1E3A4A]/30 text-center">
-                          <div className="text-2xl font-bold text-[#2D6A8F]">{activationSummary.summary.obligation_templates}</div>
-                          <div className="text-xs text-[#2D6A8F]/70">Obligations</div>
+                        <div className="p-3 rounded-xl bg-cg-slate-subtle dark:bg-foreground/30 text-center">
+                          <div className="text-2xl font-bold text-cg-slate">{activationSummary.summary.obligation_templates}</div>
+                          <div className="text-xs text-cg-slate/70">Obligations</div>
                         </div>
                       )}
                     </div>
@@ -1031,10 +1031,10 @@ function AgreementDetailsContent() {
                         {/* Overall Score */}
                         <div className="text-center p-6 rounded-2xl bg-muted/30">
                           <div className={`text-5xl font-bold ${
-                            complianceData.overall_score >= 90 ? 'text-[#2D8A70]' :
-                            complianceData.overall_score >= 75 ? 'text-[#2D6A8F]' :
+                            complianceData.overall_score >= 90 ? 'text-cg-sage-dark' :
+                            complianceData.overall_score >= 75 ? 'text-cg-slate' :
                             complianceData.overall_score >= 50 ? 'text-[#E09520]' :
-                            'text-[#C53030]'
+                            'text-cg-error'
                           }`}>
                             {complianceData.overall_score}%
                           </div>
@@ -1069,7 +1069,7 @@ function AgreementDetailsContent() {
                             </div>
                             <div className="h-2 bg-muted rounded-full overflow-hidden">
                               <div
-                                className="h-full bg-[#2D6A8F] rounded-full transition-all"
+                                className="h-full bg-cg-slate rounded-full transition-all"
                                 style={{ width: `${complianceData.exchange_compliance.completion_rate}%` }}
                               />
                             </div>
@@ -1098,7 +1098,7 @@ function AgreementDetailsContent() {
                             </div>
                             <div className="h-2 bg-muted rounded-full overflow-hidden">
                               <div
-                                className="h-full bg-[#3DAA8A] rounded-full transition-all"
+                                className="h-full bg-cg-sage rounded-full transition-all"
                                 style={{ width: `${complianceData.financial_compliance.completion_rate}%` }}
                               />
                             </div>

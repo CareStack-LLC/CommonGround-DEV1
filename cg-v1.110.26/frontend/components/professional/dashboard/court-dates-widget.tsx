@@ -112,7 +112,7 @@ export function CourtDatesWidget({ events }: CourtDatesWidgetProps) {
                                         </span>
                                     )}
                                     {event.is_mandatory && (
-                                        <Badge className="text-[9px] px-1.5 py-0 bg-[#FEF7ED] text-[#E09520] border border-[#FEF7ED] flex items-center gap-0.5">
+                                        <Badge className="text-[9px] px-1.5 py-0 bg-cg-amber-subtle text-[#E09520] border border-cg-amber-subtle flex items-center gap-0.5">
                                             <AlertTriangle className="h-2.5 w-2.5" />
                                             Req.
                                         </Badge>

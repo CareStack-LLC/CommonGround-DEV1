@@ -93,12 +93,12 @@ const REMINDER_OPTIONS = [
 ];
 
 const COLOR_OPTIONS = [
-  { value: "#2D6A8F", label: "Blue" },
-  { value: "#C53030", label: "Red" },
-  { value: "#3DAA8A", label: "Green" },
-  { value: "#F5A623", label: "Amber" },
-  { value: "#2D6A8F", label: "Purple" },
-  { value: "#F5A623", label: "Pink" },
+  { value: "var(--cg-slate)", label: "Blue" },
+  { value: "var(--cg-error)", label: "Red" },
+  { value: "var(--cg-sage)", label: "Green" },
+  { value: "var(--cg-amber)", label: "Amber" },
+  { value: "var(--cg-slate)", label: "Purple" },
+  { value: "var(--cg-amber)", label: "Pink" },
   { value: "#6B7280", label: "Gray" },
 ];
 
@@ -116,7 +116,7 @@ const defaultFormData: EventFormData = {
   parent_visibility: "none",
   reminder_minutes: 30,
   notes: "",
-  color: "#2D6A8F",
+  color: "var(--cg-slate)",
   attendee_ids: [],
   attendee_emails: [],
 };
@@ -243,7 +243,7 @@ export function EventForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
-        <div className="flex items-center gap-2 text-[#C53030] bg-[#FEE2E2] p-3 rounded-lg">
+        <div className="flex items-center gap-2 text-cg-error bg-cg-error-subtle p-3 rounded-lg">
           <AlertTriangle className="h-4 w-4" />
           <span className="text-sm">{error}</span>
         </div>
@@ -447,12 +447,12 @@ export function EventForm({
                   : "bg-white border-slate-200 text-slate-600 hover:border-slate-300"
                   }`}
               >
-                <div className="h-4 w-4 rounded-full bg-[#E0EFF8] flex items-center justify-center text-[10px]">
+                <div className="h-4 w-4 rounded-full bg-cg-slate-subtle flex items-center justify-center text-[10px]">
                   {parent.name[0]}
                 </div>
                 {parent.name}
                 {formData.attendee_ids.includes(parent.id) && (
-                  <div className="h-3 w-3 bg-[#2D6A8F] rounded-full flex items-center justify-center">
+                  <div className="h-3 w-3 bg-cg-slate rounded-full flex items-center justify-center">
                     <CheckCircle2 className="h-2 w-2 text-white" />
                   </div>
                 )}

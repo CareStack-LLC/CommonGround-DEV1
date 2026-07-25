@@ -58,7 +58,7 @@ export function TrustBar({
       {items.map((item, idx) => (
         <Fragment key={`${item.value}-${item.label}`}>
           <div className="text-center">
-            <div className="font-serif text-2xl sm:text-3xl md:text-[2.5rem] text-[#1E3A4A] leading-none">
+            <div className="font-serif text-2xl sm:text-3xl md:text-[2.5rem] text-foreground leading-none">
               {item.value}
             </div>
             <div className="mt-2 text-xs sm:text-sm font-medium uppercase tracking-wider text-gray-500">

@@ -110,9 +110,9 @@ export default function IntegrationsPage() {
 
   const categoryColors: Record<string, string> = {
     "Practice Management": "bg-blue-100 text-blue-700 border-blue-200",
-    Billing: "bg-[#E8F4F0] text-[#2D8A70] border-[#C5E5DB]",
-    Communication: "bg-[#E0EFF8] text-[#1E4E6B] border-[#C2DEF0]",
-    "Document Management": "bg-[#FEF7ED] text-[#B8791A] border-[#FBE3BF]",
+    Billing: "bg-cg-sage-subtle text-cg-sage-dark border-[#C5E5DB]",
+    Communication: "bg-cg-slate-subtle text-[#1E4E6B] border-[#C2DEF0]",
+    "Document Management": "bg-cg-amber-subtle text-[#B8791A] border-[#FBE3BF]",
   };
 
   return (
@@ -120,7 +120,7 @@ export default function IntegrationsPage() {
       {/* Header */}
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="p-4 bg-gradient-to-br from-[#3DAA8A] to-[#1E3A4A] text-white rounded-xl shadow-lg shadow-[#3DAA8A]/20">
+          <div className="p-4 bg-gradient-to-br from-cg-sage to-foreground text-white rounded-xl shadow-lg shadow-cg-sage/20">
             <Puzzle className="h-8 w-8" />
           </div>
           <div>
@@ -133,11 +133,11 @@ export default function IntegrationsPage() {
       </div>
 
       {/* Coming Soon Banner */}
-      <Card className="bg-gradient-to-r from-[#E8F4F0] via-[#F4F8F7] to-[#E8F4F0] border-2 border-[#3DAA8A]/30 overflow-hidden">
+      <Card className="bg-gradient-to-r from-cg-sage-subtle via-background to-cg-sage-subtle border-2 border-cg-sage/30 overflow-hidden">
         <div className="p-6">
           <div className="flex items-start gap-4">
             <div className="p-3 bg-white rounded-xl shadow-md">
-              <Sparkles className="h-6 w-6 text-[#3DAA8A]" />
+              <Sparkles className="h-6 w-6 text-cg-sage" />
             </div>
             <div className="flex-1">
               <h3 className="text-lg font-bold text-slate-900 mb-2">Integrations Coming Soon</h3>
@@ -147,7 +147,7 @@ export default function IntegrationsPage() {
                 entry, automate billing, and centralize case information.
               </p>
               <div className="flex flex-wrap items-center gap-3">
-                <Badge className="bg-[#E8F4F0] text-[#1E3A4A] border-[#3DAA8A]/30 text-xs">
+                <Badge className="bg-cg-sage-subtle text-foreground border-cg-sage/30 text-xs">
                   <Clock className="h-3 w-3 mr-1" />
                   Launching Q2-Q3 2026
                 </Badge>
@@ -166,7 +166,7 @@ export default function IntegrationsPage() {
         {INTEGRATIONS.map((integration) => (
           <Card
             key={integration.id}
-            className="group border-2 border-slate-200 hover:border-[#3DAA8A]/40 hover:shadow-xl transition-all duration-300 overflow-hidden"
+            className="group border-2 border-slate-200 hover:border-cg-sage/40 hover:shadow-xl transition-all duration-300 overflow-hidden"
           >
             <CardHeader className="pb-4">
               <div className="flex items-start justify-between">
@@ -204,7 +204,7 @@ export default function IntegrationsPage() {
                       key={index}
                       className="flex items-center gap-2 text-sm text-slate-700 bg-slate-50 p-2 rounded-md border border-slate-100"
                     >
-                      <CheckCircle2 className="h-3.5 w-3.5 text-[#3DAA8A] shrink-0" />
+                      <CheckCircle2 className="h-3.5 w-3.5 text-cg-sage shrink-0" />
                       <span className="text-xs">{benefit}</span>
                     </div>
                   ))}
@@ -226,8 +226,8 @@ export default function IntegrationsPage() {
                   disabled={notifyRequests.has(integration.id)}
                   className={
                     notifyRequests.has(integration.id)
-                      ? "border-[#C5E5DB] text-[#2D8A70]"
-                      : "bg-[#3DAA8A] hover:bg-[#2D8A6E] text-white ml-auto"
+                      ? "border-[#C5E5DB] text-cg-sage-dark"
+                      : "bg-cg-sage hover:bg-[#2D8A6E] text-white ml-auto"
                   }
                 >
                   {notifyRequests.has(integration.id) ? (
@@ -259,7 +259,7 @@ export default function IntegrationsPage() {
             We're actively expanding our integration partnerships. Let us know which tools you use
             and we'll prioritize accordingly.
           </p>
-          <Button variant="outline" className="text-[#3DAA8A] border-[#3DAA8A]/40 hover:bg-[#F4F8F7]">
+          <Button variant="outline" className="text-cg-sage border-cg-sage/40 hover:bg-background">
             <MessageSquare className="h-4 w-4 mr-2" />
             Request an Integration
           </Button>

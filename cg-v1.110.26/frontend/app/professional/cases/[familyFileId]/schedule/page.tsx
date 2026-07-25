@@ -155,7 +155,7 @@ export default function CaseSchedulePage() {
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      completed: { color: "bg-[#E8F4F0] text-[#236E59]", icon: CheckCircle2 },
+      completed: { color: "bg-cg-sage-subtle text-[#236E59]", icon: CheckCircle2 },
       missed: { color: "bg-red-100 text-red-800", icon: XCircle },
       scheduled: { color: "bg-blue-100 text-blue-800", icon: Clock },
       cancelled: { color: "bg-gray-100 text-gray-800", icon: AlertCircle },
@@ -184,7 +184,7 @@ export default function CaseSchedulePage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#2D8A70]" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-cg-sage-dark" />
       </div>
     );
   }
@@ -203,7 +203,7 @@ export default function CaseSchedulePage() {
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="p-4 bg-[#E8F4F0] text-[#1E3A4A] rounded-xl">
+          <div className="p-4 bg-cg-sage-subtle text-foreground rounded-xl">
             <Calendar className="h-8 w-8" />
           </div>
           <div>
@@ -250,7 +250,7 @@ export default function CaseSchedulePage() {
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-base flex items-center gap-2">
-              <Shield className="h-5 w-5 text-[#3DAA8A]" />
+              <Shield className="h-5 w-5 text-cg-sage" />
               Compliance Summary
             </CardTitle>
           </CardHeader>
@@ -352,9 +352,9 @@ function StatCard({
 }) {
   const colorClasses = {
     blue: "bg-blue-50 text-blue-600",
-    emerald: "bg-[#E8F4F0] text-[#2D8A70]",
+    emerald: "bg-cg-sage-subtle text-cg-sage-dark",
     red: "bg-red-50 text-red-600",
-    amber: "bg-[#FEF7ED] text-[#E09520]",
+    amber: "bg-cg-amber-subtle text-[#E09520]",
   };
 
   return (
@@ -382,7 +382,7 @@ function ExchangeCard({
 }) {
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      completed: { color: "bg-[#E8F4F0] text-[#236E59]", icon: CheckCircle2 },
+      completed: { color: "bg-cg-sage-subtle text-[#236E59]", icon: CheckCircle2 },
       missed: { color: "bg-red-100 text-red-800", icon: XCircle },
       scheduled: { color: "bg-blue-100 text-blue-800", icon: Clock },
       cancelled: { color: "bg-gray-100 text-gray-800", icon: AlertCircle },
@@ -407,7 +407,7 @@ function ExchangeCard({
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           {/* Left: Date and Time */}
           <div className="flex items-start gap-4">
-            <div className="flex flex-col items-center justify-center w-14 h-14 bg-[#E8F4F0] text-[#1E3A4A] rounded-lg">
+            <div className="flex flex-col items-center justify-center w-14 h-14 bg-cg-sage-subtle text-foreground rounded-lg">
               <span className="text-xs font-medium">
                 {new Date(exchange.scheduled_date).toLocaleDateString("en-US", { month: "short" })}
               </span>
@@ -448,7 +448,7 @@ function ExchangeCard({
               </span>
               <span className="text-muted-foreground">→</span>
               <span className="flex items-center gap-1">
-                <User className="h-3.5 w-3.5 text-[#3DAA8A]" />
+                <User className="h-3.5 w-3.5 text-cg-sage" />
                 {exchange.dropoff_parent_name || "Dropoff parent"}
               </span>
             </div>
@@ -464,7 +464,7 @@ function ExchangeCard({
             {/* Evidence Badges */}
             <div className="flex items-center gap-2">
               {hasGPSEvidence && (
-                <Badge variant="outline" className="text-xs bg-[#E8F4F0] text-[#2D8A70] border-[#C5E5DB]">
+                <Badge variant="outline" className="text-xs bg-cg-sage-subtle text-cg-sage-dark border-[#C5E5DB]">
                   <Navigation className="h-3 w-3 mr-1" />
                   GPS
                 </Badge>
@@ -527,7 +527,7 @@ function ExchangeDetailModal({
             <Badge
               className={
                 exchange.status === "completed"
-                  ? "bg-[#E8F4F0] text-[#236E59]"
+                  ? "bg-cg-sage-subtle text-[#236E59]"
                   : exchange.status === "missed"
                   ? "bg-red-100 text-red-800"
                   : "bg-blue-100 text-blue-800"
@@ -571,7 +571,7 @@ function ExchangeDetailModal({
                       Checked in: {new Date(exchange.pickup_checkin.checked_in_at).toLocaleTimeString()}
                     </p>
                     {exchange.pickup_checkin.is_within_geofence !== undefined && (
-                      <p className={exchange.pickup_checkin.is_within_geofence ? "text-[#2D8A70]" : "text-red-600"}>
+                      <p className={exchange.pickup_checkin.is_within_geofence ? "text-cg-sage-dark" : "text-red-600"}>
                         {exchange.pickup_checkin.is_within_geofence
                           ? "Within geofence"
                           : `${Math.round(exchange.pickup_checkin.distance_from_location || 0)}m away`}
@@ -583,17 +583,17 @@ function ExchangeDetailModal({
             </div>
             <div>
               <h4 className="text-sm font-medium text-muted-foreground mb-2">Dropoff Parent</h4>
-              <div className="p-3 bg-[#E8F4F0] rounded-lg">
+              <div className="p-3 bg-cg-sage-subtle rounded-lg">
                 <p className="font-medium text-[#236E59]">
                   {exchange.dropoff_parent_name || "Not specified"}
                 </p>
                 {exchange.dropoff_checkin && (
                   <div className="mt-2 space-y-1 text-sm">
-                    <p className="text-[#2D8A70]">
+                    <p className="text-cg-sage-dark">
                       Checked in: {new Date(exchange.dropoff_checkin.checked_in_at).toLocaleTimeString()}
                     </p>
                     {exchange.dropoff_checkin.is_within_geofence !== undefined && (
-                      <p className={exchange.dropoff_checkin.is_within_geofence ? "text-[#2D8A70]" : "text-red-600"}>
+                      <p className={exchange.dropoff_checkin.is_within_geofence ? "text-cg-sage-dark" : "text-red-600"}>
                         {exchange.dropoff_checkin.is_within_geofence
                           ? "Within geofence"
                           : `${Math.round(exchange.dropoff_checkin.distance_from_location || 0)}m away`}

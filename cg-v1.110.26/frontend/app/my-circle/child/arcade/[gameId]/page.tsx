@@ -37,7 +37,7 @@ export default function GamePlayPage() {
   if (!isAuthed) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--portal-background)' }}>
-        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#4BA8C8] to-[#3DAA8A] flex items-center justify-center animate-pulse">
+        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-cg-slate-light to-cg-sage flex items-center justify-center animate-pulse">
           <Gamepad2 className="w-8 h-8 text-white" strokeWidth={1.5} />
         </div>
       </div>
@@ -50,7 +50,7 @@ export default function GamePlayPage() {
         <p className="text-lg" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--portal-muted)' }}>Game not found</p>
         <button
           onClick={() => router.push('/my-circle/child/arcade')}
-          className="px-6 py-2 rounded-full bg-[#4BA8C8] text-white font-bold text-sm"
+          className="px-6 py-2 rounded-full bg-cg-slate-light text-white font-bold text-sm"
         >
           Back to Arcade
         </button>

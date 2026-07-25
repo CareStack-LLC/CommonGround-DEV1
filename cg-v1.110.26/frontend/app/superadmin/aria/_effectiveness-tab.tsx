@@ -65,7 +65,7 @@ export default function EffectivenessTab({ data }: { data: AriaInsights }) {
 
       {/* Weekly Acceptance Rate Trend */}
       {trendData.length > 1 && (
-        <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
           <h2 className="text-sm font-semibold text-[#D0E4EC] mb-1">
             Weekly Acceptance Rate
           </h2>
@@ -110,7 +110,7 @@ export default function EffectivenessTab({ data }: { data: AriaInsights }) {
 
       {/* Weekly Toxicity Trend */}
       {trendData.length > 1 && (
-        <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
           <h2 className="text-sm font-semibold text-[#D0E4EC] mb-1">
             Weekly Average Toxicity Score
           </h2>
@@ -151,7 +151,7 @@ export default function EffectivenessTab({ data }: { data: AriaInsights }) {
 
       {/* Intervention Volume Trend */}
       {trendData.length > 1 && (
-        <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
           <h2 className="text-sm font-semibold text-[#D0E4EC] mb-1">
             Weekly Intervention Volume
           </h2>
@@ -177,9 +177,9 @@ export default function EffectivenessTab({ data }: { data: AriaInsights }) {
                 type="monotone"
                 dataKey="total"
                 name="Total Flags"
-                stroke="#6B8A9A"
+                stroke="var(--muted-foreground)"
                 strokeWidth={2}
-                dot={{ r: 3, fill: '#6B8A9A' }}
+                dot={{ r: 3, fill: 'var(--muted-foreground)' }}
               />
               <Line
                 type="monotone"
@@ -195,7 +195,7 @@ export default function EffectivenessTab({ data }: { data: AriaInsights }) {
       )}
 
       {trendData.length <= 1 && (
-        <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-10 text-center">
+        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-10 text-center">
           <p className="text-[#4A6E7F] text-sm">
             Not enough data for trend analysis. Need at least 2 weeks of ARIA activity.
           </p>
@@ -204,7 +204,7 @@ export default function EffectivenessTab({ data }: { data: AriaInsights }) {
 
       {/* Top Cases */}
       {data.top_cases?.length > 0 && (
-        <div className="bg-[#1A3648]/60 border border-[#2D6A8F]/20 rounded-xl p-5">
+        <div className="bg-[#1A3648]/60 border border-cg-slate/20 rounded-xl p-5">
           <h2 className="text-sm font-semibold text-[#D0E4EC] mb-1">
             Top Cases by Interventions
           </h2>
@@ -227,7 +227,7 @@ export default function EffectivenessTab({ data }: { data: AriaInsights }) {
                   </div>
                   <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
                     <div
-                      className="h-full rounded-full bg-[#2D6A8F] transition-all"
+                      className="h-full rounded-full bg-cg-slate transition-all"
                       style={{ width: `${pct}%` }}
                     />
                   </div>
@@ -261,10 +261,10 @@ function EffectivenessCard({
       className={`rounded-xl border p-4 ${
         highlight
           ? 'bg-red-500/5 border-red-500/20'
-          : 'bg-[#1A3648]/60 border-[#2D6A8F]/20'
+          : 'bg-[#1A3648]/60 border-cg-slate/20'
       }`}
     >
-      <div className="text-xs text-[#6B8A9A] mb-1">{label}</div>
+      <div className="text-xs text-muted-foreground mb-1">{label}</div>
       <div className="text-2xl font-bold text-white">{value}</div>
       <div className="flex items-center gap-1 mt-1">
         {trend !== 0 && (
@@ -278,7 +278,7 @@ function EffectivenessCard({
             {trend > 0 ? '+' : ''}{trend.toFixed(1)}%
           </span>
         )}
-        <span className="text-[11px] text-[#6B8A9A]">{trendLabel}</span>
+        <span className="text-[11px] text-muted-foreground">{trendLabel}</span>
       </div>
     </div>
   );

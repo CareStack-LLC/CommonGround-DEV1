@@ -36,7 +36,7 @@ const INLINE_GAMES = [
     title: 'Tic Tac Toe',
     emoji: '❌⭕',
     description: 'Classic strategy game',
-    color: 'from-[#3DAA8A] to-[#2D6A8F]',
+    color: 'from-cg-sage to-cg-slate',
   },
 ];
 
@@ -48,14 +48,14 @@ const ROUTED_GAMES = [
     title: 'Memory Match',
     emoji: '🧠',
     description: 'Test your memory skills',
-    color: 'from-[#F5A623] to-[#E8941E]',
+    color: 'from-cg-amber to-[#E8941E]',
   },
   {
     id: 'drawing-pad',
     title: 'Drawing Pad',
     emoji: '🎨',
     description: 'Create art together',
-    color: 'from-[#2D6A8F] to-[#4BA8C8]',
+    color: 'from-cg-slate to-cg-slate-light',
   },
 ];
 
@@ -99,9 +99,9 @@ export function ArcadeMode({
   if (!activeGame) {
     return (
       <div className="fixed inset-0 z-[100] bg-[#0D1B24]/95 backdrop-blur-sm flex flex-col">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-[#3DAA8A]/10">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-cg-sage/10">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#3DAA8A] to-[#2D6A8F] flex items-center justify-center shadow-lg shadow-[#3DAA8A]/20">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cg-sage to-cg-slate flex items-center justify-center shadow-lg shadow-cg-sage/20">
               <Gamepad2 className="h-5 w-5 text-white" />
             </div>
             <div>
@@ -128,7 +128,7 @@ export function ArcadeMode({
                 <button
                   key={game.id}
                   onClick={() => setActiveGame(game.id)}
-                  className="w-full flex items-center gap-4 p-4 bg-[#1E3A4A]/60 hover:bg-[#1E3A4A] rounded-2xl border border-[#3DAA8A]/10 hover:border-[#3DAA8A]/30 transition-all group"
+                  className="w-full flex items-center gap-4 p-4 bg-foreground/60 hover:bg-foreground rounded-2xl border border-cg-sage/10 hover:border-cg-sage/30 transition-all group"
                 >
                   <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${game.color} flex items-center justify-center text-2xl shadow-lg group-hover:scale-105 transition-transform`}>
                     {game.emoji}
@@ -139,10 +139,10 @@ export function ArcadeMode({
                     </h3>
                     <p className="text-[#CBD8E0]/50 text-sm" style={{ fontFamily: "'Inter', sans-serif" }}>
                       {game.description}
-                      {callRef && <span className="text-[#3DAA8A]"> · 2-player ready</span>}
+                      {callRef && <span className="text-cg-sage"> · 2-player ready</span>}
                     </p>
                   </div>
-                  <ArrowRight className="h-5 w-5 text-[#3DAA8A] opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <ArrowRight className="h-5 w-5 text-cg-sage opacity-0 group-hover:opacity-100 transition-opacity" />
                 </button>
               ))}
 
@@ -150,7 +150,7 @@ export function ArcadeMode({
                 <button
                   key={game.id}
                   onClick={() => handleRoutedGame(game.id)}
-                  className="w-full flex items-center gap-4 p-4 bg-[#1E3A4A]/60 hover:bg-[#1E3A4A] rounded-2xl border border-[#3DAA8A]/10 hover:border-[#3DAA8A]/30 transition-all group"
+                  className="w-full flex items-center gap-4 p-4 bg-foreground/60 hover:bg-foreground rounded-2xl border border-cg-sage/10 hover:border-cg-sage/30 transition-all group"
                 >
                   <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${game.color} flex items-center justify-center text-2xl shadow-lg group-hover:scale-105 transition-transform`}>
                     {game.emoji}
@@ -163,21 +163,21 @@ export function ArcadeMode({
                       {game.description}
                     </p>
                   </div>
-                  <ArrowRight className="h-5 w-5 text-[#3DAA8A] opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <ArrowRight className="h-5 w-5 text-cg-sage opacity-0 group-hover:opacity-100 transition-opacity" />
                 </button>
               ))}
             </div>
 
             <button
               onClick={handleGoToArcade}
-              className="w-full p-5 bg-gradient-to-r from-[#3DAA8A]/20 to-[#2D6A8F]/20 hover:from-[#3DAA8A]/30 hover:to-[#2D6A8F]/30 rounded-2xl border border-[#3DAA8A]/20 hover:border-[#3DAA8A]/40 transition-all text-center group"
+              className="w-full p-5 bg-gradient-to-r from-cg-sage/20 to-cg-slate/20 hover:from-cg-sage/30 hover:to-cg-slate/30 rounded-2xl border border-cg-sage/20 hover:border-cg-sage/40 transition-all text-center group"
             >
               <div className="flex items-center justify-center gap-3">
-                <Trophy className="h-6 w-6 text-[#F5A623]" />
+                <Trophy className="h-6 w-6 text-cg-amber" />
                 <span className="text-white font-bold text-lg" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                   Open Full Arcade
                 </span>
-                <ArrowRight className="h-5 w-5 text-[#3DAA8A] group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="h-5 w-5 text-cg-sage group-hover:translate-x-1 transition-transform" />
               </div>
               <p className="text-[#CBD8E0]/50 text-sm mt-1" style={{ fontFamily: "'Inter', sans-serif" }}>
                 See all games, scores, and badges
@@ -193,7 +193,7 @@ export function ArcadeMode({
   if (!opponentKind) {
     return (
       <div className="fixed inset-0 z-[100] bg-[#0D1B24]/95 backdrop-blur-sm flex flex-col">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-[#3DAA8A]/10">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-cg-sage/10">
           <button
             onClick={resetToLobby}
             className="flex items-center gap-1 text-white/80 hover:text-white text-sm"
@@ -216,9 +216,9 @@ export function ArcadeMode({
           <div className="max-w-lg mx-auto space-y-3">
             <button
               onClick={() => setOpponentKind('computer')}
-              className="w-full flex items-center gap-4 p-4 bg-[#1E3A4A]/60 hover:bg-[#1E3A4A] rounded-2xl border border-[#3DAA8A]/10 hover:border-[#3DAA8A]/30 transition-all text-left"
+              className="w-full flex items-center gap-4 p-4 bg-foreground/60 hover:bg-foreground rounded-2xl border border-cg-sage/10 hover:border-cg-sage/30 transition-all text-left"
             >
-              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#3DAA8A] to-[#2D6A8F] flex items-center justify-center">
+              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-cg-sage to-cg-slate flex items-center justify-center">
                 <Cpu className="h-6 w-6 text-white" />
               </div>
               <div className="flex-1">
@@ -230,9 +230,9 @@ export function ArcadeMode({
             <button
               onClick={() => setOpponentKind('participant')}
               disabled={!canPlayVsParticipant}
-              className="w-full flex items-center gap-4 p-4 bg-[#1E3A4A]/60 hover:bg-[#1E3A4A] rounded-2xl border border-[#3DAA8A]/10 hover:border-[#3DAA8A]/30 transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#1E3A4A]/60"
+              className="w-full flex items-center gap-4 p-4 bg-foreground/60 hover:bg-foreground rounded-2xl border border-cg-sage/10 hover:border-cg-sage/30 transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-foreground/60"
             >
-              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#F5A623] to-[#E8941E] flex items-center justify-center">
+              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-cg-amber to-[#E8941E] flex items-center justify-center">
                 <Users className="h-6 w-6 text-white" />
               </div>
               <div className="flex-1">
@@ -246,7 +246,7 @@ export function ArcadeMode({
                 </p>
               </div>
               {canPlayVsParticipant && (
-                <UserIcon className="h-5 w-5 text-[#F5A623]" />
+                <UserIcon className="h-5 w-5 text-cg-amber" />
               )}
             </button>
           </div>
@@ -258,7 +258,7 @@ export function ArcadeMode({
   // ── Active game ──────────────────────────────────────────────────────
   return (
     <div className="fixed inset-0 z-[100] bg-[#0D1B24]/95 backdrop-blur-sm flex flex-col">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-[#3DAA8A]/10">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-cg-sage/10">
         <button
           onClick={() => setOpponentKind(null)}
           className="flex items-center gap-1 text-white/80 hover:text-white text-sm"

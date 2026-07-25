@@ -638,11 +638,11 @@ export default function CourtPortalFormDetailPage() {
             font-weight: 600;
             text-transform: uppercase;
           }
-          .status-approved { background: #E8F4F0; color: #1E3A4A; }
-          .status-submitted { background: #E0EFF8; color: #1E4E6B; }
+          .status-approved { background: var(--cg-sage-subtle); color: var(--foreground); }
+          .status-submitted { background: var(--cg-slate-subtle); color: #1E4E6B; }
           .status-draft { background: #f3f4f6; color: #374151; }
-          .status-rejected { background: #fee2e2; color: #9B2C2C; }
-          .status-under_court_review { background: #FEF7ED; color: #E09520; }
+          .status-rejected { background: var(--cg-error-subtle); color: #9B2C2C; }
+          .status-under_court_review { background: var(--cg-amber-subtle); color: #E09520; }
           .data-table {
             width: 100%;
             border-collapse: collapse;
@@ -670,8 +670,8 @@ export default function CourtPortalFormDetailPage() {
             font-style: italic;
           }
           .court-notes {
-            background: #E0EFF8;
-            border: 1px solid #E0EFF8;
+            background: var(--cg-slate-subtle);
+            border: 1px solid var(--cg-slate-subtle);
             border-radius: 8px;
             padding: 15px;
             margin-top: 10px;
@@ -790,7 +790,7 @@ export default function CourtPortalFormDetailPage() {
   if (isLoading || !professional) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#2D6A8F] border-t-transparent" />
+        <div className="animate-spin rounded-full h-10 w-10 border-2 border-cg-slate border-t-transparent" />
       </div>
     );
   }
@@ -799,7 +799,7 @@ export default function CourtPortalFormDetailPage() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#2D6A8F] border-t-transparent mx-auto" />
+          <div className="animate-spin rounded-full h-10 w-10 border-2 border-cg-slate border-t-transparent mx-auto" />
           <p className="mt-4 text-muted-foreground">Loading form...</p>
         </div>
       </div>
@@ -858,7 +858,7 @@ export default function CourtPortalFormDetailPage() {
             <>
               <Button
                 variant="outline"
-                className="text-[#E09520] hover:bg-[#FEF7ED] border-[#FEF7ED]"
+                className="text-[#E09520] hover:bg-cg-amber-subtle border-cg-amber-subtle"
                 onClick={() => setShowResubmitModal(true)}
               >
                 <Edit className="h-4 w-4 mr-2" />
@@ -866,7 +866,7 @@ export default function CourtPortalFormDetailPage() {
               </Button>
               <Button
                 variant="outline"
-                className="text-[#C53030] hover:bg-[#FEE2E2]"
+                className="text-cg-error hover:bg-cg-error-subtle"
                 onClick={() => setShowRejectModal(true)}
               >
                 <XCircle className="h-4 w-4 mr-2" />
@@ -903,9 +903,9 @@ export default function CourtPortalFormDetailPage() {
       )}
 
       {success && (
-        <Alert className="bg-[#E8F4F0] border-[#E8F4F0]">
-          <CheckCircle className="h-4 w-4 text-[#2D8A70]" />
-          <AlertDescription className="text-[#2D8A70]">{success}</AlertDescription>
+        <Alert className="bg-cg-sage-subtle border-cg-sage-subtle">
+          <CheckCircle className="h-4 w-4 text-cg-sage-dark" />
+          <AlertDescription className="text-cg-sage-dark">{success}</AlertDescription>
         </Alert>
       )}
 
@@ -953,9 +953,9 @@ export default function CourtPortalFormDetailPage() {
 
       {/* Court Notes */}
       {form.court_notes && (
-        <Card className="bg-[#E0EFF8] border-[#E0EFF8]">
+        <Card className="bg-cg-slate-subtle border-cg-slate-subtle">
           <CardHeader>
-            <CardTitle className="text-[#1E3A4A] flex items-center gap-2">
+            <CardTitle className="text-foreground flex items-center gap-2">
               <MessageSquare className="h-5 w-5" />
               Court Notes
             </CardTitle>
@@ -968,7 +968,7 @@ export default function CourtPortalFormDetailPage() {
 
       {/* Resubmission Issues */}
       {form.resubmission_issues && form.resubmission_issues.length > 0 && (
-        <Card className="bg-[#FEE2E2] border-[#FEE2E2]">
+        <Card className="bg-cg-error-subtle border-cg-error-subtle">
           <CardHeader>
             <CardTitle className="text-[#7A2222] flex items-center gap-2">
               <AlertCircle className="h-5 w-5" />
@@ -987,9 +987,9 @@ export default function CourtPortalFormDetailPage() {
 
       {/* Edits Allowed Indicator */}
       {form.edits_allowed && (
-        <Card className="bg-[#FEF7ED] border-[#FEF7ED]">
+        <Card className="bg-cg-amber-subtle border-cg-amber-subtle">
           <CardHeader>
-            <CardTitle className="text-[#1E3A4A] flex items-center gap-2">
+            <CardTitle className="text-foreground flex items-center gap-2">
               <Edit className="h-5 w-5" />
               Parent Edits Allowed
             </CardTitle>
@@ -1024,7 +1024,7 @@ export default function CourtPortalFormDetailPage() {
               <Button
                 variant="outline"
                 size="sm"
-                className="text-[#E09520] border-[#F5A623] hover:bg-[#FEF7ED]"
+                className="text-[#E09520] border-cg-amber hover:bg-cg-amber-subtle"
                 onClick={handleRevokeEdits}
                 disabled={isSubmitting}
               >
@@ -1041,7 +1041,7 @@ export default function CourtPortalFormDetailPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-[#2D6A8F]" />
+              <FileText className="h-5 w-5 text-cg-slate" />
               Court Document PDF
             </CardTitle>
             <CardDescription>
@@ -1175,7 +1175,7 @@ export default function CourtPortalFormDetailPage() {
       {showResubmitModal && (
         <Modal onClose={() => { setShowResubmitModal(false); setSelectedSections([]); }} size="large">
           <h2 className="text-xl font-bold mb-4">Request Changes</h2>
-          <Alert className="mb-4 bg-[#FEF7ED] border-[#FEF7ED]">
+          <Alert className="mb-4 bg-cg-amber-subtle border-cg-amber-subtle">
             <AlertCircle className="h-4 w-4 text-[#E09520]" />
             <AlertDescription className="text-[#E09520]">
               This will allow the parent to edit <strong>only</strong> the sections you select below.
@@ -1205,14 +1205,14 @@ export default function CourtPortalFormDetailPage() {
                         setSelectedSections(selectedSections.filter((s) => s !== section.id));
                       }
                     }}
-                    className="h-4 w-4 rounded border-gray-300 text-[#2D6A8F] focus:ring-[#2D6A8F]"
+                    className="h-4 w-4 rounded border-gray-300 text-cg-slate focus:ring-cg-slate"
                   />
                   <span className="text-sm">{section.label}</span>
                 </label>
               ))}
             </div>
             {selectedSections.length > 0 && (
-              <p className="text-xs text-[#2D6A8F] mt-2">
+              <p className="text-xs text-cg-slate mt-2">
                 {selectedSections.length} section(s) selected
               </p>
             )}
@@ -1525,9 +1525,9 @@ function FormDataDisplay({ data, formType }: { data: Record<string, any>; formTy
     }
     if (typeof value === 'boolean') {
       return value ? (
-        <span className="text-[#2D8A70]">Yes</span>
+        <span className="text-cg-sage-dark">Yes</span>
       ) : (
-        <span className="text-[#C53030]">No</span>
+        <span className="text-cg-error">No</span>
       );
     }
     if (Array.isArray(value)) {
@@ -1572,10 +1572,10 @@ function FormDataDisplay({ data, formType }: { data: Record<string, any>; formTy
   return (
     <div className="space-y-6">
       {/* AI-style Summary */}
-      <div className="bg-gradient-to-r from-[#E0EFF8] to-[#E0EFF8] rounded-lg p-4 border border-[#E0EFF8]">
+      <div className="bg-gradient-to-r from-cg-slate-subtle to-cg-slate-subtle rounded-lg p-4 border border-cg-slate-subtle">
         <div className="flex items-center gap-2 mb-3">
-          <Sparkles className="h-5 w-5 text-[#2D6A8F]" />
-          <h4 className="font-semibold text-[#1E3A4A]">Form Summary</h4>
+          <Sparkles className="h-5 w-5 text-cg-slate" />
+          <h4 className="font-semibold text-foreground">Form Summary</h4>
         </div>
         <div className="prose prose-sm max-w-none text-[#1E4E6B]">
           {summary.split('\n\n').map((paragraph, idx) => (

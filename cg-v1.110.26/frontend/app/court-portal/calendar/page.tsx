@@ -43,11 +43,11 @@ interface CourtHearing {
 }
 
 const HEARING_TYPES: Record<string, { label: string; color: string; icon: typeof Gavel }> = {
-  rfo_hearing: { label: "RFO Hearing", color: "bg-[#E0EFF8] text-[#1E4E6B]", icon: Gavel },
-  status_conference: { label: "Status Conference", color: "bg-[#E0EFF8] text-[#1E4E6B]", icon: Users },
-  trial: { label: "Trial", color: "bg-[#FEE2E2] text-[#9B2C2C]", icon: Scale },
-  settlement_conference: { label: "Settlement Conference", color: "bg-[#E8F4F0] text-[#2D8A70]", icon: Users },
-  mediation: { label: "Mediation", color: "bg-[#FEF7ED] text-[#E09520]", icon: Users },
+  rfo_hearing: { label: "RFO Hearing", color: "bg-cg-slate-subtle text-[#1E4E6B]", icon: Gavel },
+  status_conference: { label: "Status Conference", color: "bg-cg-slate-subtle text-[#1E4E6B]", icon: Users },
+  trial: { label: "Trial", color: "bg-cg-error-subtle text-[#9B2C2C]", icon: Scale },
+  settlement_conference: { label: "Settlement Conference", color: "bg-cg-sage-subtle text-cg-sage-dark", icon: Users },
+  mediation: { label: "Mediation", color: "bg-cg-amber-subtle text-[#E09520]", icon: Users },
   other: { label: "Other Hearing", color: "bg-gray-100 text-gray-700", icon: CalendarIcon },
 };
 
@@ -158,7 +158,7 @@ export default function CourtCalendarPage() {
   if (isLoading || !professional) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#2D6A8F] border-t-transparent" />
+        <div className="animate-spin rounded-full h-10 w-10 border-2 border-cg-slate border-t-transparent" />
       </div>
     );
   }
@@ -169,7 +169,7 @@ export default function CourtCalendarPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <CalendarIcon className="h-6 w-6 text-[#2D6A8F]" />
+            <CalendarIcon className="h-6 w-6 text-cg-slate" />
             Court Calendar
           </h1>
           <p className="text-muted-foreground">
@@ -193,43 +193,43 @@ export default function CourtCalendarPage() {
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="bg-gradient-to-br from-[#E0EFF8] to-white border-[#E0EFF8]">
+        <Card className="bg-gradient-to-br from-cg-slate-subtle to-white border-cg-slate-subtle">
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-[#2D6A8F] font-medium">Today</p>
+                <p className="text-sm text-cg-slate font-medium">Today</p>
                 <p className="text-2xl font-bold text-[#1E4E6B]">{todaysHearings.length}</p>
-                <p className="text-xs text-[#2D6A8F]">
+                <p className="text-xs text-cg-slate">
                   {todaysHearings.length === 1 ? "hearing" : "hearings"}
                 </p>
               </div>
-              <CalendarIcon className="h-8 w-8 text-[#4BA8C8]" />
+              <CalendarIcon className="h-8 w-8 text-cg-slate-light" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-[#FEF7ED] to-white border-[#FEF7ED]">
+        <Card className="bg-gradient-to-br from-cg-amber-subtle to-white border-cg-amber-subtle">
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-[#E09520] font-medium">Next 7 Days</p>
                 <p className="text-2xl font-bold text-[#E09520]">{upcomingHearings.length}</p>
-                <p className="text-xs text-[#F5A623]">upcoming</p>
+                <p className="text-xs text-cg-amber">upcoming</p>
               </div>
-              <Clock className="h-8 w-8 text-[#F5A623]" />
+              <Clock className="h-8 w-8 text-cg-amber" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-[#E8F4F0] to-white border-[#E8F4F0]">
+        <Card className="bg-gradient-to-br from-cg-sage-subtle to-white border-cg-sage-subtle">
           <CardContent className="pt-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-[#2D8A70] font-medium">This Month</p>
-                <p className="text-2xl font-bold text-[#2D8A70]">{hearings.length}</p>
-                <p className="text-xs text-[#3DAA8A]">total scheduled</p>
+                <p className="text-sm text-cg-sage-dark font-medium">This Month</p>
+                <p className="text-2xl font-bold text-cg-sage-dark">{hearings.length}</p>
+                <p className="text-xs text-cg-sage">total scheduled</p>
               </div>
-              <Gavel className="h-8 w-8 text-[#5BC4A0]" />
+              <Gavel className="h-8 w-8 text-cg-sage-light" />
             </div>
           </CardContent>
         </Card>
@@ -256,13 +256,13 @@ export default function CourtCalendarPage() {
 
       {/* Today's Hearings */}
       {todaysHearings.length > 0 && (
-        <Card className="border-[#E0EFF8] bg-[#E0EFF8]/30">
+        <Card className="border-cg-slate-subtle bg-cg-slate-subtle/30">
           <CardHeader>
-            <CardTitle className="text-[#1E3A4A] flex items-center gap-2">
+            <CardTitle className="text-foreground flex items-center gap-2">
               <CalendarIcon className="h-5 w-5" />
               Today&apos;s Hearings
             </CardTitle>
-            <CardDescription className="text-[#2D6A8F]">
+            <CardDescription className="text-cg-slate">
               {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
             </CardDescription>
           </CardHeader>
@@ -281,7 +281,7 @@ export default function CourtCalendarPage() {
         <Card>
           <CardContent className="py-12">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-10 w-10 border-2 border-[#2D6A8F] border-t-transparent mx-auto" />
+              <div className="animate-spin rounded-full h-10 w-10 border-2 border-cg-slate border-t-transparent mx-auto" />
               <p className="mt-4 text-muted-foreground">Loading calendar...</p>
             </div>
           </CardContent>

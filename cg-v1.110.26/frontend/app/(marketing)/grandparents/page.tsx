@@ -50,19 +50,19 @@ const doTogether = [
     icon: Video,
     title: 'Video & voice calls',
     body: 'A quick “goodnight, sweetheart” or a long catch-up — call the grandkids in their own safe space, on a schedule that works for everyone.',
-    accent: '#3DAA8A',
+    accent: 'var(--cg-sage)',
   },
   {
     icon: BookOpen,
     title: 'Read stories together',
     body: 'Be the voice of bedtime again. Read the same book on the same screen, turning pages together from two homes — or two time zones.',
-    accent: '#F5A623',
+    accent: 'var(--cg-amber)',
   },
   {
     icon: Film,
     title: 'Family movie night',
     body: 'Press play together and watch an age-appropriate movie in sync. Popcorn optional. Being there is the point.',
-    accent: '#2D6A8F',
+    accent: 'var(--cg-slate)',
   },
   {
     icon: Gamepad2,
@@ -143,19 +143,19 @@ export default function GrandparentsPage() {
 
       {/* ═══════════════ HERO ═══════════════ */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#F4F8F7] via-[#F4F8F7] to-white" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background via-background to-white" />
         <div className="relative max-w-6xl mx-auto px-6 pt-16 pb-20 lg:pt-24 lg:pb-28">
           <div className="grid items-center gap-10 lg:gap-14 lg:grid-cols-2">
             <div className="text-center lg:text-left">
-              <p className="text-[#F5A623] font-medium mb-4 tracking-wide uppercase text-sm">
+              <p className="text-cg-amber font-medium mb-4 tracking-wide uppercase text-sm">
                 For grandparents, aunts &amp; uncles
               </p>
               <h1
-                className="text-4xl sm:text-5xl lg:text-[3.4rem] text-[#1E3A4A] mb-6 leading-[1.1] tracking-tight"
+                className="text-4xl sm:text-5xl lg:text-[3.4rem] text-foreground mb-6 leading-[1.1] tracking-tight"
                 style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
               >
                 Stay in their world —{' '}
-                <span className="text-[#3DAA8A]">even from miles away.</span>
+                <span className="text-cg-sage">even from miles away.</span>
               </h1>
               <p className="text-lg text-gray-600 leading-relaxed mb-8 max-w-xl mx-auto lg:mx-0">
                 Don&apos;t let distance or a separation quietly cost you the grandkids.
@@ -165,14 +165,14 @@ export default function GrandparentsPage() {
               </p>
               <a
                 href="#early-adopter"
-                className="inline-flex items-center gap-2 bg-[#3DAA8A] text-white font-semibold px-8 py-4 rounded-xl transition-all duration-200 hover:bg-[#2E9577] hover:shadow-lg hover:shadow-[#3DAA8A]/20 text-base"
+                className="inline-flex items-center gap-2 bg-cg-sage text-white font-semibold px-8 py-4 rounded-xl transition-all duration-200 hover:bg-[#2E9577] hover:shadow-lg hover:shadow-cg-sage/20 text-base"
               >
                 Start staying close &mdash; free to try
               </a>
               <div className="mt-6 flex flex-wrap items-center justify-center lg:justify-start gap-x-5 gap-y-2 text-sm text-gray-600">
                 {heroTrust.map((t) => (
                   <span key={t} className="flex items-center gap-1.5">
-                    <CheckCircle className="w-4 h-4 text-[#3DAA8A]" />
+                    <CheckCircle className="w-4 h-4 text-cg-sage" />
                     {t}
                   </span>
                 ))}
@@ -197,10 +197,10 @@ export default function GrandparentsPage() {
       <section className="py-20 lg:py-24 bg-white">
         <div className="max-w-3xl mx-auto px-6 text-center">
           <h2
-            className="text-3xl sm:text-4xl text-[#1E3A4A] mb-6"
+            className="text-3xl sm:text-4xl text-foreground mb-6"
             style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
           >
-            They grow up so fast. <span className="text-[#3DAA8A]">Don&apos;t miss it.</span>
+            They grow up so fast. <span className="text-cg-sage">Don&apos;t miss it.</span>
           </h2>
           <p className="text-gray-600 text-lg leading-relaxed">
             A move across the country. A separation that made things complicated. Schedules
@@ -215,14 +215,14 @@ export default function GrandparentsPage() {
       {/* ═══════════════════════════════════════════════════
           STORY — A short narrative that captivates
       ═══════════════════════════════════════════════════ */}
-      <section className="relative overflow-hidden py-20 lg:py-28 bg-gradient-to-b from-[#F4F8F7] to-white">
+      <section className="relative overflow-hidden py-20 lg:py-28 bg-gradient-to-b from-background to-white">
         <div className="max-w-3xl mx-auto px-6">
           <div className="text-center mb-16">
-            <p className="font-medium mb-3 tracking-wide uppercase text-sm" style={{ color: '#F5A623' }}>
+            <p className="font-medium mb-3 tracking-wide uppercase text-sm" style={{ color: 'var(--cg-amber)' }}>
               A day in the life
             </p>
             <h2
-              className="text-3xl sm:text-4xl lg:text-[2.75rem] text-[#1E3A4A] leading-[1.15]"
+              className="text-3xl sm:text-4xl lg:text-[2.75rem] text-foreground leading-[1.15]"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               The video call Grandma
@@ -230,15 +230,15 @@ export default function GrandparentsPage() {
             </h2>
           </div>
           <div className="relative">
-            <div className="absolute left-[19px] top-3 bottom-3 w-px bg-gradient-to-b from-[#E85D75]/40 via-[#F5A623]/40 to-[#3DAA8A]/50" />
+            <div className="absolute left-[19px] top-3 bottom-3 w-px bg-gradient-to-b from-[#E85D75]/40 via-cg-amber/40 to-cg-sage/50" />
             <div className="space-y-10">
               {story.map((beat, i) => {
                 const dot =
                   beat.tone === 'before'
                     ? '#E85D75'
                     : beat.tone === 'turn'
-                    ? '#F5A623'
-                    : '#3DAA8A';
+                    ? 'var(--cg-amber)'
+                    : 'var(--cg-sage)';
                 return (
                   <div key={i} className="relative pl-14">
                     <div className="absolute left-0 top-0.5">
@@ -257,7 +257,7 @@ export default function GrandparentsPage() {
                     </span>
                     {beat.kicker ? (
                       <p
-                        className="text-xl sm:text-2xl text-[#1E3A4A] leading-relaxed"
+                        className="text-xl sm:text-2xl text-foreground leading-relaxed"
                         style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
                       >
                         {beat.text}
@@ -278,15 +278,15 @@ export default function GrandparentsPage() {
       </section>
 
       {/* ═══════════════ WHAT YOU CAN DO TOGETHER ═══════════════ */}
-      <section className="py-20 lg:py-28 bg-gradient-to-b from-white to-[#F4F8F7]">
+      <section className="py-20 lg:py-28 bg-gradient-to-b from-white to-background">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid items-center gap-10 lg:gap-16 lg:grid-cols-2 mb-16">
             <div className="order-2 lg:order-1">
-              <p className="text-[#3DAA8A] font-medium mb-3 tracking-wide uppercase text-sm">
+              <p className="text-cg-sage font-medium mb-3 tracking-wide uppercase text-sm">
                 More than a phone call
               </p>
               <h2
-                className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4 leading-tight"
+                className="text-3xl sm:text-4xl text-foreground mb-4 leading-tight"
                 style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
               >
                 Do real things together, not just talk
@@ -323,7 +323,7 @@ export default function GrandparentsPage() {
                     <Icon className="w-6 h-6" style={{ color: d.accent }} />
                   </div>
                   <h3
-                    className="text-xl text-[#1E3A4A] mb-2"
+                    className="text-xl text-foreground mb-2"
                     style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
                   >
                     {d.title}
@@ -341,10 +341,10 @@ export default function GrandparentsPage() {
         <div className="max-w-5xl mx-auto px-6">
           <div className="text-center mb-14">
             <h2
-              className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+              className="text-3xl sm:text-4xl text-foreground mb-4"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
-              Safe for the kids. <span className="text-[#3DAA8A]">Simple for you.</span>
+              Safe for the kids. <span className="text-cg-sage">Simple for you.</span>
             </h2>
             <p className="text-gray-600 text-lg max-w-2xl mx-auto">
               KidSpace isn&apos;t unsupervised internet time. It&apos;s a protected space
@@ -355,11 +355,11 @@ export default function GrandparentsPage() {
             {safeSimple.map((s) => {
               const Icon = s.icon;
               return (
-                <div key={s.title} className="bg-[#F4F8F7] rounded-2xl p-8 text-center">
-                  <div className="w-14 h-14 bg-[#3DAA8A]/10 rounded-2xl flex items-center justify-center mx-auto mb-5">
-                    <Icon className="w-7 h-7 text-[#3DAA8A]" />
+                <div key={s.title} className="bg-background rounded-2xl p-8 text-center">
+                  <div className="w-14 h-14 bg-cg-sage/10 rounded-2xl flex items-center justify-center mx-auto mb-5">
+                    <Icon className="w-7 h-7 text-cg-sage" />
                   </div>
-                  <h3 className="font-bold text-[#1E3A4A] mb-2">{s.title}</h3>
+                  <h3 className="font-bold text-foreground mb-2">{s.title}</h3>
                   <p className="text-gray-600 leading-relaxed text-[15px]">{s.body}</p>
                 </div>
               );
@@ -369,15 +369,15 @@ export default function GrandparentsPage() {
       </section>
 
       {/* ═══════════════ GIFT / SOCIAL PROOF ═══════════════ */}
-      <section className="py-20 lg:py-24 bg-[#F4F8F7]">
+      <section className="py-20 lg:py-24 bg-background">
         <div className="max-w-4xl mx-auto px-6 space-y-10">
-          <div className="bg-[#FEF7ED] rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-center gap-8">
+          <div className="bg-cg-amber-subtle rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-center gap-8">
             <div className="w-20 h-20 bg-amber-100 rounded-2xl flex items-center justify-center flex-shrink-0">
               <Gift className="w-10 h-10 text-amber-600" />
             </div>
             <div>
               <h3
-                className="text-2xl md:text-3xl text-[#1E3A4A] mb-3"
+                className="text-2xl md:text-3xl text-foreground mb-3"
                 style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
               >
                 The gift that keeps the family close
@@ -391,20 +391,20 @@ export default function GrandparentsPage() {
           </div>
 
           <div className="relative bg-white rounded-3xl p-8 sm:p-12 shadow-sm border border-gray-100">
-            <Quote className="w-10 h-10 text-[#3DAA8A]/20 mb-6" />
+            <Quote className="w-10 h-10 text-cg-sage/20 mb-6" />
             <blockquote
-              className="text-xl sm:text-2xl text-[#1E3A4A] leading-relaxed mb-8"
+              className="text-xl sm:text-2xl text-foreground leading-relaxed mb-8"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               I live three states away and I used to only see my granddaughter in photos.
               Now we read a story every Sunday night. She calls it &ldquo;our book.&rdquo;
             </blockquote>
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-[#F5A623]/15 flex items-center justify-center">
-                <span className="text-[#F5A623] font-semibold text-lg">G</span>
+              <div className="w-12 h-12 rounded-full bg-cg-amber/15 flex items-center justify-center">
+                <span className="text-cg-amber font-semibold text-lg">G</span>
               </div>
               <div>
-                <p className="font-semibold text-[#1E3A4A]">Grandma Lewis</p>
+                <p className="font-semibold text-foreground">Grandma Lewis</p>
                 <p className="text-sm text-gray-600">KidSpace family member</p>
               </div>
             </div>
@@ -416,11 +416,11 @@ export default function GrandparentsPage() {
       <section id="early-adopter" className="py-20 lg:py-28 bg-white scroll-mt-20">
         <div className="max-w-2xl mx-auto px-6">
           <div className="text-center mb-10">
-            <p className="text-[#F5A623] font-medium mb-3 tracking-wide uppercase text-sm">
+            <p className="text-cg-amber font-medium mb-3 tracking-wide uppercase text-sm">
               Early Adopter Offer
             </p>
             <h2
-              className="text-3xl sm:text-4xl text-[#1E3A4A] mb-4"
+              className="text-3xl sm:text-4xl text-foreground mb-4"
               style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
             >
               Don&apos;t miss another bedtime story
@@ -435,10 +435,10 @@ export default function GrandparentsPage() {
       </section>
 
       {/* ═══════════════ FAQ ═══════════════ */}
-      <section className="py-20 lg:py-24 bg-[#F4F8F7]">
+      <section className="py-20 lg:py-24 bg-background">
         <div className="max-w-3xl mx-auto px-6">
           <h2
-            className="text-3xl sm:text-4xl text-[#1E3A4A] mb-12 text-center"
+            className="text-3xl sm:text-4xl text-foreground mb-12 text-center"
             style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}
           >
             Questions families ask
@@ -450,7 +450,7 @@ export default function GrandparentsPage() {
                 className="group bg-white rounded-xl border border-gray-100 overflow-hidden"
               >
                 <summary className="flex items-center justify-between gap-4 p-6 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
-                  <h3 className="font-semibold text-[#1E3A4A] text-left">{faq.q}</h3>
+                  <h3 className="font-semibold text-foreground text-left">{faq.q}</h3>
                   <ChevronDown className="w-5 h-5 text-gray-600 flex-shrink-0 transition-transform duration-200 group-open:rotate-180" />
                 </summary>
                 <div className="px-6 pb-6 -mt-1">

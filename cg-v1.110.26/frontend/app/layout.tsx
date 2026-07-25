@@ -75,8 +75,8 @@ export const viewport: Viewport = {
   // the installed app feels edge-to-edge native.
   viewportFit: "cover",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#F4F8F7" },
-    { media: "(prefers-color-scheme: dark)", color: "#1E3A4A" },
+    { media: "(prefers-color-scheme: light)", color: "var(--background)" },
+    { media: "(prefers-color-scheme: dark)", color: "var(--foreground)" },
   ],
 };
 
