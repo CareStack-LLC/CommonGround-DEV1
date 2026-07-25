@@ -130,7 +130,27 @@ export default function ProfessionalDocumentsPage() {
 
     const handleBatchExport = async () => {
         if (!token) return;
-        window.open(`${API_BASE}/api/v1/professional/documents/export?token=${token}`, "_blank");
+        // Send the JWT in the Authorization header, not the URL. A token in the
+        // query string leaks into browser history, Referer, and access logs.
+        try {
+            const res = await fetch(`${API_BASE}/api/v1/professional/documents/export`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            if (!res.ok) throw new Error(`Export failed (${res.status})`);
+            const blob = await res.blob();
+            const url = URL.createObjectURL(blob);
+            const disposition = res.headers.get("Content-Disposition") || "";
+            const match = disposition.match(/filename="?([^"]+)"?/i);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = match?.[1] || "documents-export.zip";
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+        } catch (e) {
+            toast({ title: "Export failed", variant: "destructive" });
+        }
     };
 
     const filtered = docs.filter((d) =>

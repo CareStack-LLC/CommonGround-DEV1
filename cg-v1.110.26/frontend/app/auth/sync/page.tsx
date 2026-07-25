@@ -23,7 +23,12 @@ function AuthSyncContent() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const next = searchParams.get('next') || '/dashboard';
+        // Only allow same-origin relative redirects. A raw `next` fed into
+        // window.location.href is an open-redirect: `?next=https://evil.com`
+        // (or `//evil.com`) would bounce a freshly-authenticated user off-site.
+        const rawNext = searchParams.get('next') || '/dashboard';
+        const next =
+            rawNext.startsWith('/') && !rawNext.startsWith('//') ? rawNext : '/dashboard';
 
         async function syncUser() {
             try {
