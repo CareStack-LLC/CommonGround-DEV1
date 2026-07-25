@@ -119,9 +119,17 @@ async def handle_mux_webhook(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid signature",
             )
+    elif settings.is_production:
+        # Fail CLOSED in prod: an unsigned event could forge kidspace_movies
+        # rows. Matches the SendGrid/Daily handlers. Set MUX_WEBHOOK_SECRET.
+        logger.error("mux webhook: MUX_WEBHOOK_SECRET not set in production; rejecting")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Webhook signature verification not configured",
+        )
     else:
         logger.warning(
-            "mux webhook: MUX_WEBHOOK_SECRET not set; accepting unsigned event"
+            "mux webhook: MUX_WEBHOOK_SECRET not set; accepting unsigned event (non-prod)"
         )
 
     try:

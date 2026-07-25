@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.core.database import get_db
-from app.core.security import get_current_user
+from app.core.security import get_current_user, block_in_production
 from app.models.user import User
 from app.models.family_file import FamilyFile
 from app.models.custody_exchange import CustodyExchange, CustodyExchangeInstance
@@ -45,7 +45,7 @@ async def get_dashboard_summary(
     )
 
 
-@router.get("/debug/events/{family_file_id}")
+@router.get("/debug/events/{family_file_id}", dependencies=[Depends(block_in_production)])
 async def debug_upcoming_events(
     family_file_id: str,
     db: AsyncSession = Depends(get_db),
@@ -188,7 +188,7 @@ async def regenerate_exchange_instances(
     return result
 
 
-@router.post("/debug/create-test-event/{family_file_id}")
+@router.post("/debug/create-test-event/{family_file_id}", dependencies=[Depends(block_in_production)])
 async def create_test_event(
     family_file_id: str,
     db: AsyncSession = Depends(get_db),

@@ -6,15 +6,42 @@ from typing import List, Optional, Dict, Any
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, and_
+from sqlalchemy import select, func, and_, or_
 from pydantic import BaseModel
 
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.user import User
 from app.models.schedule import ScheduleEvent
+from app.models.family_file import FamilyFile
 
 router = APIRouter()
+
+
+async def _authorized_family_file_ids(
+    db: AsyncSession, user: User, requested_id: Optional[str]
+) -> List[str]:
+    """Return the family-file ids the caller may see analytics for.
+
+    Scopes every analytics query to the families the caller is a parent of —
+    without this, an optional `family_file_id` filter let any authenticated user
+    read (or aggregate across) EVERY family's data. If a specific id is
+    requested, the caller must belong to it (403 otherwise).
+    """
+    result = await db.execute(
+        select(FamilyFile.id).where(
+            or_(FamilyFile.parent_a_id == user.id, FamilyFile.parent_b_id == user.id)
+        )
+    )
+    owned = [str(r[0]) for r in result.all()]
+    if requested_id is not None:
+        if requested_id not in owned:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="You don't have access to this family file",
+            )
+        return [requested_id]
+    return owned
 
 
 class SwapRequestStats(BaseModel):
@@ -47,19 +74,21 @@ async def get_swap_request_stats(
     - Pending requests (modification_approved=False, status='pending')
     """
     
-    # Base query for swap requests
+    # Scope to the caller's own family files (verifies access to a requested id).
+    allowed_ids = await _authorized_family_file_ids(db, current_user, family_file_id)
+    if not allowed_ids:
+        return SwapRequestStats(
+            total_requests=0, accepted_requests=0, rejected_requests=0,
+            pending_requests=0, acceptance_rate=0.0,
+        )
+
+    # Base query for swap requests, always restricted to allowed families.
     query = select(ScheduleEvent).where(
         ScheduleEvent.event_type == "swap_request",
-        ScheduleEvent.is_modification == True
+        ScheduleEvent.is_modification == True,
+        ScheduleEvent.family_file_id.in_(allowed_ids),
     )
-    
-    # Apply filter if provided
-    if family_file_id:
-        query = query.where(ScheduleEvent.family_file_id == family_file_id)
-        
-        # Verify access to family file (if restricted logic is needed)
-        # For now, relying on broader access controls or assuming this is for authorized views
-    
+
     result = await db.execute(query)
     events = result.scalars().all()
     
@@ -120,22 +149,26 @@ async def get_aria_interventions(
 ):
     from sqlalchemy import text
     import json
-    
-    # Build query
+
+    # SECURITY: scope to the caller's own families. Previously this endpoint
+    # ran `WHERE 1=1` with an optional client-supplied family_file_id, so any
+    # authenticated user could read the raw flagged-message content of EVERY
+    # family. Now it is restricted to families the caller is a parent of.
+    allowed_ids = await _authorized_family_file_ids(db, current_user, family_file_id)
+    if not allowed_ids:
+        return []
+
+    # Build query — always bounded to the allowed family ids.
     sql = """
-        SELECT 
-            id, created_at, user_id, family_file_id, 
-            content_type, action_taken, severity_level, toxicity_score, 
+        SELECT
+            id, created_at, user_id, family_file_id,
+            content_type, action_taken, severity_level, toxicity_score,
             labels, original_content, context_data
         FROM aria_events
-        WHERE 1=1
+        WHERE family_file_id::text = ANY(:allowed_ids)
     """
-    params = {}
-    
-    if family_file_id:
-        sql += " AND family_file_id = :ff_id"
-        params["ff_id"] = family_file_id
-        
+    params = {"allowed_ids": allowed_ids}
+
     if start_date:
         sql += " AND created_at >= :start"
         params["start"] = start_date

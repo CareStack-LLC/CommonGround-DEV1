@@ -9,6 +9,7 @@ Handles:
 - Cancelling and reactivating subscriptions
 """
 
+import asyncio
 import logging
 from typing import List, Optional
 
@@ -18,7 +19,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
-from app.core.security import get_current_user
+from app.core.security import get_current_user, block_in_production
 from app.models.user import User
 from app.models.subscription import SubscriptionPlan, GrantRedemption
 from app.schemas.subscription import (
@@ -879,7 +880,7 @@ async def list_features(
 # =============================================================================
 
 
-@router.get("/debug/stripe-status")
+@router.get("/debug/stripe-status", dependencies=[Depends(block_in_production)])
 async def debug_stripe_status(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
@@ -920,7 +921,7 @@ async def debug_stripe_status(
 
         if price_id:
             try:
-                price = stripe.Price.retrieve(price_id)
+                price = await asyncio.to_thread(stripe.Price.retrieve, price_id)
                 result["prices"][plan.plan_code]["exists_in_stripe"] = True
                 result["prices"][plan.plan_code]["is_recurring"] = price.type == "recurring"
                 result["prices"][plan.plan_code]["unit_amount"] = price.unit_amount
@@ -933,7 +934,8 @@ async def debug_stripe_status(
     # Check customer subscriptions
     if profile and profile.stripe_customer_id:
         try:
-            subscriptions = stripe.Subscription.list(
+            subscriptions = await asyncio.to_thread(
+                stripe.Subscription.list,
                 customer=profile.stripe_customer_id,
                 limit=5
             )
@@ -951,7 +953,8 @@ async def debug_stripe_status(
 
         # Check recent checkout sessions
         try:
-            sessions = stripe.checkout.Session.list(
+            sessions = await asyncio.to_thread(
+                stripe.checkout.Session.list,
                 customer=profile.stripe_customer_id,
                 limit=5
             )
@@ -1110,7 +1113,7 @@ async def sync_subscription_from_stripe(
     return await get_current_subscription(current_user, db)
 
 
-@router.post("/debug/sync")
+@router.post("/debug/sync", dependencies=[Depends(block_in_production)])
 async def debug_sync_subscription(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)

@@ -39,31 +39,6 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
-@router.get("/debug-test")
-async def debug_test():
-    """Temporary debug endpoint — REMOVE AFTER TESTING."""
-    import openai as _openai
-    from app.core.config import settings as _s
-    result = {
-        "openai_key_present": bool(_s.OPENAI_API_KEY),
-        "openai_key_prefix": (_s.OPENAI_API_KEY or "")[:8] + "..." if _s.OPENAI_API_KEY else None,
-    }
-    try:
-        client = _openai.OpenAI(api_key=_s.OPENAI_API_KEY)
-        resp = client.chat.completions.create(
-            model="gpt-4o-mini",
-            max_tokens=20,
-            messages=[{"role": "user", "content": "Say hi in one word"}],
-        )
-        result["response"] = resp.choices[0].message.content
-        result["status"] = "SUCCESS"
-    except Exception as e:
-        result["error_type"] = type(e).__name__
-        result["error"] = str(e)[:500]
-        result["status"] = "FAILED"
-    return result
-
-
 # ── Public Endpoints (no auth) ───────────────────────────────────────
 
 @router.post("/sessions", response_model=ChatbotStartSessionResponse, status_code=status.HTTP_201_CREATED)

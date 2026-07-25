@@ -630,3 +630,14 @@ async def require_parent_user(
         status_code=status.HTTP_403_FORBIDDEN,
         detail="Professional accounts must use the professional portal to access case data.",
     )
+
+
+def block_in_production() -> None:
+    """FastAPI dependency that hides debug/test-only routes in production.
+
+    Returns 404 (not 403) in prod so the route is indistinguishable from a
+    non-existent path. Use as: @router.get(..., dependencies=[Depends(block_in_production)]).
+    """
+    from app.core.config import settings
+    if settings.is_production:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)

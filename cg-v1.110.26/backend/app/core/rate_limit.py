@@ -138,7 +138,13 @@ class RedisRateLimiter:
             return False, 0
         except Exception as e:
             logger.warning(f"Redis rate limit check failed: {e}")
-            return False, 0  # Fail open
+            # Fail CLOSED for sensitive categories — during a Redis outage,
+            # brute-force protection on auth/payment matters more than letting
+            # extra requests through; general traffic still fails open for
+            # availability.
+            if category in ("auth", "payment"):
+                return True, window
+            return False, 0  # fail open
 
 
 class InMemoryRateLimiter:
