@@ -69,7 +69,7 @@ def cors_headers_for(request: Request) -> dict[str, str]:
         "Access-Control-Allow-Origin": origin,
         "Access-Control-Allow-Credentials": "true",
         "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS, PATCH",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With, X-Request-ID",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With, X-Request-ID, sentry-trace, baggage",
     }
 
 

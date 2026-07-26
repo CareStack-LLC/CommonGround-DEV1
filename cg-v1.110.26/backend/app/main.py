@@ -14,13 +14,29 @@ from app.core.config import settings
 
 
 def _sentry_before_send(event, hint):
-    """Filter and enrich Sentry error events."""
+    """Filter, SCRUB, and enrich Sentry error events."""
     # Don't send 404s or rate limit errors to Sentry
     if "exc_info" in hint:
         exc_type, exc_value, _ = hint["exc_info"]
         from fastapi import HTTPException
         if isinstance(exc_value, HTTPException) and exc_value.status_code in (404, 429):
             return None
+
+    # PRIVACY SCRUB: send_default_pii=True lets Sentry capture request context,
+    # but on a custody platform the request body can hold message content / PII
+    # and the cookies/Authorization header carry auth tokens (incl. the
+    # cg_refresh cookie). Strip those — we keep the URL, method, and user id
+    # (enough to debug) but never the payload or credentials.
+    req = event.get("request")
+    if isinstance(req, dict):
+        req.pop("data", None)                 # request body
+        req.pop("cookies", None)              # includes cg_refresh + session cookies
+        headers = req.get("headers")
+        if isinstance(headers, dict):
+            for h in list(headers):
+                if h.lower() in ("authorization", "cookie", "x-loadtest-token"):
+                    headers[h] = "[scrubbed]"
+
     # Tag the event with the platform
     event.setdefault("tags", {})["platform"] = "commonground"
     return event
@@ -42,19 +58,23 @@ if settings.SENTRY_DSN:
     from sentry_sdk.integrations.logging import LoggingIntegration
     from sentry_sdk.integrations.httpx import HttpxIntegration
 
-    # AI Agent Monitoring — auto-instruments Anthropic + OpenAI calls
+    # AI Agent Monitoring — auto-instruments Anthropic + OpenAI calls.
+    # PRIVACY: include_prompts=False so Sentry records latency/token-count/model
+    # (useful for ARIA debugging) but NOT the prompt/response TEXT. Those prompts
+    # are co-parents' and children's actual messages — custody content that must
+    # not be stored in a third-party monitoring service.
     _ai_integrations = []
     try:
         from sentry_sdk.integrations.anthropic import AnthropicIntegration
-        _ai_integrations.append(AnthropicIntegration())
-        logger.info("Sentry: Anthropic AI monitoring enabled")
+        _ai_integrations.append(AnthropicIntegration(include_prompts=False))
+        logger.info("Sentry: Anthropic AI monitoring enabled (prompts NOT captured)")
     except ImportError:
         logger.debug("Sentry: AnthropicIntegration not available (SDK too old?)")
 
     try:
         from sentry_sdk.integrations.openai import OpenAIIntegration
-        _ai_integrations.append(OpenAIIntegration())
-        logger.info("Sentry: OpenAI AI monitoring enabled")
+        _ai_integrations.append(OpenAIIntegration(include_prompts=False))
+        logger.info("Sentry: OpenAI AI monitoring enabled (prompts NOT captured)")
     except ImportError:
         logger.debug("Sentry: OpenAIIntegration not available (SDK too old?)")
 
@@ -493,7 +513,10 @@ app.add_middleware(
     allow_origin_regex=settings.CORS_ORIGIN_REGEX,
     allow_credentials=True,
     allow_methods=["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allow_headers=["Content-Type", "Authorization", "X-Requested-With", "X-Request-ID"],
+    # sentry-trace + baggage let the frontend's Sentry trace propagate to the API
+    # so a user's browser transaction links to the backend spans (distributed
+    # tracing across the www→api subdomains).
+    allow_headers=["Content-Type", "Authorization", "X-Requested-With", "X-Request-ID", "sentry-trace", "baggage"],
 )
 
 # Rate limiting — re-enabled for production scaling

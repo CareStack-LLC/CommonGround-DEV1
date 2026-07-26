@@ -285,4 +285,16 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    # Sentry Cron monitoring — alerts if this synthetic sweep stops running
+    # (missed run) or fails, so a silently-broken cron is caught. Schedule matches
+    # the Render cron (twice daily); adjust here if the schedule changes.
+    import os as _os
+    _dsn = _os.environ.get("SENTRY_DSN")
+    if _dsn:
+        import sentry_sdk as _s
+        _s.init(dsn=_dsn, environment=_os.environ.get("ENVIRONMENT", "development"))
+        from app.utils.sentry_helpers import sentry_cron_monitor
+        with sentry_cron_monitor("endpoint-sweep", "0 */12 * * *", max_runtime=15):
+            sys.exit(main())
+    else:
+        sys.exit(main())

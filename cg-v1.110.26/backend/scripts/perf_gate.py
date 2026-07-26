@@ -131,4 +131,14 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    # Sentry Cron monitoring — alerts if the perf gate stops running or fails.
+    import os as _os
+    _dsn = _os.environ.get("SENTRY_DSN")
+    if _dsn:
+        import sentry_sdk as _s
+        _s.init(dsn=_dsn, environment=_os.environ.get("ENVIRONMENT", "development"))
+        from app.utils.sentry_helpers import sentry_cron_monitor
+        with sentry_cron_monitor("perf-gate", "0 */6 * * *", max_runtime=10):
+            sys.exit(main())
+    else:
+        sys.exit(main())

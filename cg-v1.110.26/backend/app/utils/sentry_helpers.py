@@ -245,3 +245,60 @@ def sentry_log(level: str, message: str, **attrs):
     except Exception:
         # Fall back to standard logging if Sentry logs not available
         getattr(logger, level, logger.info)(f"{message} {attrs}")
+
+
+from contextlib import contextmanager
+
+
+@contextmanager
+def sentry_cron_monitor(monitor_slug: str, schedule: str, timezone: str = "UTC",
+                        checkin_margin: int = 10, max_runtime: int = 30):
+    """Report a scheduled job run to Sentry Crons.
+
+    Sends an `in_progress` check-in on entry and `ok`/`error` on exit, and
+    registers the expected `schedule` (crontab syntax, e.g. "0 */12 * * *") so
+    Sentry alerts when a run is MISSED (didn't happen) or FAILED — catching a
+    silently-broken cron. Requires sentry_sdk.init() already called; a no-op if
+    Sentry isn't configured, so it's safe to wrap any job.
+
+    Usage (in a cron script's __main__, after init):
+        with sentry_cron_monitor("endpoint-sweep", "0 */12 * * *"):
+            sys.exit(main())
+    """
+    import time as _time
+    try:
+        import sentry_sdk
+        from sentry_sdk.crons import capture_checkin   # 2.x API (not sentry_sdk.capture_checkin)
+        client = sentry_sdk.get_client()
+        active = bool(client and getattr(client, "dsn", None))
+    except Exception:
+        active = False
+    if not active:
+        yield
+        return
+
+    monitor_config = {
+        "schedule": {"type": "crontab", "value": schedule},
+        "timezone": timezone,
+        "checkin_margin": checkin_margin,   # minutes late before "missed"
+        "max_runtime": max_runtime,         # minutes before "timed out"
+    }
+    start = _time.time()
+    checkin_id = capture_checkin(
+        monitor_slug=monitor_slug, status="in_progress", monitor_config=monitor_config,
+    )
+    try:
+        yield
+    except Exception:
+        capture_checkin(
+            monitor_slug=monitor_slug, check_in_id=checkin_id, status="error",
+            duration=_time.time() - start, monitor_config=monitor_config,
+        )
+        sentry_sdk.flush(timeout=5)
+        raise
+    else:
+        capture_checkin(
+            monitor_slug=monitor_slug, check_in_id=checkin_id, status="ok",
+            duration=_time.time() - start, monitor_config=monitor_config,
+        )
+        sentry_sdk.flush(timeout=5)

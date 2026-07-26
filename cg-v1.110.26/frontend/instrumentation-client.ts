@@ -14,6 +14,17 @@ Sentry.init({
   // Performance: sample 20% in prod, 100% in dev
   tracesSampleRate: isProduction ? 0.2 : 1.0,
 
+  // Propagate the trace to our API (a different subdomain, so it must be listed
+  // explicitly — Sentry only propagates same-origin by default). This links the
+  // browser transaction to the backend spans for end-to-end distributed traces.
+  // The backend CORS allows the sentry-trace/baggage headers (see main.py).
+  tracePropagationTargets: [
+    /^\//,                                   // same-origin relative
+    "localhost:8000",
+    /https:\/\/api\.find-commonground\.com/,
+    /https:\/\/.*\.onrender\.com/,
+  ],
+
   // Session replay: capture 10% of sessions, 100% of error sessions
   replaysSessionSampleRate: 0.1,
   replaysOnErrorSampleRate: 1.0,
