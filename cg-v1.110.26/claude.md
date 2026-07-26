@@ -41,7 +41,11 @@ mypy app/
 
 - Swagger UI: http://localhost:8000/docs
 - ReDoc: http://localhost:8000/redoc
-- Production API: https://commonground-api-a0fr.onrender.com
+- Production API: https://api.find-commonground.com  (the old commonground-api-a0fr host is RETIRED / 503)
+
+> **Read `docs/ARCHITECTURE_NOTES.md`** before changing auth, error handling,
+> rate limiting, Redis, authorization, design tokens, or deploys — it documents
+> the non-obvious behaviour and the security invariants.
 
 ## Project Structure
 
@@ -434,8 +438,8 @@ When generating ARIA responses or UI copy:
 
 | Service | Provider | URL |
 |---------|----------|-----|
-| Frontend | Vercel | https://common-ground-blue.vercel.app |
-| Backend | Render | https://commonground-api-a0fr.onrender.com |
+| Frontend | Vercel | https://www.find-commonground.com (auto-deploys on push to `main`) |
+| Backend | Render | https://api.find-commonground.com (us-east; auto-deploys on push to `main`) |
 | Database | Supabase (PostgreSQL) | Supabase Dashboard |
 | Auth | Supabase Auth + TOTP MFA | Supabase Dashboard |
 | Cache | Redis Cloud / Upstash | - |
@@ -445,6 +449,7 @@ When generating ARIA responses or UI copy:
 ## Documentation
 
 See `docs/` for detailed documentation:
+- **`docs/ARCHITECTURE_NOTES.md` - Non-obvious behaviour + security invariants (start here)**
 - `docs/architecture/OVERVIEW.md` - System overview
 - `docs/api/API_REFERENCE.md` - Full API docs
 - `docs/features/` - Feature specifications
