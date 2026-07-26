@@ -1,5 +1,28 @@
 'use client';
 
+/**
+ * AuthProvider — the single source of truth for "who is logged in" on the client.
+ *
+ * SESSION MODEL (important — this is subtle):
+ *  - The ACCESS token is held IN MEMORY only (lib/api.ts), never localStorage —
+ *    a token in localStorage is XSS-exfiltratable and survives reloads.
+ *  - The REFRESH token is an HttpOnly cookie the backend sets (cg_refresh); JS
+ *    can never read it.
+ *  - Because the access token is in-memory, it's GONE after a full page reload.
+ *    On mount we therefore "bootstrap": if a cached `user` exists, call
+ *    authAPI.refresh() to mint a fresh access token from the refresh cookie
+ *    BEFORE hitting authenticated endpoints. If that fails → treated as logged
+ *    out. (See the loadUser() effect below.)
+ *  - `user` is cached in localStorage (not a secret) purely as the "has a
+ *    session" hint so isAuthenticated() is truthy immediately on reload while
+ *    the async bootstrap runs.
+ *  - login()/register() store the user + set the in-memory token; the browser
+ *    receives the refresh cookie automatically. logout() clears both + the cookie.
+ *
+ * If you change this, also check: lib/api.ts (in-memory token + 401 refresh
+ * interceptor) and backend app/core/auth_cookies.py (cookie attributes).
+ */
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { authAPI, usersAPI, User, UserProfile } from './api';
 import { DEFAULT_TIMEZONE } from './timezone';

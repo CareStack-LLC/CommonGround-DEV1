@@ -1,3 +1,22 @@
+/**
+ * Edge middleware — refreshes the Supabase SSR session on each request so the
+ * server always sees a valid session cookie (Supabase's recommended pattern).
+ *
+ * NOTE the `matcher` at the bottom deliberately EXCLUDES static assets AND the
+ * public marketing/auth pages (/, /features, /pricing, /login, …). Those are
+ * excluded to avoid the ~200ms `getUser()` round-trip on first paint — their
+ * auth state is resolved client-side by AuthProvider instead. If you add a new
+ * page that needs the server-side session, make sure it isn't excluded here.
+ *
+ * Runs in the EDGE runtime: use Web APIs only (fetch, crypto, btoa) — Node
+ * globals like `Buffer` are undefined here and will throw on every request.
+ *
+ * (A per-request nonce-based CSP was attempted here and reverted — Next 16's
+ * App Router requires nonce+dynamic-rendering to drop script-src 'unsafe-inline',
+ * which crashed the Edge runtime and forced app-wide dynamic rendering. The
+ * static CSP lives in next.config.ts; the real XSS sink is closed by DOMPurify
+ * in lib/sanitize.ts.)
+ */
 import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 
