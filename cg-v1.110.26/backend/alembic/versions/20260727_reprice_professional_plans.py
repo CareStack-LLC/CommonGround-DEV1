@@ -34,11 +34,11 @@ def upgrade() -> None:
             description = 'For independent attorneys and mediators managing up to 15 active cases. AI intake, court-order OCR, and included compliance reports.',
             price_monthly = 49.00,
             price_annual = 490.00,
-            features = features || '{
+            features = (features::jsonb || '{
                 "team_members": 0,
                 "included_reports": true,
                 "featured_listing": false
-            }'::jsonb,
+            }'::jsonb)::json,
             updated_at = NOW()
         WHERE plan_code = 'solo'
         """
@@ -50,13 +50,13 @@ def upgrade() -> None:
             description = 'For practices with up to 5 team members and 50 active cases. Firm management, case queue, templates, analytics, and featured directory placement for lead generation.',
             price_monthly = 249.00,
             price_annual = 2490.00,
-            features = features || '{
+            features = (features::jsonb || '{
                 "team_members": 5,
                 "included_reports": true,
                 "featured_listing": true,
                 "bulk_actions": true,
                 "priority_support": true
-            }'::jsonb,
+            }'::jsonb)::json,
             updated_at = NOW()
         WHERE plan_code = 'small_firm'
         """
@@ -68,11 +68,11 @@ def upgrade() -> None:
             description = 'For growing practices with up to 15 team members and 150 active cases. Everything in Firm plus API access.',
             price_monthly = 599.00,
             price_annual = 5990.00,
-            features = features || '{
+            features = (features::jsonb || '{
                 "team_members": 15,
                 "included_reports": true,
                 "api_access": true
-            }'::jsonb,
+            }'::jsonb)::json,
             updated_at = NOW()
         WHERE plan_code = 'mid_size'
         """
@@ -86,7 +86,7 @@ def downgrade() -> None:
             display_name = 'Solo Practitioner',
             price_monthly = 99.00,
             price_annual = 990.00,
-            features = features || '{"team_members": 0, "featured_listing": false}'::jsonb,
+            features = (features::jsonb || '{"team_members": 0, "featured_listing": false}'::jsonb)::json,
             updated_at = NOW()
         WHERE plan_code = 'solo'
         """
@@ -97,7 +97,7 @@ def downgrade() -> None:
             display_name = 'Small Firm',
             price_monthly = 299.00,
             price_annual = 2990.00,
-            features = features || '{"team_members": 3, "featured_listing": false}'::jsonb,
+            features = (features::jsonb || '{"team_members": 3, "featured_listing": false}'::jsonb)::json,
             updated_at = NOW()
         WHERE plan_code = 'small_firm'
         """
@@ -108,7 +108,7 @@ def downgrade() -> None:
             display_name = 'Mid-Size Firm',
             price_monthly = 799.00,
             price_annual = 7990.00,
-            features = features || '{"team_members": 10}'::jsonb,
+            features = (features::jsonb || '{"team_members": 10}'::jsonb)::json,
             updated_at = NOW()
         WHERE plan_code = 'mid_size'
         """
