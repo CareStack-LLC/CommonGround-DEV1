@@ -151,7 +151,7 @@ const objections = [
   {
     question: 'How much does it cost for professionals?',
     answer:
-      'Professional access is free. Your clients choose and pay for their own plans. You get read access to verified data, exports, and analytics at no cost to you or your firm.',
+      'Professional access is free — reviewing cases clients invite you to costs nothing, and your clients choose and pay for their own plans. Optional practice plans (from $49/mo) add AI-assisted intake, court-order OCR, included compliance reports, and featured directory placement.',
     icon: DollarSign,
   },
 ];
@@ -163,6 +163,16 @@ const story = [
   { time: 'Now', tone: 'after', text: 'He opens a case to a clean record. ARIA had already kept the communication civil. The facts weren’t in dispute, so he could focus on the outcome.' },
   { time: 'At the hearing', tone: 'after', kicker: true, text: 'It took half as long. The judge had everything she needed on page one.' },
 ];
+
+// Real, attributed professional testimonials only. The testimonials section
+// renders exclusively from this list — when it is empty, an honest pilot band
+// is shown instead. Never ship placeholder or invented attribution.
+const professionalTestimonials: {
+  quote: string;
+  name: string;
+  role: string;
+  rating: number;
+}[] = [];
 
 export default function ProfessionalsPage() {
   return (
@@ -554,54 +564,59 @@ export default function ProfessionalsPage() {
         </div>
       </section>
 
-      {/* Professional Testimonials — placeholder quotes pending real reviews */}
-      <section className="py-16 sm:py-24 bg-white" data-section="testimonials">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-10">
+      {/* Professional Testimonials — real quotes only; honest pilot band until then */}
+      {professionalTestimonials.length > 0 ? (
+        <section className="py-16 sm:py-24 bg-white" data-section="testimonials">
+          <div className="max-w-6xl mx-auto px-6">
+            <div className="text-center mb-10">
+              <h2
+                className="text-3xl sm:text-4xl text-foreground mb-4"
+                style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
+              >
+                What professionals <span className="text-cg-sage">are saying</span>
+              </h2>
+              <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
+                Attorneys, mediators, and GALs reach for CommonGround when a case needs clean evidence fast.
+              </p>
+            </div>
+            <div className="grid md:grid-cols-3 gap-6">
+              {professionalTestimonials.map((t) => (
+                <TestimonialCard
+                  key={t.name}
+                  variant="featured"
+                  quote={t.quote}
+                  name={t.name}
+                  role={t.role}
+                  rating={t.rating}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : (
+        <section className="py-16 sm:py-24 bg-white" data-section="testimonials">
+          <div className="max-w-4xl mx-auto px-6 text-center">
             <h2
               className="text-3xl sm:text-4xl text-foreground mb-4"
               style={{ fontFamily: 'DM Serif Display, Georgia, serif' }}
             >
-              What professionals <span className="text-cg-sage">are saying</span>
+              Built <span className="text-cg-sage">with</span> family-law professionals
             </h2>
-            <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
-              Attorneys, mediators, and GALs reach for CommonGround when a case needs clean evidence fast.
+            <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto mb-8">
+              CommonGround is currently in pilot with attorneys, mediators, and guardians ad
+              litem. We&apos;ll publish reviews when our first cohort has taken real cases
+              through the platform — not before. Want to shape the tool your practice will
+              use? Join the pilot.
             </p>
+            <a
+              href="#demo"
+              className="inline-flex items-center justify-center gap-2 bg-cg-sage text-white font-medium px-8 py-3 rounded-full transition-all duration-300 hover:bg-cg-sage-light hover:shadow-lg"
+            >
+              Join the professional pilot
+            </a>
           </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            {/* TODO(marketing): replace with real quote */}
-            <div data-seed="placeholder">
-              <TestimonialCard
-                variant="featured"
-                quote="Verified timestamps and calm-messaging data saved me hours of deposition prep — the exports hold up under scrutiny."
-                name="Attorney placeholder"
-                role="Attorney, Family Law · Austin, TX"
-                rating={5}
-              />
-            </div>
-            {/* TODO(marketing): replace with real quote */}
-            <div data-seed="placeholder">
-              <TestimonialCard
-                variant="featured"
-                quote="Couples arrive at mediation less defensive because ARIA already lowered the temperature between sessions."
-                name="Mediator placeholder"
-                role="Mediator · Los Angeles, CA"
-                rating={5}
-              />
-            </div>
-            {/* TODO(marketing): replace with real quote */}
-            <div data-seed="placeholder">
-              <TestimonialCard
-                variant="featured"
-                quote="I can see the family's real dynamics instead of reconstructing them from screenshots — it changes my recommendations."
-                name="Guardian ad Litem placeholder"
-                role="Guardian ad Litem · Atlanta, GA"
-                rating={5}
-              />
-            </div>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Book-a-demo CTA band */}
       <section data-section="book-demo">
