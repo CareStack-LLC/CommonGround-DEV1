@@ -22,28 +22,30 @@ logger = logging.getLogger(__name__)
 # Constants (canonical mappings — moved out of admin.py)
 # ─────────────────────────────────────────────────────────────────────
 
+# IDs from the production Stripe account (B3EXvvERPf), synced 2026-07-28.
 STRIPE_PRICE_TO_TIER: dict[str, str] = {
     # Consumer tiers
-    "price_1TE0bXBJIivbOFX7luV9H7OZ": "web_starter",           # $0/mo
-    "price_1TE0bXBJIivbOFX70Ysv656Q": "plus",                  # $17.99/mo
-    "price_1TE0bYBJIivbOFX7atup1qAE": "plus",                  # $199.99/yr
-    "price_1TE0bYBJIivbOFX7VqmtQH23": "complete",              # $34.99/mo
-    "price_1TE0bZBJIivbOFX77f2QUPc6": "complete",              # $349.99/yr
-    # Professional tiers
-    "price_1TE0bZBJIivbOFX7kmvDAoqr": "professional_starter",  # $49/mo
-    "price_1TE0baBJIivbOFX7dqc7W1Dp": "solo",                  # $99/mo
-    "price_1TE0baBJIivbOFX7smGjiSyj": "small_firm",            # $299/mo
-    "price_1TE0bbBJIivbOFX78k6VF4wC": "mid_size",              # $799/mo
+    "price_1T7WgnB3EXvvERPfyu40gtfE": "web_starter",  # $0/mo
+    "price_1T7WgnB3EXvvERPfcpZeMSSH": "plus",         # $17.99/mo
+    "price_1T7WgnB3EXvvERPfe7NNFlru": "plus",         # $199.99/yr
+    "price_1T7WgoB3EXvvERPfDm7qKpBN": "complete",     # $34.99/mo
+    "price_1T7WgoB3EXvvERPfmDy9KtDh": "complete",     # $349.99/yr
+    # Professional tiers (free-to-practice model — no paid starter)
+    "price_1TyI6iB3EXvvERPfyAD3dGoZ": "solo",         # $49/mo
+    "price_1TyI6iB3EXvvERPfwRk49YUO": "solo",         # $490/yr
+    "price_1TyI6jB3EXvvERPfKehICp3l": "small_firm",   # $249/mo
+    "price_1TyI6kB3EXvvERPfhPqijeyu": "small_firm",   # $2,490/yr
+    "price_1TyI6lB3EXvvERPftdrajbne": "mid_size",     # $599/mo
+    "price_1TyI6lB3EXvvERPfNgxwaX0w": "mid_size",     # $5,990/yr
 }
 
 STRIPE_PRODUCT_TO_TIER: dict[str, str] = {
-    "prod_UCPQdxPYuteQUA": "web_starter",
-    "prod_UCPQBUvNRmZ4Cs": "plus",
-    "prod_UCPQxC2eRt7g6K": "complete",
-    "prod_UCPQevbVaWJDfT": "professional_starter",
-    "prod_UCPQVLqjYyuiRF": "solo",
-    "prod_UCPQOK9Qpuw1hB": "small_firm",
-    "prod_UCPQQwcr2VaCXs": "mid_size",
+    "prod_U5i6vWb4ktGrTN": "web_starter",
+    "prod_U5i6Efw49ipfb3": "plus",
+    "prod_U5i6lsgC2mOHxn": "complete",
+    "prod_U5i6WdwYSiC9wc": "solo",
+    "prod_UyEZJaIJE4cHHR": "small_firm",
+    "prod_U5i6Pvkzonm0fe": "mid_size",
 }
 
 DEFAULT_TIER_PRICES: dict[str, float] = {

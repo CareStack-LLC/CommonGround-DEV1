@@ -1,90 +1,96 @@
 {
+  "_note": "Snapshot of the production Stripe account (B3EXvvERPf) catalog, synced 2026-07-28 via backend/scripts/sync_stripe_products.py. The prior snapshot referenced a different Stripe account (BJIivbOFX7) whose IDs were never usable in prod.",
   "Web Starter": {
-    "product_id": "prod_UCPQdxPYuteQUA",
+    "product_id": "prod_U5i6vWb4ktGrTN",
     "prices": [
       {
         "label": "monthly (free)",
-        "price_id": "price_1TE0bXBJIivbOFX7luV9H7OZ",
+        "price_id": "price_1T7WgnB3EXvvERPfyu40gtfE",
         "amount": 0.0
       }
     ]
   },
   "Plus": {
-    "product_id": "prod_UCPQBUvNRmZ4Cs",
+    "product_id": "prod_U5i6Efw49ipfb3",
     "prices": [
       {
         "label": "monthly",
-        "price_id": "price_1TE0bXBJIivbOFX70Ysv656Q",
+        "price_id": "price_1T7WgnB3EXvvERPfcpZeMSSH",
         "amount": 17.99
       },
       {
         "label": "annual",
-        "price_id": "price_1TE0bYBJIivbOFX7atup1qAE",
+        "price_id": "price_1T7WgnB3EXvvERPfe7NNFlru",
         "amount": 199.99
       }
     ]
   },
   "Complete": {
-    "product_id": "prod_UCPQxC2eRt7g6K",
+    "product_id": "prod_U5i6lsgC2mOHxn",
     "prices": [
       {
         "label": "monthly",
-        "price_id": "price_1TE0bYBJIivbOFX7VqmtQH23",
+        "price_id": "price_1T7WgoB3EXvvERPfDm7qKpBN",
         "amount": 34.99
       },
       {
         "label": "annual",
-        "price_id": "price_1TE0bZBJIivbOFX77f2QUPc6",
+        "price_id": "price_1T7WgoB3EXvvERPfmDy9KtDh",
         "amount": 349.99
       }
     ]
   },
-  "Professional Starter": {
-    "product_id": "prod_UCPQevbVaWJDfT",
-    "prices": [
-      {
-        "label": "monthly",
-        "price_id": "price_1TE0bZBJIivbOFX7kmvDAoqr",
-        "amount": 49.0
-      }
-    ]
-  },
   "Professional Solo": {
-    "product_id": "prod_UCPQVLqjYyuiRF",
+    "product_id": "prod_U5i6WdwYSiC9wc",
     "prices": [
       {
         "label": "monthly",
-        "price_id": "price_1TE0baBJIivbOFX7dqc7W1Dp",
-        "amount": 99.0
+        "price_id": "price_1TyI6iB3EXvvERPfyAD3dGoZ",
+        "amount": 49.0
+      },
+      {
+        "label": "annual",
+        "price_id": "price_1TyI6iB3EXvvERPfwRk49YUO",
+        "amount": 490.0
       }
     ]
   },
-  "Professional Small Firm": {
-    "product_id": "prod_UCPQOK9Qpuw1hB",
+  "Professional Firm": {
+    "product_id": "prod_UyEZJaIJE4cHHR",
     "prices": [
       {
         "label": "monthly",
-        "price_id": "price_1TE0baBJIivbOFX7smGjiSyj",
-        "amount": 299.0
+        "price_id": "price_1TyI6jB3EXvvERPfKehICp3l",
+        "amount": 249.0
+      },
+      {
+        "label": "annual",
+        "price_id": "price_1TyI6kB3EXvvERPfhPqijeyu",
+        "amount": 2490.0
       }
     ]
   },
   "Professional Mid-Size": {
-    "product_id": "prod_UCPQQwcr2VaCXs",
+    "product_id": "prod_U5i6Pvkzonm0fe",
     "prices": [
       {
         "label": "monthly",
-        "price_id": "price_1TE0bbBJIivbOFX78k6VF4wC",
-        "amount": 799.0
+        "price_id": "price_1TyI6lB3EXvvERPftdrajbne",
+        "amount": 599.0
+      },
+      {
+        "label": "annual",
+        "price_id": "price_1TyI6lB3EXvvERPfNgxwaX0w",
+        "amount": 5990.0
       }
     ]
   },
   "Court Investigation Package": {
-    "product_id": "prod_UCPQOlUDOkaF3u",
+    "product_id": "prod_U5i6ZMoAoSQBEH",
     "prices": [
       {
         "label": "one-time",
-        "price_id": "price_1TE0bbBJIivbOFX7FwW5R7E9",
+        "price_id": "price_1T7WgqB3EXvvERPfdLfdqwwC",
         "amount": 149.0
       }
     ]
@@ -93,48 +99,58 @@
     "product_id": "prod_UCPQNVYgbcZ3Am",
     "prices": [
       {
-        "label": "one-time",
+        "label": "one-time (legacy other-account ID — reconcile on next sync)",
         "price_id": "price_1TE0bcBJIivbOFX7gMG8gSwq",
         "amount": 99.0
       }
     ]
   },
   "Communication Analysis Report": {
-    "product_id": "prod_UCPQI4zziqm3mM",
+    "product_id": "prod_U5i6T4xMbbYmrh",
     "prices": [
       {
         "label": "one-time",
-        "price_id": "price_1TE0bcBJIivbOFX7d92QMhVJ",
+        "price_id": "price_1T7WgrB3EXvvERPfgGIUwJwa",
         "amount": 79.0
       }
     ]
   },
   "Financial Compliance Report": {
-    "product_id": "prod_UCPQwdLQurLuJL",
+    "product_id": "prod_U5i6uitcZE1ykf",
     "prices": [
       {
         "label": "one-time",
-        "price_id": "price_1TE0bdBJIivbOFX7NIrWMiSg",
+        "price_id": "price_1T7WgrB3EXvvERPfR1NuSnre",
+        "amount": 79.0
+      }
+    ]
+  },
+  "KidSpace Court Communication Report": {
+    "product_id": "prod_U9hbZEZJE9Cf8z",
+    "prices": [
+      {
+        "label": "one-time",
+        "price_id": "price_1TBOCNB3EXvvERPfgsjL8kHo",
         "amount": 79.0
       }
     ]
   },
   "Rush Report Delivery": {
-    "product_id": "prod_UCPQTRgWRvrgc6",
+    "product_id": "prod_U5i7U0VOUv5SSz",
     "prices": [
       {
         "label": "one-time",
-        "price_id": "price_1TE0bdBJIivbOFX758bn5Kto",
+        "price_id": "price_1T7WgsB3EXvvERPfzQwnJ8yq",
         "amount": 50.0
       }
     ]
   },
   "Urgent Report Delivery": {
-    "product_id": "prod_UCPQ5vVhbWJRRE",
+    "product_id": "prod_U5i7ekUzdGW0sX",
     "prices": [
       {
         "label": "one-time",
-        "price_id": "price_1TE0beBJIivbOFX7o1Cxoczu",
+        "price_id": "price_1T7WgsB3EXvvERPfSV4M1DmI",
         "amount": 100.0
       }
     ]
