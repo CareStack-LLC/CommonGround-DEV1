@@ -161,6 +161,12 @@ class Settings(BaseSettings):
 
     # Email
     EMAIL_ENABLED: bool = False
+    # Transactional provider: "auto" uses Resend when RESEND_API_KEY is set,
+    # otherwise SendGrid. Set "resend" or "sendgrid" to force one.
+    # SendGrid Marketing (contact lists below) is unaffected by this switch —
+    # it runs only when SENDGRID_API_KEY and a list ID are configured.
+    EMAIL_PROVIDER: str = "auto"
+    RESEND_API_KEY: Optional[str] = None
     SENDGRID_API_KEY: Optional[str] = None
     SENDGRID_WEBHOOK_VERIFICATION_KEY: Optional[str] = None  # For verifying webhook signatures
     SENDGRID_EARLY_ADOPTER_LIST_ID: Optional[str] = None  # SendGrid Marketing contact list for early adopters

@@ -1,5 +1,10 @@
 """
-Email notification service for sending transactional emails via SendGrid.
+Email notification service for transactional emails.
+
+Delivery provider is configurable (settings.EMAIL_PROVIDER): Resend is the
+default when RESEND_API_KEY is set; SendGrid remains supported. SendGrid
+Marketing (contact lists) is independent of the transactional provider and
+runs only when a SendGrid key + list ID are configured.
 
 Uses Jinja2 templates for consistent, branded email rendering.
 """
@@ -23,10 +28,11 @@ TEMPLATES_DIR = Path(__file__).parent.parent / "templates" / "emails"
 
 class EmailService:
     """
-    Service for sending email notifications via SendGrid.
+    Service for sending transactional email notifications.
 
     In development mode (EMAIL_ENABLED=False), emails are logged to console.
-    In production (EMAIL_ENABLED=True), emails are sent via SendGrid API.
+    In production (EMAIL_ENABLED=True), emails are sent via the configured
+    provider (Resend or SendGrid — see settings.EMAIL_PROVIDER).
 
     Uses Jinja2 templates from backend/app/templates/emails/ for rendering.
     """
@@ -36,12 +42,26 @@ class EmailService:
         self.enabled = settings.EMAIL_ENABLED
         self.from_email = settings.FROM_EMAIL
         self.from_name = getattr(settings, 'FROM_NAME', 'CommonGround')
+        # SendGrid key also powers the (optional) marketing contact lists.
         self.api_key = settings.SENDGRID_API_KEY
+        self.resend_api_key = getattr(settings, 'RESEND_API_KEY', None)
         self.frontend_url = getattr(settings, 'FRONTEND_URL', 'https://www.find-commonground.com')
 
+        # Resolve transactional provider
+        provider = (getattr(settings, 'EMAIL_PROVIDER', 'auto') or 'auto').lower()
+        if provider == 'auto':
+            provider = 'resend' if self.resend_api_key else 'sendgrid'
+        self.provider = provider
+
         # Validate configuration
-        if self.enabled and not self.api_key:
-            logger.warning("EMAIL_ENABLED is True but SENDGRID_API_KEY is not set. Emails will be logged only.")
+        provider_key = self.resend_api_key if self.provider == 'resend' else self.api_key
+        if self.enabled and not provider_key:
+            logger.warning(
+                "EMAIL_ENABLED is True but no API key is set for provider "
+                f"'{self.provider}' (need "
+                f"{'RESEND_API_KEY' if self.provider == 'resend' else 'SENDGRID_API_KEY'}). "
+                "Emails will be logged only."
+            )
             self.enabled = False
 
         # Initialize Jinja2 environment
@@ -1346,7 +1366,7 @@ class EmailService:
         outbox_category: Optional[str] = None,
     ) -> Optional[str]:
         """
-        Send email via SendGrid or log in development mode.
+        Send email via the configured provider, or log in development mode.
 
         Includes retry logic (up to 2 retries with exponential backoff)
         and Sentry error tracking for production monitoring.
@@ -1362,7 +1382,7 @@ class EmailService:
                 scheduler dispatcher instead of being silently dropped.
 
         Returns:
-            SendGrid message ID for tracking, or None on failure
+            Provider message ID for tracking, or None on failure
         """
         import asyncio
         MAX_RETRIES = 2
@@ -1373,22 +1393,14 @@ class EmailService:
             logger.info(f"[EMAIL DEV MODE] To: {to_email} | Subject: {subject}")
             return None
 
-        # Production mode - send via SendGrid
+        # Production mode - single delivery attempt via configured provider;
+        # retry/backoff/outbox semantics are shared across providers here.
         try:
-            from sendgrid import SendGridAPIClient
-            from sendgrid.helpers.mail import Mail, Email, To, Content
-
-            message = Mail(
-                from_email=Email(self.from_email, sender_name),
-                to_emails=To(to_email),
-                subject=subject,
-                html_content=Content("text/html", html_body)
+            msg_id, failure = await self._deliver_once(
+                to_email, subject, html_body, text_body, sender_name
             )
 
-            sg = SendGridAPIClient(self.api_key)
-            response = sg.send(message)
-
-            if response.status_code in [200, 201, 202]:
+            if failure is None:
                 logger.info(f"Email sent to {to_email}: {subject}")
                 # Track success metric
                 try:
@@ -1396,23 +1408,22 @@ class EmailService:
                     metric_increment("email.sent", tags={"subject_prefix": subject[:30]})
                 except Exception:
                     pass
-                msg_id = response.headers.get("X-Message-Id")
                 return msg_id
-            else:
-                logger.error(f"SendGrid returned status {response.status_code} for {to_email}")
-                # Retry on server errors (5xx)
-                if response.status_code >= 500 and _retry_count < MAX_RETRIES:
-                    await asyncio.sleep(2 ** (_retry_count + 1))  # 2s, 4s backoff
-                    return await self._send_email(
-                        to_email, subject, html_body, text_body,
-                        from_name_override, _retry_count + 1,
-                        outbox_category=outbox_category,
-                    )
-                await self._spill_to_outbox(
-                    to_email, subject, html_body, from_name_override,
-                    outbox_category, f"SendGrid status {response.status_code}",
+
+            error_desc, retryable = failure
+            logger.error(f"{error_desc} for {to_email}")
+            if retryable and _retry_count < MAX_RETRIES:
+                await asyncio.sleep(2 ** (_retry_count + 1))  # 2s, 4s backoff
+                return await self._send_email(
+                    to_email, subject, html_body, text_body,
+                    from_name_override, _retry_count + 1,
+                    outbox_category=outbox_category,
                 )
-                return None
+            await self._spill_to_outbox(
+                to_email, subject, html_body, from_name_override,
+                outbox_category, error_desc,
+            )
+            return None
 
         except ImportError:
             logger.error("SendGrid library not installed. Run: pip install sendgrid")
@@ -1444,6 +1455,69 @@ class EmailService:
                 outbox_category, str(e),
             )
             return None
+
+    async def _deliver_once(
+        self,
+        to_email: str,
+        subject: str,
+        html_body: str,
+        text_body: Optional[str],
+        sender_name: str,
+    ) -> tuple:
+        """One delivery attempt via the configured provider.
+
+        Returns (message_id, None) on success, or
+        (None, (error_description, retryable)) on a non-exception failure.
+        Provider/network exceptions propagate to _send_email's handler.
+        """
+        if self.provider == "resend":
+            import httpx
+
+            payload: Dict[str, Any] = {
+                "from": f"{sender_name} <{self.from_email}>",
+                "to": [to_email],
+                "subject": subject,
+                "html": html_body,
+            }
+            if text_body:
+                payload["text"] = text_body
+
+            async with httpx.AsyncClient(timeout=15.0) as client:
+                resp = await client.post(
+                    "https://api.resend.com/emails",
+                    headers={"Authorization": f"Bearer {self.resend_api_key}"},
+                    json=payload,
+                )
+
+            if resp.status_code in (200, 201):
+                return resp.json().get("id"), None
+            # 429 (rate limit) and 5xx are transient; 4xx are not.
+            retryable = resp.status_code == 429 or resp.status_code >= 500
+            return None, (
+                f"Resend status {resp.status_code}: {resp.text[:200]}",
+                retryable,
+            )
+
+        # SendGrid (legacy provider)
+        from sendgrid import SendGridAPIClient
+        from sendgrid.helpers.mail import Mail, Email, To, Content
+
+        message = Mail(
+            from_email=Email(self.from_email, sender_name),
+            to_emails=To(to_email),
+            subject=subject,
+            html_content=Content("text/html", html_body)
+        )
+
+        sg = SendGridAPIClient(self.api_key)
+        response = sg.send(message)
+
+        if response.status_code in [200, 201, 202]:
+            return response.headers.get("X-Message-Id"), None
+        return None, (
+            f"SendGrid status {response.status_code}",
+            response.status_code >= 500,
+        )
 
     async def _spill_to_outbox(
         self,
