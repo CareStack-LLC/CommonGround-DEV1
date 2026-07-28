@@ -16,79 +16,102 @@ import { FaqJsonLd } from '@/components/marketing';
 
 export const metadata: Metadata = {
   title: 'Professional Pricing | CommonGround',
-  description: 'Special pricing for attorneys, GALs, mediators, and family law professionals. Bulk vouchers and multi-case access.',
+  description: 'Free professional access for attorneys, GALs, mediators, and evaluators. Optional practice plans add AI intake, court-order OCR, included reports, and featured directory placement.',
 };
 
 /**
  * Professional Pricing Page
  *
- * Pricing for attorneys, GALs, mediators, and other family law professionals.
+ * Free-to-practice model: reviewing a client case is always free.
+ * Paid tiers sell practice tools (AI intake, OCR, included reports) and
+ * growth (featured directory placement, firm management).
  */
 
 const professionalPlans = [
   {
     name: 'Starter',
-    price: '$49',
-    period: '/month',
-    vouchers: '5 vouchers',
-    description: 'Perfect for solo practitioners just getting started.',
+    price: 'Free',
+    period: 'forever',
+    tagline: 'Up to 3 active cases',
+    description: 'Review client cases at no cost — ever. Get invited by a parent or listed in our directory.',
     features: [
-      '5 client vouchers per month',
-      'Professional dashboard',
-      'Multi-case view',
-      'Basic analytics',
-      'Email support',
-      'Client invitation system',
+      'Read access to invited cases',
+      'Case timeline & communications view',
+      'Compliance & exchange metrics',
+      'Secure client messaging',
+      'Directory listing',
+      'Court-ready reports, pay per report',
     ],
-    cta: 'Start Free Trial',
-    ctaLink: '/court-portal/register?plan=pro-starter',
+    cta: 'Create Free Account',
+    ctaLink: '/register?redirect=/professional/onboarding',
   },
   {
-    name: 'Practice',
-    price: '$149',
+    name: 'Solo',
+    price: '$49',
     period: '/month',
-    vouchers: '20 vouchers',
-    description: 'For established practices with regular family law cases.',
+    tagline: 'Up to 15 active cases',
+    description: 'The full toolkit for independent attorneys, mediators, and GALs.',
+    features: [
+      'Everything in Starter',
+      'ARIA-assisted client intake',
+      'Court-order OCR & field locking',
+      'Compliance reports included',
+      'Call logging',
+      'Enhanced directory profile',
+    ],
+    cta: 'Start 14-Day Trial',
+    ctaLink: '/register?redirect=/professional/onboarding',
+  },
+  {
+    name: 'Firm',
+    price: '$249',
+    period: '/month',
+    tagline: '50 cases · 5 team members',
+    description: 'Run the practice and grow it — team workflow plus featured placement where parents search.',
     highlighted: true,
     badge: 'Most Popular',
     features: [
-      '20 client vouchers per month',
-      'Everything in Starter',
-      'Advanced case analytics',
-      'Bulk export tools',
+      'Everything in Solo',
+      'Firm management & case queue',
+      'Firm templates & analytics',
+      'Featured directory placement',
+      'Bulk actions & exports',
       'Priority support',
-      'Custom branding options',
-      'Team member access (up to 3)',
     ],
-    cta: 'Start Free Trial',
-    ctaLink: '/court-portal/register?plan=pro-practice',
+    cta: 'Start 14-Day Trial',
+    ctaLink: '/register?redirect=/professional/onboarding',
   },
   {
     name: 'Enterprise',
     price: 'Custom',
     period: '',
-    vouchers: 'Unlimited',
-    description: 'For large firms and organizations with high volume needs.',
+    tagline: 'Unlimited cases & seats',
+    description: 'For large firms, court programs, and organizations with high volume needs.',
     features: [
-      'Unlimited client vouchers',
-      'Everything in Practice',
-      'Dedicated account manager',
+      'Everything in Firm',
+      'Unlimited cases & team members',
+      'API access',
       'Custom integrations',
-      'SLA guarantees',
-      'On-site training',
-      'Unlimited team members',
       'White-label options',
+      'Dedicated account manager',
     ],
     cta: 'Contact Sales',
     ctaLink: '/help/contact?type=enterprise',
   },
 ];
 
+const reportProducts = [
+  { name: 'Court Investigation Package', price: '$149', description: 'Comprehensive analysis of communication, schedule, and custody exchanges.' },
+  { name: 'Custody Compliance Report', price: '$99', description: 'Agreement adherence, schedule compliance rates, and exchange history.' },
+  { name: 'Communication Analysis Report', price: '$79', description: 'Message patterns, tone trends, and ARIA intervention history.' },
+  { name: 'Financial Compliance Report', price: '$79', description: 'Expense reimbursements and obligation payments, fully audited.' },
+];
+
 const roles = [
   {
     icon: Scale,
     title: 'Attorneys',
-    description: 'Family law attorneys can provide clients with vouchers for premium CommonGround access, ensuring better documentation and communication.',
+    description: 'Open every case to a verified, timestamped record — communications, exchanges, and finances — instead of a box of screenshots.',
   },
   {
     icon: Users,
@@ -120,8 +143,8 @@ const benefits = [
   },
   {
     icon: Zap,
-    title: 'Reduce Conflict',
-    description: 'ARIA helps clients communicate better, leading to faster resolutions.',
+    title: 'Win New Clients',
+    description: 'Parents searching for help find you in our professional directory and can request your firm in one click.',
   },
   {
     icon: HeadphonesIcon,
@@ -132,24 +155,32 @@ const benefits = [
 
 const faqs = [
   {
-    question: 'How do vouchers work?',
-    answer: 'Vouchers give your clients access to premium CommonGround features. You distribute voucher codes to clients, they redeem during signup, and both parents get upgraded access. Unused vouchers roll over for up to 3 months.',
+    question: 'Is professional access really free?',
+    answer: 'Yes. Reviewing cases clients invite you to — timeline, communications, schedules, and compliance metrics — is free forever, for up to 3 active cases. Paid plans add practice tools like AI-assisted intake, court-order OCR, included reports, higher case limits, and featured directory placement.',
   },
   {
     question: 'What access do I get to client cases?',
-    answer: 'You get read-only access to cases where your clients have granted you access. This includes communication history, agreement drafts, schedules, and compliance metrics. You cannot modify anything—only view and export.',
+    answer: 'You get read-only access to cases where parents have granted you access, with scoped permissions and a complete audit trail. This includes communication history, agreement drafts, schedules, financial records, and compliance metrics. You cannot modify anything — only view, message, and export.',
   },
   {
-    question: 'Can I try before I buy?',
-    answer: 'Yes! All professional plans include a 30-day free trial with 3 vouchers included. No credit card required to start.',
+    question: 'How do court-ready reports work?',
+    answer: 'Every report is timestamped, SHA-256 hashed, and cryptographically signed, with a public verification number anyone — including opposing counsel or the court — can check. On the free Starter plan you purchase reports individually ($79–$149). Solo and above include compliance reports in the subscription.',
+  },
+  {
+    question: 'How does the directory bring me clients?',
+    answer: 'Parents on CommonGround browse the professional directory when they need an attorney, mediator, or evaluator, and can request to connect with your firm in one click. Every plan includes a listing; Firm plans and above get featured placement.',
+  },
+  {
+    question: 'Do my clients have to pay for me to access their case?',
+    answer: 'No. Clients on any plan — including the free plan — can grant you access to their case. Your clients choose their own plans based on the features they want.',
+  },
+  {
+    question: 'How does billing work?',
+    answer: 'Paid plans are billed monthly or annually (annual gets 2 months free) and include a 14-day free trial. Cancel anytime — your free Starter access and directory listing remain.',
   },
   {
     question: 'Do you offer bar association discounts?',
     answer: 'Yes, we partner with several state bar associations to offer member discounts. Contact us to check if your bar association is a partner.',
-  },
-  {
-    question: 'How does billing work?',
-    answer: 'Plans are billed monthly or annually (with 2 months free). Vouchers reset each billing cycle, with unused vouchers rolling over for up to 90 days.',
   },
   {
     question: 'Can I white-label CommonGround for my firm?',
@@ -176,10 +207,10 @@ export default function ProfessionalPricingPage() {
               <span className="text-sm font-medium text-cg-sage">For Professionals</span>
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-semibold text-foreground mb-6">
-              Pricing for <span className="text-cg-sage">legal professionals</span>
+              Free to practice. <span className="text-cg-sage">Pay to grow.</span>
             </h1>
             <p className="text-xl text-muted-foreground mb-4">
-              Help your clients co-parent better with professional tools and bulk voucher access.
+              Reviewing a client&apos;s case is always free. Upgrade when you want the intake, reporting, and lead-generation tools that grow your practice.
             </p>
             <p className="text-sm text-muted-foreground">
               Looking for parent pricing?{' '}
@@ -220,17 +251,17 @@ export default function ProfessionalPricingPage() {
               Professional Plans
             </h2>
             <p className="text-muted-foreground">
-              Choose the plan that fits your practice size.
+              Start free. Upgrade when your caseload — or your client pipeline — asks for it.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
             {professionalPlans.map((plan) => (
               <div
                 key={plan.name}
                 className={`relative bg-card rounded-2xl border ${
                   plan.highlighted
-                    ? 'border-cg-sage shadow-xl scale-105'
+                    ? 'border-cg-sage shadow-xl lg:scale-105'
                     : 'border-border/50'
                 } p-8 flex flex-col`}
               >
@@ -251,7 +282,7 @@ export default function ProfessionalPricingPage() {
                     <span className="text-muted-foreground">{plan.period}</span>
                   </div>
                   <div className="text-cg-sage font-medium mt-1">
-                    {plan.vouchers}
+                    {plan.tagline}
                   </div>
                   <p className="text-sm text-muted-foreground mt-3">
                     {plan.description}
@@ -282,13 +313,50 @@ export default function ProfessionalPricingPage() {
           </div>
 
           <p className="text-center text-sm text-muted-foreground mt-8">
-            All plans include a 30-day free trial with 3 vouchers. Cancel anytime.
+            Paid plans include a 14-day free trial. Annual billing gets 2 months free. Cancel anytime.
+            <br />
+            Growing past 5 seats? Mid-Size ($599/mo) covers 150 cases and 15 team members —{' '}
+            <Link href="/help/contact?type=professional" className="text-cg-sage hover:underline">
+              talk to us
+            </Link>
+            .
+          </p>
+        </div>
+      </section>
+
+      {/* Court-Ready Reports, à la carte */}
+      <section className="py-20 bg-card">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-semibold text-foreground mb-4">
+              Court-ready reports, on demand
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Every report is timestamped, SHA-256 verified, and cryptographically signed — with a public
+              verification number the court can check. Buy them one at a time on the free plan, or get
+              compliance reports included with Solo and above.
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+            {reportProducts.map((report) => (
+              <div key={report.name} className="bg-background rounded-xl p-6 border border-border/50 flex flex-col">
+                <FileText className="w-8 h-8 text-cg-sage mb-3" />
+                <h3 className="font-semibold text-foreground mb-1">{report.name}</h3>
+                <div className="text-2xl font-bold text-foreground mb-2">{report.price}</div>
+                <p className="text-sm text-muted-foreground flex-1">{report.description}</p>
+              </div>
+            ))}
+          </div>
+
+          <p className="text-center text-sm text-muted-foreground mt-8">
+            Need it fast? Rush delivery (48h) +$50 · Urgent delivery (24h) +$100.
           </p>
         </div>
       </section>
 
       {/* Benefits */}
-      <section className="py-20 bg-card">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-semibold text-foreground mb-4">
@@ -313,13 +381,13 @@ export default function ProfessionalPricingPage() {
         </div>
       </section>
 
-      {/* How Vouchers Work */}
-      <section className="py-20">
+      {/* How It Works */}
+      <section className="py-20 bg-card">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-3xl font-semibold text-foreground mb-4">
-                How Vouchers Work
+                How It Works
               </h2>
             </div>
 
@@ -329,9 +397,9 @@ export default function ProfessionalPricingPage() {
                   1
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground mb-1">Generate Voucher Code</h3>
+                  <h3 className="font-semibold text-foreground mb-1">Create Your Free Account</h3>
                   <p className="text-muted-foreground">
-                    From your professional dashboard, generate a unique voucher code for each client case.
+                    Sign up in minutes and get listed in the professional directory. No credit card, no install.
                   </p>
                 </div>
               </div>
@@ -341,9 +409,9 @@ export default function ProfessionalPricingPage() {
                   2
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground mb-1">Share with Both Parents</h3>
+                  <h3 className="font-semibold text-foreground mb-1">Get Connected to Cases</h3>
                   <p className="text-muted-foreground">
-                    Send the voucher code to both parents. They'll enter it during registration or in settings.
+                    A client invites you by email, or a parent finds your firm in the directory and requests you in one click.
                   </p>
                 </div>
               </div>
@@ -353,9 +421,9 @@ export default function ProfessionalPricingPage() {
                   3
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground mb-1">Clients Get Premium Access</h3>
+                  <h3 className="font-semibold text-foreground mb-1">Review With Consent</h3>
                   <p className="text-muted-foreground">
-                    Both parents receive premium features for 30 days. Voucher access can be extended as needed.
+                    Parents approve your access with scoped permissions. Every view is logged in an audit trail.
                   </p>
                 </div>
               </div>
@@ -365,9 +433,9 @@ export default function ProfessionalPricingPage() {
                   4
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground mb-1">You Get Case Access</h3>
+                  <h3 className="font-semibold text-foreground mb-1">Export Court-Ready Documentation</h3>
                   <p className="text-muted-foreground">
-                    Once both parents are on the platform, they can grant you read-only access to their case for professional review.
+                    Generate verified, tamper-evident reports — per report on the free plan, included with Solo and above.
                   </p>
                 </div>
               </div>
@@ -377,7 +445,7 @@ export default function ProfessionalPricingPage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-20 bg-card">
+      <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-semibold text-foreground mb-4">
@@ -389,7 +457,7 @@ export default function ProfessionalPricingPage() {
             {faqs.map((faq, index) => (
               <details
                 key={index}
-                className="group bg-background rounded-xl border border-border/50 overflow-hidden"
+                className="group bg-card rounded-xl border border-border/50 overflow-hidden"
               >
                 <summary className="flex items-center justify-between p-6 cursor-pointer list-none">
                   <span className="font-medium text-foreground">{faq.question}</span>
@@ -410,17 +478,17 @@ export default function ProfessionalPricingPage() {
       <section className="py-20 bg-gradient-to-br from-cg-sage-subtle to-cg-slate-subtle">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-semibold text-foreground mb-6">
-            Ready to help your clients co-parent better?
+            Ready to open a clean case file?
           </h2>
           <p className="text-lg text-muted-foreground mb-10 max-w-xl mx-auto">
-            Start your free trial today. No credit card required.
+            Create your free professional account today. No credit card required.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/court-portal/register?plan=pro-practice"
+              href="/register?redirect=/professional/onboarding"
               className="inline-flex items-center justify-center gap-2 bg-cg-sage text-white font-medium px-8 py-4 rounded-full text-lg transition-all duration-300 hover:bg-cg-sage-light hover:shadow-xl hover:-translate-y-1"
             >
-              Start Free Trial
+              Create Free Account
               <ArrowRight className="w-5 h-5" />
             </Link>
             <Link

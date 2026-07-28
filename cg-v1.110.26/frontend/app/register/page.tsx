@@ -230,7 +230,14 @@ function RegisterContent() {
         }
       }
 
-      router.push('/dashboard');
+      // Honor an explicit internal redirect (e.g. professional signup CTAs
+      // pass ?redirect=/professional/onboarding). Internal paths only.
+      const explicitRedirect = searchParams.get('redirect');
+      const safeRedirect =
+        explicitRedirect && explicitRedirect.startsWith('/') && !explicitRedirect.startsWith('//')
+          ? explicitRedirect
+          : null;
+      router.push(safeRedirect || '/dashboard');
     } catch (err) {
       if (err instanceof APIError) {
         setError(err.message);

@@ -95,9 +95,9 @@ type TabId = (typeof TABS)[number]["id"];
 const TIER_ORDER = ["starter", "solo", "small_firm", "mid_size", "enterprise"];
 const PLANS: Record<string, { name: string; monthlyPrice: string; annualPrice: string; cases: number | string; team: number | string; featureCount: number; isEnterprise?: boolean }> = {
   starter: { name: "Starter", monthlyPrice: "Free", annualPrice: "Free", cases: 3, team: 0, featureCount: 6 },
-  solo: { name: "Solo", monthlyPrice: "$99/mo", annualPrice: "$79/mo", cases: 15, team: 0, featureCount: 10 },
-  small_firm: { name: "Small Firm", monthlyPrice: "$299/mo", annualPrice: "$249/mo", cases: 50, team: 5, featureCount: 15 },
-  mid_size: { name: "Mid-Size", monthlyPrice: "$799/mo", annualPrice: "$649/mo", cases: 150, team: 15, featureCount: 18 },
+  solo: { name: "Solo", monthlyPrice: "$49/mo", annualPrice: "$41/mo", cases: 15, team: 0, featureCount: 10 },
+  small_firm: { name: "Firm", monthlyPrice: "$249/mo", annualPrice: "$208/mo", cases: 50, team: 5, featureCount: 15 },
+  mid_size: { name: "Mid-Size", monthlyPrice: "$599/mo", annualPrice: "$499/mo", cases: 150, team: 15, featureCount: 18 },
   enterprise: { name: "Enterprise", monthlyPrice: "Custom", annualPrice: "Custom", cases: "\u221E", team: 50, featureCount: 21, isEnterprise: true },
 };
 
@@ -497,7 +497,7 @@ function SubscriptionTab({
               {(["monthly", "annual"] as const).map((cycle) => (
                 <button key={cycle} onClick={() => setBillingCycle(cycle)}
                   className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${billingCycle === cycle ? "bg-cg-sage text-white shadow-sm" : "text-slate-600"}`}>
-                  {cycle === "monthly" ? "Monthly" : "Annual (Save 20%)"}
+                  {cycle === "monthly" ? "Monthly" : "Annual (2 months free)"}
                 </button>
               ))}
             </div>

@@ -41,9 +41,9 @@ TIER_ORDER = {
 
 TIER_DISPLAY_NAMES = {
     ProfessionalTier.STARTER: "Starter (Free)",
-    ProfessionalTier.SOLO: "Solo ($99/mo)",
-    ProfessionalTier.SMALL_FIRM: "Small Firm ($299/mo)",
-    ProfessionalTier.MID_SIZE: "Mid-Size ($799/mo)",
+    ProfessionalTier.SOLO: "Solo ($49/mo)",
+    ProfessionalTier.SMALL_FIRM: "Firm ($249/mo)",
+    ProfessionalTier.MID_SIZE: "Mid-Size ($599/mo)",
     ProfessionalTier.ENTERPRISE: "Enterprise (Custom)",
 }
 
@@ -159,7 +159,7 @@ async def enforce_team_limit(
             detail={
                 "error": "firm_not_supported",
                 "message": (
-                    "Firm features require Small Firm tier ($299/mo) or higher. "
+                    "Firm features require the Firm tier ($249/mo) or higher. "
                     "Your current tier doesn't support team members."
                 ),
                 "current_tier": current_tier.value,
@@ -215,18 +215,18 @@ def get_tier_features(tier: ProfessionalTier) -> dict:
             "ocr_processing": order >= 1,
             "compliance_reports": order >= 1,
             "call_logging": order >= 1,
-            # Small Firm+ (order >= 2)
+            # Firm+ (order >= 2)
             "firm_management": order >= 2,
             "team_members": order >= 2,
             "case_dispatcher": order >= 2,
             "firm_templates": order >= 2,
             "firm_analytics": order >= 2,
+            "featured_directory": order >= 2,
+            "priority_support": order >= 2,
+            "bulk_operations": order >= 2,
             # Mid-Size+ (order >= 3)
-            "featured_directory": order >= 3,
-            "priority_support": order >= 3,
-            "bulk_operations": order >= 3,
+            "api_access": order >= 3,
             # Enterprise (order >= 4)
-            "api_access": order >= 4,
             "custom_integrations": order >= 4,
             "dedicated_account_manager": order >= 4,
         },

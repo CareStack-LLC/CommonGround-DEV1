@@ -126,7 +126,7 @@ const comparisonCategories = [
     features: [
       { name: 'Web access', free: true, plus: true, complete: true },
       { name: 'Mobile apps', free: false, plus: 'Coming soon', complete: 'Coming soon' },
-      { name: 'Professional portal access', free: false, plus: false, complete: true },
+      { name: 'Invite professionals (attorney, GAL, mediator)', free: true, plus: true, complete: true },
       { name: 'Priority support', free: false, plus: false, complete: true },
     ],
   },
@@ -565,13 +565,13 @@ export default function PricingPage() {
               For Family Law Professionals
             </h3>
             <p className="text-gray-600 mb-4 max-w-xl mx-auto">
-              Free access for professionals. Your clients choose their own plans. Includes the Professional Portal, court-ready exports, and searchable directory listing.
+              Free access for professionals — your clients choose their own plans. Optional practice plans from $49/mo add AI intake, court-order OCR, included reports, and featured directory placement.
             </p>
             <button
-              onClick={() => router.push('/professionals')}
+              onClick={() => router.push('/pricing/professionals')}
               className="px-6 py-3 bg-[var(--portal-primary)] text-white rounded-xl font-medium hover:bg-cg-slate transition-all duration-200 shadow-md hover:shadow-lg"
             >
-              Schedule a Demo
+              See Professional Plans
             </button>
           </div>
         </div>

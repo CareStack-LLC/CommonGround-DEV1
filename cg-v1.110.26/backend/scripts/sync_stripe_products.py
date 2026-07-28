@@ -65,40 +65,46 @@ SUBSCRIPTION_PRODUCTS = {
         },
     },
     # Professional Tiers (BJIivbOFX7 account)
-    "professional_starter": {
-        "name": "Professional - Starter",
-        "description": "For professionals getting started with CommonGround",
-        "metadata": {"tier": "professional_starter", "type": "professional"},
-        "product_id": "prod_UCPQevbVaWJDfT",
-        "prices": {
-            "monthly": {"amount": Decimal("49.00"), "id": "price_1TE0bZBJIivbOFX7kmvDAoqr"},
-        },
-    },
+    # NOTE (2026-07 repricing): the paid "Professional - Starter" ($49) product
+    # prod_UCPQevbVaWJDfT is RETIRED — the starter tier is free and needs no
+    # Stripe product. Solo took over the $49 price point. New amounts require
+    # new Price objects (Stripe prices are immutable), so the entries below
+    # have no hardcoded price IDs — the script creates them and writes the IDs
+    # into subscription_plans; the webhook resolves them via its DB fallback.
     "professional_solo": {
         "name": "Professional - Solo",
-        "description": "For solo practitioners",
+        "description": "For independent attorneys and mediators managing up to 15 active cases. AI intake, court-order OCR, and included compliance reports.",
         "metadata": {"tier": "professional_solo", "type": "professional"},
         "product_id": "prod_UCPQVLqjYyuiRF",
+        "plan_code": "solo",
+        "display_name": "Solo Practitioner",
         "prices": {
-            "monthly": {"amount": Decimal("99.00"), "id": "price_1TE0baBJIivbOFX7dqc7W1Dp"},
+            "monthly": {"amount": Decimal("49.00")},
+            "annual": {"amount": Decimal("490.00")},
         },
     },
     "professional_small_firm": {
-        "name": "Professional - Small Firm",
-        "description": "For small firms and teams",
+        "name": "Professional - Firm",
+        "description": "For practices with up to 5 team members and 50 active cases. Firm management, case queue, templates, analytics, and featured directory placement.",
         "metadata": {"tier": "professional_small_firm", "type": "professional"},
         "product_id": "prod_UCPQOK9Qpuw1hB",
+        "plan_code": "small_firm",
+        "display_name": "Firm",
         "prices": {
-            "monthly": {"amount": Decimal("299.00"), "id": "price_1TE0baBJIivbOFX7smGjiSyj"},
+            "monthly": {"amount": Decimal("249.00")},
+            "annual": {"amount": Decimal("2490.00")},
         },
     },
     "professional_mid_size": {
         "name": "Professional - Mid-Size",
-        "description": "For mid-size firms with expanded case and team limits",
+        "description": "For growing practices with up to 15 team members and 150 active cases. Everything in Firm plus API access.",
         "metadata": {"tier": "professional_mid_size", "type": "professional"},
         "product_id": "prod_UCPQQwcr2VaCXs",
+        "plan_code": "mid_size",
+        "display_name": "Mid-Size Firm",
         "prices": {
-            "monthly": {"amount": Decimal("799.00"), "id": "price_1TE0bbBJIivbOFX78k6VF4wC"},
+            "monthly": {"amount": Decimal("599.00")},
+            "annual": {"amount": Decimal("5990.00")},
         },
     },
     # Reports (One-time payments, BJIivbOFX7 account)
@@ -157,6 +163,24 @@ SUBSCRIPTION_PRODUCTS = {
         },
     },
 }
+
+
+# Products to archive in Stripe (2026-07 repricing): the paid Professional
+# Starter tier was folded into the free starter tier.
+RETIRED_PRODUCT_IDS = ["prod_UCPQevbVaWJDfT"]  # Professional - Starter ($49)
+
+
+async def archive_retired_products(dry_run: bool = False) -> None:
+    """Mark retired products inactive in Stripe (existing subs are unaffected)."""
+    for product_id in RETIRED_PRODUCT_IDS:
+        if dry_run:
+            print(f"  [DRY RUN] Would archive retired product: {product_id}")
+            continue
+        try:
+            stripe.Product.modify(product_id, active=False)
+            print(f"  ✓ Archived retired product: {product_id}")
+        except stripe.error.InvalidRequestError:
+            print(f"  ⚠ Retired product not found (already gone?): {product_id}")
 
 
 async def create_or_update_product(config: dict) -> str:
@@ -265,21 +289,24 @@ async def update_database_plan(
     config: dict,
 ) -> None:
     """
-    Update subscription_plans table with Stripe IDs (for parent tiers).
+    Update subscription_plans table with Stripe IDs (parent + professional tiers).
     """
-    # Only update if it's a known parent tier
-    parent_plans = ["web_starter", "plus", "complete"]
-    if plan_code not in parent_plans:
+    # Professional configs carry an explicit plan_code (e.g. "solo") that
+    # differs from their SUBSCRIPTION_PRODUCTS key; parent tiers use the key.
+    db_plan_code = config.get("plan_code", plan_code)
+    known_plans = ["web_starter", "plus", "complete", "solo", "small_firm", "mid_size"]
+    if db_plan_code not in known_plans:
         return
 
     stmt = (
         update(SubscriptionPlan)
-        .where(SubscriptionPlan.plan_code == plan_code)
+        .where(SubscriptionPlan.plan_code == db_plan_code)
         .values(
             stripe_product_id=product_id,
             stripe_price_id_monthly=prices.get("monthly"),
             stripe_price_id_annual=prices.get("annual"),
-            display_name=config["name"],
+            # In-app display name; falls back to the Stripe product name.
+            display_name=config.get("display_name", config["name"]),
             description=config["description"],
             price_monthly=config["prices"].get("monthly", {}).get("amount", 0),
             price_annual=config["prices"].get("annual", {}).get("amount", 0),
@@ -342,6 +369,10 @@ async def sync_all_products(db: AsyncSession, dry_run: bool = False) -> None:
         )
 
         print()
+
+    print("Retiring discontinued products")
+    print("-" * 60)
+    await archive_retired_products(dry_run=dry_run)
 
     print("=" * 60)
     if dry_run:
