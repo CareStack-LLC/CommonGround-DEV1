@@ -249,17 +249,20 @@ async def create_or_update_price(
         except stripe.error.InvalidRequestError:
             print(f"    ⚠ Price ID {price_id} not found, creating...")
 
-    # Search for matching active price
-    query = f"product:'{product_id}' AND active:'true' AND unit_amount:'{amount_cents}'"
-    if interval != "one_time":
-        query += f" AND recurring['interval']:'{interval}'"
-    
-    existing_prices = stripe.Price.search(query=query, limit=1)
+    # Config intervals -> Stripe recurring intervals (None = one-time)
+    stripe_interval = {"monthly": "month", "annual": "year", "one_time": None}[interval]
 
-    if existing_prices.data:
-        price = existing_prices.data[0]
-        print(f"    ✓ Found matching price: {price.id} (${amount}/{interval})")
-        return price.id
+    # Find a matching active price. Stripe's search API cannot query
+    # unit_amount or recurring.interval, so list the product's active
+    # prices and filter here.
+    existing_prices = stripe.Price.list(product=product_id, active=True, limit=100)
+    for price in existing_prices.auto_paging_iter():
+        if price.unit_amount != amount_cents:
+            continue
+        found_interval = price.recurring.interval if price.recurring else None
+        if found_interval == stripe_interval:
+            print(f"    ✓ Found matching price: {price.id} (${amount}/{interval})")
+            return price.id
 
     # Create new price
     params = {
@@ -273,8 +276,8 @@ async def create_or_update_price(
         },
     }
     
-    if interval != "one_time":
-        params["recurring"] = {"interval": interval}
+    if stripe_interval is not None:
+        params["recurring"] = {"interval": stripe_interval}
 
     price = stripe.Price.create(**params)
     print(f"    ✓ Created new price: {price.id} (${amount}/{interval})")
