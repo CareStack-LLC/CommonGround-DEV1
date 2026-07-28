@@ -393,6 +393,36 @@ class CaseAssignmentService:
     # Access Logging
     # -------------------------------------------------------------------------
 
+    @staticmethod
+    async def record_access(
+        db: AsyncSession,
+        assignment: CaseAssignment,
+        action: str,
+        resource_type: Optional[str] = None,
+        resource_id: Optional[str] = None,
+        details: Optional[dict] = None,
+    ) -> None:
+        """Persist an access-log row for an already-verified assignment.
+
+        Cheap variant of log_access for read paths that hold the assignment:
+        no re-query, commits immediately. Call only where there is no other
+        pending transactional work.
+        """
+        db.add(
+            ProfessionalAccessLog(
+                id=str(uuid4()),
+                professional_id=assignment.professional_id,
+                firm_id=assignment.firm_id,
+                family_file_id=assignment.family_file_id,
+                action=action,
+                resource_type=resource_type,
+                resource_id=resource_id,
+                details=details or {},
+                logged_at=datetime.utcnow(),
+            )
+        )
+        await db.commit()
+
     async def log_access(
         self,
         professional_id: str,

@@ -47,46 +47,64 @@ class ProfessionalDocumentService:
         List documents accessible to a professional.
         If family_file_id is provided, only show docs for that case.
         Otherwise, show docs across all assigned cases.
+
+        Each document category is filtered by the assignment's access scopes:
+        agreements/accords need "agreement", reports need "compliance",
+        recordings need "circle".
         """
-        # 1. Get assigned family file IDs
-        assigned_ids = await self._get_assigned_ids(professional_id)
-        if not assigned_ids:
+        # 1. Get assigned family file IDs with their granted scopes
+        scopes_by_case = await self._get_assigned_scopes(professional_id)
+        if not scopes_by_case:
             return [], 0
-            
+
         if family_file_id:
-            if family_file_id not in assigned_ids:
+            if family_file_id not in scopes_by_case:
                 return [], 0
-            target_ids = [family_file_id]
-        else:
-            target_ids = assigned_ids
+            scopes_by_case = {family_file_id: scopes_by_case[family_file_id]}
+
+            # Audit: single-case document views leave a log entry.
+            from app.services.professional.assignment_service import (
+                CaseAssignmentService,
+            )
+            await CaseAssignmentService(self.db).log_access(
+                professional_id, family_file_id, "view_documents",
+                resource_type="documents",
+            )
+
+        def _ids_with_scope(scope: str) -> List[str]:
+            return [
+                ff_id for ff_id, scopes in scopes_by_case.items() if scope in scopes
+            ]
 
         all_docs = []
 
-        # 2. Fetch from various sources (Simplified for now)
-        # In a real implementation, we might union these or fetch in parallel
-        
+        # 2. Fetch from various sources, each limited to the cases whose
+        # assignment grants the matching data-category scope.
+
         # Agreements
         if not doc_type or doc_type == DocumentType.AGREEMENT:
-            agreements = await self._get_agreements(target_ids)
-            all_docs.extend(agreements)
+            ids = _ids_with_scope("agreement")
+            if ids:
+                all_docs.extend(await self._get_agreements(ids))
 
         # Quick Accords
         if not doc_type or doc_type == DocumentType.QUICK_ACCORD:
-            accords = await self._get_quick_accords(target_ids)
-            all_docs.extend(accords)
+            ids = _ids_with_scope("agreement")
+            if ids:
+                all_docs.extend(await self._get_quick_accords(ids))
 
         # Court Exports (Legacy Reports) & Compliance Reports (New)
         if not doc_type or doc_type == DocumentType.REPORT:
-            reports = await self._get_reports(target_ids)
-            all_docs.extend(reports)
-            
-            compliance_reports = await self._get_compliance_reports(target_ids)
-            all_docs.extend(compliance_reports)
+            ids = _ids_with_scope("compliance")
+            if ids:
+                all_docs.extend(await self._get_reports(ids))
+                all_docs.extend(await self._get_compliance_reports(ids))
 
         # Recordings
         if not doc_type or doc_type == DocumentType.RECORDING:
-            recordings = await self._get_recordings(target_ids)
-            all_docs.extend(recordings)
+            ids = _ids_with_scope("circle")
+            if ids:
+                all_docs.extend(await self._get_recordings(ids))
 
         # 3. Filtering and Sorting
         if search:
@@ -114,6 +132,20 @@ class ProfessionalDocumentService:
             )
         )
         return [row[0] for row in result.fetchall()]
+
+    async def _get_assigned_scopes(self, professional_id: str) -> dict:
+        """Map of family_file_id -> set of granted access scopes."""
+        result = await self.db.execute(
+            select(
+                CaseAssignment.family_file_id, CaseAssignment.access_scopes
+            ).where(
+                and_(
+                    CaseAssignment.professional_id == professional_id,
+                    CaseAssignment.status == "active",
+                )
+            )
+        )
+        return {row[0]: set(row[1] or []) for row in result.fetchall()}
 
     async def _get_agreements(self, family_file_ids: List[str]) -> List[dict]:
         result = await self.db.execute(

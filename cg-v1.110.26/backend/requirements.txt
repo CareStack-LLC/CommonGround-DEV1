@@ -52,6 +52,7 @@ structlog>=24.1.0
 pytest>=7.4.4
 pytest-asyncio>=0.23.3
 pytest-cov>=4.1.0
+aiosqlite>=0.20.0  # in-memory SQLite for unit tests (no Postgres needed)
 fakeredis>=2.26.0  # in-memory Redis for circuit breaker / ai_usage tests
 # End-to-end orchestrated test deps (tests/e2e/test_full_system_e2e.py):
 #   pytest-order enforces @pytest.mark.order sequencing

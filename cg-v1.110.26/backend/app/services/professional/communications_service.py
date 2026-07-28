@@ -419,6 +419,12 @@ class CommunicationsService:
         # the platform Terms) to assigned professionals viewing their messages.
         await self._require_parent_message_consent(family_file_id)
 
+        # Audit: every successful communications view leaves a log entry.
+        from app.services.professional.assignment_service import CaseAssignmentService
+        await CaseAssignmentService.record_access(
+            self.db, assignment, "view_communications", resource_type="messages"
+        )
+
         return assignment
 
     async def _require_parent_message_consent(self, family_file_id: str) -> None:

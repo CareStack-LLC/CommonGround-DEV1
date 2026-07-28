@@ -237,6 +237,62 @@ def get_report_by_code(code: str) -> Optional[dict]:
     return ALL_REPORTS.get(code.upper())
 
 
+# =============================================================================
+# Data-category scopes required to GENERATE each report type
+# =============================================================================
+# A professional's case assignment must include every scope listed for a
+# report's internal type — the export pipeline must never widen what the
+# viewing scopes deny. Unmapped internal types fail closed (full read surface
+# required) so new report types must be classified here before restricted
+# assignments can generate them.
+
+FULL_READ_SCOPES = frozenset(
+    {"messages", "schedule", "financials", "compliance", "agreement"}
+)
+
+REPORT_REQUIRED_SCOPES: dict[str, frozenset] = {
+    "communication": frozenset({"messages"}),
+    "communication_analysis": frozenset({"messages"}),
+    "expense": frozenset({"financials"}),
+    "financial_compliance": frozenset({"financials"}),
+    "schedule": frozenset({"schedule"}),
+    "custody_time": frozenset({"schedule"}),
+    "exchange_compliance": frozenset({"schedule"}),
+    "custody_compliance_report": frozenset({"schedule", "compliance"}),
+    "agreement_status": frozenset({"agreement"}),
+    "client_progress": frozenset({"compliance"}),
+    "risk_assessment": frozenset({"messages", "compliance"}),
+    "court_investigation_package": frozenset(
+        {"messages", "schedule", "financials"}
+    ),
+    "gal_welfare": frozenset({"messages", "schedule", "compliance"}),
+    "kidspace_communication": frozenset({"circle"}),
+    "kidspace_communication_court": frozenset({"circle"}),
+    # Firm-level metrics — no per-family data categories.
+    "firm_analytics": frozenset(),
+}
+
+
+def resolve_internal_type(report_type: Optional[str]) -> Optional[str]:
+    """Resolve a spec code ("A-1") or internal name to the internal type."""
+    if not report_type:
+        return None
+    by_code = ALL_REPORTS.get(report_type.upper())
+    if by_code:
+        return by_code["internal_type"]
+    if report_type in INTERNAL_TO_SPEC_CODE or report_type in REPORT_REQUIRED_SCOPES:
+        return report_type
+    return report_type  # unknown — caller's scope check fails closed
+
+
+def get_required_scopes(report_type: Optional[str]) -> set:
+    """Scopes an assignment must include to generate this report (fail-closed)."""
+    internal = resolve_internal_type(report_type)
+    if internal is None:
+        return set(FULL_READ_SCOPES)
+    return set(REPORT_REQUIRED_SCOPES.get(internal, FULL_READ_SCOPES))
+
+
 def get_parent_reports() -> list[dict]:
     """Get all parent report definitions."""
     return list(PARENT_REPORTS.values())

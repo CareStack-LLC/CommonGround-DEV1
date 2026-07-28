@@ -33,6 +33,40 @@ class ComplianceReportService:
     def __init__(self, db: AsyncSession):
         self.db = db
 
+    async def _enforce_report_scopes(
+        self,
+        professional_id: str,
+        family_file_id: str,
+        report_type: Optional[str],
+    ) -> None:
+        """Require an active assignment whose scopes cover the report's data.
+
+        Fail-closed: unknown report types require the full read surface.
+        Raises ValueError with the missing scopes on denial.
+        """
+        from app.models.professional import AssignmentStatus, CaseAssignment
+        from app.services.reports.report_registry import get_required_scopes
+
+        result = await self.db.execute(
+            select(CaseAssignment).where(
+                CaseAssignment.professional_id == professional_id,
+                CaseAssignment.family_file_id == family_file_id,
+                CaseAssignment.status == AssignmentStatus.ACTIVE.value,
+            )
+        )
+        assignment = result.scalar_one_or_none()
+        if not assignment:
+            raise ValueError("No active assignment for this case")
+
+        granted = set(assignment.access_scopes or [])
+        missing = sorted(get_required_scopes(report_type) - granted)
+        if missing:
+            raise ValueError(
+                "Your case access does not include the data this report "
+                f"contains (missing scope(s): {', '.join(missing)}). "
+                "Ask the family to broaden your access."
+            )
+
     async def create_report(
         self, 
         professional_id: str, 
@@ -40,7 +74,15 @@ class ComplianceReportService:
     ) -> ComplianceReport:
         """
         Create a new report record (starts as pending).
+
+        Raises ValueError when the professional's active assignment does not
+        include every data-category scope the report contains — generating a
+        report must never widen what the viewing scopes deny.
         """
+        await self._enforce_report_scopes(
+            professional_id, data.family_file_id, data.report_type
+        )
+
         # Phase 1: support export_format, title, signature_line
         export_format = getattr(data, 'export_format', None) or ReportExportFormat.PDF.value
         title = getattr(data, 'title', None)

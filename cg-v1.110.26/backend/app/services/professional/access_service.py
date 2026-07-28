@@ -33,6 +33,34 @@ from app.schemas.professional import (
 )
 
 
+# All access scopes a case assignment can carry. ("read"/"message" are the
+# coarse legacy scopes used by firm directory invites.)
+VALID_ACCESS_SCOPES = frozenset({
+    "agreement", "schedule", "checkins", "messages", "financials",
+    "compliance", "interventions", "circle", "read", "message",
+})
+
+
+# =============================================================================
+# Consent policy
+# =============================================================================
+
+def _required_consent_sides(representing: Optional[str]) -> tuple[bool, bool]:
+    """Return (needs_parent_a, needs_parent_b) for a representation value.
+
+    Policy: a professional representing ONE parent needs that parent's
+    approval only — they gain read access to the shared case record the
+    retaining parent can already see. Neutral roles ("both") and
+    court-appointed roles ("court", e.g. GALs) need BOTH parents' consent.
+    Unknown/unspecified representation is treated as neutral (both parents).
+    """
+    if representing == "parent_a":
+        return True, False
+    if representing == "parent_b":
+        return False, True
+    return True, True
+
+
 # =============================================================================
 # Access Service
 # =============================================================================
@@ -42,6 +70,48 @@ class ProfessionalAccessService:
 
     def __init__(self, db: AsyncSession):
         self.db = db
+
+    async def consent_satisfied(
+        self,
+        request: ProfessionalAccessRequest,
+        representing: Optional[str] = None,
+    ) -> bool:
+        """Whether the parental consent required for this request is in place.
+
+        ``representing`` overrides ``request.representing`` when the caller
+        resolves representation at assignment time. A parent slot that does
+        not exist on the family file (single-parent files) is not required,
+        but at least one recorded approval is always required.
+        """
+        family_file = await self._get_family_file(request.family_file_id)
+        if not family_file:
+            return False
+
+        needs_a, needs_b = _required_consent_sides(
+            representing or request.representing
+        )
+        if not family_file.parent_a_id:
+            needs_a = False
+        if not family_file.parent_b_id:
+            needs_b = False
+
+        if not needs_a and not needs_b:
+            # Never allow a consent-free grant.
+            return bool(request.parent_a_approved or request.parent_b_approved)
+
+        return (not needs_a or bool(request.parent_a_approved)) and (
+            not needs_b or bool(request.parent_b_approved)
+        )
+
+    def _representing_side_of(
+        self, family_file: FamilyFile, user_id: str
+    ) -> Optional[str]:
+        """Map a parent user id to "parent_a"/"parent_b" (None if not a parent)."""
+        if user_id and str(family_file.parent_a_id) == str(user_id):
+            return "parent_a"
+        if user_id and str(family_file.parent_b_id) == str(user_id):
+            return "parent_b"
+        return None
 
     # -------------------------------------------------------------------------
     # Parent Invites Professional
@@ -75,6 +145,11 @@ class ProfessionalAccessService:
         # Validate inviter is a participant
         if not await self._is_family_file_participant(family_file_id, inviter_id):
             raise ValueError("User is not a participant in this family file")
+
+        # A parent inviting "their" professional without naming a side is
+        # retaining that professional for themselves.
+        if representing is None:
+            representing = self._representing_side_of(family_file, inviter_id)
 
         # Check if professional exists
         professional = await self._get_professional_by_email(email)
@@ -142,6 +217,11 @@ class ProfessionalAccessService:
         professional = await self._get_professional(professional_id)
         if not professional:
             raise ValueError("Professional not found")
+
+        # A parent inviting "their" professional without naming a side is
+        # retaining that professional for themselves.
+        if representing is None:
+            representing = self._representing_side_of(family_file, inviter_id)
 
         # Check for existing pending request
         existing = await self._get_pending_request(family_file_id, professional_id=professional_id)
@@ -274,6 +354,8 @@ class ProfessionalAccessService:
             requested_by="parent",
             requested_by_user_id=inviter_user_id,
             requested_scopes=["read", "message"],  # Default scopes for invited firms
+            # Directory invites retain the firm for the inviting parent's side.
+            representing="parent_a" if is_parent_a else "parent_b",
             message=message,
             status=AccessRequestStatus.PENDING.value,
             # Parent who invites auto-approves
@@ -302,7 +384,11 @@ class ProfessionalAccessService:
         """
         Parent approves an access request.
 
-        If both parents have approved, the request becomes fully approved.
+        The request becomes APPROVED once the consent required for its
+        representation is in place: the represented parent's approval for
+        one-sided representation ("parent_a"/"parent_b"); BOTH parents'
+        approvals for neutral ("both"), court-appointed ("court"), or
+        unspecified representation.
         """
         request = await self.get_request(request_id)
         if not request:
@@ -338,8 +424,10 @@ class ProfessionalAccessService:
             request.parent_b_approved = True
             request.parent_b_approved_at = now
 
-        # Only one parent needs to approve - professional represents one side
-        if request.parent_a_approved or request.parent_b_approved:
+        # Representation determines whose consent is required (see
+        # _required_consent_sides): one-sided representation needs the
+        # represented parent; neutral/court/unspecified needs both parents.
+        if await self.consent_satisfied(request):
             request.status = AccessRequestStatus.APPROVED.value
             request.approved_at = now
 
@@ -400,9 +488,12 @@ class ProfessionalAccessService:
         """
         Professional accepts a parent's invitation.
 
-        Creates the case assignment immediately so the professional can see the case
-        on their dashboard. The assignment is created even if only one parent has
-        approved - dual-parent approval status can be tracked separately.
+        The case assignment is only created once the parental consent
+        required for the representation is in place (the represented parent
+        for one-sided representation; both parents for neutral/court roles).
+        If consent is still outstanding, the request stays pending with
+        ``professional_accepted`` set, and the assignment is created when the
+        remaining parent approves.
         """
         request = await self.get_request(request_id)
         if not request:
@@ -416,37 +507,54 @@ class ProfessionalAccessService:
         if request.case_assignment_id:
             raise ValueError("This invitation has already been accepted")
 
+        if request.status in (
+            AccessRequestStatus.DECLINED.value,
+            AccessRequestStatus.EXPIRED.value,
+        ):
+            raise ValueError(f"This invitation is no longer open (status: {request.status})")
+
+        # Check expiry
+        if request.expires_at and datetime.utcnow() > request.expires_at:
+            request.status = AccessRequestStatus.EXPIRED.value
+            await self.db.commit()
+            raise ValueError("This invitation has expired")
+
         # Link professional if not already linked (email invite)
         if not request.professional_id:
             request.professional_id = professional_id
 
         # Mark as accepted by professional
+        now = datetime.utcnow()
         request.professional_accepted = True
-        request.professional_accepted_at = datetime.utcnow()
-        request.updated_at = datetime.utcnow()
+        request.professional_accepted_at = now
+        request.updated_at = now
 
         await self.db.commit()
         await self.db.refresh(request)
 
-        # Create the assignment immediately when professional accepts
-        # This allows the case to show on the professional's dashboard
-        # Determine assignment role from requested_role or default
-        assignment_role = AssignmentRole.LEAD_ATTORNEY
-        if request.requested_role:
-            try:
-                assignment_role = AssignmentRole(request.requested_role)
-            except ValueError:
-                pass  # Use default
+        # Create the assignment only when required parental consent is present;
+        # otherwise the case appears once the remaining parent approves.
+        if await self.consent_satisfied(request):
+            if request.status == AccessRequestStatus.PENDING.value:
+                request.status = AccessRequestStatus.APPROVED.value
+                request.approved_at = datetime.utcnow()
+                await self.db.commit()
 
-        assignment = await self._create_assignment_for_accepted_request(
-            request=request,
-            assignment_role=assignment_role,
-            representing=request.representing or "both",
-        )
-        request.case_assignment_id = assignment.id
-        request.updated_at = datetime.utcnow()
-        await self.db.commit()
-        await self.db.refresh(request)
+            assignment_role = AssignmentRole.LEAD_ATTORNEY
+            if request.requested_role:
+                try:
+                    assignment_role = AssignmentRole(request.requested_role)
+                except ValueError:
+                    pass  # Use default
+
+            assignment = await self.create_assignment_from_request(
+                request=request,
+                assignment_role=assignment_role,
+            )
+            request.case_assignment_id = assignment.id
+            request.updated_at = datetime.utcnow()
+            await self.db.commit()
+            await self.db.refresh(request)
 
         return request
 
@@ -486,10 +594,15 @@ class ProfessionalAccessService:
         self,
         request: ProfessionalAccessRequest,
         assignment_role: AssignmentRole = AssignmentRole.LEAD_ATTORNEY,
-        representing: str = "both",
+        representing: Optional[str] = None,
     ) -> CaseAssignment:
         """
         Create a case assignment from a fully approved access request.
+
+        ``representing`` falls back to the request's representation, then
+        "both". Consent is enforced here for every creation path: one-sided
+        representation requires the represented parent's approval; neutral
+        ("both"), court, or unspecified representation requires both parents.
 
         Inherits settings from the firm when available:
         - can_control_aria: Based on role and firm settings
@@ -501,6 +614,16 @@ class ProfessionalAccessService:
 
         if not request.professional_id:
             raise ValueError("Request has no linked professional")
+
+        # Resolve the effective representation and enforce the consent policy
+        # regardless of which caller created the request.
+        representing = representing or request.representing or "both"
+        if not await self.consent_satisfied(request, representing=representing):
+            raise ValueError(
+                "Required parental consent has not been obtained. A professional "
+                "representing one parent needs that parent's approval; neutral "
+                "and court-appointed roles need approval from both parents."
+            )
 
         # Enforce case limit for the assigned professional
         from app.models.professional import TIER_CASE_LIMITS, ProfessionalTier
@@ -574,19 +697,13 @@ class ProfessionalAccessService:
         if "can_message_by_default" in firm_settings:
             can_message = firm_settings["can_message_by_default"]
 
-        # Determine if dual-parent consent is required (GAL = "court" representing)
-        needs_dual_consent = representing == "court"
-        has_dual_consent = (
+        # Record dual-parent consent state on the assignment (the consent gate
+        # above already enforced it). Reports flagged requires_dual_consent
+        # check these fields again at generation time.
+        needs_dual_consent = representing in ("both", "court")
+        has_dual_consent = bool(
             request.parent_a_approved and request.parent_b_approved
         )
-
-        # Gate: a consent-required (GAL/court) assignment cannot be created until
-        # BOTH parents have approved — enforced here, not only at report time.
-        if needs_dual_consent and not has_dual_consent:
-            raise ValueError(
-                "This assignment requires consent from both parents before it "
-                "can be created. Both parents must approve the access request."
-            )
 
         # Block conflicts of interest before creating the assignment.
         from app.services.professional.conflict_service import ConflictCheckService
@@ -860,6 +977,68 @@ class ProfessionalAccessService:
     # Revoke Access
     # -------------------------------------------------------------------------
 
+    async def update_assignment_scopes(
+        self,
+        family_file_id: str,
+        assignment_id: str,
+        new_scopes: list[str],
+        updater_user_id: str,
+    ) -> CaseAssignment:
+        """
+        Parent narrows (or otherwise edits) a professional's access scopes
+        on an active assignment — the alternative to all-or-nothing revoke.
+
+        Only a parent on the family file may do this. The change is recorded
+        in the professional access log with the old and new scope sets.
+        """
+        family_file = await self._get_family_file(family_file_id)
+        if not family_file:
+            raise ValueError("Family file not found")
+
+        is_parent = (
+            updater_user_id == family_file.parent_a_id or
+            updater_user_id == family_file.parent_b_id
+        )
+        if not is_parent:
+            raise ValueError("User is not a parent on this family file")
+
+        invalid = set(new_scopes) - VALID_ACCESS_SCOPES
+        if invalid:
+            raise ValueError(f"Unknown access scope(s): {', '.join(sorted(invalid))}")
+
+        result = await self.db.execute(
+            select(CaseAssignment).where(
+                and_(
+                    CaseAssignment.id == assignment_id,
+                    CaseAssignment.family_file_id == family_file_id,
+                )
+            )
+        )
+        assignment = result.scalar_one_or_none()
+        if not assignment:
+            raise ValueError("Assignment not found")
+        if assignment.status != AssignmentStatus.ACTIVE.value:
+            raise ValueError("Assignment is not active")
+
+        old_scopes = list(assignment.access_scopes or [])
+        assignment.access_scopes = sorted(set(new_scopes))
+        assignment.updated_at = datetime.utcnow()
+
+        # Audit the change with before/after and the acting parent.
+        from app.services.professional.assignment_service import CaseAssignmentService
+        await CaseAssignmentService.record_access(
+            self.db, assignment, "scopes_updated",
+            resource_type="case_assignment",
+            resource_id=assignment.id,
+            details={
+                "old_scopes": old_scopes,
+                "new_scopes": assignment.access_scopes,
+                "updated_by_user_id": updater_user_id,
+            },
+        )
+        await self.db.refresh(assignment)
+        return assignment
+
     async def revoke_professional_access(
         self,
         family_file_id: str,
@@ -1024,100 +1203,3 @@ class ProfessionalAccessService:
                 "parent_b_approved_at": now,
             }
         return {}
-
-    async def _create_assignment_for_accepted_request(
-        self,
-        request: ProfessionalAccessRequest,
-        assignment_role: AssignmentRole = AssignmentRole.LEAD_ATTORNEY,
-        representing: str = "both",
-    ) -> CaseAssignment:
-        """
-        Create a case assignment when a professional accepts an invitation.
-
-        This is called regardless of parent approval status - the assignment is
-        created so the professional can see the case on their dashboard. The
-        dual-parent approval status is tracked on the access request.
-        """
-        if not request.professional_id:
-            raise ValueError("Request has no linked professional")
-
-        # Check for existing assignment
-        existing = await self._get_existing_assignment(
-            request.professional_id,
-            request.family_file_id,
-        )
-        if existing:
-            if existing.status == AssignmentStatus.ACTIVE.value:
-                raise ValueError("Professional already has an active assignment to this case")
-            # Reactivate existing assignment
-            existing.status = AssignmentStatus.ACTIVE.value
-            existing.access_scopes = request.requested_scopes
-            existing.assigned_at = datetime.utcnow()
-            existing.updated_at = datetime.utcnow()
-            await self.db.commit()
-            await self.db.refresh(existing)
-            return existing
-
-        # Load firm settings if firm is specified
-        firm_settings = {}
-        if request.firm_id:
-            firm = await self.db.execute(
-                select(Firm).where(Firm.id == request.firm_id)
-            )
-            firm = firm.scalar_one_or_none()
-            if firm and firm.settings:
-                firm_settings = firm.settings
-
-        # Determine ARIA control permissions based on role
-        aria_control_roles = [
-            AssignmentRole.LEAD_ATTORNEY.value,
-            AssignmentRole.MEDIATOR.value,
-            AssignmentRole.PARENTING_COORDINATOR.value,
-        ]
-        can_control_aria = assignment_role.value in aria_control_roles
-
-        # Override with firm setting if specified
-        if "can_control_aria_by_default" in firm_settings:
-            can_control_aria = firm_settings["can_control_aria_by_default"]
-
-        # Inherit ARIA preferences from firm
-        aria_preferences = {}
-        if "default_aria_settings" in firm_settings:
-            aria_preferences = firm_settings["default_aria_settings"]
-
-        # Determine messaging permissions
-        can_message = assignment_role.value != AssignmentRole.PARALEGAL.value
-        if "can_message_by_default" in firm_settings:
-            can_message = firm_settings["can_message_by_default"]
-
-        # Block conflicts of interest before creating the assignment.
-        from app.services.professional.conflict_service import ConflictCheckService
-        await ConflictCheckService(self.db).assert_no_blocking_conflicts(
-            professional_id=request.professional_id,
-            family_file_id=request.family_file_id,
-            representing=representing,
-            assignment_role=assignment_role.value,
-            firm_id=request.firm_id,
-        )
-
-        # Create new assignment
-        assignment = CaseAssignment(
-            id=str(uuid4()),
-            professional_id=request.professional_id,
-            firm_id=request.firm_id,
-            family_file_id=request.family_file_id,
-            assignment_role=assignment_role.value,
-            representing=representing,
-            access_scopes=request.requested_scopes,
-            can_control_aria=can_control_aria,
-            aria_preferences=aria_preferences if aria_preferences else None,
-            can_message_client=can_message,
-            status=AssignmentStatus.ACTIVE.value,
-            assigned_at=datetime.utcnow(),
-        )
-
-        self.db.add(assignment)
-        await self.db.commit()
-        await self.db.refresh(assignment)
-
-        return assignment

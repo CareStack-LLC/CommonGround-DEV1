@@ -47,9 +47,9 @@ class ProfessionalTier(str, Enum):
     Each tier has different case limits, feature access, and team capabilities.
     """
     STARTER = "starter"         # Free — 3 active cases
-    SOLO = "solo"               # $99/mo — 15 active cases
-    SMALL_FIRM = "small_firm"   # $299/mo — 50 active cases, 3 team members
-    MID_SIZE = "mid_size"       # $799/mo — 150 active cases, 10 team members
+    SOLO = "solo"               # $49/mo — 15 active cases
+    SMALL_FIRM = "small_firm"   # $249/mo ("Firm") — 50 active cases, 5 team members
+    MID_SIZE = "mid_size"       # $599/mo — 150 active cases, 15 team members
     ENTERPRISE = "enterprise"   # Custom — unlimited
 
 
@@ -66,8 +66,8 @@ TIER_CASE_LIMITS = {
 TIER_TEAM_LIMITS = {
     ProfessionalTier.STARTER: 0,
     ProfessionalTier.SOLO: 0,
-    ProfessionalTier.SMALL_FIRM: 3,
-    ProfessionalTier.MID_SIZE: 10,
+    ProfessionalTier.SMALL_FIRM: 5,
+    ProfessionalTier.MID_SIZE: 15,
     ProfessionalTier.ENTERPRISE: 999999,
 }
 
@@ -502,8 +502,10 @@ class CaseAssignment(Base, UUIDMixin, TimestampMixin):
     professional_id: Mapped[str] = mapped_column(
         String(36), ForeignKey("professional_profiles.id"), index=True
     )
-    firm_id: Mapped[str] = mapped_column(
-        String(36), ForeignKey("firms.id"), index=True
+    # Nullable: solo practitioners take assignments without a firm
+    # (e.g. a parent invites their attorney directly by email).
+    firm_id: Mapped[Optional[str]] = mapped_column(
+        String(36), ForeignKey("firms.id"), index=True, nullable=True
     )
     family_file_id: Mapped[str] = mapped_column(
         String(36), ForeignKey("family_files.id"), index=True

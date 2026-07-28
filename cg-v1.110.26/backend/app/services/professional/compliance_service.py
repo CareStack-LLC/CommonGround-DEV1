@@ -330,6 +330,12 @@ class ProfessionalComplianceService:
         if required_scope not in (assignment.access_scopes or []):
             raise ValueError(f"Professional does not have {required_scope} access")
 
+        # Audit: every successful compliance-data view leaves a log entry.
+        from app.services.professional.assignment_service import CaseAssignmentService
+        await CaseAssignmentService.record_access(
+            self.db, assignment, "view_compliance", resource_type=required_scope
+        )
+
         return assignment
 
     async def _get_family_file(self, family_file_id: str) -> Optional[FamilyFile]:

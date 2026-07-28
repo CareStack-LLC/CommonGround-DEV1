@@ -33,7 +33,7 @@ from app.services.agreement import AgreementService
 from app.models.child import ChildProfileStatus
 from app.services.professional import ProfessionalAccessService, CaseAssignmentService
 from app.services.parent_call import parent_call_service
-from app.schemas.professional import CaseAssignmentCreate, AssignmentRole
+from app.schemas.professional import AssignmentRole
 from app.utils.sentry_helpers import capture_error
 import logging
 
@@ -840,8 +840,13 @@ async def approve_professional_access_request(
     """
     Approve a professional's access request.
 
-    - Both parents must approve before the professional gets access
-    - Once both approve, a case assignment is automatically created
+    Consent policy (enforced in ProfessionalAccessService):
+    - A professional representing ONE parent needs that parent's approval.
+    - Neutral ("both"), court-appointed ("court"), or unspecified
+      representation requires BOTH parents' approval.
+    - Once the required consent is in place (and the professional has
+      accepted, for parent-initiated invites), a case assignment is created
+      through the gated path (conflict check, case limits, consent).
     """
     ff_service = FamilyFileService(db)
     family_file = await ff_service.get_family_file(family_file_id, current_user)
@@ -880,23 +885,30 @@ async def approve_professional_access_request(
                 detail="An error occurred while processing your request."
             )
 
-    # If fully approved (both parents), create case assignment
-    if request.status == "approved" and not request.case_assignment_id:
-        assignment_service = CaseAssignmentService(db)
-        assignment_data = CaseAssignmentCreate(
-            family_file_id=family_file_id,
-            assignment_role=AssignmentRole(request.requested_role) if request.requested_role else AssignmentRole.LEAD_ATTORNEY,
-            access_scopes=request.requested_scopes or ["agreement", "schedule", "messages"],
-            representing=request.representing or "both",
-            can_control_aria=True,
-            can_message_client=True,
-        )
+    # Create the assignment once required consent is in place AND the
+    # professional side has actually joined the case: pro-initiated requests
+    # imply acceptance; parent-initiated invites wait for the professional
+    # to accept (the assignment is then created on acceptance).
+    if (
+        request.status == "approved"
+        and not request.case_assignment_id
+        and request.professional_id
+        and (request.professional_accepted or request.requested_by == "professional")
+    ):
         try:
-            assignment = await assignment_service.create_assignment(
-                professional_id=request.professional_id,
-                family_file_id=family_file_id,
-                data=assignment_data,
-                assigned_by=current_user.id,
+            assignment_role = (
+                AssignmentRole(request.requested_role)
+                if request.requested_role
+                else AssignmentRole.LEAD_ATTORNEY
+            )
+        except ValueError:
+            assignment_role = AssignmentRole.LEAD_ATTORNEY
+
+        try:
+            # Gated path: enforces consent policy, conflict checks, case limits.
+            assignment = await access_service.create_assignment_from_request(
+                request,
+                assignment_role=assignment_role,
             )
             request.case_assignment_id = assignment.id
             await db.commit()
@@ -1338,4 +1350,47 @@ async def remove_professional(
         "id": assignment.id,
         "status": assignment.status,
         "message": "Professional access has been revoked"
+    }
+
+
+@router.patch("/{family_file_id}/professionals/{assignment_id}/scopes")
+async def update_professional_scopes(
+    family_file_id: str,
+    assignment_id: str,
+    access_scopes: list[str] = Body(..., embed=True),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Update a professional's access scopes on this Family File.
+
+    Lets a parent narrow (or broaden) what an assigned professional can see
+    without revoking access entirely. The change is audit-logged with the
+    old and new scope sets.
+    """
+    ff_service = FamilyFileService(db)
+    await ff_service.get_family_file(family_file_id, current_user)
+
+    access_service = ProfessionalAccessService(db)
+
+    try:
+        assignment = await access_service.update_assignment_scopes(
+            family_file_id=family_file_id,
+            assignment_id=assignment_id,
+            new_scopes=access_scopes,
+            updater_user_id=str(current_user.id),
+        )
+    except ValueError as e:
+        logger.error(f"Failed to update professional scopes: {e}")
+        capture_error(e)
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="An error occurred while processing your request."
+        )
+
+    return {
+        "id": assignment.id,
+        "status": assignment.status,
+        "access_scopes": assignment.access_scopes,
+        "message": "Professional access scopes updated"
     }

@@ -1267,27 +1267,17 @@ async def accept_firm_invitation(
         invitation.professional_accepted = True
         invitation.professional_accepted_at = datetime.utcnow()
 
-        # If it's a representation role (Attorney), we can finalize if the representing parent approved
-        # This supports unilateral representation assignment
-        if (invitation.requested_role in [AssignmentRole.LEAD_ATTORNEY.value, AssignmentRole.ASSOCIATE.value]) or \
-           (invitation.representing in ["parent_a", "parent_b"] and \
-            ((invitation.representing == "parent_a" and invitation.parent_a_approved) or \
-             (invitation.representing == "parent_b" and invitation.parent_b_approved))):
-            
+        # Finalize only when the required parental consent is in place:
+        # the represented parent for one-sided representation, both parents
+        # for neutral/court roles. Otherwise the invitation stays pending and
+        # the assignment is created when the remaining parent approves.
+        if await access_service.consent_satisfied(invitation):
             invitation.status = AccessRequestStatus.APPROVED.value
             invitation.approved_at = datetime.utcnow()
-            
-            # Create case assignment
+
+            # Gated path: enforces consent policy, conflict checks, case limits.
             assignment = await access_service.create_assignment_from_request(invitation)
             invitation.case_assignment_id = str(assignment.id)
-        else:
-            # For neutral roles, we still need both parents if professional-initiated
-            # or just wait for the other parent if it's dual-approval required
-            if invitation.parent_a_approved and invitation.parent_b_approved:
-                invitation.status = AccessRequestStatus.APPROVED.value
-                invitation.approved_at = datetime.utcnow()
-                assignment = await access_service.create_assignment_from_request(invitation)
-                invitation.case_assignment_id = str(assignment.id)
 
         # Log the event
         audit_service = FirmAuditLogService(db)
@@ -3648,7 +3638,14 @@ async def generate_compliance_report(
     # Force the family_file_id to match the path
     data.family_file_id = family_file_id
 
-    report = await ComplianceReportService(db).create_report(profile.id, data)
+    try:
+        # Service enforces the data-category scope gate (fail-closed).
+        report = await ComplianceReportService(db).create_report(profile.id, data)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=str(e),
+        )
     await _audit_report_action(
         db, request, "report.generate", report.id,
         family_file_id, str(profile.user_id),
